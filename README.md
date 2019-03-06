@@ -2,7 +2,7 @@ Easy Scheduler
 ============
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-## 我们目前正在寻找开源种子用户，有意向的伙伴请点击 [种子用户申请](http://http://geek.analysys.cn/topic/52 "种子用户申请") 评论处留言，谢谢！
+## 我们目前正在寻找开源种子用户，有意向的伙伴请点击 [种子用户申请](http://geek.analysys.cn/topic/52 "种子用户申请") 评论处留言，谢谢！
 
 
 > Easy Scheduler Engine for Big Data
