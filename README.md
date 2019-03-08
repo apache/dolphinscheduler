@@ -27,7 +27,7 @@ Easy Scheduler
 
 [EasyScheduler使用手册](EasyScheduler使用手册.docx "EasyScheduler使用手册") 
 
-[数据调度系统架构分享](http://http://geek.analysys.cn/topic/24 "数据调度系统架构分享") 
+[数据调度系统架构分享](http://geek.analysys.cn/topic/24 "数据调度系统架构分享") 
  
  
 更多文档也在整理上传中，请稍作等待...
