@@ -23,11 +23,10 @@ Easy Scheduler
 
 文档
 =============
-前端部署文档：https://analysys.github.io/EasyScheduler/pages/deploy-foreground.html
+[前端部署文档](https://analysys.github.io/EasyScheduler/pages/deploy-foreground.html?_blank "前端部署文档") 
+[后端部署文档](https://analysys.github.io/EasyScheduler/pages/deploy-background.html?_blank "后端部署文档") 
 
-后端部署文档：https://analysys.github.io/EasyScheduler/pages/deploy-background.html
-
-[EasyScheduler使用手册](EasyScheduler使用手册.docx "EasyScheduler使用手册") 
+[使用手册](https://analysys.github.io/EasyScheduler/pages/guide-manual.html?_blank "使用手册") 
 
 [数据调度系统架构分享](http://geek.analysys.cn/topic/24 "数据调度系统架构分享") 
  
