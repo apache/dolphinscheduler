@@ -23,8 +23,9 @@ Easy Scheduler
 
 文档
 =============
-[前端部署文档](https://analysys.github.io/EasyScheduler/pages/deploy-foreground.html?_blank "前端部署文档") 
-[后端部署文档](https://analysys.github.io/EasyScheduler/pages/deploy-background.html?_blank "后端部署文档") 
+<a href="https://analysys.github.io/EasyScheduler/pages/deploy-background.html" target="_blank">后端部署文档</a>
+
+<a href="https://analysys.github.io/EasyScheduler/pages/deploy-foreground.html" target="_blank">前端部署文档</a>
 
 [使用手册](https://analysys.github.io/EasyScheduler/pages/guide-manual.html?_blank "使用手册") 
 
