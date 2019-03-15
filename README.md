@@ -6,7 +6,7 @@ Easy Scheduler
 ## 非常欢迎大家加入到开源队伍中来！！！
 
 
-> Easy Scheduler Engine for Big Data
+> Easy Scheduler for Big Data
 
 主要解决数据研发ETL错综复杂的依赖关系，而不能直观监控任务健康状态等问题。EasyScheduler以DAG流式的方式将Task组装起来，可实时监控任务的运行状态，同时支持重试、从指定节点恢复失败、暂停及Kill任务等操作。
 
