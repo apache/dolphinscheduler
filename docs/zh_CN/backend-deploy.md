@@ -1,0 +1,550 @@
+# 部署文档
+
+
+## 基础软件安装
+
+ * [mysql](https://blog.csdn.net/u011886447/article/details/79796802) (5.5+) :  必装
+ * [zookeeper](https://www.jianshu.com/p/de90172ea680)(3.4.6) ：必装 
+ * [hadoop](https://blog.csdn.net/Evankaka/article/details/51612437)(2.7.3) ：选装，资源上传，MR任务提交需要安装
+ * [hive](https://staroon.pro/2017/12/09/HiveInstall/)(1.2.1) :  选装，hive任务提交需要安装
+ * spark(1.x,2.x) : 选装，spark任务提交需要安装
+ * postgresql(8.2.15+) : 选装，postgresql sql任务和postgresql 存储过程需要安装
+
+## 项目编译
+
+* 执行编译命令：
+
+```
+ mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+```
+
+* 查看目录
+
+正常编译完后，会在当前目录生成 target/escheduler-{version}/
+
+```
+    bin
+    conf
+    lib
+    script
+    sql
+    install.sh
+```
+
+- 说明
+
+```
+bin : 基础服务启动脚本
+conf : 项目配置文件
+lib : 项目依赖jar包，包括各个模块jar和第三方jar
+script : 集群启动、停止和服务监控启停脚本
+sql : 项目依赖sql文件
+install.sh : 一键部署脚本
+```
+
+  
+
+## 数据库初始化
+
+* 创建db和账号
+
+``` 
+mysql -h {host} -u {user} -p{password}
+mysql> CREATE DATABASE escheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+mysql> GRANT ALL PRIVILEGES ON escheduler.* TO '{user}'@'%' IDENTIFIED BY '{password}';
+mysql> GRANT ALL PRIVILEGES ON escheduler.* TO '{user}'@'localhost' IDENTIFIED BY '{password}';
+mysql> flush privileges;
+```
+
+* 创建表
+
+```
+说明：在 target/escheduler-{version}/sql/escheduler.sql和quartz.sql
+
+mysql -h {host} -u {user} -p{password} -D {db} < escheduler.sql
+
+mysql -h {host} -u {user} -p{password} -D {db} < quartz.sql
+```
+
+
+## 创建部署用户
+
+因为escheduler worker 都是以 sudo -u {linux-user} 方式来执行作业，所以部署用户需要有 sudo 权限，而且是免密的。
+
+```部署账号
+vi /etc/sudoers
+
+# 部署用户是 escheduler 账号
+escheduler  ALL=(ALL)       NOPASSWD: NOPASSWD: ALL
+
+# 并且需要注释掉 Default requiretty 一行
+#Default requiretty
+```
+
+## 配置文件说明
+
+```
+说明：配置文件位于 target/escheduler-{version}/conf 下面 
+```
+
+### escheduler-alert
+
+配置邮件告警信息
+
+
+* alert.properties 
+
+```
+#alert type is EMAIL/SMS
+alert.type=EMAIL
+
+# mail server configuration
+mail.protocol=SMTP
+mail.server.host=smtp.exmail.qq.com
+mail.server.port=25
+mail.sender=xxxxxxx
+mail.passwd=xxxxxxx
+
+# xls file path,need create if not exist
+xls.file.path=/opt/xls
+```
+
+
+
+
+### escheduler-common
+
+通用配置文件配置，队列选择及地址配置，通用文件目录配置
+
+- common/common.properties
+
+```
+#task queue implementation, default "zookeeper"
+escheduler.queue.impl=zookeeper
+
+# user data directory path, self configuration, please make sure the directory exists and have read write permissions
+data.basedir.path=/tmp/escheduler
+
+# directory path for user data download. self configuration, please make sure the directory exists and have read write permissions
+data.download.basedir.path=/tmp/escheduler/download
+
+# process execute directory. self configuration, please make sure the directory exists and have read write permissions
+process.exec.basepath=/tmp/escheduler/exec
+
+# data base dir, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions。"/escheduler" is recommended
+data.store2hdfs.basepath=/escheduler
+
+# whether hdfs starts
+hdfs.startup.state=true
+
+# system env path. self configuration, please make sure the directory and file exists and have read write execute permissions
+escheduler.env.path=/opt/.escheduler_env.sh
+escheduler.env.py=/opt/escheduler_env.py
+
+#resource.view.suffixs
+resource.view.suffixs=txt,log,sh,conf,cfg,py,java,sql,hql,xml
+
+# is development state? default "false"
+development.state=false
+```
+
+
+
+SHELL任务 环境变量配置
+
+```
+说明：配置文件位于 target/escheduler-{version}/conf/env 下面
+```
+
+.escheduler_env.sh 
+```
+export HADOOP_HOME=/opt/soft/hadoop
+export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop
+export SPARK_HOME1=/opt/soft/spark1
+export SPARK_HOME2=/opt/soft/spark2
+export PYTHON_HOME=/opt/soft/python
+export JAVA_HOME=/opt/soft/java
+export HIVE_HOME=/opt/soft/hive
+	
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
+```
+
+
+​	
+
+Python任务 环境变量配置
+
+```
+说明：配置文件位于 target/escheduler-{version}/conf/env 下面
+```
+
+escheduler_env.py
+```
+import os
+
+HADOOP_HOME="/opt/soft/hadoop"
+SPARK_HOME1="/opt/soft/spark1"
+SPARK_HOME2="/opt/soft/spark2"
+PYTHON_HOME="/opt/soft/python"
+JAVA_HOME="/opt/soft/java"
+HIVE_HOME="/opt/soft/hive"
+PATH=os.environ['PATH']
+PATH="%s/bin:%s/bin:%s/bin:%s/bin:%s/bin:%s/bin:%s"%(HIVE_HOME,HADOOP_HOME,SPARK_HOME1,SPARK_HOME2,JAVA_HOME,PYTHON_HOME,PATH)
+
+os.putenv('PATH','%s'%PATH)	
+```
+
+
+
+hadoop 配置文件
+
+- common/hadoop/hadoop.properties
+
+```
+# ha or single namenode,If namenode ha needs to copy core-site.xml and hdfs-site.xml to the conf directory
+fs.defaultFS=hdfs://mycluster:8020
+
+#resourcemanager ha note this need ips , this empty if single
+yarn.resourcemanager.ha.rm.ids=192.168.xx.xx,192.168.xx.xx
+
+# If it is a single resourcemanager, you only need to configure one host name. If it is resourcemanager HA, the default configuration is fine
+yarn.application.status.address=http://ark1:8088/ws/v1/cluster/apps/%s
+
+```
+
+
+
+定时器配置文件
+
+- quartz.properties
+
+```
+#============================================================================
+# Configure Main Scheduler Properties
+#============================================================================
+org.quartz.scheduler.instanceName = EasyScheduler
+org.quartz.scheduler.instanceId = AUTO
+org.quartz.scheduler.makeSchedulerThreadDaemon = true
+org.quartz.jobStore.useProperties = false
+
+#============================================================================
+# Configure ThreadPool
+#============================================================================
+
+org.quartz.threadPool.class = org.quartz.simpl.SimpleThreadPool
+org.quartz.threadPool.makeThreadsDaemons = true
+org.quartz.threadPool.threadCount = 25
+org.quartz.threadPool.threadPriority = 5
+
+#============================================================================
+# Configure JobStore
+#============================================================================
+ 
+org.quartz.jobStore.class = org.quartz.impl.jdbcjobstore.JobStoreTX
+org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+org.quartz.jobStore.tablePrefix = QRTZ_
+org.quartz.jobStore.isClustered = true
+org.quartz.jobStore.misfireThreshold = 60000
+org.quartz.jobStore.clusterCheckinInterval = 5000
+org.quartz.jobStore.dataSource = myDs
+
+#============================================================================
+# Configure Datasources  
+#============================================================================
+ 
+org.quartz.dataSource.myDs.driver = com.mysql.jdbc.Driver
+org.quartz.dataSource.myDs.URL = jdbc:mysql://192.168.xx.xx:3306/escheduler?characterEncoding=utf8&useSSL=false
+org.quartz.dataSource.myDs.user = xx
+org.quartz.dataSource.myDs.password = xx
+org.quartz.dataSource.myDs.maxConnections = 10
+org.quartz.dataSource.myDs.validationQuery = select 1
+```
+
+
+
+zookeeper 配置文件
+
+
+- zookeeper.properties
+
+```
+#zookeeper cluster
+zookeeper.quorum=192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181
+
+#escheduler root directory
+zookeeper.escheduler.root=/escheduler
+
+#zookeeper server dirctory
+zookeeper.escheduler.dead.servers=/escheduler/dead-servers
+zookeeper.escheduler.masters=/escheduler/masters
+zookeeper.escheduler.workers=/escheduler/workers
+
+#zookeeper lock dirctory
+zookeeper.escheduler.lock.masters=/escheduler/lock/masters
+zookeeper.escheduler.lock.workers=/escheduler/lock/workers
+
+#escheduler failover directory
+zookeeper.escheduler.lock.masters.failover=/escheduler/lock/failover/masters
+zookeeper.escheduler.lock.workers.failover=/escheduler/lock/failover/workers
+
+#escheduler failover directory
+zookeeper.session.timeout=300
+zookeeper.connection.timeout=300
+zookeeper.retry.sleep=1000
+zookeeper.retry.maxtime=5
+
+```
+
+
+
+### escheduler-dao
+
+dao数据源配置
+
+- dao/data_source.properties
+
+```
+# base spring data source configuration
+spring.datasource.type=com.alibaba.druid.pool.DruidDataSource
+spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+spring.datasource.url=jdbc:mysql://192.168.xx.xx:3306/escheduler?characterEncoding=UTF-8
+spring.datasource.username=xx
+spring.datasource.password=xx
+
+# connection configuration
+spring.datasource.initialSize=5
+# min connection number
+spring.datasource.minIdle=5
+# max connection number
+spring.datasource.maxActive=50
+
+# max wait time for get a connection in milliseconds. if configuring maxWait, fair locks are enabled by default and concurrency efficiency decreases.
+# If necessary, unfair locks can be used by configuring the useUnfairLock attribute to true.
+spring.datasource.maxWait=60000
+
+# milliseconds for check to close free connections
+spring.datasource.timeBetweenEvictionRunsMillis=60000
+
+# the Destroy thread detects the connection interval and closes the physical connection in milliseconds if the connection idle time is greater than or equal to minEvictableIdleTimeMillis.
+spring.datasource.timeBetweenConnectErrorMillis=60000
+
+# the longest time a connection remains idle without being evicted, in milliseconds
+spring.datasource.minEvictableIdleTimeMillis=300000
+
+#the SQL used to check whether the connection is valid requires a query statement. If validation Query is null, testOnBorrow, testOnReturn, and testWhileIdle will not work.
+spring.datasource.validationQuery=SELECT 1
+#check whether the connection is valid for timeout, in seconds
+spring.datasource.validationQueryTimeout=3
+
+# when applying for a connection, if it is detected that the connection is idle longer than time Between Eviction Runs Millis,
+# validation Query is performed to check whether the connection is valid
+spring.datasource.testWhileIdle=true
+
+#execute validation to check if the connection is valid when applying for a connection
+spring.datasource.testOnBorrow=true
+#execute validation to check if the connection is valid when the connection is returned
+spring.datasource.testOnReturn=false
+spring.datasource.defaultAutoCommit=true
+spring.datasource.keepAlive=true
+
+# open PSCache, specify count PSCache for every connection
+spring.datasource.poolPreparedStatements=true
+spring.datasource.maxPoolPreparedStatementPerConnectionSize=20
+```
+
+
+
+### escheduler-server
+
+master配置文件
+
+- master.properties
+
+```
+# master execute thread num
+master.exec.threads=100
+
+# master execute task number in parallel
+master.exec.task.number=20
+
+# master heartbeat interval
+master.heartbeat.interval=10
+
+# master commit task retry times
+master.task.commit.retryTimes=5
+
+# master commit task interval
+master.task.commit.interval=100
+
+
+# only less than cpu avg load, master server can work. default value : the number of cpu cores * 2
+master.max.cpuload.avg=10
+
+# only larger than reserved memory, master server can work. default value : physical memory * 1/10, unit is G.
+master.reserved.memory=1
+```
+
+
+
+worker配置文件
+
+- worker.properties
+
+```
+# worker execute thread num
+worker.exec.threads=100
+
+# worker heartbeat interval
+worker.heartbeat.interval=10
+
+# submit the number of tasks at a time
+worker.fetch.task.num = 10
+
+
+# only less than cpu avg load, worker server can work. default value : the number of cpu cores * 2
+worker.max.cpuload.avg=10
+
+# only larger than reserved memory, worker server can work. default value : physical memory * 1/6, unit is G.
+worker.reserved.memory=1
+```
+
+
+
+### escheduler-api
+
+web配置文件
+
+- application.properties
+
+```
+# server port
+server.port=12345
+
+# session config
+server.session.timeout=7200
+
+
+server.context-path=/escheduler/
+
+# file size limit for upload
+spring.http.multipart.max-file-size=1024MB
+spring.http.multipart.max-request-size=1024MB
+
+# post content
+server.max-http-post-size=5000000
+```
+
+
+
+## 伪分布式部署
+
+### 1，创建部署用户
+
+​	如上 **创建部署用户**
+
+### 2，根据实际需求来创建HDFS根路径
+
+​	根据 **common/common.properties** 中 **hdfs.startup.state** 的配置来判断是否启动HDFS，如果启动，则需要创建HDFS根路径，并将 **owner** 修改为**部署用户**，否则忽略此步骤
+
+### 3，项目编译
+
+​	如上进行 **项目编译**
+
+###  4，修改配置文件
+
+​	根据 **配置文件说明** 修改配置文件和 **环境变量** 文件
+
+### 5，创建目录并将环境变量文件复制到指定目录
+
+- 创建 **common/common.properties** 下的data.basedir.path、data.download.basedir.path和process.exec.basepath路径
+
+- 将**.escheduler_env.sh** 和 **escheduler_env.py** 两个环境变量文件复制到 **common/common.properties**配置的**escheduler.env.path** 和 **escheduler.env.py** 的目录下，并将 **owner** 修改为**部署用户**
+
+### 6，启停服务
+
+* 启停Master
+
+```启动master
+sh ./bin/arklifter-daemon.sh start master-server
+sh ./bin/arklifter-daemon.sh stop master-server
+```
+
+* 启停Worker
+
+```
+sh ./bin/arklifter-daemon.sh start worker-server
+sh ./bin/arklifter-daemon.sh stop worker-server
+```
+
+* 启停Api
+
+```
+sh ./bin/arklifter-daemon.sh start api-server
+sh ./bin/arklifter-daemon.sh stop api-server
+```
+* 启停Logger
+
+```
+sh ./bin/arklifter-daemon.sh start logger-server
+sh ./bin/arklifter-daemon.sh stop logger-server
+```
+* 启停Alert
+
+```
+sh ./bin/arklifter-daemon.sh start alert-server
+sh ./bin/arklifter-daemon.sh stop alert-server
+```
+
+
+
+## 分布式部署
+
+### 1，创建部署用户
+
+- 在需要部署调度的机器上如上 **创建部署用户**
+- [将 **主机器** 和各个其它机器SSH打通](https://blog.csdn.net/thinkmore1314/article/details/22489203)
+
+### 2，根据实际需求来创建HDFS根路径
+
+​	根据 **common/common.properties** 中 **hdfs.startup.state** 的配置来判断是否启动HDFS，如果启动，则需要创建HDFS根路径，并将 **owner** 修改为**部署用户**，否则忽略此步骤
+
+### 3，项目编译
+
+​	如上进行 **项目编译**
+
+### 4，将环境变量文件复制到指定目录
+
+​	将**.escheduler_env.sh** 和 **escheduler_env.py** 两个环境变量文件复制到 **common/common.properties**配置的**escheduler.env.path** 和 **escheduler.env.py** 的目录下，并将 **owner** 修改为**部署用户**
+
+### 5，修改 install.sh
+
+​	修改 install.sh 中变量的值，替换成自身业务所需的值
+
+### 6，一键部署
+
+- 安装 pip install kazoo
+
+- 使用部署用户 sh install.sh 一键部署
+
+
+
+
+## 服务监控
+
+monitor_server.py 脚本是监听，master和worker服务挂掉重启的脚本
+
+注意：在全部服务都启动之后启动
+
+nohup python -u monitor_server.py > nohup.out 2>&1 &
+
+## 日志查看
+日志统一存放于指定文件夹内
+
+```日志路径
+ logs/
+    ├── escheduler-alert-server.log
+    ├── escheduler-master-server.log
+    |—— escheduler-worker-server.log
+    |—— escheduler-api-server.log
+    |—— escheduler-logger-server.log
+```
