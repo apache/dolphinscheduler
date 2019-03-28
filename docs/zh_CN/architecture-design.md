@@ -93,11 +93,13 @@
 
 ##### 一、去中心化vs中心化 
 
-######中心化思想
+###### 中心化思想
+
 中心化的设计理念比较简单，分布式集群中的节点按照角色分工，大体上分为两种角色：
 <p align="center">
    <img src="https://analysys.github.io/EasyScheduler/zh_CN/images/master_slave.png" alt="master-slave角色"  width="50%" />
  </p>
+ 
 - Master的角色主要负责任务分发并监督Slave的健康状态，可以动态的将任务均衡到Slave上，以致Slave节点不至于“忙死”或”闲死”的状态。
 - Worker的角色主要负责任务的执行工作并维护和Master的心跳，以便Master可以分配任务给Slave。
 
