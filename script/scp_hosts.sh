@@ -5,7 +5,7 @@ workDir=`cd ${workDir};pwd`
 source $workDir/../conf/config/run_config.conf
 source $workDir/../conf/config/install_config.conf
 
-tar -zxvf $workDir/../escheduler-1.0.0-PREVIEW.tar.gz -C $installPath
+tar -zxvf $workDir/../EasyScheduler-1.0.0.tar.gz -C $installPath
 
 hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
