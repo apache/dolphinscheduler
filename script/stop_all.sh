@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/bin/sh
+
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
+
 source $workDir/../conf/config/run_config.conf
 source $workDir/../conf/config/install_config.conf
 
