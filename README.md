@@ -2,6 +2,10 @@ Easy Scheduler
 ============
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
+update(2019-03-29 11:30)
+============
+https://analysys.github.io/easyscheduler_docs_cn/   这是文档(未完待续)。现在正在上传代码到github，有点慢！可以下载的时候会告诉大家，请稍作等待！！
+=====
 ## 月底正式开源！！！ 非常感谢参与的伙伴们，开源种子用户申请已满！大家对EasyScheduler的关注热情超乎预料，也是对我们的极大的鼓励，非常感谢！ 感兴趣的伙伴可以先加我微信:510570367, 入EasyScheduler微信群里，加我时请注明来意：公司+职位+姓名+ezs，再次感谢！
 ## 非常欢迎大家加入到开源队伍中来！！！
 
