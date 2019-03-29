@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 usage="Usage: escheduler-daemon.sh (start|stop) <command> "
 
