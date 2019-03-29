@@ -2,10 +2,6 @@ Easy Scheduler
 ============
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-update(2019-03-29 11:30)
-============
-https://analysys.github.io/easyscheduler_docs_cn/   这是文档(未完待续)。现在正在上传代码到github，有点慢！可以下载的时候会告诉大家，请稍作等待！！
-
 > Easy Scheduler for Big Data
 
 **设计特点：** 一个分布式易扩展的可视化DAG工作流任务调度系统。致力于解决数据处理流程中错综复杂的依赖关系，使调度系统在数据处理流程中`开箱即用`。
