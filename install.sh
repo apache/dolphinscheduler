@@ -3,6 +3,34 @@
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
 
+#To be compatible with MacOS and Linux
+txt=""
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Mac OSX
+    txt="''"
+elif [[ "$OSTYPE" == "linux-gnu" ]]; then
+    # linux
+    txt=""
+elif [[ "$OSTYPE" == "cygwin" ]]; then
+    # POSIX compatibility layer and Linux environment emulation for Windows
+    echo "Easy Scheduler not support Windows operating system"
+    exit 1
+elif [[ "$OSTYPE" == "msys" ]]; then
+    # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
+    echo "Easy Scheduler not support Windows operating system"
+    exit 1
+elif [[ "$OSTYPE" == "win32" ]]; then
+    echo "Easy Scheduler not support Windows operating system"
+    exit 1
+elif [[ "$OSTYPE" == "freebsd"* ]]; then
+    # ...
+    txt=""
+else
+    # Unknown.
+    echo "Operating system unknown, please tell us(submit issue) for better service"
+    exit 1
+fi
+
 source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
@@ -209,84 +237,84 @@ apiServers="ark1"
 
 # 1,替换文件
 echo "1,替换文件"
-sed -i  "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${mysqlHost}/${mysqlDb}?characterEncoding=UTF-8#g" conf/dao/data_source.properties
-sed -i  "s#spring.datasource.username.*#spring.datasource.username=${mysqlUserName}#g" conf/dao/data_source.properties
-sed -i  "s#spring.datasource.password.*#spring.datasource.password=${mysqlPassword}#g" conf/dao/data_source.properties
+sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${mysqlHost}/${mysqlDb}?characterEncoding=UTF-8#g" conf/dao/data_source.properties
+sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${mysqlUserName}#g" conf/dao/data_source.properties
+sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${mysqlPassword}#g" conf/dao/data_source.properties
 
-sed -i  "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${mysqlHost}/${mysqlDb}?characterEncoding=UTF-8#g" conf/quartz.properties
-sed -i  "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${mysqlUserName}#g" conf/quartz.properties
-sed -i  "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${mysqlPassword}#g" conf/quartz.properties
-
-
-sed -i  "s#fs.defaultFS.*#fs.defaultFS=${namenodeFs}#g" conf/common/hadoop/hadoop.properties
-sed -i  "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common/hadoop/hadoop.properties
-sed -i  "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common/hadoop/hadoop.properties
-
-sed -i  "s#data.basedir.path.*#data.basedir.path=${programPath}#g" conf/common/common.properties
-sed -i  "s#data.download.basedir.path.*#data.download.basedir.path=${downloadPath}#g" conf/common/common.properties
-sed -i  "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" conf/common/common.properties
-sed -i  "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
-sed -i  "s#hdfs.startup.state.*#hdfs.startup.state=${hdfsStartupSate}#g" conf/common/common.properties
-sed -i  "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
-sed -i  "s#escheduler.env.py.*#escheduler.env.py=${pythonEnvPath}#g" conf/common/common.properties
-sed -i  "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
-sed -i  "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
-
-sed -i  "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.escheduler.root.*#zookeeper.escheduler.root=${zkRoot}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.escheduler.dead.servers.*#zookeeper.escheduler.dead.servers=${zkDeadServers}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.escheduler.masters.*#zookeeper.escheduler.masters=${zkMasters}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.escheduler.workers.*#zookeeper.escheduler.workers=${zkWorkers}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.escheduler.lock.masters.*#zookeeper.escheduler.lock.masters=${mastersLock}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.escheduler.lock.workers.*#zookeeper.escheduler.lock.workers=${workersLock}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.escheduler.lock.failover.masters.*#zookeeper.escheduler.lock.failover.masters=${mastersFailover}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.escheduler.lock.failover.workers.*#zookeeper.escheduler.lock.failover.workers=${workersFailover}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/zookeeper.properties
-sed -i  "s#zookeeper.retry.maxtime.*#zookeeper.retry.maxtime=${zkRetryMaxtime}#g" conf/zookeeper.properties
-
-sed -i  "s#master.exec.threads.*#master.exec.threads=${masterExecThreads}#g" conf/master.properties
-sed -i  "s#master.exec.task.number.*#master.exec.task.number=${masterExecTaskNum}#g" conf/master.properties
-sed -i  "s#master.heartbeat.interval.*#master.heartbeat.interval=${masterHeartbeatInterval}#g" conf/master.properties
-sed -i  "s#master.task.commit.retryTimes.*#master.task.commit.retryTimes=${masterTaskCommitRetryTimes}#g" conf/master.properties
-sed -i  "s#master.task.commit.interval.*#master.task.commit.interval=${masterTaskCommitInterval}#g" conf/master.properties
-sed -i  "s#master.max.cpuload.avg.*#master.max.cpuload.avg=${masterMaxCupLoadAvg}#g" conf/master.properties
-sed -i  "s#master.reserved.memory.*#master.reserved.memory=${masterReservedMemory}#g" conf/master.properties
+sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${mysqlHost}/${mysqlDb}?characterEncoding=UTF-8#g" conf/quartz.properties
+sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${mysqlUserName}#g" conf/quartz.properties
+sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${mysqlPassword}#g" conf/quartz.properties
 
 
-sed -i  "s#worker.exec.threads.*#worker.exec.threads=${workerExecThreads}#g" conf/worker.properties
-sed -i  "s#worker.heartbeat.interval.*#worker.heartbeat.interval=${workerHeartbeatInterval}#g" conf/worker.properties
-sed -i  "s#worker.fetch.task.num.*#worker.fetch.task.num=${workerFetchTaskNum}#g" conf/worker.properties
-sed -i  "s#worker.max.cpuload.avg.*#worker.max.cpuload.avg=${workerMaxCupLoadAvg}#g" conf/worker.properties
-sed -i  "s#worker.reserved.memory.*#worker.reserved.memory=${workerReservedMemory}#g" conf/worker.properties
+sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${namenodeFs}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common/hadoop/hadoop.properties
+
+sed -i ${txt} "s#data.basedir.path.*#data.basedir.path=${programPath}#g" conf/common/common.properties
+sed -i ${txt} "s#data.download.basedir.path.*#data.download.basedir.path=${downloadPath}#g" conf/common/common.properties
+sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" conf/common/common.properties
+sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
+sed -i ${txt} "s#hdfs.startup.state.*#hdfs.startup.state=${hdfsStartupSate}#g" conf/common/common.properties
+sed -i ${txt} "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
+sed -i ${txt} "s#escheduler.env.py.*#escheduler.env.py=${pythonEnvPath}#g" conf/common/common.properties
+sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
+sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
+
+sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.root.*#zookeeper.escheduler.root=${zkRoot}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.dead.servers.*#zookeeper.escheduler.dead.servers=${zkDeadServers}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.masters.*#zookeeper.escheduler.masters=${zkMasters}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.workers.*#zookeeper.escheduler.workers=${zkWorkers}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.lock.masters.*#zookeeper.escheduler.lock.masters=${mastersLock}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.lock.workers.*#zookeeper.escheduler.lock.workers=${workersLock}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.lock.failover.masters.*#zookeeper.escheduler.lock.failover.masters=${mastersFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.lock.failover.workers.*#zookeeper.escheduler.lock.failover.workers=${workersFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.retry.maxtime.*#zookeeper.retry.maxtime=${zkRetryMaxtime}#g" conf/zookeeper.properties
+
+sed -i ${txt} "s#master.exec.threads.*#master.exec.threads=${masterExecThreads}#g" conf/master.properties
+sed -i ${txt} "s#master.exec.task.number.*#master.exec.task.number=${masterExecTaskNum}#g" conf/master.properties
+sed -i ${txt} "s#master.heartbeat.interval.*#master.heartbeat.interval=${masterHeartbeatInterval}#g" conf/master.properties
+sed -i ${txt} "s#master.task.commit.retryTimes.*#master.task.commit.retryTimes=${masterTaskCommitRetryTimes}#g" conf/master.properties
+sed -i ${txt} "s#master.task.commit.interval.*#master.task.commit.interval=${masterTaskCommitInterval}#g" conf/master.properties
+sed -i ${txt} "s#master.max.cpuload.avg.*#master.max.cpuload.avg=${masterMaxCupLoadAvg}#g" conf/master.properties
+sed -i ${txt} "s#master.reserved.memory.*#master.reserved.memory=${masterReservedMemory}#g" conf/master.properties
 
 
-sed -i  "s#server.port.*#server.port=${apiServerPort}#g" conf/application.properties
-sed -i  "s#server.session.timeout.*#server.session.timeout=${apiServerSessionTimeout}#g" conf/application.properties
-sed -i  "s#server.context-path.*#server.context-path=${apiServerContextPath}#g" conf/application.properties
-sed -i  "s#spring.http.multipart.max-file-size.*#spring.http.multipart.max-file-size=${springMaxFileSize}#g" conf/application.properties
-sed -i  "s#spring.http.multipart.max-request-size.*#spring.http.multipart.max-request-size=${springMaxRequestSize}#g" conf/application.properties
-sed -i  "s#server.max-http-post-size.*#server.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application.properties
+sed -i ${txt} "s#worker.exec.threads.*#worker.exec.threads=${workerExecThreads}#g" conf/worker.properties
+sed -i ${txt} "s#worker.heartbeat.interval.*#worker.heartbeat.interval=${workerHeartbeatInterval}#g" conf/worker.properties
+sed -i ${txt} "s#worker.fetch.task.num.*#worker.fetch.task.num=${workerFetchTaskNum}#g" conf/worker.properties
+sed -i ${txt} "s#worker.max.cpuload.avg.*#worker.max.cpuload.avg=${workerMaxCupLoadAvg}#g" conf/worker.properties
+sed -i ${txt} "s#worker.reserved.memory.*#worker.reserved.memory=${workerReservedMemory}#g" conf/worker.properties
 
 
-sed -i  "s#mail.protocol.*#mail.protocol=${mailProtocol}#g" conf/alert.properties
-sed -i  "s#mail.server.host.*#mail.server.host=${mailServerHost}#g" conf/alert.properties
-sed -i  "s#mail.server.port.*#mail.server.port=${mailServerPort}#g" conf/alert.properties
-sed -i  "s#mail.sender.*#mail.sender=${mailSender}#g" conf/alert.properties
-sed -i  "s#mail.passwd.*#mail.passwd=${mailPassword}#g" conf/alert.properties
-sed -i  "s#xls.file.path.*#xls.file.path=${xlsFilePath}#g" conf/alert.properties
+sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application.properties
+sed -i ${txt} "s#server.session.timeout.*#server.session.timeout=${apiServerSessionTimeout}#g" conf/application.properties
+sed -i ${txt} "s#server.context-path.*#server.context-path=${apiServerContextPath}#g" conf/application.properties
+sed -i ${txt} "s#spring.http.multipart.max-file-size.*#spring.http.multipart.max-file-size=${springMaxFileSize}#g" conf/application.properties
+sed -i ${txt} "s#spring.http.multipart.max-request-size.*#spring.http.multipart.max-request-size=${springMaxRequestSize}#g" conf/application.properties
+sed -i ${txt} "s#server.max-http-post-size.*#server.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application.properties
 
 
-sed -i  "s#installPath.*#installPath=${installPath}#g" conf/config/install_config.conf
-sed -i  "s#deployUser.*#deployUser=${deployUser}#g" conf/config/install_config.conf
-sed -i  "s#ips.*#ips=${ips}#g" conf/config/install_config.conf
+sed -i ${txt} "s#mail.protocol.*#mail.protocol=${mailProtocol}#g" conf/alert.properties
+sed -i ${txt} "s#mail.server.host.*#mail.server.host=${mailServerHost}#g" conf/alert.properties
+sed -i ${txt} "s#mail.server.port.*#mail.server.port=${mailServerPort}#g" conf/alert.properties
+sed -i ${txt} "s#mail.sender.*#mail.sender=${mailSender}#g" conf/alert.properties
+sed -i ${txt} "s#mail.passwd.*#mail.passwd=${mailPassword}#g" conf/alert.properties
+sed -i ${txt} "s#xls.file.path.*#xls.file.path=${xlsFilePath}#g" conf/alert.properties
 
 
-sed -i  "s#masters.*#masters=${masters}#g" conf/config/run_config.conf
-sed -i  "s#workers.*#workers=${workers}#g" conf/config/run_config.conf
-sed -i  "s#alertServer.*#alertServer=${alertServer}#g" conf/config/run_config.conf
-sed -i  "s#apiServers.*#apiServers=${apiServers}#g" conf/config/run_config.conf
+sed -i ${txt} "s#installPath.*#installPath=${installPath}#g" conf/config/install_config.conf
+sed -i ${txt} "s#deployUser.*#deployUser=${deployUser}#g" conf/config/install_config.conf
+sed -i ${txt} "s#ips.*#ips=${ips}#g" conf/config/install_config.conf
+
+
+sed -i ${txt} "s#masters.*#masters=${masters}#g" conf/config/run_config.conf
+sed -i ${txt} "s#workers.*#workers=${workers}#g" conf/config/run_config.conf
+sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/run_config.conf
+sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/run_config.conf
 
 
 
