@@ -4,7 +4,7 @@
     <parent>
         <groupId>cn.analysys</groupId>
         <artifactId>escheduler</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>escheduler-alert</artifactId>
     <packaging>jar</packaging>
