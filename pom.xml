@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.analysys</groupId>
 	<artifactId>escheduler</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 	<name>escheduler</name>
 	<url>http://maven.apache.org</url>
@@ -373,7 +373,7 @@
 		<connection>scm:git:https://github.com/analysys/EasyScheduler.git</connection>
 		<developerConnection>scm:git:https://github.com/analysys/EasyScheduler.git</developerConnection>
 		<url>https://github.com/analysys/EasyScheduler.git</url>
-	  <tag>branch-1.0.0</tag>
+	  <tag>1.0.0</tag>
   </scm>
 
 	<build>
