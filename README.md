@@ -29,7 +29,7 @@ Easy Scheduler
 
 ![](http://geek.analysys.cn/static/upload/221/2019-03-29/0a9dea80-fb02-4fa5-a812-633b67035ffc.jpeg)
 
-![](http://geek.analysys.cn/static/upload/221/2019-03-29/43489f10-d01c-4fc3-b7b1-6f66405cc621.jpeg)
+![](http://geek.analysys.cn/static/upload/221/2019-04-01/83686def-a54f-4169-8cae-77b1f8300cc1.png)
 
 ![](http://geek.analysys.cn/static/upload/221/2019-03-29/83c937c7-1793-4d7a-aa28-b98460329fe0.jpeg)
 
