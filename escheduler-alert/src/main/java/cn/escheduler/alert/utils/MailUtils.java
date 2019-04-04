@@ -117,6 +117,8 @@ public class MailUtils {
                 email.setSmtpPort(mailServerPort);
                 //set charset
                 email.setCharset(Constants.UTF_8);
+                // TLS verification
+                email.setTLS(true);
                 if (CollectionUtils.isNotEmpty(receivers)){
                     // receivers mail
                     for (String receiver : receivers) {
@@ -267,6 +269,7 @@ public class MailUtils {
         props.setProperty(Constants.MAIL_HOST, mailServerHost);
         props.setProperty(Constants.MAIL_SMTP_AUTH, Constants.STRING_TRUE);
         props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, mailProtocol);
+        props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, Constants.STRING_TRUE);
         Authenticator auth = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
