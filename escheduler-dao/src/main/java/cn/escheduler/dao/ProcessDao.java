@@ -1272,7 +1272,7 @@ public class ProcessDao extends AbstractBaseDao {
         return scheduleMapper.queryById(id);
     }
 
-    public List<ProcessInstance> queryNeddFailoverProcessInstances(String host){
+    public List<ProcessInstance> queryNeedFailoverProcessInstances(String host){
         return processInstanceMapper.queryByHostAndStatus(host, stateArray);
     }
 
