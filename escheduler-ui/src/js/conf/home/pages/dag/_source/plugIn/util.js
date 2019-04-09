@@ -17,6 +17,7 @@
 
 import _ from 'lodash'
 import $ from 'jquery'
+import i18n from '@/module/i18n'
 import store from '@/conf/home/store'
 
 /**
@@ -39,16 +40,22 @@ const saveTargetarr = (valId, domId) => {
 /**
  * 返回节点html
  */
-const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType }) => {
+const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType,runFlag }) => {
   let tpl = ``
   tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
   tpl += `<div>`
-  tpl += `<div class="state-p"></div>`
-  tpl += `<div class="icos icos-${taskType}"></div>`
-  tpl += `<span class="name-p">${name}</span>`
+    tpl += `<div class="state-p"></div>`
+    tpl += `<div class="icos icos-${taskType}"></div>`
+    tpl += `<span class="name-p">${name}</span>`
   tpl += `</div>`
   tpl += `<div class="ep"></div>`
+    tpl += `<div class="ban-p">`
+    if (runFlag === 'FORBIDDEN') {
+      tpl += `<i class="iconfont" data-toggle="tooltip" data-html="true" data-container="body" data-placement="left" title="${i18n.$t('禁止执行')}">&#xe63e;</i>`
+    }
+    tpl += `</div>`
   tpl += `</div>`
+
   return tpl
 }
 

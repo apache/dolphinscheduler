@@ -192,8 +192,12 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       y: locations[v.id]['y'],
       targetarr: locations[v.id]['targetarr'],
       isAttachment: this.config.isAttachment,
-      taskType: v.type
+      taskType: v.type,
+      runFlag:v.runFlag
     }))
+
+    // ban icon
+    console.log($(`#${v.id}`).html())
 
     // contextmenu event
     $(`#${v.id}`).on('contextmenu', e => {
