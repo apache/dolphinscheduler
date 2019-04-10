@@ -462,5 +462,8 @@ export default {
   '上月': 'LastMonth',
   '上月初': 'LastMonthBegin',
   '上月末': 'LastMonthEnd',
-  '刷新状态成功': 'Refresh status succeeded'
+  '刷新状态成功': 'Refresh status succeeded',
+  '队列管理': 'Queue manage',
+  '创建队列': 'Create queue',
+  '编辑队列': 'Edit queue',
 }
