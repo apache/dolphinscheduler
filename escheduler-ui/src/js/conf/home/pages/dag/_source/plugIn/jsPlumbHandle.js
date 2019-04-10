@@ -196,9 +196,6 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       runFlag:v.runFlag
     }))
 
-    // ban icon
-    console.log($(`#${v.id}`).html())
-
     // contextmenu event
     $(`#${v.id}`).on('contextmenu', e => {
       this.tasksContextmenu(e)
