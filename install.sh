@@ -211,7 +211,7 @@ mailPassword="xxxxxxxxxx"
 xlsFilePath="/opt/xls"
 
 # conf/config/install_config.conf配置
-# 安装路径
+# 安装路径,不要当前路径(pwd)一样
 installPath="/data1_1T/escheduler"
 
 # 部署用户
