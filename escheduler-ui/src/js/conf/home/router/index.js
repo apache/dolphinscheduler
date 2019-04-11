@@ -327,6 +327,14 @@ const router = new Router({
           }
         },
         {
+          path: '/security/queue',
+          name: 'queue-manage',
+          component: resolve => require(['../pages/security/pages/queue/index'], resolve),
+          meta: {
+            title: `${i18n.$t('队列管理')}`
+          }
+        },
+        {
           path: '/security/servers',
           name: 'servers-manage',
           component: resolve => require(['../pages/security/pages/servers/index'], resolve),

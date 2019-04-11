@@ -178,7 +178,7 @@
   import mShell from './tasks/shell'
   import mSpark from './tasks/spark'
   import mPython from './tasks/python'
-  import { isNameExDag } from './../plugIn/util'
+  import { isNameExDag,rtBantpl } from './../plugIn/util'
   import JSP from './../plugIn/jsPlumbHandle'
   import mProcedure from './tasks/procedure'
   import mDependent from './tasks/dependent'
@@ -383,7 +383,15 @@
         })
       }
     },
-    watch: {},
+    watch: {
+      runFlag(val){
+        let dom = $(`#${this.id}`).find('.ban-p')
+        dom.html('')
+        if (val === 'FORBIDDEN') {
+          dom.append(rtBantpl())
+        }
+      }
+    },
     created () {
       // Unbind copy and paste events
       JSP.removePaste()
