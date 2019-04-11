@@ -154,6 +154,8 @@ public enum Status {
     QUEUE_EXIST(10129, "queue already exists"),
     QUEUE_NAME_EXIST(10130, "queue name already exists"),
     UPDATE_QUEUE_ERROR(10131, "update queue error"),
+    NEED_NOT_UPDATE_QUEUE(10132, "need not update queue"),
+    VERIFY_QUEUE_ERROR(10133,"verify queue error"),
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
