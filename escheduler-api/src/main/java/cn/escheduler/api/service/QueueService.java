@@ -18,12 +18,15 @@ package cn.escheduler.api.service;
 
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
+import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.dao.mapper.QueueMapper;
 import cn.escheduler.dao.model.Queue;
 import cn.escheduler.dao.model.User;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +58,106 @@ public class QueueService extends BaseService{
     putMsg(result,Status.SUCCESS);
 
     return result;
+  }
+
+  /**
+   * query queue list paging
+   * @param loginUser
+   * @param searchVal
+   * @param pageNo
+   * @param pageSize
+   * @return
+   */
+  public Map<String, Object> queryList(User loginUser,String searchVal, Integer pageNo, Integer pageSize) {
+    Map<String, Object> result = new HashMap<>(5);
+    if (checkAdmin(loginUser, result)) {
+      return result;
+    }
+
+    Integer count = queueMapper.countQueuePaging(searchVal);
+
+    PageInfo<Queue> pageInfo = new PageInfo<>(pageNo,pageSize);
+
+    List<Queue> queueList = queueMapper.queryQueuePaging(searchVal,pageInfo.getStart(),pageSize);
+
+    pageInfo.setTotalCount(count);
+    pageInfo.setLists(queueList);
+    result.put(Constants.DATA_LIST, queueList);
+    putMsg(result,Status.SUCCESS);
+
+    return result;
+  }
+
+  public Map<String, Object> createQueue(User loginUser,String queue, String queueName) {
+    Map<String, Object> result = new HashMap<>(5);
+    if (checkAdmin(loginUser, result)) {
+      return result;
+    }
+
+    if (checkQueueExists(queue)){
+      putMsg(result, Status.QUEUE_EXIST, queue);
+      return result;
+    }
+
+    Queue queueObj = new Queue();
+    Date now = new Date();
+
+    queueObj.setQueue(queue);
+    queueObj.setQueueName(queueName);
+    queueObj.setCreateTime(now);
+    queueObj.setUpdateTime(now);
+
+    queueMapper.insert(queueObj);
+    putMsg(result, Status.SUCCESS);
+
+    return result;
+  }
+
+  public Map<String, Object> updateQueue(User loginUser,int id,String queue, String queueName) {
+    Map<String, Object> result = new HashMap<>(5);
+    if (checkAdmin(loginUser, result)) {
+      return result;
+    }
+
+
+
+    Queue queueObj = queueMapper.queryById(id);
+    if (queueObj == null) {
+      putMsg(result,Status.QUEUE_NOT_EXIST,id);
+      return result;
+    }
+
+    //update queue
+
+    if (StringUtils.isNotEmpty(queue)) {
+      if (!queue.equals(queueObj.getQueue()) && checkQueueExists(queue)) {
+          putMsg(result, Status.QUEUE_EXIST, queue);
+          return result;
+      }
+      queueObj.setQueue(queue);
+    }
+    if (StringUtils.isNotEmpty(queueName)) {
+      queueObj.setQueueName(queueName);
+    }
+    Date now = new Date();
+
+    queueObj.setUpdateTime(now);
+
+    queueMapper.update(queueObj);
+    putMsg(result, Status.SUCCESS);
+
+    return result;
+  }
+
+
+  /**
+   * check queue exists
+   *
+   * @param queue
+   * @return
+   */
+  private boolean checkQueueExists(String queue) {
+    return queueMapper.queryByQueue(queue) == null ? false : true;
   }
 
 }
