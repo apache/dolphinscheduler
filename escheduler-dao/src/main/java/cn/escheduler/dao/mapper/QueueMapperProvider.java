@@ -127,7 +127,7 @@ public class QueueMapperProvider {
             FROM(TABLE_NAME);
             Object searchVal = parameter.get("searchVal");
             if(searchVal != null && StringUtils.isNotEmpty(searchVal.toString())){
-                WHERE( " queue like concat('%', #{searchVal}, '%') ");
+                WHERE( " queue_name like concat('%', #{searchVal}, '%') ");
             }
         }}.toString();
     }
@@ -144,7 +144,7 @@ public class QueueMapperProvider {
                 FROM(TABLE_NAME);
                 Object searchVal = parameter.get("searchVal");
                 if(searchVal != null && StringUtils.isNotEmpty(searchVal.toString())){
-                    WHERE( " queue like concat('%', #{searchVal}, '%') ");
+                    WHERE( " queue_name like concat('%', #{searchVal}, '%') ");
                 }
                 ORDER_BY(" update_time desc limit #{offset},#{pageSize} ");
             }
