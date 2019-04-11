@@ -102,11 +102,16 @@ public class MailUtils {
      */
     public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, ShowType showType) {
         Map<String,Object> retMap = new HashMap<>();
-        retMap.put(Constants.STATUS, false);
-
 
         receivers.removeIf((from) -> (StringUtils.isEmpty(from)));
 
+        // if there is no receivers && no receiversCc, no need to process
+        if (CollectionUtils.isEmpty(receivers) && CollectionUtils.isEmpty(receiversCc)) {
+            retMap.put(Constants.STATUS, true);
+            return retMap;
+        }
+
+        retMap.put(Constants.STATUS, false);
         if (showType == ShowType.TABLE || showType == ShowType.TEXT){
             // send email
             HtmlEmail email = new HtmlEmail();
