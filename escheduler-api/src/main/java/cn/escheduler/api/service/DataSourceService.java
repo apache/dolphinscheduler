@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -399,6 +400,11 @@ public class DataSourceService extends BaseService{
         Connection con = getConnection(type, parameter);
         if (con != null) {
             isConnection = true;
+            try {
+                con.close();
+            } catch (SQLException e) {
+                logger.error("close connection fail at DataSourceService::checkConnection()", e);
+            }
         }
         return isConnection;
     }
