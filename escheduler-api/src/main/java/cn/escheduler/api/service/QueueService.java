@@ -82,7 +82,7 @@ public class QueueService extends BaseService{
 
     pageInfo.setTotalCount(count);
     pageInfo.setLists(queueList);
-    result.put(Constants.DATA_LIST, queueList);
+    result.put(Constants.DATA_LIST, pageInfo);
     putMsg(result,Status.SUCCESS);
 
     return result;
