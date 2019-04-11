@@ -141,5 +141,30 @@ public class QueueController extends BaseController{
         }
     }
 
+    /**
+     * verify queue and queue name
+     *
+     * @param loginUser
+     * @param queue
+     * @param queueName
+     * @return
+     */
+    @PostMapping(value = "/verify-queue")
+    @ResponseStatus(HttpStatus.OK)
+    public Result verifyQueue(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                   @RequestParam(value ="queue") String queue,
+                                   @RequestParam(value ="queueName") String queueName
+    ) {
+
+        try{
+            logger.info("login user {}, verfiy queue: {} queue name: {}",
+                    loginUser.getUserName(),queue,queueName);
+            return queueService.verifyQueue(queue,queueName);
+        }catch (Exception e){
+            logger.error(VERIFY_QUEUE_ERROR.getMsg(),e);
+            return error(Status.VERIFY_QUEUE_ERROR.getCode(), Status.VERIFY_QUEUE_ERROR.getMsg());
+        }
+    }
+
 
 }
