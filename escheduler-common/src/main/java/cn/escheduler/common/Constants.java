@@ -602,15 +602,19 @@ public final class Constants {
     public static final String JDBC_POSTGRESQL_CLASS_NAME = "org.postgresql.Driver";
 
     /**
-     * postgresql
+     * hive
      */
     public static final String JDBC_HIVE_CLASS_NAME = "org.apache.hive.jdbc.HiveDriver";
 
     /**
-     * postgresql
+     * spark
      */
     public static final String JDBC_SPARK_CLASS_NAME = "org.apache.hive.jdbc.HiveDriver";
 
+    /**
+     * ClickHouse
+     */
+    public static final String JDBC_CLICKHOUSE_CLASS_NAME = "ru.yandex.clickhouse.ClickHouseDriver";
 
     /**
      * spark params constant
