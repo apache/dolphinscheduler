@@ -83,7 +83,7 @@ public class QueueController extends BaseController{
             }
 
             result = queueService.queryList(loginUser,searchVal,pageNo,pageSize);
-            return returnDataList(result);
+            return returnDataListPaging(result);
         }catch (Exception e){
             logger.error(QUERY_QUEUE_LIST_ERROR.getMsg(),e);
             return error(QUERY_QUEUE_LIST_ERROR.getCode(), QUERY_QUEUE_LIST_ERROR.getMsg());
