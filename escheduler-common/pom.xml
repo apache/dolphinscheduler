@@ -371,6 +371,21 @@
 			<groupId>com.github.oshi</groupId>
 			<artifactId>oshi-core</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>ru.yandex.clickhouse</groupId>
+			<artifactId>clickhouse-jdbc</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>com.fasterxml.jackson.core</artifactId>
+					<groupId>jackson-core</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>com.fasterxml.jackson.core</artifactId>
+					<groupId>jackson-databind</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 

@@ -217,6 +217,9 @@ public class DataSourceService extends BaseService{
             case POSTGRESQL:
                 separator = "&";
                 break;
+            case CLICKHOUSE:
+                separator = "&";
+                break;
             default:
                 separator = "&";
                 break;
@@ -367,6 +370,10 @@ public class DataSourceService extends BaseService{
                     datasource = JSONObject.parseObject(parameter, SparkDataSource.class);
                     Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
                     break;
+                case CLICKHOUSE:
+                    datasource = JSONObject.parseObject(parameter, ClickHouseDataSource.class);
+                    Class.forName(Constants.COM_CLICKHOUSE_JDBC_DRIVER);
+                    break;
                 default:
                     break;
             }
@@ -428,7 +435,7 @@ public class DataSourceService extends BaseService{
         String address = buildAddress(type, host, port);
         String jdbcUrl = address + "/" + database;
         String separator = "";
-        if (Constants.MYSQL.equals(type.name()) || Constants.POSTGRESQL.equals(type.name())) {
+        if (Constants.MYSQL.equals(type.name()) || Constants.POSTGRESQL.equals(type.name()) || Constants.CLICKHOUSE.equals(type.name())) {
             separator = "&";
         } else if (Constants.HIVE.equals(type.name()) || Constants.SPARK.equals(type.name())) {
             separator = ";";
@@ -479,6 +486,9 @@ public class DataSourceService extends BaseService{
                 }
                 sb.deleteCharAt(sb.length() - 1);
             }
+        } else if (Constants.CLICKHOUSE.equals(type.name())) {
+            sb.append(Constants.JDBC_CLICKHOUSE);
+            sb.append(host).append(":").append(port);
         }
 
         return sb.toString();
