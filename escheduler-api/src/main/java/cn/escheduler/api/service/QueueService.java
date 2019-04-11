@@ -19,10 +19,13 @@ package cn.escheduler.api.service;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
+import cn.escheduler.api.utils.Result;
 import cn.escheduler.dao.mapper.QueueMapper;
 import cn.escheduler.dao.model.Queue;
 import cn.escheduler.dao.model.User;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +40,7 @@ import java.util.Map;
 @Service
 public class QueueService extends BaseService {
 
+    private static final Logger logger = LoggerFactory.getLogger(TenantService.class);
 
     @Autowired
     private QueueMapper queueMapper;
@@ -103,12 +107,22 @@ public class QueueService extends BaseService {
             return result;
         }
 
-        if (checkQueueExists(queue)) {
+        if(StringUtils.isEmpty(queue)){
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
+            return result;
+        }
+
+        if(StringUtils.isEmpty(queueName)){
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queueName);
+            return result;
+        }
+
+        if (checkQueueExist(queue)) {
             putMsg(result, Status.QUEUE_EXIST, queue);
             return result;
         }
 
-        if (checkQueueExists(queueName)) {
+        if (checkQueueNameExist(queueName)) {
             putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
             return result;
         }
@@ -142,27 +156,38 @@ public class QueueService extends BaseService {
             return result;
         }
 
-
         Queue queueObj = queueMapper.queryById(id);
         if (queueObj == null) {
             putMsg(result, Status.QUEUE_NOT_EXIST, id);
             return result;
         }
 
-        //update queue
+        // whether queue and queueName is changed
+        if (queue.equals(queueObj.getQueue()) && queueName.equals(queueObj.getQueueName())) {
+            putMsg(result, Status.NEED_NOT_UPDATE_QUEUE);
+            return result;
+        }
 
-        if (StringUtils.isNotEmpty(queue)) {
-            if (!queue.equals(queueObj.getQueue()) && checkQueueExists(queue)) {
+        // check queue is exist
+        if (!queue.equals(queueObj.getQueue())) {
+            if(checkQueueExist(queue)){
                 putMsg(result, Status.QUEUE_EXIST, queue);
                 return result;
             }
-            queueObj.setQueue(queue);
         }
-        if (StringUtils.isNotEmpty(queueName)) {
-            queueObj.setQueueName(queueName);
-        }
-        Date now = new Date();
 
+        // check queueName is exist
+        if (!queueName.equals(queueObj.getQueueName())) {
+            if(checkQueueNameExist(queueName)){
+                putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
+                return result;
+            }
+        }
+
+        // update queue
+        Date now = new Date();
+        queueObj.setQueue(queue);
+        queueObj.setQueueName(queueName);
         queueObj.setUpdateTime(now);
 
         queueMapper.update(queueObj);
@@ -171,15 +196,59 @@ public class QueueService extends BaseService {
         return result;
     }
 
+    /**
+     * verify queue and queueName
+     *
+     * @param queue
+     * @param queueName
+     * @return
+     */
+    public Result verifyQueue(String queue, String queueName) {
+        Result result=new Result();
+
+        if (StringUtils.isEmpty(queue)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
+            return result;
+        }
+
+        if (StringUtils.isEmpty(queueName)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queueName);
+            return result;
+        }
+        if(checkQueueExist(queue)){
+            logger.error("queue {} has exist, can't create again.", queue);
+            putMsg(result, Status.QUEUE_EXIST, queue);
+            return result;
+        }
+
+        if(checkQueueNameExist(queueName)){
+            logger.error("queueName {} has exist, can't create again.", queueName);
+            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
+            return result;
+        }
+
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
 
     /**
-     * check queue exists
+     * check queue exist
      *
      * @param queue
      * @return
      */
-    private boolean checkQueueExists(String queue) {
+    private boolean checkQueueExist(String queue) {
         return queueMapper.queryByQueue(queue) == null ? false : true;
+    }
+
+    /**
+     * check queue name exist
+     *
+     * @param queueName
+     * @return
+     */
+    private boolean checkQueueNameExist(String queueName) {
+        return queueMapper.queryByQueueName(queueName) == null ? false : true;
     }
 
 }

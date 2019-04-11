@@ -93,8 +93,8 @@ public class QueueControllerTest {
     public void createQueue() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("queue","ait1111");
-        paramsMap.add("queueName","aitName");
+        paramsMap.add("queue","ait111134");
+        paramsMap.add("queueName","aitName1");
 
         MvcResult mvcResult = mockMvc.perform(post("/queue/create")
                 .header("sessionId", "d4541e0d-0349-4f05-9c68-300176cd3c91")
@@ -112,13 +112,31 @@ public class QueueControllerTest {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","2");
-        paramsMap.add("queue","ait1");
+        paramsMap.add("queue","ait12");
         paramsMap.add("queueName","aitName");
 
         MvcResult mvcResult = mockMvc.perform(post("/queue/update")
                 .header("sessionId", "d4541e0d-0349-4f05-9c68-300176cd3c91")
                 .params(paramsMap))
                 .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        //Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void verifyQueue() throws Exception {
+
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("queue","ait123");
+        paramsMap.add("queueName","aitName");
+
+        MvcResult mvcResult = mockMvc.perform(post("/queue/verify-queue")
+                .header("sessionId", "d4541e0d-0349-4f05-9c68-300176cd3c91")
+                .params(paramsMap))
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
