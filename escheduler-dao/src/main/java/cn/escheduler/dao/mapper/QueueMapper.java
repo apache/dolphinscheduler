@@ -112,5 +112,8 @@ public interface QueueMapper {
     @SelectProvider(type = QueueMapperProvider.class, method = "queryByQueue")
     Queue queryByQueue(@Param("queue") String queue);
 
+    @SelectProvider(type = QueueMapperProvider.class, method = "queryByQueueName")
+    Queue queryByQueueName(@Param("queueName") String queueName);
+
 
 }

@@ -170,4 +170,22 @@ public class QueueMapperProvider {
         }.toString();
     }
 
+    /**
+     * query by queue name
+     *
+     * @param parameter
+     * @return
+     */
+    public String queryByQueueName(Map<String, Object> parameter) {
+        return new SQL() {
+            {
+                SELECT("*");
+
+                FROM(TABLE_NAME);
+
+                WHERE("`queue_name` = #{queueName}");
+            }
+        }.toString();
+    }
+
 }
