@@ -606,6 +606,7 @@ public class ProcessDao extends AbstractBaseDao {
                     updateTaskInstance(taskInstance);
                 }
                 processInstance.setStartTime(new Date());
+                processInstance.setEndTime(null);
                 processInstance.setRunTimes(runTime +1);
                 initComplementDataParam(processDefinition, processInstance, cmdParam);
                 break;
