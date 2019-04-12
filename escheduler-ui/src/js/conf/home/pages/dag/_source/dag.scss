@@ -391,6 +391,17 @@ svg path:hover {
     text-align: center;
     margin-left: -100px;
   }
+  .ban-p {
+    position: absolute;
+    left: -4px;
+    top: 36px;
+    z-index: 21;
+    i {
+      font-size: 18px;
+      color: #ff0000;
+      cursor: pointer;
+    }
+  }
   .state-p {
     width: 20px;
     height: 20px;
