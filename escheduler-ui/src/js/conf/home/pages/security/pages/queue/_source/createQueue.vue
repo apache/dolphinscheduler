@@ -65,6 +65,10 @@
         // edit
         if (this.item) {
           param.id = this.item.id
+          if (this.item.queueName === this.queueName && this.item.queue === this.queue) {
+            this.$message.warning(`名称和队列值未做更改`)
+            return
+          }
         }
         this._verifyName(param).then(() => {
           this.$refs['popup'].spinnerLoading = true
