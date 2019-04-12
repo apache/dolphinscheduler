@@ -170,7 +170,7 @@ public class FetchTaskThread implements Runnable{
 
                             // check and create Linux users
                             FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
-                                    processDefine.getUserName(), logger);
+                                    processInstance.getTenantCode(), logger);
 
 
                             // submit task

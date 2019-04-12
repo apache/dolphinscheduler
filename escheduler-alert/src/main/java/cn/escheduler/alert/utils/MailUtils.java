@@ -103,10 +103,14 @@ public class MailUtils {
     public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, ShowType showType) {
         Map<String,Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
-
+        
+        // if there is no receivers && no receiversCc, no need to process
+        if (CollectionUtils.isEmpty(receivers) && CollectionUtils.isEmpty(receiversCc)) {
+            return retMap;
+        }
 
         receivers.removeIf((from) -> (StringUtils.isEmpty(from)));
-
+        
         if (showType == ShowType.TABLE || showType == ShowType.TEXT){
             // send email
             HtmlEmail email = new HtmlEmail();
@@ -117,6 +121,8 @@ public class MailUtils {
                 email.setSmtpPort(mailServerPort);
                 //set charset
                 email.setCharset(Constants.UTF_8);
+                // TLS verification
+                email.setTLS(true);
                 if (CollectionUtils.isNotEmpty(receivers)){
                     // receivers mail
                     for (String receiver : receivers) {
@@ -267,6 +273,7 @@ public class MailUtils {
         props.setProperty(Constants.MAIL_HOST, mailServerHost);
         props.setProperty(Constants.MAIL_SMTP_AUTH, Constants.STRING_TRUE);
         props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, mailProtocol);
+        props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, Constants.STRING_TRUE);
         Authenticator auth = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {

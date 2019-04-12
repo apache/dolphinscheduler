@@ -247,9 +247,9 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param connects
      * @return
      */
-    public Map<String, Object> updateProccessDefinition(User loginUser, String projectName, int id, String name,
-                                                        String processDefinitionJson, String desc,
-                                                        String locations, String connects) throws JsonProcessingException {
+    public Map<String, Object> updateProcessDefinition(User loginUser, String projectName, int id, String name,
+                                                       String processDefinitionJson, String desc,
+                                                       String locations, String connects) {
         Map<String, Object> result = new HashMap<>(5);
 
         Project project = projectMapper.queryByName(projectName);
@@ -284,7 +284,6 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setName(name);
         processDefine.setReleaseState(ReleaseState.OFFLINE);
         processDefine.setProjectId(project.getId());
-        processDefine.setUserId(loginUser.getId());
         processDefine.setProcessDefinitionJson(processDefinitionJson);
         processDefine.setDesc(desc);
         processDefine.setLocations(locations);
