@@ -7,16 +7,10 @@
             <span>{{$t('编号')}}</span>
           </th>
           <th>
-            <span>{{$t('租户编码')}}</span>
+            <span>{{$t('名称')}}</span>
           </th>
           <th>
-            <span>{{$t('租户名称')}}</span>
-          </th>
-          <th>
-            <span>{{$t('描述')}}</span>
-          </th>
-          <th>
-            <span>{{$t('队列')}}</span>
+            <span>队列值</span>
           </th>
           <th>
             <span>{{$t('创建时间')}}</span>
@@ -35,25 +29,25 @@
           <td>
             <span>
               <a href="javascript:" class="links">
-                {{item.tenantCode}}
+                {{item.queueName}}
               </a>
             </span>
           </td>
           <td>
             <span>
               <a href="javascript:" class="links">
-                {{item.tenantName}}
+                {{item.queue}}
               </a>
             </span>
           </td>
           <td>
-            <span>{{item.desc}}</span>
+            <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
+            <span v-else>-</span>
           </td>
           <td>
-            <span>{{item.queueName}}</span>
+            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
+            <span v-else>-</span>
           </td>
-          <td><span>{{item.createTime | formatDate}}</span></td>
-          <td><span>{{item.updateTime | formatDate}}</span></td>
           <td>
             <x-button
                     type="info"
@@ -96,7 +90,7 @@
       }
     },
     props: {
-      tenementList: Array,
+      queueList: Array,
       pageNo: Number,
       pageSize: Number
     },
@@ -118,11 +112,11 @@
         })
       },
       _edit (item) {
-        findComponentDownward(this.$root, 'tenement-index')._create(item)
+        findComponentDownward(this.$root, 'queue-index')._create(item)
       }
     },
     watch: {
-      tenementList (a) {
+      queueList (a) {
         this.list = []
         setTimeout(() => {
           this.list = a
@@ -130,7 +124,7 @@
       }
     },
     created () {
-      this.list = this.tenementList
+      this.list = this.queueList
     },
     mounted () {
     },

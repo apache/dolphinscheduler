@@ -50,7 +50,7 @@
     },
     props: {},
     methods: {
-      ...mapActions('security', ['getUsersListP']),
+      ...mapActions('security', ['getUsersList']),
       /**
        * 查询
        */
@@ -91,7 +91,7 @@
       },
       _getUsersListP (flag) {
         this.isLoading = !flag
-        this.getUsersListP({
+        this.getUsersList({
           pageSize: this.pageSize,
           pageNo: this.pageNo,
           searchVal: this.searchVal
