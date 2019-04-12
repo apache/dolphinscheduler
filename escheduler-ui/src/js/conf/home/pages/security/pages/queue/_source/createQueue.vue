@@ -66,21 +66,39 @@
         if (this.item) {
           param.id = this.item.id
         }
-        this._verifyName(param).then(() => {
+
+        let $then = (res) => {
+          this.$emit('onUpdate')
+          this.$message.success(res.msg)
+          setTimeout(() => {
+            this.$refs['popup'].spinnerLoading = false
+          }, 800)
+        }
+
+        let $catch = (e) => {
+          this.$message.error(e.msg || '')
+          this.$refs['popup'].spinnerLoading = false
+        }
+
+        if (this.item) {
           this.$refs['popup'].spinnerLoading = true
-          this.store.dispatch(`security/${this.item ? 'updateQueueQ' : 'createQueueQ'}`, param).then(res => {
-            this.$emit('onUpdate')
-            this.$message.success(res.msg)
-            setTimeout(() => {
-              this.$refs['popup'].spinnerLoading = false
-            }, 800)
+          this.store.dispatch(`security/updateQueueQ`, param).then(res => {
+            $then(res)
+          }).catch(e => {
+            $catch(e)
+          })
+        }else{
+          this._verifyName(param).then(() => {
+            this.$refs['popup'].spinnerLoading = true
+            this.store.dispatch(`security/createQueueQ`, param).then(res => {
+              $then(res)
+            }).catch(e => {
+              $catch(e)
+            })
           }).catch(e => {
             this.$message.error(e.msg || '')
-            this.$refs['popup'].spinnerLoading = false
           })
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })
+        }
 
       },
       _verification(){
