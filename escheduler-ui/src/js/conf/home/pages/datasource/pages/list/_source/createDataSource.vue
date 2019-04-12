@@ -13,6 +13,7 @@
               <x-radio :label="'POSTGRESQL'">POSTGRESQL</x-radio>
               <x-radio :label="'HIVE'">HIVE</x-radio>
               <x-radio :label="'SPARK'">SPARK</x-radio>
+              <x-radio :label="'CLICKHOUSE'">CLICKHOUSE</x-radio>
             </x-radio-group>
           </template>
         </m-list-box-f>

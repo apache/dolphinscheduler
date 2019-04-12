@@ -52,21 +52,45 @@ public class SqlExecutorTest {
 
     @Test
     public void test() throws Exception {
+        String nodeName = "mysql sql test";
+        String taskAppId = "51_11282_263978";
+        String tenantCode = "hdfs";
+        Integer taskInstId = 263978;
+        sharedTestSqlTask(nodeName, taskAppId, tenantCode, taskInstId);
+    }
 
+    @Test
+    public void testClickhouse() throws Exception {
+        String nodeName = "ClickHouse sql test";
+        String taskAppId = "1_11_20";
+        String tenantCode = "default";
+        Integer taskInstId = 20;
+        sharedTestSqlTask(nodeName, taskAppId, tenantCode, taskInstId);
+    }
+
+    /**
+     * Basic test template for SQLTasks, mainly test different types of DBMS types
+     * @param nodeName node name for selected task
+     * @param taskAppId task app id
+     * @param tenantCode tenant code
+     * @param taskInstId task instance id
+     * @throws Exception
+     */
+    private void sharedTestSqlTask(String nodeName, String taskAppId, String tenantCode, Integer taskInstId) throws Exception {
         TaskProps taskProps = new TaskProps();
         taskProps.setTaskDir("");
         // processDefineId_processInstanceId_taskInstanceId
-        taskProps.setTaskAppId("51_11282_263978");
+        taskProps.setTaskAppId(taskAppId);
         // set tenant -> task execute linux user
-        taskProps.setTenantCode("hdfs");
+        taskProps.setTenantCode(tenantCode);
         taskProps.setTaskStartTime(new Date());
         taskProps.setTaskTimeout(360000);
-        taskProps.setTaskInstId(263978);
-        taskProps.setNodeName("mysql sql test");
+        taskProps.setTaskInstId(taskInstId);
+        taskProps.setNodeName(nodeName);
 
 
 
-        TaskInstance taskInstance = processDao.findTaskInstanceById(263978);
+        TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
 
         String taskJson = taskInstance.getTaskJson();
         TaskNode taskNode = JSONObject.parseObject(taskJson, TaskNode.class);
