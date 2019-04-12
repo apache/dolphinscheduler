@@ -96,6 +96,3 @@
     components: { mPopup, mListBoxF }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-</style>
