@@ -83,6 +83,14 @@ let menu = {
       children: []
     },
     {
+      name: `${i18n.$t('队列管理')}`,
+      id: 1,
+      path: 'queue-manage',
+      isOpen: true,
+      icon: 'fa-recycle',
+      children: []
+    },
+    {
       name: `${i18n.$t('服务管理')}`,
       id: 1,
       path: '',
