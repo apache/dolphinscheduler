@@ -87,7 +87,7 @@ let menu = {
       id: 1,
       path: 'queue-manage',
       isOpen: true,
-      icon: 'fa-warning',
+      icon: 'fa-recycle',
       children: []
     },
     {
