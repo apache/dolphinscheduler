@@ -151,10 +151,10 @@ public enum Status {
     SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE(10126, "schedule release is already {0}"),
     CREATE_QUEUE_ERROR(10127, "create queue error"),
     QUEUE_NOT_EXIST(10128, "queue {0} not exists"),
-    QUEUE_EXIST(10129, "queue {0} already exists"),
+    QUEUE_VALUE_EXIST(10129, "queue value {0} already exists"),
     QUEUE_NAME_EXIST(10130, "queue name {0} already exists"),
     UPDATE_QUEUE_ERROR(10131, "update queue error"),
-    NEED_NOT_UPDATE_QUEUE(10132, "need not update queue"),
+    NEED_NOT_UPDATE_QUEUE(10132, "no content changes, no updates are required"),
     VERIFY_QUEUE_ERROR(10133,"verify queue error"),
 
 
