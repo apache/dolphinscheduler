@@ -39,6 +39,8 @@ public class DataSourceFactory {
           return JSONUtils.parseObject(parameter, HiveDataSource.class);
         case SPARK:
           return JSONUtils.parseObject(parameter, SparkDataSource.class);
+        case CLICKHOUSE:
+          return JSONUtils.parseObject(parameter, ClickHouseDataSource.class);
         default:
           return null;
       }

@@ -120,6 +120,9 @@ public class SqlTask extends AbstractTask {
                     }else if (DbType.SPARK.name().equals(dataSource.getType().name())){
                         baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),SparkDataSource.class);
                         Class.forName(Constants.JDBC_SPARK_CLASS_NAME);
+                    }else if (DbType.CLICKHOUSE.name().equals(dataSource.getType().name())){
+                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),ClickHouseDataSource.class);
+                        Class.forName(Constants.JDBC_CLICKHOUSE_CLASS_NAME);
                     }
 
                     Map<Integer,Property> sqlParamMap =  new HashMap<Integer,Property>();

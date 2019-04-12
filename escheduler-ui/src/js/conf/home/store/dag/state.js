@@ -66,6 +66,11 @@ export default {
       id: 3,
       code: 'SPARK',
       disabled: false
+    },
+    {
+      id: 4,
+      code: 'CLICKHOUSE',
+      disabled: false
     }
   ],
   // Alarm interface
