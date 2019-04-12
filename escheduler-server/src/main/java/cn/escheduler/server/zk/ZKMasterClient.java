@@ -256,7 +256,7 @@ public class ZKMasterClient extends AbstractZKClient {
 
 								logger.info("start master failover ...");
 
-								List<ProcessInstance> needFailoverProcessInstanceList = processDao.queryNeddFailoverProcessInstances(masterHost);
+								List<ProcessInstance> needFailoverProcessInstanceList = processDao.queryNeedFailoverProcessInstances(masterHost);
 
 								//updateProcessInstance host is null and insert into command
 								for(ProcessInstance processInstance : needFailoverProcessInstanceList){

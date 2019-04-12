@@ -606,6 +606,7 @@ public class ProcessDao extends AbstractBaseDao {
                     updateTaskInstance(taskInstance);
                 }
                 processInstance.setStartTime(new Date());
+                processInstance.setEndTime(null);
                 processInstance.setRunTimes(runTime +1);
                 initComplementDataParam(processDefinition, processInstance, cmdParam);
                 break;
@@ -1272,7 +1273,7 @@ public class ProcessDao extends AbstractBaseDao {
         return scheduleMapper.queryById(id);
     }
 
-    public List<ProcessInstance> queryNeddFailoverProcessInstances(String host){
+    public List<ProcessInstance> queryNeedFailoverProcessInstances(String host){
         return processInstanceMapper.queryByHostAndStatus(host, stateArray);
     }
 
