@@ -47,8 +47,57 @@ mysqlUserName="xx"
 # mysql 密码
 mysqlPassword="xx"
 
+# conf/config/install_config.conf配置
+# 安装路径,不要当前路径(pwd)一样
+installPath="/data1_1T/escheduler"
+
+# 部署用户
+deployUser="escheduler"
+
+# zk集群
+zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
+
+# 安装hosts
+ips="ark0,ark1,ark2,ark3,ark4"
+
+# conf/config/run_config.conf配置
+# 运行Master的机器
+masters="ark0,ark1"
+
+# 运行Worker的机器
+workers="ark2,ark3,ark4"
+
+# 运行Alert的机器
+alertServer="ark3"
+
+# 运行Api的机器
+apiServers="ark1"
+
+# alert配置
+# 邮件协议
+mailProtocol="SMTP"
+
+# 邮件服务host
+mailServerHost="smtp.exmail.qq.com"
+
+# 邮件服务端口
+mailServerPort="25"
+
+# 发送人
+mailSender="xxxxxxxxxx"
+
+# 发送人密码
+mailPassword="xxxxxxxxxx"
+
+# 下载Excel路径
+xlsFilePath="/tmp/xls"
+
 
 # hadoop 配置
+# 是否启动hdfs,如果启动则为true,需要配置以下hadoop相关参数;
+# 不启动设置为false,如果为false,以下配置不需要修改
+hdfsStartupSate="false"
+
 # namenode地址,支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
 namenodeFs="hdfs://mycluster:8020"
 
@@ -58,6 +107,8 @@ yarnHaIps="192.168.xx.xx,192.168.xx.xx"
 # 如果是单 resourcemanager,只需要配置一个主机名称,如果是resourcemanager HA,则默认配置就好
 singleYarnIp="ark1"
 
+# hdfs根路径,根路径的owner必须是部署用户
+hdfsPath="/escheduler"
 
 # common 配置
 # 程序路径
@@ -69,17 +120,11 @@ downloadPath="/tmp/escheduler/download"
 # 任务执行路径
 execPath="/tmp/escheduler/exec"
 
-# hdfs根路径
-hdfsPath="/escheduler"
-
-# 是否启动hdfs,如果启动则为true,不启动设置为false
-hdfsStartupSate="true"
-
 # SHELL环境变量路径
-shellEnvPath="/opt/.escheduler_env.sh"
+shellEnvPath="$installPath/conf/env/.escheduler_env.sh"
 
 # Python换将变量路径
-pythonEnvPath="/opt/escheduler_env.py"
+pythonEnvPath="$installPath/conf/env/escheduler_env.py"
 
 # 资源文件的后缀
 resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
@@ -87,11 +132,7 @@ resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
 # 开发状态,如果是true,对于SHELL脚本可以在execPath目录下查看封装后的SHELL脚本,如果是false则执行完成直接删除
 devState="true"
 
-
 # zk 配置
-# zk集群
-zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
-
 # zk根目录
 zkRoot="/escheduler"
 
@@ -168,7 +209,6 @@ workerMaxCupLoadAvg="10"
 # worker预留内存,用来判断master是否还有执行能力
 workerReservedMemory="1"
 
-
 # api 配置
 # api 服务端口
 apiServerPort="12345"
@@ -187,53 +227,6 @@ springMaxRequestSize="1024MB"
 
 # api 最大post请求大小
 apiMaxHttpPostSize="5000000"
-
-
-
-# alert配置
-
-# 邮件协议
-mailProtocol="SMTP"
-
-# 邮件服务host
-mailServerHost="smtp.exmail.qq.com"
-
-# 邮件服务端口
-mailServerPort="25"
-
-# 发送人
-mailSender="xxxxxxxxxx"
-
-# 发送人密码
-mailPassword="xxxxxxxxxx"
-
-# 下载Excel路径
-xlsFilePath="/opt/xls"
-
-# conf/config/install_config.conf配置
-# 安装路径
-installPath="/data1_1T/escheduler"
-
-# 部署用户
-deployUser="escheduler"
-
-# 安装hosts
-ips="ark0,ark1,ark2,ark3,ark4"
-
-
-# conf/config/run_config.conf配置
-# 运行Master的机器
-masters="ark0,ark1"
-
-# 运行Worker的机器
-workers="ark2,ark3,ark4"
-
-# 运行Alert的机器
-alertServer="ark3"
-
-# 运行Api的机器
-apiServers="ark1"
-
 
 # 1,替换文件
 echo "1,替换文件"
@@ -315,8 +308,6 @@ sed -i ${txt} "s#masters.*#masters=${masters}#g" conf/config/run_config.conf
 sed -i ${txt} "s#workers.*#workers=${workers}#g" conf/config/run_config.conf
 sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/run_config.conf
 sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/run_config.conf
-
-
 
 
 # 2,创建目录
