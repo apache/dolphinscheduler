@@ -117,13 +117,13 @@ public class QueueService extends BaseService {
             return result;
         }
 
-        if (checkQueueExist(queue)) {
-            putMsg(result, Status.QUEUE_EXIST, queue);
+        if (checkQueueNameExist(queueName)) {
+            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
             return result;
         }
 
-        if (checkQueueNameExist(queueName)) {
-            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
+        if (checkQueueExist(queue)) {
+            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
             return result;
         }
 
@@ -162,24 +162,24 @@ public class QueueService extends BaseService {
             return result;
         }
 
-        // whether queue and queueName is changed
+        // whether queue value or queueName is changed
         if (queue.equals(queueObj.getQueue()) && queueName.equals(queueObj.getQueueName())) {
             putMsg(result, Status.NEED_NOT_UPDATE_QUEUE);
             return result;
         }
 
-        // check queue is exist
-        if (!queue.equals(queueObj.getQueue())) {
-            if(checkQueueExist(queue)){
-                putMsg(result, Status.QUEUE_EXIST, queue);
+        // check queue name is exist
+        if (!queueName.equals(queueObj.getQueueName())) {
+            if(checkQueueNameExist(queueName)){
+                putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
                 return result;
             }
         }
 
-        // check queueName is exist
-        if (!queueName.equals(queueObj.getQueueName())) {
-            if(checkQueueNameExist(queueName)){
-                putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
+        // check queue value is exist
+        if (!queue.equals(queueObj.getQueue())) {
+            if(checkQueueExist(queue)){
+                putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
                 return result;
             }
         }
@@ -216,13 +216,13 @@ public class QueueService extends BaseService {
             return result;
         }
         if(checkQueueExist(queue)){
-            logger.error("queue {} has exist, can't create again.", queue);
-            putMsg(result, Status.QUEUE_EXIST, queue);
+            logger.error("queue value {} has exist, can't create again.", queue);
+            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
             return result;
         }
 
         if(checkQueueNameExist(queueName)){
-            logger.error("queueName {} has exist, can't create again.", queueName);
+            logger.error("queue name {} has exist, can't create again.", queueName);
             putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
             return result;
         }
