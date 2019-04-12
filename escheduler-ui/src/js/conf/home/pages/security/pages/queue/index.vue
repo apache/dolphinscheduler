@@ -11,13 +11,13 @@
           </m-conditions>
         </template>
         <template slot="content">
-          <template v-if="tenementList.length">
-            <m-list :tenement-list="tenementList" :page-no="pageNo" :page-size="pageSize"></m-list>
+          <template v-if="queueList.length">
+            <m-list :queue-list="queueList" :page-no="pageNo" :page-size="pageSize"></m-list>
             <div class="page-box">
               <x-page :current="pageNo" :total="total" show-elevator @on-change="_page"></x-page>
             </div>
           </template>
-          <template v-if="!tenementList.length">
+          <template v-if="!queueList.length">
             <m-no-data></m-no-data>
           </template>
           <m-spin :is-spin="isLoading"></m-spin>
@@ -45,23 +45,23 @@
         total: null,
         searchVal: '',
         isLoading: true,
-        tenementList: []
+        queueList: []
       }
     },
     props: {},
     methods: {
-      ...mapActions('security', ['getTenantListP']),
+      ...mapActions('security', ['getQueueListP']),
       /**
        * 查询
        */
       _onConditions (o) {
         this.searchVal = o.searchVal
         this.pageNo = 1
-        this._getTenantListP()
+        this._getQueueListP()
       },
       _page (val) {
         this.pageNo = val
-        this._getTenantListP()
+        this._getQueueListP()
       },
       _create (item) {
         let self = this
@@ -75,7 +75,7 @@
             return h(mCreateQueue, {
               on: {
                 onUpdate () {
-                  self._getTenantListP('false')
+                  self._getQueueListP('false')
                   modal.remove()
                 },
                 close () {
@@ -89,14 +89,14 @@
           }
         })
       },
-      _getTenantListP (flag) {
+      _getQueueListP (flag) {
         this.isLoading = !flag
-        this.getTenantListP({
+        this.getQueueListP({
           pageSize: this.pageSize,
           pageNo: this.pageNo,
           searchVal: this.searchVal
         }).then(res => {
-          this.tenementList = res.totalList
+          this.queueList = res.totalList
           this.total = res.total
           this.isLoading = false
         }).catch(e => {
@@ -106,7 +106,7 @@
     },
     watch: {},
     created () {
-      this._getTenantListP()
+      this._getQueueListP()
     },
     mounted () {
 

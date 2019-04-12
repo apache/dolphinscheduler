@@ -11,8 +11,8 @@
           <template slot="content">
             <x-input
                     type="input"
-                    v-model="tenantName"
-                    :placeholder="$t('请输入name')"
+                    v-model="queueName"
+                    placeholder="请输入名称"
                     autocomplete="off">
             </x-input>
           </template>
@@ -22,8 +22,8 @@
           <template slot="content">
             <x-input
                     type="input"
-                    v-model="tenantName"
-                    :placeholder="$t('请输入name')"
+                    v-model="queue"
+                    placeholder="请输入队列值"
                     autocomplete="off">
             </x-input>
           </template>
@@ -45,18 +45,90 @@
     data () {
       return {
         store,
+        queue:'',
+        queueName:''
       }
     },
     props: {
       item: Object
     },
     methods: {
+      _ok(){
+        if (!this._verification()) {
+          return
+        }
 
+        let param = {
+          queue: _.trim(this.queue),
+          queueName: _.trim(this.queueName)
+        }
+        // edit
+        if (this.item) {
+          param.id = this.item.id
+        }
+
+        let $then = (res) => {
+          this.$emit('onUpdate')
+          this.$message.success(res.msg)
+          setTimeout(() => {
+            this.$refs['popup'].spinnerLoading = false
+          }, 800)
+        }
+
+        let $catch = (e) => {
+          this.$message.error(e.msg || '')
+          this.$refs['popup'].spinnerLoading = false
+        }
+
+        if (this.item) {
+          this.$refs['popup'].spinnerLoading = true
+          this.store.dispatch(`security/updateQueueQ`, param).then(res => {
+            $then(res)
+          }).catch(e => {
+            $catch(e)
+          })
+        }else{
+          this._verifyName(param).then(() => {
+            this.$refs['popup'].spinnerLoading = true
+            this.store.dispatch(`security/createQueueQ`, param).then(res => {
+              $then(res)
+            }).catch(e => {
+              $catch(e)
+            })
+          }).catch(e => {
+            this.$message.error(e.msg || '')
+          })
+        }
+
+      },
+      _verification(){
+        if (!this.queueName) {
+          this.$message.warning(`请输入名称`)
+          return false
+        }
+        if (!this.queue) {
+          this.$message.warning(`请输入队列值`)
+          return false
+        }
+        return true
+      },
+      _verifyName(param){
+        return new Promise((resolve, reject) => {
+          this.store.dispatch(`security/verifyQueueQ`, param).then(res => {
+            resolve()
+          }).catch(e => {
+            reject(e)
+          })
+        })
+      }
     },
     watch: {
     },
     created () {
-
+      if (this.item) {
+        this.queueName = this.item.queueName
+        this.queue = this.item.queue
+      }
     },
     mounted () {
 
