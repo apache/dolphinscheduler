@@ -7,6 +7,11 @@
 .idea
 .idea/
 .idea/*
+.target
+.target/
+target/*
+*/target
+*/target/*
 .settings
 .nbproject
 .classpath
