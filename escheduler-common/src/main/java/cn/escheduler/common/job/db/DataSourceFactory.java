@@ -41,6 +41,10 @@ public class DataSourceFactory {
           return JSONUtils.parseObject(parameter, SparkDataSource.class);
         case CLICKHOUSE:
           return JSONUtils.parseObject(parameter, ClickHouseDataSource.class);
+        case ORACLE:
+          return JSONUtils.parseObject(parameter, OracleDataSource.class);
+        case SQLSERVER:
+          return JSONUtils.parseObject(parameter, SQLServerDataSource.class);
         default:
           return null;
       }

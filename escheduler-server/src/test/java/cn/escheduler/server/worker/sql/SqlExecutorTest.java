@@ -55,7 +55,7 @@ public class SqlExecutorTest {
         String nodeName = "mysql sql test";
         String taskAppId = "51_11282_263978";
         String tenantCode = "hdfs";
-        Integer taskInstId = 263978;
+        int taskInstId = 263978;
         sharedTestSqlTask(nodeName, taskAppId, tenantCode, taskInstId);
     }
 
@@ -64,7 +64,25 @@ public class SqlExecutorTest {
         String nodeName = "ClickHouse sql test";
         String taskAppId = "1_11_20";
         String tenantCode = "default";
-        Integer taskInstId = 20;
+        int taskInstId = 20;
+        sharedTestSqlTask(nodeName, taskAppId, tenantCode, taskInstId);
+    }
+
+    @Test
+    public void testOracle() throws Exception {
+        String nodeName = "oracle sql test";
+        String taskAppId = "2_13_25";
+        String tenantCode = "demo";
+        int taskInstId = 25;
+        sharedTestSqlTask(nodeName, taskAppId, tenantCode, taskInstId);
+    }
+
+    @Test
+    public void testSQLServer() throws Exception {
+        String nodeName = "SQL Server sql test";
+        String taskAppId = "3_14_27";
+        String tenantCode = "demo";
+        int taskInstId = 27;
         sharedTestSqlTask(nodeName, taskAppId, tenantCode, taskInstId);
     }
 
@@ -76,7 +94,7 @@ public class SqlExecutorTest {
      * @param taskInstId task instance id
      * @throws Exception
      */
-    private void sharedTestSqlTask(String nodeName, String taskAppId, String tenantCode, Integer taskInstId) throws Exception {
+    private void sharedTestSqlTask(String nodeName, String taskAppId, String tenantCode, int taskInstId) throws Exception {
         TaskProps taskProps = new TaskProps();
         taskProps.setTaskDir("");
         // processDefineId_processInstanceId_taskInstanceId
