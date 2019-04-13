@@ -15,6 +15,7 @@
               <x-radio :label="'SPARK'">SPARK</x-radio>
               <x-radio :label="'CLICKHOUSE'">CLICKHOUSE</x-radio>
               <x-radio :label="'ORACLE'">ORACLE</x-radio>
+              <x-radio :label="'SQLSERVER'">SQLSERVER</x-radio>
             </x-radio-group>
           </template>
         </m-list-box-f>

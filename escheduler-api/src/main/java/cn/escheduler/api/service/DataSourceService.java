@@ -210,6 +210,7 @@ public class DataSourceService extends BaseService{
 
         switch (dataSource.getType()) {
             case HIVE:
+            case SQLSERVER:
                 separator = ";";
                 break;
             case MYSQL:
@@ -376,6 +377,10 @@ public class DataSourceService extends BaseService{
                     datasource = JSONObject.parseObject(parameter, OracleDataSource.class);
                     Class.forName(Constants.COM_ORACLE_JDBC_DRIVER);
                     break;
+                case SQLSERVER:
+                    datasource = JSONObject.parseObject(parameter, SQLServerDataSource.class);
+                    Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
+                    break;
                 default:
                     break;
             }
@@ -447,7 +452,9 @@ public class DataSourceService extends BaseService{
                 || Constants.CLICKHOUSE.equals(type.name())
                 || Constants.ORACLE.equals(type.name())) {
             separator = "&";
-        } else if (Constants.HIVE.equals(type.name()) || Constants.SPARK.equals(type.name())) {
+        } else if (Constants.HIVE.equals(type.name())
+                || Constants.SPARK.equals(type.name())
+                || Constants.SQLSERVER.equals(type.name())) {
             separator = ";";
         }
 
@@ -501,6 +508,9 @@ public class DataSourceService extends BaseService{
             sb.append(host).append(":").append(port);
         } else if (Constants.ORACLE.equals(type.name())) {
             sb.append(Constants.JDBC_ORACLE);
+            sb.append(host).append(":").append(port);
+        } else if (Constants.SQLSERVER.equals(type.name())) {
+            sb.append(Constants.JDBC_SQLSERVER);
             sb.append(host).append(":").append(port);
         }
 
