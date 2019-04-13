@@ -386,6 +386,17 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>com.microsoft.azure</artifactId>
+					<groupId>azure-keyvault</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 

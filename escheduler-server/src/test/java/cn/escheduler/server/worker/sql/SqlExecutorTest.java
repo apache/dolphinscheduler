@@ -77,6 +77,15 @@ public class SqlExecutorTest {
         sharedTestSqlTask(nodeName, taskAppId, tenantCode, taskInstId);
     }
 
+    @Test
+    public void testSQLServer() throws Exception {
+        String nodeName = "SQL Server sql test";
+        String taskAppId = "3_14_27";
+        String tenantCode = "demo";
+        int taskInstId = 27;
+        sharedTestSqlTask(nodeName, taskAppId, tenantCode, taskInstId);
+    }
+
     /**
      * Basic test template for SQLTasks, mainly test different types of DBMS types
      * @param nodeName node name for selected task
