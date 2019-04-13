@@ -617,6 +617,11 @@ public final class Constants {
     public static final String JDBC_CLICKHOUSE_CLASS_NAME = "ru.yandex.clickhouse.ClickHouseDriver";
 
     /**
+     * Oracle
+     */
+    public static final String JDBC_ORACLE_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
+
+    /**
      * spark params constant
      */
     public static final String MASTER = "--master";

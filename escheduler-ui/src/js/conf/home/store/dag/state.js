@@ -71,6 +71,11 @@ export default {
       id: 4,
       code: 'CLICKHOUSE',
       disabled: false
+    },
+    {
+      id: 5,
+      code: 'ORACLE',
+      disabled: false
     }
   ],
   // Alarm interface

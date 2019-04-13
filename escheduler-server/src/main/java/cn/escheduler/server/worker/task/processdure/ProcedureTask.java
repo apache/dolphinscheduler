@@ -24,6 +24,7 @@ import cn.escheduler.common.enums.TaskTimeoutStrategy;
 import cn.escheduler.common.job.db.BaseDataSource;
 import cn.escheduler.common.job.db.ClickHouseDataSource;
 import cn.escheduler.common.job.db.MySQLDataSource;
+import cn.escheduler.common.job.db.OracleDataSource;
 import cn.escheduler.common.job.db.PostgreDataSource;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.task.AbstractParameters;
@@ -117,6 +118,9 @@ public class ProcedureTask extends AbstractTask {
                         //  but still load JDBC driver to keep source code sync with other DB
                         baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),ClickHouseDataSource.class);
                         Class.forName(Constants.JDBC_CLICKHOUSE_CLASS_NAME);
+                    }else if (DbType.ORACLE.name().equals(dataSource.getType().name())){
+                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(), OracleDataSource.class);
+                        Class.forName(Constants.JDBC_ORACLE_CLASS_NAME);
                     }
 
                     // get jdbc connection

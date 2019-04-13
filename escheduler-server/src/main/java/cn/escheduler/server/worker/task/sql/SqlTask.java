@@ -123,6 +123,9 @@ public class SqlTask extends AbstractTask {
                     }else if (DbType.CLICKHOUSE.name().equals(dataSource.getType().name())){
                         baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),ClickHouseDataSource.class);
                         Class.forName(Constants.JDBC_CLICKHOUSE_CLASS_NAME);
+                    }else if (DbType.ORACLE.name().equals(dataSource.getType().name())){
+                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),OracleDataSource.class);
+                        Class.forName(Constants.JDBC_ORACLE_CLASS_NAME);
                     }
 
                     Map<Integer,Property> sqlParamMap =  new HashMap<Integer,Property>();
