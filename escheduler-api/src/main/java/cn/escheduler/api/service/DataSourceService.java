@@ -210,15 +210,13 @@ public class DataSourceService extends BaseService{
 
         switch (dataSource.getType()) {
             case HIVE:
+            case SQLSERVER:
                 separator = ";";
                 break;
             case MYSQL:
-                separator = "&";
-                break;
             case POSTGRESQL:
-                separator = "&";
-                break;
             case CLICKHOUSE:
+            case ORACLE:
                 separator = "&";
                 break;
             default:
@@ -375,6 +373,14 @@ public class DataSourceService extends BaseService{
                     datasource = JSONObject.parseObject(parameter, ClickHouseDataSource.class);
                     Class.forName(Constants.COM_CLICKHOUSE_JDBC_DRIVER);
                     break;
+                case ORACLE:
+                    datasource = JSONObject.parseObject(parameter, OracleDataSource.class);
+                    Class.forName(Constants.COM_ORACLE_JDBC_DRIVER);
+                    break;
+                case SQLSERVER:
+                    datasource = JSONObject.parseObject(parameter, SQLServerDataSource.class);
+                    Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
+                    break;
                 default:
                     break;
             }
@@ -441,9 +447,14 @@ public class DataSourceService extends BaseService{
         String address = buildAddress(type, host, port);
         String jdbcUrl = address + "/" + database;
         String separator = "";
-        if (Constants.MYSQL.equals(type.name()) || Constants.POSTGRESQL.equals(type.name()) || Constants.CLICKHOUSE.equals(type.name())) {
+        if (Constants.MYSQL.equals(type.name())
+                || Constants.POSTGRESQL.equals(type.name())
+                || Constants.CLICKHOUSE.equals(type.name())
+                || Constants.ORACLE.equals(type.name())) {
             separator = "&";
-        } else if (Constants.HIVE.equals(type.name()) || Constants.SPARK.equals(type.name())) {
+        } else if (Constants.HIVE.equals(type.name())
+                || Constants.SPARK.equals(type.name())
+                || Constants.SQLSERVER.equals(type.name())) {
             separator = ";";
         }
 
@@ -494,6 +505,12 @@ public class DataSourceService extends BaseService{
             }
         } else if (Constants.CLICKHOUSE.equals(type.name())) {
             sb.append(Constants.JDBC_CLICKHOUSE);
+            sb.append(host).append(":").append(port);
+        } else if (Constants.ORACLE.equals(type.name())) {
+            sb.append(Constants.JDBC_ORACLE);
+            sb.append(host).append(":").append(port);
+        } else if (Constants.SQLSERVER.equals(type.name())) {
+            sb.append(Constants.JDBC_SQLSERVER);
             sb.append(host).append(":").append(port);
         }
 
