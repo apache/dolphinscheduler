@@ -1,7 +1,7 @@
 <template>
   <div class="clearfix dag-model" >
     <div class="toolbar">
-      <div class="title"><span>{{$t('工具栏')}}</span></div>
+      <div class="title"><span>{{$t('Toolbar')}}</span></div>
       <div class="toolbar-btn">
         <div class="bar-box roundedRect jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected"
              :class="v === dagBarId ? 'active' : ''"
@@ -20,7 +20,7 @@
           <x-button
                   style="vertical-align: middle;"
                   data-toggle="tooltip"
-                  :title="$t('查看变量')"
+                  :title="$t('View variables')"
                   data-container="body"
                   type="primary"
                   size="xsmall"
@@ -42,7 +42,7 @@
           </div>
           <x-button
                   data-toggle="tooltip"
-                  :title="$t('刷新DAG状态')"
+                  :title="$t('Refresh DAG status')"
                   data-container="body"
                   style="vertical-align: middle;"
                   icon="fa fa-refresh"
@@ -59,7 +59,7 @@
                   size="xsmall"
                   icon="fa fa-reply"
                   @click="_rtNodesDag" >
-            {{$t('返回上一节点')}}
+            {{$t('Return_1')}}
           </x-button>
           <x-button
                   style="vertical-align: middle;"
@@ -70,7 +70,7 @@
                   @click="_saveChart"
                   icon="fa fa-save"
                   :disabled="isDetails">
-            {{spinnerLoading ? 'Loading...' : $t('保存')}}
+            {{spinnerLoading ? 'Loading...' : $t('Save')}}
           </x-button>
         </div>
       </div>
@@ -152,7 +152,7 @@
             let idArr = allNodesId()
             const titleTpl = (item, desc) => {
               let $item = _.filter(taskList, v => v.name === item.name)[0]
-              return `<div style="text-align: left">${i18n.$t('名称')}：${$item.name}</br>${i18n.$t('状态')}：${desc}</br>${i18n.$t('类型')}：${$item.taskType}</br>${i18n.$t('host')}：${$item.host || '-'}</br>${i18n.$t('重试次数')}：${$item.retryTimes}</br>${i18n.$t('提交时间')}：${formatDate($item.submitTime)}</br>${i18n.$t('开始时间')}：${formatDate($item.startTime)}</br>${i18n.$t('结束时间')}：${$item.endTime ? formatDate($item.endTime) : '-'}</br></div>`
+              return `<div style="text-align: left">${i18n.$t('Name')}：${$item.name}</br>${i18n.$t('State')}：${desc}</br>${i18n.$t('type')}：${$item.taskType}</br>${i18n.$t('host')}：${$item.host || '-'}</br>${i18n.$t('Retry Count')}：${$item.retryTimes}</br>${i18n.$t('Submit Time')}：${formatDate($item.submitTime)}</br>${i18n.$t('Start Time')}：${formatDate($item.startTime)}</br>${i18n.$t('End Time')}：${$item.endTime ? formatDate($item.endTime) : '-'}</br></div>`
             }
             data.forEach(v1 => {
               idArr.forEach(v2 => {
@@ -232,7 +232,7 @@
           Dag.saveStore().then(res => {
             if (this.urlParam.id) {
               /**
-               * 编辑
+               * Edit
                * @param saveInstanceEditDAGChart => Process instance editing
                * @param saveEditDAGChart => Process definition editing
                */
@@ -300,7 +300,7 @@
       _saveChart () {
         // Verify node
         if (!this.tasks.length) {
-          this.$message.warning(`${i18n.$t('未创建节点保存失败')}`)
+          this.$message.warning(`${i18n.$t('Failed to create node to save')}`)
           return
         }
 
@@ -350,7 +350,7 @@
         this._getTaskState(false).then(res => {
           setTimeout(() => {
             this.isRefresh = false
-            this.$message.success(`${i18n.$t('刷新状态成功')}`)
+            this.$message.success(`${i18n.$t('Refresh status succeeded')}`)
           }, 2200)
         })
       },

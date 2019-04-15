@@ -1,33 +1,33 @@
 <template>
   <m-popup
           ref="popup"
-          :ok-text="item ? $t('确认编辑') : $t('确认提交')"
-          :nameText="item ? $t('编辑用户') : $t('创建用户')"
+          :ok-text="item ? $t('Edit') : $t('Submit')"
+          :nameText="item ? $t('Edit User') : $t('Create User')"
           @ok="_ok">
     <template slot="content">
       <div class="create-user-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('用户名称')}}</template>
+          <template slot="name"><b>*</b>{{$t('User Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="userName"
-                    :placeholder="$t('请输入用户名称')">
+                    :placeholder="$t('Please enter user name')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="router.history.current.name !== 'account'">
-          <template slot="name"><b>*</b>{{$t('密码')}}</template>
+          <template slot="name"><b>*</b>{{$t('Password')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="userPassword"
-                    :placeholder="$t('请输入密码')">
+                    :placeholder="$t('Please enter your password')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isADMIN">
-          <template slot="name"><b>*</b>{{$t('租户')}}</template>
+          <template slot="name"><b>*</b>{{$t('Tenant')}}</template>
           <template slot="content">
             <x-select v-model="tenantId">
               <x-option
@@ -40,22 +40,22 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('邮件')}}</template>
+          <template slot="name"><b>*</b>{{$t('Email')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="email"
-                    :placeholder="$t('请输入邮件')">
+                    :placeholder="$t('Please enter email')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('手机')}}</template>
+          <template slot="name">{{$t('Phone')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="phone"
-                    :placeholder="$t('请输入手机')">
+                    :placeholder="$t('Please enter phone number')">
             </x-input>
           </template>
         </m-list-box-f>
@@ -116,28 +116,28 @@
 
         // user name
         if (!this.userName) {
-          this.$message.warning(`${i18n.$t('请输入用户名')}`)
+          this.$message.warning(`${i18n.$t('Please enter user name')}`)
           return false
         }
         // password
         if (!this.userPassword && !this.item) {
-          this.$message.warning(`${i18n.$t('请输入密码')}`)
+          this.$message.warning(`${i18n.$t('Please enter your password')}`)
           return false
         }
         // email
         if (!this.email) {
-          this.$message.warning(`${i18n.$t('请输入邮箱')}`)
+          this.$message.warning(`${i18n.$t('Please enter email')}`)
           return false
         }
         // Verify email
         if (!regEmail.test(this.email)) {
-          this.$message.warning(`${i18n.$t('请输入正确的邮箱格式')}`)
+          this.$message.warning(`${i18n.$t('Please enter the correct email format')}`)
           return false
         }
         // Verify phone
         if (this.phone) {
           if (!regPhone.test(this.phone)) {
-            this.$message.warning(`${i18n.$t('请输入正确的手机格式')}`)
+            this.$message.warning(`${i18n.$t('Please enter the correct mobile phone format')}`)
             return false
           }
         }

@@ -4,7 +4,7 @@
       <div class="img">
         <img src="./images/errorTip.png" alt="">
       </div>
-      <div class="text">{{msg || $t('查询无数据')}}</div>
+      <div class="text">{{msg || $t('No data')}}</div>
     </div>
   </div>
 </template>

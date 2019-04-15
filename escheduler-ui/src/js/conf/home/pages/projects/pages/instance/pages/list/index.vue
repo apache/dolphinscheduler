@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('工作流实例')">
+    <m-list-construction :title="$t('Process Instance')">
       <template slot="conditions">
         <m-conditions @on-query="_onQuery"></m-conditions>
       </template>
@@ -43,7 +43,7 @@
         total: null,
         // 数据
         processInstanceList: [],
-        // 参数
+        // Parameter
         searchParams: {
           // 搜索关键词
           searchVal: '',
@@ -53,11 +53,11 @@
           pageNo: 1,
           // host
           host: '',
-          // 状态
+          // State
           stateType: '',
-          // 开始时间
+          // Start Time
           startDate: '',
-          // 结束时间
+          // End Time
           endDate: ''
         }
       }
@@ -66,7 +66,7 @@
     methods: {
       ...mapActions('dag', ['getProcessInstance']),
       /**
-       * 查询
+       * Query
        */
       _onQuery (o) {
         this.searchParams = _.assign(this.searchParams, o)
