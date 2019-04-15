@@ -59,7 +59,7 @@ let menu = {
 
   security: [
     {
-      name: `${i18n.$t('Tenant Management')}`,
+      name: `${i18n.$t('Tenant Manage')}`,
       id: 1,
       path: 'tenement-manage',
       isOpen: true,
@@ -67,7 +67,7 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('User Management')}`,
+      name: `${i18n.$t('User Manage')}`,
       id: 1,
       path: 'users-manage',
       isOpen: true,
@@ -75,7 +75,7 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('Warning group management')}`,
+      name: `${i18n.$t('Warning group manage')}`,
       id: 1,
       path: 'warning-groups-manage',
       isOpen: true,
@@ -91,7 +91,7 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('Servers management')}`,
+      name: `${i18n.$t('Servers manage')}`,
       id: 1,
       path: '',
       isOpen: true,
@@ -112,7 +112,7 @@ let menu = {
   ],
   resource: [
     {
-      name: `${i18n.$t('File Management')}`,
+      name: `${i18n.$t('File Manage')}`,
       id: 1,
       path: 'file',
       isOpen: true,
@@ -121,7 +121,7 @@ let menu = {
       disabled: false
     },
     {
-      name: `${i18n.$t('UDF management')}`,
+      name: `${i18n.$t('UDF manage')}`,
       id: 1,
       path: '',
       isOpen: true,
@@ -129,12 +129,12 @@ let menu = {
       disabled: false,
       children: [
         {
-          name: `${i18n.$t('Resource management')}`,
+          name: `${i18n.$t('Resource manage')}`,
           path: 'resource-udf-resource',
           id: 1
         },
         {
-          name: `${i18n.$t('Function management')}`,
+          name: `${i18n.$t('Function manage')}`,
           path: 'resource-udf-function',
           id: 2
         }
