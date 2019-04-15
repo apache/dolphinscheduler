@@ -1,3 +1,5 @@
+EasyScheduler提交代码流程
+====
 * 首先从远端仓库*https://github.com/analysys/EasyScheduler.git* fork一份代码到自己的仓库中
 
 * 远端仓库中目前有三个分支：
