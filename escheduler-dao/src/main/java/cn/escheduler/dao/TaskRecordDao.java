@@ -40,6 +40,8 @@ public class TaskRecordDao {
 
     private static Logger logger = LoggerFactory.getLogger(TaskRecordDao.class.getName());
 
+
+
     /**
      * 加载配置文件
      */
@@ -134,7 +136,7 @@ public class TaskRecordDao {
      * @param filterMap
      * @return
      */
-    public static int countTaskRecord(Map<String, String> filterMap){
+    public static int countTaskRecord(Map<String, String> filterMap, String table){
 
         int count = 0;
         Connection conn = null;
@@ -143,7 +145,7 @@ public class TaskRecordDao {
             if(conn == null){
                 return count;
             }
-            String sql = "select count(1) as count from eamp_hive_log_hd";
+            String sql = String.format("select count(1) as count from %s", table);
             sql += getWhereString(filterMap);
             PreparedStatement pstmt;
             pstmt = conn.prepareStatement(sql);
@@ -171,9 +173,9 @@ public class TaskRecordDao {
      * @param filterMap
      * @return
      */
-    public static List<TaskRecord> queryAllTaskRecord(Map<String,String> filterMap ) {
+    public static List<TaskRecord> queryAllTaskRecord(Map<String,String> filterMap , String table) {
 
-        String sql = "select * from eamp_hive_log_hd ";
+        String sql = String.format("select * from  %s", table);
         sql += getWhereString(filterMap);
 
         int offset = Integer.parseInt(filterMap.get("offset"));

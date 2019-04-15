@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static cn.escheduler.common.Constants.*;
+
 /**
  * task record service
  */
@@ -69,8 +71,9 @@ public class TaskRecordService extends BaseService{
         map.put("offset", pageInfo.getStart().toString());
         map.put("pageSize", pageInfo.getPageSize().toString());
 
-        int count = TaskRecordDao.countTaskRecord(map);
-        List<TaskRecord> recordList = TaskRecordDao.queryAllTaskRecord(map);
+        String table =TASK_RECORD_TABLE_HIVE_LOG;
+        int count = TaskRecordDao.countTaskRecord(map, table);
+        List<TaskRecord> recordList = TaskRecordDao.queryAllTaskRecord(map, table);
         pageInfo.setTotalCount(count);
         pageInfo.setLists(recordList);
         result.put(Constants.DATA_LIST, pageInfo);
