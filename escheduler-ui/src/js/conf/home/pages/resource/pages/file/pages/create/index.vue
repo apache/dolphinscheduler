@@ -1,23 +1,23 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'resource'"></m-secondary-menu>
-    <m-list-construction :title="$t('创建文件')">
+    <m-list-construction :title="$t('Create File')">
       <template slot="content">
         <div class="resource-create-model">
           <m-list-box-f>
-            <template slot="name"><b>*</b>{{$t('文件名称')}}</template>
+            <template slot="name"><b>*</b>{{$t('File Name')}}</template>
             <template slot="content">
               <x-input
                       type="input"
                       v-model="fileName"
                       style="width: 300px;"
-                      :placeholder="$t('请输入name')"
+                      :placeholder="$t('Please enter name')"
                       autocomplete="off">
               </x-input>
             </template>
           </m-list-box-f>
           <m-list-box-f>
-            <template slot="name"><b>*</b>{{$t('文件格式')}}</template>
+            <template slot="name"><b>*</b>{{$t('File Format')}}</template>
             <template slot="content">
               <x-select v-model="suffix" style="width: 100px;" @on-change="_onChange">
                 <x-option
@@ -30,19 +30,19 @@
             </template>
           </m-list-box-f>
           <m-list-box-f>
-            <template slot="name">{{$t('描述')}}</template>
+            <template slot="name">{{$t('Description')}}</template>
             <template slot="content">
               <x-input
                       type="textarea"
                       v-model="desc"
                       style="width: 430px;"
-                      :placeholder="$t('请输入desc')"
+                      :placeholder="$t('Please enter description')"
                       autocomplete="off">
               </x-input>
             </template>
           </m-list-box-f>
           <m-list-box-f>
-            <template slot="name"><b>*</b>{{$t('文件内容')}}</template>
+            <template slot="name"><b>*</b>{{$t('File Content')}}</template>
             <template slot="content">
               <textarea id="code-create-mirror" name="code-create-mirror"></textarea>
             </template>
@@ -51,8 +51,8 @@
             <template slot="name">&nbsp;</template>
             <template slot="content">
               <div class="submit">
-                <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('确认创建')}} </x-button>
-                <x-button type="text" @click="() => $router.push({name: 'file'})"> {{$t('取消')}} </x-button>
+                <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('Create')}} </x-button>
+                <x-button type="text" @click="() => $router.push({name: 'file'})"> {{$t('Cancel')}} </x-button>
               </div>
             </template>
           </m-list-box-f>
@@ -112,11 +112,11 @@
       },
       _validation () {
         if (!this.fileName) {
-          this.$message.warning(`${i18n.$t('请输入资源名称')}`)
+          this.$message.warning(`${i18n.$t('Please enter resource name')}`)
           return false
         }
         if (!editor.getValue()) {
-          this.$message.warning(`${i18n.$t('请输入资源内容')}`)
+          this.$message.warning(`${i18n.$t('Please enter the resource content')}`)
           return false
         }
 

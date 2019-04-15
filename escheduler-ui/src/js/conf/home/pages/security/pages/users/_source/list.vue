@@ -4,28 +4,28 @@
       <table>
         <tr>
           <th>
-            <span>{{$t('编号')}}</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>{{$t('用户名称')}}</span>
+            <span>{{$t('User Name')}}</span>
           </th>
           <th>
-            <span>{{$t('租户')}}</span>
+            <span>{{$t('Tenant')}}</span>
           </th>
           <th>
-            <span>{{$t('邮箱')}}</span>
+            <span>{{$t('Email')}}</span>
           </th>
           <th>
-            <span>{{$t('手机')}}</span>
+            <span>{{$t('Phone')}}</span>
           </th>
           <th>
-            <span>{{$t('创建时间')}}</span>
+            <span>{{$t('Create Time')}}</span>
           </th>
           <th>
-            <span>{{$t('更新时间')}}</span>
+            <span>{{$t('Update Time')}}</span>
           </th>
           <th width="120">
-            <span>{{$t('操作')}}</span>
+            <span>{{$t('Operation')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
@@ -52,26 +52,26 @@
                     popper-class="user-list-poptip"
                     placement="bottom-end">
               <div class="auth-select-box">
-                <a href="javascript:" @click="_authProject(item,$index)">{{$t('项目')}}</a>
-                <a href="javascript:" @click="_authFile(item,$index)">{{$t('资源')}}</a>
-                <a href="javascript:" @click="_authDataSource(item,$index)">{{$t('数据源')}}</a>
-                <a href="javascript:" @click="_authUdfFunc(item,$index)">{{$t('UDF函数')}}</a>
+                <a href="javascript:" @click="_authProject(item,$index)">{{$t('Project')}}</a>
+                <a href="javascript:" @click="_authFile(item,$index)">{{$t('Resources')}}</a>
+                <a href="javascript:" @click="_authDataSource(item,$index)">{{$t('Datasource')}}</a>
+                <a href="javascript:" @click="_authUdfFunc(item,$index)">{{$t('UDF Function')}}</a>
               </div>
               <template slot="reference">
-                <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('授权')" icon="iconfont icon-yonghu1"></x-button>
+                <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Authorize')" icon="iconfont icon-yonghu1"></x-button>
               </template>
             </x-poptip>
 
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-bianjixiugai" :title="$t('编辑')" @click="_edit(item)">
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-bianjixiugai" :title="$t('Edit')" @click="_edit(item)">
             </x-button>
             <x-poptip
                     :ref="'poptip-delete-' + $index"
                     placement="bottom-end"
                     width="90">
-              <p>{{$t('确定删除吗?')}}</p>
+              <p>{{$t('Delete?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('取消')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('确定')}}</x-button>
+                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
+                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
               </div>
               <template slot="reference">
                 <x-button
@@ -79,7 +79,7 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('删除')"
+                        :title="$t('delete')"
                         icon="iconfont icon-shanchu">
                 </x-button>
               </template>
@@ -174,7 +174,7 @@
                   sourceListPrs: sourceListPrs,
                   targetListPrs: targetListPrs,
                   type: {
-                    name: `${i18n.$t('项目')}`
+                    name: `${i18n.$t('Project')}`
                   }
                 }
               })
@@ -226,7 +226,7 @@
                   sourceListPrs: sourceListPrs,
                   targetListPrs: targetListPrs,
                   type: {
-                    name: `${i18n.$t('资源')}`
+                    name: `${i18n.$t('Resources')}`
                   }
                 }
               })
@@ -278,7 +278,7 @@
                   sourceListPrs: sourceListPrs,
                   targetListPrs: targetListPrs,
                   type: {
-                    name: `${i18n.$t('数据源')}`
+                    name: `${i18n.$t('Datasource')}`
                   }
                 }
               })
@@ -330,7 +330,7 @@
                   sourceListPrs: sourceListPrs,
                   targetListPrs: targetListPrs,
                   type: {
-                    name: 'UDF函数'
+                    name: 'UDF Function'
                   }
                 }
               })

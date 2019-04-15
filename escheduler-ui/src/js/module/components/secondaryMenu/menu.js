@@ -19,7 +19,7 @@ import i18n from '@/module/i18n'
 let menu = {
   projects: [
     {
-      name: `${i18n.$t('项目首页')}`,
+      name: `${i18n.$t('Project Home')}`,
       id: 1,
       path: 'projects-index',
       isOpen: true,
@@ -27,39 +27,39 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('工作流')}`,
+      name: `${i18n.$t('Process')}`,
       id: 2,
       path: '',
       isOpen: true,
       icon: 'fa-gear',
       children: [
         {
-          name: `${i18n.$t('工作流定义')}`,
+          name: `${i18n.$t('Process definition')}`,
           path: 'definition',
           id: 1
         },
         {
-          name: `${i18n.$t('工作流实例')}`,
+          name: `${i18n.$t('Process Instance')}`,
           path: 'instance',
           id: 2
         },
         {
-          name: `${i18n.$t('任务实例')}`,
+          name: `${i18n.$t('Task Instance')}`,
           path: 'task-instance-list',
           id: 3
+        },
+        {
+          name: `${i18n.$t('Task record')}`,
+          path: 'task-record-list',
+          id: 4
         }
-        // {
-        //   name: `${i18n.$t('任务记录')}`,
-        //   path: 'task-record-list',
-        //   id: 4
-        // }
       ]
     }
   ],
 
   security: [
     {
-      name: `${i18n.$t('租户管理')}`,
+      name: `${i18n.$t('Tenant Management')}`,
       id: 1,
       path: 'tenement-manage',
       isOpen: true,
@@ -67,7 +67,7 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('用户管理')}`,
+      name: `${i18n.$t('User Management')}`,
       id: 1,
       path: 'users-manage',
       isOpen: true,
@@ -75,7 +75,7 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('告警组管理')}`,
+      name: `${i18n.$t('Warning group management')}`,
       id: 1,
       path: 'warning-groups-manage',
       isOpen: true,
@@ -83,7 +83,7 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('队列管理')}`,
+      name: `${i18n.$t('Queue manage')}`,
       id: 1,
       path: 'queue-manage',
       isOpen: true,
@@ -91,7 +91,7 @@ let menu = {
       children: []
     },
     {
-      name: `${i18n.$t('服务管理')}`,
+      name: `${i18n.$t('Servers management')}`,
       id: 1,
       path: '',
       isOpen: true,
@@ -112,7 +112,7 @@ let menu = {
   ],
   resource: [
     {
-      name: `${i18n.$t('文件管理')}`,
+      name: `${i18n.$t('File Management')}`,
       id: 1,
       path: 'file',
       isOpen: true,
@@ -121,7 +121,7 @@ let menu = {
       disabled: false
     },
     {
-      name: `${i18n.$t('UDF管理')}`,
+      name: `${i18n.$t('UDF management')}`,
       id: 1,
       path: '',
       isOpen: true,
@@ -129,12 +129,12 @@ let menu = {
       disabled: false,
       children: [
         {
-          name: `${i18n.$t('资源管理')}`,
+          name: `${i18n.$t('Resource management')}`,
           path: 'resource-udf-resource',
           id: 1
         },
         {
-          name: `${i18n.$t('函数管理')}`,
+          name: `${i18n.$t('Function management')}`,
           path: 'resource-udf-function',
           id: 2
         }
@@ -143,7 +143,7 @@ let menu = {
   ],
   user: [
     {
-      name: `${i18n.$t('用户信息')}`,
+      name: `${i18n.$t('User Information')}`,
       id: 1,
       path: 'account',
       isOpen: true,
@@ -152,7 +152,7 @@ let menu = {
       disabled: false
     },
     {
-      name: `${i18n.$t('修改密码')}`,
+      name: `${i18n.$t('Edit password')}`,
       id: 1,
       path: 'password',
       isOpen: true,

@@ -1,13 +1,13 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'resource'"></m-secondary-menu>
-    <m-list-construction :title="$t('文件管理')">
+    <m-list-construction :title="$t('File Management')">
       <template slot="conditions">
         <m-conditions @on-conditions="_onConditions">
           <template slot="button-group">
             <x-button-group size="small" >
-              <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})" v-ps="['GENERAL_USER']">{{$t('创建文件')}}</x-button>
-              <x-button type="ghost" @click="_uploading" v-ps="['GENERAL_USER']">{{$t('上传文件')}}</x-button>
+              <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})" v-ps="['GENERAL_USER']">{{$t('Create File')}}</x-button>
+              <x-button type="ghost" @click="_uploading" v-ps="['GENERAL_USER']">{{$t('Upload Files')}}</x-button>
             </x-button-group>
           </template>
         </m-conditions>
@@ -55,7 +55,7 @@
     methods: {
       ...mapActions('resource', ['getResourcesListP']),
       /**
-       * 文件上传
+       * File Upload
        */
       _uploading () {
         findComponentDownward(this.$root, 'roof-nav')._fileUpdate('FILE')

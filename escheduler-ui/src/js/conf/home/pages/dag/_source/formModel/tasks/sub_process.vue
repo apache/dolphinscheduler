@@ -2,7 +2,7 @@
   <div class="sub_process-model">
     <div class="clearfix list">
       <div class="text-box">
-        <span>{{$t('子节点')}}</span>
+        <span>{{$t('Child Node')}}</span>
       </div>
       <div class="cont-box">
         <div class="label-box">
@@ -49,7 +49,7 @@
        */
       _verification () {
         if (!this.wdiCurr) {
-          this.$message.warning(`${i18n.$t('请选择子工作流')}`)
+          this.$message.warning(`${i18n.$t('Please select a sub-Process')}`)
           return false
         }
         this.$emit('on-params', {
