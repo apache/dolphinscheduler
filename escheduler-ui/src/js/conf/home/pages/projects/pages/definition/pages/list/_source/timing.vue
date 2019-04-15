@@ -192,18 +192,21 @@
             receivers: this.receivers.join(',') || '',
             receiversCc: this.receiversCc.join(',') || ''
           }
+          let msg = ''
 
           // edit
           if (this.item.crontab) {
             api = 'dag/updateSchedule'
             searchParams.id = this.item.id
+            msg = '编辑成功！不要忘记上线'
           } else {
             api = 'dag/createSchedule'
             searchParams.processDefinitionId = this.item.id
+            msg = '创建成功'
           }
 
           this.store.dispatch(api, searchParams).then(res => {
-            this.$message.success(res.msg)
+            this.$message.success(msg)
             this.$emit('onUpdate')
           }).catch(e => {
             this.$message.error(e.msg || '')
