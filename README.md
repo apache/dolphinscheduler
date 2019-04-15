@@ -45,6 +45,17 @@ Easy Scheduler
 
 更多文档请参考 <a href="https://analysys.github.io/easyscheduler_docs_cn/" target="_blank">easyscheduler中文在线文档</a>
 
+
+### 研发计划
+
+EasyScheduler的工作计划：<a href="https://github.com/analysys/EasyScheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是1.0.2版本的功能，TODO卡片是待做事项(包括 feature ideas)
+
+### 贡献代码
+
+非常欢迎大家来参与贡献代码，提交代码流程请参考：
+https://github.com/analysys/EasyScheduler/blob/master/CONTRIBUTING.md
+
+
 ### 感谢
 
 - Easy Scheduler使用了很多优秀的开源项目，比如google的guava、guice、grpc，netty，ali的bonecp，quartz，以及apache的众多开源项目等等，
