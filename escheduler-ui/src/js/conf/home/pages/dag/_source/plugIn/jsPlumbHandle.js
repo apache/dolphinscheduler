@@ -264,10 +264,10 @@ JSP.prototype.tasksContextmenu = function (event) {
     let isTwo = store.state.dag.isDetails
 
     let html = [
-      `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><i class="iconfont">&#xe60b;</i><span>${i18n.$t('开始运行')}</span></a>`,
-      `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><i class="iconfont">&#xe601;</i><span>${i18n.$t('编辑节点')}</span></a>`,
-      `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><i class="iconfont">&#xe61e;</i><span>${i18n.$t('复制节点')}</span></a>`,
-      `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><i class="iconfont">&#xe611;</i><span>${i18n.$t('删除节点')}</span></a>`
+      `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><i class="iconfont">&#xe60b;</i><span>${i18n.$t('Start')}</span></a>`,
+      `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><i class="iconfont">&#xe601;</i><span>${i18n.$t('Edit')}</span></a>`,
+      `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><i class="iconfont">&#xe61e;</i><span>${i18n.$t('Copy')}</span></a>`,
+      `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><i class="iconfont">&#xe611;</i><span>${i18n.$t('Delete')}</span></a>`
     ]
 
     let operationHtml = () => {

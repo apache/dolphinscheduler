@@ -2,11 +2,11 @@
   <div class="main-layout-box">
     <m-secondary-menu :type="'security'"></m-secondary-menu>
     <template>
-      <m-list-construction :title="'告警组管理'">
+      <m-list-construction :title="'Warning group management'">
         <template slot="conditions">
           <m-conditions @on-conditions="_onConditions">
             <template slot="button-group">
-              <x-button type="ghost" size="small" @click="_create('')">创建告警组</x-button>
+              <x-button type="ghost" size="small" @click="_create('')">{{$t('Create alarm group')}}</x-button>
             </template>
           </m-conditions>
         </template>

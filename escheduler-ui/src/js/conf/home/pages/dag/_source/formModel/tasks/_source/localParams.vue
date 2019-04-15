@@ -8,7 +8,7 @@
               :disabled="isDetails"
               type="text"
               v-model="localParamsList[$index].prop"
-              :placeholder="$t('prop(必填)')"
+              :placeholder="$t('prop(required)')"
               maxlength="64"
               @on-blur="_verifProp()"
               style="width: 164px;">
@@ -41,25 +41,25 @@
               :disabled="isDetails"
               type="text"
               v-model="localParamsList[$index].value"
-              :placeholder="$t('value(选填)')"
+              :placeholder="$t('value(optional)')"
               maxlength="64"
               @on-blur="_handleValue()"
               style="width: 150px;position: relative;margin-bottom: -2px;">
       </x-input>
       <span class="lt-add">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('删除')" >&#xe611;</i>
+          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" >&#xe611;</i>
         </a>
       </span>
       <span class="add" v-if="$index === (localParamsList.length - 1)">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('添加')">&#xe636;</i>
+          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
         </a>
       </span>
     </div>
     <span class="add" v-if="!localParamsList.length">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
-        <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('添加')">&#xe636;</i>
+        <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
       </a>
     </span>
   </div>
@@ -149,14 +149,14 @@
         })
         if (!flag) {
           if (!type) {
-            this.$message.warning(`${i18n.$t('prop不能为空')}`)
+            this.$message.warning(`${i18n.$t('prop is empty')}`)
           }
           return false
         }
         let newArr = _.cloneDeep(_.uniqWith(arr, _.isEqual))
         if (newArr.length !== arr.length) {
           if (!type) {
-            this.$message.warning(`${i18n.$t('prop中有重复')}`)
+            this.$message.warning(`${i18n.$t('prop is repeat')}`)
           }
           return false
         }

@@ -1,13 +1,13 @@
 <template>
   <div class="main-layout-box file-details-model">
     <m-secondary-menu :type="'resource'" ></m-secondary-menu>
-    <m-list-construction :title="$t('文件详情')">
+    <m-list-construction :title="$t('File Details')">
       <div slot="content" style="margin: 20px">
         <div class="file-details-content">
           <h2>
             <span>{{name}}</span>
             <div class="down">
-              <i class="iconfont" data-container="body" data-toggle="tooltip" :title="$t('下载详情')" @click="_downloadFile">&#xe610;</i>
+              <i class="iconfont" data-container="body" data-toggle="tooltip" :title="$t('Download Details')" @click="_downloadFile">&#xe610;</i>
               <em>{{size}}</em>
             </div>
           </h2>

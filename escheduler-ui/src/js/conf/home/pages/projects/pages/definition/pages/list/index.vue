@@ -1,11 +1,11 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('工作流定义')">
+    <m-list-construction :title="$t('Process definition')">
       <template slot="conditions">
         <m-conditions @on-conditions="_onConditions">
           <template slot="button-group">
-            <x-button type="ghost" size="small"  v-ps="['GENERAL_USER']" @click="() => this.$router.push({name: 'definition-create'})">{{$t('创建工作流')}}</x-button>
+            <x-button type="ghost" size="small"  v-ps="['GENERAL_USER']" @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</x-button>
           </template>
         </m-conditions>
       </template>

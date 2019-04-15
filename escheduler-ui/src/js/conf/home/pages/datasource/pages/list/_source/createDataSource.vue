@@ -1,12 +1,12 @@
 <template>
   <div class="datasource-popup-model">
     <div class="top-p">
-      <span>{{item ? `${$t('编辑')}` : `${$t('创建')}`}}{{`${$t('数据源')}`}}</span>
+      <span>{{item ? `${$t('Edit')}` : `${$t('Create')}`}}{{`${$t('Datasource')}`}}</span>
     </div>
     <div class="content-p">
       <div class="create-datasource-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('数据源')}}</template>
+          <template slot="name"><b>*</b>{{$t('Datasource')}}</template>
           <template slot="content">
             <x-radio-group v-model="type" size="small">
               <x-radio :label="'MYSQL'">MYSQL</x-radio>
@@ -20,84 +20,84 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('数据源名称')}}</template>
+          <template slot="name"><b>*</b>{{$t('Datasource Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="name"
-                    :placeholder="$t('请输入数据源名称')"
+                    :placeholder="$t('Please enter datasource name')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('描述')}}</template>
+          <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
             <x-input
                     type="textarea"
                     v-model="note"
-                    :placeholder="$t('请输入描述')"
+                    :placeholder="$t('Please enter description')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('IP主机名')}}</template>
+          <template slot="name"><b>*</b>{{$t('IP')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="host"
-                    :placeholder="$t('请输入IP主机名')"
+                    :placeholder="$t('Please enter IP')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('端口')}}</template>
+          <template slot="name"><b>*</b>{{$t('Port')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="port"
-                    :placeholder="$t('请输入端口')"
+                    :placeholder="$t('Please enter port')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('用户名')}}</template>
+          <template slot="name"><b>*</b>{{$t('User Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="userName"
-                    :placeholder="$t('请输入用户名')"
+                    :placeholder="$t('Please enter user name')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('密码')}}</template>
+          <template slot="name">{{$t('Password')}}</template>
           <template slot="content">
             <x-input
                     type="password"
                     v-model="password"
-                    :placeholder="$t('请输入密码')"
+                    :placeholder="$t('Please enter your password')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('数据库名')}}</template>
+          <template slot="name"><b>*</b>{{$t('Database Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="database"
-                    :placeholder="$t('请输入数据库名')"
+                    :placeholder="$t('Please enter database name')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('jdbc连接参数')}}</template>
+          <template slot="name">{{$t('jdbc connect parameters')}}</template>
           <template slot="content">
             <x-input
                     type="textarea"
@@ -111,9 +111,9 @@
       </div>
     </div>
     <div class="bottom-p">
-      <x-button type="text" @click="_close()"> {{$t('取消')}} </x-button>
-      <x-button type="success" shape="circle" @click="_testConnect()" :loading="testLoading">{{testLoading ? 'Loading...' : $t('测试连接')}}</x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="_ok()">{{spinnerLoading ? 'Loading...' :item ? `${$t('确认编辑')}` : `${$t('确认提交')}`}} </x-button>
+      <x-button type="text" @click="_close()"> {{$t('Cancel')}} </x-button>
+      <x-button type="success" shape="circle" @click="_testConnect()" :loading="testLoading">{{testLoading ? 'Loading...' : $t('Test Connect')}}</x-button>
+      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="_ok()">{{spinnerLoading ? 'Loading...' :item ? `${$t('Edit')}` : `${$t('Submit')}`}} </x-button>
     </div>
   </div>
 </template>
@@ -158,7 +158,7 @@
     },
     methods: {
       _rtOtherPlaceholder () {
-        return `${i18n.$t('请输入格式为')} {"key1":"value1","key2":"value2"...} ${i18n.$t('连接参数')}`
+        return `${i18n.$t('Please enter format')} {"key1":"value1","key2":"value2"...} ${i18n.$t('connection parameter')}`
       },
       /**
        * submit
@@ -231,29 +231,29 @@
        */
       _verification () {
         if (!this.name) {
-          this.$message.warning(`${i18n.$t('请输入资源名称')}`)
+          this.$message.warning(`${i18n.$t('Please enter resource name')}`)
           return false
         }
         if (!this.host) {
-          this.$message.warning(`${i18n.$t('请输入IP/主机名')}`)
+          this.$message.warning(`${i18n.$t('Please enter IP/hostname')}`)
           return false
         }
         if (!this.port) {
-          this.$message.warning(`${i18n.$t('请输入端口')}`)
+          this.$message.warning(`${i18n.$t('Please enter port')}`)
           return false
         }
         if (!this.userName) {
-          this.$message.warning(`${i18n.$t('请输入用户名')}`)
+          this.$message.warning(`${i18n.$t('Please enter user name')}`)
           return false
         }
 
         if (!this.database) {
-          this.$message.warning(`${i18n.$t('请输入数据库名')}`)
+          this.$message.warning(`${i18n.$t('Please enter database name')}`)
           return false
         }
         if (this.other) {
           if (!isJson(this.other)) {
-            this.$message.warning(`${i18n.$t('jdbc连接参数不是一个正确的JSON格式')}`)
+            this.$message.warning(`${i18n.$t('jdbc connection parameters is not a correct JSON format')}`)
             return false
           }
         }

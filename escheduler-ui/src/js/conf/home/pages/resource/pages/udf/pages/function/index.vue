@@ -1,11 +1,11 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'resource'"></m-secondary-menu>
-    <m-list-construction :title="$t('UDF函数管理')">
+    <m-list-construction :title="$t('UDF Function')">
       <template slot="conditions">
         <m-conditions @on-conditions="_onConditions">
           <template slot="button-group">
-            <x-button type="ghost" @click="_create" v-ps="['GENERAL_USER']" size="small" >{{$t('创建UDF函数')}}</x-button>
+            <x-button type="ghost" @click="_create" v-ps="['GENERAL_USER']" size="small" >{{$t('Create UDF Function')}}</x-button>
           </template>
         </m-conditions>
       </template>

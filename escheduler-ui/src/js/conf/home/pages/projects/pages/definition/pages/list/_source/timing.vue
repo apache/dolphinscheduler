@@ -1,11 +1,11 @@
 <template>
   <div class="timing-process-model">
     <div class="title-box">
-      <span>{{$t('定时前请先设置参数')}}</span>
+      <span>{{$t('Set parameters before timing')}}</span>
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('起止时间')}}
+        {{$t('Start and stop time')}}
       </div>
       <div class="cont">
         <x-datepicker
@@ -15,14 +15,14 @@
                 @on-change="_datepicker"
                 :value="scheduleTime"
                 type="daterange"
-                :placeholder="$t('选择日期区间')"
+                :placeholder="$t('Select date range')"
                 format="YYYY-MM-DD HH:mm:ss">
         </x-datepicker>
       </div>
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('定时')}}
+        {{$t('Timing')}}
       </div>
       <div class="cont">
         <template>
@@ -45,18 +45,18 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('失败策略')}}
+        {{$t('Failure Strategy')}}
       </div>
       <div class="cont">
         <x-radio-group v-model="failureStrategy" style="margin-top: 7px;">
-          <x-radio :label="'CONTINUE'">{{$t('继续')}}</x-radio>
-          <x-radio :label="'END'">{{$t('结束')}}</x-radio>
+          <x-radio :label="'CONTINUE'">{{$t('Continue')}}</x-radio>
+          <x-radio :label="'END'">{{$t('End')}}</x-radio>
         </x-radio-group>
       </div>
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('通知策略')}}
+        {{$t('Notification strategy')}}
       </div>
       <div class="cont">
         <x-select
@@ -73,7 +73,7 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('流程优先级')}}
+        {{$t('Process priority')}}
       </div>
       <div class="cont">
         <m-priority v-model="processInstancePriority"></m-priority>
@@ -81,14 +81,14 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('通知组')}}
+        {{$t('Notification group')}}
       </div>
       <div class="cont">
         <x-select
                 style="width: 200px;"
                 :disabled="!notifyGroupList.length"
                 v-model="warningGroupId">
-          <x-input slot="trigger" readonly slot-scope="{ selectedModel }" :placeholder="$t('请选择通知组')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
+          <x-input slot="trigger" readonly slot-scope="{ selectedModel }" :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
             <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></i>
             <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId.id"></i>
           </x-input>
@@ -103,7 +103,7 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('收件人')}}
+        {{$t('Recipient')}}
       </div>
       <div class="cont" style="width: 680px;">
         <m-email v-model="receivers" :repeat-data="receiversCc"></m-email>
@@ -111,15 +111,15 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('抄送人')}}
+        {{$t('Cc')}}
       </div>
       <div class="cont" style="width: 680px;">
         <m-email v-model="receiversCc" :repeat-data="receivers"></m-email>
       </div>
     </div>
     <div class="submit">
-      <x-button type="text" @click="close()"> {{$t('取消')}} </x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : (item.crontab ? $t('编辑') : $t('创建'))}} </x-button>
+      <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
+      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : (item.crontab ? $t('Edit') : $t('Create'))}} </x-button>
     </div>
   </div>
 </template>
@@ -166,12 +166,12 @@
       },
       _verification () {
         if (!this.scheduleTime) {
-          this.$message.warning(`${i18n.$t('请选择时间')}`)
+          this.$message.warning(`${i18n.$t('Please select time')}`)
           return false
         }
 
         if (!this.crontab) {
-          this.$message.warning(`${i18n.$t('请填写 crontab')}`)
+          this.$message.warning(`${i18n.$t('Please enter crontab')}`)
           return false
         }
         return true
@@ -192,18 +192,21 @@
             receivers: this.receivers.join(',') || '',
             receiversCc: this.receiversCc.join(',') || ''
           }
+          let msg = ''
 
           // edit
           if (this.item.crontab) {
             api = 'dag/updateSchedule'
             searchParams.id = this.item.id
+            msg = '编辑成功！不要忘记上线'
           } else {
             api = 'dag/createSchedule'
             searchParams.processDefinitionId = this.item.id
+            msg = '创建成功'
           }
 
           this.store.dispatch(api, searchParams).then(res => {
-            this.$message.success(res.msg)
+            this.$message.success(msg)
             this.$emit('onUpdate')
           }).catch(e => {
             this.$message.error(e.msg || '')

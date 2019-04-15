@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('项目首页')">
+    <m-list-construction :title="$t('Project Home')">
       <template slot="content">
         <m-project-chart :id="id"></m-project-chart>
       </template>
