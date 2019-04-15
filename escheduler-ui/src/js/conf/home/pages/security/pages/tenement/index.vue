@@ -2,7 +2,7 @@
   <div class="main-layout-box">
     <m-secondary-menu :type="'security'"></m-secondary-menu>
     <template>
-      <m-list-construction :title="$t('Tenant Management')">
+      <m-list-construction :title="$t('Tenant Manage')">
         <template slot="conditions">
           <m-conditions @on-conditions="_onConditions">
             <template slot="button-group">

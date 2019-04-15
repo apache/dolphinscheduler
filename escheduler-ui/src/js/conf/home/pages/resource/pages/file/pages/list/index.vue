@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'resource'"></m-secondary-menu>
-    <m-list-construction :title="$t('File Management')">
+    <m-list-construction :title="$t('File Manage')">
       <template slot="conditions">
         <m-conditions @on-conditions="_onConditions">
           <template slot="button-group">
