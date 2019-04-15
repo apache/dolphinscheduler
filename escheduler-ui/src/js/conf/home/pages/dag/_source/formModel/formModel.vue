@@ -353,12 +353,25 @@
           },
           fromThis: this
         })
+
+        // set run flag
+        this._setRunFlag()
       },
       /**
        * Sub-workflow selected node echo name
        */
       _onSetProcessName (name) {
         this.name = name
+      },
+      /**
+       *  set run flag
+       */
+      _setRunFlag(){
+        let dom = $(`#${this.id}`).find('.ban-p')
+        dom.html('')
+        if (this.runFlag === 'FORBIDDEN') {
+          dom.append(rtBantpl())
+        }
       },
       /**
        * Submit verification
@@ -384,13 +397,7 @@
       }
     },
     watch: {
-      runFlag(val){
-        let dom = $(`#${this.id}`).find('.ban-p')
-        dom.html('')
-        if (val === 'FORBIDDEN') {
-          dom.append(rtBantpl())
-        }
-      }
+
     },
     created () {
       // Unbind copy and paste events
