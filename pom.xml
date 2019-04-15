@@ -366,6 +366,18 @@
 				<version>3.5.0</version>
 			</dependency>
 
+			<dependency>
+				<groupId>ru.yandex.clickhouse</groupId>
+				<artifactId>clickhouse-jdbc</artifactId>
+				<version>0.1.52</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.microsoft.sqlserver</groupId>
+				<artifactId>mssql-jdbc</artifactId>
+				<version>6.1.0.jre8</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 

@@ -6,7 +6,7 @@
         <m-datasource
                 ref="refDs"
                 @on-dsData="_onDsData"
-                :supportType="['MYSQL','POSTGRESQL']"
+                :supportType="['MYSQL','POSTGRESQL','CLICKHOUSE', 'ORACLE', 'SQLSERVER']"
                 :data="{ type:type,datasource:datasource }">
         </m-datasource>
       </div>
