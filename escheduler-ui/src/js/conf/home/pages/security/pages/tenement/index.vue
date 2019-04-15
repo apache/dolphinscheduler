@@ -2,11 +2,11 @@
   <div class="main-layout-box">
     <m-secondary-menu :type="'security'"></m-secondary-menu>
     <template>
-      <m-list-construction :title="$t('租户管理')">
+      <m-list-construction :title="$t('Tenant Management')">
         <template slot="conditions">
           <m-conditions @on-conditions="_onConditions">
             <template slot="button-group">
-              <x-button type="ghost" size="small" @click="_create('')">{{$t('创建租户')}}</x-button>
+              <x-button type="ghost" size="small" @click="_create('')">{{$t('Create Tenant')}}</x-button>
             </template>
           </m-conditions>
         </template>
@@ -52,7 +52,7 @@
     methods: {
       ...mapActions('security', ['getTenantListP']),
       /**
-       * 查询
+       * Query
        */
       _onConditions (o) {
         this.searchVal = o.searchVal

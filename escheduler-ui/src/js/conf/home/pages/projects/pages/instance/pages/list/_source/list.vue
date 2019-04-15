@@ -4,37 +4,37 @@
       <table class="fixed">
         <tr>
           <th>
-            <span>{{$t('编号')}}</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>{{$t('工作流名称')}}</span>
+            <span>{{$t('Process Name')}}</span>
           </th>
           <th width="120">
-            <span>{{$t('运行类型')}}</span>
+            <span>{{$t('Run Type')}}</span>
           </th>
           <th width="140">
-            <span>{{$t('开始时间')}}</span>
+            <span>{{$t('Start Time')}}</span>
           </th>
           <th width="140">
-            <span>{{$t('结束时间')}}</span>
+            <span>{{$t('End Time')}}</span>
           </th>
           <th width="90">
-            <span>{{$t('运行时长(s)')}}</span>
+            <span>{{$t('Duration')}}s</span>
           </th>
           <th width="72">
-            <span>{{$t('运行次数')}}</span>
+            <span>{{$t('Run Times')}}</span>
           </th>
           <th width="100">
             <span>{{$t('host')}}</span>
           </th>
           <th width="70">
-            <span>{{$t('容错标识')}}</span>
+            <span>{{$t('fault-tolerant sign')}}</span>
           </th>
           <th width="50">
-            <span>{{$t('状态')}}</span>
+            <span>{{$t('State')}}</span>
           </th>
           <th width="260">
-            <span>{{$t('操作')}}</span>
+            <span>{{$t('Operation')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
@@ -67,55 +67,55 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('编辑')"
+                        :title="$t('Edit')"
                         @click="_reEdit(item)"
                         v-ps="['GENERAL_USER']"
                         icon="iconfont icon-bianjixiugai"
-                        :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"><!--{{$t('编辑')}}--></x-button>
+                        :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
               <x-button type="info"
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('重跑')"
+                        :title="$t('Rerun')"
                         @click="_reRun(item,$index)"
                         v-ps="['GENERAL_USER']"
                         icon="iconfont icon-shuaxin"
-                        :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"><!--{{$t('重跑')}}--></x-button>
+                        :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
               <x-button type="success"
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('恢复失败')"
+                        :title="$t('Recovery Failed')"
                         @click="_restore(item,$index)"
                         v-ps="['GENERAL_USER']"
                         icon="iconfont icon-cuowuguanbishibai"
-                        :disabled="item.state !== 'FAILURE'"><!--{{$t('恢复失败')}}--></x-button>
+                        :disabled="item.state !== 'FAILURE'"></x-button>
               <x-button type="error"
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('停止')"
+                        :title="$t('Stop')"
                         @click="_stop(item)"
                         v-ps="['GENERAL_USER']"
                         icon="iconfont icon-zanting1"
-                        :disabled="item.state !== 'RUNNING_EXEUTION'"><!--{{$t('停止')}}--></x-button>
+                        :disabled="item.state !== 'RUNNING_EXEUTION'"></x-button>
               <x-button type="warning"
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="item.state === 'PAUSE' ? $t('恢复暂停') : $t('暂停')"
+                        :title="item.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')"
                         @click="_suspend(item,$index)"
                         v-ps="['GENERAL_USER']"
                         :icon="item.state === 'PAUSE' ? 'iconfont icon-ai06' : 'iconfont icon-zanting'"
-                        :disabled="item.state !== 'RUNNING_EXEUTION' && item.state !== 'PAUSE'"><!--{{item.state === 'PAUSE' ? $t('恢复暂停') : $t('暂停')}}--></x-button>
+                        :disabled="item.state !== 'RUNNING_EXEUTION' && item.state !== 'PAUSE'"></x-button>
               <x-poptip
                       :ref="'poptip-delete-' + $index"
                       placement="bottom-end"
                       width="90">
-                <p>{{$t('确定删除吗?')}}</p>
+                <p>{{$t('Delete?')}}</p>
                 <div style="text-align: right; margin: 0;padding-top: 4px;">
-                  <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('取消')}}</x-button>
-                  <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('确定')}}</x-button>
+                  <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
+                  <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
                 </div>
                 <template slot="reference">
                   <x-button
@@ -124,7 +124,7 @@
                           shape="circle"
                           size="xsmall"
                           data-toggle="tooltip"
-                          :title="$t('删除')"
+                          :title="$t('delete')"
                           v-ps="['GENERAL_USER']">
                   </x-button>
                 </template>
@@ -134,15 +134,14 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('甘特图')"
+                        :title="$t('Gantt')"
                         @click="_gantt(item)"
                         icon="iconfont icon-gantt">
-                <!--{{$t('甘特图')}}-->
               </x-button>
 
             </div>
             <div v-show="!item.disabled">
-              <!--编辑-->
+              <!--Edit-->
               <x-button
                       type="info"
                       shape="circle"
@@ -151,7 +150,7 @@
                       disabled="true">
               </x-button>
 
-              <!--重跑-->
+              <!--Rerun-->
               <x-button
                       v-show="buttonType === 'run'"
                       type="info"
@@ -169,7 +168,7 @@
                       disabled="true">
               </x-button>
 
-              <!--恢复失败-->
+              <!--Recovery Failed-->
               <x-button
                       v-show="buttonType === 'store'"
                       type="success"
@@ -187,7 +186,7 @@
                       disabled="true">
               </x-button>
 
-              <!--停止-->
+              <!--Stop-->
               <x-button
                       type="error"
                       shape="circle"
@@ -196,7 +195,7 @@
                       disabled="true">
               </x-button>
 
-              <!--倒计时 => 恢复暂停/暂停-->
+              <!--倒计时 => Recovery Suspend/Pause-->
               <x-button
                       v-show="item.state === 'PAUSE' && buttonType === 'suspend'"
                       type="warning"
@@ -205,7 +204,7 @@
                       disabled="true">
                 {{item.count}}s
               </x-button>
-              <!--恢复暂停-->
+              <!--Recovery Suspend-->
               <x-button
                       v-show="item.state === 'PAUSE' && buttonType !== 'suspend'"
                       type="warning"
@@ -214,7 +213,7 @@
                       icon="iconfont icon-ai06"
                       disabled="true">
               </x-button>
-              <!--暂停-->
+              <!--Pause-->
               <x-button
                       v-show="item.state !== 'PAUSE'"
                       type="warning"
@@ -224,7 +223,7 @@
                       disabled="true">
               </x-button>
 
-              <!--删除-->
+              <!--delete-->
               <x-button
                       type="error"
                       shape="circle"
@@ -233,7 +232,7 @@
                       :disabled="true">
               </x-button>
 
-              <!--甘特图-->
+              <!--Gantt-->
               <x-button
                       type="info"
                       shape="circle"

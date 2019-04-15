@@ -1,35 +1,35 @@
 <template>
   <m-popup
           ref="popup"
-          :ok-text="item ? $t('确认编辑') : $t('确认提交')"
-          :nameText="item ? $t('编辑租户') : $t('创建租户')"
+          :ok-text="item ? $t('Edit') : $t('Submit')"
+          :nameText="item ? $t('Edit Tenant') : $t('Create Tenant')"
           @ok="_ok">
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('租户编码')}}</template>
+          <template slot="name"><b>*</b>{{$t('Tenant Code')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     :disabled="item ? true : false"
                     v-model="tenantCode"
-                    :placeholder="$t('请输入name')">
+                    :placeholder="$t('Please enter name')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('租户名称')}}</template>
+          <template slot="name"><b>*</b>{{$t('Tenant Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="tenantName"
-                    :placeholder="$t('请输入name')"
+                    :placeholder="$t('Please enter name')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('队列')}}</template>
+          <template slot="name"><b>*</b>{{$t('Queue')}}</template>
           <template slot="content">
             <x-select v-model="queueId">
               <x-option
@@ -42,12 +42,12 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('描述')}}</template>
+          <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
             <x-input
                     type="textarea"
                     v-model="desc"
-                    :placeholder="$t('请输入desc')"
+                    :placeholder="$t('Please enter description')"
                     autocomplete="off">
             </x-input>
           </template>
@@ -116,15 +116,15 @@
       _verification () {
         let isEn = /^[A-Za-z]+$/
         if (!this.tenantCode) {
-          this.$message.warning(`${i18n.$t('请输入租户编码只允许英文')}`)
+          this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
         if (!isEn.test(this.tenantCode)) {
-          this.$message.warning(`${i18n.$t('请输入英文租户编码')}`)
+          this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false
         }
         if (!this.tenantName) {
-          this.$message.warning(`${i18n.$t('请输入租户名称')}`)
+          this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
         return true

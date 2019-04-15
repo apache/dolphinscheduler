@@ -4,25 +4,25 @@
       <table class="fixed">
         <tr>
           <th>
-            <span>{{$t('编号')}}</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>{{$t('名称')}}</span>
+            <span>{{$t('Name')}}</span>
           </th>
           <th>
-            <span>{{$t('文件名称')}}</span>
+            <span>{{$t('File Name')}}</span>
           </th>
           <th>
-            <span>{{$t('描述')}}</span>
+            <span>{{$t('Description')}}</span>
           </th>
           <th width="100">
-            <span>{{$t('大小')}}</span>
+            <span>{{$t('Size')}}</span>
           </th>
           <th width="140">
-            <span>{{$t('更新时间')}}</span>
+            <span>{{$t('Update Time')}}</span>
           </th>
           <th width="140">
-            <span>{{$t('操作')}}</span>
+            <span>{{$t('Operation')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
@@ -48,7 +48,7 @@
                     shape="circle"
                     size="xsmall"
                     data-toggle="tooltip"
-                    :title="$t('编辑')"
+                    :title="$t('Edit')"
                     :disabled="_rtDisb(item)"
                     @click="_edit(item,$index)"
                     icon="iconfont icon-bianjixiugai"
@@ -60,7 +60,7 @@
                     size="xsmall"
                     icon="iconfont icon-wendangxiugai"
                     data-toggle="tooltip"
-                    :title="$t('重命名')"
+                    :title="$t('Rename')"
                     @click="_rename(item,$index)"
                     v-ps="['GENERAL_USER']">
             </x-button>
@@ -70,7 +70,7 @@
                     shape="circle"
                     size="xsmall"
                     data-toggle="tooltip"
-                    :title="$t('下载')"
+                    :title="$t('Download')"
                     @click="_downloadFile(item)"
                     icon="iconfont icon-download"
                     v-ps="['GENERAL_USER']">
@@ -80,10 +80,10 @@
                     :ref="'poptip-' + $index"
                     placement="bottom-end"
                     width="90">
-              <p>{{$t('确定删除吗?')}}</p>
+              <p>{{$t('Delete?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('取消')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('确定')}}</x-button>
+                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
+                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
               </div>
               <template slot="reference">
                 <x-button
@@ -92,7 +92,7 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('删除')"
+                        :title="$t('delete')"
                         v-ps="['GENERAL_USER']">
                 </x-button>
               </template>

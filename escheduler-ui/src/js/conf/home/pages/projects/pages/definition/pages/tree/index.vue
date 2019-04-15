@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('树形图')">
+    <m-list-construction :title="$t('TreeView')">
       <template slot="conditions"></template>
       <template slot="content">
         <div class="tree-view-index-model">
@@ -20,13 +20,13 @@
                     type="primary"
                     size="default"
                     icon="fa fa-reply">
-              返回上一节点
+              {{$t('Return_1')}}
             </x-button>
           </div>
           <div class="tasks-color">
             <div class="toolbar-color-sp">
               <a href="javascript:">
-                <span>节点类型</span>
+                <span>Node Type</span>
               </a>
               <a href="javascript:" v-for="(k,v) in tasksType">
                 <i class="fa fa-circle" :style="{color:k.color}"></i>
@@ -35,7 +35,7 @@
             </div>
             <div class="state-tasks-color-sp">
               <a href="javascript:">
-                <span>任务状态</span>
+                <span>{{$t('Task Status')}}</span>
               </a>
               <a href="javascript:" v-for="(item) in tasksState">
                 <i class="fa fa-square" :style="{color:item.color}"></i>

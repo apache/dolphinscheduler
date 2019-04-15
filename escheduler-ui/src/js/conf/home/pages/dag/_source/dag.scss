@@ -386,10 +386,11 @@ svg path:hover {
   .name-p {
     position: absolute;
     left: 50%;
-    bottom: -24px;
+    top: 58px;
     width: 200px;
     text-align: center;
     margin-left: -100px;
+    word-break:break-all;
   }
   .ban-p {
     position: absolute;
