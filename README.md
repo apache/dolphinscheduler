@@ -58,9 +58,10 @@ https://github.com/analysys/EasyScheduler/blob/master/CONTRIBUTING.md
 
 ### 感谢
 
-- Easy Scheduler使用了很多优秀的开源项目，比如google的guava、guice、grpc，netty，ali的bonecp，quartz，以及apache的众多开源项目等等，
+Easy Scheduler使用了很多优秀的开源项目，比如google的guava、guice、grpc，netty，ali的bonecp，quartz，以及apache的众多开源项目等等，
 正是由于站在这些开源项目的肩膀上，才有Easy Scheduler的诞生的可能。对此我们对使用的所有开源软件表示非常的感谢！我们也希望自己不仅是开源的受益者，也能成为开源的
 贡献者，于是我们决定把易调度贡献出来，并承诺长期维护。也希望对开源有同样热情和信念的伙伴加入进来，一起为开源献出一份力！
+
 
 ### 帮助
 The fastest way to get response from our developers is to submit issues,   or add our wechat : 510570367
