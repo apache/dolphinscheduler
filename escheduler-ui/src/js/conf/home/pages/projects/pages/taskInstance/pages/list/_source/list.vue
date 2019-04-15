@@ -4,40 +4,40 @@
       <table class="fixed">
         <tr>
           <th>
-            <span>{{$t('编号')}}</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>{{$t('名称')}}</span>
+            <span>{{$t('Name')}}</span>
           </th>
           <th>
-            <span>{{$t('工作流实例')}}</span>
+            <span>{{$t('Process Instance')}}</span>
           </th>
           <th width="80">
-            <span>{{$t('节点类型')}}</span>
+            <span>{{$t('Node Type')}}</span>
           </th>
           <th width="40">
-            <span>{{$t('状态')}}</span>
+            <span>{{$t('State')}}</span>
           </th>
           <th width="140">
-            <span>{{$t('提交时间')}}</span>
+            <span>{{$t('Submit Time')}}</span>
           </th>
           <th width="140">
-            <span>{{$t('开始时间')}}</span>
+            <span>{{$t('Start Time')}}</span>
           </th>
           <th width="140">
-            <span>{{$t('结束时间')}}</span>
+            <span>{{$t('End Time')}}</span>
           </th>
           <th width="110">
             <span>{{$t('host')}}</span>
           </th>
           <th width="74">
-            <span>{{$t('运行时长')}}(s)</span>
+            <span>{{$t('Duration')}}(s)</span>
           </th>
           <th width="84">
-            <span>{{$t('重试次数')}}</span>
+            <span>{{$t('Retry Count')}}</span>
           </th>
           <th width="50">
-            <span>{{$t('操作')}}</span>
+            <span>{{$t('Operation')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
@@ -66,7 +66,7 @@
                     shape="circle"
                     size="xsmall"
                     data-toggle="tooltip"
-                    :title="$t('查看日志')"
+                    :title="$t('View log')"
                     icon="iconfont icon-xitongcaozuorizhi"
                     @click="_refreshLog(item)">
             </x-button>

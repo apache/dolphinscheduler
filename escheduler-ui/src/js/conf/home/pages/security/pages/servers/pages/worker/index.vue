@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'security'"></m-secondary-menu>
-    <m-list-construction :title="$t('服务管理-Worker')">
+    <m-list-construction :title="$t('Service-Worker')">
       <template slot="content">
         <template v-if="workerList.length">
           <m-list :list="workerList"></m-list>

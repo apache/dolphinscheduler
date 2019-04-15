@@ -19,17 +19,17 @@
       </x-select>
       <template v-if="isInstance">
         <span class="instance-state">
-          <i class="iconfont" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('成功')">&#xe607;</i>
-          <i class="iconfont" :class="'icon-' + el.state" v-if="el.state === 'WAITING'" data-toggle="tooltip" data-container="body" :title="$t('等待')">&#xe62a;</i>
-          <i class="iconfont" :class="'icon-' + el.state" v-if="el.state === 'FAILED'" data-toggle="tooltip" data-container="body" :title="$t('失败')">&#xe626;</i>
+          <i class="iconfont" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')">&#xe607;</i>
+          <i class="iconfont" :class="'icon-' + el.state" v-if="el.state === 'WAITING'" data-toggle="tooltip" data-container="body" :title="$t('waiting')">&#xe62a;</i>
+          <i class="iconfont" :class="'icon-' + el.state" v-if="el.state === 'FAILED'" data-toggle="tooltip" data-container="body" :title="$t('failed')">&#xe626;</i>
         </span>
       </template>
       <span class="operation">
         <a href="javascript:" class="delete" @click="!isDetails && _remove($index)">
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('删除')" >&#xe611;</i>
+          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('delete')" >&#xe611;</i>
         </a>
         <a href="javascript:" class="add" @click="!isDetails && _add()" v-if="$index === (dependItemList.length - 1)">
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('添加')">&#xe636;</i>
+          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('Add')">&#xe636;</i>
         </a>
       </span>
     </div>

@@ -4,37 +4,37 @@
       <table class="fixed">
         <tr>
           <th>
-            <span>{{$t('编号')}}</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>{{$t('任务名称')}}</span>
+            <span>{{$t('Task Name')}}</span>
           </th>
           <th width="66">
-            <span>{{$t('任务日期')}}</span>
+            <span>{{$t('Task Date')}}</span>
           </th>
           <th width="150">
-            <span>{{$t('开始时间')}}</span>
+            <span>{{$t('Start Time')}}</span>
           </th>
           <th width="150">
-            <span>{{$t('结束时间')}}</span>
+            <span>{{$t('End Time')}}</span>
           </th>
           <th width="134">
-            <span>{{$t('运行时长')}}({{$t('秒')}})</span>
+            <span>{{$t('Duration')}}(s)</span>
           </th>
           <th>
-            <span>{{$t('源表')}}</span>
+            <span>{{$t('Source Table')}}</span>
           </th>
           <th width="100">
-            <span>{{$t('记录数')}}</span>
+            <span>{{$t('Record Number')}}</span>
           </th>
           <th>
-            <span>{{$t('目标表')}}</span>
+            <span>{{$t('Target Table')}}</span>
           </th>
           <th width="100">
-            <span>{{$t('记录数')}}</span>
+            <span>{{$t('Record Number')}}</span>
           </th>
           <th width="88">
-            <span>{{$t('状态')}}</span>
+            <span>{{$t('State')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
@@ -45,8 +45,14 @@
             <span class="ellipsis"  data-toggle="tooltip" data-container="body" :title="_rtTooltip(item.procName)" data-html="true">{{item.procName}}</span>
           </td>
           <td><span>{{item.procDate}}</span></td>
-          <td><span>{{item.startTime | formatDate}}</span></td>
-          <td><span>{{item.endTime | formatDate}}</span></td>
+          <td>
+            <span v-if="item.startTime">{{item.startTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
+          <td>
+            <span v-if="item.endTime">{{item.endTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
           <td><span>{{item.duration}}</span></td>
           <td><span class="ellipsis" data-toggle="tooltip" data-container="body" :title="_rtTooltip(item.sourceTab)" data-html="true">{{item.sourceTab}}</span></td>
           <td>
