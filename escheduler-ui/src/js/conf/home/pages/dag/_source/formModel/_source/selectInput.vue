@@ -12,7 +12,7 @@
               slot-scope="{ selectedModel }"
               maxlength="4"
               @on-blur="_onBlur"
-              :placeholder="$t('请选择')"
+              :placeholder="$t('Please choose')"
               :value="selectedModel === null ? '0' : selectedModel.value"
               style="width: 100%;"
               @on-click-icon.stop="_ckIcon">
@@ -81,7 +81,7 @@
         if (val === '0') return true
 
         if (!(/(^[0-9]*[1-9][0-9]*$)/.test(val))) {
-          this.$message.warning(`${i18n.$t('请输入正整数')}`)
+          this.$message.warning(`${i18n.$t('Please enter a positive integer')}`)
           // init
           this._ckIcon()
           return false

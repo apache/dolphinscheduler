@@ -7,19 +7,19 @@ import i18n from '@/module/i18n'
 const cycleList = [
   {
     value: 'month',
-    label: `${i18n.$t('月')}`
+    label: `${i18n.$t('month')}`
   },
   {
     value: 'week',
-    label: `${i18n.$t('周')}`
+    label: `${i18n.$t('week')}`
   },
   {
     value: 'day',
-    label: `${i18n.$t('日')}`
+    label: `${i18n.$t('day')}`
   },
   {
     value: 'hour',
-    label: `${i18n.$t('时')}`
+    label: `${i18n.$t('hour')}`
   }
 ]
 
@@ -30,81 +30,81 @@ const dateValueList = {
   'hour': [
     {
       value: 'last1Hour',
-      label: `${i18n.$t('前1小时')}`
+      label: `${i18n.$t('Last1Hour')}`
     },
     {
       value: 'last2Hours',
-      label: `${i18n.$t('前2小时')}`
+      label: `${i18n.$t('Last2Hours')}`
     },
     {
       value: 'last3Hours',
-      label: `${i18n.$t('前3小时')}`
+      label: `${i18n.$t('Last3Hours')}`
     }
   ],
   'day': [
     {
       value: 'last1Days',
-      label: `${i18n.$t('昨天')}`
+      label: `${i18n.$t('Last1Days')}`
     },
     {
       value: 'last2Days',
-      label: `${i18n.$t('前两天')}`
+      label: `${i18n.$t('Last2Days')}`
     },
     {
       value: 'last3Days',
-      label: `${i18n.$t('前三天')}`
+      label: `${i18n.$t('Last3Days')}`
     },
     {
       value: 'last7Days',
-      label: `${i18n.$t('前七天')}`
+      label: `${i18n.$t('Last7Days')}`
     }
   ],
   'week': [
     {
       value: 'lastWeek',
-      label: `${i18n.$t('上周')}`
+      label: `${i18n.$t('LastWeek')}`
     },
     {
       value: 'lastMonday',
-      label: `${i18n.$t('上周一')}`
+      label: `${i18n.$t('LastMonday')}`
     },
     {
       value: 'lastTuesday',
-      label: `${i18n.$t('上周二')}`
+      label: `${i18n.$t('LastTuesday')}`
     },
     {
       value: 'lastWednesday',
-      label: `${i18n.$t('上周三')}`
+      label: `${i18n.$t('LastWednesday')}`
     },
     {
       value: 'lastThursday',
-      label: `${i18n.$t('上周四')}`
+      label: `${i18n.$t('LastThursday')}`
     },
     {
       value: 'lastFriday',
-      label: `${i18n.$t('上周五')}`
+      label: `${i18n.$t('LastFriday')}`
     },
     {
       value: 'lastSaturday',
-      label: `${i18n.$t('上周六')}`
+      label: `${i18n.$t('LastSaturday')}`
     },
     {
       value: 'lastSunday',
-      label: `${i18n.$t('上周日')}`
+      label: `${i18n.$t('LastSunday')}`
     }
   ],
   'month': [
     {
       value: 'lastMonth',
-      label: `${i18n.$t('上月')}`
+      label: `${i18n.$t('LastMonth')}`
     },
     {
       value: 'lastMonthBegin',
-      label: `${i18n.$t('上月初')}`
+      label: `${i18n.$t('LastMonthBegin')}`
     },
     {
       value: 'lastMonthEnd',
-      label: `${i18n.$t('上月末')}`
+      label: `${i18n.$t('LastMonthEnd')}`
     }
   ]
 }
@@ -182,11 +182,11 @@ const typeList = [
 const sqlTypeList = [
   {
     id: 0,
-    code: `${i18n.$t('查询')}`
+    code: `${i18n.$t('Query')}`
   },
   {
     id: 1,
-    code: `${i18n.$t('非查询')}`
+    code: `${i18n.$t('Non Query')}`
   }
 ]
 

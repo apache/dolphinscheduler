@@ -1,7 +1,7 @@
 <template>
   <div class="affirm-model">
-    <m-popup :ok-text="$t('确认保存')"
-            :nameText="$t('是否保存DAG图')"
+    <m-popup :ok-text="$t('Save')"
+            :nameText="$t('Whether to save the DAG graph')"
             @close="_close"
             @ok="_ok">
     </m-popup>
