@@ -140,7 +140,7 @@ export default {
     }
 
     let param = {}
-    // Management user
+    // Manage user
     if (o.type === 'user') {
       param.alertgroupId = payload.id
     } else {

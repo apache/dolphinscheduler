@@ -28,7 +28,7 @@
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/datasource'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xeef4;</i>{{$t('Datasource')}}</span><b></b>
+            <span><i class="iconfont">&#xeef4;</i>{{$t('Datasource manage')}}</span><b></b>
           </router-link>
         </div>
       </div>
@@ -121,7 +121,7 @@
             </router-link>
             <router-link :to="{ path: '/datasource'}" tag="li" active-class="active">
               <i class="iconfont">&#xeef4;</i>
-              <span>{{$t('Datasource')}}</span>
+              <span>{{$t('Datasource manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/security'}" tag="li" active-class="active" v-ps="['ADMIN_USER']">
               <i class="iconfont">&#xe671;</i>

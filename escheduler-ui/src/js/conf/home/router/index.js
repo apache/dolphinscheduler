@@ -215,7 +215,7 @@ const router = new Router({
           name: 'file',
           component: resolve => require(['../pages/resource/pages/file/pages/list/index'], resolve),
           meta: {
-            title: `${i18n.$t('File Management')}`
+            title: `${i18n.$t('File Manage')}`
           }
         },
         {
@@ -247,7 +247,7 @@ const router = new Router({
           name: 'udf',
           component: resolve => require(['../pages/resource/pages/udf/index'], resolve),
           meta: {
-            title: `${i18n.$t('UDF management')}`
+            title: `${i18n.$t('UDF manage')}`
           },
           children: [
             {
@@ -307,7 +307,7 @@ const router = new Router({
           name: 'tenement-manage',
           component: resolve => require(['../pages/security/pages/tenement/index'], resolve),
           meta: {
-            title: `${i18n.$t('Tenant Management')}`
+            title: `${i18n.$t('Tenant Manage')}`
           }
         },
         {
@@ -315,7 +315,7 @@ const router = new Router({
           name: 'users-manage',
           component: resolve => require(['../pages/security/pages/users/index'], resolve),
           meta: {
-            title: `${i18n.$t('User Management')}`
+            title: `${i18n.$t('User Manage')}`
           }
         },
         {
@@ -323,7 +323,7 @@ const router = new Router({
           name: 'warning-groups-manage',
           component: resolve => require(['../pages/security/pages/warningGroups/index'], resolve),
           meta: {
-            title: `${i18n.$t('Warning group management')}`
+            title: `${i18n.$t('Warning group manage')}`
           }
         },
         {
@@ -339,7 +339,7 @@ const router = new Router({
           name: 'servers-manage',
           component: resolve => require(['../pages/security/pages/servers/index'], resolve),
           meta: {
-            title: `${i18n.$t('Servers management')}`
+            title: `${i18n.$t('Servers manage')}`
           },
           redirect: {
             name: 'servers-master'
