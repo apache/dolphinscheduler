@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('Cron Management')">
+    <m-list-construction :title="$t('Cron Manage')">
       <template slot="content">
         <m-list></m-list>
       </template>
