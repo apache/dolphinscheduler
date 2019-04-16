@@ -157,45 +157,29 @@ const router = new Router({
         },
         {
           path: '/projects/task-instance',
-          name: 'task-instance-index',
+          name: 'task-instance',
           component: resolve => require(['../pages/projects/pages/taskInstance'], resolve),
           meta: {
             title: `${i18n.$t('Task Instance')}`
-          },
-          redirect: {
-            name: 'task-instance-list'
-          },
-          children: [
-            {
-              path: '/projects/task-instance/list',
-              name: 'task-instance-list',
-              component: resolve => require(['../pages/projects/pages/taskInstance/pages/list/index'], resolve),
-              meta: {
-                title: `${i18n.$t('Task Instance')}`
-              }
-            }
-          ]
+          }
+
         },
         {
           path: '/projects/task-record',
-          name: 'task-record-index',
+          name: 'task-record',
           component: resolve => require(['../pages/projects/pages/taskRecord'], resolve),
           meta: {
             title: `${i18n.$t('Task record')}`
-          },
-          redirect: {
-            name: 'task-record-list'
-          },
-          children: [
-            {
-              path: '/projects/task-record/list',
-              name: 'task-record-list',
-              component: resolve => require(['../pages/projects/pages/taskRecord/pages/list/index'], resolve),
-              meta: {
-                title: `${i18n.$t('Task record')}`
-              }
-            }
-          ]
+          }
+        },
+        {
+          path: '/projects/history-task-record',
+          name: 'history-task-record',
+          component: resolve => require(['../pages/projects/pages/historyTaskRecord'], resolve),
+          meta: {
+            title: `History task record`
+          }
+
         }
       ]
     },
