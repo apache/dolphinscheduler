@@ -45,13 +45,18 @@ let menu = {
         },
         {
           name: `${i18n.$t('Task Instance')}`,
-          path: 'task-instance-list',
+          path: 'task-instance',
           id: 3
         },
         {
           name: `${i18n.$t('Task record')}`,
-          path: 'task-record-list',
+          path: 'task-record',
           id: 4
+        },
+        {
+          name: `${i18n.$t('History task record')}`,
+          path: 'history-task-record',
+          id: 5
         }
       ]
     }

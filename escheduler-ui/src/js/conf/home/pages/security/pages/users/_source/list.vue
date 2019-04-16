@@ -192,13 +192,13 @@
           let sourceListPrs = _.map(data[0], v => {
             return {
               id: v.id,
-              name: v.name
+              name: v.alias
             }
           })
           let targetListPrs = _.map(data[1], v => {
             return {
               id: v.id,
-              name: v.name
+              name: v.alias
             }
           })
           let self = this

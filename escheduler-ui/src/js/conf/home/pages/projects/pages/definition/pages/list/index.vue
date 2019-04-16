@@ -62,9 +62,7 @@
        */
       _page (val) {
         this.searchParams.pageNo = val
-        setUrlParams({
-          pageNo: this.searchParams.pageNo
-        })
+        setUrlParams(this.searchParams)
         this._debounceGET()
       },
       /**
@@ -73,9 +71,7 @@
       _onConditions (o) {
         this.searchParams.searchVal = o.searchVal
         this.searchParams.pageNo = 1
-        setUrlParams({
-          pageNo: this.searchParams.pageNo
-        })
+        setUrlParams(this.searchParams)
         this._debounceGET()
       },
       /**

@@ -44,20 +44,20 @@ const rtBantpl = () => {
 /**
  * return node html
  */
-const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType,runFlag }) => {
+const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag }) => {
   let tpl = ``
   tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
   tpl += `<div>`
-    tpl += `<div class="state-p"></div>`
-    tpl += `<div class="icos icos-${taskType}"></div>`
-    tpl += `<span class="name-p">${name}</span>`
+  tpl += `<div class="state-p"></div>`
+  tpl += `<div class="icos icos-${taskType}"></div>`
+  tpl += `<span class="name-p">${name}</span>`
   tpl += `</div>`
   tpl += `<div class="ep"></div>`
-    tpl += `<div class="ban-p">`
-    if (runFlag === 'FORBIDDEN') {
-      tpl += rtBantpl()
-    }
-    tpl += `</div>`
+  tpl += `<div class="ban-p">`
+  if (runFlag === 'FORBIDDEN') {
+    tpl += rtBantpl()
+  }
+  tpl += `</div>`
   tpl += `</div>`
 
   return tpl
