@@ -193,7 +193,7 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       targetarr: locations[v.id]['targetarr'],
       isAttachment: this.config.isAttachment,
       taskType: v.type,
-      runFlag:v.runFlag
+      runFlag: v.runFlag
     }))
 
     // contextmenu event

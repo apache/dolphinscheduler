@@ -11,7 +11,7 @@
                 type="daterange"
                 format="YYYY-MM-DD HH:mm:ss"
                 placement="bottom-end"
-                v-model="datepicker"
+                :value="[searchParams.startDate,searchParams.endDate]"
                 :panelNum="2">
           <x-input slot="input" readonly slot-scope="{value}" :value="value" style="width: 310px;" size="small" :placeholder="$t('Select date range')">
             <i slot="suffix"
@@ -24,7 +24,7 @@
         </x-datepicker>
       </div>
       <div class="list">
-        <x-select style="width: 160px;" @on-change="_onChangeState" :value="stateType" >
+        <x-select style="width: 160px;" @on-change="_onChangeState" :value="searchParams.stateType" >
           <x-input slot="trigger" readonly :value="selectedModel ? selectedModel.label : ''" slot-scope="{ selectedModel }" style="width: 160px;" size="small" :placeholder="$t('State')" suffix-icon="ans-icon-arrow-down">
           </x-input>
           <x-option
@@ -36,10 +36,10 @@
         </x-select>
       </div>
       <div class="list">
-        <x-input v-model="host" style="width: 140px;" size="small" :placeholder="$t('host')"></x-input>
+        <x-input v-model="searchParams.host" style="width: 140px;" size="small" :placeholder="$t('host')"></x-input>
       </div>
       <div class="list">
-        <x-input v-model="searchVal" style="width: 200px;" size="small" :placeholder="$t('name')"></x-input>
+        <x-input v-model="searchParams.searchVal" style="width: 200px;" size="small" :placeholder="$t('name')"></x-input>
       </div>
     </template>
   </m-conditions>
@@ -47,91 +47,60 @@
 <script>
   import _ from 'lodash'
   import { stateType } from './common'
-  import { setUrlParams } from '@/module/util/routerUtil'
   import mConditions from '@/module/components/conditions/conditions'
   export default {
-    name: 'conditions',
+    name: 'instance-conditions',
     data () {
       return {
         // state(list)
         stateTypeList: stateType,
-        // state
-        stateType: '',
-        // start date
-        startDate: '',
-        // end date
-        endDate: '',
-        // search value
-        searchVal: '',
-        // host
-        host: '',
-        // datepicker plugin
-        datepicker: []
+        searchParams: {
+          // state
+          stateType: '',
+          // start date
+          startDate: '',
+          // end date
+          endDate: '',
+          // search value
+          searchVal: '',
+          // host
+          host: ''
+        }
       }
     },
     props: {},
     methods: {
       _ckQuery () {
-        setUrlParams({ pageNo: 1 })
-        this.$emit('on-query', {
-          startDate: this.startDate || '',
-          endDate: this.endDate || '',
-          stateType: this.stateType || '',
-          host: _.trim(this.host) || '',
-          searchVal: _.trim(this.searchVal) || ''
-        })
+        this.$emit('on-query', this.searchParams)
       },
       /**
        * change times
        */
       _onChangeStartStop (val) {
-        this.startDate = val[0]
-        this.endDate = val[1]
-        // set url params
-        setUrlParams({
-          startDate: this.startDate,
-          endDate: this.endDate
-        })
+        this.searchParams.startDate = val[0]
+        this.searchParams.endDate = val[1]
       },
       /**
        * change state
        */
       _onChangeState (val) {
-        this.stateType = val.value
-        // set url params
-        setUrlParams({
-          stateType: this.stateType
-        })
+        this.searchParams.stateType = val.value
       },
       /**
        * empty date
        */
       _dateEmpty () {
-        this.startDate = ''
-        this.endDate = ''
+        this.searchParams.startDate = ''
+        this.searchParams.endDate = ''
         this.$refs.datepicker.empty()
-        // set url params
-        setUrlParams({
-          startDate: '',
-          endDate: ''
-        })
       }
     },
     watch: {
-      searchVal (val) {
-        setUrlParams({
-          searchVal: _.trim(val)
-        })
-      }
     },
     created () {
-      let query = this.$route.query
-      if (!_.isEmpty(query)) {
-        this.searchVal = query.searchVal
-        this.startDate = query.startDate
-        this.endDate = query.endDate
-        this.stateType = query.stateType
-        this.datepicker = (!this.startDate && !this.endDate) ? [] : [this.startDate, this.endDate]
+      // Routing parameter merging
+      if (!_.isEmpty(this.$route.query)) {
+        this.searchParams = _.assign(this.searchParams, this.$route.query)
       }
     },
     mounted () {

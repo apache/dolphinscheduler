@@ -208,8 +208,8 @@ export default {
   'Select date range': 'Select date range',
   'Date': 'Date',
   'waiting': 'waiting',
-  'In Execution': 'In Execution',
-  'Finish': 'Finish',
+  'execution': 'execution',
+  'finish': 'finish',
   'Create File': 'Create File',
   'File Name': 'File Name',
   'File Format': 'File Format',
@@ -251,7 +251,6 @@ export default {
   'Size': 'Size',
   'Rename': 'Rename',
   'Download': 'Download',
-  'Confirm Rename': 'Confirm Rename',
   'Submit': 'Submit',
   'Edit UDF Function': 'Edit UDF Function',
   'type': 'type',
@@ -298,7 +297,6 @@ export default {
   'Copy': 'Copy',
   'Delete': 'Delete',
   'Please enter keyword': 'Please enter keyword',
-  'Confirm Upload': 'Confirm Upload',
   'File Upload': 'File Upload',
   'Drag the file into the current upload window': 'Drag the file into the current upload window',
   'Drag area upload': 'Drag area upload',
@@ -410,4 +408,5 @@ export default {
   'Create queue': 'Create queue',
   'Edit queue': 'Edit queue',
   'Datasource manage': 'Datasource',
+  'History task record': 'History task record'
 }

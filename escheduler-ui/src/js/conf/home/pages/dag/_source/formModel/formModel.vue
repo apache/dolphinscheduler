@@ -178,7 +178,7 @@
   import mShell from './tasks/shell'
   import mSpark from './tasks/spark'
   import mPython from './tasks/python'
-  import { isNameExDag,rtBantpl } from './../plugIn/util'
+  import { isNameExDag, rtBantpl } from './../plugIn/util'
   import JSP from './../plugIn/jsPlumbHandle'
   import mProcedure from './tasks/procedure'
   import mDependent from './tasks/dependent'
@@ -366,7 +366,7 @@
       /**
        *  set run flag
        */
-      _setRunFlag(){
+      _setRunFlag () {
         let dom = $(`#${this.id}`).find('.ban-p')
         dom.html('')
         if (this.runFlag === 'FORBIDDEN') {
@@ -528,10 +528,10 @@
       position: relative;
       margin-bottom: 10px;
       .text-box {
-        width: 110px;
+        width: 112px;
         float: left;
         text-align: right;
-        margin-right: 10px;
+        margin-right: 8px;
         >span {
           font-size: 14px;
           color: #777;
