@@ -47,13 +47,6 @@ public class CommonUtils {
   }
 
   /**
-   * @return get the path of Python system environment variables
-   */
-  public static String getPythonSystemEnvPath() {
-    return getString(ESCHEDULER_ENV_PY);
-  }
-
-  /**
    * @return get queue implementation name
    */
   public static String getQueueImplValue(){

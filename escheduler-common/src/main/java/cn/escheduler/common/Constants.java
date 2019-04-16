@@ -119,7 +119,12 @@ public final class Constants {
     /**
      * escheduler.env.py
      */
-    public static final String ESCHEDULER_ENV_PY = "escheduler.env.py";
+    public static final String ESCHEDULER_ENV_SH = ".escheduler_env.sh";
+
+    /**
+     * python home
+     */
+    public static final String PYTHON_HOME="PYTHON_HOME";
 
     /**
      * resource.view.suffixs
