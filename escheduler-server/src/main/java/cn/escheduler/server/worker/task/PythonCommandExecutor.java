@@ -16,6 +16,7 @@
  */
 package cn.escheduler.server.worker.task;
 
+import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -84,7 +85,9 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
 
     @Override
     protected String commandType() {
-        String envPath = System.getProperty("user.dir")+"/conf/env/.escheduler_env.sh";
+
+        String envPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH + "conf "+
+                Constants.SINGLE_SLASH +"env" + Constants.SINGLE_SLASH + Constants.ESCHEDULER_ENV_SH;
         String pythonHome = getPythonHome(envPath);
         if (StringUtils.isEmpty(pythonHome)){
             return PYTHON;
@@ -115,7 +118,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)));
             while ((line = br.readLine()) != null){
-                if (line.contains("PYTHON_HOME")){
+                if (line.contains(Constants.PYTHON_HOME)){
                     sb.append(line);
                     break;
                 }
