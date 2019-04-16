@@ -72,7 +72,7 @@ public class PythonTask extends AbstractTask {
 
     this.pythonProcessTask = new PythonCommandExecutor(this::logHandle,
             taskProps.getTaskDir(), taskProps.getTaskAppId(),
-            taskProps.getTenantCode(), CommonUtils.getPythonSystemEnvPath(), taskProps.getTaskStartTime(),
+            taskProps.getTenantCode(), null, taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(), logger);
     this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
   }
