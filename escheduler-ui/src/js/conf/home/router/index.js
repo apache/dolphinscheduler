@@ -177,7 +177,7 @@ const router = new Router({
           name: 'history-task-record',
           component: resolve => require(['../pages/projects/pages/historyTaskRecord'], resolve),
           meta: {
-            title: `History task record`
+            title: `${i18n.$t('History task record')}`
           }
 
         }

@@ -28,6 +28,7 @@
   import mSpin from '@/module/components/spin/spin'
   import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
   import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/instanceConditions'
@@ -59,6 +60,7 @@
         }
       }
     },
+    mixins: [listUrlParamHandle],
     props: {},
     methods: {
       ...mapActions('dag', ['getTaskInstanceList']),
@@ -81,7 +83,7 @@
       /**
        * get list data
        */
-      _getTaskInstanceList (flag) {
+      _getList (flag) {
         this.isLoading = !flag
         this.getTaskInstanceList(this.searchParams).then(res => {
           this.taskInstanceList = []
@@ -91,44 +93,21 @@
         }).catch(e => {
           this.isLoading = false
         })
-      },
-      /**
-       * Anti-shake request interface
-       * @desc Prevent function from being called multiple times
-       */
-      _debounceGET: _.debounce(function (flag) {
-        this._getTaskInstanceList(flag)
-      }, 100, {
-        'leading': false,
-        'trailing': true
-      })
+      }
     },
     watch: {
       // router
       '$route' (a) {
         // url no params get instance list
         if (_.isEmpty(a.query)) {
-          this.searchParams.pageNo = 1
           this.searchParams.processInstanceId = ''
-        } else {
-          this.searchParams.pageNo = a.query.pageNo || 1
         }
-      },
-      'searchParams': {
-        deep: true,
-        handler () {
-          this._debounceGET()
-        }
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
       }
     },
     created () {
-      // Routing parameter merging
-      if (!_.isEmpty(this.$route.query)) {
-        this.searchParams = _.assign(this.searchParams, this.$route.query)
-      }
     },
     mounted () {
-      this._debounceGET()
     },
     components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }

@@ -29,6 +29,7 @@
   import mSpin from '@/module/components/spin/spin'
   import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
@@ -53,6 +54,7 @@
         }
       }
     },
+    mixins: [listUrlParamHandle],
     props: {
       config: String
     },
@@ -83,44 +85,21 @@
       },
       _onUpdate () {
         this._debounceGET()
-      },
-      /**
-       * Anti-shake request interface
-       * @desc Prevent function from being called multiple times
-       */
-      _debounceGET: _.debounce(function (flag) {
-        this._getList(flag)
-      }, 100, {
-        'leading': false,
-        'trailing': true
-      })
+      }
     },
     watch: {
       // router
       '$route' (a) {
         // url no params get instance list
         if (_.isEmpty(a.query)) {
-          this.searchParams.pageNo = 1
           this.searchParams.processInstanceId = ''
-        } else {
-          this.searchParams.pageNo = a.query.pageNo || 1
         }
-      },
-      'searchParams.pageNo': {
-        deep: true,
-        handler () {
-          this._debounceGET()
-        }
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
       }
     },
     created () {
-      // Routing parameter merging
-      if (!_.isEmpty(this.$route.query)) {
-        this.searchParams = _.assign(this.searchParams, this.$route.query)
-      }
     },
     mounted () {
-      this._debounceGET()
     },
     components: { mList, mConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }

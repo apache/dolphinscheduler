@@ -82,7 +82,7 @@
       padding: 0 20px;
     }
     .content-p {
-      min-width: 500px;
+      min-width: 520px;
       min-height: 100px;
     }
   }

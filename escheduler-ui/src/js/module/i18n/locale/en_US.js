@@ -408,5 +408,6 @@ export default {
   'Create queue': 'Create queue',
   'Edit queue': 'Edit queue',
   'Datasource manage': 'Datasource',
-  'History task record': 'History task record'
+  'History task record': 'History task record',
+  'Please go online': 'Please go online'
 }

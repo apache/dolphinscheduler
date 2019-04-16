@@ -407,5 +407,6 @@ export default {
   'Create queue': '创建队列',
   'Edit queue': '编辑队列',
   'Datasource manage': '数据源中心',
-  'History task record': '历史任务记录'
+  'History task record': '历史任务记录',
+  'Please go online': '不要忘记上线'
 }
