@@ -86,7 +86,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String commandType() {
 
-        String envPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH + "conf "+
+        String envPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH + "conf"+
                 Constants.SINGLE_SLASH +"env" + Constants.SINGLE_SLASH + Constants.ESCHEDULER_ENV_SH;
         String pythonHome = getPythonHome(envPath);
         if (StringUtils.isEmpty(pythonHome)){
