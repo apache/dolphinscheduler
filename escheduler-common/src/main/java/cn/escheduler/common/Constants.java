@@ -463,6 +463,10 @@ public final class Constants {
 
     public static final String TASK_RECORD_PWD = "task.record.datasource.password";
 
+    public static  String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
+
+    public static  String TASK_RECORD_TABLE_HISTORY_HIVE_LOG = "eamp_hive_hist_log_hd";
+
     public static final String STATUS = "status";
 
 
@@ -826,4 +830,9 @@ public final class Constants {
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
     public static final String DEPENDENT_ALL = "ALL";
+
+
+    /**
+     *
+     */
 }
