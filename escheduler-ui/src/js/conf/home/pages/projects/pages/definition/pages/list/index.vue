@@ -32,6 +32,7 @@
   import localStore from '@/module/util/localStorage'
   import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
@@ -44,15 +45,14 @@
         processListP: [],
         isLoading: true,
         searchParams: {
-          // 分页条数
           pageSize: 10,
-          // 分页
           pageNo: 1,
-          // 查询名称
-          searchVal: ''
+          searchVal: '',
+          userId: ''
         }
       }
     },
+    mixins: [listUrlParamHandle],
     props: {
     },
     methods: {
@@ -77,15 +77,9 @@
       /**
        * get data list
        */
-      _getProcessListP (flag) {
+      _getList (flag) {
         this.isLoading = !flag
-        this.getProcessListP({
-          pageSize: this.searchParams.pageSize,
-          pageNo: this.searchParams.pageNo,
-          searchVal: this.searchParams.searchVal,
-          userId: this.$route.query.userId || ''
-        }).then(res => {
-          setUrlParams({ pageNo: this.pageNo })
+        this.getProcessListP(this.searchParams).then(res => {
           this.processListP = []
           this.processListP = res.totalList
           this.total = res.total
@@ -96,48 +90,20 @@
       },
       _onUpdate () {
         this._debounceGET('false')
-      },
-      /**
-       * Anti-shake request interface
-       * @desc Prevent function from being called multiple times
-       */
-      _debounceGET: _.debounce(function (flag) {
-        this._getProcessListP(flag)
-      }, 100, {
-        'leading': false,
-        'trailing': true
-      })
+      }
     },
     watch: {
       '$route' (a) {
         // url no params get instance list
-        if (_.isEmpty(a.query)) {
-          this.searchParams.pageNo = 1
-        } else {
-          this.searchParams.pageNo = a.query.pageNo || 1
-        }
-      },
-      'searchParams': {
-        deep: true,
-        handler () {
-          this._debounceGET()
-        }
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
       }
     },
     created () {
       localStore.removeItem('subProcessId')
-
-      // Routing parameter merging
-      if (!_.isEmpty(this.$route.query)) {
-        this.searchParams = _.assign(this.searchParams, this.$route.query)
-      }
     },
     mounted () {
-      this._debounceGET()
     },
     components: { mList, mConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }
 </script>
 
-<style lang="scss" rel="stylesheet/scss">
-</style>

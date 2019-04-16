@@ -333,8 +333,16 @@
       padding: 0 20px;
     }
     .content-p {
-      min-width: 500px;
+      min-width: 820px;
       min-height: 100px;
+      .list-box-f {
+        .text {
+          width: 166px;
+        }
+        .cont {
+          width: calc(100% - 186px);
+        }
+      }
     }
   }
 </style>
