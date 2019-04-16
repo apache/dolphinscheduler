@@ -4,16 +4,16 @@
       <table>
         <tr>
           <th>
-            <span>{{$t('编号')}}</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>{{$t('ip')}}</span>
+            <span>{{$t('IP')}}</span>
           </th>
           <th>
-            <span>{{$t('进程pid')}}</span>
+            <span>{{$t('Process Pid')}}</span>
           </th>
           <th>
-            <span>{{$t('zk注册目录')}}</span>
+            <span>{{$t('zk registration directory')}}</span>
           </th>
           <th>
             <span>{{$t('cpuUsage')}}</span>
@@ -22,10 +22,10 @@
             <span>{{$t('memoryUsage')}}</span>
           </th>
           <th>
-            <span>{{$t('创建时间')}}</span>
+            <span>{{$t('Create Time')}}</span>
           </th>
           <th>
-            <span>{{$t('最后心跳时间')}}</span>
+            <span>{{$t('Last heartbeat time')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="$index">

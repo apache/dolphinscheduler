@@ -1,9 +1,9 @@
 <template>
-  <m-list-construction :title="$t('项目管理')">
+  <m-list-construction :title="$t('Project')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small" @click="_create('')" v-ps="['GENERAL_USER']">{{$t('创建项目')}}</x-button>
+          <x-button type="ghost" size="small" @click="_create('')" v-ps="['GENERAL_USER']">{{$t('Create Project')}}</x-button>
         </template>
       </m-conditions>
     </template>

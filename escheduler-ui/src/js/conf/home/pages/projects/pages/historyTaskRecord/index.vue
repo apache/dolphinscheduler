@@ -4,12 +4,12 @@
 <script>
   import mList from '@/conf/home/pages/projects/pages/_source/taskRecordList'
   export default {
-    name: 'task-record',
+    name: 'history-task-record',
     data () {
       return {
         config: {
-          title: `${this.$t('Task record')}`,
-          apiFn: 'getTaskRecordList'
+          title: `${this.$t('History task record')}`,
+          apiFn: 'getHistoryTaskRecordList'
         }
       }
     },

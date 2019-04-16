@@ -1,13 +1,13 @@
 <template>
   <div class="variable-model">
       <div class="list">
-        <div class="name"><i class="fa fa-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('全局参数')}}</b></div>
+        <div class="name"><i class="fa fa-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('Global parameters')}}</b></div>
         <div class="var-cont">
           <x-button size="xsmall" type="ghost" v-for="(item,$index) in list.globalParams"  @click="_copy('gbudp-' + $index)" :data-clipboard-text="item.prop + ' = ' +item.value" :class="'gbudp-' + $index"><b style="color: #2A455B;">{{item.prop}}</b> = {{item.value}}</x-button>
         </div>
       </div>
       <div class="list" style="height: 30px;">
-        <div class="name"><i class="fa fa-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('局部参数')}}</b></div>
+        <div class="name"><i class="fa fa-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('Local parameters')}}</b></div>
         <div class="var-cont">
           &nbsp;
         </div>
@@ -57,13 +57,13 @@
       _copy (className) {
         let clipboard = new Clipboard(`.${className}`)
         clipboard.on('success', e => {
-          this.$message.success(`${i18n.$t('复制成功')}`)
+          this.$message.success(`${i18n.$t('Copy success')}`)
           // Free memory
           clipboard.destroy()
         })
         clipboard.on('error', e => {
           // Copy is not supported
-          this.$message.warning(`${i18n.$t('该浏览器不支持自动复制')}`)
+          this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
           // Free memory
           clipboard.destroy()
         })

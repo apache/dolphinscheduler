@@ -1,9 +1,9 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('工作流实例')">
+    <m-list-construction :title="$t('Process Instance')">
       <template slot="conditions">
-        <m-conditions @on-query="_onQuery"></m-conditions>
+        <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
       </template>
       <template slot="content">
         <template v-if="processInstanceList.length">
@@ -25,13 +25,13 @@
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mList from './_source/list'
-  import mConditions from './_source/conditions'
   import mSpin from '@/module/components/spin/spin'
   import localStore from '@/module/util/localStorage'
   import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/instanceConditions'
 
   export default {
     name: 'instance-list-index',
@@ -43,7 +43,7 @@
         total: null,
         // 数据
         processInstanceList: [],
-        // 参数
+        // Parameter
         searchParams: {
           // 搜索关键词
           searchVal: '',
@@ -53,11 +53,11 @@
           pageNo: 1,
           // host
           host: '',
-          // 状态
+          // State
           stateType: '',
-          // 开始时间
+          // Start Time
           startDate: '',
-          // 结束时间
+          // End Time
           endDate: ''
         }
       }
@@ -66,19 +66,20 @@
     methods: {
       ...mapActions('dag', ['getProcessInstance']),
       /**
-       * 查询
+       * Query
        */
       _onQuery (o) {
         this.searchParams = _.assign(this.searchParams, o)
+        setUrlParams(this.searchParams)
+        this._debounceGET()
       },
       /**
        * 分页事件
        */
       _page (val) {
         this.searchParams.pageNo = val
-        setUrlParams({
-          pageNo: this.searchParams.pageNo
-        })
+        setUrlParams(this.searchParams)
+        this._debounceGET()
       },
       /**
        * 获取list数据
@@ -98,7 +99,7 @@
        * 更新
        */
       _onUpdate () {
-        this._debounceGET('false')
+        this._debounceGET()
       },
       /**
        * 路由变动
@@ -158,7 +159,7 @@
       // 销毁轮循
       clearInterval(this.setIntervalP)
     },
-    components: { mList, mConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
+    components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }
 </script>
 

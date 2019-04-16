@@ -9,34 +9,34 @@
           <table>
             <tr>
               <th>
-                <span>{{$t('编号')}}</span>
+                <span>{{$t('#')}}</span>
               </th>
               <th>
-                <span>{{$t('流程名称')}}</span>
+                <span>{{$t('Process Name')}}</span>
               </th>
               <th>
-                <span>{{$t('开始时间')}}</span>
+                <span>{{$t('Start Time')}}</span>
               </th>
               <th>
-                <span>{{$t('结束时间')}}</span>
+                <span>{{$t('End Time')}}</span>
               </th>
               <th>
                 <span>{{$t('crontab')}}</span>
               </th>
               <th>
-                <span>{{$t('失败策略')}}</span>
+                <span>{{$t('Failure Strategy')}}</span>
               </th>
               <th>
-                <span>{{$t('状态')}}</span>
+                <span>{{$t('State')}}</span>
               </th>
               <th>
-                <span>{{$t('创建时间')}}</span>
+                <span>{{$t('Create Time')}}</span>
               </th>
               <th>
-                <span>{{$t('更新时间')}}</span>
+                <span>{{$t('Update Time')}}</span>
               </th>
               <th width="80">
-                <span>{{$t('操作')}}</span>
+                <span>{{$t('Operation')}}</span>
               </th>
             </tr>
             <tr v-for="(item, $index) in list" :key="item.id">
@@ -73,7 +73,7 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('编辑')"
+                        :title="$t('Edit')"
                         @click="_editTiming(item)"
                         icon="iconfont icon-bianji"
                         :disabled="item.releaseState === 'ONLINE'" >
@@ -83,7 +83,7 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('上线')"
+                        :title="$t('online')"
                         @click="_online(item)"
                         icon="iconfont icon-erji-xiaxianjilu-copy"
                         v-if="item.releaseState === 'OFFLINE'">
@@ -93,7 +93,7 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('下线')"
+                        :title="$t('offline')"
                         icon="iconfont icon-erji-xiaxianjilu"
                         @click="_offline(item)"
                         v-if="item.releaseState === 'ONLINE'">

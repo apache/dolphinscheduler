@@ -10,12 +10,12 @@
                     v-model="udfName"
                     :disabled="progress !== 0"
                     style="width: 268px"
-                    :placeholder="$t('请输入资源名称')"
+                    :placeholder="$t('Please enter resource name')"
                     autocomplete="off">
             </x-input>
             <div class="p1" style="position: absolute;">
               <input name="file" id="file" type="file" class="file-update" v-if="!progress">
-              <x-button type="dashed" size="small" :disabled="progress !== 0"> {{$t('点击上传')}} </x-button>
+              <x-button type="dashed" size="small" :disabled="progress !== 0"> {{$t('Upload')}} </x-button>
             </div>
           </div>
         </li>
@@ -25,12 +25,12 @@
                   size="small"
                   v-model="udfDesc"
                   :disabled="progress !== 0"
-                  :placeholder="$t('请输入资源描述')"
+                  :placeholder="$t('Please enter description')"
                   autocomplete="off">
           </x-input>
         </li>
         <li style="margin-top: -4px;margin-bottom: 8px;">
-          <x-button type="success" size="xsmall" long @click="_ok" :loading="spinnerLoading">{{spinnerLoading ? `Loading... (${progress}%)` : $t('上传UDF资源')}}</x-button>
+          <x-button type="success" size="xsmall" long @click="_ok" :loading="spinnerLoading">{{spinnerLoading ? `Loading... (${progress}%)` : $t('Upload UDF Resources')}}</x-button>
         </li>
       </ul>
     </div>
@@ -62,11 +62,11 @@
        */
       _validation () {
         if (!this.udfName) {
-          this.$message.warning(`${i18n.$t('请输入文件名')}`)
+          this.$message.warning(`${i18n.$t('Please enter file name')}`)
           return false
         }
         if (!this.file) {
-          this.$message.warning(`${i18n.$t('请选择要上传的文件')}`)
+          this.$message.warning(`${i18n.$t('Please select the file to upload')}`)
           return false
         }
         return true
