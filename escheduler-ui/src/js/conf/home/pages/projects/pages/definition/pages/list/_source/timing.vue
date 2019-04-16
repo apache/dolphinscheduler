@@ -198,11 +198,11 @@
           if (this.item.crontab) {
             api = 'dag/updateSchedule'
             searchParams.id = this.item.id
-            msg = '编辑成功！不要忘记上线'
+            msg = `${i18n.$t('Edit')}${i18n.$t('success')},${i18n.$t('Please go online')}`
           } else {
             api = 'dag/createSchedule'
             searchParams.processDefinitionId = this.item.id
-            msg = '创建成功'
+            msg = `${i18n.$t('Create')}${i18n.$t('success')}`
           }
 
           this.store.dispatch(api, searchParams).then(res => {

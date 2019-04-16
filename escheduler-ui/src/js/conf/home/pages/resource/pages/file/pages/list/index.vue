@@ -14,10 +14,10 @@
       </template>
       <template slot="content">
         <template v-if="fileResourcesList.length">
-          <m-list :file-resources-list="fileResourcesList" :page-no="pageNo" :page-size="pageSize">
+          <m-list :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
           </m-list>
           <div class="page-box">
-            <x-page :current="pageNo" :total="total" show-elevator @on-change="_page"></x-page>
+            <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
           </div>
         </template>
         <template v-if="!fileResourcesList.length">
@@ -30,11 +30,14 @@
   </div>
 </template>
 <script>
+  import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mList from './_source/list'
   import mSpin from '@/module/components/spin/spin'
   import { findComponentDownward } from '@/module/util/'
   import mNoData from '@/module/components/noData/noData'
+  import { setUrlParams } from '@/module/util/routerUtil'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
@@ -43,14 +46,18 @@
     name: 'resource-list-index-FILE',
     data () {
       return {
-        pageSize: 10,
-        pageNo: 1,
         total: null,
-        searchVal: '',
         isLoading: false,
-        fileResourcesList: []
+        fileResourcesList: [],
+        searchParams: {
+          pageSize: 10,
+          pageNo: 1,
+          searchVal: '',
+          type: 'FILE'
+        }
       }
     },
+    mixins: [listUrlParamHandle],
     props: {},
     methods: {
       ...mapActions('resource', ['getResourcesListP']),
@@ -61,22 +68,20 @@
         findComponentDownward(this.$root, 'roof-nav')._fileUpdate('FILE')
       },
       _onConditions (o) {
-        this.searchVal = o.searchVal
-        this.pageNo = 1
-        this._getResourcesList()
+        this.searchParams = _.assign(this.searchParams, o)
+        this.searchParams.pageNo = 1
+        setUrlParams(this.searchParams)
+        this._debounceGET()
       },
       _page (val) {
-        this.pageNo = val
-        this._getResourcesList()
+        this.searchParams.pageNo = val
+        setUrlParams(this.searchParams)
+        this._debounceGET()
       },
-      _getResourcesList (flag) {
+      _getList (flag) {
         this.isLoading = !flag
-        this.getResourcesListP({
-          pageSize: this.pageSize,
-          pageNo: this.pageNo,
-          searchVal: this.searchVal,
-          type: 'FILE'
-        }).then(res => {
+        this.fileResourcesList = []
+        this.getResourcesListP(this.searchParams).then(res => {
           this.fileResourcesList = res.totalList
           this.total = res.total
           this.isLoading = false
@@ -85,25 +90,22 @@
         })
       },
       _updateList () {
-        this.pageSize = 10
-        this.pageNo = 1
-        this.searchVal = ''
-        this._getResourcesList()
-      },
-      _routerView () {
-        let name = this.$route.name
-        if (name === 'resource-file-details') {
-          return true
-        } else {
-          return false
-        }
+        this.searchParams.pageNo = 1
+        this.searchParams.searchVal = ''
+        setUrlParams(this.searchParams)
+        this._debounceGET()
       }
     },
-    watch: {},
+    watch: {
+      // router
+      '$route' (a) {
+        // url no params get instance list
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+      }
+    },
     created () {
     },
     mounted () {
-      this._getResourcesList()
     },
     components: { mSecondaryMenu, mListConstruction, mConditions, mList, mSpin, mNoData }
   }
