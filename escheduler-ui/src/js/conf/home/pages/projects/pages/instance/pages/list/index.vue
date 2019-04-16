@@ -3,7 +3,7 @@
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
     <m-list-construction :title="$t('Process Instance')">
       <template slot="conditions">
-        <m-conditions @on-query="_onQuery"></m-conditions>
+        <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
       </template>
       <template slot="content">
         <template v-if="processInstanceList.length">
@@ -25,13 +25,13 @@
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mList from './_source/list'
-  import mConditions from './_source/conditions'
   import mSpin from '@/module/components/spin/spin'
   import localStore from '@/module/util/localStorage'
   import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import mInstanceConditions from '@/conf/home/pages/projects/pages/_source/instanceConditions'
 
   export default {
     name: 'instance-list-index',
@@ -70,15 +70,16 @@
        */
       _onQuery (o) {
         this.searchParams = _.assign(this.searchParams, o)
+        setUrlParams(this.searchParams)
+        this._debounceGET()
       },
       /**
        * 分页事件
        */
       _page (val) {
         this.searchParams.pageNo = val
-        setUrlParams({
-          pageNo: this.searchParams.pageNo
-        })
+        setUrlParams(this.searchParams)
+        this._debounceGET()
       },
       /**
        * 获取list数据
@@ -98,7 +99,7 @@
        * 更新
        */
       _onUpdate () {
-        this._debounceGET('false')
+        this._debounceGET()
       },
       /**
        * 路由变动
@@ -158,7 +159,7 @@
       // 销毁轮循
       clearInterval(this.setIntervalP)
     },
-    components: { mList, mConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
+    components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }
 </script>
 
