@@ -1,9 +1,9 @@
 <template>
-  <m-popup :ok-text="item ? $t('编辑') : $t('确定提交')" :nameText="item ? $t('编辑UDF函数') : $t('创建UDF函数')" @ok="_ok" ref="popup">
+  <m-popup :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit UDF Function') : $t('Create UDF Function')" @ok="_ok" ref="popup">
     <template slot="content">
       <div class="udf-create-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('类型')}}</template>
+          <template slot="name"><b>*</b>{{$t('type')}}</template>
           <template slot="content">
             <x-radio-group v-model="type">
               <x-radio :label="'HIVE'">HIVE UDF</x-radio>
@@ -12,49 +12,49 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('UDF函数名称')}}</template>
+          <template slot="name"><b>*</b>{{$t('UDF Function Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     maxlength="40"
                     v-model="funcName"
-                    :placeholder="$t('请输入函数名')">
+                    :placeholder="$t('Please enter a function name')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('包名类名')}}</template>
+          <template slot="name"><b>*</b>{{$t('Package Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     maxlength="40"
                     v-model="className"
-                    :placeholder="$t('请输入包名类名')">
+                    :placeholder="$t('Please enter a Package name')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('参数')}}</template>
+          <template slot="name">{{$t('Parameter')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="argTypes"
-                    :placeholder="$t('请输入参数')">
+                    :placeholder="$t('Please enter a parameter')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('数据库名')}}</template>
+          <template slot="name">{{$t('Database Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="database"
-                    :placeholder="$t('请输入数据库名')">
+                    :placeholder="$t('Please enter database name')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('UDF资源')}}</template>
+          <template slot="name"><b>*</b>{{$t('UDF Resources')}}</template>
           <template slot="content">
             <x-select
                     filterable
@@ -68,7 +68,7 @@
                       :label="city.alias">
               </x-option>
             </x-select>
-            <x-button type="primary" @click="_toggleUpdate" :disabled="upDisabled">{{$t('上传资源')}}</x-button>
+            <x-button type="primary" @click="_toggleUpdate" :disabled="upDisabled">{{$t('Upload Resources')}}</x-button>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isUpdate">
@@ -81,12 +81,12 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('使用说明')}}</template>
+          <template slot="name">{{$t('Instructions')}}</template>
           <template slot="content">
             <x-input
                     type="textarea"
                     v-model="desc"
-                    :placeholder="$t('请输入使用说明')">
+                    :placeholder="$t('Please enter a instructions')">
             </x-input>
           </template>
         </m-list-box-f>
@@ -209,15 +209,15 @@
        */
       _validation () {
         if (!this.funcName) {
-          this.$message.warning(`${i18n.$t('请输入UDF函数名称')}`)
+          this.$message.warning(`${i18n.$t('Please enter a UDF function name')}`)
           return false
         }
         if (!this.className) {
-          this.$message.warning(`${i18n.$t('请输入包名类名')}`)
+          this.$message.warning(`${i18n.$t('Please enter a Package name')}`)
           return false
         }
         if (!this.resourceId) {
-          this.$message.warning(`${i18n.$t('请选择UDF资源')}`)
+          this.$message.warning(`${i18n.$t('Select UDF Resources')}`)
           return false
         }
         return true

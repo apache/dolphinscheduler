@@ -1,19 +1,19 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('任务实例')">
+    <m-list-construction :title="config.title">
       <template slot="conditions">
         <m-conditions @on-query="_onQuery"></m-conditions>
       </template>
       <template slot="content">
-        <template v-if="taskInstanceList.length">
-          <m-list :task-instance-list="taskInstanceList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+        <template v-if="taskRecordList.length">
+          <m-list :task-record-list="taskRecordList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
           </m-list>
           <div class="page-box">
             <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page"></x-page>
           </div>
         </template>
-        <template v-if="!taskInstanceList.length">
+        <template v-if="!taskRecordList.length">
           <m-no-data></m-no-data>
         </template>
         <m-spin :is-spin="isLoading"></m-spin>
@@ -23,85 +23,73 @@
 </template>
 <script>
   import _ from 'lodash'
-  import { mapActions } from 'vuex'
   import mList from './_source/list'
-  import { setUrlParams } from '@/module/util/routerUtil'
+  import store from '@/conf/home/store'
+  import mConditions from './_source/conditions'
   import mSpin from '@/module/components/spin/spin'
-  import mConditions from '@/conf/home/pages/projects/pages/instance/pages/list/_source/conditions'
+  import { setUrlParams } from '@/module/util/routerUtil'
+  import mNoData from '@/module/components/noData/noData'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
-  import mNoData from '@/module/components/noData/noData'
 
   export default {
-    name: 'task-instance-list-index',
+    name: 'task-record-list',
     data () {
       return {
-        isLoading: true,
+        store,
         total: null,
-        taskInstanceList: [],
+        taskRecordList: [],
+        isLoading: true,
         searchParams: {
-          // page size
-          pageSize: 10,
-          // page index
-          pageNo: 1,
-          // Query name
-          searchVal: '',
-          // Process instance id
-          processInstanceId: '',
-          // host
-          host: '',
-          // state
-          stateType: '',
-          // start date
+          taskName: '',
+          state: '',
+          sourceTable: '',
+          destTable: '',
+          taskDate: '',
           startDate: '',
-          // end date
-          endDate: ''
+          endDate: '',
+          pageSize: 10,
+          pageNo: 1
         }
       }
     },
-    props: {},
+    props: {
+      config: String
+    },
     methods: {
-      ...mapActions('dag', ['getTaskInstanceList']),
-      /**
-       * click query
-       */
       _onQuery (o) {
         this.searchParams = _.assign(this.searchParams, o)
-        if (this.searchParams.taskName) {
-          this.searchParams.taskName = ''
-          setUrlParams({
-            taskName: ''
-          })
-        }
+        setUrlParams(this.searchParams)
         this._debounceGET()
       },
       _page (val) {
         this.searchParams.pageNo = val
-        setUrlParams({
-          pageNo: this.searchParams.pageNo
-        })
+        setUrlParams(this.searchParams)
         this._debounceGET()
       },
       /**
        * get list data
        */
-      _getTaskInstanceList (flag) {
+      _getList (flag) {
         this.isLoading = !flag
-        this.getTaskInstanceList(this.searchParams).then(res => {
-          this.taskInstanceList = []
-          this.taskInstanceList = res.totalList
+        this.store.dispatch(`dag/${this.config.apiFn}`, this.searchParams).then(res => {
+          this.taskRecordList = []
+          this.taskRecordList = res.totalList
           this.total = res.total
           this.isLoading = false
         }).catch(e => {
           this.isLoading = false
         })
       },
+      _onUpdate () {
+        this._debounceGET()
+      },
       /**
        * Anti-shake request interface
        * @desc Prevent function from being called multiple times
        */
       _debounceGET: _.debounce(function (flag) {
-        this._getTaskInstanceList(flag)
+        this._getList(flag)
       }, 100, {
         'leading': false,
         'trailing': true
@@ -118,7 +106,7 @@
           this.searchParams.pageNo = a.query.pageNo || 1
         }
       },
-      'searchParams': {
+      'searchParams.pageNo': {
         deep: true,
         handler () {
           this._debounceGET()

@@ -140,7 +140,7 @@ export default {
     }
 
     let param = {}
-    // Management user
+    // Manage user
     if (o.type === 'user') {
       param.alertgroupId = payload.id
     } else {
@@ -357,7 +357,7 @@ export default {
   /**
    * get queue list pages
    */
-  getQueueListP({ state }, payload){
+  getQueueListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`queue/list-paging`, payload, res => {
         resolve(res.data)
@@ -369,7 +369,7 @@ export default {
   /**
    * create queue
    */
-  createQueueQ({ state }, payload){
+  createQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`queue/create`, payload, res => {
         resolve(res)
@@ -381,7 +381,7 @@ export default {
   /**
    * update queue
    */
-  updateQueueQ({ state }, payload){
+  updateQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`queue/update`, payload, res => {
         resolve(res)
@@ -393,7 +393,7 @@ export default {
   /**
    * update queue
    */
-  verifyQueueQ({ state }, payload){
+  verifyQueueQ ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`queue/verify-queue`, payload, res => {
         resolve(res)
@@ -401,5 +401,5 @@ export default {
         reject(e)
       })
     })
-  },
+  }
 }

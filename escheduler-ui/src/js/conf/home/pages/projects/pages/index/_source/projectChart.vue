@@ -9,14 +9,14 @@
                   @on-change="_datepicker"
                   :value="scheduleTime"
                   type="daterange"
-                  :placeholder="$t('选择日期区间')"
+                  :placeholder="$t('Select date range')"
                   format="YYYY-MM-DD HH:mm:ss">
           </x-datepicker>
         </div>
         <div class="row" >
           <div class="col-md-6">
             <div class="chart-title">
-              <span>{{$t('任务状态统计')}}</span>
+              <span>{{$t('Task status statistics')}}</span>
             </div>
             <div class="row">
               <div class="col-md-7">
@@ -26,9 +26,9 @@
                 <div class="table-small-model">
                   <table>
                     <tr>
-                      <th width="40">{{$t('序号')}}</th>
-                      <th>{{$t('数量')}}</th>
-                      <th>{{$t('状态')}}</th>
+                      <th width="40">{{$t('#')}}</th>
+                      <th>{{$t('Number')}}</th>
+                      <th>{{$t('State')}}</th>
                     </tr>
                     <tr v-for="(item,$index) in taskCountDtosList">
                       <td><span>{{$index+1}}</span></td>
@@ -37,7 +37,7 @@
                           <a href="javascript:" @click="id && _goTask(item.key)" :class="id ?'links':''">{{item.value}}</a>
                         </span>
                       </td>
-                      <td><span>{{item.key}}</span></td>
+                      <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
                     </tr>
                   </table>
                 </div>
@@ -46,7 +46,7 @@
           </div>
           <div class="col-md-6">
             <div class="chart-title">
-              <span>{{$t('流程状态统计')}}</span>
+              <span>{{$t('Process Status Statistics')}}</span>
             </div>
             <div class="row">
               <div class="col-md-7">
@@ -56,14 +56,14 @@
                 <div class="table-small-model">
                   <table>
                     <tr>
-                      <th width="40">{{$t('序号')}}</th>
-                      <th>{{$t('数量')}}</th>
-                      <th>{{$t('状态')}}</th>
+                      <th width="40">{{$t('#')}}</th>
+                      <th>{{$t('Number')}}</th>
+                      <th>{{$t('State')}}</th>
                     </tr>
                     <tr v-for="(item,$index) in processStateCountList">
                       <td><span>{{$index+1}}</span></td>
                       <td><span><a href="javascript:" @click="id && _goProcess(item.key)" :class="id ?'links':''">{{item.value}}</a></span></td>
-                      <td><span>{{item.key}}</span></td>
+                      <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
                     </tr>
                   </table>
                 </div>
@@ -74,7 +74,7 @@
         <div class="row">
           <div class="col-md-12">
             <div class="chart-title" style="margin-bottom: -20px;margin-top: 30px">
-              <span>{{$t('流程定义统计')}}</span>
+              <span>{{$t('Process Definition Statistics')}}</span>
             </div>
             <div>
               <div id="process-definition-bar" style="height:500px"></div>
@@ -93,7 +93,7 @@
   import dayjs from 'dayjs'
   import { mapActions } from 'vuex'
   import { pie, bar } from './chartConfig'
-  import { stateType } from '@/conf/home/pages/projects/pages/instance/pages/list/_source/common'
+  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
   import Chart from '~/@analysys/ana-charts'
   import mNoData from '@/module/components/noData/noData'
   import mSpin from '@/module/components/spin/spin'
@@ -271,6 +271,14 @@
         color: #333;
         font-weight: bold;
       }
+    }
+  }
+  .table-small-model {
+    .ellipsis {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space:  nowrap;
+      display: block;
     }
   }
 </style>

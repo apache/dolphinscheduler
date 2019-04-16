@@ -2,11 +2,11 @@
   <div class="main-layout-box">
     <m-secondary-menu :type="'security'"></m-secondary-menu>
     <template>
-      <m-list-construction :title="$t('队列管理')">
+      <m-list-construction :title="$t('Queue manage')">
         <template slot="conditions">
           <m-conditions @on-conditions="_onConditions">
             <template slot="button-group">
-              <x-button type="ghost" size="small" @click="_create('')">{{$t('创建队列')}}</x-button>
+              <x-button type="ghost" size="small" @click="_create('')">{{$t('Create queue')}}</x-button>
             </template>
           </m-conditions>
         </template>
@@ -52,7 +52,7 @@
     methods: {
       ...mapActions('security', ['getQueueListP']),
       /**
-       * 查询
+       * Query
        */
       _onConditions (o) {
         this.searchVal = o.searchVal
