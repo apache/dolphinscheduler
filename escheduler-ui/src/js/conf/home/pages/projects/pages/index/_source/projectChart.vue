@@ -122,7 +122,7 @@
       },
       _goTask (name) {
         this.$router.push({
-          name: 'task-instance-list',
+          name: 'task-instance',
           query: {
             stateType: _.find(stateType, ['label', name])['code'],
             startDate: this.scheduleTime[0],

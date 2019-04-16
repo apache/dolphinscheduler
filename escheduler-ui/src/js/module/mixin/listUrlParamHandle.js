@@ -14,24 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import store from '@/conf/home/store'
-import router from '@/conf/home/router'
-
+import _ from 'lodash'
+/**
+ * Mainly used for data list paging url param handle
+ * @param _getList => api function(required)
+ */
 export default {
-  data () {
-    return {
-      router,
-      store,
-      isDetails: false
+  watch: {
+    // watch pageNo
+    'searchParams.pageNo': {
+      deep: true,
+      handler () {
+        this._debounceGET()
+      }
     }
   },
   created () {
-    this.isDetails = this.store.state.dag.isDetails
-  },
-  computed: {
-    _isDetails () {
-      return this.isDetails ? 'icon-disabled' : ''
+    // Routing parameter merging
+    if (!_.isEmpty(this.$route.query)) {
+      this.searchParams = _.assign(this.searchParams, this.$route.query)
     }
+  },
+  mounted () {
+    this._debounceGET()
+  },
+  methods: {
+    /**
+     * Anti-shake request interface
+     * @desc Prevent function from being called multiple times
+     */
+    _debounceGET: _.debounce(function (flag) {
+      this._getList(flag)
+    }, 100, {
+      'leading': false,
+      'trailing': true
+    })
   }
 }
