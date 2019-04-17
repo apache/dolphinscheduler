@@ -409,5 +409,7 @@ export default {
   'Edit queue': 'Edit queue',
   'Datasource manage': 'Datasource',
   'History task record': 'History task record',
-  'Please go online': 'Please go online'
+  'Please go online': 'Please go online',
+  'Queue value': 'Queue value',
+  'Please enter queue value': 'Please enter queue value'
 }
