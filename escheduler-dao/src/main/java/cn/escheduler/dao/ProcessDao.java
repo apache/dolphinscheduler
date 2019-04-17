@@ -59,7 +59,7 @@ public class ProcessDao extends AbstractBaseDao {
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private UserMapper userMapper;
 
     @Autowired
     private ProcessDefinitionMapper processDefineMapper;
@@ -102,7 +102,7 @@ public class ProcessDao extends AbstractBaseDao {
      */
     @Override
     protected void init() {
-        projectMapper = getMapper(ProjectMapper.class);
+        userMapper=getMapper(UserMapper.class);
         processDefineMapper = getMapper(ProcessDefinitionMapper.class);
         processInstanceMapper = getMapper(ProcessInstanceMapper.class);
         dataSourceMapper = getMapper(DataSourceMapper.class);
@@ -261,7 +261,7 @@ public class ProcessDao extends AbstractBaseDao {
     public ProcessInstance findProcessInstanceByScheduleTime(int defineId, Date scheduleTime){
 
         return processInstanceMapper.queryByScheduleTime(defineId,
-                DateUtils.dateToString(scheduleTime), 0,null, null);
+                DateUtils.dateToString(scheduleTime), 0, null, null);
     }
 
     /**
@@ -1210,7 +1210,7 @@ public class ProcessDao extends AbstractBaseDao {
     public int updateProcessInstance(Integer processInstanceId, String processJson,
                                      String globalParams, Date scheduleTime, Flag flag,
                                      String locations, String connects){
-        return processInstanceMapper.updateProcessInstance( processInstanceId, processJson,
+        return processInstanceMapper.updateProcessInstance(processInstanceId, processJson,
                 globalParams, scheduleTime, locations, connects, flag);
     }
 
@@ -1554,4 +1554,16 @@ public class ProcessDao extends AbstractBaseDao {
                 DateUtils.dateToString(dateInterval.getEndTime()),
                 stateArray);
     }
+
+    /**
+     *  query user queue by process instance id
+     * @param processInstanceId
+     * @return
+     */
+    public String queryQueueByProcessInstanceId(int processInstanceId){
+        return userMapper.queryQueueByProcessInstanceId(processInstanceId);
+    }
+
+
+
 }
