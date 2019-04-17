@@ -222,4 +222,13 @@ public interface UserMapper {
     })
     @SelectProvider(type = UserMapperProvider.class, method = "queryTenantCodeByUserId")
     User queryTenantCodeByUserId(@Param("userId") int userId);
+
+
+    /**
+     * query user queue by process instance id
+     * @param processInstanceId
+     * @return
+     */
+    @SelectProvider(type = UserMapperProvider.class, method = "queryQueueByProcessInstanceId")
+    String queryQueueByProcessInstanceId(@Param("processInstanceId") int processInstanceId);
 }
