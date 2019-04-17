@@ -1,0 +1,1 @@
+alter table t_escheduler_user add queue varchar(64);

@@ -36,6 +36,7 @@ import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.TaskManager;
 import cn.escheduler.server.worker.task.TaskProps;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,12 +155,18 @@ public class TaskScheduleThread implements Callable<Boolean> {
             taskProps.setTenantCode(taskInstance.getProcessInstance().getTenantCode());
 
             ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskInstance.getId());
+            String queue = processDao.queryQueueByProcessInstanceId(processInstance.getId());
+
             taskProps.setScheduleTime(processInstance.getScheduleTime());
             taskProps.setNodeName(taskInstance.getName());
             taskProps.setTaskInstId(taskInstance.getId());
             taskProps.setEnvFile(CommonUtils.getSystemEnvPath());
             // set queue
-            taskProps.setQueue(taskInstance.getProcessInstance().getQueue());
+            if (StringUtils.isEmpty(queue)){
+                taskProps.setQueue(taskInstance.getProcessInstance().getQueue());
+            }else {
+                taskProps.setQueue(queue);
+            }
             taskProps.setTaskStartTime(taskInstance.getStartTime());
             taskProps.setDefinedParams(allParamMap);
 
@@ -188,7 +195,7 @@ public class TaskScheduleThread implements Callable<Boolean> {
             task.handle();
 
 
-            logger.info("task : {} exit status code : {}",taskProps.getTaskAppId(),task.getExitStatusCode());
+            logger.info("task : {} exit status code : {}", taskProps.getTaskAppId(),task.getExitStatusCode());
 
             if (task.getExitStatusCode() == Constants.EXIT_CODE_SUCCESS){
                 status = ExecutionStatus.SUCCESS;
