@@ -1,34 +1,34 @@
 <template>
   <div class="start-process-model">
     <div class="title-box">
-      <span>{{$t('启动前请先设置参数')}}</span>
+      <span>{{$t('Please set the parameters before starting')}}</span>
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('失败策略')}}
+        {{$t('Failure Strategy')}}
       </div>
       <div class="cont">
         <x-radio-group v-model="failureStrategy" style="margin-top: 7px;">
-          <x-radio :label="'CONTINUE'">{{$t('继续')}}</x-radio>
-          <x-radio :label="'END'">{{$t('结束')}}</x-radio>
+          <x-radio :label="'CONTINUE'">{{$t('Continue')}}</x-radio>
+          <x-radio :label="'END'">{{$t('End')}}</x-radio>
         </x-radio-group>
       </div>
     </div>
     <div class="clearfix list" v-if="sourceType === 'contextmenu'">
       <div class="text">
-        {{$t('节点执行')}}
+        {{$t('Node execution')}}
       </div>
       <div class="cont">
         <x-radio-group v-model="taskDependType">
-          <x-radio :label="'TASK_POST'">{{$t('向后执行')}}</x-radio>
-          <x-radio :label="'TASK_PRE'">{{$t('向前执行')}}</x-radio>
-          <x-radio :label="'TASK_ONLY'">{{$t('仅执行当前节点')}}</x-radio>
+          <x-radio :label="'TASK_POST'">{{$t('Backward execution')}}</x-radio>
+          <x-radio :label="'TASK_PRE'">{{$t('Forward execution')}}</x-radio>
+          <x-radio :label="'TASK_ONLY'">{{$t('Execute only the current node')}}</x-radio>
         </x-radio-group>
       </div>
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('通知策略')}}
+        {{$t('Notification strategy')}}
       </div>
       <div class="cont">
         <x-select style="width: 200px;" v-model="warningType">
@@ -43,7 +43,7 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('流程优先级')}}
+        {{$t('Process priority')}}
       </div>
       <div class="cont">
         <m-priority v-model="processInstancePriority"></m-priority>
@@ -51,14 +51,14 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('通知组')}}
+        {{$t('Notification group')}}
       </div>
       <div class="cont">
         <x-select
                 style="width: 200px;"
                 v-model="warningGroupId"
                 :disabled="!notifyGroupList.length">
-          <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('请选择通知组')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
+          <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
             <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></i>
             <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId.id"></i>
           </x-input>
@@ -73,7 +73,7 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('收件人')}}
+        {{$t('Recipient')}}
       </div>
       <div class="cont">
         <m-email v-model="receivers" :repeat-data="receiversCc"></m-email>
@@ -81,7 +81,7 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('抄送人')}}
+        {{$t('Cc')}}
       </div>
       <div class="cont">
         <m-email v-model="receiversCc" :repeat-data="receivers"></m-email>
@@ -89,29 +89,29 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        {{$t('补数')}}
+        {{$t('Complement Data')}}
       </div>
       <div class="cont">
         <div style="padding-top: 6px;">
-          <x-checkbox v-model="execType">{{$t('是否补数')}}</x-checkbox>
+          <x-checkbox v-model="execType">{{$t('Whether it is a complement process?')}}</x-checkbox>
         </div>
       </div>
     </div>
     <template v-if="execType">
       <div class="clearfix list" style="margin:-6px 0 16px 0">
         <div class="text">
-          {{$t('执行方式')}}
+          {{$t('Mode of execution')}}
         </div>
         <div class="cont">
           <x-radio-group v-model="runMode" style="margin-top: 7px;">
-            <x-radio :label="'RUN_MODE_SERIAL'">{{$t('串行执行')}}</x-radio>
-            <x-radio :label="'RUN_MODE_PARALLEL'">{{$t('并行执行')}}</x-radio>
+            <x-radio :label="'RUN_MODE_SERIAL'">{{$t('Serial execution')}}</x-radio>
+            <x-radio :label="'RUN_MODE_PARALLEL'">{{$t('Parallel execution')}}</x-radio>
           </x-radio-group>
         </div>
       </div>
       <div class="clearfix list">
         <div class="text">
-          {{$t('时间')}}
+          {{$t('Date')}}
         </div>
         <div class="cont">
           <x-datepicker
@@ -121,15 +121,15 @@
                   @on-change="_datepicker"
                   :value="scheduleTime"
                   type="daterange"
-                  :placeholder="$t('选择日期区间')"
+                  :placeholder="$t('Select date range')"
                   format="YYYY-MM-DD HH:mm:ss">
           </x-datepicker>
         </div>
       </div>
     </template>
     <div class="submit">
-      <x-button type="text" @click="close()"> {{$t('取消')}} </x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('启动')}} </x-button>
+      <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
+      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('Start')}} </x-button>
     </div>
   </div>
 </template>

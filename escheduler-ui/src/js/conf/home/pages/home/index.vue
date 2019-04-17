@@ -1,5 +1,5 @@
 <template>
-  <m-list-construction :title="$t('首页')">
+  <m-list-construction :title="$t('Home')">
     <template slot="content">
       <m-project-chart :id="0"></m-project-chart>
     </template>

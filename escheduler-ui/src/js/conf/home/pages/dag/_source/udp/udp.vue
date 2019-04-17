@@ -2,14 +2,14 @@
   <div class="udp-model">
     <div class="scrollbar contpi-boxt">
       <div class="title">
-        <span>{{$t('设置DAG图名称')}}</span>
+        <span>{{$t('Set the DAG diagram name')}}</span>
       </div>
       <div>
         <x-input
                 type="text"
                 v-model="name"
                 :disabled="router.history.current.name === 'projects-instance-details'"
-                :placeholder="$t('请输入name(必填)')">
+                :placeholder="$t('Please enter name(required)')">
         </x-input>
       </div>
       <template v-if="router.history.current.name !== 'projects-instance-details'">
@@ -18,13 +18,13 @@
                   type="textarea"
                   v-model="desc"
                   :autosize="{minRows:2}"
-                  :placeholder="$t('请输入desc(选填)')"
+                  :placeholder="$t('Please enter description(optional)')"
                   autocomplete="off">
           </x-input>
         </div>
       </template>
       <div class="title" style="padding-top: 6px;">
-        <span>{{$t('设置全局')}}</span>
+        <span>{{$t('Set global')}}</span>
       </div>
       <div class="content">
         <div>
@@ -41,11 +41,11 @@
       <div class="submit">
         <template v-if="router.history.current.name === 'projects-instance-details'">
           <div class="lint-pt">
-            <x-checkbox v-model="syncDefine">{{$t('是否更新流程定义')}}</x-checkbox>
+            <x-checkbox v-model="syncDefine">{{$t('Whether to update the process definition')}}</x-checkbox>
           </div>
         </template>
-        <x-button type="text" @click="close()"> {{$t('取消')}} </x-button>
-        <x-button type="primary" shape="circle" @click="ok()" v-ps="['GENERAL_USER']" >{{$t('添加')}}</x-button>
+        <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
+        <x-button type="primary" shape="circle" @click="ok()" v-ps="['GENERAL_USER']" >{{$t('Add')}}</x-button>
       </div>
     </div>
   </div>
@@ -86,7 +86,7 @@
        */
       ok () {
         if (!this.name) {
-          this.$message.warning(`${i18n.$t('DAG图名称不能为空')}`)
+          this.$message.warning(`${i18n.$t('DAG graph name cannot be empty')}`)
           return
         }
 

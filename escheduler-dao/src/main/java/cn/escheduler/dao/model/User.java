@@ -79,6 +79,12 @@ public class  User {
      * alert group
      */
     private String alertGroup;
+
+    /**
+     * user specified queue
+     */
+    private String queue;
+
     /**
      * create time
      */
@@ -194,23 +200,12 @@ public class  User {
         this.tenantCode = tenantCode;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", userName='" + userName + '\'' +
-                ", userPassword='" + userPassword + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", userType=" + userType +
-                ", tenantId=" + tenantId +
-                ", tenantCode='" + tenantCode + '\'' +
-                ", tenantName='" + tenantName + '\'' +
-                ", queueName='" + queueName + '\'' +
-                ", alertGroup='" + alertGroup + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
+    public String getQueue() {
+        return queue;
+    }
+
+    public void setQueue(String queue) {
+        this.queue = queue;
     }
 
     @Override
@@ -236,5 +231,25 @@ public class  User {
         int result = id;
         result = 31 * result + userName.hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", userName='" + userName + '\'' +
+                ", userPassword='" + userPassword + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", userType=" + userType +
+                ", tenantId=" + tenantId +
+                ", tenantCode='" + tenantCode + '\'' +
+                ", tenantName='" + tenantName + '\'' +
+                ", queueName='" + queueName + '\'' +
+                ", alertGroup='" + alertGroup + '\'' +
+                ", queue='" + queue + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

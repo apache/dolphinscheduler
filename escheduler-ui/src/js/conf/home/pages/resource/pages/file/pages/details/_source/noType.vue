@@ -1,7 +1,7 @@
 <template>
   <div class="no-type-model">
     <img src="./down_error.png" alt="">
-    <p>{{$t('不支持在线查看类型')}}</p>
+    <p>{{$t('Online viewing type is not supported')}}</p>
   </div>
 </template>
 <script>

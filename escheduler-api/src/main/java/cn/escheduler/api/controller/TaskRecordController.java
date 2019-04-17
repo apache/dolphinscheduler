@@ -68,12 +68,44 @@ public class TaskRecordController extends BaseController{
    try{
         logger.info("query task record list, task name:{}, state :{}, taskDate: {}, start:{}, end:{}",
                 taskName, state,  taskDate, startTime, endTime);
-        Map<String, Object> result = taskRecordService.queryTaskRecordListPaging(taskName, startTime,  taskDate, sourceTable, destTable, endTime,state, pageNo, pageSize);
+        Map<String, Object> result = taskRecordService.queryTaskRecordListPaging(false, taskName, startTime,  taskDate, sourceTable, destTable, endTime,state, pageNo, pageSize);
         return returnDataListPaging(result);
     }catch (Exception e){
         logger.error(QUERY_TASK_RECORD_LIST_PAGING_ERROR.getMsg(),e);
         return error(QUERY_TASK_RECORD_LIST_PAGING_ERROR.getCode(), QUERY_TASK_RECORD_LIST_PAGING_ERROR.getMsg());
     }
+
+    }
+
+    /**
+     * query history task record list paging
+     *
+     * @param loginUser
+     * @return
+     */
+    @GetMapping("/history-list-paging")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryHistoryTaskRecordListPaging(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @RequestParam(value = "taskName", required = false) String taskName,
+                                            @RequestParam(value = "state", required = false) String state,
+                                            @RequestParam(value = "sourceTable", required = false) String sourceTable,
+                                            @RequestParam(value = "destTable", required = false) String destTable,
+                                            @RequestParam(value = "taskDate", required = false) String taskDate,
+                                            @RequestParam(value = "startDate", required = false) String startTime,
+                                            @RequestParam(value = "endDate", required = false) String endTime,
+                                            @RequestParam("pageNo") Integer pageNo,
+                                            @RequestParam("pageSize") Integer pageSize
+    ){
+
+        try{
+            logger.info("query hisotry task record list, task name:{}, state :{}, taskDate: {}, start:{}, end:{}",
+                    taskName, state,  taskDate, startTime, endTime);
+            Map<String, Object> result = taskRecordService.queryTaskRecordListPaging(true, taskName, startTime,  taskDate, sourceTable, destTable, endTime,state, pageNo, pageSize);
+            return returnDataListPaging(result);
+        }catch (Exception e){
+            logger.error(QUERY_TASK_RECORD_LIST_PAGING_ERROR.getMsg(),e);
+            return error(QUERY_TASK_RECORD_LIST_PAGING_ERROR.getCode(), QUERY_TASK_RECORD_LIST_PAGING_ERROR.getMsg());
+        }
 
     }
 

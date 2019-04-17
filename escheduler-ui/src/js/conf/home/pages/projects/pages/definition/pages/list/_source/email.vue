@@ -30,7 +30,7 @@
                   :style="{width:emailWidth + 'px'}"
                   type="text"
                   v-model="email"
-                  :placeholder="$t('请输入邮箱')"
+                  :placeholder="$t('Please enter email')"
                   @keydown.tab="_emailTab"
                   @keyup.delete="_emailDelete"
                   @keyup.enter="_emailEnter"
@@ -87,10 +87,10 @@
             this.email = ''
             this._handlerEmailWitch()
           } else {
-            this.$message.warning(`${i18n.$t('邮箱已存在！收件人和抄送人不能重复')}`)
+            this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
           }
         } else {
-          this.$message.warning(`${i18n.$t('邮箱输入不合法')}`)
+          this.$message.warning(`${i18n.$t('Mailbox input is illegal')}`)
         }
       },
       /**
@@ -191,7 +191,7 @@
 
         // Non-existing data
         if (_.filter(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeList)), v => v === item).length) {
-          this.$message.warning(`${i18n.$t('邮箱已存在！收件人和抄送人不能重复')}`)
+          this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
           return
         }
         // Width initialization
