@@ -12,18 +12,18 @@
             <x-input
                     type="input"
                     v-model="queueName"
-                    placeholder="Please enter name"
+                    :placeholder="$t('Please enter name')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>队列值</template>
+          <template slot="name"><b>*</b>{{$t('Queue value')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="queue"
-                    placeholder="请输入队列值"
+                    :placeholder="$t('Please enter queue value')"
                     autocomplete="off">
             </x-input>
           </template>

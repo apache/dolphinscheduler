@@ -12,9 +12,9 @@
         </template>
         <template slot="content">
           <template v-if="userList.length">
-            <m-list :user-list="userList" :page-no="pageNo" :page-size="pageSize"></m-list>
+            <m-list :user-list="userList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
             <div class="page-box">
-              <x-page :current="pageNo" :total="total" show-elevator @on-change="_page"></x-page>
+              <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
             </div>
           </template>
           <template v-if="!userList.length">
@@ -27,11 +27,13 @@
   </div>
 </template>
 <script>
+  import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mList from './_source/list'
   import mCreateUser from './_source/createUser'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
@@ -40,14 +42,17 @@
     name: 'users-index',
     data () {
       return {
-        pageSize: 10,
-        pageNo: 1,
         total: null,
-        searchVal: '',
         isLoading: true,
-        userList: []
+        userList: [],
+        searchParams: {
+          pageSize: 10,
+          pageNo: 1,
+          searchVal: ''
+        }
       }
     },
+    mixins: [listUrlParamHandle],
     props: {},
     methods: {
       ...mapActions('security', ['getUsersList']),
@@ -55,13 +60,11 @@
        * Query
        */
       _onConditions (o) {
-        this.searchVal = o.searchVal
-        this.pageNo = 1
-        this._getUsersListP()
+        this.searchParams = _.assign(this.searchParams, o)
+        this.searchParams.pageNo = 1
       },
       _page (val) {
-        this.pageNo = val
-        this._getUsersListP()
+        this.searchParams.pageNo = val
       },
       _create (item) {
         let self = this
@@ -75,7 +78,7 @@
             return h(mCreateUser, {
               on: {
                 onUpdate () {
-                  self._getUsersListP('false')
+                  self._debounceGET('false')
                   modal.remove()
                 },
                 close () {
@@ -89,13 +92,10 @@
           }
         })
       },
-      _getUsersListP (flag) {
+      _getList (flag) {
         this.isLoading = !flag
-        this.getUsersList({
-          pageSize: this.pageSize,
-          pageNo: this.pageNo,
-          searchVal: this.searchVal
-        }).then(res => {
+        this.getUsersList(this.searchParams).then(res => {
+          this.userList = []
           this.userList = res.totalList
           this.total = res.total
           this.isLoading = false
@@ -104,9 +104,14 @@
         })
       }
     },
-    watch: {},
+    watch: {
+      // router
+      '$route' (a) {
+        // url no params get instance list
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+      }
+    },
     created () {
-      this._getUsersListP()
     },
     mounted () {
     },

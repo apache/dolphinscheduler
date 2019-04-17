@@ -33,7 +33,6 @@
   import mCreateUdf from './_source/createUdf'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
-  import { setUrlParams } from '@/module/util/routerUtil'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
@@ -60,13 +59,9 @@
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
         this.searchParams.pageNo = 1
-        setUrlParams(this.searchParams)
-        this._debounceGET()
       },
       _page (val) {
         this.searchParams.pageNo = val
-        setUrlParams(this.searchParams)
-        this._debounceGET()
       },
       _create () {
         let self = this
@@ -96,13 +91,12 @@
       _updateList () {
         this.searchParams.pageNo = 1
         this.searchParams.searchVal = ''
-        setUrlParams(this.searchParams)
         this._debounceGET()
       },
       _getList (flag) {
         this.isLoading = !flag
-        this.udfFuncList = []
         this.getUdfFuncListP(this.searchParams).then(res => {
+          this.udfFuncList = []
           this.udfFuncList = res.totalList
           this.total = res.total
           this.isLoading = false
