@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import _ from 'lodash'
+import { setUrlParams } from '@/module/util/routerUtil'
 /**
  * Mainly used for data list paging url param handle
  * @param _getList => api function(required)
@@ -22,9 +23,10 @@ import _ from 'lodash'
 export default {
   watch: {
     // watch pageNo
-    'searchParams.pageNo': {
+    'searchParams': {
       deep: true,
       handler () {
+        setUrlParams(this.searchParams)
         this._debounceGET()
       }
     }
