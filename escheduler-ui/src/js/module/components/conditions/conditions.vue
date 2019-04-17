@@ -14,7 +14,7 @@
             <x-input v-model="searchVal"
                      @on-enterkey="_ckQuery"
                      size="small"
-                     :placeholder="$t('请输入关键词')"
+                     :placeholder="$t('Please enter keyword')"
                      type="text"
                      style="width:180px;">
             </x-input>

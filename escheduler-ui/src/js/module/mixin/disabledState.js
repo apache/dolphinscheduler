@@ -29,8 +29,6 @@ export default {
   created () {
     this.isDetails = this.store.state.dag.isDetails
   },
-  methods: {
-  },
   computed: {
     _isDetails () {
       return this.isDetails ? 'icon-disabled' : ''

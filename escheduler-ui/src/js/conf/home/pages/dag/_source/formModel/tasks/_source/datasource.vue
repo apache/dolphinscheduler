@@ -12,7 +12,7 @@
                 :label="city.code">
         </x-option>
       </x-select>
-      <x-select :placeholder="$t('请选择数据源')"
+      <x-select :placeholder="$t('Please select the datasource')"
                 v-model="datasource"
                 style="width: 288px;"
                 :disabled="isDetails">
@@ -56,7 +56,7 @@
        */
       _verifDatasource () {
         if (!this.datasource) {
-          this.$message.warning(`${i18n.$t('请选择数据源')}`)
+          this.$message.warning(`${i18n.$t('Please select the datasource')}`)
           return false
         }
         this.$emit('on-dsData', {

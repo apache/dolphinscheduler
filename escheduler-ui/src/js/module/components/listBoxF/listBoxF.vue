@@ -21,7 +21,7 @@
       margin-bottom: 0;
     }
     .text {
-      width: 120px;
+      width: 144px;
       float: left;
       text-align: right;
       line-height: 32px;
@@ -32,7 +32,7 @@
       }
     }
     .cont {
-      width: calc(100% - 140px);
+      width: calc(100% - 162px);
       float: left;
       .textarea-content {
         .v-input {
