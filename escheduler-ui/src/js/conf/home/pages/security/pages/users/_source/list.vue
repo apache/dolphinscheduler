@@ -13,6 +13,9 @@
             <span>{{$t('Tenant')}}</span>
           </th>
           <th>
+            <span>{{$t('Queue')}}</span>
+          </th>
+          <th>
             <span>{{$t('Email')}}</span>
           </th>
           <th>
@@ -38,6 +41,7 @@
             </span>
           </td>
           <td><span>{{item.tenantName || '-'}}</span></td>
+          <td><span>{{item.queue || '-'}}</span></td>
           <td>
             <span>{{item.email || '-'}}</span>
           </td>

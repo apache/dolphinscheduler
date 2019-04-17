@@ -36,7 +36,6 @@
   import mSpin from '@/module/components/spin/spin'
   import { findComponentDownward } from '@/module/util/'
   import mNoData from '@/module/components/noData/noData'
-  import { setUrlParams } from '@/module/util/routerUtil'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
@@ -70,17 +69,12 @@
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
         this.searchParams.pageNo = 1
-        setUrlParams(this.searchParams)
-        this._debounceGET()
       },
       _page (val) {
         this.searchParams.pageNo = val
-        setUrlParams(this.searchParams)
-        this._debounceGET()
       },
       _getList (flag) {
         this.isLoading = !flag
-        this.fileResourcesList = []
         this.getResourcesListP(this.searchParams).then(res => {
           this.fileResourcesList = res.totalList
           this.total = res.total
@@ -92,7 +86,6 @@
       _updateList () {
         this.searchParams.pageNo = 1
         this.searchParams.searchVal = ''
-        setUrlParams(this.searchParams)
         this._debounceGET()
       }
     },

@@ -27,7 +27,6 @@
   import store from '@/conf/home/store'
   import mConditions from './_source/conditions'
   import mSpin from '@/module/components/spin/spin'
-  import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
@@ -61,13 +60,10 @@
     methods: {
       _onQuery (o) {
         this.searchParams = _.assign(this.searchParams, o)
-        setUrlParams(this.searchParams)
-        this._debounceGET()
+        this.searchParams.pageNo = 1
       },
       _page (val) {
         this.searchParams.pageNo = val
-        setUrlParams(this.searchParams)
-        this._debounceGET()
       },
       /**
        * get list data
