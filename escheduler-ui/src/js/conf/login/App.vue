@@ -5,13 +5,13 @@
     </div>
     <div class="from-model">
       <div class="list">
-        <label>{{$t('用户名')}}</label>
+        <label>{{$t('User Name')}}</label>
         <div>
           <x-input
                   size="large"
                   type="text"
                   v-model="userName"
-                  :placeholder="$t('请输入用户名')"
+                  :placeholder="$t('Please enter user name')"
                   maxlength="20"
                   @on-enterkey="_ok">
           </x-input>
@@ -21,13 +21,13 @@
         </p>
       </div>
       <div class="list">
-        <label>{{$t('密码')}}</label>
+        <label>{{$t('Password')}}</label>
         <div>
           <x-input
                   type="password"
                   size="large"
                   v-model="userPassword"
-                  :placeholder="$t('请输入密码')"
+                  :placeholder="$t('Please enter your password')"
                   maxlength="20"
                   @on-enterkey="_ok">
           </x-input>
@@ -37,7 +37,7 @@
         </p>
       </div>
       <div class="list" style="margin-top: 10px;">
-        <x-button type="primary" shape="circle" size="large" :loading="spinnerLoading" long @click="_ok">{{spinnerLoading ? 'Loading...' : ` ${$t('登录')} `}} </x-button>
+        <x-button type="primary" shape="circle" size="large" :loading="spinnerLoading" long @click="_ok">{{spinnerLoading ? 'Loading...' : ` ${$t('Login')} `}} </x-button>
       </div>
     </div>
     <div class="ctr">Copyright © 2019 Analysys Inc.</div>
@@ -84,12 +84,12 @@
       _verification () {
         let flag = true
         if (!this.userName) {
-          this.userNameText = `${i18n.$t('请输入用户名')}`
+          this.userNameText = `${i18n.$t('Please enter user name')}`
           this.isUserName = true
           flag = false
         }
         if (!this.userPassword) {
-          this.userPasswordText = `${i18n.$t('请输入密码')}`
+          this.userPasswordText = `${i18n.$t('Please enter your password')}`
           this.isUserPassword = true
           flag = false
         }

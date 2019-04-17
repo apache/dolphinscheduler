@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'resource'" ></m-secondary-menu>
-    <m-list-construction :title="$t('文件详情')">
+    <m-list-construction :title="$t('File Details')">
       <div slot="content" style="margin: 20px">
         <div class="file-edit-content">
           <h2>
@@ -13,8 +13,8 @@
                 <textarea id="code-edit-mirror" name="code-edit-mirror"></textarea>
               </div>
               <div class="submit-c">
-                <x-button type="text" shape="circle" @click="close()" :disabled="disabled"> {{$t('返回')}} </x-button>
-                <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('保存')}} </x-button>
+                <x-button type="text" shape="circle" @click="close()" :disabled="disabled"> {{$t('Return')}} </x-button>
+                <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Save')}} </x-button>
               </div>
             </template>
             <m-no-data :msg="msg" v-if="msg"></m-no-data>

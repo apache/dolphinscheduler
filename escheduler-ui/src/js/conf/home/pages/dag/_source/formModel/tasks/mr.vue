@@ -1,7 +1,7 @@
 <template>
   <div class="spark-model">
     <m-list-box>
-      <div slot="text">{{$t('程序类型')}}</div>
+      <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
         <x-select v-model="programType" :disabled="isDetails" style="width: 100px;">
           <x-option
@@ -14,23 +14,23 @@
       </div>
     </m-list-box>
     <m-list-box v-if="programType !== 'PYTHON'">
-      <div slot="text">{{$t('主函数的class')}}</div>
+      <div slot="text">{{$t('Main class')}}</div>
       <div slot="content">
         <x-input
                 :disabled="isDetails"
                 type="input"
                 v-model="mainClass"
-                :placeholder="$t('请输入mainClass')"
+                :placeholder="$t('Please enter main class')"
                 autocomplete="off">
         </x-input>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('主jar包')}}</div>
+      <div slot="text">{{$t('Main jar package')}}</div>
       <div slot="content">
         <x-select
                 style="width: 100%;"
-                :placeholder="$t('请选择主jar包')"
+                :placeholder="$t('Please enter main jar package')"
                 v-model="mainJar"
                 filterable
                 :disabled="isDetails">
@@ -44,33 +44,33 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('命令行参数')}}</div>
+      <div slot="text">{{$t('Command-line parameters')}}</div>
       <div slot="content">
         <x-input
                 :autosize="{minRows:2}"
                 :disabled="isDetails"
                 type="textarea"
                 v-model="mainArgs"
-                :placeholder="$t('请输入命令行参数')"
+                :placeholder="$t('Please enter Command-line parameters')"
                 autocomplete="off">
         </x-input>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('其他参数')}}</div>
+      <div slot="text">{{$t('Other parameters')}}</div>
       <div slot="content">
         <x-input
                 :disabled="isDetails"
                 :autosize="{minRows:2}"
                 type="textarea"
                 v-model="others"
-                :placeholder="$t('请输入其他参数')"
+                :placeholder="$t('Please enter other parameters')"
                 autocomplete="off">
         </x-input>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('资源')}}</div>
+      <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
         <m-resources
                 ref="refResources"
@@ -80,7 +80,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('自定义参数')}}</div>
+      <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
         <m-local-params
                 ref="refLocalParams"
@@ -145,12 +145,12 @@
        */
       _verification () {
         if (this.programType !== 'PYTHON' && !this.mainClass) {
-          this.$message.warning(`${i18n.$t('请填写主函数的class')}`)
+          this.$message.warning(`${i18n.$t('Please enter main class')}`)
           return false
         }
 
         if (!this.mainJar) {
-          this.$message.warning(`${i18n.$t('请选择主jar包')}`)
+          this.$message.warning(`${i18n.$t('Please enter main jar package')}`)
           return false
         }
 

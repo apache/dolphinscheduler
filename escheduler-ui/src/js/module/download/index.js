@@ -26,7 +26,7 @@ let downloadFile = ($url, $obj) => {
   }
 
   if (!param.url) {
-    this.$message.warning(`${i18n.$t('无下载url无法下载')}`)
+    this.$message.warning(`${i18n.$t('Unable to download without proper url')}`)
     return
   }
 

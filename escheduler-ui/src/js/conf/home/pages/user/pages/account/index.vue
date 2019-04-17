@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'user'"></m-secondary-menu>
-    <m-list-construction :title="$t('用户信息')">
+    <m-list-construction :title="$t('User Information')">
       <template slot="content">
         <m-info></m-info>
       </template>

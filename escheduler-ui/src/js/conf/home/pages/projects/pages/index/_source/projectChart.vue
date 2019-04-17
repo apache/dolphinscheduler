@@ -9,14 +9,14 @@
                   @on-change="_datepicker"
                   :value="scheduleTime"
                   type="daterange"
-                  :placeholder="$t('选择日期区间')"
+                  :placeholder="$t('Select date range')"
                   format="YYYY-MM-DD HH:mm:ss">
           </x-datepicker>
         </div>
         <div class="row" >
           <div class="col-md-6">
             <div class="chart-title">
-              <span>{{$t('任务状态统计')}}</span>
+              <span>{{$t('Task status statistics')}}</span>
             </div>
             <div class="row">
               <div class="col-md-7">
@@ -26,9 +26,9 @@
                 <div class="table-small-model">
                   <table>
                     <tr>
-                      <th width="40">{{$t('序号')}}</th>
-                      <th>{{$t('数量')}}</th>
-                      <th>{{$t('状态')}}</th>
+                      <th width="40">{{$t('#')}}</th>
+                      <th>{{$t('Number')}}</th>
+                      <th>{{$t('State')}}</th>
                     </tr>
                     <tr v-for="(item,$index) in taskCountDtosList">
                       <td><span>{{$index+1}}</span></td>
@@ -46,7 +46,7 @@
           </div>
           <div class="col-md-6">
             <div class="chart-title">
-              <span>{{$t('流程状态统计')}}</span>
+              <span>{{$t('Process Status Statistics')}}</span>
             </div>
             <div class="row">
               <div class="col-md-7">
@@ -56,9 +56,9 @@
                 <div class="table-small-model">
                   <table>
                     <tr>
-                      <th width="40">{{$t('序号')}}</th>
-                      <th>{{$t('数量')}}</th>
-                      <th>{{$t('状态')}}</th>
+                      <th width="40">{{$t('#')}}</th>
+                      <th>{{$t('Number')}}</th>
+                      <th>{{$t('State')}}</th>
                     </tr>
                     <tr v-for="(item,$index) in processStateCountList">
                       <td><span>{{$index+1}}</span></td>
@@ -74,7 +74,7 @@
         <div class="row">
           <div class="col-md-12">
             <div class="chart-title" style="margin-bottom: -20px;margin-top: 30px">
-              <span>{{$t('流程定义统计')}}</span>
+              <span>{{$t('Process Definition Statistics')}}</span>
             </div>
             <div>
               <div id="process-definition-bar" style="height:500px"></div>
