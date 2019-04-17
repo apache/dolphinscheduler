@@ -13,7 +13,7 @@
                 placement="bottom-end"
                 v-model="datepicker"
                 :panelNum="2">
-          <x-input slot="input" readonly slot-scope="{value}" :value="value" style="width: 310px;" size="small" :placeholder="$t('按选择日期区间')">
+          <x-input slot="input" readonly slot-scope="{value}" :value="value" style="width: 310px;" size="small" :placeholder="$t('Select date range')">
             <i slot="suffix"
                @click.stop="_dateEmpty()"
                class="ans-icon-fail-solid"
@@ -25,7 +25,7 @@
       </div>
       <div class="list">
         <x-select style="width: 160px;" @on-change="_onChangeState" :value="stateType" >
-          <x-input slot="trigger" readonly :value="selectedModel ? selectedModel.label : ''" slot-scope="{ selectedModel }" style="width: 160px;" size="small" :placeholder="$t('按状态')" suffix-icon="ans-icon-arrow-down">
+          <x-input slot="trigger" readonly :value="selectedModel ? selectedModel.label : ''" slot-scope="{ selectedModel }" style="width: 160px;" size="small" :placeholder="$t('State')" suffix-icon="ans-icon-arrow-down">
           </x-input>
           <x-option
                   v-for="city in stateTypeList"
@@ -39,7 +39,7 @@
         <x-input v-model="host" style="width: 140px;" size="small" :placeholder="$t('host')"></x-input>
       </div>
       <div class="list">
-        <x-input v-model="searchVal" style="width: 200px;" size="small" :placeholder="$t('按名称')"></x-input>
+        <x-input v-model="searchVal" style="width: 200px;" size="small" :placeholder="$t('name')"></x-input>
       </div>
     </template>
   </m-conditions>

@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('任务实例')">
+    <m-list-construction :title="$t('Task Instance')">
       <template slot="conditions">
         <m-conditions @on-query="_onQuery"></m-conditions>
       </template>

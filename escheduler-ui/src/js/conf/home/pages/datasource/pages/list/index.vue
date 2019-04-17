@@ -1,9 +1,9 @@
 <template>
-  <m-list-construction :title="$t('数据源中心')">
+  <m-list-construction :title="$t('Datasource')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small" @click="_create('')" v-ps="['GENERAL_USER']">{{$t('创建数据源')}}</x-button>
+          <x-button type="ghost" size="small" @click="_create('')" v-ps="['GENERAL_USER']">{{$t('Create Datasource')}}</x-button>
         </template>
       </m-conditions>
     </template>

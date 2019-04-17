@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('任务记录')">
+    <m-list-construction :title="$t('Task record')">
       <template slot="conditions">
         <m-conditions>
           <template slot="search-group">
@@ -16,7 +16,7 @@
                       format="YYYY-MM-DD HH:mm:ss"
                       placement="bottom-end"
                       :panelNum="2">
-                <x-input slot="input" readonly slot-scope="{value}" :value="value" style="width: 310px;" size="small" :placeholder="$t('按选择日期区间')">
+                <x-input slot="input" readonly slot-scope="{value}" :value="value" style="width: 310px;" size="small" :placeholder="$t('Select date range')">
                   <i slot="suffix"
                      @click.stop="_dateEmpty()"
                      class="ans-icon-fail-solid"
@@ -27,14 +27,14 @@
               </x-datepicker>
             </div>
             <div class="list">
-              <x-input v-model="destTable" style="width: 120px;" size="small" :placeholder="$t('按目标表')"></x-input>
+              <x-input v-model="destTable" style="width: 120px;" size="small" :placeholder="$t('Target Table')"></x-input>
             </div>
             <div class="list">
-              <x-input v-model="sourceTable" style="width: 120px;" size="small" :placeholder="$t('按源表')"></x-input>
+              <x-input v-model="sourceTable" style="width: 120px;" size="small" :placeholder="$t('Source Table')"></x-input>
             </div>
             <div class="list">
               <x-select style="width: 90px;" @on-change="_onChangeState">
-                <x-input slot="trigger" readonly :value="selectedModel ? selectedModel.label : ''" slot-scope="{ selectedModel }" style="width: 90px;" size="small" :placeholder="$t('按状态')" suffix-icon="ans-icon-arrow-down"></x-input>
+                <x-input slot="trigger" readonly :value="selectedModel ? selectedModel.label : ''" slot-scope="{ selectedModel }" style="width: 90px;" size="small" :placeholder="$t('State')" suffix-icon="ans-icon-arrow-down"></x-input>
                 <x-option
                         v-for="city in stateList"
                         :key="city.label"
@@ -48,11 +48,11 @@
                       @on-change="_onChangeDate"
                       format="YYYY-MM-DD"
                       :panelNum="1">
-                <x-input slot="input" readonly slot-scope="{value}" style="width: 130px;" :value="value" size="small" :placeholder="$t('按日期')"></x-input>
+                <x-input slot="input" readonly slot-scope="{value}" style="width: 130px;" :value="value" size="small" :placeholder="$t('Date')"></x-input>
               </x-datepicker>
             </div>
             <div class="list">
-              <x-input v-model="taskName" style="width: 130px;" size="small" :placeholder="$t('按任务名称')"></x-input>
+              <x-input v-model="taskName" style="width: 130px;" size="small" :placeholder="$t('Task Name')"></x-input>
             </div>
           </template>
         </m-conditions>
@@ -101,27 +101,27 @@
         endDate: '',
         stateList: [
           {
-            label: `${i18n.$t('无')}`,
+            label: `${i18n.$t('none')}`,
             code: ``
           },
           {
-            label: `${i18n.$t('成功')}`,
-            code: `${i18n.$t('成功')}`
+            label: `${i18n.$t('success')}`,
+            code: `${i18n.$t('success')}`
           },
           {
-            label: `${i18n.$t('等待')}`,
-            code: `${i18n.$t('等待')}`
+            label: `${i18n.$t('waiting')}`,
+            code: `${i18n.$t('waiting')}`
           },
           {
-            label: `${i18n.$t('执行中')}`,
-            code: `${i18n.$t('执行中')}`
+            label: `${i18n.$t('In Execution')}`,
+            code: `${i18n.$t('In Execution')}`
           },
           {
-            label: `${i18n.$t('完成')}`,
-            code: `${i18n.$t('完成')}`
+            label: `${i18n.$t('Finish')}`,
+            code: `${i18n.$t('Finish')}`
           }, {
-            label: `${i18n.$t('失败')}`,
-            code: `${i18n.$t('失败')}`
+            label: `${i18n.$t('failed')}`,
+            code: `${i18n.$t('failed')}`
           }
         ]
       }

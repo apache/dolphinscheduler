@@ -32,31 +32,31 @@ const toolOper = (dagThis) => {
       code: 'pointer',
       icon: '&#xe781;',
       disable: disabled,
-      desc: `${i18n.$t('拖动节点和选中项')}`
+      desc: `${i18n.$t('Drag Nodes and Selected Items')}`
     },
     {
       code: 'line',
       icon: '&#xe61c;',
       disable: disabled,
-      desc: `${i18n.$t('选择线条连接')}`
+      desc: `${i18n.$t('Select Line Connection')}`
     },
     {
       code: 'remove',
       icon: '&#xe611;',
       disable: disabled,
-      desc: `${i18n.$t('删除选中的线或节点')}`
+      desc: `${i18n.$t('Delete selected lines or nodes')}`
     },
     {
       code: 'download',
       icon: '&#xe628;',
       disable: !!dagThis.type,
-      desc: `${i18n.$t('下载')}`
+      desc: `${i18n.$t('Download')}`
     },
     {
       code: 'screen',
       icon: '&#xe6e0;',
       disable: disabled,
-      desc: `${i18n.$t('全屏')}`
+      desc: `${i18n.$t('Full Screen')}`
     }
   ]
 }
@@ -70,17 +70,17 @@ const toolOper = (dagThis) => {
 let publishStatus = [
   {
     id: 0,
-    desc: `${i18n.$t('未发布')}`,
+    desc: `${i18n.$t('Unpublished')}`,
     code: 'NOT_RELEASE'
   },
   {
     id: 1,
-    desc: `${i18n.$t('上线')}`,
+    desc: `${i18n.$t('online')}`,
     code: 'ONLINE'
   },
   {
     id: 2,
-    desc: `${i18n.$t('下线')}`,
+    desc: `${i18n.$t('offline')}`,
     code: 'OFFLINE'
   }
 ]
@@ -92,47 +92,47 @@ let publishStatus = [
  */
 let runningType = [
   {
-    desc: `${i18n.$t('启动工作流')}`,
+    desc: `${i18n.$t('Start Process')}`,
     code: 'START_PROCESS'
   },
   {
-    desc: `${i18n.$t('从当前节点开始执行')}`,
+    desc: `${i18n.$t('Execute from the current node')}`,
     code: 'START_CURRENT_TASK_PROCESS'
   },
   {
-    desc: `${i18n.$t('恢复被容错的工作流')}`,
+    desc: `${i18n.$t('Recover tolerance fault process')}`,
     code: 'RECOVER_TOLERANCE_FAULT_PROCESS'
   },
   {
-    desc: `${i18n.$t('恢复暂停流程')}`,
+    desc: `${i18n.$t('Resume the suspension process')}`,
     code: 'RECOVER_SUSPENDED_PROCESS'
   },
   {
-    desc: `${i18n.$t('从失败节点开始执行')}`,
+    desc: `${i18n.$t('Execute from the failed nodes')}`,
     code: 'START_FAILURE_TASK_PROCESS'
   },
   {
-    desc: `${i18n.$t('补数')}`,
+    desc: `${i18n.$t('Complement Data')}`,
     code: 'COMPLEMENT_DATA'
   },
   {
-    desc: `${i18n.$t('调度执行')}`,
+    desc: `${i18n.$t('Scheduling execution')}`,
     code: 'SCHEDULER'
   },
   {
-    desc: `${i18n.$t('重跑')}`,
+    desc: `${i18n.$t('Rerun')}`,
     code: 'REPEAT_RUNNING'
   },
   {
-    desc: `${i18n.$t('暂停')}`,
+    desc: `${i18n.$t('Pause')}`,
     code: 'PAUSE'
   },
   {
-    desc: `${i18n.$t('停止')}`,
+    desc: `${i18n.$t('Stop')}`,
     code: 'STOP'
   },
   {
-    desc: `${i18n.$t('恢复等待线程')}`,
+    desc: `${i18n.$t('Recovery waiting thread')}`,
     code: 'RECOVER_WAITTING_THREAD'
   }
 ]
@@ -149,63 +149,63 @@ let runningType = [
 let tasksState = {
   'SUBMITTED_SUCCESS': {
     id: 0,
-    desc: `${i18n.$t('提交成功')}`,
+    desc: `${i18n.$t('Submitted successfully')}`,
     color: '#A9A9A9',
     icoUnicode: '&#xe7c2;',
     isSpin: false
   },
   'RUNNING_EXEUTION': {
     id: 1,
-    desc: `${i18n.$t('正在执行')}`,
+    desc: `${i18n.$t('Executing')}`,
     color: '#0097e0',
     icoUnicode: '&#xe80f;',
     isSpin: true
   },
   'READY_PAUSE': {
     id: 2,
-    desc: `${i18n.$t('准备暂停')}`,
+    desc: `${i18n.$t('Ready to pause')}`,
     color: '#07b1a3',
     icoUnicode: '&#xe677;',
     isSpin: false
   },
   'PAUSE': {
     id: 3,
-    desc: `${i18n.$t('暂停')}`,
+    desc: `${i18n.$t('Pause')}`,
     color: '#057c72',
     icoUnicode: '&#xe679;',
     isSpin: false
   },
   'READY_STOP': {
     id: 4,
-    desc: `${i18n.$t('准备停止')}`,
+    desc: `${i18n.$t('Ready to stop')}`,
     color: '#FE0402',
     icoUnicode: '&#xe6e6;',
     isSpin: false
   },
   'STOP': {
     id: 5,
-    desc: `${i18n.$t('停止')}`,
+    desc: `${i18n.$t('Stop')}`,
     color: '#e90101',
     icoUnicode: '&#xe6ae;',
     isSpin: false
   },
   'FAILURE': {
     id: 6,
-    desc: `${i18n.$t('失败')}`,
+    desc: `${i18n.$t('failed')}`,
     color: '#000000',
     icoUnicode: '&#xe75d;',
     isSpin: false
   },
   'SUCCESS': {
     id: 7,
-    desc: `${i18n.$t('成功')}`,
+    desc: `${i18n.$t('success')}`,
     color: '#33cc00',
     icoUnicode: '&#xe6d4;',
     isSpin: false
   },
   'NEED_FAULT_TOLERANCE': {
     id: 8,
-    desc: `${i18n.$t('需要容错')}`,
+    desc: `${i18n.$t('Need fault tolerance')}`,
     color: '#FF8C00',
     icoUnicode: '&#xe60d;',
     isSpin: false
@@ -219,14 +219,14 @@ let tasksState = {
   },
   'WAITTING_THREAD': {
     id: 10,
-    desc: `${i18n.$t('等待线程')}`,
+    desc: `${i18n.$t('Waiting for thread')}`,
     color: '#912eed',
     icoUnicode: '&#xe62e;',
     isSpin: false
   },
   'WAITTING_DEPEND': {
     id: 11,
-    desc: `${i18n.$t('等待依赖')}`,
+    desc: `${i18n.$t('Waiting for dependence')}`,
     color: '#5101be',
     icoUnicode: '&#xe68c;',
     isSpin: false
