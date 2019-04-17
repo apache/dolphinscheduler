@@ -40,6 +40,19 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
+          <template slot="name"><b>*</b>{{$t('Queue')}}</template>
+          <template slot="content">
+            <x-select v-model="queueName">
+              <x-option
+                      v-for="city in queueList"
+                      :key="city.id"
+                      :value="city"
+                      :label="city.code">
+              </x-option>
+            </x-select>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f>
           <template slot="name"><b>*</b>{{$t('Email')}}</template>
           <template slot="content">
             <x-input
@@ -77,9 +90,11 @@
       return {
         store,
         router,
+        queueList: [],
         userName: '',
         userPassword: '',
         tenantId: {},
+        queueName: {},
         email: '',
         phone: '',
         tenantList: [],
@@ -144,6 +159,22 @@
 
         return true
       },
+      _getQueueList () {
+        return new Promise((resolve, reject) => {
+          this.store.dispatch('security/getQueueList').then(res => {
+            this.queueList = _.map(res, v => {
+              return {
+                id: v.id,
+                code: v.queueName
+              }
+            })
+            this.$nextTick(() => {
+              this.queueName = this.queueList[0]
+            })
+            resolve()
+          })
+        })
+      },
       _getTenantList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('security/getTenantList').then(res => {
@@ -167,6 +198,7 @@
           userPassword: this.userPassword,
           tenantId: this.tenantId.id,
           email: this.email,
+          queue: this.queueName.code,
           phone: this.phone
         }
         if (this.item) {
@@ -188,13 +220,16 @@
     created () {
       // Administrator gets tenant list
       if (this.isADMIN) {
-        this._getTenantList().then(res => {
+        Promise.all([this._getQueueList(), this._getTenantList()]).then(() => {
           if (this.item) {
             this.userName = this.item.userName
             this.userPassword = ''
             this.email = this.item.email
             this.phone = this.item.phone
-            this.tenantId = _.filter(this.tenantList, v => v.id === this.item.tenantId)[0]
+            this.tenantId = _.find(this.tenantList, ['id', this.item.tenantId])
+            this.$nextTick(() => {
+              this.queueName = _.find(this.queueList, ['code', this.item.queue])
+            })
           }
         })
       } else {
@@ -204,10 +239,12 @@
           this.email = this.item.email
           this.phone = this.item.phone
           this.tenantId.id = this.item.tenantId
+          this.queueName = { queue: this.item.queue }
         }
       }
     },
     mounted () {
+
     },
     components: { mPopup, mListBoxF }
   }

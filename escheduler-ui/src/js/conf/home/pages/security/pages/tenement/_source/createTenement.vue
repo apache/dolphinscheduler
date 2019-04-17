@@ -157,19 +157,19 @@
     watch: {
     },
     created () {
-
-    },
-    mounted () {
       this._getQueueList().then(res => {
         if (this.item) {
           this.$nextTick(() => {
-            this.queueId = _.filter(this.queueList, v => v.id === this.item.queueId)[0]
+            this.queueId = _.find(this.queueList, ['id', this.item.queueId])
           })
           this.tenantCode = this.item.tenantCode
           this.tenantName = this.item.tenantName
           this.desc = this.item.desc
         }
       })
+    },
+    mounted () {
+
     },
     components: { mPopup, mListBoxF }
   }
