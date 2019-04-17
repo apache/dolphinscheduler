@@ -368,5 +368,61 @@ public class FileUtils {
         org.apache.commons.io.FileUtils.forceDelete(new File(filename));
     }
 
+    /**
+     * Gets all the parent subdirectories of the parentDir directory
+     * @param parentDir
+     * @return
+     */
+    public static File[] getAllDir(String parentDir){
+        if(parentDir == null || "".equals(parentDir)) {
+            throw new RuntimeException("parentDir can not be empty");
+        }
+
+        File file = new File(parentDir);
+        if(!file.exists() || !file.isDirectory()) {
+            throw new RuntimeException("parentDir not exist, or is not a directory:"+parentDir);
+        }
+
+        File[] schemaDirs = file.listFiles(new FileFilter() {
+
+            @Override
+            public boolean accept(File pathname) {
+                if (pathname.isDirectory()) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        });
+
+        return schemaDirs;
+    }
+
+    /**
+     * Get Content
+     * @param inputStream
+     * @return
+     * @throws IOException
+     */
+    public static String readFile2Str(InputStream inputStream) throws IOException{
+        String all_content=null;
+        try {
+            all_content = new String();
+            InputStream ins = inputStream;
+            ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
+            byte[] str_b = new byte[1024];
+            int i = -1;
+            while ((i=ins.read(str_b)) > 0) {
+                outputstream.write(str_b,0,i);
+            }
+            all_content = outputstream.toString();
+            return all_content;
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            throw new RuntimeException(e);
+        }
+    }
+
 
 }
