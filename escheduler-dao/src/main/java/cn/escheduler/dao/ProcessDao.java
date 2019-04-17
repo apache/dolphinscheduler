@@ -157,7 +157,7 @@ public class ProcessDao extends AbstractBaseDao {
             }
         }catch (Exception e){
             logger.error("scan command error ", e);
-            saveErrorCommand(command, e.getMessage());
+            saveErrorCommand(command, e.toString());
             delCommandByid(command.getId());
         }
         return null;
