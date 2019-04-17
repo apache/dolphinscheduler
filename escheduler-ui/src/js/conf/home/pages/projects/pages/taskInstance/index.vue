@@ -26,7 +26,6 @@
   import { mapActions } from 'vuex'
   import mList from './_source/list'
   import mSpin from '@/module/components/spin/spin'
-  import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
@@ -72,13 +71,10 @@
         if (this.searchParams.taskName) {
           this.searchParams.taskName = ''
         }
-        setUrlParams(this.searchParams)
-        this._debounceGET()
+        this.searchParams.pageNo = 1
       },
       _page (val) {
         this.searchParams.pageNo = val
-        setUrlParams(this.searchParams)
-        this._debounceGET()
       },
       /**
        * get list data

@@ -162,3 +162,6 @@
     components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }
 </script>
+
+<style lang="scss" rel="stylesheet/scss">
+</style>

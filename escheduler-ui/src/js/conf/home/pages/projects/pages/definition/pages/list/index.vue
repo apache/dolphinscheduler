@@ -30,7 +30,6 @@
   import mList from './_source/list'
   import mSpin from '@/module/components/spin/spin'
   import localStore from '@/module/util/localStorage'
-  import { setUrlParams } from '@/module/util/routerUtil'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
@@ -62,8 +61,6 @@
        */
       _page (val) {
         this.searchParams.pageNo = val
-        setUrlParams(this.searchParams)
-        this._debounceGET()
       },
       /**
        * conditions
@@ -71,8 +68,6 @@
       _onConditions (o) {
         this.searchParams.searchVal = o.searchVal
         this.searchParams.pageNo = 1
-        setUrlParams(this.searchParams)
-        this._debounceGET()
       },
       /**
        * get data list

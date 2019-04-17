@@ -28,7 +28,6 @@
   import mSpin from '@/module/components/spin/spin'
   import mCreateProject from './_source/createProject'
   import mNoData from '@/module/components/noData/noData'
-  import { setUrlParams } from '@/module/util/routerUtil'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
@@ -57,8 +56,11 @@
        */
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
-        setUrlParams(this.searchParams)
-        this._debounceGET()
+        this.searchParams.pageNo = 1
+      },
+
+      _page (val) {
+        this.searchParams.pageNo = val
       },
       _create (item) {
         let self = this
@@ -84,11 +86,6 @@
         })
       },
       _onUpdate () {
-        this._debounceGET()
-      },
-      _page (val) {
-        this.searchParams.pageNo = val
-        setUrlParams(this.searchParams)
         this._debounceGET()
       },
       _getList (flag) {
