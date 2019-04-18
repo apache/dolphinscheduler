@@ -96,8 +96,9 @@ public class AccessTokenMapperProvider {
             SELECT("count(0)");
             FROM(TABLE_NAME + " t,t_escheduler_user u");
             Object searchVal = parameter.get("searchVal");
+            WHERE("u.id = t.user_id");
             if(searchVal != null && StringUtils.isNotEmpty(searchVal.toString())){
-                WHERE("u.id = t.user_id and u.user_name like concat('%', #{searchVal}, '%')");
+                WHERE(" u.user_name like concat('%', #{searchVal}, '%')");
             }
         }}.toString();
     }

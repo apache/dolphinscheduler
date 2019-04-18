@@ -68,6 +68,7 @@ public interface AccessTokenMapper {
     @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "userId", column = "user_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "token", column = "token", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "expireTime", column = "expire_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)

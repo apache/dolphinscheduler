@@ -51,8 +51,9 @@ public class AccessTokenMapperTest {
 
     @Test
     public void testListPaging(){
-        Integer integer = accessTokenMapper.countAccessTokenPaging("hw");
-        List<AccessToken> accessTokenList = accessTokenMapper.queryAccessTokenPaging("hw", 0, 2);
+        Integer integer = accessTokenMapper.countAccessTokenPaging("");
+        System.out.println(integer);
+        List<AccessToken> accessTokenList = accessTokenMapper.queryAccessTokenPaging("", 0, 2);
         System.out.println(accessTokenList);
     }
 
