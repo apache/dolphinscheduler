@@ -463,6 +463,10 @@ public final class Constants {
 
     public static final String TASK_RECORD_PWD = "task.record.datasource.password";
 
+    public static  String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
+
+    public static  String TASK_RECORD_TABLE_HISTORY_HIVE_LOG = "eamp_hive_hist_log_hd";
+
     public static final String STATUS = "status";
 
 
@@ -602,15 +606,29 @@ public final class Constants {
     public static final String JDBC_POSTGRESQL_CLASS_NAME = "org.postgresql.Driver";
 
     /**
-     * postgresql
+     * hive
      */
     public static final String JDBC_HIVE_CLASS_NAME = "org.apache.hive.jdbc.HiveDriver";
 
     /**
-     * postgresql
+     * spark
      */
     public static final String JDBC_SPARK_CLASS_NAME = "org.apache.hive.jdbc.HiveDriver";
 
+    /**
+     * ClickHouse
+     */
+    public static final String JDBC_CLICKHOUSE_CLASS_NAME = "ru.yandex.clickhouse.ClickHouseDriver";
+
+    /**
+     * Oracle
+     */
+    public static final String JDBC_ORACLE_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
+
+    /**
+     * Oracle
+     */
+    public static final String JDBC_SQLSERVER_CLASS_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
     /**
      * spark params constant
@@ -812,4 +830,9 @@ public final class Constants {
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
     public static final String DEPENDENT_ALL = "ALL";
+
+
+    /**
+     *
+     */
 }

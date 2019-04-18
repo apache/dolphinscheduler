@@ -47,6 +47,7 @@ public class UserMapperProvider {
                 VALUES("`phone`", "#{user.phone}");
                 VALUES("`user_type`", EnumFieldUtil.genFieldStr("user.userType", UserType.class));
                 VALUES("`tenant_id`", "#{user.tenantId}");
+                VALUES("`queue`", "#{user.queue}");
                 VALUES("`create_time`", "#{user.createTime}");
                 VALUES("`update_time`", "#{user.updateTime}");
             }
@@ -86,6 +87,7 @@ public class UserMapperProvider {
                 SET("`phone`=#{user.phone}");
                 SET("`user_type`="+EnumFieldUtil.genFieldStr("user.userType", UserType.class));
                 SET("`tenant_id`=#{user.tenantId}");
+                SET("`queue`=#{user.queue}");
                 SET("`create_time`=#{user.createTime}");
                 SET("`update_time`=#{user.updateTime}");
 
@@ -243,6 +245,38 @@ public class UserMapperProvider {
                 SELECT("u.*,t.tenant_code as tenantCode");
                 FROM(TABLE_NAME + " u,t_escheduler_tenant t");
                 WHERE("u.tenant_id = t.id AND u.id = #{userId}");
+            }
+        }.toString();
+    }
+
+
+    /**
+     * query tenant code by user id
+     * @param parameter
+     * @return
+     */
+    public String queryQueueByProcessInstanceId(Map<String, Object> parameter) {
+        return new SQL() {
+            {
+                SELECT("queue");
+                FROM(TABLE_NAME + " u,t_escheduler_process_instance p");
+                WHERE("u.id = p.executor_id and p.id=#{processInstanceId}");
+            }
+        }.toString();
+    }
+
+
+    /**
+     * query user by id
+     * @param parameter
+     * @return
+     */
+    public String queryUserByToken(Map<String, Object> parameter) {
+        return new SQL() {
+            {
+                SELECT("u.*");
+                FROM(TABLE_NAME + " u ,t_escheduler_access_token t");
+                WHERE(" u.id = t.user_id and token=#{token}");
             }
         }.toString();
     }

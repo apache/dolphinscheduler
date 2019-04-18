@@ -1,7 +1,7 @@
 <template>
   <div class="sql-model">
     <m-list-box>
-      <div slot="text">{{$t('数据源')}}</div>
+      <div slot="text">{{$t('Datasource')}}</div>
       <div slot="content">
         <m-datasource
                 ref="refDs"
@@ -11,7 +11,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('sql类型')}}</div>
+      <div slot="text">{{$t('SQL Type')}}</div>
       <div slot="content">
         <div style="display: inline-block;">
           <m-sql-type
@@ -21,26 +21,26 @@
         </div>
         <div v-if="!sqlType" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
           <x-checkbox-group v-model="showType">
-            <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('表格')}}</x-checkbox>
-            <x-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('附件')}}</x-checkbox>
+            <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('Table')}}</x-checkbox>
+            <x-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</x-checkbox>
           </x-checkbox-group>
         </div>
       </div>
     </m-list-box>
     <m-list-box v-show="type === 'HIVE'">
-      <div slot="text">{{$t('sql参数')}}</div>
+      <div slot="text">{{$t('SQL Parameter')}}</div>
       <div slot="content">
         <x-input
                 :disabled="isDetails"
                 type="input"
                 v-model="connParams"
-                :placeholder="$t('请输入格式为') + ' key1=value1;key2=value2...'"
+                :placeholder="$t('Please enter format') + ' key1=value1;key2=value2...'"
                 autocomplete="off">
         </x-input>
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('sql语句')}}</div>
+      <div slot="text">{{$t('SQL Statement')}}</div>
       <div slot="content">
         <div class="from-mirror">
           <textarea
@@ -52,7 +52,7 @@
       </div>
     </m-list-box>
     <m-list-box v-if="type === 'HIVE'">
-      <div slot="text">{{$t('UDF函数')}}</div>
+      <div slot="text">{{$t('UDF Function')}}</div>
       <div slot="content">
         <m-udfs
                 ref="refUdfs"
@@ -63,7 +63,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('自定义参数')}}</div>
+      <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
         <m-local-params
                 ref="refLocalParams"
@@ -146,7 +146,7 @@
        */
       _verification () {
         if (!editor.getValue()) {
-          this.$message.warning(`${i18n.$t('请输入sql语句(必填)')}`)
+          this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
           return false
         }
 
