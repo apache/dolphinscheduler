@@ -46,7 +46,6 @@ public class SchedulerController extends BaseController{
     private static final Logger logger = LoggerFactory.getLogger(SchedulerController.class);
     public static final String DEFAULT_WARNING_TYPE = "NONE";
     public static final String DEFAULT_NOTIFY_GROUP_ID = "1";
-    public static final String DEFAULT_MAX_TRY_TIMES = "0";
     public static final String DEFAULT_FAILURE_POLICY = "CONTINUE";
 
 

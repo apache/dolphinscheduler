@@ -66,4 +66,10 @@ public class UserMapperTest {
         Assert.assertEquals(queue, "ait");
     }
 
+    @Test
+    public void testQueryUserByToken(){
+        User user = userMapper.queryUserByToken("ad9e8fccfc11bd18bb45aa994568b8ef");
+        Assert.assertEquals(user.getUserName(), "qiaozhanwei");
+    }
+
 }

@@ -1,65 +1,62 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'resource'"></m-secondary-menu>
-    <m-list-construction :title="$t('Create File')">
-      <template slot="content">
-        <div class="resource-create-model">
-          <m-list-box-f>
-            <template slot="name"><b>*</b>{{$t('File Name')}}</template>
-            <template slot="content">
-              <x-input
-                      type="input"
-                      v-model="fileName"
-                      style="width: 300px;"
-                      :placeholder="$t('Please enter name')"
-                      autocomplete="off">
-              </x-input>
-            </template>
-          </m-list-box-f>
-          <m-list-box-f>
-            <template slot="name"><b>*</b>{{$t('File Format')}}</template>
-            <template slot="content">
-              <x-select v-model="suffix" style="width: 100px;" @on-change="_onChange">
-                <x-option
-                        v-for="city in fileTypeList"
-                        :key="city"
-                        :value="city"
-                        :label="city">
-                </x-option>
-              </x-select>
-            </template>
-          </m-list-box-f>
-          <m-list-box-f>
-            <template slot="name">{{$t('Description')}}</template>
-            <template slot="content">
-              <x-input
-                      type="textarea"
-                      v-model="desc"
-                      style="width: 430px;"
-                      :placeholder="$t('Please enter description')"
-                      autocomplete="off">
-              </x-input>
-            </template>
-          </m-list-box-f>
-          <m-list-box-f>
-            <template slot="name"><b>*</b>{{$t('File Content')}}</template>
-            <template slot="content">
-              <textarea id="code-create-mirror" name="code-create-mirror"></textarea>
-            </template>
-          </m-list-box-f>
-          <m-list-box-f>
-            <template slot="name">&nbsp;</template>
-            <template slot="content">
-              <div class="submit">
-                <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('Create')}} </x-button>
-                <x-button type="text" @click="() => $router.push({name: 'file'})"> {{$t('Cancel')}} </x-button>
-              </div>
-            </template>
-          </m-list-box-f>
-        </div>
-      </template>
-    </m-list-construction>
-  </div>
+  <m-list-construction :title="$t('Create File')">
+    <template slot="content">
+      <div class="resource-create-model">
+        <m-list-box-f>
+          <template slot="name"><b>*</b>{{$t('File Name')}}</template>
+          <template slot="content">
+            <x-input
+                    type="input"
+                    v-model="fileName"
+                    style="width: 300px;"
+                    :placeholder="$t('Please enter name')"
+                    autocomplete="off">
+            </x-input>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f>
+          <template slot="name"><b>*</b>{{$t('File Format')}}</template>
+          <template slot="content">
+            <x-select v-model="suffix" style="width: 100px;" @on-change="_onChange">
+              <x-option
+                      v-for="city in fileTypeList"
+                      :key="city"
+                      :value="city"
+                      :label="city">
+              </x-option>
+            </x-select>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f>
+          <template slot="name">{{$t('Description')}}</template>
+          <template slot="content">
+            <x-input
+                    type="textarea"
+                    v-model="desc"
+                    style="width: 430px;"
+                    :placeholder="$t('Please enter description')"
+                    autocomplete="off">
+            </x-input>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f>
+          <template slot="name"><b>*</b>{{$t('File Content')}}</template>
+          <template slot="content">
+            <textarea id="code-create-mirror" name="code-create-mirror"></textarea>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f>
+          <template slot="name">&nbsp;</template>
+          <template slot="content">
+            <div class="submit">
+              <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('Create')}} </x-button>
+              <x-button type="text" @click="() => $router.push({name: 'file'})"> {{$t('Cancel')}} </x-button>
+            </div>
+          </template>
+        </m-list-box-f>
+      </div>
+    </template>
+  </m-list-construction>
 </template>
 <script>
   import i18n from '@/module/i18n'
@@ -70,7 +67,6 @@
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mSpin from '@/module/components/spin/spin'
   import mConditions from '@/module/components/conditions/conditions'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   let editor
@@ -158,7 +154,7 @@
       editor.off($('.code-create-mirror'), 'keypress', this.keypress)
     },
     computed: {},
-    components: { mSecondaryMenu, mListConstruction, mConditions, mSpin, mListBoxF }
+    components: { mListConstruction, mConditions, mSpin, mListBoxF }
   }
 </script>
 

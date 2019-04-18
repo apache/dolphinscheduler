@@ -410,5 +410,5 @@ export default {
   'History task record': '历史任务记录',
   'Please go online': '不要忘记上线',
   'Queue value': '队列值',
-  'Please enter queue value': '请输入队列值',
+  'Please enter queue value': '请输入队列值'
 }
