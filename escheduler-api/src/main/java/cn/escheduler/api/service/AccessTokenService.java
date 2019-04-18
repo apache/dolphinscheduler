@@ -137,6 +137,12 @@ public class AccessTokenService extends BaseService {
         return result;
     }
 
+    /**
+     *  delete access token
+     * @param loginUser
+     * @param id
+     * @return
+     */
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
@@ -146,6 +152,31 @@ public class AccessTokenService extends BaseService {
         }
 
         accessTokenMapper.delete(id);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * update token by id
+     * @param id
+     * @param userId
+     * @param expireTime
+     * @param token
+     * @return
+     */
+    public Map<String, Object> updateToken(int id,int userId, String expireTime, String token) {
+        Map<String, Object> result = new HashMap<>(5);
+        AccessToken accessToken = new AccessToken();
+        accessToken.setId(id);
+        accessToken.setUserId(userId);
+        accessToken.setExpireTime(DateUtils.stringToDate(expireTime));
+        accessToken.setToken(token);
+        accessToken.setUpdateTime(new Date());
+
+
+
+        accessTokenMapper.update(accessToken);
+
         putMsg(result, Status.SUCCESS);
         return result;
     }
