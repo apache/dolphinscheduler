@@ -1,33 +1,30 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'resource'"></m-secondary-menu>
-    <m-list-construction :title="$t('File Manage')">
-      <template slot="conditions">
-        <m-conditions @on-conditions="_onConditions">
-          <template slot="button-group">
-            <x-button-group size="small" >
-              <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})" v-ps="['GENERAL_USER']">{{$t('Create File')}}</x-button>
-              <x-button type="ghost" @click="_uploading" v-ps="['GENERAL_USER']">{{$t('Upload Files')}}</x-button>
-            </x-button-group>
-          </template>
-        </m-conditions>
-      </template>
-      <template slot="content">
-        <template v-if="fileResourcesList.length">
-          <m-list :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
-          </m-list>
-          <div class="page-box">
-            <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
-          </div>
+  <m-list-construction :title="$t('File Manage')">
+    <template slot="conditions">
+      <m-conditions @on-conditions="_onConditions">
+        <template slot="button-group">
+          <x-button-group size="small" >
+            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})" v-ps="['GENERAL_USER']">{{$t('Create File')}}</x-button>
+            <x-button type="ghost" @click="_uploading" v-ps="['GENERAL_USER']">{{$t('Upload Files')}}</x-button>
+          </x-button-group>
         </template>
-        <template v-if="!fileResourcesList.length">
-          <m-no-data></m-no-data>
-        </template>
-        <m-spin :is-spin="isLoading">
-        </m-spin>
+      </m-conditions>
+    </template>
+    <template slot="content">
+      <template v-if="fileResourcesList.length">
+        <m-list :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+        </m-list>
+        <div class="page-box">
+          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
+        </div>
       </template>
-    </m-list-construction>
-  </div>
+      <template v-if="!fileResourcesList.length">
+        <m-no-data></m-no-data>
+      </template>
+      <m-spin :is-spin="isLoading">
+      </m-spin>
+    </template>
+  </m-list-construction>
 </template>
 <script>
   import _ from 'lodash'
@@ -38,7 +35,6 @@
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -100,6 +96,6 @@
     },
     mounted () {
     },
-    components: { mSecondaryMenu, mListConstruction, mConditions, mList, mSpin, mNoData }
+    components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }
 </script>
