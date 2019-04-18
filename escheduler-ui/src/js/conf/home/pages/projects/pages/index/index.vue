@@ -1,12 +1,9 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('Project Home')">
-      <template slot="content">
-        <m-project-chart :id="id"></m-project-chart>
-      </template>
-    </m-list-construction>
-  </div>
+  <m-list-construction :title="$t('Project Home')">
+    <template slot="content">
+      <m-project-chart :id="id"></m-project-chart>
+    </template>
+  </m-list-construction>
 </template>
 <script>
   import mProjectChart from './_source/projectChart'
@@ -21,20 +18,6 @@
         id: localStore.getItem('projectId') || null
       }
     },
-    props: {},
-    methods: {
-
-    },
-    watch: {},
-    created () {
-
-    },
-    mounted () {
-    },
     components: { mSecondaryMenu, mListConstruction, mProjectChart }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-
-</style>
