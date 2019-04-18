@@ -1,20 +1,51 @@
-
 #!/bin/bash
-echo "escheduler-ui-install.sh"
-echo "escheduler-ui目录下执行"
+
+# 当前路径
+esc_basepath=$(cd `dirname $0`; pwd)
+
+
+echo "欢迎使用easy scheduler前端部署脚本,目前前端部署脚本仅支持Centos"
+echo "请在 escheduler-ui 目录下执行"
 
 # 配置前端访问端口
 esc_proxy="8888"
 
 # 配置代理后端接口
-esc_proxy_port="http://192.168.220.154:12345"
-
-# 当前路径
-esc_basepath=$(cd `dirname $0`; pwd)
+esc_proxy_port="http://192.168.xx.xx:12345"
 
 # 本机ip
-esc_ipaddr='172.0.0.1'
+esc_ipaddr='127.0.0.1'
+
 esc_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
+
+
+#To be compatible with MacOS and Linux
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Mac OSX
+    echo "Easy Scheduler ui install not support Mac OSX operating system"
+    exit 1
+elif [[ "$OSTYPE" == "linux-gnu" ]]; then
+    # linux
+    echo "linux"
+elif [[ "$OSTYPE" == "cygwin" ]]; then
+    # POSIX compatibility layer and Linux environment emulation for Windows
+    echo "Easy Scheduler ui not support Windows operating system"
+    exit 1
+elif [[ "$OSTYPE" == "msys" ]]; then
+    # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
+    echo "Easy Scheduler ui not support Windows operating system"
+    exit 1
+elif [[ "$OSTYPE" == "win32" ]]; then
+    echo "Easy Scheduler ui not support Windows operating system"
+    exit 1
+elif [[ "$OSTYPE" == "freebsd"* ]]; then
+    # ...
+    echo "freebsd"
+else
+    # Unknown.
+    echo "Operating system unknown, please tell us(submit issue) for better service"
+    exit 1
+fi
 
 # 区分版本
 version=`cat /etc/redhat-release|sed -r 's/.* ([0-9]+)\..*/\1/'`
