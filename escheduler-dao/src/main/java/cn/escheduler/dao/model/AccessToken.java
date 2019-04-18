@@ -31,6 +31,11 @@ public class AccessToken {
     private int userId;
 
     /**
+     * user name
+     */
+    private String userName;
+
+    /**
      * user token
      */
     private String token;
@@ -98,11 +103,20 @@ public class AccessToken {
         this.updateTime = updateTime;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     @Override
     public String toString() {
         return "AccessToken{" +
                 "id=" + id +
                 ", userId=" + userId +
+                ", userName='" + userName + '\'' +
                 ", token='" + token + '\'' +
                 ", expireTime=" + expireTime +
                 ", createTime=" + createTime +

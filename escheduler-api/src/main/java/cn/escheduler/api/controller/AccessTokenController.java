@@ -141,4 +141,29 @@ public class AccessTokenController extends BaseController{
         }
     }
 
+
+    /**
+     * update token
+     * @param loginUser
+     * @return
+     */
+    @PostMapping(value = "/update")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Result updateToken(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                              @RequestParam(value = "id") int id,
+                              @RequestParam(value = "userId") int userId,
+                              @RequestParam(value = "expireTime") String expireTime,
+                              @RequestParam(value = "token") String token){
+        logger.info("login user {}, update token , userId : {} , token expire time : {} , token : {}", loginUser.getUserName(),
+                userId,expireTime,token);
+
+        try {
+            Map<String, Object> result = accessTokenService.updateToken(id,userId, expireTime, token);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(CREATE_ACCESS_TOKEN_ERROR.getMsg(),e);
+            return error(CREATE_ACCESS_TOKEN_ERROR.getCode(), CREATE_ACCESS_TOKEN_ERROR.getMsg());
+        }
+    }
+
 }
