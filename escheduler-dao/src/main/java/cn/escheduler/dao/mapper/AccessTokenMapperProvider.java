@@ -80,7 +80,7 @@ public class AccessTokenMapperProvider {
                 SET("`expire_time`=#{accessToken.expireTime}");
                 SET("`update_time`=#{accessToken.updateTime}");
 
-                WHERE("`id`=#{user.id}");
+                WHERE("`id`=#{accessToken.id}");
             }
         }.toString();
     }
