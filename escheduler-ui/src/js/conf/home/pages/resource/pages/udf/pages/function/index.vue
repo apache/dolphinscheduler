@@ -1,30 +1,27 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'resource'"></m-secondary-menu>
-    <m-list-construction :title="$t('UDF Function')">
-      <template slot="conditions">
-        <m-conditions @on-conditions="_onConditions">
-          <template slot="button-group">
-            <x-button type="ghost" @click="_create" v-ps="['GENERAL_USER']" size="small" >{{$t('Create UDF Function')}}</x-button>
-          </template>
-        </m-conditions>
-      </template>
-      <template slot="content">
-        <template v-if="udfFuncList.length">
-          <m-list :udf-func-list="udfFuncList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize" @on-update="_updateList">
-          </m-list>
-          <div class="page-box">
-            <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
-          </div>
+  <m-list-construction :title="$t('UDF Function')">
+    <template slot="conditions">
+      <m-conditions @on-conditions="_onConditions">
+        <template slot="button-group">
+          <x-button type="ghost" @click="_create" v-ps="['GENERAL_USER']" size="small" >{{$t('Create UDF Function')}}</x-button>
         </template>
-        <template v-if="!udfFuncList.length">
-          <m-no-data></m-no-data>
-        </template>
-        <m-spin :is-spin="isLoading">
-        </m-spin>
+      </m-conditions>
+    </template>
+    <template slot="content">
+      <template v-if="udfFuncList.length">
+        <m-list :udf-func-list="udfFuncList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize" @on-update="_updateList">
+        </m-list>
+        <div class="page-box">
+          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
+        </div>
       </template>
-    </m-list-construction>
-  </div>
+      <template v-if="!udfFuncList.length">
+        <m-no-data></m-no-data>
+      </template>
+      <m-spin :is-spin="isLoading">
+      </m-spin>
+    </template>
+  </m-list-construction>
 </template>
 <script>
   import _ from 'lodash'
@@ -35,7 +32,6 @@
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -116,6 +112,6 @@
     },
     mounted () {
     },
-    components: { mSecondaryMenu, mListConstruction, mConditions, mList, mSpin, mCreateUdf, mNoData }
+    components: { mListConstruction, mConditions, mList, mSpin, mCreateUdf, mNoData }
   }
 </script>

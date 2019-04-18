@@ -90,9 +90,21 @@ export default {
    * @param "searchVal":string,
    * @param "pageSize":int
    */
-  getUsersList ({ state }, payload) {
+  getUsersListP ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`users/list-paging`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Paging query user list
+   */
+  getUsersList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`users/list`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)

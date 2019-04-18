@@ -375,6 +375,14 @@ const router = new Router({
           meta: {
             title: `${i18n.$t('Edit password')}`
           }
+        },
+        {
+          path: '/user/token',
+          name: 'token',
+          component: resolve => require(['../pages/user/pages/token/index'], resolve),
+          meta: {
+            title: `令牌管理`
+          }
         }
       ]
     }
