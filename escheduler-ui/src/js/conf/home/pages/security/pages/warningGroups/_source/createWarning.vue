@@ -1,23 +1,23 @@
 <template>
   <m-popup
           ref="popup"
-          :ok-text="item ? $t('确认编辑') : $t('确认提交')"
-          :nameText="item ? $t('编辑告警组') : $t('创建告警组')"
+          :ok-text="item ? $t('Edit') : $t('Submit')"
+          :nameText="item ? $t('Edit alarm group') : $t('Create alarm group')"
           @ok="_ok">
     <template slot="content">
       <div class="create-warning-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('组名称')}}</template>
+          <template slot="name"><b>*</b>{{$t('Group Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="groupName"
-                    :placeholder="$t('请输入组名称')">
+                    :placeholder="$t('Please enter group name')">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('组类型')}}</template>
+          <template slot="name"><b>*</b>{{$t('Group Type')}}</template>
           <template slot="content">
             <x-select v-model="groupType">
               <x-option
@@ -30,12 +30,12 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('备注')}}</template>
+          <template slot="name">{{$t('Remarks')}}</template>
           <template slot="content">
             <x-input
                     type="textarea"
                     v-model="desc"
-                    :placeholder="$t('请输入desc')">
+                    :placeholder="$t('Please enter description')">
             </x-input>
           </template>
         </m-list-box-f>
@@ -57,7 +57,7 @@
         groupName: '',
         groupType: 'EMAIL',
         desc: '',
-        options: [{ code: `${i18n.$t('邮件')}`, id: 'EMAIL' }, { code: `${i18n.$t('短信')}`, id: 'SMS' }]
+        options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }]
       }
     },
     props: {
@@ -86,7 +86,7 @@
       _verification () {
         // group name
         if (!this.groupName) {
-          this.$message.warning(`${i18n.$t('请输入组名称')}`)
+          this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
         return true

@@ -1,10 +1,10 @@
 <template>
-  <m-popup :ok-text="$t('确认提交')" :nameText="type.name + $t('授权')" @ok="_ok" ref="popup">
+  <m-popup :ok-text="$t('Submit')" :nameText="type.name + $t('Authorize')" @ok="_ok" ref="popup">
     <template slot="content">
       <div class="clearfix transfer-model">
         <div class="select-list-box">
           <div class="tf-header">
-            <div class="title">{{type.name}}{{$t('列表')}}</div>
+            <div class="title">{{type.name}}{{$t('List')}}</div>
             <div class="count">（{{cacheSourceList.length}}）</div>
           </div>
           <!--<div class="tf-search">
@@ -12,7 +12,7 @@
                      @on-enterkey="_sourceQuery"
                      @on-click-icon="_sourceQuery"
                      size="small"
-                     placeholder="请输入关键词"
+                     placeholder="Please enter keyword"
                      type="text"
                      style="width:202px;">
               <i slot="suffix" class="ans-icon-search"></i>
@@ -30,7 +30,7 @@
         <div class="select-oper-box">&nbsp;</div>
         <div class="select-list-box">
           <div class="tf-header">
-            <div class="title">{{$t('已选')}}{{type.name}}</div>
+            <div class="title">{{$t('Selected')}}{{type.name}}</div>
             <div class="count">（{{cacheTargetList.length}}）</div>
           </div>
           <!--<div class="tf-search">
@@ -38,7 +38,7 @@
                      @on-enterkey="_targetQuery"
                      @on-click-icon="_targetQuery"
                      size="small"
-                     placeholder="请输入关键词"
+                     placeholder="Please enter keyword"
                      type="text"
                      style="width:202px;">
               <i slot="suffix" class="ans-icon-search"></i>

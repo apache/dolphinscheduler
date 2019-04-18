@@ -25,6 +25,9 @@ public enum DbType {
    * 1 postgresql
    * 2 hive
    * 3 spark
+   * 4 clickhouse
+   * 5 oracle
+   * 6 sqlserver
    */
-  MYSQL, POSTGRESQL, HIVE, SPARK
+  MYSQL, POSTGRESQL, HIVE, SPARK, CLICKHOUSE, ORACLE, SQLSERVER
 }
