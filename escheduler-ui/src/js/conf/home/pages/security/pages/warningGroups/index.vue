@@ -1,30 +1,25 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'security'"></m-secondary-menu>
-    <template>
-      <m-list-construction :title="'Warning group manage'">
-        <template slot="conditions">
-          <m-conditions @on-conditions="_onConditions">
-            <template slot="button-group">
-              <x-button type="ghost" size="small" @click="_create('')">{{$t('Create alarm group')}}</x-button>
-            </template>
-          </m-conditions>
+  <m-list-construction :title="$t('Warning group manage')">
+    <template slot="conditions">
+      <m-conditions @on-conditions="_onConditions">
+        <template slot="button-group">
+          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create alarm group')}}</x-button>
         </template>
-        <template slot="content">
-          <template v-if="alertgroupList.length">
-            <m-list :alertgroup-list="alertgroupList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
-            <div class="page-box">
-              <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
-            </div>
-          </template>
-          <template v-if="!alertgroupList.length">
-            <m-no-data></m-no-data>
-          </template>
-          <m-spin :is-spin="isLoading"></m-spin>
-        </template>
-      </m-list-construction>
+      </m-conditions>
     </template>
-  </div>
+    <template slot="content">
+      <template v-if="alertgroupList.length">
+        <m-list :alertgroup-list="alertgroupList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
+        <div class="page-box">
+          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
+        </div>
+      </template>
+      <template v-if="!alertgroupList.length">
+        <m-no-data></m-no-data>
+      </template>
+      <m-spin :is-spin="isLoading"></m-spin>
+    </template>
+  </m-list-construction>
 </template>
 <script>
   import _ from 'lodash'
@@ -35,7 +30,6 @@
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -115,6 +109,6 @@
     },
     mounted () {
     },
-    components: { mSecondaryMenu, mList, mListConstruction, mConditions, mSpin, mNoData }
+    components: { mList, mListConstruction, mConditions, mSpin, mNoData }
   }
 </script>

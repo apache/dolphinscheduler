@@ -16,6 +16,9 @@
  */
 
 import i18n from '@/module/i18n'
+import config from '~/external/config'
+import Permissions from '@/module/permissions'
+
 let menu = {
   projects: [
     {
@@ -23,6 +26,7 @@ let menu = {
       id: 1,
       path: 'projects-index',
       isOpen: true,
+      disabled: true,
       icon: 'fa-home',
       children: []
     },
@@ -31,32 +35,38 @@ let menu = {
       id: 2,
       path: '',
       isOpen: true,
+      disabled: true,
       icon: 'fa-gear',
       children: [
         {
           name: `${i18n.$t('Process definition')}`,
           path: 'definition',
-          id: 1
+          id: 1,
+          disabled: true
         },
         {
           name: `${i18n.$t('Process Instance')}`,
           path: 'instance',
-          id: 2
+          id: 2,
+          disabled: true
         },
         {
           name: `${i18n.$t('Task Instance')}`,
           path: 'task-instance',
-          id: 3
+          id: 3,
+          disabled: true
         },
         {
           name: `${i18n.$t('Task record')}`,
           path: 'task-record',
-          id: 4
+          id: 4,
+          disabled: config.recordSwitch
         },
         {
           name: `${i18n.$t('History task record')}`,
           path: 'history-task-record',
-          id: 5
+          id: 5,
+          disabled: config.recordSwitch
         }
       ]
     }
@@ -68,6 +78,7 @@ let menu = {
       id: 1,
       path: 'tenement-manage',
       isOpen: true,
+      disabled: true,
       icon: 'fa-users',
       children: []
     },
@@ -76,6 +87,7 @@ let menu = {
       id: 1,
       path: 'users-manage',
       isOpen: true,
+      disabled: true,
       icon: 'fa-user-circle',
       children: []
     },
@@ -84,6 +96,7 @@ let menu = {
       id: 1,
       path: 'warning-groups-manage',
       isOpen: true,
+      disabled: true,
       icon: 'fa-warning',
       children: []
     },
@@ -92,6 +105,7 @@ let menu = {
       id: 1,
       path: 'queue-manage',
       isOpen: true,
+      disabled: true,
       icon: 'fa-recycle',
       children: []
     },
@@ -100,17 +114,20 @@ let menu = {
       id: 1,
       path: '',
       isOpen: true,
+      disabled: true,
       icon: 'fa-server',
       children: [
         {
           name: 'master',
           path: 'servers-master',
-          id: 1
+          id: 1,
+          disabled: true
         },
         {
           name: 'worker',
           path: 'servers-worker',
-          id: 2
+          id: 2,
+          disabled: true
         }
       ]
     }
@@ -123,7 +140,7 @@ let menu = {
       isOpen: true,
       icon: 'fa-files-o',
       children: [],
-      disabled: false
+      disabled: true
     },
     {
       name: `${i18n.$t('UDF manage')}`,
@@ -131,17 +148,19 @@ let menu = {
       path: '',
       isOpen: true,
       icon: 'fa-file-text',
-      disabled: false,
+      disabled: true,
       children: [
         {
           name: `${i18n.$t('Resource manage')}`,
           path: 'resource-udf-resource',
-          id: 1
+          id: 1,
+          disabled: true
         },
         {
           name: `${i18n.$t('Function manage')}`,
           path: 'resource-udf-function',
-          id: 2
+          id: 2,
+          disabled: true
         }
       ]
     }
@@ -149,12 +168,12 @@ let menu = {
   user: [
     {
       name: `${i18n.$t('User Information')}`,
-      id: 1,
+      id: 0,
       path: 'account',
       isOpen: true,
       icon: 'fa-user',
       children: [],
-      disabled: false
+      disabled: true
     },
     {
       name: `${i18n.$t('Edit password')}`,
@@ -163,7 +182,16 @@ let menu = {
       isOpen: true,
       icon: 'fa-key',
       children: [],
-      disabled: false
+      disabled: true
+    },
+    {
+      name: `令牌管理`,
+      id: 2,
+      path: 'token',
+      isOpen: true,
+      icon: 'fa-file-text',
+      children: [],
+      disabled: !Permissions.getAuth()
     }
   ]
 }
