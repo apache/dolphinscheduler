@@ -1,20 +1,20 @@
 <template>
-  <m-list-construction :title="$t('Queue manage')">
+  <m-list-construction :title="'令牌管理'">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create queue')}}</x-button>
+          <x-button type="ghost" size="small" @click="_create('')">创建令牌</x-button>
         </template>
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="queueList.length">
-        <m-list :queue-list="queueList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
+      <template v-if="tokenList.length">
+        <m-list :token-list="tokenList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
         </div>
       </template>
-      <template v-if="!queueList.length">
+      <template v-if="!tokenList.length">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading"></m-spin>
@@ -26,19 +26,20 @@
   import { mapActions } from 'vuex'
   import mList from './_source/list'
   import mSpin from '@/module/components/spin/spin'
-  import mCreateQueue from './_source/createQueue'
+  import mCreateToken from './_source/createToken'
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
+  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
-    name: 'queue-index',
+    name: 'token-index',
     data () {
       return {
         total: null,
-        isLoading: true,
-        queueList: [],
+        isLoading: false,
+        tokenList: [],
         searchParams: {
           pageSize: 10,
           pageNo: 1,
@@ -49,9 +50,9 @@
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('security', ['getQueueListP']),
+      ...mapActions('user', ['getTokenListP']),
       /**
-       * Query
+       * Inquire
        */
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
@@ -69,7 +70,7 @@
           className: 'v-modal-custom',
           transitionName: 'opacityp',
           render (h) {
-            return h(mCreateQueue, {
+            return h(mCreateToken, {
               on: {
                 onUpdate () {
                   self._debounceGET('false')
@@ -88,9 +89,9 @@
       },
       _getList (flag) {
         this.isLoading = !flag
-        this.getQueueListP(this.searchParams).then(res => {
-          this.queueList = []
-          this.queueList = res.totalList
+        this.getTokenListP(this.searchParams).then(res => {
+          this.tokenList = []
+          this.tokenList = res.totalList
           this.total = res.total
           this.isLoading = false
         }).catch(e => {
@@ -108,8 +109,7 @@
     created () {
     },
     mounted () {
-
     },
-    components: { mList, mListConstruction, mConditions, mSpin, mNoData }
+    components: { mSecondaryMenu, mList, mListConstruction, mConditions, mSpin, mNoData }
   }
 </script>

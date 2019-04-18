@@ -1,7 +1,5 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'resource'"></m-secondary-menu>
-    <m-list-construction :title="$t('UDF Resources')">
+  <m-list-construction :title="$t('UDF Resources')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
@@ -24,7 +22,6 @@
       </m-spin>
     </template>
   </m-list-construction>
-  </div>
 </template>
 <script>
   import _ from 'lodash'
@@ -35,7 +32,6 @@
   import mNoData from '@/module/components/noData/noData'
   import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
@@ -98,6 +94,6 @@
     },
     mounted () {
     },
-    components: { mSecondaryMenu, mListConstruction, mConditions, mList, mSpin, mNoData }
+    components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }
 </script>
