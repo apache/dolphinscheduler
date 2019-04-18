@@ -88,6 +88,9 @@ public class ProcessDao extends AbstractBaseDao {
     @Autowired
     private ResourceMapper resourceMapper;
 
+    @Autowired
+    private ErrorCommandMapper errorCommandMapper;
+
     /**
      * task queue impl
      */
@@ -139,6 +142,7 @@ public class ProcessDao extends AbstractBaseDao {
             if(processInstance == null){
                 logger.error("scan command, command parameter is error: %s", command.toString());
                 delCommandByid(command.getId());
+                saveErrorCommand(command, "process instance is null");
                 return null;
             }else if(!checkThreadNum(command, validThreadNum)){
                     logger.info("there is not enough thread for this command: {}",command.toString() );
@@ -153,9 +157,16 @@ public class ProcessDao extends AbstractBaseDao {
             }
         }catch (Exception e){
             logger.error("scan command error ", e);
+            saveErrorCommand(command, e.toString());
             delCommandByid(command.getId());
         }
         return null;
+    }
+
+    private void saveErrorCommand(Command command, String message) {
+
+        ErrorCommand errorCommand = new ErrorCommand(command, message);
+        this.errorCommandMapper.insert(errorCommand);
     }
 
     /**

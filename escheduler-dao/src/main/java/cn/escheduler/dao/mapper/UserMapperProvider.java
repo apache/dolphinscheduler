@@ -265,4 +265,20 @@ public class UserMapperProvider {
         }.toString();
     }
 
+
+    /**
+     * query user by id
+     * @param parameter
+     * @return
+     */
+    public String queryUserByToken(Map<String, Object> parameter) {
+        return new SQL() {
+            {
+                SELECT("u.*");
+                FROM(TABLE_NAME + " u ,t_escheduler_access_token t");
+                WHERE(" u.id = t.user_id and token=#{token}");
+            }
+        }.toString();
+    }
+
 }
