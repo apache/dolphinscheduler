@@ -111,6 +111,8 @@ public class AccessTokenService extends BaseService {
         accessToken.setUserId(userId);
         accessToken.setExpireTime(DateUtils.stringToDate(expireTime));
         accessToken.setToken(token);
+        accessToken.setCreateTime(new Date());
+        accessToken.setUpdateTime(new Date());
 
         // insert
         int insert = accessTokenMapper.insert(accessToken);
@@ -120,6 +122,7 @@ public class AccessTokenService extends BaseService {
         } else {
             putMsg(result, Status.CREATE_ALERT_GROUP_ERROR);
         }
+
         return result;
     }
 
@@ -172,8 +175,6 @@ public class AccessTokenService extends BaseService {
         accessToken.setExpireTime(DateUtils.stringToDate(expireTime));
         accessToken.setToken(token);
         accessToken.setUpdateTime(new Date());
-
-
 
         accessTokenMapper.update(accessToken);
 
