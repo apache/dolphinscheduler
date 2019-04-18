@@ -199,6 +199,12 @@ public enum Status {
 
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
+
+
+    CREATE_ACCESS_TOKEN_ERROR(70001,"create access token error"),
+    GENERATE_TOKEN_ERROR(70002,"generate token error"),
+    QUERY_ACCESSTOKEN_LIST_PAGING_ERROR(70003,"query access token list paging error"),
+
     ;
 
     private int code;
