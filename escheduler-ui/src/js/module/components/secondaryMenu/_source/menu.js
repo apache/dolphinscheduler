@@ -23,7 +23,7 @@ let menu = {
   projects: [
     {
       name: `${i18n.$t('Project Home')}`,
-      id: 1,
+      id: 0,
       path: 'projects-index',
       isOpen: true,
       disabled: true,
@@ -32,7 +32,7 @@ let menu = {
     },
     {
       name: `${i18n.$t('Process')}`,
-      id: 2,
+      id: 1,
       path: '',
       isOpen: true,
       disabled: true,
@@ -41,31 +41,31 @@ let menu = {
         {
           name: `${i18n.$t('Process definition')}`,
           path: 'definition',
-          id: 1,
+          id: 0,
           disabled: true
         },
         {
           name: `${i18n.$t('Process Instance')}`,
           path: 'instance',
-          id: 2,
+          id: 1,
           disabled: true
         },
         {
           name: `${i18n.$t('Task Instance')}`,
           path: 'task-instance',
-          id: 3,
+          id: 2,
           disabled: true
         },
         {
           name: `${i18n.$t('Task record')}`,
           path: 'task-record',
-          id: 4,
+          id: 3,
           disabled: config.recordSwitch
         },
         {
           name: `${i18n.$t('History task record')}`,
           path: 'history-task-record',
-          id: 5,
+          id: 4,
           disabled: config.recordSwitch
         }
       ]
@@ -75,7 +75,7 @@ let menu = {
   security: [
     {
       name: `${i18n.$t('Tenant Manage')}`,
-      id: 1,
+      id: 0,
       path: 'tenement-manage',
       isOpen: true,
       disabled: true,
@@ -93,7 +93,7 @@ let menu = {
     },
     {
       name: `${i18n.$t('Warning group manage')}`,
-      id: 1,
+      id: 2,
       path: 'warning-groups-manage',
       isOpen: true,
       disabled: true,
@@ -102,40 +102,18 @@ let menu = {
     },
     {
       name: `${i18n.$t('Queue manage')}`,
-      id: 1,
+      id: 3,
       path: 'queue-manage',
       isOpen: true,
       disabled: true,
       icon: 'fa-recycle',
       children: []
-    },
-    {
-      name: `${i18n.$t('Servers manage')}`,
-      id: 1,
-      path: '',
-      isOpen: true,
-      disabled: true,
-      icon: 'fa-server',
-      children: [
-        {
-          name: 'master',
-          path: 'servers-master',
-          id: 1,
-          disabled: true
-        },
-        {
-          name: 'worker',
-          path: 'servers-worker',
-          id: 2,
-          disabled: true
-        }
-      ]
     }
   ],
   resource: [
     {
       name: `${i18n.$t('File Manage')}`,
-      id: 1,
+      id: 0,
       path: 'file',
       isOpen: true,
       icon: 'fa-files-o',
@@ -153,13 +131,13 @@ let menu = {
         {
           name: `${i18n.$t('Resource manage')}`,
           path: 'resource-udf-resource',
-          id: 1,
+          id: 0,
           disabled: true
         },
         {
           name: `${i18n.$t('Function manage')}`,
           path: 'resource-udf-function',
-          id: 2,
+          id: 1,
           disabled: true
         }
       ]
@@ -192,6 +170,60 @@ let menu = {
       icon: 'fa-file-text',
       children: [],
       disabled: !Permissions.getAuth()
+    }
+  ],
+  monitor: [
+    {
+      name: `${i18n.$t('Servers manage')}`,
+      id: 0,
+      path: '',
+      isOpen: true,
+      disabled: true,
+      icon: 'fa-server',
+      children: [
+        {
+          name: 'Master',
+          path: 'servers-master',
+          id: 0,
+          disabled: true
+        },
+        {
+          name: 'Worker',
+          path: 'servers-worker',
+          id: 1,
+          disabled: true
+        },
+        {
+          name: 'Alert',
+          path: 'servers-alert',
+          id: 2,
+          disabled: true
+        },
+        {
+          name: 'RpcServer',
+          path: 'servers-rpcserver',
+          id: 3,
+          disabled: true
+        },
+        {
+          name: 'Zookeeper',
+          path: 'servers-zookeeper',
+          id: 4,
+          disabled: true
+        },
+        {
+          name: 'ApiServer',
+          path: 'servers-apiserver',
+          id: 5,
+          disabled: true
+        },
+        {
+          name: 'Mysql',
+          path: 'servers-mysql',
+          id: 6,
+          disabled: true
+        }
+      ]
     }
   ]
 }
