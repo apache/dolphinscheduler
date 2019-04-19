@@ -509,7 +509,7 @@ public class ProcessInstanceService extends BaseDAGService {
         }
 
         // local params
-        Map<String, List<Property>> localUserDefParams = new HashMap<>();
+        Map<String, Map<String,Object>> localUserDefParams = new HashMap<>();
         for (TaskNode taskNode : taskNodeList) {
             String parameter = taskNode.getParams();
             Map<String, String> map = JSONUtils.toMap(parameter);
@@ -517,8 +517,11 @@ public class ProcessInstanceService extends BaseDAGService {
             if (localParams != null && !localParams.isEmpty()) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
                 List<Property> localParamsList = JSON.parseArray(localParams, Property.class);
+                Map<String,Object> localParamsMap = new HashMap<>();
+                localParamsMap.put("taskType",taskNode.getType());
+                localParamsMap.put("localParamsList",localParamsList);
                 if (localParamsList.size() > 0) {
-                    localUserDefParams.put(taskNode.getName(), localParamsList);
+                    localUserDefParams.put(taskNode.getName(), localParamsMap);
                 }
             }
 
