@@ -138,8 +138,8 @@
 
 <style lang="scss" rel="stylesheet/scss">
   .udp-model {
-    width: 616px;
-    min-height: 326px;
+    width: 624px;
+    min-height: 420px;
     background: #fff;
     border-radius: 3px;
     padding:20px 0 ;
@@ -182,6 +182,14 @@
     }
     .content {
       padding-bottom: 50px;
+      .user-def-params-model {
+        .add {
+          a {
+            color: #0097e0;
+          }
+        }
+      }
     }
+
   }
 </style>

@@ -1,5 +1,6 @@
 <template>
   <div class="variable-model">
+    <template v-if="list">
       <div class="list">
         <div class="name"><i class="fa fa-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('Global parameters')}}</b></div>
         <div class="var-cont">
@@ -22,7 +23,8 @@
           </template>
         </div>
       </div>
-    </div>
+    </template>
+  </div>
 </template>
 <script>
   import i18n from '@/module/i18n'
