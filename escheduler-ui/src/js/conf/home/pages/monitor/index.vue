@@ -1,13 +1,14 @@
 <template>
   <div class="main-layout-box">
-    <m-secondary-menu :type="'resource'"></m-secondary-menu>
+    <m-secondary-menu :type="'monitor'"></m-secondary-menu>
     <router-view></router-view>
   </div>
+
 </template>
 <script>
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   export default {
-    name: 'resource-index',
+    name: 'monitor-index',
     components: { mSecondaryMenu }
   }
 </script>

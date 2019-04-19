@@ -172,7 +172,7 @@ public class FetchTaskThread implements Runnable{
                             FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
                                     processInstance.getTenantCode(), logger);
 
-
+                            logger.info("task : {} ready to submit to task scheduler thread",taskId);
                             // submit task
                             workerExecService.submit(new TaskScheduleThread(taskInstance, processDao));
                         }

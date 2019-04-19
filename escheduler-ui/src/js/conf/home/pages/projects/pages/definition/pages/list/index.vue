@@ -1,28 +1,25 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('Process definition')">
-      <template slot="conditions">
-        <m-conditions @on-conditions="_onConditions">
-          <template slot="button-group">
-            <x-button type="ghost" size="small"  v-ps="['GENERAL_USER']" @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</x-button>
-          </template>
-        </m-conditions>
-      </template>
-      <template slot="content">
-        <template v-if="processListP.length">
-          <m-list :process-list="processListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
-          <div class="page-box">
-            <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page"></x-page>
-          </div>
+  <m-list-construction :title="$t('Process definition')">
+    <template slot="conditions">
+      <m-conditions @on-conditions="_onConditions">
+        <template slot="button-group">
+          <x-button type="ghost" size="small"  v-ps="['GENERAL_USER']" @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</x-button>
         </template>
-        <template v-if="!processListP.length">
-          <m-no-data></m-no-data>
-        </template>
-        <m-spin :is-spin="isLoading"></m-spin>
+      </m-conditions>
+    </template>
+    <template slot="content">
+      <template v-if="processListP.length">
+        <m-list :process-list="processListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
+        <div class="page-box">
+          <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page"></x-page>
+        </div>
       </template>
-    </m-list-construction>
-  </div>
+      <template v-if="!processListP.length">
+        <m-no-data></m-no-data>
+      </template>
+      <m-spin :is-spin="isLoading"></m-spin>
+    </template>
+  </m-list-construction>
 </template>
 <script>
   import _ from 'lodash'

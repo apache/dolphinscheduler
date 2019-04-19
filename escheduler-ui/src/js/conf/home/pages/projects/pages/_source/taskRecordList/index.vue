@@ -1,25 +1,22 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="config.title">
-      <template slot="conditions">
-        <m-conditions @on-query="_onQuery"></m-conditions>
+  <m-list-construction :title="config.title">
+    <template slot="conditions">
+      <m-conditions @on-query="_onQuery"></m-conditions>
+    </template>
+    <template slot="content">
+      <template v-if="taskRecordList.length">
+        <m-list :task-record-list="taskRecordList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+        </m-list>
+        <div class="page-box">
+          <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page"></x-page>
+        </div>
       </template>
-      <template slot="content">
-        <template v-if="taskRecordList.length">
-          <m-list :task-record-list="taskRecordList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
-          </m-list>
-          <div class="page-box">
-            <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page"></x-page>
-          </div>
-        </template>
-        <template v-if="!taskRecordList.length">
-          <m-no-data></m-no-data>
-        </template>
-        <m-spin :is-spin="isLoading"></m-spin>
+      <template v-if="!taskRecordList.length">
+        <m-no-data></m-no-data>
       </template>
-    </m-list-construction>
-  </div>
+      <m-spin :is-spin="isLoading"></m-spin>
+    </template>
+  </m-list-construction>
 </template>
 <script>
   import _ from 'lodash'
