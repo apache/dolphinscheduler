@@ -1,8 +1,5 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-definition-details></m-definition-details>
-  </div>
+  <m-definition-details></m-definition-details>
 </template>
 <script>
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'

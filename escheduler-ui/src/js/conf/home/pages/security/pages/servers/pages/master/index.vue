@@ -1,26 +1,22 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'security'"></m-secondary-menu>
-    <m-list-construction :title="$t('Service-Master')">
-      <template slot="content">
-        <template v-if="masterList.length">
-          <m-list :list="masterList"></m-list>
-        </template>
-        <template v-if="!masterList.length">
-          <m-no-data></m-no-data>
-        </template>
-        <m-spin :is-spin="isLoading" ></m-spin>
+  <m-list-construction :title="$t('Service-Master')">
+    <template slot="content">
+      <template v-if="masterList.length">
+        <m-list :list="masterList"></m-list>
       </template>
-    </m-list-construction>
-  </div>
+      <template v-if="!masterList.length">
+        <m-no-data></m-no-data>
+      </template>
+      <m-spin :is-spin="isLoading" ></m-spin>
+    </template>
+  </m-list-construction>
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
-  import mSpin from '@/module/components/spin/spin'
   import mList from '../../_source/list'
+  import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
     name: 'servers-master',
@@ -48,6 +44,6 @@
     },
     mounted () {
     },
-    components: { mList, mListConstruction, mSpin, mNoData, mSecondaryMenu }
+    components: { mList, mListConstruction, mSpin, mNoData }
   }
 </script>

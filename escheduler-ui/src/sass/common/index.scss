@@ -129,6 +129,9 @@ body{
 
 .main-layout-box {
   padding-left: 200px;
+  &.no {
+    padding-left: 0;
+  }
 }
 
 .tooltip-cont-model {
