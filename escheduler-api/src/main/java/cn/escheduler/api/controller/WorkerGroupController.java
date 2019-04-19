@@ -63,7 +63,7 @@ public class WorkerGroupController extends BaseController{
         }
     }
 
-    @PostMapping(value = "/list-paging")
+    @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     public Result queryAllWorkerGroupsPaging(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam("pageNo") Integer pageNo,
@@ -82,7 +82,7 @@ public class WorkerGroupController extends BaseController{
         }
     }
 
-    @PostMapping(value = "/delete-by-id")
+    @GetMapping(value = "/delete-by-id")
     @ResponseStatus(HttpStatus.OK)
     public Result deleteById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam("id") Integer id
