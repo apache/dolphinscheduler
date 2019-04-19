@@ -32,6 +32,13 @@
           </router-link>
         </div>
       </div>
+      <!--<div class="clearfix list">
+        <div class="nav-links">
+          <router-link :to="{ path: '/monitor'}" tag="a" active-class="active">
+            <span><i class="iconfont">&#xe65f;</i>监控中心</span><b></b>
+          </router-link>
+        </div>
+      </div>-->
       <div class="clearfix list" >
         <div class="nav-links">
           <router-link :to="{ path: '/security'}" tag="a" active-class="active" v-ps="['ADMIN_USER']">
