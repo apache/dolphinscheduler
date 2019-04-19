@@ -668,26 +668,21 @@ JSP.prototype.saveStore = function () {
 /**
  * Event processing
  */
+
 JSP.prototype.handleEvent = function () {
   this.JspInstance.bind('beforeDrop', function (info) {
     let sourceId = info['sourceId']// 出
     let targetId = info['targetId']// 入
-
     /**
      * Recursive search for nodes
      */
     let recursiveVal
     const recursiveTargetarr = (arr, targetId) => {
-      for (var i in arr) {
+      for (let i in arr) {
         if (arr[i] === targetId) {
           recursiveVal = targetId
         } else {
-          let recTargetarrArr = rtTargetarrArr(arr[i])
-          if (recTargetarrArr.length) {
-            recursiveTargetarr(recTargetarrArr, targetId)
-          } else {
-            return recursiveTargetarr(targetId)
-          }
+          recursiveTargetarr(rtTargetarrArr(arr[i]), targetId)
         }
       }
       return recursiveVal
@@ -700,7 +695,6 @@ JSP.prototype.handleEvent = function () {
 
     // Recursive form to find if the target Targetarr has a sourceId
     if (recursiveTargetarr(rtTargetarrArr(sourceId), targetId)) {
-      // setRecursiveVal(null)
       return false
     }
 
