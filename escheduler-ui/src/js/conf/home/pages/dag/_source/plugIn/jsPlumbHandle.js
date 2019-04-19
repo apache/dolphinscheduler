@@ -678,16 +678,11 @@ JSP.prototype.handleEvent = function () {
      */
     let recursiveVal
     const recursiveTargetarr = (arr, targetId) => {
-      for (var i in arr) {
+      for (let i in arr) {
         if (arr[i] === targetId) {
           recursiveVal = targetId
         } else {
-          let recTargetarrArr = rtTargetarrArr(arr[i])
-          if (recTargetarrArr.length) {
-            recursiveTargetarr(recTargetarrArr, targetId)
-          } else {
-            return recursiveTargetarr(targetId)
-          }
+          recursiveTargetarr(rtTargetarrArr(arr[i]), targetId)
         }
       }
       return recursiveVal
