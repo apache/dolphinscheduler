@@ -12,7 +12,7 @@ CREATE TABLE `t_escheduler_access_token` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 
-CREATE TABLE `escheduler`.`t_escheduler_error_command`  (
+CREATE TABLE `t_escheduler_error_command`  (
   `id` int(11) NOT NULL COMMENT '主键',
   `command_type` tinyint(4) NULL DEFAULT NULL COMMENT '命令类型：0 启动工作流，1 从当前节点开始执行，2 恢复被容错的工作流，3 恢复暂停流程 4 从失败节点开始执行',
   `executor_id` int(11) NULL DEFAULT NULL COMMENT '命令执行者',
@@ -30,3 +30,13 @@ CREATE TABLE `escheduler`.`t_escheduler_error_command`  (
   `message` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '执行信息',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+
+CREATE TABLE `t_escheduler_worker_group`  (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `name` varchar(256) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '组名称',
+  `ip_list` varchar(256) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'worker地址列表',
+  `create_time` date NULL DEFAULT NULL COMMENT '创建时间',
+  `update_time` date NULL DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
