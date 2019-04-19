@@ -45,7 +45,7 @@
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
-  import emailList from '~/localData/email'
+  import emailList from '~/external/email'
   import { isEmial, fuzzyQuery } from './util'
 
   export default {

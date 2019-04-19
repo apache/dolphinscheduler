@@ -11,32 +11,34 @@
               :placeholder="$t('prop(required)')"
               maxlength="64"
               @on-blur="_verifProp()"
-              style="width: 164px;">
+              :style="inputStyle">
       </x-input>
-      <x-select
-              style="width: 80px;"
-              @change="_handleDirectChanged"
-              v-model="localParamsList[$index].direct"
-              :disabled="isDetails || !hide">
-        <x-option
-                v-for="city in directList"
-                :key="city.code"
-                :value="city.code"
-                :label="city.code">
-        </x-option>
-      </x-select>
-      <x-select
-              style="width: 118px;"
-              @change="_handleTypeChanged"
-              v-model="localParamsList[$index].type"
-              :disabled="isDetails || !hide">
-        <x-option
-                v-for="city in typeList"
-                :key="city.code"
-                :value="city.code"
-                :label="city.code">
-        </x-option>
-      </x-select>
+      <template v-if="hide">
+        <x-select
+                style="width: 80px;"
+                @change="_handleDirectChanged"
+                v-model="localParamsList[$index].direct"
+                :disabled="isDetails">
+          <x-option
+                  v-for="city in directList"
+                  :key="city.code"
+                  :value="city.code"
+                  :label="city.code">
+          </x-option>
+        </x-select>
+        <x-select
+                style="width: 118px;"
+                @change="_handleTypeChanged"
+                v-model="localParamsList[$index].type"
+                :disabled="isDetails">
+          <x-option
+                  v-for="city in typeList"
+                  :key="city.code"
+                  :value="city.code"
+                  :label="city.code">
+          </x-option>
+        </x-select>
+      </template>
       <x-input
               :disabled="isDetails"
               type="text"
@@ -44,7 +46,7 @@
               :placeholder="$t('value(optional)')"
               maxlength="64"
               @on-blur="_handleValue()"
-              style="width: 150px;position: relative;margin-bottom: -2px;">
+              :style="inputStyle">
       </x-input>
       <span class="lt-add">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
@@ -57,7 +59,7 @@
         </a>
       </span>
     </div>
-    <span class="add" v-if="!localParamsList.length">
+    <span class="add-dp" v-if="!localParamsList.length">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
         <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
       </a>
@@ -173,6 +175,11 @@
     created () {
       this.localParamsList = this.udpList
     },
+    computed: {
+      inputStyle () {
+        return `width:${this.hide ? 160 : 262}px`
+      }
+    },
     mounted () {
     },
     components: { }
@@ -197,11 +204,23 @@
     }
     .add {
       a {
+        color: #000;
         .iconfont {
           font-size: 18px;
           vertical-align: middle;
           display: inline-block;
           margin-top: 1px;
+        }
+      }
+    }
+    .add-dp{
+      a {
+        color: #0097e0;
+        .iconfont {
+          font-size: 18px;
+          vertical-align: middle;
+          display: inline-block;
+          margin-top: 2px;
         }
       }
     }

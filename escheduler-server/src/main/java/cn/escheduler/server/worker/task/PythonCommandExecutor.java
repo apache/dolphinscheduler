@@ -16,12 +16,13 @@
  */
 package cn.escheduler.server.worker.task;
 
+import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,6 +34,8 @@ import java.util.function.Consumer;
  * python command executor
  */
 public class PythonCommandExecutor extends AbstractCommandExecutor {
+
+    private static final Logger logger = LoggerFactory.getLogger(PythonCommandExecutor.class);
 
     public static final String PYTHON = "python";
 
@@ -63,27 +66,13 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
-        logger.info("proxy user:{}, work dir:{}", tenantCode, taskDir);
+        logger.info("tenant :{}, work dir:{}", tenantCode, taskDir);
 
         if (!Files.exists(Paths.get(commandFile))) {
             logger.info("generate command file:{}", commandFile);
 
             StringBuilder sb = new StringBuilder(200);
             sb.append("#-*- encoding=utf8 -*-\n");
-            sb.append("import os,sys\n");
-            sb.append("BASEDIR = os.path.dirname(os.path.realpath(__file__))\n");
-            sb.append("os.chdir(BASEDIR)\n");
-
-            if (StringUtils.isNotEmpty(envFile)) {
-                String[] envArray = envFile.split("\\.");
-                if(envArray.length == 2){
-                    String path = envArray[0];
-                    logger.info("path:"+path);
-                    int index =  path.lastIndexOf("/");
-                    sb.append(String.format("sys.path.append('%s')\n",path.substring(0,index)));
-                    sb.append(String.format("import %s\n",path.substring(index+1)));
-                }
-            }
 
             sb.append("\n\n");
             sb.append(String.format("import py_%s_node\n",taskAppId));
@@ -96,7 +85,14 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
 
     @Override
     protected String commandType() {
-        return PYTHON;
+
+        String envPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH + "conf"+
+                Constants.SINGLE_SLASH +"env" + Constants.SINGLE_SLASH + Constants.ESCHEDULER_ENV_SH;
+        String pythonHome = getPythonHome(envPath);
+        if (StringUtils.isEmpty(pythonHome)){
+            return PYTHON;
+        }
+        return pythonHome;
     }
 
     @Override
@@ -107,6 +103,47 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected boolean checkFindApp(String line) {
         return true;
+    }
+
+
+    /**
+     *  get python home
+     * @param envPath
+     * @return
+     */
+    private static String getPythonHome(String envPath){
+        BufferedReader br = null;
+        String line = null;
+        StringBuilder sb = new StringBuilder();
+        try {
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)));
+            while ((line = br.readLine()) != null){
+                if (line.contains(Constants.PYTHON_HOME)){
+                    sb.append(line);
+                    break;
+                }
+            }
+            String result = sb.toString();
+            if (org.apache.commons.lang.StringUtils.isEmpty(result)){
+                return null;
+            }
+            String[] arrs = result.split("=");
+            if (arrs.length == 2){
+                return arrs[1];
+            }
+
+        }catch (IOException e){
+            logger.error("read file failed : " + e.getMessage(),e);
+        }finally {
+            try {
+                if (br != null){
+                    br.close();
+                }
+            } catch (IOException e) {
+                logger.error(e.getMessage(),e);
+            }
+        }
+        return null;
     }
 
 }
