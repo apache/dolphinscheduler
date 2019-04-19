@@ -317,35 +317,6 @@ const router = new Router({
           meta: {
             title: `${i18n.$t('Queue manage')}`
           }
-        },
-        {
-          path: '/security/servers',
-          name: 'servers-manage',
-          component: resolve => require(['../pages/security/pages/servers/index'], resolve),
-          meta: {
-            title: `${i18n.$t('Servers manage')}`
-          },
-          redirect: {
-            name: 'servers-master'
-          },
-          children: [
-            {
-              path: '/security/servers/master',
-              name: 'servers-master',
-              component: resolve => require(['../pages/security/pages/servers/pages/master/index'], resolve),
-              meta: {
-                title: `${i18n.$t('Service-Master')}`
-              }
-            },
-            {
-              path: '/security/servers/worker',
-              name: 'servers-worker',
-              component: resolve => require(['../pages/security/pages/servers/pages/worker/index'], resolve),
-              meta: {
-                title: `${i18n.$t('Service-Worker')}`
-              }
-            }
-          ]
         }
       ]
     },
@@ -382,6 +353,75 @@ const router = new Router({
           component: resolve => require(['../pages/user/pages/token/index'], resolve),
           meta: {
             title: `令牌管理`
+          }
+        }
+      ]
+    },
+    {
+      path: '/monitor',
+      name: 'monitor',
+      component: resolve => require(['../pages/monitor/index'], resolve),
+      meta: {
+        title: `monitor`
+      },
+      redirect: {
+        name: 'servers-master'
+      },
+      children: [
+        {
+          path: '/monitor/servers/master',
+          name: 'servers-master',
+          component: resolve => require(['../pages/monitor/pages/servers/master'], resolve),
+          meta: {
+            title: `${i18n.$t('Service-Master')}`
+          }
+        },
+        {
+          path: '/monitor/servers/worker',
+          name: 'servers-worker',
+          component: resolve => require(['../pages/monitor/pages/servers/worker'], resolve),
+          meta: {
+            title: `${i18n.$t('Service-Worker')}`
+          }
+        },
+        {
+          path: '/monitor/servers/alert',
+          name: 'servers-alert',
+          component: resolve => require(['../pages/monitor/pages/servers/alert'], resolve),
+          meta: {
+            title: `alert`
+          }
+        },
+        {
+          path: '/monitor/servers/rpcserver',
+          name: 'servers-rpcserver',
+          component: resolve => require(['../pages/monitor/pages/servers/rpcserver'], resolve),
+          meta: {
+            title: `rpcserver`
+          }
+        },
+        {
+          path: '/monitor/servers/zookeeper',
+          name: 'servers-zookeeper',
+          component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
+          meta: {
+            title: `zookeeper`
+          }
+        },
+        {
+          path: '/monitor/servers/apiserver',
+          name: 'servers-apiserver',
+          component: resolve => require(['../pages/monitor/pages/servers/apiserver'], resolve),
+          meta: {
+            title: `apiserver`
+          }
+        },
+        {
+          path: '/monitor/servers/mysql',
+          name: 'servers-mysql',
+          component: resolve => require(['../pages/monitor/pages/servers/mysql'], resolve),
+          meta: {
+            title: `mysql`
           }
         }
       ]

@@ -295,6 +295,7 @@ export default {
   'Waiting for dependence': '等待依赖',
   'Start': '运行',
   'Copy': '复制节点',
+  'Delete': '删除',
   'Please enter keyword': '请输入关键词',
   'File Upload': '文件上传',
   'Drag the file into the current upload window': '请将文件拖拽到当前上传窗口内！',

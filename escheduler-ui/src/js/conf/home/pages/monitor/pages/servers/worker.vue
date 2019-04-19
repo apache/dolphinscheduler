@@ -13,7 +13,7 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import mList from '../../_source/list'
+  import mList from './_source/list'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
