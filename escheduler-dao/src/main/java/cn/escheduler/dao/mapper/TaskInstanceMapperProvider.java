@@ -185,7 +185,7 @@ public class TaskInstanceMapperProvider {
             {
                 SELECT ("state, count(0) as count");
                 FROM(TABLE_NAME + " t");
-                LEFT_OUTER_JOIN(DEFINE_TABLE_NAME+ " d on d.id=t.process_definition_id");
+                LEFT_OUTER_JOIN(DEFINE_TABLE_NAME + " d on d.id=t.process_definition_id");
                 LEFT_OUTER_JOIN("t_escheduler_project p on p.id=d.project_id");
                 if(parameter.get("projectId") != null && (int)parameter.get("projectId") != 0){
                     WHERE( "p.id = #{projectId} ");
@@ -399,6 +399,44 @@ public class TaskInstanceMapperProvider {
                 WHERE("`process_instance_id` = #{processInstanceId}");
                 WHERE("`name` = #{name}");
                 WHERE("`flag` = 1 ");
+            }
+        }.toString();
+    }
+
+
+    /**
+     *
+     * count task
+     * @param parameter
+     * @return
+     */
+    public String countTask(Map<String, Object> parameter){
+
+        StringBuffer taskIdsStr = new StringBuffer();
+        int[] stateArray = (int[]) parameter.get("taskIds");
+        for(int i=0;i<stateArray.length;i++){
+            taskIdsStr.append(stateArray[i]);
+            if(i<stateArray.length-1){
+                taskIdsStr.append(",");
+            }
+        }
+
+        return new SQL(){
+            {
+                SELECT("count(1) as count");
+                FROM(TABLE_NAME + " task,t_escheduler_process_definition process");
+                WHERE("task.process_definition_id=process.id");
+                if(parameter.get("projectId") != null && (int)parameter.get("projectId") != 0){
+                    WHERE( "process.project_id = #{projectId} ");
+                }else{
+                    if(parameter.get("userType") != null && String.valueOf(parameter.get("userType")) == "GENERAL_USER") {
+                        AND();
+                        WHERE("process.project_id in (select id as project_id from t_escheduler_project tp where tp.user_id= #{userId} " +
+                                "union select project_id from t_escheduler_relation_project_user tr where tr.user_id= #{userId} )");
+
+                    }
+                }
+                WHERE("task.id in (" + taskIdsStr.toString() + ")");
             }
         }.toString();
     }
