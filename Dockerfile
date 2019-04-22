@@ -9,6 +9,7 @@ RUN tar -zxvf zookeeper-3.4.6.tar.gz
 RUN mv zookeeper-3.4.6 zookeeper
 RUN echo "export ZOOKEEPER_HOME=/opt/zookeeper" >>/etc/profile
 RUN echo "export PATH=$PATH:$ZOOKEEPER_HOME/bin"  >>/etc/profile
+ADD conf/zoo.cfg /opt/zookeeper/conf/zoo.cfg
 RUN source /etc/profile
 RUN zkServer.sh start
 RUN apk add --no-cache git npm nginx
