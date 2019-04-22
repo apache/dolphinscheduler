@@ -66,7 +66,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "receiversCc", required = false) String receiversCc,
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
-                                       @RequestParam(value = "workerGroupId", required = false) int workerGroupId,
+                                       @RequestParam(value = "workerGroupId", required = false, defaultValue = "0") int workerGroupId,
                                        @RequestParam(value = "timeout", required = false) Integer timeout) {
         try {
             logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
@@ -82,7 +82,7 @@ public class ExecutorController extends BaseController {
 
             Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
                             startNodeList, taskDependType, warningType,
-                    warningGroupId,receivers,receiversCc, runMode,processInstancePriority,timeout);
+                    warningGroupId,receivers,receiversCc, runMode,processInstancePriority, workerGroupId, timeout);
             return returnDataList(result);
         } catch (Exception e) {
             logger.error(START_PROCESS_INSTANCE_ERROR.getMsg(),e);
