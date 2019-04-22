@@ -81,6 +81,14 @@
     </div>
     <div class="clearfix list">
       <div class="text">
+        Worker分组
+      </div>
+      <div class="cont">
+        <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+      </div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
         {{$t('Notification group')}}
       </div>
       <div class="cont">
@@ -133,6 +141,7 @@
   import { vCrontab } from '~/@vue/crontab/dist'
   import { formatDate } from '@/module/filter/filter'
   import mPriority from '@/module/components/priority/priority'
+  import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
 
   export default {
     name: 'timing-process',
@@ -152,7 +161,8 @@
         receivers: [],
         receiversCc: [],
         i18n: i18n.globalScope.LOCALE,
-        processInstancePriority: 'MEDIUM'
+        processInstancePriority: 'MEDIUM',
+        workerGroupId: -1
       }
     },
     props: {
@@ -190,7 +200,8 @@
             processInstancePriority: this.processInstancePriority,
             warningGroupId: _.isEmpty(this.warningGroupId) ? 0 : this.warningGroupId.id,
             receivers: this.receivers.join(',') || '',
-            receiversCc: this.receiversCc.join(',') || ''
+            receiversCc: this.receiversCc.join(',') || '',
+            workerGroupId: this.workerGroupId
           }
           let msg = ''
 
@@ -255,6 +266,7 @@
         this.failureStrategy = item.failureStrategy
         this.warningType = item.warningType
         this.processInstancePriority = item.processInstancePriority
+        this.workerGroupId = item.workerGroupId || -1
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
             let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
@@ -269,7 +281,7 @@
         }).catch(() => this.warningGroupId = { id: 0 })
       }
     },
-    components: { vCrontab, mEmail, mPriority }
+    components: { vCrontab, mEmail, mPriority, mWorkerGroups }
   }
 </script>
 
