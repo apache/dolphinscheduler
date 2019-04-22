@@ -317,6 +317,14 @@ const router = new Router({
           meta: {
             title: `${i18n.$t('Queue manage')}`
           }
+        },
+        {
+          path: '/security/worker-groups',
+          name: 'worker-groups-manage',
+          component: resolve => require(['../pages/security/pages/workerGroups/index'], resolve),
+          meta: {
+            title: `workerGroups`
+          }
         }
       ]
     },
