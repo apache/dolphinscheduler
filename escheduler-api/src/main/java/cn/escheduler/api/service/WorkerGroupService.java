@@ -57,10 +57,11 @@ public class WorkerGroupService extends BaseService {
             return result;
         }
         Date now = new Date();
-        WorkerGroup workerGroup = new WorkerGroup();
+        WorkerGroup workerGroup = null;
         if(id != 0){
             workerGroup = workerGroupMapper.queryById(id);
         }else{
+            workerGroup = new WorkerGroup();
             workerGroup.setCreateTime(now);
         }
         workerGroup.setName(name);
