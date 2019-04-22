@@ -1,13 +1,13 @@
 <template>
   <m-list-construction :title="$t('Service-Master')">
     <template slot="content">
-      <template v-if="masterList.length">
-        <m-list :list="masterList"></m-list>
-      </template>
-      <template v-if="!masterList.length">
-        <m-no-data></m-no-data>
-      </template>
-      <m-spin :is-spin="isLoading" ></m-spin>
+      <div class="servers-wrapper">
+        <div class="row">
+          <div class="col-md-4">.col-md-8</div>
+          <div class="col-md-4">.col-md-4</div>
+          <div class="col-md-4">.col-md-4</div>
+        </div>
+      </div>
     </template>
   </m-list-construction>
 </template>

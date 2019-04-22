@@ -221,7 +221,7 @@
         // Task priority
         taskInstancePriority: 'MEDIUM',
         // worker group id
-        workerGroupId: null
+        workerGroupId: -1
       }
     },
     /**

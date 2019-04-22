@@ -22,7 +22,10 @@
     },
     mixins: [disabledState],
     props: {
-      value: Number
+      value: {
+        type: Number,
+        default: -1
+      }
     },
     model: {
       prop: 'value',
@@ -37,9 +40,15 @@
     watch: {
     },
     created () {
-      this.workerGroupsList = this.store.state.security.workerGroupsListAll || []
-      if (!this.value) {
-        this.$emit('workerGroupsEvent', this.workerGroupsList[0].id)
+      let stateWorkerGroupsList = this.store.state.security.workerGroupsListAll || []
+      if (stateWorkerGroupsList.length) {
+        this.workerGroupsList = stateWorkerGroupsList
+      } else {
+        this.store.dispatch('security/getWorkerGroupsAll').then(res => {
+          this.$nextTick(() => {
+            this.workerGroupsList = res
+          })
+        })
       }
     }
   }
