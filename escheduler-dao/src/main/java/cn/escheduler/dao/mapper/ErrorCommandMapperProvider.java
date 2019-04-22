@@ -34,6 +34,7 @@ public class ErrorCommandMapperProvider {
                 VALUES("`schedule_time`", "#{errorCommand.scheduleTime}");
                 VALUES("`update_time`", "#{errorCommand.updateTime}");
                 VALUES("`start_time`", "#{errorCommand.startTime}");
+                VALUES("`worker_group_id`", "#{errorCommand.workerGroupId}");
                 VALUES("`message`", "#{errorCommand.message}");
             }
         }.toString();
