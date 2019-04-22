@@ -120,7 +120,7 @@ public interface WorkerGroupMapper {
             @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
             @Result(property = "updateTime", column = "update_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
     })
-    @DeleteProvider(type = WorkerGroupMapperProvider.class, method = "queryById")
+    @SelectProvider(type = WorkerGroupMapperProvider.class, method = "queryById")
     WorkerGroup queryById(@Param("id") int id);
 
 
