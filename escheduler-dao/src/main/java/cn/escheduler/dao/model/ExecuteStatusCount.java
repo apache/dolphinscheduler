@@ -50,4 +50,12 @@ public class ExecuteStatusCount {
     public void setCount(int count) {
         this.count = count;
     }
+
+    @Override
+    public String toString() {
+        return "ExecuteStatusCount{" +
+                "state=" + state +
+                ", count=" + count +
+                '}';
+    }
 }
