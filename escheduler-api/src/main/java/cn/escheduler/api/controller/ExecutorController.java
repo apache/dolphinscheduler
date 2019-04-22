@@ -66,7 +66,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "receiversCc", required = false) String receiversCc,
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
-                                       @RequestParam(value = "workerGroupId", required = false, defaultValue = "0") int workerGroupId,
+                                       @RequestParam(value = "workerGroupId", required = false, defaultValue = "-1") int workerGroupId,
                                        @RequestParam(value = "timeout", required = false) Integer timeout) {
         try {
             logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "

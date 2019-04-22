@@ -109,7 +109,7 @@ public class FetchTaskThread implements Runnable{
         }
         int processWorkerGroupId = processInstance.getWorkerGroupId();
 
-        taskWorkerGroupId = (taskWorkerGroupId == 0 ? processWorkerGroupId : taskWorkerGroupId);
+        taskWorkerGroupId = (taskWorkerGroupId <= 0 ? processWorkerGroupId : taskWorkerGroupId);
 
         if(taskWorkerGroupId == 0){
             return true;

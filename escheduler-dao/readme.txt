@@ -42,10 +42,13 @@ CREATE TABLE `t_escheduler_worker_group`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 ALTER TABLE `t_escheduler_task_instance`
-ADD COLUMN `worker_group_id` int(11) ZEROFILL NULL COMMENT '任务指定运行的worker分组' AFTER `task_instance_priority`;
+ADD COLUMN `worker_group_id` int(11) NULL DEFAULT -1 COMMENT '任务指定运行的worker分组' AFTER `task_instance_priority`;
 
 ALTER TABLE `t_escheduler_command`
-ADD COLUMN `worker_group_id` int(11) ZEROFILL NULL COMMENT '任务指定运行的worker分组'   NULL AFTER `process_instance_priority`;
+ADD COLUMN `worker_group_id` int(11) NULL DEFAULT -1 COMMENT '任务指定运行的worker分组'   NULL AFTER `process_instance_priority`;
 
 ALTER TABLE `t_escheduler_error_command`
-ADD COLUMN `worker_group_id` int(11) ZEROFILL NULL COMMENT '任务指定运行的worker分组'   NULL AFTER `process_instance_priority`;
+ADD COLUMN `worker_group_id` int(11) NULL DEFAULT -1 COMMENT '任务指定运行的worker分组'   NULL AFTER `process_instance_priority`;
+
+ALTER TABLE `t_escheduler_schedules`
+ADD COLUMN `worker_group_id` int(11) NULL DEFAULT -1 COMMENT '任务指定运行的worker分组'   NULL AFTER `process_instance_priority`;
