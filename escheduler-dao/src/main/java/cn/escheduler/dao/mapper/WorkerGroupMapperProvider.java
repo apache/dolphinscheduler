@@ -22,6 +22,9 @@ import org.apache.ibatis.jdbc.SQL;
 
 import java.util.Map;
 
+/**
+ * worker group mapper provider
+ */
 public class WorkerGroupMapperProvider {
 
     private static final String TABLE_NAME = "t_escheduler_worker_group";

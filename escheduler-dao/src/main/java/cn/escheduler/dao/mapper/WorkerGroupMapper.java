@@ -23,6 +23,9 @@ import org.apache.ibatis.type.JdbcType;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * worker group mapper
+ */
 public interface WorkerGroupMapper {
 
     /**
