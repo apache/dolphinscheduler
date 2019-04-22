@@ -209,6 +209,11 @@ public enum Status {
     GENERATE_TOKEN_ERROR(70002,"generate token error"),
     QUERY_ACCESSTOKEN_LIST_PAGING_ERROR(70003,"query access token list paging error"),
 
+
+    COMMAND_STATE_COUNT_ERROR(80001,"task instance state count error"),
+
+    QUEUE_COUNT_ERROR(90001,"queue count error"),
+
     ;
 
     private int code;

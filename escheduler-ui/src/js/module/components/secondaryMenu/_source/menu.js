@@ -108,6 +108,15 @@ let menu = {
       disabled: true,
       icon: 'fa-recycle',
       children: []
+    },
+    {
+      name: `worker分组管理`,
+      id: 4,
+      path: 'worker-groups-manage',
+      isOpen: true,
+      disabled: true,
+      icon: 'fa-address-book',
+      children: []
     }
   ],
   resource: [
