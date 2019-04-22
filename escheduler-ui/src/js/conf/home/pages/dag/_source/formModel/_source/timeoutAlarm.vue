@@ -46,7 +46,7 @@
   import disabledState from '@/module/mixin/disabledState'
 
   export default {
-    name: 'timeout-alarm',
+    name: 'form-timeout-alarm',
     data () {
       return {
         // Timeout display hiding
