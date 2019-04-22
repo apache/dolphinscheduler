@@ -17,7 +17,6 @@
 
 import i18n from '@/module/i18n'
 import config from '~/external/config'
-import Permissions from '@/module/permissions'
 
 let menu = {
   projects: [
@@ -178,7 +177,7 @@ let menu = {
       isOpen: true,
       icon: 'fa-file-text',
       children: [],
-      disabled: !Permissions.getAuth()
+      disabled: true
     }
   ],
   monitor: [
