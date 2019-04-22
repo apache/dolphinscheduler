@@ -44,6 +44,14 @@ public class WorkerGroupController extends BaseController{
     WorkerGroupService workerGroupService;
 
 
+    /**
+     * create or update a worker group
+     * @param loginUser
+     * @param id
+     * @param name
+     * @param ipList
+     * @return
+     */
     @PostMapping(value = "/save")
     @ResponseStatus(HttpStatus.OK)
     public Result saveWorkerGroup(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
@@ -63,6 +71,14 @@ public class WorkerGroupController extends BaseController{
         }
     }
 
+    /**
+     * query worker groups paging
+     * @param loginUser
+     * @param pageNo
+     * @param searchVal
+     * @param pageSize
+     * @return
+     */
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     public Result queryAllWorkerGroupsPaging(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
@@ -70,7 +86,7 @@ public class WorkerGroupController extends BaseController{
                                              @RequestParam(value = "searchVal", required = false) String searchVal,
                                              @RequestParam("pageSize") Integer pageSize
     ) {
-        logger.info("query all worker group: login user {}, pageNo:{}, pageSize:{}, searchVal:{}",
+        logger.info("query all worker group paging: login user {}, pageNo:{}, pageSize:{}, searchVal:{}",
                 loginUser.getUserName() , pageNo, pageSize, searchVal);
 
         try {
@@ -82,6 +98,33 @@ public class WorkerGroupController extends BaseController{
         }
     }
 
+    /**
+     * query all worker groups
+     * @param loginUser
+     * @return
+     */
+    @GetMapping(value = "/all-groups")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryAllWorkerGroups(@RequestAttribute(value = Constants.SESSION_USER) User loginUser
+    ) {
+        logger.info("query all worker group: login user {}",
+                loginUser.getUserName() );
+
+        try {
+            Map<String, Object> result = workerGroupService.queryAllGroup();
+            return returnDataListPaging(result);
+        }catch (Exception e){
+            logger.error(Status.SAVE_ERROR.getMsg(),e);
+            return error(Status.SAVE_ERROR.getCode(), Status.SAVE_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * delete worker group by id
+     * @param loginUser
+     * @param id
+     * @return
+     */
     @GetMapping(value = "/delete-by-id")
     @ResponseStatus(HttpStatus.OK)
     public Result deleteById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
