@@ -72,6 +72,26 @@
         </m-local-params>
       </div>
     </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('Pre Statement')}}</div>
+      <div slot="content">
+        <m-statement-list
+          ref="refPreStatements"
+          @on-statement-list="_onPreStatements"
+          :statement-list="preStatements">
+        </m-statement-list>
+      </div>
+    </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('Post Statement')}}</div>
+      <div slot="content">
+        <m-statement-list
+          ref="refPostStatements"
+          @on-statement-list="_onPostStatements"
+          :statement-list="postStatements">
+        </m-statement-list>
+      </div>
+    </m-list-box>
   </div>
 </template>
 <script>
@@ -82,6 +102,7 @@
   import mSqlType from './_source/sqlType'
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
+  import mStatementList from './_source/statementList'
   import disabledState from '@/module/mixin/disabledState'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
@@ -108,7 +129,11 @@
         // Form/attachment
         showType: ['TABLE'],
         // Sql parameter
-        connParams: ''
+        connParams: '',
+        // Pre statements
+        preStatements: [],
+        // Post statements
+        postStatements: []
       }
     },
     mixins: [disabledState],
@@ -142,6 +167,18 @@
         this.rtDatasource = o.datasource
       },
       /**
+       * return pre statements
+       */
+      _onPreStatements (a) {
+        this.preStatements = a
+      },
+      /**
+       * return post statements
+       */
+      _onPostStatements (a) {
+        this.postStatements = a
+      },
+      /**
        * verification
        */
       _verification () {
@@ -167,6 +204,16 @@
           return false
         }
 
+        // preStatements Subcomponent verification
+        if (!this.$refs.refPreStatements._verifProp()) {
+          return false
+        }
+
+        // postStatements Subcomponent verification
+        if (!this.$refs.refPostStatements._verifProp()) {
+          return false
+        }
+
         // storage
         this.$emit('on-params', {
           type: this.type,
@@ -187,7 +234,9 @@
             }
           })(),
           localParams: this.localParams,
-          connParams: this.connParams
+          connParams: this.connParams,
+          preStatements: this.preStatements,
+          postStatements: this.postStatements
         })
         return true
       },
@@ -245,6 +294,8 @@
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
         this.showType = o.params.showType.split(',') || []
+        this.preStatements = o.params.preStatements || []
+        this.postStatements = o.params.postStatements || []
       }
     },
     mounted () {
@@ -262,6 +313,6 @@
       }
     },
     computed: {},
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList }
   }
 </script>

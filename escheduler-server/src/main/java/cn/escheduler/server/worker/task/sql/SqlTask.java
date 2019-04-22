@@ -25,6 +25,7 @@ import cn.escheduler.common.enums.UdfType;
 import cn.escheduler.common.job.db.*;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.task.AbstractParameters;
+import cn.escheduler.common.task.sql.SqlBinds;
 import cn.escheduler.common.task.sql.SqlParameters;
 import cn.escheduler.common.task.sql.SqlType;
 import cn.escheduler.common.utils.CollectionUtils;
@@ -48,6 +49,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  *  sql task
@@ -131,11 +133,17 @@ public class SqlTask extends AbstractTask {
                         Class.forName(Constants.JDBC_SQLSERVER_CLASS_NAME);
                     }
 
-                    Map<Integer,Property> sqlParamMap =  new HashMap<Integer,Property>();
-                    StringBuilder sqlBuilder = new StringBuilder();
 
                     // ready to execute SQL and parameter entity Map
-                    setSqlAndSqlParamsMap(sqlBuilder,sqlParamMap);
+                    SqlBinds mainSqlBinds = getSqlAndSqlParamsMap(sqlParameters.getSql());
+                    List<SqlBinds> preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements()).orElse(new ArrayList<>())
+                            .stream()
+                            .map(this::getSqlAndSqlParamsMap)
+                            .collect(Collectors.toList());
+                    List<SqlBinds> postStatementSqlBinds = Optional.ofNullable(sqlParameters.getPostStatements()).orElse(new ArrayList<>())
+                            .stream()
+                            .map(this::getSqlAndSqlParamsMap)
+                            .collect(Collectors.toList());
 
                     if(EnumUtils.isValidEnum(UdfType.class, sqlParameters.getType()) && StringUtils.isNotEmpty(sqlParameters.getUdfs())){
                         List<UdfFunc> udfFuncList = processDao.queryUdfFunListByids(sqlParameters.getUdfs());
@@ -143,7 +151,7 @@ public class SqlTask extends AbstractTask {
                     }
 
                     // execute sql task
-                    con = executeFuncAndSql(baseDataSource,sqlBuilder.toString(),sqlParamMap,createFuncs);
+                    con = executeFuncAndSql(baseDataSource, mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
 
                 } finally {
                     if (con != null) {
@@ -162,9 +170,9 @@ public class SqlTask extends AbstractTask {
      *  ready to execute SQL and parameter entity Map
      * @return
      */
-    private void setSqlAndSqlParamsMap(StringBuilder sqlBuilder,Map<Integer,Property> sqlParamsMap) {
-
-        String sql =  sqlParameters.getSql();
+    private SqlBinds getSqlAndSqlParamsMap(String sql) {
+        Map<Integer,Property> sqlParamsMap =  new HashMap<>();
+        StringBuilder sqlBuilder = new StringBuilder();
 
         // find process instance by task id
         ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
@@ -178,7 +186,7 @@ public class SqlTask extends AbstractTask {
         // spell SQL according to the final user-defined variable
         if(paramsMap == null){
             sqlBuilder.append(sql);
-            return;
+            return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
         }
 
         // special characters need to be escaped, ${} needs to be escaped
@@ -191,6 +199,7 @@ public class SqlTask extends AbstractTask {
 
         // print repalce sql
         printReplacedSql(sql,formatSql,rgex,sqlParamsMap);
+        return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
 
     @Override
@@ -201,10 +210,16 @@ public class SqlTask extends AbstractTask {
     /**
      *  execute sql
      * @param baseDataSource
-     * @param sql
-     * @param params
+     * @param mainSqlBinds
+     * @param preStatementsBinds
+     * @param postStatementsBinds
+     * @param createFuncs
      */
-    public Connection executeFuncAndSql(BaseDataSource baseDataSource, String sql, Map<Integer,Property> params, List<String> createFuncs){
+    public Connection executeFuncAndSql(BaseDataSource baseDataSource,
+                                        SqlBinds mainSqlBinds,
+                                        List<SqlBinds> preStatementsBinds,
+                                        List<SqlBinds> postStatementsBinds,
+                                        List<String> createFuncs){
         Connection connection = null;
         try {
 
@@ -223,66 +238,86 @@ public class SqlTask extends AbstractTask {
                         baseDataSource.getUser(), baseDataSource.getPassword());
             }
 
-            Statement  funcStmt = connection.createStatement();
             // create temp function
-            if (createFuncs != null) {
-                for (String createFunc : createFuncs) {
-                    logger.info("hive create function sql: {}", createFunc);
-                    funcStmt.execute(createFunc);
-                }
-            }
-
-            PreparedStatement  stmt = connection.prepareStatement(sql);
-            if(taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED || taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED){
-                stmt.setQueryTimeout(taskProps.getTaskTimeout());
-            }
-            if(params != null){
-                for(Integer key : params.keySet()){
-                    Property prop = params.get(key);
-                    ParameterUtils.setInParameter(key,stmt,prop.getType(),prop.getValue());
-                }
-            }
-            // decide whether to executeQuery or executeUpdate based on sqlType
-            if(sqlParameters.getSqlType() == SqlType.QUERY.ordinal()){
-                // query statements need to be convert to JsonArray and inserted into Alert to send
-                JSONArray array=new JSONArray();
-                ResultSet resultSet = stmt.executeQuery();
-                ResultSetMetaData md=resultSet.getMetaData();
-                int num=md.getColumnCount();
-
-                while(resultSet.next()){
-                    JSONObject mapOfColValues=new JSONObject(true);
-                    for(int i=1;i<=num;i++){
-                        mapOfColValues.put(md.getColumnName(i), resultSet.getObject(i));
-                    }
-                    array.add(mapOfColValues);
-                }
-
-                logger.info("execute sql : {}",JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
-
-                // send as an attachment
-                if(StringUtils.isEmpty(sqlParameters.getShowType())){
-                    logger.info("showType is empty,don't need send email");
-                }else{
-                    if(array.size() > 0 ){
-                        sendAttachment(taskProps.getNodeName() + " query resultsets ",JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+            if (CollectionUtils.isNotEmpty(createFuncs)) {
+                try (Statement  funcStmt = connection.createStatement()) {
+                    for (String createFunc : createFuncs) {
+                        logger.info("hive create function sql: {}", createFunc);
+                        funcStmt.execute(createFunc);
                     }
                 }
-
-                exitStatusCode = 0;
-
-            }else if(sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()){
-                // non query statement
-                int result = stmt.executeUpdate();
-                exitStatusCode = 0;
             }
 
+            for (SqlBinds sqlBind: preStatementsBinds) {
+                try (PreparedStatement stmt = prepareStatementAndBind(connection, sqlBind)) {
+                    int result = stmt.executeUpdate();
+                    logger.info("pre statement execute result: " + result + ", for sql: "  + sqlBind.getSql());
+                }
+            }
+
+            try (PreparedStatement  stmt = prepareStatementAndBind(connection, mainSqlBinds)) {
+                // decide whether to executeQuery or executeUpdate based on sqlType
+                if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
+                    // query statements need to be convert to JsonArray and inserted into Alert to send
+                    JSONArray array = new JSONArray();
+                    ResultSet resultSet = stmt.executeQuery();
+                    ResultSetMetaData md = resultSet.getMetaData();
+                    int num = md.getColumnCount();
+
+                    while (resultSet.next()) {
+                        JSONObject mapOfColValues = new JSONObject(true);
+                        for (int i = 1; i <= num; i++) {
+                            mapOfColValues.put(md.getColumnName(i), resultSet.getObject(i));
+                        }
+                        array.add(mapOfColValues);
+                    }
+
+                    logger.info("execute sql : {}", JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+
+                    // send as an attachment
+                    if (StringUtils.isEmpty(sqlParameters.getShowType())) {
+                        logger.info("showType is empty,don't need send email");
+                    } else {
+                        if (array.size() > 0) {
+                            sendAttachment(taskProps.getNodeName() + " query resultsets ", JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+                        }
+                    }
+
+                    exitStatusCode = 0;
+
+                } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
+                    // non query statement
+                    int result = stmt.executeUpdate();
+                    exitStatusCode = 0;
+                }
+            }
+
+            for (SqlBinds sqlBind: postStatementsBinds) {
+                try (PreparedStatement stmt = prepareStatementAndBind(connection, sqlBind)) {
+                    int result = stmt.executeUpdate();
+                    logger.info("post statement execute result: " + result + ", for sql: "  + sqlBind.getSql());
+                }
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
         }
         return connection;
     }
 
+    private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
+        PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql());
+        if(taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED || taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED){
+            stmt.setQueryTimeout(taskProps.getTaskTimeout());
+        }
+        Map<Integer, Property> params = sqlBinds.getParamsMap();
+        if(params != null){
+            for(Integer key : params.keySet()){
+                Property prop = params.get(key);
+                ParameterUtils.setInParameter(key,stmt,prop.getType(),prop.getValue());
+            }
+        }
+        return stmt;
+    }
 
     /**
      *  send mail as an attachment

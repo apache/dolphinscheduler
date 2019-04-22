@@ -408,4 +408,7 @@ export default {
   'Queue manage': '队列管理',
   'Create queue': '创建队列',
   'Edit queue': '编辑队列',
+  'Pre Statement': '前置sql',
+  'Post Statement': '后置sql',
+  'Statement cannot be empty': '语句不能为空',
 }
