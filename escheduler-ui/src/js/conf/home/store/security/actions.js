@@ -432,8 +432,13 @@ export default {
   getWorkerGroupsAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`worker-group/all-groups`, payload, res => {
-        state.workerGroupsListAll = res.data
-        resolve(res.data)
+        let list = res.data
+        list.unshift({
+          id: -1,
+          name: 'All'
+        })
+        state.workerGroupsListAll = list
+        resolve(list)
       }).catch(e => {
         reject(e)
       })
