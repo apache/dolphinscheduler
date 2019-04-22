@@ -112,7 +112,7 @@ public class WorkerGroupController extends BaseController{
 
         try {
             Map<String, Object> result = workerGroupService.queryAllGroup();
-            return returnDataListPaging(result);
+            return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.SAVE_ERROR.getMsg(),e);
             return error(Status.SAVE_ERROR.getCode(), Status.SAVE_ERROR.getMsg());
