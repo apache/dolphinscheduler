@@ -304,4 +304,18 @@ public interface TaskInstanceMapper {
     @SelectProvider(type = TaskInstanceMapperProvider.class, method = "queryByInstanceIdAndName")
     TaskInstance queryByInstanceIdAndName(@Param("processInstanceId") int processInstanceId,
                                           @Param("name") String name);
+
+
+    /**
+     * count task
+     * @param userId
+     * @param userType
+     * @param projectId
+     * @return
+     */
+    @SelectProvider(type = TaskInstanceMapperProvider.class, method = "countTask")
+    Integer countTask(@Param("userId") int userId,
+                        @Param("userType") UserType userType,
+                        @Param("projectId") int projectId,
+                        @Param("taskIds") int[] taskIds);
 }
