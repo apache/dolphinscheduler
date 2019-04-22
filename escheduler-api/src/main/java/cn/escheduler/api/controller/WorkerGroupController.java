@@ -55,7 +55,7 @@ public class WorkerGroupController extends BaseController{
     @PostMapping(value = "/save")
     @ResponseStatus(HttpStatus.OK)
     public Result saveWorkerGroup(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @RequestParam(value = "id") int id,
+                             @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                              @RequestParam(value = "name") String name,
                              @RequestParam(value = "ipList") String ipList
                              ) {
