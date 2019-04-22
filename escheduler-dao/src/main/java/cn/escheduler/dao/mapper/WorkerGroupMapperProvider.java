@@ -35,6 +35,8 @@ public class WorkerGroupMapperProvider {
             SELECT("*");
 
             FROM(TABLE_NAME);
+
+            ORDER_BY("update_time desc");
         }}.toString();
     }
 
