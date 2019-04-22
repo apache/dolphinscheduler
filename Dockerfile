@@ -12,10 +12,10 @@ RUN echo "export PATH=$PATH:$ZOOKEEPER_HOME/bin"  >>/etc/profile
 ADD conf/zoo.cfg /opt/zookeeper/conf/zoo.cfg
 RUN source /etc/profile
 #RUN zkServer.sh start
-RUN apk add --no-cache git npm nginx
+RUN apk add --no-cache git npm nginx mariadb mariadb-client mariadb-server-utils pwgen
 RUN cd /opt
 RUN git clone https://github.com/analysys/EasyScheduler.git
-RUN cd EasyScheduler
-RUN mvn -U clean package assembly:assembly -Dmaven.test.skip=true
-RUN mv /opt/EasyScheduler/target/escheduler-1.0.0-SNAPSHOT /opt/easyscheduler
-RUN rm -rf /var/cache/apk/*
+#RUN cd /opt/EasyScheduler
+#RUN mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+#RUN mv /opt/EasyScheduler/target/escheduler-1.0.0-SNAPSHOT /opt/easyscheduler
+#RUN rm -rf /var/cache/apk/*
