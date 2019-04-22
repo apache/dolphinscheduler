@@ -66,13 +66,15 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "receiversCc", required = false) String receiversCc,
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
+                                       @RequestParam(value = "workerGroupId", required = false) int workerGroupId,
                                        @RequestParam(value = "timeout", required = false) Integer timeout) {
         try {
             logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
                             + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
-                            + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, timeout: {}",
+                            + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroupId: {}, timeout: {}",
                     loginUser.getUserName(), projectName, processDefinitionId, scheduleTime, failureStrategy,
-                    taskDependType, warningType, warningGroupId,receivers,receiversCc,runMode,processInstancePriority,timeout);
+                    taskDependType, warningType, warningGroupId,receivers,receiversCc,runMode,processInstancePriority,
+                    workerGroupId, timeout);
 
             if (timeout == null) {
                 timeout = cn.escheduler.common.Constants.MAX_TASK_TIMEOUT;

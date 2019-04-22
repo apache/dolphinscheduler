@@ -26,6 +26,7 @@ import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.ProcessDefinition;
 import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.model.WorkerGroup;
 import cn.escheduler.server.zk.ZKWorkerClient;
 import com.cronutils.utils.StringUtils;
 import org.apache.commons.configuration.Configuration;
@@ -33,7 +34,9 @@ import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -90,6 +93,42 @@ public class FetchTaskThread implements Runnable{
         this.taskQueue = taskQueue;
     }
 
+    /**
+     * Check if the task runs on this worker
+     * @param taskInstance
+     * @param host
+     * @return
+     */
+    private boolean checkWorkerGroup(TaskInstance taskInstance, String host){
+
+        int taskWorkerGroupId = taskInstance.getWorkerGroupId();
+        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskInstance.getId());
+        if(processInstance == null){
+            logger.error("cannot find the task:{} process instance", taskInstance.getId());
+            return false;
+        }
+        int processWorkerGroupId = processInstance.getWorkerGroupId();
+
+        taskWorkerGroupId = (taskWorkerGroupId == 0 ? processWorkerGroupId : taskWorkerGroupId);
+
+        if(taskWorkerGroupId == 0){
+            return true;
+        }
+        WorkerGroup workerGroup = processDao.queryWorkerGroupById(taskInstance.getWorkerGroupId());
+        if(workerGroup == null ){
+            logger.info("task {} cannot find the worker group, use all worker instead.", taskInstance.getId());
+            return true;
+        }
+        String ips = workerGroup.getIpList();
+        if(ips == null){
+            logger.error("task:{} worker group:{} parameters(ip_list) is null, this task would be running on all workers",
+                    taskInstance.getId(), workerGroup.getId());
+        }
+        String[] ipArray = ips.split(",");
+        List<String> ipList =  Arrays.asList(ipArray);
+        return ipList.contains(host);
+    }
+
 
     @Override
     public void run() {
@@ -116,11 +155,13 @@ public class FetchTaskThread implements Runnable{
                         }
 
                         // task instance id str
-                        String taskInstIdStr = taskQueue.poll(Constants.SCHEDULER_TASKS_QUEUE);
+                        String taskQueueStr = taskQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, false);
 
-                        if (!StringUtils.isEmpty(taskInstIdStr)) {
+                        if (!StringUtils.isEmpty(taskQueueStr )) {
+
+                            String[] taskStringArray = taskQueueStr.split(Constants.UNDERLINE);
+                            String taskInstIdStr = taskStringArray[taskStringArray.length - 1];
                             Date now = new Date();
-
                             Integer taskId = Integer.parseInt(taskInstIdStr);
 
                             // find task instance by task id
@@ -136,10 +177,11 @@ public class FetchTaskThread implements Runnable{
                                 retryTimes--;
                             }
 
-                            if (taskInstance == null) {
+                            if (taskInstance == null || !checkWorkerGroup(taskInstance, OSUtils.getHost())) {
                                 logger.error("task instance is null. task id : {} ", taskId);
                                 continue;
                             }
+                            taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
 
                             // set execute task worker host
                             taskInstance.setHost(OSUtils.getHost());
