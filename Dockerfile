@@ -12,8 +12,8 @@ RUN rm -rf zookeeper-3.4.6.tar.gz
 RUN echo "export ZOOKEEPER_HOME=/opt/zookeeper" >>/etc/profile
 RUN echo "export PATH=$PATH:$ZOOKEEPER_HOME/bin"  >>/etc/profile
 ADD conf/zoo.cfg /opt/zookeeper/conf/zoo.cfg
-RUN source /etc/profile
-RUN zkServer.sh start
+#RUN source /etc/profile
+#RUN zkServer.sh start
 RUN apk add --no-cache git npm nginx mariadb mariadb-client mariadb-server-utils pwgen
 WORKDIR /opt
 RUN git clone https://github.com/analysys/EasyScheduler.git
