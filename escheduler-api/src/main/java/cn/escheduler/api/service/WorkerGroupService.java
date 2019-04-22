@@ -41,6 +41,13 @@ public class WorkerGroupService extends BaseService {
     @Autowired
     WorkerGroupMapper workerGroupMapper;
 
+    /**
+     * create or update a worker group
+     * @param id
+     * @param name
+     * @param ipList
+     * @return
+     */
     public Map<String, Object> saveWorkerGroup(int id, String name, String ipList){
 
         Map<String, Object> result = new HashMap<>(5);
@@ -97,6 +104,13 @@ public class WorkerGroupService extends BaseService {
         return false;
     }
 
+    /**
+     * query worker group paging
+     * @param pageNo
+     * @param pageSize
+     * @param searchVal
+     * @return
+     */
     public Map<String,Object> queryAllGroupPaging(Integer pageNo, Integer pageSize, String searchVal) {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -112,11 +126,28 @@ public class WorkerGroupService extends BaseService {
         return result;
     }
 
+    /**
+     * delete worker group by id
+     * @param id
+     * @return
+     */
     public Map<String,Object> deleteWorkerGroupById(Integer id) {
 
         Map<String, Object> result = new HashMap<>(5);
 
         int delete = workerGroupMapper.deleteById(id);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * query all worker group
+     * @return
+     */
+    public Map<String,Object> queryAllGroup() {
+        Map<String, Object> result = new HashMap<>(5);
+        List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
+        result.put(Constants.DATA_LIST, workerGroupList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
