@@ -276,7 +276,7 @@ public class UserMapperProvider {
             {
                 SELECT("u.*");
                 FROM(TABLE_NAME + " u ,t_escheduler_access_token t");
-                WHERE(" u.id = t.user_id and token=#{token}");
+                WHERE(" u.id = t.user_id and token=#{token} and t.expire_time > NOW()");
             }
         }.toString();
     }

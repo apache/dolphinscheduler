@@ -413,5 +413,48 @@ export default {
         reject(e)
       })
     })
+  },
+  /**
+   * get worker groups
+   */
+  getWorkerGroups ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`worker-group/list-paging`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * get worker groups all
+   */
+  getWorkerGroupsAll ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`worker-group/all-groups`, payload, res => {
+        state.workerGroupsListAll = res.data
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  saveWorkerGroups ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`worker-group/save`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  deleteWorkerGroups ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`worker-group/delete-by-id`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }
