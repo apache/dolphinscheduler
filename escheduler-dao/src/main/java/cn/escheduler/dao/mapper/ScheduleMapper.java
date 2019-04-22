@@ -75,6 +75,7 @@ public interface ScheduleMapper {
           @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "releaseState", column = "release_state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "warningGroupId", column = "warning_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "workerGroupId", column = "worker_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ScheduleMapperProvider.class, method = "queryByProcessDefineIdPaging")
@@ -117,6 +118,7 @@ public interface ScheduleMapper {
           @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "releaseState", column = "release_state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "warningGroupId", column = "warning_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "workerGroupId", column = "worker_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ScheduleMapperProvider.class, method = "querySchedulerListByProjectName")
@@ -141,6 +143,7 @@ public interface ScheduleMapper {
             @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "releaseState", column = "release_state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
             @Result(property = "warningGroupId", column = "warning_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "workerGroupId", column = "worker_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
     })
     @SelectProvider(type = ScheduleMapperProvider.class, method = "queryById")
@@ -164,6 +167,7 @@ public interface ScheduleMapper {
           @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "releaseState", column = "release_state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "warningGroupId", column = "warning_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "workerGroupId", column = "worker_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ScheduleMapperProvider.class, method = "selectAllByProcessDefineArray")
