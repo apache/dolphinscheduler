@@ -19,6 +19,9 @@ WORKDIR /opt
 RUN git clone https://github.com/analysys/EasyScheduler.git
 WORKDIR /opt/EasyScheduler
 RUN mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+WORKDIR /opt/EasyScheduler/escheduler-ui
+RUN npm install
+RUN npm run build
 RUN mv /opt/EasyScheduler/target/escheduler-1.0.0-SNAPSHOT /opt/easyscheduler
 #configure mysql server https://github.com/yobasystems/alpine-mariadb/tree/master/alpine-mariadb-amd64
 ADD conf/run.sh /scripts/run.sh
