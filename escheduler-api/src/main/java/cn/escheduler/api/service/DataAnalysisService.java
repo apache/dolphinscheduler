@@ -356,9 +356,18 @@ public class DataAnalysisService {
                 }
             }
         }
+        Integer taskQueueCount = 0;
+        Integer taskKillCount = 0;
 
-        Integer taskQueueCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
-        Integer taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
+        if (tasksQueueIds.length != 0){
+            taskQueueCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
+        }
+
+        if (tasksQueueIds.length != 0){
+            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
+        }
+
+
 
         dataMap.put("taskQueue",taskQueueCount);
         dataMap.put("taskKill",taskKillCount);
