@@ -409,4 +409,7 @@ export default {
   'Queue manage': 'Queue manage',
   'Create queue': 'Create queue',
   'Edit queue': 'Edit queue',
+  'Pre Statement': 'Pre Statement',
+  'Post Statement': 'Post Statement',
+  'Statement cannot be empty': 'Statement cannot be empty',
 }
