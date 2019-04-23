@@ -1,3 +1,5 @@
+#Maintin by jimmy
+#Email: zhengge2012@gmail.com
 FROM anapsix/alpine-java:8_jdk
 WORKDIR /tmp
 RUN wget http://archive.apache.org/dist/maven/maven-3/3.6.1/binaries/apache-maven-3.6.1-bin.tar.gz
@@ -19,11 +21,15 @@ WORKDIR /opt
 RUN git clone https://github.com/analysys/EasyScheduler.git
 WORKDIR /opt/EasyScheduler
 RUN mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+RUN mv /opt/EasyScheduler/target/escheduler-1.0.0-SNAPSHOT /opt/easyscheduler
 WORKDIR /opt/EasyScheduler/escheduler-ui
 RUN npm install
-RUN npm run build
 RUN npm audit fix
-RUN mv /opt/EasyScheduler/target/escheduler-1.0.0-SNAPSHOT /opt/easyscheduler
+RUN npm run build
+RUN mkdir -p /opt/escheduler/front/server
+RUN cp -rfv dist/* /opt/escheduler/front/server
+WORKDIR /
+RUN rm -rf /opt/EasyScheduler
 #configure mysql server https://github.com/yobasystems/alpine-mariadb/tree/master/alpine-mariadb-amd64
 ADD conf/run.sh /scripts/run.sh
 RUN mkdir /docker-entrypoint-initdb.d && \
