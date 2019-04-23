@@ -27,6 +27,20 @@
         </div>
       </div>
     </m-list-box>
+    <template v-if="!sqlType && showType.length">
+      <m-list-box>
+        <div slot="text">收件人</div>
+        <div slot="content">
+          <m-email v-model="receivers" :repeat-data="receiversCc"></m-email>
+        </div>
+      </m-list-box>
+      <m-list-box>
+        <div slot="text">抄送人</div>
+        <div slot="content">
+          <m-email v-model="receiversCc" :repeat-data="receivers"></m-email>
+        </div>
+      </m-list-box>
+    </template>
     <m-list-box v-show="type === 'HIVE'">
       <div slot="text">{{$t('SQL Parameter')}}</div>
       <div slot="content">
@@ -83,6 +97,7 @@
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
+  import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
   let editor
@@ -108,7 +123,11 @@
         // Form/attachment
         showType: ['TABLE'],
         // Sql parameter
-        connParams: ''
+        connParams: '',
+        // recipients
+        receivers: [],
+        // copy to
+        receiversCc: []
       }
     },
     mixins: [disabledState],
@@ -174,6 +193,8 @@
           sql: editor.getValue(),
           udfs: this.udfs,
           sqlType: this.sqlType,
+          receivers: this.receivers.join(','),
+          receiversCc: this.receiversCc.join(','),
           showType: (() => {
             /**
              * Special processing return order TABLE,ATTACHMENT
@@ -223,11 +244,22 @@
         if (val) {
           this.showType = []
         }
+        if (val !== 0) {
+          this.receivers = []
+          this.receiversCc = []
+        }
       },
       // Listening data source
       type (val) {
         if (val !== 'HIVE') {
           this.connParams = ''
+        }
+      },
+      //
+      showType (val) {
+        if (!val.length) {
+          this.receivers = []
+          this.receiversCc = []
         }
       }
     },
@@ -245,6 +277,8 @@
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
         this.showType = o.params.showType.split(',') || []
+        this.receivers = o.params.receivers && o.params.receivers.split(',') || []
+        this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
       }
     },
     mounted () {
@@ -262,6 +296,6 @@
       }
     },
     computed: {},
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mEmail }
   }
 </script>

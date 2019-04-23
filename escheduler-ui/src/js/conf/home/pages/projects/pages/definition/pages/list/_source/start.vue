@@ -83,7 +83,7 @@
       <div class="text">
         {{$t('Recipient')}}
       </div>
-      <div class="cont">
+      <div class="cont" style="width: 688px;">
         <m-email v-model="receivers" :repeat-data="receiversCc"></m-email>
       </div>
     </div>
@@ -91,7 +91,7 @@
       <div class="text">
         {{$t('Cc')}}
       </div>
-      <div class="cont">
+      <div class="cont" style="width: 688px;">
         <m-email v-model="receiversCc" :repeat-data="receivers"></m-email>
       </div>
     </div>

@@ -66,7 +66,6 @@
   // import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
   import '@/module/filter/formatDate'
-  import { findComponentDownward } from '@/module/util/'
 
   export default {
     name: 'user-list',
@@ -98,7 +97,7 @@
         })
       },
       _edit (item) {
-        findComponentDownward(this.$root, 'worker-groups-index')._create(item)
+        this.$emit('on-edit', item)
       }
     },
     watch: {

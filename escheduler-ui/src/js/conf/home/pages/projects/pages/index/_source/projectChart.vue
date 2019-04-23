@@ -7,7 +7,7 @@
                   :panel-num="2"
                   placement="bottom-end"
                   @on-change="_datepicker"
-                  :value="scheduleTime"
+                  :value="[searchParams.startDate,searchParams.endDate]"
                   type="daterange"
                   :placeholder="$t('Select date range')"
                   format="YYYY-MM-DD HH:mm:ss">
@@ -30,7 +30,7 @@
                       <th>{{$t('Number')}}</th>
                       <th>{{$t('State')}}</th>
                     </tr>
-                    <tr v-for="(item,$index) in taskCountDtosList">
+                    <tr v-for="(item,$index) in taskCtatusList">
                       <td><span>{{$index+1}}</span></td>
                       <td>
                         <span>
@@ -60,7 +60,65 @@
                       <th>{{$t('Number')}}</th>
                       <th>{{$t('State')}}</th>
                     </tr>
-                    <tr v-for="(item,$index) in processStateCountList">
+                    <tr v-for="(item,$index) in processStateList">
+                      <td><span>{{$index+1}}</span></td>
+                      <td><span><a href="javascript:" @click="id && _goProcess(item.key)" :class="id ?'links':''">{{item.value}}</a></span></td>
+                      <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" style="padding-top: 20px;">
+          <div class="col-md-6">
+            <div class="chart-title">
+              <span>命令状态统计</span>
+            </div>
+            <div class="row">
+              <div class="col-md-7">
+                <div id="command-state-pie" style="height:260px;margin-top: 100px;"></div>
+              </div>
+              <div class="col-md-5">
+                <div class="table-small-model">
+                  <table>
+                    <tr>
+                      <th width="40">{{$t('#')}}</th>
+                      <th>{{$t('Number')}}</th>
+                      <th>{{$t('State')}}</th>
+                    </tr>
+                    <tr v-for="(item,$index) in taskCtatusList">
+                      <td><span>{{$index+1}}</span></td>
+                      <td>
+                        <span>
+                          <a href="javascript:" @click="id && _goTask(item.key)" :class="id ?'links':''">{{item.value}}</a>
+                        </span>
+                      </td>
+                      <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="chart-title">
+              <span>队列统计</span>
+            </div>
+            <div class="row">
+              <div class="col-md-7">
+                <div id="process-state-pie" style="height:260px;margin-top: 100px;"></div>
+              </div>
+              <div class="col-md-5">
+                <div class="table-small-model">
+                  <table>
+                    <tr>
+                      <th width="40">{{$t('#')}}</th>
+                      <th>{{$t('Number')}}</th>
+                      <th>{{$t('State')}}</th>
+                    </tr>
+                    <tr v-for="(item,$index) in processStateList">
                       <td><span>{{$index+1}}</span></td>
                       <td><span><a href="javascript:" @click="id && _goProcess(item.key)" :class="id ?'links':''">{{item.value}}</a></span></td>
                       <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
@@ -93,32 +151,37 @@
   import dayjs from 'dayjs'
   import { mapActions } from 'vuex'
   import { pie, bar } from './chartConfig'
-  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
   import Chart from '~/@analysys/ana-charts'
-  import mNoData from '@/module/components/noData/noData'
   import mSpin from '@/module/components/spin/spin'
+  import mNoData from '@/module/components/noData/noData'
+  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
 
 
   export default {
     name: 'perject-chart',
     data () {
       return {
-        taskCountDtosList: [],
-        processStateCountList: [],
-        userList: [],
-        scheduleTime: ['2018-11-16 00:00:00', '2018-11-16 17:13:11'],
-        isLoading: true
+        isLoading: true,
+        taskCtatusList: [],
+        processStateList: [],
+        defineUserList: [],
+        commandStateList: [],
+        searchParams: {
+          projectId: this.id,
+          startDate: '',
+          endDate: ''
+        }
       }
     },
     props: {
       id: Number
     },
     methods: {
-      ...mapActions('projects', ['getTaskCtatusCount', 'getProcessStateCount', 'getDefineUserCount']),
+      ...mapActions('projects', ['getTaskCtatusCount', 'getProcessStateCount', 'getDefineUserCount', 'getCommandStateCount', 'getQueueCount']),
       _datepicker (val) {
-        this.scheduleTime = val
-        this._stateTypePie()
-        this._processStatePie()
+        this.searchParams.startDate = val[0]
+        this.searchParams.endDate = val[1]
+        this._getData(false)
       },
       _goTask (name) {
         this.$router.push({
@@ -140,99 +203,107 @@
           }
         })
       },
-      _stateTypePie () {
-        this.taskCountDtosList = []
-        this.getTaskCtatusCount({
-          projectId: this.id,
-          startDate: this.scheduleTime[0],
-          endDate: this.scheduleTime[1]
-        }).then(res => {
-          let data = res.data.taskCountDtos
-          this.taskCountDtosList = _.map(data, v => {
-            return {
-              key: _.find(stateType, ['code', v.taskStateType])['label'],
-              value: v.count,
-              type: 'type'
-            }
-          })
-          const myChart = Chart.pie('#task-status-pie', this.taskCountDtosList, { title: '' })
-          myChart.echart.setOption(pie)
 
-          // 首页不允许跳转
-          if (this.id) {
-            myChart.echart.on('click', e => {
-              this._goTask(e.data.name)
-            })
+      _handleTaskCtatus (res) {
+        let data = res.data.taskCountDtos
+        this.taskCtatusList = _.map(data, v => {
+          return {
+            key: _.find(stateType, ['code', v.taskStateType])['label'],
+            value: v.count,
+            type: 'type'
           }
-        }).catch(e => {})
-      },
-      _processStatePie () {
-        this.processStateCountList = []
-        this.getProcessStateCount({
-          projectId: this.id,
-          startDate: this.scheduleTime[0],
-          endDate: this.scheduleTime[1]
-        }).then(res => {
-          let data = res.data.taskCountDtos
-          this.processStateCountList = _.map(data, v => {
-            return {
-              key: _.find(stateType, ['code', v.taskStateType])['label'],
-              value: v.count
-            }
+        })
+        const myChart = Chart.pie('#task-status-pie', this.taskCtatusList, { title: '' })
+        myChart.echart.setOption(pie)
+
+        // 首页不允许跳转
+        if (this.id) {
+          myChart.echart.on('click', e => {
+            this._goTask(e.data.name)
           })
-          const myChart = Chart.pie('#process-state-pie', this.processStateCountList, { title: '' })
-          myChart.echart.setOption(pie)
-          // 首页不允许跳转
-          if (this.id) {
-            myChart.echart.on('click', e => {
-              this._goProcess(e.data.name)
-            })
-          }
-        }).catch(e => {})
+        }
       },
-      _processDefinitionBar () {
-        this.getDefineUserCount({
-          projectId: this.id
-        }).then(res => {
-          let data = res.data.userList
-          this.userList = _.map(data, v => {
-            return {
-              key: v.userName + ',' + v.userId + ',' + v.count,
-              value: v.count
-            }
-          })
-          const myChart = Chart.bar('#process-definition-bar', this.userList, {})
-          myChart.echart.setOption(bar)
-          // 首页不允许跳转
-          if (this.id) {
-            myChart.echart.on('click', e => {
-              this.$router.push({
-                name: 'projects-definition-list',
-                query: {
-                  userId: e.name.split(',')[1]
-                }
-              })
-            })
+      _handleProcessState (res) {
+        let data = res.data.taskCountDtos
+        this.processStateList = _.map(data, v => {
+          return {
+            key: _.find(stateType, ['code', v.taskStateType])['label'],
+            value: v.count
           }
-        }).catch(e => {})
+        })
+        const myChart = Chart.pie('#process-state-pie', this.processStateList, { title: '' })
+        myChart.echart.setOption(pie)
+        // 首页不允许跳转
+        if (this.id) {
+          myChart.echart.on('click', e => {
+            this._goProcess(e.data.name)
+          })
+        }
+      },
+      _handleDefineUser (res) {
+        let data = res.data.userList
+        this.defineUserList = _.map(data, v => {
+          return {
+            key: v.userName + ',' + v.userId + ',' + v.count,
+            value: v.count
+          }
+        })
+        const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {})
+        myChart.echart.setOption(bar)
+        // 首页不允许跳转
+        if (this.id) {
+          myChart.echart.on('click', e => {
+            this.$router.push({
+              name: 'projects-definition-list',
+              query: {
+                userId: e.name.split(',')[1]
+              }
+            })
+          })
+        }
+      },
+      _handleCommandState (res) {
+
+      },
+      _handleQueue () {},
+
+      _getData (is = true) {
+        this.isLoading = true
+        let ioList = [
+          this.getTaskCtatusCount(this.searchParams),
+          this.getProcessStateCount(this.searchParams),
+          this.getCommandStateCount(this.searchParams),
+          this.getQueueCount(this.searchParams)
+        ]
+
+        if (is) {
+          ioList.push(this.getDefineUserCount(_.pick(this.searchParams, ['projectId'])))
+        }
+
+        Promise.all(ioList).then(res => {
+          this._handleTaskCtatus(res[0])
+          this._handleProcessState(res[1])
+          this._handleCommandState(res[2])
+          this._handleQueue(res[3])
+          if (is) {
+            this._handleDefineUser(res[4])
+          }
+          setTimeout(() => {
+            this.isLoading = false
+          }, 800)
+        }).catch(e => {
+          console.log(e)
+          this.isLoading = false
+        })
       }
     },
     watch: {
     },
     created () {
-      this.scheduleTime = [dayjs().format('YYYY-MM-DD 00:00:00'), dayjs().format('YYYY-MM-DD HH:mm:ss')]
-      this.isLoading = true
-      Promise.all([
-        this._stateTypePie(),
-        this._processStatePie(),
-        this._processDefinitionBar()
-      ]).then(res => {
-        setTimeout(() => {
-          this.isLoading = false
-        }, 800)
-      }).catch(e => {
-        this.isLoading = false
-      })
+      this.searchParams.startDate = dayjs().format('YYYY-MM-DD 00:00:00')
+      this.searchParams.endDate = dayjs().format('YYYY-MM-DD HH:mm:ss')
+      // init get data
+      this._getData()
     },
     mounted () {
 
