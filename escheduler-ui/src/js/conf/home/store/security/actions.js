@@ -435,7 +435,7 @@ export default {
         let list = res.data
         list.unshift({
           id: -1,
-          name: 'All'
+          name: 'Default'
         })
         state.workerGroupsListAll = list
         resolve(list)
