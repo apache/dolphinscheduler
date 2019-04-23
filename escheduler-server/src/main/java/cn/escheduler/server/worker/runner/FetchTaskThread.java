@@ -111,7 +111,7 @@ public class FetchTaskThread implements Runnable{
 
         taskWorkerGroupId = (taskWorkerGroupId <= 0 ? processWorkerGroupId : taskWorkerGroupId);
 
-        if(taskWorkerGroupId == 0){
+        if(taskWorkerGroupId <= 0){
             return true;
         }
         WorkerGroup workerGroup = processDao.queryWorkerGroupById(taskInstance.getWorkerGroupId());
