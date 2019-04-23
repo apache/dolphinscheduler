@@ -96,8 +96,10 @@ mysql -ueasyscheduler -peasyschedulereasyscheduler --one-database easyscheduler 
 source /etc/profile
 zkServer.sh start
 cd /opt/easyscheduler
+rm -rf /etc/nginx/conf.d/default.conf
 sh ./bin/escheduler-daemon.sh start master-server
 sh ./bin/escheduler-daemon.sh start worker-server
 sh ./bin/escheduler-daemon.sh start api-server
 sh ./bin/escheduler-daemon.sh start logger-server
 sh ./bin/escheduler-daemon.sh start alert-server
+nginx -c /etc/nginx/nginx.conf
