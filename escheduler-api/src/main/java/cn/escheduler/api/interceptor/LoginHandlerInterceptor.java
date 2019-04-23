@@ -79,15 +79,20 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
       //get user object from session
       user = userMapper.queryById(session.getUserId());
+
+      // if user is null
+      if (user == null) {
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        logger.info("user does not exist");
+        return false;
+      }
     }else {
        user = userMapper.queryUserByToken(token);
-    }
-
-    // if user is null
-    if (user == null) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      logger.info("user does not exist");
-      return false;
+      if (user == null) {
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        logger.info("user token has expired");
+        return false;
+      }
     }
     request.setAttribute(Constants.SESSION_USER, user);
     return true;
