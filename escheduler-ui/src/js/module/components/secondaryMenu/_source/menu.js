@@ -17,6 +17,7 @@
 
 import i18n from '@/module/i18n'
 import config from '~/external/config'
+import Permissions from '@/module/permissions'
 
 let menu = {
   projects: [
@@ -116,6 +117,15 @@ let menu = {
       disabled: true,
       icon: 'fa-address-book',
       children: []
+    },
+    {
+      name: `令牌管理`,
+      id: 2,
+      path: 'token-manage',
+      isOpen: true,
+      icon: 'fa-file-text',
+      children: [],
+      disabled: true
     }
   ],
   resource: [
@@ -177,7 +187,7 @@ let menu = {
       isOpen: true,
       icon: 'fa-file-text',
       children: [],
-      disabled: true
+      disabled: Permissions.getAuth()
     }
   ],
   monitor: [

@@ -72,7 +72,6 @@
 <script>
   import { mapActions } from 'vuex'
   import '@/module/filter/formatDate'
-  import { findComponentDownward } from '@/module/util/'
 
   export default {
     name: 'token-list',
@@ -104,7 +103,7 @@
         })
       },
       _edit (item) {
-        findComponentDownward(this.$root, 'token-index')._create(item)
+        this.$emit('on-edit', item)
       }
     },
     watch: {

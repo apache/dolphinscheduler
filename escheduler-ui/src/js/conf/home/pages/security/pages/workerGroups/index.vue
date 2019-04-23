@@ -9,7 +9,11 @@
     </template>
     <template slot="content">
       <template v-if="workerGroupList.length">
-        <m-list :worker-group-list="workerGroupList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
+        <m-list @on-edit="_onEdit"
+                :worker-group-list="workerGroupList"
+                :page-no="searchParams.pageNo"
+                :page-size="searchParams.pageSize">
+        </m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
         </div>
@@ -59,6 +63,9 @@
       },
       _page (val) {
         this.searchParams.pageNo = val
+      },
+      _onEdit (item) {
+        this._create(item)
       },
       _create (item) {
         let self = this

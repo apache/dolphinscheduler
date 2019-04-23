@@ -325,6 +325,14 @@ const router = new Router({
           meta: {
             title: `workerGroups`
           }
+        },
+        {
+          path: '/security/token',
+          name: 'token-manage',
+          component: resolve => require(['../pages/security/pages/token/index'], resolve),
+          meta: {
+            title: `token`
+          }
         }
       ]
     },
