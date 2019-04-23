@@ -1,40 +1,14 @@
 <template>
-  <div class="index-model">
-    index
+  <div class="main-layout-box">
+    <m-secondary-menu :type="'monitor'"></m-secondary-menu>
+    <router-view></router-view>
   </div>
+
 </template>
 <script>
+  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   export default {
     name: 'monitor-index',
-    data () {
-      return {}
-    },
-    props: {},
-    methods: {},
-    watch: {},
-    beforeCreate () {
-    },
-    created () {
-    },
-    beforeMount () {
-    },
-    mounted () {
-    },
-    beforeUpdate () {
-    },
-    updated () {
-    },
-    beforeDestroy () {
-    },
-    destroyed () {
-    },
-    computed: {},
-    components: {}
+    components: { mSecondaryMenu }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-  .index-model {
-
-  }
-</style>

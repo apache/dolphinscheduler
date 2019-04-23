@@ -1,10 +1,10 @@
 <template>
-  <m-list-construction :title="$t('Service-Worker')">
+  <m-list-construction :title="$t('Service-Master')">
     <template slot="content">
-      <template v-if="workerList.length">
-        <m-list :list="workerList"></m-list>
+      <template v-if="masterList.length">
+        <m-list :list="masterList"></m-list>
       </template>
-      <template v-if="!workerList.length">
+      <template v-if="!masterList.length">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading" ></m-spin>
@@ -13,13 +13,13 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import mList from '../../_source/list'
+  import mList from './_source/list'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
-    name: 'worker-index',
+    name: 'servers-zookeeper',
     data () {
       return {
         pageSize: 10,
@@ -27,18 +27,18 @@
         totalPage: null,
         searchVal: '',
         isLoading: false,
-        workerList: []
+        masterList: []
       }
     },
     props: {},
     methods: {
-      ...mapActions('security', ['getProcessWorkerList'])
+      ...mapActions('security', ['getProcessMasterList'])
     },
     watch: {},
     created () {
       this.isLoading = true
-      this.getProcessWorkerList().then(res => {
-        this.workerList = res.data
+      this.getProcessMasterList().then(res => {
+        this.masterList = res.data
         this.isLoading = false
       })
     },

@@ -4,25 +4,19 @@
       <table>
         <tr>
           <th>
-            <span>编号</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>用户</span>
+            <span>分组名称</span>
           </th>
           <th>
-            <span>Token</span>
+            <span>IPList</span>
           </th>
           <th>
-            <span>开始时间</span>
+            <span>{{$t('Create Time')}}</span>
           </th>
           <th>
-            <span>失效时间</span>
-          </th>
-          <th>
-            <span>创建时间</span>
-          </th>
-          <th>
-            <span>更新时间</span>
+            <span>{{$t('Update Time')}}</span>
           </th>
           <th width="70">
             <span>{{$t('Operation')}}</span>
@@ -34,17 +28,15 @@
           </td>
           <td>
             <span>
-              <a href="javascript:" class="links">{{item.userName}}</a>
+              <a href="javascript:" class="links">{{item.name}}</a>
             </span>
           </td>
-          <td><span>{{item.token}}</span></td>
+          <td>
+            <span>{{item.ipList}}</span>
+          </td>
           <td>
             <span>{{item.createTime | formatDate}}</span>
           </td>
-          <td>
-            <span>{{item.expireTime | formatDate}}</span>
-          </td>
-          <td><span>{{item.createTime | formatDate}}</span></td>
           <td><span>{{item.updateTime | formatDate}}</span></td>
           <td>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-bianjixiugai" :title="$t('Edit')" @click="_edit(item)">
@@ -70,29 +62,31 @@
   </div>
 </template>
 <script>
+  // import _ from 'lodash'
+  // import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
   import '@/module/filter/formatDate'
   import { findComponentDownward } from '@/module/util/'
 
   export default {
-    name: 'token-list',
+    name: 'user-list',
     data () {
       return {
         list: []
       }
     },
     props: {
-      tokenList: Array,
+      workerGroupList: Array,
       pageNo: Number,
       pageSize: Number
     },
     methods: {
-      ...mapActions('user', ['deleteToken']),
+      ...mapActions('security', ['deleteWorkerGroups']),
       _closeDelete (i) {
         this.$refs[`poptip-delete-${i}`][0].doClose()
       },
       _delete (item, i) {
-        this.deleteToken({
+        this.deleteWorkerGroups({
           id: item.id
         }).then(res => {
           this.$refs[`poptip-delete-${i}`][0].doClose()
@@ -104,11 +98,11 @@
         })
       },
       _edit (item) {
-        findComponentDownward(this.$root, 'token-index')._create(item)
+        findComponentDownward(this.$root, 'worker-groups-index')._create(item)
       }
     },
     watch: {
-      tokenList (a) {
+      workerGroupList (a) {
         this.list = []
         setTimeout(() => {
           this.list = a
@@ -116,7 +110,7 @@
       }
     },
     created () {
-      this.list = this.tokenList
+      this.list = this.workerGroupList
     },
     mounted () {
     },

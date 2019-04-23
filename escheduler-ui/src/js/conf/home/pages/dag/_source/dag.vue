@@ -474,5 +474,5 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  @import "dag";
+  @import "./dag";
 </style>

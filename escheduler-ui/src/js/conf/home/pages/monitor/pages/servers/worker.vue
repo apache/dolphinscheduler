@@ -1,10 +1,10 @@
 <template>
-  <m-list-construction :title="$t('Service-Master')">
+  <m-list-construction :title="$t('Service-Worker')">
     <template slot="content">
-      <template v-if="masterList.length">
-        <m-list :list="masterList"></m-list>
+      <template v-if="workerList.length">
+        <m-list :list="workerList"></m-list>
       </template>
-      <template v-if="!masterList.length">
+      <template v-if="!workerList.length">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading" ></m-spin>
@@ -13,13 +13,13 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import mList from '../../_source/list'
+  import mList from './_source/list'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
-    name: 'servers-master',
+    name: 'worker-index',
     data () {
       return {
         pageSize: 10,
@@ -27,18 +27,18 @@
         totalPage: null,
         searchVal: '',
         isLoading: false,
-        masterList: []
+        workerList: []
       }
     },
     props: {},
     methods: {
-      ...mapActions('security', ['getProcessMasterList'])
+      ...mapActions('security', ['getProcessWorkerList'])
     },
     watch: {},
     created () {
       this.isLoading = true
-      this.getProcessMasterList().then(res => {
-        this.masterList = res.data
+      this.getProcessWorkerList().then(res => {
+        this.workerList = res.data
         this.isLoading = false
       })
     },
