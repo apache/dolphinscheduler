@@ -177,11 +177,15 @@ public class FetchTaskThread implements Runnable{
                                 retryTimes--;
                             }
 
-                            if (taskInstance == null || !checkWorkerGroup(taskInstance, OSUtils.getHost())) {
+                            if (taskInstance == null ) {
                                 logger.error("task instance is null. task id : {} ", taskId);
                                 continue;
                             }
+                            if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
+                                continue;
+                            }
                             taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+                            logger.info("remove task:{} from queue", taskQueueStr);
 
                             // set execute task worker host
                             taskInstance.setHost(OSUtils.getHost());
