@@ -22,6 +22,7 @@ public class ErrorCommandMapperProvider {
         return new SQL() {
             {
                 INSERT_INTO(TABLE_NAME);
+                VALUES("`id`", "#{errorCommand.id}");
                 VALUES("`command_type`", EnumFieldUtil.genFieldStr("errorCommand.commandType", CommandType.class));
                 VALUES("`process_definition_id`", "#{errorCommand.processDefinitionId}");
                 VALUES("`executor_id`", "#{errorCommand.executorId}");
