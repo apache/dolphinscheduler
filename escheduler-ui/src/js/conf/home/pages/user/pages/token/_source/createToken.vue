@@ -18,7 +18,7 @@
             </x-datepicker>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
+        <m-list-box-f v-if="auth">
           <template slot="name"><b>*</b>用户</template>
           <template slot="content">
             <x-select v-model="userId" @on-change="_onChange">
@@ -53,6 +53,7 @@
   import dayjs from 'dayjs'
   // import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
+  import Permissions from '@/module/permissions'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
@@ -66,7 +67,8 @@
         disabledDate: date => (date.getTime() - new Date(new Date().getTime() - 24 * 60 * 60 * 1000)) < 0,
         token: '',
         userIdList: [],
-        tokenLoading: false
+        tokenLoading: false,
+        auth: !Permissions.getAuth()
       }
     },
     props: {
@@ -128,16 +130,23 @@
     },
     watch: {},
     created () {
-      this.store.dispatch(`security/getUsersList`).then(res => {
-        this.userIdList = _.map(res, v => _.pick(v, ['id', 'userName']))
+      const d = (userId) => {
         if (this.item) {
           this.expireTime = this.item.expireTime
           this.userId = this.item.userId
           this.token = this.item.token
         } else {
-          this.userId = this.userIdList[0].id
+          this.userId = userId
         }
-      })
+      }
+      if (this.auth) {
+        this.store.dispatch(`security/getUsersList`).then(res => {
+          this.userIdList = _.map(res, v => _.pick(v, ['id', 'userName']))
+          d(this.userIdList[0].id)
+        })
+      } else {
+        d(this.store.state.user.userInfo.id)
+      }
     },
     mounted () {
     },

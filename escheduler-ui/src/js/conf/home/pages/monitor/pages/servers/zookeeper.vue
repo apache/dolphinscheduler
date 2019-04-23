@@ -1,10 +1,10 @@
 <template>
-  <m-list-construction :title="$t('Service-Master')">
+  <m-list-construction :title="'Zookeeper管理'">
     <template slot="content">
-      <template v-if="masterList.length">
-        <m-list :list="masterList"></m-list>
+      <template v-if="zookeeperList.length">
+        <m-list :list="zookeeperList"></m-list>
       </template>
-      <template v-if="!masterList.length">
+      <template v-if="!zookeeperList.length">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading" ></m-spin>
@@ -27,7 +27,7 @@
         totalPage: null,
         searchVal: '',
         isLoading: false,
-        masterList: []
+        zookeeperList: []
       }
     },
     props: {},
@@ -36,11 +36,7 @@
     },
     watch: {},
     created () {
-      this.isLoading = true
-      this.getProcessMasterList().then(res => {
-        this.masterList = res.data
-        this.isLoading = false
-      })
+      this.zookeeperList = [{ id: 1 }, { id: 1 }, { id: 1 }, { id: 1 }]
     },
     mounted () {
     },
