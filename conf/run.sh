@@ -90,8 +90,8 @@ do
 	fi
 done
 
-mysql -ueasyscheduler -peasyschedulereasyscheduler --one-database easyscheduler < /opt/easyscheduler/sql/escheduler.sql
-mysql -ueasyscheduler -peasyschedulereasyscheduler --one-database easyscheduler < /opt/easyscheduler/sql/quartz.sql
+mysql -ueasyscheduler -peasyschedulereasyscheduler --one-database easyscheduler -h127.0.0.1 < /opt/easyscheduler/sql/escheduler.sql
+mysql -ueasyscheduler -peasyschedulereasyscheduler --one-database easyscheduler -h127.0.0.1 < /opt/easyscheduler/sql/quartz.sql
 source /etc/profile
 zkServer.sh start
 cd /opt/easyscheduler
