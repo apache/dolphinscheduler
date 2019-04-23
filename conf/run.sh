@@ -33,9 +33,9 @@ else
 		echo "[i] MySQL root Password: $MYSQL_ROOT_PASSWORD"
 	fi
 
-	MYSQL_DATABASE=${MYSQL_DATABASE:-""}
-	MYSQL_USER=${MYSQL_USER:-""}
-	MYSQL_PASSWORD=${MYSQL_PASSWORD:-""}
+	MYSQL_DATABASE="easyscheduler"
+	MYSQL_USER="easyscheduler"
+	MYSQL_PASSWORD="easyschedulereasyscheduler"
 
 	tfile=`mktemp`
 	if [ ! -f "$tfile" ]; then
@@ -91,3 +91,5 @@ do
 done
 
 exec /usr/bin/mysqld --user=mysql --console --skip-name-resolve --skip-networking=0 $@
+mysql -ueasyscheduler -peasyschedulereasyscheduler --one-database easyscheduler < /opt/easyscheduler/sql/escheduler.sql
+mysql -ueasyscheduler -peasyschedulereasyscheduler --one-database easyscheduler < /opt/easyscheduler/sql/quartz.sql
