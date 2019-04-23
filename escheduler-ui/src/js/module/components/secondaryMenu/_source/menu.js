@@ -117,6 +117,15 @@ let menu = {
       disabled: true,
       icon: 'fa-address-book',
       children: []
+    },
+    {
+      name: `令牌管理`,
+      id: 2,
+      path: 'token-manage',
+      isOpen: true,
+      icon: 'fa-file-text',
+      children: [],
+      disabled: true
     }
   ],
   resource: [
@@ -178,7 +187,7 @@ let menu = {
       isOpen: true,
       icon: 'fa-file-text',
       children: [],
-      disabled: !Permissions.getAuth()
+      disabled: Permissions.getAuth()
     }
   ],
   monitor: [
