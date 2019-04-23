@@ -62,6 +62,7 @@ public class TaskInstanceMapperProvider {
                 VALUES("`max_retry_times`", "#{taskInstance.maxRetryTimes}");
                 VALUES("`retry_interval`", "#{taskInstance.retryInterval}");
                 VALUES("`app_link`", "#{taskInstance.appLink}");
+                VALUES("`worker_group_id`", "#{taskInstance.workerGroupId}");
                 VALUES("`flag`", EnumFieldUtil.genFieldStr("taskInstance.flag", Flag.class));
                 VALUES("`task_instance_priority`", EnumFieldUtil.genFieldStr("taskInstance.taskInstancePriority", Priority.class));
 
@@ -114,6 +115,7 @@ public class TaskInstanceMapperProvider {
                 SET("`max_retry_times`=#{taskInstance.maxRetryTimes}");
                 SET("`retry_interval`=#{taskInstance.retryInterval}");
                 SET("`app_link`=#{taskInstance.appLink}");
+                SET("`worker_group_id`=#{taskInstance.workerGroupId}");
                 SET("`flag`="+ EnumFieldUtil.genFieldStr("taskInstance.flag", Flag.class));
                 SET("`task_instance_priority`="+ EnumFieldUtil.genFieldStr("taskInstance.taskInstancePriority", Priority.class));
 
