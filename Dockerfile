@@ -20,4 +20,12 @@ RUN git clone https://github.com/analysys/EasyScheduler.git
 WORKDIR /opt/EasyScheduler
 RUN mvn -U clean package assembly:assembly -Dmaven.test.skip=true
 RUN mv /opt/EasyScheduler/target/escheduler-1.0.0-SNAPSHOT /opt/easyscheduler
+#configure mysql server https://github.com/yobasystems/alpine-mariadb/tree/master/alpine-mariadb-amd64
+ADD conf/run.sh /scripts/run.sh
+RUN mkdir /docker-entrypoint-initdb.d && \
+    mkdir /scripts/pre-exec.d && \
+    mkdir /scripts/pre-init.d && \
+    chmod -R 755 /scripts
 RUN rm -rf /var/cache/apk/*
+EXPOSE 8888
+ENTRYPOINT ["/scripts/run.sh"]
