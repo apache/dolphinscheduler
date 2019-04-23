@@ -7,25 +7,28 @@
             <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>{{$t('IP')}}</span>
+            <span>node</span>
           </th>
           <th>
-            <span>{{$t('Process Pid')}}</span>
+            <span>ip</span>
           </th>
           <th>
-            <span>{{$t('zk registration directory')}}</span>
+            <span>模式</span>
           </th>
           <th>
-            <span>{{$t('cpuUsage')}}</span>
+            <span>连接数</span>
           </th>
           <th>
-            <span>{{$t('memoryUsage')}}</span>
+            <span>watch数</span>
           </th>
           <th>
-            <span>{{$t('Create Time')}}</span>
+            <span>数据量</span>
           </th>
           <th>
-            <span>{{$t('Last heartbeat time')}}</span>
+            <span>Sent/Received</span>
+          </th>
+          <th>
+            <span>节点自检状态</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="$index">
@@ -34,22 +37,25 @@
           </td>
           <td>
             <span>
-              <a href="javascript:" class="links">{{item.host}}</a>
+              <a href="javascript:" class="links">task1</a>
             </span>
           </td>
-          <td><span>{{item.port}}</span></td>
+          <td><span>192.11.1.1</span></td>
           <td>
-            <span>{{item.zkDirectory}}</span>
+            <span>2222</span>
           </td>
           <td>
-            <span>{{_rtResInfo(JSON.parse(item.resInfo)['cpuUsage'])}}</span>
+            <span>3333</span>
           </td>
           <td>
-            <span>{{_rtResInfo(JSON.parse(item.resInfo)['memoryUsage'])}}</span>
+            <span>4444</span>
           </td>
-          <td><span>{{item.createTime | formatDate}}</span></td>
+          <td><span>5555</span></td>
           <td>
-            <span>{{item.lastHeartbeatTime | formatDate}}</span>
+            <span>6666</span>
+          </td>
+          <td>
+            <span>7777</span>
           </td>
         </tr>
       </table>
@@ -70,9 +76,6 @@
       list: Array
     },
     methods: {
-      _rtResInfo (val) {
-        return (val * 100).toFixed(2) + ' %'
-      }
     }
   }
 </script>
