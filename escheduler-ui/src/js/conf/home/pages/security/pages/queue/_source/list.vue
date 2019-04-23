@@ -80,7 +80,6 @@
 <script>
   import { mapActions } from 'vuex'
   import '@/module/filter/formatDate'
-  import { findComponentDownward } from '@/module/util/'
 
   export default {
     name: 'tenement-list',
@@ -112,7 +111,7 @@
         })
       },
       _edit (item) {
-        findComponentDownward(this.$root, 'queue-index')._create(item)
+        this.$emit('on-edit', item)
       }
     },
     watch: {
