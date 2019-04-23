@@ -90,7 +90,6 @@ do
 	fi
 done
 
-exec /usr/bin/mysqld --user=mysql --console --skip-name-resolve --skip-networking=0 $@
 mysql -ueasyscheduler -peasyschedulereasyscheduler --one-database easyscheduler < /opt/easyscheduler/sql/escheduler.sql
 mysql -ueasyscheduler -peasyschedulereasyscheduler --one-database easyscheduler < /opt/easyscheduler/sql/quartz.sql
 source /etc/profile
@@ -103,3 +102,4 @@ sh ./bin/escheduler-daemon.sh start api-server
 sh ./bin/escheduler-daemon.sh start logger-server
 sh ./bin/escheduler-daemon.sh start alert-server
 nginx -c /etc/nginx/nginx.conf
+exec /usr/bin/mysqld --user=mysql --console --skip-name-resolve --skip-networking=0 $@
