@@ -37,7 +37,7 @@ export default {
               offset: 0,
               color: '#FFC539' // 70% 处的颜色
             }], false) ],
-            [1, new echarts.graphic.LinearGradient(0, 0, 0, 1, [ { // eslint-disable-line 
+            [1, new echarts.graphic.LinearGradient(0, 0, 0, 1, [ { // eslint-disable-line
               offset: 0.2,
               color: '#1CAD52' // 92% 处的颜色
             }, {
