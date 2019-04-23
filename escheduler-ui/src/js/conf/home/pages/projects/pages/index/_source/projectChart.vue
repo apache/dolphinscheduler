@@ -93,10 +93,10 @@
   import dayjs from 'dayjs'
   import { mapActions } from 'vuex'
   import { pie, bar } from './chartConfig'
-  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
   import Chart from '~/@analysys/ana-charts'
-  import mNoData from '@/module/components/noData/noData'
   import mSpin from '@/module/components/spin/spin'
+  import mNoData from '@/module/components/noData/noData'
+  import { stateType } from '@/conf/home/pages/projects/pages/_source/instanceConditions/common'
 
 
   export default {
