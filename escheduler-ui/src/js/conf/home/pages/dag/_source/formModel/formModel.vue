@@ -128,6 +128,7 @@
                 v-if="taskType === 'SQL'"
                 @on-params="_onParams"
                 ref="SQL"
+                :create-node-id="id"
                 :backfill-item="backfillItem">
         </m-sql>
         <!-- spark node -->
@@ -429,7 +430,9 @@
       }
       this.isContentBox = true
     },
-    mounted () {},
+    mounted () {
+
+    },
     updated () {
     },
     beforeDestroy () {
