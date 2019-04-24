@@ -42,9 +42,6 @@ public class MonitorService extends BaseService{
    */
   public Map<String,Object> queryDatabaseState(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
-    if (checkAdmin(loginUser, result)){
-      return result;
-    }
 
     List<MonitorRecord> monitorRecordList = MonitorDBDao.queryDatabaseState();
 
@@ -63,9 +60,6 @@ public class MonitorService extends BaseService{
    */
   public Map<String,Object> queryZookeeperState(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
-    if (checkAdmin(loginUser, result)){
-      return result;
-    }
 
     List<ZookeeperRecord> zookeeperRecordList = ZookeeperMonitorUtils.zookeeperInfoList();
 

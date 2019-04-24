@@ -52,9 +52,6 @@ public class ServerService extends BaseService{
     public Map<String,Object> queryMaster(User loginUser) {
 
         Map<String, Object> result = new HashMap<>(5);
-        if (checkAdmin(loginUser, result)){
-            return result;
-        }
 
         List<MasterServer> masterList = masterServerMapper.queryAllMaster();
         result.put(Constants.DATA_LIST, masterList);
@@ -71,9 +68,6 @@ public class ServerService extends BaseService{
      */
     public Map<String,Object> queryWorker(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        if (checkAdmin(loginUser, result)){
-            return result;
-        }
 
         List<WorkerServer> workerList = workerServerMapper.queryAllWorker();
         result.put(Constants.DATA_LIST, workerList);
