@@ -114,12 +114,12 @@
         })
       },
       _verification () {
-        let isEn = /^[A-Za-z]+$/
+        let isEn = /^\w+$/
         if (!this.tenantCode) {
           this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
-        if (!isEn.test(this.tenantCode)) {
+        if (!isEn.test(this.tenantCode) || this.tenantCode.split('')[0] === '_') {
           this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false
         }
