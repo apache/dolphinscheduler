@@ -201,8 +201,14 @@ public enum Status {
     PROCESS_NODE_HAS_CYCLE(50019,"process node has cycle"),
     PROCESS_NODE_S_PARAMETER_INVALID(50020,"process node %s parameter invalid"),
 
-
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
+
+    /**
+     * for monitor
+     */
+    QUERY_DATABASE_STATE_ERROR(70001,"query database state error"),
+    QUERY_ZOOKEEPER_STATE_ERROR(70002,"query zookeeper state error"),
+
 
 
     CREATE_ACCESS_TOKEN_ERROR(70001,"create access token error"),
