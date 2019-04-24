@@ -73,34 +73,7 @@
         </div>
         <div class="row" style="padding-top: 20px;">
           <div class="col-md-6">
-            <div class="chart-title">
-              <span>命令状态统计</span>
-            </div>
-            <div class="row">
-              <div class="col-md-7">
-                <div id="command-state-pie" style="height:260px;margin-top: 100px;"></div>
-              </div>
-              <div class="col-md-5">
-                <div class="table-small-model">
-                  <table>
-                    <tr>
-                      <th width="40">{{$t('#')}}</th>
-                      <th>{{$t('Number')}}</th>
-                      <th>{{$t('State')}}</th>
-                    </tr>
-                    <tr v-for="(item,$index) in taskCtatusList">
-                      <td><span>{{$index+1}}</span></td>
-                      <td>
-                        <span>
-                          <a href="javascript:" @click="id && _goTask(item.key)" :class="id ?'links':''">{{item.value}}</a>
-                        </span>
-                      </td>
-                      <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
+
           </div>
           <div class="col-md-6">
             <div class="chart-title">
@@ -108,24 +81,34 @@
             </div>
             <div class="row">
               <div class="col-md-7">
-                <div id="process-state-pie" style="height:260px;margin-top: 100px;"></div>
+                <div id="queue-pie" style="height:260px;margin-top: 100px;"></div>
               </div>
               <div class="col-md-5">
                 <div class="table-small-model">
                   <table>
                     <tr>
                       <th width="40">{{$t('#')}}</th>
-                      <th>{{$t('Number')}}</th>
-                      <th>{{$t('State')}}</th>
+                      <th>等待执行任务</th>
+                      <th>等待Kill任务</th>
                     </tr>
-                    <tr v-for="(item,$index) in processStateList">
+                    <tr v-for="(item,$index) in queueList">
                       <td><span>{{$index+1}}</span></td>
-                      <td><span><a href="javascript:" @click="id && _goProcess(item.key)" :class="id ?'links':''">{{item.value}}</a></span></td>
+                      <td><span><a href="javascript:" >{{item.value}}</a></span></td>
                       <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
                     </tr>
                   </table>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="chart-title" style="margin-bottom: 20px;margin-top: 30px">
+              <span>命令状态统计</span>
+            </div>
+            <div>
+              <div id="command-state-bar" style="height:500px"></div>
             </div>
           </div>
         </div>
@@ -150,7 +133,7 @@
   import _ from 'lodash'
   import dayjs from 'dayjs'
   import { mapActions } from 'vuex'
-  import { pie, bar } from './chartConfig'
+  import { pie, bar, simple } from './chartConfig'
   import Chart from '~/@analysys/ana-charts'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
@@ -166,6 +149,7 @@
         processStateList: [],
         defineUserList: [],
         commandStateList: [],
+        queueList: [],
         searchParams: {
           projectId: this.id,
           startDate: '',
@@ -203,7 +187,6 @@
           }
         })
       },
-
       _handleTaskCtatus (res) {
         let data = res.data.taskCountDtos
         this.taskCtatusList = _.map(data, v => {
@@ -263,10 +246,32 @@
         }
       },
       _handleCommandState (res) {
-
+        let data = []
+        _.forEach(res.data, (v, i) => {
+          let key = _.keys(v)
+          if (key[0] === 'errorCount') {
+            data.push({ typeName: '错误指令数', key: v.commandState, value: v.errorCount })
+          }
+        })
+        _.forEach(res.data, (v, i) => {
+          let key = _.keys(v)
+          if (key[1] === 'normalCount') {
+            data.push({ typeName: '正常指令数', key: v.commandState, value: v.normalCount })
+          }
+        })
+        const myChart = Chart.bar('#command-state-bar', data, {
+          title: ''
+        })
+        myChart.echart.setOption(simple)
       },
-      _handleQueue () {},
-
+      _handleQueue (res) {
+        _.forEach(res.data, (v, k) => this.queueList.push({
+          key: k === 'taskQueue' ? '等待执行任务' : '等待kill任务',
+          value: v
+        }))
+        const myChart = Chart.pie('#queue-pie', this.queueList, { title: '' })
+        myChart.echart.setOption(pie)
+      },
       _getData (is = true) {
         this.isLoading = true
         let ioList = [
