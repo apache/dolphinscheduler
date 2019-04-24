@@ -305,7 +305,7 @@ public class SqlTask extends AbstractTask {
             receviersList.add(user.getEmail());
         }
         // custom receiver
-        String receivers = StringUtils.isNotEmpty(sqlParameters.getReceivers()) ? sqlParameters.getReceivers() : processDefine.getReceivers();
+        String receivers = sqlParameters.getReceivers();
         if (StringUtils.isNotEmpty(receivers)){
             String[] splits = receivers.split(Constants.COMMA);
             for (String receiver : splits){
@@ -316,7 +316,7 @@ public class SqlTask extends AbstractTask {
         // copy list
         List<String> receviersCcList = new ArrayList<String>();
         // Custom Copier
-        String receiversCc = StringUtils.isNotEmpty(sqlParameters.getReceiversCc()) ? sqlParameters.getReceiversCc() : processDefine.getReceiversCc();
+        String receiversCc = sqlParameters.getReceiversCc();
         if (StringUtils.isNotEmpty(receiversCc)){
             String[] splits = receiversCc.split(Constants.COMMA);
             for (String receiverCc : splits){
