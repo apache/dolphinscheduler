@@ -236,6 +236,12 @@
         editor.setValue(this.sql)
 
         return editor
+      },
+      _getReceiver () {
+        this.store.dispatch('dag/getReceiver', { processDefinitionId: this.item.id }).then(res => {
+          this.receivers = res.receivers && res.receivers.split(',') || []
+          this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
+        })
       }
     },
     watch: {
@@ -279,6 +285,10 @@
         this.showType = o.params.showType.split(',') || []
         this.receivers = o.params.receivers && o.params.receivers.split(',') || []
         this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
+      }
+      //
+      if (this.router.history.current.name === 'definition-create') {
+        this._getReceiver()
       }
     },
     mounted () {

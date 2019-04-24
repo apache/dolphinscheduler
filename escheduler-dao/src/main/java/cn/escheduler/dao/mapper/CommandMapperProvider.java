@@ -51,6 +51,7 @@ public class CommandMapperProvider {
                 VALUES("`warning_group_id`", "#{command.warningGroupId}");
                 VALUES("`schedule_time`", "#{command.scheduleTime}");
                 VALUES("`update_time`", "#{command.updateTime}");
+                VALUES("`worker_group_id`", "#{command.workerGroupId}");
                 VALUES("`start_time`", "#{command.startTime}");
 
             }
@@ -95,6 +96,7 @@ public class CommandMapperProvider {
                 SET("`warning_group_id`=#{command.warningGroupId}");
                 SET("`schedule_time`=#{command.scheduleTime}");
                 SET("`update_time`=#{command.updateTime}");
+                SET("`worker_group_id`=#{command.workerGroupId}");
                 SET("`start_time`=#{command.startTime}");
 
                 WHERE("`id`=#{command.id}");
@@ -166,8 +168,4 @@ public class CommandMapperProvider {
             }
         }.toString();
     }
-
-
-
-
 }

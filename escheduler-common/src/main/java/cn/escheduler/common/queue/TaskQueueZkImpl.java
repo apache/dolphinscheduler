@@ -137,10 +137,11 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      *
      *   流程实例优先级_流程实例id_任务优先级_任务id       high <- low
      * @param  key  task queue name
+     * @param  remove  whether remove the element
      * @return the task id  to be executed
      */
     @Override
-    public String poll(String key) {
+    public String poll(String key, boolean remove) {
         try{
             CuratorFramework zk = getZkClient();
             String tasksQueuePath = getTasksPath(key) + Constants.SINGLE_SLASH;
@@ -181,18 +182,11 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
 
                     String[] vals = targetTaskKey.split(Constants.UNDERLINE);
 
-                    try{
-                        zk.delete().forPath(taskIdPath);
-
-//                        String path = conf.getString(Constants.ZOOKEEPER_SCHEDULER_ROOT) + Constants.SINGLE_SLASH + Constants.SCHEDULER_TASKS_QUEUE + "_remove" + Constants.SINGLE_SLASH + targetTaskKey;
-//                        getZkClient().create().creatingParentContainersIfNeeded().withMode(CreateMode.PERSISTENT).forPath(path,
-//                                Bytes.toBytes(targetTaskKey));
-                    }catch(Exception e){
-                        logger.error(String.format("delete task:%s from zookeeper fail, task detail: %s exception" ,targetTaskKey, vals[vals.length - 1]) ,e);
+                    if(remove){
+                        removeNode(key, targetTaskKey);
                     }
-                    logger.info("consume task: {},there still have {} tasks need to be executed", targetTaskKey, size - 1);
-
-                    return vals[vals.length - 1];
+                    logger.info("consume task: {},there still have {} tasks need to be executed", vals[vals.length - 1], size - 1);
+                    return targetTaskKey;
                 }else{
                     logger.error("should not go here, task queue poll error, please check!");
                 }
@@ -202,6 +196,21 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
             logger.error("add task to tasks queue exception",e);
         }
         return null;
+    }
+
+    @Override
+    public void removeNode(String key, String nodeValue){
+
+        CuratorFramework zk = getZkClient();
+        String tasksQueuePath = getTasksPath(key) + Constants.SINGLE_SLASH;
+        String taskIdPath = tasksQueuePath + nodeValue;
+        logger.info("consume task {}", taskIdPath);
+        try{
+            zk.delete().forPath(taskIdPath);
+        }catch(Exception e){
+            logger.error(String.format("delete task:%s from zookeeper fail, exception:" ,nodeValue) ,e);
+        }
+
     }
 
 

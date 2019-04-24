@@ -156,6 +156,10 @@ public enum Status {
     UPDATE_QUEUE_ERROR(10131, "update queue error"),
     NEED_NOT_UPDATE_QUEUE(10132, "no content changes, no updates are required"),
     VERIFY_QUEUE_ERROR(10133,"verify queue error"),
+    NAME_NULL(10134,"name must be not null"),
+    NAME_EXIST(10135, "name {0} already exists"),
+    SAVE_ERROR(10136, "save error"),
+
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
