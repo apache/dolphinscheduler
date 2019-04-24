@@ -149,6 +149,17 @@ public enum Status {
     TENANT_CODE_HAS_ALREADY_EXISTS(10124,"tenant code has already exists"),
     IP_IS_EMPTY(10125,"ip is empty"),
     SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE(10126, "schedule release is already {0}"),
+    CREATE_QUEUE_ERROR(10127, "create queue error"),
+    QUEUE_NOT_EXIST(10128, "queue {0} not exists"),
+    QUEUE_VALUE_EXIST(10129, "queue value {0} already exists"),
+    QUEUE_NAME_EXIST(10130, "queue name {0} already exists"),
+    UPDATE_QUEUE_ERROR(10131, "update queue error"),
+    NEED_NOT_UPDATE_QUEUE(10132, "no content changes, no updates are required"),
+    VERIFY_QUEUE_ERROR(10133,"verify queue error"),
+    NAME_NULL(10134,"name must be not null"),
+    NAME_EXIST(10135, "name {0} already exists"),
+    SAVE_ERROR(10136, "save error"),
+
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
@@ -197,6 +208,17 @@ public enum Status {
      */
     QUERY_DATABASE_STATE_ERROR(70001,"query database state error"),
     QUERY_ZOOKEEPER_STATE_ERROR(70002,"query zookeeper state error"),
+
+
+
+    CREATE_ACCESS_TOKEN_ERROR(70001,"create access token error"),
+    GENERATE_TOKEN_ERROR(70002,"generate token error"),
+    QUERY_ACCESSTOKEN_LIST_PAGING_ERROR(70003,"query access token list paging error"),
+
+
+    COMMAND_STATE_COUNT_ERROR(80001,"task instance state count error"),
+
+    QUEUE_COUNT_ERROR(90001,"queue count error"),
 
     ;
 

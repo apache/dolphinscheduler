@@ -1,7 +1,7 @@
 <template>
   <div class="shell-model">
     <m-list-box>
-      <div slot="text">{{$t('脚本')}}</div>
+      <div slot="text">{{$t('Script')}}</div>
       <div slot="content">
         <div class="from-mirror">
           <textarea
@@ -13,7 +13,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('资源')}}</div>
+      <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
         <m-resources
                 ref="refResources"
@@ -23,7 +23,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('自定义参数')}}</div>
+      <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
         <m-local-params
                 ref="refLocalParams"
@@ -81,7 +81,7 @@
       _verification () {
         // rawScript verification
         if (!editor.getValue()) {
-          this.$message.warning(`${i18n.$t('请输入rawScript(必填)')}`)
+          this.$message.warning(`${i18n.$t('Please enter script(required)')}`)
           return false
         }
 

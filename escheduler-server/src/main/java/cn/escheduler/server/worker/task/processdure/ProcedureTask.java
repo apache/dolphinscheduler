@@ -22,8 +22,11 @@ import cn.escheduler.common.enums.DbType;
 import cn.escheduler.common.enums.Direct;
 import cn.escheduler.common.enums.TaskTimeoutStrategy;
 import cn.escheduler.common.job.db.BaseDataSource;
+import cn.escheduler.common.job.db.ClickHouseDataSource;
 import cn.escheduler.common.job.db.MySQLDataSource;
+import cn.escheduler.common.job.db.OracleDataSource;
 import cn.escheduler.common.job.db.PostgreDataSource;
+import cn.escheduler.common.job.db.SQLServerDataSource;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.task.procedure.ProcedureParameters;
@@ -111,6 +114,17 @@ public class ProcedureTask extends AbstractTask {
                     }else if (DbType.POSTGRESQL.name().equals(dataSource.getType().name())){
                         baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),PostgreDataSource.class);
                         Class.forName(Constants.JDBC_POSTGRESQL_CLASS_NAME);
+                    }else if (DbType.CLICKHOUSE.name().equals(dataSource.getType().name())){
+                        // NOTE: currently, ClickHouse don't support procedure or UDF yet,
+                        //  but still load JDBC driver to keep source code sync with other DB
+                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),ClickHouseDataSource.class);
+                        Class.forName(Constants.JDBC_CLICKHOUSE_CLASS_NAME);
+                    }else if (DbType.ORACLE.name().equals(dataSource.getType().name())){
+                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(), OracleDataSource.class);
+                        Class.forName(Constants.JDBC_ORACLE_CLASS_NAME);
+                    }else if (DbType.SQLSERVER.name().equals(dataSource.getType().name())){
+                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(), SQLServerDataSource.class);
+                        Class.forName(Constants.JDBC_SQLSERVER_CLASS_NAME);
                     }
 
                     // get jdbc connection

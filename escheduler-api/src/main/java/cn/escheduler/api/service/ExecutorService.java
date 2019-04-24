@@ -90,7 +90,7 @@ public class ExecutorService extends BaseService{
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    String receivers, String receiversCc, RunMode runMode,
-                                                   Priority processInstancePriority, Integer timeout) throws ParseException {
+                                                   Priority processInstancePriority, int workerGroupId, Integer timeout) throws ParseException {
         Map<String, Object> result = new HashMap<>(5);
         // timeout is valid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
@@ -115,7 +115,7 @@ public class ExecutorService extends BaseService{
          */
         int create = this.createCommand(commandType, processDefinitionId,
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode,processInstancePriority);
+                warningGroupId, runMode,processInstancePriority, workerGroupId);
         if(create > 0 ){
             /**
              * according to the process definition ID updateProcessInstance and CC recipient
@@ -405,7 +405,7 @@ public class ExecutorService extends BaseService{
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
                               int excutorId, int warningGroupId,
-                              RunMode runMode,Priority processInstancePriority) throws ParseException {
+                              RunMode runMode,Priority processInstancePriority, int workerGroupId) throws ParseException {
 
         /**
          * instantiate command schedule instance
@@ -436,6 +436,7 @@ public class ExecutorService extends BaseService{
         command.setExecutorId(excutorId);
         command.setWarningGroupId(warningGroupId);
         command.setProcessInstancePriority(processInstancePriority);
+        command.setWorkerGroupId(workerGroupId);
 
         Date start = null;
         Date end = null;

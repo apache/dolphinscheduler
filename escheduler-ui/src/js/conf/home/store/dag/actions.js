@@ -479,6 +479,18 @@ export default {
     })
   },
   /**
+   * Query history task record list
+   */
+  getHistoryTaskRecordList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/task-record/history-list-paging`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * tree chart
    */
   getViewTree ({ state }, payload) {

@@ -7,7 +7,7 @@
       <slot name="content"></slot>
     </div>
     <div class="bottom-p">
-      <x-button type="text" shape="circle" @click="close()" :disabled="disabled"> {{$t('取消')}} </x-button>
+      <x-button type="text" shape="circle" @click="close()" :disabled="disabled"> {{$t('Cancel')}} </x-button>
       <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="disabled || apDisabled">{{spinnerLoading ? 'Loading...' : okText}} </x-button>
     </div>
   </div>
@@ -25,11 +25,11 @@
     props: {
       nameText: {
         type: String,
-        default: `${i18n.$t('创建')}`
+        default: `${i18n.$t('Create')}`
       },
       okText: {
         type: String,
-        default: `${i18n.$t('确认')}`
+        default: `${i18n.$t('Confirm')}`
       },
       disabled: {
         type: Boolean,
@@ -82,7 +82,7 @@
       padding: 0 20px;
     }
     .content-p {
-      min-width: 500px;
+      min-width: 520px;
       min-height: 100px;
     }
   }

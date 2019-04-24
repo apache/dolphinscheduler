@@ -59,7 +59,7 @@ public class ProcessDao extends AbstractBaseDao {
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private UserMapper userMapper;
 
     @Autowired
     private ProcessDefinitionMapper processDefineMapper;
@@ -88,6 +88,12 @@ public class ProcessDao extends AbstractBaseDao {
     @Autowired
     private ResourceMapper resourceMapper;
 
+    @Autowired
+    private WorkerGroupMapper workerGroupMapper;
+
+    @Autowired
+    private ErrorCommandMapper errorCommandMapper;
+
     /**
      * task queue impl
      */
@@ -102,7 +108,7 @@ public class ProcessDao extends AbstractBaseDao {
      */
     @Override
     protected void init() {
-        projectMapper = getMapper(ProjectMapper.class);
+        userMapper=getMapper(UserMapper.class);
         processDefineMapper = getMapper(ProcessDefinitionMapper.class);
         processInstanceMapper = getMapper(ProcessInstanceMapper.class);
         dataSourceMapper = getMapper(DataSourceMapper.class);
@@ -112,6 +118,7 @@ public class ProcessDao extends AbstractBaseDao {
         scheduleMapper = getMapper(ScheduleMapper.class);
         udfFuncMapper = getMapper(UdfFuncMapper.class);
         resourceMapper = getMapper(ResourceMapper.class);
+        workerGroupMapper = getMapper(WorkerGroupMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
     }
 
@@ -120,48 +127,72 @@ public class ProcessDao extends AbstractBaseDao {
      * find one command from command queue, construct process instance
      * @param logger
      * @param host
-     * @param vaildThreadNum
+     * @param validThreadNum
      * @return
      */
     @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
-    public ProcessInstance scanCommand(Logger logger, String host, int vaildThreadNum){
+    public ProcessInstance scanCommand(Logger logger, String host, int validThreadNum){
 
         ProcessInstance processInstance = null;
         Command command = findOneCommand();
-
         if (command == null) {
             return null;
         }
         logger.info(String.format("find one command: id: %d, type: %s", command.getId(),command.getCommandType().toString()));
 
-        processInstance = constructProcessInstance(command, host);
-
-        //cannot construct process instance, return null;
-        if(processInstance == null){
-            logger.error("scan command, command parameter is error: %s", command.toString());
-        }else{
-            // check thread number enough for this command, if not, change state to waiting thread.
-            int commandThreadCount = this.workProcessThreadNumCount(command.getProcessDefinitionId());
-            if(vaildThreadNum < commandThreadCount){
-                logger.info("there is not enough thread for this command: {}",command.toString() );
-                processInstance.setState(ExecutionStatus.WAITTING_THREAD);
-                if(command.getCommandType() != CommandType.RECOVER_WAITTING_THREAD){
-                    processInstance.addHistoryCmd(command.getCommandType());
-                }
-                saveProcessInstance(processInstance);
-                this.setSubProcessParam(processInstance);
-                createRecoveryWaitingThreadCommand(command, processInstance);
+        try{
+            processInstance = constructProcessInstance(command, host);
+            //cannot construct process instance, return null;
+            if(processInstance == null){
+                logger.error("scan command, command parameter is error: %s", command.toString());
+                delCommandByid(command.getId());
+                saveErrorCommand(command, "process instance is null");
                 return null;
+            }else if(!checkThreadNum(command, validThreadNum)){
+                    logger.info("there is not enough thread for this command: {}",command.toString() );
+                    return setWaitingThreadProcess(command, processInstance);
             }else{
-                processInstance.setCommandType(command.getCommandType());
-                processInstance.addHistoryCmd(command.getCommandType());
-                saveProcessInstance(processInstance);
-                this.setSubProcessParam(processInstance);
+                    processInstance.setCommandType(command.getCommandType());
+                    processInstance.addHistoryCmd(command.getCommandType());
+                    saveProcessInstance(processInstance);
+                    this.setSubProcessParam(processInstance);
+                    delCommandByid(command.getId());
+                    return processInstance;
             }
+        }catch (Exception e){
+            logger.error("scan command error ", e);
+            saveErrorCommand(command, e.toString());
+            delCommandByid(command.getId());
         }
-        // delete command
-        delCommandByid(command.getId());
-        return processInstance;
+        return null;
+    }
+
+    private void saveErrorCommand(Command command, String message) {
+
+        ErrorCommand errorCommand = new ErrorCommand(command, message);
+        this.errorCommandMapper.insert(errorCommand);
+    }
+
+    /**
+     * set process waiting thread
+     * @param command
+     * @param processInstance
+     * @return
+     */
+    private ProcessInstance setWaitingThreadProcess(Command command, ProcessInstance processInstance) {
+        processInstance.setState(ExecutionStatus.WAITTING_THREAD);
+        if(command.getCommandType() != CommandType.RECOVER_WAITTING_THREAD){
+            processInstance.addHistoryCmd(command.getCommandType());
+        }
+        saveProcessInstance(processInstance);
+        this.setSubProcessParam(processInstance);
+        createRecoveryWaitingThreadCommand(command, processInstance);
+        return null;
+    }
+
+    private boolean checkThreadNum(Command command, int validThreadNum) {
+        int commandThreadCount = this.workProcessThreadNumCount(command.getProcessDefinitionId());
+        return validThreadNum >= commandThreadCount;
     }
 
     /**
@@ -245,7 +276,7 @@ public class ProcessDao extends AbstractBaseDao {
     public ProcessInstance findProcessInstanceByScheduleTime(int defineId, Date scheduleTime){
 
         return processInstanceMapper.queryByScheduleTime(defineId,
-                DateUtils.dateToString(scheduleTime), 0,null, null);
+                DateUtils.dateToString(scheduleTime), 0, null, null);
     }
 
     /**
@@ -450,6 +481,7 @@ public class ProcessDao extends AbstractBaseDao {
         processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
+        processInstance.setWorkerGroupId(command.getWorkerGroupId());
         return processInstance;
     }
 
@@ -669,7 +701,7 @@ public class ProcessDao extends AbstractBaseDao {
             paramMap.put(CMDPARAM_SUB_PROCESS, String.valueOf(processInstance.getId()));
             processInstance.setCommandParam(JSONUtils.toJson(paramMap));
             processInstance.setIsSubProcess(Flag.YES);
-            this.updateProcessInstance(processInstance);
+            this.saveProcessInstance(processInstance);
         }
         // copy parent instance user def params to sub process..
         String parentInstanceId = paramMap.get(CMDPARAM_SUB_PROCESS_PARENT_INSTANCE_ID);
@@ -677,7 +709,7 @@ public class ProcessDao extends AbstractBaseDao {
             ProcessInstance parentInstance = findProcessInstanceDetailById(Integer.parseInt(parentInstanceId));
             if(parentInstance != null){
                 processInstance.setGlobalParams(parentInstance.getGlobalParams());
-                this.updateProcessInstance(processInstance);
+                this.saveProcessInstance(processInstance);
             }else{
                 logger.error("sub process command params error, cannot find parent instance: {} ", cmdParam);
             }
@@ -1194,7 +1226,7 @@ public class ProcessDao extends AbstractBaseDao {
     public int updateProcessInstance(Integer processInstanceId, String processJson,
                                      String globalParams, Date scheduleTime, Flag flag,
                                      String locations, String connects){
-        return processInstanceMapper.updateProcessInstance( processInstanceId, processJson,
+        return processInstanceMapper.updateProcessInstance(processInstanceId, processJson,
                 globalParams, scheduleTime, locations, connects, flag);
     }
 
@@ -1538,4 +1570,25 @@ public class ProcessDao extends AbstractBaseDao {
                 DateUtils.dateToString(dateInterval.getEndTime()),
                 stateArray);
     }
+
+    /**
+     *  query user queue by process instance id
+     * @param processInstanceId
+     * @return
+     */
+    public String queryQueueByProcessInstanceId(int processInstanceId){
+        return userMapper.queryQueueByProcessInstanceId(processInstanceId);
+    }
+
+    /**
+     * query worker group by id
+     * @param workerGroupId
+     * @return
+     */
+    public WorkerGroup queryWorkerGroupById(int workerGroupId){
+        return workerGroupMapper.queryById(workerGroupId);
+    }
+
+
+
 }
