@@ -45,7 +45,7 @@ public class MonitorDBDao {
 
     static {
         try {
-            conf = new PropertiesConfiguration(Constants.DataSource_PROPERTIES_PATH);
+            conf = new PropertiesConfiguration(Constants.DATA_SOURCE_PROPERTIES);
         }catch (ConfigurationException e){
             logger.error("load configuration excetpion",e);
             System.exit(1);
