@@ -14,7 +14,7 @@ CREATE TABLE `t_escheduler_access_token` (
 
 CREATE TABLE `t_escheduler_error_command`  (
   `id` int(11) NOT NULL COMMENT '主键',
-  `command_type` tinyint(4) NULL DEFAULT NULL COMMENT '命令类型：0 启动工作流，1 从当前节点开始执行，2 恢复被容错的工作流，3 恢复暂停流程 4 从失败节点开始执行',
+  `command_type` tinyint(4) NULL DEFAULT NULL COMMENT '命令类型：0 启动工作流,1 从当前节点开始执行,2 恢复被容错的工作流,3 恢复暂停流程,4 从失败节点开始执行,5 补数,6 调度,7 重跑,8 暂停,9 停止,10 恢复等待线程',
   `executor_id` int(11) NULL DEFAULT NULL COMMENT '命令执行者',
   `process_definition_id` int(11) NULL DEFAULT NULL COMMENT '流程定义id',
   `command_param` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '命令的参数（json格式）',
