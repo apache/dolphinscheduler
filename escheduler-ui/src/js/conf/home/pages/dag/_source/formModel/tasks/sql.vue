@@ -29,15 +29,15 @@
     </m-list-box>
     <template v-if="!sqlType && showType.length">
       <m-list-box>
-        <div slot="text">收件人</div>
+        <div slot="text">{{$t('Recipient')}}</div>
         <div slot="content">
-          <m-email v-model="receivers" :repeat-data="receiversCc"></m-email>
+          <m-email v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
         </div>
       </m-list-box>
       <m-list-box>
-        <div slot="text">抄送人</div>
+        <div slot="text">{{$t('Cc')}}</div>
         <div slot="content">
-          <m-email v-model="receiversCc" :repeat-data="receivers"></m-email>
+          <m-email v-model="receiversCc" :disabled="isDetails" :repeat-data="receivers"></m-email>
         </div>
       </m-list-box>
     </template>
@@ -132,7 +132,8 @@
     },
     mixins: [disabledState],
     props: {
-      backfillItem: Object
+      backfillItem: Object,
+      createNodeId: Number
     },
     methods: {
       /**
@@ -238,7 +239,14 @@
         return editor
       },
       _getReceiver () {
-        this.store.dispatch('dag/getReceiver', { processDefinitionId: this.item.id }).then(res => {
+        let param = {}
+        let current = this.router.history.current
+        if (current.name === 'projects-definition-details') {
+          param.processDefinitionId = current.params.id
+        } else {
+          param.processInstanceId = current.params.id
+        }
+        this.store.dispatch('dag/getReceiver', param).then(res => {
           this.receivers = res.receivers && res.receivers.split(',') || []
           this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
         })
@@ -286,8 +294,8 @@
         this.receivers = o.params.receivers && o.params.receivers.split(',') || []
         this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
       }
-      //
-      if (this.router.history.current.name === 'definition-create') {
+      if (!_.some(this.store.state.dag.tasks, { id: this.createNodeId }) &&
+        this.router.history.current.name !== 'definition-create') {
         this._getReceiver()
       }
     },
