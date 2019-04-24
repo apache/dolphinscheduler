@@ -242,7 +242,11 @@ public class ProjectService extends BaseService{
         if (checkResult != null) {
             return checkResult;
         }
-
+        Project tempProject = projectMapper.queryByName(projectName);
+        if (tempProject != null && tempProject.getId() != projectId) {
+            putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
+            return result;
+        }
         project.setName(projectName);
         project.setDesc(desc);
         project.setUpdateTime(new Date());
