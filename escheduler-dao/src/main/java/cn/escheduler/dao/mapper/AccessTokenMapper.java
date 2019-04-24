@@ -74,7 +74,8 @@ public interface AccessTokenMapper {
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
     })
     @SelectProvider(type = AccessTokenMapperProvider.class, method = "queryAccessTokenPaging")
-    List<AccessToken> queryAccessTokenPaging(@Param("searchVal") String searchVal,
+    List<AccessToken> queryAccessTokenPaging(@Param("userId") Integer userId,
+                                             @Param("searchVal") String searchVal,
                                              @Param("offset") Integer offset,
                                              @Param("pageSize") Integer pageSize);
 
@@ -84,5 +85,6 @@ public interface AccessTokenMapper {
      * @return
      */
     @SelectProvider(type = AccessTokenMapperProvider.class, method = "countAccessTokenPaging")
-    Integer countAccessTokenPaging(@Param("searchVal") String searchVal);
+    Integer countAccessTokenPaging(@Param("userId") Integer userId
+                            ,@Param("searchVal") String searchVal);
 }
