@@ -89,6 +89,9 @@ public class ProcessDao extends AbstractBaseDao {
     private ResourceMapper resourceMapper;
 
     @Autowired
+    private WorkerGroupMapper workerGroupMapper;
+
+    @Autowired
     private ErrorCommandMapper errorCommandMapper;
 
     /**
@@ -115,6 +118,7 @@ public class ProcessDao extends AbstractBaseDao {
         scheduleMapper = getMapper(ScheduleMapper.class);
         udfFuncMapper = getMapper(UdfFuncMapper.class);
         resourceMapper = getMapper(ResourceMapper.class);
+        workerGroupMapper = getMapper(WorkerGroupMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
     }
 
@@ -477,6 +481,7 @@ public class ProcessDao extends AbstractBaseDao {
         processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
+        processInstance.setWorkerGroupId(command.getWorkerGroupId());
         return processInstance;
     }
 
@@ -1573,6 +1578,15 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public String queryQueueByProcessInstanceId(int processInstanceId){
         return userMapper.queryQueueByProcessInstanceId(processInstanceId);
+    }
+
+    /**
+     * query worker group by id
+     * @param workerGroupId
+     * @return
+     */
+    public WorkerGroup queryWorkerGroupById(int workerGroupId){
+        return workerGroupMapper.queryById(workerGroupId);
     }
 
 

@@ -54,10 +54,17 @@ public interface ITaskQueue {
      * an element pops out of the queue
      *
      * @param key  queue name
+     * @param remove  where remove the element
      * @return
      */
-    String poll(String key);
+    String poll(String key, boolean remove);
 
+    /**
+     * remove a element from queue
+     * @param key
+     * @param value
+     */
+    void removeNode(String key, String value);
 
     /**
      * add an element to the set
