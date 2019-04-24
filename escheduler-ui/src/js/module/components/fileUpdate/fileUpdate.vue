@@ -1,8 +1,8 @@
 <template>
   <m-popup
           ref="popup"
-          :ok-text="$t('确认上传')"
-          :nameText="$t('文件上传')"
+          :ok-text="$t('Upload')"
+          :nameText="$t('File Upload')"
           @ok="_ok"
           :disabled="progress === 0 ? false : true">
     <template slot="content">
@@ -14,7 +14,7 @@
              id="file-update-model">
           <div class="tooltip-info">
             <i class="fa fa-info-circle"></i>
-            <span>{{$t('请将文件拖拽到当前上传窗口内！')}}</span>
+            <span>{{$t('Drag the file into the current upload window')}}</span>
           </div>
           <!--<div class="hide-archive" v-if="progress !== 0" @click="_ckArchive">
             <i class="fa fa-minus" data-toggle="tooltip" title="关闭窗口 继续上传" data-container="body" ></i>
@@ -24,40 +24,40 @@
               <i class="fa fa-cloud-upload"></i>
             </div>
             <p class="p1">
-              <span>{{$t('拖动区域上传')}}</span>
+              <span>{{$t('Drag area upload')}}</span>
             </p>
           </div>
           <m-list-box-f>
-            <template slot="name"><b>*</b>{{$t('文件名')}}</template>
+            <template slot="name"><b>*</b>{{$t('File Name')}}</template>
             <template slot="content">
               <x-input
                       type="input"
                       v-model="name"
                       :disabled="progress !== 0"
-                      :placeholder="$t('请输入name')"
+                      :placeholder="$t('Please enter name')"
                       autocomplete="off">
               </x-input>
             </template>
           </m-list-box-f>
           <m-list-box-f>
-            <template slot="name">{{$t('描述')}}</template>
+            <template slot="name">{{$t('Description')}}</template>
             <template slot="content">
               <x-input
                       type="textarea"
                       v-model="desc"
                       :disabled="progress !== 0"
-                      :placeholder="$t('请输入desc')"
+                      :placeholder="$t('Please enter description')"
                       autocomplete="off">
               </x-input>
             </template>
           </m-list-box-f>
           <m-list-box-f>
-            <template slot="name"><b>*</b>{{$t('上传文件')}}</template>
+            <template slot="name"><b>*</b>{{$t('Upload Files')}}</template>
             <template slot="content">
               <div class="file-update-box">
                 <template v-if="progress === 0">
                   <input name="file" id="file" type="file" class="file-update">
-                  <x-button type="dashed" size="xsmall"> {{$t('点击上传')}} </x-button>
+                  <x-button type="dashed" size="xsmall"> {{$t('Upload')}} </x-button>
                 </template>
                 <div class="progress-box" v-if="progress !== 0">
                   <m-progress-bar :value="progress" text-placement="left-right"></m-progress-bar>
@@ -131,11 +131,11 @@
        */
       _validation () {
         if (!this.name) {
-          this.$message.warning(`${i18n.$t('请输入文件名')}`)
+          this.$message.warning(`${i18n.$t('Please enter file name')}`)
           return false
         }
         if (!this.file) {
-          this.$message.warning(`${i18n.$t('请选择要上传的文件')}`)
+          this.$message.warning(`${i18n.$t('Please select the file to upload')}`)
           return false
         }
         return true

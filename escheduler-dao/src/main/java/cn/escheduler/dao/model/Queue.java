@@ -16,6 +16,8 @@
  */
 package cn.escheduler.dao.model;
 
+import java.util.Date;
+
 /**
  * queue
  */
@@ -33,6 +35,15 @@ public class Queue {
      * yarn queue name
      */
     private String queue;
+
+    /**
+     * create time
+     */
+    private Date createTime;
+    /**
+     * update time
+     */
+    private Date updateTime;
 
     public int getId() {
         return id;
@@ -58,12 +69,30 @@ public class Queue {
         this.queue = queue;
     }
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
     @Override
     public String toString() {
         return "Queue{" +
                 "id=" + id +
                 ", queueName='" + queueName + '\'' +
                 ", queue='" + queue + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
                 '}';
     }
 }

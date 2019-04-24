@@ -87,7 +87,8 @@ public class UsersService extends BaseService {
                                           String userPassword,
                                           String email,
                                           int tenantId,
-                                          String phone) throws Exception {
+                                          String phone,
+                                          String queue) throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
         result = CheckUtils.checkUserParams(userName, userPassword, email, phone);
@@ -114,6 +115,7 @@ public class UsersService extends BaseService {
         user.setUserType(UserType.GENERAL_USER);
         user.setCreateTime(now);
         user.setUpdateTime(now);
+        user.setQueue(queue);
 
         // save user
         userMapper.insert(user);
@@ -194,7 +196,13 @@ public class UsersService extends BaseService {
      * @param phone
      * @return
      */
-    public Map<String, Object> updateUser(int userId, String userName, String userPassword, String email, int tenantId, String phone) throws Exception {
+    public Map<String, Object> updateUser(int userId,
+                                          String userName,
+                                          String userPassword,
+                                          String email,
+                                          int tenantId,
+                                          String phone,
+                                          String queue) throws Exception {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
@@ -218,6 +226,7 @@ public class UsersService extends BaseService {
         if (StringUtils.isNotEmpty(email)) {
             user.setEmail(email);
         }
+        user.setQueue(queue);
         user.setPhone(phone);
         user.setUpdateTime(now);
 

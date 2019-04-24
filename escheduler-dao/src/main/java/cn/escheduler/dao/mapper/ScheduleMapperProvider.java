@@ -48,6 +48,7 @@ public class ScheduleMapperProvider {
       VALUES("`user_id`", "#{schedule.userId}");
       VALUES("`release_state`", EnumFieldUtil.genFieldStr("schedule.releaseState", ReleaseState.class));
       VALUES("`warning_group_id`", "#{schedule.warningGroupId}");
+      VALUES("`worker_group_id`", "#{schedule.workerGroupId}");
       VALUES("`process_instance_priority`", EnumFieldUtil.genFieldStr("schedule.processInstancePriority", Priority.class));
     }}.toString();
   }
@@ -67,6 +68,7 @@ public class ScheduleMapperProvider {
         SET("`user_id`=#{schedule.userId}");
         SET("`release_state`=" + EnumFieldUtil.genFieldStr("schedule.releaseState", ReleaseState.class));
         SET("`warning_group_id`=#{schedule.warningGroupId}");
+        SET("`worker_group_id`=#{schedule.workerGroupId}");
         SET("`process_instance_priority`="+ EnumFieldUtil.genFieldStr("schedule.processInstancePriority", Priority.class));
 
         WHERE("`id` = #{schedule.id}");

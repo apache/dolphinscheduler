@@ -1,0 +1,44 @@
+.servers-wrapper {
+  padding: 16px;
+  >.row {
+    margin-bottom: 20px;
+  }
+  .gridb-model {
+    width: 100%;
+    height: 360px;
+    overflow: hidden;
+    border: 1px solid #E8E8E8;
+    margin:  0 auto;
+    >.title {
+      height: 36px;
+      line-height: 36px;
+      background: #F9F9F9;
+      border-bottom: 1px solid #E8E8E8;
+      span {
+        padding-left: 8px;
+      }
+    }
+    .gauge-echart {
+      width: 350px;
+      margin:  auto;
+      margin-bottom: -80px;
+    }
+    .text-1 {
+      width: 100%;
+      margin: 0 auto;
+      font-size: 32px;
+      text-align: center;
+    }
+    .value-p {
+      height: 254px;
+      line-height: 254px;
+      text-align: center;
+      >b {
+        font-size: 140px;
+        color: #333;
+      }
+    }
+  }
+
+}
+

@@ -1,59 +1,56 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('树形图')">
-      <template slot="conditions"></template>
-      <template slot="content">
-        <div class="tree-view-index-model">
-          <div class="tree-limit-select">
-            <x-select v-model="limit" style="width: 70px;" @on-change="_onChangeSelect">
-              <x-option
-                      v-for="city in [{value:25},{value:50},{value:75},{value:100}]"
-                      :key="city.value"
-                      :value="city.value"
-                      :label="city.value">
-              </x-option>
-            </x-select>
-            <x-button
-                    @click="_rtTasksDag"
-                    v-if="$route.query.subProcessIds"
-                    type="primary"
-                    size="default"
-                    icon="fa fa-reply">
-              返回上一节点
-            </x-button>
-          </div>
-          <div class="tasks-color">
-            <div class="toolbar-color-sp">
-              <a href="javascript:">
-                <span>节点类型</span>
-              </a>
-              <a href="javascript:" v-for="(k,v) in tasksType">
-                <i class="fa fa-circle" :style="{color:k.color}"></i>
-                <span>{{v}}</span>
-              </a>
-            </div>
-            <div class="state-tasks-color-sp">
-              <a href="javascript:">
-                <span>任务状态</span>
-              </a>
-              <a href="javascript:" v-for="(item) in tasksState">
-                <i class="fa fa-square" :style="{color:item.color}"></i>
-                <span>{{item.desc}}</span>
-              </a>
-            </div>
-          </div>
-          <div class="tree-model" v-show="!isNodata">
-            <div class="d3-tree">
-              <svg class='tree' width="100%"></svg>
-            </div>
-          </div>
-          <m-no-data v-if="isNodata"></m-no-data>
+  <m-list-construction :title="$t('TreeView')">
+    <template slot="conditions"></template>
+    <template slot="content">
+      <div class="tree-view-index-model">
+        <div class="tree-limit-select">
+          <x-select v-model="limit" style="width: 70px;" @on-change="_onChangeSelect">
+            <x-option
+                    v-for="city in [{value:25},{value:50},{value:75},{value:100}]"
+                    :key="city.value"
+                    :value="city.value"
+                    :label="city.value">
+            </x-option>
+          </x-select>
+          <x-button
+                  @click="_rtTasksDag"
+                  v-if="$route.query.subProcessIds"
+                  type="primary"
+                  size="default"
+                  icon="fa fa-reply">
+            {{$t('Return_1')}}
+          </x-button>
         </div>
-        <m-spin :is-spin="isLoading"></m-spin>
-      </template>
-    </m-list-construction>
-  </div>
+        <div class="tasks-color">
+          <div class="toolbar-color-sp">
+            <a href="javascript:">
+              <span>Node Type</span>
+            </a>
+            <a href="javascript:" v-for="(k,v) in tasksType">
+              <i class="fa fa-circle" :style="{color:k.color}"></i>
+              <span>{{v}}</span>
+            </a>
+          </div>
+          <div class="state-tasks-color-sp">
+            <a href="javascript:">
+              <span>{{$t('Task Status')}}</span>
+            </a>
+            <a href="javascript:" v-for="(item) in tasksState">
+              <i class="fa fa-square" :style="{color:item.color}"></i>
+              <span>{{item.desc}}</span>
+            </a>
+          </div>
+        </div>
+        <div class="tree-model" v-show="!isNodata">
+          <div class="d3-tree">
+            <svg class='tree' width="100%"></svg>
+          </div>
+        </div>
+        <m-no-data v-if="isNodata"></m-no-data>
+      </div>
+      <m-spin :is-spin="isLoading"></m-spin>
+    </template>
+  </m-list-construction>
 
 </template>
 <script>

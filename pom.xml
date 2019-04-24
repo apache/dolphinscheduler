@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cn.analysys</groupId>
 	<artifactId>escheduler</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>escheduler</name>
 	<url>http://maven.apache.org</url>
@@ -364,6 +364,18 @@
 				<groupId>com.github.oshi</groupId>
 				<artifactId>oshi-core</artifactId>
 				<version>3.5.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>ru.yandex.clickhouse</groupId>
+				<artifactId>clickhouse-jdbc</artifactId>
+				<version>0.1.52</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.microsoft.sqlserver</groupId>
+				<artifactId>mssql-jdbc</artifactId>
+				<version>6.1.0.jre8</version>
 			</dependency>
 
 		</dependencies>
