@@ -1,9 +1,9 @@
 <template>
   <div class="ans-input email-model">
-    <div class="clearfix input-element">
+    <div class="clearfix input-element" :class="disabled ? 'disabled' : ''">
       <span class="tag-wrapper" v-for="(item,$index) in activeList" :class="activeIndex === $index ? 'active' : ''">
         <span class="tag-text">{{item}}</span>
-        <i class="remove-tag ans-icon-close" @click.stop="_del($index)"></i>
+        <i class="remove-tag ans-icon-close" @click.stop="_del($index)" v-if="!disabled"></i>
       </span>
       <x-poptip
               placement="bottom-start"
@@ -30,6 +30,7 @@
                   :style="{width:emailWidth + 'px'}"
                   type="text"
                   v-model="email"
+                  :disabled="disabled"
                   :placeholder="$t('Please enter email')"
                   @keydown.tab="_emailTab"
                   @keyup.delete="_emailDelete"
@@ -38,7 +39,6 @@
                   @keyup.down="_emailKeyup('down')">
         </span>
       </x-poptip>
-
     </div>
   </div>
 </template>
@@ -63,7 +63,11 @@
     },
     props: {
       activeList: Array,
-      repeatData: Array
+      repeatData: Array,
+      disabled: {
+        type: Boolean,
+        default: false
+      }
     },
     model: {
       prop: 'activeList',
@@ -315,6 +319,14 @@
           line-height: 29px;
           border: 0;
           padding-left: 4px;
+        }
+      }
+      &.disabled {
+        .tag-wrapper {
+          background: #d9d9d9;
+        }
+        .email-input {
+          background: none;
         }
       }
     }
