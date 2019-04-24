@@ -114,6 +114,12 @@ public class TaskNode {
   private Priority taskInstancePriority;
 
   /**
+   * worker group id
+   */
+  private int workerGroupId;
+
+
+  /**
    * task time out
    */
   @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
@@ -224,6 +230,7 @@ public class TaskNode {
             Objects.equals(extras, taskNode.extras) &&
             Objects.equals(runFlag, taskNode.runFlag) &&
             Objects.equals(dependence, taskNode.dependence) &&
+            Objects.equals(workerGroupId, taskNode.workerGroupId) &&
             CollectionUtils.equalLists(depList, taskNode.depList);
   }
 
@@ -303,6 +310,15 @@ public class TaskNode {
             ", dependence='" + dependence + '\'' +
             ", taskInstancePriority=" + taskInstancePriority +
             ", timeout='" + timeout + '\'' +
+            ", workerGroupId='" + workerGroupId + '\'' +
             '}';
+  }
+
+  public int getWorkerGroupId() {
+    return workerGroupId;
+  }
+
+  public void setWorkerGroupId(int workerGroupId) {
+    this.workerGroupId = workerGroupId;
   }
 }
