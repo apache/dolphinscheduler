@@ -404,6 +404,9 @@ public class MasterExecThread implements Runnable {
                 taskInstance.setTaskInstancePriority(taskNode.getTaskInstancePriority());
             }
 
+            int workerGroupId = taskNode.getWorkerGroupId();
+            taskInstance.setWorkerGroupId(workerGroupId);
+
         }
         return taskInstance;
     }
