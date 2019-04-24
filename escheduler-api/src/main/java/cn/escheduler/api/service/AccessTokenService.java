@@ -58,15 +58,16 @@ public class AccessTokenService extends BaseService {
     public Map<String, Object> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>(5);
 
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
-            return result;
-        }
-
-        Integer count = accessTokenMapper.countAccessTokenPaging(searchVal);
-
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-        List<AccessToken> accessTokenList = accessTokenMapper.queryAccessTokenPaging(searchVal, pageInfo.getStart(), pageSize);
+        Integer count;
+        List<AccessToken> accessTokenList;
+        if (loginUser.getUserType() == UserType.ADMIN_USER){
+             count = accessTokenMapper.countAccessTokenPaging(0,searchVal);
+            accessTokenList = accessTokenMapper.queryAccessTokenPaging(0,searchVal, pageInfo.getStart(), pageSize);
+        }else {
+            count = accessTokenMapper.countAccessTokenPaging(loginUser.getId(),searchVal);
+            accessTokenList = accessTokenMapper.queryAccessTokenPaging(loginUser.getId(),searchVal, pageInfo.getStart(), pageSize);
+        }
 
         pageInfo.setTotalCount(count);
         pageInfo.setLists(accessTokenList);
