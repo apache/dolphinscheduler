@@ -91,6 +91,12 @@ public class Command {
     private Date updateTime;
 
 
+    /**
+     *
+     */
+    private int workerGroupId;
+
+
     public Command(){
         this.taskDependType = TaskDependType.TASK_POST;
         this.failureStrategy = FailureStrategy.CONTINUE;
@@ -229,6 +235,15 @@ public class Command {
         this.updateTime = updateTime;
     }
 
+
+    public int getWorkerGroupId() {
+        return workerGroupId;
+    }
+
+    public void setWorkerGroupId(int workerGroupId) {
+        this.workerGroupId = workerGroupId;
+    }
+
     @Override
     public String toString() {
         return "Command{" +
@@ -245,6 +260,7 @@ public class Command {
                 ", startTime=" + startTime +
                 ", processInstancePriority=" + processInstancePriority +
                 ", updateTime=" + updateTime +
+                ", workerGroupId=" + workerGroupId +
                 '}';
     }
 }

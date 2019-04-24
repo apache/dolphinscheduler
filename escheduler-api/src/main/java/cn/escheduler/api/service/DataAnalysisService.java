@@ -17,6 +17,7 @@
 package cn.escheduler.api.service;
 
 
+import cn.escheduler.api.dto.CommandStateCount;
 import cn.escheduler.api.dto.DefineUserDto;
 import cn.escheduler.api.dto.TaskCountDto;
 import cn.escheduler.api.enums.Status;
@@ -38,10 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * data analysis service
@@ -298,7 +296,16 @@ public class DataAnalysisService {
             dataMap.put(errorExecutionStatus.getExecutionStatus(),errorCommandStateCountsMap);
         }
 
-        result.put(Constants.DATA_LIST, dataMap);
+        List<CommandStateCount> list = new ArrayList<>();
+        Iterator<Map.Entry<ExecutionStatus, Map<String, Integer>>> iterator = dataMap.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry<ExecutionStatus, Map<String, Integer>> next = iterator.next();
+            CommandStateCount commandStateCount = new CommandStateCount(next.getValue().get("errorCommandState"),
+                    next.getValue().get("commandState"),next.getKey());
+            list.add(commandStateCount);
+        }
+
+        result.put(Constants.DATA_LIST, list);
         putMsg(result, Status.SUCCESS);
         return  result;
     }
@@ -356,9 +363,18 @@ public class DataAnalysisService {
                 }
             }
         }
+        Integer taskQueueCount = 0;
+        Integer taskKillCount = 0;
 
-        Integer taskQueueCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
-        Integer taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
+        if (tasksQueueIds.length != 0){
+            taskQueueCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
+        }
+
+        if (tasksQueueIds.length != 0){
+            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
+        }
+
+
 
         dataMap.put("taskQueue",taskQueueCount);
         dataMap.put("taskKill",taskKillCount);

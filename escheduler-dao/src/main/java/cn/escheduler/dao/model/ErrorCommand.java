@@ -95,6 +95,11 @@ public class ErrorCommand {
      */
     private String message;
 
+    /**
+     * worker group id
+     */
+    private int workerGroupId;
+
 
     public ErrorCommand(Command command, String message){
         this.commandType = command.getCommandType();
@@ -245,6 +250,14 @@ public class ErrorCommand {
         this.updateTime = updateTime;
     }
 
+    public int getWorkerGroupId() {
+        return workerGroupId;
+    }
+
+    public void setWorkerGroupId(int workerGroupId) {
+        this.workerGroupId = workerGroupId;
+    }
+
     @Override
     public String toString() {
         return "Command{" +
@@ -272,4 +285,6 @@ public class ErrorCommand {
     public void setMessage(String message) {
         this.message = message;
     }
+
+
 }

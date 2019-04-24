@@ -88,7 +88,7 @@ public class SchedulerService extends BaseService {
     @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName, Integer processDefineId, String schedule, WarningType warningType,
                                               int warningGroupId, FailureStrategy failureStrategy,
-                                              String receivers, String receiversCc,Priority processInstancePriority) throws IOException {
+                                              String receivers, String receiversCc,Priority processInstancePriority, int workerGroupId) throws IOException {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
 
@@ -133,6 +133,7 @@ public class SchedulerService extends BaseService {
         scheduleObj.setUserName(loginUser.getUserName());
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
         scheduleObj.setProcessInstancePriority(processInstancePriority);
+        scheduleObj.setWorkerGroupId(workerGroupId);
         scheduleMapper.insert(scheduleObj);
 
         /**
@@ -156,13 +157,14 @@ public class SchedulerService extends BaseService {
      * @param warningGroupId
      * @param failureStrategy
      * @param scheduleStatus
+     * @param workerGroupId
      * @return
      */
     @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
     public Map<String, Object> updateSchedule(User loginUser, String projectName, Integer id, String scheduleExpression, WarningType warningType,
                                               int warningGroupId, FailureStrategy failureStrategy,
                                               String receivers, String receiversCc, ReleaseState scheduleStatus,
-                                              Priority processInstancePriority) throws IOException {
+                                              Priority processInstancePriority, int workerGroupId) throws IOException {
         Map<String, Object> result = new HashMap<String, Object>(5);
 
         Project project = projectMapper.queryByName(projectName);
@@ -221,6 +223,7 @@ public class SchedulerService extends BaseService {
         if (scheduleStatus != null) {
             schedule.setReleaseState(scheduleStatus);
         }
+        schedule.setWorkerGroupId(workerGroupId);
         schedule.setUpdateTime(now);
         schedule.setProcessInstancePriority(processInstancePriority);
         scheduleMapper.update(schedule);

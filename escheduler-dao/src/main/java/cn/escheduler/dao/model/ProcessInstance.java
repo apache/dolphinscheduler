@@ -177,6 +177,12 @@ public class ProcessInstance {
      */
     private Priority processInstancePriority;
 
+
+    /**
+     * worker group id
+     */
+    private int workerGroupId;
+
     public ProcessInstance(){
 
     }
@@ -481,6 +487,13 @@ public class ProcessInstance {
         this.duration = duration;
     }
 
+    public int getWorkerGroupId() {
+        return workerGroupId;
+    }
+
+    public void setWorkerGroupId(int workerGroupId) {
+        this.workerGroupId = workerGroupId;
+    }
 
     @Override
     public String toString() {
