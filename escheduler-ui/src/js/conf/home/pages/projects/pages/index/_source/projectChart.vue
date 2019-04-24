@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-show="!isLoading">
-      <div class="perject-home-content">
+      <div class="perject-home-content" v-show="!msg">
         <div class="time-model">
           <x-datepicker
                   :panel-num="2"
@@ -123,6 +123,7 @@
           </div>
         </div>
       </div>
+      <m-no-data :msg="msg" v-if="msg"></m-no-data>
     </template>
     <m-spin :is-spin="isLoading" :is-left="id ? true : false">
     </m-spin>
@@ -154,7 +155,8 @@
           projectId: this.id,
           startDate: '',
           endDate: ''
-        }
+        },
+        msg: ''
       }
     },
     props: {
@@ -297,7 +299,7 @@
             this.isLoading = false
           }, 800)
         }).catch(e => {
-          console.log(e)
+          this.msg = e.msg || 'error'
           this.isLoading = false
         })
       }

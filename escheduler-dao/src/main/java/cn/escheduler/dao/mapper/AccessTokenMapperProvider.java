@@ -97,6 +97,9 @@ public class AccessTokenMapperProvider {
             FROM(TABLE_NAME + " t,t_escheduler_user u");
             Object searchVal = parameter.get("searchVal");
             WHERE("u.id = t.user_id");
+            if(parameter.get("userId") != null && (int)parameter.get("userId") != 0){
+                WHERE(" u.id = #{userId}");
+            }
             if(searchVal != null && StringUtils.isNotEmpty(searchVal.toString())){
                 WHERE(" u.user_name like concat('%', #{searchVal}, '%')");
             }
@@ -115,6 +118,9 @@ public class AccessTokenMapperProvider {
                 FROM(TABLE_NAME + " t,t_escheduler_user u");
                 Object searchVal = parameter.get("searchVal");
                 WHERE("u.id = t.user_id");
+                if(parameter.get("userId") != null && (int)parameter.get("userId") != 0){
+                    WHERE(" u.id = #{userId}");
+                }
                 if(searchVal != null && StringUtils.isNotEmpty(searchVal.toString())){
                     WHERE(" u.user_name like concat('%', #{searchVal}, '%') ");
                 }
