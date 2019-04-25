@@ -91,7 +91,7 @@ let simple = {
       return str
     }
   },
-  color:['#D5050B','#0398E1']
+  color: ['#D5050B', '#0398E1']
 
 
 }
