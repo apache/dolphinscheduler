@@ -6,12 +6,12 @@
           <div class="row-title">
             <div class="left">
               <span class="sp">IP: {{item.host}}</span>
-              <span class="sp">端口: {{item.port}}</span>
-              <span class="sp">zk注册目录: {{item.zkDirectory}}</span>
+              <span class="sp">{{$t('Port')}}: {{item.port}}</span>
+              <span class="sp">{{$t('Zk registration directory')}}: {{item.zkDirectory}}</span>
             </div>
             <div class="right">
-              <span class="sp">创建时间: {{item.createTime | formatDate}}</span>
-              <span class="sp">最后心跳时间: {{item.lastHeartbeatTime | formatDate}}</span>
+              <span class="sp">{{$t('Create Time')}}: {{item.createTime | formatDate}}</span>
+              <span class="sp">{{$t('Last heartbeat time')}}: {{item.lastHeartbeatTime | formatDate}}</span>
             </div>
           </div>
           <div class="row-cont">

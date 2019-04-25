@@ -2,7 +2,7 @@
   <m-popup
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? '编辑Worker分组' : '创建Worker分组'"
+          :nameText="item ? $t('Edit worker group') : $t('Create worker group')"
           @ok="_ok">
     <template slot="content">
       <div class="create-worker-model">
@@ -23,10 +23,10 @@
                     :autosize="{ minRows: 4, maxRows: 6 }"
                     type="textarea"
                     v-model="ipList"
-                    :placeholder="'请输入IP地址多个用逗号隔开'">
+                    :placeholder="$t('Please enter the IP address separated by commas')">
             </x-input>
             <div class="ipt-tip">
-              <span>注意：多个IP地址已逗号分割</span>
+              <span>{{$t('Note: Multiple IP addresses have been comma separated')}}</span>
             </div>
           </template>
         </m-list-box-f>
