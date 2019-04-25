@@ -15,23 +15,16 @@
  * limitations under the License.
  */
 
-import Vuex from 'vuex'
-import dag from './dag'
-import projects from './projects'
-import resource from './resource'
-import security from './security'
-import datasource from './datasource'
-import user from './user'
-import monitor from './monitor'
+import actions from './actions'
+import getters from './getters'
+import mutations from './mutations'
+import state from './state'
 
-export default new Vuex.Store({
-  modules: {
-    dag,
-    projects,
-    resource,
-    security,
-    datasource,
-    user,
-    monitor
-  }
-})
+export default {
+  strict: true,
+  namespaced: true,
+  state,
+  getters,
+  mutations,
+  actions
+}
