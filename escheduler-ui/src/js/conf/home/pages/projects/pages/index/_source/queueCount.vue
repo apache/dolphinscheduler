@@ -1,6 +1,6 @@
 <template>
   <div class="queue-count-model">
-    <template v-show="!msg">
+    <div v-show="!msg">
       <div class="data-area" v-spin="isSpin" style="height: 430px;">
         <div class="col-md-7">
           <div id="queue-pie" style="height:260px;margin-top: 100px;"></div>
@@ -10,8 +10,8 @@
             <table>
               <tr>
                 <th width="40">{{$t('#')}}</th>
-                <th>等待执行任务</th>
-                <th>等待Kill任务</th>
+                <th>{{$t('Number')}}</th>
+                <th>{{$t('State')}}</th>
               </tr>
               <tr v-for="(item,$index) in queueList">
                 <td><span>{{$index+1}}</span></td>
@@ -22,10 +22,10 @@
           </div>
         </div>
       </div>
-    </template>
-    <template v-show="msg">
-      <m-no-data :msg="msg" v-if="msg"></m-no-data>
-    </template>
+    </div>
+    <div v-show="msg">
+      <m-no-data :msg="msg" v-if="msg" :height="430"></m-no-data>
+    </div>
   </div>
 </template>
 <script>
@@ -50,12 +50,12 @@
       ...mapActions('projects', ['getQueueCount']),
       _handleQueue (res) {
         _.forEach(res.data, (v, k) => this.queueList.push({
-          key: k === 'taskQueue' ? '等待执行任务' : '等待kill任务',
+          key: k === 'taskQueue' ? `${this.$t('Task queue')}` : `${this.$t('Task kill')}`,
           value: v
         }))
         const myChart = Chart.pie('#queue-pie', this.queueList, { title: '' })
-        myChart.echart.setOption(_.assign(_.cloneDeep(pie),{
-          color:['#D5050B','#0398E1']
+        myChart.echart.setOption(_.assign(_.cloneDeep(pie), {
+          color: ['#D5050B', '#0398E1']
         }))
       }
     },
@@ -76,29 +76,10 @@
         }
       }
     },
-    beforeCreate () {
-    },
     created () {
-    },
-    beforeMount () {
     },
     mounted () {
     },
-    beforeUpdate () {
-    },
-    updated () {
-    },
-    beforeDestroy () {
-    },
-    destroyed () {
-    },
-    computed: {},
     components: { mNoData }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-  .queue-count-model {
-
-  }
-</style>

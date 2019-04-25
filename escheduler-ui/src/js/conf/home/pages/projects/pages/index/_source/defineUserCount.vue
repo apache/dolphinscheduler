@@ -1,13 +1,13 @@
 <template>
   <div class="define-user-count-model">
-    <template v-if="!msg">
+    <div v-if="!msg">
       <div class="data-area" v-spin="isSpin">
         <div id="process-definition-bar" style="height:500px"></div>
       </div>
-    </template>
-    <template v-if="msg">
-      <m-no-data :msg="msg" v-if="msg"></m-no-data>
-    </template>
+    </div>
+    <div v-if="msg">
+      <m-no-data :msg="msg" v-if="msg" :height="530"></m-no-data>
+    </div>
   </div>
 </template>
 <script>
@@ -40,7 +40,7 @@
         const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {})
         myChart.echart.setOption(bar)
         // 首页不允许跳转
-        if (this.id) {
+        if (this.projectId) {
           myChart.echart.on('click', e => {
             this.$router.push({
               name: 'projects-definition-list',

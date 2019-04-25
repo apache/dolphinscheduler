@@ -1,13 +1,13 @@
 <template>
   <div class="command-state-count-model">
-    <template v-show="!msg">
+    <div v-show="!msg">
       <div class="data-area" v-spin="isSpin">
         <div id="command-state-bar" style="height:500px"></div>
       </div>
-    </template>
-    <template v-show="msg">
-      <m-no-data :msg="msg" v-if="msg"></m-no-data>
-    </template>
+    </div>
+    <div v-show="msg">
+      <m-no-data :msg="msg" v-if="msg" :height="530"></m-no-data>
+    </div>
   </div>
 </template>
 <script>

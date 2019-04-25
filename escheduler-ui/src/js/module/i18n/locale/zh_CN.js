@@ -426,5 +426,10 @@ export default {
   'Please enter token': '请输入令牌',
   'Generate token': '生成令牌',
   'Monitor': '监控中心',
-  'Group': '分组'
+  'Group': '分组',
+
+  'Queue statistics': '队列统计',
+  'Command status statistics': '命令状态统计',
+  'Task kill': '等待kill任务',
+  'Task queue': '等待执行任务'
 }
