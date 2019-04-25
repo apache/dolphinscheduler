@@ -54,7 +54,9 @@
           value: v
         }))
         const myChart = Chart.pie('#queue-pie', this.queueList, { title: '' })
-        myChart.echart.setOption(pie)
+        myChart.echart.setOption(_.assign(_.cloneDeep(pie),{
+          color:['#D5050B','#0398E1']
+        }))
       }
     },
     watch: {
