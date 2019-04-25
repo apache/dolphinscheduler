@@ -4,25 +4,25 @@
       <table>
         <tr>
           <th>
-            <span>编号</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>用户</span>
+            <span>{{$t('User')}}</span>
           </th>
           <th>
             <span>Token</span>
           </th>
           <th>
-            <span>开始时间</span>
+            <span>{{$t('Start Time')}}</span>
           </th>
           <th>
-            <span>失效时间</span>
+            <span>{{$t('Failure time')}}</span>
           </th>
           <th>
-            <span>创建时间</span>
+            <span>{{$t('Create Time')}}</span>
           </th>
           <th>
-            <span>更新时间</span>
+            <span>{{$t('Update Time')}}</span>
           </th>
           <th width="70">
             <span>{{$t('Operation')}}</span>

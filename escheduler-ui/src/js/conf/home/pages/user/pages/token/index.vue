@@ -1,9 +1,9 @@
 <template>
-  <m-list-construction :title="'令牌管理'">
+  <m-list-construction :title="$t('Token manage')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small" @click="_create('')">创建令牌</x-button>
+          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create token')}}</x-button>
         </template>
       </m-conditions>
     </template>
