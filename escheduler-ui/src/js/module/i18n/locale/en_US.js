@@ -426,5 +426,10 @@ export default {
   'Please enter token': 'Please enter token',
   'Generate token': 'Generate token',
   'Monitor': 'Monitor',
-  'Group': 'Group'
+  'Group': 'Group',
+
+  'Queue statistics': 'Queue statistics',
+  'Command status statistics': 'Command status statistics',
+  'Task kill': 'Task Kill',
+  'Task queue': 'Task queue'
 }
