@@ -201,10 +201,10 @@ workerExecThreads="100"
 workerHeartbeatInterval="10"
 
 # worker一次抓取任务数
-workerFetchTaskNum="10"
+workerFetchTaskNum="3"
 
-# worker最大cpu平均负载,用来判断master是否还有执行能力
-workerMaxCupLoadAvg="10"
+# worker最大cpu平均负载,用来判断worker是否还有执行能力,保持系统默认，默认为cpu核数的2倍，当负载达到2倍时，
+#workerMaxCupLoadAvg="10"
 
 # worker预留内存,用来判断master是否还有执行能力
 workerReservedMemory="1"
@@ -279,7 +279,7 @@ sed -i ${txt} "s#master.reserved.memory.*#master.reserved.memory=${masterReserve
 sed -i ${txt} "s#worker.exec.threads.*#worker.exec.threads=${workerExecThreads}#g" conf/worker.properties
 sed -i ${txt} "s#worker.heartbeat.interval.*#worker.heartbeat.interval=${workerHeartbeatInterval}#g" conf/worker.properties
 sed -i ${txt} "s#worker.fetch.task.num.*#worker.fetch.task.num=${workerFetchTaskNum}#g" conf/worker.properties
-sed -i ${txt} "s#worker.max.cpuload.avg.*#worker.max.cpuload.avg=${workerMaxCupLoadAvg}#g" conf/worker.properties
+#sed -i ${txt} "s#worker.max.cpuload.avg.*#worker.max.cpuload.avg=${workerMaxCupLoadAvg}#g" conf/worker.properties
 sed -i ${txt} "s#worker.reserved.memory.*#worker.reserved.memory=${workerReservedMemory}#g" conf/worker.properties
 
 
