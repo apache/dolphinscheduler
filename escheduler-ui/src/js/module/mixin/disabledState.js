@@ -17,6 +17,7 @@
 
 import store from '@/conf/home/store'
 import router from '@/conf/home/router'
+import Permissions from '@/module/permissions'
 
 export default {
   data () {
@@ -27,7 +28,7 @@ export default {
     }
   },
   created () {
-    this.isDetails = this.store.state.dag.isDetails
+    this.isDetails = Permissions.getAuth() ? this.store.state.dag.isDetails : true
   },
   computed: {
     _isDetails () {
