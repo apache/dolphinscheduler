@@ -1,9 +1,9 @@
 <template>
-  <m-list-construction :title="'worker分组管理'">
+  <m-list-construction :title="$t('Worker group manage')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small" @click="_create('')">创建worker分组</x-button>
+          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create worker group')}}</x-button>
         </template>
       </m-conditions>
     </template>

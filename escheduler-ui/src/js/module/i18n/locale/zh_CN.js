@@ -151,7 +151,7 @@ export default {
   'Please enter name': '请输入名称',
   'Owned Users': '所属用户',
   'Process Pid': '进程pid',
-  'zk registration directory': 'zk注册目录',
+  'Zk registration directory': 'zk注册目录',
   'cpuUsage': 'cpuUsage',
   'memoryUsage': 'memoryUsage',
   'Last heartbeat time': '最后心跳时间',
@@ -411,5 +411,20 @@ export default {
   'History task record': '历史任务记录',
   'Please go online': '不要忘记上线',
   'Queue value': '队列值',
-  'Please enter queue value': '请输入队列值'
+  'Please enter queue value': '请输入队列值',
+
+  'Worker group manage': 'Worker分组管理',
+  'Create worker group': '创建Worker分组',
+  'Edit worker group': '编辑Worker分组',
+  'Token manage': '令牌管理',
+  'Create token': '创建令牌',
+  'Edit token': '编辑令牌',
+  'Please enter the IP address separated by commas': '请输入IP地址多个用逗号隔开',
+  'Note: Multiple IP addresses have been comma separated': '注意：多个IP地址已逗号分割',
+  'Failure time': '失效时间',
+  'User': '用户',
+  'Please enter token': '请输入令牌',
+  'Generate token': '生成令牌',
+  'Monitor': '监控中心',
+  'Group': '分组'
 }

@@ -323,7 +323,7 @@ const router = new Router({
           name: 'worker-groups-manage',
           component: resolve => require(['../pages/security/pages/workerGroups/index'], resolve),
           meta: {
-            title: `workerGroups`
+            title: `${i18n.$t('Worker group manage')}`
           }
         },
         {
@@ -331,7 +331,7 @@ const router = new Router({
           name: 'token-manage',
           component: resolve => require(['../pages/security/pages/token/index'], resolve),
           meta: {
-            title: `token`
+            title: `${i18n.$t('Token manage')}`
           }
         }
       ]
@@ -368,7 +368,7 @@ const router = new Router({
           name: 'token',
           component: resolve => require(['../pages/user/pages/token/index'], resolve),
           meta: {
-            title: `令牌管理`
+            title: `${i18n.$t('Token manage')}`
           }
         }
       ]
@@ -405,7 +405,7 @@ const router = new Router({
           name: 'servers-alert',
           component: resolve => require(['../pages/monitor/pages/servers/alert'], resolve),
           meta: {
-            title: `alert`
+            title: `Alert`
           }
         },
         {
@@ -413,7 +413,7 @@ const router = new Router({
           name: 'servers-rpcserver',
           component: resolve => require(['../pages/monitor/pages/servers/rpcserver'], resolve),
           meta: {
-            title: `rpcserver`
+            title: `Rpcserver`
           }
         },
         {
@@ -421,7 +421,7 @@ const router = new Router({
           name: 'servers-zookeeper',
           component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
           meta: {
-            title: `zookeeper`
+            title: `Zookeeper`
           }
         },
         {
@@ -429,7 +429,7 @@ const router = new Router({
           name: 'servers-apiserver',
           component: resolve => require(['../pages/monitor/pages/servers/apiserver'], resolve),
           meta: {
-            title: `apiserver`
+            title: `Apiserver`
           }
         },
         {
@@ -437,7 +437,7 @@ const router = new Router({
           name: 'servers-mysql',
           component: resolve => require(['../pages/monitor/pages/servers/mysql'], resolve),
           meta: {
-            title: `mysql`
+            title: `Mysql`
           }
         }
       ]

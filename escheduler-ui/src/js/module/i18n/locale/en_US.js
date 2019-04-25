@@ -151,7 +151,7 @@ export default {
   'Please enter name': 'Please enter name',
   'Owned Users': 'Owned Users',
   'Process Pid': 'Process Pid',
-  'zk registration directory': 'zk registration directory',
+  'Zk registration directory': 'Zk registration directory',
   'cpuUsage': 'cpuUsage',
   'memoryUsage': 'memoryUsage',
   'Last heartbeat time': 'Last heartbeat time',
@@ -411,5 +411,20 @@ export default {
   'History task record': 'History task record',
   'Please go online': 'Please go online',
   'Queue value': 'Queue value',
-  'Please enter queue value': 'Please enter queue value'
+  'Please enter queue value': 'Please enter queue value',
+
+  'Worker group manage': 'Worker group manage',
+  'Create worker group': 'Create worker group',
+  'Edit worker group': 'Edit worker group',
+  'Token manage': 'Token manage',
+  'Create token': 'Create token',
+  'Edit token': 'Edit token',
+  'Please enter the IP address separated by commas': 'Please enter the IP address separated by commas',
+  'Note: Multiple IP addresses have been comma separated': 'Note: Multiple IP addresses have been comma separated',
+  'Failure time': 'Failure time',
+  'User': 'User',
+  'Please enter token': 'Please enter token',
+  'Generate token': 'Generate token',
+  'Monitor': 'Monitor',
+  'Group': 'Group'
 }
