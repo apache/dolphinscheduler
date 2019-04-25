@@ -1,9 +1,5 @@
 <template>
-  <m-list-construction :title="$t('Home')">
-    <template slot="content">
-      <m-project-home :id="0"></m-project-home>
-    </template>
-  </m-list-construction>
+  <m-project-home :id="0"></m-project-home>
 </template>
 
 <script>
