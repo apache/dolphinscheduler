@@ -65,7 +65,6 @@
   // import _ from 'lodash'
   // import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
 
   export default {
     name: 'user-list',

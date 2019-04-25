@@ -58,7 +58,6 @@
 </template>
 <script>
   import { mapState, mapMutations } from 'vuex'
-  import '@/module/filter/formatDate'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mCreateUser from '@/conf/home/pages/security/pages/users/_source/createUser'
 

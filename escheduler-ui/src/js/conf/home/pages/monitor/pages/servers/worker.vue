@@ -2,170 +2,91 @@
   <m-list-construction :title="'Worker管理'">
     <template slot="content">
       <div class="servers-wrapper">
-        <div class="row">
-          <div class="col-md-4">
-            <div class="gridb-model">
-              <div class="title">
-                <span>Cpu详细信息</span>
-              </div>
-              <div class="gauge-echart">
-                <div id="a1" style="height: 380px;"></div>
-              </div>
-              <div class="text-1" style="margin-top: -126px">
-                cpu
-              </div>
+        <div class="row-box" v-for="(item,$index) in workerList">
+          <div class="row-title">
+            <div class="left">
+              <span class="sp">IP: {{item.host}}</span>
+              <span class="sp">端口: {{item.port}}</span>
+              <span class="sp">zk注册目录: {{item.zkDirectory}}</span>
+            </div>
+            <div class="right">
+              <span class="sp">创建时间: {{item.createTime | formatDate}}</span>
+              <span class="sp">最后心跳时间: {{item.lastHeartbeatTime | formatDate}}</span>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="gridb-model">
-              <div class="title">
-                <span>内存详细信息</span>
-              </div>
-              <div class="gauge-echart">
-                <div id="a2" style="height: 380px;"></div>
-              </div>
-              <div class="text-1" style="margin-top: -126px">
-                cpu
-              </div>
+          <div class="row-cont">
+            <div class="col-md-4">
+              <m-gauge
+                      :value="(item.resInfo.cpuUsage * 100).toFixed(2)"
+                      :name="'cpuUsage'"
+                      :id="'gauge-cpu-' + item.id">
+              </m-gauge>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="gridb-model">
-              <div class="title">
-                <span>内存详细信息</span>
-              </div>
-              <div class="value-p">
-                <b style="color: #0098e1;">83</b>
-              </div>
-              <div class="text-1">
-                cpu
-              </div>
+            <div class="col-md-4">
+              <m-gauge
+                      :value="(item.resInfo.memoryUsage * 100).toFixed(2)"
+                      :name="'memoryUsage'"
+                      :id="'gauge-memory-' + item.id">
+              </m-gauge>
             </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-4">
-            <div class="gridb-model">
-              <div class="title">
-                <span>Cpu详细信息</span>
-              </div>
-              <div class="gauge-echart">
-                <div id="a3" style="height: 380px;"></div>
-              </div>
-              <div class="text-1" style="margin-top: -126px">
-                cpu
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="gridb-model">
-              <div class="title">
-                <span>内存详细信息</span>
-              </div>
-              <div class="gauge-echart">
-                <div id="a4" style="height: 380px;"></div>
-              </div>
-              <div class="text-1" style="margin-top: -126px">
-                cpu
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="gridb-model">
-              <div class="title">
-                <span>内存详细信息</span>
-              </div>
-              <div class="value-p">
-                <b  style="color: #7281c2;">18</b>
-              </div>
-              <div class="text-1">
-                cpu
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-4">
-            <div class="gridb-model">
-              <div class="title">
-                <span>Cpu详细信息</span>
-              </div>
-              <div class="gauge-echart">
-                <div id="a5" style="height: 380px;"></div>
-              </div>
-              <div class="text-1" style="margin-top: -126px">
-                cpu
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="gridb-model">
-              <div class="title">
-                <span>内存详细信息</span>
-              </div>
-              <div class="gauge-echart">
-                <div id="a6" style="height: 380px;"></div>
-              </div>
-              <div class="text-1" style="margin-top: -126px">
-                cpu
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="gridb-model">
-              <div class="title">
-                <span>内存详细信息</span>
-              </div>
-              <div class="value-p">
-                <b  style="color: #f2ac6f;">15</b>
-              </div>
-              <div class="text-1">
-                cpu
+            <div class="col-md-4">
+              <div class="text-num-model">
+                <div class="value-p">
+                  <b :style="{color:color[$index]}">{{item.resInfo.loadAverage}}</b>
+                </div>
+                <div class="text-1">
+                  loadAverage
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+      <m-spin :is-spin="isLoading"></m-spin>
     </template>
   </m-list-construction>
 </template>
 <script>
+  import _ from 'lodash'
   import { mapActions } from 'vuex'
-  import mList from './_source/list'
+  import mGauge from './_source/gauge'
+  import mList from './_source/zookeeperList'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
-  import gaugeOption from './_source/gaugeOption'
+  import themeData from '@/module/echarts/themeData.json'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
     name: 'servers-worker',
     data () {
       return {
-        pageSize: 10,
-        pageNo: 1,
-        totalPage: null,
-        searchVal: '',
         isLoading: false,
-        masterList: []
+        workerList: [],
+        color: themeData.color
       }
     },
     props: {},
     methods: {
-      ...mapActions('security', ['getProcessMasterList'])
+      ...mapActions('monitor', ['getWorkerData'])
     },
     watch: {},
     created () {
 
     },
     mounted () {
-      let b = {}
-      let a = ['a1', 'a2', 'a3', 'a4', 'a5', 'a6']
-      a.forEach((v, i) => {
-        b[v] = echarts.init(document.getElementById(v)) // eslint-disable-line
-        b[v].setOption(gaugeOption, true)
+      this.isLoading = true
+      this.getWorkerData().then(res => {
+        this.workerList = _.map(res, (v, i) => {
+          return _.assign(v, {
+            resInfo: JSON.parse(v.resInfo)
+          })
+        })
+        this.isLoading = false
+      }).catch(() => {
+        this.isLoading = true
       })
     },
-    components: { mList, mListConstruction, mSpin, mNoData }
+    components: { mList, mListConstruction, mSpin, mNoData, mGauge }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss">

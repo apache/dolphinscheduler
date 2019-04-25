@@ -77,7 +77,6 @@
   </div>
 </template>
 <script>
-  import '@/module/filter/formatDate'
   import Permissions from '@/module/permissions'
   import mLog from '@/conf/home/pages/dag/_source/formModel/log'
   import { tasksState } from '@/conf/home/pages/dag/_source/config'
