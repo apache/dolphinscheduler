@@ -149,10 +149,11 @@ public class ExecutorController extends BaseController {
     @GetMapping(value = "/get-receiver-cc")
     @ResponseStatus(HttpStatus.OK)
     public Result getReceiverCc(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                        @RequestParam(value = "processDefinitionId") int processDefinitionId){
+                                @RequestParam(value = "processDefinitionId",required = false) Integer processDefinitionId,
+                                @RequestParam(value = "processInstanceId",required = false) Integer processInstanceId) {
         logger.info("login user {}, get process definition receiver and cc", loginUser.getUserName());
         try {
-            Map<String, Object> result = execService.getReceiverCc(processDefinitionId);
+            Map<String, Object> result = execService.getReceiverCc(processDefinitionId,processInstanceId);
             return returnDataList(result);
         } catch (Exception e) {
             logger.error(QUERY_RECIPIENTS_AND_COPYERS_BY_PROCESS_DEFINITION_ERROR.getMsg(),e);
