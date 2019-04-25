@@ -107,7 +107,6 @@
   import _ from 'lodash'
   import mRename from './rename'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import { filtTypeArr } from '../../_source/common'
   import { bytesToSize } from '@/module/util/util'
   import { downloadFile } from '@/module/download'

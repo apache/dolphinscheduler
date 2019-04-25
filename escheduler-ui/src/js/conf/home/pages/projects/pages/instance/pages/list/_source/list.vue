@@ -250,7 +250,6 @@
 <script>
   import _ from 'lodash'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import { tasksState, runningType } from '@/conf/home/pages/dag/_source/config'
 
   export default {

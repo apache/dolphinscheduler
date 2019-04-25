@@ -116,7 +116,6 @@
 <script>
   import _ from 'lodash'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import mSpin from '@/module/components/spin/spin'
   import mTiming from '../../pages/list/_source/timing'
   import mNoData from '@/module/components/noData/noData'
