@@ -110,7 +110,7 @@ let menu = {
       children: []
     },
     {
-      name: `worker分组管理`,
+      name: `${i18n.$t('Worker group manage')}`,
       id: 4,
       path: 'worker-groups-manage',
       isOpen: true,
@@ -119,7 +119,7 @@ let menu = {
       children: []
     },
     {
-      name: `令牌管理`,
+      name: `${i18n.$t('Token manage')}`,
       id: 2,
       path: 'token-manage',
       isOpen: true,
@@ -181,7 +181,7 @@ let menu = {
       disabled: true
     },
     {
-      name: `令牌管理`,
+      name: `${i18n.$t('Token manage')}`,
       id: 2,
       path: 'token',
       isOpen: true,

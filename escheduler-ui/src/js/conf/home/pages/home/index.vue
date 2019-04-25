@@ -1,16 +1,16 @@
 <template>
   <m-list-construction :title="$t('Home')">
     <template slot="content">
-      <m-project-chart :id="0"></m-project-chart>
+      <m-project-home :id="0"></m-project-home>
     </template>
   </m-list-construction>
 </template>
 
 <script>
-import mProjectChart from '@/conf/home/pages/projects/pages/index/_source/projectChart'
+import mProjectHome from '@/conf/home/pages/projects/pages/index'
 import mListConstruction from '@/module/components/listConstruction/listConstruction'
 export default {
   name: 'home',
-  components: { mProjectChart, mListConstruction }
+  components: { mProjectHome, mListConstruction }
 }
 </script>
