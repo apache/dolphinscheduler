@@ -20,6 +20,7 @@ import cn.escheduler.common.utils.MysqlUtil;
 import cn.escheduler.common.utils.ScriptRunner;
 import cn.escheduler.dao.AbstractBaseDao;
 import cn.escheduler.dao.datasource.ConnectionFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ public class UpgradeDao extends AbstractBaseDao {
 
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
     private static final String T_VERSION_NAME = "t_escheduler_version";
+    private static final String rootDir = System.getProperty("user.dir");
 
     @Override
     protected void init() {
@@ -64,6 +66,10 @@ public class UpgradeDao extends AbstractBaseDao {
 
     private void runInitEschedulerDML() {
         Connection conn = null;
+        if (StringUtils.isEmpty(rootDir)) {
+            throw new RuntimeException("Environment variable user.dir not found");
+        }
+        String mysqlSQLFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/escheduler_dml.sql";
         try {
             conn = ConnectionFactory.getDataSource().getConnection();
             conn.setAutoCommit(false);
@@ -71,7 +77,7 @@ public class UpgradeDao extends AbstractBaseDao {
             // Execute the ark_manager_dml.sql script to import the data related to escheduler
 
             ScriptRunner initScriptRunner = new ScriptRunner(conn, false, true);
-            Reader initSqlReader = new FileReader(new File("sql/create/release-1.0.0_schema/mysql/escheduler_dml.sql"));
+            Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
             initScriptRunner.runScript(initSqlReader);
 
             conn.commit();
@@ -100,11 +106,15 @@ public class UpgradeDao extends AbstractBaseDao {
 
     private void runInitEschedulerDDL() {
         Connection conn = null;
+        if (StringUtils.isEmpty(rootDir)) {
+            throw new RuntimeException("Environment variable user.dir not found");
+        }
+        String mysqlSQLFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/escheduler_ddl.sql";
         try {
             conn = ConnectionFactory.getDataSource().getConnection();
             // Execute the escheduler_ddl.sql script to create the table structure of escheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
-            Reader initSqlReader = new FileReader(new File("sql/create/release-1.0.0_schema/mysql/escheduler_ddl.sql"));
+            Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
             initScriptRunner.runScript(initSqlReader);
 
         } catch (IOException e) {
@@ -213,7 +223,10 @@ public class UpgradeDao extends AbstractBaseDao {
 
     private void upgradeEschedulerDML(String schemaDir) {
         String schemaVersion = schemaDir.split("_")[0];
-        String mysqlSQLFilePath = "sql/upgrade/" + schemaDir + "/mysql/escheduler_dml.sql";
+        if (StringUtils.isEmpty(rootDir)) {
+            throw new RuntimeException("Environment variable user.dir not found");
+        }
+        String mysqlSQLFilePath = rootDir + "/sql/upgrade/" + schemaDir + "/mysql/escheduler_dml.sql";
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -270,7 +283,10 @@ public class UpgradeDao extends AbstractBaseDao {
     }
 
     private void upgradeEschedulerDDL(String schemaDir) {
-        String mysqlSQLFilePath = "sql/upgrade/" + schemaDir + "/mysql/escheduler_ddl.sql";
+        if (StringUtils.isEmpty(rootDir)) {
+            throw new RuntimeException("Environment variable user.dir not found");
+        }
+        String mysqlSQLFilePath = rootDir + "/sql/upgrade/" + schemaDir + "/mysql/escheduler_ddl.sql";
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
