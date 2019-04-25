@@ -1,7 +1,7 @@
 <template>
-  <m-list-construction :title="'Master管理'">
+  <m-list-construction :title="'Master ' + $t('Manage')">
     <template slot="content">
-      <div class="servers-wrapper">
+      <div class="servers-wrapper" v-show="masterList.length">
         <div class="row-box" v-for="(item,$index) in masterList">
           <div class="row-title">
             <div class="left">
@@ -41,6 +41,9 @@
             </div>
           </div>
         </div>
+      </div>
+      <div v-if="!masterList.length">
+        <m-no-data></m-no-data>
       </div>
       <m-spin :is-spin="isLoading"></m-spin>
     </template>

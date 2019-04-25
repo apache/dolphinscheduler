@@ -31,6 +31,13 @@
         background: #F9F9F9;
         border-bottom: 1px solid #E8E8E8;
         padding-left: 10px;
+        span {
+          width: 80%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space:  nowrap;
+          display: block;
+        }
       }
     }
     .value-p {
@@ -51,13 +58,13 @@
   }
   &.mysql-model {
     .text-num-model {
-      height: 260px;
+      height: 250px;
       .text-1 {
-        font-size: 20px;
+        font-size: 18px;
       }
       .value-p {
-        height: 160px;
-        line-height: 160px;
+        height: 150px;
+        line-height: 150px;
         >b {
           font-size: 72px;
         }

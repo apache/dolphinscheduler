@@ -7,40 +7,40 @@
             <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>host</span>
+            <span>{{$t('host')}}</span>
           </th>
           <th>
-            <span>连接数</span>
+            <span>{{$t('Number of connections')}}</span>
           </th>
           <th>
-            <span>watches数量</span>
+            <span>watches {{$t('Number')}}</span>
           </th>
           <th>
-            <span>发送量</span>
+            <span>{{$t('Sent')}}</span>
           </th>
           <th>
-            <span>接收量</span>
+            <span>{{$t('Received')}}</span>
           </th>
           <th>
             <span>leader/follower</span>
           </th>
           <th>
-            <span>最低延时</span>
+            <span>{{$t('Min latency')}}</span>
           </th>
           <th>
-            <span>平均延时</span>
+            <span>{{$t('Avg latency')}}</span>
           </th>
           <th>
-            <span>最大延时</span>
+            <span>{{$t('Max latency')}}</span>
           </th>
           <th>
-            <span>节点数</span>
+            <span>{{$t('Node count')}}</span>
           </th>
           <th>
-            <span>当前查询时间戳</span>
+            <span>{{$t('Query time')}}</span>
           </th>
           <th style="text-align: center">
-            <span>节点自检状态</span>
+            <span>{{$t('Node self-test status')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="$index">
@@ -99,8 +99,6 @@
     },
     props: {
       list: Array
-    },
-    methods: {
     }
   }
 </script>

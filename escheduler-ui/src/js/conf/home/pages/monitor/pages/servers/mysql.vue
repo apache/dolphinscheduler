@@ -1,12 +1,12 @@
 <template>
-  <m-list-construction :title="'Mysql管理'">
+  <m-list-construction :title="'Mysql ' + $t('Manage')">
     <template slot="content">
-      <div class="servers-wrapper mysql-model">
+      <div class="servers-wrapper mysql-model" v-show="mysqlList.length">
         <div class="row" v-for="(item,$index) in mysqlList">
           <div class="col-md-2">
             <div class="text-num-model text">
               <div class="title">
-                <span>正常与否</span>
+                <span :title="$t('Health status')">{{$t('Health status')}}</span>
               </div>
               <div class="value-p">
                 <span class="state">
@@ -15,63 +15,66 @@
                 </span>
               </div>
               <div class="text-1">
-                正常与否
+                {{$t('Health status')}}
               </div>
             </div>
           </div>
           <div class="col-md-3">
             <div class="text-num-model text">
               <div class="title">
-                <span>最大连接数 - {{item.date | formatDate}}</span>
+                <span :title="$t('Max connections')">{{$t('Max connections')}} - {{item.date | formatDate}}</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[0]}">{{item.maxConnections}}</b>
               </div>
               <div class="text-1">
-                最大连接数
+                {{$t('Max connections')}}
               </div>
             </div>
           </div>
           <div class="col-md-3">
             <div class="text-num-model text">
               <div class="title">
-                <span>当前活跃连接</span>
+                <span :title="$t('Threads connections')">{{$t('Threads connections')}}</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[8]}">{{item.threadsConnections}}</b>
               </div>
               <div class="text-1">
-                当前活跃连接
+                {{$t('Threads connections')}}
               </div>
             </div>
           </div>
           <div class="col-md-2">
             <div class="text-num-model text">
               <div class="title">
-                <span>最大使用连接数</span>
+                <span :title="$t('Max used connections')">{{$t('Max used connections')}}</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[2]}">{{item.maxUsedConnections}}</b>
               </div>
               <div class="text-1">
-                最大使用连接数
+                {{$t('Max used connections')}}
               </div>
             </div>
           </div>
           <div class="col-md-2">
             <div class="text-num-model text">
               <div class="title">
-                <span>线程运行连接</span>
+                <span :title="$t('Threads running connections')">{{$t('Threads running connections')}}</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[4]}">{{item.threadsRunningConnections}}</b>
               </div>
               <div class="text-1">
-                线程运行连接
+                {{$t('Threads running connections')}}
               </div>
             </div>
           </div>
         </div>
+      </div>
+      <div v-if="!mysqlList.length">
+        <m-no-data></m-no-data>
       </div>
       <m-spin :is-spin="isLoading" ></m-spin>
     </template>
