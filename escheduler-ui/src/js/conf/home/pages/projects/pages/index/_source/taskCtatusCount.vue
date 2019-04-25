@@ -1,6 +1,6 @@
 <template>
   <div class="task-ctatus-count-model">
-    <template v-show="!msg">
+    <div v-show="!msg">
       <div class="data-area" v-spin="isSpin" style="height: 430px;">
         <div class="col-md-7">
           <div id="task-status-pie" style="height:260px;margin-top: 100px;"></div>
@@ -26,10 +26,10 @@
           </div>
         </div>
       </div>
-    </template>
-    <template v-show="msg">
-      <m-no-data :msg="msg" v-if="msg"></m-no-data>
-    </template>
+    </div>
+    <div v-show="msg">
+      <m-no-data :msg="msg" v-if="msg" :height="430"></m-no-data>
+    </div>
   </div>
 </template>
 <script>
@@ -59,8 +59,8 @@
           name: 'task-instance',
           query: {
             stateType: _.find(stateType, ['label', name])['code'],
-            startDate: this.scheduleTime[0],
-            endDate: this.scheduleTime[1]
+            startDate: this.searchParams.startDate,
+            endDate: this.searchParams.endDate
           }
         })
       },
@@ -77,7 +77,7 @@
         myChart.echart.setOption(pie)
 
         // 首页不允许跳转
-        if (this.id) {
+        if (this.searchParams.projectId) {
           myChart.echart.on('click', e => {
             this._goTask(e.data.name)
           })

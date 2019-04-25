@@ -38,7 +38,7 @@
           </div>
           <div class="col-md-6">
             <div class="chart-title">
-              <span>队列统计</span>
+              <span>{{$t('Queue statistics')}}</span>
             </div>
             <div class="row">
               <m-queue-count :search-params="searchParams">
@@ -49,7 +49,7 @@
         <div class="row">
           <div class="col-md-12">
             <div class="chart-title" style="margin-bottom: 20px;margin-top: 30px">
-              <span>命令状态统计</span>
+              <span>{{$t('Command status statistics')}}</span>
             </div>
             <div>
               <m-command-state-count :search-params="searchParams">

@@ -182,6 +182,26 @@ delimiter ;
 CALL ac_escheduler_T_t_escheduler_schedules_C_worker_group_id;
 DROP PROCEDURE ac_escheduler_T_t_escheduler_schedules_C_worker_group_id;
 
+-- ac_escheduler_T_t_escheduler_process_instance_C_worker_group_id
+drop PROCEDURE if EXISTS ac_escheduler_T_t_escheduler_process_instance_C_worker_group_id;
+delimiter d//
+CREATE PROCEDURE ac_escheduler_T_t_escheduler_process_instance_C_worker_group_id()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_escheduler_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME='worker_group_id')
+   THEN
+         ALTER TABLE t_escheduler_process_instance ADD COLUMN `worker_group_id` int(11) NULL DEFAULT -1 COMMENT '任务指定运行的worker分组' AFTER `process_instance_priority`;
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL ac_escheduler_T_t_escheduler_process_instance_C_worker_group_id;
+DROP PROCEDURE ac_escheduler_T_t_escheduler_process_instance_C_worker_group_id;
+
 
 -- ac_escheduler_T_t_escheduler_process_instance_C_timeout
 drop PROCEDURE if EXISTS ac_escheduler_T_t_escheduler_process_instance_C_timeout;

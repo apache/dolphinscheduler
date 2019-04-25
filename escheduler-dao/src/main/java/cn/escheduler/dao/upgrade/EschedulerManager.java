@@ -30,12 +30,17 @@ public class EschedulerManager {
     UpgradeDao upgradeDao = UpgradeDao.getInstance();
 
     public void initEscheduler() {
+        // Determines whether the escheduler table structure has been init
+        if(upgradeDao.isExistsTable("t_escheduler_version") || upgradeDao.isExistsTable("t_escheduler_queue")) {
+            logger.info("The database has been initialized. Skip the initialization step");
+            return;
+        }
         this.initEschedulerSchema();
     }
 
     public void initEschedulerSchema() {
 
-        logger.info("Start initializing the ark manager mysql table structure");
+        logger.info("Start initializing the escheduler manager mysql table structure");
         upgradeDao.initEschedulerSchema();
     }
 
@@ -52,15 +57,20 @@ public class EschedulerManager {
         }else {
 
             String version = "";
+            // Gets the version of the current system
+            if (upgradeDao.isExistsTable("t_escheduler_version")) {
+                version = upgradeDao.getCurrentVersion();
+            }else if(upgradeDao.isExistsColumn("t_escheduler_queue","create_time")){
+                version = "1.0.1";
+            }else if(upgradeDao.isExistsTable("t_escheduler_queue")){
+                version = "1.0.0";
+            }else{
+                logger.error("Unable to determine current software version, so cannot upgrade");
+            }
             // The target version of the upgrade
             String schemaVersion = "";
             for(String schemaDir : schemaList) {
-                // Gets the version of the current system
-                if (upgradeDao.isExistsTable("t_escheduler_version")) {
-                    version = upgradeDao.getCurrentVersion();
-                }else {
-                    version = "1.0.0";
-                }
+
 
                 schemaVersion = schemaDir.split("_")[0];
                 if(SchemaUtils.isAGreatVersion(schemaVersion , version)) {
@@ -70,7 +80,11 @@ public class EschedulerManager {
 
                     logger.info("Begin upgrading escheduler's mysql table structure");
                     upgradeDao.upgradeEscheduler(schemaDir);
-
+                    if(SchemaUtils.isAGreatVersion(version,"1.0.1")){
+                        version = upgradeDao.getCurrentVersion();
+                    }else {
+                        version = schemaVersion;
+                    }
                 }
 
             }

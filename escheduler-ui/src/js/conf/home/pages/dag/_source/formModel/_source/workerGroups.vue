@@ -1,5 +1,6 @@
 <template>
   <x-select
+          :disabled="isDetails"
           @on-change="_onChange"
           v-model="value"
           style="width: 180px">
