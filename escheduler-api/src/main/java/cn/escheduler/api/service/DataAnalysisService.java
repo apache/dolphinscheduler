@@ -370,8 +370,8 @@ public class DataAnalysisService {
             taskQueueCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
         }
 
-        if (tasksQueueIds.length != 0){
-            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
+        if (tasksKillIds.length != 0){
+            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksKillIds);
         }
 
 

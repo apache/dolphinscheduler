@@ -71,7 +71,6 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
 
   export default {
     name: 'token-list',
