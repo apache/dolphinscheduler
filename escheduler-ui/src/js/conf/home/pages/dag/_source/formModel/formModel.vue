@@ -73,7 +73,7 @@
             <span class="label-box" style="width: 193px;display: inline-block;">
               <m-priority v-model="taskInstancePriority"></m-priority>
             </span>
-            <span class="text-b">Worker分组</span>
+            <span class="text-b">{{$t('Worker group')}}</span>
             <m-worker-groups v-model="workerGroupId"></m-worker-groups>
           </div>
         </div>
