@@ -2,12 +2,12 @@
   <m-popup
           ref="popup"
           :ok-text="item ? $t('Edit') : $t('Submit')"
-          :nameText="item ? '编辑令牌' : '创建令牌'"
+          :nameText="item ? $t('Edit token') : $t('Create token')"
           @ok="_ok">
     <template slot="content">
       <div class="create-token-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>失效时间</template>
+          <template slot="name"><b>*</b>{{$t('Failure time')}}</template>
           <template slot="content">
             <x-datepicker
                     :disabled-date="disabledDate"
@@ -19,7 +19,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="auth">
-          <template slot="name"><b>*</b>用户</template>
+          <template slot="name"><b>*</b>{{$t('User')}}</template>
           <template slot="content">
             <x-select v-model="userId" @on-change="_onChange">
               <x-option
@@ -36,12 +36,12 @@
           <template slot="content">
             <x-input
                     readonly
-                    style="width: 330px;"
+                    style="width: 306px;"
                     type="input"
                     v-model="token"
-                    placeholder="请输入Token">
+                    :placeholder="$t('Please enter token')">
             </x-input>
-            <x-button type="ghost" @click="_generateToken" :loading="tokenLoading">生成Token</x-button>
+            <x-button type="ghost" @click="_generateToken" :loading="tokenLoading">{{$t('Generate token')}}</x-button>
           </template>
         </m-list-box-f>
       </div>

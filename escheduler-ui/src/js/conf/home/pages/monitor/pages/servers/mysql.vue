@@ -22,7 +22,7 @@
           <div class="col-md-3">
             <div class="text-num-model text">
               <div class="title">
-                <span>最大连接数</span>
+                <span>最大连接数 - {{item.date | formatDate}}</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[0]}">{{item.maxConnections}}</b>
@@ -48,13 +48,13 @@
           <div class="col-md-2">
             <div class="text-num-model text">
               <div class="title">
-                <span>最大连接数</span>
+                <span>最大使用连接数</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[2]}">{{item.maxUsedConnections}}</b>
               </div>
               <div class="text-1">
-                最大连接数
+                最大使用连接数
               </div>
             </div>
           </div>
