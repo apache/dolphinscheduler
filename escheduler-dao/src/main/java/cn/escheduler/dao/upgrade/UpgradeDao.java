@@ -122,12 +122,43 @@ public class UpgradeDao extends AbstractBaseDao {
 
     }
 
-
+    /**
+     * Determines whether a table exists
+     * @param tableName
+     * @return
+     */
     public boolean isExistsTable(String tableName) {
         Connection conn = null;
         try {
             conn = ConnectionFactory.getDataSource().getConnection();
             ResultSet rs = conn.getMetaData().getTables(null, null, tableName, null);
+            if (rs.next()) {
+                return true;
+            } else {
+                return false;
+            }
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(),e);
+            throw new RuntimeException(e.getMessage(),e);
+        } finally {
+            MysqlUtil.realeaseResource(null, null, conn);
+
+        }
+
+    }
+
+    /**
+     * Determines whether a field exists in the specified table
+     * @param tableName
+     * @param columnName
+     * @return
+     */
+    public boolean isExistsColumn(String tableName,String columnName) {
+        Connection conn = null;
+        try {
+            conn = ConnectionFactory.getDataSource().getConnection();
+            ResultSet rs = conn.getMetaData().getColumns(null,null,tableName,columnName);
             if (rs.next()) {
                 return true;
             } else {
