@@ -224,7 +224,7 @@ CALL ac_escheduler_T_t_escheduler_process_instance_C_timeout;
 DROP PROCEDURE ac_escheduler_T_t_escheduler_process_instance_C_timeout;
 
 
--- ac_escheduler_T_t_escheduler_process_instance_C_timeout
+-- ac_escheduler_T_t_escheduler_process_definition_C_timeout
 drop PROCEDURE if EXISTS ac_escheduler_T_t_escheduler_process_definition_C_timeout;
 delimiter d//
 CREATE PROCEDURE ac_escheduler_T_t_escheduler_process_definition_C_timeout()
