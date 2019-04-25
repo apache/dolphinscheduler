@@ -181,3 +181,45 @@ d//
 delimiter ;
 CALL ac_escheduler_T_t_escheduler_schedules_C_worker_group_id;
 DROP PROCEDURE ac_escheduler_T_t_escheduler_schedules_C_worker_group_id;
+
+
+-- ac_escheduler_T_t_escheduler_process_instance_C_timeout
+drop PROCEDURE if EXISTS ac_escheduler_T_t_escheduler_process_instance_C_timeout;
+delimiter d//
+CREATE PROCEDURE ac_escheduler_T_t_escheduler_process_instance_C_timeout()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_escheduler_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME='timeout')
+   THEN
+         ALTER TABLE `t_escheduler_process_instance` ADD COLUMN `timeout` int(11) NULL DEFAULT 0  COMMENT '超时时间' AFTER `worker_group_id`;
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL ac_escheduler_T_t_escheduler_process_instance_C_timeout;
+DROP PROCEDURE ac_escheduler_T_t_escheduler_process_instance_C_timeout;
+
+
+-- ac_escheduler_T_t_escheduler_process_instance_C_timeout
+drop PROCEDURE if EXISTS ac_escheduler_T_t_escheduler_process_definition_C_timeout;
+delimiter d//
+CREATE PROCEDURE ac_escheduler_T_t_escheduler_process_definition_C_timeout()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_escheduler_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME='timeout')
+   THEN
+         ALTER TABLE `t_escheduler_process_definition` ADD COLUMN `timeout` int(11) NULL DEFAULT 0 COMMENT '超时时间' AFTER `create_time`;
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL ac_escheduler_T_t_escheduler_process_definition_C_timeout;
+DROP PROCEDURE ac_escheduler_T_t_escheduler_process_definition_C_timeout;
