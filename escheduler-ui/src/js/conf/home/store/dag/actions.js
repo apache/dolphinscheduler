@@ -112,6 +112,8 @@ export default {
         state.tasks = processDefinitionJson.tasks
         // global params
         state.globalParams = processDefinitionJson.globalParams
+        // timeout
+        state.timeout = processDefinitionJson.timeout
 
         resolve(res.data)
       }).catch(res => {
@@ -141,6 +143,8 @@ export default {
         state.tasks = processInstanceJson.tasks
         // global params
         state.globalParams = processInstanceJson.globalParams
+        // timeout
+        state.timeout = processInstanceJson.timeout
 
         resolve(res.data)
       }).catch(res => {
@@ -155,7 +159,8 @@ export default {
     return new Promise((resolve, reject) => {
       let data = {
         globalParams: state.globalParams,
-        tasks: state.tasks
+        tasks: state.tasks,
+        timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/save`, {
         processDefinitionJson: JSON.stringify(data),
@@ -177,7 +182,8 @@ export default {
     return new Promise((resolve, reject) => {
       let data = {
         globalParams: state.globalParams,
-        tasks: state.tasks
+        tasks: state.tasks,
+        timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/update`, {
         processDefinitionJson: JSON.stringify(data),
@@ -200,7 +206,8 @@ export default {
     return new Promise((resolve, reject) => {
       let data = {
         globalParams: state.globalParams,
-        tasks: state.tasks
+        tasks: state.tasks,
+        timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/instance/update`, {
         processInstanceJson: JSON.stringify(data),
