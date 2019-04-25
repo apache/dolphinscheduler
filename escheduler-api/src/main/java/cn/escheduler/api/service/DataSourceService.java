@@ -480,7 +480,9 @@ public class DataSourceService extends BaseService{
 
         }
 
-        logger.info("parameters map-----" + JSONObject.toJSONString(parameterMap));
+        if(logger.isDebugEnabled()){
+            logger.info("parameters map-----" + JSONObject.toJSONString(parameterMap));
+        }
         return JSONObject.toJSONString(parameterMap);
 
 
