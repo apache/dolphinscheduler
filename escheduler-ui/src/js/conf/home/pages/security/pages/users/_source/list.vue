@@ -98,7 +98,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import mTransfer from '@/module/components/transfer/transfer'
 
   export default {

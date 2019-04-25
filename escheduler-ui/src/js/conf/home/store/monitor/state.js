@@ -14,24 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import Vuex from 'vuex'
-import dag from './dag'
-import projects from './projects'
-import resource from './resource'
-import security from './security'
-import datasource from './datasource'
-import user from './user'
-import monitor from './monitor'
-
-export default new Vuex.Store({
-  modules: {
-    dag,
-    projects,
-    resource,
-    security,
-    datasource,
-    user,
-    monitor
-  }
-})
+export default {
+}

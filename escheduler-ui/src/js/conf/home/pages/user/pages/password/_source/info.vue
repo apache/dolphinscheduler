@@ -39,7 +39,6 @@
 <script>
   import i18n from '@/module/i18n'
   import { mapState, mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
   export default {
