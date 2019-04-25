@@ -104,7 +104,6 @@
         this.isLog = true
         this.store.dispatch('dag/getLog', this._rtParam).then(res => {
           this.$message.destroy()
-
           if (!res.data) {
             this.isData = false
             setTimeout(() => {
@@ -123,8 +122,8 @@
             }, 800)
           }
         }).catch(e => {
-          this.$message.error(e.msg || '')
           this.$message.destroy()
+          this.$message.error(e.msg || '')
         })
       },
       _screenOpen () {
