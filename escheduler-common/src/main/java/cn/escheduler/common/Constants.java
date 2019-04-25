@@ -331,6 +331,11 @@ public final class Constants {
      */
     public static final int MAX_TASK_TIMEOUT = 24 * 3600;
 
+    /**
+     * max task timeout
+     */
+    public static final int MAX_PROCESS_TIMEOUT = Integer.MAX_VALUE;
+
 
     /**
      * heartbeat threads number

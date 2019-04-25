@@ -183,6 +183,11 @@ public class ProcessInstance {
      */
     private int workerGroupId;
 
+    /**
+     * process timeout for warning
+     */
+    private int timeout;
+
     public ProcessInstance(){
 
     }
@@ -495,6 +500,14 @@ public class ProcessInstance {
         this.workerGroupId = workerGroupId;
     }
 
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
     @Override
     public String toString() {
         return "ProcessInstance{" +
@@ -528,7 +541,9 @@ public class ProcessInstance {
                 ", historyCmd='" + historyCmd + '\'' +
                 ", dependenceScheduleTimes='" + dependenceScheduleTimes + '\'' +
                 ", duration=" + duration +
+                ", timeout=" + timeout +
                 ", processInstancePriority=" + processInstancePriority +
                 '}';
     }
+
 }
