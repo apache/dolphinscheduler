@@ -16,6 +16,7 @@
   import { simple } from './chartConfig'
   import Chart from '~/@analysys/ana-charts'
   import mNoData from '@/module/components/noData/noData'
+
   export default {
     name: 'command-state-count',
     data () {
@@ -34,13 +35,13 @@
         _.forEach(res.data, (v, i) => {
           let key = _.keys(v)
           if (key[0] === 'errorCount') {
-            data.push({ typeName: '错误指令数', key: v.commandState, value: v.errorCount })
+            data.push({ typeName: `${this.$t('Error command count')}`, key: v.commandState, value: v.errorCount })
           }
         })
         _.forEach(res.data, (v, i) => {
           let key = _.keys(v)
           if (key[1] === 'normalCount') {
-            data.push({ typeName: '正常指令数', key: v.commandState, value: v.normalCount })
+            data.push({ typeName: `${this.$t('Normal command count')}`, key: v.commandState, value: v.normalCount })
           }
         })
         const myChart = Chart.bar('#command-state-bar', data, {

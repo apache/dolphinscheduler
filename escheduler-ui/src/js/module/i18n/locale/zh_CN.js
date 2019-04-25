@@ -412,7 +412,6 @@ export default {
   'Please go online': '不要忘记上线',
   'Queue value': '队列值',
   'Please enter queue value': '请输入队列值',
-
   'Worker group manage': 'Worker分组管理',
   'Create worker group': '创建Worker分组',
   'Edit worker group': '编辑Worker分组',
@@ -427,9 +426,26 @@ export default {
   'Generate token': '生成令牌',
   'Monitor': '监控中心',
   'Group': '分组',
-
   'Queue statistics': '队列统计',
   'Command status statistics': '命令状态统计',
   'Task kill': '等待kill任务',
-  'Task queue': '等待执行任务'
+  'Task queue': '等待执行任务',
+  'Error command count': '错误指令数',
+  'Normal command count': '正确指令数',
+  'Manage': '管理',
+  'Number of connections': '连接数',
+  'Sent': '发送量',
+  'Received': '接收量',
+  'Min latency': '最低延时',
+  'Avg latency': '平均延时',
+  'Max latency': '最大延时',
+  'Node count': '节点数',
+  'Query time': '当前查询时间戳',
+  'Node self-test status': '节点自检状态',
+  'Health status': '健康状态',
+  'Max connections': '最大连接数',
+  'Threads connections': '当前活跃连接',
+  'Max used connections': '同时使用连接最大数',
+  'Threads running connections': '数据库当前活跃连接数',
+  'Worker group': 'Worker分组'
 }

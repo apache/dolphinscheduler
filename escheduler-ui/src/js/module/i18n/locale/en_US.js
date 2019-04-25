@@ -412,7 +412,6 @@ export default {
   'Please go online': 'Please go online',
   'Queue value': 'Queue value',
   'Please enter queue value': 'Please enter queue value',
-
   'Worker group manage': 'Worker group manage',
   'Create worker group': 'Create worker group',
   'Edit worker group': 'Edit worker group',
@@ -427,9 +426,26 @@ export default {
   'Generate token': 'Generate token',
   'Monitor': 'Monitor',
   'Group': 'Group',
-
   'Queue statistics': 'Queue statistics',
   'Command status statistics': 'Command status statistics',
   'Task kill': 'Task Kill',
-  'Task queue': 'Task queue'
+  'Task queue': 'Task queue',
+  'Error command count': 'Error command count',
+  'Normal command count': 'Normal command count',
+  'Manage': 'Manage',
+  'Number of connections': 'Number of connections',
+  'Sent': 'Sent',
+  'Received': 'Received',
+  'Min latency': 'Min latency',
+  'Avg latency': 'Avg latency',
+  'Max latency': 'Max latency',
+  'Node count': 'Node count',
+  'Query time': 'Query time',
+  'Node self-test status': 'Node self-test status',
+  'Health status': 'Health status',
+  'Max connections': 'Max connections',
+  'Threads connections': 'Threads connections',
+  'Max used connections': 'Max used connections',
+  'Threads running connections': 'Threads running connections',
+  'Worker group': 'Worker group'
 }

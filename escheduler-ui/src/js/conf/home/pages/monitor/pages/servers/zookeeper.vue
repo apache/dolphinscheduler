@@ -1,5 +1,5 @@
 <template>
-  <m-list-construction :title="'Zookeeper管理'">
+  <m-list-construction :title="'Zookeeper ' + $t('Manage')">
     <template slot="content">
       <template v-if="zookeeperList.length">
         <m-list :list="zookeeperList"></m-list>
