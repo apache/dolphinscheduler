@@ -1,7 +1,7 @@
 <template>
-  <m-list-construction :title="'Worker管理'">
+  <m-list-construction :title="'Worker ' + $t('Manage')">
     <template slot="content">
-      <div class="servers-wrapper">
+      <div class="servers-wrapper" v-show="workerList.length">
         <div class="row-box" v-for="(item,$index) in workerList">
           <div class="row-title">
             <div class="left">
@@ -41,6 +41,9 @@
             </div>
           </div>
         </div>
+      </div>
+      <div v-if="!workerList.length">
+        <m-no-data></m-no-data>
       </div>
       <m-spin :is-spin="isLoading"></m-spin>
     </template>
