@@ -88,6 +88,12 @@ public class ProcessDao extends AbstractBaseDao {
     @Autowired
     private ResourceMapper resourceMapper;
 
+    @Autowired
+    private WorkerGroupMapper workerGroupMapper;
+
+    @Autowired
+    private ErrorCommandMapper errorCommandMapper;
+
     /**
      * task queue impl
      */
@@ -112,6 +118,7 @@ public class ProcessDao extends AbstractBaseDao {
         scheduleMapper = getMapper(ScheduleMapper.class);
         udfFuncMapper = getMapper(UdfFuncMapper.class);
         resourceMapper = getMapper(ResourceMapper.class);
+        workerGroupMapper = getMapper(WorkerGroupMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
     }
 
@@ -139,6 +146,7 @@ public class ProcessDao extends AbstractBaseDao {
             if(processInstance == null){
                 logger.error("scan command, command parameter is error: %s", command.toString());
                 delCommandByid(command.getId());
+                saveErrorCommand(command, "process instance is null");
                 return null;
             }else if(!checkThreadNum(command, validThreadNum)){
                     logger.info("there is not enough thread for this command: {}",command.toString() );
@@ -153,9 +161,16 @@ public class ProcessDao extends AbstractBaseDao {
             }
         }catch (Exception e){
             logger.error("scan command error ", e);
+            saveErrorCommand(command, e.toString());
             delCommandByid(command.getId());
         }
         return null;
+    }
+
+    private void saveErrorCommand(Command command, String message) {
+
+        ErrorCommand errorCommand = new ErrorCommand(command, message);
+        this.errorCommandMapper.insert(errorCommand);
     }
 
     /**
@@ -466,6 +481,8 @@ public class ProcessDao extends AbstractBaseDao {
         processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
+        processInstance.setWorkerGroupId(command.getWorkerGroupId());
+        processInstance.setTimeout(processDefinition.getTimeout());
         return processInstance;
     }
 
@@ -1562,6 +1579,15 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public String queryQueueByProcessInstanceId(int processInstanceId){
         return userMapper.queryQueueByProcessInstanceId(processInstanceId);
+    }
+
+    /**
+     * query worker group by id
+     * @param workerGroupId
+     * @return
+     */
+    public WorkerGroup queryWorkerGroupById(int workerGroupId){
+        return workerGroupMapper.queryById(workerGroupId);
     }
 
 

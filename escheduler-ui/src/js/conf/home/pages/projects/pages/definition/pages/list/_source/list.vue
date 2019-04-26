@@ -72,7 +72,6 @@
   import mStart from './start'
   import mTiming from './timing'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import { publishStatus } from '@/conf/home/pages/dag/_source/config'
 
   export default {

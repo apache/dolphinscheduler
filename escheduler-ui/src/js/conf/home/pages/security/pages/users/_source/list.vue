@@ -98,8 +98,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
-  import { findComponentDownward } from '@/module/util/'
   import mTransfer from '@/module/components/transfer/transfer'
 
   export default {
@@ -132,7 +130,7 @@
         })
       },
       _edit (item) {
-        findComponentDownward(this.$root, 'users-index')._create(item)
+        this.$emit('on-edit', item)
       },
       _authProject (item, i) {
         this.$refs[`poptip-auth-${i}`][0].doClose()

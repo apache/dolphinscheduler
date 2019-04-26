@@ -156,6 +156,10 @@ public enum Status {
     UPDATE_QUEUE_ERROR(10131, "update queue error"),
     NEED_NOT_UPDATE_QUEUE(10132, "no content changes, no updates are required"),
     VERIFY_QUEUE_ERROR(10133,"verify queue error"),
+    NAME_NULL(10134,"name must be not null"),
+    NAME_EXIST(10135, "name {0} already exists"),
+    SAVE_ERROR(10136, "save error"),
+
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
@@ -197,13 +201,24 @@ public enum Status {
     PROCESS_NODE_HAS_CYCLE(50019,"process node has cycle"),
     PROCESS_NODE_S_PARAMETER_INVALID(50020,"process node %s parameter invalid"),
 
-
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
+
+    /**
+     * for monitor
+     */
+    QUERY_DATABASE_STATE_ERROR(70001,"query database state error"),
+    QUERY_ZOOKEEPER_STATE_ERROR(70002,"query zookeeper state error"),
+
 
 
     CREATE_ACCESS_TOKEN_ERROR(70001,"create access token error"),
     GENERATE_TOKEN_ERROR(70002,"generate token error"),
     QUERY_ACCESSTOKEN_LIST_PAGING_ERROR(70003,"query access token list paging error"),
+
+
+    COMMAND_STATE_COUNT_ERROR(80001,"task instance state count error"),
+
+    QUEUE_COUNT_ERROR(90001,"queue count error"),
 
     ;
 
