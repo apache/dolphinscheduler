@@ -34,7 +34,7 @@
       </div>
       <div class="content" style="padding-bottom: 10px;" v-if="checkedTimeout">
         <span>
-          <x-input v-model="timeout" style="width: 128px;" maxlength="9">
+          <x-input v-model="timeout" style="width: 160px;" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
           </x-input>
         </span>
