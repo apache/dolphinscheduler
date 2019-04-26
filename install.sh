@@ -123,9 +123,6 @@ execPath="/tmp/escheduler/exec"
 # SHELL环境变量路径
 shellEnvPath="$installPath/conf/env/.escheduler_env.sh"
 
-# Python换将变量路径
-pythonEnvPath="$installPath/conf/env/escheduler_env.py"
-
 # 资源文件的后缀
 resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
 
@@ -249,7 +246,6 @@ sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" co
 sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
 sed -i ${txt} "s#hdfs.startup.state.*#hdfs.startup.state=${hdfsStartupSate}#g" conf/common/common.properties
 sed -i ${txt} "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
-sed -i ${txt} "s#escheduler.env.py.*#escheduler.env.py=${pythonEnvPath}#g" conf/common/common.properties
 sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
 sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
 
