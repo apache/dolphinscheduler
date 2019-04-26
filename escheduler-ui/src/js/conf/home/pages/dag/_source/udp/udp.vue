@@ -105,7 +105,7 @@
       _verifTimeout () {
         const reg = /^[1-9]\d*$/
         if (!reg.test(this.timeout)) {
-          alert(1)
+          this.$message.warning(`${i18n.$t('Please enter a positive integer')}`)
           return false
         }
         return true
