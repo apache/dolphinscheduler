@@ -66,6 +66,7 @@ public class EschedulerManager {
                 version = "1.0.0";
             }else{
                 logger.error("Unable to determine current software version, so cannot upgrade");
+                throw new RuntimeException("Unable to determine current software version, so cannot upgrade");
             }
             // The target version of the upgrade
             String schemaVersion = "";
