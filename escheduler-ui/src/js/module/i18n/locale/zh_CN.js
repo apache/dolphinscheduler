@@ -448,5 +448,5 @@ export default {
   'Max used connections': '同时使用连接最大数',
   'Threads running connections': '数据库当前活跃连接数',
   'Worker group': 'Worker分组',
-  'Please enter a positive integer greater than 0': '请输入大于 0 的正整数',
+  'Please enter a positive integer greater than 0': '请输入大于 0 的正整数'
 }

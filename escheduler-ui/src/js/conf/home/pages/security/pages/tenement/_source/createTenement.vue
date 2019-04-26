@@ -114,12 +114,13 @@
         })
       },
       _verification () {
-        let isEn = /^\w+$/
+        let isEn = /^[0-9a-zA-Z_.-]{1,}$/
+
         if (!this.tenantCode) {
           this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
-        if (!isEn.test(this.tenantCode) || this.tenantCode.split('')[0] === '_') {
+        if (!isEn.test(this.tenantCode) || _.startsWith(this.tenantCode, '_', 0) || _.startsWith(this.tenantCode, '.', 0)) {
           this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false
         }

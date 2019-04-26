@@ -34,26 +34,19 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 public class HttpClientTest {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpClientTest.class);
 
-    public static void main(String[] args) throws Exception {
-//        doGETParamPathVariableAndChinese();
-//        doGETParam();
-//        doPOSTParam();
-
-        String md5 = EncryptionUtils.getMd5(String.valueOf(System.currentTimeMillis()) + "张三");
-        System.out.println(md5);
-        System.out.println(md5.length());
-    }
-
-    public static void doPOSTParam()throws Exception{
-        // create Httpclient
+    @Test
+    public  void doPOSTParam()throws Exception{
+        // create HttpClient
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        // 创建http POST请求
+
+        // create http post request
         HttpPost httpPost = new HttpPost("http://127.0.0.1:12345/escheduler/projects/create");
         httpPost.setHeader("token", "123");
         // set parameters
@@ -83,23 +76,24 @@ public class HttpClientTest {
     }
 
     /**
-     *
+     * do get param path variables chinese
      * @throws Exception
      */
-    public static void doGETParamPathVariableAndChinese()throws Exception{
+    @Test
+    public  void doGETParamPathVariableAndChinese()throws Exception{
         // create HttpClient
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
-//        parameters.add(new BasicNameValuePair("pageSize", "10"));
+       // parameters.add(new BasicNameValuePair("pageSize", "10"));
 
         // define the parameters of the request
-        URI uri = new URIBuilder("http://127.0.0.1:12345/escheduler/projects/%E5%85%A8%E9%83%A8%E6%B5%81%E7%A8%8B%E6%B5%8B%E8%AF%95/process/list")
+        URI uri = new URIBuilder("http://192.168.220.247:12345/escheduler/projects/%E5%85%A8%E9%83%A8%E6%B5%81%E7%A8%8B%E6%B5%8B%E8%AF%95/process/list")
                 .build();
 
         // create http GET request
         HttpGet httpGet = new HttpGet(uri);
-        httpGet.setHeader("token","123");
+        httpGet.setHeader("token","10f5625a2a1cbf9aa710653796c5d764");
         //response object
         CloseableHttpResponse response = null;
         try {
@@ -122,23 +116,27 @@ public class HttpClientTest {
 
     /**
      *
+     * do get param
      * @throws Exception
      */
-    public static void doGETParam()throws Exception{
+    @Test
+    public  void doGETParam()throws Exception{
         // create HttpClient
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
-        parameters.add(new BasicNameValuePair("processInstanceId", "41415"));
+        parameters.add(new BasicNameValuePair("startDate", "2018-04-22 19:30:08"));
+        parameters.add(new BasicNameValuePair("endDate", "2028-04-22 19:30:08"));
+        parameters.add(new BasicNameValuePair("projectId", "0"));
 
         // define the parameters of the request
-        URI uri = new URIBuilder("http://127.0.0.1:12345/escheduler/projects/%E5%85%A8%E9%83%A8%E6%B5%81%E7%A8%8B%E6%B5%8B%E8%AF%95/instance/view-variables")
+        URI uri = new URIBuilder("http://192.168.220.247:12345/escheduler/projects/analysis/queue-count")
                  .setParameters(parameters)
                 .build();
 
         // create http GET request
         HttpGet httpGet = new HttpGet(uri);
-        httpGet.setHeader("token","123");
+        httpGet.setHeader("token","2aef24c052c212fab9eec78848c2258b");
         //response object
         CloseableHttpResponse response = null;
         try {
