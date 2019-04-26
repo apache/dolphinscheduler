@@ -125,7 +125,7 @@
             return
           }
           // verification timeout
-          if (!this._verifTimeout()) {
+          if (this.checkedTimeout && !this._verifTimeout()) {
             return
           }
 
