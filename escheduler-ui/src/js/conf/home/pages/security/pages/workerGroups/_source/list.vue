@@ -7,7 +7,7 @@
             <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>分组名称</span>
+            <span>{{$t('Group')}}</span>
           </th>
           <th>
             <span>IPList</span>
@@ -62,10 +62,7 @@
   </div>
 </template>
 <script>
-  // import _ from 'lodash'
-  // import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
 
   export default {
     name: 'user-list',

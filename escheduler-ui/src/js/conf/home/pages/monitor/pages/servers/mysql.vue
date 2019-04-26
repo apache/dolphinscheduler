@@ -1,77 +1,115 @@
 <template>
-  <m-list-construction :title="'Mysql管理'">
+  <m-list-construction :title="'Mysql ' + $t('Manage')">
     <template slot="content">
-      <div class="servers-wrapper">
-        <div class="row">
-          <div class="col-md-4">
-            <div class="gridb-model">
+      <div class="servers-wrapper mysql-model" v-show="mysqlList.length">
+        <div class="row" v-for="(item,$index) in mysqlList">
+          <div class="col-md-2">
+            <div class="text-num-model text">
               <div class="title">
-                <span>正常与否</span>
+                <span :title="$t('Health status')">{{$t('Health status')}}</span>
               </div>
               <div class="value-p">
-                <b style="color: #0098e1;">78</b>
+                <span class="state">
+                  <i class="iconfont success" v-if="item.state">&#xe607;</i>
+                  <i class="iconfont error" v-else>&#xe626;</i>
+                </span>
               </div>
               <div class="text-1">
-                正常与否
+                {{$t('Health status')}}
               </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="gridb-model">
+          <div class="col-md-3">
+            <div class="text-num-model text">
               <div class="title">
-                <span>最大连接数</span>
+                <span :title="$t('Max connections')">{{$t('Max connections')}} - {{item.date | formatDate}}</span>
               </div>
               <div class="value-p">
-                <b style="color: #ffcf3d;">55</b>
+                <b :style="{color:color[0]}">{{item.maxConnections}}</b>
               </div>
               <div class="text-1">
-                最大连接数
+                {{$t('Max connections')}}
               </div>
             </div>
           </div>
-          <div class="col-md-4">
-            <div class="gridb-model">
+          <div class="col-md-3">
+            <div class="text-num-model text">
               <div class="title">
-                <span>当前活跃连接</span>
+                <span :title="$t('Threads connections')">{{$t('Threads connections')}}</span>
               </div>
               <div class="value-p">
-                <b style="color: #f07d7d;">32</b>
+                <b :style="{color:color[8]}">{{item.threadsConnections}}</b>
               </div>
               <div class="text-1">
-                当前活跃连接
+                {{$t('Threads connections')}}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="text-num-model text">
+              <div class="title">
+                <span :title="$t('Max used connections')">{{$t('Max used connections')}}</span>
+              </div>
+              <div class="value-p">
+                <b :style="{color:color[2]}">{{item.maxUsedConnections}}</b>
+              </div>
+              <div class="text-1">
+                {{$t('Max used connections')}}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="text-num-model text">
+              <div class="title">
+                <span :title="$t('Threads running connections')">{{$t('Threads running connections')}}</span>
+              </div>
+              <div class="value-p">
+                <b :style="{color:color[4]}">{{item.threadsRunningConnections}}</b>
+              </div>
+              <div class="text-1">
+                {{$t('Threads running connections')}}
               </div>
             </div>
           </div>
         </div>
       </div>
+      <div v-if="!mysqlList.length">
+        <m-no-data></m-no-data>
+      </div>
+      <m-spin :is-spin="isLoading" ></m-spin>
     </template>
   </m-list-construction>
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import mList from './_source/list'
+  import mList from './_source/zookeeperList'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
+  import themeData from '@/module/echarts/themeData.json'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
     name: 'servers-mysql',
     data () {
       return {
-        pageSize: 10,
-        pageNo: 1,
-        totalPage: null,
-        searchVal: '',
         isLoading: false,
-        masterList: []
+        mysqlList: [],
+        color: themeData.color
       }
     },
     props: {},
     methods: {
-      ...mapActions('security', ['getProcessMasterList'])
+      ...mapActions('monitor', ['getDatabaseData'])
     },
     watch: {},
     created () {
+      this.isLoading = true
+      this.getDatabaseData().then(res => {
+        this.mysqlList = res
+        this.isLoading = false
+      }).catch(() => {
+        this.isLoading = false
+      })
     },
     mounted () {
     },

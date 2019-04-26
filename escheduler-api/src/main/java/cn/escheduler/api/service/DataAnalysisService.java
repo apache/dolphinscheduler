@@ -357,7 +357,7 @@ public class DataAnalysisService {
         i = 0;
         for (String taskKillStr : tasksKillList){
             if (StringUtils.isNotEmpty(taskKillStr)){
-                String[] splits = taskKillStr.split("_");
+                String[] splits = taskKillStr.split("-");
                 if (splits.length == 2){
                     tasksKillIds[i++]=Integer.parseInt(splits[1]);
                 }
@@ -370,8 +370,8 @@ public class DataAnalysisService {
             taskQueueCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
         }
 
-        if (tasksQueueIds.length != 0){
-            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
+        if (tasksKillIds.length != 0){
+            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksKillIds);
         }
 
 

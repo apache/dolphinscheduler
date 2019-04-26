@@ -27,8 +27,6 @@ public class UpgradeEscheduler {
 	private static final Logger logger = LoggerFactory.getLogger(UpgradeEscheduler.class);
 
 	public static void main(String[] args) {
-		Thread.currentThread().setName("manager-UpgradeEscheduler");
-		
 		EschedulerManager eschedulerManager = new EschedulerManager();
 		try {
 			eschedulerManager.upgradeEscheduler();

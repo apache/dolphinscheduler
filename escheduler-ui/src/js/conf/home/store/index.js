@@ -22,6 +22,7 @@ import resource from './resource'
 import security from './security'
 import datasource from './datasource'
 import user from './user'
+import monitor from './monitor'
 
 export default new Vuex.Store({
   modules: {
@@ -30,6 +31,7 @@ export default new Vuex.Store({
     resource,
     security,
     datasource,
-    user
+    user,
+    monitor
   }
 })
