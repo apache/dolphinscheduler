@@ -67,8 +67,6 @@
   </div>
 </template>
 <script>
-  import '@/module/filter/formatDate'
-
   export default {
     name: 'list',
     data () {
