@@ -68,6 +68,7 @@ public class ProcessInstanceMapperProvider {
                 VALUES("`is_sub_process`", EnumFieldUtil.genFieldStr("processInstance.isSubProcess", Flag.class));
                 VALUES("`executor_id`", "#{processInstance.executorId}");
                 VALUES("`worker_group_id`", "#{processInstance.workerGroupId}");
+                VALUES("`timeout`", "#{processInstance.timeout}");
                 VALUES("`process_instance_priority`", EnumFieldUtil.genFieldStr("processInstance.processInstancePriority", Priority.class));
             }
         }.toString();
@@ -141,6 +142,7 @@ public class ProcessInstanceMapperProvider {
                 SET("`is_sub_process`="+EnumFieldUtil.genFieldStr("processInstance.isSubProcess", Flag.class));
                 SET("`executor_id`=#{processInstance.executorId}");
                 SET("`worker_group_id`=#{processInstance.workerGroupId}");
+                SET("`timeout`=#{processInstance.timeout}");
 
                 WHERE("`id`=#{processInstance.id}");
 
