@@ -13,9 +13,6 @@
             <span>Token</span>
           </th>
           <th>
-            <span>{{$t('Start Time')}}</span>
-          </th>
-          <th>
             <span>{{$t('Failure time')}}</span>
           </th>
           <th>
@@ -38,9 +35,6 @@
             </span>
           </td>
           <td><span>{{item.token}}</span></td>
-          <td>
-            <span>{{item.createTime | formatDate}}</span>
-          </td>
           <td>
             <span>{{item.expireTime | formatDate}}</span>
           </td>
