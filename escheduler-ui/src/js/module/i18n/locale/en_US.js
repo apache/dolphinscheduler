@@ -447,5 +447,6 @@ export default {
   'Threads connections': 'Threads connections',
   'Max used connections': 'Max used connections',
   'Threads running connections': 'Threads running connections',
-  'Worker group': 'Worker group'
+  'Worker group': 'Worker group',
+  'Please enter a positive integer greater than 0': 'Please enter a positive integer greater than 0',
 }
