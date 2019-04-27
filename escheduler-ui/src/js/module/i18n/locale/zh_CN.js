@@ -130,7 +130,7 @@ export default {
   'Please enter database name': '请输入数据库名',
   'jdbc connect parameters': 'jdbc连接参数',
   'Test Connect': '测试连接',
-  'Please enter resource name': '请输入资源名称',
+  'Please enter resource name': '请输入数据源名称',
   'Please enter IP/hostname': '请输入IP/主机名',
   'jdbc connection parameters is not a correct JSON format': 'jdbc连接参数不是一个正确的JSON格式',
   '#': '编号',
