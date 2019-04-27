@@ -125,13 +125,14 @@ public class ProcessScheduleJob implements Job {
         }
 
         Command command = new Command();
-        command.setCommandType(CommandType.START_PROCESS);
+        command.setCommandType(CommandType.SCHEDULER);
         command.setExecutorId(schedule.getUserId());
         command.setFailureStrategy(schedule.getFailureStrategy());
         command.setProcessDefinitionId(schedule.getProcessDefinitionId());
         command.setScheduleTime(scheduledFireTime);
         command.setStartTime(fireTime);
         command.setWarningGroupId(schedule.getWarningGroupId());
+        command.setWorkerGroupId(schedule.getWorkerGroupId());
         command.setWarningType(schedule.getWarningType());
         command.setProcessInstancePriority(schedule.getProcessInstancePriority());
 

@@ -32,7 +32,6 @@ Permissions.prototype = {
           this.isAuth = false
         }
         this.ps(res)
-
         resolve()
       })
     })

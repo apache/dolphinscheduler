@@ -63,14 +63,14 @@ public class ConnectionFactory {
     druidDataSource.setTestOnReturn(getBoolean(Constants.SPRING_DATASOURCE_TEST_ON_RETURN));
     druidDataSource.setKeepAlive(getBoolean(Constants.SPRING_DATASOURCE_KEEP_ALIVE));
     //just for development
-    if (CommonUtils.isDevelopMode()) {
+    /*if (CommonUtils.isDevelopMode()) {
       //Configure filters that are intercepted by monitoring statistics, and SQL can not be counted after removing them.'wall'is used for firewall
       try {
         druidDataSource.setFilters("stat,wall,log4j");
       } catch (SQLException e) {
         logger.error(e.getMessage(), e);
       }
-    }
+    }*/
 
     druidDataSource.setMinIdle(getInt(Constants.SPRING_DATASOURCE_MIN_IDLE));
     druidDataSource.setMaxActive(getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE));

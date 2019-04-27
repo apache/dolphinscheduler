@@ -29,7 +29,6 @@ public class CreateEscheduler {
 	private static final Logger logger = LoggerFactory.getLogger(CreateEscheduler.class);
 
 	public static void main(String[] args) {
-		Thread.currentThread().setName("manager-CreateEscheduler");
 		EschedulerManager eschedulerManager = new EschedulerManager();
 		eschedulerManager.initEscheduler();
 		logger.info("init escheduler finished");

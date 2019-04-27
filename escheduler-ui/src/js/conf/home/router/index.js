@@ -319,33 +319,20 @@ const router = new Router({
           }
         },
         {
-          path: '/security/servers',
-          name: 'servers-manage',
-          component: resolve => require(['../pages/security/pages/servers/index'], resolve),
+          path: '/security/worker-groups',
+          name: 'worker-groups-manage',
+          component: resolve => require(['../pages/security/pages/workerGroups/index'], resolve),
           meta: {
-            title: `${i18n.$t('Servers manage')}`
-          },
-          redirect: {
-            name: 'servers-master'
-          },
-          children: [
-            {
-              path: '/security/servers/master',
-              name: 'servers-master',
-              component: resolve => require(['../pages/security/pages/servers/pages/master/index'], resolve),
-              meta: {
-                title: `${i18n.$t('Service-Master')}`
-              }
-            },
-            {
-              path: '/security/servers/worker',
-              name: 'servers-worker',
-              component: resolve => require(['../pages/security/pages/servers/pages/worker/index'], resolve),
-              meta: {
-                title: `${i18n.$t('Service-Worker')}`
-              }
-            }
-          ]
+            title: `${i18n.$t('Worker group manage')}`
+          }
+        },
+        {
+          path: '/security/token',
+          name: 'token-manage',
+          component: resolve => require(['../pages/security/pages/token/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Token manage')}`
+          }
         }
       ]
     },
@@ -374,6 +361,83 @@ const router = new Router({
           component: resolve => require(['../pages/user/pages/password/index'], resolve),
           meta: {
             title: `${i18n.$t('Edit password')}`
+          }
+        },
+        {
+          path: '/user/token',
+          name: 'token',
+          component: resolve => require(['../pages/user/pages/token/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Token manage')}`
+          }
+        }
+      ]
+    },
+    {
+      path: '/monitor',
+      name: 'monitor',
+      component: resolve => require(['../pages/monitor/index'], resolve),
+      meta: {
+        title: `monitor`
+      },
+      redirect: {
+        name: 'servers-master'
+      },
+      children: [
+        {
+          path: '/monitor/servers/master',
+          name: 'servers-master',
+          component: resolve => require(['../pages/monitor/pages/servers/master'], resolve),
+          meta: {
+            title: `${i18n.$t('Service-Master')}`
+          }
+        },
+        {
+          path: '/monitor/servers/worker',
+          name: 'servers-worker',
+          component: resolve => require(['../pages/monitor/pages/servers/worker'], resolve),
+          meta: {
+            title: `${i18n.$t('Service-Worker')}`
+          }
+        },
+        {
+          path: '/monitor/servers/alert',
+          name: 'servers-alert',
+          component: resolve => require(['../pages/monitor/pages/servers/alert'], resolve),
+          meta: {
+            title: `Alert`
+          }
+        },
+        {
+          path: '/monitor/servers/rpcserver',
+          name: 'servers-rpcserver',
+          component: resolve => require(['../pages/monitor/pages/servers/rpcserver'], resolve),
+          meta: {
+            title: `Rpcserver`
+          }
+        },
+        {
+          path: '/monitor/servers/zookeeper',
+          name: 'servers-zookeeper',
+          component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
+          meta: {
+            title: `Zookeeper`
+          }
+        },
+        {
+          path: '/monitor/servers/apiserver',
+          name: 'servers-apiserver',
+          component: resolve => require(['../pages/monitor/pages/servers/apiserver'], resolve),
+          meta: {
+            title: `Apiserver`
+          }
+        },
+        {
+          path: '/monitor/servers/mysql',
+          name: 'servers-mysql',
+          component: resolve => require(['../pages/monitor/pages/servers/mysql'], resolve),
+          meta: {
+            title: `Mysql`
           }
         }
       ]

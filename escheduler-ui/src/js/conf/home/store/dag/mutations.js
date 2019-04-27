@@ -53,6 +53,12 @@ export default {
     state.name = payload
   },
   /**
+   * set timeout
+   */
+  setTimeout (state, payload) {
+    state.timeout = payload
+  },
+  /**
    * set global params
    */
   setGlobalParams (state, payload) {
@@ -93,6 +99,7 @@ export default {
     state.tasks = payload && payload.tasks || []
     state.name = payload && payload.name || ''
     state.desc = payload && payload.desc || ''
+    state.timeout = payload && payload.timeout || 0
     state.processListS = payload && payload.processListS || []
     state.resourcesListS = payload && payload.resourcesListS || []
     state.isDetails = payload && payload.isDetails || false

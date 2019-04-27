@@ -111,6 +111,11 @@ public class Schedule {
    */
   private Priority processInstancePriority;
 
+  /**
+   *  worker group id
+   */
+  private int workerGroupId;
+
   public int getWarningGroupId() {
     return warningGroupId;
   }
@@ -256,6 +261,15 @@ public class Schedule {
     this.processInstancePriority = processInstancePriority;
   }
 
+
+  public int getWorkerGroupId() {
+    return workerGroupId;
+  }
+
+  public void setWorkerGroupId(int workerGroupId) {
+    this.workerGroupId = workerGroupId;
+  }
+
   @Override
   public String toString() {
     return "Schedule{" +
@@ -276,6 +290,8 @@ public class Schedule {
             ", releaseState=" + releaseState +
             ", warningGroupId=" + warningGroupId +
             ", processInstancePriority=" + processInstancePriority +
+            ", workerGroupId=" + workerGroupId +
             '}';
   }
+
 }

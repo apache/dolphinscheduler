@@ -33,7 +33,7 @@
   import disabledState from '@/module/mixin/disabledState'
 
   export default {
-    name: 'select-input',
+    name: 'form-select-input',
     data () {
       return {
         isIconState: false,

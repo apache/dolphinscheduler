@@ -1,8 +1,5 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-create-dag></m-create-dag>
-  </div>
+  <m-create-dag></m-create-dag>
 </template>
 <script>
   import mCreateDag from '@/conf/home/pages/dag/index'

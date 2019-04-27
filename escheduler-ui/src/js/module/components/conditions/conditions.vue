@@ -53,6 +53,12 @@
         return this.$slots['search-group']
       }
     },
+    created () {
+      // Routing parameter merging
+      if (!_.isEmpty(this.$route.query)) {
+        this.searchVal = this.$route.query.searchVal || ''
+      }
+    },
     components: {}
   }
 </script>
