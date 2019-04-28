@@ -1,8 +1,5 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-instance-details></m-instance-details>
-  </div>
+  <m-instance-details></m-instance-details>
 </template>
 <script>
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
@@ -12,23 +9,6 @@
     data () {
       return {}
     },
-    props: {},
-    methods: {},
-    watch: {},
-    created () {
-    },
-    mounted () {
-    },
-    updated () {
-    },
-    beforeDestroy () {
-    },
-    destroyed () {
-    },
-    computed: {},
     components: { mInstanceDetails, mSecondaryMenu }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-</style>

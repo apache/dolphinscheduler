@@ -27,6 +27,20 @@
         </div>
       </div>
     </m-list-box>
+    <template v-if="!sqlType && showType.length">
+      <m-list-box>
+        <div slot="text">{{$t('Recipient')}}</div>
+        <div slot="content">
+          <m-email v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
+        </div>
+      </m-list-box>
+      <m-list-box>
+        <div slot="text">{{$t('Cc')}}</div>
+        <div slot="content">
+          <m-email v-model="receiversCc" :disabled="isDetails" :repeat-data="receivers"></m-email>
+        </div>
+      </m-list-box>
+    </template>
     <m-list-box v-show="type === 'HIVE'">
       <div slot="text">{{$t('SQL Parameter')}}</div>
       <div slot="content">
@@ -104,6 +118,7 @@
   import mLocalParams from './_source/localParams'
   import mStatementList from './_source/statementList'
   import disabledState from '@/module/mixin/disabledState'
+  import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
   let editor
@@ -133,12 +148,17 @@
         // Pre statements
         preStatements: [],
         // Post statements
-        postStatements: []
+        postStatements: [],
+        // recipients
+        receivers: [],
+        // copy to
+        receiversCc: []
       }
     },
     mixins: [disabledState],
     props: {
-      backfillItem: Object
+      backfillItem: Object,
+      createNodeId: Number
     },
     methods: {
       /**
@@ -221,6 +241,8 @@
           sql: editor.getValue(),
           udfs: this.udfs,
           sqlType: this.sqlType,
+          receivers: this.receivers.join(','),
+          receiversCc: this.receiversCc.join(','),
           showType: (() => {
             /**
              * Special processing return order TABLE,ATTACHMENT
@@ -264,6 +286,19 @@
         editor.setValue(this.sql)
 
         return editor
+      },
+      _getReceiver () {
+        let param = {}
+        let current = this.router.history.current
+        if (current.name === 'projects-definition-details') {
+          param.processDefinitionId = current.params.id
+        } else {
+          param.processInstanceId = current.params.id
+        }
+        this.store.dispatch('dag/getReceiver', param).then(res => {
+          this.receivers = res.receivers && res.receivers.split(',') || []
+          this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
+        })
       }
     },
     watch: {
@@ -272,11 +307,22 @@
         if (val) {
           this.showType = []
         }
+        if (val !== 0) {
+          this.receivers = []
+          this.receiversCc = []
+        }
       },
       // Listening data source
       type (val) {
         if (val !== 'HIVE') {
           this.connParams = ''
+        }
+      },
+      //
+      showType (val) {
+        if (!val.length) {
+          this.receivers = []
+          this.receiversCc = []
         }
       }
     },
@@ -296,6 +342,12 @@
         this.showType = o.params.showType.split(',') || []
         this.preStatements = o.params.preStatements || []
         this.postStatements = o.params.postStatements || []
+        this.receivers = o.params.receivers && o.params.receivers.split(',') || []
+        this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
+      }
+      if (!_.some(this.store.state.dag.tasks, { id: this.createNodeId }) &&
+        this.router.history.current.name !== 'definition-create') {
+        this._getReceiver()
       }
     },
     mounted () {
@@ -313,6 +365,6 @@
       }
     },
     computed: {},
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
   }
 </script>

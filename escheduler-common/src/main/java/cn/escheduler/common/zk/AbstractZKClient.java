@@ -87,15 +87,6 @@ public abstract class AbstractZKClient {
 
 
 	public AbstractZKClient() {
-		StringBuilder sb = new StringBuilder();
-		String[] zookeeperParamslist = conf.getStringArray(Constants.ZOOKEEPER_QUORUM);
-		for (String param : zookeeperParamslist) {
-			sb.append(param).append(Constants.COMMA);
-		}
-
-		if(sb.length() > 0){
-			sb.deleteCharAt(sb.length() - 1);
-		}
 
 		// retry strategy
 		RetryPolicy retryPolicy = new ExponentialBackoffRetry(
@@ -105,7 +96,7 @@ public abstract class AbstractZKClient {
 		try{
 			// crate zookeeper client
 			zkClient = CuratorFrameworkFactory.builder()
-						.connectString(sb.toString())
+						.connectString(getZookeeperQuorum())
 						.retryPolicy(retryPolicy)
 						.sessionTimeoutMs(1000 * Integer.parseInt(conf.getString(Constants.ZOOKEEPER_SESSION_TIMEOUT)))
 						.connectionTimeoutMs(1000 * Integer.parseInt(conf.getString(Constants.ZOOKEEPER_CONNECTION_TIMEOUT)))
@@ -325,6 +316,24 @@ public abstract class AbstractZKClient {
 			return childrenList.size();
 		}
 		return childrenList.size();
+	}
+
+	/**
+	 *
+	 * @return zookeeper quorum
+	 */
+	public static String getZookeeperQuorum(){
+		StringBuilder sb = new StringBuilder();
+		String[] zookeeperParamslist = conf.getStringArray(Constants.ZOOKEEPER_QUORUM);
+		for (String param : zookeeperParamslist) {
+			sb.append(param).append(Constants.COMMA);
+		}
+
+		if(sb.length() > 0){
+			sb.deleteCharAt(sb.length() - 1);
+		}
+
+		return sb.toString();
 	}
 
 	@Override

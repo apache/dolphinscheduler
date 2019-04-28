@@ -102,7 +102,6 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import mCreateUdf from './createUdf'
 
   export default {

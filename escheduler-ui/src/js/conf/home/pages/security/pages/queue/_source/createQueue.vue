@@ -12,18 +12,18 @@
             <x-input
                     type="input"
                     v-model="queueName"
-                    placeholder="Please enter name"
+                    :placeholder="$t('Please enter name')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>队列值</template>
+          <template slot="name"><b>*</b>{{$t('Queue value')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="queue"
-                    placeholder="请输入队列值"
+                    :placeholder="$t('Please enter queue value')"
                     autocomplete="off">
             </x-input>
           </template>
@@ -35,7 +35,6 @@
 </template>
 <script>
   import _ from 'lodash'
-  import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
@@ -45,15 +44,15 @@
     data () {
       return {
         store,
-        queue:'',
-        queueName:''
+        queue: '',
+        queueName: ''
       }
     },
     props: {
       item: Object
     },
     methods: {
-      _ok(){
+      _ok () {
         if (!this._verification()) {
           return
         }
@@ -87,7 +86,7 @@
           }).catch(e => {
             $catch(e)
           })
-        }else{
+        } else {
           this._verifyName(param).then(() => {
             this.$refs['popup'].spinnerLoading = true
             this.store.dispatch(`security/createQueueQ`, param).then(res => {
@@ -99,9 +98,8 @@
             this.$message.error(e.msg || '')
           })
         }
-
       },
-      _verification(){
+      _verification () {
         if (!this.queueName) {
           this.$message.warning(`Please enter name`)
           return false
@@ -112,7 +110,7 @@
         }
         return true
       },
-      _verifyName(param){
+      _verifyName (param) {
         return new Promise((resolve, reject) => {
           this.store.dispatch(`security/verifyQueueQ`, param).then(res => {
             resolve()

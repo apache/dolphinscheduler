@@ -11,7 +11,7 @@
             <x-radio-group v-model="type" size="small">
               <x-radio :label="'MYSQL'">MYSQL</x-radio>
               <x-radio :label="'POSTGRESQL'">POSTGRESQL</x-radio>
-              <x-radio :label="'HIVE'">HIVE</x-radio>
+              <x-radio :label="'HIVE'">HIVE/IMPALA</x-radio>
               <x-radio :label="'SPARK'">SPARK</x-radio>
               <x-radio :label="'CLICKHOUSE'">CLICKHOUSE</x-radio>
               <x-radio :label="'ORACLE'">ORACLE</x-radio>
@@ -333,8 +333,16 @@
       padding: 0 20px;
     }
     .content-p {
-      min-width: 500px;
+      min-width: 850px;
       min-height: 100px;
+      .list-box-f {
+        .text {
+          width: 166px;
+        }
+        .cont {
+          width: calc(100% - 186px);
+        }
+      }
     }
   }
 </style>
