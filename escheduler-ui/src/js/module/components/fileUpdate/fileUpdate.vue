@@ -1,7 +1,7 @@
 <template>
   <m-popup
           ref="popup"
-          :ok-text="$t('Confirm Upload')"
+          :ok-text="$t('Upload')"
           :nameText="$t('File Upload')"
           @ok="_ok"
           :disabled="progress === 0 ? false : true">

@@ -22,6 +22,7 @@ import cn.escheduler.dao.mapper.UserMapper;
 import cn.escheduler.dao.model.Session;
 import cn.escheduler.dao.model.User;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,37 +65,36 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
-    Session session = sessionService.getSession(request);
+    // get token
+    String token = request.getHeader("token");
+    User user = null;
+    if (StringUtils.isEmpty(token)){
+      Session session = sessionService.getSession(request);
 
-    if(logger.isDebugEnabled()){
-      logger.debug("session info : " + session);
+      if (session == null) {
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        logger.info("session info is null ");
+        return false;
+      }
+
+      //get user object from session
+      user = userMapper.queryById(session.getUserId());
+
+      // if user is null
+      if (user == null) {
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        logger.info("user does not exist");
+        return false;
+      }
+    }else {
+       user = userMapper.queryUserByToken(token);
+      if (user == null) {
+        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
+        logger.info("user token has expired");
+        return false;
+      }
     }
-
-    if (session == null) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      logger.info("session info is null ");
-      return false;
-    }
-
-    if(logger.isDebugEnabled()){
-      logger.debug("session id: {}", session.getId());
-    }
-
-    //get user object from session
-    User user = userMapper.queryById(session.getUserId());
-
-    if(logger.isDebugEnabled()){
-      logger.info("user info : " + user);
-    }
-
-
-    if (user == null) {
-      response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-      return false;
-    }
-
     request.setAttribute(Constants.SESSION_USER, user);
-
     return true;
   }
 

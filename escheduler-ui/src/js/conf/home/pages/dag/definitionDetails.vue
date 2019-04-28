@@ -26,6 +26,7 @@
     methods: {
       ...mapMutations('dag', ['resetParams', 'setIsDetails']),
       ...mapActions('dag', ['getProcessList', 'getResourcesList', 'getProcessDetails']),
+      ...mapActions('security', ['getWorkerGroupsAll']),
       /**
        * init
        */
@@ -40,7 +41,9 @@
           // get process definition
           this.getProcessList(),
           // get resource
-          this.getResourcesList()
+          this.getResourcesList(),
+          // get worker group list
+          this.getWorkerGroupsAll()
         ]).then((data) => {
           let item = data[0]
           this.setIsDetails(item.releaseState === 'ONLINE')

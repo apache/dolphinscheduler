@@ -1,63 +1,63 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'resource'"></m-secondary-menu>
-    <m-list-construction :title="$t('UDF Function')">
-      <template slot="conditions">
-        <m-conditions @on-conditions="_onConditions">
-          <template slot="button-group">
-            <x-button type="ghost" @click="_create" v-ps="['GENERAL_USER']" size="small" >{{$t('Create UDF Function')}}</x-button>
-          </template>
-        </m-conditions>
-      </template>
-      <template slot="content">
-        <template v-if="udfFuncList.length">
-          <m-list :udf-func-list="udfFuncList" :page-no="pageNo" :page-size="pageSize" @on-update="_updateList">
-          </m-list>
-          <div class="page-box">
-            <x-page :current="pageNo" :total="total" show-elevator @on-change="_page"></x-page>
-          </div>
+  <m-list-construction :title="$t('UDF Function')">
+    <template slot="conditions">
+      <m-conditions @on-conditions="_onConditions">
+        <template slot="button-group">
+          <x-button type="ghost" @click="_create" v-ps="['GENERAL_USER']" size="small" >{{$t('Create UDF Function')}}</x-button>
         </template>
-        <template v-if="!udfFuncList.length">
-          <m-no-data></m-no-data>
-        </template>
-        <m-spin :is-spin="isLoading">
-        </m-spin>
+      </m-conditions>
+    </template>
+    <template slot="content">
+      <template v-if="udfFuncList.length">
+        <m-list :udf-func-list="udfFuncList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize" @on-update="_updateList">
+        </m-list>
+        <div class="page-box">
+          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
+        </div>
       </template>
-    </m-list-construction>
-  </div>
+      <template v-if="!udfFuncList.length">
+        <m-no-data></m-no-data>
+      </template>
+      <m-spin :is-spin="isLoading">
+      </m-spin>
+    </template>
+  </m-list-construction>
 </template>
 <script>
+  import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mList from './_source/list'
   import mCreateUdf from './_source/createUdf'
   import mSpin from '@/module/components/spin/spin'
   import mNoData from '@/module/components/noData/noData'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
   import mConditions from '@/module/components/conditions/conditions'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+
   export default {
     name: 'udf-function-index',
     data () {
       return {
-        pageSize: 10,
-        pageNo: 1,
-        total: 20,
-        searchVal: '',
+        total: null,
         isLoading: false,
-        udfFuncList: []
+        udfFuncList: [],
+        searchParams: {
+          pageSize: 10,
+          pageNo: 1,
+          searchVal: ''
+        }
       }
     },
+    mixins: [listUrlParamHandle],
     props: {},
     methods: {
       ...mapActions('resource', ['getUdfFuncListP']),
       _onConditions (o) {
-        this.searchVal = o.searchVal
-        this.pageNo = 1
-        this._getUdfFuncListP()
+        this.searchParams = _.assign(this.searchParams, o)
+        this.searchParams.pageNo = 1
       },
       _page (val) {
-        this.pageNo = val
-        this._getUdfFuncListP()
+        this.searchParams.pageNo = val
       },
       _create () {
         let self = this
@@ -85,18 +85,14 @@
         })
       },
       _updateList () {
-        this.pageSize = 10
-        this.pageNo = 1
-        this.searchVal = ''
-        this._getUdfFuncListP()
+        this.searchParams.pageNo = 1
+        this.searchParams.searchVal = ''
+        this._debounceGET()
       },
-      _getUdfFuncListP (flag) {
+      _getList (flag) {
         this.isLoading = !flag
-        this.getUdfFuncListP({
-          pageSize: this.pageSize,
-          pageNo: this.pageNo,
-          searchVal: this.searchVal
-        }).then(res => {
+        this.getUdfFuncListP(this.searchParams).then(res => {
+          this.udfFuncList = []
           this.udfFuncList = res.totalList
           this.total = res.total
           this.isLoading = false
@@ -105,12 +101,17 @@
         })
       }
     },
-    watch: {},
+    watch: {
+      // router
+      '$route' (a) {
+        // url no params get instance list
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+      }
+    },
     created () {
     },
     mounted () {
-      this._getUdfFuncListP()
     },
-    components: { mSecondaryMenu, mListConstruction, mConditions, mList, mSpin, mCreateUdf, mNoData }
+    components: { mListConstruction, mConditions, mList, mSpin, mCreateUdf, mNoData }
   }
 </script>

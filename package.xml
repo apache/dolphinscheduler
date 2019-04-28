@@ -37,7 +37,7 @@
 		<fileSet>
 			<directory>sql</directory>
 			<includes>
-				<include>**/*.*</include>
+				<include>**/*</include>
 			</includes>
 			<outputDirectory>./sql</outputDirectory>
 		</fileSet>
@@ -57,6 +57,16 @@
 				<include>env/*.*</include>
 			</includes>
 			<outputDirectory>./conf</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>script</directory>
+			<includes>
+				<include>start_all.sh</include>
+				<include>stop_all.sh</include>
+				<include>escheduler-daemon.sh</include>
+			</includes>
+			<outputDirectory>./bin</outputDirectory>
 		</fileSet>
 
 		<fileSet>

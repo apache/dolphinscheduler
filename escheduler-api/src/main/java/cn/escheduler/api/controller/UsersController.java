@@ -64,13 +64,14 @@ public class UsersController extends BaseController{
                                                      @RequestParam(value = "userName") String userName,
                                                      @RequestParam(value = "userPassword") String userPassword,
                                                      @RequestParam(value = "tenantId") int tenantId,
+                                                     @RequestParam(value = "queue") String queue,
                                                      @RequestParam(value = "email") String email,
                                                      @RequestParam(value = "phone", required = false) String phone) {
-        logger.info("login user {}, create user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, proxyUsers: {}",
-                loginUser.getUserName(), userName, email, tenantId, Constants.PASSWORD_DEFAULT, phone);
+        logger.info("login user {}, create user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, user queue: {}",
+                loginUser.getUserName(), userName, email, tenantId, Constants.PASSWORD_DEFAULT, phone,queue);
 
         try {
-            Map<String, Object> result = usersService.createUser(loginUser, userName, userPassword, email, tenantId, phone);
+            Map<String, Object> result = usersService.createUser(loginUser, userName, userPassword,email,tenantId, phone,queue);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(CREATE_USER_ERROR.getMsg(),e);
@@ -127,13 +128,14 @@ public class UsersController extends BaseController{
                                                      @RequestParam(value = "id") int id,
                                                      @RequestParam(value = "userName") String userName,
                                                      @RequestParam(value = "userPassword") String userPassword,
+                                                     @RequestParam(value = "queue") String queue,
                                                      @RequestParam(value = "email") String email,
                                                      @RequestParam(value = "tenantId") int tenantId,
                                                      @RequestParam(value = "phone", required = false) String phone) {
-        logger.info("login user {}, updateProcessInstance user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, proxyUsers: {}",
-                loginUser.getUserName(), userName, email, tenantId, Constants.PASSWORD_DEFAULT, phone);
+        logger.info("login user {}, updateProcessInstance user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, user queue: {}",
+                loginUser.getUserName(), userName, email, tenantId, Constants.PASSWORD_DEFAULT, phone,queue);
         try {
-            Map<String, Object> result = usersService.updateUser(id,userName,userPassword,email,tenantId,phone);
+            Map<String, Object> result = usersService.updateUser(id,userName,userPassword,email,tenantId,phone,queue);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(UPDATE_USER_ERROR.getMsg(),e);

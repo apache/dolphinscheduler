@@ -417,8 +417,10 @@
     watch: {
       'tasks': {
         deep: true,
-        handler () {
+        handler (o) {
           console.log('+++++ save dag params +++++')
+          console.log(o)
+
           // Edit state does not allow deletion of node a...
           this.setIsEditDag(true)
         }
@@ -474,5 +476,5 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  @import "dag";
+  @import "./dag";
 </style>
