@@ -1,13 +1,13 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('甘特图')">
+    <m-list-construction :title="$t('Gantt')">
       <template slot="content">
         <div class="gantt-model">
           <div class="gantt-state">
             <div class="state-tasks-color-sp">
               <a href="javascript:">
-                <span>{{$t('任务状态')}}</span>
+                <span>{{$t('Task Status')}}</span>
               </a>
               <a href="javascript:" v-for="(item) in tasksState">
                 <i class="fa fa-square" :style="{color:item.color}"></i>
@@ -71,7 +71,7 @@
             this.isNodata = true
             return
           }
-          // 甘特图
+          // Gantt
           Gantt.init({
             el: '.gantt',
             tasks: res.tasks

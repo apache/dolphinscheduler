@@ -4,25 +4,25 @@
       <table>
         <tr>
           <th>
-            <span>{{$t('编号')}}</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>{{$t('项目名称')}}</span>
+            <span>{{$t('Project Name')}}</span>
           </th>
           <th>
-            <span>{{$t('所属用户')}}</span>
+            <span>{{$t('Owned Users')}}</span>
           </th>
           <th>
-            <span>{{$t('描述')}}</span>
+            <span>{{$t('Description')}}</span>
           </th>
           <th>
-            <span>{{$t('创建时间')}}</span>
+            <span>{{$t('Create Time')}}</span>
           </th>
           <th>
-            <span>{{$t('更新时间')}}</span>
+            <span>{{$t('Update Time')}}</span>
           </th>
           <th width="80">
-            <span>{{$t('操作')}}</span>
+            <span>{{$t('Operation')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="$index">
@@ -49,7 +49,7 @@
                     shape="circle"
                     size="xsmall"
                     data-toggle="tooltip"
-                    :title="$t('编辑')"
+                    :title="$t('Edit')"
                     @click="_edit(item)"
                     icon="iconfont icon-bianjixiugai"
                     v-ps="['GENERAL_USER']">
@@ -58,10 +58,10 @@
                     :ref="'poptip-' + $index"
                     placement="bottom-end"
                     width="90">
-              <p>{{$t('确定删除吗?')}}</p>
+              <p>{{$t('Delete?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('取消')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('确定')}}</x-button>
+                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
+                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
               </div>
               <template slot="reference">
                 <x-button
@@ -69,7 +69,7 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('删除')"
+                        :title="$t('delete')"
                         icon="iconfont icon-shanchu"
                         v-ps="['GENERAL_USER']">
                 </x-button>

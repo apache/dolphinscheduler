@@ -7,28 +7,28 @@
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/home'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe61d;</i>{{$t('首页')}}</span><b></b>
+            <span><i class="iconfont">&#xe61d;</i>{{$t('Home')}}</span><b></b>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/projects'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe635;</i>{{$t('项目管理')}}</span><b></b>
+            <span><i class="iconfont">&#xe635;</i>{{$t('Project Manage')}}</span><b></b>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/resource'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe768;</i>{{$t('资源中心')}}</span><b></b>
+            <span><i class="iconfont">&#xe768;</i>{{$t('Resources manage')}}</span><b></b>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/datasource'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xeef4;</i>{{$t('数据源中心')}}</span><b></b>
+            <span><i class="iconfont">&#xeef4;</i>{{$t('Datasource')}}</span><b></b>
           </router-link>
         </div>
       </div>
@@ -42,14 +42,14 @@
       <div class="clearfix list" >
         <div class="nav-links">
           <router-link :to="{ path: '/security'}" tag="a" active-class="active" v-ps="['ADMIN_USER']">
-            <span><i class="iconfont">&#xe671;</i>{{$t('安全中心')}}</span><b></b>
+            <span><i class="iconfont">&#xe671;</i>{{$t('Security')}}</span><b></b>
           </router-link>
         </div>
       </div>
     </div>
     <div class="right">
       <!--<span class="docs">
-        <a :href="docLink">{{$t('文档中心')}}</a>
+        <a :href="docLink">doc</a>
       </span>-->
       <span class="lang">
         <x-poptip
@@ -72,11 +72,11 @@
         <div class="lrns-list">
           <a href="javascript:" @click="_goAccount">
             <i class="iconfont">&#xe629;</i>
-            <span>{{$t('用户信息')}}</span>
+            <span>{{$t('User Information')}}</span>
           </a>
           <a href="javascript:" @click="_signOut">
             <i class="iconfont">&#xe60c;</i>
-            <span>{{$t('退出')}}</span>
+            <span>{{$t('Logout')}}</span>
           </a>
         </div>
         <div class="login-model" slot="reference">
@@ -109,23 +109,23 @@
           <ul @click="mIsNav = false">
             <router-link :to="{ path: '/home'}" tag="li" active-class="active">
               <i class="iconfont">&#xe61d;</i>
-              <span>{{$t('首页')}}</span>
+              <span>{{$t('Home')}}</span>
             </router-link>
             <router-link :to="{ path: '/projects'}" tag="li" active-class="active">
               <i class="iconfont">&#xe635;</i>
-              <span>{{$t('项目管理')}}</span>
+              <span>{{$t('Project manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/resource'}" tag="li" active-class="active">
               <i class="iconfont">&#xe768;</i>
-              <span>{{$t('资源中心')}}</span>
+              <span>{{$t('Resources manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/datasource'}" tag="li" active-class="active">
               <i class="iconfont">&#xeef4;</i>
-              <span>{{$t('数据源中心')}}</span>
+              <span>{{$t('Datasource')}}</span>
             </router-link>
             <router-link :to="{ path: '/security'}" tag="li" active-class="active" v-ps="['ADMIN_USER']">
               <i class="iconfont">&#xe671;</i>
-              <span>{{$t('安全中心')}}</span>
+              <span>{{$t('Security')}}</span>
             </router-link>
           </ul>
         </div>

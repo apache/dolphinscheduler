@@ -1,11 +1,11 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'resource'"></m-secondary-menu>
-    <m-list-construction :title="$t('UDF资源管理')">
+    <m-list-construction :title="$t('UDF Resources')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small"  @click="_uploading" v-ps="['GENERAL_USER']">{{$t('上传UDF资源')}}</x-button>
+          <x-button type="ghost" size="small"  @click="_uploading" v-ps="['GENERAL_USER']">{{$t('Upload UDF Resources')}}</x-button>
         </template>
       </m-conditions>
     </template>
@@ -52,7 +52,7 @@
     methods: {
       ...mapActions('resource', ['getResourcesListP']),
       /**
-       * 文件上传
+       * File Upload
        */
       _uploading () {
         findComponentDownward(this.$root, 'roof-nav')._fileUpdate('UDF')

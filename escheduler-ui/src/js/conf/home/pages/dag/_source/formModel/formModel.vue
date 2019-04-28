@@ -1,14 +1,14 @@
 <template>
   <div class="form-model-model" v-clickoutside="_handleClose">
     <div class="title-box">
-      <span class="name">{{$t('当前节点设置')}}</span>
+      <span class="name">{{$t('Current node settings')}}</span>
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
         <m-log :item="backfillItem">
-          <template slot="history"><a href="javascript:" @click="_seeHistory" ><i class="iconfont">&#xe6ee;</i><em>{{$t('查看历史')}}</em></a></template>
-          <template slot="log"><a href="javascript:"><i class="iconfont">&#xe691;</i><em>{{$t('查看日志')}}</em></a></template>
+          <template slot="history"><a href="javascript:" @click="_seeHistory" ><i class="iconfont">&#xe6ee;</i><em>{{$t('View history')}}</em></a></template>
+          <template slot="log"><a href="javascript:"><i class="iconfont">&#xe691;</i><em>{{$t('View log')}}</em></a></template>
         </m-log>
-        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><i class="iconfont">&#xe600;</i><em>{{$t('进入该子节点')}}</em></a>
+        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><i class="iconfont">&#xe600;</i><em>{{$t('Enter this child node')}}</em></a>
       </span>
     </div>
     <div class="content-box" v-if="isContentBox">
@@ -16,14 +16,14 @@
 
         <!-- Node name -->
         <div class="clearfix list">
-          <div class="text-box"><span>{{$t('节点名称')}}</span></div>
+          <div class="text-box"><span>{{$t('Node name')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
               <x-input
                       type="text"
                       v-model="name"
                       :disabled="isDetails"
-                      :placeholder="$t('请输入name(必填)')"
+                      :placeholder="$t('Please enter name(required)')"
                       maxlength="100"
                       @on-blur="_verifName()"
                       autocomplete="off">
@@ -34,12 +34,12 @@
 
         <!-- Running sign -->
         <div class="clearfix list">
-          <div class="text-box"><span>{{$t('运行标志')}}</span></div>
+          <div class="text-box"><span>{{$t('Run flag')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
               <x-radio-group v-model="runFlag" >
-                <x-radio :label="'NORMAL'" :disabled="isDetails">{{$t('正常')}}</x-radio>
-                <x-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('禁止执行')}}</x-radio>
+                <x-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</x-radio>
+                <x-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</x-radio>
               </x-radio-group>
             </label>
           </div>
@@ -48,7 +48,7 @@
         <!-- desc -->
         <div class="clearfix list">
           <div class="text-box">
-            <span>{{$t('描述')}}</span>
+            <span>{{$t('Description')}}</span>
           </div>
           <div class="cont-box">
 
@@ -59,7 +59,7 @@
                       type="textarea"
                       :disabled="isDetails"
                       v-model="desc"
-                      :placeholder="$t('请输入desc')"
+                      :placeholder="$t('Please enter description')"
                       autocomplete="off">
               </x-input>
             </label>
@@ -69,7 +69,7 @@
         <!-- Task priority -->
         <div class="clearfix list">
           <div class="text-box">
-            <span>{{$t('任务优先级')}}</span>
+            <span>{{$t('Task priority')}}</span>
           </div>
           <div class="cont-box">
             <label class="label-box">
@@ -81,16 +81,16 @@
         <!-- Number of failed retries -->
         <div class="clearfix list" v-if="taskType !== 'SUB_PROCESS'">
           <div class="text-box">
-            <span>{{$t('失败重试次数')}}</span>
+            <span>{{$t('Number of failed retries')}}</span>
           </div>
           <div class="cont-box">
             <m-select-input v-model="maxRetryTimes" :list="[0,1,2,3,4]">
             </m-select-input>
-            <span>({{$t('次')}})</span>
-            <span class="text-b">{{$t('失败重试间隔')}}</span>
+            <span>({{$t('Times')}})</span>
+            <span class="text-b">{{$t('Failed retry interval')}}</span>
             <m-select-input v-model="retryInterval" :list="[1,10,30,60,120]">
             </m-select-input>
-            <span>({{$t('分')}})</span>
+            <span>({{$t('Minute')}})</span>
           </div>
         </div>
 
@@ -163,8 +163,8 @@
     </div>
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
-        <x-button type="text" @click="close()"> {{$t('取消')}} </x-button>
-        <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('确认添加')}} </x-button>
+        <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
+        <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
       </div>
     </div>
   </div>
@@ -269,13 +269,13 @@
        */
       _goSubProcess () {
         if (_.isEmpty(this.backfillItem)) {
-          this.$message.warning(`${i18n.$t('新创建子工作流还未执行，不能进入子工作流')}`)
+          this.$message.warning(`${i18n.$t('The newly created sub-Process has not yet been executed and cannot enter the sub-Process')}`)
           return
         }
         if (this.router.history.current.name === 'projects-instance-details') {
           let stateId = $(`#${this.id}`).attr('data-state-id') || null
           if (!stateId) {
-            this.$message.warning(`${i18n.$t('该任务还未执行，不能进入子工作流')}`)
+            this.$message.warning(`${i18n.$t('The task has not been executed and cannot enter the sub-Process')}`)
             return
           }
           this.store.dispatch('dag/getSubProcessId', { taskId: stateId }).then(res => {
@@ -304,7 +304,7 @@
        */
       _verifName () {
         if (!_.trim(this.name)) {
-          this.$message.warning(`${i18n.$t('请输入名称(必填)')}`)
+          this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
         if (this.name === this.backfillItem.name) {
@@ -312,7 +312,7 @@
         }
         // Name repeat depends on dom backfill dependent store
         if (isNameExDag(this.name, _.isEmpty(this.backfillItem) ? 'dom' : 'backfill')) {
-          this.$message.warning(`${i18n.$t('名称已存在请重新输入')}`)
+          this.$message.warning(`${i18n.$t('Name already exists')}`)
           return false
         }
         return true
@@ -353,12 +353,25 @@
           },
           fromThis: this
         })
+
+        // set run flag
+        this._setRunFlag()
       },
       /**
        * Sub-workflow selected node echo name
        */
       _onSetProcessName (name) {
         this.name = name
+      },
+      /**
+       *  set run flag
+       */
+      _setRunFlag(){
+        let dom = $(`#${this.id}`).find('.ban-p')
+        dom.html('')
+        if (this.runFlag === 'FORBIDDEN') {
+          dom.append(rtBantpl())
+        }
       },
       /**
        * Submit verification
@@ -384,13 +397,7 @@
       }
     },
     watch: {
-      runFlag(val){
-        let dom = $(`#${this.id}`).find('.ban-p')
-        dom.html('')
-        if (val === 'FORBIDDEN') {
-          dom.append(rtBantpl())
-        }
-      }
+
     },
     created () {
       // Unbind copy and paste events

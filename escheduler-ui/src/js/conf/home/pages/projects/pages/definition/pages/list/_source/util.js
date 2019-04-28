@@ -20,19 +20,19 @@ import i18n from '@/module/i18n'
 let warningTypeList = [
   {
     id: 'NONE',
-    code: `${i18n.$t('都不发')}`
+    code: `${i18n.$t('none_1')}`
   },
   {
     id: 'SUCCESS',
-    code: `${i18n.$t('成功发')}`
+    code: `${i18n.$t('success_1')}`
   },
   {
     id: 'FAILURE',
-    code: `${i18n.$t('失败发')}`
+    code: `${i18n.$t('failure_1')}`
   },
   {
     id: 'ALL',
-    code: `${i18n.$t('成功或失败都发')}`
+    code: `${i18n.$t('All_1')}`
   }
 ]
 

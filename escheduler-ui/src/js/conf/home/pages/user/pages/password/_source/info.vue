@@ -1,37 +1,37 @@
 <template>
   <div class="user-info-model password-model">
     <m-list-box-f>
-      <template slot="name">{{$t('用户名称')}}</template>
+      <template slot="name">{{$t('User Name')}}</template>
       <template slot="content">
         <span class="sp1">{{userInfo.userName}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f>
-      <template slot="name">{{$t('密码')}}</template>
+      <template slot="name">{{$t('Password')}}</template>
       <template slot="content">
         <x-input
                 style="width: 320px;"
                 type="password"
                 v-model="userPassword"
-                :placeholder="$t('请输入密码')">
+                :placeholder="$t('Please enter your password')">
         </x-input>
       </template>
     </m-list-box-f>
     <m-list-box-f>
-      <template slot="name">{{$t('确认密码')}}</template>
+      <template slot="name">{{$t('Confirm Password')}}</template>
       <template slot="content">
         <x-input
                 style="width: 320px;"
                 type="password"
                 v-model="oldUserPassword"
-                :placeholder="$t('请输入确认密码')">
+                :placeholder="$t('Please enter confirm password')">
         </x-input>
       </template>
     </m-list-box-f>
     <m-list-box-f>
       <template slot="name">&nbsp;</template>
       <template slot="content">
-        <x-button type="primary" shape="circle" @click="_edit()" :loading="spinnerLoading">{{spinnerLoading ? 'Loading...' : '修改'}}</x-button>
+        <x-button type="primary" shape="circle" @click="_edit()" :loading="spinnerLoading">{{spinnerLoading ? 'Loading...' : 'Edit'}}</x-button>
       </template>
     </m-list-box-f>
   </div>
@@ -92,33 +92,33 @@
 
         // password
         if (regCn.test(this.userPassword)) {
-          this.$message.warning(`${i18n.$t('密码不能为中文')}`)
+          this.$message.warning(`${i18n.$t('Password cannot be in Chinese')}`)
           return false
         }
         if (!this.userPassword) {
-          this.$message.warning(`${i18n.$t('请输入密码(6-22)字符密码')}`)
+          this.$message.warning(`${i18n.$t('Please enter a password (6-22) character password')}`)
           return false
         }
         if (this.userPassword.length < 6 || this.userPassword.length > 22) {
-          this.$message.warning(`${i18n.$t('请输入密码(6-22)字符密码')}`)
+          this.$message.warning(`${i18n.$t('Please enter a password (6-22) character password')}`)
           return false
         }
 
         // confirm password
         if (regCn.test(this.oldUserPassword)) {
-          this.$message.warning(`${i18n.$t('确认密码不能为中文')}`)
+          this.$message.warning(`${i18n.$t('Confirmation password cannot be in Chinese')}`)
           return false
         }
         if (!this.oldUserPassword) {
-          this.$message.warning(`${i18n.$t('请输入确认密码(6-22)字符密码')}`)
+          this.$message.warning(`${i18n.$t('Please enter a confirmation password (6-22) character password')}`)
           return false
         }
         if (this.oldUserPassword.length < 6 || this.oldUserPassword.length > 22) {
-          this.$message.warning(`${i18n.$t('请输入确认密码(6-22)字符密码')}`)
+          this.$message.warning(`${i18n.$t('Please enter a confirmation password (6-22) character password')}`)
           return false
         }
         if (this.userPassword !== this.oldUserPassword) {
-          this.$message.warning(`${i18n.$t('密码与确认密码不一致,请重新确认')}`)
+          this.$message.warning(`${i18n.$t('The password is inconsistent with the confirmation password')}`)
           return false
         }
         return true

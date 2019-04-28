@@ -1,18 +1,18 @@
 <template>
   <m-popup
           ref="popup"
-          :ok-text="item ? $t('确认编辑') : $t('确认提交')"
-          :nameText="item ? $t('编辑队列') : $t('创建队列')"
+          :ok-text="item ? $t('Edit') : $t('Submit')"
+          :nameText="item ? $t('Edit queue') : $t('Create queue')"
           @ok="_ok">
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>名称</template>
+          <template slot="name"><b>*</b>{{$t('Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="queueName"
-                    placeholder="请输入名称"
+                    placeholder="Please enter name"
                     autocomplete="off">
             </x-input>
           </template>
@@ -103,7 +103,7 @@
       },
       _verification(){
         if (!this.queueName) {
-          this.$message.warning(`请输入名称`)
+          this.$message.warning(`Please enter name`)
           return false
         }
         if (!this.queue) {
