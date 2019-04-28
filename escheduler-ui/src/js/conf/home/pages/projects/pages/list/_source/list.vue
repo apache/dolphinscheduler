@@ -82,7 +82,6 @@
   </div>
 </template>
 <script>
-  import '@/module/filter/formatDate'
   import { mapActions, mapMutations } from 'vuex'
   import localStore from '@/module/util/localStorage'
   import { findComponentDownward } from '@/module/util/'

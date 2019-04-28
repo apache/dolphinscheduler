@@ -35,11 +35,22 @@ public class ResInfo {
      */
     private double memoryUsage;
 
+    /**
+     * loadAverage
+     */
+    private double loadAverage;
+
     public ResInfo(){}
 
     public ResInfo(double cpuUsage , double memoryUsage){
         this.cpuUsage = cpuUsage ;
         this.memoryUsage = memoryUsage;
+    }
+
+    public ResInfo(double cpuUsage, double memoryUsage, double loadAverage) {
+        this.cpuUsage = cpuUsage;
+        this.memoryUsage = memoryUsage;
+        this.loadAverage = loadAverage;
     }
 
     public double getCpuUsage() {
@@ -58,12 +69,21 @@ public class ResInfo {
         this.memoryUsage = memoryUsage;
     }
 
+    public double getLoadAverage() {
+        return loadAverage;
+    }
+
+    public void setLoadAverage(double loadAverage) {
+        this.loadAverage = loadAverage;
+    }
+
     /**
      * get CPU and memory usage
+     * add cpu load average by lidong for service monitor
      * @return
      */
     public static String getResInfoJson(){
-        ResInfo resInfo = new ResInfo(OSUtils.cpuUsage(), OSUtils.memoryUsage());
+        ResInfo resInfo = new ResInfo(OSUtils.cpuUsage(), OSUtils.memoryUsage(),OSUtils.loadAverage());
         return JSONUtils.toJson(resInfo);
     }
 

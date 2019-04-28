@@ -25,6 +25,7 @@
     methods: {
       ...mapMutations('dag', ['resetParams']),
       ...mapActions('dag', ['getProcessList', 'getResourcesList']),
+      ...mapActions('security', ['getWorkerGroupsAll']),
       /**
        * init
        */
@@ -37,7 +38,9 @@
           // get process definition
           this.getProcessList(),
           // get resource
-          this.getResourcesList()
+          this.getResourcesList(),
+          // get worker group list
+          this.getWorkerGroupsAll()
         ]).then((data) => {
           this.isLoading = false
           // Whether to pop up the box?

@@ -13,7 +13,6 @@
     </div>
     <div class="content-box" v-if="isContentBox">
       <div class="from-model">
-
         <!-- Node name -->
         <div class="clearfix list">
           <div class="text-box"><span>{{$t('Node name')}}</span></div>
@@ -51,7 +50,6 @@
             <span>{{$t('Description')}}</span>
           </div>
           <div class="cont-box">
-
             <label class="label-box">
               <x-input
                       resize
@@ -72,9 +70,11 @@
             <span>{{$t('Task priority')}}</span>
           </div>
           <div class="cont-box">
-            <label class="label-box">
-              <m-priority v-model="taskInstancePriority" style="width: 180px;"></m-priority>
-            </label>
+            <span class="label-box" style="width: 193px;display: inline-block;">
+              <m-priority v-model="taskInstancePriority"></m-priority>
+            </span>
+            <span class="text-b">{{$t('Worker group')}}</span>
+            <m-worker-groups v-model="workerGroupId"></m-worker-groups>
           </div>
         </div>
 
@@ -128,6 +128,7 @@
                 v-if="taskType === 'SQL'"
                 @on-params="_onParams"
                 ref="SQL"
+                :create-node-id="id"
                 :backfill-item="backfillItem">
         </m-sql>
         <!-- spark node -->
@@ -178,15 +179,16 @@
   import mShell from './tasks/shell'
   import mSpark from './tasks/spark'
   import mPython from './tasks/python'
-  import { isNameExDag,rtBantpl } from './../plugIn/util'
   import JSP from './../plugIn/jsPlumbHandle'
   import mProcedure from './tasks/procedure'
   import mDependent from './tasks/dependent'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
+  import mWorkerGroups from './_source/workerGroups'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
+  import { isNameExDag, rtBantpl } from './../plugIn/util'
   import mPriority from '@/module/components/priority/priority'
 
   export default {
@@ -218,7 +220,9 @@
         // Task timeout alarm
         timeout: {},
         // Task priority
-        taskInstancePriority: 'MEDIUM'
+        taskInstancePriority: 'MEDIUM',
+        // worker group id
+        workerGroupId: -1
       }
     },
     /**
@@ -255,7 +259,7 @@
        */
       _seeHistory () {
         this.self.$router.push({
-          name: 'task-instance-list',
+          name: 'task-instance',
           query: {
             processInstanceId: this.self.$route.params.id,
             taskName: this.backfillItem.name
@@ -349,7 +353,8 @@
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
             timeout: this.timeout,
-            taskInstancePriority: this.taskInstancePriority
+            taskInstancePriority: this.taskInstancePriority,
+            workerGroupId: this.workerGroupId
           },
           fromThis: this
         })
@@ -366,7 +371,7 @@
       /**
        *  set run flag
        */
-      _setRunFlag(){
+      _setRunFlag () {
         let dom = $(`#${this.id}`).find('.ban-p')
         dom.html('')
         if (this.runFlag === 'FORBIDDEN') {
@@ -420,11 +425,14 @@
           this.desc = o.desc
           this.maxRetryTimes = o.maxRetryTimes
           this.retryInterval = o.retryInterval
+          this.workerGroupId = o.workerGroupId
         }
       }
       this.isContentBox = true
     },
-    mounted () {},
+    mounted () {
+
+    },
     updated () {
     },
     beforeDestroy () {
@@ -451,119 +459,12 @@
       mDependent,
       mSelectInput,
       mTimeoutAlarm,
-      mPriority
+      mPriority,
+      mWorkerGroups
     }
   }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .form-model-model {
-    width: 720px;
-    position: relative;
-    .title-box {
-      height: 61px;
-      border-bottom: 1px solid #DCDEDC;
-      position: relative;
-      .name {
-        position: absolute;
-        left: 24px;
-        top: 18px;
-        font-size: 16px;
-      }
-      .go-subtask {
-        position: absolute;
-        right: 30px;
-        top: 17px;
-        a {
-          font-size: 14px;
-          color: #0097e0;
-          margin-left: 10px;
-          i.iconfont {
-            font-size: 18px;
-            vertical-align: middle;
-          }
-          em {
-            color: #333;
-            vertical-align: middle;
-            font-style: normal;
-            vertical-align: middle;
-            padding-left: 2px;
-          }
-          &:hover {
-            em {
-              text-decoration: underline;
-            }
-          }
-        }
-      }
-    }
-    .bottom-box {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      text-align: right;
-      height: 60px;
-      line-height: 60px;
-      border-top: 1px solid #DCDEDC;
-      background: #fff;
-      .submit {
-        padding-right: 20px;
-        position: relative;
-        z-index: 9;
-      }
-    }
-    .content-box {
-      overflow-y: scroll;
-      height: calc(100vh - 61px);
-      padding-bottom: 60px;
-    }
-  }
-  .from-model {
-    padding-top: 26px;
-    >div {
-      clear: both;
-    }
-    .list {
-      position: relative;
-      margin-bottom: 10px;
-      .text-box {
-        width: 110px;
-        float: left;
-        text-align: right;
-        margin-right: 10px;
-        >span {
-          font-size: 14px;
-          color: #777;
-          display: inline-block;
-          padding-top: 6px;
-        }
-      }
-      .cont-box {
-        width: 580px;
-        float: left;
-        .label-box {
-          width: 100%;
-        }
-        .text-b {
-          font-size: 14px;
-          color: #777;
-          display: inline-block;
-          padding:0 6px 0 20px;
-        }
-      }
-      .add {
-        line-height: 32px;
-        a {
-          color: #0097e0;
-        }
-      }
-      &:hover {
-      }
-      .list-t {
-        width: 50%;
-        float: left;
-      }
-    }
-  }
+  @import "./formModel";
 </style>

@@ -31,7 +31,7 @@ public enum Status {
     HDFS_OPERATION_ERROR(10006, "hdfs operation error"),
     UPDATE_FAILED(10007, "updateProcessInstance failed"),
     TASK_INSTANCE_HOST_NOT_FOUND(10008, "task instance does not set host"),
-    TENANT_NAME_EXIST(10009, "tenant name already exists"),
+    TENANT_NAME_EXIST(10009, "tenant code already exists"),
     USER_NOT_EXIST(10010, "user {0} not exists"),
     ALERT_GROUP_NOT_EXIST(10011, "alarm group not found"),
     ALERT_GROUP_EXIST(10012, "alarm group already exists"),
@@ -156,6 +156,10 @@ public enum Status {
     UPDATE_QUEUE_ERROR(10131, "update queue error"),
     NEED_NOT_UPDATE_QUEUE(10132, "no content changes, no updates are required"),
     VERIFY_QUEUE_ERROR(10133,"verify queue error"),
+    NAME_NULL(10134,"name must be not null"),
+    NAME_EXIST(10135, "name {0} already exists"),
+    SAVE_ERROR(10136, "save error"),
+
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
@@ -197,8 +201,25 @@ public enum Status {
     PROCESS_NODE_HAS_CYCLE(50019,"process node has cycle"),
     PROCESS_NODE_S_PARAMETER_INVALID(50020,"process node %s parameter invalid"),
 
-
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
+
+    /**
+     * for monitor
+     */
+    QUERY_DATABASE_STATE_ERROR(70001,"query database state error"),
+    QUERY_ZOOKEEPER_STATE_ERROR(70002,"query zookeeper state error"),
+
+
+
+    CREATE_ACCESS_TOKEN_ERROR(70001,"create access token error"),
+    GENERATE_TOKEN_ERROR(70002,"generate token error"),
+    QUERY_ACCESSTOKEN_LIST_PAGING_ERROR(70003,"query access token list paging error"),
+
+
+    COMMAND_STATE_COUNT_ERROR(80001,"task instance state count error"),
+
+    QUEUE_COUNT_ERROR(90001,"queue count error"),
+
     ;
 
     private int code;

@@ -15,6 +15,9 @@
  * limitations under the License.
  */
 
+import _ from 'lodash'
+import { tasksState } from '@/conf/home/pages/dag/_source/config'
+
 let pie = {
   series: [
     {
@@ -63,4 +66,34 @@ let bar = {
   }]
 }
 
-export { pie, bar }
+let simple = {
+  xAxis: {
+    splitLine: {
+      show: false
+    },
+    axisLabel: {
+      interval: 0,
+      showMaxLabel: true,
+      formatter (v) {
+        return tasksState[v].desc
+      }
+    }
+  },
+  tooltip: {
+    formatter (data) {
+      let str = ''
+      _.map(data, (v, i) => {
+        if (i === 0) {
+          str += `${tasksState[v.name].desc}<br>`
+        }
+        str += `<div style="font-size: 12px;">${v.seriesName} : ${v.data}<br></div>`
+      })
+      return str
+    }
+  },
+  color: ['#D5050B', '#0398E1']
+
+
+}
+
+export { pie, bar, simple }

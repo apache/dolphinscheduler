@@ -37,6 +37,9 @@ public class ProcessData {
   private List<Property> globalParams;
 
 
+  private int timeout;
+
+
   public ProcessData() {
   }
 
@@ -82,4 +85,11 @@ public class ProcessData {
     this.globalParams = globalParams;
   }
 
+  public int getTimeout() {
+    return timeout;
+  }
+
+  public void setTimeout(int timeout) {
+    this.timeout = timeout;
+  }
 }
