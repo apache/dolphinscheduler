@@ -31,7 +31,7 @@ public enum Status {
     HDFS_OPERATION_ERROR(10006, "hdfs operation error"),
     UPDATE_FAILED(10007, "updateProcessInstance failed"),
     TASK_INSTANCE_HOST_NOT_FOUND(10008, "task instance does not set host"),
-    TENANT_NAME_EXIST(10009, "tenant name already exists"),
+    TENANT_NAME_EXIST(10009, "tenant code already exists"),
     USER_NOT_EXIST(10010, "user {0} not exists"),
     ALERT_GROUP_NOT_EXIST(10011, "alarm group not found"),
     ALERT_GROUP_EXIST(10012, "alarm group already exists"),
