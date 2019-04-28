@@ -216,6 +216,11 @@ public class UsersService extends BaseService {
         Date now = new Date();
 
         if (StringUtils.isNotEmpty(userName)) {
+            User tempUser = userMapper.queryByUserName(userName);
+            if (tempUser != null && tempUser.getId() != userId) {
+                putMsg(result, Status.USER_NAME_EXIST);
+                return result;
+            }
             user.setUserName(userName);
         }
 
