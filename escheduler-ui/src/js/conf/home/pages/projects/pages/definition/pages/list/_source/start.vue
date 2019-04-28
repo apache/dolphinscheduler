@@ -14,11 +14,11 @@
         </x-radio-group>
       </div>
     </div>
-    <div class="clearfix list" v-if="sourceType === 'contextmenu'">
+    <div class="clearfix list" v-if="sourceType === 'contextmenu'" style="margin-top: -8px;">
       <div class="text">
         {{$t('Node execution')}}
       </div>
-      <div class="cont">
+      <div class="cont" style="padding-top: 6px;">
         <x-radio-group v-model="taskDependType">
           <x-radio :label="'TASK_POST'">{{$t('Backward execution')}}</x-radio>
           <x-radio :label="'TASK_PRE'">{{$t('Forward execution')}}</x-radio>
@@ -51,6 +51,14 @@
     </div>
     <div class="clearfix list">
       <div class="text">
+        Worker分组
+      </div>
+      <div class="cont">
+        <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+      </div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
         {{$t('Notification group')}}
       </div>
       <div class="cont">
@@ -75,7 +83,7 @@
       <div class="text">
         {{$t('Recipient')}}
       </div>
-      <div class="cont">
+      <div class="cont" style="width: 688px;">
         <m-email v-model="receivers" :repeat-data="receiversCc"></m-email>
       </div>
     </div>
@@ -83,7 +91,7 @@
       <div class="text">
         {{$t('Cc')}}
       </div>
-      <div class="cont">
+      <div class="cont" style="width: 688px;">
         <m-email v-model="receiversCc" :repeat-data="receivers"></m-email>
       </div>
     </div>
@@ -140,6 +148,7 @@
   import store from '@/conf/home/store'
   import { warningTypeList } from './util'
   import mPriority from '@/module/components/priority/priority'
+  import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
 
   export default {
     name: 'start-process',
@@ -159,7 +168,8 @@
         receivers: [],
         receiversCc: [],
         runMode: 'RUN_MODE_SERIAL',
-        processInstancePriority: 'MEDIUM'
+        processInstancePriority: 'MEDIUM',
+        workerGroupId: -1
       }
     },
     props: {
@@ -188,7 +198,8 @@
           runMode: this.runMode,
           processInstancePriority: this.processInstancePriority,
           receivers: this.receivers.join(',') || '',
-          receiversCc: this.receiversCc.join(',') || ''
+          receiversCc: this.receiversCc.join(',') || '',
+          workerGroupId: this.workerGroupId
         }
         // Executed from the specified node
         if (this.sourceType === 'contextmenu') {
@@ -251,7 +262,7 @@
       })
     },
     computed: {},
-    components: { mEmail, mPriority }
+    components: { mEmail, mPriority, mWorkerGroups }
   }
 </script>
 

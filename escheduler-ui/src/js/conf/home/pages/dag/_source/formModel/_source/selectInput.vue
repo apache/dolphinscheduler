@@ -1,6 +1,6 @@
 <template>
   <x-select
-          style="width: 170px;"
+          style="width: 157px;"
           :disabled="isDetails"
           @on-change="_onChange"
           v-model="value">
@@ -33,7 +33,7 @@
   import disabledState from '@/module/mixin/disabledState'
 
   export default {
-    name: 'select-input',
+    name: 'form-select-input',
     data () {
       return {
         isIconState: false,

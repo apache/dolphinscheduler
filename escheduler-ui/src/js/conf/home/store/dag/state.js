@@ -29,6 +29,8 @@ export default {
   globalParams: [],
   // Node information
   tasks: [],
+  // Timeout alarm
+  timeout: 0,
   // Node location information
   locations: {},
   // Node-to-node connection

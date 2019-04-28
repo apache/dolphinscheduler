@@ -346,7 +346,8 @@ public class ProcessInstanceService extends BaseDAGService {
 
         //check process instance status
         if (!processInstance.getState().typeIsFinished()) {
-            putMsg(result, Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, "update");
+            putMsg(result, Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR,
+                    processInstance.getName(), processInstance.getState().toString(), "update");
             return result;
         }
         Date schedule = null;
@@ -355,8 +356,12 @@ public class ProcessInstanceService extends BaseDAGService {
         } else {
             schedule = processInstance.getScheduleTime();
         }
+        processInstance.setScheduleTime(schedule);
+        processInstance.setLocations(locations);
+        processInstance.setConnects(connects);
         String globalParams = null;
         String originDefParams = null;
+        int timeout = processInstance.getTimeout();
         if (StringUtils.isNotEmpty(processInstanceJson)) {
             ProcessData processData = JSONUtils.parseObject(processInstanceJson, ProcessData.class);
             //check workflow json is valid
@@ -370,9 +375,14 @@ public class ProcessInstanceService extends BaseDAGService {
             Map<String, String> globalParamMap = globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
             globalParams = ParameterUtils.curingGlobalParams(globalParamMap, globalParamList,
                     processInstance.getCmdTypeIfComplement(), schedule);
+            timeout = processData.getTimeout();
+            processInstance.setTimeout(timeout);
+            processInstance.setProcessInstanceJson(processInstanceJson);
+            processInstance.setGlobalParams(globalParams);
         }
-        int update = processDao.updateProcessInstance(processInstanceId, processInstanceJson,
-                globalParams, schedule, flag, locations, connects);
+//        int update = processDao.updateProcessInstance(processInstanceId, processInstanceJson,
+//                globalParams, schedule, flag, locations, connects);
+        int update = processDao.updateProcessInstance(processInstance);
         int updateDefine = 1;
         if (syncDefine && StringUtils.isNotEmpty(processInstanceJson)) {
             ProcessDefinition processDefinition = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
@@ -380,6 +390,7 @@ public class ProcessInstanceService extends BaseDAGService {
             processDefinition.setGlobalParams(originDefParams);
             processDefinition.setLocations(locations);
             processDefinition.setConnects(connects);
+            processDefinition.setTimeout(timeout);
             updateDefine = processDefineMapper.update(processDefinition);
         }
         if (update > 0 && updateDefine > 0) {
@@ -509,7 +520,7 @@ public class ProcessInstanceService extends BaseDAGService {
         }
 
         // local params
-        Map<String, List<Property>> localUserDefParams = new HashMap<>();
+        Map<String, Map<String,Object>> localUserDefParams = new HashMap<>();
         for (TaskNode taskNode : taskNodeList) {
             String parameter = taskNode.getParams();
             Map<String, String> map = JSONUtils.toMap(parameter);
@@ -517,8 +528,11 @@ public class ProcessInstanceService extends BaseDAGService {
             if (localParams != null && !localParams.isEmpty()) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
                 List<Property> localParamsList = JSON.parseArray(localParams, Property.class);
+                Map<String,Object> localParamsMap = new HashMap<>();
+                localParamsMap.put("taskType",taskNode.getType());
+                localParamsMap.put("localParamsList",localParamsList);
                 if (localParamsList.size() > 0) {
-                    localUserDefParams.put(taskNode.getName(), localParamsList);
+                    localUserDefParams.put(taskNode.getName(), localParamsMap);
                 }
             }
 

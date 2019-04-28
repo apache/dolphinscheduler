@@ -51,6 +51,7 @@ public class CommandMapperProvider {
                 VALUES("`warning_group_id`", "#{command.warningGroupId}");
                 VALUES("`schedule_time`", "#{command.scheduleTime}");
                 VALUES("`update_time`", "#{command.updateTime}");
+                VALUES("`worker_group_id`", "#{command.workerGroupId}");
                 VALUES("`start_time`", "#{command.startTime}");
 
             }
@@ -95,6 +96,7 @@ public class CommandMapperProvider {
                 SET("`warning_group_id`=#{command.warningGroupId}");
                 SET("`schedule_time`=#{command.scheduleTime}");
                 SET("`update_time`=#{command.updateTime}");
+                SET("`worker_group_id`=#{command.workerGroupId}");
                 SET("`start_time`=#{command.startTime}");
 
                 WHERE("`id`=#{command.id}");
@@ -139,6 +141,31 @@ public class CommandMapperProvider {
         }.toString();
     }
 
+    /**
+     *
+     * count command type
+     * @param parameter
+     * @return
+     */
+    public String countCommandState(Map<String, Object> parameter){
+        return new SQL(){
+            {
+                SELECT ("command_type as state,COUNT(*) AS count");
+                FROM(TABLE_NAME + " cmd,t_escheduler_process_definition process");
+                WHERE("cmd.process_definition_id = process.id");
+                if(parameter.get("projectId") != null && (int)parameter.get("projectId") != 0){
+                    WHERE( "process.project_id = #{projectId} ");
+                }else{
+                    if(parameter.get("userType") != null && String.valueOf(parameter.get("userType")) == "GENERAL_USER") {
+                        AND();
+                        WHERE("process.project_id in (select id as project_id from t_escheduler_project tp where tp.user_id= #{userId} " +
+                                "union select project_id from t_escheduler_relation_project_user tr where tr.user_id= #{userId} )");
 
-
+                    }
+                }
+                WHERE("cmd.start_time >= #{startTime} and cmd.update_time <= #{endTime}");
+                GROUP_BY("cmd.command_type");
+            }
+        }.toString();
+    }
 }

@@ -9,9 +9,9 @@
     </template>
     <template slot="content">
       <template v-if="projectsList.length">
-        <m-list :projects-list="projectsList" @on-update="_onUpdate" :page-no="pageNo" :page-size="pageSize"></m-list>
+        <m-list :projects-list="projectsList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
         <div class="page-box">
-          <x-page :current="pageNo" :total="total" show-elevator @on-change="_page"></x-page>
+          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
         </div>
       </template>
       <template v-if="!projectsList.length">
@@ -22,26 +22,32 @@
   </m-list-construction>
 </template>
 <script>
+  import _ from 'lodash'
   import { mapActions } from 'vuex'
-  import mListConstruction from '@/module/components/listConstruction/listConstruction'
-  import mConditions from '@/module/components/conditions/conditions'
   import mList from './_source/list'
-  import mCreateProject from './_source/createProject'
   import mSpin from '@/module/components/spin/spin'
+  import mCreateProject from './_source/createProject'
   import mNoData from '@/module/components/noData/noData'
+  import listUrlParamHandle from '@/module/mixin/listUrlParamHandle'
+  import mConditions from '@/module/components/conditions/conditions'
+  import mListConstruction from '@/module/components/listConstruction/listConstruction'
+
 
   export default {
     name: 'projects-list',
     data () {
       return {
-        pageSize: 10,
-        pageNo: 1,
         total: null,
-        searchVal: '',
         projectsList: [],
-        isLoading: true
+        isLoading: true,
+        searchParams: {
+          pageSize: 10,
+          pageNo: 1,
+          searchVal: ''
+        }
       }
     },
+    mixins: [listUrlParamHandle],
     props: {},
     methods: {
       ...mapActions('projects', ['getProjectsList']),
@@ -49,9 +55,12 @@
        * Inquire
        */
       _onConditions (o) {
-        this.searchVal = o.searchVal
-        this.pageNo = 1
-        this._getProjectsList()
+        this.searchParams = _.assign(this.searchParams, o)
+        this.searchParams.pageNo = 1
+      },
+
+      _page (val) {
+        this.searchParams.pageNo = val
       },
       _create (item) {
         let self = this
@@ -65,7 +74,7 @@
             return h(mCreateProject, {
               on: {
                 onUpdate () {
-                  self._getProjectsList()
+                  self._debounceGET()
                   modal.remove()
                 }
               },
@@ -77,19 +86,12 @@
         })
       },
       _onUpdate () {
-        this._getProjectsList()
+        this._debounceGET()
       },
-      _page (val) {
-        this.pageNo = val
-        this._getProjectsList()
-      },
-      _getProjectsList (flag) {
+      _getList (flag) {
         this.isLoading = !flag
-        this.getProjectsList({
-          pageSize: this.pageSize,
-          pageNo: this.pageNo,
-          searchVal: this.searchVal
-        }).then(res => {
+        this.getProjectsList(this.searchParams).then(res => {
+          this.projectsList = []
           this.projectsList = res.totalList
           this.total = res.total
           this.isLoading = false
@@ -98,11 +100,16 @@
         })
       }
     },
-    watch: {},
+    watch: {
+      // router
+      '$route' (a) {
+        // url no params get instance list
+        this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+      }
+    },
     created () {
     },
     mounted () {
-      this._getProjectsList()
     },
     components: { mListConstruction, mSpin, mConditions, mList, mCreateProject, mNoData }
   }
