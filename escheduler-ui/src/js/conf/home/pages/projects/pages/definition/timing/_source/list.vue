@@ -160,7 +160,10 @@
           pageNo: this.pageNo,
           pageSize: this.pageSize
         }).then(res => {
-          this.list = res.data.totalList
+          this.list = []
+          setTimeout(() => {
+            this.list = res.data.totalList
+          })
           this.total = res.data.total
           this.isLoading = false
         }).catch(e => {
