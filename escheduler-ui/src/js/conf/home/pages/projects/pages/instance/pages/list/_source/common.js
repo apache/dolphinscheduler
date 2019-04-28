@@ -23,43 +23,43 @@ import i18n from '@/module/i18n'
 let stateType = [
   {
     code: '',
-    label: `${i18n.$t('无')}`
+    label: `${i18n.$t('none')}`
   }, {
     code: 'SUBMITTED_SUCCESS',
-    label: `${i18n.$t('提交成功')}`
+    label: `${i18n.$t('Submitted successfully')}`
   }, {
     code: 'RUNNING_EXEUTION',
-    label: `${i18n.$t('正在运行')}`
+    label: `${i18n.$t('Running')}`
   }, {
     code: 'READY_PAUSE',
-    label: `${i18n.$t('准备暂停')}`
+    label: `${i18n.$t('Ready to pause')}`
   }, {
     code: 'PAUSE',
-    label: `${i18n.$t('暂停')}`
+    label: `${i18n.$t('Pause')}`
   }, {
     code: 'READY_STOP',
-    label: `${i18n.$t('准备停止')}`
+    label: `${i18n.$t('Ready to stop')}`
   }, {
     code: 'STOP',
-    label: `${i18n.$t('停止')}`
+    label: `${i18n.$t('Stop')}`
   }, {
     code: 'FAILURE',
-    label: `${i18n.$t('失败')}`
+    label: `${i18n.$t('failed')}`
   }, {
     code: 'SUCCESS',
-    label: `${i18n.$t('成功')}`
+    label: `${i18n.$t('success')}`
   }, {
     code: 'NEED_FAULT_TOLERANCE',
-    label: `${i18n.$t('需要容错')}`
+    label: `${i18n.$t('Need fault tolerance')}`
   }, {
     code: 'KILL',
     label: `${i18n.$t('kill')}`
   }, {
     code: 'WAITTING_THREAD',
-    label: `${i18n.$t('等待线程')}`
+    label: `${i18n.$t('Waiting for thread')}`
   }, {
     code: 'WAITTING_DEPEND',
-    label: `${i18n.$t('等待依赖完成')}`
+    label: `${i18n.$t('Waiting for dependency to complete')}`
   }
 ]
 

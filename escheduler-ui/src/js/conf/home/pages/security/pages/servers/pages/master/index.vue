@@ -1,7 +1,7 @@
 <template>
   <div class="main-layout-box">
     <m-secondary-menu :type="'security'"></m-secondary-menu>
-    <m-list-construction :title="$t('服务管理-Master')">
+    <m-list-construction :title="$t('Service-Master')">
       <template slot="content">
         <template v-if="masterList.length">
           <m-list :list="masterList"></m-list>

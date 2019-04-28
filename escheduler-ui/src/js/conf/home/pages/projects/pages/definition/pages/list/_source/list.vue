@@ -4,28 +4,28 @@
       <table class="fixed">
         <tr>
           <th>
-            <span>{{$t('编号')}}</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>{{$t('工作流名称')}}</span>
+            <span>{{$t('Process Name')}}</span>
           </th>
           <th width="50">
-            <span>{{$t('状态')}}</span>
+            <span>{{$t('State')}}</span>
           </th>
           <th width="140">
-            <span>{{$t('创建时间')}}</span>
+            <span>{{$t('Create Time')}}</span>
           </th>
           <th width="140">
-            <span>{{$t('更新时间')}}</span>
+            <span>{{$t('Update Time')}}</span>
           </th>
           <th>
-            <span>{{$t('描述')}}</span>
+            <span>{{$t('Description')}}</span>
           </th>
           <th width="90">
-            <span>{{$t('定时状态')}}</span>
+            <span>{{$t('Timing state')}}</span>
           </th>
           <th width="220">
-            <span>{{$t('操作')}}</span>
+            <span>{{$t('Operation')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
@@ -49,18 +49,18 @@
           </td>
           <td><span class="ellipsis">{{item.desc}}</span></td>
           <td>
-            <span v-if="item.scheduleReleaseState === 'OFFLINE'">{{$t('下线')}}</span>
-            <span v-if="item.scheduleReleaseState === 'ONLINE'">{{$t('上线')}}</span>
+            <span v-if="item.scheduleReleaseState === 'OFFLINE'">{{$t('offline')}}</span>
+            <span v-if="item.scheduleReleaseState === 'ONLINE'">{{$t('online')}}</span>
             <span v-if="!item.scheduleReleaseState">-</span>
           </td>
           <td>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('编辑')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-bianji"><!--{{$t('编辑')}}--></x-button>
-            <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('启动')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-qidong"><!--{{$t('启动')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('定时')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null" v-ps="['GENERAL_USER']" icon="iconfont icon-timer"><!--{{$t('定时')}}--></x-button>
-            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('下线')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu"><!--{{$t('下线')}}--></x-button>
-            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('上线')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu-copy"><!--{{$t('上线')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('定时管理')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-paibanguanli"><!--{{$t('定时管理')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('树形图')" @click="_treeView(item)"  icon="iconfont icon-juxingkaobei"><!--{{$t('树形图')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Edit')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-bianji"><!--{{$t('编辑')}}--></x-button>
+            <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Start')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-qidong"><!--{{$t('启动')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null" v-ps="['GENERAL_USER']" icon="iconfont icon-timer"><!--{{$t('定时')}}--></x-button>
+            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu"><!--{{$t('下线')}}--></x-button>
+            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu-copy"><!--{{$t('上线')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Management')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-paibanguanli"><!--{{$t('定时管理')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('TreeView')" @click="_treeView(item)"  icon="iconfont icon-juxingkaobei"><!--{{$t('树形图')}}--></x-button>
           </td>
         </tr>
       </table>
