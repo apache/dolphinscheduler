@@ -39,7 +39,7 @@
             </x-select>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
+        <m-list-box-f v-if="isADMIN">
           <template slot="name"><b>*</b>{{$t('Queue')}}</template>
           <template slot="content">
             <x-select v-model="queueName">
