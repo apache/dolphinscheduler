@@ -31,7 +31,7 @@
     <m-list-box-f>
       <template slot="name">&nbsp;</template>
       <template slot="content">
-        <x-button type="primary" shape="circle" @click="_edit()" :loading="spinnerLoading">{{spinnerLoading ? 'Loading...' : 'Edit'}}</x-button>
+        <x-button type="primary" shape="circle" @click="_edit()" :loading="spinnerLoading">{{spinnerLoading ? 'Loading...' : $t('Edit')}}</x-button>
       </template>
     </m-list-box-f>
   </div>
@@ -80,6 +80,7 @@
             }, 1500)
           }).catch(e => {
             this.$message.error(e.msg || '')
+            this.spinnerLoading = false
           })
         }
       },
