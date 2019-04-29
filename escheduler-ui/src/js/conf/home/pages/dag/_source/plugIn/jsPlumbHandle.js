@@ -489,6 +489,9 @@ JSP.prototype.removeNodes = function ($id) {
   })
   // delete node
   this.JspInstance.remove($id)
+
+  // delete dom
+  $(`#${$id}`).remove()
 }
 
 /**
@@ -557,7 +560,7 @@ JSP.prototype.copyNodes = function ($id) {
   // Add new node
   store.commit('dag/addTasks', newNodeInfo)
   // Add node location information
-  store.commit('dag/setLocations', {
+  store.commit('dag/addLocations', {
     [newId]: {
       name: newName,
       targetarr: '',
@@ -642,6 +645,8 @@ JSP.prototype.saveStore = function () {
       })
     })
 
+    console.log(tasksAll())
+
     _.map(tasksAll(), v => {
       locations[v.id] = {
         name: v.name,
@@ -650,6 +655,8 @@ JSP.prototype.saveStore = function () {
         y: v.y
       }
     })
+
+    console.log(locations)
 
     // Storage node
     store.commit('dag/setTasks', tasks)
