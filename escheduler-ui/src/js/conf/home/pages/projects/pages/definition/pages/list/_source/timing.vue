@@ -9,7 +9,7 @@
       </div>
       <div class="cont">
         <x-datepicker
-                style="width: 300px;"
+                style="width: 360px;"
                 :panel-num="2"
                 placement="bottom-start"
                 @on-change="_datepicker"
@@ -32,7 +32,7 @@
             </div>
             <template slot="reference">
               <x-input
-                      style="width: 300px;"
+                      style="width: 360px;"
                       type="text"
                       readonly
                       :value="crontab"
@@ -77,6 +77,14 @@
       </div>
       <div class="cont">
         <m-priority v-model="processInstancePriority"></m-priority>
+      </div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
+        Worker分组
+      </div>
+      <div class="cont">
+        <m-worker-groups v-model="workerGroupId"></m-worker-groups>
       </div>
     </div>
     <div class="clearfix list">
@@ -133,6 +141,7 @@
   import { vCrontab } from '~/@vue/crontab/dist'
   import { formatDate } from '@/module/filter/filter'
   import mPriority from '@/module/components/priority/priority'
+  import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
 
   export default {
     name: 'timing-process',
@@ -152,7 +161,8 @@
         receivers: [],
         receiversCc: [],
         i18n: i18n.globalScope.LOCALE,
-        processInstancePriority: 'MEDIUM'
+        processInstancePriority: 'MEDIUM',
+        workerGroupId: -1
       }
     },
     props: {
@@ -190,7 +200,8 @@
             processInstancePriority: this.processInstancePriority,
             warningGroupId: _.isEmpty(this.warningGroupId) ? 0 : this.warningGroupId.id,
             receivers: this.receivers.join(',') || '',
-            receiversCc: this.receiversCc.join(',') || ''
+            receiversCc: this.receiversCc.join(',') || '',
+            workerGroupId: this.workerGroupId
           }
           let msg = ''
 
@@ -198,11 +209,11 @@
           if (this.item.crontab) {
             api = 'dag/updateSchedule'
             searchParams.id = this.item.id
-            msg = '编辑成功！不要忘记上线'
+            msg = `${i18n.$t('Edit')}${i18n.$t('success')},${i18n.$t('Please go online')}`
           } else {
             api = 'dag/createSchedule'
             searchParams.processDefinitionId = this.item.id
-            msg = '创建成功'
+            msg = `${i18n.$t('Create')}${i18n.$t('success')}`
           }
 
           this.store.dispatch(api, searchParams).then(res => {
@@ -255,6 +266,7 @@
         this.failureStrategy = item.failureStrategy
         this.warningType = item.warningType
         this.processInstancePriority = item.processInstancePriority
+        this.workerGroupId = item.workerGroupId || -1
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
             let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
@@ -269,7 +281,7 @@
         }).catch(() => this.warningGroupId = { id: 0 })
       }
     },
-    components: { vCrontab, mEmail, mPriority }
+    components: { vCrontab, mEmail, mPriority, mWorkerGroups }
   }
 </script>
 

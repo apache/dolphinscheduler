@@ -72,7 +72,7 @@ public class DateUtils {
 	public static Date parse(String date,String format){
 		try {
 			return new SimpleDateFormat(format).parse(date);
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			logger.error("error while parse date:" + date, e);
 		}
 		return null;

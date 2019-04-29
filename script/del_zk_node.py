@@ -8,7 +8,7 @@ class ZkClient:
         self.zk.start()
     def del_node(self):
         self.zk.delete(sys.argv[2], recursive=True)
-	print('deleted success')
+        print('deleted success')
     def __del__(self):
         self.zk.stop()
 if __name__ == '__main__':

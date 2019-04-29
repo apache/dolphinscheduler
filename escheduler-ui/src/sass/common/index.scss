@@ -31,7 +31,7 @@
 }
 
 .ans-poptip {
-  min-width: 154px;
+  min-width: 158px;
 }
 
 .ans-checkbox-wrapper .checkbox-label,
@@ -129,6 +129,9 @@ body{
 
 .main-layout-box {
   padding-left: 200px;
+  &.no {
+    padding-left: 0;
+  }
 }
 
 .tooltip-cont-model {

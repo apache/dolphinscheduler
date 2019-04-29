@@ -3,11 +3,21 @@
     <div class="toogle-box">
       <a href="javascript:" class="tog-close" @click="_toggleMenu" v-if="!isTogHide"></a>
       <a href="javascript:" class="tog-open" @click="_toggleMenu" v-if="isTogHide"></a>
-      <!--<a href="javascriipt:" @click="_toggleMenu"><i class="iconfont">{{isTogHide ?'&#xeef5;' : '&#xe652;'}}</i></a>-->
     </div>
     <div class="leven-1" v-for="(item,$index) in menuList">
-      <template v-if="item.path">
-        <router-link :to="{ name: item.path}">
+      <div v-if="item.disabled">
+        <template v-if="item.path">
+          <router-link :to="{ name: item.path}">
+            <div class="name" @click="_toggleSubMenu(item)">
+              <a href="javascript:">
+                <i class="fa icon" :class="item.icon"></i>
+                <span>{{item.name}}</span>
+                <i class="fa angle" :class="item.isOpen ? 'fa-angle-down' : 'fa-angle-right'" v-if="item.children.length"></i>
+              </a>
+            </div>
+          </router-link>
+        </template>
+        <template v-if="!item.path">
           <div class="name" @click="_toggleSubMenu(item)">
             <a href="javascript:">
               <i class="fa icon" :class="item.icon"></i>
@@ -15,27 +25,20 @@
               <i class="fa angle" :class="item.isOpen ? 'fa-angle-down' : 'fa-angle-right'" v-if="item.children.length"></i>
             </a>
           </div>
-        </router-link>
-      </template>
-      <template v-if="!item.path">
-        <div class="name" @click="_toggleSubMenu(item)">
-          <a href="javascript:">
-            <i class="fa icon" :class="item.icon"></i>
-            <span>{{item.name}}</span>
-            <i class="fa angle" :class="item.isOpen ? 'fa-angle-down' : 'fa-angle-right'" v-if="item.children.length"></i>
-          </a>
-        </div>
-      </template>
-      <ul v-if="item.isOpen && item.children.length">
-        <router-link :to="{ name: el.path}" tag="li" active-class="active" v-for="(el,index) in item.children">
-          <span>{{el.name}}</span>
-        </router-link>
-      </ul>
+        </template>
+        <ul v-if="item.isOpen && item.children.length">
+          <template v-for="(el,index) in item.children">
+            <router-link :to="{ name: el.path}" tag="li" active-class="active" v-if="el.disabled">
+              <span>{{el.name}}</span>
+            </router-link>
+          </template>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 <script>
-  import menu from './menu'
+  import menu from './_source/menu'
 
   export default {
     name: 'secondary-menu',
@@ -94,13 +97,13 @@
       .tog-close {
         width: 12px;
         height: 102px;
-        background: url("./close.png") no-repeat;
+        background: url("./_source/close.png") no-repeat;
         display: inline-block;
       }
       .tog-open {
         width: 12px;
         height: 102px;
-        background: url("./open.png") no-repeat;
+        background: url("./_source/open.png") no-repeat;
         display: inline-block;
         position: absolute;
         right: -12px;
@@ -114,7 +117,7 @@
           line-height: 40px;
           display: block;
           position: relative;
-          padding-left: 12px;
+          padding-left: 10px;
           >.icon {
             vertical-align: middle;
             font-size: 15px;
