@@ -64,7 +64,7 @@ public class UsersController extends BaseController{
                                                      @RequestParam(value = "userName") String userName,
                                                      @RequestParam(value = "userPassword") String userPassword,
                                                      @RequestParam(value = "tenantId") int tenantId,
-                                                     @RequestParam(value = "queue") String queue,
+                                                     @RequestParam(value = "queue",required = false,defaultValue = "") String queue,
                                                      @RequestParam(value = "email") String email,
                                                      @RequestParam(value = "phone", required = false) String phone) {
         logger.info("login user {}, create user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, user queue: {}",
@@ -128,7 +128,7 @@ public class UsersController extends BaseController{
                                                      @RequestParam(value = "id") int id,
                                                      @RequestParam(value = "userName") String userName,
                                                      @RequestParam(value = "userPassword") String userPassword,
-                                                     @RequestParam(value = "queue") String queue,
+                                                     @RequestParam(value = "queue",required = false,defaultValue = "") String queue,
                                                      @RequestParam(value = "email") String email,
                                                      @RequestParam(value = "tenantId") int tenantId,
                                                      @RequestParam(value = "phone", required = false) String phone) {

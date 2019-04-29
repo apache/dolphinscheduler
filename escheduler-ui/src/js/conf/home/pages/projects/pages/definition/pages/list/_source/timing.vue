@@ -9,7 +9,7 @@
       </div>
       <div class="cont">
         <x-datepicker
-                style="width: 300px;"
+                style="width: 360px;"
                 :panel-num="2"
                 placement="bottom-start"
                 @on-change="_datepicker"
@@ -32,7 +32,7 @@
             </div>
             <template slot="reference">
               <x-input
-                      style="width: 300px;"
+                      style="width: 360px;"
                       type="text"
                       readonly
                       :value="crontab"
