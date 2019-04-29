@@ -33,7 +33,7 @@
       </div>
       <div class="cont-box">
         <label class="label-box">
-          <x-input v-model="interval" style="width: 128px;" :disabled="isDetails">
+          <x-input v-model="interval" style="width: 128px;" :disabled="isDetails" maxlength="9">
             <span slot="append">{{$t('Minute')}}</span>
           </x-input>
         </label>
@@ -46,7 +46,7 @@
   import disabledState from '@/module/mixin/disabledState'
 
   export default {
-    name: 'timeout-alarm',
+    name: 'form-timeout-alarm',
     data () {
       return {
         // Timeout display hiding

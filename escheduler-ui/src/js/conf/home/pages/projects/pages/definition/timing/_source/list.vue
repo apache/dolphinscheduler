@@ -116,7 +116,6 @@
 <script>
   import _ from 'lodash'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import mSpin from '@/module/components/spin/spin'
   import mTiming from '../../pages/list/_source/timing'
   import mNoData from '@/module/components/noData/noData'
@@ -161,7 +160,10 @@
           pageNo: this.pageNo,
           pageSize: this.pageSize
         }).then(res => {
-          this.list = res.data.totalList
+          this.list = []
+          setTimeout(() => {
+            this.list = res.data.totalList
+          })
           this.total = res.data.total
           this.isLoading = false
         }).catch(e => {

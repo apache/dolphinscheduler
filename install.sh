@@ -123,9 +123,6 @@ execPath="/tmp/escheduler/exec"
 # SHELL环境变量路径
 shellEnvPath="$installPath/conf/env/.escheduler_env.sh"
 
-# Python换将变量路径
-pythonEnvPath="$installPath/conf/env/escheduler_env.py"
-
 # 资源文件的后缀
 resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
 
@@ -187,7 +184,7 @@ masterTaskCommitRetryTimes="5"
 masterTaskCommitInterval="100"
 
 # master最大cpu平均负载,用来判断master是否还有执行能力
-masterMaxCupLoadAvg="10"
+masterMaxCpuLoadAvg="10"
 
 # master预留内存,用来判断master是否还有执行能力
 masterReservedMemory="1"
@@ -201,10 +198,10 @@ workerExecThreads="100"
 workerHeartbeatInterval="10"
 
 # worker一次抓取任务数
-workerFetchTaskNum="10"
+workerFetchTaskNum="3"
 
-# worker最大cpu平均负载,用来判断master是否还有执行能力
-workerMaxCupLoadAvg="10"
+# worker最大cpu平均负载,用来判断worker是否还有执行能力,保持系统默认，默认为cpu核数的2倍，当负载达到2倍时，
+#workerMaxCupLoadAvg="10"
 
 # worker预留内存,用来判断master是否还有执行能力
 workerReservedMemory="1"
@@ -249,7 +246,6 @@ sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" co
 sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
 sed -i ${txt} "s#hdfs.startup.state.*#hdfs.startup.state=${hdfsStartupSate}#g" conf/common/common.properties
 sed -i ${txt} "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
-sed -i ${txt} "s#escheduler.env.py.*#escheduler.env.py=${pythonEnvPath}#g" conf/common/common.properties
 sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
 sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
 
@@ -272,14 +268,14 @@ sed -i ${txt} "s#master.exec.task.number.*#master.exec.task.number=${masterExecT
 sed -i ${txt} "s#master.heartbeat.interval.*#master.heartbeat.interval=${masterHeartbeatInterval}#g" conf/master.properties
 sed -i ${txt} "s#master.task.commit.retryTimes.*#master.task.commit.retryTimes=${masterTaskCommitRetryTimes}#g" conf/master.properties
 sed -i ${txt} "s#master.task.commit.interval.*#master.task.commit.interval=${masterTaskCommitInterval}#g" conf/master.properties
-sed -i ${txt} "s#master.max.cpuload.avg.*#master.max.cpuload.avg=${masterMaxCupLoadAvg}#g" conf/master.properties
+sed -i ${txt} "s#master.max.cpuload.avg.*#master.max.cpuload.avg=${masterMaxCpuLoadAvg}#g" conf/master.properties
 sed -i ${txt} "s#master.reserved.memory.*#master.reserved.memory=${masterReservedMemory}#g" conf/master.properties
 
 
 sed -i ${txt} "s#worker.exec.threads.*#worker.exec.threads=${workerExecThreads}#g" conf/worker.properties
 sed -i ${txt} "s#worker.heartbeat.interval.*#worker.heartbeat.interval=${workerHeartbeatInterval}#g" conf/worker.properties
 sed -i ${txt} "s#worker.fetch.task.num.*#worker.fetch.task.num=${workerFetchTaskNum}#g" conf/worker.properties
-sed -i ${txt} "s#worker.max.cpuload.avg.*#worker.max.cpuload.avg=${workerMaxCupLoadAvg}#g" conf/worker.properties
+#sed -i ${txt} "s#worker.max.cpuload.avg.*#worker.max.cpuload.avg=${workerMaxCupLoadAvg}#g" conf/worker.properties
 sed -i ${txt} "s#worker.reserved.memory.*#worker.reserved.memory=${workerReservedMemory}#g" conf/worker.properties
 
 

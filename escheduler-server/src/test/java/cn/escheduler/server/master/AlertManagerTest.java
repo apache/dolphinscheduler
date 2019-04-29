@@ -76,7 +76,7 @@ public class AlertManagerTest {
         toleranceTaskList.add(toleranceTask1);
         toleranceTaskList.add(toleranceTask2);
 
-        alertManager.sendWarnningWorkerleranceFault(processInstance, toleranceTaskList);
+        alertManager.sendAlertWorkerToleranceFault(processInstance, toleranceTaskList);
     }
 
 
@@ -103,7 +103,7 @@ public class AlertManagerTest {
         toleranceTaskList.add(toleranceTask1);
         toleranceTaskList.add(toleranceTask2);
 
-        alertManager.sendWarnningOfProcessInstance(processInstance, toleranceTaskList);
+        alertManager.sendAlertProcessInstance(processInstance, toleranceTaskList);
     }
 
 }

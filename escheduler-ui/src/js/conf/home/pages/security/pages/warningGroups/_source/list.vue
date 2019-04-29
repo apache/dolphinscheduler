@@ -71,8 +71,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
-  import { findComponentDownward } from '@/module/util/'
   import mTransfer from '@/module/components/transfer/transfer'
 
   export default {
@@ -105,7 +103,7 @@
         })
       },
       _edit (item) {
-        findComponentDownward(this.$root, 'warning-groups-index')._create(item)
+        this.$emit('on-edit', item)
       },
       _mangeUser (item, i) {
         this.getAuthList({

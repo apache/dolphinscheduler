@@ -193,7 +193,7 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       targetarr: locations[v.id]['targetarr'],
       isAttachment: this.config.isAttachment,
       taskType: v.type,
-      runFlag:v.runFlag
+      runFlag: v.runFlag
     }))
 
     // contextmenu event
@@ -489,6 +489,9 @@ JSP.prototype.removeNodes = function ($id) {
   })
   // delete node
   this.JspInstance.remove($id)
+
+  // delete dom
+  $(`#${$id}`).remove()
 }
 
 /**
@@ -557,7 +560,7 @@ JSP.prototype.copyNodes = function ($id) {
   // Add new node
   store.commit('dag/addTasks', newNodeInfo)
   // Add node location information
-  store.commit('dag/setLocations', {
+  store.commit('dag/addLocations', {
     [newId]: {
       name: newName,
       targetarr: '',
@@ -642,6 +645,8 @@ JSP.prototype.saveStore = function () {
       })
     })
 
+    console.log(tasksAll())
+
     _.map(tasksAll(), v => {
       locations[v.id] = {
         name: v.name,
@@ -650,6 +655,8 @@ JSP.prototype.saveStore = function () {
         y: v.y
       }
     })
+
+    console.log(locations)
 
     // Storage node
     store.commit('dag/setTasks', tasks)
@@ -668,26 +675,21 @@ JSP.prototype.saveStore = function () {
 /**
  * Event processing
  */
+
 JSP.prototype.handleEvent = function () {
   this.JspInstance.bind('beforeDrop', function (info) {
     let sourceId = info['sourceId']// 出
     let targetId = info['targetId']// 入
-
     /**
      * Recursive search for nodes
      */
     let recursiveVal
     const recursiveTargetarr = (arr, targetId) => {
-      for (var i in arr) {
+      for (let i in arr) {
         if (arr[i] === targetId) {
           recursiveVal = targetId
         } else {
-          let recTargetarrArr = rtTargetarrArr(arr[i])
-          if (recTargetarrArr.length) {
-            recursiveTargetarr(recTargetarrArr, targetId)
-          } else {
-            return recursiveTargetarr(targetId)
-          }
+          recursiveTargetarr(rtTargetarrArr(arr[i]), targetId)
         }
       }
       return recursiveVal
@@ -700,7 +702,6 @@ JSP.prototype.handleEvent = function () {
 
     // Recursive form to find if the target Targetarr has a sourceId
     if (recursiveTargetarr(rtTargetarrArr(sourceId), targetId)) {
-      // setRecursiveVal(null)
       return false
     }
 

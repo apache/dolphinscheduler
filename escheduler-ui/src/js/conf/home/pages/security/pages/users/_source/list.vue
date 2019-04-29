@@ -13,6 +13,9 @@
             <span>{{$t('Tenant')}}</span>
           </th>
           <th>
+            <span>{{$t('Queue')}}</span>
+          </th>
+          <th>
             <span>{{$t('Email')}}</span>
           </th>
           <th>
@@ -38,6 +41,7 @@
             </span>
           </td>
           <td><span>{{item.tenantName || '-'}}</span></td>
+          <td><span>{{item.queue || '-'}}</span></td>
           <td>
             <span>{{item.email || '-'}}</span>
           </td>
@@ -94,8 +98,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
-  import { findComponentDownward } from '@/module/util/'
   import mTransfer from '@/module/components/transfer/transfer'
 
   export default {
@@ -128,7 +130,7 @@
         })
       },
       _edit (item) {
-        findComponentDownward(this.$root, 'users-index')._create(item)
+        this.$emit('on-edit', item)
       },
       _authProject (item, i) {
         this.$refs[`poptip-auth-${i}`][0].doClose()
@@ -192,13 +194,13 @@
           let sourceListPrs = _.map(data[0], v => {
             return {
               id: v.id,
-              name: v.name
+              name: v.alias
             }
           })
           let targetListPrs = _.map(data[1], v => {
             return {
               id: v.id,
-              name: v.name
+              name: v.alias
             }
           })
           let self = this
