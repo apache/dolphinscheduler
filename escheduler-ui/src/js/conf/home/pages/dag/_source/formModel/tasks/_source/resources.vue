@@ -4,7 +4,7 @@
               v-model="value"
               filterable
               :disabled="isDetails"
-              :placeholder="$t('请选择资源')"
+              :placeholder="$t('Please select resources')"
               style="width: 100%;">
       <x-option
               v-for="city in resList"

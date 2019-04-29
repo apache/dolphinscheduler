@@ -60,4 +60,16 @@ public class UserMapperTest {
 
     }
 
+    @Test
+    public void queryQueueByProcessInstanceId(){
+        String queue = userMapper.queryQueueByProcessInstanceId(41388);
+        Assert.assertEquals(queue, "ait");
+    }
+
+    @Test
+    public void testQueryUserByToken(){
+        User user = userMapper.queryUserByToken("ad9e8fccfc11bd18bb45aa994568b8ef");
+        Assert.assertEquals(user.getUserName(), "qiaozhanwei");
+    }
+
 }

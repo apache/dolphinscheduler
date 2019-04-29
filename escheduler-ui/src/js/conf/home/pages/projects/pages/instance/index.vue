@@ -3,33 +3,6 @@
 </template>
 <script>
   export default {
-    name: 'process-instance-index',
-    data () {
-      return {
-      }
-    },
-    props: {},
-    methods: {
-    },
-    watch: {
-    },
-    created () {
-    },
-    mounted () {
-
-    },
-    updated () {
-    },
-    beforeDestroy () {
-
-    },
-    destroyed () {
-    },
-    computed: {
-    },
-    components: { }
+    name: 'process-instance-index'
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-</style>

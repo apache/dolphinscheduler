@@ -79,6 +79,30 @@ export default {
     })
   },
   /**
+   * get command state count
+   */
+  getCommandStateCount ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/analysis/command-state-count`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * get command state count
+   */
+  getQueueCount ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/analysis/queue-count`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * Process status statistics
    */
   getProcessStateCount ({ state }, payload) {

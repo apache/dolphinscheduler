@@ -4,25 +4,25 @@
       <table>
         <tr>
           <th>
-            <span>{{$t('编号')}}</span>
+            <span>{{$t('#')}}</span>
           </th>
           <th>
-            <span>{{$t('组名称')}}</span>
+            <span>{{$t('Group Name')}}</span>
           </th>
           <th>
-            <span>{{$t('组类型')}}</span>
+            <span>{{$t('Group Type')}}</span>
           </th>
           <th>
-            <span>{{$t('备注')}}</span>
+            <span>{{$t('Remarks')}}</span>
           </th>
           <th>
-            <span>{{$t('创建时间')}}</span>
+            <span>{{$t('Create Time')}}</span>
           </th>
           <th>
-            <span>{{$t('更新时间')}}</span>
+            <span>{{$t('Update Time')}}</span>
           </th>
           <th width="120">
-            <span>{{$t('操作')}}</span>
+            <span>{{$t('Operation')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="$index">
@@ -34,7 +34,7 @@
               <a href="javascript:" class="links">{{item.groupName}}</a>
             </span>
           </td>
-          <td><span>{{item.groupType === 'EMAIL' ? '邮件' : '短信'}}</span></td>
+          <td><span>{{item.groupType === 'EMAIL' ? `${$t('Email')}` : `${$t('SMS')}`}}</span></td>
           <td>
             <span>{{item.desc}}</span>
           </td>
@@ -43,21 +43,21 @@
           </td>
           <td><span>{{item.updateTime | formatDate}}</span></td>
           <td>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-yonghu1" :title="$t('管理用户')" @click="_mangeUser(item)">
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-yonghu1" :title="$t('Managing Users')" @click="_mangeUser(item)">
             </x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-bianjixiugai" :title="$t('编辑')" @click="_edit(item)">
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-bianjixiugai" :title="$t('Edit')" @click="_edit(item)">
             </x-button>
             <x-poptip
                     :ref="'poptip-delete-' + $index"
                     placement="bottom-end"
                     width="90">
-              <p>{{$t('确定删除吗?')}}</p>
+              <p>{{$t('Delete?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
-                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('取消')}}</x-button>
-                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('确定')}}</x-button>
+                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
+                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
               </div>
               <template slot="reference">
-                <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-shanchu" :title="$t('删除')">
+                <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-shanchu" :title="$t('delete')">
                 </x-button>
               </template>
             </x-poptip>
@@ -71,8 +71,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
-  import { findComponentDownward } from '@/module/util/'
   import mTransfer from '@/module/components/transfer/transfer'
 
   export default {
@@ -105,7 +103,7 @@
         })
       },
       _edit (item) {
-        findComponentDownward(this.$root, 'warning-groups-index')._create(item)
+        this.$emit('on-edit', item)
       },
       _mangeUser (item, i) {
         this.getAuthList({
@@ -150,7 +148,7 @@
                   sourceListPrs: sourceListPrs,
                   targetListPrs: targetListPrs,
                   type: {
-                    name: `${i18n.$t('管理用户')}`
+                    name: `${i18n.$t('Managing Users')}`
                   }
                 }
               })

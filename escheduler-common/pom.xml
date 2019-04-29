@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>escheduler</artifactId>
 		<groupId>cn.analysys</groupId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>escheduler-common</artifactId>
 	<name>escheduler-common</name>
@@ -370,6 +370,32 @@
 		<dependency>
 			<groupId>com.github.oshi</groupId>
 			<artifactId>oshi-core</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ru.yandex.clickhouse</groupId>
+			<artifactId>clickhouse-jdbc</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>com.fasterxml.jackson.core</artifactId>
+					<groupId>jackson-core</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>com.fasterxml.jackson.core</artifactId>
+					<groupId>jackson-databind</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>com.microsoft.azure</artifactId>
+					<groupId>azure-keyvault</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 

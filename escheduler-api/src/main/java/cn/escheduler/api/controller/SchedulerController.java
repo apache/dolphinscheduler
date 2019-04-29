@@ -46,7 +46,6 @@ public class SchedulerController extends BaseController{
     private static final Logger logger = LoggerFactory.getLogger(SchedulerController.class);
     public static final String DEFAULT_WARNING_TYPE = "NONE";
     public static final String DEFAULT_NOTIFY_GROUP_ID = "1";
-    public static final String DEFAULT_MAX_TRY_TIMES = "0";
     public static final String DEFAULT_FAILURE_POLICY = "CONTINUE";
 
 
@@ -77,13 +76,15 @@ public class SchedulerController extends BaseController{
                                                        @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
                                                        @RequestParam(value = "receivers", required = false) String receivers,
                                                        @RequestParam(value = "receiversCc", required = false) String receiversCc,
+                                                       @RequestParam(value = "workerGroupId", required = false, defaultValue = "-1") int workerGroupId,
                                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
     logger.info("login user {}, project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {}," +
-                    "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}",
-            loginUser.getUserName(), projectName, processDefinitionId, schedule, warningType, warningGroupId, failureStrategy,receivers,receiversCc,processInstancePriority);
+                    "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}, workGroupId:{}",
+            loginUser.getUserName(), projectName, processDefinitionId, schedule, warningType, warningGroupId,
+            failureStrategy,receivers,receiversCc,processInstancePriority,workerGroupId);
       try {
           Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
-                  warningType, warningGroupId, failureStrategy, receivers,receiversCc,processInstancePriority);
+                  warningType, warningGroupId, failureStrategy, receivers,receiversCc,processInstancePriority,workerGroupId);
 
           return returnDataList(result);
       }catch (Exception e){
@@ -114,14 +115,16 @@ public class SchedulerController extends BaseController{
                                                        @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                                        @RequestParam(value = "receivers", required = false) String receivers,
                                                        @RequestParam(value = "receiversCc", required = false) String receiversCc,
+                                                       @RequestParam(value = "workerGroupId", required = false, defaultValue = "-1") int workerGroupId,
                                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
     logger.info("login user {}, project name: {},id: {}, updateProcessInstance schedule: {}, notify type: {}, notify mails: {}, " +
-                    "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}",
-            loginUser.getUserName(), projectName, id, schedule, warningType, warningGroupId, failureStrategy,receivers,receiversCc,processInstancePriority);
+                    "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {},workerGroupId:{}",
+            loginUser.getUserName(), projectName, id, schedule, warningType, warningGroupId, failureStrategy,
+            receivers,receiversCc,processInstancePriority,workerGroupId);
 
       try {
           Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
-                  warningType, warningGroupId, failureStrategy, receivers,receiversCc,null,processInstancePriority);
+                  warningType, warningGroupId, failureStrategy, receivers,receiversCc,null,processInstancePriority, workerGroupId);
           return returnDataList(result);
 
       }catch (Exception e){

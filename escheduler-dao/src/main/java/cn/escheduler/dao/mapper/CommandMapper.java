@@ -18,12 +18,15 @@ package cn.escheduler.dao.mapper;
 
 import cn.escheduler.common.enums.*;
 import cn.escheduler.dao.model.Command;
+import cn.escheduler.dao.model.ExecuteStatusCount;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.EnumOrdinalTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * command mapper
@@ -76,6 +79,7 @@ public interface CommandMapper {
             @Result(property = "scheduleTime", column = "schedule_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "startTime", column = "start_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "workerGroupId", column = "worker_group_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
     })
     @SelectProvider(type = CommandMapperProvider.class, method = "queryOneCommand")
@@ -98,9 +102,23 @@ public interface CommandMapper {
             @Result(property = "scheduleTime", column = "schedule_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "startTime", column = "start_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "workerGroupId", column = "worker_group_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
     })
     @SelectProvider(type = CommandMapperProvider.class, method = "queryAllCommand")
     List<Command> queryAllCommand();
 
+
+
+    @Results(value = {
+            @Result(property = "state", column = "state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ExecutionStatus.class, jdbcType = JdbcType.TINYINT),
+            @Result(property = "count", column = "count", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+    })
+    @SelectProvider(type = CommandMapperProvider.class, method = "countCommandState")
+    List<ExecuteStatusCount> countCommandState(
+            @Param("userId") int userId,
+            @Param("userType") UserType userType,
+            @Param("startTime") Date startTime,
+            @Param("endTime") Date endTime,
+            @Param("projectId") int projectId);
 }

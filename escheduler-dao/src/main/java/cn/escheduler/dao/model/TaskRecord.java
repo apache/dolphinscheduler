@@ -46,12 +46,12 @@ public class TaskRecord {
     /**
      * start date
      */
-    private Date startDate;
+    private Date startTime;
 
     /**
      * end date
      */
-    private Date endDate;
+    private Date endTime;
 
     /**
      * result
@@ -136,20 +136,20 @@ public class TaskRecord {
         this.procDate = procDate;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
-    public Date getEndDate() {
-        return endDate;
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public String getResult() {
@@ -238,8 +238,8 @@ public class TaskRecord {
                 +" proc id:" + procId
                 + " proc name:" + procName
                 + " proc date: " + procDate
-                + " start date:" + startDate
-                + " end date:" + endDate
+                + " start date:" + startTime
+                + " end date:" + endTime
                 + " result : " + result
                 + " duration : " + duration
                 + " note : " + note
