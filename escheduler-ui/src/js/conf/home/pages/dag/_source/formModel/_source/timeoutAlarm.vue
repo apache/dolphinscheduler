@@ -2,7 +2,7 @@
   <div class="timeout-alarm-model">
     <div class="clearfix list">
       <div class="text-box">
-        <span>{{$t('任务超时告警')}}</span>
+        <span>{{$t('Timeout alarm')}}</span>
       </div>
       <div class="cont-box">
         <label class="label-box">
@@ -14,14 +14,14 @@
     </div>
     <div class="clearfix list" v-if="enable">
       <div class="text-box">
-        <span>{{$t('超时策略')}}</span>
+        <span>{{$t('Timeout strategy')}}</span>
       </div>
       <div class="cont-box">
         <label class="label-box">
           <div style="padding-top: 6px;">
             <x-checkbox-group v-model="strategy">
-              <x-checkbox label="WARN" :disabled="isDetails">{{$t('超时告警')}}</x-checkbox>
-              <x-checkbox label="FAILED" :disabled="isDetails">{{$t('超时失败')}}</x-checkbox>
+              <x-checkbox label="WARN" :disabled="isDetails">{{$t('Timeout alarm')}}</x-checkbox>
+              <x-checkbox label="FAILED" :disabled="isDetails">{{$t('Timeout failure')}}</x-checkbox>
             </x-checkbox-group>
           </div>
         </label>
@@ -29,12 +29,12 @@
     </div>
     <div class="clearfix list" v-if="enable">
       <div class="text-box">
-        <span>{{$t('超时时长')}}</span>
+        <span>{{$t('Timeout period')}}</span>
       </div>
       <div class="cont-box">
         <label class="label-box">
-          <x-input v-model="interval" style="width: 128px;" :disabled="isDetails">
-            <span slot="append">{{$t('分')}}</span>
+          <x-input v-model="interval" style="width: 128px;" :disabled="isDetails" maxlength="9">
+            <span slot="append">{{$t('Minute')}}</span>
           </x-input>
         </label>
       </div>
@@ -46,7 +46,7 @@
   import disabledState from '@/module/mixin/disabledState'
 
   export default {
-    name: 'timeout-alarm',
+    name: 'form-timeout-alarm',
     data () {
       return {
         // Timeout display hiding
@@ -71,12 +71,12 @@
       _verification () {
         // Verification timeout policy
         if (this.enable && !this.strategy.length) {
-          this.$message.warning(`${this.$t('超时策略必须选一个')}`)
+          this.$message.warning(`${this.$t('Timeout strategy must be selected')}`)
           return false
         }
         // Verify timeout duration Non 0 positive integer
         if (this.enable && !parseInt(this.interval) && !_.isInteger(this.interval)) {
-          this.$message.warning(`${this.$t('超时时长必须为正整数')}`)
+          this.$message.warning(`${this.$t('Timeout must be a positive integer')}`)
           return false
         }
         this.$emit('on-timeout', {

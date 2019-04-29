@@ -1,10 +1,10 @@
 <template>
-  <div class="no-data-model">
+  <div class="no-data-model" :style="{height:height + 'px'}">
     <div class="no-data-box">
       <div class="img">
         <img src="./images/errorTip.png" alt="">
       </div>
-      <div class="text">{{msg || $t('查询无数据')}}</div>
+      <div class="text">{{msg || $t('No data')}}</div>
     </div>
   </div>
 </template>
@@ -12,7 +12,8 @@
   export default {
     name: 'no-data',
     props: {
-      msg: String
+      msg: String,
+      height: Number
     }
   }
 </script>

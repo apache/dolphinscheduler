@@ -1,9 +1,9 @@
 <template>
   <div class="ans-input email-model">
-    <div class="clearfix input-element">
+    <div class="clearfix input-element" :class="disabled ? 'disabled' : ''">
       <span class="tag-wrapper" v-for="(item,$index) in activeList" :class="activeIndex === $index ? 'active' : ''">
         <span class="tag-text">{{item}}</span>
-        <i class="remove-tag ans-icon-close" @click="_del($index)"></i>
+        <i class="remove-tag ans-icon-close" @click.stop="_del($index)" v-if="!disabled"></i>
       </span>
       <x-poptip
               placement="bottom-start"
@@ -15,7 +15,7 @@
           <div class="ans-scroller" style=" max-height: 300px;">
             <div class="scroll-area-wrapper scroll-transition">
               <ul class="dropdown-container">
-                <li class="ans-option" v-for="(item,$index) in emailList" @click="_selectEmail($index + 1)">
+                <li class="ans-option" v-for="(item,$index) in emailList" @click.stop="_selectEmail($index + 1)">
                   <span class="default-option-class" :class="index === ($index + 1) ? 'active' : ''">{{item}}</span>
                 </li>
               </ul>
@@ -30,7 +30,8 @@
                   :style="{width:emailWidth + 'px'}"
                   type="text"
                   v-model="email"
-                  :placeholder="$t('请输入邮箱')"
+                  :disabled="disabled"
+                  :placeholder="$t('Please enter email')"
                   @keydown.tab="_emailTab"
                   @keyup.delete="_emailDelete"
                   @keyup.enter="_emailEnter"
@@ -38,14 +39,13 @@
                   @keyup.down="_emailKeyup('down')">
         </span>
       </x-poptip>
-
     </div>
   </div>
 </template>
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
-  import emailList from '~/localData/email'
+  import emailList from '~/external/email'
   import { isEmial, fuzzyQuery } from './util'
 
   export default {
@@ -63,7 +63,11 @@
     },
     props: {
       activeList: Array,
-      repeatData: Array
+      repeatData: Array,
+      disabled: {
+        type: Boolean,
+        default: false
+      }
     },
     model: {
       prop: 'activeList',
@@ -87,10 +91,10 @@
             this.email = ''
             this._handlerEmailWitch()
           } else {
-            this.$message.warning(`${i18n.$t('邮箱已存在！收件人和抄送人不能重复')}`)
+            this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
           }
         } else {
-          this.$message.warning(`${i18n.$t('邮箱输入不合法')}`)
+          this.$message.warning(`${i18n.$t('Mailbox input is illegal')}`)
         }
       },
       /**
@@ -191,7 +195,7 @@
 
         // Non-existing data
         if (_.filter(_.cloneDeep(this.repeatData).concat(_.cloneDeep(this.activeList)), v => v === item).length) {
-          this.$message.warning(`${i18n.$t('邮箱已存在！收件人和抄送人不能重复')}`)
+          this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
           return
         }
         // Width initialization
@@ -212,7 +216,7 @@
        */
       _handlerEmailWitch () {
         setTimeout(() => {
-          this.emailWidth = parseInt(688 - $(this.$refs.emailInput).position().left - 20)
+          this.emailWidth = parseInt($('.email-model').width() - $(this.$refs.emailInput).position().left - 20)
           if (this.emailWidth < 80) {
             this.emailWidth = 200
           }
@@ -274,7 +278,7 @@
 
 <style lang="scss" rel="stylesheet/scss">
   .email-model {
-    width: 688px;
+    width: 100%;
     .input-element {
       min-height: 32px;
       padding: 1px 8px;
@@ -315,6 +319,14 @@
           line-height: 29px;
           border: 0;
           padding-left: 4px;
+        }
+      }
+      &.disabled {
+        .tag-wrapper {
+          background: #d9d9d9;
+        }
+        .email-input {
+          background: none;
         }
       }
     }

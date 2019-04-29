@@ -1,49 +1,49 @@
 <template>
   <div class="user-info-model">
     <m-list-box-f>
-      <template slot="name">{{$t('用户名称')}}</template>
+      <template slot="name">{{$t('User Name')}}</template>
       <template slot="content">
         <span class="sp1">{{userInfo.userName}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f>
-      <template slot="name">{{$t('邮箱')}}</template>
+      <template slot="name">{{$t('Email')}}</template>
       <template slot="content">
         <span class="sp1">{{userInfo.email}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f>
-      <template slot="name">{{$t('手机')}}</template>
+      <template slot="name">{{$t('Phone')}}</template>
       <template slot="content">
         <span class="sp1">{{userInfo.phone}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f>
-      <template slot="name">{{$t('权限')}}</template>
+      <template slot="name">{{$t('Permission')}}</template>
       <template slot="content">
-        <span class="sp1">{{userInfo.userType === 'GENERAL_USER' ? `${$t('普通用户')}` : `${$t('管理员')}`}}</span>
+        <span class="sp1">{{userInfo.userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f v-ps="['GENERAL_USER']">
-      <template slot="name">{{$t('租户')}}</template>
+      <template slot="name">{{$t('Tenant')}}</template>
       <template slot="content">
         <span class="sp1">{{userInfo.tenantName}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f v-ps="['GENERAL_USER']">
-      <template slot="name">{{$t('队列')}}</template>
+      <template slot="name">{{$t('Queue')}}</template>
       <template slot="content">
         <span class="sp1">{{userInfo.queueName}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f>
-      <template slot="name">{{$t('创建时间')}}</template>
+      <template slot="name">{{$t('Create Time')}}</template>
       <template slot="content">
         <span class="sp1">{{userInfo.createTime | formatDate}}</span>
       </template>
     </m-list-box-f>
     <m-list-box-f>
-      <template slot="name">{{$t('更新时间')}}</template>
+      <template slot="name">{{$t('Update Time')}}</template>
       <template slot="content">
         <span class="sp1">{{userInfo.updateTime | formatDate}}</span>
       </template>
@@ -51,14 +51,13 @@
     <m-list-box-f>
       <template slot="name">&nbsp;</template>
       <template slot="content">
-        <x-button type="primary" shape="circle" @click="_edit()" >{{$t('修改')}}</x-button>
+        <x-button type="primary" shape="circle" @click="_edit()" >{{$t('Edit')}}</x-button>
       </template>
     </m-list-box-f>
   </div>
 </template>
 <script>
   import { mapState, mapMutations } from 'vuex'
-  import '@/module/filter/formatDate'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mCreateUser from '@/conf/home/pages/security/pages/users/_source/createUser'
 

@@ -14,7 +14,7 @@
             <x-input v-model="searchVal"
                      @on-enterkey="_ckQuery"
                      size="small"
-                     :placeholder="$t('请输入关键词')"
+                     :placeholder="$t('Please enter keyword')"
                      type="text"
                      style="width:180px;">
             </x-input>
@@ -51,6 +51,12 @@
       // Whether the slot comes in
       isShow () {
         return this.$slots['search-group']
+      }
+    },
+    created () {
+      // Routing parameter merging
+      if (!_.isEmpty(this.$route.query)) {
+        this.searchVal = this.$route.query.searchVal || ''
       }
     },
     components: {}

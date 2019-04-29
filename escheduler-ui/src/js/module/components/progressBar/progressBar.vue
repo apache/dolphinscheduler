@@ -5,11 +5,11 @@
     </div>
     <template v-if="textPlacement === 'bottom'">
       <div class="textp text-1">
-        {{$t('文件上传中')}} <span>({{value}}%)</span>
+        {{$t('Uploading...')}} <span>({{value}}%)</span>
       </div>
     </template>
     <template v-if="textPlacement === 'left-right'">
-      <div class="textp text-2-1">{{$t('文件上传中')}}</div>
+      <div class="textp text-2-1">{{$t('Uploading...')}}</div>
       <div class="textp text-2-2"><span>({{value}}%)</span></div>
     </template>
   </div>

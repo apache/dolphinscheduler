@@ -10,18 +10,18 @@
       <div v-show="isLog || source === 'list'" class="log-pop">
         <div class="log-box" >
           <div class="title">
-            <span>{{$t('查看日志')}}</span>
+            <span>{{$t('View log')}}</span>
             <div class="full-screen">
-              <a href="javascript:" @click="_downloadLog" data-container="body" data-toggle="tooltip" :title="$t('下载日志')">
+              <a href="javascript:" @click="_downloadLog" data-container="body" data-toggle="tooltip" :title="$t('Download Log')">
                 <i class="iconfont" style="font-size: 20px">&#xe610;</i>
               </a>
-              <a href="javascript:" class="refresh-log" :class="loading ? 'active' :''" @click="!loading && _refreshLog()" data-container="body" data-toggle="tooltip" :title="$t('刷新日志')">
+              <a href="javascript:" class="refresh-log" :class="loading ? 'active' :''" @click="!loading && _refreshLog()" data-container="body" data-toggle="tooltip" :title="$t('Refresh Log')">
                 <i class="fa iconfont">&#xe602;</i>
               </a>
-              <a href="javascript:" @click="_screenOpen" v-show="!isScreen" data-container="body" data-toggle="tooltip" :title="$t('进入全屏')">
+              <a href="javascript:" @click="_screenOpen" v-show="!isScreen" data-container="body" data-toggle="tooltip" :title="$t('Enter full screen')">
                 <i class="iconfont">&#xe6e0;</i>
               </a>
-              <a href="javascript:" @click="_screenClose" v-show="isScreen" data-container="body" data-toggle="tooltip" :title="$t('取消全屏')">
+              <a href="javascript:" @click="_screenClose" v-show="isScreen" data-container="body" data-toggle="tooltip" :title="$t('Cancel full screen')">
                 <i class="iconfont">&#xe660;</i>
               </a>
             </div>
@@ -32,7 +32,7 @@
             </div>
           </div>
           <div class="operation">
-            <x-button type="primary" shape="circle" @click="close"> {{$t('关闭')}} </x-button>
+            <x-button type="primary" shape="circle" @click="close"> {{$t('Close')}} </x-button>
           </div>
         </div>
       </div>
@@ -88,13 +88,13 @@
           setTimeout(() => {
             this.loading = false
             if (res.data) {
-              this.$message.success(`${i18n.$t('更新日志成功')}`)
+              this.$message.success(`${i18n.$t('Update log success')}`)
             } else {
-              this.$message.warning(`${i18n.$t('暂无更多日志')}`)
+              this.$message.warning(`${i18n.$t('No more logs')}`)
             }
           }, 1500)
           // Handling text field size
-          handerTextareaSize().html('').text(res.data || `${i18n.$t('暂无日志')}`)
+          handerTextareaSize().html('').text(res.data || `${i18n.$t('No log')}`)
         }).catch(e => {
           this.$message.error(e.msg || '')
           this.loading = false
@@ -104,27 +104,26 @@
         this.isLog = true
         this.store.dispatch('dag/getLog', this._rtParam).then(res => {
           this.$message.destroy()
-
           if (!res.data) {
             this.isData = false
             setTimeout(() => {
-              this.$message.warning(`${i18n.$t('暂无更多日志')}`)
+              this.$message.warning(`${i18n.$t('No more logs')}`)
             }, 1000)
             // Handling text field size
-            handerTextareaSize().html('').text(content || `${i18n.$t('暂无日志')}`)
+            handerTextareaSize().html('').text(content || `${i18n.$t('No log')}`)
           } else {
             this.isData = true
             content = res.data
             // Handling text field size
-            handerTextareaSize().html('').text(content || `${i18n.$t('暂无日志')}`)
+            handerTextareaSize().html('').text(content || `${i18n.$t('No log')}`)
 
             setTimeout(() => {
               $('#textarea').scrollTop(2)
             }, 800)
           }
         }).catch(e => {
-          this.$message.error(e.msg || '')
           this.$message.destroy()
+          this.$message.error(e.msg || '')
         })
       },
       _screenOpen () {
@@ -189,7 +188,7 @@
           if (($this.scrollTop() + $this.height()) === $this.height()) {
             if (self.loadingIndex > 0) {
               self.$message.loading({
-                content: `${i18n.$t('正在努力请求日志中...')}`,
+                content: `${i18n.$t('Loading Log...')}`,
                 duration: 0,
                 closable: false
               })
@@ -201,7 +200,7 @@
             // No data is not requested
             if (self.isData) {
               self.$message.loading({
-                content: `${i18n.$t('正在努力请求日志中...')}`,
+                content: `${i18n.$t('Loading Log...')}`,
                 duration: 0,
                 closable: false
               })
@@ -226,7 +225,7 @@
       // Source is a task instance
       if (this.source === 'list') {
         this.$message.loading({
-          content: `${i18n.$t('正在努力请求日志中...')}`,
+          content: `${i18n.$t('Loading Log...')}`,
           duration: 0,
           closable: false
         })

@@ -20,6 +20,7 @@ import cn.escheduler.dao.model.Queue;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -64,7 +65,9 @@ public interface QueueMapper {
      */
     @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "queueName", column = "queue_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+            @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
     })
     @SelectProvider(type = QueueMapperProvider.class, method = "queryById")
     Queue queryById(@Param("queueId") int queueId);
@@ -76,13 +79,41 @@ public interface QueueMapper {
      */
     @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "queueName", column = "queue_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+            @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
     })
     @SelectProvider(type = QueueMapperProvider.class, method = "queryAllQueue")
     List<Queue> queryAllQueue();
 
+    /**
+     * query all queue list
+     * @return
+     */
+    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "queueName", column = "queue_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+    })
+    @SelectProvider(type = QueueMapperProvider.class, method = "queryQueuePaging")
+    List<Queue> queryQueuePaging(@Param("searchVal") String searchVal,
+                                 @Param("offset") Integer offset,
+                                 @Param("pageSize") Integer pageSize);
 
+    /**
+     * count queue by search value
+     * @param searchVal
+     * @return
+     */
+    @SelectProvider(type = QueueMapperProvider.class, method = "countQueuePaging")
+    Integer countQueuePaging(@Param("searchVal") String searchVal);
 
+    @SelectProvider(type = QueueMapperProvider.class, method = "queryByQueue")
+    Queue queryByQueue(@Param("queue") String queue);
+
+    @SelectProvider(type = QueueMapperProvider.class, method = "queryByQueueName")
+    Queue queryByQueueName(@Param("queueName") String queueName);
 
 
 }

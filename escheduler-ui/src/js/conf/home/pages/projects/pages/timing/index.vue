@@ -1,5 +1,5 @@
 <template>
-  <m-list-construction :title="$t('定时管理')">
+  <m-list-construction :title="$t('Cron Manage')">
     <template slot="content">
       <m-list></m-list>
     </template>

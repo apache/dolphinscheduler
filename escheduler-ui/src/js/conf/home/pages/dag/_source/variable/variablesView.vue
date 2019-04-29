@@ -1,28 +1,48 @@
 <template>
   <div class="variable-model">
+    <template v-if="list">
       <div class="list">
-        <div class="name"><i class="fa fa-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('全局参数')}}</b></div>
+        <div class="name"><i class="fa fa-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('Global parameters')}}</b></div>
         <div class="var-cont">
-          <x-button size="xsmall" type="ghost" v-for="(item,$index) in list.globalParams"  @click="_copy('gbudp-' + $index)" :data-clipboard-text="item.prop + ' = ' +item.value" :class="'gbudp-' + $index"><b style="color: #2A455B;">{{item.prop}}</b> = {{item.value}}</x-button>
+          <template v-for="(item,$index) in list.globalParams">
+            <x-button
+                    size="xsmall"
+                    type="ghost"
+                    @click="_copy('gbudp-' + $index)"
+                    :data-clipboard-text="item.prop + ' = ' +item.value"
+                    :class="'gbudp-' + $index">
+              <b style="color: #2A455B;">{{item.prop}}</b> = {{item.value}}
+            </x-button>
+          </template>
         </div>
       </div>
       <div class="list" style="height: 30px;">
-        <div class="name"><i class="fa fa-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('局部参数')}}</b></div>
+        <div class="name"><i class="fa fa-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('Local parameters')}}</b></div>
         <div class="var-cont">
           &nbsp;
         </div>
       </div>
       <div class="list list-t" v-for="(item,key,$index) in list.localParams">
         <div class="task-name">Task({{$index}})：{{key}}</div>
-        <div class="var-cont" v-if="item.length">
-          <template v-for="(el,index) in item">
-            <x-button size="xsmall" type="ghost" @click="_copy('copy-part-' + index)" :data-clipboard-text="_rtClipboard(el)" :class="'copy-part-' + index">
-              <span v-for="(e,k,i) in el"><b style="color: #2A455B;">{{k}}</b> = {{e}} </span>
+        <div class="var-cont" v-if="item.localParamsList.length">
+          <template v-for="(el,index) in item.localParamsList">
+            <x-button size="xsmall" type="ghost" @click="_copy('copy-part-' + index)" :data-clipboard-text="_rtClipboard(el,item.taskType)" :class="'copy-part-' + index">
+              <span v-for="(e,k,i) in el">
+                <template v-if="item.taskType === 'SQL' || item.taskType === 'PROCEDURE'">
+                  <template v-if="(k !== 'direct' && k !== 'type')">
+                    <b style="color: #2A455B;">{{k}}</b> = {{e}}
+                  </template>
+                </template>
+                <template v-else>
+                  <b style="color: #2A455B;">{{k}}</b> = {{e}}
+                </template>
+              </span>
             </x-button>
           </template>
         </div>
       </div>
-    </div>
+    </template>
+  </div>
 </template>
 <script>
   import i18n from '@/module/i18n'
@@ -57,13 +77,13 @@
       _copy (className) {
         let clipboard = new Clipboard(`.${className}`)
         clipboard.on('success', e => {
-          this.$message.success(`${i18n.$t('复制成功')}`)
+          this.$message.success(`${i18n.$t('Copy success')}`)
           // Free memory
           clipboard.destroy()
         })
         clipboard.on('error', e => {
           // Copy is not supported
-          this.$message.warning(`${i18n.$t('该浏览器不支持自动复制')}`)
+          this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
           // Free memory
           clipboard.destroy()
         })
@@ -71,10 +91,16 @@
       /**
        * Copyed text processing
        */
-      _rtClipboard (el) {
+      _rtClipboard (el, taskType) {
         let arr = []
         Object.keys(el).forEach((key) => {
-          arr.push(`${key}=${el[key]}`)
+          if (taskType === 'SQL' || taskType === 'PROCEDURE') {
+            if (key !== 'direct' && key !== 'type') {
+              arr.push(`${key}=${el[key]}`)
+            }
+          } else {
+            arr.push(`${key}=${el[key]}`)
+          }
         })
         return arr.join(' ')
       }
