@@ -3,5 +3,5 @@
  */
 export default {
   // qianfan task record switch
-  recordSwitch:true
+  recordSwitch:false
 }
