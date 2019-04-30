@@ -102,6 +102,7 @@ public class ErrorCommand {
 
 
     public ErrorCommand(Command command, String message){
+        this.id = command.getId();
         this.commandType = command.getCommandType();
         this.executorId = command.getExecutorId();
         this.processDefinitionId = command.getProcessDefinitionId();
