@@ -22,6 +22,7 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.enums.Flag;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +73,7 @@ public class ProcessInstanceController extends BaseController{
                     "search value:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
                     loginUser.getUserName(), projectName, processDefinitionId, searchVal, stateType,host,
                     startTime, endTime, pageNo, pageSize);
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = processInstanceService.queryProcessInstanceList(
                     loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
             return returnDataListPaging(result);
