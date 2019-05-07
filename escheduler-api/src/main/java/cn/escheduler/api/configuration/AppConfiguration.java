@@ -19,16 +19,13 @@ package cn.escheduler.api.configuration;
 import cn.escheduler.api.interceptor.LoginHandlerInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.*;
 
 /**
  * application configuration
  */
 @Configuration
-public class AppConfiguration extends WebMvcConfigurerAdapter {
+public class AppConfiguration implements WebMvcConfigurer {
 
   public static final String LOGIN_INTERCEPTOR_PATH_PATTERN = "/**/*";
   public static final String LOGIN_PATH_PATTERN = "/login";
