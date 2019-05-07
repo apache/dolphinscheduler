@@ -59,7 +59,6 @@
         this._handleDefineUser(res)
         this.isSpin = false
       }).catch(e => {
-        this.msg = e.msg || 'error'
         this.isSpin = false
       })
     },
