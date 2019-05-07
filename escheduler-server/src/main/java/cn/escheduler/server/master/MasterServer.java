@@ -189,7 +189,6 @@ public class MasterServer implements CommandLineRunner, IStoppable {
 
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(MasterServer.class);
-        app.setWebEnvironment(false);
         app.run(args);
     }
 
