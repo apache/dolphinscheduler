@@ -200,6 +200,9 @@ public enum Status {
     DATA_IS_NULL(50018,"data %s is null"),
     PROCESS_NODE_HAS_CYCLE(50019,"process node has cycle"),
     PROCESS_NODE_S_PARAMETER_INVALID(50020,"process node %s parameter invalid"),
+    PROCESS_DEFINE_STATE_ONLINE(50021, "process definition {0} is already on line"),
+    DELETE_PROCESS_DEFINE_BY_ID_ERROR(50022,"delete process definition by id error"),
+    SCHEDULE_CRON_STATE_ONLINE(50023,"the status of schedule {0} is already on line"),
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
 
