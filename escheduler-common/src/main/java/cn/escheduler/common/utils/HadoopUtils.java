@@ -28,6 +28,7 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.yarn.client.cli.RMAdminCLI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -261,6 +262,22 @@ public class HadoopUtils implements Closeable {
      */
     public boolean exists(String hdfsFilePath) throws IOException {
         return fs.exists(new Path(hdfsFilePath));
+    }
+
+    /**
+     * Gets a list of files in the directory
+     *
+     * @param filePath
+     * @return {@link FileStatus}
+     */
+    public FileStatus[] listFileStatus(String filePath)throws Exception{
+        Path path = new Path(filePath);
+        try {
+            return fs.listStatus(new Path(filePath));
+        } catch (IOException e) {
+            logger.error("Get file list exception", e);
+            throw new Exception("Get file list exception", e);
+        }
     }
 
     /**
