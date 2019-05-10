@@ -19,6 +19,7 @@
 		<logback.version>1.2.3</logback.version>
 		<hadoop.version>2.7.3</hadoop.version>
 		<quartz.version>2.2.3</quartz.version>
+		<jackson.version>2.9.8</jackson.version>
 	</properties>
 
 	<dependencyManagement>
@@ -163,27 +164,27 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.3.2</version>
+				<version>4.4.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore</artifactId>
-				<version>4.3.2</version>
+				<version>4.4.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-annotations</artifactId>
-				<version>2.8.6</version>
+				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-databind</artifactId>
-				<version>2.8.6</version>
+				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
 				<artifactId>jackson-core</artifactId>
-				<version>2.8.6</version>
+				<version>${jackson.version}</version>
 			</dependency>
 
 			<dependency>
@@ -240,8 +241,6 @@
 				<artifactId>commons-configuration</artifactId>
 				<version>1.10</version>
 			</dependency>
-
-
 
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
@@ -368,13 +367,13 @@
 
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<scm>
 		<connection>scm:git:https://github.com/analysys/EasyScheduler.git</connection>
 		<developerConnection>scm:git:https://github.com/analysys/EasyScheduler.git</developerConnection>
 		<url>https://github.com/analysys/EasyScheduler.git</url>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 
 	<build>
 		<plugins>
@@ -435,7 +434,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		
+
 	</build>
 
 	<modules>
