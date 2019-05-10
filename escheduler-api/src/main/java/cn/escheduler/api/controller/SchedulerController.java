@@ -24,6 +24,7 @@ import cn.escheduler.common.enums.FailureStrategy;
 import cn.escheduler.common.enums.Priority;
 import cn.escheduler.common.enums.ReleaseState;
 import cn.escheduler.common.enums.WarningType;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,6 +202,7 @@ public class SchedulerController extends BaseController{
     logger.info("login user {}, query schedule, project name: {}, process definition id: {}",
             loginUser.getUserName(), projectName, processDefinitionId);
       try {
+          searchVal = ParameterUtils.handleEscapes(searchVal);
           Map<String, Object> result = schedulerService.querySchedule(loginUser, projectName, processDefinitionId, searchVal, pageNo, pageSize);
           return returnDataListPaging(result);
        }catch (Exception e){
