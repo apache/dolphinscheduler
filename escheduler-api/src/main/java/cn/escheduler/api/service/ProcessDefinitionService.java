@@ -337,6 +337,65 @@ public class ProcessDefinitionService extends BaseDAGService {
     }
 
     /**
+     * delete process definition by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionId
+     * @return
+     */
+    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    public Map<String, Object> deleteProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId) {
+
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
+
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
+            return result;
+        }
+        // check process definition is already online
+        if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
+            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE,processDefinitionId);
+            return result;
+        }
+
+        // get the timing according to the process definition
+        List<Schedule> schedules = scheduleMapper.selectAllByProcessDefineArray(new int[processDefinitionId]);
+        if (!schedules.isEmpty() && schedules.size() > 1) {
+            logger.warn("scheduler num is {},Greater than 1",schedules.size());
+            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
+            return result;
+        }else if(schedules.size() == 1){
+            Schedule schedule = schedules.get(0);
+            if(schedule.getReleaseState() == ReleaseState.OFFLINE){
+                scheduleMapper.delete(schedule.getId());
+            }else if(schedule.getReleaseState() == ReleaseState.ONLINE){
+                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE,schedule.getId());
+                return result;
+            }
+        }
+
+        int delete = processDefineMapper.delete(processDefinitionId);
+
+        if (delete > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
+        }
+        return result;
+    }
+
+    /**
      * release process definition: online / offline
      *
      * @param loginUser

@@ -173,6 +173,12 @@ public interface ScheduleMapper {
   @SelectProvider(type = ScheduleMapperProvider.class, method = "selectAllByProcessDefineArray")
   List<Schedule> selectAllByProcessDefineArray(@Param("processDefineIds") int[] processDefineIds);
 
-
+  /**
+   * delete schedule by id
+   * @param scheduleId
+   * @return
+   */
+  @DeleteProvider(type = ScheduleMapperProvider.class, method = "delete")
+  int delete(@Param("scheduleId") int scheduleId);
 
 }
