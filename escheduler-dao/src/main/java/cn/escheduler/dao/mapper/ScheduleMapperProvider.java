@@ -182,6 +182,20 @@ public class ScheduleMapperProvider {
   }
 
   /**
+   * query schedule by process definition id
+   * @param parameter
+   * @return
+   */
+  public String queryByProcessDefinitionId(Map<String, Object> parameter) {
+
+    return new SQL() {{
+      SELECT("*");
+      FROM(DB_NAME);
+      WHERE("process_definition_id = #{processDefinitionId}");
+    }}.toString();
+  }
+
+  /**
    * delete schedule by id
    *
    * @param parameter
