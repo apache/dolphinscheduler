@@ -230,4 +230,29 @@ public class SchedulerController extends BaseController{
           return error(Status.QUERY_SCHEDULE_LIST_ERROR.getCode(), Status.QUERY_SCHEDULE_LIST_ERROR.getMsg());
       }
   }
+
+    /**
+     * delete schedule by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param scheduleId
+     * @return
+     */
+    @GetMapping(value="/delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
+                                              @PathVariable String projectName,
+                                              @RequestParam("scheduleId") Integer scheduleId
+    ){
+        try{
+            logger.info("delete schedule by id, login user:{}, project name:{}, schedule id:{}",
+                    loginUser.getUserName(), projectName, scheduleId);
+            Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectName, scheduleId);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(DELETE_SCHEDULE_CRON_BY_ID_ERROR.getMsg(),e);
+            return error(Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR.getCode(), Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR.getMsg());
+        }
+    }
 }
