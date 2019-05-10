@@ -115,6 +115,8 @@ public interface ProjectMapper {
             @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "defCount", column = "def_count", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "instRunningCount", column = "inst_running_count", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
     })
     @SelectProvider(type = ProjectMapperProvider.class, method = "queryProjectListPaging")
     List<Project> queryProjectListPaging(@Param("userId") Integer userId,
@@ -145,6 +147,8 @@ public interface ProjectMapper {
             @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "defCount", column = "def_count", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "instRunningCount", column = "inst_running_count", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
     })
     @SelectProvider(type = ProjectMapperProvider.class, method = "queryAllProjectListPaging")
     List<Project> queryAllProjectListPaging(
