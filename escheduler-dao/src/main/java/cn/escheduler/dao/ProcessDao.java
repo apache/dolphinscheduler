@@ -20,6 +20,7 @@ import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.*;
 import cn.escheduler.common.model.DateInterval;
 import cn.escheduler.common.model.TaskNode;
+import cn.escheduler.common.process.Property;
 import cn.escheduler.common.queue.ITaskQueue;
 import cn.escheduler.common.queue.TaskQueueFactory;
 import cn.escheduler.common.task.subprocess.SubProcessParameters;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.escheduler.common.Constants.*;
 import static cn.escheduler.dao.datasource.ConnectionFactory.getMapper;
@@ -737,17 +739,16 @@ public class ProcessDao extends AbstractBaseDao {
      * @return
      */
     private String joinGlobalParams(String parentGlobalParams, String subGlobalParams){
-        Map<String, String> parentMap = JSONUtils.toMap(parentGlobalParams);
-        Map<String, String> subMap = JSONUtils.toMap(subGlobalParams);
+        List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
+        List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
+        Map<String,String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
 
-        Set<String> parentKeySet = parentMap.keySet();
-        for(String parentKey : parentKeySet){
-            if(subMap.containsKey(parentKey)){
-                continue;
+        for(Property parent : parentPropertyList){
+            if(!subMap.containsKey(parent.getProp())){
+                subPropertyList.add(parent);
             }
-            subMap.put( parentKey, parentMap.get(parentKey));
         }
-        return JSONUtils.toJson(subMap);
+        return JSONUtils.toJson(subPropertyList);
     }
 
     /**
