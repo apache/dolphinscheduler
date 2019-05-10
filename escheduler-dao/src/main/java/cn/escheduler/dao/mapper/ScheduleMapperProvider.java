@@ -180,4 +180,21 @@ public class ScheduleMapperProvider {
       WHERE("release_state = 1");
     }}.toString();
   }
+
+  /**
+   * delete schedule by id
+   *
+   * @param parameter
+   * @return
+   */
+  public String delete(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        DELETE_FROM(DB_NAME);
+
+        WHERE("`id`=#{scheduleId}");
+      }
+    }.toString();
+  }
+
 }
