@@ -55,8 +55,7 @@ public class ProjectMapperProvider {
     public String delete(Map<String, Object> parameter) {
         return new SQL() {
             {
-                UPDATE(TABLE_NAME);
-                SET("flag=0");
+                DELETE_FROM(TABLE_NAME);
                 WHERE("`id`=#{projectId}");
             }
         }.toString();

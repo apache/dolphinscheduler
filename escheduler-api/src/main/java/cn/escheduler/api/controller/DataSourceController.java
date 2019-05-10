@@ -21,6 +21,7 @@ import cn.escheduler.api.service.DataSourceService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.DbType;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -182,6 +183,7 @@ public class DataSourceController extends BaseController {
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 return returnDataListPaging(result);
             }
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
             return returnDataListPaging(result);
         } catch (Exception e) {

@@ -20,9 +20,11 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.common.enums.UserType;
+import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
 import cn.escheduler.dao.mapper.ProjectMapper;
 import cn.escheduler.dao.mapper.ProjectUserMapper;
 import cn.escheduler.dao.mapper.UserMapper;
+import cn.escheduler.dao.model.ProcessDefinition;
 import cn.escheduler.dao.model.Project;
 import cn.escheduler.dao.model.ProjectUser;
 import cn.escheduler.dao.model.User;
@@ -54,6 +56,9 @@ public class ProjectService extends BaseService{
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * create project
@@ -198,6 +203,12 @@ public class ProjectService extends BaseService{
         Map<String, Object> checkResult = getCheckResult(loginUser, project);
         if (checkResult != null) {
             return checkResult;
+        }
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(projectId);
+
+        if(processDefinitionList.size() > 0){
+            putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
+            return result;
         }
 
         int delete = projectMapper.delete(projectId);
