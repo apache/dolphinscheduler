@@ -323,4 +323,29 @@ public class ProcessDefinitionController extends BaseController{
         }
     }
 
+    /**
+     * delete process definition by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionId
+     * @return
+     */
+    @GetMapping(value="/delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result deleteProcessDefinitionById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @PathVariable String projectName,
+                                            @RequestParam("processDefinitionId") Integer processDefinitionId
+    ){
+        try{
+            logger.info("delete process definition by id, login user:{}, project name:{}, process definition id:{}",
+                    loginUser.getUserName(), projectName, processDefinitionId);
+            Map<String, Object> result = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(DELETE_PROCESS_DEFINE_BY_ID_ERROR.getMsg(),e);
+            return error(Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR.getCode(), Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR.getMsg());
+        }
+    }
+
 }
