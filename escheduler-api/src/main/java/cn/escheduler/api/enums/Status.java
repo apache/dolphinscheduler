@@ -204,8 +204,11 @@ public enum Status {
     PROCESS_DEFINE_STATE_ONLINE(50021, "process definition {0} is already on line"),
     DELETE_PROCESS_DEFINE_BY_ID_ERROR(50022,"delete process definition by id error"),
     SCHEDULE_CRON_STATE_ONLINE(50023,"the status of schedule {0} is already on line"),
+    DELETE_SCHEDULE_CRON_BY_ID_ERROR(50024,"delete schedule by id error"),
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
+    HDFS_TERANT_RESOURCES_FILE_EXISTS(60002,"resource file exists,please delete resource first"),
+    HDFS_TERANT_UDFS_FILE_EXISTS(60003,"udf file exists,please delete resource first"),
 
     /**
      * for monitor
