@@ -33,6 +33,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.hdfs.web.JsonUtil;
+import org.apache.twill.internal.json.JsonUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -689,41 +691,63 @@ public class ProcessDao extends AbstractBaseDao {
      * handle sub work process instance, update relation table and command parameters
      * set sub work process flag, extends parent work process command parameters.
      */
-    public ProcessInstance setSubProcessParam(ProcessInstance processInstance){
-        String cmdParam = processInstance.getCommandParam();
+    public ProcessInstance setSubProcessParam(ProcessInstance subProcessInstance){
+        String cmdParam = subProcessInstance.getCommandParam();
         if(StringUtils.isEmpty(cmdParam)){
-            return processInstance;
+            return subProcessInstance;
         }
         Map<String, String> paramMap = JSONUtils.toMap(cmdParam);
         // write sub process id into cmd param.
         if(paramMap.containsKey(CMDPARAM_SUB_PROCESS)
                 && CMDPARAM_EMPTY_SUB_PROCESS.equals(paramMap.get(CMDPARAM_SUB_PROCESS))){
             paramMap.remove(CMDPARAM_SUB_PROCESS);
-            paramMap.put(CMDPARAM_SUB_PROCESS, String.valueOf(processInstance.getId()));
-            processInstance.setCommandParam(JSONUtils.toJson(paramMap));
-            processInstance.setIsSubProcess(Flag.YES);
-            this.saveProcessInstance(processInstance);
+            paramMap.put(CMDPARAM_SUB_PROCESS, String.valueOf(subProcessInstance.getId()));
+            subProcessInstance.setCommandParam(JSONUtils.toJson(paramMap));
+            subProcessInstance.setIsSubProcess(Flag.YES);
+            this.saveProcessInstance(subProcessInstance);
         }
         // copy parent instance user def params to sub process..
         String parentInstanceId = paramMap.get(CMDPARAM_SUB_PROCESS_PARENT_INSTANCE_ID);
         if(StringUtils.isNotEmpty(parentInstanceId)){
             ProcessInstance parentInstance = findProcessInstanceDetailById(Integer.parseInt(parentInstanceId));
             if(parentInstance != null){
-                processInstance.setGlobalParams(parentInstance.getGlobalParams());
-                this.saveProcessInstance(processInstance);
+                subProcessInstance.setGlobalParams(
+                        joinGlobalParams(parentInstance.getGlobalParams(), subProcessInstance.getGlobalParams()));
+                this.saveProcessInstance(subProcessInstance);
             }else{
                 logger.error("sub process command params error, cannot find parent instance: {} ", cmdParam);
             }
         }
         ProcessInstanceMap processInstanceMap = JSONUtils.parseObject(cmdParam, ProcessInstanceMap.class);
         if(processInstanceMap == null || processInstanceMap.getParentProcessInstanceId() == 0){
-            return processInstance;
+            return subProcessInstance;
         }
         // update sub process id to process map table
-        processInstanceMap.setProcessInstanceId(processInstance.getId());
+        processInstanceMap.setProcessInstanceId(subProcessInstance.getId());
 
         this.updateWorkProcessInstanceMap(processInstanceMap);
-        return processInstance;
+        return subProcessInstance;
+    }
+
+    /**
+     * join parent global params into sub process.
+     *  only the keys doesn't in sub process global would be joined.
+     * @param parentGlobalParams
+     * @param subGlobalParams
+     * @return
+     */
+    private String joinGlobalParams(String parentGlobalParams, String subGlobalParams){
+        Map<String, String> parentMap = JSONUtils.toMap(parentGlobalParams);
+        Map<String, String> subMap = JSONUtils.toMap(subGlobalParams);
+
+        Set<String> parentKeySet = parentMap.keySet();
+        for(String parentKey : parentKeySet){
+            if(subMap.containsKey(parentKey)){
+                continue;
+            }
+            subMap.put( parentKey, parentMap.get(parentKey));
+        }
+        return JSONUtils.toJson(subMap);
     }
 
     /**
