@@ -118,7 +118,7 @@ public class UserMapperProvider {
      *
      * @return
      */
-    public String queryAllUsers() {
+    public String queryAllGeneralUsers() {
         return new SQL() {
             {
                 SELECT("*");
@@ -129,6 +129,22 @@ public class UserMapperProvider {
             }
         }.toString();
     }
+
+    /**
+     * query all user list
+     *
+     * @return
+     */
+    public String queryAllUsers() {
+        return new SQL() {
+            {
+                SELECT("*");
+                FROM(TABLE_NAME);
+            }
+        }.toString();
+    }
+
+
 
     /**
      * check user name and password
@@ -188,13 +204,17 @@ public class UserMapperProvider {
         return new SQL() {
             {
                 SELECT("u.*,t.tenant_name as tenantName,q.queue_name as queueName");
-                FROM(TABLE_NAME +" u,t_escheduler_tenant t,t_escheduler_queue q");
-                WHERE("u.user_type = 1 AND u.tenant_id = t.id and t.queue_id = q.id");
+                FROM(TABLE_NAME + " u ");
+                LEFT_OUTER_JOIN("t_escheduler_tenant t on u.tenant_id = t.id");
+                LEFT_OUTER_JOIN("t_escheduler_queue q on t.queue_id = q.id");
+                WHERE("u.user_type = 1");
                 Object searchVal = parameter.get("searchVal");
                 if(searchVal != null && StringUtils.isNotEmpty(searchVal.toString())){
                     WHERE( " u.user_name like concat('%', #{searchVal}, '%') ");
                 }
                 ORDER_BY(" u.update_time desc limit #{offset},#{pageSize} ");
+
+
             }
         }.toString();
 
