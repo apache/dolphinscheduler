@@ -20,6 +20,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.ProcessDefinitionService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -235,6 +236,7 @@ public class ProcessDefinitionController extends BaseController{
             if(result.get(Constants.STATUS) != Status.SUCCESS){
                 return returnDataListPaging(result);
             }
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
             return returnDataListPaging(result);
         }catch (Exception e){
