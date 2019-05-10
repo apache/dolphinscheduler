@@ -370,7 +370,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         }
 
         // get the timing according to the process definition
-        List<Schedule> schedules = scheduleMapper.selectAllByProcessDefineArray(new int[processDefinitionId]);
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
         if (!schedules.isEmpty() && schedules.size() > 1) {
             logger.warn("scheduler num is {},Greater than 1",schedules.size());
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
