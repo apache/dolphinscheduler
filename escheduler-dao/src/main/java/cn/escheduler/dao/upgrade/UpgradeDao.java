@@ -16,7 +16,7 @@
  */
 package cn.escheduler.dao.upgrade;
 
-import cn.escheduler.common.utils.MysqlUtil;
+import cn.escheduler.common.utils.MysqlUtils;
 import cn.escheduler.common.utils.ScriptRunner;
 import cn.escheduler.dao.AbstractBaseDao;
 import cn.escheduler.dao.datasource.ConnectionFactory;
@@ -98,7 +98,7 @@ public class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            MysqlUtil.realeaseResource(null, null, conn);
+            MysqlUtils.releaseResource(null, null, conn);
 
         }
 
@@ -126,7 +126,7 @@ public class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            MysqlUtil.realeaseResource(null, null, conn);
+            MysqlUtils.releaseResource(null, null, conn);
 
         }
 
@@ -152,7 +152,7 @@ public class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            MysqlUtil.realeaseResource(null, null, conn);
+            MysqlUtils.releaseResource(null, null, conn);
 
         }
 
@@ -179,7 +179,7 @@ public class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            MysqlUtil.realeaseResource(null, null, conn);
+            MysqlUtils.releaseResource(null, null, conn);
 
         }
 
@@ -207,7 +207,7 @@ public class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException("sql: " + sql, e);
         } finally {
-            MysqlUtil.realeaseResource(rs, pstmt, conn);
+            MysqlUtils.releaseResource(rs, pstmt, conn);
 
         }
     }
@@ -277,7 +277,7 @@ public class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            MysqlUtil.realeaseResource(null, pstmt, conn);
+            MysqlUtils.releaseResource(null, pstmt, conn);
         }
 
     }
@@ -316,7 +316,7 @@ public class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            MysqlUtil.realeaseResource(null, pstmt, conn);
+            MysqlUtils.releaseResource(null, pstmt, conn);
         }
 
     }
@@ -338,7 +338,7 @@ public class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException("sql: " + upgradeSQL, e);
         } finally {
-            MysqlUtil.realeaseResource(null, pstmt, conn);
+            MysqlUtils.releaseResource(null, pstmt, conn);
         }
 
     }
