@@ -118,7 +118,7 @@ public class UserMapperProvider {
      *
      * @return
      */
-    public String queryAllUsers() {
+    public String queryAllGeneralUsers() {
         return new SQL() {
             {
                 SELECT("*");
@@ -129,6 +129,22 @@ public class UserMapperProvider {
             }
         }.toString();
     }
+
+    /**
+     * query all user list
+     *
+     * @return
+     */
+    public String queryAllUsers() {
+        return new SQL() {
+            {
+                SELECT("*");
+                FROM(TABLE_NAME);
+            }
+        }.toString();
+    }
+
+
 
     /**
      * check user name and password
