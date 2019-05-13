@@ -220,7 +220,7 @@ public class ProcessInstanceMapperProvider {
     public String queryDetailById(Map<String, Object> parameter) {
         return new SQL() {
             {
-                SELECT("inst.*,q.queue_name as queue,t.tenant_code as tenantCode,UNIX_TIMESTAMP(inst.end_time)-UNIX_TIMESTAMP(inst.start_time) as duration");
+                SELECT("inst.*,q.queue_name as queue,t.tenant_code,UNIX_TIMESTAMP(inst.end_time)-UNIX_TIMESTAMP(inst.start_time) as duration");
 
                 FROM(TABLE_NAME + "  inst, t_escheduler_user u,t_escheduler_tenant t,t_escheduler_queue q");
 
