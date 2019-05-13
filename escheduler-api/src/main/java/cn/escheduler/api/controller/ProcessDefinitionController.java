@@ -350,4 +350,29 @@ public class ProcessDefinitionController extends BaseController{
         }
     }
 
+    /**
+     * batch delete process definition by ids
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionIds
+     * @return
+     */
+    @GetMapping(value="/batch-delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result batchDeleteProcessDefinitionByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                              @PathVariable String projectName,
+                                              @RequestParam("processDefinitionIds") String processDefinitionIds
+    ){
+        try{
+            logger.info("delete process definition by ids, login user:{}, project name:{}, process definition ids:{}",
+                    loginUser.getUserName(), projectName, processDefinitionIds);
+            Map<String, Object> result = processDefinitionService.batchDeleteProcessDefinitionByIds(loginUser, projectName, processDefinitionIds);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(),e);
+            return error(Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getCode(), Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getMsg());
+        }
+    }
+
 }

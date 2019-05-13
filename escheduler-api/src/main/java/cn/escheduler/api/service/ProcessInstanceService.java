@@ -467,6 +467,7 @@ public class ProcessInstanceService extends BaseDAGService {
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, workflowId);
             return result;
         }
+
         int delete = processDao.deleteWorkProcessInstanceById(workflowId);
         processDao.deleteAllSubWorkProcessByParentId(workflowId);
         processDao.deleteWorkProcessMapByParentId(workflowId);
@@ -476,6 +477,48 @@ public class ProcessInstanceService extends BaseDAGService {
         } else {
             putMsg(result, Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR);
         }
+        return result;
+    }
+
+    /**
+     * batch delete process instance by ids, at the same time，delete task instance and their mapping relation data
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processInstanceIds
+     * @return
+     */
+    public Map<String, Object> batchDeleteProcessInstanceByIds(User loginUser, String projectName, String processInstanceIds) {
+
+        Map<String, Object> result = new HashMap<>(5);
+        List<Integer> deleteFailedIdList = new ArrayList<Integer>();
+
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        if(StringUtils.isNotEmpty(processInstanceIds)){
+            String[] processInstanceIdArray = processInstanceIds.split(",");
+
+            for (String strProcessInstanceId:processInstanceIdArray) {
+                int processInstanceId = Integer.parseInt(strProcessInstanceId);
+                try {
+                    deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+                } catch (Exception e) {
+                    deleteFailedIdList.add(processInstanceId);
+                }
+            }
+        }
+        if(deleteFailedIdList.size() > 0){
+            putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
+        }else{
+            putMsg(result, Status.SUCCESS);
+        }
+
         return result;
     }
 
