@@ -75,4 +75,16 @@ public class ProcessInstanceServiceTest {
         Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
         logger.info(JSON.toJSONString(map));
     }
+
+    @Test
+    public void batchDeleteProcessInstanceByIds() throws Exception {
+
+        User loginUser = new User();
+        loginUser.setId(2);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> map = processInstanceService.batchDeleteProcessInstanceByIds(loginUser, "li_test_1", "4,2,300");
+
+        Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+        logger.info(JSON.toJSONString(map));
+    }
 }
