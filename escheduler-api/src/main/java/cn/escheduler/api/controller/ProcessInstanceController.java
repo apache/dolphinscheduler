@@ -282,4 +282,30 @@ public class ProcessInstanceController extends BaseController{
             return error(Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR.getCode(),ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR.getMsg());
         }
     }
+
+    /**
+     * batch delete process instance by ids, at the same time,
+     * delete task instance and their mapping relation data
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processInstanceIds
+     * @return
+     */
+    @GetMapping(value="/batch-delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result batchDeleteProcessInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @PathVariable String projectName,
+                                            @RequestParam("processInstanceIds") String processInstanceIds
+    ){
+        try{
+            logger.info("delete process instance by ids, login user:{}, project name:{}, process instance ids :{}",
+                    loginUser.getUserName(), projectName, processInstanceIds);
+            Map<String, Object> result = processInstanceService.batchDeleteProcessInstanceByIds(loginUser, projectName, processInstanceIds);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR.getMsg(),e);
+            return error(Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR.getCode(), Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR.getMsg());
+        }
+    }
 }

@@ -160,6 +160,7 @@ public enum Status {
     NAME_EXIST(10135, "name {0} already exists"),
     SAVE_ERROR(10136, "save error"),
     DELETE_PROJECT_ERROR_DEFINES_NOT_NULL(10137, "please delete the process definitions in project first!"),
+    BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117,"batch delete process instance by ids {0} error"),
 
 
 
