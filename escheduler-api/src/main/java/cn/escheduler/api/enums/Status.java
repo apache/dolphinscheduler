@@ -206,6 +206,8 @@ public enum Status {
     DELETE_PROCESS_DEFINE_BY_ID_ERROR(50022,"delete process definition by id error"),
     SCHEDULE_CRON_STATE_ONLINE(50023,"the status of schedule {0} is already on line"),
     DELETE_SCHEDULE_CRON_BY_ID_ERROR(50024,"delete schedule by id error"),
+    BATCH_DELETE_PROCESS_DEFINE_ERROR(50025,"batch delete process definition error"),
+    BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR(50026,"batch delete process definition by ids {0} error"),
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
     HDFS_TERANT_RESOURCES_FILE_EXISTS(60002,"resource file exists,please delete resource first"),
