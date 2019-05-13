@@ -23,6 +23,9 @@ import cn.escheduler.api.service.UsersService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -60,6 +63,11 @@ public class LoginController extends BaseController {
      * @param response
      * @return
      */
+    @ApiOperation(value="更新用户详细信息", notes="根据url的id来指定更新对象，并根据传过来的user信息来更新用户详细信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userName", value = "用户名", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "密码", required = true, dataType = "String")
+    })
     @RequestMapping(value = "/login")
     public Result login(@RequestParam(value = "userName") String userName,
                         @RequestParam(value = "userPassword") String userPassword,
