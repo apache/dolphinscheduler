@@ -75,4 +75,15 @@ public class ProcessDefinitionServiceTest {
         Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
         logger.info(JSON.toJSONString(map));
     }
+
+    @Test
+    public void batchDeleteProcessDefinitionByIds() throws Exception {
+
+        User loginUser = new User();
+        loginUser.setId(2);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> map = processDefinitionService.batchDeleteProcessDefinitionByIds(loginUser, "li_test_1", "2,3");
+        Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+        logger.info(JSON.toJSONString(map));
+    }
 }
