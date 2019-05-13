@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.api.quartz;
+package cn.escheduler.server.quartz;
 
 
 import cn.escheduler.common.Constants;
@@ -31,8 +31,8 @@ import org.springframework.util.Assert;
 
 import java.util.Date;
 
-import static cn.escheduler.api.quartz.QuartzExecutors.buildJobGroupName;
-import static cn.escheduler.api.quartz.QuartzExecutors.buildJobName;
+import static cn.escheduler.server.quartz.QuartzExecutors.buildJobGroupName;
+import static cn.escheduler.server.quartz.QuartzExecutors.buildJobName;
 
 /**
  * process schedule job

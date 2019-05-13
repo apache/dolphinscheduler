@@ -134,7 +134,7 @@ public class FetchTaskThread implements Runnable{
     public void run() {
 
         while (Stopper.isRunning()){
-
+            long start = System.currentTimeMillis();
             InterProcessMutex mutex = null;
             try {
                 if(OSUtils.checkResource(this.conf, false)) {
@@ -221,7 +221,10 @@ public class FetchTaskThread implements Runnable{
                             logger.info("task : {} ready to submit to task scheduler thread",taskId);
                             // submit task
                             workerExecService.submit(new TaskScheduleThread(taskInstance, processDao));
+
+                            logger.info("{} 耗时: {} ms",taskQueueStr,System.currentTimeMillis() - start );
                         }
+
                     }
                 }
 
