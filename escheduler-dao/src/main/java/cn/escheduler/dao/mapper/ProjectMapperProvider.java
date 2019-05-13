@@ -93,7 +93,7 @@ public class ProjectMapperProvider {
     public String queryById(Map<String, Object> parameter) {
         return new SQL() {{
             SELECT("p.user_id");
-            SELECT("u.user_name as userName");
+            SELECT("u.user_name");
             SELECT("p.*");
 
             FROM(TABLE_NAME + " p");
@@ -114,7 +114,7 @@ public class ProjectMapperProvider {
     public String queryByName(Map<String, Object> parameter) {
         return new SQL() {{
             SELECT("p.user_id");
-            SELECT("u.user_name as userName");
+            SELECT("u.user_name");
             SELECT("p.*");
 
             FROM(TABLE_NAME + " p");
