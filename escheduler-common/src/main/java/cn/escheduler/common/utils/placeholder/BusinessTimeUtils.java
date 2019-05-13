@@ -54,11 +54,11 @@ public class BusinessTimeUtils {
       case SCHEDULER:
       default:
           businessDate = addDays(new Date(), -1);
-          if (businessDate != null){
+          if (runTime != null){
             /**
              * If there is a scheduled time, take the scheduling time. Recovery from failed nodes, suspension of recovery, re-run for scheduling
              */
-            businessDate = runTime;
+            businessDate = addDays(runTime, -1);
           }
           break;
     }
