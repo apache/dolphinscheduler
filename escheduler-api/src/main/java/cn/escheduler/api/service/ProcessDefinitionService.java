@@ -357,13 +357,19 @@ public class ProcessDefinitionService extends BaseDAGService {
             return checkResult;
         }
 
-
         ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
 
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
             return result;
         }
+
+        // Determine if the login user is the owner of the process definition
+        if (loginUser.getId() != processDefinition.getUserId()) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
         // check process definition is already online
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
             putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE,processDefinitionId);
