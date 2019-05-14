@@ -126,4 +126,16 @@ public class Constants {
     public static final String TH_END = "</th>";
 
     public static final int ALERT_SCAN_INTERVEL = 5000;
+
+    public static final String QIYE_WEIXIN_CORP_ID = "qiye.weixin.corp.id";
+
+    public static final String QIYE_WEIXIN_SECRET = "qiye.weixin.secret";
+
+    public static final String QIYE_WEIXIN_TOKEN_URL = "qiye.weixin.token.url";
+
+    public static final String QIYE_WEIXIN_PUSH_URL = "qiye.weixin.push.url";
+
+    public static final String QIYE_WEIXIN_TEAM_SEND_MSG = "qiye.weixin.team.send.msg";
+
+    public static final String QIYE_WEIXIN_USER_SEND_MSG = "qiye.weixin.user.send.msg";
 }
