@@ -39,24 +39,24 @@ import static cn.escheduler.alert.utils.PropertyUtils.getString;
 /**
  * qiye weixin utils
  */
-public class QiyeWeixinUtils {
+public class EnterpriseWeChatUtils {
 
-    public static final Logger logger = LoggerFactory.getLogger(QiyeWeixinUtils.class);
+    public static final Logger logger = LoggerFactory.getLogger(EnterpriseWeChatUtils.class);
 
-    private static final String qiyeWeixinCorpId = getString(Constants.QIYE_WEIXIN_CORP_ID);
+    private static final String enterpriseWeChatCorpId = getString(Constants.ENTERPRISE_WECHAT_CORP_ID);
 
-    private static final String qiyeWeixinSecret = getString(Constants.QIYE_WEIXIN_SECRET);
+    private static final String enterpriseWeChatSecret = getString(Constants.ENTERPRISE_WECHAT_SECRET);
 
-    private static final String qiyeWeixinTokenUrl = getString(Constants.QIYE_WEIXIN_TOKEN_URL);
-    private String qiyeWeixinTokenUrlReplace = qiyeWeixinTokenUrl
-            .replaceAll("\\$weixinCorpId", qiyeWeixinCorpId)
-            .replaceAll("\\$weixinSecret", qiyeWeixinSecret);
+    private static final String enterpriseWeChatTokenUrl = getString(Constants.ENTERPRISE_WECHAT_TOKEN_URL);
+    private String enterpriseWeChatTokenUrlReplace = enterpriseWeChatTokenUrl
+            .replaceAll("\\$corpId", enterpriseWeChatCorpId)
+            .replaceAll("\\$secret", enterpriseWeChatSecret);
 
-    private static final String qiyeWeixinPushUrl = getString(Constants.QIYE_WEIXIN_PUSH_URL);
+    private static final String enterpriseWeChatPushUrl = getString(Constants.ENTERPRISE_WECHAT_PUSH_URL);
 
-    private static final String qiyeWeixinTeamSendMsg = getString(Constants.QIYE_WEIXIN_TEAM_SEND_MSG);
+    private static final String enterpriseWeChatTeamSendMsg = getString(Constants.ENTERPRISE_WECHAT_TEAM_SEND_MSG);
 
-    private static final String qiyeWeixinUserSendMsg = getString(Constants.QIYE_WEIXIN_USER_SEND_MSG);
+    private static final String enterpriseWeChatUserSendMsg = getString(Constants.ENTERPRISE_WECHAT_USER_SEND_MSG);
 
     /**
      * get winxin token info
@@ -67,7 +67,7 @@ public class QiyeWeixinUtils {
         String resp;
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(qiyeWeixinTokenUrlReplace);
+        HttpGet httpGet = new HttpGet(enterpriseWeChatTokenUrlReplace);
         CloseableHttpResponse response = httpClient.execute(httpGet);
         try {
             HttpEntity entity = response.getEntity();
@@ -91,7 +91,7 @@ public class QiyeWeixinUtils {
      * @return weixin send message
      */
     public String makeTeamSendMsg(String toParty, String agentId, String msg) {
-        return qiyeWeixinTeamSendMsg.replaceAll("\\$toParty", toParty)
+        return enterpriseWeChatTeamSendMsg.replaceAll("\\$toParty", toParty)
                 .replaceAll("\\$agentId", agentId)
                 .replaceAll("\\$msg", msg);
     }
@@ -105,7 +105,7 @@ public class QiyeWeixinUtils {
      */
     public String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
         String listParty = FuncUtils.mkString(toParty, "|");
-        return qiyeWeixinTeamSendMsg.replaceAll("\\$toParty", listParty)
+        return enterpriseWeChatTeamSendMsg.replaceAll("\\$toParty", listParty)
                 .replaceAll("\\$agentId", agentId)
                 .replaceAll("\\$msg", msg);
     }
@@ -118,7 +118,7 @@ public class QiyeWeixinUtils {
      * @return weixin send message
      */
     public String makeUserSendMsg(String toUser, String agentId, String msg) {
-        return qiyeWeixinUserSendMsg.replaceAll("\\$toUser", toUser)
+        return enterpriseWeChatUserSendMsg.replaceAll("\\$toUser", toUser)
                 .replaceAll("\\$agentId", agentId)
                 .replaceAll("\\$msg", msg);
     }
@@ -132,7 +132,7 @@ public class QiyeWeixinUtils {
      */
     public String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
         String listUser = FuncUtils.mkString(toUser, "|");
-        return qiyeWeixinUserSendMsg.replaceAll("\\$toUser", listUser)
+        return enterpriseWeChatUserSendMsg.replaceAll("\\$toUser", listUser)
                 .replaceAll("\\$agentId", agentId)
                 .replaceAll("\\$msg", msg);
     }
@@ -146,10 +146,10 @@ public class QiyeWeixinUtils {
      * @throws IOException
      */
     public String sendQiyeWeixin(String charset, String data, String token) throws IOException {
-        String qiyeWeixinPushUrlReplace = qiyeWeixinPushUrl.replaceAll("\\$weixinToken", token);
+        String enterpriseWeChatPushUrlReplace = enterpriseWeChatPushUrl.replaceAll("\\$token", token);
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(qiyeWeixinPushUrlReplace);
+        HttpPost httpPost = new HttpPost(enterpriseWeChatPushUrlReplace);
         httpPost.setEntity(new StringEntity(data, charset));
         CloseableHttpResponse response = httpclient.execute(httpPost);
         String resp;
@@ -160,7 +160,7 @@ public class QiyeWeixinUtils {
         } finally {
             response.close();
         }
-        logger.info("qiye weixin send [{}], param:{}, resp:{}", qiyeWeixinPushUrl, data, resp);
+        logger.info("qiye weixin send [{}], param:{}, resp:{}", enterpriseWeChatPushUrl, data, resp);
         return resp;
     }
 

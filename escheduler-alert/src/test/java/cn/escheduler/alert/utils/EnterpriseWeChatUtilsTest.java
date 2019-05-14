@@ -28,13 +28,13 @@ import java.util.Collection;
 /**
  * Please manually modify the configuration file before testing.
  * file: alert.properties
- *   qiye.weixin.corp.id
- *   qiye.weixin.secret
- *   qiye.weixin.token.url
- *   qiye.weixin.push.url
- *   qiye.weixin.send.msg
+ *   enterprise.wechat.corp.id
+ *   enterprise.wechat.secret
+ *   enterprise.wechat.token.url
+ *   enterprise.wechat.push.url
+ *   enterprise.wechat.send.msg
  */
-public class QiyeWeixinUtilsTest {
+public class EnterpriseWeChatUtilsTest {
 
     // Please change
     private String agentId = "1000002"; // app id
@@ -44,8 +44,8 @@ public class QiyeWeixinUtilsTest {
     private Collection<String> listUserId = Arrays.asList("test1","test2");
 
     @Test
-    public void testSendSingleTeamWeixin() {
-        QiyeWeixinUtils wx = new QiyeWeixinUtils();
+    public void testSendSingleTeamWeChat() {
+        EnterpriseWeChatUtils wx = new EnterpriseWeChatUtils();
 
         try {
             String token = wx.getToken();
@@ -60,8 +60,8 @@ public class QiyeWeixinUtilsTest {
     }
 
     @Test
-    public void testSendMultiTeamWeixin() {
-        QiyeWeixinUtils wx = new QiyeWeixinUtils();
+    public void testSendMultiTeamWeChat() {
+        EnterpriseWeChatUtils wx = new EnterpriseWeChatUtils();
 
         try {
             String token = wx.getToken();
@@ -76,8 +76,8 @@ public class QiyeWeixinUtilsTest {
     }
 
     @Test
-    public void testSendSingleUserWeixin() {
-        QiyeWeixinUtils wx = new QiyeWeixinUtils();
+    public void testSendSingleUserWeChat() {
+        EnterpriseWeChatUtils wx = new EnterpriseWeChatUtils();
 
         try {
             String token = wx.getToken();
@@ -92,8 +92,8 @@ public class QiyeWeixinUtilsTest {
     }
 
     @Test
-    public void testSendMultiUserWeixin() {
-        QiyeWeixinUtils wx = new QiyeWeixinUtils();
+    public void testSendMultiUserWeChat() {
+        EnterpriseWeChatUtils wx = new EnterpriseWeChatUtils();
 
         try {
             String token = wx.getToken();
