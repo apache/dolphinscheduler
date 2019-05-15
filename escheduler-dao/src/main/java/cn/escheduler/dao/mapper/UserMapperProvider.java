@@ -208,7 +208,7 @@ public class UserMapperProvider {
     public String queryDetailsById(Map<String, Object> parameter) {
         return new SQL() {
             {
-                SELECT("u.*,q.queue_name as queueName,t.tenant_name as tenantName");
+                SELECT("u.*,q.queue_name,t.tenant_name");
 
                 FROM(TABLE_NAME + " u,t_escheduler_tenant t,t_escheduler_queue q");
 
