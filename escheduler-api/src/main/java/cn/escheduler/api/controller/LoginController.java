@@ -23,6 +23,7 @@ import cn.escheduler.api.service.UsersService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -31,11 +32,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.util.Locale;
 
 import static cn.escheduler.api.enums.Status.*;
 
@@ -44,15 +49,21 @@ import static cn.escheduler.api.enums.Status.*;
  */
 @RestController
 @RequestMapping("")
+@Api(value = "", tags = {"中国"}, description = "中国")
 public class LoginController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+    private Locale locale = LocaleContextHolder.getLocale();
 
     @Autowired
     private SessionService sessionService;
 
     @Autowired
     private UsersService userService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     /**
      * login
@@ -63,10 +74,10 @@ public class LoginController extends BaseController {
      * @param response
      * @return
      */
-    @ApiOperation(value="更新用户详细信息", notes="根据url的id来指定更新对象，并根据传过来的user信息来更新用户详细信息")
+    @ApiOperation(value = "test", notes="loginNotes")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userName", value = "用户名", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "userPassword", value = "密码", required = true, dataType = "String")
+            @ApiImplicitParam(name = "userName", value = "userName", required = true, type = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "userPassword", required = true, type ="String")
     })
     @RequestMapping(value = "/login")
     public Result login(@RequestParam(value = "userName") String userName,
