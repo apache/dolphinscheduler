@@ -116,6 +116,11 @@
 
 			<dependency>
 				<groupId>cn.analysys</groupId>
+				<artifactId>escheduler-server</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cn.analysys</groupId>
 				<artifactId>escheduler-common</artifactId>
 				<version>${project.version}</version>
 			</dependency>
@@ -326,7 +331,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>19.0</version>
+				<version>20.0</version>
 			</dependency>
 
 			<dependency>
