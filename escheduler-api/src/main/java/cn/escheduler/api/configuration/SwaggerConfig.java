@@ -16,6 +16,7 @@
  */
 package cn.escheduler.api.configuration;
 
+import com.github.xiaoymin.swaggerbootstrapui.annotations.EnableSwaggerBootstrapUI;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,7 +36,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @Configuration
 @EnableSwagger2
-public class Swagger2 implements WebMvcConfigurer {
+@EnableSwaggerBootstrapUI
+public class SwaggerConfig implements WebMvcConfigurer {
 
     @Bean
     public Docket createRestApi() {
@@ -45,8 +47,8 @@ public class Swagger2 implements WebMvcConfigurer {
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title("api docs").description("easy scheduler api docs")
-                .termsOfServiceUrl("https://www.analysys.com").version("1.0.0").build();
+        return new ApiInfoBuilder().title("Easy Scheduler Api Docs").description("Easy Scheduler Api Docs")
+                .version("1.0.0").build();
     }
 
 
