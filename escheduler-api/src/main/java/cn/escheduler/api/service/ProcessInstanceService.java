@@ -465,6 +465,7 @@ public class ProcessInstanceService extends BaseDAGService {
             return checkResult;
         }
         ProcessInstance processInstance = processDao.findProcessInstanceDetailById(processInstanceId);
+        List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstanceId);
         //process instance priority
         int processInstancePriority = processInstance.getProcessInstancePriority().ordinal();
         if (processInstance == null) {
@@ -477,7 +478,6 @@ public class ProcessInstanceService extends BaseDAGService {
         processDao.deleteWorkProcessMapByParentId(processInstanceId);
 
         if (delete > 0) {
-            List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstanceId);
             if (CollectionUtils.isNotEmpty(taskInstanceList)){
                 for (TaskInstance taskInstance : taskInstanceList){
                     // task instance priority
@@ -487,7 +487,7 @@ public class ProcessInstanceService extends BaseDAGService {
                         logger.info("delete task queue node : {}",nodeValue);
                         tasksQueue.removeNode(cn.escheduler.common.Constants.SCHEDULER_TASKS_QUEUE, nodeValue);
                     }catch (Exception e){
-                        logger.error("delete task queue node : {}",nodeValue);
+                        logger.error("delete task queue node : {}", nodeValue);
                     }
                 }
             }
