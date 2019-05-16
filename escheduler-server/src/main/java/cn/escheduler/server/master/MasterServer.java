@@ -16,8 +16,8 @@
  */
 package cn.escheduler.server.master;
 
-import cn.escheduler.api.quartz.ProcessScheduleJob;
-import cn.escheduler.api.quartz.QuartzExecutors;
+import cn.escheduler.server.quartz.ProcessScheduleJob;
+import cn.escheduler.server.quartz.QuartzExecutors;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.IStoppable;
 import cn.escheduler.common.thread.Stopper;

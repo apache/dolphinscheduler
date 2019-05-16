@@ -72,4 +72,10 @@ public class UserMapperTest {
         Assert.assertEquals(user.getUserName(), "qiaozhanwei");
     }
 
+    @Test
+    public void test(){
+        User user = userMapper.queryDetailsById(19);
+        System.out.println(user);
+    }
+
 }
