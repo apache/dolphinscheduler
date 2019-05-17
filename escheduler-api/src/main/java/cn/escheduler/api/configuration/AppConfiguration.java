@@ -36,6 +36,8 @@ public class AppConfiguration implements WebMvcConfigurer {
   public static final String LOGIN_INTERCEPTOR_PATH_PATTERN = "/**/*";
   public static final String LOGIN_PATH_PATTERN = "/login";
   public static final String PATH_PATTERN = "/**";
+  public static final String LOCALE_LANGUAGE_COOKIE = "language";
+  public static final int COOKIE_MAX_AGE = 3600;
 
 
   @Bean
@@ -44,21 +46,24 @@ public class AppConfiguration implements WebMvcConfigurer {
   }
 
 
-  //Cookie
+  /**
+   * Cookie
+   */
   @Bean
   public LocaleResolver localeResolver() {
     CookieLocaleResolver localeResolver = new CookieLocaleResolver();
-    localeResolver.setCookieName("localeCookie");
-    //设置默认区域
+    localeResolver.setCookieName(LOCALE_LANGUAGE_COOKIE);
+    /** set default locale **/
     localeResolver.setDefaultLocale(Locale.ENGLISH);
-    localeResolver.setCookieMaxAge(3600);//设置cookie有效期.
+    /** set cookie max age **/
+    localeResolver.setCookieMaxAge(COOKIE_MAX_AGE);
     return localeResolver;
   }
 
   @Bean
   public LocaleChangeInterceptor localeChangeInterceptor() {
     LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-    // 参数名
+    /**  **/
     lci.setParamName("lang");
 
     return lci;
