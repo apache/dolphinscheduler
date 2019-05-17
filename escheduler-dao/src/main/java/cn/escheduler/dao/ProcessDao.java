@@ -923,7 +923,11 @@ public class ProcessDao extends AbstractBaseDao {
                     taskInstance.setFlag(Flag.NO);
                     updateTaskInstance(taskInstance);
                     // crate new task instance
-                    taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1 );
+                    if(taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE){
+                        taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1 );
+                    }
+                    taskInstance.setEndTime(null);
+                    taskInstance.setStartTime(new Date());
                     taskInstance.setFlag(Flag.YES);
                     taskInstance.setHost(null);
                     taskInstance.setId(0);
