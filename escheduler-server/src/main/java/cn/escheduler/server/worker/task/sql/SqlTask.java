@@ -279,7 +279,11 @@ public class SqlTask extends AbstractTask {
                         logger.info("showType is empty,don't need send email");
                     } else {
                         if (array.size() > 0) {
-                            sendAttachment(taskProps.getNodeName() + " query resultsets ", JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+                            if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
+                                sendAttachment(sqlParameters.getTitle(), JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+                            }else{
+                                sendAttachment(taskProps.getNodeName() + " query resultsets ", JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+                            }
                         }
                     }
 

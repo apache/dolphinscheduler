@@ -538,7 +538,7 @@ export default {
    */
   getReceiver ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/{projectName}/executors/get-receiver-cc`, payload, res => {
+      io.get(`projects/${state.projectName}/executors/get-receiver-cc`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -547,7 +547,7 @@ export default {
   },
   getTaskListDefIdAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/{projectName}/process/get-task-list`, payload, res => {
+      io.get(`projects/${state.projectName}/process/get-task-list`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)

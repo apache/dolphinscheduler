@@ -1555,6 +1555,14 @@ public class ProcessDao extends AbstractBaseDao {
 
     }
 
+    public void selfFaultTolerant(int ... states){
+        List<ProcessInstance> processInstanceList = processInstanceMapper.listByStatus(states);
+        for (ProcessInstance processInstance:processInstanceList){
+            selfFaultTolerant(processInstance);
+        }
+
+    }
+
     @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
     public void selfFaultTolerant(ProcessInstance processInstance){
 
