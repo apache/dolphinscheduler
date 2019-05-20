@@ -88,9 +88,9 @@ eschedulerConf(){
             proxy_set_header remote_addr $E_remote_addr;
             proxy_set_header X-Forwarded-For $E_proxy_add_x_forwarded_for;
             proxy_http_version 1.1;
-            proxy_connect_timeout 4s;
-            proxy_read_timeout 30s;
-            proxy_send_timeout 12s;
+            proxy_connect_timeout 300s;
+            proxy_read_timeout 300s;
+            proxy_send_timeout 300s;
             proxy_set_header Upgrade $E_http_upgrade;
             proxy_set_header Connection "upgrade";
             }
@@ -184,7 +184,7 @@ if [[ $version -eq 6 ]]; then
 fi
 
 # centos 7
-if [[ $version -eq 7 ]]; then	
+if [[ $version -eq 7 ]]; then
     centos7
 fi
 
