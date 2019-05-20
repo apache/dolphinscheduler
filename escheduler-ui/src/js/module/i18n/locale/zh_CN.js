@@ -452,4 +452,6 @@ export default {
   'Pre Statement': '前置sql',
   'Post Statement': '后置sql',
   'Statement cannot be empty': '语句不能为空',
+  'Process Define Count':'流程定义个数',
+  'Process Instance Running Count':'运行流程实例个数',
 }

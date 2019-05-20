@@ -50,9 +50,16 @@ public class BusinessTimeUtils {
       case RECOVER_TOLERANCE_FAULT_PROCESS:
       case RECOVER_SUSPENDED_PROCESS:
       case START_FAILURE_TASK_PROCESS:
+      case REPEAT_RUNNING:
       case SCHEDULER:
       default:
           businessDate = addDays(new Date(), -1);
+          if (runTime != null){
+            /**
+             * If there is a scheduled time, take the scheduling time. Recovery from failed nodes, suspension of recovery, re-run for scheduling
+             */
+            businessDate = addDays(runTime, -1);
+          }
           break;
     }
     Date businessCurrentDate = addDays(businessDate, 1);

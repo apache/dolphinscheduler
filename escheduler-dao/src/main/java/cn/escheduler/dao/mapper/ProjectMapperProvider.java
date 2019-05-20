@@ -93,7 +93,7 @@ public class ProjectMapperProvider {
     public String queryById(Map<String, Object> parameter) {
         return new SQL() {{
             SELECT("p.user_id");
-            SELECT("u.user_name as userName");
+            SELECT("u.user_name");
             SELECT("p.*");
 
             FROM(TABLE_NAME + " p");
@@ -114,7 +114,7 @@ public class ProjectMapperProvider {
     public String queryByName(Map<String, Object> parameter) {
         return new SQL() {{
             SELECT("p.user_id");
-            SELECT("u.user_name as userName");
+            SELECT("u.user_name");
             SELECT("p.*");
 
             FROM(TABLE_NAME + " p");
@@ -157,7 +157,8 @@ public class ProjectMapperProvider {
         return new SQL() {{
             SELECT("p.*");
             SELECT("u.user_name as user_name");
-
+            SELECT("(SELECT COUNT(*) FROM t_escheduler_process_definition AS def WHERE def.project_id = p.id) AS def_count");
+            SELECT("(SELECT COUNT(*) FROM t_escheduler_process_definition def, t_escheduler_process_instance inst WHERE def.id = inst.process_definition_id AND def.project_id = p.id AND inst.state=1 ) as inst_running_count");
             FROM(TABLE_NAME + " p");
             JOIN("t_escheduler_user u on u.id=p.user_id");
             WHERE("p.id in " +
@@ -199,7 +200,8 @@ public class ProjectMapperProvider {
         return new SQL() {{
             SELECT("p.*");
             SELECT("u.user_name as user_name");
-
+            SELECT("(SELECT COUNT(*) FROM t_escheduler_process_definition AS def WHERE def.project_id = p.id) AS def_count");
+            SELECT("(SELECT COUNT(*) FROM t_escheduler_process_definition def, t_escheduler_process_instance inst WHERE def.id = inst.process_definition_id AND def.project_id = p.id AND inst.state=1 ) as inst_running_count");
             FROM(TABLE_NAME + " p");
             JOIN("t_escheduler_user u on p.user_id = u.id");
 

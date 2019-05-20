@@ -38,6 +38,7 @@ import cn.escheduler.dao.mapper.*;
 import cn.escheduler.dao.model.*;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -356,13 +357,19 @@ public class ProcessDefinitionService extends BaseDAGService {
             return checkResult;
         }
 
-
         ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
 
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
             return result;
         }
+
+        // Determine if the login user is the owner of the process definition
+        if (loginUser.getId() != processDefinition.getUserId()) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
         // check process definition is already online
         if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
             putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE,processDefinitionId);
@@ -370,7 +377,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         }
 
         // get the timing according to the process definition
-        List<Schedule> schedules = scheduleMapper.selectAllByProcessDefineArray(new int[processDefinitionId]);
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
         if (!schedules.isEmpty() && schedules.size() > 1) {
             logger.warn("scheduler num is {},Greater than 1",schedules.size());
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
@@ -391,6 +398,55 @@ public class ProcessDefinitionService extends BaseDAGService {
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
+        }
+        return result;
+    }
+
+    /**
+     * batch delete process definition by ids
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionIds
+     * @return
+     */
+    public Map<String, Object> batchDeleteProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds) {
+
+        Map<String, Object> result = new HashMap<>(5);
+
+        Map<String, Object> deleteReuslt = new HashMap<>(5);
+
+        List<Integer> deleteFailedIdList = new ArrayList<Integer>();
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+
+        if(StringUtils.isNotEmpty(processDefinitionIds)){
+            String[] processInstanceIdArray = processDefinitionIds.split(",");
+
+            for (String strProcessInstanceId:processInstanceIdArray) {
+                int processInstanceId = Integer.parseInt(strProcessInstanceId);
+                try {
+                    deleteReuslt = deleteProcessDefinitionById(loginUser, projectName, processInstanceId);
+                    if(!Status.SUCCESS.equals(deleteReuslt.get(Constants.STATUS))){
+                        deleteFailedIdList.add(processInstanceId);
+                        logger.error((String)deleteReuslt.get(Constants.MSG));
+                    }
+                } catch (Exception e) {
+                    deleteFailedIdList.add(processInstanceId);
+                }
+            }
+        }
+
+        if(deleteFailedIdList.size() > 0){
+            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
+        }else{
+            putMsg(result, Status.SUCCESS);
         }
         return result;
     }
