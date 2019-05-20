@@ -34,8 +34,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.hdfs.web.JsonUtil;
-import org.apache.twill.internal.json.JsonUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
