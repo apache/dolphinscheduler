@@ -22,6 +22,8 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.enums.Flag;
+import cn.escheduler.common.queue.ITaskQueue;
+import cn.escheduler.common.queue.TaskQueueFactory;
 import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
@@ -189,7 +191,9 @@ public class ProcessInstanceController extends BaseController{
         try{
             logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
                     loginUser.getUserName(), projectName, processInstanceId);
-            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+            // task queue
+            ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
+            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getMsg(),e);
