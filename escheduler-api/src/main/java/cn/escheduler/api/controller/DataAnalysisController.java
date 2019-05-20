@@ -57,8 +57,7 @@ public class DataAnalysisController extends BaseController{
     public Result countTaskState(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                          @RequestParam(value="startDate", required=false) String startDate,
                                                          @RequestParam(value="endDate", required=false) String endDate,
-                                                         @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId
-    ){
+                                                         @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
         try{
             logger.info("count task state, user:{}, start date: {}, end date:{}, project id {}",
                     loginUser.getUserName(), startDate, endDate, projectId);
@@ -82,12 +81,11 @@ public class DataAnalysisController extends BaseController{
     public Result countProcessInstanceState(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value="startDate", required=false) String startDate,
                                             @RequestParam(value="endDate", required=false) String endDate,
-                                            @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId
-    ){
+                                            @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
         try{
             logger.info("count process instance state, user:{}, start date: {}, end date:{}, project id",
                     loginUser.getUserName(), startDate, endDate, projectId);
-            Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(loginUser,projectId, startDate, endDate);
+            Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(loginUser, projectId, startDate, endDate);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(COUNT_PROCESS_INSTANCE_STATE_ERROR.getMsg(),e);
@@ -105,8 +103,7 @@ public class DataAnalysisController extends BaseController{
     @GetMapping(value="/define-user-count")
     @ResponseStatus(HttpStatus.OK)
     public Result countDefinitionByUser(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId
-    ){
+                                        @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
         try{
             logger.info("count process definition , user:{}, project id",
                     loginUser.getUserName(), projectId);
@@ -115,6 +112,53 @@ public class DataAnalysisController extends BaseController{
         }catch (Exception e){
             logger.error(COUNT_PROCESS_DEFINITION_USER_ERROR.getMsg(),e);
             return error(COUNT_PROCESS_DEFINITION_USER_ERROR.getCode(), COUNT_PROCESS_DEFINITION_USER_ERROR.getMsg());
+        }
+    }
+
+
+    /**
+     * statistical command status data
+     *
+     * @param loginUser
+     * @param projectId
+     * @return
+     */
+    @GetMapping(value="/command-state-count")
+    @ResponseStatus(HttpStatus.OK)
+    public Result countCommandState(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                 @RequestParam(value="startDate", required=false) String startDate,
+                                 @RequestParam(value="endDate", required=false) String endDate,
+                                 @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
+        try{
+            logger.info("count command state, user:{}, start date: {}, end date:{}, project id {}",
+                    loginUser.getUserName(), startDate, endDate, projectId);
+            Map<String, Object> result = dataAnalysisService.countCommandState(loginUser, projectId, startDate, endDate);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(COMMAND_STATE_COUNT_ERROR.getMsg(),e);
+            return error(COMMAND_STATE_COUNT_ERROR.getCode(), COMMAND_STATE_COUNT_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * queue count
+     *
+     * @param loginUser
+     * @param projectId
+     * @return
+     */
+    @GetMapping(value="/queue-count")
+    @ResponseStatus(HttpStatus.OK)
+    public Result countQueueState(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                    @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
+        try{
+            logger.info("count command state, user:{}, start date: {}, end date:{}, project id {}",
+                    loginUser.getUserName(), projectId);
+            Map<String, Object> result = dataAnalysisService.countQueueState(loginUser, projectId);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(QUEUE_COUNT_ERROR.getMsg(),e);
+            return error(QUEUE_COUNT_ERROR.getCode(), QUEUE_COUNT_ERROR.getMsg());
         }
     }
 

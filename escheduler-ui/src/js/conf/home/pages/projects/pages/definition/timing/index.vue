@@ -1,12 +1,9 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('定时管理')">
-      <template slot="content">
-        <m-list></m-list>
-      </template>
-    </m-list-construction>
-  </div>
+  <m-list-construction :title="$t('Cron Manage')">
+    <template slot="content">
+      <m-list></m-list>
+    </template>
+  </m-list-construction>
 </template>
 <script>
   import mList from './_source/list'

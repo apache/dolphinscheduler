@@ -65,6 +65,16 @@ public class SqlParameters extends AbstractParameters {
      */
     private String connParams;
 
+    /**
+     * receivers
+     */
+    private String receivers;
+
+    /**
+     * receivers cc
+     */
+    private String receiversCc;
+
     public String getType() {
         return type;
     }
@@ -121,6 +131,21 @@ public class SqlParameters extends AbstractParameters {
         this.connParams = connParams;
     }
 
+    public String getReceivers() {
+        return receivers;
+    }
+
+    public void setReceivers(String receivers) {
+        this.receivers = receivers;
+    }
+
+    public String getReceiversCc() {
+        return receiversCc;
+    }
+
+    public void setReceiversCc(String receiversCc) {
+        this.receiversCc = receiversCc;
+    }
 
     @Override
     public boolean checkParameters() {
@@ -142,6 +167,8 @@ public class SqlParameters extends AbstractParameters {
                 ", udfs='" + udfs + '\'' +
                 ", showType='" + showType + '\'' +
                 ", connParams='" + connParams + '\'' +
+                ", receivers='" + receivers + '\'' +
+                ", receiversCc='" + receiversCc + '\'' +
                 '}';
     }
 }

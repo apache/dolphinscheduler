@@ -35,7 +35,7 @@ const router = new Router({
       name: 'home',
       component: resolve => require(['../pages/home/index'], resolve),
       meta: {
-        title: `${i18n.$t('首页')} - EasyScheduler`
+        title: `${i18n.$t('Home')} - EasyScheduler`
       }
     },
     {
@@ -43,7 +43,7 @@ const router = new Router({
       name: 'projects',
       component: resolve => require(['../pages/projects/index'], resolve),
       meta: {
-        title: `${i18n.$t('项目管理')}`
+        title: `${i18n.$t('Project')}`
       },
       redirect: {
         name: 'projects-list'
@@ -54,7 +54,7 @@ const router = new Router({
           name: 'projects-index',
           component: resolve => require(['../pages/projects/pages/index/index'], resolve),
           meta: {
-            title: `${i18n.$t('项目首页')}`
+            title: `${i18n.$t('Project Home')}`
           }
         },
         {
@@ -62,7 +62,7 @@ const router = new Router({
           name: 'projects-list',
           component: resolve => require(['../pages/projects/pages/list/index'], resolve),
           meta: {
-            title: `${i18n.$t('项目')}`
+            title: `${i18n.$t('Project')}`
           }
         },
         {
@@ -70,7 +70,7 @@ const router = new Router({
           name: 'definition',
           component: resolve => require(['../pages/projects/pages/definition/index'], resolve),
           meta: {
-            title: `${i18n.$t('工作流定义')}`
+            title: `${i18n.$t('Process definition')}`
           },
           redirect: {
             name: 'projects-definition-list'
@@ -81,7 +81,7 @@ const router = new Router({
               name: 'projects-definition-list',
               component: resolve => require(['../pages/projects/pages/definition/pages/list/index'], resolve),
               meta: {
-                title: `${i18n.$t('工作流定义')}`
+                title: `${i18n.$t('Process definition')}`
               }
             },
             {
@@ -89,7 +89,7 @@ const router = new Router({
               name: 'projects-definition-details',
               component: resolve => require(['../pages/projects/pages/definition/pages/details/index'], resolve),
               meta: {
-                title: `${i18n.$t('流程定义详情')}`
+                title: `${i18n.$t('Process definition details')}`
               }
             },
             {
@@ -97,7 +97,7 @@ const router = new Router({
               name: 'definition-create',
               component: resolve => require(['../pages/projects/pages/definition/pages/create/index'], resolve),
               meta: {
-                title: `${i18n.$t('创建流程定义')}`
+                title: `${i18n.$t('Create process definition')}`
               }
             },
             {
@@ -105,7 +105,7 @@ const router = new Router({
               name: 'definition-tree-view-index',
               component: resolve => require(['../pages/projects/pages/definition/pages/tree/index'], resolve),
               meta: {
-                title: `${i18n.$t('树形图')}`
+                title: `${i18n.$t('TreeView')}`
               }
             },
             {
@@ -113,7 +113,7 @@ const router = new Router({
               name: 'definition-timing-details',
               component: resolve => require(['../pages/projects/pages/definition/timing/index'], resolve),
               meta: {
-                title: `${i18n.$t('定时任务列表')}`
+                title: `${i18n.$t('Scheduled task list')}`
               }
             }
           ]
@@ -123,7 +123,7 @@ const router = new Router({
           name: 'instance',
           component: resolve => require(['../pages/projects/pages/instance/index'], resolve),
           meta: {
-            title: `${i18n.$t('工作流实例')}`
+            title: `${i18n.$t('Process Instance')}`
           },
           redirect: {
             name: 'projects-instance-list'
@@ -134,7 +134,7 @@ const router = new Router({
               name: 'projects-instance-list',
               component: resolve => require(['../pages/projects/pages/instance/pages/list/index'], resolve),
               meta: {
-                title: `${i18n.$t('工作流实例')}`
+                title: `${i18n.$t('Process Instance')}`
               }
             },
             {
@@ -142,7 +142,7 @@ const router = new Router({
               name: 'projects-instance-details',
               component: resolve => require(['../pages/projects/pages/instance/pages/details/index'], resolve),
               meta: {
-                title: `${i18n.$t('流程实例详情')}`
+                title: `${i18n.$t('Process instance details')}`
               }
             },
             {
@@ -150,52 +150,36 @@ const router = new Router({
               name: 'instance-gantt-index',
               component: resolve => require(['../pages/projects/pages/instance/pages/gantt/index'], resolve),
               meta: {
-                title: `${i18n.$t('甘特图')}`
+                title: `${i18n.$t('Gantt')}`
               }
             }
           ]
         },
         {
           path: '/projects/task-instance',
-          name: 'task-instance-index',
+          name: 'task-instance',
           component: resolve => require(['../pages/projects/pages/taskInstance'], resolve),
           meta: {
-            title: `${i18n.$t('任务实例')}`
-          },
-          redirect: {
-            name: 'task-instance-list'
-          },
-          children: [
-            {
-              path: '/projects/task-instance/list',
-              name: 'task-instance-list',
-              component: resolve => require(['../pages/projects/pages/taskInstance/pages/list/index'], resolve),
-              meta: {
-                title: `${i18n.$t('任务实例')}`
-              }
-            }
-          ]
+            title: `${i18n.$t('Task Instance')}`
+          }
+
         },
         {
           path: '/projects/task-record',
-          name: 'task-record-index',
+          name: 'task-record',
           component: resolve => require(['../pages/projects/pages/taskRecord'], resolve),
           meta: {
-            title: `${i18n.$t('任务记录')}`
-          },
-          redirect: {
-            name: 'task-record-list'
-          },
-          children: [
-            {
-              path: '/projects/task-record/list',
-              name: 'task-record-list',
-              component: resolve => require(['../pages/projects/pages/taskRecord/pages/list/index'], resolve),
-              meta: {
-                title: `${i18n.$t('任务记录')}`
-              }
-            }
-          ]
+            title: `${i18n.$t('Task record')}`
+          }
+        },
+        {
+          path: '/projects/history-task-record',
+          name: 'history-task-record',
+          component: resolve => require(['../pages/projects/pages/historyTaskRecord'], resolve),
+          meta: {
+            title: `${i18n.$t('History task record')}`
+          }
+
         }
       ]
     },
@@ -207,7 +191,7 @@ const router = new Router({
         name: 'file'
       },
       meta: {
-        title: `${i18n.$t('资源中心')}`
+        title: `${i18n.$t('Resources')}`
       },
       children: [
         {
@@ -215,7 +199,7 @@ const router = new Router({
           name: 'file',
           component: resolve => require(['../pages/resource/pages/file/pages/list/index'], resolve),
           meta: {
-            title: `${i18n.$t('文件管理')}`
+            title: `${i18n.$t('File Manage')}`
           }
         },
         {
@@ -223,7 +207,7 @@ const router = new Router({
           name: 'resource-file-create',
           component: resolve => require(['../pages/resource/pages/file/pages/create/index'], resolve),
           meta: {
-            title: `${i18n.$t('创建资源')}`
+            title: `${i18n.$t('Create Resource')}`
           }
         },
         {
@@ -231,7 +215,7 @@ const router = new Router({
           name: 'resource-file-details',
           component: resolve => require(['../pages/resource/pages/file/pages/details/index'], resolve),
           meta: {
-            title: `${i18n.$t('文件详情')}`
+            title: `${i18n.$t('File Details')}`
           }
         },
         {
@@ -239,7 +223,7 @@ const router = new Router({
           name: 'resource-file-edit',
           component: resolve => require(['../pages/resource/pages/file/pages/edit/index'], resolve),
           meta: {
-            title: `${i18n.$t('文件详情')}`
+            title: `${i18n.$t('File Details')}`
           }
         },
         {
@@ -247,7 +231,7 @@ const router = new Router({
           name: 'udf',
           component: resolve => require(['../pages/resource/pages/udf/index'], resolve),
           meta: {
-            title: `${i18n.$t('UDF管理')}`
+            title: `${i18n.$t('UDF manage')}`
           },
           children: [
             {
@@ -255,7 +239,7 @@ const router = new Router({
               name: 'resource-udf-resource',
               component: resolve => require(['../pages/resource/pages/udf/pages/resource/index'], resolve),
               meta: {
-                title: `${i18n.$t('UDF资源管理')}`
+                title: `${i18n.$t('UDF Resources')}`
               }
             },
             {
@@ -263,7 +247,7 @@ const router = new Router({
               name: 'resource-udf-function',
               component: resolve => require(['../pages/resource/pages/udf/pages/function/index'], resolve),
               meta: {
-                title: `${i18n.$t('UDF函数管理')}`
+                title: `${i18n.$t('UDF Function')}`
               }
             }
           ]
@@ -275,7 +259,7 @@ const router = new Router({
       name: 'datasource',
       component: resolve => require(['../pages/datasource/index'], resolve),
       meta: {
-        title: `${i18n.$t('数据源中心')}`
+        title: `${i18n.$t('Datasource')}`
       },
       redirect: {
         name: 'datasource-list'
@@ -286,7 +270,7 @@ const router = new Router({
           name: 'datasource-list',
           component: resolve => require(['../pages/datasource/pages/list/index'], resolve),
           meta: {
-            title: `${i18n.$t('数据源中心')}`
+            title: `${i18n.$t('Datasource')}`
           }
         }
       ]
@@ -296,7 +280,7 @@ const router = new Router({
       name: 'security',
       component: resolve => require(['../pages/security/index'], resolve),
       meta: {
-        title: `${i18n.$t('安全中心')}`
+        title: `${i18n.$t('Security')}`
       },
       redirect: {
         name: 'tenement-manage'
@@ -307,7 +291,7 @@ const router = new Router({
           name: 'tenement-manage',
           component: resolve => require(['../pages/security/pages/tenement/index'], resolve),
           meta: {
-            title: `${i18n.$t('租户管理')}`
+            title: `${i18n.$t('Tenant Manage')}`
           }
         },
         {
@@ -315,7 +299,7 @@ const router = new Router({
           name: 'users-manage',
           component: resolve => require(['../pages/security/pages/users/index'], resolve),
           meta: {
-            title: `${i18n.$t('用户管理')}`
+            title: `${i18n.$t('User Manage')}`
           }
         },
         {
@@ -323,37 +307,32 @@ const router = new Router({
           name: 'warning-groups-manage',
           component: resolve => require(['../pages/security/pages/warningGroups/index'], resolve),
           meta: {
-            title: `${i18n.$t('告警组管理')}`
+            title: `${i18n.$t('Warning group manage')}`
           }
         },
         {
-          path: '/security/servers',
-          name: 'servers-manage',
-          component: resolve => require(['../pages/security/pages/servers/index'], resolve),
+          path: '/security/queue',
+          name: 'queue-manage',
+          component: resolve => require(['../pages/security/pages/queue/index'], resolve),
           meta: {
-            title: `${i18n.$t('服务管理')}`
-          },
-          redirect: {
-            name: 'servers-master'
-          },
-          children: [
-            {
-              path: '/security/servers/master',
-              name: 'servers-master',
-              component: resolve => require(['../pages/security/pages/servers/pages/master/index'], resolve),
-              meta: {
-                title: `${i18n.$t('服务管理-Master')}`
-              }
-            },
-            {
-              path: '/security/servers/worker',
-              name: 'servers-worker',
-              component: resolve => require(['../pages/security/pages/servers/pages/worker/index'], resolve),
-              meta: {
-                title: `${i18n.$t('服务管理-Worker')}`
-              }
-            }
-          ]
+            title: `${i18n.$t('Queue manage')}`
+          }
+        },
+        {
+          path: '/security/worker-groups',
+          name: 'worker-groups-manage',
+          component: resolve => require(['../pages/security/pages/workerGroups/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Worker group manage')}`
+          }
+        },
+        {
+          path: '/security/token',
+          name: 'token-manage',
+          component: resolve => require(['../pages/security/pages/token/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Token manage')}`
+          }
         }
       ]
     },
@@ -362,7 +341,7 @@ const router = new Router({
       name: 'user',
       component: resolve => require(['../pages/user/index'], resolve),
       meta: {
-        title: `${i18n.$t('用户中心')}`
+        title: `${i18n.$t('User Center')}`
       },
       redirect: {
         name: 'account'
@@ -373,7 +352,7 @@ const router = new Router({
           name: 'account',
           component: resolve => require(['../pages/user/pages/account/index'], resolve),
           meta: {
-            title: `${i18n.$t('用户信息')}`
+            title: `${i18n.$t('User Information')}`
           }
         },
         {
@@ -381,7 +360,84 @@ const router = new Router({
           name: 'password',
           component: resolve => require(['../pages/user/pages/password/index'], resolve),
           meta: {
-            title: `${i18n.$t('修改密码')}`
+            title: `${i18n.$t('Edit password')}`
+          }
+        },
+        {
+          path: '/user/token',
+          name: 'token',
+          component: resolve => require(['../pages/user/pages/token/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Token manage')}`
+          }
+        }
+      ]
+    },
+    {
+      path: '/monitor',
+      name: 'monitor',
+      component: resolve => require(['../pages/monitor/index'], resolve),
+      meta: {
+        title: `monitor`
+      },
+      redirect: {
+        name: 'servers-master'
+      },
+      children: [
+        {
+          path: '/monitor/servers/master',
+          name: 'servers-master',
+          component: resolve => require(['../pages/monitor/pages/servers/master'], resolve),
+          meta: {
+            title: `${i18n.$t('Service-Master')}`
+          }
+        },
+        {
+          path: '/monitor/servers/worker',
+          name: 'servers-worker',
+          component: resolve => require(['../pages/monitor/pages/servers/worker'], resolve),
+          meta: {
+            title: `${i18n.$t('Service-Worker')}`
+          }
+        },
+        {
+          path: '/monitor/servers/alert',
+          name: 'servers-alert',
+          component: resolve => require(['../pages/monitor/pages/servers/alert'], resolve),
+          meta: {
+            title: `Alert`
+          }
+        },
+        {
+          path: '/monitor/servers/rpcserver',
+          name: 'servers-rpcserver',
+          component: resolve => require(['../pages/monitor/pages/servers/rpcserver'], resolve),
+          meta: {
+            title: `Rpcserver`
+          }
+        },
+        {
+          path: '/monitor/servers/zookeeper',
+          name: 'servers-zookeeper',
+          component: resolve => require(['../pages/monitor/pages/servers/zookeeper'], resolve),
+          meta: {
+            title: `Zookeeper`
+          }
+        },
+        {
+          path: '/monitor/servers/apiserver',
+          name: 'servers-apiserver',
+          component: resolve => require(['../pages/monitor/pages/servers/apiserver'], resolve),
+          meta: {
+            title: `Apiserver`
+          }
+        },
+        {
+          path: '/monitor/servers/mysql',
+          name: 'servers-mysql',
+          component: resolve => require(['../pages/monitor/pages/servers/mysql'], resolve),
+          meta: {
+            title: `Mysql`
           }
         }
       ]

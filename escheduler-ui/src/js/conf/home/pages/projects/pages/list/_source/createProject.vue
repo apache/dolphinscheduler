@@ -1,25 +1,25 @@
 <template>
-  <m-popup ref="popup" :ok-text="item ? $t('确认编辑') : $t('确认提交')" :nameText="item ? $t('编辑项目') : $t('创建项目')" @ok="_ok">
+  <m-popup ref="popup" :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit') : $t('Create Project')" @ok="_ok">
     <template slot="content">
       <div class="projects-create-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('项目名称')}}</template>
+          <template slot="name"><b>*</b>{{$t('Project Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="projectName"
-                    :placeholder="$t('请输入name')"
+                    :placeholder="$t('Please enter name')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">{{$t('描述')}}</template>
+          <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
             <x-input
                     type="textarea"
                     v-model="desc"
-                    :placeholder="$t('请输入desc')"
+                    :placeholder="$t('Please enter description')"
                     autocomplete="off">
             </x-input>
           </template>
@@ -78,7 +78,7 @@
       },
       _verification () {
         if (!this.projectName) {
-          this.$message.warning(`${i18n.$t('请输入名称')}`)
+          this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
         return true
@@ -96,6 +96,3 @@
     components: { mPopup, mListBoxF }
   }
 </script>
-
-<style lang="scss" rel="stylesheet/scss">
-</style>

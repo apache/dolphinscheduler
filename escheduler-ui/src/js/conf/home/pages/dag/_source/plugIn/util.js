@@ -17,18 +17,19 @@
 
 import _ from 'lodash'
 import $ from 'jquery'
+import i18n from '@/module/i18n'
 import store from '@/conf/home/store'
 
 /**
- * 节点,转数组
+ * Node, to array
  */
 const rtTargetarrArr = (id) => {
-  let a = $(`#${id}`).attr('data-targetarr')
-  return a ? a.split(',') : []
+  let ids = $(`#${id}`).attr('data-targetarr')
+  return ids ? ids.split(',') : []
 }
 
 /**
- * 存储节点id到targetarr
+ * Store node id to targetarr
  */
 const saveTargetarr = (valId, domId) => {
   let $target = $(`#${domId}`)
@@ -36,10 +37,14 @@ const saveTargetarr = (valId, domId) => {
   $target.attr('data-targetarr', targetStr)
 }
 
+const rtBantpl = () => {
+  return `<i class="iconfont" data-toggle="tooltip" data-html="true" data-container="body" data-placement="left" title="${i18n.$t('Prohibition execution')}">&#xe63e;</i>`
+}
+
 /**
- * 返回节点html
+ * return node html
  */
-const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType }) => {
+const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag }) => {
   let tpl = ``
   tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
   tpl += `<div>`
@@ -48,12 +53,18 @@ const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType }) => {
   tpl += `<span class="name-p">${name}</span>`
   tpl += `</div>`
   tpl += `<div class="ep"></div>`
+  tpl += `<div class="ban-p">`
+  if (runFlag === 'FORBIDDEN') {
+    tpl += rtBantpl()
+  }
   tpl += `</div>`
+  tpl += `</div>`
+
   return tpl
 }
 
 /**
- * 获取所有tasks节点
+ * Get all tasks nodes
  */
 const tasksAll = () => {
   let a = []
@@ -71,8 +82,8 @@ const tasksAll = () => {
 }
 
 /**
- * 判断 name 是否在当前的dag图中
- * rely dom / backfill dom元素 回填
+ * Determine if name is in the current dag map
+ * rely dom / backfill
  */
 const isNameExDag = (name, rely) => {
   if (rely === 'dom') {
@@ -83,17 +94,17 @@ const isNameExDag = (name, rely) => {
 }
 
 /**
- * 更改svg线条颜色
+ * Change svg line color
  */
 const setSvgColor = (e, color) => {
-  // 遍历 清除所有颜色
+  // Traverse clear all colors
   $('.jtk-connector').each((i, o) => {
     _.map($(o)[0].childNodes, v => {
       $(v).attr('fill', '#555').attr('stroke', '#555').attr('stroke-width', 2)
     })
   })
 
-  // 给选择的添加颜色
+  // Add color to the selection
   _.map($(e.canvas)[0].childNodes, (v, i) => {
     $(v).attr('fill', color).attr('stroke', color)
     if ($(v).attr('class')) {
@@ -103,7 +114,7 @@ const setSvgColor = (e, color) => {
 }
 
 /**
- * 获取所有节点id
+ * Get all node ids
  */
 const allNodesId = () => {
   let idArr = []
@@ -127,5 +138,6 @@ export {
   tasksAll,
   isNameExDag,
   setSvgColor,
-  allNodesId
+  allNodesId,
+  rtBantpl
 }

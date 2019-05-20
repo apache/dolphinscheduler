@@ -1,29 +1,28 @@
 <template>
   <div class="form-model-model" v-clickoutside="_handleClose">
     <div class="title-box">
-      <span class="name">{{$t('当前节点设置')}}</span>
+      <span class="name">{{$t('Current node settings')}}</span>
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
         <m-log :item="backfillItem">
-          <template slot="history"><a href="javascript:" @click="_seeHistory" ><i class="iconfont">&#xe6ee;</i><em>{{$t('查看历史')}}</em></a></template>
-          <template slot="log"><a href="javascript:"><i class="iconfont">&#xe691;</i><em>{{$t('查看日志')}}</em></a></template>
+          <template slot="history"><a href="javascript:" @click="_seeHistory" ><i class="iconfont">&#xe6ee;</i><em>{{$t('View history')}}</em></a></template>
+          <template slot="log"><a href="javascript:"><i class="iconfont">&#xe691;</i><em>{{$t('View log')}}</em></a></template>
         </m-log>
-        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><i class="iconfont">&#xe600;</i><em>{{$t('进入该子节点')}}</em></a>
+        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><i class="iconfont">&#xe600;</i><em>{{$t('Enter this child node')}}</em></a>
       </span>
     </div>
     <div class="content-box" v-if="isContentBox">
       <div class="from-model">
-
         <!-- Node name -->
         <div class="clearfix list">
-          <div class="text-box"><span>{{$t('节点名称')}}</span></div>
+          <div class="text-box"><span>{{$t('Node name')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
               <x-input
                       type="text"
                       v-model="name"
                       :disabled="isDetails"
-                      :placeholder="$t('请输入name(必填)')"
+                      :placeholder="$t('Please enter name(required)')"
                       maxlength="100"
                       @on-blur="_verifName()"
                       autocomplete="off">
@@ -34,12 +33,12 @@
 
         <!-- Running sign -->
         <div class="clearfix list">
-          <div class="text-box"><span>{{$t('运行标志')}}</span></div>
+          <div class="text-box"><span>{{$t('Run flag')}}</span></div>
           <div class="cont-box">
             <label class="label-box">
               <x-radio-group v-model="runFlag" >
-                <x-radio :label="'NORMAL'" :disabled="isDetails">{{$t('正常')}}</x-radio>
-                <x-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('禁止执行')}}</x-radio>
+                <x-radio :label="'NORMAL'" :disabled="isDetails">{{$t('Normal')}}</x-radio>
+                <x-radio :label="'FORBIDDEN'" :disabled="isDetails">{{$t('Prohibition execution')}}</x-radio>
               </x-radio-group>
             </label>
           </div>
@@ -48,10 +47,9 @@
         <!-- desc -->
         <div class="clearfix list">
           <div class="text-box">
-            <span>{{$t('描述')}}</span>
+            <span>{{$t('Description')}}</span>
           </div>
           <div class="cont-box">
-
             <label class="label-box">
               <x-input
                       resize
@@ -59,7 +57,7 @@
                       type="textarea"
                       :disabled="isDetails"
                       v-model="desc"
-                      :placeholder="$t('请输入desc')"
+                      :placeholder="$t('Please enter description')"
                       autocomplete="off">
               </x-input>
             </label>
@@ -69,28 +67,30 @@
         <!-- Task priority -->
         <div class="clearfix list">
           <div class="text-box">
-            <span>{{$t('任务优先级')}}</span>
+            <span>{{$t('Task priority')}}</span>
           </div>
           <div class="cont-box">
-            <label class="label-box">
-              <m-priority v-model="taskInstancePriority" style="width: 180px;"></m-priority>
-            </label>
+            <span class="label-box" style="width: 193px;display: inline-block;">
+              <m-priority v-model="taskInstancePriority"></m-priority>
+            </span>
+            <span class="text-b">{{$t('Worker group')}}</span>
+            <m-worker-groups v-model="workerGroupId"></m-worker-groups>
           </div>
         </div>
 
         <!-- Number of failed retries -->
         <div class="clearfix list" v-if="taskType !== 'SUB_PROCESS'">
           <div class="text-box">
-            <span>{{$t('失败重试次数')}}</span>
+            <span>{{$t('Number of failed retries')}}</span>
           </div>
           <div class="cont-box">
             <m-select-input v-model="maxRetryTimes" :list="[0,1,2,3,4]">
             </m-select-input>
-            <span>({{$t('次')}})</span>
-            <span class="text-b">{{$t('失败重试间隔')}}</span>
+            <span>({{$t('Times')}})</span>
+            <span class="text-b">{{$t('Failed retry interval')}}</span>
             <m-select-input v-model="retryInterval" :list="[1,10,30,60,120]">
             </m-select-input>
-            <span>({{$t('分')}})</span>
+            <span>({{$t('Minute')}})</span>
           </div>
         </div>
 
@@ -128,6 +128,7 @@
                 v-if="taskType === 'SQL'"
                 @on-params="_onParams"
                 ref="SQL"
+                :create-node-id="id"
                 :backfill-item="backfillItem">
         </m-sql>
         <!-- spark node -->
@@ -163,8 +164,8 @@
     </div>
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
-        <x-button type="text" @click="close()"> {{$t('取消')}} </x-button>
-        <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('确认添加')}} </x-button>
+        <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
+        <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
       </div>
     </div>
   </div>
@@ -178,15 +179,16 @@
   import mShell from './tasks/shell'
   import mSpark from './tasks/spark'
   import mPython from './tasks/python'
-  import { isNameExDag } from './../plugIn/util'
   import JSP from './../plugIn/jsPlumbHandle'
   import mProcedure from './tasks/procedure'
   import mDependent from './tasks/dependent'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
+  import mWorkerGroups from './_source/workerGroups'
   import clickoutside from '@/module/util/clickoutside'
   import disabledState from '@/module/mixin/disabledState'
+  import { isNameExDag, rtBantpl } from './../plugIn/util'
   import mPriority from '@/module/components/priority/priority'
 
   export default {
@@ -218,7 +220,9 @@
         // Task timeout alarm
         timeout: {},
         // Task priority
-        taskInstancePriority: 'MEDIUM'
+        taskInstancePriority: 'MEDIUM',
+        // worker group id
+        workerGroupId: -1
       }
     },
     /**
@@ -255,7 +259,7 @@
        */
       _seeHistory () {
         this.self.$router.push({
-          name: 'task-instance-list',
+          name: 'task-instance',
           query: {
             processInstanceId: this.self.$route.params.id,
             taskName: this.backfillItem.name
@@ -269,13 +273,13 @@
        */
       _goSubProcess () {
         if (_.isEmpty(this.backfillItem)) {
-          this.$message.warning(`${i18n.$t('新创建子工作流还未执行，不能进入子工作流')}`)
+          this.$message.warning(`${i18n.$t('The newly created sub-Process has not yet been executed and cannot enter the sub-Process')}`)
           return
         }
         if (this.router.history.current.name === 'projects-instance-details') {
           let stateId = $(`#${this.id}`).attr('data-state-id') || null
           if (!stateId) {
-            this.$message.warning(`${i18n.$t('该任务还未执行，不能进入子工作流')}`)
+            this.$message.warning(`${i18n.$t('The task has not been executed and cannot enter the sub-Process')}`)
             return
           }
           this.store.dispatch('dag/getSubProcessId', { taskId: stateId }).then(res => {
@@ -304,7 +308,7 @@
        */
       _verifName () {
         if (!_.trim(this.name)) {
-          this.$message.warning(`${i18n.$t('请输入名称(必填)')}`)
+          this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
         if (this.name === this.backfillItem.name) {
@@ -312,7 +316,7 @@
         }
         // Name repeat depends on dom backfill dependent store
         if (isNameExDag(this.name, _.isEmpty(this.backfillItem) ? 'dom' : 'backfill')) {
-          this.$message.warning(`${i18n.$t('名称已存在请重新输入')}`)
+          this.$message.warning(`${i18n.$t('Name already exists')}`)
           return false
         }
         return true
@@ -349,16 +353,30 @@
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
             timeout: this.timeout,
-            taskInstancePriority: this.taskInstancePriority
+            taskInstancePriority: this.taskInstancePriority,
+            workerGroupId: this.workerGroupId
           },
           fromThis: this
         })
+
+        // set run flag
+        this._setRunFlag()
       },
       /**
        * Sub-workflow selected node echo name
        */
       _onSetProcessName (name) {
         this.name = name
+      },
+      /**
+       *  set run flag
+       */
+      _setRunFlag () {
+        let dom = $(`#${this.id}`).find('.ban-p')
+        dom.html('')
+        if (this.runFlag === 'FORBIDDEN') {
+          dom.append(rtBantpl())
+        }
       },
       /**
        * Submit verification
@@ -383,7 +401,9 @@
         })
       }
     },
-    watch: {},
+    watch: {
+
+    },
     created () {
       // Unbind copy and paste events
       JSP.removePaste()
@@ -405,11 +425,14 @@
           this.desc = o.desc
           this.maxRetryTimes = o.maxRetryTimes
           this.retryInterval = o.retryInterval
+          this.workerGroupId = o.workerGroupId
         }
       }
       this.isContentBox = true
     },
-    mounted () {},
+    mounted () {
+
+    },
     updated () {
     },
     beforeDestroy () {
@@ -436,119 +459,12 @@
       mDependent,
       mSelectInput,
       mTimeoutAlarm,
-      mPriority
+      mPriority,
+      mWorkerGroups
     }
   }
 </script>
 
 <style lang="scss" rel="stylesheet/scss">
-  .form-model-model {
-    width: 720px;
-    position: relative;
-    .title-box {
-      height: 61px;
-      border-bottom: 1px solid #DCDEDC;
-      position: relative;
-      .name {
-        position: absolute;
-        left: 24px;
-        top: 18px;
-        font-size: 16px;
-      }
-      .go-subtask {
-        position: absolute;
-        right: 30px;
-        top: 17px;
-        a {
-          font-size: 14px;
-          color: #0097e0;
-          margin-left: 10px;
-          i.iconfont {
-            font-size: 18px;
-            vertical-align: middle;
-          }
-          em {
-            color: #333;
-            vertical-align: middle;
-            font-style: normal;
-            vertical-align: middle;
-            padding-left: 2px;
-          }
-          &:hover {
-            em {
-              text-decoration: underline;
-            }
-          }
-        }
-      }
-    }
-    .bottom-box {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      text-align: right;
-      height: 60px;
-      line-height: 60px;
-      border-top: 1px solid #DCDEDC;
-      background: #fff;
-      .submit {
-        padding-right: 20px;
-        position: relative;
-        z-index: 9;
-      }
-    }
-    .content-box {
-      overflow-y: scroll;
-      height: calc(100vh - 61px);
-      padding-bottom: 60px;
-    }
-  }
-  .from-model {
-    padding-top: 26px;
-    >div {
-      clear: both;
-    }
-    .list {
-      position: relative;
-      margin-bottom: 10px;
-      .text-box {
-        width: 110px;
-        float: left;
-        text-align: right;
-        margin-right: 10px;
-        >span {
-          font-size: 14px;
-          color: #777;
-          display: inline-block;
-          padding-top: 6px;
-        }
-      }
-      .cont-box {
-        width: 580px;
-        float: left;
-        .label-box {
-          width: 100%;
-        }
-        .text-b {
-          font-size: 14px;
-          color: #777;
-          display: inline-block;
-          padding:0 6px 0 20px;
-        }
-      }
-      .add {
-        line-height: 32px;
-        a {
-          color: #0097e0;
-        }
-      }
-      &:hover {
-      }
-      .list-t {
-        width: 50%;
-        float: left;
-      }
-    }
-  }
+  @import "./formModel";
 </style>

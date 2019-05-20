@@ -120,6 +120,15 @@ public class SqlTask extends AbstractTask {
                     }else if (DbType.SPARK.name().equals(dataSource.getType().name())){
                         baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),SparkDataSource.class);
                         Class.forName(Constants.JDBC_SPARK_CLASS_NAME);
+                    }else if (DbType.CLICKHOUSE.name().equals(dataSource.getType().name())){
+                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),ClickHouseDataSource.class);
+                        Class.forName(Constants.JDBC_CLICKHOUSE_CLASS_NAME);
+                    }else if (DbType.ORACLE.name().equals(dataSource.getType().name())){
+                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),OracleDataSource.class);
+                        Class.forName(Constants.JDBC_ORACLE_CLASS_NAME);
+                    }else if (DbType.SQLSERVER.name().equals(dataSource.getType().name())){
+                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),SQLServerDataSource.class);
+                        Class.forName(Constants.JDBC_SQLSERVER_CLASS_NAME);
                     }
 
                     Map<Integer,Property> sqlParamMap =  new HashMap<Integer,Property>();
@@ -296,7 +305,7 @@ public class SqlTask extends AbstractTask {
             receviersList.add(user.getEmail());
         }
         // custom receiver
-        String receivers = processDefine.getReceivers();
+        String receivers = sqlParameters.getReceivers();
         if (StringUtils.isNotEmpty(receivers)){
             String[] splits = receivers.split(Constants.COMMA);
             for (String receiver : splits){
@@ -306,11 +315,8 @@ public class SqlTask extends AbstractTask {
 
         // copy list
         List<String> receviersCcList = new ArrayList<String>();
-
-
         // Custom Copier
-        String receiversCc = processDefine.getReceiversCc();
-
+        String receiversCc = sqlParameters.getReceiversCc();
         if (StringUtils.isNotEmpty(receiversCc)){
             String[] splits = receiversCc.split(Constants.COMMA);
             for (String receiverCc : splits){

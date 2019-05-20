@@ -127,7 +127,7 @@ public class ProcessDefinitionController extends BaseController{
             logger.info("login user {}, update process define, project name: {}, process define name: {}, " +
                             "process_definition_json: {}, desc: {}, locations:{}, connects:{}",
                     loginUser.getUserName(), projectName, name, processDefinitionJson,desc, locations, connects);
-            Map<String, Object> result = processDefinitionService.updateProccessDefinition(loginUser, projectName, id, name,
+            Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, id, name,
                     processDefinitionJson, desc, locations, connects);
             return returnDataList(result);
         }catch (Exception e){

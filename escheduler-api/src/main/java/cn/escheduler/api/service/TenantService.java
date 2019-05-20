@@ -80,6 +80,10 @@ public class TenantService extends BaseService{
     Tenant tenant = new Tenant();
     Date now = new Date();
 
+    if (!tenantCode.matches("^[0-9a-zA-Z_.-]{1,}$") || tenantCode.startsWith("-") || tenantCode.startsWith(".")){
+      putMsg(result, Status.VERIFY_TENANT_CODE_ERROR);
+      return result;
+    }
     tenant.setTenantCode(tenantCode);
     tenant.setTenantName(tenantName);
     tenant.setQueueId(queueId);

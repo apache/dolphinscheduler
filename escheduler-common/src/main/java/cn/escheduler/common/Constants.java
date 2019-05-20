@@ -70,25 +70,6 @@ public final class Constants {
      */
     public static final String YARN_APPLICATION_STATUS_ADDRESS = "yarn.application.status.address";
 
-    /**
-     * spring.redis.maxIdle
-     */
-    public static final String SPRING_REDIS_MAXIDLE = "spring.redis.maxIdle";
-
-    /**
-     * spring.redis.maxTotal
-     */
-    public static final String SPRING_REDIS_MAXTOTAL = "spring.redis.maxTotal";
-
-    /**
-     * spring.redis.host
-     */
-    public static final String SPRING_REDIS_HOST = "spring.redis.host";
-
-    /**
-     * spring.redis.port
-     */
-    public static final String SPRING_REDIS_PORT = "spring.redis.port";
 
     /**
      * hdfs configuration
@@ -117,9 +98,14 @@ public final class Constants {
     public static final String ESCHEDULER_ENV_PATH = "escheduler.env.path";
 
     /**
-     * escheduler.env.py
+     * escheduler.env.sh
      */
-    public static final String ESCHEDULER_ENV_PY = "escheduler.env.py";
+    public static final String ESCHEDULER_ENV_SH = ".escheduler_env.sh";
+
+    /**
+     * python home
+     */
+    public static final String PYTHON_HOME="PYTHON_HOME";
 
     /**
      * resource.view.suffixs
@@ -255,8 +241,6 @@ public final class Constants {
 
     public static final String SCHEDULER_QUEUE_IMPL = "escheduler.queue.impl";
 
-    public static final String SCHEDULER_QUEUE_REDIS_IMPL = "redis";
-
 
     /**
      * date format of yyyy-MM-dd HH:mm:ss
@@ -346,6 +330,11 @@ public final class Constants {
      * max task timeout
      */
     public static final int MAX_TASK_TIMEOUT = 24 * 3600;
+
+    /**
+     * max task timeout
+     */
+    public static final int MAX_PROCESS_TIMEOUT = Integer.MAX_VALUE;
 
 
     /**
@@ -453,7 +442,7 @@ public final class Constants {
     /**
      * task record configuration path
      */
-    public static final String TASK_RECORD_PROPERTIES_PATH = "dao/data_source.properties";
+    public static final String DATA_SOURCE_PROPERTIES = "dao/data_source.properties";
 
     public static final String TASK_RECORD_URL = "task.record.datasource.url";
 
@@ -462,6 +451,10 @@ public final class Constants {
     public static final String TASK_RECORD_USER = "task.record.datasource.username";
 
     public static final String TASK_RECORD_PWD = "task.record.datasource.password";
+
+    public static  String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
+
+    public static  String TASK_RECORD_TABLE_HISTORY_HIVE_LOG = "eamp_hive_hist_log_hd";
 
     public static final String STATUS = "status";
 
@@ -602,15 +595,29 @@ public final class Constants {
     public static final String JDBC_POSTGRESQL_CLASS_NAME = "org.postgresql.Driver";
 
     /**
-     * postgresql
+     * hive
      */
     public static final String JDBC_HIVE_CLASS_NAME = "org.apache.hive.jdbc.HiveDriver";
 
     /**
-     * postgresql
+     * spark
      */
     public static final String JDBC_SPARK_CLASS_NAME = "org.apache.hive.jdbc.HiveDriver";
 
+    /**
+     * ClickHouse
+     */
+    public static final String JDBC_CLICKHOUSE_CLASS_NAME = "ru.yandex.clickhouse.ClickHouseDriver";
+
+    /**
+     * Oracle
+     */
+    public static final String JDBC_ORACLE_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
+
+    /**
+     * Oracle
+     */
+    public static final String JDBC_SQLSERVER_CLASS_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
     /**
      * spark params constant
@@ -812,4 +819,9 @@ public final class Constants {
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
     public static final String DEPENDENT_ALL = "ALL";
+
+
+    /**
+     *
+     */
 }

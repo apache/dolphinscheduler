@@ -1,32 +1,29 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'projects'"></m-secondary-menu>
-    <m-list-construction :title="$t('甘特图')">
-      <template slot="content">
-        <div class="gantt-model">
-          <div class="gantt-state">
-            <div class="state-tasks-color-sp">
-              <a href="javascript:">
-                <span>{{$t('任务状态')}}</span>
-              </a>
-              <a href="javascript:" v-for="(item) in tasksState">
-                <i class="fa fa-square" :style="{color:item.color}"></i>
-                <span>{{item.desc}}</span>
-              </a>
-            </div>
+  <m-list-construction :title="$t('Gantt')">
+    <template slot="content">
+      <div class="gantt-model">
+        <div class="gantt-state">
+          <div class="state-tasks-color-sp">
+            <a href="javascript:">
+              <span>{{$t('Task Status')}}</span>
+            </a>
+            <a href="javascript:" v-for="(item) in tasksState">
+              <i class="fa fa-square" :style="{color:item.color}"></i>
+              <span>{{item.desc}}</span>
+            </a>
           </div>
-          <template v-show="!isNodata">
-            <div class="gantt"></div>
-          </template>
-          <template v-if="isNodata">
-            <m-no-data></m-no-data>
-          </template>
-          <m-spin :is-spin="isLoading">
-          </m-spin>
         </div>
-      </template>
-    </m-list-construction>
-  </div>
+        <template v-show="!isNodata">
+          <div class="gantt"></div>
+        </template>
+        <template v-if="isNodata">
+          <m-no-data></m-no-data>
+        </template>
+        <m-spin :is-spin="isLoading">
+        </m-spin>
+      </div>
+    </template>
+  </m-list-construction>
 </template>
 <script>
   import { mapActions } from 'vuex'
@@ -71,7 +68,7 @@
             this.isNodata = true
             return
           }
-          // 甘特图
+          // Gantt
           Gantt.init({
             el: '.gantt',
             tasks: res.tasks

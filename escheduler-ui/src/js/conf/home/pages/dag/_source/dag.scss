@@ -386,10 +386,22 @@ svg path:hover {
   .name-p {
     position: absolute;
     left: 50%;
-    bottom: -24px;
+    top: 58px;
     width: 200px;
     text-align: center;
     margin-left: -100px;
+    word-break:break-all;
+  }
+  .ban-p {
+    position: absolute;
+    left: -4px;
+    top: 36px;
+    z-index: 21;
+    i {
+      font-size: 18px;
+      color: #ff0000;
+      cursor: pointer;
+    }
   }
   .state-p {
     width: 20px;

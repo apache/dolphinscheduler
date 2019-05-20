@@ -23,6 +23,8 @@ import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.mapper.AlertMapper;
 import cn.escheduler.dao.mapper.UserAlertGroupMapper;
 import cn.escheduler.dao.model.Alert;
+import cn.escheduler.dao.model.ProcessDefinition;
+import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.User;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -83,12 +85,41 @@ public class AlertDao extends AbstractBaseDao {
      */
     public void sendServerStopedAlert(int alertgroupId,String host,String serverType){
         Alert alert = new Alert();
-        String content = String.format("[{'type':'%s','host':'%s','event':'服务挂掉','警告级别':'严重'}]",serverType,host);
-        alert.setTitle("容错告警");
+        String content = String.format("[{'type':'%s','host':'%s','event':'server down','warning level':'serious'}]",
+                serverType, host);
+        alert.setTitle("Fault tolerance warning");
         alert.setShowType(ShowType.TABLE);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(alertgroupId);
+        alert.setCreateTime(new Date());
+        alert.setUpdateTime(new Date());
+        alertMapper.insert(alert);
+    }
+
+    /**
+     * process time out alert
+     * @param processInstance
+     * @param processDefinition
+     */
+    public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition){
+        int alertgroupId = processInstance.getWarningGroupId();
+        String receivers = processDefinition.getReceivers();
+        String receiversCc = processDefinition.getReceiversCc();
+        Alert alert = new Alert();
+        String content = String.format("[{'id':'%d','name':'%s','event':'timeout','warnLevel':'middle'}]",
+                processInstance.getId(), processInstance.getName());
+        alert.setTitle("Process Timeout Warn");
+        alert.setShowType(ShowType.TABLE);
+        alert.setContent(content);
+        alert.setAlertType(AlertType.EMAIL);
+        alert.setAlertGroupId(alertgroupId);
+        if (StringUtils.isNotEmpty(receivers)) {
+            alert.setReceivers(receivers);
+        }
+        if (StringUtils.isNotEmpty(receiversCc)) {
+            alert.setReceiversCc(receiversCc);
+        }
         alert.setCreateTime(new Date());
         alert.setUpdateTime(new Date());
         alertMapper.insert(alert);

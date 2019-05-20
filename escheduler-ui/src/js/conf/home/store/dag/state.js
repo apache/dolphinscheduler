@@ -29,6 +29,8 @@ export default {
   globalParams: [],
   // Node information
   tasks: [],
+  // Timeout alarm
+  timeout: 0,
   // Node location information
   locations: {},
   // Node-to-node connection
@@ -65,6 +67,21 @@ export default {
     {
       id: 3,
       code: 'SPARK',
+      disabled: false
+    },
+    {
+      id: 4,
+      code: 'CLICKHOUSE',
+      disabled: false
+    },
+    {
+      id: 5,
+      code: 'ORACLE',
+      disabled: false
+    },
+    {
+      id: 6,
+      code: 'SQLSERVER',
       disabled: false
     }
   ],

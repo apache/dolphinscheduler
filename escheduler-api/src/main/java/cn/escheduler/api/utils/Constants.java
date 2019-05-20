@@ -82,6 +82,9 @@ public class Constants {
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
     public static final String COM_MYSQL_JDBC_DRIVER = "com.mysql.jdbc.Driver";
     public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
+    public static final String COM_CLICKHOUSE_JDBC_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
+    public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
+    public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
     /**
      * database type
@@ -90,6 +93,9 @@ public class Constants {
     public static final String POSTGRESQL = "POSTGRESQL";
     public static final String HIVE = "HIVE";
     public static final String SPARK = "SPARK";
+    public static final String CLICKHOUSE = "CLICKHOUSE";
+    public static final String ORACLE = "ORACLE";
+    public static final String SQLSERVER = "SQLSERVER";
 
     /**
      * jdbc url
@@ -97,6 +103,9 @@ public class Constants {
     public static final String JDBC_MYSQL = "jdbc:mysql://";
     public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
     public static final String JDBC_HIVE_2 = "jdbc:hive2://";
+    public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
+    public static final String JDBC_ORACLE = "jdbc:oracle:thin:@//";
+    public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
 
 
     public static final String ADDRESS = "address";
