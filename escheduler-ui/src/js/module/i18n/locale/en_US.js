@@ -452,6 +452,6 @@ export default {
   'Pre Statement': 'Pre Statement',
   'Post Statement': 'Post Statement',
   'Statement cannot be empty': 'Statement cannot be empty',
-  'Process Define Count':'Process Define Count',
-  'Process Instance Running Count':'Process Instance Running Count',
+  'Process Define Count': 'Process Define Count',
+  'Process Instance Running Count': 'Process Instance Running Count'
 }

@@ -6,4 +6,4 @@ export PYTHON_HOME=/opt/soft/python
 export JAVA_HOME=/opt/soft/java
 export HIVE_HOME=/opt/soft/hive
 	
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
