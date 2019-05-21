@@ -1,8 +1,11 @@
 <template>
-  <div class="list-model">
+  <div class="list-model" style="position: relative;">
     <div class="table-box">
       <table class="fixed">
         <tr>
+          <th width="50">
+            <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
+          </th>
           <th>
             <span>{{$t('#')}}</span>
           </th>
@@ -38,6 +41,7 @@
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
+          <td width="50"><x-checkbox v-model="item.isCheck" @on-change="_arrDelChange"></x-checkbox></td>
           <td>
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
@@ -245,6 +249,7 @@
         </tr>
       </table>
     </div>
+    <x-button style="position: absolute; bottom: -52px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">批量删除</x-button>
   </div>
 </template>
 <script>
@@ -259,7 +264,9 @@
         // 数据
         list: [],
         // 按钮类型
-        buttonType: ''
+        buttonType: '',
+        strDelete: '',
+        checkAll: false
       }
     },
     props: {
@@ -268,7 +275,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editExecutorsState', 'deleteInstance']),
+      ...mapActions('dag', ['editExecutorsState', 'deleteInstance', 'batchDeleteInstance']),
       /**
        * Return run type
        */
@@ -440,6 +447,36 @@
       },
       _gantt (item) {
         this.$router.push({ path: `/projects/instance/gantt/${item.id}` })
+      },
+      _topCheckBoxClick (v) {
+        this.list.forEach((item, i) => {
+          this.$set(this.list[i], 'isCheck', v)
+        })
+        this._arrDelChange()
+      },
+      _arrDelChange (v) {
+        let arr = []
+        this.list.forEach((item)=>{
+          if (item.isCheck) {
+            arr.push(item.id)
+          }
+        })
+        this.strDelete = _.join(arr, ',')
+        if (v === false) {
+          this.checkAll = false
+        }
+      },
+      _batchDelete () {
+        this.batchDeleteInstance({
+          processInstanceIds: this.strDelete
+        }).then(res => {
+          this._onUpdate()
+          this.checkAll = false
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.checkAll = false
+          this.$message.error(e.msg || '')
+        })
       }
     },
     watch: {
@@ -448,6 +485,10 @@
         setTimeout(() => {
           this.list = this._listDataHandle(a)
         })
+      },
+      pageNo () {
+        this.checkAll = false
+        this.strDelete = ''
       }
     },
     created () {

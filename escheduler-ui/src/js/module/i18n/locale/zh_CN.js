@@ -111,6 +111,8 @@ export default {
   'Please enter ExecutorPlease enter Executor core number': '请填写Executor内核数',
   'Core number should be positive integer': '内核数为正整数',
   'SQL Type': 'sql类型',
+  'Title': '主题',
+  'Please enter the title of email': '请输入邮件主题',
   'Table': '表格',
   'Attachment': '附件',
   'SQL Parameter': 'sql参数',
