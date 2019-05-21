@@ -438,6 +438,42 @@ export default {
     })
   },
   /**
+   * Batch delete process instance
+   */
+  batchDeleteInstance ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/instance/batch-delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Delete definition
+   */
+  deleteDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Batch delete definition
+   */
+  batchDeleteDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/batch-delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * Process instance get variable
    */
   getViewvariables ({ state }, payload) {
