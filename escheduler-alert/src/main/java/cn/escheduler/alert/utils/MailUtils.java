@@ -35,6 +35,7 @@ import javax.mail.internet.*;
 import java.io.*;
 import java.util.*;
 
+import static cn.escheduler.alert.utils.PropertyUtils.getBoolean;
 import static cn.escheduler.alert.utils.PropertyUtils.getInt;
 import static cn.escheduler.alert.utils.PropertyUtils.getString;
 
@@ -55,6 +56,10 @@ public class MailUtils {
     public static final String mailSender = getString(Constants.MAIL_SENDER);
 
     public static final String mailPasswd = getString(Constants.MAIL_PASSWD);
+
+    public static final Boolean mailUseStartTLS = getBoolean(Constants.MAIL_SMTP_STARTTLS_ENABLE);
+
+    public static final Boolean mailUseSSL = getBoolean(Constants.MAIL_SMTP_SSL_ENABLE);
 
     public static final String xlsFilePath = getString(Constants.XLS_FILE_PATH);
 
@@ -122,7 +127,9 @@ public class MailUtils {
                 //set charset
                 email.setCharset(Constants.UTF_8);
                 // TLS verification
-                email.setTLS(true);
+                email.setTLS(mailUseStartTLS);
+                // SSL verification
+                email.setSSL(mailUseSSL);
                 if (CollectionUtils.isNotEmpty(receivers)){
                     // receivers mail
                     for (String receiver : receivers) {
