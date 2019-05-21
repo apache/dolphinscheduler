@@ -1,66 +1,17 @@
 #!/bin/bash
-
 # 当前路径
 esc_basepath=$(cd `dirname $0`; pwd)
 
-
-echo "欢迎使用easy scheduler前端部署脚本,目前前端部署脚本仅支持Centos"
-echo "请在 escheduler-ui 目录下执行"
-
-# 配置前端访问端口
-esc_proxy="8888"
-
-# 配置代理后端接口
-esc_proxy_port="http://192.168.xx.xx:12345"
-
-# 本机ip
-esc_ipaddr='127.0.0.1'
-
-esc_ipaddr=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
-
-
-#To be compatible with MacOS and Linux
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # Mac OSX
-    echo "Easy Scheduler ui install not support Mac OSX operating system"
-    exit 1
-elif [[ "$OSTYPE" == "linux-gnu" ]]; then
-    # linux
-    echo "linux"
-elif [[ "$OSTYPE" == "cygwin" ]]; then
-    # POSIX compatibility layer and Linux environment emulation for Windows
-    echo "Easy Scheduler ui not support Windows operating system"
-    exit 1
-elif [[ "$OSTYPE" == "msys" ]]; then
-    # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
-    echo "Easy Scheduler ui not support Windows operating system"
-    exit 1
-elif [[ "$OSTYPE" == "win32" ]]; then
-    echo "Easy Scheduler ui not support Windows operating system"
-    exit 1
-elif [[ "$OSTYPE" == "freebsd"* ]]; then
-    # ...
-    echo "freebsd"
-else
-    # Unknown.
-    echo "Operating system unknown, please tell us(submit issue) for better service"
-    exit 1
-fi
-
-# 区分版本
-version=`cat /etc/redhat-release|sed -r 's/.* ([0-9]+)\..*/\1/'`
-
-
-echo "========================================================================配置信息======================================================================="
-
-echo "前端访问端口：${esc_proxy}"
-echo "后端代理接口地址：${esc_proxy_port}"
-echo "静态文件地址：${esc_basepath}/dist"
-echo "当前路径：${esc_basepath}"
-echo "本机ip：${esc_ipaddr}"
-
-echo "========================================================================配置信息======================================================================="
-echo ""
+menu(){
+        cat <<END
+=================================================
+        1.CentOS6安装
+        2.CentOS7安装
+        3.Ubuntu安装
+        4.退出
+=================================================
+END
+}
 
 
 # 创建文件并配置nginx
@@ -72,7 +23,7 @@ eschedulerConf(){
     E_http_upgrade='$http_upgrade'
     echo "
         server {
-            listen       $esc_proxy;# 访问端口
+            listen       $1;# 访问端口
             server_name  localhost;
             #charset koi8-r;
             #access_log  /var/log/nginx/host.access.log  main;
@@ -81,7 +32,7 @@ eschedulerConf(){
             index  index.html index.html;
             }
             location /escheduler {
-            proxy_pass ${esc_proxy_port}; # 接口地址
+            proxy_pass $2; # 接口地址
             proxy_set_header Host $E_host;
             proxy_set_header X-Real-IP $E_remote_addr;
             proxy_set_header x_real_ipP $E_remote_addr;
@@ -106,15 +57,32 @@ eschedulerConf(){
 
 }
 
+ubuntu(){
+    #更新源
+    apt-get update
 
-centos7(){
-    # nginx是否安装
-    sudo rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
-    sudo yum install -y nginx
-    echo "nginx 安装成功"
+    #安装nginx
+    apt-get install -y nginx
 
     # 配置nginx
-    eschedulerConf
+    eschedulerConf $1 $2
+
+    # 启动nginx
+    /etc/init.d/nginx start
+    sleep 1
+    if [ $? -ne 0 ];then
+        /etc/init.d/nginx start
+    fi
+    nginx -s reload
+}
+
+centos7(){
+
+    rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+    yum install -y nginx
+
+    # 配置nginx
+    eschedulerConf $1 $2
 
     # 解决 0.0.0.0:8888 问题
     yum -y install policycoreutils-python
@@ -123,11 +91,13 @@ centos7(){
     # 开放前端访问端口
     firewall-cmd --zone=public --add-port=$esc_proxy/tcp --permanent
 
-    # 重启防火墙
-    firewall-cmd --reload
-
     # 启动nginx
     systemctl start nginx
+    sleep 1
+    if [ $? -ne 0 ];then
+        systemctl start nginx
+    fi
+    nginx -s reload
 
     # 调整SELinux的参数
     sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
@@ -138,37 +108,22 @@ centos7(){
 
 
 centos6(){
-    # yum
-    E_basearch='$basearch'
-    E_releasever='$releasever'
-    echo "
-    [nginx]
-    name=nginx repo
-    baseurl=http://nginx.org/packages/centos/$E_releasever/$E_basearch/
-    gpgcheck=0
-    enabled=1
-    " >> /etc/yum.repos.d/nginx.repo
+
+    rpm -ivh http://nginx.org/packages/centos/6/noarch/RPMS/nginx-release-centos-6-0.el6.ngx.noarch.rpm
 
     # install nginx
     yum install nginx -y
 
     # 配置nginx
-    eschedulerConf
+    eschedulerConf $1 $2
 
-    # 防火墙
-    E_iptables=`lsof -i:$esc_proxy | wc -l`
-    if [ "$E_iptables" -gt "0" ];then
-    # 已开启端口防火墙重启
-    service iptables restart
-    else
-    # 未开启防火墙添加端口再重启
-    iptables -I INPUT 5 -i eth0 -p tcp --dport $esc_proxy -m state --state NEW,ESTABLISHED -j ACCEPT
-    service iptables save
-    service iptables restart
-    fi
-
-    # start
+    # 启动nginx
     /etc/init.d/nginx start
+    sleep 1
+	if [ $? -ne 0 ];then
+        /etc/init.d/nginx start
+    fi
+    nginx -s reload
 
     # 调整SELinux的参数
     sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
@@ -178,16 +133,87 @@ centos6(){
 
 }
 
-# centos 6
-if [[ $version -eq 6 ]]; then
-    centos6
-fi
+function main(){
+	echo "欢迎使用easy scheduler前端部署脚本,目前前端部署脚本仅支持CentOS,Ubuntu"
+	echo "请在 escheduler-ui 目录下执行"
 
-# centos 7
-if [[ $version -eq 7 ]]; then
-    centos7
-fi
+	#To be compatible with MacOS and Linux
+	if [[ "$OSTYPE" == "darwin"* ]]; then
+    		# Mac OSX
+    		echo "Easy Scheduler ui install not support Mac OSX operating system"
+    		exit 1
+	elif [[ "$OSTYPE" == "linux-gnu" ]]; then
+   		# linux
+		echo "linux"
+	elif [[ "$OSTYPE" == "cygwin" ]]; then
+    		# POSIX compatibility layer and Linux environment emulation for Windows
+    		echo "Easy Scheduler ui not support Windows operating system"
+    		exit 1
+	elif [[ "$OSTYPE" == "msys" ]]; then
+    		# Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
+    		echo "Easy Scheduler ui not support Windows operating system"
+    		exit 1
+	elif [[ "$OSTYPE" == "win32" ]]; then
+    		echo "Easy Scheduler ui not support Windows operating system"
+    		exit 1
+	elif [[ "$OSTYPE" == "freebsd"* ]]; then
+    		# ...
+    		echo "freebsd"
+	else
+    		# Unknown.
+    		echo "Operating system unknown, please tell us(submit issue) for better service"
+    		exit 1
+	fi
 
 
-echo "请浏览器访问：http://${esc_ipaddr}:${esc_proxy}"
+	# 配置前端访问端口
+	read -p "请输入nginx代理端口，不输入，则默认8888 :" esc_proxy_port
+	if [ -z "${esc_proxy_port}" ];then
+    	esc_proxy_port="8888"
+	fi
 
+	read -p "请输入api server代理ip,必须输入，例如：192.168.xx.xx :" esc_api_server_ip
+	if [ -z "${esc_api_server_ip}" ];then
+		echo "api server代理ip不能为空."
+		exit 1
+	fi
+
+	read -p "请输入api server代理端口,不输入，则默认12345 :" esc_api_server_port
+	if [ -z "${esc_api_server_port}" ];then
+		esc_api_server_port="12345"
+	fi
+
+	# api server后端地址
+	esc_api_server="http://$esc_api_server_ip:$esc_api_server_port"
+
+	# 本机ip地址
+	esc_ipaddr=$(ip a | grep inet | grep -v inet6 | grep -v 127 | sed 's/^[ \t]*//g' | cut -d ' ' -f2 | head -n 1 | awk -F '/' '{print $1}')
+
+	# 提示信息
+	menu
+
+	read -p "请输入安装编号(1|2|3|4)：" num
+
+   	case $num in
+        	1)
+			centos6 ${esc_proxy_port} ${esc_api_server}
+                	;;
+       		2)
+                	centos7 ${esc_proxy_port} ${esc_api_server}
+                	;;
+        	3)
+			ubuntu ${esc_proxy_port} ${esc_api_server}
+                	;;
+		4)
+			echo $"Usage :sh $0"
+                	exit 1
+			;;
+        	*)
+                	echo $"Usage :sh $0"
+                	exit 1
+	esac
+	echo "请浏览器访问：http://${esc_ipaddr}:${esc_proxy_port}"
+
+}
+
+main
