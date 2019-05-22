@@ -29,12 +29,8 @@ schedule = sched.scheduler(time.time, time.sleep)
 class ZkClient:
     def __init__(self):
         # hosts配置zk地址集群
-        #self.zk = KazooClient(hosts='192.168.220.188:2181,192.168.220.189:2181,192.168.220.190:2181')
-        print zookeepers
-	#zookeepers1 = zookeepers
-	self.zk = KazooClient(hosts=zookeepers)
-        print "ready start"
-	self.zk.start()
+	    self.zk = KazooClient(hosts=zookeepers)
+	    self.zk.start()
 
     # 读取配置文件，组装成字典
     def read_file(self,path):
