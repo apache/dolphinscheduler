@@ -51,7 +51,7 @@
         this._verification().then(res => {
           if (this.name === this.item.alias) {
             return new Promise((resolve,reject) => {
-              resolve()
+              this.desc === this.item.desc ? reject({msg:'内容未修改'}) : resolve()
             })
           }else{
             return this.store.dispatch('resource/resourceVerifyName', {
