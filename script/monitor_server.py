@@ -96,7 +96,6 @@ if __name__ == '__main__':
     if (len(sys.argv) < 4):
         print('please input install_path,zookeepers,masters_zk_path and worker_zk_path')
     install_path = sys.argv[1]
-    #zookeepers = "'" + sys.argv[2] + "'"
     zookeepers = sys.argv[2]
     masters_zk_path = sys.argv[3]
     workers_zk_path = sys.argv[4]
