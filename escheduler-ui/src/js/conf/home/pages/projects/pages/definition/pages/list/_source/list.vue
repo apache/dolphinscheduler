@@ -6,7 +6,7 @@
           <th width="50">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th>
+          <th width="40">
             <span>{{$t('#')}}</span>
           </th>
           <th>
@@ -33,7 +33,7 @@
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
           <td width="50"><x-checkbox v-model="item.isCheck" @on-change="_arrDelChange"></x-checkbox></td>
-          <td>
+          <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
@@ -90,7 +90,7 @@
         </tr>
       </table>
     </div>
-    <x-button style="position: absolute; bottom: -52px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">批量删除</x-button>
+    <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">删除</x-button>
   </div>
 </template>
 <script>
@@ -308,21 +308,24 @@
       }
     },
     watch: {
-      processList (a) {
-        this.list = []
-        setTimeout(() => {
-          this.list = a
-        })
+      processList: {
+        handler (a) {
+          this.checkAll = false
+          this.list = []
+          setTimeout(() => {
+            this.list = _.cloneDeep(a)
+          })
+        },
+        immediate: true,
+        deep: true
       },
       pageNo () {
-        this.checkAll = false
         this.strDelete = ''
       }
     },
     created () {
     },
     mounted () {
-      this.list = this.processList
     },
     components: { }
   }
