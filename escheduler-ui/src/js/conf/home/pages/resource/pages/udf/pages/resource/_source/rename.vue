@@ -49,10 +49,16 @@
     methods: {
       _ok (fn) {
         this._verification().then(res => {
-          return this.store.dispatch('resource/resourceVerifyName', {
-            name: this.name,
-            type: 'UDF'
-          })
+          if (this.name === this.item.alias) {
+            return new Promise((resolve,reject) => {
+              resolve()
+            })
+          }else{
+            return this.store.dispatch('resource/resourceVerifyName', {
+              name: this.name,
+              type: 'UDF'
+            })
+          }
         }).then(res => {
           return this.store.dispatch('resource/resourceRename', {
             name: this.name,
