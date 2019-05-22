@@ -6,13 +6,13 @@
           <th width="50">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th>
+          <th width="40">
             <span>{{$t('#')}}</span>
           </th>
           <th>
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th width="120">
+          <th>
             <span>{{$t('Run Type')}}</span>
           </th>
           <th width="140">
@@ -21,10 +21,10 @@
           <th width="140">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th width="90">
+          <th width="70">
             <span>{{$t('Duration')}}s</span>
           </th>
-          <th width="72">
+          <th width="70">
             <span>{{$t('Run Times')}}</span>
           </th>
           <th width="100">
@@ -36,13 +36,13 @@
           <th width="50">
             <span>{{$t('State')}}</span>
           </th>
-          <th width="260">
+          <th width="220">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
           <td width="50"><x-checkbox v-model="item.isCheck" @on-change="_arrDelChange"></x-checkbox></td>
-          <td>
+          <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
@@ -54,8 +54,8 @@
             <span v-if="item.endTime">{{item.endTime | formatDate}}</span>
             <span v-if="!item.endTime">-</span>
           </td>
-          <td><span>{{item.duration || '-'}}</span></td>
-          <td><span>{{item.runTimes}}</span></td>
+          <td width="70"><span>{{item.duration || '-'}}</span></td>
+          <td width="70"><span>{{item.runTimes}}</span></td>
           <td>
             <span v-if="item.host">{{item.host}}</span>
             <span v-if="!item.host">-</span>
@@ -249,7 +249,7 @@
         </tr>
       </table>
     </div>
-    <x-button style="position: absolute; bottom: -52px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">批量删除</x-button>
+    <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">删除</x-button>
   </div>
 </template>
 <script>
@@ -480,21 +480,24 @@
       }
     },
     watch: {
-      processInstanceList (a) {
-        this.list = []
-        setTimeout(() => {
-          this.list = this._listDataHandle(a)
-        })
+      processInstanceList: {
+        handler (a) {
+          this.checkAll = false
+          this.list = []
+          setTimeout(() => {
+            this.list = _.cloneDeep(this._listDataHandle(a))
+          })
+        },
+        immediate: true,
+        deep: true
       },
       pageNo () {
-        this.checkAll = false
         this.strDelete = ''
       }
     },
     created () {
     },
     mounted () {
-      this.list = this._listDataHandle(this.processInstanceList)
     },
     components: { }
   }
