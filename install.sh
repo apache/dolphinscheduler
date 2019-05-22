@@ -98,6 +98,8 @@ xlsFilePath="/tmp/xls"
 # 不启动设置为false,如果为false,以下配置不需要修改
 hdfsStartupSate="false"
 
+#是否启动自启动脚本
+monitorServerState="true"
 # namenode地址,支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
 namenodeFs="hdfs://mycluster:8020"
 
@@ -364,3 +366,10 @@ fi
 # 6,启动
 echo "6,启动"
 sh ${workDir}/script/start_all.sh
+
+# 7启动自启动脚本
+if [ "true" = $monitorServerState ];then
+        echo 'start monitor server'
+        nohup python -u ${workDir}/script/monitor_server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor_server.log 2>&1 &
+fi
+
