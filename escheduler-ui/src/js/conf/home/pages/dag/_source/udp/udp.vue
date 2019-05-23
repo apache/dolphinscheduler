@@ -110,6 +110,13 @@
         }
         return true
       },
+      _accuStore(){
+        this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
+        this.store.commit('dag/setName', _.cloneDeep(this.name))
+        this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
+        this.store.commit('dag/setDesc', _.cloneDeep(this.desc))
+        this.store.commit('dag/setSyncDefine', this.syncDefine)
+      },
       /**
        * submit
        */
@@ -130,11 +137,8 @@
           }
 
           // Storage global globalParams
-          this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
-          this.store.commit('dag/setName', _.cloneDeep(this.name))
-          this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
-          this.store.commit('dag/setDesc', _.cloneDeep(this.desc))
-          this.store.commit('dag/setSyncDefine', this.syncDefine)
+          this._accuStore()
+
           Affirm.setIsPop(false)
           this.$emit('onUdp')
         }
@@ -155,7 +159,11 @@
        * Close the popup
        */
       close () {
-        this.$emit('close')
+        // Storage global globalParams
+        this._accuStore()
+        setTimeout(() => {
+          this.$emit('close')
+        })
       }
     },
     watch: {
