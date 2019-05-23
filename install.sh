@@ -98,8 +98,9 @@ xlsFilePath="/tmp/xls"
 # 不启动设置为false,如果为false,以下配置不需要修改
 hdfsStartupSate="false"
 
-#是否启动自启动脚本
+#是否启动监控自启动脚本
 monitorServerState="false"
+
 # namenode地址,支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
 namenodeFs="hdfs://mycluster:8020"
 
@@ -367,7 +368,7 @@ fi
 echo "6,启动"
 sh ${workDir}/script/start_all.sh
 
-# 7启动自启动脚本
+# 7启动监控自启动脚本
 monitor_pid=${workDir}/monitor_server.pid
 if [ "true" = $monitorServerState ];then
         if [ -f $monitor_pid ]; then
