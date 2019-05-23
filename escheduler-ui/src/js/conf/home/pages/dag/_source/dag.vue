@@ -28,7 +28,8 @@
                   @click="_toggleView"
                   icon="fa fa-code">
           </x-button>
-          <span class="name">{{name}}</span>
+          <span class="name ">{{name}}</span>
+          <span class="copy-name" @click="_copyName" :data-clipboard-text="name"><i class="iconfont" data-container="body"  data-toggle="tooltip" title="复制名称" >&#xe61e;</i></span>
         </div>
         <div class="save-btn">
           <div class="operation" style="vertical-align: middle;">
@@ -88,6 +89,7 @@
   import mUdp from './udp/udp'
   import i18n from '@/module/i18n'
   import { jsPlumb } from 'jsplumb'
+  import Clipboard from 'clipboard'
   import { allNodesId } from './plugIn/util'
   import { toolOper, tasksType } from './config'
   import mFormModel from './formModel/formModel'
@@ -138,6 +140,20 @@
         } else {
           Dag.create()
         }
+      },
+      _copyName(){
+        let clipboard = new Clipboard(`.copy-name`)
+        clipboard.on('success', e => {
+          this.$message.success(`${i18n.$t('Copy success')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+        clipboard.on('error', e => {
+          // Copy is not supported
+          this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
+          // Free memory
+          clipboard.destroy()
+        })
       },
       /**
        * Get state interface
