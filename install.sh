@@ -377,7 +377,7 @@ if [ "true" = $monitorServerState ];then
                         kill $TARGET_PID
                         sleep 5
                         if kill -0 $TARGET_PID > /dev/null 2>&1; then
-                                echo "$command did not stop gracefully after 5 seconds: killing with kill -9"
+                                echo "monitor server did not stop gracefully after 5 seconds: killing with kill -9"
                                 kill -9 $TARGET_PID
                         fi
                 else
