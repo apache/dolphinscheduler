@@ -29,7 +29,8 @@
                   icon="fa fa-code">
           </x-button>
           <span class="name">{{name}}</span>
-          <span v-if="name" class="copy-name" @click="_copyName" :data-clipboard-text="name"><i class="iconfont" data-container="body"  data-toggle="tooltip" title="复制名称" >&#xe61e;</i></span>
+          &nbsp;
+          <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><i class="iconfont" data-container="body"  data-toggle="tooltip" title="复制名称" >&#xe61e;</i></span>
         </div>
         <div class="save-btn">
           <div class="operation" style="vertical-align: middle;">
