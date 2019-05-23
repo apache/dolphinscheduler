@@ -26,12 +26,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static cn.escheduler.api.enums.Status.*;
 
+/**
+ * alert group controller
+ */
+@ApiIgnore
 @RestController
 @RequestMapping("alert-group")
 public class AlertGroupController extends  BaseController{

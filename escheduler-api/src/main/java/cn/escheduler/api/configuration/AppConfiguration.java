@@ -19,8 +19,8 @@ package cn.escheduler.api.configuration;
 import cn.escheduler.api.interceptor.LoginHandlerInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
@@ -49,12 +49,12 @@ public class AppConfiguration implements WebMvcConfigurer {
   /**
    * Cookie
    */
-  @Bean
+  @Bean(name = "localeResolver")
   public LocaleResolver localeResolver() {
     CookieLocaleResolver localeResolver = new CookieLocaleResolver();
     localeResolver.setCookieName(LOCALE_LANGUAGE_COOKIE);
     /** set default locale **/
-    localeResolver.setDefaultLocale(Locale.ENGLISH);
+    localeResolver.setDefaultLocale(Locale.US);
     /** set cookie max age **/
     localeResolver.setCookieMaxAge(COOKIE_MAX_AGE);
     return localeResolver;
@@ -64,7 +64,7 @@ public class AppConfiguration implements WebMvcConfigurer {
   public LocaleChangeInterceptor localeChangeInterceptor() {
     LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
     /**  **/
-    lci.setParamName("lang");
+    lci.setParamName("language");
 
     return lci;
   }
@@ -72,14 +72,16 @@ public class AppConfiguration implements WebMvcConfigurer {
 
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(loginInterceptor()).addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN).excludePathPatterns(LOGIN_PATH_PATTERN,"/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "*.html");
     //i18n
     registry.addInterceptor(localeChangeInterceptor());
+
+    registry.addInterceptor(loginInterceptor()).addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN).excludePathPatterns(LOGIN_PATH_PATTERN,"/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "*.html");
   }
 
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
     registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
     registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
   }

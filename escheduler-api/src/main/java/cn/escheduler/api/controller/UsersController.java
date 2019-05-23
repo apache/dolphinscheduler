@@ -66,10 +66,10 @@ public class UsersController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userName", value = "USER_NAME",type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type ="String"),
-            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", type ="Int"),
-            @ApiImplicitParam(name = "queue", value = "QUEUE", type ="Int"),
-            @ApiImplicitParam(name = "email", value = "EMAIL", type ="Int"),
-            @ApiImplicitParam(name = "phone", value = "PHONE", type ="Int")
+            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "Int", example = "100")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -103,7 +103,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "queryUserList", notes= "QUERY_USER_LIST_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO",type = "Int"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", type ="String"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type ="String")
     })
@@ -143,13 +143,13 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "updateUser", notes= "UPDATE_USER_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "USER_ID",type = "Int"),
+            @ApiImplicitParam(name = "id", value = "USER_ID",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "userName", value = "USER_NAME",type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type ="String"),
-            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", type ="Int"),
-            @ApiImplicitParam(name = "queue", value = "QUEUE", type ="Int"),
-            @ApiImplicitParam(name = "email", value = "EMAIL", type ="Int"),
-            @ApiImplicitParam(name = "phone", value = "PHONE", type ="Int")
+            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "Int", example = "100")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -180,7 +180,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "delUserById", notes= "DELETE_USER_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "USER_ID",type = "Int")
+            @ApiImplicitParam(name = "id", value = "USER_ID",dataType = "Int", example = "100")
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -205,7 +205,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "grantProject", notes= "GRANT_PROJECT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID",type = "Int"),
+            @ApiImplicitParam(name = "userId", value = "USER_ID",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "projectIds", value = "PROJECT_IDS",type = "String")
     })
     @PostMapping(value = "/grant-project")
@@ -232,7 +232,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "grantResource", notes= "GRANT_RESOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID",type = "Int"),
+            @ApiImplicitParam(name = "userId", value = "USER_ID",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "resourceIds", value = "RESOURCE_IDS",type = "String")
     })
     @PostMapping(value = "/grant-file")
@@ -260,7 +260,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "grantUDFFunc", notes= "GRANT_UDF_FUNC_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID",type = "Int"),
+            @ApiImplicitParam(name = "userId", value = "USER_ID",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "udfIds", value = "UDF_IDS",type = "String")
     })
     @PostMapping(value = "/grant-udf-func")
@@ -289,7 +289,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "grantDataSource", notes= "GRANT_DATASOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID",type = "Int"),
+            @ApiImplicitParam(name = "userId", value = "USER_ID",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "datasourceIds", value = "DATASOURCE_IDS",type = "String")
     })
     @PostMapping(value = "/grant-datasource")

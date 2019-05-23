@@ -57,9 +57,9 @@ public class LoggerController extends BaseController {
      */
     @ApiOperation(value = "queryLog", notes= "QUERY_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskInstId", value = "TASK_ID",type = "Int"),
-            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", type ="Int"),
-            @ApiImplicitParam(name = "limit", value = "LIMIT", type ="Int")
+            @ApiImplicitParam(name = "taskInstId", value = "TASK_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", dataType ="Int", example = "100"),
+            @ApiImplicitParam(name = "limit", value = "LIMIT", dataType ="Int", example = "100")
     })
     @GetMapping(value = "/detail")
     @ResponseStatus(HttpStatus.OK)
@@ -87,11 +87,11 @@ public class LoggerController extends BaseController {
      */
     @ApiOperation(value = "downloadTaskLog", notes= "DOWNLOAD_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskInstId", value = "TASK_ID",type = "Int")
+            @ApiImplicitParam(name = "taskInstId", value = "TASK_ID",dataType = "Int", example = "100")
     })
     @GetMapping(value = "/download-log")
     @ResponseBody
-    public ResponseEntity downloadTaskLog(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ResponseEntity downloadTaskLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam(value = "taskInstId") int taskInstanceId) {
         try {
             byte[] logBytes = loggerService.getLogBytes(taskInstanceId);

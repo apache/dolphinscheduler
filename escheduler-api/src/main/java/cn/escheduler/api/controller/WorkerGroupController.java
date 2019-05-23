@@ -27,12 +27,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
 /**
  * worker group controller
  */
+@ApiIgnore
 @RestController
 @RequestMapping("/worker-group")
 public class WorkerGroupController extends BaseController{
