@@ -100,12 +100,24 @@ public class HadoopUtils implements Closeable {
                             logger.info("appAddress : {}", appAddress);
                         }
                         configuration.set(Constants.YARN_APPLICATION_STATUS_ADDRESS, appAddress);
+                        initBasePath();
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
                     }
 
                 }
             }
+        }
+    }
+
+    /**
+     * init data.store2hdfs.basepath in common.properties
+     * @throws IOException
+     */
+    private void initBasePath() throws IOException {
+        Path path = new Path(getString(DATA_STORE_2_HDFS_BASEPATH));
+        if( !fs.exists(path) ){
+            fs.mkdirs(path);
         }
     }
 
