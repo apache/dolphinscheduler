@@ -70,14 +70,14 @@ public class SchedulerController extends BaseController {
      */
     @ApiOperation(value = "createSchedule", notes= "CREATE_SCHEDULE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, type = "Int"),
-            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", type = "Int"),
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type ="WarningType"),
-            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", type ="Int"),
+            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type ="FailureStrategy"),
             @ApiImplicitParam(name = "receivers", value = "RECEIVERS", type ="String"),
             @ApiImplicitParam(name = "receiversCc", value = "RECEIVERS_CC", type ="String"),
-            @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", type ="Int"),
+            @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type ="Priority"),
     })
     @PostMapping("/create")
@@ -122,14 +122,14 @@ public class SchedulerController extends BaseController {
      */
     @ApiOperation(value = "updateSchedule", notes= "UPDATE_SCHEDULE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, type = "Int"),
-            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", type = "Int"),
+            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type ="WarningType"),
-            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", type ="Int"),
+            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type ="FailureStrategy"),
             @ApiImplicitParam(name = "receivers", value = "RECEIVERS", type ="String"),
             @ApiImplicitParam(name = "receiversCc", value = "RECEIVERS_CC", type ="String"),
-            @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", type ="Int"),
+            @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", type ="Priority"),
     })
     @PostMapping("/update")
@@ -171,7 +171,7 @@ public class SchedulerController extends BaseController {
      */
     @ApiOperation(value = "online", notes= "ONLINE_SCHEDULE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, type = "Int")
+            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
     })
     @PostMapping("/online")
     public Result online(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
@@ -199,7 +199,7 @@ public class SchedulerController extends BaseController {
      */
     @ApiOperation(value = "offline", notes= "OFFLINE_SCHEDULE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, type = "Int")
+            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
     })
     @PostMapping("/offline")
     public Result offline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
@@ -228,11 +228,11 @@ public class SchedulerController extends BaseController {
      */
     @ApiOperation(value = "queryScheduleListPaging", notes= "QUERY_SCHEDULE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, type = "Int"),
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true,type = "Int"),
+            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true,dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL",  type = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO",  type = "Int"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE",  type = "Int")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO",  dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE",  dataType = "Int", example = "100")
 
     })
     @GetMapping("/list-paging")
