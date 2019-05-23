@@ -280,7 +280,8 @@ public class MailUtils {
         props.setProperty(Constants.MAIL_HOST, mailServerHost);
         props.setProperty(Constants.MAIL_SMTP_AUTH, Constants.STRING_TRUE);
         props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, mailProtocol);
-        props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, Constants.STRING_TRUE);
+        props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, mailUseStartTLS.toString());
+        props.setProperty(Constants.MAIL_SMTP_SSL_ENABLE, mailUseSSL.toString());
         Authenticator auth = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
