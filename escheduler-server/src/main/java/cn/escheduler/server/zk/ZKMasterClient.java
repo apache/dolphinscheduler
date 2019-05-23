@@ -115,9 +115,9 @@ public class ZKMasterClient extends AbstractZKClient {
 		InterProcessMutex mutex = null;
 		try {
 			// create distributed lock with the root node path of the lock space as /escheduler/lock/failover/master
-			String znodeLock = zkMasterClient.getMasterStartUpLockPath();
+			String znodeLock = getMasterStartUpLockPath();
 
-			mutex = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
+			mutex = new InterProcessMutex(zkClient, znodeLock);
 			mutex.acquire();
 
 			// init system znode
@@ -138,7 +138,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			}
 
 		}catch (Exception e){
-			logger.error("master scheduler thread exception : " + e.getMessage(),e);
+			logger.error("master start up  exception : " + e.getMessage(),e);
 		}finally {
 			if (mutex != null){
 				try {
