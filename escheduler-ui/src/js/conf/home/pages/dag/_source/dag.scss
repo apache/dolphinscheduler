@@ -138,7 +138,7 @@
       .assist-btn {
         position: absolute;
         left: 10px;
-        top: 4px;
+        top: 7px;
         >.name {
           padding-left: 6px;
           vertical-align: middle;
@@ -146,6 +146,8 @@
         >.copy-name {
           cursor: pointer;
           padding-left: 4px;
+          position: relative;
+          top: -2px;
           &:hover {
             i {
               color: #47c3ff;
@@ -154,6 +156,7 @@
           i {
             color: #333;
             font-size: 18px;
+            vertical-align: middle;
           }
         }
       }
