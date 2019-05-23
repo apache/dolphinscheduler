@@ -9,12 +9,13 @@ yum -y install python-pip
 pip install kazoo 安装
 conda install -c conda-forge kazoo 安装
 
-运行脚本：
+运行脚本及参数说明：
+nohup python -u monitor_server.py /data1_1T/escheduler 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181 /escheduler/masters /escheduler/workers> monitor_server.log 2>&1 &
+参数说明如下:
 /data1_1T/escheduler的值来自install.sh中的installPath
 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181的值来自install.sh中的zkQuorum
 /escheduler/masters的值来自install.sh中的zkMasters
 /escheduler/workers的值来自install.sh中的zkWorkers
-nohup python -u monitor_server.py /data1_1T/escheduler 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181 /escheduler/masters /escheduler/workers> nohup.out 2>&1 &
 '''
 import sys
 import socket
