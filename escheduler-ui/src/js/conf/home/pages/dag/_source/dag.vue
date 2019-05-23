@@ -141,6 +141,9 @@
           Dag.create()
         }
       },
+      /**
+       * copy name
+       */
       _copyName(){
         let clipboard = new Clipboard(`.copy-name`)
         clipboard.on('success', e => {
@@ -170,6 +173,10 @@
               let $item = _.filter(taskList, v => v.name === item.name)[0]
               return `<div style="text-align: left">${i18n.$t('Name')}：${$item.name}</br>${i18n.$t('State')}：${desc}</br>${i18n.$t('type')}：${$item.taskType}</br>${i18n.$t('host')}：${$item.host || '-'}</br>${i18n.$t('Retry Count')}：${$item.retryTimes}</br>${i18n.$t('Submit Time')}：${formatDate($item.submitTime)}</br>${i18n.$t('Start Time')}：${formatDate($item.startTime)}</br>${i18n.$t('End Time')}：${$item.endTime ? formatDate($item.endTime) : '-'}</br></div>`
             }
+
+            // remove tip state dom
+            $('.w').find('.state-p').html('')
+
             data.forEach(v1 => {
               idArr.forEach(v2 => {
                 if (v2.name === v1.name) {
@@ -177,7 +184,6 @@
                   let state = dom.find('.state-p')
                   dom.attr('data-state-id', v1.stateId)
                   dom.attr('data-dependent-result', v1.dependentResult || '')
-                  state.html('')
                   state.append(`<b class="iconfont ${v1.isSpin ? 'fa fa-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body">${v1.icoUnicode}</b>`)
                   state.find('b').attr('title', titleTpl(v2, v1.desc))
                 }
