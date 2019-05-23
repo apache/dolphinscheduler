@@ -99,7 +99,7 @@ xlsFilePath="/tmp/xls"
 hdfsStartupSate="false"
 
 #是否启动自启动脚本
-monitorServerState="true"
+monitorServerState="false"
 # namenode地址,支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
 namenodeFs="hdfs://mycluster:8020"
 
@@ -368,8 +368,28 @@ echo "6,启动"
 sh ${workDir}/script/start_all.sh
 
 # 7启动自启动脚本
+monitor_pid=${workDir}/monitor_server.pid
 if [ "true" = $monitorServerState ];then
-        echo 'start monitor server'
-        nohup python -u ${workDir}/script/monitor_server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor_server.log 2>&1 &
+        if [ -f $monitor_pid ]; then
+                TARGET_PID=`cat $monitor_pid`
+                if kill -0 $TARGET_PID > /dev/null 2>&1; then
+                        echo "monitor server running as process ${TARGET_PID}.Stopping"
+                        kill $TARGET_PID
+                        sleep 5
+                        if kill -0 $TARGET_PID > /dev/null 2>&1; then
+                                echo "$command did not stop gracefully after 5 seconds: killing with kill -9"
+                                kill -9 $TARGET_PID
+                        fi
+                else
+                        echo "no monitor server to stop"
+                fi
+                echo "monitor server running as process ${TARGET_PID}.Stopped success"
+                rm -f $monitor_pid
+        fi
+        nohup python -u ${workDir}/script/monitor_server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor_server
+.log 2>&1 &
+        echo $! > $monitor_pid
+        echo "start monitor server success as process `cat $monitor_pid`"
+
 fi
 
