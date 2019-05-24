@@ -293,12 +293,12 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setTimeout(processData.getTimeout());
 
         //custom global params
-        List<Property> globalParamsList = processData.getGlobalParams();
-        if (globalParamsList != null && globalParamsList.size() > 0) {
+        List<Property> globalParamsList = new ArrayList<>();
+        if (processData.getGlobalParams() != null && processData.getGlobalParams().size() > 0) {
             Set<Property> userDefParamsSet = new HashSet<>(globalParamsList);
             globalParamsList = new ArrayList<>(userDefParamsSet);
-            processDefine.setGlobalParamList(globalParamsList);
         }
+        processDefine.setGlobalParamList(globalParamsList);
         processDefine.setUpdateTime(now);
         processDefine.setFlag(Flag.YES);
         if (processDefineMapper.update(processDefine) > 0) {
