@@ -45,32 +45,39 @@ mysqlDb="escheduler"
 mysqlUserName="xx"
 
 # mysql 密码
+# 注意：如果有特殊字符，请用 \ 转移符进行转移
 mysqlPassword="xx"
 
 # conf/config/install_config.conf配置
-# 安装路径,不要当前路径(pwd)一样
+# 注意：安装路径,不要当前路径(pwd)一样
 installPath="/data1_1T/escheduler"
 
 # 部署用户
+# 注意：部署用户需要有sudo权限及操作hdfs的权限，如果开启hdfs，根目录需要自行创建
 deployUser="escheduler"
 
 # zk集群
 zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
 
 # 安装hosts
+# 注意：安装调度的机器hostname列表，如果是伪分布式，则只需写一个伪分布式hostname即可
 ips="ark0,ark1,ark2,ark3,ark4"
 
 # conf/config/run_config.conf配置
 # 运行Master的机器
+# 注意：部署master的机器hostname列表
 masters="ark0,ark1"
 
 # 运行Worker的机器
+# 注意：部署worker的机器hostname列表
 workers="ark2,ark3,ark4"
 
 # 运行Alert的机器
+# 注意：部署alert server的机器hostname列表
 alertServer="ark3"
 
 # 运行Api的机器
+# 注意：部署api server的机器hostname列表
 apiServers="ark1"
 
 # alert配置
@@ -93,12 +100,16 @@ mailPassword="xxxxxxxxxx"
 xlsFilePath="/tmp/xls"
 
 
+#是否启动监控自启动脚本
+monitorServerState="false"
+
 # hadoop 配置
 # 是否启动hdfs,如果启动则为true,需要配置以下hadoop相关参数;
 # 不启动设置为false,如果为false,以下配置不需要修改
+# 特别注意：如果启动hdfs，需要自行创建hdfs根路径，也就是install.sh中的 hdfsPath
 hdfsStartupSate="false"
 
-# namenode地址,支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
+# namenode地址，支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
 namenodeFs="hdfs://mycluster:8020"
 
 # resourcemanager HA配置，如果是单resourcemanager,这里为空即可
@@ -153,6 +164,9 @@ mastersFailover="/escheduler/lock/failover/masters"
 
 # zk worker容错分布式锁
 workersFailover="/escheduler/lock/failover/masters"
+
+# zk master启动容错分布式锁
+mastersStartupFailover="/escheduler/lock/failover/startup-masters"
 
 # zk session 超时
 zkSessionTimeout="300"
@@ -258,6 +272,7 @@ sed -i ${txt} "s#zookeeper.escheduler.lock.masters.*#zookeeper.escheduler.lock.m
 sed -i ${txt} "s#zookeeper.escheduler.lock.workers.*#zookeeper.escheduler.lock.workers=${workersLock}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.escheduler.lock.failover.masters.*#zookeeper.escheduler.lock.failover.masters=${mastersFailover}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.escheduler.lock.failover.workers.*#zookeeper.escheduler.lock.failover.workers=${workersFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.lock.failover.startup.masters.*#zookeeper.escheduler.lock.failover.startup.masters=${mastersStartupFailover}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/zookeeper.properties
@@ -364,3 +379,30 @@ fi
 # 6,启动
 echo "6,启动"
 sh ${workDir}/script/start_all.sh
+
+# 7,启动监控自启动脚本
+monitor_pid=${workDir}/monitor_server.pid
+if [ "true" = $monitorServerState ];then
+        if [ -f $monitor_pid ]; then
+                TARGET_PID=`cat $monitor_pid`
+                if kill -0 $TARGET_PID > /dev/null 2>&1; then
+                        echo "monitor server running as process ${TARGET_PID}.Stopping"
+                        kill $TARGET_PID
+                        sleep 5
+                        if kill -0 $TARGET_PID > /dev/null 2>&1; then
+                                echo "monitor server did not stop gracefully after 5 seconds: killing with kill -9"
+                                kill -9 $TARGET_PID
+                        fi
+                else
+                        echo "no monitor server to stop"
+                fi
+                echo "monitor server running as process ${TARGET_PID}.Stopped success"
+                rm -f $monitor_pid
+        fi
+        nohup python -u ${workDir}/script/monitor_server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor_server
+.log 2>&1 &
+        echo $! > $monitor_pid
+        echo "start monitor server success as process `cat $monitor_pid`"
+
+fi
+

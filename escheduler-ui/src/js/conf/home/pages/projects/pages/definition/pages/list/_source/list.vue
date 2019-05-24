@@ -1,9 +1,12 @@
 <template>
-  <div class="list-model">
+  <div class="list-model" style="position: relative;">
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th width="50">
+            <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
+          </th>
+          <th width="40">
             <span>{{$t('#')}}</span>
           </th>
           <th>
@@ -29,7 +32,8 @@
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
-          <td>
+          <td width="50"><x-checkbox v-model="item.isCheck" @on-change="_arrDelChange"></x-checkbox></td>
+          <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
@@ -60,11 +64,33 @@
             <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu"><!--{{$t('下线')}}--></x-button>
             <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu-copy"><!--{{$t('上线')}}--></x-button>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Manage')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-paibanguanli"><!--{{$t('定时管理')}}--></x-button>
+            <x-poptip
+              :ref="'poptip-delete-' + $index"
+              placement="bottom-end"
+              width="90">
+              <p>{{$t('Delete?')}}</p>
+              <div style="text-align: right; margin: 0;padding-top: 4px;">
+                <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
+                <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
+              </div>
+              <template slot="reference">
+                <x-button
+                  icon="iconfont icon-shanchu"
+                  type="error"
+                  shape="circle"
+                  size="xsmall"
+                  data-toggle="tooltip"
+                  :title="$t('delete')"
+                  v-ps="['GENERAL_USER']">
+                </x-button>
+              </template>
+            </x-poptip>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('TreeView')" @click="_treeView(item)"  icon="iconfont icon-juxingkaobei"><!--{{$t('树形图')}}--></x-button>
           </td>
         </tr>
       </table>
     </div>
+    <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">删除</x-button>
   </div>
 </template>
 <script>
@@ -78,7 +104,9 @@
     name: 'definition-list',
     data () {
       return {
-        list: []
+        list: [],
+        strDelete: '',
+        checkAll: false
       }
     },
     props: {
@@ -87,7 +115,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition']),
       _rtPublishStatus (code) {
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
@@ -180,6 +208,27 @@
         this.$router.push({ path: `/projects/definition/list/timing/${item.id}` })
       },
       /**
+       * Close the delete layer
+       */
+      _closeDelete (i) {
+        this.$refs[`poptip-delete-${i}`][0].doClose()
+      },
+      /**
+       * delete
+       */
+      _delete (item, i) {
+        this.deleteDefinition({
+          processDefinitionId: item.id
+        }).then(res => {
+          this.$refs[`poptip-delete-${i}`][0].doClose()
+          this._onUpdate()
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.$refs[`poptip-delete-${i}`][0].doClose()
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * edit
        */
       _edit (item) {
@@ -217,20 +266,66 @@
       },
       _onUpdate () {
         this.$emit('on-update')
+      },
+      /**
+       * click the select-all checkbox
+       */
+      _topCheckBoxClick (v) {
+        this.list.forEach((item, i) => {
+          this.$set(this.list[i], 'isCheck', v)
+        })
+        this._arrDelChange()
+      },
+      /**
+       * the array that to be delete
+       */
+      _arrDelChange (v) {
+        let arr = []
+        this.list.forEach((item)=>{
+          if (item.isCheck) {
+            arr.push(item.id)
+          }
+        })
+        this.strDelete = _.join(arr, ',')
+        if (v === false) {
+          this.checkAll = false
+        }
+      },
+      /**
+       * batch delete
+       */
+      _batchDelete () {
+        this.batchDeleteDefinition({
+          processDefinitionIds: this.strDelete
+        }).then(res => {
+          this._onUpdate()
+          this.checkAll = false
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.checkAll = false
+          this.$message.error(e.msg || '')
+        })
       }
     },
     watch: {
-      processList (a) {
-        this.list = []
-        setTimeout(() => {
-          this.list = a
-        })
+      processList: {
+        handler (a) {
+          this.checkAll = false
+          this.list = []
+          setTimeout(() => {
+            this.list = _.cloneDeep(a)
+          })
+        },
+        immediate: true,
+        deep: true
+      },
+      pageNo () {
+        this.strDelete = ''
       }
     },
     created () {
     },
     mounted () {
-      this.list = this.processList
     },
     components: { }
   }

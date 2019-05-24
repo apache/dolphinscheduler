@@ -92,7 +92,8 @@
             this.isData = false
           } else {
             this.isData = true
-            this._handlerEditor().setValue(res.data.content || '')
+            let content = res.data.content ? res.data.content + '\n' : ''
+            this._handlerEditor().setValue(content)
             setTimeout(() => {
               $('.code-mirror-model').scrollTop(12).scrollLeft(0)
             }, 200)
