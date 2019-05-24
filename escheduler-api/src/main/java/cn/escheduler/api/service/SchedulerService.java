@@ -514,6 +514,13 @@ public class SchedulerService extends BaseService {
             putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, scheduleId);
             return result;
         }
+
+        // Determine if the login user is the owner of the schedule
+        if (loginUser.getId() != schedule.getUserId()) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
         // check schedule is already online
         if(schedule.getReleaseState() == ReleaseState.ONLINE){
             putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE,schedule.getId());

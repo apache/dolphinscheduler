@@ -111,6 +111,8 @@ export default {
   'Please enter ExecutorPlease enter Executor core number': 'Please enter ExecutorPlease enter Executor core number',
   'Core number should be positive integer': 'Core number should be positive integer',
   'SQL Type': 'SQL Type',
+  'Title': 'Title',
+  'Please enter the title of email': 'Please enter the title of email',
   'Table': 'Table',
   'Attachment': 'Attachment',
   'SQL Parameter': 'SQL Parameter',
@@ -452,6 +454,6 @@ export default {
   'Pre Statement': 'Pre Statement',
   'Post Statement': 'Post Statement',
   'Statement cannot be empty': 'Statement cannot be empty',
-  'Process Define Count':'Process Define Count',
-  'Process Instance Running Count':'Process Instance Running Count',
+  'Process Define Count': 'Process Define Count',
+  'Process Instance Running Count': 'Process Instance Running Count'
 }

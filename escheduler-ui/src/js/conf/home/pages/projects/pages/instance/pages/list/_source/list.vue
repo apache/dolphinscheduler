@@ -1,15 +1,18 @@
 <template>
-  <div class="list-model">
+  <div class="list-model" style="position: relative;">
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th width="50">
+            <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
+          </th>
+          <th width="40">
             <span>{{$t('#')}}</span>
           </th>
           <th>
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th width="120">
+          <th>
             <span>{{$t('Run Type')}}</span>
           </th>
           <th width="140">
@@ -18,10 +21,10 @@
           <th width="140">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th width="90">
+          <th width="70">
             <span>{{$t('Duration')}}s</span>
           </th>
-          <th width="72">
+          <th width="70">
             <span>{{$t('Run Times')}}</span>
           </th>
           <th width="100">
@@ -33,12 +36,13 @@
           <th width="50">
             <span>{{$t('State')}}</span>
           </th>
-          <th width="260">
+          <th width="220">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
-          <td>
+          <td width="50"><x-checkbox v-model="item.isCheck" @on-change="_arrDelChange"></x-checkbox></td>
+          <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
@@ -50,8 +54,8 @@
             <span v-if="item.endTime">{{item.endTime | formatDate}}</span>
             <span v-if="!item.endTime">-</span>
           </td>
-          <td><span>{{item.duration || '-'}}</span></td>
-          <td><span>{{item.runTimes}}</span></td>
+          <td width="70"><span>{{item.duration || '-'}}</span></td>
+          <td width="70"><span>{{item.runTimes}}</span></td>
           <td>
             <span v-if="item.host">{{item.host}}</span>
             <span v-if="!item.host">-</span>
@@ -245,6 +249,7 @@
         </tr>
       </table>
     </div>
+    <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">删除</x-button>
   </div>
 </template>
 <script>
@@ -259,7 +264,9 @@
         // 数据
         list: [],
         // 按钮类型
-        buttonType: ''
+        buttonType: '',
+        strDelete: '',
+        checkAll: false
       }
     },
     props: {
@@ -268,7 +275,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editExecutorsState', 'deleteInstance']),
+      ...mapActions('dag', ['editExecutorsState', 'deleteInstance', 'batchDeleteInstance']),
       /**
        * Return run type
        */
@@ -440,20 +447,57 @@
       },
       _gantt (item) {
         this.$router.push({ path: `/projects/instance/gantt/${item.id}` })
+      },
+      _topCheckBoxClick (v) {
+        this.list.forEach((item, i) => {
+          this.$set(this.list[i], 'isCheck', v)
+        })
+        this._arrDelChange()
+      },
+      _arrDelChange (v) {
+        let arr = []
+        this.list.forEach((item)=>{
+          if (item.isCheck) {
+            arr.push(item.id)
+          }
+        })
+        this.strDelete = _.join(arr, ',')
+        if (v === false) {
+          this.checkAll = false
+        }
+      },
+      _batchDelete () {
+        this.batchDeleteInstance({
+          processInstanceIds: this.strDelete
+        }).then(res => {
+          this._onUpdate()
+          this.checkAll = false
+          this.$message.success(res.msg)
+        }).catch(e => {
+          this.checkAll = false
+          this.$message.error(e.msg || '')
+        })
       }
     },
     watch: {
-      processInstanceList (a) {
-        this.list = []
-        setTimeout(() => {
-          this.list = this._listDataHandle(a)
-        })
+      processInstanceList: {
+        handler (a) {
+          this.checkAll = false
+          this.list = []
+          setTimeout(() => {
+            this.list = _.cloneDeep(this._listDataHandle(a))
+          })
+        },
+        immediate: true,
+        deep: true
+      },
+      pageNo () {
+        this.strDelete = ''
       }
     },
     created () {
     },
     mounted () {
-      this.list = this._listDataHandle(this.processInstanceList)
     },
     components: { }
   }
