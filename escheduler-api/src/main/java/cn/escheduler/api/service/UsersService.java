@@ -115,6 +115,9 @@ public class UsersService extends BaseService {
         user.setUserType(UserType.GENERAL_USER);
         user.setCreateTime(now);
         user.setUpdateTime(now);
+        if (StringUtils.isEmpty(queue)){
+            queue = "";
+        }
         user.setQueue(queue);
 
         // save user

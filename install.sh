@@ -96,6 +96,13 @@ mailSender="xxxxxxxxxx"
 # 发送人密码
 mailPassword="xxxxxxxxxx"
 
+# TLS邮件协议支持
+starttlsEnable="false"
+
+# SSL邮件协议支持
+# 注意：默认开启的是SSL协议，TLS和SSL只能有一个处于true状态
+sslEnable="true"
+
 # 下载Excel路径
 xlsFilePath="/tmp/xls"
 
@@ -307,6 +314,8 @@ sed -i ${txt} "s#mail.server.host.*#mail.server.host=${mailServerHost}#g" conf/a
 sed -i ${txt} "s#mail.server.port.*#mail.server.port=${mailServerPort}#g" conf/alert.properties
 sed -i ${txt} "s#mail.sender.*#mail.sender=${mailSender}#g" conf/alert.properties
 sed -i ${txt} "s#mail.passwd.*#mail.passwd=${mailPassword}#g" conf/alert.properties
+sed -i ${txt} "s#mail.smtp.starttls.enable.*#mail.smtp.starttls.enable=${starttlsEnable}#g" conf/alert.properties
+sed -i ${txt} "s#mail.smtp.ssl.enable.*#mail.smtp.ssl.enable=${sslEnable}#g" conf/alert.properties
 sed -i ${txt} "s#xls.file.path.*#xls.file.path=${xlsFilePath}#g" conf/alert.properties
 
 
