@@ -572,11 +572,10 @@ public class ProcessInstanceMapperProvider {
 
                 FROM(TABLE_NAME);
 
-                WHERE("process_definition_id=#{processDefinitionId} ");
                 if(parameter.get("startTime") != null && parameter.get("endTime") != null
                         ){
-                    WHERE("schedule_time between #{startTime} and #{endTime} " +
-                            "or start_time between #{startTime} and #{endTime}");
+                    WHERE("process_definition_id=#{processDefinitionId} and (schedule_time between #{startTime} and #{endTime} " +
+                            "or start_time between #{startTime} and #{endTime})");
                 }
                 WHERE("`state` in (" + strStates.toString() + ")");
                 ORDER_BY("start_time desc limit 1");
