@@ -144,3 +144,6 @@ escheduler-ui/dist/js/login/index.291b8e3.js.map
 escheduler-ui/dist/lib/external/
 escheduler-ui/src/js/conf/home/pages/projects/pages/taskInstance/index.vue
 /escheduler-dao/src/main/resources/dao/data_source.properties
+core-site.xml
+hdfs-site.xml
+yarn-site.xml
