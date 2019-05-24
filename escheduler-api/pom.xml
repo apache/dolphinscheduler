@@ -32,6 +32,10 @@
           <artifactId>leveldbjni-all</artifactId>
           <groupId>org.fusesource.leveldbjni</groupId>
         </exclusion>
+        <exclusion>
+          <artifactId>protobuf-java</artifactId>
+          <groupId>com.google.protobuf</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
 

@@ -22,6 +22,9 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.enums.Flag;
+import cn.escheduler.common.queue.ITaskQueue;
+import cn.escheduler.common.queue.TaskQueueFactory;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -86,6 +89,7 @@ public class ProcessInstanceController extends BaseController{
                     "search value:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
                     loginUser.getUserName(), projectName, processDefinitionId, searchVal, stateType,host,
                     startTime, endTime, pageNo, pageSize);
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = processInstanceService.queryProcessInstanceList(
                     loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
             return returnDataListPaging(result);
@@ -223,7 +227,9 @@ public class ProcessInstanceController extends BaseController{
         try{
             logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
                     loginUser.getUserName(), projectName, processInstanceId);
-            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+            // task queue
+            ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
+            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getMsg(),e);
@@ -330,6 +336,32 @@ public class ProcessInstanceController extends BaseController{
         }catch (Exception e){
             logger.error(ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR.getMsg(),e);
             return error(Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR.getCode(),ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * batch delete process instance by ids, at the same time,
+     * delete task instance and their mapping relation data
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processInstanceIds
+     * @return
+     */
+    @GetMapping(value="/batch-delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result batchDeleteProcessInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @PathVariable String projectName,
+                                            @RequestParam("processInstanceIds") String processInstanceIds
+    ){
+        try{
+            logger.info("delete process instance by ids, login user:{}, project name:{}, process instance ids :{}",
+                    loginUser.getUserName(), projectName, processInstanceIds);
+            Map<String, Object> result = processInstanceService.batchDeleteProcessInstanceByIds(loginUser, projectName, processInstanceIds);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR.getMsg(),e);
+            return error(Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR.getCode(), Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR.getMsg());
         }
     }
 }

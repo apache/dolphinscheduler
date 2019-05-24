@@ -111,6 +111,8 @@ export default {
   'Please enter ExecutorPlease enter Executor core number': '请填写Executor内核数',
   'Core number should be positive integer': '内核数为正整数',
   'SQL Type': 'sql类型',
+  'Title': '主题',
+  'Please enter the title of email': '请输入邮件主题',
   'Table': '表格',
   'Attachment': '附件',
   'SQL Parameter': 'sql参数',
@@ -452,4 +454,6 @@ export default {
   'Pre Statement': '前置sql',
   'Post Statement': '后置sql',
   'Statement cannot be empty': '语句不能为空',
+  'Process Define Count': '流程定义个数',
+  'Process Instance Running Count': '运行流程实例个数'
 }
