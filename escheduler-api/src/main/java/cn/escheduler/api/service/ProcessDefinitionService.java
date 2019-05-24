@@ -295,7 +295,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();
         if (processData.getGlobalParams() != null && processData.getGlobalParams().size() > 0) {
-            Set<Property> userDefParamsSet = new HashSet<>(globalParamsList);
+            Set<Property> userDefParamsSet = new HashSet<>(processData.getGlobalParams());
             globalParamsList = new ArrayList<>(userDefParamsSet);
         }
         processDefine.setGlobalParamList(globalParamsList);
