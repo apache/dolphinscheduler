@@ -390,6 +390,7 @@ export default {
   'Last1Hour': '前1小时',
   'Last2Hours': '前2小时',
   'Last3Hours': '前3小时',
+  'today': '今天',
   'Last1Days': '昨天',
   'Last2Days': '前两天',
   'Last3Days': '前三天',
