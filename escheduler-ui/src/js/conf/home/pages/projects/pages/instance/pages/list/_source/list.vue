@@ -249,7 +249,20 @@
         </tr>
       </table>
     </div>
-    <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">删除</x-button>
+    <x-poptip
+            v-show="strDelete !== ''"
+            ref="poptipDeleteAll"
+            placement="bottom-start"
+            width="90">
+      <p>{{$t('Delete?')}}</p>
+      <div style="text-align: right; margin: 0;padding-top: 4px;">
+        <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete(-1)">{{$t('Cancel')}}</x-button>
+        <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
+      </div>
+      <template slot="reference">
+        <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >删除</x-button>
+      </template>
+    </x-poptip>
   </div>
 </template>
 <script>
@@ -293,12 +306,22 @@
        * Close the delete layer
        */
       _closeDelete (i) {
-        this.$refs[`poptip-delete-${i}`][0].doClose()
+        if (i > 0) {
+          this.$refs[`poptip-delete-${i}`][0].doClose()
+        }else{
+          this.$refs['poptipDeleteAll'].doClose()
+        }
       },
       /**
        * delete
        */
       _delete (item, i) {
+        // remove tow++
+        if (i < 0) {
+          this._batchDelete()
+          return
+        }
+        // remove one
         this.deleteInstance({
           processInstanceId: item.id
         }).then(res => {
@@ -467,6 +490,7 @@
         }
       },
       _batchDelete () {
+        this.$refs['poptipDeleteAll'].doClose()
         this.batchDeleteInstance({
           processInstanceIds: this.strDelete
         }).then(res => {
