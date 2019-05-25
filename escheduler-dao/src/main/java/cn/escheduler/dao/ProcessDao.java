@@ -1377,7 +1377,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @return
      */
     public List<TaskInstance> queryNeedFailoverTaskInstances(String host){
-        return taskInstanceMapper.queryByHostAndStatus(host,stateArray);
+        return taskInstanceMapper.queryByHostAndStatus(host, stateArray);
     }
 
     /**
@@ -1555,10 +1555,16 @@ public class ProcessDao extends AbstractBaseDao {
 
     }
 
-    public void selfFaultTolerant(int ... states){
-        List<ProcessInstance> processInstanceList = processInstanceMapper.listByStatus(states);
+    /**
+     * master starup fault tolerant
+     */
+    public void masterStartupFaultTolerant(){
+
+        int[] readyStopAndKill=new int[]{ExecutionStatus.READY_PAUSE.ordinal(),ExecutionStatus.READY_STOP.ordinal(),
+                ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),ExecutionStatus.RUNNING_EXEUTION.ordinal()};
+        List<ProcessInstance> processInstanceList = processInstanceMapper.listByStatus(readyStopAndKill);
         for (ProcessInstance processInstance:processInstanceList){
-            selfFaultTolerant(processInstance);
+            processNeedFailoverProcessInstances(processInstance);
         }
 
     }
