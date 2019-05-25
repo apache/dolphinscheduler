@@ -29,12 +29,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.util.Locale;
 
 import static cn.escheduler.api.enums.Status.*;
 
@@ -43,9 +46,9 @@ import static cn.escheduler.api.enums.Status.*;
  *
  * swagger bootstrap ui docs refer : https://doc.xiaominfo.com/guide/enh-func.html
  */
+@Api(tags = "LOGIN_TAG", position = 1)
 @RestController
 @RequestMapping("")
-@Api(tags = "LOGIN_TAG", position = 1)
 public class LoginController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
@@ -69,8 +72,8 @@ public class LoginController extends BaseController {
      */
     @ApiOperation(value = "login", notes= "LOGIN_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, type = "String"),
-            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, type ="String")
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataType ="String")
     })
     @PostMapping(value = "/login")
     public Result login(@RequestParam(value = "userName") String userName,

@@ -130,7 +130,7 @@ public class ProcessDefinitionController extends BaseController{
     @ApiOperation(value = "updateProccessDefinition", notes= "UPDATE_PROCCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
-            @ApiImplicitParam(name = "id", value = "PROCESS_DEFINITION_ID", required = true, type = "Int"),
+            @ApiImplicitParam(name = "id", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "processDefinitionJson", value = "PROCESS_DEFINITION_JSON", required = true, type ="String"),
             @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type ="String"),
             @ApiImplicitParam(name = "connects", value = "PROCESS_DEFINITION_CONNECTS", required = true, type ="String"),
@@ -172,8 +172,8 @@ public class ProcessDefinitionController extends BaseController{
     @ApiOperation(value = "releaseProccessDefinition", notes= "RELEASE_PROCCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
-            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, type = "Int"),
-            @ApiImplicitParam(name = "releaseState", value = "PROCESS_DEFINITION_CONNECTS", required = true, type ="Int"),
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "releaseState", value = "PROCESS_DEFINITION_CONNECTS", required = true, dataType = "Int", example = "100"),
     })
     @PostMapping(value = "/release")
     @ResponseStatus(HttpStatus.OK)
@@ -204,7 +204,7 @@ public class ProcessDefinitionController extends BaseController{
      */
     @ApiOperation(value = "queryProccessDefinitionById", notes= "QUERY_PROCCESS_DEFINITION_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, type = "Int")
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value="/select-by-id")
     @ResponseStatus(HttpStatus.OK)
@@ -258,10 +258,10 @@ public class ProcessDefinitionController extends BaseController{
      */
     @ApiOperation(value = "queryProcessDefinitionListPaging", notes= "QUERY_PROCCESS_DEFINITION_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, type = "Int"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", required = false, type = "String"),
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = false, type = "Int"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, type = "Int")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = false, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value="/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -296,8 +296,8 @@ public class ProcessDefinitionController extends BaseController{
      */
     @ApiOperation(value = "viewTree", notes= "VIEW_TREE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, type = "Int"),
-            @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, type = "Int")
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value="/view-tree")
     @ResponseStatus(HttpStatus.OK)
@@ -327,7 +327,7 @@ public class ProcessDefinitionController extends BaseController{
      */
     @ApiOperation(value = "getNodeListByDefinitionId", notes= "GET_NODE_LIST_BY_DEFINITION_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, type = "Int")
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value="gen-task-list")
     @ResponseStatus(HttpStatus.OK)
