@@ -408,8 +408,7 @@ if [ "true" = $monitorServerState ];then
                 echo "monitor server running as process ${TARGET_PID}.Stopped success"
                 rm -f $monitor_pid
         fi
-        nohup python -u ${workDir}/script/monitor_server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor_server
-.log 2>&1 &
+        nohup python -u ${workDir}/script/monitor_server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor_server.log 2>&1 &
         echo $! > $monitor_pid
         echo "start monitor server success as process `cat $monitor_pid`"
 
