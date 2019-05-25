@@ -79,7 +79,7 @@
                   type="error"
                   shape="circle"
                   size="xsmall"
-                  :disabled="item.releaseState === 'OFFLINE'"
+                  :disabled="item.releaseState === 'ONLINE'"
                   data-toggle="tooltip"
                   :title="$t('delete')"
                   v-ps="['GENERAL_USER']">
