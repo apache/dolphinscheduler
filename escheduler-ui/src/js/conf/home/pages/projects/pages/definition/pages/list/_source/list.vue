@@ -32,7 +32,7 @@
           </th>
         </tr>
         <tr v-for="(item, $index) in list" :key="item.id">
-          <td width="50"><x-checkbox v-model="item.isCheck" @on-change="_arrDelChange"></x-checkbox></td>
+          <td width="50"><x-checkbox v-model="item.isCheck" :disabled="item.releaseState === 'OFFLINE'" @on-change="_arrDelChange"></x-checkbox></td>
           <td width="50">
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
@@ -79,6 +79,7 @@
                   type="error"
                   shape="circle"
                   size="xsmall"
+                  :disabled="item.releaseState === 'OFFLINE'"
                   data-toggle="tooltip"
                   :title="$t('delete')"
                   v-ps="['GENERAL_USER']">
