@@ -295,10 +295,8 @@
       /**
        * click the select-all checkbox
        */
-      _topCheckBoxClick (v) {
-        this.list.forEach((item, i) => {
-          this.$set(this.list[i], 'isCheck', item.releaseState !== 'OFFLINE' ? v : false)
-        })
+      _topCheckBoxClick (is) {
+        _.map(this.list , v => v.isCheck = v.releaseState === 'ONLINE' ? false : is)
         this._arrDelChange()
       },
       /**
