@@ -53,8 +53,8 @@
           </td>
           <td><span class="ellipsis">{{item.desc}}</span></td>
           <td>
-            <span v-if="item.scheduleReleaseState === 'OFFLINE'">{{$t('online')}}</span>
-            <span v-if="item.scheduleReleaseState === 'ONLINE'">{{$t('offline')}}</span>
+            <span v-if="item.scheduleReleaseState === 'OFFLINE'">{{$t('offline')}}</span>
+            <span v-if="item.scheduleReleaseState === 'ONLINE'">{{$t('online')}}</span>
             <span v-if="!item.scheduleReleaseState">-</span>
           </td>
           <td>
