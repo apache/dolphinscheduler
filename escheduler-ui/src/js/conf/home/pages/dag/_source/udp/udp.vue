@@ -84,6 +84,8 @@
         desc: '',
         // Global custom parameters
         udpList: [],
+        // Global custom parameters
+        udpListCache: [],
         // Whether to update the process definition
         syncDefine: true,
         // Timeout alarm
@@ -159,11 +161,7 @@
        * Close the popup
        */
       close () {
-        // Storage global globalParams
-        this._accuStore()
-        setTimeout(() => {
-          this.$emit('close')
-        })
+        this.$emit('close')
       }
     },
     watch: {
@@ -175,11 +173,13 @@
       }
     },
     created () {
-      this.udpList = this.store.state.dag.globalParams
-      this.name = this.store.state.dag.name
-      this.desc = this.store.state.dag.desc
-      this.syncDefine = this.store.state.dag.syncDefine
-      this.timeout = this.store.state.dag.timeout || 0
+      const dag = _.cloneDeep(this.store.state.dag)
+      this.udpList = dag.globalParams
+      this.udpListCache = dag.globalParams
+      this.name = dag.name
+      this.desc = dag.desc
+      this.syncDefine = dag.syncDefine
+      this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
     },
     mounted () {},
