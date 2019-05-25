@@ -61,8 +61,8 @@
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Edit')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-bianji"><!--{{$t('编辑')}}--></x-button>
             <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Start')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-qidong"><!--{{$t('启动')}}--></x-button>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null" v-ps="['GENERAL_USER']" icon="iconfont icon-timer"><!--{{$t('定时')}}--></x-button>
-            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu"><!--{{$t('下线')}}--></x-button>
-            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu-copy"><!--{{$t('上线')}}--></x-button>
+            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu-copy"><!--{{$t('下线')}}--></x-button>
+            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu"><!--{{$t('上线')}}--></x-button>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Manage')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-paibanguanli"><!--{{$t('定时管理')}}--></x-button>
             <x-poptip
               :ref="'poptip-delete-' + $index"
@@ -91,7 +91,21 @@
         </tr>
       </table>
     </div>
-    <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">删除</x-button>
+    <x-poptip
+            v-show="strDelete !== ''"
+            ref="poptipDeleteAll"
+            placement="bottom-start"
+            width="90">
+      <p>{{$t('Delete?')}}</p>
+      <div style="text-align: right; margin: 0;padding-top: 4px;">
+        <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete(-1)">{{$t('Cancel')}}</x-button>
+        <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
+      </div>
+      <template slot="reference">
+        <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >删除</x-button>
+      </template>
+    </x-poptip>
+
   </div>
 </template>
 <script>
@@ -212,12 +226,22 @@
        * Close the delete layer
        */
       _closeDelete (i) {
-        this.$refs[`poptip-delete-${i}`][0].doClose()
+        if (i > 0) {
+          this.$refs[`poptip-delete-${i}`][0].doClose()
+        }else{
+          this.$refs['poptipDeleteAll'].doClose()
+        }
       },
       /**
        * delete
        */
       _delete (item, i) {
+        // remove tow++
+        if (i < 0) {
+          this._batchDelete()
+          return
+        }
+        // remove one
         this.deleteDefinition({
           processDefinitionId: item.id
         }).then(res => {
@@ -273,7 +297,7 @@
        */
       _topCheckBoxClick (v) {
         this.list.forEach((item, i) => {
-          this.$set(this.list[i], 'isCheck', v)
+          this.$set(this.list[i], 'isCheck', item.releaseState !== 'OFFLINE' ? v : false)
         })
         this._arrDelChange()
       },
@@ -296,6 +320,7 @@
        * batch delete
        */
       _batchDelete () {
+        this.$refs['poptipDeleteAll'].doClose()
         this.batchDeleteDefinition({
           processDefinitionIds: this.strDelete
         }).then(res => {
