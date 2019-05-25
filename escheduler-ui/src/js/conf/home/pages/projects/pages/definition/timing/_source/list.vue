@@ -79,7 +79,7 @@
                         :disabled="item.releaseState === 'ONLINE'" >
                 </x-button>
                 <x-button
-                        type="success"
+                        type="warning"
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
@@ -89,7 +89,7 @@
                         v-if="item.releaseState === 'OFFLINE'">
                 </x-button>
                 <x-button
-                        type="warning"
+                        type="error"
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
