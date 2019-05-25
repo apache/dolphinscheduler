@@ -456,5 +456,6 @@ export default {
   'Post Statement': '后置sql',
   'Statement cannot be empty': '语句不能为空',
   'Process Define Count': '流程定义个数',
-  'Process Instance Running Count': '运行流程实例个数'
+  'Process Instance Running Count': '运行流程实例个数',
+  'Please select a queue': '请选择队列',
 }

@@ -203,7 +203,9 @@ public class UserMapperProvider {
     public String queryUserPaging(Map<String, Object> parameter) {
         return new SQL() {
             {
-                SELECT("u.*,t.tenant_name,q.queue_name");
+                SELECT("u.id,u.user_name,u.user_password,u.user_type,u.email,u.phone,u.tenant_id,u.create_time,u.update_time,t.tenant_name," +
+                        "case when u.queue <> '' then u.queue else q.queue_name end as queue," +
+                        "q.queue_name");
                 FROM(TABLE_NAME + " u ");
                 LEFT_OUTER_JOIN("t_escheduler_tenant t on u.tenant_id = t.id");
                 LEFT_OUTER_JOIN("t_escheduler_queue q on t.queue_id = q.id");
@@ -228,7 +230,8 @@ public class UserMapperProvider {
     public String queryDetailsById(Map<String, Object> parameter) {
         return new SQL() {
             {
-                SELECT("u.*,q.queue_name,t.tenant_name");
+                SELECT("u.*, t.tenant_name," +
+                        "case when u.queue <> '' then u.queue else q.queue_name end as queue_name");
 
                 FROM(TABLE_NAME + " u,t_escheduler_tenant t,t_escheduler_queue q");
 
