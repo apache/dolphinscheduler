@@ -21,6 +21,10 @@ import cn.escheduler.api.service.DataAnalysisService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +39,7 @@ import static cn.escheduler.api.enums.Status.*;
 /**
  * data analysis controller
  */
-@ApiIgnore
+@Api(tags = "DATA_ANALYSIS_TAG", position = 1)
 @RestController
 @RequestMapping("projects/analysis")
 public class DataAnalysisController extends BaseController{
@@ -54,9 +58,15 @@ public class DataAnalysisController extends BaseController{
      * @param projectId
      * @return
      */
+    @ApiOperation(value = "countTaskState", notes= "COUNT_TASK_STATE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", dataType ="String"),
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID",  dataType ="Int", example = "100")
+    })
     @GetMapping(value="/task-state-count")
     @ResponseStatus(HttpStatus.OK)
-    public Result countTaskState(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result countTaskState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                          @RequestParam(value="startDate", required=false) String startDate,
                                                          @RequestParam(value="endDate", required=false) String endDate,
                                                          @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
@@ -78,9 +88,15 @@ public class DataAnalysisController extends BaseController{
      * @param projectId
      * @return
      */
+    @ApiOperation(value = "countProcessInstanceState", notes= "COUNT_PROCESS_INSTANCE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE",  dataType ="String"),
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID",  dataType ="Int", example = "100")
+    })
     @GetMapping(value="/process-state-count")
     @ResponseStatus(HttpStatus.OK)
-    public Result countProcessInstanceState(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result countProcessInstanceState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value="startDate", required=false) String startDate,
                                             @RequestParam(value="endDate", required=false) String endDate,
                                             @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
@@ -102,9 +118,13 @@ public class DataAnalysisController extends BaseController{
      * @param projectId
      * @return
      */
+    @ApiOperation(value = "countDefinitionByUser", notes= "COUNT_PROCESS_DEFINITION_BY_USER_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType ="Int", example = "100")
+    })
     @GetMapping(value="/define-user-count")
     @ResponseStatus(HttpStatus.OK)
-    public Result countDefinitionByUser(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result countDefinitionByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
         try{
             logger.info("count process definition , user:{}, project id",
@@ -125,9 +145,15 @@ public class DataAnalysisController extends BaseController{
      * @param projectId
      * @return
      */
+    @ApiOperation(value = "countCommandState", notes= "COUNT_COMMAND_STATE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE",  dataType ="String"),
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID",  dataType ="Int", example = "100")
+    })
     @GetMapping(value="/command-state-count")
     @ResponseStatus(HttpStatus.OK)
-    public Result countCommandState(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result countCommandState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value="startDate", required=false) String startDate,
                                  @RequestParam(value="endDate", required=false) String endDate,
                                  @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
@@ -149,9 +175,15 @@ public class DataAnalysisController extends BaseController{
      * @param projectId
      * @return
      */
+    @ApiOperation(value = "countQueueState", notes= "COUNT_QUEUE_STATE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE",  dataType ="String"),
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID",  dataType ="Int", example = "100")
+    })
     @GetMapping(value="/queue-count")
     @ResponseStatus(HttpStatus.OK)
-    public Result countQueueState(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
         try{
             logger.info("count command state, user:{}, start date: {}, end date:{}, project id {}",

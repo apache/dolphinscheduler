@@ -48,7 +48,7 @@ public class SwaggerConfig implements WebMvcConfigurer {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder().title("Easy Scheduler Api Docs").description("Easy Scheduler Api Docs")
-                .version("1.0.0").build();
+                .build();
     }
 
 

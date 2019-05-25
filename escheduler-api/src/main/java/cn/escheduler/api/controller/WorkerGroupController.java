@@ -19,9 +19,12 @@ package cn.escheduler.api.controller;
 
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.WorkerGroupService;
-import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +34,12 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
+import static cn.escheduler.api.utils.Constants.SESSION_USER;
+
 /**
  * worker group controller
  */
-@ApiIgnore
+@Api(tags = "WORKER_GROUP_TAG", position = 1)
 @RestController
 @RequestMapping("/worker-group")
 public class WorkerGroupController extends BaseController{
@@ -54,9 +59,15 @@ public class WorkerGroupController extends BaseController{
      * @param ipList
      * @return
      */
+    @ApiOperation(value = "saveWorkerGroup", notes= "CREATE_WORKER_GROUP_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
+            @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType ="String"),
+            @ApiImplicitParam(name = "ipList", value = "WORKER_IP_LIST", required = true, dataType ="String")
+    })
     @PostMapping(value = "/save")
     @ResponseStatus(HttpStatus.OK)
-    public Result saveWorkerGroup(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result saveWorkerGroup(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                              @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                              @RequestParam(value = "name") String name,
                              @RequestParam(value = "ipList") String ipList
@@ -81,9 +92,15 @@ public class WorkerGroupController extends BaseController{
      * @param pageSize
      * @return
      */
+    @ApiOperation(value = "queryAllWorkerGroupsPaging", notes= "QUERY_WORKER_GROUP_PAGING_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", dataType = "Int", example = "10", defaultValue = "0"),
+            @ApiImplicitParam(name = "name", value = "WORKER_GROUP_NAME", required = true, dataType ="String"),
+            @ApiImplicitParam(name = "ipList", value = "WORKER_IP_LIST", required = true, dataType ="String")
+    })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryAllWorkerGroupsPaging(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryAllWorkerGroupsPaging(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                              @RequestParam("pageNo") Integer pageNo,
                                              @RequestParam(value = "searchVal", required = false) String searchVal,
                                              @RequestParam("pageSize") Integer pageSize
@@ -105,9 +122,10 @@ public class WorkerGroupController extends BaseController{
      * @param loginUser
      * @return
      */
+    @ApiOperation(value = "queryAllWorkerGroups", notes= "QUERY_WORKER_GROUP_LIST_NOTES")
     @GetMapping(value = "/all-groups")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryAllWorkerGroups(@RequestAttribute(value = Constants.SESSION_USER) User loginUser
+    public Result queryAllWorkerGroups(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser
     ) {
         logger.info("query all worker group: login user {}",
                 loginUser.getUserName() );
@@ -127,9 +145,14 @@ public class WorkerGroupController extends BaseController{
      * @param id
      * @return
      */
+    @ApiOperation(value = "deleteById", notes= "DELETE_WORKER_GROUP_BY_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "WORKER_GROUP_ID", required = true, dataType = "Int", example = "10"),
+
+    })
     @GetMapping(value = "/delete-by-id")
     @ResponseStatus(HttpStatus.OK)
-    public Result deleteById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result deleteById(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                              @RequestParam("id") Integer id
     ) {
         logger.info("delete worker group: login user {}, id:{} ",

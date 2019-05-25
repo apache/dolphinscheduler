@@ -41,7 +41,7 @@ import static cn.escheduler.api.enums.Status.*;
 /**
  * data source controller
  */
-@Api(tags = "DATA_SOURCE_TAG", position = 1)
+@Api(tags = "DATA_SOURCE_TAG", position = 3)
 @RestController
 @RequestMapping("datasources")
 public class DataSourceController extends BaseController {
