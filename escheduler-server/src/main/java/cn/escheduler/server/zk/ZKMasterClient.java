@@ -134,7 +134,7 @@ public class ZKMasterClient extends AbstractZKClient {
 
 			// check if fault tolerance is required，failure and tolerance
 			if (getActiveMasterNum() == 1) {
-				processDao.selfFaultTolerant(ExecutionStatus.RUNNING_EXEUTION.ordinal(),ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal());
+				processDao.masterStartupFaultTolerant();
 			}
 
 		}catch (Exception e){
