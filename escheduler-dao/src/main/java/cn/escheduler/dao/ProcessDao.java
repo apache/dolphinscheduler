@@ -588,10 +588,12 @@ public class ProcessDao extends AbstractBaseDao {
             case START_FAILURE_TASK_PROCESS:
                 // find failed tasks and init these tasks
                 List<Integer> failedList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.FAILURE);
+                List<Integer> toleranceList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.NEED_FAULT_TOLERANCE);
                 List<Integer> killedList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.KILL);
                 cmdParam.remove(Constants.CMDPARAM_RECOVERY_START_NODE_STRING);
 
                 failedList.addAll(killedList);
+                failedList.addAll(toleranceList);
                 for(Integer taskId : failedList){
                     initTaskInstance(this.findTaskInstanceById(taskId));
                 }

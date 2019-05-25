@@ -390,6 +390,7 @@ export default {
   'Last1Hour': 'Last1Hour',
   'Last2Hours': 'Last2Hours',
   'Last3Hours': 'Last3Hours',
+  'today': 'today',
   'Last1Days': 'Last1Days',
   'Last2Days': 'Last2Days',
   'Last3Days': 'Last3Days',

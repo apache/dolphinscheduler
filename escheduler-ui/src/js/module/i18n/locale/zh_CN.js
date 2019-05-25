@@ -390,6 +390,7 @@ export default {
   'Last1Hour': '前1小时',
   'Last2Hours': '前2小时',
   'Last3Hours': '前3小时',
+  'today': '今天',
   'Last1Days': '昨天',
   'Last2Days': '前两天',
   'Last3Days': '前三天',
@@ -455,5 +456,6 @@ export default {
   'Post Statement': '后置sql',
   'Statement cannot be empty': '语句不能为空',
   'Process Define Count': '流程定义个数',
-  'Process Instance Running Count': '运行流程实例个数'
+  'Process Instance Running Count': '运行流程实例个数',
+  'Please select a queue': '请选择队列',
 }
