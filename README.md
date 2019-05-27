@@ -45,7 +45,7 @@ Easy Scheduler
 
 - <a href="http://52.82.13.76:8888" target="_blank">我要体验</a>
 
-- [**FAQ**](https://analysys.github.io/easyscheduler_docs_cn/FAQ.html?_blank "FAQ") 
+- [**FAQ**](https://analysys.github.io/easyscheduler_docs_cn/EasyScheduler-FAQ".html?_blank "EasyScheduler-FAQ") 
 
 更多文档请参考 <a href="https://analysys.github.io/easyscheduler_docs_cn/" target="_blank">easyscheduler中文在线文档</a>
 
