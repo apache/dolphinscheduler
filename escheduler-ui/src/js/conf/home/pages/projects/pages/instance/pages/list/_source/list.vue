@@ -260,7 +260,7 @@
         <x-button type="primary" size="xsmall" shape="circle" @click="_delete({},-1)">{{$t('Confirm')}}</x-button>
       </div>
       <template slot="reference">
-        <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >删除</x-button>
+        <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" >{{$t('Delete')}}</x-button>
       </template>
     </x-poptip>
   </div>
