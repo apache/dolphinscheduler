@@ -90,7 +90,7 @@
         </tr>
       </table>
     </div>
-    <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">{{$t('Delete')}}</x-button>
+    <x-button size="xsmall" style="position: absolute; bottom: -48px; left: 22px;" v-if="strDelete !== ''" @click="_batchDelete">删除</x-button>
   </div>
 </template>
 <script>
