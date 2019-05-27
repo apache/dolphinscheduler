@@ -77,6 +77,16 @@ public class DependentDateUtils {
     }
 
     /**
+     * get interval between this month first day and businessDate
+     * @param businessDate
+     * @return
+     */
+    public static List<DateInterval> getThisMonthInterval(Date businessDate) {
+        Date firstDay = DateUtils.getFirstDayOfMonth(businessDate);
+        return getDateIntervalListBetweenTwoDates(firstDay, businessDate);
+    }
+
+    /**
      * get interval between last month first day and last day
      * @param businessDate
      * @return
@@ -106,6 +116,16 @@ public class DependentDateUtils {
         }else{
             return getDateIntervalListBetweenTwoDates(lastDay, lastDay);
         }
+    }
+
+    /**
+     * get interval between monday to businessDate of this week
+     * @param businessDate
+     * @return
+     */
+    public static List<DateInterval> getThisWeekInterval(Date businessDate) {
+        Date mondayThisWeek = DateUtils.getMonday(businessDate);
+        return getDateIntervalListBetweenTwoDates(mondayThisWeek, businessDate);
     }
 
     /**
