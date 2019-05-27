@@ -589,5 +589,17 @@ export default {
         reject(e)
       })
     })
+  },
+  /**
+   * remove timing
+   */
+  deleteTiming({ state }, payload){
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/schedule/delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }
