@@ -701,17 +701,19 @@ public class ResourcesService extends BaseService {
         if (checkAdmin(loginUser, result)) {
             return result;
         }
-
         List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
-        Set<Resource> resourceSet = null;
+        List<Object> list ;
         if (resourceList != null && resourceList.size() > 0) {
-            resourceSet = new HashSet<>(resourceList);
-
+            Set<Resource> resourceSet = new HashSet<>(resourceList);
             List<Resource> authedResourceList = resourcesMapper.queryAuthorizedResourceList(userId);
 
             getAuthorizedResourceList(resourceSet, authedResourceList);
+            list = new ArrayList<>(resourceSet);
+        }else {
+            list = new ArrayList<>(0);
         }
-        result.put(Constants.DATA_LIST, new ArrayList<>(resourceSet));
+
+        result.put(Constants.DATA_LIST, list);
         putMsg(result,Status.SUCCESS);
         return result;
     }

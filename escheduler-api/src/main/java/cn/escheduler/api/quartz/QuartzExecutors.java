@@ -26,8 +26,8 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Calendar;
 import java.util.*;
+import java.util.Calendar;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -226,8 +226,12 @@ public class QuartzExecutors {
   public boolean deleteJob(String jobName, String jobGroupName) {
     lock.writeLock().lock();
     try {
-      logger.info("try to delete job, job name: {}, job group name: {},", jobName, jobGroupName);
-      return scheduler.deleteJob(new JobKey(jobName, jobGroupName));
+      JobKey jobKey = new JobKey(jobName,jobGroupName);
+      if(scheduler.checkExists(jobKey)){
+        logger.info("try to delete job, job name: {}, job group name: {},", jobName, jobGroupName);
+        return scheduler.deleteJob(jobKey);
+      }
+
     } catch (SchedulerException e) {
       logger.error(String.format("delete job : %s failed",jobName), e);
     } finally {

@@ -43,6 +43,10 @@ const dateValueList = {
   ],
   'day': [
     {
+      value: 'today',
+      label: `${i18n.$t('today')}`
+    },
+    {
       value: 'last1Days',
       label: `${i18n.$t('Last1Days')}`
     },

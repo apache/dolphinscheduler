@@ -84,6 +84,8 @@
         desc: '',
         // Global custom parameters
         udpList: [],
+        // Global custom parameters
+        udpListCache: [],
         // Whether to update the process definition
         syncDefine: true,
         // Timeout alarm
@@ -110,6 +112,13 @@
         }
         return true
       },
+      _accuStore(){
+        this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
+        this.store.commit('dag/setName', _.cloneDeep(this.name))
+        this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
+        this.store.commit('dag/setDesc', _.cloneDeep(this.desc))
+        this.store.commit('dag/setSyncDefine', this.syncDefine)
+      },
       /**
        * submit
        */
@@ -130,11 +139,8 @@
           }
 
           // Storage global globalParams
-          this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
-          this.store.commit('dag/setName', _.cloneDeep(this.name))
-          this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
-          this.store.commit('dag/setDesc', _.cloneDeep(this.desc))
-          this.store.commit('dag/setSyncDefine', this.syncDefine)
+          this._accuStore()
+
           Affirm.setIsPop(false)
           this.$emit('onUdp')
         }
@@ -167,11 +173,13 @@
       }
     },
     created () {
-      this.udpList = this.store.state.dag.globalParams
-      this.name = this.store.state.dag.name
-      this.desc = this.store.state.dag.desc
-      this.syncDefine = this.store.state.dag.syncDefine
-      this.timeout = this.store.state.dag.timeout || 0
+      const dag = _.cloneDeep(this.store.state.dag)
+      this.udpList = dag.globalParams
+      this.udpListCache = dag.globalParams
+      this.name = dag.name
+      this.desc = dag.desc
+      this.syncDefine = dag.syncDefine
+      this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
     },
     mounted () {},

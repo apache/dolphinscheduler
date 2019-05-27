@@ -163,6 +163,11 @@ public final class Constants {
     public static final String ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_WORKERS = "zookeeper.escheduler.lock.failover.workers";
 
     /**
+     * MasterServer startup  failover runing and fault tolerance process
+     */
+    public static final String ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "zookeeper.escheduler.lock.failover.startup.masters";
+
+    /**
      * need send warn times when master server or worker server failover
      */
     public static final int ESCHEDULER_WARN_TIMES_FAILOVER = 3;

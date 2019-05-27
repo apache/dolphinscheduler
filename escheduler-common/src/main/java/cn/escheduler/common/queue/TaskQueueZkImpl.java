@@ -206,7 +206,10 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         String taskIdPath = tasksQueuePath + nodeValue;
         logger.info("consume task {}", taskIdPath);
         try{
-            zk.delete().forPath(taskIdPath);
+            Stat stat = zk.checkExists().forPath(taskIdPath);
+            if(stat != null){
+                zk.delete().forPath(taskIdPath);
+            }
         }catch(Exception e){
             logger.error(String.format("delete task:%s from zookeeper fail, exception:" ,nodeValue) ,e);
         }

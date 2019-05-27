@@ -869,7 +869,7 @@ public class MasterExecThread implements Runnable {
         }
 
         Date now = new Date();
-        long runningTime =  DateUtils.differMs(now, processInstance.getStartTime());
+        long runningTime =  DateUtils.diffMin(now, processInstance.getStartTime());
 
         if(runningTime > processInstance.getTimeout()){
             return true;
