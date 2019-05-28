@@ -30,7 +30,7 @@ A: 支持绝大多数邮箱，qq、163、126、139、outlook、aliyun等皆可�
 
 Q:常用的系统变量时间参数有哪些,如何使用？
 
-![image-20190524180218862](/Users/stone/Library/Application Support/typora-user-images/image-20190524180218862.png)
+A: 请参考使用手册中的系统参数
 
 ---
 
@@ -82,31 +82,15 @@ A:  建议在Ubuntu、Centos上运行，暂不支持windows上运行，不过win
 
 -----
 
-Q: 自定义参数如何使用？
-
-A: 
-
-----
-
 Q：任务为什么不执行？
 
 A: 不执行的原因：
 
-查看xx表里有没有内容？
+查看command表里有没有内容？
 
 查看Master server的运行日志：
 
 查看Worker Server的运行日志
-
-----
-
-Q: 为什么任务一直在运行中？
-
-A:
-
-----
-
-Q: 任务
 
 
 
