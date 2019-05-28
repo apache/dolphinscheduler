@@ -64,6 +64,19 @@ public class SqlParameters extends AbstractParameters {
      * SQL connection parameters
      */
     private String connParams;
+    /**
+     * Pre Statements
+     */
+    private List<String> preStatements;
+    /**
+     * Post Statements
+     */
+    private List<String> postStatements;
+
+    /**
+     * title
+     */
+    private String title;
 
     /**
      * receivers
@@ -131,6 +144,14 @@ public class SqlParameters extends AbstractParameters {
         this.connParams = connParams;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getReceivers() {
         return receivers;
     }
@@ -145,6 +166,21 @@ public class SqlParameters extends AbstractParameters {
 
     public void setReceiversCc(String receiversCc) {
         this.receiversCc = receiversCc;
+    }
+    public List<String> getPreStatements() {
+        return preStatements;
+    }
+
+    public void setPreStatements(List<String> preStatements) {
+        this.preStatements = preStatements;
+    }
+
+    public List<String> getPostStatements() {
+        return postStatements;
+    }
+
+    public void setPostStatements(List<String> postStatements) {
+        this.postStatements = postStatements;
     }
 
     @Override
@@ -167,8 +203,11 @@ public class SqlParameters extends AbstractParameters {
                 ", udfs='" + udfs + '\'' +
                 ", showType='" + showType + '\'' +
                 ", connParams='" + connParams + '\'' +
+                ", title='" + title + '\'' +
                 ", receivers='" + receivers + '\'' +
                 ", receiversCc='" + receiversCc + '\'' +
+                ", preStatements=" + preStatements +
+                ", postStatements=" + postStatements +
                 '}';
     }
 }

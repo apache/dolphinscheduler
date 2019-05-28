@@ -438,6 +438,42 @@ export default {
     })
   },
   /**
+   * Batch delete process instance
+   */
+  batchDeleteInstance ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/instance/batch-delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Delete definition
+   */
+  deleteDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Batch delete definition
+   */
+  batchDeleteDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/batch-delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * Process instance get variable
    */
   getViewvariables ({ state }, payload) {
@@ -538,7 +574,7 @@ export default {
    */
   getReceiver ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/{projectName}/executors/get-receiver-cc`, payload, res => {
+      io.get(`projects/${state.projectName}/executors/get-receiver-cc`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -547,8 +583,20 @@ export default {
   },
   getTaskListDefIdAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/{projectName}/process/get-task-list`, payload, res => {
+      io.get(`projects/${state.projectName}/process/get-task-list`, payload, res => {
         resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * remove timing
+   */
+  deleteTiming({ state }, payload){
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/schedule/delete`, payload, res => {
+        resolve(res)
       }).catch(e => {
         reject(e)
       })

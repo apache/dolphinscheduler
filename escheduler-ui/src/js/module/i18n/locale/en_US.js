@@ -111,6 +111,8 @@ export default {
   'Please enter ExecutorPlease enter Executor core number': 'Please enter ExecutorPlease enter Executor core number',
   'Core number should be positive integer': 'Core number should be positive integer',
   'SQL Type': 'SQL Type',
+  'Title': 'Title',
+  'Please enter the title of email': 'Please enter the title of email',
   'Table': 'Table',
   'Attachment': 'Attachment',
   'SQL Parameter': 'SQL Parameter',
@@ -388,6 +390,7 @@ export default {
   'Last1Hour': 'Last1Hour',
   'Last2Hours': 'Last2Hours',
   'Last3Hours': 'Last3Hours',
+  'today': 'today',
   'Last1Days': 'Last1Days',
   'Last2Days': 'Last2Days',
   'Last3Days': 'Last3Days',
@@ -448,5 +451,10 @@ export default {
   'Max used connections': 'Max used connections',
   'Threads running connections': 'Threads running connections',
   'Worker group': 'Worker group',
-  'Please enter a positive integer greater than 0': 'Please enter a positive integer greater than 0'
+  'Please enter a positive integer greater than 0': 'Please enter a positive integer greater than 0',
+  'Pre Statement': 'Pre Statement',
+  'Post Statement': 'Post Statement',
+  'Statement cannot be empty': 'Statement cannot be empty',
+  'Process Define Count': 'Process Define Count',
+  'Process Instance Running Count': 'Process Instance Running Count'
 }

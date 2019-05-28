@@ -3,7 +3,7 @@
   <parent>
     <groupId>cn.analysys</groupId>
     <artifactId>escheduler</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
   </parent>
   <artifactId>escheduler-api</artifactId>
   <packaging>jar</packaging>
@@ -33,6 +33,10 @@
         <exclusion>
           <artifactId>leveldbjni-all</artifactId>
           <groupId>org.fusesource.leveldbjni</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>protobuf-java</artifactId>
+          <groupId>com.google.protobuf</groupId>
         </exclusion>
       </exclusions>
     </dependency>

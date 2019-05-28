@@ -32,13 +32,13 @@ export default {
    * set locations
    * */
   setLocations (state, payload) {
-    state.locations = Object.assign(state.locations, {}, payload)
+    state.locations = payload
   },
   /**
    * add locations
    * */
   addLocations (state, payload) {
-    state.locations = payload
+    state.locations = Object.assign(state.locations, {}, payload)
   },
   /**
    * set connects

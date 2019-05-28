@@ -21,6 +21,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.UsersService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +65,7 @@ public class UsersController extends BaseController{
                                                      @RequestParam(value = "userName") String userName,
                                                      @RequestParam(value = "userPassword") String userPassword,
                                                      @RequestParam(value = "tenantId") int tenantId,
-                                                     @RequestParam(value = "queue") String queue,
+                                                     @RequestParam(value = "queue",required = false,defaultValue = "") String queue,
                                                      @RequestParam(value = "email") String email,
                                                      @RequestParam(value = "phone", required = false) String phone) {
         logger.info("login user {}, create user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, user queue: {}",
@@ -101,6 +102,7 @@ public class UsersController extends BaseController{
             if(result.get(Constants.STATUS) != Status.SUCCESS){
                 return returnDataListPaging(result);
             }
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = usersService.queryUserList(loginUser, searchVal, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){
@@ -128,14 +130,14 @@ public class UsersController extends BaseController{
                                                      @RequestParam(value = "id") int id,
                                                      @RequestParam(value = "userName") String userName,
                                                      @RequestParam(value = "userPassword") String userPassword,
-                                                     @RequestParam(value = "queue") String queue,
+                                                     @RequestParam(value = "queue",required = false,defaultValue = "") String queue,
                                                      @RequestParam(value = "email") String email,
                                                      @RequestParam(value = "tenantId") int tenantId,
                                                      @RequestParam(value = "phone", required = false) String phone) {
         logger.info("login user {}, updateProcessInstance user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, user queue: {}",
                 loginUser.getUserName(), userName, email, tenantId, Constants.PASSWORD_DEFAULT, phone,queue);
         try {
-            Map<String, Object> result = usersService.updateUser(id,userName,userPassword,email,tenantId,phone,queue);
+            Map<String, Object> result = usersService.updateUser(id, userName, userPassword, email, tenantId, phone, queue);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(UPDATE_USER_ERROR.getMsg(),e);
@@ -285,6 +287,26 @@ public class UsersController extends BaseController{
     public Result listUser(@RequestAttribute(value = Constants.SESSION_USER) User loginUser){
         logger.info("login user {}, user list");
         try{
+            Map<String, Object> result = usersService.queryAllGeneralUsers(loginUser);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(USER_LIST_ERROR.getMsg(),e);
+            return error(Status.USER_LIST_ERROR.getCode(), Status.USER_LIST_ERROR.getMsg());
+        }
+    }
+
+
+    /**
+     * user list no paging
+     *
+     * @param loginUser
+     * @return
+     */
+    @GetMapping(value="/list-all")
+    @ResponseStatus(HttpStatus.OK)
+    public Result listAll(@RequestAttribute(value = Constants.SESSION_USER) User loginUser){
+        logger.info("login user {}, user list");
+        try{
             Map<String, Object> result = usersService.queryUserList(loginUser);
             return returnDataList(result);
         }catch (Exception e){
@@ -292,6 +314,7 @@ public class UsersController extends BaseController{
             return error(Status.USER_LIST_ERROR.getCode(), Status.USER_LIST_ERROR.getMsg());
         }
     }
+
 
     /**
      * verify username

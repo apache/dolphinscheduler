@@ -1,6 +1,6 @@
 <template>
   <div class="assist-dag-model">
-    <template v-if="isView">
+    <template v-if="isView && isActive">
       <m-variables-view></m-variables-view>
     </template>
   </div>
@@ -11,12 +11,22 @@
     name: 'assist-dag-index',
     data () {
       return {
-        isView: false
+        isView: false,
+        isActive: true
       }
     },
     methods: {
       _toggleView () {
         this.isView = !this.isView
+      }
+    },
+    watch: {
+      '$route': {
+        deep: true,
+        handler () {
+          this.isActive = false
+          this.$nextTick(() => (this.isActive = true))
+        }
       }
     },
     components: { mVariablesView }
