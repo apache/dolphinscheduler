@@ -137,8 +137,14 @@
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
         </dependency>
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>1.5.20</version>
+			<scope>compile</scope>
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 
 
 	<build>

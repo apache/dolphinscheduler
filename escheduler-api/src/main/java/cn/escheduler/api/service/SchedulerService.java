@@ -19,8 +19,8 @@ package cn.escheduler.api.service;
 
 import cn.escheduler.api.dto.ScheduleParam;
 import cn.escheduler.api.enums.Status;
-import cn.escheduler.api.quartz.ProcessScheduleJob;
-import cn.escheduler.api.quartz.QuartzExecutors;
+import cn.escheduler.server.quartz.ProcessScheduleJob;
+import cn.escheduler.server.quartz.QuartzExecutors;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.common.enums.FailureStrategy;
