@@ -19,8 +19,8 @@ package cn.escheduler.api.service;
 
 import cn.escheduler.api.dto.ScheduleParam;
 import cn.escheduler.api.enums.Status;
-import cn.escheduler.api.quartz.ProcessScheduleJob;
-import cn.escheduler.api.quartz.QuartzExecutors;
+import cn.escheduler.server.quartz.ProcessScheduleJob;
+import cn.escheduler.server.quartz.QuartzExecutors;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.common.enums.FailureStrategy;
@@ -487,5 +487,54 @@ public class SchedulerService extends BaseService {
             return checkResult;
         }
         return null;
+    }
+
+    /**
+     * delete schedule by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param scheduleId
+     * @return
+     */
+    public Map<String, Object> deleteScheduleById(User loginUser, String projectName, Integer scheduleId) {
+
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        Schedule schedule = scheduleMapper.queryById(scheduleId);
+
+        if (schedule == null) {
+            putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, scheduleId);
+            return result;
+        }
+
+        // Determine if the login user is the owner of the schedule
+        if (loginUser.getId() != schedule.getUserId()) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        // check schedule is already online
+        if(schedule.getReleaseState() == ReleaseState.ONLINE){
+            putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE,schedule.getId());
+            return result;
+        }
+
+
+        int delete = scheduleMapper.delete(scheduleId);
+
+        if (delete > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
+        }
+        return result;
     }
 }

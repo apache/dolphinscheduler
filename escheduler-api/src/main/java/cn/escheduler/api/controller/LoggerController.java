@@ -21,6 +21,10 @@ import cn.escheduler.api.service.LoggerService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +32,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import static cn.escheduler.api.enums.Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR;
 import static cn.escheduler.api.enums.Status.QUERY_TASK_INSTANCE_LOG_ERROR;
@@ -36,6 +41,7 @@ import static cn.escheduler.api.enums.Status.QUERY_TASK_INSTANCE_LOG_ERROR;
 /**
  * log controller
  */
+@Api(tags = "LOGGER_TAG", position = 13)
 @RestController
 @RequestMapping("/log")
 public class LoggerController extends BaseController {
@@ -49,9 +55,15 @@ public class LoggerController extends BaseController {
     /**
      * query task log
      */
+    @ApiOperation(value = "queryLog", notes= "QUERY_TASK_INSTANCE_LOG_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "taskInstId", value = "TASK_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", dataType ="Int", example = "100"),
+            @ApiImplicitParam(name = "limit", value = "LIMIT", dataType ="Int", example = "100")
+    })
     @GetMapping(value = "/detail")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryLog(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @RequestParam(value = "taskInstId") int taskInstanceId,
                            @RequestParam(value = "skipLineNum") int skipNum,
                            @RequestParam(value = "limit") int limit) {
@@ -73,9 +85,13 @@ public class LoggerController extends BaseController {
      * @param loginUser
      * @param taskInstanceId
      */
+    @ApiOperation(value = "downloadTaskLog", notes= "DOWNLOAD_TASK_INSTANCE_LOG_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "taskInstId", value = "TASK_ID",dataType = "Int", example = "100")
+    })
     @GetMapping(value = "/download-log")
     @ResponseBody
-    public ResponseEntity downloadTaskLog(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public ResponseEntity downloadTaskLog(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam(value = "taskInstId") int taskInstanceId) {
         try {
             byte[] logBytes = loggerService.getLogBytes(taskInstanceId);

@@ -21,19 +21,25 @@ import cn.escheduler.api.service.TaskRecordService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
 import static cn.escheduler.api.enums.Status.QUERY_TASK_RECORD_LIST_PAGING_ERROR;
 
 /**
- * task record controller
+ * data quality controller
  */
+@ApiIgnore
 @RestController
 @RequestMapping("/projects/task-record")
 public class TaskRecordController extends BaseController{
@@ -53,7 +59,7 @@ public class TaskRecordController extends BaseController{
      */
     @GetMapping("/list-paging")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryTaskRecordListPaging(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryTaskRecordListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "taskName", required = false) String taskName,
                                             @RequestParam(value = "state", required = false) String state,
                                             @RequestParam(value = "sourceTable", required = false) String sourceTable,
@@ -85,7 +91,7 @@ public class TaskRecordController extends BaseController{
      */
     @GetMapping("/history-list-paging")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryHistoryTaskRecordListPaging(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryHistoryTaskRecordListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "taskName", required = false) String taskName,
                                             @RequestParam(value = "state", required = false) String state,
                                             @RequestParam(value = "sourceTable", required = false) String sourceTable,

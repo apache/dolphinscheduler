@@ -54,7 +54,7 @@ public interface ITaskQueue {
      * an element pops out of the queue
      *
      * @param key  queue name
-     * @param remove  where remove the element
+     * @param remove  whether remove the element
      * @return
      */
     String poll(String key, boolean remove);

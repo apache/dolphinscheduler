@@ -20,18 +20,28 @@ import cn.escheduler.api.service.AlertGroupService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.AlertType;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static cn.escheduler.api.enums.Status.*;
 
+/**
+ * alert group controller
+ */
+@Api(tags = "ALERT_GROUP_TAG", position = 1)
 @RestController
 @RequestMapping("alert-group")
 public class AlertGroupController extends  BaseController{
@@ -50,9 +60,15 @@ public class AlertGroupController extends  BaseController{
      * @param desc
      * @return
      */
+    @ApiOperation(value = "createAlertgroup", notes= "CREATE_ALERT_GROUP_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "groupType", value = "GROUP_TYPE", required = true, dataType ="AlertType"),
+            @ApiImplicitParam(name = "desc", value = "DESC",  dataType ="String")
+    })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public Result createAlertgroup(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result createAlertgroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @RequestParam(value = "groupName") String groupName,
                                @RequestParam(value = "groupType") AlertType groupType,
                                @RequestParam(value = "desc",required = false) String desc) {
@@ -72,9 +88,10 @@ public class AlertGroupController extends  BaseController{
      * @param loginUser
      * @return
      */
+    @ApiOperation(value = "list", notes= "QUERY_ALERT_GROUP_LIST_NOTES")
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
-    public Result list(@RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result list(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login  user {}, query all alertGroup",
                 loginUser.getUserName());
         try{
@@ -95,9 +112,15 @@ public class AlertGroupController extends  BaseController{
      * @param pageSize
      * @return
      */
+    @ApiOperation(value = "queryTaskListPaging", notes= "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type ="String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+    })
     @GetMapping(value="/list-paging")
     @ResponseStatus(HttpStatus.OK)
-    public Result listPaging(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result listPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam("pageNo") Integer pageNo,
                              @RequestParam(value = "searchVal", required = false) String searchVal,
                              @RequestParam("pageSize") Integer pageSize){
@@ -109,6 +132,7 @@ public class AlertGroupController extends  BaseController{
                 return returnDataListPaging(result);
             }
 
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = alertGroupService.listPaging(loginUser, searchVal, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){
@@ -126,9 +150,16 @@ public class AlertGroupController extends  BaseController{
      * @param desc
      * @return
      */
+    @ApiOperation(value = "updateAlertgroup", notes= "UPDATE_ALERT_GROUP_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int",example = "100"),
+            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "groupType", value = "GROUP_TYPE", required = true, dataType ="AlertType"),
+            @ApiImplicitParam(name = "desc", value = "DESC",  dataType ="String")
+    })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
-    public Result updateAlertgroup(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result updateAlertgroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "id") int id,
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "groupType") AlertType groupType,
@@ -151,9 +182,13 @@ public class AlertGroupController extends  BaseController{
      * @param id
      * @return
      */
+    @ApiOperation(value = "delAlertgroupById", notes= "DELETE_ALERT_GROUP_BY_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int",example = "100")
+    })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
-    public Result delAlertgroupById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result delAlertgroupById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "id") int id) {
         logger.info("login user {}, delete AlertGroup, id: {},", loginUser.getUserName(), id);
         try {
@@ -173,9 +208,13 @@ public class AlertGroupController extends  BaseController{
      * @param groupName
      * @return
      */
+    @ApiOperation(value = "verifyGroupName", notes= "VERIFY_ALERT_GROUP_NAME_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+    })
     @GetMapping(value = "/verify-group-name")
     @ResponseStatus(HttpStatus.OK)
-    public Result verifyGroupName(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result verifyGroupName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value ="groupName") String groupName
     ) {
         logger.info("login user {}, verfiy group name: {}",
@@ -191,9 +230,14 @@ public class AlertGroupController extends  BaseController{
      * @param userIds
      * @return
      */
+    @ApiOperation(value = "grantUser", notes= "GRANT_ALERT_GROUP_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int",example = "100"),
+            @ApiImplicitParam(name = "userIds", value = "USER_IDS", required = true, dataType = "String")
+    })
     @PostMapping(value = "/grant-user")
     @ResponseStatus(HttpStatus.OK)
-    public Result grantUser(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result grantUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "alertgroupId") int  alertgroupId,
                                   @RequestParam(value = "userIds") String userIds) {
         logger.info("login user {}, grant user, alertGroupId: {},userIds : {}", loginUser.getUserName(), alertgroupId,userIds);

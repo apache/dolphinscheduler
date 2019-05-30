@@ -63,6 +63,32 @@ public class Project {
      */
     private int perm;
 
+    /**
+     * process define count
+     */
+    private int defCount;
+
+    /**
+     * process instance running count
+     */
+    private int instRunningCount;
+
+    public int getDefCount() {
+        return defCount;
+    }
+
+    public void setDefCount(int defCount) {
+        this.defCount = defCount;
+    }
+
+    public int getInstRunningCount() {
+        return instRunningCount;
+    }
+
+    public void setInstRunningCount(int instRunningCount) {
+        this.instRunningCount = instRunningCount;
+    }
+
     public int getId() {
         return id;
     }

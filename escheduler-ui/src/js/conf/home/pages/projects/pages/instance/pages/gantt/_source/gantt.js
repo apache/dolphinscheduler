@@ -107,11 +107,11 @@ Gantt.prototype.drawChart = function () {
     .append('svg')
     .attr('class', 'chart')
     .attr('width', this.width + this.margin.left + this.margin.right)
-    .attr('height', this.height + this.margin.top + this.margin.bottom)
+    .attr('height', this.height + this.margin.top + this.margin.bottom + 150)
     .append('g')
     .attr('class', 'gantt-chart')
     .attr('width', this.width + this.margin.left + this.margin.right)
-    .attr('height', this.height + this.margin.top + this.margin.bottom)
+    .attr('height', this.height + this.margin.top + this.margin.bottom + 150)
     .attr('transform', 'translate(' + this.margin.left + ', ' + this.margin.top + ')')
 
   svg.selectAll('.chart')
@@ -132,6 +132,9 @@ Gantt.prototype.drawChart = function () {
     .attr('transform', 'translate(0, ' + (this.height - this.margin.top - this.margin.bottom) + ')')
     .transition()
     .call(this.xAxis)
+    .selectAll("text")
+      .attr("transform", `rotate(-${this.width / ($('.tick').length - 1) > 50 ? 0 : Math.acos(this.width / ($('.tick').length - 1) / 50) * 57 })`)
+      .style("text-anchor", `${this.width / ($('.tick').length - 1) > 50 ? 'middle' : 'end'}`)
 
   svg.append('g')
     .attr('class', 'y axis')

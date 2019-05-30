@@ -1,8 +1,8 @@
 <template>
-  <m-list-construction :title="$t('Project Home')">
+  <m-list-construction :title="searchParams.projectId ? $t('Project Home') : $t('Home')">
     <template slot="content">
       <div class="perject-home-content">
-        <div class="time-model" v-show="searchParams.projectId !== 0">
+        <div class="time-model">
           <x-datepicker
                   :panel-num="2"
                   placement="bottom-end"

@@ -43,6 +43,21 @@ public class DependentDateUtils {
     }
 
     /**
+     * get today day interval list
+     * @param businessDate
+     * @return
+     */
+    public static List<DateInterval> getTodayInterval(Date businessDate){
+
+        List<DateInterval> dateIntervals = new ArrayList<>();
+
+        Date beginTime = DateUtils.getStartOfDay(businessDate);
+        Date endTime = DateUtils.getEndOfDay(businessDate);
+        dateIntervals.add(new DateInterval(beginTime, endTime));
+        return dateIntervals;
+    }
+
+    /**
      * get last day interval list
      * @param businessDate
      * @param someDay
