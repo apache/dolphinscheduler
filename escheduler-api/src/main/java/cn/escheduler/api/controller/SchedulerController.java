@@ -229,7 +229,6 @@ public class SchedulerController extends BaseController {
      */
     @ApiOperation(value = "queryScheduleListPaging", notes= "QUERY_SCHEDULE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true,dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL",  type = "String"),
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO",  dataType = "Int", example = "100"),
@@ -237,12 +236,12 @@ public class SchedulerController extends BaseController {
 
     })
   @GetMapping("/list-paging")
-  public Result queryScheduleListPaging(@RequestAttribute(value = SESSION_USER) User loginUser,
-                                                      @PathVariable String projectName,
-                                                      @RequestParam Integer processDefinitionId,
-                                                      @RequestParam(value = "searchVal", required = false) String searchVal,
-                                                      @RequestParam("pageNo") Integer pageNo,
-                                                      @RequestParam("pageSize") Integer pageSize) {
+    public Result queryScheduleListPaging(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
+                                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                          @RequestParam Integer processDefinitionId,
+                                          @RequestParam(value = "searchVal", required = false) String searchVal,
+                                          @RequestParam("pageNo") Integer pageNo,
+                                          @RequestParam("pageSize") Integer pageSize) {
     logger.info("login user {}, query schedule, project name: {}, process definition id: {}",
             loginUser.getUserName(), projectName, processDefinitionId);
       try {
@@ -264,6 +263,10 @@ public class SchedulerController extends BaseController {
      * @param scheduleId
      * @return
      */
+    @ApiOperation(value = "deleteScheduleById", notes= "OFFLINE_SCHEDULE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "scheduleId", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100")
+    })
     @GetMapping(value="/delete")
     @ResponseStatus(HttpStatus.OK)
     public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
