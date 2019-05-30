@@ -1,5 +1,5 @@
 <template>
-  <m-list-construction :title="$t('Project Home')">
+  <m-list-construction :title="searchParams.projectId ? $t('Project Home') : $t('Home')">
     <template slot="content">
       <div class="perject-home-content">
         <div class="time-model">

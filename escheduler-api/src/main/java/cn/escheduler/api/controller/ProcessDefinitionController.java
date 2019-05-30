@@ -20,6 +20,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.ProcessDefinitionService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -235,6 +236,7 @@ public class ProcessDefinitionController extends BaseController{
             if(result.get(Constants.STATUS) != Status.SUCCESS){
                 return returnDataListPaging(result);
             }
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
             return returnDataListPaging(result);
         }catch (Exception e){
@@ -320,6 +322,56 @@ public class ProcessDefinitionController extends BaseController{
         }catch (Exception e){
             logger.error(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR.getMsg(), e);
             return error(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR.getCode(), GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * delete process definition by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionId
+     * @return
+     */
+    @GetMapping(value="/delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result deleteProcessDefinitionById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @PathVariable String projectName,
+                                            @RequestParam("processDefinitionId") Integer processDefinitionId
+    ){
+        try{
+            logger.info("delete process definition by id, login user:{}, project name:{}, process definition id:{}",
+                    loginUser.getUserName(), projectName, processDefinitionId);
+            Map<String, Object> result = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(DELETE_PROCESS_DEFINE_BY_ID_ERROR.getMsg(),e);
+            return error(Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR.getCode(), Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * batch delete process definition by ids
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionIds
+     * @return
+     */
+    @GetMapping(value="/batch-delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result batchDeleteProcessDefinitionByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                              @PathVariable String projectName,
+                                              @RequestParam("processDefinitionIds") String processDefinitionIds
+    ){
+        try{
+            logger.info("delete process definition by ids, login user:{}, project name:{}, process definition ids:{}",
+                    loginUser.getUserName(), projectName, processDefinitionIds);
+            Map<String, Object> result = processDefinitionService.batchDeleteProcessDefinitionByIds(loginUser, projectName, processDefinitionIds);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(),e);
+            return error(Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getCode(), Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getMsg());
         }
     }
 
