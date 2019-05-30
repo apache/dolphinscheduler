@@ -29,6 +29,17 @@
     </m-list-box>
     <template v-if="!sqlType && showType.length">
       <m-list-box>
+        <div slot="text">{{$t('Title')}}</div>
+        <div slot="content">
+          <x-input
+            type="input"
+            v-model="title"
+            :placeholder="$t('Please enter the title of email')"
+            autocomplete="off">
+          </x-input>
+        </div>
+      </m-list-box>
+      <m-list-box>
         <div slot="text">{{$t('Recipient')}}</div>
         <div slot="content">
           <m-email v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
@@ -141,6 +152,8 @@
         udfs: '',
         // Sql type
         sqlType: 0,
+        // Email title
+        title: '',
         // Form/attachment
         showType: ['TABLE'],
         // Sql parameter
@@ -241,6 +254,7 @@
           sql: editor.getValue(),
           udfs: this.udfs,
           sqlType: this.sqlType,
+          title: this.title,
           receivers: this.receivers.join(','),
           receiversCc: this.receiversCc.join(','),
           showType: (() => {
@@ -308,6 +322,7 @@
           this.showType = []
         }
         if (val !== 0) {
+          this.title = ''
           this.receivers = []
           this.receiversCc = []
         }
@@ -321,6 +336,7 @@
       //
       showType (val) {
         if (!val.length) {
+          this.title = ''
           this.receivers = []
           this.receiversCc = []
         }
@@ -342,6 +358,7 @@
         this.showType = o.params.showType.split(',') || []
         this.preStatements = o.params.preStatements || []
         this.postStatements = o.params.postStatements || []
+        this.title = o.params.title || ''
         this.receivers = o.params.receivers && o.params.receivers.split(',') || []
         this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
       }

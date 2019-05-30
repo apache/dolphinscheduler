@@ -21,6 +21,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.WorkerGroupService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +91,7 @@ public class WorkerGroupController extends BaseController{
                 loginUser.getUserName() , pageNo, pageSize, searchVal);
 
         try {
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = workerGroupService.queryAllGroupPaging(pageNo, pageSize, searchVal);
             return returnDataListPaging(result);
         }catch (Exception e){

@@ -23,6 +23,7 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ResourceType;
 import cn.escheduler.common.enums.UdfType;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -146,6 +147,7 @@ public class ResourcesController extends BaseController{
                 return returnDataListPaging(result);
             }
 
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = resourceService.queryResourceListPaging(loginUser,type,searchVal,pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){

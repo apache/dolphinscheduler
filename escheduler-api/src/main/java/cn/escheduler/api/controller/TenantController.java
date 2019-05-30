@@ -21,7 +21,9 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.TenantService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +100,7 @@ public class TenantController extends BaseController{
             if(result.get(Constants.STATUS) != Status.SUCCESS){
                 return returnDataListPaging(result);
             }
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = tenantService.queryTenantList(loginUser, searchVal, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){

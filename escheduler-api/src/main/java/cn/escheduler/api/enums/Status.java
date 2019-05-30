@@ -159,6 +159,8 @@ public enum Status {
     NAME_NULL(10134,"name must be not null"),
     NAME_EXIST(10135, "name {0} already exists"),
     SAVE_ERROR(10136, "save error"),
+    DELETE_PROJECT_ERROR_DEFINES_NOT_NULL(10137, "please delete the process definitions in project first!"),
+    BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117,"batch delete process instance by ids {0} error"),
 
 
 
@@ -200,8 +202,16 @@ public enum Status {
     DATA_IS_NULL(50018,"data %s is null"),
     PROCESS_NODE_HAS_CYCLE(50019,"process node has cycle"),
     PROCESS_NODE_S_PARAMETER_INVALID(50020,"process node %s parameter invalid"),
+    PROCESS_DEFINE_STATE_ONLINE(50021, "process definition {0} is already on line"),
+    DELETE_PROCESS_DEFINE_BY_ID_ERROR(50022,"delete process definition by id error"),
+    SCHEDULE_CRON_STATE_ONLINE(50023,"the status of schedule {0} is already on line"),
+    DELETE_SCHEDULE_CRON_BY_ID_ERROR(50024,"delete schedule by id error"),
+    BATCH_DELETE_PROCESS_DEFINE_ERROR(50025,"batch delete process definition error"),
+    BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR(50026,"batch delete process definition by ids {0} error"),
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
+    HDFS_TERANT_RESOURCES_FILE_EXISTS(60002,"resource file exists,please delete resource first"),
+    HDFS_TERANT_UDFS_FILE_EXISTS(60003,"udf file exists,please delete resource first"),
 
     /**
      * for monitor

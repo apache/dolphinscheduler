@@ -111,7 +111,7 @@ public class DataSourceMapperProvider {
    */
   public String queryById(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("r.*,u.user_name as userName");
+      SELECT("r.*,u.user_name");
 
       FROM(TABLE_NAME + " r");
 

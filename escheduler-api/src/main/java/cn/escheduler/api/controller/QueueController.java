@@ -21,6 +21,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.QueueService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +83,7 @@ public class QueueController extends BaseController{
                 return returnDataListPaging(result);
             }
 
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = queueService.queryList(loginUser,searchVal,pageNo,pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){

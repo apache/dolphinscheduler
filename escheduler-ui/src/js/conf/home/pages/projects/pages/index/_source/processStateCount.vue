@@ -15,7 +15,7 @@
               </tr>
               <tr v-for="(item,$index) in processStateList">
                 <td><span>{{$index+1}}</span></td>
-                <td><span><a href="javascript:" @click="id && _goProcess(item.key)" :class="id ?'links':''">{{item.value}}</a></span></td>
+                <td><span><a href="javascript:" @click="searchParams.projectId && _goProcess(item.key)" :class="searchParams.projectId ?'links':''">{{item.value}}</a></span></td>
                 <td><span class="ellipsis" style="width: 98%;" :title="item.key">{{item.key}}</span></td>
               </tr>
             </table>

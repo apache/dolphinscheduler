@@ -106,8 +106,8 @@ CREATE PROCEDURE ac_escheduler_T_t_escheduler_worker_group()
        drop table if exists t_escheduler_worker_group;
        CREATE TABLE  IF NOT EXISTS  `t_escheduler_worker_group` (
            `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
-           `name` varchar(256) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT '组名称',
-           `ip_list` varchar(256) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL COMMENT 'worker地址列表',
+           `name` varchar(256)  NULL DEFAULT NULL COMMENT '组名称',
+           `ip_list` varchar(256)  NULL DEFAULT NULL COMMENT 'worker地址列表',
            `create_time` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
            `update_time` datetime(0) NULL DEFAULT NULL COMMENT '更新时间',
            PRIMARY KEY (`id`) USING BTREE
