@@ -21,16 +21,16 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 
-public class MysqlUtil {
+public class MysqlUtils {
 
-	public static final Logger logger = LoggerFactory.getLogger(MysqlUtil.class);
+	public static final Logger logger = LoggerFactory.getLogger(MysqlUtils.class);
 
-	private static MysqlUtil instance;
+	private static MysqlUtils instance;
 
-	MysqlUtil() {
+	MysqlUtils() {
 	}
 
-	public static MysqlUtil getInstance() {
+	public static MysqlUtils getInstance() {
 		if (null == instance) {
 			syncInit();
 		}
@@ -39,7 +39,7 @@ public class MysqlUtil {
 
 	private static synchronized void syncInit() {
 		if (instance == null) {
-			instance = new MysqlUtil();
+			instance = new MysqlUtils();
 		}
 	}
 
@@ -75,8 +75,8 @@ public class MysqlUtil {
 		}
 	}
 
-	public static void realeaseResource(ResultSet rs, PreparedStatement ps, Connection conn) {
-		MysqlUtil.getInstance().release(rs,ps,conn);
+	public static void releaseResource(ResultSet rs, PreparedStatement ps, Connection conn) {
+		MysqlUtils.getInstance().release(rs,ps,conn);
 		if (null != rs) {
 			try {
 				rs.close();
