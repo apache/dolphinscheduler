@@ -77,6 +77,25 @@ public interface UserMapper {
     User queryById(@Param("userId") int userId);
 
     /**
+     * query all general user list
+     * @return
+     */
+    @Results(value = {
+            @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "userPassword", column = "user_password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "userType", column = "user_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = UserType.class, jdbcType = JdbcType.TINYINT),
+            @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+    })
+    @SelectProvider(type = UserMapperProvider.class, method = "queryAllGeneralUsers")
+    List<User> queryAllGeneralUsers();
+
+
+    /**
      * query all user list
      * @return
      */
@@ -156,6 +175,8 @@ public interface UserMapper {
             @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "userType", column = "user_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = UserType.class, jdbcType = JdbcType.TINYINT),
             @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantName", column = "tenant_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "queueName", column = "queue_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
     })

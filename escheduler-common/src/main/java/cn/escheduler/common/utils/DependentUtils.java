@@ -80,6 +80,9 @@ public class DependentUtils {
             case "last3Hours":
                 result =  DependentDateUtils.getLastHoursInterval(businessDate, 3);
                 break;
+            case "today":
+                result =  DependentDateUtils.getTodayInterval(businessDate);
+                break;
             case "last1Days":
                 result =  DependentDateUtils.getLastDayInterval(businessDate, 1);
                 break;
