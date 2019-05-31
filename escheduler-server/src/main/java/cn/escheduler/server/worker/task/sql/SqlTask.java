@@ -189,6 +189,12 @@ public class SqlTask extends AbstractTask {
             return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
         }
 
+        if (StringUtils.isNotEmpty(sqlParameters.getTitle())){
+            String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(), ParamUtils.convert(paramsMap));
+            logger.info(title);
+            sqlParameters.setTitle(title);
+        }
+
         // special characters need to be escaped, ${} needs to be escaped
         String rgex = "'?\\$\\{(.*?)\\}'?";
         setSqlParamsMap(sql,rgex,sqlParamsMap,paramsMap);
