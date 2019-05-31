@@ -230,6 +230,8 @@ public class QuartzExecutors {
       if(scheduler.checkExists(jobKey)){
         logger.info("try to delete job, job name: {}, job group name: {},", jobName, jobGroupName);
         return scheduler.deleteJob(jobKey);
+      }else {
+        return true;
       }
 
     } catch (SchedulerException e) {
