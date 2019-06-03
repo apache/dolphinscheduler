@@ -25,12 +25,28 @@ import java.util.List;
 /**
  * Resource View Dto
  */
-@JSONType(orders={"id","pid","alias","type","children"})
+@JSONType(orders={"id","pid","alias","type","permission","children"})
 public class ResourceViewDto {
+    /**
+     * id
+     */
     private int id;
+    /**
+     * parent id
+     */
     private int pid;
+    /**
+     * resource aliases are used for uploading, downloading, and so on
+     */
     private String alias;
+    /**
+     * resource type
+     */
     private ResourceType type;
+    /**
+     * 1 has permission;0 no permission
+     */
+    private int permission;
 
     public ResourceViewDto() {
     }
@@ -40,6 +56,14 @@ public class ResourceViewDto {
         this.pid = pid;
         this.alias = alias;
         this.type = type;
+    }
+
+    public ResourceViewDto(int id, int pid, String alias, ResourceType type, int permission) {
+        this.id = id;
+        this.pid = pid;
+        this.alias = alias;
+        this.type = type;
+        this.permission = permission;
     }
 
     /**
@@ -79,6 +103,14 @@ public class ResourceViewDto {
         this.type = type;
     }
 
+    public int getPermission() {
+        return permission;
+    }
+
+    public void setPermission(int permission) {
+        this.permission = permission;
+    }
+
     public List<ResourceViewDto> getChildren() {
         return children;
     }
@@ -94,6 +126,7 @@ public class ResourceViewDto {
                 ", pid=" + pid +
                 ", alias='" + alias + '\'' +
                 ", type=" + type +
+                ", permission=" + permission +
                 ", children=" + children +
                 '}';
     }
