@@ -86,4 +86,15 @@ public class ResourceViewDto {
     public void setChildren(List<ResourceViewDto> children) {
         this.children = children;
     }
+
+    @Override
+    public String toString() {
+        return "ResourceViewDto{" +
+                "id=" + id +
+                ", pid=" + pid +
+                ", alias='" + alias + '\'' +
+                ", type=" + type +
+                ", children=" + children +
+                '}';
+    }
 }
