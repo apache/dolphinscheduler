@@ -643,6 +643,7 @@ public class ResourcesService extends BaseService {
                 logger.error("{} is not exist", resourcePath);
                 result.setCode(Status.HDFS_OPERATION_ERROR.getCode());
                 result.setMsg(String.format("%s is not exist", resourcePath));
+                return result;
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
