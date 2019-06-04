@@ -80,6 +80,26 @@ public class DependentUtilsTest {
         Assert.assertEquals(dateIntervals.get(0), diCur);
 
 
+        dateValue = "thisWeek";
+        Date firstWeekDay = DateUtils.getMonday(curDay);
+        dateIntervals = DependentUtils.getDateIntervalList(curDay, dateValue);
+
+        DateInterval weekHead = new DateInterval(DateUtils.getStartOfDay(firstWeekDay), DateUtils.getEndOfDay(firstWeekDay));
+        DateInterval weekThis = new DateInterval(DateUtils.getStartOfDay(curDay), DateUtils.getEndOfDay(curDay));
+
+        Assert.assertEquals(dateIntervals.get(0), weekHead);
+        Assert.assertEquals(dateIntervals.get(dateIntervals.size() - 1), weekThis);
+
+
+        dateValue = "thisMonth";
+        Date firstMonthDay = DateUtils.getFirstDayOfMonth(curDay);
+        dateIntervals = DependentUtils.getDateIntervalList(curDay, dateValue);
+
+        DateInterval monthHead = new DateInterval(DateUtils.getStartOfDay(firstMonthDay), DateUtils.getEndOfDay(firstMonthDay));
+        DateInterval monthThis = new DateInterval(DateUtils.getStartOfDay(curDay), DateUtils.getEndOfDay(curDay));
+
+        Assert.assertEquals(dateIntervals.get(0), monthHead);
+        Assert.assertEquals(dateIntervals.get(dateIntervals.size() - 1), monthThis);
 
     }
 
