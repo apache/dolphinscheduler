@@ -581,6 +581,8 @@ public class ProcessDao extends AbstractBaseDao {
             processInstance.setScheduleTime(command.getScheduleTime());
         }
         processInstance.setHost(host);
+
+        ExecutionStatus runStatus = ExecutionStatus.RUNNING_EXEUTION;
         int runTime = processInstance.getRunTimes();
         switch (commandType){
             case START_PROCESS:
@@ -621,6 +623,7 @@ public class ProcessDao extends AbstractBaseDao {
             case RECOVER_TOLERANCE_FAULT_PROCESS:
                 // recover tolerance fault process
                 processInstance.setRecovery(Flag.YES);
+                runStatus = processInstance.getState();
                 break;
             case COMPLEMENT_DATA:
                 // delete all the valid tasks when complement data
@@ -652,7 +655,7 @@ public class ProcessDao extends AbstractBaseDao {
             default:
                 break;
         }
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(runStatus);
         return processInstance;
     }
 
