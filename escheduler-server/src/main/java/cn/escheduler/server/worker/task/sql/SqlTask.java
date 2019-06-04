@@ -347,14 +347,14 @@ public class SqlTask extends AbstractTask {
         // receiving group list
         List<String> receviersList = new ArrayList<String>();
         for(User user:users){
-            receviersList.add(user.getEmail());
+            receviersList.add(user.getEmail().trim());
         }
         // custom receiver
         String receivers = sqlParameters.getReceivers();
         if (StringUtils.isNotEmpty(receivers)){
             String[] splits = receivers.split(Constants.COMMA);
             for (String receiver : splits){
-                receviersList.add(receiver);
+                receviersList.add(receiver.trim());
             }
         }
 
@@ -365,7 +365,7 @@ public class SqlTask extends AbstractTask {
         if (StringUtils.isNotEmpty(receiversCc)){
             String[] splits = receiversCc.split(Constants.COMMA);
             for (String receiverCc : splits){
-                receviersCcList.add(receiverCc);
+                receviersCcList.add(receiverCc.trim());
             }
         }
 
