@@ -264,7 +264,7 @@ public class ProcessUtils {
 
       logger.info("process id:{}, cmd:{}", processId, cmd);
 
-      Runtime.getRuntime().exec(cmd);
+      OSUtils.exeCmd(cmd);
 
       // find log and kill yarn job
       killYarnJob(taskInstance);
