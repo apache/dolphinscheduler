@@ -18,6 +18,7 @@ package cn.escheduler.server.utils;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.CommonUtils;
+import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.dao.model.TaskInstance;
 import cn.escheduler.server.rpc.LogClient;
 import org.apache.commons.io.FileUtils;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 /**
  *  mainly used to get the start command line of a process
@@ -138,6 +140,8 @@ public class ProcessUtils {
   private static final char[][] ESCAPE_VERIFICATION = {{' ', '\t', '<', '>', '&', '|', '^'},
 
           {' ', '\t', '<', '>'}, {' ', '\t'}};
+
+  private static Matcher matcher;
 
   private static String createCommandLine(int verificationType, final String executablePath, final String[] cmd) {
     StringBuilder cmdbuf = new StringBuilder(80);
@@ -256,7 +260,7 @@ public class ProcessUtils {
           return ;
       }
 
-      String cmd = String.format("sudo kill -9 %d", processId);
+      String cmd = String.format("sudo kill -9 %s", getPidsStr(processId));
 
       logger.info("process id:{}, cmd:{}", processId, cmd);
 
@@ -268,6 +272,23 @@ public class ProcessUtils {
     } catch (Exception e) {
       logger.error("kill failed : " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * get pids str
+   * @param processId
+   * @return
+   * @throws Exception
+   */
+  private static String getPidsStr(int processId)throws Exception{
+    StringBuilder sb = new StringBuilder();
+    // pstree -p pid get sub pids
+    String pids = OSUtils.exeCmd("pstree -p " +processId+ "");
+    Matcher mat = Pattern.compile("(\\d+)").matcher(pids);
+    while (mat.find()){
+      sb.append(mat.group()+" ");
+    }
+    return sb.toString().trim();
   }
 
   /**
