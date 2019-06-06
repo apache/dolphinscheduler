@@ -17,6 +17,7 @@
 package cn.escheduler.api.dto.resources;
 
 import cn.escheduler.common.enums.ResourceType;
+import cn.escheduler.dao.model.Resource;
 import com.alibaba.fastjson.annotation.JSONType;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ import java.util.List;
  * Resource View Dto
  */
 @JSONType(orders={"id","pid","alias","type","permission","children"})
-public class ResourceViewDto {
+public class ResourceViewDto implements Comparable<ResourceViewDto>{
     /**
      * id
      */
@@ -49,6 +50,25 @@ public class ResourceViewDto {
     private int permission;
 
     public ResourceViewDto() {
+    }
+
+    public ResourceViewDto(Resource resource) {
+        if (resource != null) {
+            this.setAlias(resource.getAlias());
+            this.setId(resource.getId());
+            this.setPid(resource.getPid());
+            this.setType(resource.getType());
+        }
+    }
+
+    public ResourceViewDto(Resource resource,int permission) {
+        if (resource != null) {
+            this.setAlias(resource.getAlias());
+            this.setId(resource.getId());
+            this.setPid(resource.getPid());
+            this.setType(resource.getType());
+            this.setPermission(permission);
+        }
     }
 
     public ResourceViewDto(int id, int pid, String alias, ResourceType type) {
@@ -129,5 +149,12 @@ public class ResourceViewDto {
                 ", permission=" + permission +
                 ", children=" + children +
                 '}';
+    }
+
+
+    @Override
+    public int compareTo(ResourceViewDto o) {
+        //return o.getType().compareTo(this.type);
+        return this.type.compareTo(o.getType());
     }
 }

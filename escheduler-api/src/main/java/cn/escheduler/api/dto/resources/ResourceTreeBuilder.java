@@ -17,13 +17,16 @@
 package cn.escheduler.api.dto.resources;
 
 import cn.escheduler.api.service.ResourcesService;
+import cn.escheduler.dao.model.Resource;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Resource Tree Builder
@@ -34,9 +37,59 @@ public class ResourceTreeBuilder {
 
     List<ResourceViewDto> nodes = new ArrayList<ResourceViewDto>();
 
+    public ResourceTreeBuilder() {
+    }
+
+    public ResourceTreeBuilder(List<?> resNodes,Class<?> clazz) {
+        if(clazz == ResourceViewDto.class){
+            this.nodes = (List<ResourceViewDto>) resNodes;
+        }else if(clazz == Resource.class){
+            List<ResourceViewDto> resourceViewDtoList = new ArrayList<>();
+
+            for(Object resource:resNodes){
+                resourceViewDtoList.add(new ResourceViewDto((Resource) resource));
+            }
+            this.nodes = resourceViewDtoList;
+        }
+    }
+
+
     public ResourceTreeBuilder(List<ResourceViewDto> nodes) {
-        super();
         this.nodes = nodes;
+    }
+
+    /**
+     *
+     * @param all
+     * @param authorized
+     */
+    public ResourceTreeBuilder(List<Resource> all,List<Resource> authorized) {
+        List<ResourceViewDto> resourceViewDtoList = all.stream().map(t -> {
+            ResourceViewDto resourceViewDto = null;
+            if (authorized.contains(t)) {
+                resourceViewDto = new ResourceViewDto(t,1);
+            } else {
+                resourceViewDto = new ResourceViewDto(t, 0);
+            }
+            return resourceViewDto;
+        }).collect(Collectors.toList());
+        this.nodes = resourceViewDtoList;
+        //all.stream().filter(item -> authorized.contains(item)).collect(Collectors.toList());
+    }
+
+    /**
+     * resource tree builder
+     * @param resources
+     * @param permission 0 no permission 1 has permission
+     */
+    public ResourceTreeBuilder(List<Resource> resources,int permission) {
+        List<ResourceViewDto> resourceViewDtoList = new ArrayList<>();
+
+        for(Resource resource:resources){
+            resourceViewDtoList.add(new ResourceViewDto(resource,permission));
+        }
+        this.nodes = resourceViewDtoList;
+
     }
 
     /**
@@ -46,7 +99,7 @@ public class ResourceTreeBuilder {
      */
 
     public String buildJSONTree() {
-
+        Collections.sort(this.nodes);
         List<ResourceViewDto> nodeTree = buildTree();
         logger.info(nodeTree.toString());
 
