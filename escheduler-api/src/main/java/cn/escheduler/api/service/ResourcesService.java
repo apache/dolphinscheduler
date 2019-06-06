@@ -569,6 +569,7 @@ public class ResourcesService extends BaseService {
      * @param resourceId
      * @return
      */
+    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
     public Result updateResourceContent(int resourceId, String content) {
         Result result = new Result();
 
@@ -596,6 +597,10 @@ public class ResourcesService extends BaseService {
                 return result;
             }
         }
+
+        resource.setSize(content.getBytes().length);
+        resource.setUpdateTime(new Date());
+        resourcesMapper.update(resource);
 
         User user = userMapper.queryDetailsById(resource.getUserId());
         String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
