@@ -21,7 +21,7 @@ package cn.escheduler.common.enums;
  */
 public enum  ResourceType {
     /**
-     * 0 file, 1 udf
+     * 0 file, 1 udf, 2 fileDir, 3 udfDir
      */
-    FILE,UDF
+    FILE,UDF,FILEDIR,UDFDIR
 }
