@@ -213,7 +213,7 @@ public abstract class AbstractCommandExecutor {
      */
     private int updateState(ProcessDao processDao, int exitStatusCode, int pid, int taskInstId) {
         //get yarn state by log
-        if (exitStatusCode != -1) {
+        if (exitStatusCode != 0) {
             TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
             logger.info("process id is {}", pid);
 
@@ -556,10 +556,4 @@ public abstract class AbstractCommandExecutor {
     protected abstract boolean checkShowLog(String line);
     protected abstract boolean checkFindApp(String line);
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
-
-
-
-//    if(line.contains(taskAppId) || !line.contains("cn.escheduler.server.worker.log.TaskLogger")){
-//        logs.add(line);
-//    }
 }
