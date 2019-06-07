@@ -273,9 +273,8 @@ public class ProcessUtils {
   /**
    * find logs and kill yarn tasks
    * @param taskInstance
-   * @throws IOException
    */
-  public static void killYarnJob(TaskInstance taskInstance) throws Exception {
+  public static void killYarnJob(TaskInstance taskInstance) {
     try {
       Thread.sleep(Constants.SLEEP_TIME_MILLIS);
       LogClient logClient = new LogClient(taskInstance.getHost(), Constants.RPC_PORT);
@@ -295,7 +294,7 @@ public class ProcessUtils {
 
     } catch (Exception e) {
       logger.error("kill yarn job failed : " + e.getMessage(),e);
-      throw new RuntimeException("kill yarn job fail");
+//      throw new RuntimeException("kill yarn job fail");
     }
   }
 }

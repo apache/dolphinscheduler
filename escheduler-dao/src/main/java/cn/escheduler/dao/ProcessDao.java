@@ -58,6 +58,7 @@ public class ProcessDao extends AbstractBaseDao {
     private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.RUNNING_EXEUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
+            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
@@ -1569,7 +1570,6 @@ public class ProcessDao extends AbstractBaseDao {
         for (ProcessInstance processInstance:processInstanceList){
             processNeedFailoverProcessInstances(processInstance);
         }
-
     }
 
     @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
