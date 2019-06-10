@@ -166,7 +166,7 @@ public class TenantService extends BaseService{
     Tenant tenant = tenantMapper.queryById(id);
 
     if (tenant == null){
-      putMsg(result, Status.USER_NOT_EXIST, id);
+      putMsg(result, Status.TENANT_NOT_EXIST);
       return result;
     }
 
