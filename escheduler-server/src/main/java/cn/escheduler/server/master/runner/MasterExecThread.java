@@ -411,6 +411,25 @@ public class MasterExecThread implements Runnable {
         return taskInstance;
     }
 
+    private Collection<String> getStartVertex(String parentNodeName, DAG<String, TaskNode, TaskNodeRelation> dag){
+        Collection<String> startVertex = null;
+        if(StringUtils.isNotEmpty(parentNodeName)){
+            startVertex = dag.getSubsequentNodes(parentNodeName);
+        }else{
+            startVertex = dag.getBeginNode();
+        }
+
+        for(String start : startVertex){
+            TaskNode node = dag.getNode(start);
+            if(node.isForbidden()){
+
+            }
+
+        }
+
+        return startVertex;
+    }
+
     /**
      *  get post task instance by node
      *
@@ -421,12 +440,8 @@ public class MasterExecThread implements Runnable {
     private List<TaskInstance> getPostTaskInstanceByNode(DAG<String, TaskNode, TaskNodeRelation> dag, String parentNodeName){
 
         List<TaskInstance> postTaskList = new ArrayList<>();
-        Collection<String> startVertex = null;
-        if(StringUtils.isNotEmpty(parentNodeName)){
-            startVertex = dag.getSubsequentNodes(parentNodeName);
-        }else{
-            startVertex = dag.getBeginNode();
-        }
+        Collection<String> startVertex = getStartVertex(parentNodeName, dag);
+
         for (String nodeName : startVertex){
 
             // encapsulation task instance

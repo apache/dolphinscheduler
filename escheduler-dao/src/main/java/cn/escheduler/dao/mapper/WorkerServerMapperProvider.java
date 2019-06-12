@@ -38,6 +38,21 @@ public class WorkerServerMapperProvider {
     }
 
     /**
+     * query worker list
+     * @return
+     */
+    public String queryWorkerByHost(Map<String, Object> parameter) {
+        return new SQL() {{
+            SELECT("*");
+
+            FROM(TABLE_NAME);
+
+            WHERE("host = #{host}");
+        }}.toString();
+    }
+
+
+    /**
      * insert worker server
      * @param parameter
      * @return

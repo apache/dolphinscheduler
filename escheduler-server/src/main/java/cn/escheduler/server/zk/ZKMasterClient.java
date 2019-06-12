@@ -18,6 +18,7 @@ package cn.escheduler.server.zk;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ExecutionStatus;
+import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.OSUtils;
@@ -28,11 +29,11 @@ import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.ServerDao;
 import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.model.WorkerServer;
 import cn.escheduler.server.ResInfo;
 import cn.escheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
@@ -135,7 +136,8 @@ public class ZKMasterClient extends AbstractZKClient {
 
 			// check if fault tolerance is required，failure and tolerance
 			if (getActiveMasterNum() == 1) {
-				processDao.masterStartupFaultTolerant();
+//				processDao.masterStartupFaultTolerant();
+				failoverMaster(null);
 			}
 
 		}catch (Exception e){
@@ -191,31 +193,20 @@ public class ZKMasterClient extends AbstractZKClient {
 		Date now = new Date();
 		createTime = now ;
 		try {
+			String osHost = OSUtils.getHost();
 
-			// encapsulation master znnode
-			masterZNode = masterZNodeParentPath + "/" + OSUtils.getHost() + "_";
-			List<String> masterZNodeList = zkClient.getChildren().forPath(masterZNodeParentPath);
-
-			if (CollectionUtils.isNotEmpty(masterZNodeList)){
-				boolean flag = false;
-				for (String masterZNode : masterZNodeList){
-					if (masterZNode.startsWith(OSUtils.getHost())){
-						flag = true;
-						break;
-					}
-				}
-
-				if (flag){
-					logger.error("register failure , master already started on host : {}" , OSUtils.getHost());
-					// exit system
-					System.exit(-1);
-				}
+			// zookeeper node exists, cannot start a new one.
+			if(checkZKNodeExists(osHost, ZKNodeType.MASTER)){
+				logger.error("register failure , master already started on host : {}" , osHost);
+				// exit system
+				System.exit(-1);
 			}
 
 			// specify the format of stored data in ZK nodes
 			String heartbeatZKInfo = getOsInfo(now);
 			// create temporary sequence nodes for master znode
-			masterZNode = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(masterZNode, heartbeatZKInfo.getBytes());
+			masterZNode = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(
+					masterZNodeParentPath + "/" + OSUtils.getHost() + "_", heartbeatZKInfo.getBytes());
 
 			logger.info("register master node {} success" , masterZNode);
 
@@ -238,6 +229,46 @@ public class ZKMasterClient extends AbstractZKClient {
 		}
 	}
 
+
+	/**
+	 * check the zookeeper node already exists
+	 * @param host
+	 * @param zkNodeType
+	 * @return
+	 * @throws Exception
+	 */
+	private boolean checkZKNodeExists(String host, ZKNodeType zkNodeType) throws Exception {
+
+		String path = null;
+		switch (zkNodeType){
+			case MASTER:
+				path = masterZNodeParentPath;
+				break;
+			case WORKER:
+				path = workerZNodeParentPath;
+				break;
+			case DEAD_SERVER:
+				path = deadServerZNodeParentPath;
+				break;
+			default:
+				break;
+		}
+		if(StringUtils.isEmpty(path)){
+			logger.error("check zk node exists error, host:{}, zk node type:{}", host, zkNodeType.toString());
+			return false;
+		}
+
+		List<String> masterZNodeList = null;
+        masterZNodeList = zkClient.getChildren().forPath(path);
+		if (CollectionUtils.isNotEmpty(masterZNodeList)){
+            for (String masterZNode : masterZNodeList){
+                if (masterZNode.startsWith(host)){
+                    return true;
+                }
+                }
+            }
+        return false;
+	}
 
 	/**
 	 *  monitor master
@@ -281,7 +312,7 @@ public class ZKMasterClient extends AbstractZKClient {
 									alertDao.sendServerStopedAlert(1, masterHost, "Master-Server");
 								}
 								if(StringUtils.isNotEmpty(masterHost)){
-									FailoverMaster(masterHost);
+									failoverMaster(masterHost);
 								}
 							}catch (Exception e){
 								logger.error("master failover failed : " + e.getMessage(),e);
@@ -365,7 +396,7 @@ public class ZKMasterClient extends AbstractZKClient {
 								}
 
 								if(StringUtils.isNotEmpty(workerHost)){
-									FailoverWorker(workerHost);
+									failoverWorker(workerHost, true);
                                 }
 							}catch (Exception e){
 								logger.error("worker failover failed : " + e.getMessage(),e);
@@ -458,26 +489,75 @@ public class ZKMasterClient extends AbstractZKClient {
 
 
 	/**
+	 * task needs failover if task start before worker starts
+     *
+	 * @param taskInstance
+	 * @return
+	 */
+	private boolean checkTaskInstanceNeedFailover(TaskInstance taskInstance) throws Exception {
+
+		boolean taskNeedFailover = true;
+
+		// if the worker node exists in zookeeper, we must check the task starts after the worker
+	    if(checkZKNodeExists(taskInstance.getHost(), ZKNodeType.WORKER)){
+	        //if task start after worker starts, there is no need to failover the task.
+         	if(checkTaskAfterWorkerStart(taskInstance)){
+         	    taskNeedFailover = false;
+			}
+		}
+		return taskNeedFailover;
+	}
+
+	/**
+	 * check task start after the worker server starts.
+	 * @param taskInstance
+	 * @return
+	 */
+	private boolean checkTaskAfterWorkerStart(TaskInstance taskInstance) {
+	    Date workerServerStartDate = null;
+		List<WorkerServer> workerServers = processDao.queryWorkerServerByHost(taskInstance.getHost());
+		if(workerServers.size() > 0){
+		    workerServerStartDate = workerServers.get(0).getCreateTime();
+		}
+
+		if(workerServerStartDate != null){
+			return taskInstance.getStartTime().after(workerServerStartDate);
+
+		}else{
+			return false;
+		}
+	}
+
+	/**
 	 * failover worker tasks
 	 * 1. kill yarn job if there are yarn jobs in tasks.
 	 * 2. change task state from running to need failover.
 	 * @param workerHost
 	 */
-	private void FailoverWorker(String workerHost){
+	private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
 		logger.info("start worker[{}] failover ...", workerHost);
 
 		List<TaskInstance> needFailoverTaskInstanceList = processDao.queryNeedFailoverTaskInstances(workerHost);
 		for(TaskInstance taskInstance : needFailoverTaskInstanceList){
+			if(needCheckWorkerAlive){
+				if(!checkTaskInstanceNeedFailover(taskInstance)){
+					continue;
+                }
+			}
+
 			ProcessInstance instance = processDao.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
 			if(instance!=null){
 				taskInstance.setProcessInstance(instance);
 			}
 			// only kill yarn job if exists , the local thread has exited
 			ProcessUtils.killYarnJob(taskInstance);
+
+			taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
+			processDao.saveTaskInstance(taskInstance);
 		}
 
-		//updateProcessInstance state value is NEED_FAULT_TOLERANCE
-		processDao.updateNeedFailoverTaskInstances(workerHost);
+		//update task Instance state value is NEED_FAULT_TOLERANCE
+		// processDao.updateNeedFailoverTaskInstances(workerHost);
 		logger.info("end worker[{}] failover ...", workerHost);
 	}
 
@@ -485,7 +565,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * failover master tasks
 	 * @param masterHost
 	 */
-	private void FailoverMaster(String masterHost) {
+	private void failoverMaster(String masterHost) {
 		logger.info("start master failover ...");
 
 		List<ProcessInstance> needFailoverProcessInstanceList = processDao.queryNeedFailoverProcessInstances(masterHost);
