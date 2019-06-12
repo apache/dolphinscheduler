@@ -827,6 +827,7 @@ public final class Constants {
 
 
     /**
-     *
+     *  preview schedule execute count
      */
+    public static final int PREVIEW_SCHEDULE_EXECUTE_COUNT = 5;
 }
