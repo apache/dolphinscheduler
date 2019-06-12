@@ -24,6 +24,7 @@ import cn.escheduler.common.enums.FailureStrategy;
 import cn.escheduler.common.enums.Priority;
 import cn.escheduler.common.enums.ReleaseState;
 import cn.escheduler.common.enums.WarningType;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,13 +77,15 @@ public class SchedulerController extends BaseController{
                                                        @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
                                                        @RequestParam(value = "receivers", required = false) String receivers,
                                                        @RequestParam(value = "receiversCc", required = false) String receiversCc,
+                                                       @RequestParam(value = "workerGroupId", required = false, defaultValue = "-1") int workerGroupId,
                                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
     logger.info("login user {}, project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {}," +
-                    "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}",
-            loginUser.getUserName(), projectName, processDefinitionId, schedule, warningType, warningGroupId, failureStrategy,receivers,receiversCc,processInstancePriority);
+                    "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}, workGroupId:{}",
+            loginUser.getUserName(), projectName, processDefinitionId, schedule, warningType, warningGroupId,
+            failureStrategy,receivers,receiversCc,processInstancePriority,workerGroupId);
       try {
           Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
-                  warningType, warningGroupId, failureStrategy, receivers,receiversCc,processInstancePriority);
+                  warningType, warningGroupId, failureStrategy, receivers,receiversCc,processInstancePriority,workerGroupId);
 
           return returnDataList(result);
       }catch (Exception e){
@@ -113,14 +116,16 @@ public class SchedulerController extends BaseController{
                                                        @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                                        @RequestParam(value = "receivers", required = false) String receivers,
                                                        @RequestParam(value = "receiversCc", required = false) String receiversCc,
+                                                       @RequestParam(value = "workerGroupId", required = false, defaultValue = "-1") int workerGroupId,
                                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
     logger.info("login user {}, project name: {},id: {}, updateProcessInstance schedule: {}, notify type: {}, notify mails: {}, " +
-                    "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}",
-            loginUser.getUserName(), projectName, id, schedule, warningType, warningGroupId, failureStrategy,receivers,receiversCc,processInstancePriority);
+                    "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {},workerGroupId:{}",
+            loginUser.getUserName(), projectName, id, schedule, warningType, warningGroupId, failureStrategy,
+            receivers,receiversCc,processInstancePriority,workerGroupId);
 
       try {
           Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
-                  warningType, warningGroupId, failureStrategy, receivers,receiversCc,null,processInstancePriority);
+                  warningType, warningGroupId, failureStrategy, receivers,receiversCc,null,processInstancePriority, workerGroupId);
           return returnDataList(result);
 
       }catch (Exception e){
@@ -197,6 +202,7 @@ public class SchedulerController extends BaseController{
     logger.info("login user {}, query schedule, project name: {}, process definition id: {}",
             loginUser.getUserName(), projectName, processDefinitionId);
       try {
+          searchVal = ParameterUtils.handleEscapes(searchVal);
           Map<String, Object> result = schedulerService.querySchedule(loginUser, projectName, processDefinitionId, searchVal, pageNo, pageSize);
           return returnDataListPaging(result);
        }catch (Exception e){
@@ -226,4 +232,29 @@ public class SchedulerController extends BaseController{
           return error(Status.QUERY_SCHEDULE_LIST_ERROR.getCode(), Status.QUERY_SCHEDULE_LIST_ERROR.getMsg());
       }
   }
+
+    /**
+     * delete schedule by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param scheduleId
+     * @return
+     */
+    @GetMapping(value="/delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
+                                              @PathVariable String projectName,
+                                              @RequestParam("scheduleId") Integer scheduleId
+    ){
+        try{
+            logger.info("delete schedule by id, login user:{}, project name:{}, schedule id:{}",
+                    loginUser.getUserName(), projectName, scheduleId);
+            Map<String, Object> result = schedulerService.deleteScheduleById(loginUser, projectName, scheduleId);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(DELETE_SCHEDULE_CRON_BY_ID_ERROR.getMsg(),e);
+            return error(Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR.getCode(), Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR.getMsg());
+        }
+    }
 }

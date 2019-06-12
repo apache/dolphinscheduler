@@ -75,6 +75,7 @@ public interface ScheduleMapper {
           @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "releaseState", column = "release_state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "warningGroupId", column = "warning_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "workerGroupId", column = "worker_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ScheduleMapperProvider.class, method = "queryByProcessDefineIdPaging")
@@ -117,6 +118,7 @@ public interface ScheduleMapper {
           @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "releaseState", column = "release_state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "warningGroupId", column = "warning_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "workerGroupId", column = "worker_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ScheduleMapperProvider.class, method = "querySchedulerListByProjectName")
@@ -141,6 +143,7 @@ public interface ScheduleMapper {
             @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "releaseState", column = "release_state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
             @Result(property = "warningGroupId", column = "warning_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "workerGroupId", column = "worker_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
     })
     @SelectProvider(type = ScheduleMapperProvider.class, method = "queryById")
@@ -164,11 +167,42 @@ public interface ScheduleMapper {
           @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "releaseState", column = "release_state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
           @Result(property = "warningGroupId", column = "warning_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "workerGroupId", column = "worker_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
           @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
   })
   @SelectProvider(type = ScheduleMapperProvider.class, method = "selectAllByProcessDefineArray")
   List<Schedule> selectAllByProcessDefineArray(@Param("processDefineIds") int[] processDefineIds);
 
+  /**
+   * query schedule list by definition id
+   * @param processDefinitionId
+   * @return
+   */
+  @Results(value = {
+          @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "processDefinitionId", column = "process_definition_id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "startTime", column = "start_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "endTime", column = "end_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "crontab", column = "crontab", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "failureStrategy", column = "failure_strategy", typeHandler = EnumOrdinalTypeHandler.class, javaType = FailureStrategy.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "warningType", column = "warning_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = WarningType.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "updateTime", column = "update_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+          @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "releaseState", column = "release_state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "warningGroupId", column = "warning_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "workerGroupId", column = "worker_group_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
+  })
+  @SelectProvider(type = ScheduleMapperProvider.class, method = "queryByProcessDefinitionId")
+  List<Schedule> queryByProcessDefinitionId(@Param("processDefinitionId") int processDefinitionId);
 
+  /**
+   * delete schedule by id
+   * @param scheduleId
+   * @return
+   */
+  @DeleteProvider(type = ScheduleMapperProvider.class, method = "delete")
+  int delete(@Param("scheduleId") int scheduleId);
 
 }

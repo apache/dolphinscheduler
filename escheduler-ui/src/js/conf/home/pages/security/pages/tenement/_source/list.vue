@@ -64,19 +64,26 @@
                     @click="_edit(item)"
                     icon="iconfont icon-bianjixiugai">
             </x-button>
-            <!--<x-poptip
-                    :ref="'poptip-' + $index"
-                    placement="bottom-end"
-                    width="90">
+            <x-poptip
+              :ref="'poptip-' + $index"
+              placement="bottom-end"
+              width="90">
               <p>{{$t('Delete?')}}</p>
               <div style="text-align: right; margin: 0;padding-top: 4px;">
                 <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
                 <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
               </div>
               <template slot="reference">
-                <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('delete')">{{$t('delete')}}</x-button>
+                <x-button
+                  icon="iconfont icon-shanchu"
+                  type="error"
+                  shape="circle"
+                  size="xsmall"
+                  data-toggle="tooltip"
+                  :title="$t('delete')">
+                </x-button>
               </template>
-            </x-poptip>-->
+            </x-poptip>
           </td>
         </tr>
       </table>
@@ -85,8 +92,7 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
-  import { findComponentDownward } from '@/module/util/'
+  
 
   export default {
     name: 'tenement-list',
@@ -118,7 +124,7 @@
         })
       },
       _edit (item) {
-        findComponentDownward(this.$root, 'tenement-index')._create(item)
+        this.$emit('on-edit', item)
       }
     },
     watch: {

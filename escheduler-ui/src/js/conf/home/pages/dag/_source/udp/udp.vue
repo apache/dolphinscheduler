@@ -4,6 +4,7 @@
       <div class="title">
         <span>{{$t('Set the DAG diagram name')}}</span>
       </div>
+
       <div>
         <x-input
                 type="text"
@@ -12,6 +13,7 @@
                 :placeholder="$t('Please enter name(required)')">
         </x-input>
       </div>
+
       <template v-if="router.history.current.name !== 'projects-instance-details'">
         <div style="padding-top: 12px;">
           <x-input
@@ -23,6 +25,21 @@
           </x-input>
         </div>
       </template>
+
+      <div class="title" style="padding-top: 6px;">
+        <span>超时告警</span>
+        <span style="padding-left: 6px;">
+          <x-switch v-model="checkedTimeout"></x-switch>
+        </span>
+      </div>
+      <div class="content" style="padding-bottom: 10px;" v-if="checkedTimeout">
+        <span>
+          <x-input v-model="timeout" style="width: 160px;" maxlength="9">
+            <span slot="append">{{$t('Minute')}}</span>
+          </x-input>
+        </span>
+      </div>
+
       <div class="title" style="padding-top: 6px;">
         <span>{{$t('Set global')}}</span>
       </div>
@@ -67,8 +84,14 @@
         desc: '',
         // Global custom parameters
         udpList: [],
+        // Global custom parameters
+        udpListCache: [],
         // Whether to update the process definition
-        syncDefine: true
+        syncDefine: true,
+        // Timeout alarm
+        timeout: 0,
+        // checked Timeout alarm
+        checkedTimeout: true
       }
     },
     mixins: [disabledState],
@@ -80,6 +103,21 @@
        */
       _onLocalParams (a) {
         this.udpList = a
+      },
+      _verifTimeout () {
+        const reg = /^[1-9]\d*$/
+        if (!reg.test(this.timeout)) {
+          this.$message.warning(`${i18n.$t('Please enter a positive integer greater than 0')}`)
+          return false
+        }
+        return true
+      },
+      _accuStore(){
+        this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
+        this.store.commit('dag/setName', _.cloneDeep(this.name))
+        this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
+        this.store.commit('dag/setDesc', _.cloneDeep(this.desc))
+        this.store.commit('dag/setSyncDefine', this.syncDefine)
       },
       /**
        * submit
@@ -95,11 +133,14 @@
           if (!this.$refs.refLocalParams._verifProp()) {
             return
           }
+          // verification timeout
+          if (this.checkedTimeout && !this._verifTimeout()) {
+            return
+          }
+
           // Storage global globalParams
-          this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
-          this.store.commit('dag/setName', _.cloneDeep(this.name))
-          this.store.commit('dag/setDesc', _.cloneDeep(this.desc))
-          this.store.commit('dag/setSyncDefine', this.syncDefine)
+          this._accuStore()
+
           Affirm.setIsPop(false)
           this.$emit('onUdp')
         }
@@ -124,12 +165,22 @@
       }
     },
     watch: {
+      checkedTimeout (val) {
+        if (!val) {
+          this.timeout = 0
+          this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
+        }
+      }
     },
     created () {
-      this.udpList = this.store.state.dag.globalParams
-      this.name = this.store.state.dag.name
-      this.desc = this.store.state.dag.desc
-      this.syncDefine = this.store.state.dag.syncDefine
+      const dag = _.cloneDeep(this.store.state.dag)
+      this.udpList = dag.globalParams
+      this.udpListCache = dag.globalParams
+      this.name = dag.name
+      this.desc = dag.desc
+      this.syncDefine = dag.syncDefine
+      this.timeout = dag.timeout || 0
+      this.checkedTimeout = this.timeout !== 0
     },
     mounted () {},
     components: { mLocalParams }
@@ -138,8 +189,8 @@
 
 <style lang="scss" rel="stylesheet/scss">
   .udp-model {
-    width: 616px;
-    min-height: 326px;
+    width: 624px;
+    min-height: 420px;
     background: #fff;
     border-radius: 3px;
     padding:20px 0 ;
@@ -182,6 +233,14 @@
     }
     .content {
       padding-bottom: 50px;
+      .user-def-params-model {
+        .add {
+          a {
+            color: #0097e0;
+          }
+        }
+      }
     }
+
   }
 </style>

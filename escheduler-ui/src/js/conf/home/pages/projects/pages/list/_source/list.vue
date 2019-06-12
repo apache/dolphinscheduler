@@ -13,6 +13,12 @@
             <span>{{$t('Owned Users')}}</span>
           </th>
           <th>
+            <span>{{$t('Process Define Count')}}</span>
+          </th>
+          <th>
+            <span>{{$t('Process Instance Running Count')}}</span>
+          </th>
+          <th>
             <span>{{$t('Description')}}</span>
           </th>
           <th>
@@ -36,6 +42,12 @@
           </td>
           <td>
             <span>{{item.userName || '-'}}</span>
+          </td>
+          <td>
+            <span>{{item.defCount}}</span>
+          </td>
+          <td>
+            <span>{{item.instRunningCount}}</span>
           </td>
           <td>
             <span>{{item.desc}}</span>
@@ -82,7 +94,6 @@
   </div>
 </template>
 <script>
-  import '@/module/filter/formatDate'
   import { mapActions, mapMutations } from 'vuex'
   import localStore from '@/module/util/localStorage'
   import { findComponentDownward } from '@/module/util/'

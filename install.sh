@@ -45,32 +45,39 @@ mysqlDb="escheduler"
 mysqlUserName="xx"
 
 # mysql 密码
+# 注意：如果有特殊字符，请用 \ 转移符进行转移
 mysqlPassword="xx"
 
 # conf/config/install_config.conf配置
-# 安装路径,不要当前路径(pwd)一样
+# 注意：安装路径,不要当前路径(pwd)一样
 installPath="/data1_1T/escheduler"
 
 # 部署用户
+# 注意：部署用户需要有sudo权限及操作hdfs的权限，如果开启hdfs，根目录需要自行创建
 deployUser="escheduler"
 
 # zk集群
 zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
 
 # 安装hosts
+# 注意：安装调度的机器hostname列表，如果是伪分布式，则只需写一个伪分布式hostname即可
 ips="ark0,ark1,ark2,ark3,ark4"
 
 # conf/config/run_config.conf配置
 # 运行Master的机器
+# 注意：部署master的机器hostname列表
 masters="ark0,ark1"
 
 # 运行Worker的机器
+# 注意：部署worker的机器hostname列表
 workers="ark2,ark3,ark4"
 
 # 运行Alert的机器
+# 注意：部署alert server的机器hostname列表
 alertServer="ark3"
 
 # 运行Api的机器
+# 注意：部署api server的机器hostname列表
 apiServers="ark1"
 
 # alert配置
@@ -89,16 +96,27 @@ mailSender="xxxxxxxxxx"
 # 发送人密码
 mailPassword="xxxxxxxxxx"
 
+# TLS邮件协议支持
+starttlsEnable="false"
+
+# SSL邮件协议支持
+# 注意：默认开启的是SSL协议，TLS和SSL只能有一个处于true状态
+sslEnable="true"
+
 # 下载Excel路径
 xlsFilePath="/tmp/xls"
 
 
+#是否启动监控自启动脚本
+monitorServerState="false"
+
 # hadoop 配置
 # 是否启动hdfs,如果启动则为true,需要配置以下hadoop相关参数;
 # 不启动设置为false,如果为false,以下配置不需要修改
+# 特别注意：如果启动hdfs，需要自行创建hdfs根路径，也就是install.sh中的 hdfsPath
 hdfsStartupSate="false"
 
-# namenode地址,支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
+# namenode地址，支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
 namenodeFs="hdfs://mycluster:8020"
 
 # resourcemanager HA配置，如果是单resourcemanager,这里为空即可
@@ -122,9 +140,6 @@ execPath="/tmp/escheduler/exec"
 
 # SHELL环境变量路径
 shellEnvPath="$installPath/conf/env/.escheduler_env.sh"
-
-# Python换将变量路径
-pythonEnvPath="$installPath/conf/env/escheduler_env.py"
 
 # 资源文件的后缀
 resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
@@ -157,6 +172,9 @@ mastersFailover="/escheduler/lock/failover/masters"
 # zk worker容错分布式锁
 workersFailover="/escheduler/lock/failover/masters"
 
+# zk master启动容错分布式锁
+mastersStartupFailover="/escheduler/lock/failover/startup-masters"
+
 # zk session 超时
 zkSessionTimeout="300"
 
@@ -187,7 +205,7 @@ masterTaskCommitRetryTimes="5"
 masterTaskCommitInterval="100"
 
 # master最大cpu平均负载,用来判断master是否还有执行能力
-masterMaxCupLoadAvg="10"
+masterMaxCpuLoadAvg="10"
 
 # master预留内存,用来判断master是否还有执行能力
 masterReservedMemory="1"
@@ -201,10 +219,10 @@ workerExecThreads="100"
 workerHeartbeatInterval="10"
 
 # worker一次抓取任务数
-workerFetchTaskNum="10"
+workerFetchTaskNum="3"
 
-# worker最大cpu平均负载,用来判断master是否还有执行能力
-workerMaxCupLoadAvg="10"
+# worker最大cpu平均负载,用来判断worker是否还有执行能力,保持系统默认，默认为cpu核数的2倍，当负载达到2倍时，
+#workerMaxCupLoadAvg="10"
 
 # worker预留内存,用来判断master是否还有执行能力
 workerReservedMemory="1"
@@ -249,7 +267,6 @@ sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" co
 sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
 sed -i ${txt} "s#hdfs.startup.state.*#hdfs.startup.state=${hdfsStartupSate}#g" conf/common/common.properties
 sed -i ${txt} "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
-sed -i ${txt} "s#escheduler.env.py.*#escheduler.env.py=${pythonEnvPath}#g" conf/common/common.properties
 sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
 sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
 
@@ -262,6 +279,7 @@ sed -i ${txt} "s#zookeeper.escheduler.lock.masters.*#zookeeper.escheduler.lock.m
 sed -i ${txt} "s#zookeeper.escheduler.lock.workers.*#zookeeper.escheduler.lock.workers=${workersLock}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.escheduler.lock.failover.masters.*#zookeeper.escheduler.lock.failover.masters=${mastersFailover}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.escheduler.lock.failover.workers.*#zookeeper.escheduler.lock.failover.workers=${workersFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.lock.failover.startup.masters.*#zookeeper.escheduler.lock.failover.startup.masters=${mastersStartupFailover}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/zookeeper.properties
@@ -272,14 +290,14 @@ sed -i ${txt} "s#master.exec.task.number.*#master.exec.task.number=${masterExecT
 sed -i ${txt} "s#master.heartbeat.interval.*#master.heartbeat.interval=${masterHeartbeatInterval}#g" conf/master.properties
 sed -i ${txt} "s#master.task.commit.retryTimes.*#master.task.commit.retryTimes=${masterTaskCommitRetryTimes}#g" conf/master.properties
 sed -i ${txt} "s#master.task.commit.interval.*#master.task.commit.interval=${masterTaskCommitInterval}#g" conf/master.properties
-sed -i ${txt} "s#master.max.cpuload.avg.*#master.max.cpuload.avg=${masterMaxCupLoadAvg}#g" conf/master.properties
+sed -i ${txt} "s#master.max.cpuload.avg.*#master.max.cpuload.avg=${masterMaxCpuLoadAvg}#g" conf/master.properties
 sed -i ${txt} "s#master.reserved.memory.*#master.reserved.memory=${masterReservedMemory}#g" conf/master.properties
 
 
 sed -i ${txt} "s#worker.exec.threads.*#worker.exec.threads=${workerExecThreads}#g" conf/worker.properties
 sed -i ${txt} "s#worker.heartbeat.interval.*#worker.heartbeat.interval=${workerHeartbeatInterval}#g" conf/worker.properties
 sed -i ${txt} "s#worker.fetch.task.num.*#worker.fetch.task.num=${workerFetchTaskNum}#g" conf/worker.properties
-sed -i ${txt} "s#worker.max.cpuload.avg.*#worker.max.cpuload.avg=${workerMaxCupLoadAvg}#g" conf/worker.properties
+#sed -i ${txt} "s#worker.max.cpuload.avg.*#worker.max.cpuload.avg=${workerMaxCupLoadAvg}#g" conf/worker.properties
 sed -i ${txt} "s#worker.reserved.memory.*#worker.reserved.memory=${workerReservedMemory}#g" conf/worker.properties
 
 
@@ -296,6 +314,8 @@ sed -i ${txt} "s#mail.server.host.*#mail.server.host=${mailServerHost}#g" conf/a
 sed -i ${txt} "s#mail.server.port.*#mail.server.port=${mailServerPort}#g" conf/alert.properties
 sed -i ${txt} "s#mail.sender.*#mail.sender=${mailSender}#g" conf/alert.properties
 sed -i ${txt} "s#mail.passwd.*#mail.passwd=${mailPassword}#g" conf/alert.properties
+sed -i ${txt} "s#mail.smtp.starttls.enable.*#mail.smtp.starttls.enable=${starttlsEnable}#g" conf/alert.properties
+sed -i ${txt} "s#mail.smtp.ssl.enable.*#mail.smtp.ssl.enable=${sslEnable}#g" conf/alert.properties
 sed -i ${txt} "s#xls.file.path.*#xls.file.path=${xlsFilePath}#g" conf/alert.properties
 
 
@@ -368,3 +388,29 @@ fi
 # 6,启动
 echo "6,启动"
 sh ${workDir}/script/start_all.sh
+
+# 7,启动监控自启动脚本
+monitor_pid=${workDir}/monitor_server.pid
+if [ "true" = $monitorServerState ];then
+        if [ -f $monitor_pid ]; then
+                TARGET_PID=`cat $monitor_pid`
+                if kill -0 $TARGET_PID > /dev/null 2>&1; then
+                        echo "monitor server running as process ${TARGET_PID}.Stopping"
+                        kill $TARGET_PID
+                        sleep 5
+                        if kill -0 $TARGET_PID > /dev/null 2>&1; then
+                                echo "monitor server did not stop gracefully after 5 seconds: killing with kill -9"
+                                kill -9 $TARGET_PID
+                        fi
+                else
+                        echo "no monitor server to stop"
+                fi
+                echo "monitor server running as process ${TARGET_PID}.Stopped success"
+                rm -f $monitor_pid
+        fi
+        nohup python -u ${workDir}/script/monitor_server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor_server.log 2>&1 &
+        echo $! > $monitor_pid
+        echo "start monitor server success as process `cat $monitor_pid`"
+
+fi
+

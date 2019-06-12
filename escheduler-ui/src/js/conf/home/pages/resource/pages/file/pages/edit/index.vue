@@ -1,34 +1,31 @@
 <template>
-  <div class="main-layout-box">
-    <m-secondary-menu :type="'resource'" ></m-secondary-menu>
-    <m-list-construction :title="$t('File Details')">
-      <div slot="content" style="margin: 20px">
-        <div class="file-edit-content">
-          <h2>
-            <span>{{name}}</span>
-          </h2>
-          <template v-show="isNoType">
-            <template v-if="!msg">
-              <div class="code-mirror-model">
-                <textarea id="code-edit-mirror" name="code-edit-mirror"></textarea>
-              </div>
-              <div class="submit-c">
-                <x-button type="text" shape="circle" @click="close()" :disabled="disabled"> {{$t('Return')}} </x-button>
-                <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Save')}} </x-button>
-              </div>
-            </template>
-            <m-no-data :msg="msg" v-if="msg"></m-no-data>
+  <m-list-construction :title="$t('File Details')">
+    <div slot="content" style="margin: 20px">
+      <div class="file-edit-content">
+        <h2>
+          <span>{{name}}</span>
+        </h2>
+        <template v-show="isNoType">
+          <template v-if="!msg">
+            <div class="code-mirror-model">
+              <textarea id="code-edit-mirror" name="code-edit-mirror"></textarea>
+            </div>
+            <div class="submit-c">
+              <x-button type="text" shape="circle" @click="close()" :disabled="disabled"> {{$t('Return')}} </x-button>
+              <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Save')}} </x-button>
+            </div>
+          </template>
+          <m-no-data :msg="msg" v-if="msg"></m-no-data>
 
-          </template>
-          <template v-if="!isNoType">
-            <m-no-type></m-no-type>
-          </template>
-        </div>
-        <m-spin :is-spin="isLoading">
-        </m-spin>
+        </template>
+        <template v-if="!isNoType">
+          <m-no-type></m-no-type>
+        </template>
       </div>
-    </m-list-construction>
-  </div>
+      <m-spin :is-spin="isLoading">
+      </m-spin>
+    </div>
+  </m-list-construction>
 </template>
 <script>
   import _ from 'lodash'
@@ -41,7 +38,6 @@
   import localStore from '@/module/util/localStorage'
   import mNoData from '@/module/components/noData/noData'
   import { handlerSuffix } from '../details/_source/utils'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   let editor
@@ -96,7 +92,8 @@
             this.isData = false
           } else {
             this.isData = true
-            this._handlerEditor().setValue(res.data.content || '')
+            let content = res.data.content ? res.data.content + '\n' : ''
+            this._handlerEditor().setValue(content)
             setTimeout(() => {
               $('.code-mirror-model').scrollTop(12).scrollLeft(0)
             }, 200)
@@ -158,7 +155,7 @@
     },
     computed: {
     },
-    components: { mListConstruction, mNoType, mSpin, mSecondaryMenu, mNoData }
+    components: { mListConstruction, mNoType, mSpin, mNoData }
   }
 </script>
 

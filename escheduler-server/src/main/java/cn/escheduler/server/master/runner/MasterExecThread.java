@@ -258,7 +258,7 @@ public class MasterExecThread implements Runnable {
             processDao.createRecoveryWaitingThreadCommand(null, processInstance);
         }
         List<TaskInstance> taskInstances = processDao.findValidTaskListByProcessId(processInstance.getId());
-        alertManager.sendWarnningOfProcessInstance(processInstance, taskInstances);
+        alertManager.sendAlertProcessInstance(processInstance, taskInstances);
     }
 
 
@@ -403,6 +403,9 @@ public class MasterExecThread implements Runnable {
             }else{
                 taskInstance.setTaskInstancePriority(taskNode.getTaskInstancePriority());
             }
+
+            int workerGroupId = taskNode.getWorkerGroupId();
+            taskInstance.setWorkerGroupId(workerGroupId);
 
         }
         return taskInstance;
@@ -772,8 +775,15 @@ public class MasterExecThread implements Runnable {
     private void runProcess(){
         // submit start node
         submitPostNode(null);
-        // submitStandByTask();
+        boolean sendTimeWarning = false;
         while(!processInstance.IsProcessInstanceStop()){
+
+            // send warning email if process time out.
+            if( !sendTimeWarning && checkProcessTimeOut(processInstance) ){
+                alertManager.sendProcessTimeoutAlert(processInstance,
+                        processDao.findProcessDefineById(processInstance.getProcessDefinitionId()));
+                sendTimeWarning = true;
+            }
             Set<MasterBaseTaskExecThread> keys = activeTaskNode.keySet();
             for (MasterBaseTaskExecThread taskExecThread : keys) {
                 Future<Boolean> future = activeTaskNode.get(taskExecThread);
@@ -818,7 +828,7 @@ public class MasterExecThread implements Runnable {
             }
             // send alert
             if(this.recoverToleranceFaultTaskList.size() > 0){
-                alertManager.sendWarnningWorkerleranceFault(processInstance, recoverToleranceFaultTaskList);
+                alertManager.sendAlertWorkerToleranceFault(processInstance, recoverToleranceFaultTaskList);
                 this.recoverToleranceFaultTaskList.clear();
             }
             // updateProcessInstance completed task status
@@ -846,6 +856,25 @@ public class MasterExecThread implements Runnable {
         }
 
         logger.info("process:{} end, state :{}", processInstance.getId(), processInstance.getState());
+    }
+
+    /**
+     * check process time out
+     * @param processInstance
+     * @return
+     */
+    private boolean checkProcessTimeOut(ProcessInstance processInstance) {
+        if(processInstance.getTimeout() == 0 ){
+            return false;
+        }
+
+        Date now = new Date();
+        long runningTime =  DateUtils.diffMin(now, processInstance.getStartTime());
+
+        if(runningTime > processInstance.getTimeout()){
+            return true;
+        }
+        return false;
     }
 
     private boolean canSubmitTaskToQueue() {

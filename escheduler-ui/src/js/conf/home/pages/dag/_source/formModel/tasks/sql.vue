@@ -27,6 +27,31 @@
         </div>
       </div>
     </m-list-box>
+    <template v-if="!sqlType && showType.length">
+      <m-list-box>
+        <div slot="text">{{$t('Title')}}</div>
+        <div slot="content">
+          <x-input
+            type="input"
+            v-model="title"
+            :placeholder="$t('Please enter the title of email')"
+            autocomplete="off">
+          </x-input>
+        </div>
+      </m-list-box>
+      <m-list-box>
+        <div slot="text">{{$t('Recipient')}}</div>
+        <div slot="content">
+          <m-email v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
+        </div>
+      </m-list-box>
+      <m-list-box>
+        <div slot="text">{{$t('Cc')}}</div>
+        <div slot="content">
+          <m-email v-model="receiversCc" :disabled="isDetails" :repeat-data="receivers"></m-email>
+        </div>
+      </m-list-box>
+    </template>
     <m-list-box v-show="type === 'HIVE'">
       <div slot="text">{{$t('SQL Parameter')}}</div>
       <div slot="content">
@@ -72,6 +97,26 @@
         </m-local-params>
       </div>
     </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('Pre Statement')}}</div>
+      <div slot="content">
+        <m-statement-list
+          ref="refPreStatements"
+          @on-statement-list="_onPreStatements"
+          :statement-list="preStatements">
+        </m-statement-list>
+      </div>
+    </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('Post Statement')}}</div>
+      <div slot="content">
+        <m-statement-list
+          ref="refPostStatements"
+          @on-statement-list="_onPostStatements"
+          :statement-list="postStatements">
+        </m-statement-list>
+      </div>
+    </m-list-box>
   </div>
 </template>
 <script>
@@ -82,7 +127,9 @@
   import mSqlType from './_source/sqlType'
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
+  import mStatementList from './_source/statementList'
   import disabledState from '@/module/mixin/disabledState'
+  import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
   let editor
@@ -105,15 +152,26 @@
         udfs: '',
         // Sql type
         sqlType: 0,
+        // Email title
+        title: '',
         // Form/attachment
         showType: ['TABLE'],
         // Sql parameter
-        connParams: ''
+        connParams: '',
+        // Pre statements
+        preStatements: [],
+        // Post statements
+        postStatements: [],
+        // recipients
+        receivers: [],
+        // copy to
+        receiversCc: []
       }
     },
     mixins: [disabledState],
     props: {
-      backfillItem: Object
+      backfillItem: Object,
+      createNodeId: Number
     },
     methods: {
       /**
@@ -142,6 +200,18 @@
         this.rtDatasource = o.datasource
       },
       /**
+       * return pre statements
+       */
+      _onPreStatements (a) {
+        this.preStatements = a
+      },
+      /**
+       * return post statements
+       */
+      _onPostStatements (a) {
+        this.postStatements = a
+      },
+      /**
        * verification
        */
       _verification () {
@@ -167,6 +237,16 @@
           return false
         }
 
+        // preStatements Subcomponent verification
+        if (!this.$refs.refPreStatements._verifProp()) {
+          return false
+        }
+
+        // postStatements Subcomponent verification
+        if (!this.$refs.refPostStatements._verifProp()) {
+          return false
+        }
+
         // storage
         this.$emit('on-params', {
           type: this.type,
@@ -174,6 +254,9 @@
           sql: editor.getValue(),
           udfs: this.udfs,
           sqlType: this.sqlType,
+          title: this.title,
+          receivers: this.receivers.join(','),
+          receiversCc: this.receiversCc.join(','),
           showType: (() => {
             /**
              * Special processing return order TABLE,ATTACHMENT
@@ -187,7 +270,9 @@
             }
           })(),
           localParams: this.localParams,
-          connParams: this.connParams
+          connParams: this.connParams,
+          preStatements: this.preStatements,
+          postStatements: this.postStatements
         })
         return true
       },
@@ -215,6 +300,19 @@
         editor.setValue(this.sql)
 
         return editor
+      },
+      _getReceiver () {
+        let param = {}
+        let current = this.router.history.current
+        if (current.name === 'projects-definition-details') {
+          param.processDefinitionId = current.params.id
+        } else {
+          param.processInstanceId = current.params.id
+        }
+        this.store.dispatch('dag/getReceiver', param).then(res => {
+          this.receivers = res.receivers && res.receivers.split(',') || []
+          this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
+        })
       }
     },
     watch: {
@@ -223,11 +321,24 @@
         if (val) {
           this.showType = []
         }
+        if (val !== 0) {
+          this.title = ''
+          this.receivers = []
+          this.receiversCc = []
+        }
       },
       // Listening data source
       type (val) {
         if (val !== 'HIVE') {
           this.connParams = ''
+        }
+      },
+      //
+      showType (val) {
+        if (!val.length) {
+          this.title = ''
+          this.receivers = []
+          this.receiversCc = []
         }
       }
     },
@@ -245,6 +356,15 @@
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
         this.showType = o.params.showType.split(',') || []
+        this.preStatements = o.params.preStatements || []
+        this.postStatements = o.params.postStatements || []
+        this.title = o.params.title || ''
+        this.receivers = o.params.receivers && o.params.receivers.split(',') || []
+        this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
+      }
+      if (!_.some(this.store.state.dag.tasks, { id: this.createNodeId }) &&
+        this.router.history.current.name !== 'definition-create') {
+        this._getReceiver()
       }
     },
     mounted () {
@@ -262,6 +382,6 @@
       }
     },
     computed: {},
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
   }
 </script>

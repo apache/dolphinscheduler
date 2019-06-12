@@ -90,7 +90,7 @@ public class ExecutorService extends BaseService{
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    String receivers, String receiversCc, RunMode runMode,
-                                                   Priority processInstancePriority, Integer timeout) throws ParseException {
+                                                   Priority processInstancePriority, int workerGroupId, Integer timeout) throws ParseException {
         Map<String, Object> result = new HashMap<>(5);
         // timeout is valid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
@@ -115,7 +115,7 @@ public class ExecutorService extends BaseService{
          */
         int create = this.createCommand(commandType, processDefinitionId,
                 taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode,processInstancePriority);
+                warningGroupId, runMode,processInstancePriority, workerGroupId);
         if(create > 0 ){
             /**
              * according to the process definition ID updateProcessInstance and CC recipient
@@ -178,9 +178,11 @@ public class ExecutorService extends BaseService{
         }
 
         ProcessDefinition processDefinition = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
-        result = checkProcessDefinitionValid(processDefinition, processInstance.getProcessDefinitionId());
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
+        if(executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE){
+            result = checkProcessDefinitionValid(processDefinition, processInstance.getProcessDefinitionId());
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                return result;
+            }
         }
 
         checkResult = checkExecuteType(processInstance, executeType);
@@ -361,18 +363,29 @@ public class ExecutorService extends BaseService{
     }
 
     /**
-     * query recipients and copyers by process definition id
+     * query recipients and copyers by process definition id or processInstanceId
      *
      * @param processDefineId
      * @return
      */
-    public Map<String, Object> getReceiverCc(int processDefineId) {
+    public Map<String, Object> getReceiverCc(Integer processDefineId,Integer processInstanceId) {
         Map<String, Object> result = new HashMap<>();
-
+        logger.info("processInstanceId {}",processInstanceId);
+        if(processDefineId == null && processInstanceId == null){
+            throw new RuntimeException("You must set values for parameters processDefineId or processInstanceId");
+        }
+        if(processDefineId == null && processInstanceId != null) {
+            ProcessInstance processInstance = processInstanceMapper.queryById(processInstanceId);
+            if (processInstance == null) {
+                throw new RuntimeException("processInstanceId is not exists");
+            }
+            processDefineId = processInstance.getProcessDefinitionId();
+        }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(processDefineId);
         if (processDefinition == null){
-            throw new RuntimeException("processDefineId is not exists");
+            throw new RuntimeException(String.format("processDefineId %d is not exists",processDefineId));
         }
+
         String receivers = processDefinition.getReceivers();
         String receiversCc = processDefinition.getReceiversCc();
         Map<String,String> dataMap = new HashMap<>();
@@ -405,7 +418,7 @@ public class ExecutorService extends BaseService{
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
                               int excutorId, int warningGroupId,
-                              RunMode runMode,Priority processInstancePriority) throws ParseException {
+                              RunMode runMode,Priority processInstancePriority, int workerGroupId) throws ParseException {
 
         /**
          * instantiate command schedule instance
@@ -436,6 +449,7 @@ public class ExecutorService extends BaseService{
         command.setExecutorId(excutorId);
         command.setWarningGroupId(warningGroupId);
         command.setProcessInstancePriority(processInstancePriority);
+        command.setWorkerGroupId(workerGroupId);
 
         Date start = null;
         Date end = null;

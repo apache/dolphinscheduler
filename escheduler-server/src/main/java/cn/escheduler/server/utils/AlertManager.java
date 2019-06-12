@@ -26,6 +26,7 @@ import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.model.Alert;
+import cn.escheduler.dao.model.ProcessDefinition;
 import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
 import org.slf4j.Logger;
@@ -54,27 +55,27 @@ public class AlertManager {
     private String getCommandCnName(CommandType commandType) {
         switch (commandType) {
             case RECOVER_TOLERANCE_FAULT_PROCESS:
-                return "恢复容错";
+                return "recover tolerance fault process";
             case RECOVER_SUSPENDED_PROCESS:
-                return "恢复暂停流程";
+                return "recover suspended process";
             case START_CURRENT_TASK_PROCESS:
-                return "从当前节点开始执行";
+                return "start current task process";
             case START_FAILURE_TASK_PROCESS:
-                return "从失败节点开始执行";
+                return "start failure task process";
             case START_PROCESS:
-                return "启动工作流";
+                return "start process";
             case REPEAT_RUNNING:
-                return "重跑";
+                return "repeat running";
             case SCHEDULER:
-                return "定时执行";
+                return "scheduler";
             case COMPLEMENT_DATA:
-                return "补数";
+                return "complement data";
             case PAUSE:
-                return "暂停工作流";
+                return "pause";
             case STOP:
-                return "停止工作流";
+                return "stop";
             default:
-                return "未知的命令类型";
+                return "unknown type";
         }
     }
 
@@ -124,14 +125,14 @@ public class AlertManager {
                     continue;
                 }
                 LinkedHashMap<String, String> failedTaskMap = new LinkedHashMap();
-                failedTaskMap.put("任务id", String.valueOf(task.getId()));
-                failedTaskMap.put("任务名称", task.getName());
-                failedTaskMap.put("任务类型", task.getTaskType());
-                failedTaskMap.put("任务状态", task.getState().toString());
-                failedTaskMap.put("任务开始时间", DateUtils.dateToString(task.getStartTime()));
-                failedTaskMap.put("任务结束时间", DateUtils.dateToString(task.getEndTime()));
+                failedTaskMap.put("task id", String.valueOf(task.getId()));
+                failedTaskMap.put("task name", task.getName());
+                failedTaskMap.put("task type", task.getTaskType());
+                failedTaskMap.put("task state", task.getState().toString());
+                failedTaskMap.put("task start time", DateUtils.dateToString(task.getStartTime()));
+                failedTaskMap.put("task end time", DateUtils.dateToString(task.getEndTime()));
                 failedTaskMap.put("host", task.getHost());
-                failedTaskMap.put("日志路径", task.getLogPath());
+                failedTaskMap.put("log path", task.getLogPath());
                 failedTaskList.add(failedTaskMap);
             }
             res = JSONUtils.toJson(failedTaskList);
@@ -152,10 +153,10 @@ public class AlertManager {
 
         for(TaskInstance taskInstance: toleranceTaskList){
             LinkedHashMap<String, String> toleranceWorkerContentMap = new LinkedHashMap();
-            toleranceWorkerContentMap.put("工作流程名称", processInstance.getName());
-            toleranceWorkerContentMap.put("容错任务名称", taskInstance.getName());
-            toleranceWorkerContentMap.put("容错机器IP", taskInstance.getHost());
-            toleranceWorkerContentMap.put("任务失败次数", String.valueOf(taskInstance.getRetryTimes()));
+            toleranceWorkerContentMap.put("process name", processInstance.getName());
+            toleranceWorkerContentMap.put("task name", taskInstance.getName());
+            toleranceWorkerContentMap.put("host", taskInstance.getHost());
+            toleranceWorkerContentMap.put("task retry times", String.valueOf(taskInstance.getRetryTimes()));
             toleranceTaskInstanceList.add(toleranceWorkerContentMap);
         }
         return JSONUtils.toJson(toleranceTaskInstanceList);
@@ -166,15 +167,15 @@ public class AlertManager {
      * @param processInstance
      * @param toleranceTaskList
      */
-    public void sendWarnningWorkerleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList){
+    public void sendAlertWorkerToleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList){
         Alert alert = new Alert();
-        alert.setTitle("worker容错报警");
+        alert.setTitle("worker fault tolerance");
         alert.setShowType(ShowType.TABLE);
         String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setCreateTime(new Date());
-        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1:processInstance.getWarningGroupId());
         alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
         alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
 
@@ -187,8 +188,8 @@ public class AlertManager {
      * send process instance alert
      * @param processInstance
      */
-    public void sendWarnningOfProcessInstance(ProcessInstance processInstance,
-                                              List<TaskInstance> taskInstances){
+    public void sendAlertProcessInstance(ProcessInstance processInstance,
+                                         List<TaskInstance> taskInstances){
 
         boolean sendWarnning = false;
         WarningType warningType = processInstance.getWarningType();
@@ -217,7 +218,7 @@ public class AlertManager {
 
 
         String cmdName = getCommandCnName(processInstance.getCommandType());
-        String success = processInstance.getState().typeIsSuccess() ? "成功" :"失败";
+        String success = processInstance.getState().typeIsSuccess() ? "success" :"failed";
         alert.setTitle(cmdName + success);
         ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
         alert.setShowType(showType);
@@ -233,4 +234,7 @@ public class AlertManager {
         logger.info("add alert to db , alert: {}", alert.toString());
     }
 
+    public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
+        alertDao.sendProcessTimeoutAlert(processInstance, processDefinition);
+    }
 }

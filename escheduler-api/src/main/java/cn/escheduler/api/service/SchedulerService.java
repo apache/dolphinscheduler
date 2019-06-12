@@ -88,7 +88,7 @@ public class SchedulerService extends BaseService {
     @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName, Integer processDefineId, String schedule, WarningType warningType,
                                               int warningGroupId, FailureStrategy failureStrategy,
-                                              String receivers, String receiversCc,Priority processInstancePriority) throws IOException {
+                                              String receivers, String receiversCc,Priority processInstancePriority, int workerGroupId) throws IOException {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
 
@@ -133,6 +133,7 @@ public class SchedulerService extends BaseService {
         scheduleObj.setUserName(loginUser.getUserName());
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
         scheduleObj.setProcessInstancePriority(processInstancePriority);
+        scheduleObj.setWorkerGroupId(workerGroupId);
         scheduleMapper.insert(scheduleObj);
 
         /**
@@ -156,13 +157,14 @@ public class SchedulerService extends BaseService {
      * @param warningGroupId
      * @param failureStrategy
      * @param scheduleStatus
+     * @param workerGroupId
      * @return
      */
     @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
     public Map<String, Object> updateSchedule(User loginUser, String projectName, Integer id, String scheduleExpression, WarningType warningType,
                                               int warningGroupId, FailureStrategy failureStrategy,
                                               String receivers, String receiversCc, ReleaseState scheduleStatus,
-                                              Priority processInstancePriority) throws IOException {
+                                              Priority processInstancePriority, int workerGroupId) throws IOException {
         Map<String, Object> result = new HashMap<String, Object>(5);
 
         Project project = projectMapper.queryByName(projectName);
@@ -221,6 +223,7 @@ public class SchedulerService extends BaseService {
         if (scheduleStatus != null) {
             schedule.setReleaseState(scheduleStatus);
         }
+        schedule.setWorkerGroupId(workerGroupId);
         schedule.setUpdateTime(now);
         schedule.setProcessInstancePriority(processInstancePriority);
         scheduleMapper.update(schedule);
@@ -484,5 +487,54 @@ public class SchedulerService extends BaseService {
             return checkResult;
         }
         return null;
+    }
+
+    /**
+     * delete schedule by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param scheduleId
+     * @return
+     */
+    public Map<String, Object> deleteScheduleById(User loginUser, String projectName, Integer scheduleId) {
+
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        Schedule schedule = scheduleMapper.queryById(scheduleId);
+
+        if (schedule == null) {
+            putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, scheduleId);
+            return result;
+        }
+
+        // Determine if the login user is the owner of the schedule
+        if (loginUser.getId() != schedule.getUserId()) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        // check schedule is already online
+        if(schedule.getReleaseState() == ReleaseState.ONLINE){
+            putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE,schedule.getId());
+            return result;
+        }
+
+
+        int delete = scheduleMapper.delete(scheduleId);
+
+        if (delete > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
+        }
+        return result;
     }
 }

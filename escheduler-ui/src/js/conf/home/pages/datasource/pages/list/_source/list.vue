@@ -90,7 +90,6 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import { findComponentDownward } from '@/module/util/'
   import mTooltipsJSON from '@/module/components/tooltipsJSON/tooltipsJSON'
 

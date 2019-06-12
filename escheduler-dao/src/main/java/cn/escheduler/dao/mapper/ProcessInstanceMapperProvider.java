@@ -67,6 +67,8 @@ public class ProcessInstanceMapperProvider {
                 VALUES("`dependence_schedule_times`", "#{processInstance.dependenceScheduleTimes}");
                 VALUES("`is_sub_process`", EnumFieldUtil.genFieldStr("processInstance.isSubProcess", Flag.class));
                 VALUES("`executor_id`", "#{processInstance.executorId}");
+                VALUES("`worker_group_id`", "#{processInstance.workerGroupId}");
+                VALUES("`timeout`", "#{processInstance.timeout}");
                 VALUES("`process_instance_priority`", EnumFieldUtil.genFieldStr("processInstance.processInstancePriority", Priority.class));
             }
         }.toString();
@@ -139,6 +141,8 @@ public class ProcessInstanceMapperProvider {
                 SET("`dependence_schedule_times`=#{processInstance.dependenceScheduleTimes}");
                 SET("`is_sub_process`="+EnumFieldUtil.genFieldStr("processInstance.isSubProcess", Flag.class));
                 SET("`executor_id`=#{processInstance.executorId}");
+                SET("`worker_group_id`=#{processInstance.workerGroupId}");
+                SET("`timeout`=#{processInstance.timeout}");
 
                 WHERE("`id`=#{processInstance.id}");
 
@@ -216,7 +220,7 @@ public class ProcessInstanceMapperProvider {
     public String queryDetailById(Map<String, Object> parameter) {
         return new SQL() {
             {
-                SELECT("inst.*,q.queue_name as queue,t.tenant_code as tenantCode,UNIX_TIMESTAMP(inst.end_time)-UNIX_TIMESTAMP(inst.start_time) as duration");
+                SELECT("inst.*,q.queue_name as queue,t.tenant_code,UNIX_TIMESTAMP(inst.end_time)-UNIX_TIMESTAMP(inst.start_time) as duration");
 
                 FROM(TABLE_NAME + "  inst, t_escheduler_user u,t_escheduler_tenant t,t_escheduler_queue q");
 
@@ -568,11 +572,10 @@ public class ProcessInstanceMapperProvider {
 
                 FROM(TABLE_NAME);
 
-                WHERE("process_definition_id=#{processDefinitionId} ");
                 if(parameter.get("startTime") != null && parameter.get("endTime") != null
                         ){
-                    WHERE("schedule_time between #{startTime} and #{endTime} " +
-                            "or start_time between #{startTime} and #{endTime}");
+                    WHERE("process_definition_id=#{processDefinitionId} and (schedule_time between #{startTime} and #{endTime} " +
+                            "or start_time between #{startTime} and #{endTime})");
                 }
                 WHERE("`state` in (" + strStates.toString() + ")");
                 ORDER_BY("start_time desc limit 1");

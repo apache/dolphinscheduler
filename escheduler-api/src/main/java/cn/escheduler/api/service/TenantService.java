@@ -26,6 +26,7 @@ import cn.escheduler.dao.mapper.TenantMapper;
 import cn.escheduler.dao.model.Tenant;
 import cn.escheduler.dao.model.User;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,10 @@ public class TenantService extends BaseService{
     Tenant tenant = new Tenant();
     Date now = new Date();
 
+    if (!tenantCode.matches("^[0-9a-zA-Z_.-]{1,}$") || tenantCode.startsWith("-") || tenantCode.startsWith(".")){
+      putMsg(result, Status.VERIFY_TENANT_CODE_ERROR);
+      return result;
+    }
     tenant.setTenantCode(tenantCode);
     tenant.setTenantName(tenantName);
     tenant.setQueueId(queueId);
@@ -215,6 +220,7 @@ public class TenantService extends BaseService{
    * @param id
    * @return
    */
+  @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
   public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
     Map<String, Object> result = new HashMap<>(5);
 
@@ -225,6 +231,19 @@ public class TenantService extends BaseService{
     Tenant tenant = tenantMapper.queryById(id);
 
     String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
+
+    String resourcePath = HadoopUtils.getHdfsDir(tenant.getTenantCode());
+    FileStatus[] fileStatus = HadoopUtils.getInstance().listFileStatus(resourcePath);
+    if (fileStatus.length > 0) {
+      putMsg(result, Status.HDFS_TERANT_RESOURCES_FILE_EXISTS);
+      return result;
+    }
+    fileStatus = HadoopUtils.getInstance().listFileStatus(HadoopUtils.getHdfsUdfDir(tenant.getTenantCode()));
+    if (fileStatus.length > 0) {
+      putMsg(result, Status.HDFS_TERANT_UDFS_FILE_EXISTS);
+      return result;
+    }
+
     HadoopUtils.getInstance().delete(tenantPath, true);
 
     tenantMapper.deleteById(id);

@@ -35,7 +35,7 @@
               <th>
                 <span>{{$t('Update Time')}}</span>
               </th>
-              <th width="80">
+              <th width="120">
                 <span>{{$t('Operation')}}</span>
               </th>
             </tr>
@@ -79,7 +79,7 @@
                         :disabled="item.releaseState === 'ONLINE'" >
                 </x-button>
                 <x-button
-                        type="success"
+                        type="warning"
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
@@ -89,7 +89,7 @@
                         v-if="item.releaseState === 'OFFLINE'">
                 </x-button>
                 <x-button
-                        type="warning"
+                        type="error"
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
@@ -98,6 +98,28 @@
                         @click="_offline(item)"
                         v-if="item.releaseState === 'ONLINE'">
                 </x-button>
+                <x-poptip
+                        :ref="'poptip-delete-' + $index"
+                        placement="bottom-end"
+                        width="90">
+                  <p>{{$t('Delete?')}}</p>
+                  <div style="text-align: right; margin: 0;padding-top: 4px;">
+                    <x-button type="text" size="xsmall" shape="circle" @click="_closeDelete($index)">{{$t('Cancel')}}</x-button>
+                    <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
+                  </div>
+                  <template slot="reference">
+                    <x-button
+                            icon="iconfont icon-shanchu"
+                            type="error"
+                            shape="circle"
+                            size="xsmall"
+                            :disabled="item.releaseState === 'ONLINE'"
+                            data-toggle="tooltip"
+                            :title="$t('delete')"
+                            v-ps="['GENERAL_USER']">
+                    </x-button>
+                  </template>
+                </x-poptip>
               </td>
             </tr>
           </table>
@@ -116,7 +138,6 @@
 <script>
   import _ from 'lodash'
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import mSpin from '@/module/components/spin/spin'
   import mTiming from '../../pages/list/_source/timing'
   import mNoData from '@/module/components/noData/noData'
@@ -136,7 +157,28 @@
     props: {
     },
     methods: {
-      ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'getReceiver']),
+      ...mapActions('dag', ['getScheduleList', 'scheduleOffline', 'scheduleOnline', 'getReceiver','deleteTiming']),
+      /**
+       * delete
+       */
+      _delete (item, i) {
+        this.deleteTiming({
+          scheduleId: item.id
+        }).then(res => {
+          this.$refs[`poptip-delete-${i}`][0].doClose()
+          this.$message.success(res.msg)
+          this.$router.push({ name: 'projects-definition-list' })
+        }).catch(e => {
+          this.$refs[`poptip-delete-${i}`][0].doClose()
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
+       * Close the delete layer
+       */
+      _closeDelete (i) {
+        this.$refs[`poptip-delete-${i}`][0].doClose()
+      },
       /**
        * return state
        */
@@ -161,7 +203,10 @@
           pageNo: this.pageNo,
           pageSize: this.pageSize
         }).then(res => {
-          this.list = res.data.totalList
+          this.list = []
+          setTimeout(() => {
+            this.list = res.data.totalList
+          })
           this.total = res.data.total
           this.isLoading = false
         }).catch(e => {

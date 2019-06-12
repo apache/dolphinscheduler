@@ -70,25 +70,6 @@ public final class Constants {
      */
     public static final String YARN_APPLICATION_STATUS_ADDRESS = "yarn.application.status.address";
 
-    /**
-     * spring.redis.maxIdle
-     */
-    public static final String SPRING_REDIS_MAXIDLE = "spring.redis.maxIdle";
-
-    /**
-     * spring.redis.maxTotal
-     */
-    public static final String SPRING_REDIS_MAXTOTAL = "spring.redis.maxTotal";
-
-    /**
-     * spring.redis.host
-     */
-    public static final String SPRING_REDIS_HOST = "spring.redis.host";
-
-    /**
-     * spring.redis.port
-     */
-    public static final String SPRING_REDIS_PORT = "spring.redis.port";
 
     /**
      * hdfs configuration
@@ -117,9 +98,14 @@ public final class Constants {
     public static final String ESCHEDULER_ENV_PATH = "escheduler.env.path";
 
     /**
-     * escheduler.env.py
+     * escheduler.env.sh
      */
-    public static final String ESCHEDULER_ENV_PY = "escheduler.env.py";
+    public static final String ESCHEDULER_ENV_SH = ".escheduler_env.sh";
+
+    /**
+     * python home
+     */
+    public static final String PYTHON_HOME="PYTHON_HOME";
 
     /**
      * resource.view.suffixs
@@ -175,6 +161,11 @@ public final class Constants {
      * WorkerServer failover directory registered in zookeeper
      */
     public static final String ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_WORKERS = "zookeeper.escheduler.lock.failover.workers";
+
+    /**
+     * MasterServer startup  failover runing and fault tolerance process
+     */
+    public static final String ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "zookeeper.escheduler.lock.failover.startup.masters";
 
     /**
      * need send warn times when master server or worker server failover
@@ -254,8 +245,6 @@ public final class Constants {
     public static final String ZOOKEEPER_SCHEDULER_ROOT = "zookeeper.escheduler.root";
 
     public static final String SCHEDULER_QUEUE_IMPL = "escheduler.queue.impl";
-
-    public static final String SCHEDULER_QUEUE_REDIS_IMPL = "redis";
 
 
     /**
@@ -346,6 +335,11 @@ public final class Constants {
      * max task timeout
      */
     public static final int MAX_TASK_TIMEOUT = 24 * 3600;
+
+    /**
+     * max task timeout
+     */
+    public static final int MAX_PROCESS_TIMEOUT = Integer.MAX_VALUE;
 
 
     /**
@@ -453,7 +447,7 @@ public final class Constants {
     /**
      * task record configuration path
      */
-    public static final String TASK_RECORD_PROPERTIES_PATH = "dao/data_source.properties";
+    public static final String DATA_SOURCE_PROPERTIES = "dao/data_source.properties";
 
     public static final String TASK_RECORD_URL = "task.record.datasource.url";
 

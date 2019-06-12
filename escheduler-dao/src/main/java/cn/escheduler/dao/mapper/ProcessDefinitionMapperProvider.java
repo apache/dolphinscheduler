@@ -55,6 +55,7 @@ public class ProcessDefinitionMapperProvider {
                 VALUES("`connects`", "#{processDefinition.connects}");
                 VALUES("`create_time`", "#{processDefinition.createTime}");
                 VALUES("`update_time`", "#{processDefinition.updateTime}");
+                VALUES("`timeout`", "#{processDefinition.timeout}");
                 VALUES("`flag`", EnumFieldUtil.genFieldStr("processDefinition.flag", ReleaseState.class));
                 VALUES("`user_id`", "#{processDefinition.userId}");
 
@@ -100,6 +101,7 @@ public class ProcessDefinitionMapperProvider {
                 SET("`global_params`=#{processDefinition.globalParams}");
                 SET("`create_time`=#{processDefinition.createTime}");
                 SET("`update_time`=#{processDefinition.updateTime}");
+                SET("`timeout`=#{processDefinition.timeout}");
                 SET("`flag`="+EnumFieldUtil.genFieldStr("processDefinition.flag", Flag.class));
                 SET("`user_id`=#{processDefinition.userId}");
 
@@ -132,7 +134,7 @@ public class ProcessDefinitionMapperProvider {
     public String queryByDefineId(Map<String, Object> parameter) {
         return new SQL() {
             {
-                SELECT("pd.*,u.user_name,p.name as projectName");
+                SELECT("pd.*,u.user_name,p.name as project_name");
 
                 FROM(TABLE_NAME + " pd");
                 JOIN("t_escheduler_user u ON pd.user_id = u.id");
@@ -173,7 +175,7 @@ public class ProcessDefinitionMapperProvider {
      */
     public String queryDefineListPaging(Map<String, Object> parameter) {
         return new SQL() {{
-            SELECT("td.id,td.name,td.version,td.release_state,td.project_id,td.user_id,td.`desc`,td.create_time,td.update_time,td.flag,td.global_params,td.receivers,td.receivers_cc,sc.schedule_release_state");
+            SELECT("td.*,sc.schedule_release_state");
             FROM(TABLE_NAME + " td");
             LEFT_OUTER_JOIN(" (select process_definition_id,release_state as schedule_release_state from `t_escheduler_schedules` " +
                     "group by `process_definition_id`,`release_state`) sc on sc.process_definition_id = td.id");

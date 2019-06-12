@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>escheduler</artifactId>
 		<groupId>cn.analysys</groupId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>escheduler-server</artifactId>
 	<name>escheduler-server</name>
@@ -18,6 +18,10 @@
 			<groupId>cn.analysys</groupId>
 			<artifactId>escheduler-common</artifactId>
 			<exclusions>
+				<exclusion>
+					<artifactId>protobuf-java</artifactId>
+					<groupId>com.google.protobuf</groupId>
+				</exclusion>
 				<exclusion>
 					<groupId>io.netty</groupId>
 					<artifactId>netty</artifactId>

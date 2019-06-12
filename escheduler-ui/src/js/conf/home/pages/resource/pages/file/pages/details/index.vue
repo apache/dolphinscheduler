@@ -1,34 +1,31 @@
 <template>
-  <div class="main-layout-box file-details-model">
-    <m-secondary-menu :type="'resource'" ></m-secondary-menu>
-    <m-list-construction :title="$t('File Details')">
-      <div slot="content" style="margin: 20px">
-        <div class="file-details-content">
-          <h2>
-            <span>{{name}}</span>
-            <div class="down">
-              <i class="iconfont" data-container="body" data-toggle="tooltip" :title="$t('Download Details')" @click="_downloadFile">&#xe610;</i>
-              <em>{{size}}</em>
-            </div>
-          </h2>
-          <template v-if="isNoType">
+  <m-list-construction :title="$t('File Details')">
+    <div slot="content" style="margin: 20px">
+      <div class="file-details-content">
+        <h2>
+          <span>{{name}}</span>
+          <div class="down">
+            <i class="iconfont" data-container="body" data-toggle="tooltip" :title="$t('Download Details')" @click="_downloadFile">&#xe610;</i>
+            <em>{{size}}</em>
+          </div>
+        </h2>
+        <template v-if="isNoType">
 
-            <div class="code-mirror-model" v-if="!msg">
-              <textarea id="code-details-mirror" name="code-details-mirror"></textarea>
-            </div>
+          <div class="code-mirror-model" v-if="!msg">
+            <textarea id="code-details-mirror" name="code-details-mirror"></textarea>
+          </div>
 
-            <m-no-data :msg="msg" v-if="msg"></m-no-data>
+          <m-no-data :msg="msg" v-if="msg"></m-no-data>
 
-          </template>
-          <template v-if="!isNoType">
-            <m-no-type></m-no-type>
-          </template>
-        </div>
-        <m-spin :is-spin="isLoading">
-        </m-spin>
+        </template>
+        <template v-if="!isNoType">
+          <m-no-type></m-no-type>
+        </template>
       </div>
-    </m-list-construction>
-  </div>
+      <m-spin :is-spin="isLoading">
+      </m-spin>
+    </div>
+  </m-list-construction>
 </template>
 <script>
   import _ from 'lodash'
@@ -42,7 +39,6 @@
   import mSpin from '@/module/components/spin/spin'
   import localStore from '@/module/util/localStorage'
   import mNoData from '@/module/components/noData/noData'
-  import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   let editor
@@ -83,7 +79,7 @@
             this.isData = false
           } else {
             this.isData = true
-            this._handlerEditor().setValue(res.data.content)
+            this._handlerEditor().setValue(res.data.content + '\n')
 
             // Initialize the plugin to prevent repeated calls
             if (editor.lineCount() < 1000) {
@@ -202,7 +198,7 @@
         }
       }
     },
-    components: { mListConstruction, mNoType, mSpin, mSecondaryMenu, mNoData }
+    components: { mListConstruction, mNoType, mSpin, mNoData }
   }
 </script>
 

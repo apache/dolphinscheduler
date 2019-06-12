@@ -51,10 +51,10 @@ public class AccessTokenMapperTest {
 
     @Test
     public void testListPaging(){
-        Integer count = accessTokenMapper.countAccessTokenPaging("");
+        Integer count = accessTokenMapper.countAccessTokenPaging(1,"");
         Assert.assertEquals(count, (Integer) 5);
 
-        List<AccessToken> accessTokenList = accessTokenMapper.queryAccessTokenPaging("", 0, 2);
+        List<AccessToken> accessTokenList = accessTokenMapper.queryAccessTokenPaging(1,"", 0, 2);
         Assert.assertEquals(accessTokenList.size(), 5);
     }
 

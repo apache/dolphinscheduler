@@ -20,6 +20,7 @@ import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.*;
 import cn.escheduler.common.model.DateInterval;
 import cn.escheduler.common.model.TaskNode;
+import cn.escheduler.common.process.Property;
 import cn.escheduler.common.queue.ITaskQueue;
 import cn.escheduler.common.queue.TaskQueueFactory;
 import cn.escheduler.common.task.subprocess.SubProcessParameters;
@@ -41,6 +42,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.escheduler.common.Constants.*;
 import static cn.escheduler.dao.datasource.ConnectionFactory.getMapper;
@@ -88,6 +90,12 @@ public class ProcessDao extends AbstractBaseDao {
     @Autowired
     private ResourceMapper resourceMapper;
 
+    @Autowired
+    private WorkerGroupMapper workerGroupMapper;
+
+    @Autowired
+    private ErrorCommandMapper errorCommandMapper;
+
     /**
      * task queue impl
      */
@@ -112,6 +120,7 @@ public class ProcessDao extends AbstractBaseDao {
         scheduleMapper = getMapper(ScheduleMapper.class);
         udfFuncMapper = getMapper(UdfFuncMapper.class);
         resourceMapper = getMapper(ResourceMapper.class);
+        workerGroupMapper = getMapper(WorkerGroupMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
     }
 
@@ -139,6 +148,7 @@ public class ProcessDao extends AbstractBaseDao {
             if(processInstance == null){
                 logger.error("scan command, command parameter is error: %s", command.toString());
                 delCommandByid(command.getId());
+                saveErrorCommand(command, "process instance is null");
                 return null;
             }else if(!checkThreadNum(command, validThreadNum)){
                     logger.info("there is not enough thread for this command: {}",command.toString() );
@@ -153,9 +163,16 @@ public class ProcessDao extends AbstractBaseDao {
             }
         }catch (Exception e){
             logger.error("scan command error ", e);
+            saveErrorCommand(command, e.toString());
             delCommandByid(command.getId());
         }
         return null;
+    }
+
+    private void saveErrorCommand(Command command, String message) {
+
+        ErrorCommand errorCommand = new ErrorCommand(command, message);
+        this.errorCommandMapper.insert(errorCommand);
     }
 
     /**
@@ -466,6 +483,8 @@ public class ProcessDao extends AbstractBaseDao {
         processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
+        processInstance.setWorkerGroupId(command.getWorkerGroupId());
+        processInstance.setTimeout(processDefinition.getTimeout());
         return processInstance;
     }
 
@@ -569,10 +588,12 @@ public class ProcessDao extends AbstractBaseDao {
             case START_FAILURE_TASK_PROCESS:
                 // find failed tasks and init these tasks
                 List<Integer> failedList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.FAILURE);
+                List<Integer> toleranceList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.NEED_FAULT_TOLERANCE);
                 List<Integer> killedList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.KILL);
                 cmdParam.remove(Constants.CMDPARAM_RECOVERY_START_NODE_STRING);
 
                 failedList.addAll(killedList);
+                failedList.addAll(toleranceList);
                 for(Integer taskId : failedList){
                     initTaskInstance(this.findTaskInstanceById(taskId));
                 }
@@ -672,41 +693,62 @@ public class ProcessDao extends AbstractBaseDao {
      * handle sub work process instance, update relation table and command parameters
      * set sub work process flag, extends parent work process command parameters.
      */
-    public ProcessInstance setSubProcessParam(ProcessInstance processInstance){
-        String cmdParam = processInstance.getCommandParam();
+    public ProcessInstance setSubProcessParam(ProcessInstance subProcessInstance){
+        String cmdParam = subProcessInstance.getCommandParam();
         if(StringUtils.isEmpty(cmdParam)){
-            return processInstance;
+            return subProcessInstance;
         }
         Map<String, String> paramMap = JSONUtils.toMap(cmdParam);
         // write sub process id into cmd param.
         if(paramMap.containsKey(CMDPARAM_SUB_PROCESS)
                 && CMDPARAM_EMPTY_SUB_PROCESS.equals(paramMap.get(CMDPARAM_SUB_PROCESS))){
             paramMap.remove(CMDPARAM_SUB_PROCESS);
-            paramMap.put(CMDPARAM_SUB_PROCESS, String.valueOf(processInstance.getId()));
-            processInstance.setCommandParam(JSONUtils.toJson(paramMap));
-            processInstance.setIsSubProcess(Flag.YES);
-            this.saveProcessInstance(processInstance);
+            paramMap.put(CMDPARAM_SUB_PROCESS, String.valueOf(subProcessInstance.getId()));
+            subProcessInstance.setCommandParam(JSONUtils.toJson(paramMap));
+            subProcessInstance.setIsSubProcess(Flag.YES);
+            this.saveProcessInstance(subProcessInstance);
         }
         // copy parent instance user def params to sub process..
         String parentInstanceId = paramMap.get(CMDPARAM_SUB_PROCESS_PARENT_INSTANCE_ID);
         if(StringUtils.isNotEmpty(parentInstanceId)){
             ProcessInstance parentInstance = findProcessInstanceDetailById(Integer.parseInt(parentInstanceId));
             if(parentInstance != null){
-                processInstance.setGlobalParams(parentInstance.getGlobalParams());
-                this.saveProcessInstance(processInstance);
+                subProcessInstance.setGlobalParams(
+                        joinGlobalParams(parentInstance.getGlobalParams(), subProcessInstance.getGlobalParams()));
+                this.saveProcessInstance(subProcessInstance);
             }else{
                 logger.error("sub process command params error, cannot find parent instance: {} ", cmdParam);
             }
         }
         ProcessInstanceMap processInstanceMap = JSONUtils.parseObject(cmdParam, ProcessInstanceMap.class);
         if(processInstanceMap == null || processInstanceMap.getParentProcessInstanceId() == 0){
-            return processInstance;
+            return subProcessInstance;
         }
         // update sub process id to process map table
-        processInstanceMap.setProcessInstanceId(processInstance.getId());
+        processInstanceMap.setProcessInstanceId(subProcessInstance.getId());
 
         this.updateWorkProcessInstanceMap(processInstanceMap);
-        return processInstance;
+        return subProcessInstance;
+    }
+
+    /**
+     * join parent global params into sub process.
+     *  only the keys doesn't in sub process global would be joined.
+     * @param parentGlobalParams
+     * @param subGlobalParams
+     * @return
+     */
+    private String joinGlobalParams(String parentGlobalParams, String subGlobalParams){
+        List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
+        List<Property> subPropertyList = JSONUtils.toList(subGlobalParams, Property.class);
+        Map<String,String> subMap = subPropertyList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+
+        for(Property parent : parentPropertyList){
+            if(!subMap.containsKey(parent.getProp())){
+                subPropertyList.add(parent);
+            }
+        }
+        return JSONUtils.toJson(subPropertyList);
     }
 
     /**
@@ -881,7 +923,11 @@ public class ProcessDao extends AbstractBaseDao {
                     taskInstance.setFlag(Flag.NO);
                     updateTaskInstance(taskInstance);
                     // crate new task instance
-                    taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1 );
+                    if(taskInstance.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE){
+                        taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1 );
+                    }
+                    taskInstance.setEndTime(null);
+                    taskInstance.setStartTime(new Date());
                     taskInstance.setFlag(Flag.YES);
                     taskInstance.setHost(null);
                     taskInstance.setId(0);
@@ -1331,7 +1377,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @return
      */
     public List<TaskInstance> queryNeedFailoverTaskInstances(String host){
-        return taskInstanceMapper.queryByHostAndStatus(host,stateArray);
+        return taskInstanceMapper.queryByHostAndStatus(host, stateArray);
     }
 
     /**
@@ -1509,6 +1555,20 @@ public class ProcessDao extends AbstractBaseDao {
 
     }
 
+    /**
+     * master starup fault tolerant
+     */
+    public void masterStartupFaultTolerant(){
+
+        int[] readyStopAndKill=new int[]{ExecutionStatus.READY_PAUSE.ordinal(),ExecutionStatus.READY_STOP.ordinal(),
+                ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),ExecutionStatus.RUNNING_EXEUTION.ordinal()};
+        List<ProcessInstance> processInstanceList = processInstanceMapper.listByStatus(readyStopAndKill);
+        for (ProcessInstance processInstance:processInstanceList){
+            processNeedFailoverProcessInstances(processInstance);
+        }
+
+    }
+
     @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
     public void selfFaultTolerant(ProcessInstance processInstance){
 
@@ -1562,6 +1622,15 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public String queryQueueByProcessInstanceId(int processInstanceId){
         return userMapper.queryQueueByProcessInstanceId(processInstanceId);
+    }
+
+    /**
+     * query worker group by id
+     * @param workerGroupId
+     * @return
+     */
+    public WorkerGroup queryWorkerGroupById(int workerGroupId){
+        return workerGroupMapper.queryById(workerGroupId);
     }
 
 

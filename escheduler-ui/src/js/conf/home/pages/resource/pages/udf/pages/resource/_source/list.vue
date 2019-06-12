@@ -101,7 +101,6 @@
 </template>
 <script>
   import { mapActions } from 'vuex'
-  import '@/module/filter/formatDate'
   import mRename from './rename'
   import { downloadFile } from '@/module/download'
   import { bytesToSize } from '@/module/util/util'
