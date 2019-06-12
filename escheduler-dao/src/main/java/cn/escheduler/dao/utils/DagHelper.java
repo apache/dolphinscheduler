@@ -105,8 +105,7 @@ public class DagHelper {
         }
 
         for (TaskNode taskNode : tmpTaskNodeList) {
-            if ( !taskNode.isForbidden()
-                    && null == findNodeByName(destTaskNodeList, taskNode.getName())) {
+            if (null == findNodeByName(destTaskNodeList, taskNode.getName())) {
                 destTaskNodeList.add(taskNode);
             }
         }

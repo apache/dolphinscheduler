@@ -58,7 +58,7 @@ public class ProcessDao extends AbstractBaseDao {
     private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.RUNNING_EXEUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
-            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+//            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
@@ -97,6 +97,9 @@ public class ProcessDao extends AbstractBaseDao {
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
 
+    @Autowired
+    private WorkerServerMapper workerServerMapper;
+
     /**
      * task queue impl
      */
@@ -122,6 +125,7 @@ public class ProcessDao extends AbstractBaseDao {
         udfFuncMapper = getMapper(UdfFuncMapper.class);
         resourceMapper = getMapper(ResourceMapper.class);
         workerGroupMapper = getMapper(WorkerGroupMapper.class);
+        workerServerMapper = getMapper(WorkerServerMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
     }
 
@@ -1634,6 +1638,17 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public WorkerGroup queryWorkerGroupById(int workerGroupId){
         return workerGroupMapper.queryById(workerGroupId);
+    }
+
+    /**
+     * query worker server by host
+     * @param host
+     * @return
+     */
+    public List<WorkerServer> queryWorkerServerByHost(String host){
+
+        return workerServerMapper.queryWorkerByHost(host);
+
     }
 
 
