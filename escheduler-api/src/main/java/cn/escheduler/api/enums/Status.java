@@ -161,7 +161,8 @@ public enum Status {
     SAVE_ERROR(10136, "save error"),
     DELETE_PROJECT_ERROR_DEFINES_NOT_NULL(10137, "please delete the process definitions in project first!"),
     BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117,"batch delete process instance by ids {0} error"),
-
+    PREVIEW_SCHEDULE_ERROR(10139,"preview schedule error"),
+    PARSE_TO_CRON_EXPRESSION_ERROR(10140,"parse cron to cron expression error"),
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
