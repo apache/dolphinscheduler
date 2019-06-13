@@ -241,7 +241,11 @@ public final class Constants {
      */
     public static final String SCHEDULER_TASKS_QUEUE = "tasks_queue";
 
+    /**
+     * escheduler need kill tasks queue
+     */
     public static final String SCHEDULER_TASKS_KILL = "tasks_kill";
+
     public static final String ZOOKEEPER_SCHEDULER_ROOT = "zookeeper.escheduler.root";
 
     public static final String SCHEDULER_QUEUE_IMPL = "escheduler.queue.impl";
@@ -335,11 +339,6 @@ public final class Constants {
      * max task timeout
      */
     public static final int MAX_TASK_TIMEOUT = 24 * 3600;
-
-    /**
-     * max task timeout
-     */
-    public static final int MAX_PROCESS_TIMEOUT = Integer.MAX_VALUE;
 
 
     /**
@@ -830,4 +829,35 @@ public final class Constants {
      *  preview schedule execute count
      */
     public static final int PREVIEW_SCHEDULE_EXECUTE_COUNT = 5;
+
+    /**
+     * java.security.krb5.conf
+     */
+    public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
+
+    /**
+     * java.security.krb5.conf.path
+     */
+    public static final String JAVA_SECURITY_KRB5_CONF_PATH = "java.security.krb5.conf.path";
+
+    /**
+     * hadoop.security.authentication
+     */
+    public static final String HADOOP_SECURITY_AUTHENTICATION = "hadoop.security.authentication";
+
+    /**
+     * hadoop.security.authentication
+     */
+    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE = "hadoop.security.authentication.startup.state";
+
+
+    /**
+     * loginUserFromKeytab user
+     */
+    public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
+
+    /**
+     * loginUserFromKeytab path
+     */
+    public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 }
