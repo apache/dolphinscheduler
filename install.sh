@@ -125,7 +125,7 @@ yarnHaIps="192.168.xx.xx,192.168.xx.xx"
 # 如果是单 resourcemanager,只需要配置一个主机名称,如果是resourcemanager HA,则默认配置就好
 singleYarnIp="ark1"
 
-# hdfs根路径,根路径的owner必须是部署用户
+# hdfs根路径，根路径的owner必须是部署用户。1.1.0之前版本不会自动创建hdfs根目录，需要自行创建
 hdfsPath="/escheduler"
 
 # common 配置
@@ -146,6 +146,19 @@ resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
 
 # 开发状态,如果是true,对于SHELL脚本可以在execPath目录下查看封装后的SHELL脚本,如果是false则执行完成直接删除
 devState="true"
+
+# kerberos 配置
+# kerberos 是否启动
+kerberosStartUp="false"
+
+# kdc krb5 配置文件路径
+krb5ConfPath="$installPath/conf/krb5.conf"
+
+# keytab 用户名
+keytabUserName="hdfs-mycluster@ESZ.COM"
+
+# 用户 keytab路径
+keytabPath="$installPath/conf/hdfs.headless.keytab"
 
 # zk 配置
 # zk根目录
