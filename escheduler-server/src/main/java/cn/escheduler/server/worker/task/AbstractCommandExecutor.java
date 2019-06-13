@@ -380,14 +380,22 @@ public abstract class AbstractCommandExecutor {
         boolean result = true;
         try {
             for (String appId : appIds) {
-                ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
-                if (!applicationStatus.equals(ExecutionStatus.SUCCESS)) {
-                    result = false;
+                while(true){
+                    ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
+                    logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
+                    if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
+                            applicationStatus.equals(ExecutionStatus.KILL)) {
+                        return false;
+                    }
+
+                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)){
+                        break;
+                    }
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
-            }
+           }
         } catch (Exception e) {
-            logger.error(String.format("mapreduce applications: %s  status failed : " + e.getMessage(), appIds.toString()),e);
+            logger.error(String.format("yarn applications: %s  status failed : " + e.getMessage(), appIds.toString()),e);
             result = false;
         }
         return result;
