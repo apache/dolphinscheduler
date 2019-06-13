@@ -128,6 +128,9 @@ singleYarnIp="ark1"
 # hdfs根路径，根路径的owner必须是部署用户。1.1.0之前版本不会自动创建hdfs根目录，需要自行创建
 hdfsPath="/escheduler"
 
+# 拥有在hdfs根路径/下创建目录权限的用户
+hdfsRootUser="hdfs"
+
 # common 配置
 # 程序路径
 programPath="/tmp/escheduler"
