@@ -35,6 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -61,6 +64,30 @@ public class HadoopUtils implements Closeable {
 
     public static HadoopUtils getInstance(){
         return instance;
+    }
+
+    /**
+     * init escheduler root path in hdfs
+     */
+    private void initHdfsPath(){
+        String hdfsUser = getString(Constants.HDFS_ROOT_USER);
+        String hdfsPath = getString(Constants.DATA_STORE_2_HDFS_BASEPATH);
+        Path path = new Path(hdfsPath);
+        try {
+            UserGroupInformation ugi = UserGroupInformation.createProxyUser(hdfsUser,UserGroupInformation.getLoginUser());
+            ugi.doAs(new PrivilegedExceptionAction<Boolean>() {
+                @Override
+                public Boolean run() throws Exception {
+
+                    if(!fs.exists(path)){
+                        return fs.mkdirs(path);
+                    }
+                    return true;
+                }
+            });
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
     }
 
     /**
