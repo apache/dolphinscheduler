@@ -17,6 +17,7 @@
 package cn.escheduler.server.worker.task.sql;
 
 import cn.escheduler.alert.utils.MailUtils;
+import cn.escheduler.api.enums.Status;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.DbType;
 import cn.escheduler.common.enums.ShowType;
@@ -310,6 +311,7 @@ public class SqlTask extends AbstractTask {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
+            throw new RuntimeException(e.getMessage());
         }
         return connection;
     }
@@ -371,9 +373,14 @@ public class SqlTask extends AbstractTask {
 
         String showTypeName = sqlParameters.getShowType().replace(Constants.COMMA,"").trim();
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
-            MailUtils.sendMails(receviersList,receviersCcList,title, content, ShowType.valueOf(showTypeName));
+            Map<String, Object> mailResult = MailUtils.sendMails(receviersList, receviersCcList, title, content, ShowType.valueOf(showTypeName));
+            Status status = (Status) mailResult.get(cn.escheduler.api.utils.Constants.STATUS);
+            if(status != Status.SUCCESS){
+                throw new RuntimeException("send mail failed!");
+            }
         }else{
             logger.error("showType: {} is not valid "  ,showTypeName);
+            throw new RuntimeException(String.format("showType: %s is not valid ",showTypeName));
         }
     }
 
