@@ -18,16 +18,22 @@ package cn.escheduler.dao.utils;
 
 
 import cn.escheduler.common.enums.TaskDependType;
+import cn.escheduler.common.graph.DAG;
 import cn.escheduler.common.model.TaskNode;
 import cn.escheduler.common.model.TaskNodeRelation;
 import cn.escheduler.common.process.ProcessDag;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.model.ProcessData;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * dag tools
@@ -192,6 +198,24 @@ public class DagHelper {
         return processDag;
     }
 
+    /**
+     * parse the forbidden task nodes in process definition.
+     * @param processDefinitionJson
+     * @return
+     */
+    public static Map<String, TaskNode> getForbiddenTaskNodeMaps(String processDefinitionJson){
+        Map<String, TaskNode> forbidTaskNodeMap = new ConcurrentHashMap<>();
+        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
+
+        List<TaskNode> taskNodeList = processData.getTasks();
+        for(TaskNode node : taskNodeList){
+            if(node.isForbidden()){
+                forbidTaskNodeMap.putIfAbsent(node.getName(), node);
+            }
+        }
+        return forbidTaskNodeMap;
+    }
+
 
     /**
      * find node by node name
@@ -208,5 +232,93 @@ public class DagHelper {
             }
         }
         return null;
+    }
+
+
+    /**
+     * get start vertex in one dag
+     * it would find the post node if the start vertex is forbidden running
+     * @param parentNodeName the previous node
+     * @param dag
+     * @return
+     */
+    public static Collection<String> getStartVertex(String parentNodeName, DAG<String, TaskNode, TaskNodeRelation> dag){
+        Collection<String> startVertexs = null;
+        if(StringUtils.isNotEmpty(parentNodeName)){
+            startVertexs = dag.getSubsequentNodes(parentNodeName);
+        }else{
+            startVertexs = dag.getBeginNode();
+        }
+
+        Collection<String> tmpStartVertexs = new ArrayList<>();
+        tmpStartVertexs.addAll(startVertexs);
+
+        for(String start : tmpStartVertexs){
+            TaskNode startNode = dag.getNode(start);
+            if(!startNode.isForbidden()){
+                continue;
+            }
+            Collection<String> postNodes = getStartVertex(start, dag);
+
+            for(String post : postNodes){
+                if(checkForbiddenPostCanSubmit(post, dag)){
+                    startVertexs.add(post);
+                }
+            }
+            startVertexs.remove(start);
+        }
+
+        return startVertexs;
+    }
+
+    /**
+     *
+     * @param postNodeName
+     * @param dag
+     * @return
+     */
+    private static boolean checkForbiddenPostCanSubmit(String postNodeName,  DAG<String, TaskNode, TaskNodeRelation> dag){
+
+        TaskNode postNode = dag.getNode(postNodeName);
+        List<String> dependList = postNode.getDepList();
+
+        for(String dependNodeName : dependList){
+            TaskNode dependNode = dag.getNode(dependNodeName);
+            if(!dependNode.isForbidden()){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
+    /***
+     * generate dag graph
+     * @param processDag
+     * @return
+     */
+    public static DAG<String, TaskNode, TaskNodeRelation> buildDagGraph(ProcessDag processDag) {
+
+        DAG<String,TaskNode,TaskNodeRelation> dag = new DAG<>();
+
+        /**
+         * add vertex
+         */
+        if (CollectionUtils.isNotEmpty(processDag.getNodes())){
+            for (TaskNode node : processDag.getNodes()){
+                dag.addNode(node.getName(),node);
+            }
+        }
+
+        /**
+         * add edge
+         */
+        if (CollectionUtils.isNotEmpty(processDag.getEdges())){
+            for (TaskNodeRelation edge : processDag.getEdges()){
+                dag.addEdge(edge.getStartNode(),edge.getEndNode());
+            }
+        }
+        return dag;
     }
 }
