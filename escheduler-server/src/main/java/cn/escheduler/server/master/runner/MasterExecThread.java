@@ -432,6 +432,9 @@ public class MasterExecThread implements Runnable {
         }
 
         for (String nodeName : startVertex){
+            if(completeTaskList.containsKey(nodeName)){
+                continue;
+            }
             // encapsulation task instance
             TaskInstance taskInstance = createTaskInstance(processInstance, nodeName ,
                     dag.getNode(nodeName),parentNodeName);

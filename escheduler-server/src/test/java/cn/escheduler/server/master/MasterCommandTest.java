@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 /**
  *  master test
@@ -135,6 +136,8 @@ public class MasterCommandTest {
 
             System.out.println(start.toString());
 
+            Map<String, TaskNode> forbidden = DagHelper.getForbiddenTaskNodeMaps(processDefinition.getProcessDefinitionJson());
+            System.out.println(forbidden);
         } catch (Exception e) {
             e.printStackTrace();
         }
