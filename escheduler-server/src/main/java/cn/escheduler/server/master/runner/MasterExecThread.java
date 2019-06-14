@@ -520,8 +520,11 @@ public class MasterExecThread implements Runnable {
         List<String> depsNameList = taskNode.getDepList();
         for(String depsNode : depsNameList ){
 
-            // dependencies must be fully completed or run prohibited
-            if(!completeTaskList.containsKey(depsNode) || !forbiddenTaskList.containsKey(depsNode)){
+            if(forbiddenTaskList.containsKey(depsNode)){
+                continue;
+            }
+            // dependencies must be fully completed
+            if(!completeTaskList.containsKey(depsNode)){
                 return DependResult.WAITING;
             }
             ExecutionStatus taskState = completeTaskList.get(depsNode).getState();
