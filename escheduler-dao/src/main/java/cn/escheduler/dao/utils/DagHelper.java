@@ -250,10 +250,10 @@ public class DagHelper {
             startVertexs = dag.getBeginNode();
         }
 
-        Collection<String> tmpStartVertexs = new ArrayList<>();
+        List<String> tmpStartVertexs = new ArrayList<>();
         tmpStartVertexs.addAll(startVertexs);
 
-        for(String start : tmpStartVertexs){
+        for(String start : startVertexs){
             TaskNode startNode = dag.getNode(start);
             if(!startNode.isForbidden()){
                 continue;
@@ -262,13 +262,13 @@ public class DagHelper {
 
             for(String post : postNodes){
                 if(checkForbiddenPostCanSubmit(post, dag)){
-                    startVertexs.add(post);
+                    tmpStartVertexs.add(post);
                 }
             }
-            startVertexs.remove(start);
+            tmpStartVertexs.remove(start);
         }
 
-        return startVertexs;
+        return tmpStartVertexs;
     }
 
     /**
