@@ -426,15 +426,12 @@ public class MasterExecThread implements Runnable {
     private List<TaskInstance> getPostTaskInstanceByNode(DAG<String, TaskNode, TaskNodeRelation> dag, String parentNodeName){
 
         List<TaskInstance> postTaskList = new ArrayList<>();
-        Collection<String> startVertex = DagHelper.getStartVertex(parentNodeName, dag);
+        Collection<String> startVertex = DagHelper.getStartVertex(parentNodeName, dag, completeTaskList);
         if(startVertex == null){
             return postTaskList;
         }
 
         for (String nodeName : startVertex){
-            if(completeTaskList.containsKey(nodeName)){
-                continue;
-            }
             // encapsulation task instance
             TaskInstance taskInstance = createTaskInstance(processInstance, nodeName ,
                     dag.getNode(nodeName),parentNodeName);
