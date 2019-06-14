@@ -251,7 +251,9 @@ public class DagHelper {
         }
 
         List<String> tmpStartVertexs = new ArrayList<>();
-        tmpStartVertexs.addAll(startVertexs);
+        if(startVertexs!= null){
+            tmpStartVertexs.addAll(startVertexs);
+        }
 
         for(String start : startVertexs){
             TaskNode startNode = dag.getNode(start);
