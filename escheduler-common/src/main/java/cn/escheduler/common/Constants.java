@@ -70,6 +70,11 @@ public final class Constants {
      */
     public static final String YARN_APPLICATION_STATUS_ADDRESS = "yarn.application.status.address";
 
+    /**
+     * hdfs configuration
+     * hdfs.root.user
+     */
+    public static final String HDFS_ROOT_USER = "hdfs.root.user";
 
     /**
      * hdfs configuration
