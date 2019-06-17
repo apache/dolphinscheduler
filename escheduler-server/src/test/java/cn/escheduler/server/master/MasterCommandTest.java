@@ -30,7 +30,6 @@ import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
 import cn.escheduler.dao.model.Command;
 import cn.escheduler.dao.model.ProcessDefinition;
 import cn.escheduler.dao.utils.DagHelper;
-import org.codehaus.jackson.SerializableString;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -132,7 +131,7 @@ public class MasterCommandTest {
                     new ArrayList<>(), new ArrayList<>(), TaskDependType.TASK_POST);
 
             DAG<String,TaskNode,TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
-            Collection<String> start = DagHelper.getStartVertex("1", dag);
+            Collection<String> start = DagHelper.getStartVertex("1", dag, null);
 
             System.out.println(start.toString());
 
