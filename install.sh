@@ -128,6 +128,9 @@ singleYarnIp="ark1"
 # hdfs根路径，根路径的owner必须是部署用户。1.1.0之前版本不会自动创建hdfs根目录，需要自行创建
 hdfsPath="/escheduler"
 
+# 拥有在hdfs根路径/下创建目录权限的用户
+hdfsRootUser="hdfs"
+
 # common 配置
 # 程序路径
 programPath="/tmp/escheduler"
@@ -278,6 +281,7 @@ sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.addre
 sed -i ${txt} "s#data.basedir.path.*#data.basedir.path=${programPath}#g" conf/common/common.properties
 sed -i ${txt} "s#data.download.basedir.path.*#data.download.basedir.path=${downloadPath}#g" conf/common/common.properties
 sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" conf/common/common.properties
+sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common/common.properties
 sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
 sed -i ${txt} "s#hdfs.startup.state.*#hdfs.startup.state=${hdfsStartupSate}#g" conf/common/common.properties
 sed -i ${txt} "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
