@@ -118,9 +118,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
             String taskIdPath = getTasksPath(key) + Constants.SINGLE_SLASH + value;
             String result = getZkClient().create().withMode(CreateMode.PERSISTENT).forPath(taskIdPath, Bytes.toBytes(value));
 
-//            String path = conf.getString(Constants.ZOOKEEPER_SCHEDULER_ROOT) + Constants.SINGLE_SLASH + Constants.SCHEDULER_TASKS_QUEUE + "_add" + Constants.SINGLE_SLASH + value;
-//            getZkClient().create().creatingParentContainersIfNeeded().withMode(CreateMode.PERSISTENT).forPath(path,
-//                    Bytes.toBytes(value));
             logger.info("add task : {} to tasks queue , result success",result);
         } catch (Exception e) {
             logger.error("add task to tasks queue exception",e);
