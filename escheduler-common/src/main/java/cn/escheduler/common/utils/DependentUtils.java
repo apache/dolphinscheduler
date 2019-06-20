@@ -95,6 +95,9 @@ public class DependentUtils {
             case "last7Days":
                 result = DependentDateUtils.getLastDayInterval(businessDate, 7);
                 break;
+            case "thisWeek":
+                result = DependentDateUtils.getThisWeekInterval(businessDate);
+                break;
             case "lastWeek":
                 result = DependentDateUtils.getLastWeekInterval(businessDate);
                 break;
@@ -118,6 +121,9 @@ public class DependentUtils {
                 break;
             case "lastSunday":
                 result = DependentDateUtils.getLastWeekOneDayInterval(businessDate, 7);
+                break;
+            case "thisMonth":
+                result = DependentDateUtils.getThisMonthInterval(businessDate);
                 break;
             case "lastMonth":
                 result = DependentDateUtils.getLastMonthInterval(businessDate);
