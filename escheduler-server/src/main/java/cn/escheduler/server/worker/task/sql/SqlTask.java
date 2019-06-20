@@ -17,7 +17,6 @@
 package cn.escheduler.server.worker.task.sql;
 
 import cn.escheduler.alert.utils.MailUtils;
-import cn.escheduler.api.enums.Status;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.DbType;
 import cn.escheduler.common.enums.ShowType;
@@ -197,7 +196,7 @@ public class SqlTask extends AbstractTask {
         }
 
         // special characters need to be escaped, ${} needs to be escaped
-        String rgex = "'?\\$\\{(.*?)\\}'?";
+        String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql,rgex,sqlParamsMap,paramsMap);
 
         // replace the ${} of the SQL statement with the Placeholder
@@ -328,6 +327,7 @@ public class SqlTask extends AbstractTask {
                 ParameterUtils.setInParameter(key,stmt,prop.getType(),prop.getValue());
             }
         }
+        logger.info("prepare statement replace sql:{}",stmt.toString());
         return stmt;
     }
 
@@ -417,19 +417,5 @@ public class SqlTask extends AbstractTask {
             logPrint.append(sqlParamsMap.get(i).getValue()+"("+sqlParamsMap.get(i).getType()+")");
         }
         logger.info(logPrint.toString());
-
-        //direct print style
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
-        int index = 1;
-        StringBuffer sb = new StringBuffer("replaced sql , direct:");
-        while (m.find()) {
-
-            m.appendReplacement(sb, sqlParamsMap.get(index).getValue());
-
-            index ++;
-        }
-        m.appendTail(sb);
-        logger.info(sb.toString());
     }
 }
