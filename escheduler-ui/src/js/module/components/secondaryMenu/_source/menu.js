@@ -193,7 +193,7 @@ let menu = {
   monitor: [
     {
       name: `${i18n.$t('Servers manage')}`,
-      id: 0,
+      id: 1,
       path: '',
       isOpen: true,
       disabled: true,
@@ -239,6 +239,22 @@ let menu = {
           name: 'Mysql',
           path: 'servers-mysql',
           id: 6,
+          disabled: true
+        }
+      ]
+    },
+    {
+      name: `${i18n.$t('Statistics manage')}`,
+      id: 0,
+      path: '',
+      isOpen: true,
+      disabled: true,
+      icon: 'fa-server',
+      children: [
+        {
+          name: "Statistics",
+          path: 'statistics',
+          id: 0,
           disabled: true
         }
       ]
