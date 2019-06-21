@@ -272,8 +272,8 @@ public class TaskRecordDao {
      * @return
      */
     public static TaskRecordStatus getTaskRecordState(String procName,String procDate){
-        String sql = String.format("SELECT * FROM eamp_hive_log_hd WHERE PROC_NAME='%s' and PROC_DATE='%s'"
-                ,procName,procDate);
+        String sql = String.format("SELECT * FROM eamp_hive_log_hd WHERE PROC_NAME='%s' and PROC_DATE like '%s'"
+                ,procName,procDate + "%");
         List<TaskRecord> taskRecordList = getQueryResult(sql);
 
         // contains no record and sql exception
@@ -296,6 +296,5 @@ public class TaskRecordDao {
 
         }
     }
-
 
 }
