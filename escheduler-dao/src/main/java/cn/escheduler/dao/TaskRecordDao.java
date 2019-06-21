@@ -17,6 +17,8 @@
 package cn.escheduler.dao;
 
 import cn.escheduler.common.Constants;
+import cn.escheduler.common.enums.TaskRecordStatus;
+import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.dao.model.TaskRecord;
 import org.apache.commons.configuration.Configuration;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +46,7 @@ public class TaskRecordDao {
 
 
     /**
-     * 加载配置文件
+     * load conf file
      */
     private static Configuration conf;
 
@@ -56,6 +59,14 @@ public class TaskRecordDao {
         }
     }
 
+
+    /**
+     *  get task record flag
+     * @return
+     */
+    public static boolean getTaskRecordFlag(){
+       return conf.getBoolean(Constants.TASK_RECORD_FLAG);
+    }
     /**
      * create connection
      * @return
@@ -253,4 +264,38 @@ public class TaskRecordDao {
         }
         return recordList;
     }
+
+    /**
+     * according to procname and procdate query task record
+     * @param procName
+     * @param procDate
+     * @return
+     */
+    public static TaskRecordStatus getTaskRecordState(String procName,String procDate){
+        String sql = String.format("SELECT * FROM eamp_hive_log_hd WHERE PROC_NAME='%s' and PROC_DATE='%s'"
+                ,procName,procDate);
+        List<TaskRecord> taskRecordList = getQueryResult(sql);
+
+        // contains no record and sql exception
+        if (CollectionUtils.isEmpty(taskRecordList)){
+            // exception
+            return TaskRecordStatus.EXCEPTION;
+        }else if (taskRecordList.size() > 1){
+            return TaskRecordStatus.EXCEPTION;
+        }else {
+            TaskRecord taskRecord = taskRecordList.get(0);
+            if (taskRecord == null){
+                return TaskRecordStatus.EXCEPTION;
+            }
+            Long targetRowCount = taskRecord.getTargetRowCount();
+            if (targetRowCount <= 0){
+                return TaskRecordStatus.FAILURE;
+            }else {
+                return TaskRecordStatus.SUCCESS;
+            }
+
+        }
+    }
+
+
 }
