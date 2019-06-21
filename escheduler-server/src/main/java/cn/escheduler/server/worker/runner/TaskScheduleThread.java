@@ -19,15 +19,18 @@ package cn.escheduler.server.worker.runner;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ExecutionStatus;
+import cn.escheduler.common.enums.TaskRecordStatus;
 import cn.escheduler.common.enums.TaskType;
 import cn.escheduler.common.model.TaskNode;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.task.TaskTimeoutParameter;
 import cn.escheduler.common.utils.CommonUtils;
+import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.common.utils.TaskParametersUtils;
 import cn.escheduler.dao.ProcessDao;
+import cn.escheduler.dao.TaskRecordDao;
 import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
 import cn.escheduler.server.utils.LoggerUtils;
@@ -199,6 +202,23 @@ public class TaskScheduleThread implements Callable<Boolean> {
 
             if (task.getExitStatusCode() == Constants.EXIT_CODE_SUCCESS){
                 status = ExecutionStatus.SUCCESS;
+                // task recor flat : if true , start up qianfan
+                if (TaskRecordDao.getTaskRecordFlag()
+                        && TaskType.typeIsNormalTask(taskInstance.getTaskType())){
+                    Date scheduleTime = processInstance.getScheduleTime();
+                    if(scheduleTime == null){
+                        scheduleTime = processInstance.getStartTime();
+                    }
+
+                    // process exec time : yyyyMMdd format
+                    String scheduleDate = DateUtils.format(scheduleTime, Constants.YYYYMMDD);
+                    TaskRecordStatus taskRecordState = TaskRecordDao.getTaskRecordState(taskInstance.getName(), scheduleDate);
+                    logger.info("task record status : {}",taskRecordState);
+                    if (taskRecordState == TaskRecordStatus.FAILURE){
+                        status = ExecutionStatus.FAILURE;
+                    }
+                }
+
             }else if (task.getExitStatusCode() == Constants.EXIT_CODE_KILL){
                 status = ExecutionStatus.KILL;
             }else {
