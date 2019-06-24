@@ -110,14 +110,17 @@ xlsFilePath="/tmp/xls"
 #是否启动监控自启动脚本
 monitorServerState="false"
 
-# hadoop 配置
-# 是否启动hdfs,如果启动则为true,需要配置以下hadoop相关参数;
-# 不启动设置为false,如果为false,以下配置不需要修改
-# 特别注意：如果启动hdfs，需要自行创建hdfs根路径，也就是install.sh中的 hdfsPath
-hdfsStartupSate="false"
+# 资源中心上传选择存储方式：HDFS,S3,NONE
+resUploadStartupType="NONE"
 
-# namenode地址，支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
-namenodeFs="hdfs://mycluster:8020"
+# 如果resUploadStartupType为HDFS，defaultFS写namenode地址，支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
+# 如果是S3，则写S3地址，比如说：s3a://escheduler，注意，一定要创建根目录/escheduler
+defaultFS="hdfs://mycluster:8020"
+
+# 如果配置了S3，则需要有以下配置
+s3Endpoint="http://192.168.199.91:9010"
+s3AccessKey="A3DXS30FO22544RE"
+s3SecretKey="OloCLq3n+8+sdPHUhJ21XrSxTC+JK"
 
 # resourcemanager HA配置，如果是单resourcemanager,这里为空即可
 yarnHaIps="192.168.xx.xx,192.168.xx.xx"
@@ -273,7 +276,10 @@ sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.us
 sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${mysqlPassword}#g" conf/quartz.properties
 
 
-sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${namenodeFs}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.s3a.endpoint.*#fs.s3a.endpoint=${s3Endpoint}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.s3a.access.key.*#fs.s3a.access.key=${s3AccessKey}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.s3a.secret.key.*#fs.s3a.secret.key=${s3SecretKey}#g" conf/common/hadoop/hadoop.properties
 sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common/hadoop/hadoop.properties
 sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common/hadoop/hadoop.properties
 
@@ -283,7 +289,7 @@ sed -i ${txt} "s#data.download.basedir.path.*#data.download.basedir.path=${downl
 sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" conf/common/common.properties
 sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common/common.properties
 sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
-sed -i ${txt} "s#hdfs.startup.state.*#hdfs.startup.state=${hdfsStartupSate}#g" conf/common/common.properties
+sed -i ${txt} "s#res.upload.startup.type.*#res.upload.startup.type=${resUploadStartupType}#g" conf/common/common.properties
 sed -i ${txt} "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
 sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
 sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
