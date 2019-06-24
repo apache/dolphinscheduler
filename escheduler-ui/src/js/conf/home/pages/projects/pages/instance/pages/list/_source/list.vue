@@ -73,7 +73,6 @@
                         data-toggle="tooltip"
                         :title="$t('Edit')"
                         @click="_reEdit(item)"
-                        v-ps="['GENERAL_USER']"
                         icon="iconfont icon-bianjixiugai"
                         :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
               <x-button type="info"
@@ -82,7 +81,6 @@
                         data-toggle="tooltip"
                         :title="$t('Rerun')"
                         @click="_reRun(item,$index)"
-                        v-ps="['GENERAL_USER']"
                         icon="iconfont icon-shuaxin"
                         :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
               <x-button type="success"
@@ -91,7 +89,6 @@
                         data-toggle="tooltip"
                         :title="$t('Recovery Failed')"
                         @click="_restore(item,$index)"
-                        v-ps="['GENERAL_USER']"
                         icon="iconfont icon-cuowuguanbishibai"
                         :disabled="item.state !== 'FAILURE'"></x-button>
               <x-button type="error"
@@ -100,7 +97,6 @@
                         data-toggle="tooltip"
                         :title="$t('Stop')"
                         @click="_stop(item)"
-                        v-ps="['GENERAL_USER']"
                         icon="iconfont icon-zanting1"
                         :disabled="item.state !== 'RUNNING_EXEUTION'"></x-button>
               <x-button type="warning"
@@ -109,7 +105,6 @@
                         data-toggle="tooltip"
                         :title="item.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')"
                         @click="_suspend(item,$index)"
-                        v-ps="['GENERAL_USER']"
                         :icon="item.state === 'PAUSE' ? 'iconfont icon-ai06' : 'iconfont icon-zanting'"
                         :disabled="item.state !== 'RUNNING_EXEUTION' && item.state !== 'PAUSE'"></x-button>
               <x-poptip
@@ -128,8 +123,7 @@
                           shape="circle"
                           size="xsmall"
                           data-toggle="tooltip"
-                          :title="$t('delete')"
-                          v-ps="['GENERAL_USER']">
+                          :title="$t('delete')">
                   </x-button>
                 </template>
               </x-poptip>

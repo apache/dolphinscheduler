@@ -1,4 +1,4 @@
-<template>
+v-ps<template>
   <div class="list-model">
     <div class="table-box">
       <table class="fixed">
@@ -70,8 +70,7 @@
                     data-toggle="tooltip"
                     :title="$t('Edit')"
                     @click="_edit(item)"
-                    icon="iconfont icon-bianjixiugai"
-                    v-ps="['GENERAL_USER']">
+                    icon="iconfont icon-bianjixiugai">
             </x-button>
             <x-poptip
                     :ref="'poptip-' + $index"
@@ -89,8 +88,7 @@
                         size="xsmall"
                         icon="iconfont icon-shanchu"
                         data-toggle="tooltip"
-                        :title="$t('delete')"
-                        v-ps="['GENERAL_USER']">
+                        :title="$t('delete')">
                 </x-button>
               </template>
             </x-poptip>
