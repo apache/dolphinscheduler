@@ -160,6 +160,7 @@ public class MailUtils {
                 return retMap;
             }catch (Exception e){
                 handleException(receivers, retMap, e);
+                return retMap;
             }
         }
         return retMap;
