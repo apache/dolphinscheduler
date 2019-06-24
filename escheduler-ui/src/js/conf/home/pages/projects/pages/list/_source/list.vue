@@ -63,8 +63,7 @@
                     data-toggle="tooltip"
                     :title="$t('Edit')"
                     @click="_edit(item)"
-                    icon="iconfont icon-bianjixiugai"
-                    v-ps="['GENERAL_USER']">
+                    icon="iconfont icon-bianjixiugai">
             </x-button>
             <x-poptip
                     :ref="'poptip-' + $index"
@@ -82,8 +81,7 @@
                         size="xsmall"
                         data-toggle="tooltip"
                         :title="$t('delete')"
-                        icon="iconfont icon-shanchu"
-                        v-ps="['GENERAL_USER']">
+                        icon="iconfont icon-shanchu">
                 </x-button>
               </template>
             </x-poptip>

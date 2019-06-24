@@ -58,8 +58,7 @@
                     icon="iconfont icon-wendangxiugai"
                     data-toggle="tooltip"
                     :title="$t('Rename')"
-                    @click="_rename(item,$index)"
-                    v-ps="['GENERAL_USER']">
+                    @click="_rename(item,$index)">
             </x-button>
             <x-button
                     type="info"
@@ -68,8 +67,7 @@
                     data-toggle="tooltip"
                     :title="$t('Download')"
                     icon="iconfont icon-download"
-                    @click="_downloadFile(item)"
-                    v-ps="['GENERAL_USER']">
+                    @click="_downloadFile(item)">
             </x-button>
             <x-poptip
                     :ref="'poptip-' + $index"
@@ -87,8 +85,7 @@
                         size="xsmall"
                         data-toggle="tooltip"
                         :title="$t('delete')"
-                        icon="iconfont icon-shanchu"
-                        v-ps="['GENERAL_USER']">
+                        icon="iconfont icon-shanchu">
                 </x-button>
               </template>
             </x-poptip>

@@ -8,7 +8,7 @@
              :id="v"
              v-for="(item,v) in tasksTypeList"
              @mousedown="_getDagId(v)">
-          <div data-toggle="tooltip" :title="item.desc" :class="_isDetails">
+          <div data-toggle="tooltip" :title="item.desc">
             <div class="icos" :class="'icos-' + v" ></div>
           </div>
         </div>
@@ -68,10 +68,9 @@
                   type="primary"
                   size="xsmall"
                   :loading="spinnerLoading"
-                  v-ps="['GENERAL_USER']"
                   @click="_saveChart"
                   icon="fa fa-save"
-                  :disabled="isDetails">
+                  >
             {{spinnerLoading ? 'Loading...' : $t('Save')}}
           </x-button>
         </div>
@@ -205,9 +204,9 @@
        * @param item
        */
       _getDagId (v) {
-        if (this.isDetails) {
-          return
-        }
+        // if (this.isDetails) {
+        //   return
+        // }
         this.dagBarId = v
       },
       /**
@@ -239,11 +238,12 @@
         })
       },
       _operationClass (item) {
-        if (item.disable) {
-          return this.toolOperCode === item.code ? 'active' : ''
-        } else {
-          return 'disable'
-        }
+        return this.toolOperCode === item.code ? 'active' : ''
+        // if (item.disable) {
+        //   return this.toolOperCode === item.code ? 'active' : ''
+        // } else {
+        //   return 'disable'
+        // }
       },
       /**
        * Storage interface
