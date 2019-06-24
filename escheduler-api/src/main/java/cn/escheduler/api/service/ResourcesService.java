@@ -515,13 +515,19 @@ public class ResourcesService extends BaseService {
         String hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resource.getAlias());
         logger.info("resource hdfs path is {} ", hdfsFileName);
         try {
-            List<String> content = HadoopUtils.getInstance().catFile(hdfsFileName, skipLineNum, limit);
+            if(HadoopUtils.getInstance().exists(hdfsFileName)){
+                List<String> content = HadoopUtils.getInstance().catFile(hdfsFileName, skipLineNum, limit);
 
-            putMsg(result, Status.SUCCESS);
-            Map<String, Object> map = new HashMap<>();
-            map.put(ALIAS, resource.getAlias());
-            map.put(CONTENT, StringUtils.join(content.toArray(), "\n"));
-            result.setData(map);
+                putMsg(result, Status.SUCCESS);
+                Map<String, Object> map = new HashMap<>();
+                map.put(ALIAS, resource.getAlias());
+                map.put(CONTENT, StringUtils.join(content.toArray(), "\n"));
+                result.setData(map);
+            }else{
+                logger.error("read file {} not exist in hdfs", hdfsFileName);
+                putMsg(result, Status.RESOURCE_FILE_NOT_EXIST);
+            }
+
         } catch (Exception e) {
             logger.error(String.format("Resource %s read failed", hdfsFileName), e);
             putMsg(result, Status.HDFS_OPERATION_ERROR);
@@ -565,17 +571,14 @@ public class ResourcesService extends BaseService {
 
         String name = fileName.trim() + "." + nameSuffix;
 
-        //check file already exists
-        Resource resource = resourcesMapper.queryResourceByNameAndType(name, type.ordinal());
-        if (resource != null) {
-            logger.error("resource {} has exist, can't recreate .", name);
-            putMsg(result, Status.RESOURCE_EXIST);
+        result = verifyResourceName(name,type,loginUser);
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
         // save data
         Date now = new Date();
-        resource = new Resource(name,name,desc,loginUser.getId(),type,content.getBytes().length,now,now);
+        Resource resource = new Resource(name,name,desc,loginUser.getId(),type,content.getBytes().length,now,now);
 
         resourcesMapper.insert(resource);
 
