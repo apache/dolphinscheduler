@@ -525,7 +525,7 @@ public class ResourcesService extends BaseService {
                 result.setData(map);
             }else{
                 logger.error("read file {} not exist in hdfs", hdfsFileName);
-                putMsg(result, Status.RESOURCE_FILE_NOT_EXIST);
+                putMsg(result, Status.RESOURCE_FILE_NOT_EXIST,hdfsFileName);
             }
 
         } catch (Exception e) {
