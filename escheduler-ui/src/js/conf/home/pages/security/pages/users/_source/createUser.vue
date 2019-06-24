@@ -98,7 +98,9 @@
         userName: '',
         userPassword: '',
         tenantId: {},
-        queueName: {},
+        queueName: {
+          id:''
+        },
         email: '',
         phone: '',
         tenantList: [],
@@ -197,6 +199,7 @@
       },
       _submit () {
         this.$refs['popup'].spinnerLoading = true
+        console.log(this.tenantId.id)
         let param = {
           userName: this.userName,
           userPassword: this.userPassword,
@@ -205,9 +208,11 @@
           queue: this.queueName.code,
           phone: this.phone
         }
+
         if (this.item) {
           param.id = this.item.id
         }
+
         this.store.dispatch(`security/${this.item ? 'updateUser' : 'createUser'}`, param).then(res => {
           setTimeout(() => {
             this.$refs['popup'].spinnerLoading = false
@@ -232,7 +237,7 @@
             this.phone = this.item.phone
             this.tenantId = _.find(this.tenantList, ['id', this.item.tenantId])
             this.$nextTick(() => {
-              this.queueName = _.find(this.queueList, ['code', this.item.queue])
+              this.queueName = _.find(this.queueList, ['code', this.item.queue])||{id:''}
             })
           }
         })
@@ -243,7 +248,7 @@
           this.email = this.item.email
           this.phone = this.item.phone
           this.tenantId.id = this.item.tenantId
-          this.queueName = { queue: this.item.queue }
+          this.queueName = { queue: this.item.queue}
         }
       }
     },
