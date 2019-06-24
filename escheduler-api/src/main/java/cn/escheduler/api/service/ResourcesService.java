@@ -422,6 +422,41 @@ public class ResourcesService extends BaseService {
 
     /**
      * verify resource by name and type
+     * @param name
+     * @param type
+     * @param loginUser
+     * @return
+     */
+    public Result verifyResourceName(String name, ResourceType type,User loginUser) {
+        Result result = new Result();
+        putMsg(result, Status.SUCCESS);
+        Resource resource = resourcesMapper.queryResourceByNameAndType(name, type.ordinal());
+        if (resource != null) {
+            logger.error("resource type:{} name:{} has exist, can't create again.", type, name);
+            putMsg(result, Status.RESOURCE_EXIST);
+        } else {
+            // query tenant
+            String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
+
+            try {
+                String hdfsFilename = getHdfsFileName(type,tenantCode,name);
+                if(HadoopUtils.getInstance().exists(hdfsFilename)){
+                    logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, name,hdfsFilename);
+                    putMsg(result, Status.RESOURCE_FILE_EXIST,hdfsFilename);
+                }
+
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                putMsg(result,Status.HDFS_OPERATION_ERROR);
+            }
+        }
+
+
+        return result;
+    }
+
+    /**
+     * verify resource by name and type
      *
      * @param name
      * @return
@@ -811,6 +846,23 @@ public class ResourcesService extends BaseService {
             hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resource.getAlias());
         } else if (resource.getType().equals(ResourceType.UDF)) {
             hdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, resource.getAlias());
+        }
+        return hdfsFileName;
+    }
+
+    /**
+     * get hdfs file name
+     *
+     * @param resourceType
+     * @param tenantCode
+     * @param hdfsFileName
+     * @return
+     */
+    private String getHdfsFileName(ResourceType resourceType, String tenantCode, String hdfsFileName) {
+        if (resourceType.equals(ResourceType.FILE)) {
+            hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, hdfsFileName);
+        } else if (resourceType.equals(ResourceType.UDF)) {
+            hdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, hdfsFileName);
         }
         return hdfsFileName;
     }
