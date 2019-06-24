@@ -21,6 +21,7 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.DbType;
+import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.job.db.*;
 import cn.escheduler.dao.mapper.DataSourceMapper;
 import cn.escheduler.dao.mapper.DatasourceUserMapper;
@@ -537,7 +538,7 @@ public class DataSourceService extends BaseService{
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-            if(loginUser.getId() != dataSource.getUserId()){
+            if(loginUser.getId() != dataSource.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER){
                 putMsg(result, Status.USER_NO_OPERATION_PERM);
                 return result;
             }

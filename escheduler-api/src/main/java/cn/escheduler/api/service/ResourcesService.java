@@ -21,6 +21,7 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ResourceType;
+import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.utils.FileUtils;
 import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.common.utils.PropertyUtils;
@@ -399,7 +400,7 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        if (loginUser.getId() != resource.getUserId()) {
+        if (loginUser.getId() != resource.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
