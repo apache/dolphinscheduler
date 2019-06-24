@@ -174,6 +174,7 @@ public enum Status {
     RESOURCE_SUFFIX_FORBID_CHANGE(20008, "resource suffix not allowed to be modified"),
     UDF_RESOURCE_SUFFIX_NOT_JAR(20009, "UDF resource suffix name must be jar"),
     HDFS_COPY_FAIL(20009, "hdfs copy {0} -> {1} fail"),
+    RESOURCE_FILE_EXIST(20010, "resource file {0} already exists in hdfs,please delete it or change name!"),
 
 
 
