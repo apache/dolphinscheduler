@@ -86,8 +86,8 @@ public class ResourcesService extends BaseService {
         Result result = new Result();
 
         // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -185,9 +185,9 @@ public class ResourcesService extends BaseService {
                                  ResourceType type) {
         Result result = new Result();
 
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -386,9 +386,9 @@ public class ResourcesService extends BaseService {
     public Result delete(User loginUser, int resourceId) throws Exception {
         Result result = new Result();
 
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -449,9 +449,9 @@ public class ResourcesService extends BaseService {
     public Result readResource(int resourceId, int skipLineNum, int limit) {
         Result result = new Result();
 
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -510,9 +510,9 @@ public class ResourcesService extends BaseService {
     @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
     public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content) {
         Result result = new Result();
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -573,9 +573,9 @@ public class ResourcesService extends BaseService {
     public Result updateResourceContent(int resourceId, String content) {
         Result result = new Result();
 
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -663,9 +663,9 @@ public class ResourcesService extends BaseService {
      * @return
      */
     public org.springframework.core.io.Resource downloadResource(int resourceId) throws Exception {
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             throw new RuntimeException("hdfs not startup");
         }
 
