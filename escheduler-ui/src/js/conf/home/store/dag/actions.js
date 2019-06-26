@@ -378,6 +378,19 @@ export default {
     })
   },
   /**
+   * Preview timing
+   */
+  previewSchedule ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/schedule/preview`, payload, res => {
+        //resolve(res)
+        alert(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * Timing list paging
    */
   getScheduleList ({ state }, payload) {
