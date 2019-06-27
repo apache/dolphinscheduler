@@ -235,8 +235,8 @@ public class TenantService extends BaseService{
       return result;
     }
 
-    // if hdfs startup
-    if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
+    // if resource upload startup
+    if (PropertyUtils.getResUploadStartupState()){
       String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
 
       String resourcePath = HadoopUtils.getHdfsDir(tenant.getTenantCode());
