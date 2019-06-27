@@ -47,7 +47,7 @@
     </div>
     <div class="clearfix list">
       <div class="text">{{$t('previewTime')}}</div>
-      <x-input v-model="previewResult" style="width: 360px;"></x-input>
+      <x-input v-model="previewTime" style="width: 360px;" readonly :value="123"></x-input>
     </div>
     <div class="clearfix list">
       <div class="text">
@@ -168,7 +168,8 @@
         receiversCc: [],
         i18n: i18n.globalScope.LOCALE,
         processInstancePriority: 'MEDIUM',
-        workerGroupId: -1
+        workerGroupId: -1,
+        previewTime: 12345
       }
     },
     props: {
@@ -244,10 +245,12 @@
                 let msg = ''
 
                 this.store.dispatch(api, searchParams).then(res => {
-                  this.$message.success(msg)
-                  this.$emit('onUpdate')
-                }).catch(e => {
-                  this.$message.error(e.msg || '')
+                  this.previewTime = res
+                  if (this.previewTime.length) {
+                    resolve()
+                  } else {
+                    reject(new Error(0))
+                  }
                 })
               }
             },
