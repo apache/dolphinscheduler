@@ -383,8 +383,8 @@ export default {
   previewSchedule ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectName}/schedule/preview`, payload, res => {
-        //resolve(res)
-        alert(res.data)
+        resolve(res.data)
+        //alert(res.data)
       }).catch(e => {
         reject(e)
       })
