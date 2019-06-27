@@ -34,9 +34,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static cn.escheduler.api.enums.Status.*;
+import static cn.escheduler.common.utils.PropertyUtils.getBoolean;
 
 
 /**
@@ -427,6 +429,26 @@ public class DataSourceController extends BaseController {
         } catch (Exception e) {
             logger.error(AUTHORIZED_DATA_SOURCE.getMsg(),e);
             return error(AUTHORIZED_DATA_SOURCE.getCode(), AUTHORIZED_DATA_SOURCE.getMsg());
+        }
+    }
+
+    /**
+     * get user info
+     *
+     * @param loginUser
+     * @return
+     */
+    @ApiOperation(value = "getKerberosStartupState", notes= "GET_USER_INFO_NOTES")
+    @GetMapping(value="/kerberos-startup-state")
+    @ResponseStatus(HttpStatus.OK)
+    public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
+        logger.info("login user {},get user info : {}", loginUser.getUserName());
+        try{
+            Boolean kerberosStartupState = getBoolean(cn.escheduler.common.Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE);
+            return success(Status.SUCCESS.getMsg(),kerberosStartupState);
+        }catch (Exception e){
+            logger.error(KERBEROS_STARTUP_STATE.getMsg(),e);
+            return error(Status.KERBEROS_STARTUP_STATE.getCode(), Status.KERBEROS_STARTUP_STATE.getMsg());
         }
     }
 }
