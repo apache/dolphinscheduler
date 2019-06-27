@@ -49,9 +49,11 @@ public class TaskQueueImplTest {
         tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"4");
 
         //pop
-        String node1 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, false);
+        String node1 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1).get(0);
+
         assertEquals(node1,"1");
-        String node2 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, false);
+
+        String node2 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1).get(0);
         assertEquals(node2,"2");
 
         //sadd
@@ -99,7 +101,7 @@ public class TaskQueueImplTest {
             }
         }
 
-        String node1 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, false);
+        String node1 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1).get(0);
         assertEquals(node1,"0");
 
         //clear all data
