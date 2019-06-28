@@ -56,6 +56,7 @@ public class ProcessDefinitionMapperProvider {
                 VALUES("`create_time`", "#{processDefinition.createTime}");
                 VALUES("`update_time`", "#{processDefinition.updateTime}");
                 VALUES("`timeout`", "#{processDefinition.timeout}");
+                VALUES("`tenant_id`", "#{processDefinition.tenantId}");
                 VALUES("`flag`", EnumFieldUtil.genFieldStr("processDefinition.flag", ReleaseState.class));
                 VALUES("`user_id`", "#{processDefinition.userId}");
 
