@@ -72,11 +72,11 @@ A：单独安装 **npm install node-sass --unsafe-perm**，之后再 **npm insta
 
 A： 1，如果是node启动的查看escheduler-ui下的.env API_BASE配置是否是Api Server服务地址
 
-​        2，如果是nginx启动的并且是通过 **install-escheduler-ui.sh** 安装的，查看             											**/etc/nginx/conf.d/escheduler.conf** 中的proxy_pass配置是否是Api Server服务地址
+    2，如果是nginx启动的并且是通过 **install-escheduler-ui.sh** 安装的，查看             											**/etc/nginx/conf.d/escheduler.conf** 中的proxy_pass配置是否是Api Server服务地址
 
-​	3，如果以上配置都是正确的，那么请查看Api Server服务是否是正常的，curl http://192.168.xx.xx:12345/escheduler/users/get-user-info，查看Api Server日志，如果提示 cn.escheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null，则证明Api Server服务是正常的
+    3，如果以上配置都是正确的，那么请查看Api Server服务是否是正常的，curl http://192.168.xx.xx:12345/escheduler/users/get-user-info，查看Api Server日志，如果提示 cn.escheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null，则证明Api Server服务是正常的
 
-​	4，如果以上都没有问题，需要查看一下 **application.properties** 中的 **server.context-path 和 server.port 配置**是否正确
+    4，如果以上都没有问题，需要查看一下 **application.properties** 中的 **server.context-path 和 server.port 配置**是否正确
 
 ---
 
@@ -232,7 +232,7 @@ A ： EasyScheduler 中的队列可以在用户或者租户上指定队列，**�
 注意：MR在用以上方法指定队列的时候，传递参数请使用如下方式：
 
 ```
-		Configuration conf = new Configuration();
+	Configuration conf = new Configuration();
         GenericOptionsParser optionParser = new GenericOptionsParser(conf, args);
         String[] remainingArgs = optionParser.getRemainingArgs();
 ```
