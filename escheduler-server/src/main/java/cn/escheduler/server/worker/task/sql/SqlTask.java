@@ -374,7 +374,7 @@ public class SqlTask extends AbstractTask {
         String showTypeName = sqlParameters.getShowType().replace(Constants.COMMA,"").trim();
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
             Map<String, Object> mailResult = MailUtils.sendMails(receviersList, receviersCcList, title, content, ShowType.valueOf(showTypeName));
-            if(!(Boolean) mailResult.get(cn.escheduler.api.utils.Constants.STATUS)){
+            if(!(Boolean) mailResult.get(Constants.STATUS)){
                 throw new RuntimeException("send mail failed!");
             }
         }else{

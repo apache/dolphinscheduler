@@ -458,5 +458,6 @@ export default {
   'Post Statement': 'Post Statement',
   'Statement cannot be empty': 'Statement cannot be empty',
   'Process Define Count': 'Process Define Count',
-  'Process Instance Running Count': 'Process Instance Running Count'
+  'Process Instance Running Count': 'Process Instance Running Count',
+  'Please enter Principal':'Please enter Principal'
 }

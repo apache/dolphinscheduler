@@ -233,6 +233,7 @@ public enum Status {
 
     QUEUE_COUNT_ERROR(90001,"queue count error"),
 
+    KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error"),
     ;
 
     private int code;

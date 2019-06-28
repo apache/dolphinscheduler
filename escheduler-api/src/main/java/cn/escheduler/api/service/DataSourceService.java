@@ -17,12 +17,15 @@
 package cn.escheduler.api.service;
 
 import cn.escheduler.api.enums.Status;
+import cn.escheduler.api.utils.CheckUtils;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.DbType;
+import cn.escheduler.common.enums.ResUploadType;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.job.db.*;
+import cn.escheduler.common.utils.PropertyUtils;
 import cn.escheduler.dao.mapper.DataSourceMapper;
 import cn.escheduler.dao.mapper.DatasourceUserMapper;
 import cn.escheduler.dao.mapper.ProjectMapper;
@@ -31,6 +34,8 @@ import cn.escheduler.dao.model.Resource;
 import cn.escheduler.dao.model.User;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +46,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
+
+import static cn.escheduler.common.utils.PropertyUtils.getBoolean;
+import static cn.escheduler.common.utils.PropertyUtils.getString;
 
 /**
  * datasource service
@@ -55,6 +63,7 @@ public class DataSourceService extends BaseService{
     public static final String TYPE = "type";
     public static final String HOST = "host";
     public static final String PORT = "port";
+    public static final String PRINCIPAL = "principal";
     public static final String DATABASE = "database";
     public static final String USER_NAME = "userName";
     public static final String PASSWORD = "password";
@@ -240,6 +249,7 @@ public class DataSourceService extends BaseService{
         map.put(TYPE, dataSourceType);
         map.put(HOST, host);
         map.put(PORT, port);
+        map.put(PRINCIPAL, datasourceForm.getPrincipal());
         map.put(DATABASE, database);
         map.put(USER_NAME, datasourceForm.getUser());
         map.put(PASSWORD, datasourceForm.getPassword());
@@ -363,11 +373,21 @@ public class DataSourceService extends BaseService{
                     Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
                     break;
                 case HIVE:
-                    datasource = JSONObject.parseObject(parameter, HiveDataSource.class);
-                    Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
-                    break;
                 case SPARK:
-                    datasource = JSONObject.parseObject(parameter, SparkDataSource.class);
+                    if (CheckUtils.getKerberosStartupState())  {
+                            System.setProperty(cn.escheduler.common.Constants.JAVA_SECURITY_KRB5_CONF,
+                                    getString(cn.escheduler.common.Constants.JAVA_SECURITY_KRB5_CONF_PATH));
+                            Configuration configuration = new Configuration();
+                            configuration.set(cn.escheduler.common.Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
+                            UserGroupInformation.setConfiguration(configuration);
+                            UserGroupInformation.loginUserFromKeytab(getString(cn.escheduler.common.Constants.LOGIN_USER_KEY_TAB_USERNAME),
+                                    getString(cn.escheduler.common.Constants.LOGIN_USER_KEY_TAB_PATH));
+                    }
+                    if (dbType == DbType.HIVE){
+                        datasource = JSONObject.parseObject(parameter, HiveDataSource.class);
+                    }else if (dbType == DbType.SPARK){
+                        datasource = JSONObject.parseObject(parameter, SparkDataSource.class);
+                    }
                     Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
                     break;
                 case CLICKHOUSE:
@@ -443,10 +463,18 @@ public class DataSourceService extends BaseService{
      * @param other
      * @return
      */
-    public String buildParameter(String name, String desc, DbType type, String host, String port, String database, String userName, String password, String other) {
+    public String buildParameter(String name, String desc, DbType type, String host,
+                                 String port, String database,String principal,String userName,
+                                 String password, String other) {
 
         String address = buildAddress(type, host, port);
+
         String jdbcUrl = address + "/" + database;
+        if (CheckUtils.getKerberosStartupState() &&
+                (type == DbType.HIVE || type == DbType.SPARK)){
+            jdbcUrl += ";principal=" + principal;
+        }
+
         String separator = "";
         if (Constants.MYSQL.equals(type.name())
                 || Constants.POSTGRESQL.equals(type.name())
@@ -465,6 +493,7 @@ public class DataSourceService extends BaseService{
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
         parameterMap.put(Constants.USER, userName);
         parameterMap.put(Constants.PASSWORD, password);
+        parameterMap.put(Constants.PRINCIPAL,principal);
         if (other != null && !"".equals(other)) {
             Map map = JSONObject.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
             });
