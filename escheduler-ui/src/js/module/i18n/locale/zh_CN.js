@@ -460,4 +460,5 @@ export default {
   'Process Define Count': '流程定义个数',
   'Process Instance Running Count': '运行流程实例个数',
   'Please select a queue': '请选择队列',
+  'Please enter Principal':'请输入Principal'
 }
