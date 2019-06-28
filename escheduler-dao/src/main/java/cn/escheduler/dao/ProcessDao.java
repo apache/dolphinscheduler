@@ -100,6 +100,9 @@ public class ProcessDao extends AbstractBaseDao {
     @Autowired
     private WorkerServerMapper workerServerMapper;
 
+    @Autowired
+    private TenantMapper tenantMapper;
+
     /**
      * task queue impl
      */
@@ -127,6 +130,7 @@ public class ProcessDao extends AbstractBaseDao {
         workerGroupMapper = getMapper(WorkerGroupMapper.class);
         workerServerMapper = getMapper(WorkerServerMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
+        tenantMapper = getMapper(TenantMapper.class);
     }
 
 
@@ -490,9 +494,34 @@ public class ProcessDao extends AbstractBaseDao {
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
         processInstance.setWorkerGroupId(command.getWorkerGroupId());
         processInstance.setTimeout(processDefinition.getTimeout());
+        Tenant tenant =  getTenantForProcess(processDefinition.getTenantId(),
+                processDefinition.getUserId());
+        if(tenant!= null){
+            processInstance.setTenantCode(tenant.getTenantCode());
+        }
         return processInstance;
     }
 
+    /**
+     * get process tenant
+     * there is tenant id in definition, use the tenant of the definition.
+     * if there is not tenant id in the definiton or the tenant not exist
+     * use definition creator's tenant.
+     * @param tenantId
+     * @param userId
+     * @return
+     */
+    public Tenant getTenantForProcess(int tenantId, int userId){
+        Tenant tenant = null;
+        if(tenantId >= 0){
+            tenant = tenantMapper.queryById(tenantId);
+        }
+        if(tenant == null){
+            User user = userMapper.queryById(userId);
+            tenant = tenantMapper.queryById(user.getTenantId());
+        }
+        return tenant;
+    }
 
     /**
      * check command parameters is valid

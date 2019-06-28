@@ -102,6 +102,7 @@ public class ProcessDefinitionMapperProvider {
                 SET("`create_time`=#{processDefinition.createTime}");
                 SET("`update_time`=#{processDefinition.updateTime}");
                 SET("`timeout`=#{processDefinition.timeout}");
+                SET("`tenant_id`=#{processDefinition.tenantId}");
                 SET("`flag`="+EnumFieldUtil.genFieldStr("processDefinition.flag", Flag.class));
                 SET("`user_id`=#{processDefinition.userId}");
 
