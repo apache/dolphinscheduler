@@ -189,7 +189,7 @@ workersLock="/escheduler/lock/workers"
 mastersFailover="/escheduler/lock/failover/masters"
 
 # zk worker容错分布式锁
-workersFailover="/escheduler/lock/failover/masters"
+workersFailover="/escheduler/lock/failover/workers"
 
 # zk master启动容错分布式锁
 mastersStartupFailover="/escheduler/lock/failover/startup-masters"
