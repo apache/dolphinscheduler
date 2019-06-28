@@ -69,6 +69,7 @@ public class ProcessInstanceMapperProvider {
                 VALUES("`executor_id`", "#{processInstance.executorId}");
                 VALUES("`worker_group_id`", "#{processInstance.workerGroupId}");
                 VALUES("`timeout`", "#{processInstance.timeout}");
+                VALUES("`tenant_id`", "#{processInstance.tenantId}");
                 VALUES("`process_instance_priority`", EnumFieldUtil.genFieldStr("processInstance.processInstancePriority", Priority.class));
             }
         }.toString();
@@ -141,6 +142,7 @@ public class ProcessInstanceMapperProvider {
                 SET("`dependence_schedule_times`=#{processInstance.dependenceScheduleTimes}");
                 SET("`is_sub_process`="+EnumFieldUtil.genFieldStr("processInstance.isSubProcess", Flag.class));
                 SET("`executor_id`=#{processInstance.executorId}");
+                SET("`tenant_id`=#{processInstance.tenantId}");
                 SET("`worker_group_id`=#{processInstance.workerGroupId}");
                 SET("`timeout`=#{processInstance.timeout}");
 

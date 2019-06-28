@@ -97,6 +97,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
     })
     @SelectProvider(type = ProcessInstanceMapperProvider.class, method = "queryDetailById")
@@ -136,6 +137,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "dependenceScheduleTimes", column = "dependence_schedule_times", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
     })
     @SelectProvider(type = ProcessInstanceMapperProvider.class, method = "queryById")
@@ -175,6 +177,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "processInstanceJson", column = "process_instance_json", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
 
     })
@@ -214,6 +217,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "processInstanceJson", column = "process_instance_json", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
 
     })
@@ -262,6 +266,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "processInstanceJson", column = "process_instance_json", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
 
     })
@@ -359,6 +364,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "processInstanceJson", column = "process_instance_json", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
 
     })
@@ -452,6 +458,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "processInstanceJson", column = "process_instance_json", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
 
     })
@@ -497,6 +504,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "processInstanceJson", column = "process_instance_json", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
 
     })
@@ -542,6 +550,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "processInstanceJson", column = "process_instance_json", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
 
     })
@@ -585,6 +594,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "processInstanceJson", column = "process_instance_json", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
     })
     @SelectProvider(type = ProcessInstanceMapperProvider.class, method = "queryLastRunningProcess")
@@ -628,6 +638,7 @@ public interface ProcessInstanceMapper {
             @Result(property = "processInstanceJson", column = "process_instance_json", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "workerGroupId", column = "worker_group_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "timeout", column = "timeout",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id",  javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "processInstancePriority", column = "process_instance_priority", javaType = Priority.class, typeHandler = EnumOrdinalTypeHandler.class, jdbcType = JdbcType.TINYINT)
     })
     @SelectProvider(type = ProcessInstanceMapperProvider.class, method = "queryLastManualProcess")
