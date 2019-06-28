@@ -243,9 +243,11 @@ A ： EasyScheduler 中的队列可以在用户或者租户上指定队列，**�
 
 
 
-## Q : Master 后者 Worker报如下告警
+## Q : Master 或者 Worker报如下告警
 
-![1560847965302](C:\Users\Administrator\Desktop\FAQ\1560847965302.png)
+<p align="center">
+   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/master_worker_lack_res.png" width="60%" />
+ </p>
 
 
 
@@ -257,7 +259,9 @@ worker.properties **worker.reserved.memory** 的值为更小的值，比如说0.
 
 ## Q : hive版本是1.1.0+cdh5.15.0，SQL hive任务连接报错
 
-![EF4DA613-5129-4c7a-A0AB-61E5A866A919](C:\Users\Administrator\Desktop\FAQ\EF4DA613-5129-4c7a-A0AB-61E5A866A919.png)
+<p align="center">
+   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/cdh_hive_error.png" width="60%" />
+ </p>
 
 
 
