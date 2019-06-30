@@ -240,7 +240,13 @@ export default {
   getTenantList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`tenant/list`, payload, res => {
-        resolve(res.data)
+        let list=res.data
+        list.unshift({
+          id: -1,
+          tenantName: 'Default'
+        })
+        state.tenantAllList = list
+        resolve(list)
       }).catch(e => {
         reject(e)
       })
