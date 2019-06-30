@@ -465,4 +465,5 @@ export default {
   'task number of ready to kill': '待杀死任务数',
   'Statistics manage': 'Statistics manage',
   'statistics': 'statistics',
+  'select tenant':'select tenant',
 }
