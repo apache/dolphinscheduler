@@ -192,7 +192,7 @@ public class ProcessInstance {
     /**
      * tenant id
      */
-    private String tenantId;
+    private int tenantId;
 
     public ProcessInstance(){
 
@@ -553,4 +553,11 @@ public class ProcessInstance {
                 '}';
     }
 
+    public void setTenantId(int tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public int getTenantId() {
+        return this.tenantId ;
+    }
 }
