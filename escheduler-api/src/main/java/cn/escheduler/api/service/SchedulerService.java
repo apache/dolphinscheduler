@@ -19,14 +19,13 @@ package cn.escheduler.api.service;
 
 import cn.escheduler.api.dto.ScheduleParam;
 import cn.escheduler.api.enums.Status;
-import cn.escheduler.server.quartz.ProcessScheduleJob;
-import cn.escheduler.server.quartz.QuartzExecutors;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.common.enums.FailureStrategy;
 import cn.escheduler.common.enums.Priority;
 import cn.escheduler.common.enums.ReleaseState;
 import cn.escheduler.common.enums.WarningType;
+import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.mapper.MasterServerMapper;
@@ -34,7 +33,11 @@ import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
 import cn.escheduler.dao.mapper.ProjectMapper;
 import cn.escheduler.dao.mapper.ScheduleMapper;
 import cn.escheduler.dao.model.*;
+import cn.escheduler.dao.utils.cron.CronUtils;
+import cn.escheduler.server.quartz.ProcessScheduleJob;
+import cn.escheduler.server.quartz.QuartzExecutors;
 import org.apache.commons.lang3.StringUtils;
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -535,6 +539,34 @@ public class SchedulerService extends BaseService {
         } else {
             putMsg(result, Status.DELETE_SCHEDULE_CRON_BY_ID_ERROR);
         }
+        return result;
+    }
+
+    /**
+     * preview schedule
+     * @param loginUser
+     * @param projectName
+     * @param schedule
+     * @return
+     */
+    public Map<String,Object> previewSchedule(User loginUser, String projectName, String schedule) {
+        Map<String, Object> result = new HashMap<>(5);
+        CronExpression cronExpression;
+        ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
+        Date now = new Date();
+
+        Date startTime = now.after(scheduleParam.getStartTime()) ? now : scheduleParam.getStartTime();
+        Date endTime = scheduleParam.getEndTime();
+        try {
+            cronExpression = CronUtils.parse2CronExpression(scheduleParam.getCrontab());
+        } catch (ParseException e) {
+            logger.error(e.getMessage(),e);
+            putMsg(result,Status.PARSE_TO_CRON_EXPRESSION_ERROR);
+            return result;
+        }
+        List<Date> selfFireDateList = CronUtils.getSelfFireDateList(startTime, endTime,cronExpression);
+        result.put(Constants.DATA_LIST, selfFireDateList.stream().map(t -> DateUtils.dateToString(t)).limit(cn.escheduler.common.Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT));
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 }

@@ -161,7 +161,8 @@ public enum Status {
     SAVE_ERROR(10136, "save error"),
     DELETE_PROJECT_ERROR_DEFINES_NOT_NULL(10137, "please delete the process definitions in project first!"),
     BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117,"batch delete process instance by ids {0} error"),
-
+    PREVIEW_SCHEDULE_ERROR(10139,"preview schedule error"),
+    PARSE_TO_CRON_EXPRESSION_ERROR(10140,"parse cron to cron expression error"),
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
@@ -174,6 +175,8 @@ public enum Status {
     RESOURCE_SUFFIX_FORBID_CHANGE(20008, "resource suffix not allowed to be modified"),
     UDF_RESOURCE_SUFFIX_NOT_JAR(20009, "UDF resource suffix name must be jar"),
     HDFS_COPY_FAIL(20009, "hdfs copy {0} -> {1} fail"),
+    RESOURCE_FILE_EXIST(20010, "resource file {0} already exists in hdfs,please delete it or change name!"),
+    RESOURCE_FILE_NOT_EXIST(20011, "resource file {0} not exists in hdfs!"),
 
 
 
@@ -230,6 +233,7 @@ public enum Status {
 
     QUEUE_COUNT_ERROR(90001,"queue count error"),
 
+    KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error"),
     ;
 
     private int code;

@@ -4,8 +4,8 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <x-button-group size="small" >
-            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})" v-ps="['GENERAL_USER']">{{$t('Create File')}}</x-button>
-            <x-button type="ghost" @click="_uploading" v-ps="['GENERAL_USER']">{{$t('Upload Files')}}</x-button>
+            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})">{{$t('Create File')}}</x-button>
+            <x-button type="ghost" @click="_uploading">{{$t('Upload Files')}}</x-button>
           </x-button-group>
         </template>
       </m-conditions>
