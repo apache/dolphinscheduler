@@ -191,7 +191,7 @@ public class ProcessDefinitionMapperProvider {
             if(userId != null && 0 != Integer.parseInt(userId.toString())){
                 WHERE("td.user_id = #{userId}");
             }
-            ORDER_BY(" td.update_time desc limit #{offset},#{pageSize} ");
+            ORDER_BY(" sc.schedule_release_state desc,td.update_time desc limit #{offset},#{pageSize} ");
         }}.toString();
     }
     /**

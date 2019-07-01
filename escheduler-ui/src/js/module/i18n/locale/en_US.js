@@ -466,4 +466,6 @@ export default {
   'Statistics manage': 'Statistics manage',
   'statistics': 'statistics',
   'select tenant':'select tenant',
+  'Process Instance Running Count': 'Process Instance Running Count',
+  'Please enter Principal':'Please enter Principal'
 }

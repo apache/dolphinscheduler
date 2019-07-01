@@ -64,4 +64,17 @@ public class SchedulerControllerTest {
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
+    @Test
+    public void previewSchedule() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/preview","li_test_1")
+                .header("sessionId", "c24ed9d9-1c20-48a0-bd9c-5cfca14a4dcb")
+                .param("schedule","{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
 }

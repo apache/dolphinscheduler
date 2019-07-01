@@ -3,7 +3,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small" @click="_create('')" v-ps="['GENERAL_USER']">{{$t('Create Datasource')}}</x-button>
+          <x-button type="ghost" size="small" @click="_create('')">{{$t('Create Datasource')}}</x-button>
         </template>
       </m-conditions>
     </template>
