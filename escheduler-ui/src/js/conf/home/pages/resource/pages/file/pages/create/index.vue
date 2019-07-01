@@ -49,7 +49,7 @@
           <template slot="name">&nbsp;</template>
           <template slot="content">
             <div class="submit">
-              <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('Create')}} </x-button>
+              <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Create')}} </x-button>
               <x-button type="text" @click="() => $router.push({name: 'file'})"> {{$t('Cancel')}} </x-button>
             </div>
           </template>
