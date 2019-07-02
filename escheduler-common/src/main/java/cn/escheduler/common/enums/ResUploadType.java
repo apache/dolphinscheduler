@@ -17,24 +17,13 @@
 package cn.escheduler.common.enums;
 
 /**
- * task node type
+ * data base types
  */
-public enum TaskType {
-    /**
-     * 0 SHELL
-     * 1 SQL
-     * 2 SUB_PROCESS
-     * 3 PROCEDURE
-     * 4 MR
-     * 5 SPARK
-     * 6 PYTHON
-     * 7 DEPENDENT
-     */
-    SHELL,SQL, SUB_PROCESS,PROCEDURE,MR,SPARK,PYTHON,DEPENDENT;
-
-    public static boolean typeIsNormalTask(String typeName) {
-        TaskType taskType = TaskType.valueOf(typeName);
-        return !(taskType == TaskType.SUB_PROCESS || taskType == TaskType.DEPENDENT);
-    }
-
+public enum ResUploadType {
+  /**
+   * 0 hdfs
+   * 1 s3
+   * 2 none
+   */
+  HDFS,S3,NONE
 }
