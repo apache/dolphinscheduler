@@ -239,6 +239,7 @@ public class DataSourceMapperProvider {
     return new SQL() {{
       SELECT("*");
       FROM(TABLE_NAME);
+      WHERE("type = #{type}");
     }}.toString();
   }
 
