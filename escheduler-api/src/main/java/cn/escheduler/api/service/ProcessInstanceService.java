@@ -364,6 +364,7 @@ public class ProcessInstanceService extends BaseDAGService {
         String globalParams = null;
         String originDefParams = null;
         int timeout = processInstance.getTimeout();
+        ProcessDefinition processDefinition = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
         if (StringUtils.isNotEmpty(processInstanceJson)) {
             ProcessData processData = JSONUtils.parseObject(processInstanceJson, ProcessData.class);
             //check workflow json is valid
@@ -379,6 +380,11 @@ public class ProcessInstanceService extends BaseDAGService {
                     processInstance.getCmdTypeIfComplement(), schedule);
             timeout = processData.getTimeout();
             processInstance.setTimeout(timeout);
+            Tenant tenant = processDao.getTenantForProcess(processData.getTenantId(),
+                    processDefinition.getUserId());
+            if(tenant != null){
+                processInstance.setTenantCode(tenant.getTenantCode());
+            }
             processInstance.setProcessInstanceJson(processInstanceJson);
             processInstance.setGlobalParams(globalParams);
         }
@@ -387,7 +393,6 @@ public class ProcessInstanceService extends BaseDAGService {
         int update = processDao.updateProcessInstance(processInstance);
         int updateDefine = 1;
         if (syncDefine && StringUtils.isNotEmpty(processInstanceJson)) {
-            ProcessDefinition processDefinition = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
             processDefinition.setProcessDefinitionJson(processInstanceJson);
             processDefinition.setGlobalParams(originDefParams);
             processDefinition.setLocations(locations);

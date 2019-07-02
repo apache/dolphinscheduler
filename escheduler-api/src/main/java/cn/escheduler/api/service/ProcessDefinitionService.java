@@ -128,6 +128,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setLocations(locations);
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
+        processDefine.setTenantId(processData.getTenantId());
 
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
@@ -292,6 +293,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setLocations(locations);
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
+        processDefine.setTenantId(processData.getTenantId());
 
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();

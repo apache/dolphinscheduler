@@ -26,7 +26,7 @@
     methods: {
       ...mapMutations('dag', ['setIsDetails', 'resetParams']),
       ...mapActions('dag', ['getProcessList', 'getResourcesList', 'getInstancedetail']),
-      ...mapActions('security', ['getWorkerGroupsAll']),
+      ...mapActions('security', ['getTenantList','getWorkerGroupsAll']),
       /**
        * init
        */
@@ -43,7 +43,8 @@
           // get resources
           this.getResourcesList(),
           // get worker group list
-          this.getWorkerGroupsAll()
+          this.getWorkerGroupsAll(),
+          this.getTenantList()
         ]).then((data) => {
           let item = data[0]
           let flag = false
