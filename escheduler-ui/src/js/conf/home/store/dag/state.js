@@ -31,6 +31,8 @@ export default {
   tasks: [],
   // Timeout alarm
   timeout: 0,
+  // tenant id
+  tenantId:-1,
   // Node location information
   locations: {},
   // Node-to-node connection
