@@ -188,6 +188,12 @@ public class ProcessInstance {
      */
     private int timeout;
 
+
+    /**
+     * tenant id
+     */
+    private int tenantId;
+
     public ProcessInstance(){
 
     }
@@ -534,6 +540,7 @@ public class ProcessInstance {
                 ", processInstanceJson='" + processInstanceJson + '\'' +
                 ", executorId=" + executorId +
                 ", tenantCode='" + tenantCode + '\'' +
+                ", tenantId='" + tenantId + '\'' +
                 ", queue='" + queue + '\'' +
                 ", isSubProcess=" + isSubProcess +
                 ", locations='" + locations + '\'' +
@@ -546,4 +553,11 @@ public class ProcessInstance {
                 '}';
     }
 
+    public void setTenantId(int tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public int getTenantId() {
+        return this.tenantId ;
+    }
 }

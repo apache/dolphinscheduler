@@ -59,6 +59,12 @@ export default {
     state.timeout = payload
   },
   /**
+   * set tenantId
+   */
+  setTenantId (state, payload) {
+    state.tenantId = payload
+  },
+  /**
    * set global params
    */
   setGlobalParams (state, payload) {
@@ -100,6 +106,7 @@ export default {
     state.name = payload && payload.name || ''
     state.desc = payload && payload.desc || ''
     state.timeout = payload && payload.timeout || 0
+    state.tenantId = payload && payload.tenantId || -1
     state.processListS = payload && payload.processListS || []
     state.resourcesListS = payload && payload.resourcesListS || []
     state.isDetails = payload && payload.isDetails || false

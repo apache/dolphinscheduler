@@ -125,9 +125,9 @@ public class TenantService extends BaseService{
   public Map<String,Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
     Map<String, Object> result = new HashMap<>(5);
-    if (checkAdmin(loginUser, result)) {
-      return result;
-    }
+//    if (checkAdmin(loginUser, result)) {
+//      return result;
+//    }
 
     Integer count = tenantMapper.countTenantPaging(searchVal);
 
