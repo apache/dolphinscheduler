@@ -227,6 +227,6 @@ public interface DataSourceMapper {
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
     })
     @SelectProvider(type = DataSourceMapperProvider.class, method = "listAllDataSourceByType")
-    List<DataSource> listAllDataSourceByType();
+    List<DataSource> listAllDataSourceByType(@Param("type") Integer type);
 
 }

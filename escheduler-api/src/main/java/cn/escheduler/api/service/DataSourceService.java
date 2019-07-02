@@ -328,7 +328,7 @@ public class DataSourceService extends BaseService{
         List<DataSource> datasourceList;
 
         if (isAdmin(loginUser)) {
-            datasourceList = dataSourceMapper.listAllDataSourceByType();
+            datasourceList = dataSourceMapper.listAllDataSourceByType(type);
         }else{
             datasourceList = dataSourceMapper.queryDataSourceByType(loginUser.getId(), type);
         }
