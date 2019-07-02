@@ -45,7 +45,7 @@
       if (stateTenantAllList.length) {
         this.itemList = stateTenantAllList
       } else {
-        this.store.dispatch('actions/getTenantList').then(res => {
+        this.store.dispatch('security/getTenantList').then(res => {
           this.$nextTick(() => {
             this.itemList = res
           })
