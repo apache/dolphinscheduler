@@ -182,7 +182,7 @@ public class TaskScheduleThread implements Callable<Boolean> {
                 );
                 status = ExecutionStatus.FAILURE;
             }else{
-                taskProps.setTenantCode(taskInstance.getProcessInstance().getTenantCode());
+                taskProps.setTenantCode(tenant.getTenantCode());
                 String queue = processDao.queryQueueByProcessInstanceId(processInstance.getId());
                 // set queue
                 if (StringUtils.isEmpty(queue)){
