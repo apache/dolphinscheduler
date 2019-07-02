@@ -190,6 +190,11 @@
           return false
         }
 
+        if (this.scheduleTime[0] === this.scheduleTime[1]) {
+          this.$message.warning(`${i18n.$t('The start time must not be the same as the end')}`)
+          return false
+        }
+
         if (!this.crontab) {
           this.$message.warning(`${i18n.$t('Please enter crontab')}`)
           return false
