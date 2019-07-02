@@ -58,6 +58,7 @@ public class ProcessDao extends AbstractBaseDao {
     private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.RUNNING_EXEUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
+//            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
@@ -96,6 +97,12 @@ public class ProcessDao extends AbstractBaseDao {
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
 
+    @Autowired
+    private WorkerServerMapper workerServerMapper;
+
+    @Autowired
+    private TenantMapper tenantMapper;
+
     /**
      * task queue impl
      */
@@ -121,7 +128,9 @@ public class ProcessDao extends AbstractBaseDao {
         udfFuncMapper = getMapper(UdfFuncMapper.class);
         resourceMapper = getMapper(ResourceMapper.class);
         workerGroupMapper = getMapper(WorkerGroupMapper.class);
+        workerServerMapper = getMapper(WorkerServerMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
+        tenantMapper = getMapper(TenantMapper.class);
     }
 
 
@@ -485,9 +494,30 @@ public class ProcessDao extends AbstractBaseDao {
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
         processInstance.setWorkerGroupId(command.getWorkerGroupId());
         processInstance.setTimeout(processDefinition.getTimeout());
+        processInstance.setTenantId(processDefinition.getTenantId());
         return processInstance;
     }
 
+    /**
+     * get process tenant
+     * there is tenant id in definition, use the tenant of the definition.
+     * if there is not tenant id in the definiton or the tenant not exist
+     * use definition creator's tenant.
+     * @param tenantId
+     * @param userId
+     * @return
+     */
+    public Tenant getTenantForProcess(int tenantId, int userId){
+        Tenant tenant = null;
+        if(tenantId >= 0){
+            tenant = tenantMapper.queryById(tenantId);
+        }
+        if(tenant == null){
+            User user = userMapper.queryById(userId);
+            tenant = tenantMapper.queryById(user.getTenantId());
+        }
+        return tenant;
+    }
 
     /**
      * check command parameters is valid
@@ -581,6 +611,8 @@ public class ProcessDao extends AbstractBaseDao {
             processInstance.setScheduleTime(command.getScheduleTime());
         }
         processInstance.setHost(host);
+
+        ExecutionStatus runStatus = ExecutionStatus.RUNNING_EXEUTION;
         int runTime = processInstance.getRunTimes();
         switch (commandType){
             case START_PROCESS:
@@ -621,6 +653,7 @@ public class ProcessDao extends AbstractBaseDao {
             case RECOVER_TOLERANCE_FAULT_PROCESS:
                 // recover tolerance fault process
                 processInstance.setRecovery(Flag.YES);
+                runStatus = processInstance.getState();
                 break;
             case COMPLEMENT_DATA:
                 // delete all the valid tasks when complement data
@@ -652,7 +685,7 @@ public class ProcessDao extends AbstractBaseDao {
             default:
                 break;
         }
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(runStatus);
         return processInstance;
     }
 
@@ -1566,7 +1599,6 @@ public class ProcessDao extends AbstractBaseDao {
         for (ProcessInstance processInstance:processInstanceList){
             processNeedFailoverProcessInstances(processInstance);
         }
-
     }
 
     @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
@@ -1631,6 +1663,17 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public WorkerGroup queryWorkerGroupById(int workerGroupId){
         return workerGroupMapper.queryById(workerGroupId);
+    }
+
+    /**
+     * query worker server by host
+     * @param host
+     * @return
+     */
+    public List<WorkerServer> queryWorkerServerByHost(String host){
+
+        return workerServerMapper.queryWorkerByHost(host);
+
     }
 
 

@@ -23,10 +23,7 @@ import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.FileUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.ProcessDefinition;
-import cn.escheduler.dao.model.ProcessInstance;
-import cn.escheduler.dao.model.TaskInstance;
-import cn.escheduler.dao.model.WorkerGroup;
+import cn.escheduler.dao.model.*;
 import cn.escheduler.server.zk.ZKWorkerClient;
 import com.cronutils.utils.StringUtils;
 import org.apache.commons.configuration.Configuration;
@@ -194,9 +191,16 @@ public class FetchTaskThread implements Runnable{
                             // get process instance
                             ProcessInstance processInstance = processDao.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
 
+
                             // get process define
                             ProcessDefinition processDefine = processDao.findProcessDefineById(taskInstance.getProcessDefinitionId());
 
+                            Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
+                                    processDefine.getUserId());
+
+                            if(tenant != null){
+                                processInstance.setTenantCode(tenant.getTenantCode());
+                            }
 
                             taskInstance.setProcessInstance(processInstance);
                             taskInstance.setProcessDefine(processDefine);

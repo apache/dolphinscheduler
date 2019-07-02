@@ -236,9 +236,9 @@ public class ResourcesController extends BaseController{
     ) {
         try {
             logger.info("login user {}, verfiy resource alias: {},resource type: {}",
-                    loginUser.getUserName(), alias);
+                    loginUser.getUserName(), alias,type);
 
-            return resourceService.verifyResourceName(alias, type);
+            return resourceService.verifyResourceName(alias,type,loginUser);
         } catch (Exception e) {
             logger.error(VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg(), e);
             return error(Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getCode(), Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg());

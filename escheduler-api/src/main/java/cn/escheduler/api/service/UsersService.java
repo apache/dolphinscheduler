@@ -125,7 +125,7 @@ public class UsersService extends BaseService {
 
         Tenant tenant = tenantMapper.queryById(tenantId);
         // if hdfs startup
-        if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
+        if (PropertyUtils.getResUploadStartupState()){
             String userPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode() + "/home/" + user.getId();
 
             HadoopUtils.getInstance().mkdir(userPath);
@@ -245,7 +245,7 @@ public class UsersService extends BaseService {
             Tenant newTenant = tenantMapper.queryById(tenantId);
             if (newTenant != null) {
                 // if hdfs startup
-                if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
+                if (PropertyUtils.getResUploadStartupState()){
                     String newTenantCode = newTenant.getTenantCode();
                     String oldResourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + oldTenant.getTenantCode() + "/resources";
                     String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
@@ -308,7 +308,7 @@ public class UsersService extends BaseService {
         User user = userMapper.queryTenantCodeByUserId(id);
 
 
-        if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
+        if (PropertyUtils.getResUploadStartupState()){
             String userPath = HadoopUtils.getHdfsDataBasePath() + "/" + user.getTenantCode() + "/home/" + id;
 
             HadoopUtils.getInstance().delete(userPath, true);

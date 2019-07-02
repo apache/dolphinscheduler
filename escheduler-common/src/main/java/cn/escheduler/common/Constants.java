@@ -60,6 +60,23 @@ public final class Constants {
      */
     public static final String FS_DEFAULTFS = "fs.defaultFS";
 
+
+    /**
+     * fs s3a endpoint
+     */
+    public static final String FS_S3A_ENDPOINT = "fs.s3a.endpoint";
+
+    /**
+     * fs s3a access key
+     */
+    public static final String FS_S3A_ACCESS_KEY = "fs.s3a.access.key";
+
+    /**
+     * fs s3a secret key
+     */
+    public static final String FS_S3A_SECRET_KEY = "fs.s3a.secret.key";
+
+
     /**
      * yarn.resourcemanager.ha.rm.idsfs.defaultFS
      */
@@ -123,9 +140,9 @@ public final class Constants {
     public static final String DEVELOPMENT_STATE = "development.state";
 
     /**
-     * hdfs.startup.state
+     * res.upload.startup.type
      */
-    public static final String HDFS_STARTUP_STATE = "hdfs.startup.state";
+    public static final String RES_UPLOAD_STARTUP_TYPE = "res.upload.startup.type";
 
     /**
      * zookeeper quorum
@@ -260,6 +277,11 @@ public final class Constants {
      * date format of yyyy-MM-dd HH:mm:ss
      */
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+
+    /**
+     * date format of yyyyMMdd
+     */
+    public static final String YYYYMMDD = "yyyyMMdd";
 
     /**
      * date format of yyyyMMddHHmmss

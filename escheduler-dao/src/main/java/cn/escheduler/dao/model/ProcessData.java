@@ -39,6 +39,8 @@ public class ProcessData {
 
   private int timeout;
 
+  private int tenantId;
+
 
   public ProcessData() {
   }
@@ -91,5 +93,13 @@ public class ProcessData {
 
   public void setTimeout(int timeout) {
     this.timeout = timeout;
+  }
+
+  public int getTenantId() {
+    return tenantId;
+  }
+
+  public void setTenantId(int tenantId) {
+    this.tenantId = tenantId;
   }
 }
