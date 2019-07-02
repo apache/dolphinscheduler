@@ -28,11 +28,11 @@ export default {
     }
   },
   created () {
-    this.isDetails = Permissions.getAuth() ? this.store.state.dag.isDetails : true
+    this.isDetails =this.store.state.dag.isDetails// Permissions.getAuth() ? this.store.state.dag.isDetails : true
   },
   computed: {
     _isDetails () {
-      return this.isDetails ? 'icon-disabled' : ''
+      return ''// this.isDetails ? 'icon-disabled' : ''
     }
   }
 }

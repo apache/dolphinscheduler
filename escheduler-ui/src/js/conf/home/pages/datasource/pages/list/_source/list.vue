@@ -56,7 +56,6 @@
                     shape="circle"
                     size="xsmall"
                     data-toggle="tooltip"
-                    v-ps="['GENERAL_USER']"
                     :title="$t('Edit')"
                     icon="iconfont icon-bianjixiugai"
                     @click="_edit(item)">
@@ -77,8 +76,7 @@
                         size="xsmall"
                         icon="iconfont icon-shanchu"
                         data-toggle="tooltip"
-                        :title="$t('delete')"
-                        v-ps="['GENERAL_USER']">
+                        :title="$t('delete')">
                 </x-button>
               </template>
             </x-poptip>

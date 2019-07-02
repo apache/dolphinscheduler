@@ -21,6 +21,7 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ResourceType;
+import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.utils.FileUtils;
 import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.common.utils.PropertyUtils;
@@ -85,8 +86,8 @@ public class ResourcesService extends BaseService {
         Result result = new Result();
 
         // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -184,9 +185,9 @@ public class ResourcesService extends BaseService {
                                  ResourceType type) {
         Result result = new Result();
 
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -385,9 +386,9 @@ public class ResourcesService extends BaseService {
     public Result delete(User loginUser, int resourceId) throws Exception {
         Result result = new Result();
 
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -399,7 +400,7 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        if (loginUser.getId() != resource.getUserId()) {
+        if (loginUser.getId() != resource.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -416,6 +417,41 @@ public class ResourcesService extends BaseService {
         //delete file on hdfs
         HadoopUtils.getInstance().delete(hdfsFilename, false);
         putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * verify resource by name and type
+     * @param name
+     * @param type
+     * @param loginUser
+     * @return
+     */
+    public Result verifyResourceName(String name, ResourceType type,User loginUser) {
+        Result result = new Result();
+        putMsg(result, Status.SUCCESS);
+        Resource resource = resourcesMapper.queryResourceByNameAndType(name, type.ordinal());
+        if (resource != null) {
+            logger.error("resource type:{} name:{} has exist, can't create again.", type, name);
+            putMsg(result, Status.RESOURCE_EXIST);
+        } else {
+            // query tenant
+            String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
+
+            try {
+                String hdfsFilename = getHdfsFileName(type,tenantCode,name);
+                if(HadoopUtils.getInstance().exists(hdfsFilename)){
+                    logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, name,hdfsFilename);
+                    putMsg(result, Status.RESOURCE_FILE_EXIST,hdfsFilename);
+                }
+
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                putMsg(result,Status.HDFS_OPERATION_ERROR);
+            }
+        }
+
 
         return result;
     }
@@ -448,9 +484,9 @@ public class ResourcesService extends BaseService {
     public Result readResource(int resourceId, int skipLineNum, int limit) {
         Result result = new Result();
 
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -480,13 +516,19 @@ public class ResourcesService extends BaseService {
         String hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resource.getAlias());
         logger.info("resource hdfs path is {} ", hdfsFileName);
         try {
-            List<String> content = HadoopUtils.getInstance().catFile(hdfsFileName, skipLineNum, limit);
+            if(HadoopUtils.getInstance().exists(hdfsFileName)){
+                List<String> content = HadoopUtils.getInstance().catFile(hdfsFileName, skipLineNum, limit);
 
-            putMsg(result, Status.SUCCESS);
-            Map<String, Object> map = new HashMap<>();
-            map.put(ALIAS, resource.getAlias());
-            map.put(CONTENT, StringUtils.join(content.toArray(), "\n"));
-            result.setData(map);
+                putMsg(result, Status.SUCCESS);
+                Map<String, Object> map = new HashMap<>();
+                map.put(ALIAS, resource.getAlias());
+                map.put(CONTENT, StringUtils.join(content.toArray(), "\n"));
+                result.setData(map);
+            }else{
+                logger.error("read file {} not exist in hdfs", hdfsFileName);
+                putMsg(result, Status.RESOURCE_FILE_NOT_EXIST,hdfsFileName);
+            }
+
         } catch (Exception e) {
             logger.error(String.format("Resource %s read failed", hdfsFileName), e);
             putMsg(result, Status.HDFS_OPERATION_ERROR);
@@ -509,9 +551,9 @@ public class ResourcesService extends BaseService {
     @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
     public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content) {
         Result result = new Result();
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -530,17 +572,14 @@ public class ResourcesService extends BaseService {
 
         String name = fileName.trim() + "." + nameSuffix;
 
-        //check file already exists
-        Resource resource = resourcesMapper.queryResourceByNameAndType(name, type.ordinal());
-        if (resource != null) {
-            logger.error("resource {} has exist, can't recreate .", name);
-            putMsg(result, Status.RESOURCE_EXIST);
+        result = verifyResourceName(name,type,loginUser);
+        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
         // save data
         Date now = new Date();
-        resource = new Resource(name,name,desc,loginUser.getId(),type,content.getBytes().length,now,now);
+        Resource resource = new Resource(name,name,desc,loginUser.getId(),type,content.getBytes().length,now,now);
 
         resourcesMapper.insert(resource);
 
@@ -569,12 +608,13 @@ public class ResourcesService extends BaseService {
      * @param resourceId
      * @return
      */
+    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
     public Result updateResourceContent(int resourceId, String content) {
         Result result = new Result();
 
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -596,6 +636,10 @@ public class ResourcesService extends BaseService {
                 return result;
             }
         }
+
+        resource.setSize(content.getBytes().length);
+        resource.setUpdateTime(new Date());
+        resourcesMapper.update(resource);
 
         User user = userMapper.queryDetailsById(resource.getUserId());
         String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
@@ -643,6 +687,7 @@ public class ResourcesService extends BaseService {
                 logger.error("{} is not exist", resourcePath);
                 result.setCode(Status.HDFS_OPERATION_ERROR.getCode());
                 result.setMsg(String.format("%s is not exist", resourcePath));
+                return result;
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -662,9 +707,9 @@ public class ResourcesService extends BaseService {
      * @return
      */
     public org.springframework.core.io.Resource downloadResource(int resourceId) throws Exception {
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             throw new RuntimeException("hdfs not startup");
         }
 
@@ -805,6 +850,23 @@ public class ResourcesService extends BaseService {
             hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resource.getAlias());
         } else if (resource.getType().equals(ResourceType.UDF)) {
             hdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, resource.getAlias());
+        }
+        return hdfsFileName;
+    }
+
+    /**
+     * get hdfs file name
+     *
+     * @param resourceType
+     * @param tenantCode
+     * @param hdfsFileName
+     * @return
+     */
+    private String getHdfsFileName(ResourceType resourceType, String tenantCode, String hdfsFileName) {
+        if (resourceType.equals(ResourceType.FILE)) {
+            hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, hdfsFileName);
+        } else if (resourceType.equals(ResourceType.UDF)) {
+            hdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, hdfsFileName);
         }
         return hdfsFileName;
     }

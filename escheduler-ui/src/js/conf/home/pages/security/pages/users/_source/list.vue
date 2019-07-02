@@ -10,6 +10,9 @@
             <span>{{$t('User Name')}}</span>
           </th>
           <th>
+            <span>用户类型</span>
+          </th>
+          <th>
             <span>{{$t('Tenant')}}</span>
           </th>
           <th>
@@ -21,6 +24,7 @@
           <th>
             <span>{{$t('Phone')}}</span>
           </th>
+
           <th>
             <span>{{$t('Create Time')}}</span>
           </th>
@@ -39,6 +43,9 @@
             <span>
               <a href="javascript:" class="links">{{item.userName || '-'}}</a>
             </span>
+          </td>
+          <td>
+            <span>{{item.userType === 'GENERAL_USER' ? `${$t('Ordinary users')}` : `${$t('Administrator')}`}}</span>
           </td>
           <td><span>{{item.tenantName || '-'}}</span></td>
           <td><span>{{item.queue || '-'}}</span></td>
@@ -62,7 +69,7 @@
                 <a href="javascript:" @click="_authUdfFunc(item,$index)">{{$t('UDF Function')}}</a>
               </div>
               <template slot="reference">
-                <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Authorize')" icon="iconfont icon-yonghu1"></x-button>
+                <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Authorize')" icon="iconfont icon-yonghu1" :disabled="item.userType === 'ADMIN_USER'"></x-button>
               </template>
             </x-poptip>
 
@@ -84,6 +91,7 @@
                         size="xsmall"
                         data-toggle="tooltip"
                         :title="$t('delete')"
+                        :disabled="item.userType === 'ADMIN_USER'"
                         icon="iconfont icon-shanchu">
                 </x-button>
               </template>

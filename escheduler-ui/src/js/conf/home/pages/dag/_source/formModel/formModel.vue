@@ -165,7 +165,7 @@
     <div class="bottom-box">
       <div class="submit" style="background: #fff;">
         <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
+        <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" :disabled="isDetails">{{spinnerLoading ? 'Loading...' : $t('Confirm add')}} </x-button>
       </div>
     </div>
   </div>

@@ -175,6 +175,8 @@ public enum Status {
     RESOURCE_SUFFIX_FORBID_CHANGE(20008, "resource suffix not allowed to be modified"),
     UDF_RESOURCE_SUFFIX_NOT_JAR(20009, "UDF resource suffix name must be jar"),
     HDFS_COPY_FAIL(20009, "hdfs copy {0} -> {1} fail"),
+    RESOURCE_FILE_EXIST(20010, "resource file {0} already exists in hdfs,please delete it or change name!"),
+    RESOURCE_FILE_NOT_EXIST(20011, "resource file {0} not exists in hdfs!"),
 
 
 
@@ -231,6 +233,7 @@ public enum Status {
 
     QUEUE_COUNT_ERROR(90001,"queue count error"),
 
+    KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error"),
     ;
 
     private int code;

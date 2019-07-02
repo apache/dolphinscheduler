@@ -63,6 +63,17 @@
             </x-input>
           </template>
         </m-list-box-f>
+        <m-list-box-f :class="{hidden:showPrincipal}">
+          <template slot="name"><b>*</b>Principal</template>
+          <template slot="content">
+            <x-input
+              type="input"
+              v-model="principal"
+              :placeholder="$t('Please enter Principal')"
+              autocomplete="off">
+            </x-input>
+          </template>
+        </m-list-box-f>
         <m-list-box-f>
           <template slot="name"><b>*</b>{{$t('User Name')}}</template>
           <template slot="content">
@@ -143,6 +154,8 @@
         port: '',
         // data storage name
         database: '',
+        // principal
+        principal:'',
         // database username
         userName: '',
         // Database password
@@ -150,12 +163,15 @@
         // Jdbc connection parameter
         other: '',
         // btn test loading
-        testLoading: false
+        testLoading: false,
+        showPrincipal: true,
+        isShowPrincipal:true
       }
     },
     props: {
       item: Object
     },
+
     methods: {
       _rtOtherPlaceholder () {
         return `${i18n.$t('Please enter format')} {"key1":"value1","key2":"value2"...} ${i18n.$t('connection parameter')}`
@@ -187,6 +203,7 @@
           host: this.host,
           port: this.port,
           database: this.database,
+          principal:this.principal,
           userName: this.userName,
           password: this.password,
           other: this.other
@@ -289,6 +306,7 @@
           this.note = res.note
           this.host = res.host
           this.port = res.port
+          this.principal = res.principal
           this.database = res.database
           this.userName = res.userName
           this.password = res.password
@@ -298,12 +316,31 @@
         })
       }
     },
-    watch: {},
+    watch: {
+      'type'(value){
+        if((value =='HIVE'||value == 'SPARK')&&this.isShowPrincipal== true){
+          this.showPrincipal = false
+        }else{
+          this.showPrincipal = true
+        }
+      }
+    },
     created () {
       // Backfill
       if (this.item.id) {
         this._getEditDatasource()
       }
+
+      return new Promise((resolve, reject) => {
+        this.store.dispatch('datasource/getKerberosStartupState').then(res => {
+          this.isShowPrincipal=res
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+          reject(e)
+        })
+      })
+
+
     },
     mounted () {
     },
