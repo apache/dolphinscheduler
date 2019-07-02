@@ -195,12 +195,6 @@ public class FetchTaskThread implements Runnable{
                             // get process define
                             ProcessDefinition processDefine = processDao.findProcessDefineById(taskInstance.getProcessDefinitionId());
 
-                            Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
-                                    processDefine.getUserId());
-
-                            if(tenant != null){
-                                processInstance.setTenantCode(tenant.getTenantCode());
-                            }
 
                             taskInstance.setProcessInstance(processInstance);
                             taskInstance.setProcessDefine(processDefine);
