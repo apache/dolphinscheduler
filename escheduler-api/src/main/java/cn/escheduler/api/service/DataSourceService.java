@@ -325,7 +325,14 @@ public class DataSourceService extends BaseService{
      */
     public Map<String, Object> queryDataSourceList(User loginUser, Integer type) {
         Map<String, Object> result = new HashMap<>(5);
-        List<DataSource> datasourceList = dataSourceMapper.queryDataSourceByType(loginUser.getId(), type);
+
+        List<DataSource> datasourceList;
+
+        if (isAdmin(loginUser)) {
+            datasourceList = dataSourceMapper.listAllDataSourceByType(type);
+        }else{
+            datasourceList = dataSourceMapper.queryDataSourceByType(loginUser.getId(), type);
+        }
 
         result.put(Constants.DATA_LIST, datasourceList);
         putMsg(result, Status.SUCCESS);
