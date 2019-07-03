@@ -88,8 +88,12 @@
 			<groupId>cn.analysys</groupId>
 			<artifactId>escheduler-alert</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>cn.analysys</groupId>
+            <artifactId>escheduler-api</artifactId>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 
 	<build>
