@@ -195,12 +195,6 @@ public class FetchTaskThread implements Runnable{
                             // get process define
                             ProcessDefinition processDefine = processDao.findProcessDefineById(taskInstance.getProcessDefinitionId());
 
-                            Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
-                                    processDefine.getUserId());
-
-                            if(tenant != null){
-                                processInstance.setTenantCode(tenant.getTenantCode());
-                            }
 
                             taskInstance.setProcessInstance(processInstance);
                             taskInstance.setProcessDefine(processDefine);
@@ -217,9 +211,12 @@ public class FetchTaskThread implements Runnable{
                             // set task execute path
                             taskInstance.setExecutePath(execLocalPath);
 
+                            Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
+                                    processDefine.getUserId());
+
                             // check and create Linux users
                             FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
-                                    processInstance.getTenantCode(), logger);
+                                    tenant.getTenantCode(), logger);
 
                             logger.info("task : {} ready to submit to task scheduler thread",taskId);
                             // submit task
