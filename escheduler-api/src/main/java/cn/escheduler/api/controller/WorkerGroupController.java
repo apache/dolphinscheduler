@@ -20,6 +20,7 @@ package cn.escheduler.api.controller;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.WorkerGroupService;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -109,6 +110,7 @@ public class WorkerGroupController extends BaseController{
                 loginUser.getUserName() , pageNo, pageSize, searchVal);
 
         try {
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = workerGroupService.queryAllGroupPaging(pageNo, pageSize, searchVal);
             return returnDataListPaging(result);
         }catch (Exception e){

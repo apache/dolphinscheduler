@@ -189,8 +189,14 @@ public class SqlTask extends AbstractTask {
             return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
         }
 
+        if (StringUtils.isNotEmpty(sqlParameters.getTitle())){
+            String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(), ParamUtils.convert(paramsMap));
+            logger.info(title);
+            sqlParameters.setTitle(title);
+        }
+
         // special characters need to be escaped, ${} needs to be escaped
-        String rgex = "'?\\$\\{(.*?)\\}'?";
+        String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql,rgex,sqlParamsMap,paramsMap);
 
         // replace the ${} of the SQL statement with the Placeholder
@@ -279,7 +285,11 @@ public class SqlTask extends AbstractTask {
                         logger.info("showType is empty,don't need send email");
                     } else {
                         if (array.size() > 0) {
-                            sendAttachment(taskProps.getNodeName() + " query resultsets ", JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+                            if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
+                                sendAttachment(sqlParameters.getTitle(), JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+                            }else{
+                                sendAttachment(taskProps.getNodeName() + " query resultsets ", JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+                            }
                         }
                     }
 
@@ -300,6 +310,7 @@ public class SqlTask extends AbstractTask {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
+            throw new RuntimeException(e.getMessage());
         }
         return connection;
     }
@@ -316,6 +327,7 @@ public class SqlTask extends AbstractTask {
                 ParameterUtils.setInParameter(key,stmt,prop.getType(),prop.getValue());
             }
         }
+        logger.info("prepare statement replace sql:{}",stmt.toString());
         return stmt;
     }
 
@@ -337,14 +349,14 @@ public class SqlTask extends AbstractTask {
         // receiving group list
         List<String> receviersList = new ArrayList<String>();
         for(User user:users){
-            receviersList.add(user.getEmail());
+            receviersList.add(user.getEmail().trim());
         }
         // custom receiver
         String receivers = sqlParameters.getReceivers();
         if (StringUtils.isNotEmpty(receivers)){
             String[] splits = receivers.split(Constants.COMMA);
             for (String receiver : splits){
-                receviersList.add(receiver);
+                receviersList.add(receiver.trim());
             }
         }
 
@@ -355,15 +367,19 @@ public class SqlTask extends AbstractTask {
         if (StringUtils.isNotEmpty(receiversCc)){
             String[] splits = receiversCc.split(Constants.COMMA);
             for (String receiverCc : splits){
-                receviersCcList.add(receiverCc);
+                receviersCcList.add(receiverCc.trim());
             }
         }
 
         String showTypeName = sqlParameters.getShowType().replace(Constants.COMMA,"").trim();
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
-            MailUtils.sendMails(receviersList,receviersCcList,title, content, ShowType.valueOf(showTypeName));
+            Map<String, Object> mailResult = MailUtils.sendMails(receviersList, receviersCcList, title, content, ShowType.valueOf(showTypeName));
+            if(!(Boolean) mailResult.get(cn.escheduler.api.utils.Constants.STATUS)){
+                throw new RuntimeException("send mail failed!");
+            }
         }else{
             logger.error("showType: {} is not valid "  ,showTypeName);
+            throw new RuntimeException(String.format("showType: %s is not valid ",showTypeName));
         }
     }
 
@@ -401,19 +417,5 @@ public class SqlTask extends AbstractTask {
             logPrint.append(sqlParamsMap.get(i).getValue()+"("+sqlParamsMap.get(i).getType()+")");
         }
         logger.info(logPrint.toString());
-
-        //direct print style
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
-        int index = 1;
-        StringBuffer sb = new StringBuffer("replaced sql , direct:");
-        while (m.find()) {
-
-            m.appendReplacement(sb, sqlParamsMap.get(index).getValue());
-
-            index ++;
-        }
-        m.appendTail(sb);
-        logger.info(sb.toString());
     }
 }

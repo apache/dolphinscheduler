@@ -27,10 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * json utils
@@ -109,7 +106,7 @@ public class JSONUtils {
    */
   public static <T> List<T> toList(String json, Class<T> clazz) {
     if (StringUtils.isEmpty(json)) {
-      return null;
+      return new ArrayList<>();
     }
     try {
       return JSONArray.parseArray(json, clazz);
@@ -117,7 +114,7 @@ public class JSONUtils {
       logger.error("JSONArray.parseArray exception!",e);
     }
 
-    return null;
+    return new ArrayList<>();
   }
 
 
