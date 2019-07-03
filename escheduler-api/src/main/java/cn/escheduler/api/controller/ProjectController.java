@@ -21,6 +21,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.ProjectService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -161,6 +162,7 @@ public class ProjectController extends BaseController {
 
         try {
             logger.info("login user {}, query project list paging", loginUser.getUserName());
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
             return returnDataListPaging(result);
         } catch (Exception e) {

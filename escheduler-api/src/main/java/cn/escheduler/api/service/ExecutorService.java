@@ -178,9 +178,11 @@ public class ExecutorService extends BaseService{
         }
 
         ProcessDefinition processDefinition = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
-        result = checkProcessDefinitionValid(processDefinition, processInstance.getProcessDefinitionId());
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
+        if(executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE){
+            result = checkProcessDefinitionValid(processDefinition, processInstance.getProcessDefinitionId());
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                return result;
+            }
         }
 
         checkResult = checkExecuteType(processInstance, executeType);

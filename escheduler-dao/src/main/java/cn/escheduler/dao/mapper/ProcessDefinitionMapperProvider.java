@@ -134,7 +134,7 @@ public class ProcessDefinitionMapperProvider {
     public String queryByDefineId(Map<String, Object> parameter) {
         return new SQL() {
             {
-                SELECT("pd.*,u.user_name,p.name as projectName");
+                SELECT("pd.*,u.user_name,p.name as project_name");
 
                 FROM(TABLE_NAME + " pd");
                 JOIN("t_escheduler_user u ON pd.user_id = u.id");
@@ -189,7 +189,7 @@ public class ProcessDefinitionMapperProvider {
             if(userId != null && 0 != Integer.parseInt(userId.toString())){
                 WHERE("td.user_id = #{userId}");
             }
-            ORDER_BY(" td.update_time desc limit #{offset},#{pageSize} ");
+            ORDER_BY(" sc.schedule_release_state desc,td.update_time desc limit #{offset},#{pageSize} ");
         }}.toString();
     }
     /**

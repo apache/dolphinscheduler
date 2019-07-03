@@ -20,6 +20,7 @@ import cn.escheduler.api.service.AlertGroupService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.AlertType;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -131,6 +132,7 @@ public class AlertGroupController extends  BaseController{
                 return returnDataListPaging(result);
             }
 
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = alertGroupService.listPaging(loginUser, searchVal, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){

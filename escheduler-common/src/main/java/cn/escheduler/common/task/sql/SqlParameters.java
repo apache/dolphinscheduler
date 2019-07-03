@@ -74,6 +74,11 @@ public class SqlParameters extends AbstractParameters {
     private List<String> postStatements;
 
     /**
+     * title
+     */
+    private String title;
+
+    /**
      * receivers
      */
     private String receivers;
@@ -139,6 +144,14 @@ public class SqlParameters extends AbstractParameters {
         this.connParams = connParams;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getReceivers() {
         return receivers;
     }
@@ -190,6 +203,7 @@ public class SqlParameters extends AbstractParameters {
                 ", udfs='" + udfs + '\'' +
                 ", showType='" + showType + '\'' +
                 ", connParams='" + connParams + '\'' +
+                ", title='" + title + '\'' +
                 ", receivers='" + receivers + '\'' +
                 ", receiversCc='" + receiversCc + '\'' +
                 ", preStatements=" + preStatements +

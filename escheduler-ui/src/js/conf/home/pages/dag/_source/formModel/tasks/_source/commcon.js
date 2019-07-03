@@ -43,6 +43,10 @@ const dateValueList = {
   ],
   'day': [
     {
+      value: 'today',
+      label: `${i18n.$t('today')}`
+    },
+    {
       value: 'last1Days',
       label: `${i18n.$t('Last1Days')}`
     },
@@ -60,6 +64,10 @@ const dateValueList = {
     }
   ],
   'week': [
+    {
+      value: 'thisWeek',
+      label: `${i18n.$t('ThisWeek')}`
+    },
     {
       value: 'lastWeek',
       label: `${i18n.$t('LastWeek')}`
@@ -94,6 +102,10 @@ const dateValueList = {
     }
   ],
   'month': [
+    {
+      value: 'thisMonth',
+      label: `${i18n.$t('ThisMonth')}`
+    },
     {
       value: 'lastMonth',
       label: `${i18n.$t('LastMonth')}`

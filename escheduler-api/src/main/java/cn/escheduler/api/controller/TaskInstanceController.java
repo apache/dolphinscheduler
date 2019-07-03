@@ -21,6 +21,7 @@ import cn.escheduler.api.service.TaskInstanceService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ExecutionStatus;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -83,6 +84,7 @@ public class TaskInstanceController extends BaseController{
         try{
             logger.info("query task instance list, project name:{},process instance:{}, search value:{},task name:{}, state type:{}, host:{}, start:{}, end:{}",
                     projectName, processInstanceId, searchVal, taskName, stateType, host, startTime, endTime);
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = taskInstanceService.queryTaskListPaging(
                     loginUser, projectName, processInstanceId, taskName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
             return returnDataListPaging(result);

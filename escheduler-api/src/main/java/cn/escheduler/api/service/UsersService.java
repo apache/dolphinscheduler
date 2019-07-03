@@ -115,6 +115,9 @@ public class UsersService extends BaseService {
         user.setUserType(UserType.GENERAL_USER);
         user.setCreateTime(now);
         user.setUpdateTime(now);
+        if (StringUtils.isEmpty(queue)){
+            queue = "";
+        }
         user.setQueue(queue);
 
         // save user
@@ -517,6 +520,27 @@ public class UsersService extends BaseService {
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
+    /**
+     * query user list
+     *
+     * @param loginUser
+     * @return
+     */
+    public Map<String, Object> queryAllGeneralUsers(User loginUser) {
+        Map<String, Object> result = new HashMap<>(5);
+        //only admin can operate
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+            return result;
+        }
+
+        List<User> userList = userMapper.queryAllGeneralUsers();
+        result.put(Constants.DATA_LIST, userList);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
 
     /**
      * query user list

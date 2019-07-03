@@ -49,10 +49,16 @@
     methods: {
       _ok (fn) {
         this._verification().then(res => {
-          return this.store.dispatch('resource/resourceVerifyName', {
-            name: this.name,
-            type: 'FILE'
-          })
+          if (this.name === this.item.alias) {
+            return new Promise((resolve,reject) => {
+              this.desc === this.item.desc ? reject({msg:'内容未修改'}) : resolve()
+            })
+          }else{
+            return this.store.dispatch('resource/resourceVerifyName', {
+              name: this.name,
+              type: 'FILE'
+            })
+          }
         }).then(res => {
           return this.store.dispatch('resource/resourceRename', {
             name: this.name,
@@ -78,6 +84,7 @@
           } else {
             resolve()
           }
+
         })
       }
     },

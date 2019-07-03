@@ -23,6 +23,7 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ResourceType;
 import cn.escheduler.common.enums.UdfType;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -178,6 +179,7 @@ public class ResourcesController extends BaseController{
                 return returnDataListPaging(result);
             }
 
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = resourceService.queryResourceListPaging(loginUser,type,searchVal,pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){
@@ -234,9 +236,9 @@ public class ResourcesController extends BaseController{
     ) {
         try {
             logger.info("login user {}, verfiy resource alias: {},resource type: {}",
-                    loginUser.getUserName(), alias);
+                    loginUser.getUserName(), alias,type);
 
-            return resourceService.verifyResourceName(alias, type);
+            return resourceService.verifyResourceName(alias,type,loginUser);
         } catch (Exception e) {
             logger.error(VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg(), e);
             return error(Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getCode(), Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg());
