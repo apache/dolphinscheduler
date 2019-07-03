@@ -642,6 +642,9 @@ public class ProcessDao extends AbstractBaseDao {
                 // find pause tasks and init task's state
                 cmdParam.remove(Constants.CMDPARAM_RECOVERY_START_NODE_STRING);
                 List<Integer> suspendedNodeList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.PAUSE);
+                List<Integer> stopNodeList = findTaskIdByInstanceState(processInstance.getId(),
+                        ExecutionStatus.KILL);
+                suspendedNodeList.addAll(stopNodeList);
                 for(Integer taskId : suspendedNodeList){
                     // 把暂停状态初始化
                     initTaskInstance(this.findTaskInstanceById(taskId));
@@ -789,13 +792,16 @@ public class ProcessDao extends AbstractBaseDao {
      * @param taskInstance
      */
     private void initTaskInstance(TaskInstance taskInstance){
-        if(taskInstance.getState().typeIsFailure() && !taskInstance.isSubProcess()){
-            taskInstance.setFlag(Flag.NO);
-            updateTaskInstance(taskInstance);
-        }else{
-            taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
-            updateTaskInstance(taskInstance);
+
+        if(!taskInstance.isSubProcess()){
+            if(taskInstance.getState().typeIsCancel() || taskInstance.getState().typeIsFailure()){
+                taskInstance.setFlag(Flag.NO);
+                updateTaskInstance(taskInstance);
+                return;
+            }
         }
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        updateTaskInstance(taskInstance);
     }
 
     /**

@@ -23,6 +23,7 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.DbType;
 import cn.escheduler.common.enums.ResUploadType;
+import cn.escheduler.common.utils.CommonUtils;
 import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.common.utils.PropertyUtils;
 import cn.escheduler.dao.model.User;
@@ -455,7 +456,7 @@ public class DataSourceController extends BaseController {
         logger.info("login user {},get kerberos startup state : {}", loginUser.getUserName());
         try{
             // if upload resource is HDFS and kerberos startup is true , else false
-            return success(Status.SUCCESS.getMsg(), CheckUtils.getKerberosStartupState());
+            return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
         }catch (Exception e){
             logger.error(KERBEROS_STARTUP_STATE.getMsg(),e);
             return error(Status.KERBEROS_STARTUP_STATE.getCode(), Status.KERBEROS_STARTUP_STATE.getMsg());
