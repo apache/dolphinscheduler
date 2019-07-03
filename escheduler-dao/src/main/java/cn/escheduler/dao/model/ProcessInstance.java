@@ -194,6 +194,11 @@ public class ProcessInstance {
      */
     private int tenantId;
 
+    /**
+     * worker group name. for api.
+     */
+    private String workerGroupName;
+
     public ProcessInstance(){
 
     }
@@ -549,6 +554,7 @@ public class ProcessInstance {
                 ", dependenceScheduleTimes='" + dependenceScheduleTimes + '\'' +
                 ", duration=" + duration +
                 ", timeout=" + timeout +
+                ", workerGroupName=" + workerGroupName +
                 ", processInstancePriority=" + processInstancePriority +
                 '}';
     }
@@ -559,5 +565,13 @@ public class ProcessInstance {
 
     public int getTenantId() {
         return this.tenantId ;
+    }
+
+    public String getWorkerGroupName() {
+        return workerGroupName;
+    }
+
+    public void setWorkerGroupName(String workerGroupName) {
+        this.workerGroupName = workerGroupName;
     }
 }

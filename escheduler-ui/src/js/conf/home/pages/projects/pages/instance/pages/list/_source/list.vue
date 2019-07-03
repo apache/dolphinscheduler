@@ -95,10 +95,10 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('Stop')"
-                        @click="_stop(item)"
+                        :title="item.state === 'STOP' ? $t('Recovery Stop') : $t('Stop')"
+                        @click="_stop(item,$index)"
                         icon="iconfont icon-zanting1"
-                        :disabled="item.state !== 'RUNNING_EXEUTION'"></x-button>
+                        :disabled="item.state !== 'RUNNING_EXEUTION' && item.state != 'STOP'"></x-button>
               <x-button type="warning"
                         shape="circle"
                         size="xsmall"
@@ -362,11 +362,20 @@
        * stop
        * @param STOP
        */
-      _stop (item) {
-        this._upExecutorsState({
-          processInstanceId: item.id,
-          executeType: 'STOP'
-        })
+      _stop (item, index) {
+        if(item.state == 'STOP') {
+          this._countDownFn({
+            id: item.id,
+            executeType: 'RECOVER_SUSPENDED_PROCESS',
+            index: index,
+            buttonType: 'suspend'
+          })
+        } else {
+          this._upExecutorsState({
+            processInstanceId: item.id,
+            executeType: 'STOP'
+          })
+        }
       },
       /**
        * pause

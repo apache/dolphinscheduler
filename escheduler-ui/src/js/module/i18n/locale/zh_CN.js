@@ -238,6 +238,7 @@ export default {
   'Stop': '停止',
   'Pause': '暂停',
   'Recovery Suspend': '恢复暂停',
+  'Recovery Stop': '恢复停止',
   'Gantt': '甘特图',
   'Name': '名称',
   'Node Type': '节点类型',
