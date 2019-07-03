@@ -38,10 +38,7 @@ import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.common.utils.placeholder.BusinessTimeUtils;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
-import cn.escheduler.dao.mapper.ProcessInstanceMapper;
-import cn.escheduler.dao.mapper.ProjectMapper;
-import cn.escheduler.dao.mapper.TaskInstanceMapper;
+import cn.escheduler.dao.mapper.*;
 import cn.escheduler.dao.model.*;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
@@ -97,6 +94,9 @@ public class ProcessInstanceService extends BaseDAGService {
     @Autowired
     LoggerService loggerService;
 
+    @Autowired
+    WorkerGroupMapper workerGroupMapper;
+
     /**
      * query process instance by id
      *
@@ -115,6 +115,12 @@ public class ProcessInstanceService extends BaseDAGService {
             return checkResult;
         }
         ProcessInstance processInstance = processDao.findProcessInstanceDetailById(processId);
+        if(processInstance.getWorkerGroupId() == -1){
+            processInstance.setWorkerGroupName("Default");
+        }else{
+            WorkerGroup workerGroup = workerGroupMapper.queryById(processInstance.getWorkerGroupId());
+            processInstance.setWorkerGroupName(workerGroup.getName());
+        }
         result.put(Constants.DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
 
