@@ -216,4 +216,17 @@ public interface DataSourceMapper {
     @SelectProvider(type = DataSourceMapperProvider.class, method = "queryDatasourceExceptUserId")
     List<DataSource> queryDatasourceExceptUserId(@Param("userId") int userId);
 
+    @Results(value = {
+            @Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "note", column = "note", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = DbType.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "userId", column = "user_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "connectionParams", column = "connection_params", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+    })
+    @SelectProvider(type = DataSourceMapperProvider.class, method = "listAllDataSourceByType")
+    List<DataSource> listAllDataSourceByType(@Param("type") Integer type);
+
 }
