@@ -34,8 +34,10 @@ import cn.escheduler.common.task.sql.SqlParameters;
 import cn.escheduler.common.utils.*;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.TaskRecordDao;
+import cn.escheduler.dao.model.ProcessDefinition;
 import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.model.Tenant;
 import cn.escheduler.server.utils.LoggerUtils;
 import cn.escheduler.server.utils.ParamUtils;
 import cn.escheduler.server.worker.log.TaskLogger;
@@ -160,82 +162,94 @@ public class TaskScheduleThread implements Callable<Boolean> {
             // set task params
             taskProps.setTaskParams(taskNode.getParams());
             // set tenant code , execute task linux user
-            taskProps.setTenantCode(taskInstance.getProcessInstance().getTenantCode());
 
             ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskInstance.getId());
-            String queue = processDao.queryQueueByProcessInstanceId(processInstance.getId());
 
             taskProps.setScheduleTime(processInstance.getScheduleTime());
             taskProps.setNodeName(taskInstance.getName());
             taskProps.setTaskInstId(taskInstance.getId());
             taskProps.setEnvFile(CommonUtils.getSystemEnvPath());
-            // set queue
-            if (StringUtils.isEmpty(queue)){
-                taskProps.setQueue(taskInstance.getProcessInstance().getQueue());
-            }else {
-                taskProps.setQueue(queue);
-            }
-            taskProps.setTaskStartTime(taskInstance.getStartTime());
-            taskProps.setDefinedParams(allParamMap);
 
-            // set task timeout
-            setTaskTimeout(taskProps, taskNode);
+            ProcessDefinition processDefine = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
 
-            taskProps.setDependence(taskInstance.getDependency());
+            Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
+                    processDefine.getUserId());
 
-            taskProps.setTaskAppId(String.format("%s_%s_%s",
-                    taskInstance.getProcessDefine().getId(),
-                    taskInstance.getProcessInstance().getId(),
-                    taskInstance.getId()));
+            if(tenant == null){
+                processInstance.setTenantCode(tenant.getTenantCode());
+                logger.error("cannot find the tenant, process definition id:{}, tenant id:{}, user id:{}",
+                        processDefine.getId(), processDefine.getTenantId(), processDefine.getUserId()
+                );
+                status = ExecutionStatus.FAILURE;
+            }else{
+                taskProps.setTenantCode(tenant.getTenantCode());
+                String queue = processDao.queryQueueByProcessInstanceId(processInstance.getId());
+                // set queue
+                if (StringUtils.isEmpty(queue)){
+                    taskProps.setQueue(taskInstance.getProcessInstance().getQueue());
+                }else {
+                    taskProps.setQueue(tenant.getQueueName());
+                }
+                taskProps.setTaskStartTime(taskInstance.getStartTime());
+                taskProps.setDefinedParams(allParamMap);
 
-            // custom logger
-            TaskLogger taskLogger = new TaskLogger(LoggerUtils.buildTaskId(TASK_PREFIX,
-                    taskInstance.getProcessDefine().getId(),
-                    taskInstance.getProcessInstance().getId(),
-                    taskInstance.getId()));
+                // set task timeout
+                setTaskTimeout(taskProps, taskNode);
 
-            task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+                taskProps.setDependence(taskInstance.getDependency());
 
-            // job init
-            task.init();
+                taskProps.setTaskAppId(String.format("%s_%s_%s",
+                        taskInstance.getProcessDefine().getId(),
+                        taskInstance.getProcessInstance().getId(),
+                        taskInstance.getId()));
 
-            // job handle
-            task.handle();
+                // custom logger
+                TaskLogger taskLogger = new TaskLogger(LoggerUtils.buildTaskId(TASK_PREFIX,
+                        taskInstance.getProcessDefine().getId(),
+                        taskInstance.getProcessInstance().getId(),
+                        taskInstance.getId()));
 
+                task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
 
-            logger.info("task : {} exit status code : {}", taskProps.getTaskAppId(),task.getExitStatusCode());
+                // job init
+                task.init();
 
-            if (task.getExitStatusCode() == Constants.EXIT_CODE_SUCCESS){
-                status = ExecutionStatus.SUCCESS;
-                // task recor flat : if true , start up qianfan
-                if (TaskRecordDao.getTaskRecordFlag()
-                        && TaskType.typeIsNormalTask(taskInstance.getTaskType())){
+                // job handle
+                task.handle();
+                logger.info("task : {} exit status code : {}", taskProps.getTaskAppId(),task.getExitStatusCode());
 
-                    AbstractParameters params = (AbstractParameters) JSONUtils.parseObject(taskProps.getTaskParams(), getCurTaskParamsClass());
+                if (task.getExitStatusCode() == Constants.EXIT_CODE_SUCCESS){
+                    status = ExecutionStatus.SUCCESS;
+                    // task recor flat : if true , start up qianfan
+                    if (TaskRecordDao.getTaskRecordFlag()
+                            && TaskType.typeIsNormalTask(taskInstance.getTaskType())){
 
-                    // replace placeholder
-                    Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-                            taskProps.getDefinedParams(),
-                            params.getLocalParametersMap(),
-                            processInstance.getCmdTypeIfComplement(),
-                            processInstance.getScheduleTime());
-                    if (paramsMap != null && !paramsMap.isEmpty()
-                            && paramsMap.containsKey("v_proc_date")){
-                        String vProcDate = paramsMap.get("v_proc_date").getValue();
-                        if (!StringUtils.isEmpty(vProcDate)){
-                            TaskRecordStatus taskRecordState = TaskRecordDao.getTaskRecordState(taskInstance.getName(), vProcDate);
-                            logger.info("task record status : {}",taskRecordState);
-                            if (taskRecordState == TaskRecordStatus.FAILURE){
-                                status = ExecutionStatus.FAILURE;
+                        AbstractParameters params = (AbstractParameters) JSONUtils.parseObject(taskProps.getTaskParams(), getCurTaskParamsClass());
+
+                        // replace placeholder
+                        Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
+                                taskProps.getDefinedParams(),
+                                params.getLocalParametersMap(),
+                                processInstance.getCmdTypeIfComplement(),
+                                processInstance.getScheduleTime());
+                        if (paramsMap != null && !paramsMap.isEmpty()
+                                && paramsMap.containsKey("v_proc_date")){
+                            String vProcDate = paramsMap.get("v_proc_date").getValue();
+                            if (!StringUtils.isEmpty(vProcDate)){
+                                TaskRecordStatus taskRecordState = TaskRecordDao.getTaskRecordState(taskInstance.getName(), vProcDate);
+                                logger.info("task record status : {}",taskRecordState);
+                                if (taskRecordState == TaskRecordStatus.FAILURE){
+                                    status = ExecutionStatus.FAILURE;
+                                }
                             }
                         }
                     }
-                }
 
-            }else if (task.getExitStatusCode() == Constants.EXIT_CODE_KILL){
-                status = ExecutionStatus.KILL;
-            }else {
-                status = ExecutionStatus.FAILURE;
+                }else if (task.getExitStatusCode() == Constants.EXIT_CODE_KILL){
+                    status = ExecutionStatus.KILL;
+                }else {
+                    status = ExecutionStatus.FAILURE;
+                }
             }
         }catch (Exception e){
             logger.error("task escheduler failure : " + e.getMessage(),e);
