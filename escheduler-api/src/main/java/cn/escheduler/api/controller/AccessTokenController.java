@@ -22,6 +22,7 @@ import cn.escheduler.api.service.AccessTokenService;
 import cn.escheduler.api.service.UsersService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -127,6 +128,7 @@ public class AccessTokenController extends BaseController{
             if(result.get(Constants.STATUS) != Status.SUCCESS){
                 return returnDataListPaging(result);
             }
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = accessTokenService.queryAccessTokenList(loginUser, searchVal, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){

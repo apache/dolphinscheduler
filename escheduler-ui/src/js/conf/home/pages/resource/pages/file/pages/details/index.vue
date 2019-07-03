@@ -79,7 +79,7 @@
             this.isData = false
           } else {
             this.isData = true
-            this._handlerEditor().setValue(res.data.content)
+            this._handlerEditor().setValue(res.data.content + '\n')
 
             // Initialize the plugin to prevent repeated calls
             if (editor.lineCount() < 1000) {

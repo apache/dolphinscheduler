@@ -40,9 +40,13 @@
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isADMIN">
-          <template slot="name"><b>*</b>{{$t('Queue')}}</template>
+          <template slot="name">{{$t('Queue')}}</template>
           <template slot="content">
             <x-select v-model="queueName">
+              <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="queueName = {}">
+                <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="queueName.id"></i>
+                <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!queueName.id"></i>
+              </x-input>
               <x-option
                       v-for="city in queueList"
                       :key="city.id"
@@ -125,7 +129,7 @@
         }
       },
       _verification () {
-        let regEmail = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/ // eslint-disable-line
+        let regEmail = /^([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/ // eslint-disable-line
         // Mobile phone number regular
         let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
 

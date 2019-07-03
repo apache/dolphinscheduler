@@ -45,10 +45,9 @@
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
-            <span v-if="isAuth" class="ellipsis"><a href="javascript:" class="links">{{item.name}}</a></span>
-            <span v-if="!isAuth" class="ellipsis"><a href="javascript:" class="links">{{item.name}}</a></span>
+            <span class="ellipsis"><a href="javascript:" class="links">{{item.name}}</a></span>
           </td>
-          <td><span class="ellipsis">{{item.processInstanceName}}</span></td>
+          <td><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis">{{item.processInstanceName}}</span></a></td>
           <td><span>{{item.taskType}}</span></td>
           <td><span v-html="_rtState(item.state)" style="cursor: pointer;"></span></td>
           <td><span>{{item.submitTime | formatDate}}</span></td>
@@ -125,7 +124,10 @@
             })
           }
         })
-      }
+      },
+      _go (item) {
+        this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })
+      },
     },
     watch: {
       taskInstanceList (a) {
