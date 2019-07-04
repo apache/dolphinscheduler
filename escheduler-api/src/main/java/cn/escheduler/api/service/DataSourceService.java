@@ -25,6 +25,7 @@ import cn.escheduler.common.enums.DbType;
 import cn.escheduler.common.enums.ResUploadType;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.job.db.*;
+import cn.escheduler.common.utils.CommonUtils;
 import cn.escheduler.common.utils.PropertyUtils;
 import cn.escheduler.dao.mapper.DataSourceMapper;
 import cn.escheduler.dao.mapper.DatasourceUserMapper;
@@ -324,7 +325,14 @@ public class DataSourceService extends BaseService{
      */
     public Map<String, Object> queryDataSourceList(User loginUser, Integer type) {
         Map<String, Object> result = new HashMap<>(5);
-        List<DataSource> datasourceList = dataSourceMapper.queryDataSourceByType(loginUser.getId(), type);
+
+        List<DataSource> datasourceList;
+
+        if (isAdmin(loginUser)) {
+            datasourceList = dataSourceMapper.listAllDataSourceByType(type);
+        }else{
+            datasourceList = dataSourceMapper.queryDataSourceByType(loginUser.getId(), type);
+        }
 
         result.put(Constants.DATA_LIST, datasourceList);
         putMsg(result, Status.SUCCESS);
@@ -374,7 +382,7 @@ public class DataSourceService extends BaseService{
                     break;
                 case HIVE:
                 case SPARK:
-                    if (CheckUtils.getKerberosStartupState())  {
+                    if (CommonUtils.getKerberosStartupState())  {
                             System.setProperty(cn.escheduler.common.Constants.JAVA_SECURITY_KRB5_CONF,
                                     getString(cn.escheduler.common.Constants.JAVA_SECURITY_KRB5_CONF_PATH));
                             Configuration configuration = new Configuration();
@@ -470,7 +478,7 @@ public class DataSourceService extends BaseService{
         String address = buildAddress(type, host, port);
 
         String jdbcUrl = address + "/" + database;
-        if (CheckUtils.getKerberosStartupState() &&
+        if (CommonUtils.getKerberosStartupState() &&
                 (type == DbType.HIVE || type == DbType.SPARK)){
             jdbcUrl += ";principal=" + principal;
         }

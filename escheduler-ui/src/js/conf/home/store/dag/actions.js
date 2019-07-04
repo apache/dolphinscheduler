@@ -149,6 +149,10 @@ export default {
 
         state.tenantId = processInstanceJson.tenantId
 
+        //startup parameters
+        state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroupId', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
+        state.startup.commandParam = JSON.parse(res.data.commandParam)
+
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -378,6 +382,19 @@ export default {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectName}/schedule/create`, payload, res => {
         resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Preview timing
+   */
+  previewSchedule ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/schedule/preview`, payload, res => {
+        resolve(res.data)
+        //alert(res.data)
       }).catch(e => {
         reject(e)
       })

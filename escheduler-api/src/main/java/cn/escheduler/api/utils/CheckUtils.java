@@ -160,16 +160,4 @@ public class CheckUtils {
 
     return pattern.matcher(str).matches();
   }
-
-  /**
-   * if upload resource is HDFS and kerberos startup is true , else false
-   * @return
-   */
-  public static boolean getKerberosStartupState(){
-    String resUploadStartupType = PropertyUtils.getString(cn.escheduler.common.Constants.RES_UPLOAD_STARTUP_TYPE);
-    ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
-    Boolean kerberosStartupState = getBoolean(cn.escheduler.common.Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE);
-    return resUploadType == ResUploadType.HDFS && kerberosStartupState;
-  }
-
 }
