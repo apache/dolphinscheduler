@@ -307,11 +307,13 @@ public class UsersService extends BaseService {
         // delete user
         User user = userMapper.queryTenantCodeByUserId(id);
 
-
-        if (PropertyUtils.getResUploadStartupState()){
-            String userPath = HadoopUtils.getHdfsDataBasePath() + "/" + user.getTenantCode() + "/home/" + id;
-
-            HadoopUtils.getInstance().delete(userPath, true);
+        if (user != null) {
+            if (PropertyUtils.getResUploadStartupState()) {
+                String userPath = HadoopUtils.getHdfsDataBasePath() + "/" + user.getTenantCode() + "/home/" + id;
+                if (HadoopUtils.getInstance().exists(userPath)) {
+                    HadoopUtils.getInstance().delete(userPath, true);
+                }
+            }
         }
 
         userMapper.delete(id);
