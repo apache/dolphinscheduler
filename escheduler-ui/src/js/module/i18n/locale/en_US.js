@@ -466,7 +466,9 @@ export default {
   'Statistics manage': 'Statistics manage',
   'statistics': 'statistics',
   'select tenant':'select tenant',
-  'Process Instance Running Count': 'Process Instance Running Count',
   'Please enter Principal':'Please enter Principal',
-  'The start time must not be the same as the end': 'The start time must not be the same as the end'
+  'The start time must not be the same as the end': 'The start time must not be the same as the end',
+  'Startup parameter': 'Startup parameter',
+  'Startup type': 'Startup type',
+  'Complement range': 'Complement range'
 }
