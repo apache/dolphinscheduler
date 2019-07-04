@@ -238,7 +238,6 @@ export default {
   'Stop': 'Stop',
   'Pause': 'Pause',
   'Recovery Suspend': 'Recovery Suspend',
-  'Recovery Stop': 'Recovery Stop',
   'Gantt': 'Gantt',
   'Name': 'Name',
   'Node Type': 'Node Type',

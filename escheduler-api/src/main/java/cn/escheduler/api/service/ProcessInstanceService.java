@@ -121,6 +121,9 @@ public class ProcessInstanceService extends BaseDAGService {
             WorkerGroup workerGroup = workerGroupMapper.queryById(processInstance.getWorkerGroupId());
             processInstance.setWorkerGroupName(workerGroup.getName());
         }
+        ProcessDefinition processDefinition = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
+        processInstance.setReceivers(processDefinition.getReceivers());
+        processInstance.setReceiversCc(processDefinition.getReceiversCc());
         result.put(Constants.DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
 
