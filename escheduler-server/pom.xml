@@ -89,7 +89,7 @@
 			<artifactId>escheduler-alert</artifactId>
 		</dependency>
 
-	</dependencies>
+    </dependencies>
 
 
 	<build>
