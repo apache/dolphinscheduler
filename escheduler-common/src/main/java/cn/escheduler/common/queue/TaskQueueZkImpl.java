@@ -210,7 +210,12 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         while(iterator.hasNext()){
             if(j++ < tasksNum){
                 String task = iterator.next();
-                taskslist.add(task);
+                String[] taskArray = task.split(Constants.UNDERLINE);
+                int processInstanceId = Integer.parseInt(taskArray[1]);
+                int taskId = Integer.parseInt(taskArray[3]);
+                String destTask = taskArray[0]+Constants.UNDERLINE + processInstanceId + Constants.UNDERLINE
+                        + taskArray[2] + Constants.UNDERLINE + taskId;
+                taskslist.add(destTask);
             }
         }
         return taskslist;
