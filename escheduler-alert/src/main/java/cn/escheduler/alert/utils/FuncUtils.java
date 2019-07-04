@@ -14,47 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package cn.escheduler.alert.utils;
 
-import i18n from '@/module/i18n'
+public class FuncUtils {
 
-let warningTypeList = [
-  {
-    id: 'NONE',
-    code: `${i18n.$t('none_1')}`
-  },
-  {
-    id: 'SUCCESS',
-    code: `${i18n.$t('success_1')}`
-  },
-  {
-    id: 'FAILURE',
-    code: `${i18n.$t('failure_1')}`
-  },
-  {
-    id: 'ALL',
-    code: `${i18n.$t('All_1')}`
-  }
-]
-
-const isEmial = (val) => {
-  let regEmail = /^([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/ // eslint-disable-line
-  return regEmail.test(val)
-}
-
-const fuzzyQuery = (list, keyWord) => {
-  let len = list.length
-  let arr = []
-  let reg = new RegExp(keyWord)
-  for (let i = 0; i < len; i++) {
-    if (list[i].match(reg)) {
-      arr.push(list[i])
+    static public String mkString(Iterable<String> list, String split) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String item : list) {
+            if (first)
+                first = false;
+            else
+                sb.append(split);
+            sb.append(item);
+        }
+        return sb.toString();
     }
-  }
-  return arr
-}
 
-export {
-  warningTypeList,
-  isEmial,
-  fuzzyQuery
 }

@@ -29,6 +29,7 @@ import cn.escheduler.common.task.sql.SqlBinds;
 import cn.escheduler.common.task.sql.SqlParameters;
 import cn.escheduler.common.task.sql.SqlType;
 import cn.escheduler.common.utils.CollectionUtils;
+import cn.escheduler.common.utils.CommonUtils;
 import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.DaoFactory;
@@ -43,6 +44,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 
 import java.sql.*;
@@ -50,6 +53,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static cn.escheduler.common.utils.PropertyUtils.getString;
 
 /**
  *  sql task
@@ -228,7 +233,15 @@ public class SqlTask extends AbstractTask {
                                         List<String> createFuncs){
         Connection connection = null;
         try {
-
+            if (CommonUtils.getKerberosStartupState())  {
+                System.setProperty(cn.escheduler.common.Constants.JAVA_SECURITY_KRB5_CONF,
+                        getString(cn.escheduler.common.Constants.JAVA_SECURITY_KRB5_CONF_PATH));
+                Configuration configuration = new Configuration();
+                configuration.set(cn.escheduler.common.Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
+                UserGroupInformation.setConfiguration(configuration);
+                UserGroupInformation.loginUserFromKeytab(getString(cn.escheduler.common.Constants.LOGIN_USER_KEY_TAB_USERNAME),
+                        getString(cn.escheduler.common.Constants.LOGIN_USER_KEY_TAB_PATH));
+            }
             if (DbType.HIVE.name().equals(sqlParameters.getType())) {
                 Properties paramProp = new Properties();
                 paramProp.setProperty("user", baseDataSource.getUser());
@@ -278,7 +291,7 @@ public class SqlTask extends AbstractTask {
                         array.add(mapOfColValues);
                     }
 
-                    logger.info("execute sql : {}", JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+                    logger.debug("execute sql : {}", JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
 
                     // send as an attachment
                     if (StringUtils.isEmpty(sqlParameters.getShowType())) {
@@ -374,7 +387,7 @@ public class SqlTask extends AbstractTask {
         String showTypeName = sqlParameters.getShowType().replace(Constants.COMMA,"").trim();
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
             Map<String, Object> mailResult = MailUtils.sendMails(receviersList, receviersCcList, title, content, ShowType.valueOf(showTypeName));
-            if(!(Boolean) mailResult.get(Constants.STATUS)){
+            if(!(Boolean) mailResult.get(cn.escheduler.common.Constants.STATUS)){
                 throw new RuntimeException("send mail failed!");
             }
         }else{
