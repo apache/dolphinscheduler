@@ -116,7 +116,7 @@ public class ProcessInstanceService extends BaseDAGService {
         }
         ProcessInstance processInstance = processDao.findProcessInstanceDetailById(processId);
         if(processInstance.getWorkerGroupId() == -1){
-            processInstance.setWorkerGroupName("Default");
+            processInstance.setWorkerGroupName(DEFAULT);
         }else{
             WorkerGroup workerGroup = workerGroupMapper.queryById(processInstance.getWorkerGroupId());
             processInstance.setWorkerGroupName(workerGroup.getName());
