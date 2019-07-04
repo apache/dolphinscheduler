@@ -149,6 +149,10 @@ export default {
 
         state.tenantId = processInstanceJson.tenantId
 
+        //startup parameters
+        state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroupId', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
+        state.startup.commandParam = JSON.parse(res.data.commandParam)
+
         resolve(res.data)
       }).catch(res => {
         reject(res)
