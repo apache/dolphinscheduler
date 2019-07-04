@@ -144,4 +144,8 @@ public class Constants {
     public static final String ENTERPRISE_WECHAT_TEAM_SEND_MSG = "enterprise.wechat.team.send.msg";
 
     public static final String ENTERPRISE_WECHAT_USER_SEND_MSG = "enterprise.wechat.user.send.msg";
+
+    public static final String ENTERPRISE_WECHAT_AGENT_ID = "enterprise.wechat.agent.id";
+
+    public static final String ENTERPRISE_WECHAT_USERS = "enterprise.wechat.users";
 }

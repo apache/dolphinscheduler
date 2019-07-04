@@ -60,6 +60,10 @@ public class EnterpriseWeChatUtils {
 
     private static final String enterpriseWeChatUserSendMsg = getString(Constants.ENTERPRISE_WECHAT_USER_SEND_MSG);
 
+    public static final String enterpriseWeChatAgentId = getString(Constants.ENTERPRISE_WECHAT_AGENT_ID);
+
+    public static final String enterpriseWeChatUsers = getString(Constants.ENTERPRISE_WECHAT_USERS);
+
     /**
      * get Enterprise WeChat token info
      * @return token string info
@@ -140,14 +144,14 @@ public class EnterpriseWeChatUtils {
     }
 
     /**
-     * send weixin
+     * send Enterprise WeChat
      * @param charset
      * @param data
      * @param token
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      * @throws IOException
      */
-    public static String sendQiyeWeixin(String charset, String data, String token) throws IOException {
+    public static String sendEnterpriseWeChat(String charset, String data, String token) throws IOException {
         String enterpriseWeChatPushUrlReplace = enterpriseWeChatPushUrl.replaceAll("\\$token", token);
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
