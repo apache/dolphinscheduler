@@ -28,6 +28,17 @@
                   @click="_toggleView"
                   icon="fa fa-code">
           </x-button>
+          <x-button
+            style="vertical-align: middle;"
+            data-toggle="tooltip"
+            :title="$t('Startup parameter')"
+            data-container="body"
+            type="primary"
+            size="xsmall"
+            :disabled="$route.name !== 'projects-instance-details'"
+            @click="_toggleParam"
+            icon="fa fa-chevron-circle-right">
+          </x-button>
           <span class="name">{{name}}</span>
           &nbsp;
           <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><i class="iconfont" data-container="body"  data-toggle="tooltip" title="复制名称" >&#xe61e;</i></span>
@@ -382,6 +393,13 @@
        */
       _toggleView () {
         findComponentDownward(this.$root, `assist-dag-index`)._toggleView()
+      },
+
+      /**
+       * Starting parameters
+       */
+      _toggleParam () {
+        findComponentDownward(this.$root, `starting-params-dag-index`)._toggleParam()
       },
       /**
        * Create a node popup layer
