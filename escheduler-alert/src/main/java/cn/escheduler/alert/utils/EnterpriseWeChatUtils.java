@@ -16,9 +16,12 @@
  */
 package cn.escheduler.alert.utils;
 
+import cn.escheduler.common.enums.ShowType;
+import cn.escheduler.dao.model.Alert;
 import com.alibaba.fastjson.JSON;
 
 import com.google.common.reflect.TypeToken;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -31,13 +34,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 import static cn.escheduler.alert.utils.PropertyUtils.getString;
 
 /**
- * qiye weixin utils
+ * Enterprise WeChat utils
  */
 public class EnterpriseWeChatUtils {
 
@@ -48,7 +50,7 @@ public class EnterpriseWeChatUtils {
     private static final String enterpriseWeChatSecret = getString(Constants.ENTERPRISE_WECHAT_SECRET);
 
     private static final String enterpriseWeChatTokenUrl = getString(Constants.ENTERPRISE_WECHAT_TOKEN_URL);
-    private String enterpriseWeChatTokenUrlReplace = enterpriseWeChatTokenUrl
+    private static String enterpriseWeChatTokenUrlReplace = enterpriseWeChatTokenUrl
             .replaceAll("\\$corpId", enterpriseWeChatCorpId)
             .replaceAll("\\$secret", enterpriseWeChatSecret);
 
@@ -59,11 +61,11 @@ public class EnterpriseWeChatUtils {
     private static final String enterpriseWeChatUserSendMsg = getString(Constants.ENTERPRISE_WECHAT_USER_SEND_MSG);
 
     /**
-     * get winxin token info
+     * get Enterprise WeChat token info
      * @return token string info
      * @throws IOException
      */
-    public String getToken() throws IOException {
+    public static String getToken() throws IOException {
         String resp;
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
@@ -71,7 +73,7 @@ public class EnterpriseWeChatUtils {
         CloseableHttpResponse response = httpClient.execute(httpGet);
         try {
             HttpEntity entity = response.getEntity();
-            resp = EntityUtils.toString(entity, "utf-8");
+            resp = EntityUtils.toString(entity, Constants.UTF_8);
             EntityUtils.consume(entity);
         } finally {
             response.close();
@@ -84,26 +86,26 @@ public class EnterpriseWeChatUtils {
     }
 
     /**
-     * make team single weixin message
+     * make team single Enterprise WeChat message
      * @param toParty
      * @param agentId
      * @param msg
-     * @return weixin send message
+     * @return Enterprise WeChat send message
      */
-    public String makeTeamSendMsg(String toParty, String agentId, String msg) {
+    public static String makeTeamSendMsg(String toParty, String agentId, String msg) {
         return enterpriseWeChatTeamSendMsg.replaceAll("\\$toParty", toParty)
                 .replaceAll("\\$agentId", agentId)
                 .replaceAll("\\$msg", msg);
     }
 
     /**
-     * make team multi weixin message
+     * make team multi Enterprise WeChat message
      * @param toParty
      * @param agentId
      * @param msg
-     * @return weixin send message
+     * @return Enterprise WeChat send message
      */
-    public String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
+    public static String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
         String listParty = FuncUtils.mkString(toParty, "|");
         return enterpriseWeChatTeamSendMsg.replaceAll("\\$toParty", listParty)
                 .replaceAll("\\$agentId", agentId)
@@ -115,9 +117,9 @@ public class EnterpriseWeChatUtils {
      * @param toUser
      * @param agentId
      * @param msg
-     * @return weixin send message
+     * @return Enterprise WeChat send message
      */
-    public String makeUserSendMsg(String toUser, String agentId, String msg) {
+    public static String makeUserSendMsg(String toUser, String agentId, String msg) {
         return enterpriseWeChatUserSendMsg.replaceAll("\\$toUser", toUser)
                 .replaceAll("\\$agentId", agentId)
                 .replaceAll("\\$msg", msg);
@@ -128,9 +130,9 @@ public class EnterpriseWeChatUtils {
      * @param toUser
      * @param agentId
      * @param msg
-     * @return weixin send message
+     * @return Enterprise WeChat send message
      */
-    public String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
+    public static String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
         String listUser = FuncUtils.mkString(toUser, "|");
         return enterpriseWeChatUserSendMsg.replaceAll("\\$toUser", listUser)
                 .replaceAll("\\$agentId", agentId)
@@ -142,10 +144,10 @@ public class EnterpriseWeChatUtils {
      * @param charset
      * @param data
      * @param token
-     * @return weixin resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
+     * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
      * @throws IOException
      */
-    public String sendQiyeWeixin(String charset, String data, String token) throws IOException {
+    public static String sendQiyeWeixin(String charset, String data, String token) throws IOException {
         String enterpriseWeChatPushUrlReplace = enterpriseWeChatPushUrl.replaceAll("\\$token", token);
 
         CloseableHttpClient httpclient = HttpClients.createDefault();
@@ -160,8 +162,83 @@ public class EnterpriseWeChatUtils {
         } finally {
             response.close();
         }
-        logger.info("qiye weixin send [{}], param:{}, resp:{}", enterpriseWeChatPushUrl, data, resp);
+        logger.info("Enterprise WeChat send [{}], param:{}, resp:{}", enterpriseWeChatPushUrl, data, resp);
         return resp;
+    }
+
+    /**
+     * convert table to markdown style
+     * @param title
+     * @param content
+     * @return
+     */
+    public static String markdownTable(String title,String content){
+        List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
+        StringBuilder contents = new StringBuilder(200);
+        for (LinkedHashMap mapItems : mapItemsList){
+
+            Set<Map.Entry<String, String>> entries = mapItems.entrySet();
+
+            Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+
+            StringBuilder t = new StringBuilder(String.format("`%s`%s",title,Constants.MARKDOWN_ENTER));
+            while (iterator.hasNext()){
+
+                Map.Entry<String, String> entry = iterator.next();
+                t.append(Constants.MARKDOWN_QUOTE);
+                t.append(entry.getKey()).append(":").append(entry.getValue());
+                t.append(Constants.MARKDOWN_ENTER);
+            }
+
+            contents.append(t);
+        }
+        return contents.toString();
+    }
+
+    /**
+     * convert text to markdown style
+     * @param title
+     * @param content
+     * @return
+     */
+    public static String markdownText(String title,String content){
+        if (StringUtils.isNotEmpty(content)){
+            List<String> list;
+            try {
+                list = JSONUtils.toList(content,String.class);
+            }catch (Exception e){
+                logger.error("json format exception",e);
+                return null;
+            }
+
+            StringBuilder contents = new StringBuilder(100);
+            contents.append(String.format("`%s`\n",title));
+            for (String str : list){
+                contents.append(Constants.MARKDOWN_QUOTE);
+                contents.append(str);
+                contents.append(Constants.MARKDOWN_ENTER);
+            }
+
+            return contents.toString();
+
+        }
+        return null;
+    }
+
+    /**
+     * Determine the mardown style based on the show type of the alert
+     * @param alert
+     * @return
+     */
+    public static String markdownByAlert(Alert alert){
+        String result = "";
+        if (alert.getShowType() == ShowType.TABLE) {
+            result = markdownTable(alert.getTitle(),alert.getContent());
+        }else if(alert.getShowType() == ShowType.TEXT){
+            result = markdownText(alert.getTitle(),alert.getContent());
+        }
+        return result;
+
     }
 
 }
