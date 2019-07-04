@@ -1693,6 +1693,7 @@ public class ProcessDao extends AbstractBaseDao {
         ProcessInstance processInstance = findProcessInstanceByTaskId(taskInstance.getId());
         if(processInstance == null){
             logger.error("cannot find the task:{} process instance", taskInstance.getId());
+            return Constants.DEFAULT_WORKER_ID;
         }
         int processWorkerGroupId = processInstance.getWorkerGroupId();
 
