@@ -129,6 +129,10 @@ public class Constants {
 
     public static final int ALERT_SCAN_INTERVEL = 5000;
 
+    public static final String MARKDOWN_QUOTE = ">";
+
+    public static final String MARKDOWN_ENTER = "\n";
+
     public static final String ENTERPRISE_WECHAT_CORP_ID = "enterprise.wechat.corp.id";
 
     public static final String ENTERPRISE_WECHAT_SECRET = "enterprise.wechat.secret";
