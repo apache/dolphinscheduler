@@ -220,6 +220,11 @@ public final class Constants {
     public static final String SEMICOLON = ";";
 
     /**
+     * DOT .
+     */
+    public static final String DOT = ".";
+
+    /**
      * ZOOKEEPER_SESSION_TIMEOUT
      */
     public static final String ZOOKEEPER_SESSION_TIMEOUT = "zookeeper.session.timeout";
@@ -882,6 +887,11 @@ public final class Constants {
      * loginUserFromKeytab user
      */
     public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
+
+    /**
+     * default worker group id
+     */
+    public static final int DEFAULT_WORKER_ID = -1;
 
     /**
      * loginUserFromKeytab path
