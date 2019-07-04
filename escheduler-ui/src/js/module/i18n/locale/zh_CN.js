@@ -468,5 +468,8 @@ export default {
   'statistics': '统计',
   'select tenant':'选择租户',
   'Please enter Principal':'请输入Principal',
-  'The start time must not be the same as the end': '开始时间和结束时间不能相同'
+  'The start time must not be the same as the end': '开始时间和结束时间不能相同',
+  'Startup parameter': '启动参数',
+  'Startup type': '启动类型',
+  'Complement range': '补数范围'
 }
