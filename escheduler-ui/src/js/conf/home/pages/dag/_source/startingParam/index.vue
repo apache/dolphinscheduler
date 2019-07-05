@@ -85,8 +85,6 @@
         deep: true,
         handler () {
           this.isActive = false
-          this.notifyGroupList = null
-          this.workerGroupList = null
           this.$nextTick(() => (this.isActive = true))
         }
       }
