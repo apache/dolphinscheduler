@@ -493,7 +493,8 @@ public class ProcessDao extends AbstractBaseDao {
         processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
-        processInstance.setWorkerGroupId(command.getWorkerGroupId());
+        int workerGroupId = command.getWorkerGroupId() == 0 ? -1 : command.getWorkerGroupId();
+        processInstance.setWorkerGroupId(workerGroupId);
         processInstance.setTimeout(processDefinition.getTimeout());
         processInstance.setTenantId(processDefinition.getTenantId());
         return processInstance;
