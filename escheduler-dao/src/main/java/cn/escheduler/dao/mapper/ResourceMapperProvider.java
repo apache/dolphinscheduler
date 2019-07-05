@@ -118,6 +118,7 @@ public class ResourceMapperProvider {
       SET("`alias` = #{resource.alias}");
       SET("`desc` = #{resource.desc}");
       SET("`update_time` = #{resource.updateTime}");
+      SET("`size` = #{resource.size}");
       WHERE("`id` = #{resource.id}");
     }}.toString();
   }

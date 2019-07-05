@@ -198,6 +198,11 @@ public final class Constants {
     public static final String SEMICOLON = ";";
 
     /**
+     * DOT .
+     */
+    public static final String DOT = ".";
+
+    /**
      * ZOOKEEPER_SESSION_TIMEOUT
      */
     public static final String ZOOKEEPER_SESSION_TIMEOUT = "zookeeper.session.timeout";
@@ -251,6 +256,11 @@ public final class Constants {
      * date format of yyyy-MM-dd HH:mm:ss
      */
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
+
+    /**
+     * date format of yyyyMMdd
+     */
+    public static final String YYYYMMDD = "yyyyMMdd";
 
     /**
      * date format of yyyyMMddHHmmss
@@ -827,6 +837,7 @@ public final class Constants {
 
 
     /**
-     *
+     * default worker group id
      */
+    public static final int DEFAULT_WORKER_ID = -1;
 }
