@@ -216,7 +216,7 @@ public class MasterServer implements CommandLineRunner, IStoppable {
                 if(Stopper.isRunning()) {
                     // send heartbeat to zk
                     if (StringUtils.isBlank(zkMasterClient.getMasterZNode())) {
-                        logger.error("master send heartbeat to zk failed");
+                        logger.error("master send heartbeat to zk failed: can't find zookeeper regist path of master server");
                         return;
                     }
 
