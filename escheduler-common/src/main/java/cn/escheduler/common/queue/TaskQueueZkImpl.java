@@ -22,6 +22,7 @@ import cn.escheduler.common.utils.Bytes;
 import cn.escheduler.common.utils.IpUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.zk.AbstractZKClient;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
@@ -157,7 +158,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                     String taskDetail = list.get(i);
                     String[] taskDetailArrs = taskDetail.split(Constants.UNDERLINE);
 
-                    //向前版本兼容
+                    //向前版本兼ProcessInstanceService容
                     if(taskDetailArrs.length >= 4){
 
                         //format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
@@ -166,9 +167,8 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                             String taskHosts = taskDetailArrs[4];
 
                             //task can assign to any worker host if equals default ip value of worker server
-                            if(!taskHosts.equals(Constants.DEFAULT_WORKER_ID)){
+                            if(!taskHosts.equals(String.valueOf(Constants.DEFAULT_WORKER_ID))){
                                 String[] taskHostsArr = taskHosts.split(Constants.COMMA);
-
                                 if(!Arrays.asList(taskHostsArr).contains(workerIpLongStr)){
                                     continue;
                                 }
@@ -210,12 +210,33 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         while(iterator.hasNext()){
             if(j++ < tasksNum){
                 String task = iterator.next();
-                taskslist.add(task);
+
+                taskslist.add(getOriginTaskFormat(task));
             }
         }
         return taskslist;
     }
 
+    /**
+     * format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
+     * processInstanceId and task id need to be convert to int.
+     * @param formatTask
+     * @return
+     */
+    private String getOriginTaskFormat(String formatTask){
+        String[] taskArray = formatTask.split(Constants.UNDERLINE);
+        int processInstanceId = Integer.parseInt(taskArray[1]);
+        int taskId = Integer.parseInt(taskArray[3]);
+        String suffix = "";
+        for(int index =4; index < taskArray.length; index++){
+            suffix += taskArray[index] + Constants.UNDERLINE;
+        }
+        String destTask = String.format("%s_%s_%s_%s", taskArray[0], processInstanceId, taskArray[3], taskId);
+        if(StringUtils.isNotEmpty(suffix)){
+            destTask += Constants.UNDERLINE + suffix;
+        }
+        return destTask;
+    }
 
     @Override
     public void removeNode(String key, String nodeValue){
