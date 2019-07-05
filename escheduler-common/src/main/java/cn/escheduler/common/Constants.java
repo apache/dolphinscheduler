@@ -220,6 +220,11 @@ public final class Constants {
     public static final String SEMICOLON = ";";
 
     /**
+     * DOT .
+     */
+    public static final String DOT = ".";
+
+    /**
      * ZOOKEEPER_SESSION_TIMEOUT
      */
     public static final String ZOOKEEPER_SESSION_TIMEOUT = "zookeeper.session.timeout";
@@ -482,6 +487,8 @@ public final class Constants {
     public static final String TASK_RECORD_USER = "task.record.datasource.username";
 
     public static final String TASK_RECORD_PWD = "task.record.datasource.password";
+
+    public static final String DEFAULT = "Default";
 
     public static  String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
 
@@ -882,6 +889,11 @@ public final class Constants {
      * loginUserFromKeytab user
      */
     public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
+
+    /**
+     * default worker group id
+     */
+    public static final int DEFAULT_WORKER_ID = -1;
 
     /**
      * loginUserFromKeytab path
