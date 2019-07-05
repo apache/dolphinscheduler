@@ -21,7 +21,7 @@
       </div>
     </div>
     <div class="clearfix list">
-      <x-button type="info"  style="margin-left:20px" shape="circle" :loading="spinnerLoading" @click="preview()" v-ps="['GENERAL_USER']">执行时间</x-button>
+      <x-button type="info"  style="margin-left:20px" shape="circle" :loading="spinnerLoading" @click="preview()">执行时间</x-button>
       <div class="text">
         {{$t('Timing')}}
       </div>
@@ -136,7 +136,7 @@
     </div>
     <div class="submit">
       <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : (item.crontab ? $t('Edit') : $t('Create'))}} </x-button>
+      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : (item.crontab ? $t('Edit') : $t('Create'))}} </x-button>
     </div>
   </div>
 </template>
