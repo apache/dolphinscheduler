@@ -158,7 +158,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                     String taskDetail = list.get(i);
                     String[] taskDetailArrs = taskDetail.split(Constants.UNDERLINE);
 
-                    //向前版本兼ProcessInstanceService容
+                    //forward compatibility 向前版本兼容
                     if(taskDetailArrs.length >= 4){
 
                         //format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
@@ -227,15 +227,18 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         String[] taskArray = formatTask.split(Constants.UNDERLINE);
         int processInstanceId = Integer.parseInt(taskArray[1]);
         int taskId = Integer.parseInt(taskArray[3]);
-        String suffix = "";
-        for(int index =4; index < taskArray.length; index++){
-            suffix += taskArray[index] + Constants.UNDERLINE;
-        }
+
+        StringBuilder sb = new StringBuilder(50);
         String destTask = String.format("%s_%s_%s_%s", taskArray[0], processInstanceId, taskArray[3], taskId);
-        if(StringUtils.isNotEmpty(suffix)){
-            destTask += Constants.UNDERLINE + suffix;
+
+        sb.append(destTask);
+
+        if(taskArray.length > 4){
+            for(int index = 4; index < taskArray.length; index++){
+                sb.append(Constants.UNDERLINE).append(taskArray[index]);
+            }
         }
-        return destTask;
+        return sb.toString();
     }
 
     @Override
