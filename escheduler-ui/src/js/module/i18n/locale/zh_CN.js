@@ -237,7 +237,7 @@ export default {
   'Recovery Failed': '恢复失败',
   'Stop': '停止',
   'Pause': '暂停',
-  'Recovery Suspend': '恢复暂停',
+  'Recovery Suspend': '恢复运行',
   'Gantt': '甘特图',
   'Name': '名称',
   'Node Type': '节点类型',
@@ -282,7 +282,7 @@ export default {
   'Start Process': '启动工作流',
   'Execute from the current node': '从当前节点开始执行',
   'Recover tolerance fault process': '恢复被容错的工作流',
-  'Resume the suspension process': '恢复暂停流程',
+  'Resume the suspension process': '恢复运行流程',
   'Execute from the failed nodes': '从失败节点开始执行',
   'Complement Data': '补数',
   'Scheduling execution': '调度执行',
@@ -468,5 +468,8 @@ export default {
   'statistics': '统计',
   'select tenant':'选择租户',
   'Please enter Principal':'请输入Principal',
-  'The start time must not be the same as the end': '开始时间和结束时间不能相同'
+  'The start time must not be the same as the end': '开始时间和结束时间不能相同',
+  'Startup parameter': '启动参数',
+  'Startup type': '启动类型',
+  'Complement range': '补数范围'
 }

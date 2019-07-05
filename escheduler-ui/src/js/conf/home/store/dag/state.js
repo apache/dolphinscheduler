@@ -92,5 +92,8 @@ export default {
   // Process instance list{ view a single record }
   instanceListS: [],
   // Operating state
-  isDetails: false
+  isDetails: false,
+  startup: {
+
+  }
 }

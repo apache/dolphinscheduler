@@ -312,7 +312,11 @@ public abstract class AbstractZKClient {
 				childrenList = zkClient.getChildren().forPath(masterZNodeParentPath);
 			}
 		} catch (Exception e) {
-			logger.warn(e.getMessage(),e);
+//			logger.warn(e.getMessage());
+			if(!e.getMessage().contains("java.lang.IllegalStateException: instance must be started")){
+				logger.warn(e.getMessage(),e);
+			}
+
 			return childrenList.size();
 		}
 		return childrenList.size();

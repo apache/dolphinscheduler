@@ -295,4 +295,19 @@ public class ResourceMapperProvider {
       WHERE("type = #{type} and user_id = #{userId}");
     }}.toString();
   }
+
+  /**
+   * list all resource by type
+   *
+   * @param parameter
+   * @return
+   */
+  public String listAllResourceByType(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("*");
+      FROM(TABLE_NAME);
+      WHERE("type = #{type}");
+    }}.toString();
+  }
+
 }

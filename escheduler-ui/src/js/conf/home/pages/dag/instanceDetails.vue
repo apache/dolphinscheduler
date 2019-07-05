@@ -1,6 +1,7 @@
 <template>
   <div class="home-main index-model">
     <m-variable></m-variable>
+    <m-starting-param></m-starting-param>
     <m-dag v-if="!isLoading" :type="'instance'"></m-dag>
     <m-spin :is-spin="isLoading"></m-spin>
   </div>
@@ -10,6 +11,7 @@
   import { mapActions, mapMutations } from 'vuex'
   import mSpin from '@/module/components/spin/spin'
   import mVariable from './_source/variable'
+  import mStartingParam from './_source/startingParam'
   import Affirm from './_source/jumpAffirm'
   import disabledState from '@/module/mixin/disabledState'
 
@@ -91,6 +93,6 @@
     },
     mounted () {
     },
-    components: { mDag, mSpin, mVariable }
+    components: { mDag, mSpin, mVariable, mStartingParam }
   }
 </script>
