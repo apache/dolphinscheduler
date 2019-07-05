@@ -191,6 +191,16 @@ public class ExecutorService extends BaseService{
             return checkResult;
         }
 
+        // checkTenantExists();
+        Tenant tenant = processDao.getTenantForProcess(processDefinition.getTenantId(),
+                processDefinition.getUserId());
+        if(tenant == null){
+            logger.error("there is not any vaild tenant for the process definition: id:{},name:{}, ",
+                    processDefinition.getId(), processDefinition.getName());
+            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
+            return result;
+        }
+
         switch (executeType) {
             case REPEAT_RUNNING:
                 result = insertCommand(loginUser, processInstanceId, processDefinition.getId(), CommandType.REPEAT_RUNNING);
@@ -260,7 +270,7 @@ public class ExecutorService extends BaseService{
                 }
                 break;
             case RECOVER_SUSPENDED_PROCESS:
-                if (executionStatus.typeIsPause()) {
+                if (executionStatus.typeIsPause()|| executionStatus.typeIsCancel()) {
                     checkResult = true;
                 }
             default:

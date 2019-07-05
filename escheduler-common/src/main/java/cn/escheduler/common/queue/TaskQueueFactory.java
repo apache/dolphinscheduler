@@ -42,7 +42,7 @@ public class TaskQueueFactory {
   public static ITaskQueue getTaskQueueInstance() {
     String queueImplValue = CommonUtils.getQueueImplValue();
     if (StringUtils.isNotBlank(queueImplValue)) {
-//      queueImplValue = StringUtils.trim(queueImplValue);
+//      queueImplValue = IpUtils.trim(queueImplValue);
 
 //      if (SCHEDULER_QUEUE_REDIS_IMPL.equals(queueImplValue)) {
 //        logger.info("task queue impl use reids ");
