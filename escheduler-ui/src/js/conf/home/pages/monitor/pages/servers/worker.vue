@@ -6,7 +6,7 @@
           <div class="row-title">
             <div class="left">
               <span class="sp">IP: {{item.host}}</span>
-              <span class="sp">{{$t('Port')}}: {{item.port}}</span>
+              <span class="sp">{{$t('Process Pid')}}: {{item.port}}</span>
               <span class="sp">{{$t('Zk registration directory')}}: {{item.zkDirectory}}</span>
             </div>
             <div class="right">

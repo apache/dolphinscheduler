@@ -16,10 +16,9 @@
  */
 package cn.escheduler.alert.utils;
 
+import com.alibaba.fastjson.JSON;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.alibaba.fastjson.JSON;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -33,24 +32,23 @@ import java.util.Collection;
  *   enterprise.wechat.token.url
  *   enterprise.wechat.push.url
  *   enterprise.wechat.send.msg
+ *   enterprise.wechat.agent.id
+ *   enterprise.wechat.users
  */
 public class EnterpriseWeChatUtilsTest {
 
+    private String agentId = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_AGENT_ID); // app id
+    private Collection<String> listUserId = Arrays.asList(PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_USERS).split(","));
+
     // Please change
-    private String agentId = "1000002"; // app id
     private String partyId = "2";
     private Collection<String> listPartyId = Arrays.asList("2","4");
-    private String userId = "test1";
-    private Collection<String> listUserId = Arrays.asList("test1","test2");
-
     @Test
     public void testSendSingleTeamWeChat() {
-        EnterpriseWeChatUtils wx = new EnterpriseWeChatUtils();
-
         try {
-            String token = wx.getToken();
-            String msg = wx.makeTeamSendMsg(partyId, agentId, "hello world");
-            String resp = wx.sendQiyeWeixin("utf-8", msg, token);
+            String token = EnterpriseWeChatUtils.getToken();
+            String msg = EnterpriseWeChatUtils.makeTeamSendMsg(partyId, agentId, "hello world");
+            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 
             String errmsg = JSON.parseObject(resp).getString("errmsg");
             Assert.assertEquals(errmsg, "ok");
@@ -61,12 +59,11 @@ public class EnterpriseWeChatUtilsTest {
 
     @Test
     public void testSendMultiTeamWeChat() {
-        EnterpriseWeChatUtils wx = new EnterpriseWeChatUtils();
 
         try {
-            String token = wx.getToken();
-            String msg = wx.makeTeamSendMsg(listPartyId, agentId, "hello world");
-            String resp = wx.sendQiyeWeixin("utf-8", msg, token);
+            String token = EnterpriseWeChatUtils.getToken();
+            String msg = EnterpriseWeChatUtils.makeTeamSendMsg(listPartyId, agentId, "hello world");
+            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 
             String errmsg = JSON.parseObject(resp).getString("errmsg");
             Assert.assertEquals(errmsg, "ok");
@@ -77,12 +74,23 @@ public class EnterpriseWeChatUtilsTest {
 
     @Test
     public void testSendSingleUserWeChat() {
-        EnterpriseWeChatUtils wx = new EnterpriseWeChatUtils();
-
         try {
-            String token = wx.getToken();
-            String msg = wx.makeUserSendMsg(userId, agentId, "hello world");
-            String resp = wx.sendQiyeWeixin("utf-8", msg, token);
+            String token = EnterpriseWeChatUtils.getToken();
+            String msg = EnterpriseWeChatUtils.makeUserSendMsg(listUserId.stream().findFirst().get(), agentId, "您的会议室已经预定，稍后会同步到`邮箱` \n" +
+                    ">**事项详情** \n" +
+                    ">事　项：<font color='info'>开会</font> <br>" +
+                    ">组织者：@miglioguan \n" +
+                    ">参与者：@miglioguan、@kunliu、@jamdeezhou、@kanexiong、@kisonwang \n" +
+                    "> \n" +
+                    ">会议室：<font color='info'>广州TIT 1楼 301</font> \n" +
+                    ">日　期：<font color='warning'>2018年5月18日</font> \n" +
+                    ">时　间：<font color='comment'>上午9:00-11:00</font> \n" +
+                    "> \n" +
+                    ">请准时参加会议。 \n" +
+                    "> \n" +
+                    ">如需修改会议信息，请点击：[修改会议信息](https://work.weixin.qq.com)\"");
+
+            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 
             String errmsg = JSON.parseObject(resp).getString("errmsg");
             Assert.assertEquals(errmsg, "ok");
@@ -93,12 +101,11 @@ public class EnterpriseWeChatUtilsTest {
 
     @Test
     public void testSendMultiUserWeChat() {
-        EnterpriseWeChatUtils wx = new EnterpriseWeChatUtils();
-
         try {
-            String token = wx.getToken();
-            String msg = wx.makeUserSendMsg(listUserId, agentId, "hello world");
-            String resp = wx.sendQiyeWeixin("utf-8", msg, token);
+            String token = EnterpriseWeChatUtils.getToken();
+
+            String msg = EnterpriseWeChatUtils.makeUserSendMsg(listUserId, agentId, "hello world");
+            String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 
             String errmsg = JSON.parseObject(resp).getString("errmsg");
             Assert.assertEquals(errmsg, "ok");
