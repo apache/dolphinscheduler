@@ -93,7 +93,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         if (StringUtils.isEmpty(pythonHome)){
             return PYTHON;
         }
-        return pythonHome + Constants.SINGLE_SLASH +PYTHON;
+        return pythonHome;
     }
 
     @Override
