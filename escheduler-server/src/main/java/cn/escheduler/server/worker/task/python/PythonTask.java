@@ -112,14 +112,14 @@ public class PythonTask extends AbstractTask {
    */
   private String buildCommand() throws Exception {
     // generate scripts
-    String fileName = String.format("%s/py_%s_node.py", taskDir, taskProps.getTaskAppId());
-    Path path = new File(fileName).toPath();
+//    String fileName = String.format("%s/py_%s_node.py", taskDir, taskProps.getTaskAppId());
+//    Path path = new File(fileName).toPath();
 
 
 
-    if (Files.exists(path)) {
-      return fileName;
-    }
+//    if (Files.exists(path)) {
+//      return fileName;
+//    }
 
     String rawScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
 
@@ -140,19 +140,20 @@ public class PythonTask extends AbstractTask {
     }
 
 
-    pythonParameters.setRawScript(rawScript);
+//    pythonParameters.setRawScript(rawScript);
 
     logger.info("raw script : {}", pythonParameters.getRawScript());
     logger.info("task dir : {}", taskDir);
 
-    Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");
-    FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-
-    Files.createFile(path, attr);
-
-    Files.write(path, pythonParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
-
-    return fileName;
+//    Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");
+//    FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+//
+//    Files.createFile(path, attr);
+//
+//    Files.write(path, pythonParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
+//
+//    return fileName;
+    return rawScript;
   }
 
   @Override
