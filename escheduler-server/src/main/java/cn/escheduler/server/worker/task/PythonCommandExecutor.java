@@ -18,6 +18,7 @@ package cn.escheduler.server.worker.task;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.FileUtils;
+import cn.escheduler.common.utils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,11 +72,11 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         if (!Files.exists(Paths.get(commandFile))) {
             logger.info("generate command file:{}", commandFile);
 
-            StringBuilder sb = new StringBuilder(200);
+            StringBuilder sb = new StringBuilder();
             sb.append("#-*- encoding=utf8 -*-\n");
 
             sb.append("\n\n");
-            sb.append(String.format("import py_%s_node\n",taskAppId));
+            sb.append(execCommand);
             logger.info(sb.toString());
 
             // write data to file
@@ -86,13 +87,13 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String commandType() {
 
-        String envPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH + "conf"+
-                Constants.SINGLE_SLASH +"env" + Constants.SINGLE_SLASH + Constants.ESCHEDULER_ENV_SH;
+        String envPath = PropertyUtils.getString(Constants.ESCHEDULER_ENV_PATH);
+
         String pythonHome = getPythonHome(envPath);
         if (StringUtils.isEmpty(pythonHome)){
             return PYTHON;
         }
-        return pythonHome;
+        return pythonHome + Constants.SINGLE_SLASH +PYTHON;
     }
 
     @Override
