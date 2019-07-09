@@ -241,10 +241,10 @@ export default {
     return new Promise((resolve, reject) => {
       io.get(`tenant/list`, payload, res => {
         let list=res.data
-        // list.unshift({
-        //   id: -1,
-        //   tenantName: 'Default'
-        // })
+        list.unshift({
+          id: -1,
+          tenantName: 'Default'
+        })
         state.tenantAllList = list
         resolve(list)
       }).catch(e => {
