@@ -61,10 +61,4 @@ public class IpUtils {
     return sb.toString();
   }
 
-
-
-  public static void main(String[] args){
-    long ipLong = ipToLong("11.3.4.5");
-    logger.info(longToIp(ipLong));
-  }
 }

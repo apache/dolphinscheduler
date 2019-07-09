@@ -20,8 +20,6 @@ public class ZookeeperMonitorUtilsTest {
 
         List<MasterServer> workerServerList = zookeeperMonitor.getWorkerServers();
 
-        System.out.println("master:" + masterServerList);
-        System.out.println("worker:" + workerServerList);
         Assert.assertEquals(masterServerList.size(), 1);
         Assert.assertEquals(workerServerList.size(), 1);
 
