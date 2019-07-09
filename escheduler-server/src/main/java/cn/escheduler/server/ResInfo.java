@@ -17,8 +17,12 @@
 package cn.escheduler.server;
 
 import cn.escheduler.common.Constants;
+import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.common.utils.OSUtils;
+import cn.escheduler.dao.model.MasterServer;
+
+import java.util.Date;
 
 /**
  *  heartbeat for ZK reigster res info
@@ -117,6 +121,27 @@ public class ResInfo {
                 + memoryUsage + Constants.COMMA
                 + createTime + Constants.COMMA
                 + lastHeartbeatTime;
+    }
+
+    /**
+     * parse heartbeat info for zk
+     * @param heartBeatInfo
+     * @return
+     */
+    public static MasterServer parseHeartbeatForZKInfo(String heartBeatInfo){
+        MasterServer masterServer =  null;
+        String[] masterArray = heartBeatInfo.split(Constants.COMMA);
+        if(masterArray.length != 6){
+            return masterServer;
+
+        }
+        masterServer = new MasterServer();
+        masterServer.setHost(masterArray[0]);
+        masterServer.setPort(Integer.parseInt(masterArray[1]));
+        masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[2]), Double.parseDouble(masterArray[3])));
+        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[4]));
+        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[5]));
+        return masterServer;
     }
 
 }

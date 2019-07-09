@@ -448,45 +448,6 @@ public class ZKMasterClient extends AbstractZKClient {
 	}
 
 
-	/**
-	 *  get master lock path
-	 * @return
-	 */
-	public String getMasterLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_MASTERS);
-	}
-
-	/**
-	 *  get master start up lock path
-	 * @return
-	 */
-	public String getMasterStartUpLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS);
-	}
-
-	/**
-	 *  get master failover lock path
-	 * @return
-	 */
-	public String getMasterFailoverLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_MASTERS);
-	}
-
-	/**
-	 * get worker failover lock path
-	 * @return
-	 */
-	public String getWorkerFailoverLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_WORKERS);
-	}
-
-	/**
-	 *  get zkclient
-	 * @return
-	 */
-	public  CuratorFramework getZkClient() {
-		return zkClient;
-	}
 
 
 	/**
