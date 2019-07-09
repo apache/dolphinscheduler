@@ -66,7 +66,7 @@ public class MonitorController extends BaseController{
         logger.info("login user: {}, query all master", loginUser.getUserName());
         try{
             logger.info("list master, user:{}", loginUser.getUserName());
-            Map<String, Object> result = serverService.queryMaster(loginUser);
+            Map<String, Object> result = monitorService.queryMaster(loginUser);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(LIST_MASTERS_ERROR.getMsg(),e);
@@ -86,7 +86,7 @@ public class MonitorController extends BaseController{
     public Result listWorker(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login user: {}, query all workers", loginUser.getUserName());
         try{
-            Map<String, Object> result = serverService.queryWorker(loginUser);
+            Map<String, Object> result = monitorService.queryWorker(loginUser);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(LIST_WORKERS_ERROR.getMsg(),e);
