@@ -184,7 +184,10 @@
       _getTenantList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('security/getTenantList').then(res => {
-            this.tenantList = _.map(res, v => {
+            let arr = _.filter(res, (o) => {
+              return o.id !== -1
+            })
+            this.tenantList = _.map(arr, v => {
               return {
                 id: v.id,
                 code: v.tenantName
