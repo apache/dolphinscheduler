@@ -489,6 +489,8 @@ public final class Constants {
     public static final String TASK_RECORD_PWD = "task.record.datasource.password";
 
     public static final String DEFAULT = "Default";
+    public static final String PASSWORD = "password";
+    public static final String XXXXXX = "xxxxxx";
 
     public static  String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
 
