@@ -102,6 +102,16 @@ public class ResInfo {
     }
 
 
+    public static String getHeartBeatInfo(Date now){
+        return buildHeartbeatForZKInfo(OSUtils.getHost(),
+                OSUtils.getProcessID(),
+                OSUtils.cpuUsage(),
+                OSUtils.memoryUsage(),
+                DateUtils.dateToString(now),
+                DateUtils.dateToString(now));
+
+    }
+
     /**
      * build heartbeat info for zk
      * @param host
