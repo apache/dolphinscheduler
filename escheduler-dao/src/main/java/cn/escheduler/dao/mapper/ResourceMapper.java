@@ -274,5 +274,21 @@ public interface ResourceMapper {
     @SelectProvider(type = ResourceMapperProvider.class, method = "queryTenantCodeByResourceName")
     String queryTenantCodeByResourceName(@Param("resName") String  resName);
 
-
+  /**
+   * query resource list that the appointed user has permission
+   * @param type
+   * @return
+   */
+  @Results(value = {@Result(property = "id", column = "id", id = true, javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "alias", column = "alias", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "fileName", column = "file_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+          @Result(property = "userId", column = "user_id", javaType = int.class, jdbcType = JdbcType.INTEGER),
+          @Result(property = "type", column = "type", typeHandler = EnumOrdinalTypeHandler.class, javaType = ResourceType.class, jdbcType = JdbcType.TINYINT),
+          @Result(property = "size", column = "size", javaType = Long.class, jdbcType = JdbcType.BIGINT),
+          @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+          @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
+  })
+  @SelectProvider(type = ResourceMapperProvider.class, method = "listAllResourceByType")
+  List<Resource> listAllResourceByType(@Param("type") Integer type);
 }
