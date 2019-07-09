@@ -16,7 +16,7 @@
         <div class="col-md-3">
           <div class="text-num-model text">
             <div class="title">
-              <span >{{$t('failure command number')}}}</span>
+              <span >{{$t('failure command number')}}</span>
             </div>
             <div class="value-p">
               <b :style="{color:color[1]}"> {{commandCountData.errorCount}}</b>
