@@ -144,6 +144,7 @@ singleYarnIp="ark1"
 hdfsPath="/escheduler"
 
 # 拥有在hdfs根路径/下创建目录权限的用户
+# 注意：如果开启了kerberos，则直接hdfsRootUser=，就可以
 hdfsRootUser="hdfs"
 
 # common 配置
