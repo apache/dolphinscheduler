@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>escheduler</artifactId>
 		<groupId>cn.analysys</groupId>
-		<version>1.0.3-SNAPSHOT</version>
+		<version>1.0.4-SNAPSHOT</version>
 	</parent>
 	<artifactId>escheduler-server</artifactId>
 	<name>escheduler-server</name>
@@ -89,7 +89,7 @@
 			<artifactId>escheduler-alert</artifactId>
 		</dependency>
 
-	</dependencies>
+    </dependencies>
 
 
 	<build>

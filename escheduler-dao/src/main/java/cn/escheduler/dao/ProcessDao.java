@@ -25,6 +25,7 @@ import cn.escheduler.common.queue.ITaskQueue;
 import cn.escheduler.common.queue.TaskQueueFactory;
 import cn.escheduler.common.task.subprocess.SubProcessParameters;
 import cn.escheduler.common.utils.DateUtils;
+import cn.escheduler.common.utils.IpUtils;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.mapper.*;
@@ -110,7 +111,7 @@ public class ProcessDao extends AbstractBaseDao {
      */
     @Override
     protected void init() {
-        userMapper=getMapper(UserMapper.class);
+        userMapper = getMapper(UserMapper.class);
         processDefineMapper = getMapper(ProcessDefinitionMapper.class);
         processInstanceMapper = getMapper(ProcessInstanceMapper.class);
         dataSourceMapper = getMapper(DataSourceMapper.class);
@@ -976,11 +977,58 @@ public class ProcessDao extends AbstractBaseDao {
      *
      * 流程实例优先级_流程实例id_任务优先级_任务id       high <- low
      *
-     * @param task
+     * @param taskInstance
      * @return
      */
-    private String taskZkInfo(TaskInstance task) {
-        return String.valueOf(task.getProcessInstancePriority().ordinal()) + Constants.UNDERLINE + task.getProcessInstanceId() + Constants.UNDERLINE + task.getTaskInstancePriority().ordinal() + Constants.UNDERLINE + task.getId();
+    private String taskZkInfo(TaskInstance taskInstance) {
+
+        int taskWorkerGroupId = getTaskWorkerGroupId(taskInstance);
+
+        StringBuilder sb = new StringBuilder(100);
+
+        sb.append(taskInstance.getProcessInstancePriority().ordinal()).append(Constants.UNDERLINE)
+                .append(taskInstance.getProcessInstanceId()).append(Constants.UNDERLINE)
+                .append(taskInstance.getTaskInstancePriority().ordinal()).append(Constants.UNDERLINE)
+                .append(taskInstance.getId()).append(Constants.UNDERLINE);
+
+        if(taskWorkerGroupId > 0){
+            //not to find data from db
+            WorkerGroup workerGroup = queryWorkerGroupById(taskWorkerGroupId);
+            if(workerGroup == null ){
+                logger.info("task {} cannot find the worker group, use all worker instead.", taskInstance.getId());
+
+                sb.append(Constants.DEFAULT_WORKER_ID);
+                return sb.toString();
+            }
+
+            String ips = workerGroup.getIpList();
+
+            if(StringUtils.isBlank(ips)){
+                logger.error("task:{} worker group:{} parameters(ip_list) is null, this task would be running on all workers",
+                        taskInstance.getId(), workerGroup.getId());
+                sb.append(Constants.DEFAULT_WORKER_ID);
+                return sb.toString();
+            }
+
+            StringBuilder ipSb = new StringBuilder(100);
+            String[] ipArray = ips.split(COMMA);
+
+            for (String ip : ipArray) {
+               long ipLong = IpUtils.ipToLong(ip);
+                ipSb.append(ipLong).append(COMMA);
+            }
+
+            if(ipSb.length() > 0) {
+                ipSb.deleteCharAt(ipSb.length() - 1);
+            }
+
+            sb.append(ipSb);
+        }else{
+            sb.append(Constants.DEFAULT_WORKER_ID);
+        }
+
+
+        return  sb.toString();
     }
 
     /**
@@ -1633,6 +1681,25 @@ public class ProcessDao extends AbstractBaseDao {
         return workerGroupMapper.queryById(workerGroupId);
     }
 
+
+    /**
+     * get task worker group id
+     *
+     * @param taskInstance
+     * @return
+     */
+    public int getTaskWorkerGroupId(TaskInstance taskInstance) {
+        int taskWorkerGroupId = taskInstance.getWorkerGroupId();
+        ProcessInstance processInstance = findProcessInstanceByTaskId(taskInstance.getId());
+        if(processInstance == null){
+            logger.error("cannot find the task:{} process instance", taskInstance.getId());
+            return Constants.DEFAULT_WORKER_ID;
+        }
+        int processWorkerGroupId = processInstance.getWorkerGroupId();
+
+        taskWorkerGroupId = (taskWorkerGroupId <= 0 ? processWorkerGroupId : taskWorkerGroupId);
+        return taskWorkerGroupId;
+    }
 
 
 }

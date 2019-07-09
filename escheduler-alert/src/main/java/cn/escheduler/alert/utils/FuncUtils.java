@@ -14,27 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.common.enums;
+package cn.escheduler.alert.utils;
 
-/**
- * task node type
- */
-public enum TaskType {
-    /**
-     * 0 SHELL
-     * 1 SQL
-     * 2 SUB_PROCESS
-     * 3 PROCEDURE
-     * 4 MR
-     * 5 SPARK
-     * 6 PYTHON
-     * 7 DEPENDENT
-     */
-    SHELL,SQL, SUB_PROCESS,PROCEDURE,MR,SPARK,PYTHON,DEPENDENT;
+public class FuncUtils {
 
-    public static boolean typeIsNormalTask(String typeName) {
-        TaskType taskType = TaskType.valueOf(typeName);
-        return !(taskType == TaskType.SUB_PROCESS || taskType == TaskType.DEPENDENT);
+    static public String mkString(Iterable<String> list, String split) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String item : list) {
+            if (first)
+                first = false;
+            else
+                sb.append(split);
+            sb.append(item);
+        }
+        return sb.toString();
     }
 
 }
