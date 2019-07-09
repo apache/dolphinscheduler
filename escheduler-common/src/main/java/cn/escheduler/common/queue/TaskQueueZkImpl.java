@@ -151,7 +151,27 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                 int size = list.size();
 
 
-                Set<String> taskTreeSet = new TreeSet<>();
+                Set<String> taskTreeSet = new TreeSet<>(new Comparator<String>() {
+                    @Override
+                    public int compare(String o1, String o2) {
+
+                        String s1 = o1;
+                        String s2 = o2;
+                        String[] s1Array = s1.split(Constants.UNDERLINE);
+                        if(s1Array.length>4){
+                            // warning: if this length > 5, need to be changed
+                            s1 = s1.substring(0, s1.lastIndexOf(Constants.UNDERLINE) );
+                        }
+
+                        String[] s2Array = s2.split(Constants.UNDERLINE);
+                        if(s2Array.length>4){
+                            // warning: if this length > 5, need to be changed
+                            s2 = s2.substring(0, s2.lastIndexOf(Constants.UNDERLINE) );
+                        }
+
+                        return s1.compareTo(s2);
+                    }
+                });
 
                 for (int i = 0; i < size; i++) {
 
@@ -173,8 +193,8 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                                     continue;
                                 }
                             }
+                            formatTask += Constants.UNDERLINE + taskDetailArrs[4];
                         }
-
                         taskTreeSet.add(formatTask);
 
                     }
@@ -229,7 +249,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         int taskId = Integer.parseInt(taskArray[3]);
 
         StringBuilder sb = new StringBuilder(50);
-        String destTask = String.format("%s_%s_%s_%s", taskArray[0], processInstanceId, taskArray[3], taskId);
+        String destTask = String.format("%s_%s_%s_%s", taskArray[0], processInstanceId, taskArray[2], taskId);
 
         sb.append(destTask);
 
