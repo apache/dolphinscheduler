@@ -254,11 +254,6 @@
 
                 this.store.dispatch(api, searchParams).then(res => {
                   this.previewTimes = res
-                  if (this.previewTimes.length) {
-                    resolve()
-                  } else {
-                    reject(new Error(0))
-                  }
                 })
               }
             },
