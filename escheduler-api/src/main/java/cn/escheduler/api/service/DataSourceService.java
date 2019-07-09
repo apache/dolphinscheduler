@@ -67,14 +67,10 @@ public class DataSourceService extends BaseService{
     public static final String PASSWORD = cn.escheduler.common.Constants.PASSWORD;
     public static final String OTHER = "other";
 
-    @Autowired
-    private ProjectMapper projectMapper;
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
 
-    @Autowired
-    private ProjectService projectService;
 
     @Autowired
     private DatasourceUserMapper datasourceUserMapper;
