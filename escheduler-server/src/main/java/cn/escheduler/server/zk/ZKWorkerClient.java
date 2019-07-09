@@ -264,16 +264,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 		return workerZNode;
 	}
 
-
-	/**
-	 *  get zkclient
-	 * @return
-	 */
-	public  CuratorFramework getZkClient() {
-		return zkClient;
-	}
-
-
 	/**
 	 *  get worker lock path
 	 * @return

@@ -84,8 +84,6 @@ public class TaskQueueImplTest {
             return;
         }
 
-        String node2 = tasks.get(0);
-
     }
 
 
