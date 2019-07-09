@@ -567,6 +567,11 @@ public class SchedulerService extends BaseService {
 
         Date startTime = now.after(scheduleParam.getStartTime()) ? now : scheduleParam.getStartTime();
         Date endTime = scheduleParam.getEndTime();
+        if (DateUtils.differSec(scheduleParam.getStartTime(),scheduleParam.getEndTime()) == 0) {
+            logger.warn("The start time must not be the same as the end");
+            putMsg(result,Status.SCHEDULE_START_TIME_END_TIME_SAME);
+            return result;
+        }
         try {
             cronExpression = CronUtils.parse2CronExpression(scheduleParam.getCrontab());
         } catch (ParseException e) {
