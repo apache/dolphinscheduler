@@ -22,10 +22,11 @@ public class FuncUtils {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (String item : list) {
-            if (first)
+            if (first) {
                 first = false;
-            else
+            } else {
                 sb.append(split);
+            }
             sb.append(item);
         }
         return sb.toString();
