@@ -22,6 +22,7 @@ import cn.escheduler.common.utils.Bytes;
 import cn.escheduler.common.utils.IpUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.zk.AbstractZKClient;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
@@ -157,7 +158,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                     String taskDetail = list.get(i);
                     String[] taskDetailArrs = taskDetail.split(Constants.UNDERLINE);
 
-                    //向前版本兼容
+                    //forward compatibility 向前版本兼容
                     if(taskDetailArrs.length >= 4){
 
                         //format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
@@ -209,17 +210,36 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         while(iterator.hasNext()){
             if(j++ < tasksNum){
                 String task = iterator.next();
-                String[] taskArray = task.split(Constants.UNDERLINE);
-                int processInstanceId = Integer.parseInt(taskArray[1]);
-                int taskId = Integer.parseInt(taskArray[3]);
-                String destTask = taskArray[0]+Constants.UNDERLINE + processInstanceId + Constants.UNDERLINE
-                        + taskArray[2] + Constants.UNDERLINE + taskId;
-                taskslist.add(destTask);
+
+                taskslist.add(getOriginTaskFormat(task));
             }
         }
         return taskslist;
     }
 
+    /**
+     * format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
+     * processInstanceId and task id need to be convert to int.
+     * @param formatTask
+     * @return
+     */
+    private String getOriginTaskFormat(String formatTask){
+        String[] taskArray = formatTask.split(Constants.UNDERLINE);
+        int processInstanceId = Integer.parseInt(taskArray[1]);
+        int taskId = Integer.parseInt(taskArray[3]);
+
+        StringBuilder sb = new StringBuilder(50);
+        String destTask = String.format("%s_%s_%s_%s", taskArray[0], processInstanceId, taskArray[3], taskId);
+
+        sb.append(destTask);
+
+        if(taskArray.length > 4){
+            for(int index = 4; index < taskArray.length; index++){
+                sb.append(Constants.UNDERLINE).append(taskArray[index]);
+            }
+        }
+        return sb.toString();
+    }
 
     @Override
     public void removeNode(String key, String nodeValue){

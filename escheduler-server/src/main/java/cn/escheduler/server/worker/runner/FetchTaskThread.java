@@ -153,7 +153,7 @@ public class FetchTaskThread implements Runnable{
                                 }
 
                                 String[] taskStringArray = taskQueueStr.split(Constants.UNDERLINE);
-                                String taskInstIdStr = taskStringArray[taskStringArray.length - 1];
+                                String taskInstIdStr = taskStringArray[3];
                                 Date now = new Date();
                                 Integer taskId = Integer.parseInt(taskInstIdStr);
 

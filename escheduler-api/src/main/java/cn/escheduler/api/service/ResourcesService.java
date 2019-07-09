@@ -369,7 +369,12 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
 
         Map<String, Object> result = new HashMap<>(5);
-        List<Resource> resourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), type.ordinal());
+        List<Resource> resourceList;
+        if(isAdmin(loginUser)){
+            resourceList = resourcesMapper.listAllResourceByType(type.ordinal());
+        }else{
+            resourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), type.ordinal());
+        }
         result.put(Constants.DATA_LIST, resourceList);
         putMsg(result,Status.SUCCESS);
 
