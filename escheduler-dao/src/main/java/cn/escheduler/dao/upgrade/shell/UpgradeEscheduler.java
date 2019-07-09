@@ -30,7 +30,7 @@ public class UpgradeEscheduler {
 		EschedulerManager eschedulerManager = new EschedulerManager();
 		try {
 			eschedulerManager.upgradeEscheduler();
-			logger.info("upgrade escheduler finished");
+			logger.info("upgrade escheduler success");
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			logger.info("Upgrade escheduler failed");
