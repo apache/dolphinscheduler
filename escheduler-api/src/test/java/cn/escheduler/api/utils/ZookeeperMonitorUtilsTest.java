@@ -4,11 +4,8 @@ import cn.escheduler.dao.model.MasterServer;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.crypto.MacSpi;
 
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class ZookeeperMonitorUtilsTest {
 
