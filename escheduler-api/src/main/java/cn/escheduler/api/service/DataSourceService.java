@@ -17,16 +17,14 @@
 package cn.escheduler.api.service;
 
 import cn.escheduler.api.enums.Status;
-import cn.escheduler.api.utils.CheckUtils;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.DbType;
-import cn.escheduler.common.enums.ResUploadType;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.job.db.*;
 import cn.escheduler.common.utils.CommonUtils;
-import cn.escheduler.common.utils.PropertyUtils;
+import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.mapper.DataSourceMapper;
 import cn.escheduler.dao.mapper.DatasourceUserMapper;
 import cn.escheduler.dao.mapper.ProjectMapper;
@@ -48,7 +46,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.*;
 
-import static cn.escheduler.common.utils.PropertyUtils.getBoolean;
 import static cn.escheduler.common.utils.PropertyUtils.getString;
 
 /**
@@ -67,7 +64,7 @@ public class DataSourceService extends BaseService{
     public static final String PRINCIPAL = "principal";
     public static final String DATABASE = "database";
     public static final String USER_NAME = "userName";
-    public static final String PASSWORD = "password";
+    public static final String PASSWORD = cn.escheduler.common.Constants.PASSWORD;
     public static final String OTHER = "other";
 
     @Autowired
@@ -296,12 +293,36 @@ public class DataSourceService extends BaseService{
      * @return
      */
     private List<DataSource> getDataSources(User loginUser, String searchVal, Integer pageSize, PageInfo pageInfo) {
+        List<DataSource> dataSourceList = null;
         if (isAdmin(loginUser)) {
-            return dataSourceMapper.queryAllDataSourcePaging(searchVal, pageInfo.getStart(), pageSize);
+            dataSourceList = dataSourceMapper.queryAllDataSourcePaging(searchVal, pageInfo.getStart(), pageSize);
+        }else{
+            dataSourceList = dataSourceMapper.queryDataSourcePaging(loginUser.getId(), searchVal,
+                    pageInfo.getStart(), pageSize);
         }
-        return dataSourceMapper.queryDataSourcePaging(loginUser.getId(), searchVal,
-                pageInfo.getStart(), pageSize);
+
+        handlePasswd(dataSourceList);
+
+        return dataSourceList;
     }
+
+
+    /**
+     * handle datasource connection password for safety
+     * @param dataSourceList
+     */
+    private void handlePasswd(List<DataSource> dataSourceList) {
+
+        for (DataSource dataSource : dataSourceList) {
+
+            String connectionParams  = dataSource.getConnectionParams();
+            JSONObject  object = JSONObject.parseObject(connectionParams);
+            object.put(cn.escheduler.common.Constants.PASSWORD, cn.escheduler.common.Constants.XXXXXX);
+            dataSource.setConnectionParams(JSONUtils.toJson(object));
+
+        }
+    }
+
 
     /**
      * get datasource total num
@@ -660,13 +681,13 @@ public class DataSourceService extends BaseService{
      */
     private String[] getHostsAndPort(String address) {
         String[] result = new String[2];
-        String[] tmpArray = address.split("//");
+        String[] tmpArray = address.split(cn.escheduler.common.Constants.DOUBLE_SLASH);
         String hostsAndPorts = tmpArray[tmpArray.length - 1];
-        StringBuilder hosts = new StringBuilder("");
-        String[] hostPortArray = hostsAndPorts.split(",");
-        String port = hostPortArray[0].split(":")[1];
+        StringBuilder hosts = new StringBuilder();
+        String[] hostPortArray = hostsAndPorts.split(cn.escheduler.common.Constants.COMMA);
+        String port = hostPortArray[0].split(cn.escheduler.common.Constants.COLON)[1];
         for (String hostPort : hostPortArray) {
-            hosts.append(hostPort.split(":")[0]).append(",");
+            hosts.append(hostPort.split(cn.escheduler.common.Constants.COLON)[0]).append(cn.escheduler.common.Constants.COMMA);
         }
         hosts.deleteCharAt(hosts.length() - 1);
         result[0] = hosts.toString();
