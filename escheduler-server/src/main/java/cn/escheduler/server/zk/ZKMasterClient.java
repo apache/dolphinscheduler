@@ -204,7 +204,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			}
 
 			// specify the format of stored data in ZK nodes
-			String heartbeatZKInfo = getOsInfo(now);
+			String heartbeatZKInfo = ResInfo.getHeartBeatInfo(now);
 			// create temporary sequence nodes for master znode
 			masterZNode = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(
 					masterZNodeParentPath + "/" + OSUtils.getHost() + "_", heartbeatZKInfo.getBytes());
@@ -259,10 +259,10 @@ public class ZKMasterClient extends AbstractZKClient {
 			return false;
 		}
 
-		List<String> masterZNodeList = null;
-        masterZNodeList = zkClient.getChildren().forPath(path);
-		if (CollectionUtils.isNotEmpty(masterZNodeList)){
-            for (String masterZNode : masterZNodeList){
+		List<String> serverList = null;
+        serverList = zkClient.getChildren().forPath(path);
+		if (CollectionUtils.isNotEmpty(serverList)){
+            for (String masterZNode : serverList){
                 if (masterZNode.startsWith(host)){
                     return true;
                 }
@@ -423,22 +423,6 @@ public class ZKMasterClient extends AbstractZKClient {
 
 	}
 
-
-	/**
-	 * get os info
-	 * @param now
-	 * @return
-	 */
-	private String getOsInfo(Date now) {
-		return ResInfo.buildHeartbeatForZKInfo(OSUtils.getHost(),
-				OSUtils.getProcessID(),
-				OSUtils.cpuUsage(),
-				OSUtils.memoryUsage(),
-				DateUtils.dateToString(now),
-				DateUtils.dateToString(now));
-	}
-
-
 	/**
 	 *  get master znode
 	 * @return
@@ -541,7 +525,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	}
 
 	/**
-	 *  get host ip
+	 *  get host ip, string format: masterParentPath/ip_000001/value
 	 * @param path
 	 * @return
 	 */

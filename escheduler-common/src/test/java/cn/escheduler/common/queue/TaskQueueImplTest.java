@@ -20,13 +20,11 @@ import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.IpUtils;
 import cn.escheduler.common.utils.OSUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 

@@ -116,11 +116,10 @@ public class ZKWorkerClient extends AbstractZKClient {
 
 	public String initWorkZNode() throws Exception {
 
-		Date now = new Date();
-		String heartbeatZKInfo = getOsInfo(now);
-
+		String heartbeatZKInfo = ResInfo.getHeartBeatInfo(new Date());
 
 		workerZNode = workerZNodeParentPath + "/" + OSUtils.getHost() + "_";
+
 		workerZNode = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(workerZNode,
 				heartbeatZKInfo.getBytes());
 		logger.info("register worker node {} success", workerZNode);
@@ -140,7 +139,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 			// encapsulation worker znnode
 			workerZNode = workerZNodeParentPath + "/" + OSUtils.getHost() + "_";
 			List<String> workerZNodeList = zkClient.getChildren().forPath(workerZNodeParentPath);
-
 
 			if (CollectionUtils.isNotEmpty(workerZNodeList)){
 				boolean flag = false;
@@ -240,21 +238,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 		}
 
 	}
-
-	/**
-	 * get os info
-	 * @param now
-	 * @return
-	 */
-	private String getOsInfo(Date now) {
-		return ResInfo.buildHeartbeatForZKInfo(OSUtils.getHost(),
-				OSUtils.getProcessID(),
-				OSUtils.cpuUsage(),
-				OSUtils.memoryUsage(),
-				DateUtils.dateToString(now),
-				DateUtils.dateToString(now));
-	}
-
 
 	/**
 	 * get worker znode
