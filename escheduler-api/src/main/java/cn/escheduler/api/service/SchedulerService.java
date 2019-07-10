@@ -119,6 +119,11 @@ public class SchedulerService extends BaseService {
         scheduleObj.setProcessDefinitionName(processDefinition.getName());
 
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
+        if (DateUtils.differSec(scheduleParam.getStartTime(),scheduleParam.getEndTime()) == 0) {
+            logger.warn("The start time must not be the same as the end");
+            putMsg(result,Status.SCHEDULE_START_TIME_END_TIME_SAME);
+            return result;
+        }
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
         if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
@@ -205,6 +210,11 @@ public class SchedulerService extends BaseService {
         // updateProcessInstance param
         if (StringUtils.isNotEmpty(scheduleExpression)) {
             ScheduleParam scheduleParam = JSONUtils.parseObject(scheduleExpression, ScheduleParam.class);
+            if (DateUtils.differSec(scheduleParam.getStartTime(),scheduleParam.getEndTime()) == 0) {
+                logger.warn("The start time must not be the same as the end");
+                putMsg(result,Status.SCHEDULE_START_TIME_END_TIME_SAME);
+                return result;
+            }
             schedule.setStartTime(scheduleParam.getStartTime());
             schedule.setEndTime(scheduleParam.getEndTime());
             if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {

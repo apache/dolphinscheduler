@@ -1,6 +1,7 @@
 package cn.escheduler.server.zk;
 
 import cn.escheduler.common.Constants;
+import cn.escheduler.common.zk.AbstractZKClient;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -17,8 +18,8 @@ public class ZKWorkerClientTest {
     public void getZKWorkerClient() throws Exception {
 
 
-        ZKWorkerClient zkWorkerClient = ZKWorkerClient.getZKWorkerClient();
-        zkWorkerClient.removeDeadServerByHost("127.0.0.1", Constants.WORKER_PREFIX);
+//        ZKWorkerClient zkWorkerClient = ZKWorkerClient.getZKWorkerClient();
+//        zkWorkerClient.removeDeadServerByHost("127.0.0.1", Constants.WORKER_PREFIX);
 
 
     }
