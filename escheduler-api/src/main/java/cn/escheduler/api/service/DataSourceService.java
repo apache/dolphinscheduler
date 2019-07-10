@@ -67,14 +67,10 @@ public class DataSourceService extends BaseService{
     public static final String PASSWORD = cn.escheduler.common.Constants.PASSWORD;
     public static final String OTHER = "other";
 
-    @Autowired
-    private ProjectMapper projectMapper;
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
 
-    @Autowired
-    private ProjectService projectService;
 
     @Autowired
     private DatasourceUserMapper datasourceUserMapper;
@@ -522,7 +518,10 @@ public class DataSourceService extends BaseService{
         parameterMap.put(Constants.JDBC_URL, jdbcUrl);
         parameterMap.put(Constants.USER, userName);
         parameterMap.put(Constants.PASSWORD, password);
-        parameterMap.put(Constants.PRINCIPAL,principal);
+        if (CommonUtils.getKerberosStartupState() &&
+                (type == DbType.HIVE || type == DbType.SPARK)){
+            parameterMap.put(Constants.PRINCIPAL,principal);
+        }
         if (other != null && !"".equals(other)) {
             Map map = JSONObject.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
             });
