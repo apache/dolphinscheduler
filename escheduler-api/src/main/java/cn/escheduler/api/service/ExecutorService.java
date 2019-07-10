@@ -110,6 +110,13 @@ public class ExecutorService extends BaseService{
             return result;
         }
 
+        if (!checkTenantSuitable(processDefinition)){
+            logger.error("there is not any vaild tenant for the process definition: id:{},name:{}, ",
+                    processDefinition.getId(), processDefinition.getName());
+            putMsg(result, Status.TENANT_NOT_SUITABLE);
+            return result;
+        }
+
         /**
          * create command
          */
@@ -190,15 +197,10 @@ public class ExecutorService extends BaseService{
         if (status != Status.SUCCESS) {
             return checkResult;
         }
-
-        // checkTenantExists();
-        Tenant tenant = processDao.getTenantForProcess(processDefinition.getTenantId(),
-                processDefinition.getUserId());
-        if(tenant == null){
+        if (!checkTenantSuitable(processDefinition)){
             logger.error("there is not any vaild tenant for the process definition: id:{},name:{}, ",
                     processDefinition.getId(), processDefinition.getName());
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
-            return result;
+            putMsg(result, Status.TENANT_NOT_SUITABLE);
         }
 
         switch (executeType) {
@@ -238,6 +240,21 @@ public class ExecutorService extends BaseService{
                 break;
         }
         return result;
+    }
+
+    /**
+     * check tenant suitable
+     * @param processDefinition
+     * @return
+     */
+    private boolean checkTenantSuitable(ProcessDefinition processDefinition) {
+        // checkTenantExists();
+        Tenant tenant = processDao.getTenantForProcess(processDefinition.getTenantId(),
+                processDefinition.getUserId());
+        if(tenant == null){
+            return false;
+        }
+        return true;
     }
 
     /**
