@@ -417,16 +417,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         }
     }
 
-
-    /**
-     * get zookeeper client of CuratorFramework
-     * @return
-     */
-    public CuratorFramework getZkClient() {
-        return zkClient;
-    }
-
-
     /**
      * Get the task queue path
      * @param key  task queue name
