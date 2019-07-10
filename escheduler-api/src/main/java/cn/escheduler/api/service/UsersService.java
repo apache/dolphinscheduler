@@ -245,7 +245,7 @@ public class UsersService extends BaseService {
             Tenant newTenant = tenantMapper.queryById(tenantId);
             if (newTenant != null) {
                 // if hdfs startup
-                if (PropertyUtils.getResUploadStartupState()){
+                if (PropertyUtils.getResUploadStartupState() && oldTenant != null){
                     String newTenantCode = newTenant.getTenantCode();
                     String oldResourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + oldTenant.getTenantCode() + "/resources";
                     String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
