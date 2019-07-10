@@ -459,8 +459,6 @@
       'tasks': {
         deep: true,
         handler (o) {
-          console.log('+++++ save dag params +++++')
-          console.log(o)
 
           // Edit state does not allow deletion of node a...
           this.setIsEditDag(true)
