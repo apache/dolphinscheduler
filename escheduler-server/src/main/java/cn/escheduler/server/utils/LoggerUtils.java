@@ -16,6 +16,7 @@
  */
 package cn.escheduler.server.utils;
 
+import cn.escheduler.common.Constants;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class LoggerUtils {
     /**
      * rules for extracting application ID
      */
-    private static final Pattern APPLICATION_REGEX = Pattern.compile("\\d+_\\d+");
+    private static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
 
     /**
      *  build job id
