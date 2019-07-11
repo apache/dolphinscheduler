@@ -228,11 +228,11 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         int j = 0;
         List<String> taskslist = new ArrayList<>(tasksNum);
         while(iterator.hasNext()){
-            if(j++ < tasksNum){
-                String task = iterator.next();
-
-                taskslist.add(getOriginTaskFormat(task));
+            if(j++ >= tasksNum){
+                break;
             }
+            String task = iterator.next();
+            taskslist.add(getOriginTaskFormat(task));
         }
         return taskslist;
     }
@@ -245,6 +245,9 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      */
     private String getOriginTaskFormat(String formatTask){
         String[] taskArray = formatTask.split(Constants.UNDERLINE);
+        if(taskArray.length< 4){
+            return formatTask;
+        }
         int processInstanceId = Integer.parseInt(taskArray[1]);
         int taskId = Integer.parseInt(taskArray[3]);
 
