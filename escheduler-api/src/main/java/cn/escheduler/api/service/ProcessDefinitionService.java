@@ -487,7 +487,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     // set status
                     schedule.setReleaseState(ReleaseState.OFFLINE);
                     scheduleMapper.update(schedule);
-                    deleteSchedule(project.getId(), id);
+                    deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
             }
