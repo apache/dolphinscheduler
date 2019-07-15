@@ -456,14 +456,14 @@ public class SchedulerService extends BaseService {
     /**
      * delete schedule
      */
-    public static void deleteSchedule(int projectId, int processId) throws RuntimeException{
-        logger.info("delete schedules of project id:{}, flow id:{}", projectId, processId);
+    public static void deleteSchedule(int projectId, int scheduleId) throws RuntimeException{
+        logger.info("delete schedules of project id:{}, schedule id:{}", projectId, scheduleId);
 
-        String jobName = QuartzExecutors.buildJobName(processId);
+        String jobName = QuartzExecutors.buildJobName(scheduleId);
         String jobGroupName = QuartzExecutors.buildJobGroupName(projectId);
 
         if(!QuartzExecutors.getInstance().deleteJob(jobName, jobGroupName)){
-            logger.warn("set offline failure:projectId:{},processId:{}",projectId,processId);
+            logger.warn("set offline failure:projectId:{},scheduleId:{}",projectId,scheduleId);
             throw new RuntimeException(String.format("set offline failure"));
         }
 
