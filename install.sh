@@ -134,7 +134,7 @@ s3Endpoint="http://192.168.199.91:9010"
 s3AccessKey="A3DXS30FO22544RE"
 s3SecretKey="OloCLq3n+8+sdPHUhJ21XrSxTC+JK"
 
-# resourcemanager HA配置，如果是单resourcemanager,这里为空即可
+# resourcemanager HA配置，如果是单resourcemanager,这里为yarnHaIps=""
 yarnHaIps="192.168.xx.xx,192.168.xx.xx"
 
 # 如果是单 resourcemanager,只需要配置一个主机名称,如果是resourcemanager HA,则默认配置就好
@@ -144,6 +144,7 @@ singleYarnIp="ark1"
 hdfsPath="/escheduler"
 
 # 拥有在hdfs根路径/下创建目录权限的用户
+# 注意：如果开启了kerberos，则直接hdfsRootUser=""，就可以
 hdfsRootUser="hdfs"
 
 # common 配置

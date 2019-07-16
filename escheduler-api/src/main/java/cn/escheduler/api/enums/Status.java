@@ -163,6 +163,7 @@ public enum Status {
     BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117,"batch delete process instance by ids {0} error"),
     PREVIEW_SCHEDULE_ERROR(10139,"preview schedule error"),
     PARSE_TO_CRON_EXPRESSION_ERROR(10140,"parse cron to cron expression error"),
+    SCHEDULE_START_TIME_END_TIME_SAME(10141,"The start time must not be the same as the end"),
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),

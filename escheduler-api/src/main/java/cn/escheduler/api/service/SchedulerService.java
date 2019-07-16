@@ -119,6 +119,11 @@ public class SchedulerService extends BaseService {
         scheduleObj.setProcessDefinitionName(processDefinition.getName());
 
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
+        if (DateUtils.differSec(scheduleParam.getStartTime(),scheduleParam.getEndTime()) == 0) {
+            logger.warn("The start time must not be the same as the end");
+            putMsg(result,Status.SCHEDULE_START_TIME_END_TIME_SAME);
+            return result;
+        }
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
         if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
@@ -205,6 +210,11 @@ public class SchedulerService extends BaseService {
         // updateProcessInstance param
         if (StringUtils.isNotEmpty(scheduleExpression)) {
             ScheduleParam scheduleParam = JSONUtils.parseObject(scheduleExpression, ScheduleParam.class);
+            if (DateUtils.differSec(scheduleParam.getStartTime(),scheduleParam.getEndTime()) == 0) {
+                logger.warn("The start time must not be the same as the end");
+                putMsg(result,Status.SCHEDULE_START_TIME_END_TIME_SAME);
+                return result;
+            }
             schedule.setStartTime(scheduleParam.getStartTime());
             schedule.setEndTime(scheduleParam.getEndTime());
             if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
@@ -446,14 +456,14 @@ public class SchedulerService extends BaseService {
     /**
      * delete schedule
      */
-    public static void deleteSchedule(int projectId, int processId) throws RuntimeException{
-        logger.info("delete schedules of project id:{}, flow id:{}", projectId, processId);
+    public static void deleteSchedule(int projectId, int scheduleId) throws RuntimeException{
+        logger.info("delete schedules of project id:{}, schedule id:{}", projectId, scheduleId);
 
-        String jobName = QuartzExecutors.buildJobName(processId);
+        String jobName = QuartzExecutors.buildJobName(scheduleId);
         String jobGroupName = QuartzExecutors.buildJobGroupName(projectId);
 
         if(!QuartzExecutors.getInstance().deleteJob(jobName, jobGroupName)){
-            logger.warn("set offline failure:projectId:{},processId:{}",projectId,processId);
+            logger.warn("set offline failure:projectId:{},scheduleId:{}",projectId,scheduleId);
             throw new RuntimeException(String.format("set offline failure"));
         }
 
