@@ -337,7 +337,7 @@ public final class Constants {
     /**
      * email regex
      */
-    public static final Pattern REGEX_MAIL_NAME = Pattern.compile("^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)+$");
+    public static final Pattern REGEX_MAIL_NAME = Pattern.compile("^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
 
     /**
      * read permission
@@ -489,6 +489,8 @@ public final class Constants {
     public static final String TASK_RECORD_PWD = "task.record.datasource.password";
 
     public static final String DEFAULT = "Default";
+    public static final String PASSWORD = "password";
+    public static final String XXXXXX = "******";
 
     public static  String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
 
