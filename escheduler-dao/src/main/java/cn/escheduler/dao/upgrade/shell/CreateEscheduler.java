@@ -30,13 +30,15 @@ public class CreateEscheduler {
 
 	public static void main(String[] args) {
 		EschedulerManager eschedulerManager = new EschedulerManager();
-		eschedulerManager.initEscheduler();
-		logger.info("init escheduler finished");
+
 		try {
+			eschedulerManager.initEscheduler();
+			logger.info("init escheduler finished");
 			eschedulerManager.upgradeEscheduler();
 			logger.info("upgrade escheduler finished");
+			logger.info("create escheduler success");
 		} catch (Exception e) {
-			logger.error("upgrade escheduler failed",e);
+			logger.error("create escheduler failed",e);
 		}
 
 	}
