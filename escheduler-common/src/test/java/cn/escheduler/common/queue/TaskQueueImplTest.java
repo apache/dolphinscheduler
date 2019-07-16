@@ -17,14 +17,14 @@
 package cn.escheduler.common.queue;
 
 import cn.escheduler.common.Constants;
+import cn.escheduler.common.utils.IpUtils;
+import cn.escheduler.common.utils.OSUtils;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -58,31 +58,29 @@ public class TaskQueueImplTest {
     @Test
     public void testAdd(){
 
+
         //add
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_1_1_1_2130706433,3232236775");
+        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_0_1_1_-1");
         tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"0_1_1_1_2130706433,3232236775");
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_1_0_1_2130706433,3232236775");
+        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_1_0_1_2130706433,3232236775,"+IpUtils.ipToLong(OSUtils.getHost()));
         tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_2_1_1_2130706433,3232236775");
 
         List<String> tasks = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1);
 
-        if(tasks.size() < 0){
+        if(tasks.size() <= 0){
             return;
         }
 
         //pop
         String node1 = tasks.get(0);
 
-        assertEquals(node1,"0_0000000001_1_0000000001");
+        assertEquals(node1,"1_0_1_1_-1");
 
         tasks = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1);
 
-        if(tasks.size() < 0){
+        if(tasks.size() <= 0){
             return;
         }
-
-        String node2 = tasks.get(0);
-        assertEquals(node2,"0_0000000001_1_0000000001");
 
     }
 

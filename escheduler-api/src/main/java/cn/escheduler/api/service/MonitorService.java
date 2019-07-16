@@ -18,13 +18,16 @@ package cn.escheduler.api.service;
 
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
-import cn.escheduler.api.utils.ZookeeperMonitorUtils;
+import cn.escheduler.api.utils.ZookeeperMonitor;
 import cn.escheduler.dao.MonitorDBDao;
+import cn.escheduler.dao.model.MasterServer;
 import cn.escheduler.dao.model.MonitorRecord;
 import cn.escheduler.dao.model.User;
 import cn.escheduler.dao.model.ZookeeperRecord;
+import org.apache.hadoop.mapred.Master;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +55,22 @@ public class MonitorService extends BaseService{
 
   }
 
+  /**
+   * query master list
+   *
+   * @param loginUser
+   * @return
+   */
+  public Map<String,Object> queryMaster(User loginUser) {
+
+    Map<String, Object> result = new HashMap<>(5);
+
+    List<MasterServer> masterServers = new ZookeeperMonitor().getMasterServers();
+    result.put(Constants.DATA_LIST, masterServers);
+    putMsg(result,Status.SUCCESS);
+
+    return result;
+  }
 
   /**
    * query zookeeper state
@@ -61,12 +80,30 @@ public class MonitorService extends BaseService{
   public Map<String,Object> queryZookeeperState(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
 
-    List<ZookeeperRecord> zookeeperRecordList = ZookeeperMonitorUtils.zookeeperInfoList();
+    List<ZookeeperRecord> zookeeperRecordList = ZookeeperMonitor.zookeeperInfoList();
 
     result.put(Constants.DATA_LIST, zookeeperRecordList);
     putMsg(result, Status.SUCCESS);
 
     return result;
 
+  }
+
+
+  /**
+   * query master list
+   *
+   * @param loginUser
+   * @return
+   */
+  public Map<String,Object> queryWorker(User loginUser) {
+
+    Map<String, Object> result = new HashMap<>(5);
+
+    List<MasterServer> workerServers = new ZookeeperMonitor().getWorkerServers();
+    result.put(Constants.DATA_LIST, workerServers);
+    putMsg(result,Status.SUCCESS);
+
+    return result;
   }
 }

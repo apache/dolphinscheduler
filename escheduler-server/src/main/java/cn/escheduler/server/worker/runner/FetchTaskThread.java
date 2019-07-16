@@ -23,10 +23,7 @@ import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.FileUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.ProcessDefinition;
-import cn.escheduler.dao.model.ProcessInstance;
-import cn.escheduler.dao.model.TaskInstance;
-import cn.escheduler.dao.model.WorkerGroup;
+import cn.escheduler.dao.model.*;
 import cn.escheduler.server.zk.ZKWorkerClient;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
@@ -156,7 +153,7 @@ public class FetchTaskThread implements Runnable{
                                 }
 
                                 String[] taskStringArray = taskQueueStr.split(Constants.UNDERLINE);
-                                String taskInstIdStr = taskStringArray[taskStringArray.length - 1];
+                                String taskInstIdStr = taskStringArray[3];
                                 Date now = new Date();
                                 Integer taskId = Integer.parseInt(taskInstIdStr);
 
@@ -211,9 +208,17 @@ public class FetchTaskThread implements Runnable{
                                 // set task execute path
                                 taskInstance.setExecutePath(execLocalPath);
 
-                                // check and create Linux users
-                                FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
-                                        processInstance.getTenantCode(), logger);
+                            Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
+                                    processDefine.getUserId());
+                            if(tenant == null){
+                                logger.error("cannot find suitable tenant for the task:{}, process instance tenant:{}, process definition tenant:{}",
+                                        taskInstance.getName(),processInstance.getTenantId(), processDefine.getTenantId());
+                                continue;
+                            }
+
+                            // check and create Linux users
+                            FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
+                                    tenant.getTenantCode(), logger);
 
                                 logger.info("task : {} ready to submit to task scheduler thread",taskId);
                                 // submit task

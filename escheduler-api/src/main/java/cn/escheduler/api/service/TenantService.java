@@ -96,7 +96,7 @@ public class TenantService extends BaseService{
     tenantMapper.insert(tenant);
 
     // if hdfs startup
-    if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
+    if (PropertyUtils.getResUploadStartupState()){
       String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
       String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
       /**
@@ -178,7 +178,7 @@ public class TenantService extends BaseService{
       Tenant newTenant = tenantMapper.queryByTenantCode(tenantCode);
       if (newTenant == null){
         // if hdfs startup
-        if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
+        if (PropertyUtils.getResUploadStartupState()){
           String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
           String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
           //init hdfs resource
@@ -235,28 +235,29 @@ public class TenantService extends BaseService{
       return result;
     }
 
-    // if hdfs startup
-    if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
+    // if resource upload startup
+    if (PropertyUtils.getResUploadStartupState()){
       String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
 
-      String resourcePath = HadoopUtils.getHdfsDir(tenant.getTenantCode());
-      FileStatus[] fileStatus = HadoopUtils.getInstance().listFileStatus(resourcePath);
-      if (fileStatus.length > 0) {
-        putMsg(result, Status.HDFS_TERANT_RESOURCES_FILE_EXISTS);
-        return result;
-      }
-      fileStatus = HadoopUtils.getInstance().listFileStatus(HadoopUtils.getHdfsUdfDir(tenant.getTenantCode()));
-      if (fileStatus.length > 0) {
-        putMsg(result, Status.HDFS_TERANT_UDFS_FILE_EXISTS);
-        return result;
-      }
+      if (HadoopUtils.getInstance().exists(tenantPath)){
+        String resourcePath = HadoopUtils.getHdfsDir(tenant.getTenantCode());
+        FileStatus[] fileStatus = HadoopUtils.getInstance().listFileStatus(resourcePath);
+        if (fileStatus.length > 0) {
+          putMsg(result, Status.HDFS_TERANT_RESOURCES_FILE_EXISTS);
+          return result;
+        }
+        fileStatus = HadoopUtils.getInstance().listFileStatus(HadoopUtils.getHdfsUdfDir(tenant.getTenantCode()));
+        if (fileStatus.length > 0) {
+          putMsg(result, Status.HDFS_TERANT_UDFS_FILE_EXISTS);
+          return result;
+        }
 
-      HadoopUtils.getInstance().delete(tenantPath, true);
+        HadoopUtils.getInstance().delete(tenantPath, true);
+      }
     }
 
     tenantMapper.deleteById(id);
     putMsg(result, Status.SUCCESS);
-    
     return result;
   }
 
@@ -269,9 +270,6 @@ public class TenantService extends BaseService{
   public Map<String, Object> queryTenantList(User loginUser) {
 
     Map<String, Object> result = new HashMap<>(5);
-    if (checkAdmin(loginUser, result)) {
-      return result;
-    }
 
     List<Tenant> resourceList = tenantMapper.queryAllTenant();
     result.put(Constants.DATA_LIST, resourceList);

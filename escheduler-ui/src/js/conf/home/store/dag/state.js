@@ -31,6 +31,8 @@ export default {
   tasks: [],
   // Timeout alarm
   timeout: 0,
+  // tenant id
+  tenantId:-1,
   // Node location information
   locations: {},
   // Node-to-node connection
@@ -90,5 +92,8 @@ export default {
   // Process instance list{ view a single record }
   instanceListS: [],
   // Operating state
-  isDetails: false
+  isDetails: false,
+  startup: {
+
+  }
 }

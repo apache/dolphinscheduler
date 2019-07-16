@@ -137,7 +137,7 @@
     </template>
     <div class="submit">
       <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : $t('Start')}} </x-button>
+      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : $t('Start')}} </x-button>
     </div>
   </div>
 </template>

@@ -110,6 +110,13 @@ public class ExecutorService extends BaseService{
             return result;
         }
 
+        if (!checkTenantSuitable(processDefinition)){
+            logger.error("there is not any vaild tenant for the process definition: id:{},name:{}, ",
+                    processDefinition.getId(), processDefinition.getName());
+            putMsg(result, Status.TENANT_NOT_SUITABLE);
+            return result;
+        }
+
         /**
          * create command
          */
@@ -190,6 +197,11 @@ public class ExecutorService extends BaseService{
         if (status != Status.SUCCESS) {
             return checkResult;
         }
+        if (!checkTenantSuitable(processDefinition)){
+            logger.error("there is not any vaild tenant for the process definition: id:{},name:{}, ",
+                    processDefinition.getId(), processDefinition.getName());
+            putMsg(result, Status.TENANT_NOT_SUITABLE);
+        }
 
         switch (executeType) {
             case REPEAT_RUNNING:
@@ -231,6 +243,21 @@ public class ExecutorService extends BaseService{
     }
 
     /**
+     * check tenant suitable
+     * @param processDefinition
+     * @return
+     */
+    private boolean checkTenantSuitable(ProcessDefinition processDefinition) {
+        // checkTenantExists();
+        Tenant tenant = processDao.getTenantForProcess(processDefinition.getTenantId(),
+                processDefinition.getUserId());
+        if(tenant == null){
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Check the state of process instance and the type of operation match
      *
      * @param processInstance
@@ -260,7 +287,7 @@ public class ExecutorService extends BaseService{
                 }
                 break;
             case RECOVER_SUSPENDED_PROCESS:
-                if (executionStatus.typeIsPause()) {
+                if (executionStatus.typeIsPause()|| executionStatus.typeIsCancel()) {
                     checkResult = true;
                 }
             default:

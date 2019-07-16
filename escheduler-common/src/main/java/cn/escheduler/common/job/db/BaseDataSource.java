@@ -46,6 +46,18 @@ public abstract class BaseDataSource {
   private String other;
 
   /**
+   * principal
+   */
+  private String principal;
+
+  public String getPrincipal() {
+    return principal;
+  }
+
+  public void setPrincipal(String principal) {
+    this.principal = principal;
+  }
+  /**
    * test whether the data source can be connected successfully
    * @throws Exception
    */
@@ -73,12 +85,12 @@ public abstract class BaseDataSource {
     this.password = password;
   }
 
-  public String getAddress() {
-    return address;
-  }
-
   public void setAddress(String address) {
     this.address = address;
+  }
+
+  public String getAddress() {
+    return address;
   }
 
   public String getDatabase() {

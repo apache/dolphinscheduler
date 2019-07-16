@@ -106,27 +106,46 @@ sslEnable="true"
 # 下载Excel路径
 xlsFilePath="/tmp/xls"
 
+# 企业微信企业ID配置
+enterpriseWechatCorpId="xxxxxxxxxx"
+
+# 企业微信应用Secret配置
+enterpriseWechatSecret="xxxxxxxxxx"
+
+# 企业微信应用AgentId配置
+enterpriseWechatAgentId="xxxxxxxxxx"
+
+# 企业微信用户配置,多个用户以,分割
+enterpriseWechatUsers="xxxxx,xxxxx"
+
 
 #是否启动监控自启动脚本
 monitorServerState="false"
 
-# hadoop 配置
-# 是否启动hdfs,如果启动则为true,需要配置以下hadoop相关参数;
-# 不启动设置为false,如果为false,以下配置不需要修改
-# 特别注意：如果启动hdfs，需要自行创建hdfs根路径，也就是install.sh中的 hdfsPath
-hdfsStartupSate="false"
+# 资源中心上传选择存储方式：HDFS,S3,NONE
+resUploadStartupType="NONE"
 
-# namenode地址，支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
-namenodeFs="hdfs://mycluster:8020"
+# 如果resUploadStartupType为HDFS，defaultFS写namenode地址，支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
+# 如果是S3，则写S3地址，比如说：s3a://escheduler，注意，一定要创建根目录/escheduler
+defaultFS="hdfs://mycluster:8020"
 
-# resourcemanager HA配置，如果是单resourcemanager,这里为空即可
+# 如果配置了S3，则需要有以下配置
+s3Endpoint="http://192.168.199.91:9010"
+s3AccessKey="A3DXS30FO22544RE"
+s3SecretKey="OloCLq3n+8+sdPHUhJ21XrSxTC+JK"
+
+# resourcemanager HA配置，如果是单resourcemanager,这里为yarnHaIps=""
 yarnHaIps="192.168.xx.xx,192.168.xx.xx"
 
 # 如果是单 resourcemanager,只需要配置一个主机名称,如果是resourcemanager HA,则默认配置就好
 singleYarnIp="ark1"
 
-# hdfs根路径,根路径的owner必须是部署用户
+# hdfs根路径，根路径的owner必须是部署用户。1.1.0之前版本不会自动创建hdfs根目录，需要自行创建
 hdfsPath="/escheduler"
+
+# 拥有在hdfs根路径/下创建目录权限的用户
+# 注意：如果开启了kerberos，则直接hdfsRootUser=""，就可以
+hdfsRootUser="hdfs"
 
 # common 配置
 # 程序路径
@@ -146,6 +165,19 @@ resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
 
 # 开发状态,如果是true,对于SHELL脚本可以在execPath目录下查看封装后的SHELL脚本,如果是false则执行完成直接删除
 devState="true"
+
+# kerberos 配置
+# kerberos 是否启动
+kerberosStartUp="false"
+
+# kdc krb5 配置文件路径
+krb5ConfPath="$installPath/conf/krb5.conf"
+
+# keytab 用户名
+keytabUserName="hdfs-mycluster@ESZ.COM"
+
+# 用户 keytab路径
+keytabPath="$installPath/conf/hdfs.headless.keytab"
 
 # zk 配置
 # zk根目录
@@ -170,7 +202,7 @@ workersLock="/escheduler/lock/workers"
 mastersFailover="/escheduler/lock/failover/masters"
 
 # zk worker容错分布式锁
-workersFailover="/escheduler/lock/failover/masters"
+workersFailover="/escheduler/lock/failover/workers"
 
 # zk master启动容错分布式锁
 mastersStartupFailover="/escheduler/lock/failover/startup-masters"
@@ -257,18 +289,27 @@ sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.us
 sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${mysqlPassword}#g" conf/quartz.properties
 
 
-sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${namenodeFs}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.s3a.endpoint.*#fs.s3a.endpoint=${s3Endpoint}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.s3a.access.key.*#fs.s3a.access.key=${s3AccessKey}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.s3a.secret.key.*#fs.s3a.secret.key=${s3SecretKey}#g" conf/common/hadoop/hadoop.properties
 sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common/hadoop/hadoop.properties
 sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common/hadoop/hadoop.properties
+
 
 sed -i ${txt} "s#data.basedir.path.*#data.basedir.path=${programPath}#g" conf/common/common.properties
 sed -i ${txt} "s#data.download.basedir.path.*#data.download.basedir.path=${downloadPath}#g" conf/common/common.properties
 sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" conf/common/common.properties
+sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common/common.properties
 sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
-sed -i ${txt} "s#hdfs.startup.state.*#hdfs.startup.state=${hdfsStartupSate}#g" conf/common/common.properties
+sed -i ${txt} "s#res.upload.startup.type.*#res.upload.startup.type=${resUploadStartupType}#g" conf/common/common.properties
 sed -i ${txt} "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
 sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
 sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
+sed -i ${txt} "s#hadoop.security.authentication.startup.state.*#hadoop.security.authentication.startup.state=${kerberosStartUp}#g" conf/common/common.properties
+sed -i ${txt} "s#java.security.krb5.conf.path.*#java.security.krb5.conf.path=${krb5ConfPath}#g" conf/common/common.properties
+sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keytabUserName}#g" conf/common/common.properties
+sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common/common.properties
 
 sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.escheduler.root.*#zookeeper.escheduler.root=${zkRoot}#g" conf/zookeeper.properties
@@ -317,6 +358,10 @@ sed -i ${txt} "s#mail.passwd.*#mail.passwd=${mailPassword}#g" conf/alert.propert
 sed -i ${txt} "s#mail.smtp.starttls.enable.*#mail.smtp.starttls.enable=${starttlsEnable}#g" conf/alert.properties
 sed -i ${txt} "s#mail.smtp.ssl.enable.*#mail.smtp.ssl.enable=${sslEnable}#g" conf/alert.properties
 sed -i ${txt} "s#xls.file.path.*#xls.file.path=${xlsFilePath}#g" conf/alert.properties
+sed -i ${txt} "s#enterprise.wechat.corp.id.*#enterprise.wechat.corp.id=${enterpriseWechatCorpId}#g" conf/alert.properties
+sed -i ${txt} "s#enterprise.wechat.secret.*#enterprise.wechat.secret=${enterpriseWechatSecret}#g" conf/alert.properties
+sed -i ${txt} "s#enterprise.wechat.agent.id.*#enterprise.wechat.agent.id=${enterpriseWechatAgentId}#g" conf/alert.properties
+sed -i ${txt} "s#enterprise.wechat.users.*#enterprise.wechat.users=${enterpriseWechatUsers}#g" conf/alert.properties
 
 
 sed -i ${txt} "s#installPath.*#installPath=${installPath}#g" conf/config/install_config.conf

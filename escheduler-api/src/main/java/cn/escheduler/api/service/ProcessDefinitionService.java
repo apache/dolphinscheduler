@@ -24,6 +24,7 @@ import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.common.enums.Flag;
 import cn.escheduler.common.enums.ReleaseState;
 import cn.escheduler.common.enums.TaskType;
+import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.graph.DAG;
 import cn.escheduler.common.model.TaskNode;
 import cn.escheduler.common.model.TaskNodeRelation;
@@ -127,6 +128,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setLocations(locations);
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
+        processDefine.setTenantId(processData.getTenantId());
 
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
@@ -291,6 +293,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setLocations(locations);
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
+        processDefine.setTenantId(processData.getTenantId());
 
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();
@@ -365,7 +368,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         }
 
         // Determine if the login user is the owner of the process definition
-        if (loginUser.getId() != processDefinition.getUserId()) {
+        if (loginUser.getId() != processDefinition.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }

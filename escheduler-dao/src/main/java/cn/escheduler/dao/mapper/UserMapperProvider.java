@@ -187,7 +187,6 @@ public class UserMapperProvider {
         return new SQL() {{
             SELECT("count(0)");
             FROM(TABLE_NAME);
-            WHERE("user_type = 1");
             Object searchVal = parameter.get("searchVal");
             if(searchVal != null && StringUtils.isNotEmpty(searchVal.toString())){
                 WHERE( " user_name like concat('%', #{searchVal}, '%') ");
@@ -209,7 +208,6 @@ public class UserMapperProvider {
                 FROM(TABLE_NAME + " u ");
                 LEFT_OUTER_JOIN("t_escheduler_tenant t on u.tenant_id = t.id");
                 LEFT_OUTER_JOIN("t_escheduler_queue q on t.queue_id = q.id");
-                WHERE("u.user_type = 1");
                 Object searchVal = parameter.get("searchVal");
                 if(searchVal != null && StringUtils.isNotEmpty(searchVal.toString())){
                     WHERE( " u.user_name like concat('%', #{searchVal}, '%') ");
