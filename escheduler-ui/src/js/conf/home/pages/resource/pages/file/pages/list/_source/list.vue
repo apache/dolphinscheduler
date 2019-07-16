@@ -51,8 +51,7 @@
                     :title="$t('Edit')"
                     :disabled="_rtDisb(item)"
                     @click="_edit(item,$index)"
-                    icon="iconfont icon-bianjixiugai"
-                    v-ps="['GENERAL_USER']">
+                    icon="iconfont icon-bianjixiugai">
             </x-button>
             <x-button
                     type="info"
@@ -61,8 +60,7 @@
                     icon="iconfont icon-wendangxiugai"
                     data-toggle="tooltip"
                     :title="$t('Rename')"
-                    @click="_rename(item,$index)"
-                    v-ps="['GENERAL_USER']">
+                    @click="_rename(item,$index)">
             </x-button>
 
             <x-button
@@ -72,8 +70,7 @@
                     data-toggle="tooltip"
                     :title="$t('Download')"
                     @click="_downloadFile(item)"
-                    icon="iconfont icon-download"
-                    v-ps="['GENERAL_USER']">
+                    icon="iconfont icon-download">
             </x-button>
 
             <x-poptip
@@ -92,8 +89,7 @@
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('delete')"
-                        v-ps="['GENERAL_USER']">
+                        :title="$t('delete')">
                 </x-button>
               </template>
             </x-poptip>

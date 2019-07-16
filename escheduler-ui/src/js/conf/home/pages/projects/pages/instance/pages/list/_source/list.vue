@@ -73,7 +73,6 @@
                         data-toggle="tooltip"
                         :title="$t('Edit')"
                         @click="_reEdit(item)"
-                        v-ps="['GENERAL_USER']"
                         icon="iconfont icon-bianjixiugai"
                         :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
               <x-button type="info"
@@ -82,7 +81,6 @@
                         data-toggle="tooltip"
                         :title="$t('Rerun')"
                         @click="_reRun(item,$index)"
-                        v-ps="['GENERAL_USER']"
                         icon="iconfont icon-shuaxin"
                         :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
               <x-button type="success"
@@ -91,26 +89,23 @@
                         data-toggle="tooltip"
                         :title="$t('Recovery Failed')"
                         @click="_restore(item,$index)"
-                        v-ps="['GENERAL_USER']"
                         icon="iconfont icon-cuowuguanbishibai"
                         :disabled="item.state !== 'FAILURE'"></x-button>
               <x-button type="error"
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
-                        :title="$t('Stop')"
-                        @click="_stop(item)"
-                        v-ps="['GENERAL_USER']"
-                        icon="iconfont icon-zanting1"
-                        :disabled="item.state !== 'RUNNING_EXEUTION'"></x-button>
+                        :title="item.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')"
+                        @click="_stop(item,$index)"
+                        :icon="item.state === 'STOP' ? 'iconfont icon-ai06' : 'iconfont icon-zanting'"
+                        :disabled="item.state !== 'RUNNING_EXEUTION' && item.state != 'STOP'"></x-button>
               <x-button type="warning"
                         shape="circle"
                         size="xsmall"
                         data-toggle="tooltip"
                         :title="item.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')"
                         @click="_suspend(item,$index)"
-                        v-ps="['GENERAL_USER']"
-                        :icon="item.state === 'PAUSE' ? 'iconfont icon-ai06' : 'iconfont icon-zanting'"
+                        :icon="item.state === 'PAUSE' ? 'iconfont icon-ai06' : 'iconfont icon-zanting1'"
                         :disabled="item.state !== 'RUNNING_EXEUTION' && item.state !== 'PAUSE'"></x-button>
               <x-poptip
                       :ref="'poptip-delete-' + $index"
@@ -128,8 +123,7 @@
                           shape="circle"
                           size="xsmall"
                           data-toggle="tooltip"
-                          :title="$t('delete')"
-                          v-ps="['GENERAL_USER']">
+                          :title="$t('delete')">
                   </x-button>
                 </template>
               </x-poptip>
@@ -161,7 +155,7 @@
                       shape="circle"
                       size="xsmall"
                       disabled="true">
-                {{item.count}}s
+                {{item.count}}
               </x-button>
               <x-button
                       v-show="buttonType !== 'run'"
@@ -179,7 +173,7 @@
                       shape="circle"
                       size="xsmall"
                       disabled="true">
-                {{item.count}}s
+                {{item.count}}
               </x-button>
               <x-button
                       v-show="buttonType !== 'store'"
@@ -191,26 +185,26 @@
               </x-button>
 
               <!--Stop-->
-              <x-button
-                      type="error"
-                      shape="circle"
-                      size="xsmall"
-                      icon="iconfont icon-zanting1"
-                      disabled="true">
-              </x-button>
+              <!--<x-button-->
+                      <!--type="error"-->
+                      <!--shape="circle"-->
+                      <!--size="xsmall"-->
+                      <!--icon="iconfont icon-zanting1"-->
+                      <!--disabled="true">-->
+              <!--</x-button>-->
 
               <!--倒计时 => Recovery Suspend/Pause-->
               <x-button
-                      v-show="item.state === 'PAUSE' && buttonType === 'suspend'"
+                      v-show="(item.state === 'PAUSE' || item.state == 'STOP') && buttonType === 'suspend'"
                       type="warning"
                       shape="circle"
                       size="xsmall"
                       disabled="true">
-                {{item.count}}s
+                {{item.count}}
               </x-button>
               <!--Recovery Suspend-->
               <x-button
-                      v-show="item.state === 'PAUSE' && buttonType !== 'suspend'"
+                      v-show="(item.state === 'PAUSE' || item.state == 'STOP') && buttonType !== 'suspend'"
                       type="warning"
                       shape="circle"
                       size="xsmall"
@@ -220,6 +214,15 @@
               <!--Pause-->
               <x-button
                       v-show="item.state !== 'PAUSE'"
+                      type="warning"
+                      shape="circle"
+                      size="xsmall"
+                      icon="iconfont icon-zanting1"
+                      disabled="true">
+              </x-button>
+            <!--Stop-->
+              <x-button
+                      v-show="item.state !== 'STOP'"
                       type="warning"
                       shape="circle"
                       size="xsmall"
@@ -368,11 +371,20 @@
        * stop
        * @param STOP
        */
-      _stop (item) {
-        this._upExecutorsState({
-          processInstanceId: item.id,
-          executeType: 'STOP'
-        })
+      _stop (item, index) {
+        if(item.state == 'STOP') {
+          this._countDownFn({
+            id: item.id,
+            executeType: 'RECOVER_SUSPENDED_PROCESS',
+            index: index,
+            buttonType: 'suspend'
+          })
+        } else {
+          this._upExecutorsState({
+            processInstanceId: item.id,
+            executeType: 'STOP'
+          })
+        }
       },
       /**
        * pause
@@ -389,7 +401,7 @@
         } else {
           this._upExecutorsState({
             processInstanceId: item.id,
-            executeType: item.state === 'PAUSE' ? 'RECOVER_SUSPENDED_PROCESS' : 'PAUSE'
+            executeType: 'PAUSE'
           })
         }
       },
@@ -441,7 +453,7 @@
         if (data.length) {
           _.map(data, v => {
             v.disabled = true
-            v.count = 10
+            v.count = 9
           })
         }
         return data

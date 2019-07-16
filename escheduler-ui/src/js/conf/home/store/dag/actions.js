@@ -115,6 +115,7 @@ export default {
         // timeout
         state.timeout = processDefinitionJson.timeout
 
+        state.tenantId = processDefinitionJson.tenantId
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -146,6 +147,12 @@ export default {
         // timeout
         state.timeout = processInstanceJson.timeout
 
+        state.tenantId = processInstanceJson.tenantId
+
+        //startup parameters
+        state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroupId', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
+        state.startup.commandParam = JSON.parse(res.data.commandParam)
+
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -160,6 +167,7 @@ export default {
       let data = {
         globalParams: state.globalParams,
         tasks: state.tasks,
+        tenantId: state.tenantId,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/save`, {
@@ -183,6 +191,7 @@ export default {
       let data = {
         globalParams: state.globalParams,
         tasks: state.tasks,
+        tenantId: state.tenantId,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/update`, {
@@ -207,6 +216,7 @@ export default {
       let data = {
         globalParams: state.globalParams,
         tasks: state.tasks,
+        tenantId: state.tenantId,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/instance/update`, {
@@ -372,6 +382,19 @@ export default {
     return new Promise((resolve, reject) => {
       io.post(`projects/${state.projectName}/schedule/create`, payload, res => {
         resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Preview timing
+   */
+  previewSchedule ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/schedule/preview`, payload, res => {
+        resolve(res.data)
+        //alert(res.data)
       }).catch(e => {
         reject(e)
       })

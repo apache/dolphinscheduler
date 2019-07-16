@@ -3,7 +3,7 @@
     <m-list-box>
       <div slot="text">{{$t('Program Type')}}</div>
       <div slot="content">
-        <x-select v-model="programType" :disabled="isDetails" style="width: 100px;">
+        <x-select v-model="programType" :disabled="isDetails" style="width: 110px;">
           <x-option
                   v-for="city in programTypeList"
                   :key="city.code"

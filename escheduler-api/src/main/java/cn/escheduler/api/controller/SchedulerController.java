@@ -304,4 +304,33 @@ public class SchedulerController extends BaseController {
             return error(Status.QUERY_SCHEDULE_LIST_ERROR.getCode(), Status.QUERY_SCHEDULE_LIST_ERROR.getMsg());
         }
     }
+
+    /**
+     * preview schedule
+     *
+     * @param loginUser
+     * @param projectName
+     * @param schedule
+     * @return
+     */
+    @ApiOperation(value = "previewSchedule", notes= "PREVIEW_SCHEDULE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "String", example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"),
+    })
+    @PostMapping("/preview")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Result previewSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
+                                 @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+                                 @RequestParam(value = "schedule") String schedule
+    ){
+        logger.info("login user {}, project name: {}, preview schedule: {}",
+                loginUser.getUserName(), projectName, schedule);
+        try {
+            Map<String, Object> result = schedulerService.previewSchedule(loginUser, projectName, schedule);
+            return returnDataList(result);
+        } catch (Exception e) {
+            logger.error(PREVIEW_SCHEDULE_ERROR.getMsg(), e);
+            return error(PREVIEW_SCHEDULE_ERROR.getCode(), PREVIEW_SCHEDULE_ERROR.getMsg());
+        }
+    }
 }
