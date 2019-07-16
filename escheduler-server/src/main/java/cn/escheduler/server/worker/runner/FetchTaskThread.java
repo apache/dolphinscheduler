@@ -210,6 +210,11 @@ public class FetchTaskThread implements Runnable{
 
                             Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
                                     processDefine.getUserId());
+                            if(tenant == null){
+                                logger.error("cannot find suitable tenant for the task:{}, process instance tenant:{}, process definition tenant:{}",
+                                        taskInstance.getName(),processInstance.getTenantId(), processDefine.getTenantId());
+                                continue;
+                            }
 
                             // check and create Linux users
                             FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
