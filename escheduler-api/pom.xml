@@ -9,9 +9,11 @@
   <packaging>jar</packaging>
 
   <dependencies>
-
-
-    <dependency>
+      <dependency>
+          <groupId>cn.analysys</groupId>
+          <artifactId>escheduler-alert</artifactId>
+      </dependency>
+      <dependency>
       <groupId>cn.analysys</groupId>
       <artifactId>escheduler-server</artifactId>
       <exclusions>
