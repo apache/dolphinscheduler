@@ -4,22 +4,25 @@ Easy Scheduler
 
 > Easy Scheduler for Big Data
 
-** Design features: **  A distributed and easy-to-expand visual DAG workflow scheduling system. Dedicated to solving the complex dependencies in the data processing process, making the scheduling system `out of the box` in the data processing process.
+### Design features: 
+
+A distributed and easy-to-expand visual DAG workflow scheduling system. Dedicated to solving the complex dependencies in the data processing process, making the scheduling system `out of the box` in the data processing process.
 Its main objectives are as follows:
- - Associate the Tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of task in real time.
- - Support for many task types: Shell, MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Sub_Process, Procedure, etc.
- - Support process scheduling, dependency scheduling, manual scheduling, manual pause/stop/recovery, support for failed retry/alarm, recovery from specified nodes, Kill task, etc.
- - Support process priority, task priority and task failover and task timeout alarm/failure
- - Support process global parameters and node custom parameter settings
- - Support online upload/download of resource files, management, etc. Support online file creation and editing
- - Support task log online viewing and scrolling, online download log, etc.
- - Implement cluster HA, decentralize Master cluster and Worker cluster through Zookeeper
- - Support online viewing of `Master/Worker` cpu load, memory, cpu
- - Support process running history tree/gantt chart display, support task status statistics, process status statistics
- - Support for complement
- - Support for multi-tenant
- - Support internationalization
- - There are more waiting partners to explore
+
+ - Associate the Tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of task in real time.
+ - Support for many task types: Shell, MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Sub_Process, Procedure, etc.
+ - Support process scheduling, dependency scheduling, manual scheduling, manual pause/stop/recovery, support for failed retry/alarm, recovery from specified nodes, Kill task, etc.
+ - Support process priority, task priority and task failover and task timeout alarm/failure
+ - Support process global parameters and node custom parameter settings
+ - Support online upload/download of resource files, management, etc. Support online file creation and editing
+ - Support task log online viewing and scrolling, online download log, etc.
+ - Implement cluster HA, decentralize Master cluster and Worker cluster through Zookeeper
+ - Support online viewing of `Master/Worker` cpu load, memory, cpu
+ - Support process running history tree/gantt chart display, support task status statistics, process status statistics
+ - Support for complement
+ - Support for multi-tenant
+ - Support internationalization
+ - There are more waiting partners to explore
 
 
 ### Comparison with similar scheduler systems
