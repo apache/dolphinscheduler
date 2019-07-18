@@ -84,7 +84,7 @@ https://github.com/analysys/EasyScheduler/blob/master/CONTRIBUTING.md
 ### Thanks
 
 Easy Scheduler uses a lot of excellent open source projects, such as google guava, guice, grpc, netty, ali bonecp, quartz, and many open source projects of apache, etc.
-It is because of the shoulders of these open source projects that the birth of the Easy Scheduler is possible. We are very grateful for all the open source software used! We also hope that we will not only be the beneficiaries of open source, but also be open source contributors, so we decided to contribute to easy scheduling and promised long-term updates. I also hope that partners who have the same passion and conviction for open source will join in and contribute to open source!
+It is because of the shoulders of these open source projects that the birth of the Easy Scheduler is possible. We are very grateful for all the open source software used! We also hope that we will not only be the beneficiaries of open source, but also be open source contributors, so we decided to contribute to easy scheduling and promised long-term updates. We also hope that partners who have the same passion and conviction for open source will join in and contribute to open source!
 
 ### Help
 The fastest way to get response from our developers is to submit issues,  or add our wechat : 510570367
