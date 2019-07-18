@@ -17,19 +17,25 @@
 package cn.escheduler.common.queue;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.Bytes;
 import cn.escheduler.common.utils.IpUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.zk.AbstractZKClient;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * A singleton of a task queue implemented with zookeeper
@@ -39,7 +45,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskQueueZkImpl.class);
 
-    private static TaskQueueZkImpl instance;
+    private static volatile TaskQueueZkImpl instance;
 
     private TaskQueueZkImpl(){
         init();
