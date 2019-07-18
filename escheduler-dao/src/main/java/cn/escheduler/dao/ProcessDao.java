@@ -890,6 +890,9 @@ public class ProcessDao extends AbstractBaseDao {
             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startTime);
             processMapStr = JSONUtils.toJson(cmdParam);
         }
+
+        updateSubProcessDefinitionByParent(parentProcessInstance, childDefineId);
+
         Command command = new Command();
         command.setWarningType(parentProcessInstance.getWarningType());
         command.setWarningGroupId(parentProcessInstance.getWarningGroupId());
@@ -902,6 +905,16 @@ public class ProcessDao extends AbstractBaseDao {
         command.setProcessInstancePriority(parentProcessInstance.getProcessInstancePriority());
         createCommand(command);
         logger.info("sub process command created: {} ", command.toString());
+    }
+
+    private void updateSubProcessDefinitionByParent(ProcessInstance parentProcessInstance, int childDefinitionId) {
+        ProcessDefinition fatherDefinition = this.findProcessDefineById(parentProcessInstance.getProcessDefinitionId());
+        ProcessDefinition childDefinition = this.findProcessDefineById(childDefinitionId);
+        if(childDefinition != null && fatherDefinition != null){
+            childDefinition.setReceivers(fatherDefinition.getReceivers());
+            childDefinition.setReceiversCc(fatherDefinition.getReceiversCc());
+            processDefineMapper.update(childDefinition);
+        }
     }
 
     /**
