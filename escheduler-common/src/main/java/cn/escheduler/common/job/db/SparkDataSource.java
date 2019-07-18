@@ -31,7 +31,6 @@ public class SparkDataSource extends BaseDataSource {
 
   private static final Logger logger = LoggerFactory.getLogger(SparkDataSource.class);
 
-
   /**
    * gets the JDBC url for the data source connection
    * @return
@@ -43,7 +42,7 @@ public class SparkDataSource extends BaseDataSource {
       jdbcUrl += "/";
     }
 
-    jdbcUrl += getDatabase();
+    jdbcUrl += getDatabase() + ";principal=" + getPrincipal();
 
     if (StringUtils.isNotEmpty(getOther())) {
       jdbcUrl += ";" + getOther();

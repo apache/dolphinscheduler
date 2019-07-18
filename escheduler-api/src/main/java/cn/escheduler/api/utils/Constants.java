@@ -111,6 +111,7 @@ public class Constants {
     public static final String ADDRESS = "address";
     public static final String DATABASE = "database";
     public static final String JDBC_URL = "jdbcUrl";
+    public static final String PRINCIPAL = "principal";
     public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final String OTHER = "other";

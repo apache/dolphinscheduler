@@ -58,12 +58,12 @@
             <span v-if="!item.scheduleReleaseState">-</span>
           </td>
           <td>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Edit')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-bianji"><!--{{$t('编辑')}}--></x-button>
-            <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Start')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-qidong"><!--{{$t('启动')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null" v-ps="['GENERAL_USER']" icon="iconfont icon-timer"><!--{{$t('定时')}}--></x-button>
-            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu-copy"><!--{{$t('下线')}}--></x-button>
-            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-erji-xiaxianjilu"><!--{{$t('上线')}}--></x-button>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Manage')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'" v-ps="['GENERAL_USER']" icon="iconfont icon-paibanguanli"><!--{{$t('定时管理')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Edit')" @click="_edit(item)" :disabled="item.releaseState === 'ONLINE'"  icon="iconfont icon-bianji"><!--{{$t('编辑')}}--></x-button>
+            <x-button type="success" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Start')" @click="_start(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="iconfont icon-qidong"><!--{{$t('启动')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Timing')" @click="_timing(item)" :disabled="item.releaseState !== 'ONLINE' || item.scheduleReleaseState !== null"  icon="iconfont icon-timer"><!--{{$t('定时')}}--></x-button>
+            <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('online')" @click="_poponline(item)" v-if="item.releaseState === 'OFFLINE'"  icon="iconfont icon-erji-xiaxianjilu-copy"><!--{{$t('下线')}}--></x-button>
+            <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('offline')" @click="_downline(item)" v-if="item.releaseState === 'ONLINE'"  icon="iconfont icon-erji-xiaxianjilu"><!--{{$t('上线')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Cron Manage')" @click="_timingManage(item)" :disabled="item.releaseState !== 'ONLINE'"  icon="iconfont icon-paibanguanli"><!--{{$t('定时管理')}}--></x-button>
             <x-poptip
               :ref="'poptip-delete-' + $index"
               placement="bottom-end"
@@ -81,8 +81,7 @@
                   size="xsmall"
                   :disabled="item.releaseState === 'ONLINE'"
                   data-toggle="tooltip"
-                  :title="$t('delete')"
-                  v-ps="['GENERAL_USER']">
+                  :title="$t('delete')">
                 </x-button>
               </template>
             </x-poptip>

@@ -29,6 +29,7 @@ import cn.escheduler.common.task.sql.SqlBinds;
 import cn.escheduler.common.task.sql.SqlParameters;
 import cn.escheduler.common.task.sql.SqlType;
 import cn.escheduler.common.utils.CollectionUtils;
+import cn.escheduler.common.utils.CommonUtils;
 import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.DaoFactory;
@@ -43,6 +44,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 
 import java.sql.*;
@@ -50,6 +53,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static cn.escheduler.common.utils.PropertyUtils.getString;
 
 /**
  *  sql task
@@ -196,7 +201,7 @@ public class SqlTask extends AbstractTask {
         }
 
         // special characters need to be escaped, ${} needs to be escaped
-        String rgex = "'?\\$\\{(.*?)\\}'?";
+        String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql,rgex,sqlParamsMap,paramsMap);
 
         // replace the ${} of the SQL statement with the Placeholder
@@ -228,7 +233,15 @@ public class SqlTask extends AbstractTask {
                                         List<String> createFuncs){
         Connection connection = null;
         try {
-
+            if (CommonUtils.getKerberosStartupState())  {
+                System.setProperty(cn.escheduler.common.Constants.JAVA_SECURITY_KRB5_CONF,
+                        getString(cn.escheduler.common.Constants.JAVA_SECURITY_KRB5_CONF_PATH));
+                Configuration configuration = new Configuration();
+                configuration.set(cn.escheduler.common.Constants.HADOOP_SECURITY_AUTHENTICATION, "kerberos");
+                UserGroupInformation.setConfiguration(configuration);
+                UserGroupInformation.loginUserFromKeytab(getString(cn.escheduler.common.Constants.LOGIN_USER_KEY_TAB_USERNAME),
+                        getString(cn.escheduler.common.Constants.LOGIN_USER_KEY_TAB_PATH));
+            }
             if (DbType.HIVE.name().equals(sqlParameters.getType())) {
                 Properties paramProp = new Properties();
                 paramProp.setProperty("user", baseDataSource.getUser());
@@ -278,7 +291,7 @@ public class SqlTask extends AbstractTask {
                         array.add(mapOfColValues);
                     }
 
-                    logger.info("execute sql : {}", JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
+                    logger.debug("execute sql : {}", JSONObject.toJSONString(array, SerializerFeature.WriteMapNullValue));
 
                     // send as an attachment
                     if (StringUtils.isEmpty(sqlParameters.getShowType())) {
@@ -310,6 +323,7 @@ public class SqlTask extends AbstractTask {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
+            throw new RuntimeException(e.getMessage());
         }
         return connection;
     }
@@ -326,6 +340,7 @@ public class SqlTask extends AbstractTask {
                 ParameterUtils.setInParameter(key,stmt,prop.getType(),prop.getValue());
             }
         }
+        logger.info("prepare statement replace sql:{}",stmt.toString());
         return stmt;
     }
 
@@ -347,14 +362,14 @@ public class SqlTask extends AbstractTask {
         // receiving group list
         List<String> receviersList = new ArrayList<String>();
         for(User user:users){
-            receviersList.add(user.getEmail());
+            receviersList.add(user.getEmail().trim());
         }
         // custom receiver
         String receivers = sqlParameters.getReceivers();
         if (StringUtils.isNotEmpty(receivers)){
             String[] splits = receivers.split(Constants.COMMA);
             for (String receiver : splits){
-                receviersList.add(receiver);
+                receviersList.add(receiver.trim());
             }
         }
 
@@ -365,15 +380,19 @@ public class SqlTask extends AbstractTask {
         if (StringUtils.isNotEmpty(receiversCc)){
             String[] splits = receiversCc.split(Constants.COMMA);
             for (String receiverCc : splits){
-                receviersCcList.add(receiverCc);
+                receviersCcList.add(receiverCc.trim());
             }
         }
 
         String showTypeName = sqlParameters.getShowType().replace(Constants.COMMA,"").trim();
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
-            MailUtils.sendMails(receviersList,receviersCcList,title, content, ShowType.valueOf(showTypeName));
+            Map<String, Object> mailResult = MailUtils.sendMails(receviersList, receviersCcList, title, content, ShowType.valueOf(showTypeName));
+            if(!(Boolean) mailResult.get(cn.escheduler.common.Constants.STATUS)){
+                throw new RuntimeException("send mail failed!");
+            }
         }else{
             logger.error("showType: {} is not valid "  ,showTypeName);
+            throw new RuntimeException(String.format("showType: %s is not valid ",showTypeName));
         }
     }
 
@@ -411,19 +430,5 @@ public class SqlTask extends AbstractTask {
             logPrint.append(sqlParamsMap.get(i).getValue()+"("+sqlParamsMap.get(i).getType()+")");
         }
         logger.info(logPrint.toString());
-
-        //direct print style
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
-        int index = 1;
-        StringBuffer sb = new StringBuffer("replaced sql , direct:");
-        while (m.find()) {
-
-            m.appendReplacement(sb, sqlParamsMap.get(index).getValue());
-
-            index ++;
-        }
-        m.appendTail(sb);
-        logger.info(sb.toString());
     }
 }

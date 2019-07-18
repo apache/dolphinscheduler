@@ -17,12 +17,15 @@
 package cn.escheduler.common.queue;
 
 import cn.escheduler.common.Constants;
-import org.junit.Assert;
+import cn.escheduler.common.utils.IpUtils;
+import cn.escheduler.common.utils.OSUtils;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -34,59 +37,60 @@ public class TaskQueueImplTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskQueueImplTest.class);
 
+    ITaskQueue tasksQueue = null;
 
-    @Test
-    public void testTaskQueue(){
-
-        ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
+    @Before
+    public void before(){
+        tasksQueue = TaskQueueFactory.getTaskQueueInstance();
         //clear all data
         tasksQueue.delete();
 
+    }
+
+
+    @After
+    public void after(){
+        //clear all data
+        tasksQueue.delete();
+    }
+
+
+    @Test
+    public void testAdd(){
+
+
         //add
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1");
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"2");
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"3");
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"4");
+        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_0_1_1_-1");
+        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"0_1_1_1_2130706433,3232236775");
+        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_1_0_1_2130706433,3232236775,"+IpUtils.ipToLong(OSUtils.getHost()));
+        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_2_1_1_2130706433,3232236775");
+
+        List<String> tasks = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1);
+
+        if(tasks.size() <= 0){
+            return;
+        }
 
         //pop
-        String node1 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, false);
-        assertEquals(node1,"1");
-        String node2 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, false);
-        assertEquals(node2,"2");
+        String node1 = tasks.get(0);
 
-        //sadd
-        String task1 = "1.1.1.1-1-mr";
-        String task2 = "1.1.1.2-2-mr";
-        String task3 = "1.1.1.3-3-mr";
-        String task4 = "1.1.1.4-4-mr";
-        String task5 = "1.1.1.5-5-mr";
+        assertEquals(node1,"1_0_1_1_-1");
 
-        tasksQueue.sadd(Constants.SCHEDULER_TASKS_KILL,task1);
-        tasksQueue.sadd(Constants.SCHEDULER_TASKS_KILL,task2);
-        tasksQueue.sadd(Constants.SCHEDULER_TASKS_KILL,task3);
-        tasksQueue.sadd(Constants.SCHEDULER_TASKS_KILL,task4);
-        tasksQueue.sadd(Constants.SCHEDULER_TASKS_KILL,task5);
-        tasksQueue.sadd(Constants.SCHEDULER_TASKS_KILL,task5); //repeat task
+        tasks = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1);
 
-        Assert.assertEquals(tasksQueue.smembers(Constants.SCHEDULER_TASKS_KILL).size(),5);
-        logger.info(Arrays.toString(tasksQueue.smembers(Constants.SCHEDULER_TASKS_KILL).toArray()));
-        //srem
-        tasksQueue.srem(Constants.SCHEDULER_TASKS_KILL,task5);
-        //smembers
-        Assert.assertEquals(tasksQueue.smembers(Constants.SCHEDULER_TASKS_KILL).size(),4);
-        logger.info(Arrays.toString(tasksQueue.smembers(Constants.SCHEDULER_TASKS_KILL).toArray()));
-
+        if(tasks.size() <= 0){
+            return;
+        }
 
     }
+
+
 
     /**
      * test one million data from zookeeper queue
      */
     @Test
     public void extremeTest(){
-        ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-        //clear all data
-        tasksQueue.delete();
         int total = 30 * 10000;
 
         for(int i = 0; i < total; i++)
@@ -99,13 +103,8 @@ public class TaskQueueImplTest {
             }
         }
 
-        String node1 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, false);
+        String node1 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1).get(0);
         assertEquals(node1,"0");
-
-        //clear all data
-        tasksQueue.delete();
-
-
 
     }
 

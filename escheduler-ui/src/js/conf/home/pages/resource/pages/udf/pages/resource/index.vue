@@ -3,7 +3,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small"  @click="_uploading" v-ps="['GENERAL_USER']">{{$t('Upload UDF Resources')}}</x-button>
+          <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
         </template>
       </m-conditions>
     </template>
