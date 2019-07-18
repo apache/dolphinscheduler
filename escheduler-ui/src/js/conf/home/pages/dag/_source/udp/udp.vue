@@ -31,7 +31,7 @@
         <form-tenant v-model="tenantId"></form-tenant>
       </div>
       <div class="title" style="padding-top: 6px;">
-        <span>超时告警</span>
+        <span class="text-b">{{$t('warning of timeout')}}</span>
         <span style="padding-left: 6px;">
           <x-switch v-model="checkedTimeout"></x-switch>
         </span>
