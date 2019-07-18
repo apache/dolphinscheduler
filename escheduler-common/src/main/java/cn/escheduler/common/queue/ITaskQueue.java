@@ -24,20 +24,17 @@ public interface ITaskQueue {
     /**
      * take out all the elements
      *
-     * this method has deprecated
-     * use checkTaskExists instead
      *
      * @param key
      * @return
      */
-    @Deprecated
     List<String> getAllTasks(String key);
 
     /**
      * check task exists in the task queue or not
      *
      * @param key queue name
-     * @param task ${priority}_${processInstanceId}_${taskId}
+     * @param task ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
      * @return true if exists in the queue
      */
     boolean checkTaskExists(String key, String task);
@@ -54,10 +51,10 @@ public interface ITaskQueue {
      * an element pops out of the queue
      *
      * @param key  queue name
-     * @param remove  whether remove the element
+     * @param n    how many elements to poll
      * @return
      */
-    String poll(String key, boolean remove);
+    List<String> poll(String key, int n);
 
     /**
      * remove a element from queue

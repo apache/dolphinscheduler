@@ -18,8 +18,10 @@ package cn.escheduler.api.utils;
 
 
 import cn.escheduler.api.enums.Status;
+import cn.escheduler.common.enums.ResUploadType;
 import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.utils.JSONUtils;
+import cn.escheduler.common.utils.PropertyUtils;
 import cn.escheduler.common.utils.TaskParametersUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -28,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static cn.escheduler.common.utils.PropertyUtils.getBoolean;
 
 
 /**
@@ -157,5 +160,4 @@ public class CheckUtils {
 
     return pattern.matcher(str).matches();
   }
-
 }

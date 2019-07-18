@@ -34,6 +34,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -43,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ResourcesControllerTest {
-    private static Logger logger = LoggerFactory.getLogger(QueueControllerTest.class);
+    private static Logger logger = LoggerFactory.getLogger(ResourcesControllerTest.class);
 
     private MockMvc mockMvc;
 
@@ -67,6 +69,26 @@ public class ResourcesControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
         JSONObject object = (JSONObject) JSONObject.parse(mvcResult.getResponse().getContentAsString());
+
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void verifyResourceName() throws Exception {
+
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("name","list_resources_1.sh");
+        paramsMap.add("type","FILE");
+
+        MvcResult mvcResult = mockMvc.perform(get("/resources/verify-name")
+                .header("sessionId", "c24ed9d9-1c20-48a0-bd9c-5cfca14a4dcb")
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());

@@ -21,9 +21,11 @@
       </div>
     </div>
     <div class="clearfix list">
+      <x-button type="info"  style="margin-left:20px" shape="circle" :loading="spinnerLoading" @click="preview()">执行时间</x-button>
       <div class="text">
         {{$t('Timing')}}
       </div>
+
       <div class="cont">
         <template>
           <x-poptip :ref="'poptip'" placement="bottom-start">
@@ -43,6 +45,13 @@
         </template>
       </div>
     </div>
+    <div class="clearfix list">
+      <div style = "padding-left: 150px;">未来五次执行时间</div>
+      <ul style = "padding-left: 150px;">
+          <li v-for="time in previewTimes">{{time}}</li>
+      </ul>
+    </div>
+
     <div class="clearfix list">
       <div class="text">
         {{$t('Failure Strategy')}}
@@ -127,7 +136,7 @@
     </div>
     <div class="submit">
       <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()" v-ps="['GENERAL_USER']">{{spinnerLoading ? 'Loading...' : (item.crontab ? $t('Edit') : $t('Create'))}} </x-button>
+      <x-button type="primary" shape="circle" :loading="spinnerLoading" @click="ok()">{{spinnerLoading ? 'Loading...' : (item.crontab ? $t('Edit') : $t('Create'))}} </x-button>
     </div>
   </div>
 </template>
@@ -162,7 +171,8 @@
         receiversCc: [],
         i18n: i18n.globalScope.LOCALE,
         processInstancePriority: 'MEDIUM',
-        workerGroupId: -1
+        workerGroupId: -1,
+        previewTimes: []
       }
     },
     props: {
@@ -177,6 +187,11 @@
       _verification () {
         if (!this.scheduleTime) {
           this.$message.warning(`${i18n.$t('Please select time')}`)
+          return false
+        }
+
+        if (this.scheduleTime[0] === this.scheduleTime[1]) {
+          this.$message.warning(`${i18n.$t('The start time must not be the same as the end')}`)
           return false
         }
 
@@ -225,6 +240,24 @@
         }
       },
 
+      _preview () {
+              if (this._verification()) {
+                let api = 'dag/previewSchedule'
+                let searchParams = {
+                  schedule: JSON.stringify({
+                    startTime: this.scheduleTime[0],
+                    endTime: this.scheduleTime[1],
+                    crontab: this.crontab
+                  })
+                }
+                let msg = ''
+
+                this.store.dispatch(api, searchParams).then(res => {
+                  this.previewTimes = res
+                })
+              }
+            },
+
       _getNotifyGroupList () {
         return new Promise((resolve, reject) => {
           let notifyGroupListS = _.cloneDeep(this.store.state.dag.notifyGroupListS) || []
@@ -248,6 +281,9 @@
       },
       close () {
         this.$emit('close')
+      },
+      preview () {
+        this._preview()
       }
     },
     watch: {

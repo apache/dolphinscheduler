@@ -84,6 +84,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
     registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
     registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+    registry.addResourceHandler("/ui/**").addResourceLocations("file:ui/");
   }
 
   @Override
