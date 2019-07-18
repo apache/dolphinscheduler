@@ -31,21 +31,21 @@ Its main objectives are as follows:
   | EasyScheduler | Azkaban | Airflow
 -- | -- | -- | --
 **Stability** |   |   |  
-Single point of failure | Decentralized   multi-master and multi-worker | Yes     Single Web and Scheduler Combination Node | Yes.     Single Scheduler
+Single point of failure | Decentralized   multi-master and multi-worker | Yes <br/> Single Web and Scheduler Combination Node | Yes <br/>    Single Scheduler
 Additional HA requirements | Not   required (HA is supported by itself) | DB | Celery   / Dask / Mesos + Load Balancer + DB
 Overload processing | Task   queue mechanism, the number of schedulable tasks on a single machine can be   flexibly configured, when too many tasks will be cached in the task queue,   will not cause machine jam. | Jammed   the server when there are too many tasks | Jammed   the server when there are too many tasks
 **Easy to use** |   |   |  
-DAG Monitoring Interface | Visualization   process defines key information such as task status, task type, retry times,   task running machine, visual variables and so on at a glance. | Only   task status can be seen | Can't   visually distinguish task types
-Visual process definition | Yes     All process definition operations are visualized, dragging tasks to draw   DAGs, configuring data sources and resources. At the same time, for   third-party systems, the api mode operation is provided. | No     DAG and custom upload via custom DSL | No     DAG is drawn through Python code, which is inconvenient to use, especially   for business people who can't write code.
-Quick deployment | One-click   deployment | Complex   clustering deployment | Complex   clustering deployment
+DAG Monitoring Interface | Visualization process defines key information such as task status, task type, retry times,   task running machine, visual variables and so on at a glance. | Only task status can be seen | Can't visually distinguish task types
+Visual process definition | Yes <br/> All process definition operations are visualized, dragging tasks to draw   DAGs, configuring data sources and resources. At the same time, for   third-party systems, the api mode operation is provided. | No <br/> DAG and custom upload via custom DSL | No <br/> DAG is drawn through Python code, which is inconvenient to use, especially   for business people who can't write code.
+Quick deployment | One-click   deployment | Complex  clustering deployment | Complex  clustering deployment
 **Features** |   |   |  
-Suspend and resume | Support   pause, recover operation | No     Can only kill the workflow first and then re-run | No     Can only kill the workflow first and then re-run
+Suspend and resume | Support   pause, recover operation | No <br/>  Can only kill the workflow first and then re-run | No <br/>  Can only kill the workflow first and then re-run
 Whether to support multiple tenants | Users   on easyscheduler can achieve many-to-one or one-to-one mapping relationship   through tenants and Hadoop users, which is very important for scheduling   large data jobs. "     Supports traditional shell tasks, while supporting large data platform task   scheduling: MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python,   Procedure, Sub_Process | No | No
 Task type | Supports   traditional shell tasks, and also support big data platform task scheduling:   MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Procedure,   Sub_Process | shell、gobblin、hadoopJava、java、hive、pig、spark、hdfsToTeradata、teradataToHdfs | BashOperator、DummyOperator、MySqlOperator、HiveOperator、EmailOperator、HTTPOperator、SqlOperator
 Compatibility | Support   the scheduling of big data jobs like spark, hive, Mr. At the same time, it is   more compatible with big data business because it supports multiple tenants. | Because   it does not support multi-tenant, it is not flexible enough to use business   in big data platform. | Because   it does not support multi-tenant, it is not flexible enough to use business   in big data platform.
 **Scalability** |   |   |  
 Whether to support custom task types | Yes | Yes | Yes
-Is Cluster Extension Supported? | Yes     The scheduler uses distributed scheduling, and the overall scheduling   capability will increase linearly with the scale of the cluster. Master and  Worker support dynamic online and offline. | Yes,   but complicated     Executor horizontal extend | Yes,   but complicated     Executor horizontal extend
+Is Cluster Extension Supported? | Yes <br/> The scheduler uses distributed scheduling, and the overall scheduling   capability will increase linearly with the scale of the cluster. Master and  Worker support dynamic online and offline. | Yes <br/>    but complicated     Executor horizontal extend | Yes  <br/>   but complicated     Executor horizontal extend
 
 
 
