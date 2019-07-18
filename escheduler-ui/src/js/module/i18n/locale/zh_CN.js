@@ -471,5 +471,6 @@ export default {
   'The start time must not be the same as the end': '开始时间和结束时间不能相同',
   'Startup parameter': '启动参数',
   'Startup type': '启动类型',
+  'warning of timeout': '超时告警',
   'Complement range': '补数范围'
 }
