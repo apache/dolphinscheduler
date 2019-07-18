@@ -80,9 +80,9 @@ public class UdfFuncService extends BaseService{
                                     int resourceId) {
         Result result = new Result();
 
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -167,9 +167,9 @@ public class UdfFuncService extends BaseService{
         // verify udfFunc is exist
         UdfFunc udf = udfFuncMapper.queryUdfById(udfFuncId);
 
-        // if hdfs not startup
-        if (!PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            logger.error("hdfs startup state: {}", PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE));
+        // if resource upload startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }

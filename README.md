@@ -4,69 +4,91 @@ Easy Scheduler
 
 > Easy Scheduler for Big Data
 
-**设计特点：** 一个分布式易扩展的可视化DAG工作流任务调度系统。致力于解决数据处理流程中错综复杂的依赖关系，使调度系统在数据处理流程中`开箱即用`。
-其主要目标如下：
- - 以DAG图的方式将Task按照任务的依赖关系关联起来，可实时可视化监控任务的运行状态
- - 支持丰富的任务类型：Shell、MR、Spark、SQL(mysql、postgresql、hive、sparksql),Python,Sub_Process、Procedure等
- - 支持工作流定时调度、依赖调度、手动调度、手动暂停/停止/恢复，同时支持失败重试/告警、从指定节点恢复失败、Kill任务等操作
- - 支持工作流优先级、任务优先级及任务的故障转移及任务超时告警/失败
- - 支持工作流全局参数及节点自定义参数设置
- - 支持资源文件的在线上传/下载，管理等，支持在线文件创建、编辑
- - 支持任务日志在线查看及滚动、在线下载日志等
- - 实现集群HA，通过Zookeeper实现Master集群和Worker集群去中心化
- - 支持对`Master/Worker` cpu load，memory，cpu在线查看
- - 支持工作流运行历史树形/甘特图展示、支持任务状态统计、流程状态统计
- - 支持补数
- - 支持多租户
- - 支持国际化
- - 还有更多等待伙伴们探索
+### Design features: 
 
-### 与同类调度系统的对比
+A distributed and easy-to-expand visual DAG workflow scheduling system. Dedicated to solving the complex dependencies in data processing, making the scheduling system `out of the box` for data processing.
+Its main objectives are as follows:
 
-![调度系统对比](http://geek.analysys.cn/static/upload/47/2019-03-01/9609ca82-cf8b-4d91-8dc0-0e2805194747.jpeg)
-
-### 系统部分截图
-
-![](http://geek.analysys.cn/static/upload/221/2019-03-29/0a9dea80-fb02-4fa5-a812-633b67035ffc.jpeg)
-
-![](http://geek.analysys.cn/static/upload/221/2019-04-01/83686def-a54f-4169-8cae-77b1f8300cc1.png)
-
-![](http://geek.analysys.cn/static/upload/221/2019-03-29/83c937c7-1793-4d7a-aa28-b98460329fe0.jpeg)
-
-### 文档
-
-- <a href="https://analysys.github.io/easyscheduler_docs_cn/后端部署文档.html" target="_blank">后端部署文档</a>
-
-- <a href="https://analysys.github.io/easyscheduler_docs_cn/前端部署文档.html" target="_blank">前端部署文档</a>
-
-- [**使用手册**](https://analysys.github.io/easyscheduler_docs_cn/系统使用手册.html?_blank "系统使用手册") 
-
-- [**升级文档**](https://analysys.github.io/easyscheduler_docs_cn/升级文档.html?_blank "升级文档") 
-
-- <a href="http://52.82.13.76:8888" target="_blank">我要体验</a> 
-
-更多文档请参考 <a href="https://analysys.github.io/easyscheduler_docs_cn/" target="_blank">easyscheduler中文在线文档</a>
+ - Associate the Tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of task in real time.
+ - Support for many task types: Shell, MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Sub_Process, Procedure, etc.
+ - Support process scheduling, dependency scheduling, manual scheduling, manual pause/stop/recovery, support for failed retry/alarm, recovery from specified nodes, Kill task, etc.
+ - Support process priority, task priority and task failover and task timeout alarm/failure
+ - Support process global parameters and node custom parameter settings
+ - Support online upload/download of resource files, management, etc. Support online file creation and editing
+ - Support task log online viewing and scrolling, online download log, etc.
+ - Implement cluster HA, decentralize Master cluster and Worker cluster through Zookeeper
+ - Support online viewing of `Master/Worker` cpu load, memory, cpu
+ - Support process running history tree/gantt chart display, support task status statistics, process status statistics
+ - Support for complement
+ - Support for multi-tenant
+ - Support internationalization
+ - There are more waiting partners to explore
 
 
-### 近期研发计划
+### Comparison with similar scheduler systems
 
-EasyScheduler的工作计划：<a href="https://github.com/analysys/EasyScheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是1.0.2版本的功能，TODO卡片是待做事项(包括 feature ideas)
 
-### 贡献代码
+  | EasyScheduler | Azkaban | Airflow
+-- | -- | -- | --
+**Stability** |   |   |  
+Single point of failure | Decentralized   multi-master and multi-worker | Yes     Single Web and Scheduler Combination Node | Yes.     Single Scheduler
+Additional HA requirements | Not   required (HA is supported by itself) | DB | Celery   / Dask / Mesos + Load Balancer + DB
+Overload processing | Task   queue mechanism, the number of schedulable tasks on a single machine can be   flexibly configured, when too many tasks will be cached in the task queue,   will not cause machine jam. | Jammed   the server when there are too many tasks | Jammed   the server when there are too many tasks
+**Easy to use** |   |   |  
+DAG Monitoring Interface | Visualization   process defines key information such as task status, task type, retry times,   task running machine, visual variables and so on at a glance. | Only   task status can be seen | Can't   visually distinguish task types
+Visual process definition | Yes     All process definition operations are visualized, dragging tasks to draw   DAGs, configuring data sources and resources. At the same time, for   third-party systems, the api mode operation is provided. | No     DAG and custom upload via custom DSL | No     DAG is drawn through Python code, which is inconvenient to use, especially   for business people who can't write code.
+Quick deployment | One-click   deployment | Complex   clustering deployment | Complex   clustering deployment
+**Features** |   |   |  
+Suspend and resume | Support   pause, recover operation | No     Can only kill the workflow first and then re-run | No     Can only kill the workflow first and then re-run
+Whether to support multiple tenants | Users   on easyscheduler can achieve many-to-one or one-to-one mapping relationship   through tenants and Hadoop users, which is very important for scheduling   large data jobs. "     Supports traditional shell tasks, while supporting large data platform task   scheduling: MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python,   Procedure, Sub_Process | No | No
+Task type | Supports   traditional shell tasks, and also support big data platform task scheduling:   MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Procedure,   Sub_Process | shell、gobblin、hadoopJava、java、hive、pig、spark、hdfsToTeradata、teradataToHdfs | BashOperator、DummyOperator、MySqlOperator、HiveOperator、EmailOperator、HTTPOperator、SqlOperator
+Compatibility | Support   the scheduling of big data jobs like spark, hive, Mr. At the same time, it is   more compatible with big data business because it supports multiple tenants. | Because   it does not support multi-tenant, it is not flexible enough to use business   in big data platform. | Because   it does not support multi-tenant, it is not flexible enough to use business   in big data platform.
+**Scalability** |   |   |  
+Whether to support custom task types | Yes | Yes | Yes
+Is Cluster Extension Supported? | Yes     The scheduler uses distributed scheduling, and the overall scheduling   capability will increase linearly with the scale of the cluster. Master and  Worker support dynamic online and offline. | Yes,   but complicated     Executor horizontal extend | Yes,   but complicated     Executor horizontal extend
 
-非常欢迎大家来参与贡献代码，提交代码流程请参考：
+
+
+
+### System partial screenshot
+
+![image](https://user-images.githubusercontent.com/48329107/61368744-1f5f3b00-a8c1-11e9-9cf1-10f8557a6b3b.png)
+
+![image](https://user-images.githubusercontent.com/48329107/61368966-9dbbdd00-a8c1-11e9-8dcc-a9469d33583e.png)
+
+![image](https://user-images.githubusercontent.com/48329107/61372146-f347b800-a8c8-11e9-8882-66e8934ada23.png)
+
+
+### Document
+
+- <a href="https://analysys.github.io/easyscheduler_docs_cn/后端部署文档.html" target="_blank">Backend deployment documentation</a>
+
+- <a href="https://analysys.github.io/easyscheduler_docs_cn/前端部署文档.html" target="_blank">Front-end deployment documentation</a>
+
+- [**User manual**](https://analysys.github.io/easyscheduler_docs_cn/系统使用手册.html?_blank "User manual") 
+
+- [**Upgrade document**](https://analysys.github.io/easyscheduler_docs_cn/升级文档.html?_blank "Upgrade document") 
+
+- <a href="http://52.82.13.76:8888" target="_blank">Online Demo</a> 
+
+More documentation please refer to <a href="https://analysys.github.io/easyscheduler_docs_cn/" target="_blank">[EasyScheduler online documentation]</a>
+
+### Recent R&D plan
+Work plan of Easy Scheduler: [R&D plan](https://github.com/analysys/EasyScheduler/projects/1), where `In Develop` card is the features of 1.1.0 version , TODO card is to be done (including feature ideas)
+
+### How to contribute code
+
+Welcome to participate in contributing code, please refer to the process of submitting the code:
 https://github.com/analysys/EasyScheduler/blob/master/CONTRIBUTING.md
 
+### Thanks
 
-### 感谢
+Easy Scheduler uses a lot of excellent open source projects, such as google guava, guice, grpc, netty, ali bonecp, quartz, and many open source projects of apache, etc.
+It is because of the shoulders of these open source projects that the birth of the Easy Scheduler is possible. We are very grateful for all the open source software used! We also hope that we will not only be the beneficiaries of open source, but also be open source contributors, so we decided to contribute to easy scheduling and promised long-term updates. I also hope that partners who have the same passion and conviction for open source will join in and contribute to open source!
 
-Easy Scheduler使用了很多优秀的开源项目，比如google的guava、guice、grpc，netty，ali的bonecp，quartz，以及apache的众多开源项目等等，
-正是由于站在这些开源项目的肩膀上，才有Easy Scheduler的诞生的可能。对此我们对使用的所有开源软件表示非常的感谢！我们也希望自己不仅是开源的受益者，也能成为开源的
-贡献者，于是我们决定把易调度贡献出来，并承诺长期维护。也希望对开源有同样热情和信念的伙伴加入进来，一起为开源献出一份力！
-
-
-### 帮助
-The fastest way to get response from our developers is to submit issues,   or add our wechat : 510570367
+### Help
+The fastest way to get response from our developers is to submit issues,  or add our wechat : 510570367
+ 
  
 
 

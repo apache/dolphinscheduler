@@ -141,6 +141,11 @@ public class ProcessDefinition {
      */
     private int timeout;
 
+    /**
+     * tenant id
+     */
+    private int tenantId;
+
 
     public String getName() {
         return name;
@@ -354,7 +359,15 @@ public class ProcessDefinition {
                 ", receiversCc='" + receiversCc + '\'' +
                 ", scheduleReleaseState=" + scheduleReleaseState +
                 ", timeout=" + timeout +
+                ", tenantId=" + tenantId +
                 '}';
     }
 
+    public int getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(int tenantId) {
+        this.tenantId = tenantId;
+    }
 }

@@ -32,9 +32,12 @@
                   v-model="email"
                   :disabled="disabled"
                   :placeholder="$t('Please enter email')"
+                  @blur="_emailEnter"
                   @keydown.tab="_emailTab"
                   @keyup.delete="_emailDelete"
                   @keyup.enter="_emailEnter"
+                  @keyup.space="_emailEnter"
+                  @keyup.186="_emailEnter"
                   @keyup.up="_emailKeyup('up')"
                   @keyup.down="_emailKeyup('down')">
         </span>
@@ -78,6 +81,11 @@
        * Manually add a mailbox
        */
       _manualEmail () {
+        if (this.email === '') {
+          return
+        }
+        this.email = _.trim(this.email).replace(/(;$)|(；$)/g, "")
+
         let email = this.email
 
         let is = (n) => {
