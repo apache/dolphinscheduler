@@ -6,7 +6,7 @@ Easy Scheduler
 
 ### Design features: 
 
-A distributed and easy-to-expand visual DAG workflow scheduling system. Dedicated to solving the complex dependencies in the data processing process, making the scheduling system `out of the box` in the data processing process.
+A distributed and easy-to-expand visual DAG workflow scheduling system. Dedicated to solving the complex dependencies in data processing, making the scheduling system `out of the box` for data processing.
 Its main objectives are as follows:
 
  - Associate the Tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of task in real time.
