@@ -55,6 +55,8 @@ public class ProcessDefinitionMapperProvider {
                 VALUES("`connects`", "#{processDefinition.connects}");
                 VALUES("`create_time`", "#{processDefinition.createTime}");
                 VALUES("`update_time`", "#{processDefinition.updateTime}");
+                VALUES("`receivers` ","#{processDefinition.receivers}");
+                VALUES("`receivers_cc`", "#{processDefinition.receiversCc}");
                 VALUES("`timeout`", "#{processDefinition.timeout}");
                 VALUES("`flag`", EnumFieldUtil.genFieldStr("processDefinition.flag", ReleaseState.class));
                 VALUES("`user_id`", "#{processDefinition.userId}");
@@ -101,6 +103,8 @@ public class ProcessDefinitionMapperProvider {
                 SET("`global_params`=#{processDefinition.globalParams}");
                 SET("`create_time`=#{processDefinition.createTime}");
                 SET("`update_time`=#{processDefinition.updateTime}");
+                SET("`receivers`=#{processDefinition.receivers}");
+                SET("`receivers_cc`=#{processDefinition.receiversCc}");
                 SET("`timeout`=#{processDefinition.timeout}");
                 SET("`flag`="+EnumFieldUtil.genFieldStr("processDefinition.flag", Flag.class));
                 SET("`user_id`=#{processDefinition.userId}");
