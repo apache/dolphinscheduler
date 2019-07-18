@@ -162,7 +162,12 @@ public abstract class AbstractCommandExecutor {
                 exitStatusCode = updateState(processDao, exitStatusCode, pid, taskInstId);
 
             } else {
-                cancelApplication();
+                TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+                if (taskInstance == null) {
+                    logger.error("task instance id:{} not exist", taskInstId);
+                } else {
+                    ProcessUtils.kill(taskInstance);
+                }
                 exitStatusCode = -1;
                 logger.warn("process timeout, work dir:{}, pid:{}", taskDir, pid);
             }
