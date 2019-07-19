@@ -69,9 +69,9 @@
             setTimeout(() => {
               this.spinnerLoading = false
               if (this.userName === 'admin') {
-                window.location.href = '/#/security/tenant'
+                window.location.href = `${PUBLIC_PATH}/#/security/tenant`
               } else {
-                window.location.href = '/#/home'
+                window.location.href = `${PUBLIC_PATH}/#/home`
               }
             }, 1000)
           }).catch(e => {
