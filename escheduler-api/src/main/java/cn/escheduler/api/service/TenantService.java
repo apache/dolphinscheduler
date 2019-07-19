@@ -223,40 +223,55 @@ public class TenantService extends BaseService{
   @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
   public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
     Map<String, Object> result = new HashMap<>(5);
-
+    // whether to delete tenant hdfs path
+    boolean deleteHdfsPath = false;
+    String tenantPath = "";
     if (checkAdmin(loginUser, result)) {
       return result;
     }
 
     Tenant tenant = tenantMapper.queryById(id);
 
-    if (tenant == null){
+    if (tenant == null) {
       putMsg(result, Status.TENANT_NOT_EXIST);
       return result;
     }
 
     // if hdfs startup
-    if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-      String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
+    if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)) {
+      // get tenant path
+      tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
 
+      // if tenantPath is exist
+      if (HadoopUtils.getInstance().exists(tenantPath)) {
+        deleteHdfsPath = true;
+      }
+    }
+
+    if (deleteHdfsPath) {
+      // get resource root path
       String resourcePath = HadoopUtils.getHdfsDir(tenant.getTenantCode());
       FileStatus[] fileStatus = HadoopUtils.getInstance().listFileStatus(resourcePath);
       if (fileStatus.length > 0) {
         putMsg(result, Status.HDFS_TERANT_RESOURCES_FILE_EXISTS);
         return result;
       }
-      fileStatus = HadoopUtils.getInstance().listFileStatus(HadoopUtils.getHdfsUdfDir(tenant.getTenantCode()));
+
+      // get udf root path
+      String udfPath = HadoopUtils.getHdfsUdfDir(tenant.getTenantCode());
+      fileStatus = HadoopUtils.getInstance().listFileStatus(udfPath);
       if (fileStatus.length > 0) {
         putMsg(result, Status.HDFS_TERANT_UDFS_FILE_EXISTS);
         return result;
       }
 
+      tenantMapper.deleteById(id);
       HadoopUtils.getInstance().delete(tenantPath, true);
+    } else {
+      tenantMapper.deleteById(id);
     }
 
-    tenantMapper.deleteById(id);
     putMsg(result, Status.SUCCESS);
-    
     return result;
   }
 
