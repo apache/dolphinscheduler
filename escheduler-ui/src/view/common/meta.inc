@@ -11,12 +11,12 @@
 <meta name="theme-color" content="#4a8dee">
 <meta name="msapplication-navbutton-color" content="#4a8dee">
 <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1">
-<link rel="shortcut icon" href="/images/favicon.ico"/>
-<link href="/combo/1.0.0/base.css?v1.0.0.1" rel="stylesheet">
-<link href="/combo/1.0.0/3rd.css?v1.0.0.1" rel="stylesheet">
+<link rel="shortcut icon" href="${locals.PUBLIC_PATH}/images/favicon.ico"/>
+<link href="${locals.PUBLIC_PATH}/combo/1.0.0/base.css?v1.0.0.1" rel="stylesheet">
+<link href="${locals.PUBLIC_PATH}/combo/1.0.0/3rd.css?v1.0.0.1" rel="stylesheet">
 
 <!--[if lt IE 9]>
-<script src="/combo/1.0.0/es5.js"></script>
+<script src="${locals.PUBLIC_PATH}/combo/1.0.0/es5.js"></script>
 <![endif]-->
 
 <script>
