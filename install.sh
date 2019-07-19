@@ -130,9 +130,9 @@ resUploadStartupType="NONE"
 defaultFS="hdfs://mycluster:8020"
 
 # 如果配置了S3，则需要有以下配置
-s3Endpoint="http://192.168.199.91:9010"
-s3AccessKey="A3DXS30FO22544RE"
-s3SecretKey="OloCLq3n+8+sdPHUhJ21XrSxTC+JK"
+s3Endpoint="http://192.168.xx.xx:9010"
+s3AccessKey="xxxxxxxxxx"
+s3SecretKey="xxxxxxxxxx"
 
 # resourcemanager HA配置，如果是单resourcemanager,这里为yarnHaIps=""
 yarnHaIps="192.168.xx.xx,192.168.xx.xx"
@@ -343,11 +343,11 @@ sed -i ${txt} "s#worker.reserved.memory.*#worker.reserved.memory=${workerReserve
 
 
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application.properties
-sed -i ${txt} "s#server.session.timeout.*#server.session.timeout=${apiServerSessionTimeout}#g" conf/application.properties
-sed -i ${txt} "s#server.context-path.*#server.context-path=${apiServerContextPath}#g" conf/application.properties
-sed -i ${txt} "s#spring.http.multipart.max-file-size.*#spring.http.multipart.max-file-size=${springMaxFileSize}#g" conf/application.properties
-sed -i ${txt} "s#spring.http.multipart.max-request-size.*#spring.http.multipart.max-request-size=${springMaxRequestSize}#g" conf/application.properties
-sed -i ${txt} "s#server.max-http-post-size.*#server.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application.properties
+sed -i ${txt} "s#server.servlet.session.timeout.*#server.servlet.session.timeout=${apiServerSessionTimeout}#g" conf/application.properties
+sed -i ${txt} "s#server.servlet.context-path.*#server.servlet.context-path=${apiServerContextPath}#g" conf/application.properties
+sed -i ${txt} "s#spring.servlet.multipart.max-file-size.*#spring.servlet.multipart.max-file-size=${springMaxFileSize}#g" conf/application.properties
+sed -i ${txt} "s#spring.servlet.multipart.max-request-size.*#spring.servlet.multipart.max-request-size=${springMaxRequestSize}#g" conf/application.properties
+sed -i ${txt} "s#server.jetty.max-http-post-size.*#server.jetty.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application.properties
 
 
 sed -i ${txt} "s#mail.protocol.*#mail.protocol=${mailProtocol}#g" conf/alert.properties
