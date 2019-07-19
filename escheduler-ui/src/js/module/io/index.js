@@ -44,7 +44,7 @@ io.config.timeout = 0
 io.config.maxContentLength = 200000
 io.config.validateStatus = function (status) {
   if (status === 401 || status === 504) {
-    window.location.href = '/view/login/index.html'
+    window.location.href = `${PUBLIC_PATH}/view/login/index.html`
     return
   }
   return status
