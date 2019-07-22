@@ -97,13 +97,7 @@ public class TenantService extends BaseService{
 
     // if hdfs startup
     if (PropertyUtils.getResUploadStartupState()){
-      String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
-      String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-      /**
-       * init resource path and udf path
-       */
-      HadoopUtils.getInstance().mkdir(resourcePath);
-      HadoopUtils.getInstance().mkdir(udfsPath);
+        createTenantDirIfNotExists(tenantCode);
     }
 
     putMsg(result, Status.SUCCESS);
@@ -240,7 +234,7 @@ public class TenantService extends BaseService{
       String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
 
       if (HadoopUtils.getInstance().exists(tenantPath)){
-        String resourcePath = HadoopUtils.getHdfsDir(tenant.getTenantCode());
+        String resourcePath = HadoopUtils.getHdfsResDir(tenant.getTenantCode());
         FileStatus[] fileStatus = HadoopUtils.getInstance().listFileStatus(resourcePath);
         if (fileStatus.length > 0) {
           putMsg(result, Status.HDFS_TERANT_RESOURCES_FILE_EXISTS);
