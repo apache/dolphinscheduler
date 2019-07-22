@@ -49,21 +49,22 @@ public class LoggerService {
    */
   public Result queryLog(int taskInstId, int skipLineNum, int limit) {
 
+
     TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
     String host = taskInstance.getHost();
     if(StringUtils.isEmpty(host)){
       return new Result(Status.TASK_INSTANCE_HOST_NOT_FOUND.getCode(), Status.TASK_INSTANCE_HOST_NOT_FOUND.getMsg());
     }
-    logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
+
 
     Result result = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
 
-    if(host != null){
-      LogClient logClient = new LogClient(host, Constants.RPC_PORT);
-      String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
-      result.setData(log);
-      logger.info(log);
-    }
+    logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
+
+    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
+    String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
+    result.setData(log);
+    logger.info(log);
 
     return result;
   }

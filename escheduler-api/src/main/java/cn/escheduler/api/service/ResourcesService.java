@@ -339,19 +339,18 @@ public class ResourcesService extends BaseService {
         String resourcePath = "";
         if (type.equals(ResourceType.FILE)) {
             hdfsFilename = HadoopUtils.getHdfsFilename(tenantCode, name);
-            resourcePath = HadoopUtils.getHdfsDir(tenantCode);
+            resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
         } else if (type.equals(ResourceType.UDF)) {
             hdfsFilename = HadoopUtils.getHdfsUdfFilename(tenantCode, name);
             resourcePath = HadoopUtils.getHdfsUdfDir(tenantCode);
         }
         try {
-            if (HadoopUtils.getInstance().exists(resourcePath)) {
-                cn.escheduler.api.utils.FileUtils.copyFile(file, localFilename);
-                HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
-            } else {
-                logger.error("{} is not exist", resourcePath);
-                return false;
+            // if tenant dir not exists
+            if (!HadoopUtils.getInstance().exists(resourcePath)) {
+                createTenantDirIfNotExists(tenantCode);
             }
+            cn.escheduler.api.utils.FileUtils.copyFile(file, localFilename);
+            HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return false;
@@ -678,7 +677,7 @@ public class ResourcesService extends BaseService {
 
             // get file hdfs path
             hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resourceName);
-            String resourcePath = HadoopUtils.getHdfsDir(tenantCode);
+            String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
             logger.info("resource hdfs path is {} ", hdfsFileName);
 
             HadoopUtils hadoopUtils = HadoopUtils.getInstance();

@@ -136,7 +136,7 @@ public class WorkerGroupService extends BaseService {
 
         Map<String, Object> result = new HashMap<>(5);
 
-        int delete = workerGroupMapper.deleteById(id);
+        workerGroupMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;
     }
