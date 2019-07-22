@@ -322,7 +322,7 @@ public class UsersService extends BaseService {
 
         if (user != null) {
             if (PropertyUtils.getResUploadStartupState()) {
-                String userPath = HadoopUtils.getHdfsDataBasePath() + "/" + user.getTenantCode() + "/home/" + id;
+                String userPath = HadoopUtils.getHdfsUserDir(user.getTenantCode(),id);
                 if (HadoopUtils.getInstance().exists(userPath)) {
                     HadoopUtils.getInstance().delete(userPath, true);
                 }
