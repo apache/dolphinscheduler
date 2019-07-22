@@ -4,6 +4,8 @@ Easy Scheduler
 
 > Easy Scheduler for Big Data
 
+[English](https://github.com/analysys/EasyScheduler/blob/dev/README.md) | [Chinese](https://github.com/analysys/EasyScheduler/blob/dev/README_zh_CN.md)
+
 ### Design features: 
 
 A distributed and easy-to-expand visual DAG workflow scheduling system. Dedicated to solving the complex dependencies in data processing, making the scheduling system `out of the box` for data processing.
