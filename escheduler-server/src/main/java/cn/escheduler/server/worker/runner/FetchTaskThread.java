@@ -128,7 +128,6 @@ public class FetchTaskThread implements Runnable{
         while (Stopper.isRunning()){
             InterProcessMutex mutex = null;
             try {
-
                 ThreadPoolExecutor poolExecutor = (ThreadPoolExecutor) workerExecService;
 
                 //check memory and cpu usage and threads
