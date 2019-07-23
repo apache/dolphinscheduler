@@ -277,6 +277,7 @@ public class MasterExecThread implements Runnable {
         ProcessDag processDag = generateFlowDag(processInstance.getProcessInstanceJson(),
                 startNodeNameList, recoveryNameList, processInstance.getTaskDependType());
         if(processDag == null){
+            //TODO...
             logger.error("processDag is null");
             return;
         }
