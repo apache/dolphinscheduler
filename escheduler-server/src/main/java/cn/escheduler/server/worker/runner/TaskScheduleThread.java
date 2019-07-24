@@ -252,7 +252,7 @@ public class TaskScheduleThread implements Callable<Boolean> {
                 }
             }
         }catch (Exception e){
-            logger.error("task escheduler failure : " + e.getMessage(),e);
+            logger.error("task escheduler failure : ", e);
             status = ExecutionStatus.FAILURE ;
             logger.error(String.format("task process exception, process id : %s , task : %s",
                     taskInstance.getProcessInstanceId(),
