@@ -22,6 +22,7 @@ import cn.escheduler.common.thread.Stopper;
 import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.FileUtils;
 import cn.escheduler.common.utils.OSUtils;
+import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.*;
 import cn.escheduler.server.zk.ZKWorkerClient;
@@ -235,17 +236,7 @@ public class FetchTaskThread implements Runnable{
             }catch (Exception e){
                 logger.error("fetch task thread exception : " + e.getMessage(),e);
             }finally {
-                if (mutex != null){
-                    try {
-                        mutex.release();
-                    } catch (Exception e) {
-                        if(e.getMessage().equals("instance must be started before calling this method")){
-                            logger.warn("fetch task lock release");
-                        }else{
-                            logger.error("fetch task lock release failed : " + e.getMessage(),e);
-                        }
-                    }
-                }
+                AbstractZKClient.releaseMutex(mutex);
             }
         }
     }

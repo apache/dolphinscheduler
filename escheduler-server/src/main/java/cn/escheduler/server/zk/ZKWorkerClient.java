@@ -17,13 +17,13 @@
 package cn.escheduler.server.zk;
 
 import cn.escheduler.common.Constants;
+import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.common.utils.CollectionUtils;
-import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ServerDao;
-import cn.escheduler.server.ResInfo;
+import cn.escheduler.common.utils.ResInfo;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
@@ -130,50 +130,19 @@ public class ZKWorkerClient extends AbstractZKClient {
 	 *  register worker
 	 */
 	private void registWorker(){
-
 		// get current date
 		Date now = new Date();
 		createTime = now ;
 		try {
-
-			// encapsulation worker znnode
-			workerZNode = workerZNodeParentPath + "/" + OSUtils.getHost() + "_";
-			List<String> workerZNodeList = zkClient.getChildren().forPath(workerZNodeParentPath);
-
-			if (CollectionUtils.isNotEmpty(workerZNodeList)){
-				boolean flag = false;
-				for (String workerZNode : workerZNodeList){
-					if (workerZNode.startsWith(OSUtils.getHost())){
-						flag = true;
-						break;
-					}
-				}
-
-				if (flag){
-					logger.info("register failure , worker already started on : {}, please wait for a moment and try again" , OSUtils.getHost());
-					// exit system
-					System.exit(-1);
-				}
+			if(checkZKNodeExists(OSUtils.getHost(), ZKNodeType.WORKER)){
+				logger.info("register failure , worker already started on : {}, please wait for a moment and try again" , OSUtils.getHost());
+				System.exit(-1);
 			}
 
-//			String heartbeatZKInfo = getOsInfo(now);
-//			workerZNode = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(workerZNode,
-//					heartbeatZKInfo.getBytes());
-
+			// create worker zknode
             initWorkZNode();
 			// handle dead server
 			handleDeadServer(workerZNode, Constants.WORKER_PREFIX, Constants.DELETE_ZK_OP);
-
-			// delete worker server from database
-			serverDao.deleteWorker(OSUtils.getHost());
-
-			// register worker znode
-			serverDao.registerWorker(OSUtils.getHost(),
-					OSUtils.getProcessID(),
-					workerZNode,
-					ResInfo.getResInfoJson(),
-					createTime,
-					createTime);
 		} catch (Exception e) {
 			logger.error("register worker failure : "  + e.getMessage(),e);
 		}
@@ -198,7 +167,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 							break;
 						case CHILD_REMOVED:
                             String path = event.getData().getPath();
-
 							// handle dead server, add to zk dead server path
 							handleDeadServer(path, Constants.WORKER_PREFIX, Constants.ADD_ZK_OP);
 
@@ -211,22 +179,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 							logger.info("node deleted : {}", event.getData().getPath());
 							break;
 						case CHILD_UPDATED:
-							if (event.getData().getPath().contains(OSUtils.getHost())){
-								byte[] bytes = zkClient.getData().forPath(event.getData().getPath());
-								String resInfoStr = new String(bytes);
-								String[] splits = resInfoStr.split(Constants.COMMA);
-								if (splits.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH) {
-									return;
-								}
-
-								// updateProcessInstance master info in database according to host
-								serverDao.updateWorker(OSUtils.getHost(),
-										OSUtils.getProcessID(),
-										ResInfo.getResInfoJson(Double.parseDouble(splits[2])
-												,Double.parseDouble(splits[3])),
-										DateUtils.stringToDate(splits[5]));
-								logger.debug("node updated : {}",event.getData().getPath());
-							}
 							break;
 						default:
 							break;
