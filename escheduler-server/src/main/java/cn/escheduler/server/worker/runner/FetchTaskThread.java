@@ -244,7 +244,7 @@ public class FetchTaskThread implements Runnable{
     private String getExecLocalPath(){
         return FileUtils.getProcessExecDir(taskInstance.getProcessDefine().getProjectId(),
                 taskInstance.getProcessDefine().getId(),
-                taskInstance.getProcessDefine().getId(),
+                taskInstance.getProcessInstance().getId(),
                 taskInstance.getId());
     }
     /**
