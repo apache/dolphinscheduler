@@ -18,19 +18,24 @@ package cn.escheduler.common.zk;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.IStoppable;
+import cn.escheduler.common.enums.ZKNodeType;
+import cn.escheduler.common.model.MasterServer;
+import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.OSUtils;
+import cn.escheduler.common.utils.ResInfo;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.hadoop.hbase.protobuf.generated.MasterProtos;
 import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -217,7 +222,7 @@ public abstract class AbstractZKClient {
 			workerZNodeParentPath = getWorkerZNodeParentPath();
 
 			// read server node parent path from conf
-			deadServerZNodeParentPath = conf.getString(ZOOKEEPER_ESCHEDULER_DEAD_SERVERS);
+			deadServerZNodeParentPath = getDeadZNodeParentPath();
 
 			if(zkClient.checkExists().forPath(deadServerZNodeParentPath) == null){
 				//  create persistent dead server parent node
@@ -241,6 +246,7 @@ public abstract class AbstractZKClient {
 			logger.error("init system znode failed : " + e.getMessage(),e);
 		}
 	}
+
 
 
 	public void removeDeadServerByHost(String host, String serverType) throws Exception {
@@ -342,15 +348,33 @@ public abstract class AbstractZKClient {
 	}
 
 	/**
+	 * get server list.
+	 * @param zkNodeType
+	 * @return
+	 */
+	public List<MasterServer> getServers(ZKNodeType zkNodeType){
+		Map<String, String> masterMap = getServerList(zkNodeType);
+		String parentPath = getZNodeParentPath(zkNodeType);
+
+		List<MasterServer> masterServers = new ArrayList<>();
+		for(String path : masterMap.keySet()){
+			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(masterMap.get(path));
+			masterServer.setZkDirectory( parentPath + "/"+ path);
+			masterServers.add(masterServer);
+		}
+		return masterServers;
+	}
+
+	/**
 	 * get master server list map.
 	 * result : {host : resource info}
 	 * @return
 	 */
-	public Map<String, String> getServerList(boolean isMaster ){
+	public Map<String, String> getServerList(ZKNodeType zkNodeType){
 
 		Map<String, String> masterMap = new HashMap<>();
 		try {
-			String path =  isMaster ? getMasterZNodeParentPath() : getWorkerZNodeParentPath();
+			String path =  getZNodeParentPath(zkNodeType);
 			List<String> serverList  = getZkClient().getChildren().forPath(path);
 			for(String server : serverList){
 				byte[] bytes  = getZkClient().getData().forPath(path + "/" + server);
@@ -361,6 +385,28 @@ public abstract class AbstractZKClient {
 		}
 
 		return masterMap;
+	}
+
+	/**
+	 * check the zookeeper node already exists
+	 * @param host
+	 * @param zkNodeType
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean checkZKNodeExists(String host, ZKNodeType zkNodeType) throws Exception {
+		String path = getZNodeParentPath(zkNodeType);
+		if(StringUtils.isEmpty(path)){
+			logger.error("check zk node exists error, host:{}, zk node type:{}", host, zkNodeType.toString());
+			return false;
+		}
+		Map<String, String> serverMaps = getServerList(zkNodeType);
+		for(String hostKey : serverMaps.keySet()){
+			if(hostKey.startsWith(host)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -392,6 +438,34 @@ public abstract class AbstractZKClient {
 	}
 
 	/**
+	 * get zookeeper node parent path
+	 * @param zkNodeType
+	 * @return
+	 */
+	public String getZNodeParentPath(ZKNodeType zkNodeType) {
+		String path = "";
+		switch (zkNodeType){
+			case MASTER:
+				return getMasterZNodeParentPath();
+			case WORKER:
+				return getWorkerZNodeParentPath();
+			case DEAD_SERVER:
+				return getDeadZNodeParentPath();
+			default:
+				break;
+		}
+		return path;
+	}
+
+	/**
+	 * get dead server node parent path
+	 * @return
+	 */
+	protected String getDeadZNodeParentPath(){
+		return conf.getString(ZOOKEEPER_ESCHEDULER_DEAD_SERVERS);
+	}
+
+	/**
 	 *  get master start up lock path
 	 * @return
 	 */
@@ -414,6 +488,26 @@ public abstract class AbstractZKClient {
 	public String getWorkerFailoverLockPath(){
 		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_WORKERS);
 	}
+
+	/**
+	 * release mutex
+	 * @param mutex
+	 */
+	public static void releaseMutex(InterProcessMutex mutex) {
+		if (mutex != null){
+			try {
+				mutex.release();
+			} catch (Exception e) {
+				if(e.getMessage().equals("instance must be started before calling this method")){
+					logger.warn("lock release");
+				}else{
+					logger.error("lock release failed : " + e.getMessage(),e);
+				}
+
+			}
+		}
+	}
+
 
 
 	@Override

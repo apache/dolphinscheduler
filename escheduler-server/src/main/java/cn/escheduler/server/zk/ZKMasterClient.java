@@ -19,8 +19,8 @@ package cn.escheduler.server.zk;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.enums.ZKNodeType;
+import cn.escheduler.common.model.MasterServer;
 import cn.escheduler.common.utils.CollectionUtils;
-import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.AlertDao;
@@ -30,7 +30,7 @@ import cn.escheduler.dao.ServerDao;
 import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
 import cn.escheduler.dao.model.WorkerServer;
-import cn.escheduler.server.ResInfo;
+import cn.escheduler.common.utils.ResInfo;
 import cn.escheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -118,7 +118,6 @@ public class ZKMasterClient extends AbstractZKClient {
 		try {
 			// create distributed lock with the root node path of the lock space as /escheduler/lock/failover/master
 			String znodeLock = getMasterStartUpLockPath();
-
 			mutex = new InterProcessMutex(zkClient, znodeLock);
 			mutex.acquire();
 
@@ -137,27 +136,17 @@ public class ZKMasterClient extends AbstractZKClient {
 			// check if fault tolerance is required，failure and tolerance
 			if (getActiveMasterNum() == 1) {
 				failoverWorker(null, true);
-//				processDao.masterStartupFaultTolerant();
 				failoverMaster(null);
 			}
 
 		}catch (Exception e){
 			logger.error("master start up  exception : " + e.getMessage(),e);
 		}finally {
-			if (mutex != null){
-				try {
-					mutex.release();
-				} catch (Exception e) {
-					if(e.getMessage().equals("instance must be started before calling this method")){
-						logger.warn("lock release");
-					}else{
-						logger.error("lock release failed : " + e.getMessage(),e);
-					}
-
-				}
-			}
+			releaseMutex(mutex);
 		}
 	}
+
+
 
 
 	/**
@@ -202,74 +191,24 @@ public class ZKMasterClient extends AbstractZKClient {
 				// exit system
 				System.exit(-1);
 			}
-
-			// specify the format of stored data in ZK nodes
-			String heartbeatZKInfo = ResInfo.getHeartBeatInfo(now);
-			// create temporary sequence nodes for master znode
-			masterZNode = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(
-					masterZNodeParentPath + "/" + OSUtils.getHost() + "_", heartbeatZKInfo.getBytes());
-
+			createMasterZNode(now);
 			logger.info("register master node {} success" , masterZNode);
 
 			// handle dead server
 			handleDeadServer(masterZNode, Constants.MASTER_PREFIX, Constants.DELETE_ZK_OP);
-
-			// delete master server from database
-			serverDao.deleteMaster(OSUtils.getHost());
-
-			// register master znode
-			serverDao.registerMaster(OSUtils.getHost(),
-					OSUtils.getProcessID(),
-					masterZNode,
-					ResInfo.getResInfoJson(),
-					createTime,
-					createTime);
-
 		} catch (Exception e) {
 			logger.error("register master failure : "  + e.getMessage(),e);
 		}
 	}
 
-
-	/**
-	 * check the zookeeper node already exists
-	 * @param host
-	 * @param zkNodeType
-	 * @return
-	 * @throws Exception
-	 */
-	private boolean checkZKNodeExists(String host, ZKNodeType zkNodeType) throws Exception {
-
-		String path = null;
-		switch (zkNodeType){
-			case MASTER:
-				path = masterZNodeParentPath;
-				break;
-			case WORKER:
-				path = workerZNodeParentPath;
-				break;
-			case DEAD_SERVER:
-				path = deadServerZNodeParentPath;
-				break;
-			default:
-				break;
-		}
-		if(StringUtils.isEmpty(path)){
-			logger.error("check zk node exists error, host:{}, zk node type:{}", host, zkNodeType.toString());
-			return false;
-		}
-
-		List<String> serverList = null;
-        serverList = zkClient.getChildren().forPath(path);
-		if (CollectionUtils.isNotEmpty(serverList)){
-            for (String masterZNode : serverList){
-                if (masterZNode.startsWith(host)){
-                    return true;
-                }
-                }
-            }
-        return false;
+	private void createMasterZNode(Date now) throws Exception {
+		// specify the format of stored data in ZK nodes
+		String heartbeatZKInfo = ResInfo.getHeartBeatInfo(now);
+		// create temporary sequence nodes for master znode
+		masterZNode = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(
+				masterZNodeParentPath + "/" + OSUtils.getHost() + "_", heartbeatZKInfo.getBytes());
 	}
+
 
 	/**
 	 *  monitor master
@@ -291,59 +230,9 @@ public class ZKMasterClient extends AbstractZKClient {
 						case CHILD_REMOVED:
 							String path = event.getData().getPath();
 							logger.info("master node deleted : {}",event.getData().getPath());
-
-							InterProcessMutex mutexLock = null;
-							try {
-								// handle dead server, add to zk dead server pth
-								handleDeadServer(path, Constants.MASTER_PREFIX, Constants.ADD_ZK_OP);
-
-								if(masterZNode.equals(path)){
-									logger.error("master server({}) of myself dead , stopping...", path);
-									stoppable.stop(String.format("master server(%s) of myself dead , stopping...", path));
-									break;
-								}
-
-								// create a distributed lock, and the root node path of the lock space is /escheduler/lock/failover/master
-								String znodeLock = zkMasterClient.getMasterFailoverLockPath();
-								mutexLock = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
-								mutexLock.acquire();
-
-								String masterHost = getHostByEventDataPath(path);
-								for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
-									alertDao.sendServerStopedAlert(1, masterHost, "Master-Server");
-								}
-								if(StringUtils.isNotEmpty(masterHost)){
-									failoverMaster(masterHost);
-								}
-							}catch (Exception e){
-								logger.error("master failover failed : " + e.getMessage(),e);
-							}finally {
-								if (mutexLock != null){
-									try {
-										mutexLock.release();
-									} catch (Exception e) {
-										logger.error("lock relase failed : " + e.getMessage(),e);
-									}
-								}
-							}
+							removeMasterNode(path);
 							break;
 						case CHILD_UPDATED:
-							if (event.getData().getPath().contains(OSUtils.getHost())){
-								byte[] bytes = zkClient.getData().forPath(event.getData().getPath());
-								String resInfoStr = new String(bytes);
-								String[] splits = resInfoStr.split(Constants.COMMA);
-								if (splits.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH) {
-									return;
-								}
-								// updateProcessInstance Master information in database according to host
-								serverDao.updateMaster(OSUtils.getHost(),
-										OSUtils.getProcessID(),
-										ResInfo.getResInfoJson(Double.parseDouble(splits[2]),
-												Double.parseDouble(splits[3])),
-										DateUtils.stringToDate(splits[5]));
-
-								logger.debug("master zk node updated : {}",event.getData().getPath());
-							}
 							break;
 						default:
 							break;
@@ -356,6 +245,42 @@ public class ZKMasterClient extends AbstractZKClient {
 
 	}
 
+	private void removeMasterNode(String path) {
+		InterProcessMutex mutexLock = null;
+		try {
+			// handle dead server, add to zk dead server pth
+			handleDeadServer(path, Constants.MASTER_PREFIX, Constants.ADD_ZK_OP);
+
+			if(masterZNode.equals(path)){
+				logger.error("master server({}) of myself dead , stopping...", path);
+				stoppable.stop(String.format("master server(%s) of myself dead , stopping...", path));
+				return;
+			}
+
+			// create a distributed lock, and the root node path of the lock space is /escheduler/lock/failover/master
+			String znodeLock = zkMasterClient.getMasterFailoverLockPath();
+			mutexLock = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
+			mutexLock.acquire();
+
+			String masterHost = getHostByEventDataPath(path);
+			for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
+				alertDao.sendServerStopedAlert(1, masterHost, "Master-Server");
+			}
+			if(StringUtils.isNotEmpty(masterHost)){
+				failoverMaster(masterHost);
+			}
+		}catch (Exception e){
+			logger.error("master failover failed : " + e.getMessage(),e);
+		}finally {
+			if (mutexLock != null){
+				try {
+					mutexLock.release();
+				} catch (Exception e) {
+					logger.error("lock relase failed : " + e.getMessage(),e);
+				}
+			}
+		}
+	}
 
 
 	/**
@@ -377,40 +302,8 @@ public class ZKMasterClient extends AbstractZKClient {
 							break;
 						case CHILD_REMOVED:
 							String path = event.getData().getPath();
-
 							logger.info("node deleted : {}",event.getData().getPath());
-
-							InterProcessMutex mutex = null;
-							try {
-
-								// handle dead server
-								handleDeadServer(path, Constants.WORKER_PREFIX, Constants.ADD_ZK_OP);
-
-								// create a distributed lock, and the root node path of the lock space is /escheduler/lock/failover/worker
-								String znodeLock = zkMasterClient.getWorkerFailoverLockPath();
-								mutex = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
-								mutex.acquire();
-
-								String workerHost = getHostByEventDataPath(path);
-								for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
-									alertDao.sendServerStopedAlert(1, workerHost, "Worker-Server");
-								}
-
-								if(StringUtils.isNotEmpty(workerHost)){
-									failoverWorker(workerHost, true);
-                                }
-							}catch (Exception e){
-								logger.error("worker failover failed : " + e.getMessage(),e);
-							}
-							finally {
-								if (mutex != null){
-									try {
-										mutex.release();
-									} catch (Exception e) {
-										logger.error("lock relase failed : " + e.getMessage(),e);
-									}
-								}
-							}
+							removeZKNodePath(path);
 							break;
 						default:
 							break;
@@ -420,7 +313,34 @@ public class ZKMasterClient extends AbstractZKClient {
 		}catch (Exception e){
 			logger.error("listener worker failed : " + e.getMessage(),e);
 		}
+	}
 
+	private void removeZKNodePath(String path) {
+		InterProcessMutex mutex = null;
+		try {
+
+			// handle dead server
+			handleDeadServer(path, Constants.WORKER_PREFIX, Constants.ADD_ZK_OP);
+
+			// create a distributed lock, and the root node path of the lock space is /escheduler/lock/failover/worker
+			String znodeLock = zkMasterClient.getWorkerFailoverLockPath();
+			mutex = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
+			mutex.acquire();
+
+			String workerHost = getHostByEventDataPath(path);
+			for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
+				alertDao.sendServerStopedAlert(1, workerHost, "Worker-Server");
+			}
+
+			if(StringUtils.isNotEmpty(workerHost)){
+				failoverWorker(workerHost, true);
+			}
+		}catch (Exception e){
+			logger.error("worker failover failed : " + e.getMessage(),e);
+		}
+		finally {
+		    releaseMutex(mutex);
+		}
 	}
 
 	/**
@@ -430,9 +350,6 @@ public class ZKMasterClient extends AbstractZKClient {
 	public String getMasterZNode() {
 		return masterZNode;
 	}
-
-
-
 
 	/**
 	 * task needs failover if task start before worker starts
@@ -460,15 +377,20 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @return
 	 */
 	private boolean checkTaskAfterWorkerStart(TaskInstance taskInstance) {
+	    if(StringUtils.isEmpty(taskInstance.getHost())){
+	    	return false;
+		}
 	    Date workerServerStartDate = null;
-		List<WorkerServer> workerServers = processDao.queryWorkerServerByHost(taskInstance.getHost());
-		if(workerServers.size() > 0){
-		    workerServerStartDate = workerServers.get(0).getCreateTime();
+	    List<MasterServer> workerServers= getServers(ZKNodeType.WORKER);
+	    for(MasterServer server : workerServers){
+	    	if(server.getHost().equals(taskInstance.getHost())){
+	    	    workerServerStartDate = server.getCreateTime();
+	    	    break;
+			}
 		}
 
 		if(workerServerStartDate != null){
 			return taskInstance.getStartTime().after(workerServerStartDate);
-
 		}else{
 			return false;
 		}
@@ -478,6 +400,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * failover worker tasks
 	 * 1. kill yarn job if there are yarn jobs in tasks.
 	 * 2. change task state from running to need failover.
+     * 3. failover all tasks when workerHost is null
 	 * @param workerHost
 	 */
 	private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
@@ -501,9 +424,6 @@ public class ZKMasterClient extends AbstractZKClient {
 			taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
 			processDao.saveTaskInstance(taskInstance);
 		}
-
-		//update task Instance state value is NEED_FAULT_TOLERANCE
-		// processDao.updateNeedFailoverTaskInstances(workerHost);
 		logger.info("end worker[{}] failover ...", workerHost);
 	}
 
