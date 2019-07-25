@@ -1220,6 +1220,26 @@ public class ProcessDao extends AbstractBaseDao {
         return taskInstanceMapper.queryById(taskId);
     }
 
+
+    /**
+     * package task instance，associate processInstance and processDefine
+     * @param taskInstId
+     * @return
+     */
+    public TaskInstance getTaskInstanceRelationByTaskId(int taskInstId){
+        // get task instance
+        TaskInstance taskInstance = findTaskInstanceById(taskInstId);
+        // get process instance
+        ProcessInstance processInstance = findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
+        // get process define
+        ProcessDefinition processDefine = findProcessDefineById(taskInstance.getProcessDefinitionId());
+
+        taskInstance.setProcessInstance(processInstance);
+        taskInstance.setProcessDefine(processDefine);
+        return taskInstance;
+    }
+
+
     /**
      * get id list by task state
      * @param instanceId
@@ -1324,7 +1344,6 @@ public class ProcessDao extends AbstractBaseDao {
                                 String executePath,
                                 String logPath,
                                 int taskInstId) {
-
         TaskInstance taskInstance = taskInstanceMapper.queryById(taskInstId);
         taskInstance.setState(state);
         taskInstance.setStartTime(startTime);

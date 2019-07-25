@@ -189,6 +189,14 @@ public class TaskInstance {
     private int workerGroupId;
 
 
+
+    public void  init(String host,Date startTime,String executePath){
+        this.host = host;
+        this.startTime = startTime;
+        this.executePath = executePath;
+    }
+
+
     public ProcessInstance getProcessInstance() {
         return processInstance;
     }

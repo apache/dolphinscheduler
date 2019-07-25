@@ -529,44 +529,6 @@ public class ProcessInstance {
         this.timeout = timeout;
     }
 
-    @Override
-    public String toString() {
-        return "ProcessInstance{" +
-                "id=" + id +
-                ", processDefinitionId=" + processDefinitionId +
-                ", state=" + state +
-                ", recovery=" + recovery +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", runTimes=" + runTimes +
-                ", name='" + name + '\'' +
-                ", host='" + host + '\'' +
-                ", processDefinition=" + processDefinition +
-                ", commandType=" + commandType +
-                ", commandParam='" + commandParam + '\'' +
-                ", taskDependType=" + taskDependType +
-                ", maxTryTimes=" + maxTryTimes +
-                ", failureStrategy=" + failureStrategy +
-                ", warningType=" + warningType +
-                ", warningGroupId=" + warningGroupId +
-                ", scheduleTime=" + scheduleTime +
-                ", commandStartTime=" + commandStartTime +
-                ", globalParams='" + globalParams + '\'' +
-                ", processInstanceJson='" + processInstanceJson + '\'' +
-                ", executorId=" + executorId +
-                ", tenantCode='" + tenantCode + '\'' +
-                ", tenantId='" + tenantId + '\'' +
-                ", queue='" + queue + '\'' +
-                ", isSubProcess=" + isSubProcess +
-                ", locations='" + locations + '\'' +
-                ", connects='" + connects + '\'' +
-                ", historyCmd='" + historyCmd + '\'' +
-                ", dependenceScheduleTimes='" + dependenceScheduleTimes + '\'' +
-                ", duration=" + duration +
-                ", timeout=" + timeout +
-                ", processInstancePriority=" + processInstancePriority +
-                '}';
-    }
 
     public void setTenantId(int tenantId) {
         this.tenantId = tenantId;
@@ -598,5 +560,48 @@ public class ProcessInstance {
 
     public void setReceiversCc(String receiversCc) {
         this.receiversCc = receiversCc;
+    }
+
+    @Override
+    public String toString() {
+        return "ProcessInstance{" +
+                "id=" + id +
+                ", processDefinitionId=" + processDefinitionId +
+                ", state=" + state +
+                ", recovery=" + recovery +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", runTimes=" + runTimes +
+                ", name='" + name + '\'' +
+                ", host='" + host + '\'' +
+                ", processDefinition=" + processDefinition +
+                ", commandType=" + commandType +
+                ", commandParam='" + commandParam + '\'' +
+                ", taskDependType=" + taskDependType +
+                ", maxTryTimes=" + maxTryTimes +
+                ", failureStrategy=" + failureStrategy +
+                ", warningType=" + warningType +
+                ", warningGroupId=" + warningGroupId +
+                ", scheduleTime=" + scheduleTime +
+                ", commandStartTime=" + commandStartTime +
+                ", globalParams='" + globalParams + '\'' +
+                ", processInstanceJson='" + processInstanceJson + '\'' +
+                ", executorId=" + executorId +
+                ", tenantCode='" + tenantCode + '\'' +
+                ", queue='" + queue + '\'' +
+                ", isSubProcess=" + isSubProcess +
+                ", locations='" + locations + '\'' +
+                ", connects='" + connects + '\'' +
+                ", historyCmd='" + historyCmd + '\'' +
+                ", dependenceScheduleTimes='" + dependenceScheduleTimes + '\'' +
+                ", duration=" + duration +
+                ", processInstancePriority=" + processInstancePriority +
+                ", workerGroupId=" + workerGroupId +
+                ", timeout=" + timeout +
+                ", tenantId=" + tenantId +
+                ", workerGroupName='" + workerGroupName + '\'' +
+                ", receivers='" + receivers + '\'' +
+                ", receiversCc='" + receiversCc + '\'' +
+                '}';
     }
 }

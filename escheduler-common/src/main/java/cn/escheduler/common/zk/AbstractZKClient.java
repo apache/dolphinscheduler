@@ -18,6 +18,7 @@ package cn.escheduler.common.zk;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.IStoppable;
+import cn.escheduler.common.enums.ServerEnum;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.OSUtils;
 import org.apache.commons.configuration.Configuration;
@@ -27,6 +28,7 @@ import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
@@ -415,6 +417,17 @@ public abstract class AbstractZKClient {
 		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_WORKERS);
 	}
 
+	/**
+	 * acquire zk lock
+	 * @param zkClient
+	 * @param zNodeLockPath
+	 * @throws Exception
+	 */
+	public InterProcessMutex acquireZkLock(CuratorFramework zkClient,String zNodeLockPath)throws Exception{
+		InterProcessMutex mutex = new InterProcessMutex(zkClient, zNodeLockPath);
+		mutex.acquire();
+		return mutex;
+	}
 
 	@Override
 	public String toString() {
