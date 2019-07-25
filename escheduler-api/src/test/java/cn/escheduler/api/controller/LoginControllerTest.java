@@ -16,6 +16,7 @@
  */
 package cn.escheduler.api.controller;
 
+import cn.escheduler.api.CombinedApplicationServer;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.utils.JSONUtils;
@@ -31,18 +32,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+        classes = CombinedApplicationServer.class)
 public class LoginControllerTest {
     private static Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
 
@@ -59,9 +62,9 @@ public class LoginControllerTest {
     public void login() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userName","admin");
-        paramsMap.add("userPassword","admin123");
+        paramsMap.add("userPassword","escheduler123");
 
-        MvcResult mvcResult = mockMvc.perform(get("/login")
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/login")
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
