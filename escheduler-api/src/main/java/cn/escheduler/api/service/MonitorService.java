@@ -111,10 +111,11 @@ public class MonitorService extends BaseService{
         zookeeperMonitor = new ZookeeperMonitor();
         servers = zookeeperMonitor.getServers(isMaster);
     }catch (Exception e){
-        if(zookeeperMonitor != null){
-          zookeeperMonitor.close();
-        }
         throw e;
+    }finally {
+      if(zookeeperMonitor != null){
+        zookeeperMonitor.close();
+      }
     }
     return servers;
   }
