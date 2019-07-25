@@ -46,12 +46,6 @@ public class ProjectService extends BaseService{
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private UsersService userService;
-
-    @Autowired
     private ProjectMapper projectMapper;
 
     @Autowired
