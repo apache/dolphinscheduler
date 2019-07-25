@@ -24,7 +24,6 @@ import cn.escheduler.dao.model.MasterServer;
 import cn.escheduler.dao.model.MonitorRecord;
 import cn.escheduler.dao.model.User;
 import cn.escheduler.dao.model.ZookeeperRecord;
-import org.apache.hadoop.mapred.Master;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -65,7 +64,7 @@ public class MonitorService extends BaseService{
 
     Map<String, Object> result = new HashMap<>(5);
 
-    List<MasterServer> masterServers = new ZookeeperMonitor().getMasterServers();
+    List<MasterServer> masterServers = getServerList(true);
     result.put(Constants.DATA_LIST, masterServers);
     putMsg(result,Status.SUCCESS);
 
@@ -99,11 +98,24 @@ public class MonitorService extends BaseService{
   public Map<String,Object> queryWorker(User loginUser) {
 
     Map<String, Object> result = new HashMap<>(5);
-
-    List<MasterServer> workerServers = new ZookeeperMonitor().getWorkerServers();
+    List<MasterServer> workerServers = getServerList(false);
     result.put(Constants.DATA_LIST, workerServers);
     putMsg(result,Status.SUCCESS);
-
     return result;
+  }
+
+  private List<MasterServer> getServerList(boolean isMaster){
+    List<MasterServer> servers = new ArrayList<>();
+    ZookeeperMonitor zookeeperMonitor = null;
+    try{
+        zookeeperMonitor = new ZookeeperMonitor();
+        servers = zookeeperMonitor.getServers(isMaster);
+    }catch (Exception e){
+        if(zookeeperMonitor != null){
+          zookeeperMonitor.close();
+        }
+        throw e;
+    }
+    return servers;
   }
 }
