@@ -4,7 +4,7 @@ Easy Scheduler
 
 > Easy Scheduler for Big Data
 
-[English](https://github.com/analysys/EasyScheduler/blob/dev/README.md) | [Chinese](https://github.com/analysys/EasyScheduler/blob/dev/README_zh_CN.md)
+[English](README.md) | [Chinese](README_zh_CN.md)
 
 ### Design features: 
 
