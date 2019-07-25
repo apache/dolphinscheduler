@@ -19,6 +19,7 @@ package cn.escheduler.api.service;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.ZookeeperMonitor;
+import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.dao.MonitorDBDao;
 import cn.escheduler.common.model.MasterServer;
 import cn.escheduler.dao.model.MonitorRecord;
@@ -26,6 +27,7 @@ import cn.escheduler.dao.model.User;
 import cn.escheduler.dao.model.ZookeeperRecord;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,9 +65,7 @@ public class MonitorService extends BaseService{
 
     Map<String, Object> result = new HashMap<>(5);
 
-    ZookeeperMonitor zookeeperMonitor = new ZookeeperMonitor();
-    List<MasterServer> masterServers = zookeeperMonitor.getMasterServers();
-    zookeeperMonitor.close();
+    List<MasterServer> masterServers = getServerList(true);
     result.put(Constants.DATA_LIST, masterServers);
     putMsg(result,Status.SUCCESS);
 
@@ -99,13 +99,29 @@ public class MonitorService extends BaseService{
   public Map<String,Object> queryWorker(User loginUser) {
 
     Map<String, Object> result = new HashMap<>(5);
-    ZookeeperMonitor zookeeperMonitor = new ZookeeperMonitor();
-    List<MasterServer> workerServers = zookeeperMonitor.getWorkerServers();
-    zookeeperMonitor.close();
+    List<MasterServer> workerServers = getServerList(false);
 
     result.put(Constants.DATA_LIST, workerServers);
     putMsg(result,Status.SUCCESS);
 
     return result;
   }
+
+  private List<MasterServer> getServerList(boolean isMaster){
+    List<MasterServer> servers = new ArrayList<>();
+    ZookeeperMonitor zookeeperMonitor = null;
+    try{
+      zookeeperMonitor = new ZookeeperMonitor();
+      ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
+      servers = zookeeperMonitor.getServers(zkNodeType);
+    }catch (Exception e){
+      throw e;
+    }finally {
+      if(zookeeperMonitor != null){
+        zookeeperMonitor.close();
+      }
+    }
+    return servers;
+  }
+
 }
