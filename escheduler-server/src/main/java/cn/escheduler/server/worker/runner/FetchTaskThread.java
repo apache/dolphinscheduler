@@ -82,7 +82,7 @@ public class FetchTaskThread implements Runnable{
     /**
      *  task instance
      */
-    private TaskInstance taskInstance;
+    private volatile TaskInstance taskInstance;
 
     /**
      * task instance id
