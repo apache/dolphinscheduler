@@ -14,13 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.server;
+package cn.escheduler.common.utils;
 
 import cn.escheduler.common.Constants;
-import cn.escheduler.common.utils.DateUtils;
-import cn.escheduler.common.utils.JSONUtils;
-import cn.escheduler.common.utils.OSUtils;
-import cn.escheduler.dao.model.MasterServer;
+import cn.escheduler.common.model.MasterServer;
 
 import java.util.Date;
 

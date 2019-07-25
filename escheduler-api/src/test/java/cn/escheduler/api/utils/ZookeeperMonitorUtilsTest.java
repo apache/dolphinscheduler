@@ -1,6 +1,6 @@
 package cn.escheduler.api.utils;
 
-import cn.escheduler.dao.model.MasterServer;
+import cn.escheduler.common.model.MasterServer;
 import org.junit.Assert;
 import org.junit.Test;
 

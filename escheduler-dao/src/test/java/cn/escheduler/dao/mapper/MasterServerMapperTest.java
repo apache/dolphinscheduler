@@ -17,7 +17,7 @@
 package cn.escheduler.dao.mapper;
 
 import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.MasterServer;
+import cn.escheduler.common.model.MasterServer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
