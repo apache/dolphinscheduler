@@ -82,7 +82,7 @@ public class FetchTaskThread implements Runnable{
     /**
      *  task instance
      */
-    private volatile TaskInstance taskInstance;
+    private  TaskInstance taskInstance;
 
     /**
      * task instance id
@@ -175,7 +175,7 @@ public class FetchTaskThread implements Runnable{
                     taskInstId = Integer.parseInt(taskQueueStr.split(Constants.UNDERLINE)[3]);
 
                     // get task instance relation
-                    TaskInstance taskInstance = processDao.getTaskInstanceRelationByTaskId(taskInstId);
+                    taskInstance = processDao.getTaskInstanceRelationByTaskId(taskInstId);
 
                     Tenant tenant = processDao.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(),
                             taskInstance.getProcessDefine().getUserId());
