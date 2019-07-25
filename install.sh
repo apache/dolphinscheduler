@@ -36,17 +36,17 @@ source ${workDir}/conf/config/install_config.conf
 
 # mysql配置
 # mysql 地址,端口
-mysqlHost="192.168.xx.xx:3306"
+mysqlHost="172.168.1.23:3306"
 
 # mysql 数据库名称
 mysqlDb="escheduler"
 
 # mysql 用户名
-mysqlUserName="xx"
+mysqlUserName="root"
 
 # mysql 密码
 # 注意：如果有特殊字符，请用 \ 转移符进行转移
-mysqlPassword="xx"
+mysqlPassword="Mininglamp123$%^"
 
 # conf/config/install_config.conf配置
 # 注意：安装路径,不要当前路径(pwd)一样
