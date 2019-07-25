@@ -322,9 +322,9 @@ public class ZKMasterClient extends AbstractZKClient {
 			// handle dead server
 			handleDeadServer(path, Constants.WORKER_PREFIX, Constants.ADD_ZK_OP);
 
-			// create a distributed lock, and the root node path of the lock space is /escheduler/lock/failover/worker
-			String znodeLock = zkMasterClient.getWorkerFailoverLockPath();
-			mutex = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
+			// create a distributed lock
+			String znodeLock = getWorkerFailoverLockPath();
+			mutex = new InterProcessMutex(getZkClient(), znodeLock);
 			mutex.acquire();
 
 			String workerHost = getHostByEventDataPath(path);
