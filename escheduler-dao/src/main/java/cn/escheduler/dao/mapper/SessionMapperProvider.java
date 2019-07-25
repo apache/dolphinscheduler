@@ -114,7 +114,6 @@ public class SessionMapperProvider {
             FROM(TABLE_NAME);
 
             WHERE("`id` = #{sessionId}");
-            WHERE("`ip` = #{ip}");
         }}.toString();
     }
 
@@ -130,7 +129,6 @@ public class SessionMapperProvider {
             FROM(TABLE_NAME);
 
             WHERE("`user_id` = #{userId}");
-            WHERE("`ip` = #{ip}");
         }}.toString();
     }
 }
