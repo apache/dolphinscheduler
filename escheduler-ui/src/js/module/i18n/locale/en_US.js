@@ -462,7 +462,7 @@ export default {
   'process number of waiting for running': 'process number of waiting for running',
   'failure command number': 'failure command number',
   'tasks number of waiting running': 'tasks number of waiting running',
-  'task number of ready to kill': '待杀死任务数',
+  'task number of ready to kill': 'task number of ready to kill',
   'Statistics manage': 'Statistics manage',
   'statistics': 'statistics',
   'select tenant':'select tenant',
@@ -470,5 +470,6 @@ export default {
   'The start time must not be the same as the end': 'The start time must not be the same as the end',
   'Startup parameter': 'Startup parameter',
   'Startup type': 'Startup type',
+  'warning of timeout': 'warning of timeout',
   'Complement range': 'Complement range'
 }
