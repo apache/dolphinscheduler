@@ -16,6 +16,7 @@
  */
 package cn.escheduler.server.worker.task;
 
+import cn.escheduler.common.enums.CommandType;
 import cn.escheduler.common.enums.DataType;
 import cn.escheduler.common.enums.Direct;
 import cn.escheduler.common.enums.TaskTimeoutStrategy;
@@ -45,6 +46,8 @@ public class TaskProps {
    *  tenant code , execute task linux user
    **/
   private String tenantCode;
+
+  private String taskType;
 
   /**
    *  task parameters
@@ -101,6 +104,41 @@ public class TaskProps {
    */
   private Date scheduleTime;
 
+  /**
+   *  command type is complement
+   */
+  private CommandType cmdTypeIfComplement;
+
+
+  public TaskProps(){}
+  public TaskProps(String taskParams,
+                   String taskDir,
+                   Date scheduleTime,
+                   String nodeName,
+                   String taskType,
+                   int taskInstId,
+                   String envFile,
+                   String tenantCode,
+                   String queue,
+                   Date taskStartTime,
+                   Map<String, String> definedParams,
+                   String dependence,
+                   CommandType cmdTypeIfComplement){
+    this.taskParams = taskParams;
+    this.taskDir = taskDir;
+    this.scheduleTime = scheduleTime;
+    this.nodeName = nodeName;
+    this.taskType = taskType;
+    this.taskInstId = taskInstId;
+    this.envFile = envFile;
+    this.tenantCode = tenantCode;
+    this.queue = queue;
+    this.taskStartTime = taskStartTime;
+    this.definedParams = definedParams;
+    this.dependence = dependence;
+    this.cmdTypeIfComplement = cmdTypeIfComplement;
+
+  }
 
   public String getTenantCode() {
     return tenantCode;
@@ -200,22 +238,12 @@ public class TaskProps {
     this.taskTimeoutStrategy = taskTimeoutStrategy;
   }
 
-  /**
-   *  get parameters map
-   * @return
-   */
-  public Map<String,Property> getUserDefParamsMap() {
-    if (definedParams != null) {
-      Map<String,Property> userDefParamsMaps = new HashMap<>();
-      Iterator<Map.Entry<String, String>> iter = definedParams.entrySet().iterator();
-      while (iter.hasNext()){
-        Map.Entry<String, String> en = iter.next();
-        Property property = new Property(en.getKey(), Direct.IN, DataType.VARCHAR , en.getValue());
-        userDefParamsMaps.put(property.getProp(),property);
-      }
-      return userDefParamsMaps;
-    }
-    return null;
+  public String getTaskType() {
+    return taskType;
+  }
+
+  public void setTaskType(String taskType) {
+    this.taskType = taskType;
   }
 
   public String getDependence() {
@@ -232,5 +260,31 @@ public class TaskProps {
 
   public void setScheduleTime(Date scheduleTime) {
     this.scheduleTime = scheduleTime;
+  }
+
+  public CommandType getCmdTypeIfComplement() {
+    return cmdTypeIfComplement;
+  }
+
+  public void setCmdTypeIfComplement(CommandType cmdTypeIfComplement) {
+    this.cmdTypeIfComplement = cmdTypeIfComplement;
+  }
+
+  /**
+   *  get parameters map
+   * @return
+   */
+  public Map<String,Property> getUserDefParamsMap() {
+    if (definedParams != null) {
+      Map<String,Property> userDefParamsMaps = new HashMap<>();
+      Iterator<Map.Entry<String, String>> iter = definedParams.entrySet().iterator();
+      while (iter.hasNext()){
+        Map.Entry<String, String> en = iter.next();
+        Property property = new Property(en.getKey(), Direct.IN, DataType.VARCHAR , en.getValue());
+        userDefParamsMaps.put(property.getProp(),property);
+      }
+      return userDefParamsMaps;
+    }
+    return null;
   }
 }

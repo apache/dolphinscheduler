@@ -20,27 +20,18 @@ package cn.escheduler.server.worker.task.python;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.task.python.PythonParameters;
-import cn.escheduler.common.utils.CommonUtils;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.server.utils.ParamUtils;
 import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.PythonCommandExecutor;
 import cn.escheduler.server.worker.task.TaskProps;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
+
 import java.util.Map;
-import java.util.Set;
 
 /**
  *  python task
@@ -57,7 +48,10 @@ public class PythonTask extends AbstractTask {
    */
   private String taskDir;
 
-  private PythonCommandExecutor pythonProcessTask;
+  /**
+   * python command executor
+   */
+  private PythonCommandExecutor pythonCommandExecutor;
 
   /**
    * process database access
@@ -70,10 +64,15 @@ public class PythonTask extends AbstractTask {
 
     this.taskDir = taskProps.getTaskDir();
 
-    this.pythonProcessTask = new PythonCommandExecutor(this::logHandle,
-            taskProps.getTaskDir(), taskProps.getTaskAppId(),
-            taskProps.getTenantCode(), null, taskProps.getTaskStartTime(),
-            taskProps.getTaskTimeout(), logger);
+    this.pythonCommandExecutor = new PythonCommandExecutor(this::logHandle,
+            taskProps.getTaskDir(),
+            taskProps.getTaskAppId(),
+            taskProps.getTaskInstId(),
+            taskProps.getTenantCode(),
+            taskProps.getEnvFile(),
+            taskProps.getTaskStartTime(),
+            taskProps.getTaskTimeout(),
+            logger);
     this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
   }
 
@@ -92,9 +91,9 @@ public class PythonTask extends AbstractTask {
   public void handle() throws Exception {
     try {
       //  construct process
-      exitStatusCode = pythonProcessTask.run(buildCommand(), processDao);
+      exitStatusCode = pythonCommandExecutor.run(buildCommand(), processDao);
     } catch (Exception e) {
-      logger.error("python process exception", e);
+      logger.error("python task failure", e);
       exitStatusCode = -1;
     }
   }
@@ -102,7 +101,7 @@ public class PythonTask extends AbstractTask {
   @Override
   public void cancelApplication(boolean cancelApplication) throws Exception {
     // cancel process
-    pythonProcessTask.cancelApplication();
+    pythonCommandExecutor.cancelApplication();
   }
 
   /**
@@ -111,21 +110,7 @@ public class PythonTask extends AbstractTask {
    * @throws Exception
    */
   private String buildCommand() throws Exception {
-    // generate scripts
-//    String fileName = String.format("%s/py_%s_node.py", taskDir, taskProps.getTaskAppId());
-//    Path path = new File(fileName).toPath();
-
-
-
-//    if (Files.exists(path)) {
-//      return fileName;
-//    }
-
-    String rawScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
-
-
-    // find process instance by task id
-    ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+    String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");
 
     /**
      *  combining local and global parameters
@@ -133,27 +118,16 @@ public class PythonTask extends AbstractTask {
     Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
             taskProps.getDefinedParams(),
             pythonParameters.getLocalParametersMap(),
-            processInstance.getCmdTypeIfComplement(),
-            processInstance.getScheduleTime());
+            taskProps.getCmdTypeIfComplement(),
+            taskProps.getScheduleTime());
     if (paramsMap != null){
-      rawScript = ParameterUtils.convertParameterPlaceholders(rawScript, ParamUtils.convert(paramsMap));
+      rawPythonScript = ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
     }
 
-
-//    pythonParameters.setRawScript(rawScript);
-
-    logger.info("raw script : {}", pythonParameters.getRawScript());
+    logger.info("raw python script : {}", pythonParameters.getRawScript());
     logger.info("task dir : {}", taskDir);
 
-//    Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rwxr-xr-x");
-//    FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-//
-//    Files.createFile(path, attr);
-//
-//    Files.write(path, pythonParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
-//
-//    return fileName;
-    return rawScript;
+    return rawPythonScript;
   }
 
   @Override
