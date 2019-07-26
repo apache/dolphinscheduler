@@ -20,6 +20,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -59,5 +61,92 @@ public class CollectionUtilsTest {
 
 
         Assert.assertArrayEquals(new Integer[]{1,3},CollectionUtils.subtract(a,b).toArray());
+    }
+
+    @Test
+    public void testIsNotEmpty() {
+        Assert.assertFalse(CollectionUtils.isNotEmpty(null));
+        Assert.assertFalse(CollectionUtils.isNotEmpty(new ArrayList<>()));
+
+        Assert.assertTrue(CollectionUtils.isNotEmpty(
+                new ArrayList<>(Arrays.asList("foo", "bar"))));
+    }
+
+    @Test
+    public void testIsEmpty() {
+        Assert.assertTrue(CollectionUtils.isEmpty(null));
+        Assert.assertTrue(CollectionUtils.isEmpty(new ArrayList<>()));
+
+        Assert.assertFalse(CollectionUtils.isEmpty(
+                new ArrayList<>(Arrays.asList("foo", "bar"))));
+    }
+
+    @Test
+    public void testStringToMap() {
+        Assert.assertNull(CollectionUtils.stringToMap("", ","));
+        Assert.assertNull(CollectionUtils.stringToMap("", ",", "bar"));
+        Assert.assertNull(CollectionUtils.stringToMap(null, ",", "bar"));
+        Assert.assertNull(CollectionUtils.stringToMap("foo", "", "bar"));
+        Assert.assertNull(CollectionUtils.stringToMap("foo", null, "bar"));
+    }
+
+    @Test
+    public void testEqualLists() {
+        Assert.assertTrue(CollectionUtils.equalLists(null, null));
+        Assert.assertTrue(CollectionUtils.equalLists(
+                new ArrayList<>(), new ArrayList<>()));
+        Assert.assertTrue(CollectionUtils.equalLists(
+                new ArrayList<>(Arrays.asList("foo", "123")),
+                new ArrayList<>(Arrays.asList("foo", "123"))));
+
+        Assert.assertFalse(CollectionUtils.equalLists(
+                null, new ArrayList<>()));
+        Assert.assertFalse(CollectionUtils.equalLists(
+                new ArrayList<>(), null));
+        Assert.assertFalse(CollectionUtils.equalLists(
+                new ArrayList<>(Arrays.asList("foo", "123")),
+                new ArrayList<>(Arrays.asList("bar"))));
+        Assert.assertFalse(CollectionUtils.equalLists(
+                new ArrayList<>(Arrays.asList("foo", "123")),
+                new ArrayList<>(Arrays.asList("bar", "123"))));
+    }
+
+    @Test
+    public void testIsEqualCollection() {
+        Assert.assertTrue(CollectionUtils.isEqualCollection(
+                new ArrayList<>(), new ArrayList<>()));
+        Assert.assertTrue(CollectionUtils.isEqualCollection(
+                new ArrayList<>(Arrays.asList("foo", "123")),
+                new ArrayList<>(Arrays.asList("foo", "123"))));
+
+        Assert.assertFalse(CollectionUtils.isEqualCollection(
+                new ArrayList<>(Arrays.asList("foo", "123")),
+                new ArrayList<>(Arrays.asList("bar"))));
+        Assert.assertFalse(CollectionUtils.isEqualCollection(
+                new ArrayList<>(Arrays.asList("foo", "123")),
+                new ArrayList<>(Arrays.asList("bar", "123"))));
+    }
+
+    @Test
+    public void testGetCardinalityMap() {
+        HashMap<Integer, Integer> hashMap = new HashMap<>();
+        hashMap.put(null, 2);
+        hashMap.put(-2147483648, 1);
+
+        Assert.assertEquals(new HashMap<>(),
+                CollectionUtils.getCardinalityMap(new ArrayList<>()));
+        Assert.assertEquals(hashMap, CollectionUtils.getCardinalityMap(
+                new ArrayList<>(Arrays.asList(null, -2147483648, null))));
+    }
+
+    @Test
+    public void testGetListByExclusion() {
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("empty", false);
+
+        Assert.assertEquals(new ArrayList<>(Arrays.asList(hashMap)),
+                CollectionUtils.getListByExclusion(
+                        new ArrayList<>(Arrays.asList("foo")),
+                        new HashSet<>(Arrays.asList("bytes", "class"))));
     }
 }
