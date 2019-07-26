@@ -254,7 +254,7 @@ public class WorkerServer implements IStoppable {
                     try {
                         Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     } catch (InterruptedException e) {
-                        logger.error("interrupted exception : " + e.getMessage(),e);
+                        logger.error("interrupted exception",e);
                     }
                     // if set is null , return
                     if (CollectionUtils.isNotEmpty(taskInfoSet)){

@@ -21,12 +21,7 @@ import cn.escheduler.common.enums.DataType;
 import cn.escheduler.common.enums.DbType;
 import cn.escheduler.common.enums.Direct;
 import cn.escheduler.common.enums.TaskTimeoutStrategy;
-import cn.escheduler.common.job.db.BaseDataSource;
-import cn.escheduler.common.job.db.ClickHouseDataSource;
-import cn.escheduler.common.job.db.MySQLDataSource;
-import cn.escheduler.common.job.db.OracleDataSource;
-import cn.escheduler.common.job.db.PostgreDataSource;
-import cn.escheduler.common.job.db.SQLServerDataSource;
+import cn.escheduler.common.job.db.*;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.task.procedure.ProcedureParameters;
@@ -49,6 +44,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import static cn.escheduler.common.enums.DataType.*;
+
 /**
  *  procedure task
  */
@@ -63,6 +60,11 @@ public class ProcedureTask extends AbstractTask {
      *  process database access
      */
     private ProcessDao processDao;
+
+    /**
+     * base datasource
+     */
+    private BaseDataSource baseDataSource;
 
     public ProcedureTask(TaskProps taskProps, Logger logger) {
         super(taskProps, logger);
@@ -93,173 +95,178 @@ public class ProcedureTask extends AbstractTask {
 
         // determine whether there is a data source
         if (procedureParameters.getDatasource() == 0){
-            logger.error("datasource is null");
-            exitStatusCode = 0;
-        }else {
+            logger.error("datasource id not exists");
+            exitStatusCode = -1;
+            return;
+        }
 
-            DataSource dataSource = processDao.findDataSourceById(procedureParameters.getDatasource());
-            logger.info("datasource name : {} , type : {} , desc : {} ,  user_id : {} , parameter : {}",
-                    dataSource.getName(),dataSource.getType(),dataSource.getNote(),
-                    dataSource.getUserId(),dataSource.getConnectionParams());
+        DataSource dataSource = processDao.findDataSourceById(procedureParameters.getDatasource());
+        logger.info("datasource name : {} , type : {} , desc : {} ,  user_id : {} , parameter : {}",
+                dataSource.getName(),
+                dataSource.getType(),
+                dataSource.getNote(),
+                dataSource.getUserId(),
+                dataSource.getConnectionParams());
 
-            if (dataSource != null){
-                Connection connection = null;
-                CallableStatement stmt = null;
-                try {
-                    BaseDataSource baseDataSource = null;
+        if (dataSource == null){
+            logger.error("datasource not exists");
+            exitStatusCode = -1;
+            return;
+        }
+        Connection connection = null;
+        CallableStatement stmt = null;
+        try {
+            // load class
+            DataSourceFactory.loadClass(dataSource.getType());
+            // get datasource
+            baseDataSource = DataSourceFactory.getDatasource(dataSource.getType(),
+                    dataSource.getConnectionParams());
 
-                    if (DbType.MYSQL.name().equals(dataSource.getType().name())){
-                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),MySQLDataSource.class);
-                        Class.forName(Constants.JDBC_MYSQL_CLASS_NAME);
-                    }else if (DbType.POSTGRESQL.name().equals(dataSource.getType().name())){
-                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),PostgreDataSource.class);
-                        Class.forName(Constants.JDBC_POSTGRESQL_CLASS_NAME);
-                    }else if (DbType.CLICKHOUSE.name().equals(dataSource.getType().name())){
-                        // NOTE: currently, ClickHouse don't support procedure or UDF yet,
-                        //  but still load JDBC driver to keep source code sync with other DB
-                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(),ClickHouseDataSource.class);
-                        Class.forName(Constants.JDBC_CLICKHOUSE_CLASS_NAME);
-                    }else if (DbType.ORACLE.name().equals(dataSource.getType().name())){
-                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(), OracleDataSource.class);
-                        Class.forName(Constants.JDBC_ORACLE_CLASS_NAME);
-                    }else if (DbType.SQLSERVER.name().equals(dataSource.getType().name())){
-                        baseDataSource = JSONObject.parseObject(dataSource.getConnectionParams(), SQLServerDataSource.class);
-                        Class.forName(Constants.JDBC_SQLSERVER_CLASS_NAME);
-                    }
-
-                    // get jdbc connection
-                    connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                            baseDataSource.getUser(),
-                            baseDataSource.getPassword());
-
-                    // get process instance by task instance id
-                    ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
-
-                    // combining local and global parameters
-                    Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-                            taskProps.getDefinedParams(),
-                            procedureParameters.getLocalParametersMap(),
-                            processInstance.getCmdTypeIfComplement(),
-                            processInstance.getScheduleTime());
+            // get jdbc connection
+            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
+                    baseDataSource.getUser(),
+                    baseDataSource.getPassword());
 
 
-                    Collection<Property> userDefParamsList = null;
 
-                    if (procedureParameters.getLocalParametersMap() != null){
-                        userDefParamsList = procedureParameters.getLocalParametersMap().values();
-                    }
+            // combining local and global parameters
+            Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
+                    taskProps.getDefinedParams(),
+                    procedureParameters.getLocalParametersMap(),
+                    taskProps.getCmdTypeIfComplement(),
+                    taskProps.getScheduleTime());
 
-                    String method = "";
-                    // no parameters
-                    if (CollectionUtils.isEmpty(userDefParamsList)){
-                        method = "{call " + procedureParameters.getMethod() + "}";
-                    }else { // exists parameters
-                        int size = userDefParamsList.size();
-                        StringBuilder parameter = new StringBuilder();
-                        parameter.append("(");
-                        for (int i = 0 ;i < size - 1; i++){
-                            parameter.append("?,");
-                        }
-                        parameter.append("?)");
-                        method = "{call " + procedureParameters.getMethod() + parameter.toString()+ "}";
-                    }
 
-                    logger.info("call method : {}",method);
-                    // call method
-                    stmt = connection.prepareCall(method);
-                    if(taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED || taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED){
-                        stmt.setQueryTimeout(taskProps.getTaskTimeout());
-                    }
-                    Map<Integer,Property> outParameterMap = new HashMap<>();
-                    if (userDefParamsList != null && userDefParamsList.size() > 0){
-                        int index = 1;
-                        for (Property property : userDefParamsList){
-                            logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
-                                    ,property.getProp(),
-                                    property.getDirect(),
-                                    property.getType(),
-                                    property.getValue());
-                            // set parameters
-                            if (property.getDirect().equals(Direct.IN)){
-                                ParameterUtils.setInParameter(index,stmt,property.getType(),paramsMap.get(property.getProp()).getValue());
-                            }else if (property.getDirect().equals(Direct.OUT)){
-                                setOutParameter(index,stmt,property.getType(),paramsMap.get(property.getProp()).getValue());
-                                property.setValue(paramsMap.get(property.getProp()).getValue());
-                                outParameterMap.put(index,property);
-                            }
-                            index++;
-                        }
-                    }
+            Collection<Property> userDefParamsList = null;
 
-                    stmt.executeUpdate();
+            if (procedureParameters.getLocalParametersMap() != null){
+                userDefParamsList = procedureParameters.getLocalParametersMap().values();
+            }
 
-                    /**
-                     *  print the output parameters to the log
-                     */
-                    Iterator<Map.Entry<Integer, Property>> iter = outParameterMap.entrySet().iterator();
-                    while (iter.hasNext()){
-                        Map.Entry<Integer, Property> en = iter.next();
-
-                        int index = en.getKey();
-                        Property property = en.getValue();
-                        String prop = property.getProp();
-                        DataType dataType = property.getType();
-
-                        if (dataType.equals(DataType.VARCHAR)){
-                            String value = stmt.getString(index);
-                            logger.info("out prameter key : {} , value : {}",prop,value);
-                        }else if (dataType.equals(DataType.INTEGER)){
-                            int value = stmt.getInt(index);
-                            logger.info("out prameter key : {} , value : {}",prop,value);
-                        }else if (dataType.equals(DataType.LONG)){
-                            long value = stmt.getLong(index);
-                            logger.info("out prameter key : {} , value : {}",prop,value);
-                        }else if (dataType.equals(DataType.FLOAT)){
-                            float value = stmt.getFloat(index);
-                            logger.info("out prameter key : {} , value : {}",prop,value);
-                        }else if (dataType.equals(DataType.DOUBLE)){
-                            double value = stmt.getDouble(index);
-                            logger.info("out prameter key : {} , value : {}",prop,value);
-                        }else if (dataType.equals(DataType.DATE)){
-                            Date value = stmt.getDate(index);
-                            logger.info("out prameter key : {} , value : {}",prop,value);
-                        }else if (dataType.equals(DataType.TIME)){
-                            Time value = stmt.getTime(index);
-                            logger.info("out prameter key : {} , value : {}",prop,value);
-                        }else if (dataType.equals(DataType.TIMESTAMP)){
-                            Timestamp value = stmt.getTimestamp(index);
-                            logger.info("out prameter key : {} , value : {}",prop,value);
-                        }else if (dataType.equals(DataType.BOOLEAN)){
-                            boolean value = stmt.getBoolean(index);
-                            logger.info("out prameter key : {} , value : {}",prop,value);
-                        }
-                    }
-
-                    exitStatusCode = 0;
-                }catch (Exception e){
-                    logger.error(e.getMessage(),e);
-                    exitStatusCode = -1;
-                    throw new RuntimeException("process interrupted. exit status code is : "  + exitStatusCode);
+            String method = "";
+            // no parameters
+            if (CollectionUtils.isEmpty(userDefParamsList)){
+                method = "{call " + procedureParameters.getMethod() + "}";
+            }else { // exists parameters
+                int size = userDefParamsList.size();
+                StringBuilder parameter = new StringBuilder();
+                parameter.append("(");
+                for (int i = 0 ;i < size - 1; i++){
+                    parameter.append("?,");
                 }
-                finally {
-                    if (stmt != null) {
-                        try {
-                            stmt.close();
-                        } catch (SQLException e) {
-                            exitStatusCode = -1;
-                            logger.error(e.getMessage(),e);
-                        }
+                parameter.append("?)");
+                method = "{call " + procedureParameters.getMethod() + parameter.toString()+ "}";
+            }
+
+            logger.info("call method : {}",method);
+            // call method
+            stmt = connection.prepareCall(method);
+            if(taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED || taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED){
+                stmt.setQueryTimeout(taskProps.getTaskTimeout());
+            }
+            Map<Integer,Property> outParameterMap = new HashMap<>();
+            if (userDefParamsList != null && userDefParamsList.size() > 0){
+                int index = 1;
+                for (Property property : userDefParamsList){
+                    logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
+                            ,property.getProp(),
+                            property.getDirect(),
+                            property.getType(),
+                            property.getValue());
+                    // set parameters
+                    if (property.getDirect().equals(Direct.IN)){
+                        ParameterUtils.setInParameter(index,stmt,property.getType(),paramsMap.get(property.getProp()).getValue());
+                    }else if (property.getDirect().equals(Direct.OUT)){
+                        setOutParameter(index,stmt,property.getType(),paramsMap.get(property.getProp()).getValue());
+                        property.setValue(paramsMap.get(property.getProp()).getValue());
+                        outParameterMap.put(index,property);
                     }
-                    if (connection != null) {
-                        try {
-                            connection.close();
-                        } catch (SQLException e) {
-                            exitStatusCode = -1;
-                            logger.error(e.getMessage(), e);
-                        }
-                    }
+                    index++;
                 }
             }
+
+            stmt.executeUpdate();
+
+            /**
+             *  print the output parameters to the log
+             */
+            Iterator<Map.Entry<Integer, Property>> iter = outParameterMap.entrySet().iterator();
+            while (iter.hasNext()){
+                Map.Entry<Integer, Property> en = iter.next();
+
+                int index = en.getKey();
+                Property property = en.getValue();
+                String prop = property.getProp();
+                DataType dataType = property.getType();
+                // get output parameter
+                getOutputParameter(stmt, index, prop, dataType);
+            }
+
+            exitStatusCode = 0;
+        }catch (Exception e){
+            logger.error(e.getMessage(),e);
+            exitStatusCode = -1;
+            throw new RuntimeException(String.format("process interrupted. exit status code is %d",exitStatusCode));
+        }
+        finally {
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException e) {
+                    exitStatusCode = -1;
+                    logger.error(e.getMessage(),e);
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    exitStatusCode = -1;
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }
+    }
+
+    /**
+     * get output parameter
+     * @param stmt
+     * @param index
+     * @param prop
+     * @param dataType
+     * @throws SQLException
+     */
+    private void getOutputParameter(CallableStatement stmt, int index, String prop, DataType dataType) throws SQLException {
+        switch (dataType){
+            case VARCHAR:
+                logger.info("out prameter key : {} , value : {}",prop,stmt.getString(index));
+                break;
+            case INTEGER:
+                logger.info("out prameter key : {} , value : {}", prop, stmt.getInt(index));
+                break;
+            case LONG:
+                logger.info("out prameter key : {} , value : {}",prop,stmt.getLong(index));
+                break;
+            case FLOAT:
+                logger.info("out prameter key : {} , value : {}",prop,stmt.getFloat(index));
+                break;
+            case DOUBLE:
+                logger.info("out prameter key : {} , value : {}",prop,stmt.getDouble(index));
+                break;
+            case DATE:
+                logger.info("out prameter key : {} , value : {}",prop,stmt.getDate(index));
+                break;
+            case TIME:
+                logger.info("out prameter key : {} , value : {}",prop,stmt.getTime(index));
+                break;
+            case TIMESTAMP:
+                logger.info("out prameter key : {} , value : {}",prop,stmt.getTimestamp(index));
+                break;
+            case BOOLEAN:
+                logger.info("out prameter key : {} , value : {}",prop, stmt.getBoolean(index));
+                break;
+            default:
+                break;
         }
     }
 
@@ -277,61 +284,61 @@ public class ProcedureTask extends AbstractTask {
      * @throws Exception
      */
     private void setOutParameter(int index,CallableStatement stmt,DataType dataType,String value)throws Exception{
-        if (dataType.equals(DataType.VARCHAR)){
+        if (dataType.equals(VARCHAR)){
             if (StringUtils.isEmpty(value)){
                 stmt.registerOutParameter(index, Types.VARCHAR);
             }else {
                 stmt.registerOutParameter(index, Types.VARCHAR, value);
             }
 
-        }else if (dataType.equals(DataType.INTEGER)){
+        }else if (dataType.equals(INTEGER)){
             if (StringUtils.isEmpty(value)){
                 stmt.registerOutParameter(index, Types.INTEGER);
             }else {
                 stmt.registerOutParameter(index, Types.INTEGER, value);
             }
 
-        }else if (dataType.equals(DataType.LONG)){
+        }else if (dataType.equals(LONG)){
             if (StringUtils.isEmpty(value)){
                 stmt.registerOutParameter(index,Types.INTEGER);
             }else {
                 stmt.registerOutParameter(index,Types.INTEGER ,value);
             }
-        }else if (dataType.equals(DataType.FLOAT)){
+        }else if (dataType.equals(FLOAT)){
             if (StringUtils.isEmpty(value)){
                 stmt.registerOutParameter(index, Types.FLOAT);
             }else {
                 stmt.registerOutParameter(index, Types.FLOAT,value);
             }
-        }else if (dataType.equals(DataType.DOUBLE)){
+        }else if (dataType.equals(DOUBLE)){
             if (StringUtils.isEmpty(value)){
                 stmt.registerOutParameter(index, Types.DOUBLE);
             }else {
                 stmt.registerOutParameter(index, Types.DOUBLE , value);
             }
 
-        }else if (dataType.equals(DataType.DATE)){
+        }else if (dataType.equals(DATE)){
             if (StringUtils.isEmpty(value)){
                 stmt.registerOutParameter(index, Types.DATE);
             }else {
                 stmt.registerOutParameter(index, Types.DATE , value);
             }
 
-        }else if (dataType.equals(DataType.TIME)){
+        }else if (dataType.equals(TIME)){
             if (StringUtils.isEmpty(value)){
                 stmt.registerOutParameter(index, Types.TIME);
             }else {
                 stmt.registerOutParameter(index, Types.TIME , value);
             }
 
-        }else if (dataType.equals(DataType.TIMESTAMP)){
+        }else if (dataType.equals(TIMESTAMP)){
             if (StringUtils.isEmpty(value)){
                 stmt.registerOutParameter(index, Types.TIMESTAMP);
             }else {
                 stmt.registerOutParameter(index, Types.TIMESTAMP , value);
             }
 
-        }else if (dataType.equals(DataType.BOOLEAN)){
+        }else if (dataType.equals(BOOLEAN)){
             if (StringUtils.isEmpty(value)){
                 stmt.registerOutParameter(index, Types.BOOLEAN);
             }else {

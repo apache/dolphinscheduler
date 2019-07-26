@@ -104,7 +104,7 @@ public class DependentTask extends AbstractTask {
                         Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
             }
         }catch (Exception e){
-            logger.error("Exception " + e);
+            logger.error(e.getMessage(),e);
             exitStatusCode = -1;
         }
     }

@@ -314,8 +314,7 @@ public class ProcessUtils {
       }
 
     } catch (Exception e) {
-      logger.error("kill yarn job failed : " + e.getMessage(),e);
-//      throw new RuntimeException("kill yarn job fail");
+      logger.error("kill yarn job failure",e);
     }
   }
 }

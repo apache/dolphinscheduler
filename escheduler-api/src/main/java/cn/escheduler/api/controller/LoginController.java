@@ -116,7 +116,7 @@ public class LoginController extends BaseController {
             response.setStatus(HttpStatus.SC_OK);
             response.addCookie(new Cookie(Constants.SESSION_ID, sessionId));
 
-            logger.info("sessionId = " + sessionId);
+            logger.info("sessionId : {}" , sessionId);
             return success(LOGIN_SUCCESS.getMsg(), sessionId);
         } catch (Exception e) {
             logger.error(USER_LOGIN_FAILURE.getMsg(),e);
