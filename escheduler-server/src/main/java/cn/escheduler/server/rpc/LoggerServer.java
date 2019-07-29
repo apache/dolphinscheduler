@@ -98,8 +98,14 @@ public class LoggerServer {
                     request.getLimit());
             List<String> list = readFile(request.getPath(), request.getSkipLineNum(), request.getLimit());
             StringBuilder sb = new StringBuilder();
+            StringBuilder lineSb = new StringBuilder();
             for (String line : list){
-                sb.append(line + "\r\n");
+                if (filterLine(request.getPath(),line)){
+                    lineSb.append(line + "\r\n");
+                }else {
+                    lineSb = new StringBuilder();
+                    sb.append(lineSb);
+                }
             }
             RetStrInfo retInfoBuild = RetStrInfo.newBuilder().setMsg(sb.toString()).build();
             responseObserver.onNext(retInfoBuild);
@@ -183,9 +189,17 @@ public class LoggerServer {
         StringBuilder sb = new StringBuilder();
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+            StringBuilder lineSb = new StringBuilder();
             while ((line = br.readLine()) != null){
-                sb.append(line + "\r\n");
+                if (filterLine(path,line)){
+                    lineSb.append(line + "\r\n");
+                }else {
+                    lineSb = new StringBuilder();
+                    sb.append(lineSb);
+                }
             }
+
+
             return sb.toString();
         }catch (IOException e){
             logger.error("read file failed : " + e.getMessage(),e);
@@ -199,5 +213,16 @@ public class LoggerServer {
             }
         }
         return null;
+    }
+
+
+    private static boolean filterLine(String path,String line){
+        String removeSuffix = path.split("\\.")[0];
+        String[] strArrs = removeSuffix.split("/");
+        String taskAppId = String.format("%s_%s_%s",
+                strArrs[strArrs.length - 3],
+                strArrs[strArrs.length-2],
+                strArrs[strArrs.length - 1]);
+        return line.contains(taskAppId) || !line.startsWith("[INFO]");
     }
 }
