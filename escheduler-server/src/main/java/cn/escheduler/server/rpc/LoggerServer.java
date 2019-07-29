@@ -98,13 +98,14 @@ public class LoggerServer {
                     request.getLimit());
             List<String> list = readFile(request.getPath(), request.getSkipLineNum(), request.getLimit());
             StringBuilder sb = new StringBuilder();
-            StringBuilder lineSb = new StringBuilder();
+            boolean errorLineFlag = false;
             for (String line : list){
-                if (filterLine(request.getPath(),line)){
-                    lineSb.append(line + "\r\n");
-                }else {
-                    lineSb = new StringBuilder();
-                    sb.append(lineSb);
+                if (line.startsWith("[INFO]")){
+                    errorLineFlag = filterLine(request.getPath(),line);
+                }
+
+                if (!errorLineFlag || !line.startsWith("[INFO]")){
+                    sb.append(line + "\r\n");
                 }
             }
             RetStrInfo retInfoBuild = RetStrInfo.newBuilder().setMsg(sb.toString()).build();
@@ -199,7 +200,6 @@ public class LoggerServer {
                 }
             }
 
-
             return sb.toString();
         }catch (IOException e){
             logger.error("read file failed : " + e.getMessage(),e);
@@ -223,6 +223,6 @@ public class LoggerServer {
                 strArrs[strArrs.length - 3],
                 strArrs[strArrs.length-2],
                 strArrs[strArrs.length - 1]);
-        return line.contains(taskAppId) || !line.startsWith("[INFO]");
+        return !line.contains(taskAppId);
     }
 }
