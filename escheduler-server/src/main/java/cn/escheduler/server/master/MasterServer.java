@@ -119,14 +119,17 @@ public class MasterServer implements CommandLineRunner, IStoppable {
 
     public MasterServer(ProcessDao processDao){
         zkMasterClient = ZKMasterClient.getZKMasterClient(processDao);
-        this.serverDao = zkMasterClient.getServerDao();
-        this.alertDao = zkMasterClient.getAlertDao();
     }
     public void run(ProcessDao processDao){
 
         // heartbeat interval
         heartBeatInterval = conf.getInt(Constants.MASTER_HEARTBEAT_INTERVAL,
                 Constants.defaultMasterHeartbeatInterval);
+
+        // master exec thread pool num
+        int masterExecThreadNum = conf.getInt(Constants.MASTER_EXEC_THREADS,
+                Constants.defaultMasterExecThreadNum);
+
 
         heartbeatMasterService = ThreadUtils.newDaemonThreadScheduledExecutor("Master-Main-Thread",Constants.defaulMasterHeartbeatThreadNum);
 
@@ -140,10 +143,6 @@ public class MasterServer implements CommandLineRunner, IStoppable {
         heartbeatMasterService.
                 scheduleAtFixedRate(heartBeatThread, 5, heartBeatInterval, TimeUnit.SECONDS);
 
-        // master exec thread pool num
-        int masterExecThreadNum = conf.getInt(Constants.MASTER_EXEC_THREADS,
-                Constants.defaultMasterExecThreadNum);
-
         // master scheduler thread
         MasterSchedulerThread masterSchedulerThread = new MasterSchedulerThread(
                 zkMasterClient,
@@ -154,6 +153,8 @@ public class MasterServer implements CommandLineRunner, IStoppable {
         masterSchedulerService.execute(masterSchedulerThread);
 
         // start QuartzExecutors
+        // TODO...
+        // what system should do if exception
         try {
             ProcessScheduleJob.init(processDao);
             QuartzExecutors.getInstance().start();
@@ -173,13 +174,11 @@ public class MasterServer implements CommandLineRunner, IStoppable {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                String host = OSUtils.getHost();
-                // clear master table register info
-                serverDao.deleteMaster(host);
                 logger.info("master server stopped");
                 if (zkMasterClient.getActiveMasterNum() <= 1) {
                     for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
-                        alertDao.sendServerStopedAlert(1, host, "Master-Server");
+                        zkMasterClient.getAlertDao().sendServerStopedAlert(
+                                1, OSUtils.getHost(), "Master-Server");
                     }
                 }
             }
