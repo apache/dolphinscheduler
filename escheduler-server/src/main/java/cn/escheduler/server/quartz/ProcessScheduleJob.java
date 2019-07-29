@@ -78,6 +78,7 @@ public class ProcessScheduleJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
 
+        //TODO...
         Assert.notNull(processDao, "please call init() method first");
 
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();
@@ -85,24 +86,10 @@ public class ProcessScheduleJob implements Job {
         int projectId = dataMap.getInt(Constants.PROJECT_ID);
         int scheduleId = dataMap.getInt(Constants.SCHEDULE_ID);
 
-        /**
-         * The scheduled time the trigger fired for. For instance the scheduled
-         * time may have been 10:00:00 but the actual fire time may have been
-         * 10:00:03 if the scheduler was too busy.
-         *
-         * @return Returns the scheduledFireTime.
-         * @see #getFireTime()
-         */
+
         Date scheduledFireTime = context.getScheduledFireTime();
 
-        /**
-         * The actual time the trigger fired. For instance the scheduled time may
-         * have been 10:00:00 but the actual fire time may have been 10:00:03 if
-         * the scheduler was too busy.
-         *
-         * @return Returns the fireTime.
-         * @see #getScheduledFireTime()
-         */
+
         Date fireTime = context.getFireTime();
 
         logger.info("scheduled fire time :{}, fire time :{}, process id :{}", scheduledFireTime, fireTime, scheduleId);

@@ -4,6 +4,8 @@ Easy Scheduler
 
 > Easy Scheduler for Big Data
 
+[中文](README_zh_CN.md) | [英文](README.md)
+
 **设计特点：** 一个分布式易扩展的可视化DAG工作流任务调度系统。致力于解决数据处理流程中错综复杂的依赖关系，使调度系统在数据处理流程中`开箱即用`。
 其主要目标如下：
  - 以DAG图的方式将Task按照任务的依赖关系关联起来，可实时可视化监控任务的运行状态

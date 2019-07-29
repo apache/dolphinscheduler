@@ -20,6 +20,7 @@ import cn.escheduler.common.Constants;
 import cn.escheduler.common.queue.ITaskQueue;
 import cn.escheduler.common.thread.Stopper;
 import cn.escheduler.common.thread.ThreadUtils;
+import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.FileUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.dao.ProcessDao;
@@ -27,7 +28,6 @@ import cn.escheduler.dao.model.*;
 import cn.escheduler.server.zk.ZKWorkerClient;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,8 +74,20 @@ public class FetchTaskThread implements Runnable{
      */
     private int workerExecNums;
 
+    /**
+     * conf
+     */
     private Configuration conf;
 
+    /**
+     *  task instance
+     */
+    private  TaskInstance taskInstance;
+
+    /**
+     * task instance id
+     */
+    Integer taskInstId;
 
     public FetchTaskThread(int taskNum, ZKWorkerClient zkWorkerClient,
                            ProcessDao processDao, Configuration conf,
@@ -124,127 +136,101 @@ public class FetchTaskThread implements Runnable{
 
     @Override
     public void run() {
-
         while (Stopper.isRunning()){
             InterProcessMutex mutex = null;
             try {
-
                 ThreadPoolExecutor poolExecutor = (ThreadPoolExecutor) workerExecService;
-
                 //check memory and cpu usage and threads
-                if(OSUtils.checkResource(this.conf, false) && checkThreadCount(poolExecutor)) {
-
-                    //whether have tasks, if no tasks , no need lock  //get all tasks
-                    List<String> tasksQueueList = taskQueue.getAllTasks(Constants.SCHEDULER_TASKS_QUEUE);
-                    if(tasksQueueList.size() > 0){
-                        // creating distributed locks, lock path /escheduler/lock/worker
-                        String zNodeLockPath = zkWorkerClient.getWorkerLockPath();
-                        mutex = new InterProcessMutex(zkWorkerClient.getZkClient(), zNodeLockPath);
-                        mutex.acquire();
-
-                        // task instance id str
-                        List<String> taskQueueStrArr = taskQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, taskNum);
-
-                        for(String taskQueueStr : taskQueueStrArr){
-                            if (StringUtils.isNotBlank(taskQueueStr )) {
-
-                                if (!checkThreadCount(poolExecutor)) {
-                                    break;
-                                }
-
-                                String[] taskStringArray = taskQueueStr.split(Constants.UNDERLINE);
-                                String taskInstIdStr = taskStringArray[3];
-                                Date now = new Date();
-                                Integer taskId = Integer.parseInt(taskInstIdStr);
-
-                                // find task instance by task id
-                                TaskInstance taskInstance = processDao.findTaskInstanceById(taskId);
-
-                                logger.info("worker fetch taskId : {} from queue ", taskId);
-
-                                int retryTimes = 30;
-                                // mainly to wait for the master insert task to succeed
-                                while (taskInstance == null && retryTimes > 0) {
-                                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                                    taskInstance = processDao.findTaskInstanceById(taskId);
-                                    retryTimes--;
-                                }
-
-                                if (taskInstance == null ) {
-                                    logger.error("task instance is null. task id : {} ", taskId);
-                                    continue;
-                                }
-
-                                if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
-                                    continue;
-                                }
-                                taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
-                                logger.info("remove task:{} from queue", taskQueueStr);
-
-                                // set execute task worker host
-                                taskInstance.setHost(OSUtils.getHost());
-                                taskInstance.setStartTime(now);
-
-
-                                // get process instance
-                                ProcessInstance processInstance = processDao.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
-
-                                // get process define
-                                ProcessDefinition processDefine = processDao.findProcessDefineById(taskInstance.getProcessDefinitionId());
-
-
-                                taskInstance.setProcessInstance(processInstance);
-                                taskInstance.setProcessDefine(processDefine);
-
-
-                                // get local execute path
-                                String execLocalPath = FileUtils.getProcessExecDir(processDefine.getProjectId(),
-                                        processDefine.getId(),
-                                        processInstance.getId(),
-                                        taskInstance.getId());
-                                logger.info("task instance  local execute path : {} ", execLocalPath);
-
-
-                                // set task execute path
-                                taskInstance.setExecutePath(execLocalPath);
-
-                            Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
-                                    processDefine.getUserId());
-                            if(tenant == null){
-                                logger.error("cannot find suitable tenant for the task:{}, process instance tenant:{}, process definition tenant:{}",
-                                        taskInstance.getName(),processInstance.getTenantId(), processDefine.getTenantId());
-                                continue;
-                            }
-
-                            // check and create Linux users
-                            FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
-                                    tenant.getTenantCode(), logger);
-
-                                logger.info("task : {} ready to submit to task scheduler thread",taskId);
-                                // submit task
-                                workerExecService.submit(new TaskScheduleThread(taskInstance, processDao));
-
-                            }
-                        }
-
-                    }
-
-                }
+                boolean runCheckFlag = OSUtils.checkResource(this.conf, false) && checkThreadCount(poolExecutor);
 
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
 
+                if(!runCheckFlag) {
+                    continue;
+                }
+
+                //whether have tasks, if no tasks , no need lock  //get all tasks
+                List<String> tasksQueueList = taskQueue.getAllTasks(Constants.SCHEDULER_TASKS_QUEUE);
+                if (CollectionUtils.isEmpty(tasksQueueList)){
+                    continue;
+                }
+                // creating distributed locks, lock path /escheduler/lock/worker
+                mutex = zkWorkerClient.acquireZkLock(zkWorkerClient.getZkClient(),
+                        zkWorkerClient.getWorkerLockPath());
+
+
+                // task instance id str
+                List<String> taskQueueStrArr = taskQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, taskNum);
+
+                for(String taskQueueStr : taskQueueStrArr){
+                    if (StringUtils.isEmpty(taskQueueStr)) {
+                        continue;
+                    }
+
+                    if (!checkThreadCount(poolExecutor)) {
+                        break;
+                    }
+
+                    // get task instance id
+                    taskInstId = Integer.parseInt(taskQueueStr.split(Constants.UNDERLINE)[3]);
+
+                    // get task instance relation
+                    taskInstance = processDao.getTaskInstanceRelationByTaskId(taskInstId);
+
+                    Tenant tenant = processDao.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(),
+                            taskInstance.getProcessDefine().getUserId());
+                    if(tenant == null){
+                        logger.error("tenant not exists,process define id : {},process instance id : {},task instance id : {}",
+                                taskInstance.getProcessDefine().getId(),
+                                taskInstance.getProcessInstance().getId(),
+                                taskInstance.getId());
+                        taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+                        continue;
+                    }
+
+                    logger.info("worker fetch taskId : {} from queue ", taskInstId);
+
+                    // mainly to wait for the master insert task to succeed
+                    waitForMasterEnterQueue();
+
+                    if (taskInstance == null ) {
+                        logger.error("task instance is null. task id : {} ", taskInstId);
+                        taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+                        continue;
+                    }
+
+                    if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
+                        continue;
+                    }
+
+                    // get local execute path
+                    logger.info("task instance  local execute path : {} ", getExecLocalPath());
+
+                    // init task
+                    taskInstance.init(OSUtils.getHost(),
+                            new Date(),
+                            getExecLocalPath());
+
+                    // check and create Linux users
+                    FileUtils.createWorkDirAndUserIfAbsent(getExecLocalPath(),
+                            tenant.getTenantCode(), logger);
+
+                    logger.info("task : {} ready to submit to task scheduler thread",taskInstId);
+                    // submit task
+                    workerExecService.submit(new TaskScheduleThread(taskInstance, processDao));
+
+                    // remove node from zk
+                    taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+                }
+
             }catch (Exception e){
-                logger.error("fetch task thread exception : " + e.getMessage(),e);
+                logger.error("fetch task thread failure" ,e);
             }finally {
                 if (mutex != null){
                     try {
                         mutex.release();
                     } catch (Exception e) {
-                        if(e.getMessage().equals("instance must be started before calling this method")){
-                            logger.warn("fetch task lock release");
-                        }else{
-                            logger.error("fetch task lock release failed : " + e.getMessage(),e);
-                        }
+                        logger.error("fetch task lock release failure ",e);
                     }
                 }
             }
@@ -252,16 +238,44 @@ public class FetchTaskThread implements Runnable{
     }
 
     /**
-     *
+     * get execute local path
+     * @return
+     */
+    private String getExecLocalPath(){
+        return FileUtils.getProcessExecDir(taskInstance.getProcessDefine().getProjectId(),
+                taskInstance.getProcessDefine().getId(),
+                taskInstance.getProcessInstance().getId(),
+                taskInstance.getId());
+    }
+    /**
+     *  check
      * @param poolExecutor
      * @return
      */
     private boolean checkThreadCount(ThreadPoolExecutor poolExecutor) {
         int activeCount = poolExecutor.getActiveCount();
         if (activeCount >= workerExecNums) {
-            logger.info("thread insufficient , activeCount : {} , workerExecNums : {}, will sleep : {} millis for thread resource", activeCount, workerExecNums, Constants.SLEEP_TIME_MILLIS);
+            logger.info("thread insufficient , activeCount : {} , " +
+                            "workerExecNums : {}, will sleep : {} millis for thread resource",
+                    activeCount,
+                    workerExecNums,
+                    Constants.SLEEP_TIME_MILLIS);
             return false;
         }
         return true;
+    }
+
+    /**
+     *  mainly to wait for the master insert task to succeed
+     * @throws Exception
+     */
+    private void waitForMasterEnterQueue()throws Exception{
+        int retryTimes = 30;
+
+        while (taskInstance == null && retryTimes > 0) {
+            Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+            taskInstance = processDao.findTaskInstanceById(taskInstId);
+            retryTimes--;
+        }
     }
 }

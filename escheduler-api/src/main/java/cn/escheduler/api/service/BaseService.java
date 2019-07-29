@@ -20,6 +20,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.UserType;
+import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.dao.model.User;
 import org.apache.commons.lang3.StringUtils;
 
@@ -109,5 +110,21 @@ public class BaseService {
         }
 
         return null;
+    }
+
+    /**
+     * create tenant dir if not exists
+     * @param tenantCode
+     * @throws Exception
+     */
+    protected void createTenantDirIfNotExists(String tenantCode)throws Exception{
+
+        String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
+        String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
+        /**
+         * init resource path and udf path
+         */
+        HadoopUtils.getInstance().mkdir(resourcePath);
+        HadoopUtils.getInstance().mkdir(udfsPath);
     }
 }
