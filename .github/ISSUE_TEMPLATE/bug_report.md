@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-*For better global communication, please give priority to using English description*
+*For better global communication, please give priority to using English description, thx! *
 
 **Describe the bug**
 A clear and concise description of what the bug is.
