@@ -674,7 +674,7 @@ Note: JAVA and Scala are just used for identification, no difference. If it's a 
 
 > When we define this benchmark variable as $[...]， [yyyyMMddHHmmss] can be decomposed and combined arbitrarily, such as:$[yyyyMMdd], $[HHmmss], $[yyyy-MM-dd] ,etc.
 
-> 也可以这样：
+> Can also do this：
 >
 > 
 
