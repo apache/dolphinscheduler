@@ -81,7 +81,7 @@ Work plan of Easy Scheduler: [R&D plan](https://github.com/analysys/EasySchedule
 ### How to contribute code
 
 Welcome to participate in contributing code, please refer to the process of submitting the code:
-https://github.com/analysys/EasyScheduler/blob/master/CONTRIBUTING.md
+[[How to contribute code](https://github.com/analysys/EasyScheduler/issues/310)]
 
 ### Thanks
 
