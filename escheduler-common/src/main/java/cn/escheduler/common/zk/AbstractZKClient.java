@@ -20,7 +20,6 @@ import cn.escheduler.common.Constants;
 import cn.escheduler.common.IStoppable;
 import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.common.model.MasterServer;
-import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.utils.ResInfo;
@@ -223,28 +222,68 @@ public abstract class AbstractZKClient {
         }
 	}
 
+
+	/**
+	 * create zookeeper path according the zk node type.
+	 * @param zkNodeType
+	 * @return
+	 * @throws Exception
+	 */
+	private String createZNodePath(ZKNodeType zkNodeType) throws Exception {
+		// specify the format of stored data in ZK nodes
+		String heartbeatZKInfo = ResInfo.getHeartBeatInfo(new Date());
+		// create temporary sequence nodes for master znode
+		String parentPath = getZNodeParentPath(zkNodeType);
+		String serverPathPrefix = parentPath + "/" + OSUtils.getHost();
+		String registerPath = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(
+				serverPathPrefix + "_", heartbeatZKInfo.getBytes());
+		logger.info("register {} node {} success" , zkNodeType.toString(), registerPath);
+		return registerPath;
+	}
+
+	/**
+	 * register server,  if server already exists, return null.
+	 * @param zkNodeType
+	 * @return register server path in zookeeper
+	 */
+	public String registerServer(ZKNodeType zkNodeType) throws Exception {
+		String registerPath = null;
+		String host = OSUtils.getHost();
+		if(checkZKNodeExists(host, zkNodeType)){
+			logger.error("register failure , {} server already started on host : {}" ,
+					zkNodeType.toString(), host);
+			return registerPath;
+		}
+		registerPath = createZNodePath(ZKNodeType.MASTER);
+
+		// handle dead server
+		handleDeadServer(registerPath, zkNodeType, Constants.DELETE_ZK_OP);
+
+		return registerPath;
+	}
+
 	/**
 	 * opType(add): if find dead server , then add to zk deadServerPath
 	 * opType(delete): delete path from zk
 	 *
 	 * @param zNode   		  node path
-	 * @param serverType	  master or worker prefix
+	 * @param zkNodeType	  master or worker
 	 * @param opType		  delete or add
 	 * @throws Exception
 	 */
-	public void handleDeadServer(String zNode, String serverType, String opType) throws Exception {
+	public void handleDeadServer(String zNode, ZKNodeType zkNodeType, String opType) throws Exception {
 		//ip_sequenceno
 		String[] zNodesPath = zNode.split("\\/");
 		String ipSeqNo = zNodesPath[zNodesPath.length - 1];
 
-		String type = serverType.equals(MASTER_PREFIX) ? MASTER_PREFIX : WORKER_PREFIX;
+		String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_PREFIX : WORKER_PREFIX;
 
 
 		//check server restart, if restart , dead server path in zk should be delete
 		if(opType.equals(DELETE_ZK_OP)){
 			String[] ipAndSeqNo = ipSeqNo.split(UNDERLINE);
 			String ip = ipAndSeqNo[0];
-			removeDeadServerByHost(ip, serverType);
+			removeDeadServerByHost(ip, type);
 
 		}else if(opType.equals(ADD_ZK_OP)){
 			String deadServerPath = deadServerZNodeParentPath + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
@@ -253,7 +292,8 @@ public abstract class AbstractZKClient {
 
 				zkClient.create().forPath(deadServerPath,(type + UNDERLINE + ipSeqNo).getBytes());
 
-				logger.info("{} server dead , and {} added to zk dead server path success" , serverType, zNode);
+				logger.info("{} server dead , and {} added to zk dead server path success" ,
+						zkNodeType.toString(), zNode);
 			}
 		}
 
@@ -314,8 +354,8 @@ public abstract class AbstractZKClient {
 	 * @param zkNodeType
 	 * @return
 	 */
-	public List<MasterServer> getServers(ZKNodeType zkNodeType){
-		Map<String, String> masterMap = getServerList(zkNodeType);
+	public List<MasterServer> getServersList(ZKNodeType zkNodeType){
+		Map<String, String> masterMap = getServerMaps(zkNodeType);
 		String parentPath = getZNodeParentPath(zkNodeType);
 
 		List<MasterServer> masterServers = new ArrayList<>();
@@ -332,7 +372,7 @@ public abstract class AbstractZKClient {
 	 * result : {host : resource info}
 	 * @return
 	 */
-	public Map<String, String> getServerList(ZKNodeType zkNodeType){
+	public Map<String, String> getServerMaps(ZKNodeType zkNodeType){
 
 		Map<String, String> masterMap = new HashMap<>();
 		try {
@@ -363,7 +403,7 @@ public abstract class AbstractZKClient {
 					host, zkNodeType.toString());
 			return false;
 		}
-		Map<String, String> serverMaps = getServerList(zkNodeType);
+		Map<String, String> serverMaps = getServerMaps(zkNodeType);
 		for(String hostKey : serverMaps.keySet()){
 			if(hostKey.startsWith(host)){
 				return true;
@@ -497,7 +537,39 @@ public abstract class AbstractZKClient {
 		}
 	}
 
-	@Override
+	/**
+	 * server self dead, stop all threads
+	 * @param serverHost
+	 * @param zkNodeType
+	 */
+	protected boolean checkServerSelfDead(String serverHost, ZKNodeType zkNodeType) {
+		if (serverHost.equals(OSUtils.getHost())) {
+			logger.error("{} server({}) of myself dead , stopping...",
+					zkNodeType.toString(), serverHost);
+			stoppable.stop(String.format(" {} server {} of myself dead , stopping...",
+					zkNodeType.toString(), serverHost));
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 *  get host ip, string format: masterParentPath/ip_000001/value
+	 * @param path
+	 * @return
+	 */
+	protected String getHostByEventDataPath(String path) {
+		int  startIndex = path.lastIndexOf("/")+1;
+		int endIndex = 	path.lastIndexOf("_");
+
+		if(startIndex >= endIndex){
+			logger.error("parse ip error");
+			return "";
+		}
+		return path.substring(startIndex, endIndex);
+	}
+
+		@Override
 	public String toString() {
 		return "AbstractZKClient{" +
 				"zkClient=" + zkClient +

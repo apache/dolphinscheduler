@@ -20,8 +20,6 @@ import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.common.model.MasterServer;
-import cn.escheduler.common.utils.CollectionUtils;
-import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.DaoFactory;
@@ -29,8 +27,6 @@ import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.ServerDao;
 import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
-import cn.escheduler.dao.model.WorkerServer;
-import cn.escheduler.common.utils.ResInfo;
 import cn.escheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -39,7 +35,6 @@ import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.utils.ThreadUtils;
-import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +63,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	 *  master database access
 	 */
 	private ServerDao serverDao = null;
+
 	/**
 	 *  alert database access
 	 */
@@ -76,9 +72,6 @@ public class ZKMasterClient extends AbstractZKClient {
 	 *  flow database access
 	 */
 	private ProcessDao processDao;
-
-
-	private Date createTime = null;
 
 	/**
 	 *  zkMasterClient
@@ -131,7 +124,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			this.listenerWorker();
 
 			// register master
-			this.registMaster();
+			this.registerMaster();
 
 			// check if fault tolerance is required，failure and tolerance
 			if (getActiveMasterNum() == 1) {
@@ -157,15 +150,6 @@ public class ZKMasterClient extends AbstractZKClient {
 		this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 		this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
 	}
-
-	/**
-	 *  get maste dao
-	 * @return
-	 */
-	public ServerDao getServerDao(){
-		return serverDao;
-	}
-
 	/**
 	 * get alert dao
 	 * @return
@@ -174,40 +158,24 @@ public class ZKMasterClient extends AbstractZKClient {
 		return alertDao;
 	}
 
+
+
+
 	/**
 	 *  register master znode
 	 */
-	public void registMaster(){
-
-		// get current date
-		Date now = new Date();
-		createTime = now ;
+	public void registerMaster(){
 		try {
-			String osHost = OSUtils.getHost();
-
-			// zookeeper node exists, cannot start a new one.
-			if(checkZKNodeExists(osHost, ZKNodeType.MASTER)){
-				logger.error("register failure , master already started on host : {}" , osHost);
-				// exit system
-				System.exit(-1);
+		    String serverPath = registerServer(ZKNodeType.MASTER);
+		    if(StringUtils.isEmpty(serverPath)){
+		    	System.exit(-1);
 			}
-			createMasterZNode(now);
-			logger.info("register master node {} success" , masterZNode);
-
-			// handle dead server
-			handleDeadServer(masterZNode, Constants.MASTER_PREFIX, Constants.DELETE_ZK_OP);
 		} catch (Exception e) {
 			logger.error("register master failure : "  + e.getMessage(),e);
+			System.exit(-1);
 		}
 	}
 
-	private void createMasterZNode(Date now) throws Exception {
-		// specify the format of stored data in ZK nodes
-		String heartbeatZKInfo = ResInfo.getHeartBeatInfo(now);
-		// create temporary sequence nodes for master znode
-		masterZNode = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(
-				masterZNodeParentPath + "/" + OSUtils.getHost() + "_", heartbeatZKInfo.getBytes());
-	}
 
 
 	/**
@@ -217,8 +185,6 @@ public class ZKMasterClient extends AbstractZKClient {
 		PathChildrenCache masterPc = new PathChildrenCache(zkClient, masterZNodeParentPath, true ,defaultThreadFactory);
 
 		try {
-			Date now = new Date();
-			createTime = now ;
 			masterPc.start();
 			masterPc.getListenable().addListener(new PathChildrenCacheListener() {
 				@Override
@@ -229,8 +195,11 @@ public class ZKMasterClient extends AbstractZKClient {
 							break;
 						case CHILD_REMOVED:
 							String path = event.getData().getPath();
-							logger.info("master node deleted : {}",event.getData().getPath());
-							removeMasterNode(path);
+							String serverHost = getHostByEventDataPath(path);
+							if(checkServerSelfDead(serverHost, ZKNodeType.MASTER)){
+								return;
+							}
+							removeZKNodePath(path, ZKNodeType.MASTER, true);
 							break;
 						case CHILD_UPDATED:
 							break;
@@ -242,46 +211,69 @@ public class ZKMasterClient extends AbstractZKClient {
 		}catch (Exception e){
 			logger.error("monitor master failed : " + e.getMessage(),e);
 		}
+}
 
-	}
-
-	private void removeMasterNode(String path) {
-		InterProcessMutex mutexLock = null;
+	private void removeZKNodePath(String path, ZKNodeType zkNodeType, boolean failover) {
+		logger.info("{} node deleted : {}", zkNodeType.toString(), path);
+		InterProcessMutex mutex = null;
 		try {
-			// handle dead server, add to zk dead server pth
-			handleDeadServer(path, Constants.MASTER_PREFIX, Constants.ADD_ZK_OP);
+			String failoverPath = getFailoverLockPath(zkNodeType);
+			// create a distributed lock
+			mutex = new InterProcessMutex(getZkClient(), failoverPath);
+			mutex.acquire();
 
-			if(masterZNode.equals(path)){
-				logger.error("master server({}) of myself dead , stopping...", path);
-				stoppable.stop(String.format("master server(%s) of myself dead , stopping...", path));
-				return;
-			}
-
-			// create a distributed lock, and the root node path of the lock space is /escheduler/lock/failover/master
-			String znodeLock = zkMasterClient.getMasterFailoverLockPath();
-			mutexLock = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
-			mutexLock.acquire();
-
-			String masterHost = getHostByEventDataPath(path);
-			for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
-				alertDao.sendServerStopedAlert(1, masterHost, "Master-Server");
-			}
-			if(StringUtils.isNotEmpty(masterHost)){
-				failoverMaster(masterHost);
+			String serverHost = getHostByEventDataPath(path);
+			// handle dead server
+			handleDeadServer(path, zkNodeType, Constants.ADD_ZK_OP);
+			//alert server down.
+			alertServerDown(serverHost, zkNodeType);
+			//failover server
+			if(failover){
+				failoverServerWhenDown(serverHost, zkNodeType);
 			}
 		}catch (Exception e){
-			logger.error("master failover failed : " + e.getMessage(),e);
-		}finally {
-			if (mutexLock != null){
-				try {
-					mutexLock.release();
-				} catch (Exception e) {
-					logger.error("lock relase failed : " + e.getMessage(),e);
-				}
-			}
+			logger.error("{} server failover failed.", zkNodeType.toString());
+			logger.error("failover exception : " + e.getMessage(),e);
+		}
+		finally {
+			releaseMutex(mutex);
 		}
 	}
 
+	private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
+	    if(StringUtils.isEmpty(serverHost)){
+	    	return ;
+		}
+		switch (zkNodeType){
+			case MASTER:
+				failoverMaster(serverHost);
+				break;
+			case WORKER:
+				failoverWorker(serverHost, true);
+			default:
+				break;
+		}
+	}
+
+	private String getFailoverLockPath(ZKNodeType zkNodeType){
+
+		switch (zkNodeType){
+			case MASTER:
+				return getMasterFailoverLockPath();
+			case WORKER:
+				return getWorkerFailoverLockPath();
+			default:
+				return "";
+		}
+	}
+
+	private void alertServerDown(String serverHost, ZKNodeType zkNodeType) {
+
+	    String serverType = zkNodeType.toString();
+		for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER; i++) {
+			alertDao.sendServerStopedAlert(1, serverHost, serverType);
+		}
+	}
 
 	/**
 	 *  monitor worker
@@ -290,8 +282,6 @@ public class ZKMasterClient extends AbstractZKClient {
 
 		PathChildrenCache workerPc = new PathChildrenCache(zkClient,workerZNodeParentPath,true ,defaultThreadFactory);
 		try {
-			Date now = new Date();
-			createTime = now ;
 			workerPc.start();
 			workerPc.getListenable().addListener(new PathChildrenCacheListener() {
 				@Override
@@ -303,7 +293,7 @@ public class ZKMasterClient extends AbstractZKClient {
 						case CHILD_REMOVED:
 							String path = event.getData().getPath();
 							logger.info("node deleted : {}",event.getData().getPath());
-							removeZKNodePath(path);
+							removeZKNodePath(path, ZKNodeType.WORKER, true);
 							break;
 						default:
 							break;
@@ -315,33 +305,6 @@ public class ZKMasterClient extends AbstractZKClient {
 		}
 	}
 
-	private void removeZKNodePath(String path) {
-		InterProcessMutex mutex = null;
-		try {
-
-			// handle dead server
-			handleDeadServer(path, Constants.WORKER_PREFIX, Constants.ADD_ZK_OP);
-
-			// create a distributed lock
-			String znodeLock = getWorkerFailoverLockPath();
-			mutex = new InterProcessMutex(getZkClient(), znodeLock);
-			mutex.acquire();
-
-			String workerHost = getHostByEventDataPath(path);
-			for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
-				alertDao.sendServerStopedAlert(1, workerHost, "Worker-Server");
-			}
-
-			if(StringUtils.isNotEmpty(workerHost)){
-				failoverWorker(workerHost, true);
-			}
-		}catch (Exception e){
-			logger.error("worker failover failed : " + e.getMessage(),e);
-		}
-		finally {
-		    releaseMutex(mutex);
-		}
-	}
 
 	/**
 	 *  get master znode
@@ -381,7 +344,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	    	return false;
 		}
 	    Date workerServerStartDate = null;
-	    List<MasterServer> workerServers= getServers(ZKNodeType.WORKER);
+	    List<MasterServer> workerServers= getServersList(ZKNodeType.WORKER);
 	    for(MasterServer server : workerServers){
 	    	if(server.getHost().equals(taskInstance.getHost())){
 	    	    workerServerStartDate = server.getCreateTime();
@@ -443,25 +406,5 @@ public class ZKMasterClient extends AbstractZKClient {
 
 		logger.info("master failover end");
 	}
-
-	/**
-	 *  get host ip, string format: masterParentPath/ip_000001/value
-	 * @param path
-	 * @return
-	 */
-	private String getHostByEventDataPath(String path) {
-		int  startIndex = path.lastIndexOf("/")+1;
-		int endIndex = 	path.lastIndexOf("_");
-
-		if(startIndex >= endIndex){
-			logger.error("parse ip error");
-			return "";
-		}
-		return path.substring(startIndex, endIndex);
-	}
-
-
-
-
 
 }

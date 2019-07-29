@@ -18,12 +18,12 @@ package cn.escheduler.server.zk;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ZKNodeType;
-import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ServerDao;
 import cn.escheduler.common.utils.ResInfo;
+import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ThreadFactory;
 
 
@@ -130,21 +129,14 @@ public class ZKWorkerClient extends AbstractZKClient {
 	 *  register worker
 	 */
 	private void registWorker(){
-		// get current date
-		Date now = new Date();
-		createTime = now ;
 		try {
-			if(checkZKNodeExists(OSUtils.getHost(), ZKNodeType.WORKER)){
-				logger.info("register failure , worker already started on : {}, please wait for a moment and try again" , OSUtils.getHost());
+			String serverPath = registerServer(ZKNodeType.WORKER);
+			if(StringUtils.isEmpty(serverPath)){
 				System.exit(-1);
 			}
-
-			// create worker zknode
-            initWorkZNode();
-			// handle dead server
-			handleDeadServer(workerZNode, Constants.WORKER_PREFIX, Constants.DELETE_ZK_OP);
 		} catch (Exception e) {
 			logger.error("register worker failure : "  + e.getMessage(),e);
+			System.exit(-1);
 		}
 	}
 	
@@ -167,16 +159,11 @@ public class ZKWorkerClient extends AbstractZKClient {
 							break;
 						case CHILD_REMOVED:
                             String path = event.getData().getPath();
-							// handle dead server, add to zk dead server path
-							handleDeadServer(path, Constants.WORKER_PREFIX, Constants.ADD_ZK_OP);
-
 							//find myself dead
-                            if(workerZNode.equals(path)){
-
-                                logger.warn(" worker server({}) of myself dead , stopping...", path);
-                                stoppable.stop(String.format("worker server(%s) of myself dead , stopping",path));
-                            }
-							logger.info("node deleted : {}", event.getData().getPath());
+							String serverHost = getHostByEventDataPath(path);
+							if(checkServerSelfDead(serverHost, ZKNodeType.WORKER)){
+								return;
+							}
 							break;
 						case CHILD_UPDATED:
 							break;
