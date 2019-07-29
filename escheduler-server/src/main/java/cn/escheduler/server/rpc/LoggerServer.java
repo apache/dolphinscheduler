@@ -82,17 +82,9 @@ public class LoggerServer {
      * main launches the server from the command line.
      */
     public static void main(String[] args) throws IOException, InterruptedException {
-//        final LoggerServer server = new LoggerServer();
-//        server.start();
-//        server.blockUntilShutdown();
-
-        String log = "/data1_4T/escheduler/logs/1/1/1.log";
-        String removeSuffix = log.split("\\.")[0];
-        String[] split = removeSuffix.split("/");
-        for (String str : split){
-            System.out.println(str);
-        }
-
+        final LoggerServer server = new LoggerServer();
+        server.start();
+        server.blockUntilShutdown();
     }
 
 
