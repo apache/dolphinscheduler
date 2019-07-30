@@ -181,10 +181,11 @@ public class TaskScheduleThread implements Callable<Boolean> {
                 );
                 status = ExecutionStatus.FAILURE;
             }else{
-
                 taskProps.setQueue(taskInstance.getProcessInstance().getQueue());
                 taskProps.setTaskStartTime(taskInstance.getStartTime());
                 taskProps.setDefinedParams(allParamMap);
+                // set tenantCode
+                taskProps.setTenantCode(tenant.getTenantCode());
 
                 // set task timeout
                 setTaskTimeout(taskProps, taskNode);
