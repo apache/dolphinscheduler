@@ -176,20 +176,13 @@ public class TaskScheduleThread implements Callable<Boolean> {
                     processDefine.getUserId());
 
             if(tenant == null){
-                processInstance.setTenantCode(tenant.getTenantCode());
                 logger.error("cannot find the tenant, process definition id:{}, tenant id:{}, user id:{}",
                         processDefine.getId(), processDefine.getTenantId(), processDefine.getUserId()
                 );
                 status = ExecutionStatus.FAILURE;
             }else{
-                taskProps.setTenantCode(tenant.getTenantCode());
-                String queue = processDao.queryQueueByProcessInstanceId(processInstance.getId());
-                // set queue
-                if (StringUtils.isEmpty(queue)){
-                    taskProps.setQueue(taskInstance.getProcessInstance().getQueue());
-                }else {
-                    taskProps.setQueue(tenant.getQueueName());
-                }
+
+                taskProps.setQueue(taskInstance.getProcessInstance().getQueue());
                 taskProps.setTaskStartTime(taskInstance.getStartTime());
                 taskProps.setDefinedParams(allParamMap);
 
