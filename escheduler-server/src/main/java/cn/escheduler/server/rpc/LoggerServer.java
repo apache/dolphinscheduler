@@ -190,13 +190,14 @@ public class LoggerServer {
         StringBuilder sb = new StringBuilder();
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
-            StringBuilder lineSb = new StringBuilder();
+            boolean errorLineFlag = false;
             while ((line = br.readLine()) != null){
-                if (filterLine(path,line)){
-                    lineSb.append(line + "\r\n");
-                }else {
-                    lineSb = new StringBuilder();
-                    sb.append(lineSb);
+                if (line.startsWith("[INFO]")){
+                    errorLineFlag = filterLine(path,line);
+                }
+
+                if (!errorLineFlag || !line.startsWith("[INFO]")){
+                    sb.append(line + "\r\n");
                 }
             }
 
@@ -216,6 +217,12 @@ public class LoggerServer {
     }
 
 
+    /**
+     * 
+     * @param path
+     * @param line
+     * @return
+     */
     private static boolean filterLine(String path,String line){
         String removeSuffix = path.split("\\.")[0];
         String[] strArrs = removeSuffix.split("/");

@@ -180,10 +180,7 @@ public class TaskLogger implements Logger {
 
   @Override
   public void info(String format, Object arg1, Object arg2) {
-    String taskAppIdStr = "TASK_" + arg2;
-    if (taskAppId.equals(taskAppIdStr)){
-      logger.info(addJobId(format), arg1);
-    }
+    logger.info(addJobId(format), arg1, arg2);
   }
 
   @Override
