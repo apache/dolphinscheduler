@@ -294,9 +294,6 @@ public class ZKMasterClient extends AbstractZKClient {
 
 							InterProcessMutex mutexLock = null;
 							try {
-								// handle dead server, add to zk dead server pth
-								handleDeadServer(path, Constants.MASTER_PREFIX, Constants.ADD_ZK_OP);
-
 								if(masterZNode.equals(path)){
 									logger.error("master server({}) of myself dead , stopping...", path);
 									stoppable.stop(String.format("master server(%s) of myself dead , stopping...", path));
@@ -307,6 +304,9 @@ public class ZKMasterClient extends AbstractZKClient {
 								String znodeLock = zkMasterClient.getMasterFailoverLockPath();
 								mutexLock = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
 								mutexLock.acquire();
+
+								// handle dead server, add to zk dead server pth
+								handleDeadServer(path, Constants.MASTER_PREFIX, Constants.ADD_ZK_OP);
 
 								String masterHost = getHostByEventDataPath(path);
 								for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
@@ -382,14 +382,13 @@ public class ZKMasterClient extends AbstractZKClient {
 
 							InterProcessMutex mutex = null;
 							try {
-
-								// handle dead server
-								handleDeadServer(path, Constants.WORKER_PREFIX, Constants.ADD_ZK_OP);
-
 								// create a distributed lock, and the root node path of the lock space is /escheduler/lock/failover/worker
 								String znodeLock = zkMasterClient.getWorkerFailoverLockPath();
 								mutex = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
 								mutex.acquire();
+
+								// handle dead server
+								handleDeadServer(path, Constants.WORKER_PREFIX, Constants.ADD_ZK_OP);
 
 								String workerHost = getHostByEventDataPath(path);
 								for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
