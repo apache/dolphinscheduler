@@ -68,7 +68,7 @@ public class SessionService extends BaseService{
     String ip = BaseController.getClientIpAddress(request);
     logger.info("get session: {}, ip: {}", sessionId, ip);
 
-    return sessionMapper.queryByIdAndIp(sessionId, ip);
+    return sessionMapper.queryBySessionId(sessionId);
   }
 
   /**
@@ -80,7 +80,7 @@ public class SessionService extends BaseService{
    */
   public String createSession(User user, String ip) {
     // logined
-    Session session = sessionMapper.queryByUserIdAndIp(user.getId(), ip);
+    Session session = sessionMapper.queryByUserId(user.getId());
     Date now = new Date();
 
     /**
@@ -126,7 +126,7 @@ public class SessionService extends BaseService{
     /**
      * query session by user id and ip
      */
-    Session session = sessionMapper.queryByUserIdAndIp(loginUser.getId(), ip);
+    Session session = sessionMapper.queryByUserId(loginUser.getId());
     //delete session
     sessionMapper.deleteById(session.getId());
   }
