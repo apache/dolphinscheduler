@@ -164,6 +164,7 @@ public enum Status {
     PREVIEW_SCHEDULE_ERROR(10139,"preview schedule error"),
     PARSE_TO_CRON_EXPRESSION_ERROR(10140,"parse cron to cron expression error"),
     SCHEDULE_START_TIME_END_TIME_SAME(10141,"The start time must not be the same as the end"),
+    SUB_PROCESS_TASK_HAS_NOT_LOG(10142, "Child process task has not log"),
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
