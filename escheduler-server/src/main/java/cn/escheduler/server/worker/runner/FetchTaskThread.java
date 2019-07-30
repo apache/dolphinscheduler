@@ -208,17 +208,20 @@ public class FetchTaskThread implements Runnable{
                                 // set task execute path
                                 taskInstance.setExecutePath(execLocalPath);
 
-                            Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
-                                    processDefine.getUserId());
-                            if(tenant == null){
-                                logger.error("cannot find suitable tenant for the task:{}, process instance tenant:{}, process definition tenant:{}",
-                                        taskInstance.getName(),processInstance.getTenantId(), processDefine.getTenantId());
-                                continue;
-                            }
+                                Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
+                                        processDefine.getUserId());
+                                if(tenant == null){
+                                    logger.error("cannot find suitable tenant for the task:{}, process instance tenant:{}, process definition tenant:{}",
+                                            taskInstance.getName(),processInstance.getTenantId(), processDefine.getTenantId());
+                                    continue;
+                                }
 
-                            // check and create Linux users
-                            FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
-                                    tenant.getTenantCode(), logger);
+                                // set queue
+                                processInstance.setQueue(tenant.getQueue());
+
+                                // check and create Linux users
+                                FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
+                                        tenant.getTenantCode(), logger);
 
                                 logger.info("task : {} ready to submit to task scheduler thread",taskId);
                                 // submit task
