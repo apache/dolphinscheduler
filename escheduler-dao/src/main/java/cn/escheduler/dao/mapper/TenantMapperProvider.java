@@ -101,7 +101,7 @@ public class TenantMapperProvider {
 
                 FROM(TABLE_NAME + " t,t_escheduler_queue q");
                 WHERE(" t.queue_id = q.id");
-                WHERE("`t.id` = #{tenantId}");
+                WHERE(" t.id = #{tenantId}");
             }
         }.toString();
     }
