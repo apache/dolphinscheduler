@@ -134,7 +134,7 @@ public abstract class AbstractCommandExecutor {
             createCommandFileIfNotExists(execCommand, commandFilePath);
 
             //build process
-            buildProcess(commandFilePath);
+            Process process = buildProcess(commandFilePath);
 
             // parse process output
             parseProcessOutput(process);
@@ -186,7 +186,7 @@ public abstract class AbstractCommandExecutor {
      * @param commandFile
      * @throws IOException
      */
-    private void buildProcess(String commandFile) throws IOException {
+    private Process buildProcess(String commandFile) throws IOException {
         //init process builder
         ProcessBuilder processBuilder = new ProcessBuilder();
         // setting up a working directory
@@ -200,6 +200,8 @@ public abstract class AbstractCommandExecutor {
 
         // print command
         printCommand(processBuilder);
+
+        return process;
     }
 
     /**
@@ -351,6 +353,7 @@ public abstract class AbstractCommandExecutor {
                         if(checkShowLog(line)){
                             logBuffer.add(line);
                         }
+
 
                         lastFlushTime = flush(lastFlushTime);
                     }

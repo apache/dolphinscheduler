@@ -98,8 +98,15 @@ public class LoggerServer {
                     request.getLimit());
             List<String> list = readFile(request.getPath(), request.getSkipLineNum(), request.getLimit());
             StringBuilder sb = new StringBuilder();
+            boolean errorLineFlag = false;
             for (String line : list){
-                sb.append(line + "\r\n");
+                if (line.startsWith("[INFO]")){
+                    errorLineFlag = filterLine(request.getPath(),line);
+                }
+
+                if (!errorLineFlag || !line.startsWith("[INFO]")){
+                    sb.append(line + "\r\n");
+                }
             }
             RetStrInfo retInfoBuild = RetStrInfo.newBuilder().setMsg(sb.toString()).build();
             responseObserver.onNext(retInfoBuild);
@@ -183,9 +190,17 @@ public class LoggerServer {
         StringBuilder sb = new StringBuilder();
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+            boolean errorLineFlag = false;
             while ((line = br.readLine()) != null){
-                sb.append(line + "\r\n");
+                if (line.startsWith("[INFO]")){
+                    errorLineFlag = filterLine(path,line);
+                }
+
+                if (!errorLineFlag || !line.startsWith("[INFO]")){
+                    sb.append(line + "\r\n");
+                }
             }
+
             return sb.toString();
         }catch (IOException e){
             logger.error("read file failed : " + e.getMessage(),e);
@@ -201,4 +216,20 @@ public class LoggerServer {
         return null;
     }
 
+
+    /**
+     * 
+     * @param path
+     * @param line
+     * @return
+     */
+    private static boolean filterLine(String path,String line){
+        String removeSuffix = path.split("\\.")[0];
+        String[] strArrs = removeSuffix.split("/");
+        String taskAppId = String.format("%s_%s_%s",
+                strArrs[strArrs.length - 3],
+                strArrs[strArrs.length-2],
+                strArrs[strArrs.length - 1]);
+        return !line.contains(taskAppId);
+    }
 }

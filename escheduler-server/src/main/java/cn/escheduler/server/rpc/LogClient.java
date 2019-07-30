@@ -16,6 +16,7 @@
  */
 package cn.escheduler.server.rpc;
 
+import cn.escheduler.common.Constants;
 import cn.escheduler.rpc.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
