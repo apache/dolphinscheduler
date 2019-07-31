@@ -75,7 +75,6 @@ public interface SessionMapper {
      * query by session id and ip
      *
      * @param sessionId
-     * @param ip
      * @return
      */
     @Results(value = {
@@ -85,13 +84,12 @@ public interface SessionMapper {
             @Result(property = "lastLoginTime", column = "last_login_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
     })
     @SelectProvider(type = SessionMapperProvider.class, method = "queryByIdAndIp")
-    Session queryByIdAndIp(@Param("sessionId") String sessionId, @Param("ip") String ip);
+    Session queryByIdAndIp(@Param("sessionId") String sessionId);
 
 
     /**
      * query by user id and ip
      * @param userId
-     * @param ip
      * @return
      */
     @Results(value = {
@@ -101,6 +99,6 @@ public interface SessionMapper {
             @Result(property = "lastLoginTime", column = "last_login_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
     })
     @SelectProvider(type = SessionMapperProvider.class, method = "queryByUserIdAndIp")
-    Session queryByUserIdAndIp(@Param("userId") int userId, @Param("ip") String ip);
+    Session queryByUserIdAndIp(@Param("userId") int userId);
 
 }

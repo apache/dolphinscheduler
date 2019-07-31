@@ -20,6 +20,7 @@ import cn.escheduler.common.Constants;
 import cn.escheduler.common.IStoppable;
 import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.common.model.MasterServer;
+import cn.escheduler.common.enums.ServerEnum;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.utils.ResInfo;
@@ -568,8 +569,19 @@ public abstract class AbstractZKClient {
 		}
 		return path.substring(startIndex, endIndex);
 	}
+	/**
+	 * acquire zk lock
+	 * @param zkClient
+	 * @param zNodeLockPath
+	 * @throws Exception
+	 */
+	public InterProcessMutex acquireZkLock(CuratorFramework zkClient,String zNodeLockPath)throws Exception{
+		InterProcessMutex mutex = new InterProcessMutex(zkClient, zNodeLockPath);
+		mutex.acquire();
+		return mutex;
+	}
 
-		@Override
+	@Override
 	public String toString() {
 		return "AbstractZKClient{" +
 				"zkClient=" + zkClient +

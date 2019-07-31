@@ -38,7 +38,7 @@ public abstract class AbstractYarnTask extends AbstractTask {
   /**
    *  process task
    */
-  private ShellCommandExecutor processTask;
+  private ShellCommandExecutor shellCommandExecutor;
 
   /**
    *  process database access
@@ -53,21 +53,25 @@ public abstract class AbstractYarnTask extends AbstractTask {
   public AbstractYarnTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
     this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
-    // find process instance by taskId
     this.processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
-    this.processTask = new ShellCommandExecutor(this::logHandle,
-            taskProps.getTaskDir(), taskProps.getTaskAppId(),
-            taskProps.getTenantCode(), taskProps.getEnvFile(), taskProps.getTaskStartTime(),
-            taskProps.getTaskTimeout(), logger);
+    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
+            taskProps.getTaskDir(),
+            taskProps.getTaskAppId(),
+            taskProps.getTaskInstId(),
+            taskProps.getTenantCode(),
+            taskProps.getEnvFile(),
+            taskProps.getTaskStartTime(),
+            taskProps.getTaskTimeout(),
+            logger);
   }
 
   @Override
   public void handle() throws Exception {
     try {
       // construct process
-      exitStatusCode = processTask.run(buildCommand(), processDao);
+      exitStatusCode = shellCommandExecutor.run(buildCommand(), processDao);
     } catch (Exception e) {
-      logger.error("yarn process failed : " + e.getMessage(), e);
+      logger.error("yarn process failure", e);
       exitStatusCode = -1;
     }
   }
@@ -76,9 +80,8 @@ public abstract class AbstractYarnTask extends AbstractTask {
   public void cancelApplication(boolean status) throws Exception {
     cancel = true;
     // cancel process
-    processTask.cancelApplication();
-    int taskInstId = taskProps.getTaskInstId();
-    TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+    shellCommandExecutor.cancelApplication();
+    TaskInstance taskInstance = processDao.findTaskInstanceById(taskProps.getTaskInstId());
     if (status && taskInstance != null){
       ProcessUtils.killYarnJob(taskInstance);
     }

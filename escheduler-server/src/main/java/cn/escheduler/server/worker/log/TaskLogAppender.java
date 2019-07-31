@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskLogAppender extends FileAppender<ILoggingEvent> {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskLogAppender.class);
-
     private String currentlyActiveFile;
 
     @Override
