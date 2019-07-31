@@ -119,10 +119,6 @@ public final class Constants {
      */
     public static final String ESCHEDULER_ENV_PATH = "escheduler.env.path";
 
-    /**
-     * escheduler.env.sh
-     */
-    public static final String ESCHEDULER_ENV_SH = ".escheduler_env.sh";
 
     /**
      * python home
@@ -220,9 +216,9 @@ public final class Constants {
     public static final String SEMICOLON = ";";
 
     /**
-     * DOT .
+     * EQUAL SIGN
      */
-    public static final String DOT = ".";
+    public static final String EQUAL_SIGN = "=";
 
     /**
      * ZOOKEEPER_SESSION_TIMEOUT
@@ -283,10 +279,6 @@ public final class Constants {
      */
     public static final String YYYY_MM_DD_HH_MM_SS = "yyyy-MM-dd HH:mm:ss";
 
-    /**
-     * date format of yyyyMMdd
-     */
-    public static final String YYYYMMDD = "yyyyMMdd";
 
     /**
      * date format of yyyyMMddHHmmss
@@ -489,6 +481,7 @@ public final class Constants {
     public static final String TASK_RECORD_PWD = "task.record.datasource.password";
 
     public static final String DEFAULT = "Default";
+    public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final String XXXXXX = "******";
 
@@ -497,6 +490,7 @@ public final class Constants {
     public static  String TASK_RECORD_TABLE_HISTORY_HIVE_LOG = "eamp_hive_hist_log_hd";
 
     public static final String STATUS = "status";
+
 
 
     /**
@@ -867,6 +861,11 @@ public final class Constants {
     public static final int PREVIEW_SCHEDULE_EXECUTE_COUNT = 5;
 
     /**
+     * kerberos
+     */
+    public static final String KERBEROS = "kerberos";
+
+    /**
      * java.security.krb5.conf
      */
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
@@ -901,4 +900,10 @@ public final class Constants {
      * loginUserFromKeytab path
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
+
+
+    /**
+     * hive conf
+     */
+    public static final String HIVE_CONF = "hiveconf:";
 }

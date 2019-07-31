@@ -21,6 +21,8 @@ import cn.escheduler.common.utils.JSONUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static cn.escheduler.common.Constants.*;
+
 /**
  * produce datasource in this custom defined datasource factory.
  */
@@ -49,8 +51,43 @@ public class DataSourceFactory {
           return null;
       }
     } catch (Exception e) {
-      logger.error("Get datasource object error", e);
+      logger.error("get datasource object error", e);
       return null;
+    }
+  }
+
+  /**
+   * load class
+   * @param dbType
+   * @throws Exception
+   */
+  public static void loadClass(DbType dbType) throws Exception{
+    switch (dbType){
+      case MYSQL :
+        Class.forName(JDBC_MYSQL_CLASS_NAME);
+        break;
+      case POSTGRESQL :
+        Class.forName(JDBC_POSTGRESQL_CLASS_NAME);
+        break;
+      case HIVE :
+        Class.forName(JDBC_HIVE_CLASS_NAME);
+        break;
+      case SPARK :
+        Class.forName(JDBC_SPARK_CLASS_NAME);
+        break;
+      case CLICKHOUSE :
+        Class.forName(JDBC_CLICKHOUSE_CLASS_NAME);
+        break;
+      case ORACLE :
+        Class.forName(JDBC_ORACLE_CLASS_NAME);
+        break;
+      case SQLSERVER:
+        Class.forName(JDBC_SQLSERVER_CLASS_NAME);
+        break;
+      default:
+        logger.error("not support sql type: {},can't load class", dbType);
+        throw new IllegalArgumentException("not support sql type,can't load class");
+
     }
   }
 }

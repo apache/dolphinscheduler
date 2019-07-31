@@ -57,7 +57,7 @@ EasyScheduler的工作计划：<a href="https://github.com/analysys/EasySchedule
 ### 贡献代码
 
 非常欢迎大家来参与贡献代码，提交代码流程请参考：
-https://github.com/analysys/EasyScheduler/blob/master/CONTRIBUTING.md
+[[How to contribute code](https://github.com/analysys/EasyScheduler/issues/310)]
 
 
 ### 感谢

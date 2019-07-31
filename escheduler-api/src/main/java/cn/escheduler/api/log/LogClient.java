@@ -100,7 +100,7 @@ public class LogClient {
      * @return
      */
     public String viewLog(String path) {
-        logger.info("view queryLog path {}",path);
+        logger.info("view log path {}",path);
         PathParameter pathParameter = PathParameter.newBuilder().setPath(path).build();
         RetStrInfo retStrInfo;
         try {
@@ -119,14 +119,14 @@ public class LogClient {
      * @return
      */
     public byte[] getLogBytes(String path) {
-        logger.info("get log path {}",path);
+        logger.info("log path {}",path);
         PathParameter pathParameter = PathParameter.newBuilder().setPath(path).build();
         RetByteInfo retByteInfo;
         try {
             retByteInfo = blockingStub.getLogBytes(pathParameter);
             return retByteInfo.getData().toByteArray();
         } catch (StatusRuntimeException e) {
-            logger.error("get log size error", e);
+            logger.error("log size error", e);
             return null;
         }
     }
