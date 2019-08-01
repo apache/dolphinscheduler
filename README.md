@@ -27,8 +27,7 @@ Its main objectives are as follows:
  - There are more waiting partners to explore
 
 
-### what's in the scheduler systems
-
+### What's in Easy Scheduler
 
  Stability | Easy to use | Features | Scalability |
  -- | -- | -- | --
