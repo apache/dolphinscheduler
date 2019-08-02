@@ -23,6 +23,7 @@ import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.FileUtils;
 import cn.escheduler.common.utils.OSUtils;
+import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.*;
 import cn.escheduler.server.zk.ZKWorkerClient;
@@ -226,13 +227,7 @@ public class FetchTaskThread implements Runnable{
             }catch (Exception e){
                 logger.error("fetch task thread failure" ,e);
             }finally {
-                if (mutex != null){
-                    try {
-                        mutex.release();
-                    } catch (Exception e) {
-                        logger.error("fetch task lock release failure ",e);
-                    }
-                }
+                AbstractZKClient.releaseMutex(mutex);
             }
         }
     }
@@ -247,6 +242,7 @@ public class FetchTaskThread implements Runnable{
                 taskInstance.getProcessInstance().getId(),
                 taskInstance.getId());
     }
+
     /**
      *  check
      * @param poolExecutor
