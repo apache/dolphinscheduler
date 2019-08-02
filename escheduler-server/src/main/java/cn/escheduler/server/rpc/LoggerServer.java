@@ -196,7 +196,7 @@ public class LoggerServer {
                     errorLineFlag = filterLine(path,line);
                 }
 
-                if (!errorLineFlag || !line.startsWith("TaskLogger")){
+                if (!errorLineFlag || !line.contains("TaskLogger")){
                     sb.append(line + "\r\n");
                 }
             }
@@ -224,7 +224,7 @@ public class LoggerServer {
      * @return
      */
     private static boolean filterLine(String path,String line){
-        String removeSuffix = path.split("\\.")[0];
+        String removeSuffix = path.substring(0, path.length() - 4);
         String[] strArrs = removeSuffix.split("/");
         String taskAppId = String.format("%s_%s_%s",
                 strArrs[strArrs.length - 3],
