@@ -35,6 +35,14 @@
 		</fileSet>
 
 		<fileSet>
+			<directory>escheduler-ui/dist</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>./ui</outputDirectory>
+		</fileSet>
+
+		<fileSet>
 			<directory>sql</directory>
 			<includes>
 				<include>**/*</include>

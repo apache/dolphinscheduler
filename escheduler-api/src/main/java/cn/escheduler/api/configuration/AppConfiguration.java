@@ -75,7 +75,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     //i18n
     registry.addInterceptor(localeChangeInterceptor());
 
-    registry.addInterceptor(loginInterceptor()).addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN).excludePathPatterns(LOGIN_PATH_PATTERN,"/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "*.html");
+    registry.addInterceptor(loginInterceptor()).addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN).excludePathPatterns(LOGIN_PATH_PATTERN,"/swagger-resources/**", "/webjars/**", "/v2/**", "/doc.html", "*.html", "/ui/**");
   }
 
 
@@ -84,6 +84,13 @@ public class AppConfiguration implements WebMvcConfigurer {
     registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
     registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
     registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+    registry.addResourceHandler("/ui/**").addResourceLocations("file:ui/");
+  }
+
+  @Override
+  public void addViewControllers(ViewControllerRegistry registry) {
+    registry.addViewController("/ui/").setViewName("forward:/ui/index.html");
+    registry.addViewController("/").setViewName("forward:/ui/index.html");
   }
 
   @Override

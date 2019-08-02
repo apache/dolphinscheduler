@@ -68,6 +68,11 @@ public abstract class AbstractCommandExecutor {
     protected final String taskAppId;
 
     /**
+     *  task appId
+     */
+    protected final int taskInstId;
+
+    /**
      *  tenant code , execute task linux user
      */
     protected final String tenantCode;
@@ -99,11 +104,12 @@ public abstract class AbstractCommandExecutor {
 
 
     public AbstractCommandExecutor(Consumer<List<String>> logHandler,
-                                   String taskDir, String taskAppId, String tenantCode, String envFile,
+                                   String taskDir, String taskAppId,int taskInstId,String tenantCode, String envFile,
                                    Date startTime, int timeout, Logger logger){
         this.logHandler = logHandler;
         this.taskDir = taskDir;
         this.taskAppId = taskAppId;
+        this.taskInstId = taskInstId;
         this.tenantCode = tenantCode;
         this.envFile = envFile;
         this.startTime = startTime;
@@ -162,7 +168,12 @@ public abstract class AbstractCommandExecutor {
                 exitStatusCode = updateState(processDao, exitStatusCode, pid, taskInstId);
 
             } else {
-                cancelApplication();
+                TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+                if (taskInstance == null) {
+                    logger.error("task instance id:{} not exist", taskInstId);
+                } else {
+                    ProcessUtils.kill(taskInstance);
+                }
                 exitStatusCode = -1;
                 logger.warn("process timeout, work dir:{}, pid:{}", taskDir, pid);
             }

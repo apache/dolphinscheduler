@@ -42,9 +42,15 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
 
 
     public PythonCommandExecutor(Consumer<List<String>> logHandler,
-                                 String taskDir, String taskAppId, String tenantCode, String envFile,
-                                 Date startTime, int timeout, Logger logger) {
-        super(logHandler,taskDir,taskAppId, tenantCode, envFile, startTime, timeout, logger);
+                                 String taskDir,
+                                 String taskAppId,
+                                 int taskInstId,
+                                 String tenantCode,
+                                 String envFile,
+                                 Date startTime,
+                                 int timeout,
+                                 Logger logger) {
+        super(logHandler,taskDir,taskAppId,taskInstId,tenantCode, envFile, startTime, timeout, logger);
     }
 
 
@@ -66,29 +72,28 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
-        logger.info("tenant :{}, work dir:{}", tenantCode, taskDir);
+        logger.info("tenantCode :{}, task dir:{}", tenantCode, taskDir);
 
         if (!Files.exists(Paths.get(commandFile))) {
             logger.info("generate command file:{}", commandFile);
 
-            StringBuilder sb = new StringBuilder(200);
+            StringBuilder sb = new StringBuilder();
             sb.append("#-*- encoding=utf8 -*-\n");
 
             sb.append("\n\n");
-            sb.append(String.format("import py_%s_node\n",taskAppId));
+            sb.append(execCommand);
             logger.info(sb.toString());
 
             // write data to file
-            FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
+            FileUtils.writeStringToFile(new File(commandFile),
+                    sb.toString(),
+                    StandardCharsets.UTF_8);
         }
     }
 
     @Override
     protected String commandType() {
-
-        String envPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH + "conf"+
-                Constants.SINGLE_SLASH +"env" + Constants.SINGLE_SLASH + Constants.ESCHEDULER_ENV_SH;
-        String pythonHome = getPythonHome(envPath);
+        String pythonHome = getPythonHome(envFile);
         if (StringUtils.isEmpty(pythonHome)){
             return PYTHON;
         }
@@ -107,16 +112,25 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
 
 
     /**
-     *  get python home
+     *  get the absolute path of the Python command
+     *  note :
+     *  common.properties
+     *  PYTHON_HOME configured under common.properties is Python absolute path, not PYTHON_HOME itself
+     *
+     *  for example :
+     *  your PYTHON_HOM is /opt/python3.7/
+     *  you must set PYTHON_HOME is /opt/python3.7/python under nder common.properties
+     *  escheduler.env.path file.
+     *
      * @param envPath
      * @return
      */
     private static String getPythonHome(String envPath){
         BufferedReader br = null;
-        String line = null;
         StringBuilder sb = new StringBuilder();
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)));
+            String line;
             while ((line = br.readLine()) != null){
                 if (line.contains(Constants.PYTHON_HOME)){
                     sb.append(line);
@@ -127,13 +141,13 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
             if (org.apache.commons.lang.StringUtils.isEmpty(result)){
                 return null;
             }
-            String[] arrs = result.split("=");
+            String[] arrs = result.split(Constants.EQUAL_SIGN);
             if (arrs.length == 2){
                 return arrs[1];
             }
 
         }catch (IOException e){
-            logger.error("read file failed : " + e.getMessage(),e);
+            logger.error("read file failure",e);
         }finally {
             try {
                 if (br != null){

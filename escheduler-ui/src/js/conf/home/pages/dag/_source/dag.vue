@@ -8,7 +8,7 @@
              :id="v"
              v-for="(item,v) in tasksTypeList"
              @mousedown="_getDagId(v)">
-          <div data-toggle="tooltip" :title="item.desc" :class="_isDetails">
+          <div data-toggle="tooltip" :title="item.desc">
             <div class="icos" :class="'icos-' + v" ></div>
           </div>
         </div>
@@ -27,6 +27,17 @@
                   :disabled="$route.name !== 'projects-instance-details'"
                   @click="_toggleView"
                   icon="fa fa-code">
+          </x-button>
+          <x-button
+            style="vertical-align: middle;"
+            data-toggle="tooltip"
+            :title="$t('Startup parameter')"
+            data-container="body"
+            type="primary"
+            size="xsmall"
+            :disabled="$route.name !== 'projects-instance-details'"
+            @click="_toggleParam"
+            icon="fa fa-chevron-circle-right">
           </x-button>
           <span class="name">{{name}}</span>
           &nbsp;
@@ -68,10 +79,9 @@
                   type="primary"
                   size="xsmall"
                   :loading="spinnerLoading"
-                  v-ps="['GENERAL_USER']"
                   @click="_saveChart"
                   icon="fa fa-save"
-                  :disabled="isDetails">
+                  >
             {{spinnerLoading ? 'Loading...' : $t('Save')}}
           </x-button>
         </div>
@@ -205,9 +215,9 @@
        * @param item
        */
       _getDagId (v) {
-        if (this.isDetails) {
-          return
-        }
+        // if (this.isDetails) {
+        //   return
+        // }
         this.dagBarId = v
       },
       /**
@@ -239,11 +249,12 @@
         })
       },
       _operationClass (item) {
-        if (item.disable) {
-          return this.toolOperCode === item.code ? 'active' : ''
-        } else {
-          return 'disable'
-        }
+        return this.toolOperCode === item.code ? 'active' : ''
+        // if (item.disable) {
+        //   return this.toolOperCode === item.code ? 'active' : ''
+        // } else {
+        //   return 'disable'
+        // }
       },
       /**
        * Storage interface
@@ -383,6 +394,13 @@
       _toggleView () {
         findComponentDownward(this.$root, `assist-dag-index`)._toggleView()
       },
+
+      /**
+       * Starting parameters
+       */
+      _toggleParam () {
+        findComponentDownward(this.$root, `starting-params-dag-index`)._toggleParam()
+      },
       /**
        * Create a node popup layer
        * @param Object id
@@ -441,8 +459,6 @@
       'tasks': {
         deep: true,
         handler (o) {
-          console.log('+++++ save dag params +++++')
-          console.log(o)
 
           // Edit state does not allow deletion of node a...
           this.setIsEditDag(true)

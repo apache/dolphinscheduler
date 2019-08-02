@@ -59,6 +59,7 @@ public class ProcessDao extends AbstractBaseDao {
     private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.RUNNING_EXEUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
+//            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
@@ -97,6 +98,12 @@ public class ProcessDao extends AbstractBaseDao {
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
 
+    @Autowired
+    private WorkerServerMapper workerServerMapper;
+
+    @Autowired
+    private TenantMapper tenantMapper;
+
     /**
      * task queue impl
      */
@@ -122,7 +129,9 @@ public class ProcessDao extends AbstractBaseDao {
         udfFuncMapper = getMapper(UdfFuncMapper.class);
         resourceMapper = getMapper(ResourceMapper.class);
         workerGroupMapper = getMapper(WorkerGroupMapper.class);
+        workerServerMapper = getMapper(WorkerServerMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
+        tenantMapper = getMapper(TenantMapper.class);
     }
 
 
@@ -484,11 +493,33 @@ public class ProcessDao extends AbstractBaseDao {
         processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
-        processInstance.setWorkerGroupId(command.getWorkerGroupId());
+        int workerGroupId = command.getWorkerGroupId() == 0 ? -1 : command.getWorkerGroupId();
+        processInstance.setWorkerGroupId(workerGroupId);
         processInstance.setTimeout(processDefinition.getTimeout());
+        processInstance.setTenantId(processDefinition.getTenantId());
         return processInstance;
     }
 
+    /**
+     * get process tenant
+     * there is tenant id in definition, use the tenant of the definition.
+     * if there is not tenant id in the definiton or the tenant not exist
+     * use definition creator's tenant.
+     * @param tenantId
+     * @param userId
+     * @return
+     */
+    public Tenant getTenantForProcess(int tenantId, int userId){
+        Tenant tenant = null;
+        if(tenantId >= 0){
+            tenant = tenantMapper.queryById(tenantId);
+        }
+        if(tenant == null){
+            User user = userMapper.queryById(userId);
+            tenant = tenantMapper.queryById(user.getTenantId());
+        }
+        return tenant;
+    }
 
     /**
      * check command parameters is valid
@@ -582,6 +613,8 @@ public class ProcessDao extends AbstractBaseDao {
             processInstance.setScheduleTime(command.getScheduleTime());
         }
         processInstance.setHost(host);
+
+        ExecutionStatus runStatus = ExecutionStatus.RUNNING_EXEUTION;
         int runTime = processInstance.getRunTimes();
         switch (commandType){
             case START_PROCESS:
@@ -611,6 +644,9 @@ public class ProcessDao extends AbstractBaseDao {
                 // find pause tasks and init task's state
                 cmdParam.remove(Constants.CMDPARAM_RECOVERY_START_NODE_STRING);
                 List<Integer> suspendedNodeList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.PAUSE);
+                List<Integer> stopNodeList = findTaskIdByInstanceState(processInstance.getId(),
+                        ExecutionStatus.KILL);
+                suspendedNodeList.addAll(stopNodeList);
                 for(Integer taskId : suspendedNodeList){
                     // 把暂停状态初始化
                     initTaskInstance(this.findTaskInstanceById(taskId));
@@ -622,6 +658,7 @@ public class ProcessDao extends AbstractBaseDao {
             case RECOVER_TOLERANCE_FAULT_PROCESS:
                 // recover tolerance fault process
                 processInstance.setRecovery(Flag.YES);
+                runStatus = processInstance.getState();
                 break;
             case COMPLEMENT_DATA:
                 // delete all the valid tasks when complement data
@@ -653,7 +690,7 @@ public class ProcessDao extends AbstractBaseDao {
             default:
                 break;
         }
-        processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+        processInstance.setState(runStatus);
         return processInstance;
     }
 
@@ -757,13 +794,16 @@ public class ProcessDao extends AbstractBaseDao {
      * @param taskInstance
      */
     private void initTaskInstance(TaskInstance taskInstance){
-        if(taskInstance.getState().typeIsFailure() && !taskInstance.isSubProcess()){
-            taskInstance.setFlag(Flag.NO);
-            updateTaskInstance(taskInstance);
-        }else{
-            taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
-            updateTaskInstance(taskInstance);
+
+        if(!taskInstance.isSubProcess()){
+            if(taskInstance.getState().typeIsCancel() || taskInstance.getState().typeIsFailure()){
+                taskInstance.setFlag(Flag.NO);
+                updateTaskInstance(taskInstance);
+                return;
+            }
         }
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        updateTaskInstance(taskInstance);
     }
 
     /**
@@ -891,6 +931,9 @@ public class ProcessDao extends AbstractBaseDao {
             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startTime);
             processMapStr = JSONUtils.toJson(cmdParam);
         }
+
+        updateSubProcessDefinitionByParent(parentProcessInstance, childDefineId);
+
         Command command = new Command();
         command.setWarningType(parentProcessInstance.getWarningType());
         command.setWarningGroupId(parentProcessInstance.getWarningGroupId());
@@ -903,6 +946,16 @@ public class ProcessDao extends AbstractBaseDao {
         command.setProcessInstancePriority(parentProcessInstance.getProcessInstancePriority());
         createCommand(command);
         logger.info("sub process command created: {} ", command.toString());
+    }
+
+    private void updateSubProcessDefinitionByParent(ProcessInstance parentProcessInstance, int childDefinitionId) {
+        ProcessDefinition fatherDefinition = this.findProcessDefineById(parentProcessInstance.getProcessDefinitionId());
+        ProcessDefinition childDefinition = this.findProcessDefineById(childDefinitionId);
+        if(childDefinition != null && fatherDefinition != null){
+            childDefinition.setReceivers(fatherDefinition.getReceivers());
+            childDefinition.setReceiversCc(fatherDefinition.getReceiversCc());
+            processDefineMapper.update(childDefinition);
+        }
     }
 
     /**
@@ -971,11 +1024,11 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
+     * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_${task executed by ip1},${ip2}...
      *
      * The tasks with the highest priority are selected by comparing the priorities of the above four levels from high to low.
      *
-     * 流程实例优先级_流程实例id_任务优先级_任务id       high <- low
+     * 流程实例优先级_流程实例id_任务优先级_任务id_任务执行机器ip1，ip2...          high <- low
      *
      * @param taskInstance
      * @return
@@ -1167,6 +1220,26 @@ public class ProcessDao extends AbstractBaseDao {
         return taskInstanceMapper.queryById(taskId);
     }
 
+
+    /**
+     * package task instance，associate processInstance and processDefine
+     * @param taskInstId
+     * @return
+     */
+    public TaskInstance getTaskInstanceRelationByTaskId(int taskInstId){
+        // get task instance
+        TaskInstance taskInstance = findTaskInstanceById(taskInstId);
+        // get process instance
+        ProcessInstance processInstance = findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
+        // get process define
+        ProcessDefinition processDefine = findProcessDefineById(taskInstance.getProcessDefinitionId());
+
+        taskInstance.setProcessInstance(processInstance);
+        taskInstance.setProcessDefine(processDefine);
+        return taskInstance;
+    }
+
+
     /**
      * get id list by task state
      * @param instanceId
@@ -1271,7 +1344,6 @@ public class ProcessDao extends AbstractBaseDao {
                                 String executePath,
                                 String logPath,
                                 int taskInstId) {
-
         TaskInstance taskInstance = taskInstanceMapper.queryById(taskInstId);
         taskInstance.setState(state);
         taskInstance.setStartTime(startTime);
@@ -1614,7 +1686,6 @@ public class ProcessDao extends AbstractBaseDao {
         for (ProcessInstance processInstance:processInstanceList){
             processNeedFailoverProcessInstances(processInstance);
         }
-
     }
 
     @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
@@ -1679,6 +1750,17 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public WorkerGroup queryWorkerGroupById(int workerGroupId){
         return workerGroupMapper.queryById(workerGroupId);
+    }
+
+    /**
+     * query worker server by host
+     * @param host
+     * @return
+     */
+    public List<WorkerServer> queryWorkerServerByHost(String host){
+
+        return workerServerMapper.queryWorkerByHost(host);
+
     }
 
 

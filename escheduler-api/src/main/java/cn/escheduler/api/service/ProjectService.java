@@ -46,12 +46,6 @@ public class ProjectService extends BaseService{
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private UsersService userService;
-
-    @Autowired
     private ProjectMapper projectMapper;
 
     @Autowired
@@ -74,15 +68,6 @@ public class ProjectService extends BaseService{
         Map<String, Object> descCheck = checkDesc(desc);
         if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
             return descCheck;
-        }
-
-        /**
-         * only general users can create projects. administrators have no corresponding tenants and can only view
-         * 管理员没有对应的租户,只能查看,只有普通用户才可以创建项目
-         */
-        if (!userService.isGeneral(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
         }
 
         Project project = projectMapper.queryByName(name);

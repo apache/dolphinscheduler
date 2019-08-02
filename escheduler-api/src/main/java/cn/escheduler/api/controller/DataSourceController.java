@@ -18,10 +18,14 @@ package cn.escheduler.api.controller;
 
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.DataSourceService;
+import cn.escheduler.api.utils.CheckUtils;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.DbType;
+import cn.escheduler.common.enums.ResUploadType;
+import cn.escheduler.common.utils.CommonUtils;
 import cn.escheduler.common.utils.ParameterUtils;
+import cn.escheduler.common.utils.PropertyUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -34,9 +38,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static cn.escheduler.api.enums.Status.*;
+import static cn.escheduler.common.utils.PropertyUtils.getBoolean;
 
 
 /**
@@ -54,12 +60,16 @@ public class DataSourceController extends BaseController {
 
     /**
      * create data source
-     * 创建数据源
-     *
      * @param loginUser
      * @param name
      * @param note
      * @param type
+     * @param host
+     * @param port
+     * @param database
+     * @param principal
+     * @param userName
+     * @param password
      * @param other
      * @return
      */
@@ -84,13 +94,14 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "host") String host,
                                    @RequestParam(value = "port") String port,
                                    @RequestParam(value = "database") String database,
+                                   @RequestParam(value = "principal") String principal,
                                    @RequestParam(value = "userName") String userName,
                                    @RequestParam(value = "password") String password,
                                    @RequestParam(value = "other") String other) {
-        logger.info("login user {} create datasource ame: {}, note: {}, type: {}, other: {}",
-                loginUser.getUserName(), name, note, type, other);
+        logger.info("login user {} create datasource name: {}, note: {}, type: {}, host: {},port: {},database : {},principal: {},userName : {} other: {}",
+                loginUser.getUserName(), name, note, type, host,port,database,principal,userName,other);
         try {
-            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, userName, password, other);
+            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database,principal,userName, password, other);
             Map<String, Object> result = dataSourceService.createDataSource(loginUser, name, note, type, parameter);
             return returnDataList(result);
 
@@ -134,13 +145,14 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "host") String host,
                                    @RequestParam(value = "port") String port,
                                    @RequestParam(value = "database") String database,
+                                   @RequestParam(value = "principal") String principal,
                                    @RequestParam(value = "userName") String userName,
                                    @RequestParam(value = "password") String password,
                                    @RequestParam(value = "other") String other) {
         logger.info("login user {} updateProcessInstance datasource name: {}, note: {}, type: {}, other: {}",
                 loginUser.getUserName(), name, note, type, other);
         try {
-            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, userName, password, other);
+            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database,principal, userName, password, other);
             Map<String, Object> dataSource = dataSourceService.updateDataSource(id, loginUser, name, note, type, parameter);
             return returnDataList(dataSource);
         } catch (Exception e) {
@@ -269,13 +281,14 @@ public class DataSourceController extends BaseController {
                                     @RequestParam(value = "host") String host,
                                     @RequestParam(value = "port") String port,
                                     @RequestParam(value = "database") String database,
+                                    @RequestParam(value = "principal") String principal,
                                     @RequestParam(value = "userName") String userName,
                                     @RequestParam(value = "password") String password,
                                     @RequestParam(value = "other") String other) {
         logger.info("login user {}, connect datasource: {} failure, note: {}, type: {}, other: {}",
                 loginUser.getUserName(), name, note, type, other);
         try {
-            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, userName, password, other);
+            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database,principal,userName, password, other);
             Boolean isConnection = dataSourceService.checkConnection(type, parameter);
             Result result = new Result();
 
@@ -427,6 +440,26 @@ public class DataSourceController extends BaseController {
         } catch (Exception e) {
             logger.error(AUTHORIZED_DATA_SOURCE.getMsg(),e);
             return error(AUTHORIZED_DATA_SOURCE.getCode(), AUTHORIZED_DATA_SOURCE.getMsg());
+        }
+    }
+
+    /**
+     * get user info
+     *
+     * @param loginUser
+     * @return
+     */
+    @ApiOperation(value = "getKerberosStartupState", notes= "GET_USER_INFO_NOTES")
+    @GetMapping(value="/kerberos-startup-state")
+    @ResponseStatus(HttpStatus.OK)
+    public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
+        logger.info("login user {},get kerberos startup state : {}", loginUser.getUserName());
+        try{
+            // if upload resource is HDFS and kerberos startup is true , else false
+            return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
+        }catch (Exception e){
+            logger.error(KERBEROS_STARTUP_STATE.getMsg(),e);
+            return error(Status.KERBEROS_STARTUP_STATE.getCode(), Status.KERBEROS_STARTUP_STATE.getMsg());
         }
     }
 }

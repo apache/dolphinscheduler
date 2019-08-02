@@ -43,6 +43,23 @@ public interface WorkerServerMapper {
     List<WorkerServer> queryAllWorker();
 
     /**
+     * query worker list
+     *
+     * @return
+     */
+    @Results(value = {
+            @Result(property = "id", column = "id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "host", column = "host", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "port", column = "port", javaType = int.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "zkDirectory", column = "zk_directory", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "resInfo", column = "res_info", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
+            @Result(property = "lastHeartbeatTime", column = "last_heartbeat_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP)
+    })
+    @SelectProvider(type = WorkerServerMapperProvider.class, method = "queryWorkerByHost")
+    List<WorkerServer> queryWorkerByHost(@Param("host") String host);
+
+    /**
      * insert worker server
      *
      * @param workerServer

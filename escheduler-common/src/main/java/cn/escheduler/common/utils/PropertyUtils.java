@@ -16,6 +16,8 @@
  */
 package cn.escheduler.common.utils;
 
+import cn.escheduler.common.Constants;
+import cn.escheduler.common.enums.ResUploadType;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,11 +67,15 @@ public class PropertyUtils {
         }
     }
 
-/*
-    public static PropertyUtils getInstance(){
-        return propertyUtils;
+    /**
+     * judge whether resource upload startup
+     * @return
+     */
+    public static Boolean getResUploadStartupState(){
+        String resUploadStartupType = PropertyUtils.getString(Constants.RES_UPLOAD_STARTUP_TYPE);
+        ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
+        return resUploadType == ResUploadType.HDFS || resUploadType == ResUploadType.S3;
     }
-*/
 
     /**
      * get property value

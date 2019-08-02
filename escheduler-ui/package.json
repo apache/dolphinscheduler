@@ -10,7 +10,8 @@
     "lint": "standard \"**/*.{js,vue}\"",
     "lint:fix": "standard \"**/*.{js,vue}\" --fix",
     "start": "npm run dev",
-    "combo": "node ./build/combo.js"
+    "combo": "node ./build/combo.js",
+    "build:combined": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/escheduler/ui webpack --config ./build/webpack.config.combined.js"
   },
   "dependencies": {
     "autoprefixer": "^9.1.0",

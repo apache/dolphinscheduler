@@ -17,6 +17,15 @@
 package cn.escheduler.common.queue;
 
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.Bytes;
 import cn.escheduler.common.utils.IpUtils;
@@ -28,8 +37,6 @@ import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-
 /**
  * A singleton of a task queue implemented with zookeeper
  * tasks queue implemention
@@ -38,7 +45,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskQueueZkImpl.class);
 
-    private static TaskQueueZkImpl instance;
+    private static volatile TaskQueueZkImpl instance;
 
     private TaskQueueZkImpl(){
         init();
@@ -150,14 +157,34 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                 int size = list.size();
 
 
-                Set<String> taskTreeSet = new TreeSet<>();
+                Set<String> taskTreeSet = new TreeSet<>(new Comparator<String>() {
+                    @Override
+                    public int compare(String o1, String o2) {
+
+                        String s1 = o1;
+                        String s2 = o2;
+                        String[] s1Array = s1.split(Constants.UNDERLINE);
+                        if(s1Array.length>4){
+                            // warning: if this length > 5, need to be changed
+                            s1 = s1.substring(0, s1.lastIndexOf(Constants.UNDERLINE) );
+                        }
+
+                        String[] s2Array = s2.split(Constants.UNDERLINE);
+                        if(s2Array.length>4){
+                            // warning: if this length > 5, need to be changed
+                            s2 = s2.substring(0, s2.lastIndexOf(Constants.UNDERLINE) );
+                        }
+
+                        return s1.compareTo(s2);
+                    }
+                });
 
                 for (int i = 0; i < size; i++) {
 
                     String taskDetail = list.get(i);
                     String[] taskDetailArrs = taskDetail.split(Constants.UNDERLINE);
 
-                    //向前版本兼容
+                    //forward compatibility 向前版本兼容
                     if(taskDetailArrs.length >= 4){
 
                         //format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
@@ -166,15 +193,14 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                             String taskHosts = taskDetailArrs[4];
 
                             //task can assign to any worker host if equals default ip value of worker server
-                            if(!taskHosts.equals(Constants.DEFAULT_WORKER_ID)){
+                            if(!taskHosts.equals(String.valueOf(Constants.DEFAULT_WORKER_ID))){
                                 String[] taskHostsArr = taskHosts.split(Constants.COMMA);
-
                                 if(!Arrays.asList(taskHostsArr).contains(workerIpLongStr)){
                                     continue;
                                 }
                             }
+                            formatTask += Constants.UNDERLINE + taskDetailArrs[4];
                         }
-
                         taskTreeSet.add(formatTask);
 
                     }
@@ -208,14 +234,41 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         int j = 0;
         List<String> taskslist = new ArrayList<>(tasksNum);
         while(iterator.hasNext()){
-            if(j++ < tasksNum){
-                String task = iterator.next();
-                taskslist.add(task);
+            if(j++ >= tasksNum){
+                break;
             }
+            String task = iterator.next();
+            taskslist.add(getOriginTaskFormat(task));
         }
         return taskslist;
     }
 
+    /**
+     * format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
+     * processInstanceId and task id need to be convert to int.
+     * @param formatTask
+     * @return
+     */
+    private String getOriginTaskFormat(String formatTask){
+        String[] taskArray = formatTask.split(Constants.UNDERLINE);
+        if(taskArray.length< 4){
+            return formatTask;
+        }
+        int processInstanceId = Integer.parseInt(taskArray[1]);
+        int taskId = Integer.parseInt(taskArray[3]);
+
+        StringBuilder sb = new StringBuilder(50);
+        String destTask = String.format("%s_%s_%s_%s", taskArray[0], processInstanceId, taskArray[2], taskId);
+
+        sb.append(destTask);
+
+        if(taskArray.length > 4){
+            for(int index = 4; index < taskArray.length; index++){
+                sb.append(Constants.UNDERLINE).append(taskArray[index]);
+            }
+        }
+        return sb.toString();
+    }
 
     @Override
     public void removeNode(String key, String nodeValue){
@@ -372,16 +425,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
             logger.error("delete all tasks in tasks queue failure",e);
         }
     }
-
-
-    /**
-     * get zookeeper client of CuratorFramework
-     * @return
-     */
-    public CuratorFramework getZkClient() {
-        return zkClient;
-    }
-
 
     /**
      * Get the task queue path

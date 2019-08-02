@@ -33,30 +33,6 @@
             </div>
           </div>
         </div>
-        <div class="row" style="padding-top: 20px;">
-          <div class="col-md-6">
-          </div>
-          <div class="col-md-6">
-            <div class="chart-title">
-              <span>{{$t('Queue statistics')}}</span>
-            </div>
-            <div class="row">
-              <m-queue-count :search-params="searchParams">
-              </m-queue-count>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="chart-title" style="margin-bottom: 20px;margin-top: 30px">
-              <span>{{$t('Command status statistics')}}</span>
-            </div>
-            <div>
-              <m-command-state-count :search-params="searchParams">
-              </m-command-state-count>
-            </div>
-          </div>
-        </div>
         <div class="row">
           <div class="col-md-12">
             <div class="chart-title" style="margin-bottom: -20px;margin-top: 30px">
