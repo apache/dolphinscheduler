@@ -27,8 +27,8 @@ Its main objectives are as follows:
  - Implement cluster HA, decentralize Master cluster and Worker cluster through Zookeeper
  - Support online viewing of `Master/Worker` cpu load, memory, cpu
  - Support process running history tree/gantt chart display, support task status statistics, process status statistics
- - Support for complement
- - Support for multi-tenant
+ - Support backfilling data
+ - Support multi-tenant
  - Support internationalization
  - There are more waiting partners to explore
 
