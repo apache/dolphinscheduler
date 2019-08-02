@@ -1,10 +1,17 @@
 Easy Scheduler
 ============
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
+[![Total Lines](https://tokei.rs/b1/github/analysys/EasyScheduler?category=lines)](https://github.com/analysys/EasyScheduler)
 
 > Easy Scheduler for Big Data
 
-[中文](README_zh_CN.md) | [英文](README.md)
+
+
+[![Stargazers over time](https://starchart.cc/analysys/EasyScheduler.svg)](https://starchart.cc/analysys/EasyScheduler)
+
+[![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
+[![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
+
 
 **设计特点：** 一个分布式易扩展的可视化DAG工作流任务调度系统。致力于解决数据处理流程中错综复杂的依赖关系，使调度系统在数据处理流程中`开箱即用`。
 其主要目标如下：
