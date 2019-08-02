@@ -16,7 +16,7 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.model.MasterServer;
+import cn.escheduler.common.model.MasterServer;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.type.JdbcType;
 
