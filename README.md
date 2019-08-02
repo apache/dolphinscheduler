@@ -1,7 +1,7 @@
 Easy Scheduler
 ============
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-
+[![Total Lines](https://tokei.rs/b1/github/analysys/EasyScheduler?category=lines)](https://github.com/analysys/EasyScheduler)
 > Easy Scheduler for Big Data
 
 [English](README.md) | [Chinese](README_zh_CN.md)
