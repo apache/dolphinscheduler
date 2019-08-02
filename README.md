@@ -25,7 +25,7 @@ Its main objectives are as follows:
  - Support online upload/download of resource files, management, etc. Support online file creation and editing
  - Support task log online viewing and scrolling, online download log, etc.
  - Implement cluster HA, decentralize Master cluster and Worker cluster through Zookeeper
- - Support online viewing of `Master/Worker` cpu load, memory, cpu
+ - Support online viewing of `Master/Worker` cpu load, memory
  - Support process running history tree/gantt chart display, support task status statistics, process status statistics
  - Support backfilling data
  - Support multi-tenant
