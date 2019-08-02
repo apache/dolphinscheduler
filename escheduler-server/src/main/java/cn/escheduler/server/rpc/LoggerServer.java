@@ -100,11 +100,11 @@ public class LoggerServer {
             StringBuilder sb = new StringBuilder();
             boolean errorLineFlag = false;
             for (String line : list){
-                if (line.startsWith("[INFO]")){
+                if (line.contains("TaskLogger")){
                     errorLineFlag = filterLine(request.getPath(),line);
                 }
 
-                if (!errorLineFlag || !line.startsWith("[INFO]")){
+                if (!errorLineFlag || !line.contains("TaskLogger")){
                     sb.append(line + "\r\n");
                 }
             }
@@ -192,11 +192,11 @@ public class LoggerServer {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
             boolean errorLineFlag = false;
             while ((line = br.readLine()) != null){
-                if (line.startsWith("[INFO]")){
+                if (line.contains("TaskLogger")){
                     errorLineFlag = filterLine(path,line);
                 }
 
-                if (!errorLineFlag || !line.startsWith("[INFO]")){
+                if (!errorLineFlag || !line.startsWith("TaskLogger")){
                     sb.append(line + "\r\n");
                 }
             }
@@ -218,7 +218,7 @@ public class LoggerServer {
 
 
     /**
-     * 
+     *
      * @param path
      * @param line
      * @return
