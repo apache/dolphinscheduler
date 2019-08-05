@@ -107,14 +107,13 @@ public class SessionMapperProvider {
      * @param parameter
      * @return
      */
-    public String queryByIdAndIp(Map<String, Object> parameter) {
+    public String queryBySessionId(Map<String, Object> parameter) {
         return new SQL() {{
             SELECT("*");
 
             FROM(TABLE_NAME);
 
             WHERE("`id` = #{sessionId}");
-            WHERE("`ip` = #{ip}");
         }}.toString();
     }
 
@@ -123,14 +122,13 @@ public class SessionMapperProvider {
      * @param parameter
      * @return
      */
-    public String queryByUserIdAndIp(Map<String, Object> parameter) {
+    public String queryByUserId(Map<String, Object> parameter) {
         return new SQL() {{
             SELECT("*");
 
             FROM(TABLE_NAME);
 
             WHERE("`user_id` = #{userId}");
-            WHERE("`ip` = #{ip}");
         }}.toString();
     }
 }

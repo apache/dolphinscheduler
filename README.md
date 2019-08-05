@@ -43,18 +43,14 @@ Easy Scheduler
 
 - [**升级文档**](https://analysys.github.io/easyscheduler_docs_cn/升级文档.html?_blank "升级文档") 
 
-- [**接口文档**](http://52.82.13.76:8888/easyscheduler/doc.html?language=zh_CN&lang=cn?_blank "接口文档") 
-
-- <a href="http://52.82.13.76:8888" target="_blank">我要体验</a>
-
-- [**FAQ**](https://analysys.github.io/easyscheduler_docs_cn/EasyScheduler-FAQ".html?_blank "EasyScheduler-FAQ") 
+- <a href="http://52.82.13.76:8888" target="_blank">我要体验</a> 
 
 更多文档请参考 <a href="https://analysys.github.io/easyscheduler_docs_cn/" target="_blank">easyscheduler中文在线文档</a>
 
 
 ### 近期研发计划
 
-EasyScheduler的工作计划：<a href="https://github.com/analysys/EasyScheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是1.0.2版本的功能，TODO卡片是待做事项(包括 feature ideas)
+EasyScheduler的工作计划：<a href="https://github.com/analysys/EasyScheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是1.1.0版本的功能，TODO卡片是待做事项(包括 feature ideas)
 
 ### 贡献代码
 

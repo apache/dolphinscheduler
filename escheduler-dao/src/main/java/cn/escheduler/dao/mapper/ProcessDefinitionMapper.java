@@ -95,6 +95,7 @@ public interface ProcessDefinitionMapper {
             @Result(property = "connects", column = "connects", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "timeout", column = "timeout", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "receivers", column = "receivers", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "receiversCc", column = "receivers_cc", javaType = String.class, jdbcType = JdbcType.VARCHAR)
 
@@ -123,6 +124,7 @@ public interface ProcessDefinitionMapper {
             @Result(property = "locations", column = "locations", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "connects", column = "connects", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "timeout", column = "timeout", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR)
     })
     @SelectProvider(type = ProcessDefinitionMapperProvider.class, method = "queryByDefineName")
@@ -160,6 +162,7 @@ public interface ProcessDefinitionMapper {
             @Result(property = "flag", column = "flag", typeHandler = EnumOrdinalTypeHandler.class, javaType = Flag.class, jdbcType = JdbcType.TINYINT),
             @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "timeout", column = "timeout", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR)
     })
     @SelectProvider(type = ProcessDefinitionMapperProvider.class, method = "queryAllDefinitionList")
@@ -187,6 +190,7 @@ public interface ProcessDefinitionMapper {
             @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "scheduleReleaseState", column = "schedule_release_state",  typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
             @Result(property = "timeout", column = "timeout", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR)
     })
     @SelectProvider(type = ProcessDefinitionMapperProvider.class, method = "queryDefineListPaging")
@@ -216,6 +220,7 @@ public interface ProcessDefinitionMapper {
             @Result(property = "connects", column = "connects", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "timeout", column = "timeout", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR)
     })
     @SelectProvider(type = ProcessDefinitionMapperProvider.class, method = "queryDefinitionListByIdList")

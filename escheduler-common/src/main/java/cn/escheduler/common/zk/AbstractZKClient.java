@@ -30,13 +30,12 @@ import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.hadoop.hbase.protobuf.generated.MasterProtos;
 import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static cn.escheduler.common.Constants.*;
 
@@ -213,9 +212,9 @@ public abstract class AbstractZKClient {
 	protected void initSystemZNode(){
 		try {
 			// read master node parent path from conf
-			masterZNodeParentPath = conf.getString(Constants.ZOOKEEPER_ESCHEDULER_MASTERS);
+			masterZNodeParentPath = getMasterZNodeParentPath();
 			// read worker node parent path from conf
-			workerZNodeParentPath = conf.getString(Constants.ZOOKEEPER_ESCHEDULER_WORKERS);
+			workerZNodeParentPath = getWorkerZNodeParentPath();
 
 			// read server node parent path from conf
 			deadServerZNodeParentPath = conf.getString(ZOOKEEPER_ESCHEDULER_DEAD_SERVERS);
@@ -242,6 +241,7 @@ public abstract class AbstractZKClient {
 			logger.error("init system znode failed : " + e.getMessage(),e);
 		}
 	}
+
 
 	public void removeDeadServerByHost(String host, String serverType) throws Exception {
         List<String> deadServers = zkClient.getChildren().forPath(deadServerZNodeParentPath);
@@ -291,6 +291,8 @@ public abstract class AbstractZKClient {
 
 	}
 
+
+
 	/**
 	 * for stop server
 	 * @param serverStoppable
@@ -312,7 +314,10 @@ public abstract class AbstractZKClient {
 				childrenList = zkClient.getChildren().forPath(masterZNodeParentPath);
 			}
 		} catch (Exception e) {
-			logger.warn(e.getMessage(),e);
+			if(!e.getMessage().contains("java.lang.IllegalStateException: instance must be started")){
+				logger.warn(e.getMessage(),e);
+			}
+
 			return childrenList.size();
 		}
 		return childrenList.size();
@@ -335,6 +340,81 @@ public abstract class AbstractZKClient {
 
 		return sb.toString();
 	}
+
+	/**
+	 * get master server list map.
+	 * result : {host : resource info}
+	 * @return
+	 */
+	public Map<String, String> getServerList(boolean isMaster ){
+
+		Map<String, String> masterMap = new HashMap<>();
+		try {
+			String path =  isMaster ? getMasterZNodeParentPath() : getWorkerZNodeParentPath();
+			List<String> serverList  = getZkClient().getChildren().forPath(path);
+			for(String server : serverList){
+				byte[] bytes  = getZkClient().getData().forPath(path + "/" + server);
+				masterMap.putIfAbsent(server, new String(bytes));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return masterMap;
+	}
+
+	/**
+	 *  get zkclient
+	 * @return
+	 */
+	public  CuratorFramework getZkClient() {
+		return zkClient;
+	}
+
+	/**
+	 * get worker node parent path
+	 * @return
+	 */
+	protected String getWorkerZNodeParentPath(){return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_WORKERS);};
+
+	/**
+	 * get master node parent path
+	 * @return
+	 */
+	protected String getMasterZNodeParentPath(){return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_MASTERS);}
+
+	/**
+	 *  get master lock path
+	 * @return
+	 */
+	public String getMasterLockPath(){
+		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_MASTERS);
+	}
+
+	/**
+	 *  get master start up lock path
+	 * @return
+	 */
+	public String getMasterStartUpLockPath(){
+		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS);
+	}
+
+	/**
+	 *  get master failover lock path
+	 * @return
+	 */
+	public String getMasterFailoverLockPath(){
+		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_MASTERS);
+	}
+
+	/**
+	 * get worker failover lock path
+	 * @return
+	 */
+	public String getWorkerFailoverLockPath(){
+		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_WORKERS);
+	}
+
 
 	@Override
 	public String toString() {

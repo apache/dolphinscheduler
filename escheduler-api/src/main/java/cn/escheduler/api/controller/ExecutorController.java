@@ -24,11 +24,13 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.*;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
@@ -36,8 +38,9 @@ import static cn.escheduler.api.enums.Status.*;
 
 
 /**
- * execute task controller
+ * execute process controller
  */
+@Api(tags = "PROCESS_INSTANCE_EXECUTOR_TAG", position = 1)
 @RestController
 @RequestMapping("projects/{projectName}/executors")
 public class ExecutorController extends BaseController {
@@ -50,10 +53,27 @@ public class ExecutorController extends BaseController {
     /**
      * execute process instance
      */
+    @ApiOperation(value = "startProcessInstance", notes= "RUN_PROCESS_INSTANCE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", required = true, dataType ="FailureStrategy"),
+            @ApiImplicitParam(name = "startNodeList", value = "START_NODE_LIST", dataType ="String"),
+            @ApiImplicitParam(name = "taskDependType", value = "TASK_DEPEND_TYPE", dataType ="TaskDependType"),
+            @ApiImplicitParam(name = "execType", value = "COMMAND_TYPE", dataType ="CommandType"),
+            @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE",required = true, dataType ="WarningType"),
+            @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID",required = true, dataType ="Int", example = "100"),
+            @ApiImplicitParam(name = "receivers", value = "RECEIVERS",dataType ="String" ),
+            @ApiImplicitParam(name = "receiversCc", value = "RECEIVERS_CC",dataType ="String" ),
+            @ApiImplicitParam(name = "runMode", value = "RUN_MODE",dataType ="RunMode" ),
+            @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority" ),
+            @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int",example = "100"),
+            @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int",example = "100"),
+    })
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
-    public Result startProcessInstance(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @PathVariable String projectName,
+    public Result startProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                        @RequestParam(value = "processDefinitionId") int processDefinitionId,
                                        @RequestParam(value = "scheduleTime", required = false) String scheduleTime,
                                        @RequestParam(value = "failureStrategy", required = true) FailureStrategy failureStrategy,
@@ -99,10 +119,15 @@ public class ExecutorController extends BaseController {
      * @param processInstanceId
      * @return
      */
+    @ApiOperation(value = "execute", notes= "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "executeType", value = "EXECUTE_TYPE", required = true, dataType = "ExecuteType")
+    })
     @PostMapping(value = "/execute")
     @ResponseStatus(HttpStatus.OK)
-    public Result execute(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @PathVariable String projectName,
+    public Result execute(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                          @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                   @RequestParam("processInstanceId") Integer processInstanceId,
                                                   @RequestParam("executeType") ExecuteType executeType
     ) {
@@ -124,9 +149,13 @@ public class ExecutorController extends BaseController {
      * @param processDefinitionId
      * @return
      */
+    @ApiOperation(value = "startCheckProcessDefinition", notes= "START_CHECK_PROCESS_DEFINITION_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+    })
     @PostMapping(value = "/start-check")
     @ResponseStatus(HttpStatus.OK)
-    public Result startCheckProcessDefinition(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result startCheckProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam(value = "processDefinitionId") int processDefinitionId) {
         logger.info("login user {}, check process definition", loginUser.getUserName(), processDefinitionId);
         try {
@@ -146,9 +175,16 @@ public class ExecutorController extends BaseController {
      * @param processDefinitionId
      * @return
      */
+    @ApiIgnore
+    @ApiOperation(value = "getReceiverCc", notes= "GET_RECEIVER_CC_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", required = true, dataType = "Int", example = "100")
+
+    })
     @GetMapping(value = "/get-receiver-cc")
     @ResponseStatus(HttpStatus.OK)
-    public Result getReceiverCc(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result getReceiverCc(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam(value = "processDefinitionId",required = false) Integer processDefinitionId,
                                 @RequestParam(value = "processInstanceId",required = false) Integer processInstanceId) {
         logger.info("login user {}, get process definition receiver and cc", loginUser.getUserName());

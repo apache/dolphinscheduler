@@ -352,6 +352,7 @@ public abstract class AbstractCommandExecutor {
                             logBuffer.add(line);
                         }
 
+
                         lastFlushTime = flush(lastFlushTime);
                     }
                 } catch (Exception e) {
