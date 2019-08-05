@@ -25,6 +25,7 @@ import cn.escheduler.common.enums.UdfType;
 import cn.escheduler.common.job.db.*;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.task.AbstractParameters;
+import cn.escheduler.common.task.sql.LoggableStatement;
 import cn.escheduler.common.task.sql.SqlBinds;
 import cn.escheduler.common.task.sql.SqlParameters;
 import cn.escheduler.common.task.sql.SqlType;
@@ -329,7 +330,7 @@ public class SqlTask extends AbstractTask {
     }
 
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
-        PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql());
+        PreparedStatement  stmt = new LoggableStatement(connection,sqlBinds.getSql());
         if(taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED || taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED){
             stmt.setQueryTimeout(taskProps.getTaskTimeout());
         }
@@ -340,7 +341,8 @@ public class SqlTask extends AbstractTask {
                 ParameterUtils.setInParameter(key,stmt,prop.getType(),prop.getValue());
             }
         }
-        logger.info("prepare statement replace sql:{}",stmt.toString());
+        logger.info("prepare statement replace sql:{}",((LoggableStatement)stmt).getQueryString());
+
         return stmt;
     }
 
