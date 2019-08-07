@@ -18,7 +18,7 @@ package cn.escheduler.dao;
 
 import cn.escheduler.dao.mapper.MasterServerMapper;
 import cn.escheduler.dao.mapper.WorkerServerMapper;
-import cn.escheduler.dao.model.MasterServer;
+import cn.escheduler.common.model.MasterServer;
 import cn.escheduler.dao.model.WorkerServer;
 import org.springframework.beans.factory.annotation.Autowired;
 
