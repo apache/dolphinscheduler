@@ -182,7 +182,8 @@ public class ZKMasterClient extends AbstractZKClient {
 	 *  monitor master
 	 */
 	public void listenerMaster(){
-		PathChildrenCache masterPc = new PathChildrenCache(zkClient, masterZNodeParentPath, true ,defaultThreadFactory);
+		PathChildrenCache masterPc = new PathChildrenCache(zkClient,
+				getZNodeParentPath(ZKNodeType.MASTER), true ,defaultThreadFactory);
 
 		try {
 			masterPc.start();
@@ -280,7 +281,8 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	public void listenerWorker(){
 
-		PathChildrenCache workerPc = new PathChildrenCache(zkClient,workerZNodeParentPath,true ,defaultThreadFactory);
+		PathChildrenCache workerPc = new PathChildrenCache(zkClient,
+				getZNodeParentPath(ZKNodeType.WORKER),true ,defaultThreadFactory);
 		try {
 			workerPc.start();
 			workerPc.getListenable().addListener(new PathChildrenCacheListener() {
