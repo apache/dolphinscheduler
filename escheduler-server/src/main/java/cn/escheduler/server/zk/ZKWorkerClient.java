@@ -117,7 +117,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 
 		String heartbeatZKInfo = ResInfo.getHeartBeatInfo(new Date());
 
-		workerZNode = workerZNodeParentPath + "/" + OSUtils.getHost() + "_";
+		workerZNode = getZNodeParentPath(ZKNodeType.WORKER) + "/" + OSUtils.getHost() + "_";
 
 		workerZNode = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(workerZNode,
 				heartbeatZKInfo.getBytes());
@@ -144,7 +144,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 	 *  monitor worker
 	 */
 	private void listenerWorker(){
-		PathChildrenCache workerPc = new PathChildrenCache(zkClient, workerZNodeParentPath, true, defaultThreadFactory);
+		PathChildrenCache workerPc = new PathChildrenCache(zkClient, getZNodeParentPath(ZKNodeType.WORKER), true, defaultThreadFactory);
 		try {
 
 			Date now = new Date();
