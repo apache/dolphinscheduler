@@ -65,16 +65,6 @@ public abstract class AbstractZKClient {
 	protected String deadServerZNodeParentPath = null;
 
 	/**
-	 *  master node parent path
-	 */
-	protected String masterZNodeParentPath = null;
-
-	/**
-	 *  worker node parent path
-	 */
-	protected String workerZNodeParentPath = null;
-
-	/**
 	 * server stop or not
 	 */
 	protected IStoppable stoppable = null;
@@ -318,18 +308,16 @@ public abstract class AbstractZKClient {
 		List<String> childrenList = new ArrayList<>();
 		try {
 			// read master node parent path from conf
-			masterZNodeParentPath = conf.getString(Constants.ZOOKEEPER_ESCHEDULER_MASTERS);
-			if(zkClient.checkExists().forPath(masterZNodeParentPath) != null){
-				childrenList = zkClient.getChildren().forPath(masterZNodeParentPath);
+			if(zkClient.checkExists().forPath(getZNodeParentPath(ZKNodeType.MASTER)) != null){
+				childrenList = zkClient.getChildren().forPath(getZNodeParentPath(ZKNodeType.MASTER));
 			}
 		} catch (Exception e) {
 			if(!e.getMessage().contains("java.lang.IllegalStateException: instance must be started")){
 				logger.warn(e.getMessage(),e);
 			}
-
+		}finally {
 			return childrenList.size();
 		}
-		return childrenList.size();
 	}
 
 	/**
@@ -585,9 +573,9 @@ public abstract class AbstractZKClient {
 	public String toString() {
 		return "AbstractZKClient{" +
 				"zkClient=" + zkClient +
-				", deadServerZNodeParentPath='" + deadServerZNodeParentPath + '\'' +
-				", masterZNodeParentPath='" + masterZNodeParentPath + '\'' +
-				", workerZNodeParentPath='" + workerZNodeParentPath + '\'' +
+				", deadServerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.DEAD_SERVER) + '\'' +
+				", masterZNodeParentPath='" + getZNodeParentPath(ZKNodeType.MASTER) + '\'' +
+				", workerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.WORKER) + '\'' +
 				", stoppable=" + stoppable +
 				'}';
 	}

@@ -7,9 +7,6 @@
 
 ## Operational Guidelines
 
-  - Administrator accounts can only be managed in terms of authority, do not participate in specific business, can not create projects, and can not perform related operations on process definition.
-  - The following operations can only be performed by using ordinary user login system.
-
 ### Create a project
 
   - Click "Project - > Create Project", enter project name,  description, and click "Submit" to create a new project.
@@ -18,7 +15,7 @@
       <img src="https://user-images.githubusercontent.com/53217792/61776719-2ee50380-ae2e-11e9-9d11-41de8907efb5.png" width="60%" />
  </p>
 
-> Project Home Page contains task status statistics, process status statistics, process definition statistics, queue statistics, command statistics.
+> Project Home Page contains task status statistics, process status statistics.
 
  - Task State Statistics: It refers to the statistics of the number of tasks to be run, failed, running, completed and succeeded in a given time frame.
  - Process State Statistics: It refers to the statistics of the number of waiting, failing, running, completing and succeeding process instances in a specified time range.
