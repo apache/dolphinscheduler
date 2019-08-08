@@ -315,8 +315,9 @@ public abstract class AbstractZKClient {
 			if(!e.getMessage().contains("java.lang.IllegalStateException: instance must be started")){
 				logger.warn(e.getMessage(),e);
 			}
+		}finally {
+			return childrenList.size();
 		}
-		return childrenList.size();
 	}
 
 	/**
