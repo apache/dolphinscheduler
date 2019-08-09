@@ -169,7 +169,9 @@ public class ZKMasterClient extends AbstractZKClient {
 		    String serverPath = registerServer(ZKNodeType.MASTER);
 		    if(StringUtils.isEmpty(serverPath)){
 		    	System.exit(-1);
-			}
+			  }else{
+					masterZNode = serverPath;
+				}
 		} catch (Exception e) {
 			logger.error("register master failure : "  + e.getMessage(),e);
 			System.exit(-1);
