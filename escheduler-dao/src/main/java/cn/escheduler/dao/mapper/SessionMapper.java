@@ -22,6 +22,7 @@ import org.apache.ibatis.type.JdbcType;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 /**
  * session mapper
@@ -85,6 +86,6 @@ public interface SessionMapper {
             @Result(property = "lastLoginTime", column = "last_login_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
     })
     @SelectProvider(type = SessionMapperProvider.class, method = "queryByUserId")
-    Session queryByUserId(@Param("userId") int userId);
+    List<Session> queryByUserId(@Param("userId") int userId);
 
 }
