@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo "------ push start -------"
+printenv
+
+docker push $DOCKER_REPO:$version
+
+echo "------ push end -------"
