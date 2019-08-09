@@ -19,6 +19,7 @@ package cn.escheduler.api.service;
 
 import cn.escheduler.api.controller.BaseController;
 import cn.escheduler.api.utils.Constants;
+import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.dao.mapper.SessionMapper;
 import cn.escheduler.dao.model.Session;
 import cn.escheduler.dao.model.User;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -79,14 +81,26 @@ public class SessionService extends BaseService{
    * @return
    */
   public String createSession(User user, String ip) {
+    Session session = null;
+
     // logined
-    Session session = sessionMapper.queryByUserId(user.getId());
+    List<Session> sessionList = sessionMapper.queryByUserId(user.getId());
+
+
+
     Date now = new Date();
 
     /**
      * if you have logged in and are still valid, return directly
      */
-    if (session != null) {
+    if (CollectionUtils.isNotEmpty(sessionList)) {
+      // is session list greater 1 ， delete other ，get one
+      if (sessionList.size() > 1){
+        for (int i=1 ; i < sessionList.size();i++){
+          sessionMapper.deleteById(sessionList.get(i).getId());
+        }
+      }
+      session = sessionList.get(0);
       if (now.getTime() - session.getLastLoginTime().getTime() <= Constants.SESSION_TIME_OUT * 1000) {
         /**
          * updateProcessInstance the latest login time
@@ -126,8 +140,11 @@ public class SessionService extends BaseService{
     /**
      * query session by user id and ip
      */
-    Session session = sessionMapper.queryByUserId(loginUser.getId());
-    //delete session
-    sessionMapper.deleteById(session.getId());
+    List<Session> sessionList = sessionMapper.queryByUserId(loginUser.getId());
+
+    for (Session session : sessionList){
+      //delete session
+      sessionMapper.deleteById(session.getId());
+    }
   }
 }
