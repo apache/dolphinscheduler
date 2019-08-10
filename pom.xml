@@ -454,6 +454,7 @@
 		<module>escheduler-dao</module>
 		<module>escheduler-alert</module>
 		<module>escheduler-rpc</module>
+		<module>escheduler-plugin-api</module>
 	</modules>
 
 </project>
