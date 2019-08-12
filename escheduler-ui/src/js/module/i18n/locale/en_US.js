@@ -471,5 +471,7 @@ export default {
   'Startup parameter': 'Startup parameter',
   'Startup type': 'Startup type',
   'warning of timeout': 'warning of timeout',
+  'Next five execution times': 'Next five execution times',
+  'Execute time': 'Execute time',
   'Complement range': 'Complement range'
 }
