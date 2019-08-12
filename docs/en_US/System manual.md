@@ -47,7 +47,7 @@
   - Click "Save", enter the name of the process definition, the description of the process definition, and set the global parameters.
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61778891-3c03f180-ae32-11e9-812a-9d9f6c151301.png" width="60%" />
+   <img src="https://analysys.github.io/easyscheduler_docs_es/images/save-definition.png" width="60%" />
  </p>
 
   - For other types of nodes, refer to [task node types and parameter settings](#task node types and parameter settings)
@@ -66,13 +66,15 @@
     * Notification group: When the process ends or fault tolerance occurs, process information is sent to all members of the notification group by mail.
     * Recipient: Enter the mailbox and press Enter key to save. When the process ends and fault tolerance occurs, an alert message is sent to the recipient list.
     * Cc: Enter the mailbox and press Enter key to save. When the process is over and fault-tolerant occurs, alarm messages are copied to the copier list.
-    <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61779865-0829cb80-ae34-11e9-901f-00cb3bf80e36.png" width="60%" />
+    
+<p align="center">
+   <img src="https://analysys.github.io/easyscheduler_docs/images/start-process.png" width="60%" />
  </p>
 
   * Complement: To implement the workflow definition of a specified date, you can select the time range of the complement (currently only support for continuous days), such as the data from May 1 to May 10, as shown in the figure:
+  
 <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61780083-6a82cc00-ae34-11e9-9839-fda9153f693b.png" width="60%" />
+   <img src="https://analysys.github.io/easyscheduler_docs_es/images/complement.png" width="60%" />
  </p>
 
 > Complement execution mode includes serial execution and parallel execution. In serial mode, the complement will be executed sequentially from May 1 to May 10. In parallel mode, the tasks from May 1 to May 10 will be executed simultaneously.
@@ -80,8 +82,9 @@
 ### Timing Process Definition
   - Create Timing: "Process Definition - > Timing"
   - Choose start-stop time, in the start-stop time range, regular normal work, beyond the scope, will not continue to produce timed workflow instances.
+  
 <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61781565-28a75500-ae37-11e9-9ca5-85f211f341b2.png" width="60%" />
+   <img src="https://analysys.github.io/easyscheduler_docs/images/timing.png" width="60%" />
  </p>
 
   - Add a timer to be executed once a day at 5:00 a.m. as shown below:
@@ -211,7 +214,7 @@
   </p>
 
 
-Note: If **kerberos** is turned on, you need to fill in **Principal **
+Note: If **kerberos** is turned on, you need to fill in **Principal**
 <p align="center">
     <img src="https://user-images.githubusercontent.com/53217792/61784847-0adcee80-ae3d-11e9-8ac7-ba8a13aef90c.png" width="60%" />
   </p>
