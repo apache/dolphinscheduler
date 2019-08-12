@@ -1,0 +1,4 @@
+[
+  "cn.escheduler.plugin.api.base.Errors",
+  "cn.escheduler.plugin.api.StageUpgrader"
+]

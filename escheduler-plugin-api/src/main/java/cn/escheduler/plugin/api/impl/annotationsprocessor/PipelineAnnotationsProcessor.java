@@ -47,9 +47,8 @@ import java.util.Set;
 
 
 @SupportedAnnotationTypes({
-        "com.streamsets.pipeline.api.StageDef",
-        "com.streamsets.pipeline.api.GenerateResourceBundle",
-        "com.streamsets.pipeline.api.delegate.StageLibraryDelegateDef"
+        "cn.escheduler.plugin.api.StageDef",
+        "cn.escheduler.plugin.api.GenerateResourceBundle"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 @SupportedOptions(PipelineAnnotationsProcessor.SKIP_PROCESSOR)
