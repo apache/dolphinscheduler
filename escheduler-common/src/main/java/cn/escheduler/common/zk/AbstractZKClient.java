@@ -246,8 +246,9 @@ public abstract class AbstractZKClient {
 			return registerPath;
 		}
 		registerPath = createZNodePath(ZKNodeType.MASTER);
+        logger.info("register {} node {} success", zkNodeType.toString(), registerPath);
 
-		// handle dead server
+        // handle dead server
 		handleDeadServer(registerPath, zkNodeType, Constants.DELETE_ZK_OP);
 
 		return registerPath;
