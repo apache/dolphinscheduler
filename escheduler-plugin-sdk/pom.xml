@@ -6,8 +6,8 @@
         <groupId>cn.analysys</groupId>
         <version>1.1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>escheduler-plugin-api</artifactId>
-    <name>escheduler-plugin-api</name>
+    <artifactId>escheduler-plugin-sdk</artifactId>
+    <name>escheduler-plugin-sdk</name>
     <version>1.1.0-SNAPSHOT</version>
     <url>http://maven.apache.org</url>
     <packaging>jar</packaging>
@@ -20,22 +20,26 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations-java5</artifactId>
-            <version>${jetbrains.annotations.version}</version>
+            <groupId>cn.analysys</groupId>
+            <artifactId>escheduler-plugin-api</artifactId>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-            <version>${metrics.version}</version>
-            <scope>compile</scope>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-json</artifactId>
-            <version>${metrics.version}</version>
-            <scope>compile</scope>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

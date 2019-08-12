@@ -448,13 +448,14 @@
 	</build>
 
 	<modules>
+		<module>escheduler-plugin-api</module>
+		<module>escheduler-plugin-sdk</module>
 		<module>escheduler-server</module>
 		<module>escheduler-common</module>
 		<module>escheduler-api</module>
 		<module>escheduler-dao</module>
 		<module>escheduler-alert</module>
 		<module>escheduler-rpc</module>
-		<module>escheduler-plugin-api</module>
 	</modules>
 
 </project>
