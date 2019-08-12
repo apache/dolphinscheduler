@@ -472,5 +472,7 @@ export default {
   'Startup parameter': '启动参数',
   'Startup type': '启动类型',
   'warning of timeout': '超时告警',
+  'Next five execution times': '接下来五次执行时间',
+  'Execute time': '执行时间',
   'Complement range': '补数范围'
 }

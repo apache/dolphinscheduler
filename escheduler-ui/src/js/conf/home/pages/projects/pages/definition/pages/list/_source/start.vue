@@ -51,7 +51,7 @@
     </div>
     <div class="clearfix list">
       <div class="text">
-        Worker分组
+        {{$t('Worker group')}}
       </div>
       <div class="cont">
         <m-worker-groups v-model="workerGroupId"></m-worker-groups>

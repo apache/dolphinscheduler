@@ -100,7 +100,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 		if(zkWorkerClient == null){
 			zkWorkerClient = new ZKWorkerClient();
 		}
-
 		return zkWorkerClient;
 	}
 
@@ -112,19 +111,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 		return serverDao;
 	}
 
-
-	public String initWorkZNode() throws Exception {
-
-		String heartbeatZKInfo = ResInfo.getHeartBeatInfo(new Date());
-
-		workerZNode = getZNodeParentPath(ZKNodeType.WORKER) + "/" + OSUtils.getHost() + "_";
-
-		workerZNode = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(workerZNode,
-				heartbeatZKInfo.getBytes());
-		logger.info("register worker node {} success", workerZNode);
-		return workerZNode;
-	}
-
 	/**
 	 *  register worker
 	 */
@@ -134,6 +120,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 			if(StringUtils.isEmpty(serverPath)){
 				System.exit(-1);
 			}
+			workerZNode = serverPath;
 		} catch (Exception e) {
 			logger.error("register worker failure : "  + e.getMessage(),e);
 			System.exit(-1);
