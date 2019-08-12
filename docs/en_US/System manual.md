@@ -436,11 +436,8 @@ conf/common/hadoop.properties
 - 2.Select the project button to authorize the project
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61842992-af5a4180-aecc-11e9-9553-43e836aee78b.png" width="60%" />
-
-
-
-   </p>
+   <img src="https://analysys.github.io/easyscheduler_docs/images/auth-project.png" width="60%" />
+ </p>
 
 ### Monitor center
   - Service management is mainly to monitor and display the health status and basic information of each service in the system.
@@ -518,21 +515,19 @@ conf/common/hadoop.properties
   > Dependent nodes provide logical judgment functions, such as checking whether yesterday's B process was successful or whether the C process was successfully executed.
 
   <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/depend-node.png" width="80%" />
+   <img src="https://analysys.github.io/easyscheduler_docs/images/depend-b-and-c.png" width="80%" />
  </p>
 
-  > For example, process A is a weekly task and process B and C are daily tasks. Task A requires that task B and C be successfully executed every day of the week, as shown in the figure:
+  > For example, process A is a weekly task and process B and C are daily tasks. Task A requires that task B and C be successfully executed every day of the last week, as shown in the figure:
 
  <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/depend-node2.png" width="80%" />
+   <img src="https://analysys.github.io/easyscheduler_docs/images/depend-week.png" width="80%" />
  </p>
 
   > If weekly A also needs to be implemented successfully on Tuesday:
-  >
-  >
 
  <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/depend-node3.png" width="80%" />
+   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/depend-last-tuesday.png" width="80%" />
  </p>
 
 ###  PROCEDURE
@@ -693,9 +688,8 @@ Note: JAVA and Scala are just used for identification, no difference. If it's a 
 > User-defined parameters are divided into global parameters and local parameters. Global parameters are the global parameters passed when the process definition and process instance are saved. Global parameters can be referenced by local parameters of any task node in the whole process.
 
 > For example:
-
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61864229-a0db4c80-af03-11e9-962c-044ab12991c7.png" width="60%" />
+   <img src="https://analysys.github.io/easyscheduler_docs/images/save-global-parameters.png" width="60%" />
  </p>
 
 > global_bizdate is a global parameter, referring to system parameters.
