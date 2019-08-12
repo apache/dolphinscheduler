@@ -108,17 +108,18 @@ However, we prefer that the community provided by the Apache Software Foundation
 
 A complete set of Sharding-Sphere documentations is provided on shardingsphere.io in both English and Simplified Chinese.
 
-- [English](https://github.com/analysys/easyscheduler_docs/en_US)
-- [Chinese](https://github.com/analysys/easyscheduler_docs/zh_CN)
+- [English](https://analysys.github.io/easyscheduler_docs)
+- [Chinese](https://analysys.github.io/easyscheduler_docs_cn)
 
 ## Initial Source
 
-The project consists of two distinct codebases: core and document. The address of two existed git repositories are as follows:
+The project consists of three distinct codebases: core and document. The address of two existed git repositories are as follows:
 
 - <https://github.com/analysys/easyscheduler>
 
 - <https://github.com/analysys/easyscheduler_docs> 
 
+- <https://github.com/analysys/easyscheduler_docs_cn> 
   
 
 ## Source and Intellectual Property Submission Plan
