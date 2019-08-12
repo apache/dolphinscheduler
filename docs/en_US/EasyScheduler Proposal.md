@@ -31,7 +31,8 @@ Analysys submits this proposal to donate EasyScheduler's source codes and all re
 The codes are already under Apache License Version 2.0.
 
 - Code base: https://www.github.com/analysys/easyscheduler
-- Documentations: <https://analysys.github.io/easyscheduler_docs>
+- English Documentations: <https://analysys.github.io/easyscheduler_docs>
+- Chinese Documentations: <https://analysys.github.io/easyscheduler_docs_cn>
 
 ## Background
 
