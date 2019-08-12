@@ -43,22 +43,6 @@ import java.util.concurrent.ExecutionException;
 public class ClassLoaderStageLibraryTask implements StageLibraryTask {
     public static final String IGNORE_STAGE_DEFINITIONS = "ignore.stage.definitions";
 
-
-    private static final String CONFIG_CP_VALIDATION_RESULT = "stagelibs.classpath.validation.terminate";
-    private static final boolean DEFAULT_CP_VALIDATION_RESULT = false;
-
-    private static final String DEFAULT_REQUIRED_STAGELIBS = "";
-
-    private static final String NIGHTLY_URL = "http://nightly.streamsets.com/datacollector/";
-    private static final String ARCHIVES_URL = "http://archives.streamsets.com/datacollector/";
-    private static final String LATEST = "latest";
-    private static final String SNAPSHOT = "-SNAPSHOT";
-    private static final String TARBALL_PATH = "/tarball/";
-    private static final String ENTERPRISE_PATH = "enterprise/";
-    private static final String CONFIG_PACKAGE_MANAGER_REPOSITORY_LINKS = "package.manager.repository.links";
-    private static final String REPOSITORY_MANIFEST_JSON_PATH = "repository.manifest.json";
-    private static final String ADDITIONAL = "additional";
-
     private static final Logger LOG = LoggerFactory.getLogger(ClassLoaderStageLibraryTask.class);
 
     private List<? extends ClassLoader> stageClassLoaders;
@@ -147,11 +131,6 @@ public class ClassLoaderStageLibraryTask implements StageLibraryTask {
         try {
             int libs = 0;
             int stages = 0;
-            int lineagePublishers = 0;
-            int credentialStores = 0;
-            int services = 0;
-            int interceptors = 0;
-            int delegates = 0;
             long start = System.currentTimeMillis();
             LocaleInContext.set(Locale.getDefault());
             for (ClassLoader cl : stageClassLoaders) {
@@ -179,14 +158,9 @@ public class ClassLoaderStageLibraryTask implements StageLibraryTask {
                 }
             }
             LOG.info(
-                    "Loaded '{}' libraries with a total of '{}' stages, '{}' lineage publishers, '{}' services, '{}' interceptors, '{}' delegates and '{}' credentialStores in '{}ms'",
+                    "Loaded '{}' libraries with a total of '{}' stages in '{}ms'",
                     libs,
                     stages,
-                    lineagePublishers,
-                    services,
-                    interceptors,
-                    delegates,
-                    credentialStores,
                     System.currentTimeMillis() - start
             );
         } finally {
