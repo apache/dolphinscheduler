@@ -1,8 +1,0 @@
-#!/bin/bash
-
-echo "------ escheduler start - build -------"
-printenv
-
-docker build --build-arg version=$version --build-arg tar_version=$tar_version  -t $DOCKER_REPO:$version .
-
-echo "------ escheduler end   - build -------"
