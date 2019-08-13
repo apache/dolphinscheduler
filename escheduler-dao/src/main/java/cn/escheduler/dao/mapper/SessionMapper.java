@@ -22,6 +22,7 @@ import org.apache.ibatis.type.JdbcType;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 /**
  * session mapper
@@ -58,20 +59,6 @@ public interface SessionMapper {
 
 
     /**
-     * query by  session id
-     * @param sessionId
-     * @return
-     */
-    @Results(value = {@Result(property = "id", column = "id", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "userId", column = "user_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "ip", column = "ip", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "lastLoginTime", column = "last_login_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
-    })
-    @SelectProvider(type = SessionMapperProvider.class, method = "queryById")
-    Session queryById(@Param("sessionId") int sessionId);
-
-
-    /**
      * query by session id and ip
      *
      * @param sessionId
@@ -83,8 +70,8 @@ public interface SessionMapper {
             @Result(property = "ip", column = "ip", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "lastLoginTime", column = "last_login_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
     })
-    @SelectProvider(type = SessionMapperProvider.class, method = "queryByIdAndIp")
-    Session queryByIdAndIp(@Param("sessionId") String sessionId);
+    @SelectProvider(type = SessionMapperProvider.class, method = "queryBySessionId")
+    Session queryBySessionId(@Param("sessionId") String sessionId);
 
 
     /**
@@ -98,7 +85,7 @@ public interface SessionMapper {
             @Result(property = "ip", column = "ip", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "lastLoginTime", column = "last_login_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
     })
-    @SelectProvider(type = SessionMapperProvider.class, method = "queryByUserIdAndIp")
-    Session queryByUserIdAndIp(@Param("userId") int userId);
+    @SelectProvider(type = SessionMapperProvider.class, method = "queryByUserId")
+    List<Session> queryByUserId(@Param("userId") int userId);
 
 }
