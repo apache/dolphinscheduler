@@ -97,11 +97,10 @@ public class TenantMapperProvider {
     public String queryById(Map<String, Object> parameter) {
         return new SQL() {
             {
-                SELECT("*");
-
-                FROM(TABLE_NAME);
-
-                WHERE("`id` = #{tenantId}");
+                SELECT("t.*,q.queue_name,q.queue");
+                FROM(TABLE_NAME + " t,t_escheduler_queue q");
+                WHERE(" t.queue_id = q.id");
+                WHERE(" t.id = #{tenantId}");
             }
         }.toString();
     }
