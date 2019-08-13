@@ -92,7 +92,7 @@ public class LoggerServer {
         @Override
         public void rollViewLog(LogParameter request, StreamObserver<RetStrInfo> responseObserver) {
 
-            logger.info("log parameter path : {} ,skipLine : {}, limit : {}",
+            logger.info("log parameter path : {} ,skip line : {}, limit : {}",
                     request.getPath(),
                     request.getSkipLineNum(),
                     request.getLimit());
@@ -130,7 +130,7 @@ public class LoggerServer {
                 responseObserver.onNext(builder.build());
                 responseObserver.onCompleted();
             }catch (Exception e){
-                logger.error("get log bytes failed : " + e.getMessage(),e);
+                logger.error("get log bytes failed",e);
             }
         }
     }
@@ -141,23 +141,35 @@ public class LoggerServer {
      * @return
      * @throws Exception
      */
-    private static byte[] getFileBytes(String path)throws IOException{
+    private static byte[] getFileBytes(String path){
         InputStream in = null;
         ByteArrayOutputStream bos = null;
         try {
             in = new FileInputStream(path);
             bos  = new ByteArrayOutputStream();
-            byte[] buffer = new byte[4096];
-            int n = 0;
-            while ((n = in.read(buffer)) != -1) {
-                bos.write(buffer, 0, n);
+            byte[] buf = new byte[1024];
+            int len = 0;
+            while ((len = in.read(buf)) != -1) {
+                bos.write(buf, 0, len);
             }
             return bos.toByteArray();
         }catch (IOException e){
-            logger.error("getFileBytes error",e);
+            logger.error("get file bytes error",e);
         }finally {
-            bos.close();
-            in.close();
+            if (bos != null){
+                try {
+                    bos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (in != null){
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return null;
     }
@@ -173,7 +185,7 @@ public class LoggerServer {
         try (Stream<String> stream = Files.lines(Paths.get(path))) {
             return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
         } catch (IOException e) {
-            logger.error("read file failed : " + e.getMessage(),e);
+            logger.error("read file failed",e);
         }
         return null;
     }
@@ -203,7 +215,7 @@ public class LoggerServer {
 
             return sb.toString();
         }catch (IOException e){
-            logger.error("read file failed : " + e.getMessage(),e);
+            logger.error("read file failed",e);
         }finally {
             try {
                 if (br != null){
