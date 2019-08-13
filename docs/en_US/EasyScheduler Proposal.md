@@ -1398,19 +1398,19 @@ Travis  （TODO）
 - William-GuoWei(guowei20m@outlook.com)
 - Lidong Dai(lidong.dai@outlook.com)
 - Zhanwei Qiao(qiaozhanwei@outlook.com)
-- Liang Bao
-- Gang Li
+- Liang Bao(baoliang.leon@gmail.com)
+- Gang Li(lgcareer2019@outlook.com)
 - Zijian Gong(quanquansy@gmail.com)
-- Jun Gao
+- Jun Gao(gaojun2048@gmail.com)
 - Baoqi Wu(wubaoqi@gmail.com)
 
 ## Affiliations
 
-- Analysys: William-GuoWei，Zhanwei Qiao，Liang Bao，Gang Li，Jun Gao，Lidong Dai
+- Analysys Inc: William-GuoWei，Zhanwei Qiao，Liang Bao，Gang Li，Jun Gao，Lidong Dai
 
-- Hydee: Zijian Gong
+- Hydee Inc: Zijian Gong
 
-- Guandata: Baoqi Wu
+- Guandata Inc: Baoqi Wu
 
   
 
