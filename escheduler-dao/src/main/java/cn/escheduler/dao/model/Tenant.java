@@ -53,6 +53,12 @@ public class Tenant {
      */
     private String queueName;
 
+
+    /**
+     * queue
+     */
+    private String queue;
+
     /**
      * create time
      */
@@ -126,6 +132,15 @@ public class Tenant {
     public void setQueueName(String queueName) {
         this.queueName = queueName;
     }
+
+    public String getQueue() {
+        return queue;
+    }
+
+    public void setQueue(String queue) {
+        this.queue = queue;
+    }
+
     @Override
     public String toString() {
         return "Tenant{" +
@@ -135,6 +150,7 @@ public class Tenant {
                 ", desc='" + desc + '\'' +
                 ", queueId=" + queueId +
                 ", queueName='" + queueName + '\'' +
+                ", queue='" + queue + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 '}';
