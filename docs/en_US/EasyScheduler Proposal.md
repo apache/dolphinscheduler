@@ -38,7 +38,7 @@ We want to find a data processing tool with the following features:
 
 For the above reasons, we realized that no existing product met our requirements, so we decided to develop this tool ourselves. We designed EasyScheduler at the end of 2017. The first internal use version was completed in May 2018. We then iterated several internal versions and the system gradually became stabilized. 
 
-Then we open the source code of EasyScheduler on March 2019. It soon gained lot's of ETL developers interest and stars on github. Then it won the `GVP` (Gitee Most Valuable Project) in April 2019 and our key member was invited to GAIC Summit 2019 for speech on June 2019.
+Then we open the source code of EasyScheduler on March 2019. It soon gained lot's of ETL developers interest and stars on github. 
 
 ## Rationale
 
