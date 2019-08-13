@@ -133,7 +133,7 @@ public class TaskScheduleThread implements Runnable {
                         taskInstance.getId(),
                         CommonUtils.getSystemEnvPath(),
                         tenant.getTenantCode(),
-                        tenant.getQueueName(),
+                        tenant.getQueue(),
                         taskInstance.getStartTime(),
                         getGlobalParamsMap(),
                         taskInstance.getDependency(),
