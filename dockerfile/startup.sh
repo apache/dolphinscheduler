@@ -37,7 +37,7 @@ fi
 
 /opt/zookeeper/bin/zkServer.sh restart 
 
-sleep 10
+sleep 90
 
 echo "启动api-server"
 /opt/escheduler/bin/escheduler-daemon.sh stop api-server
