@@ -6,37 +6,13 @@ EasyScheduler is a distributed ETL scheduling engine with powerful DAG visualiza
 
 ## Proposal
 
-EasyScheduler provides many easy-to-use features to accelerate the engineer enficiency on data ETL workflow job. We propose a new concept of 'instance of process' and 'instance of task' to let developers to tuning their jobs on the running state of workflow instead of changing the task's template. EasyScheduler DAG UI  also let data engineer easily add or change a ETL job in a complex schedulnig system. Its main objectives are as follows:
+EasyScheduler provides many easy-to-use features to accelerate the engineer enficiency on data ETL workflow job. We propose a new concept of 'instance of process' and 'instance of task' to let developers to tuning their jobs on the running state of workflow instead of changing the task's template. Its main objectives are as follows:
 
-- Define the complex tasks' dependencies & triggers  in a DAG graph by dragging and dropping . DAG graph can also show the running state of task in real time.
-
-- Define the process result dependencies besides DAG dependencies, e.g. weekly job depends on the success of last 7 daily job.
-
-- Support cluster HA, and implement distributed Master clusters and Worker clusters base on Zookeeper services.
-
-- Support multi-tenant 
-
-- Support  automatical failure job retry and recovery from specified nodes by pre-define rules.
-
-- Support parallel or serial backfilling data instead of duplicated maintainence work.
-
-- Support many data task types: Shell, MapReduce, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Sub_Process, Stored Procedure, etc.
-
-- Support process running history tree/gantt chart display, support task status statistics, process status statistics.
-
-- Support process scheduling, manual scheduling, also support manual pause/stop/recovery, killing task on runnning time.
-
-- Support define process priority, task priority and relative task timeout alarm.
-
-- Support process global parameters and node specified parameter settings.
-
-- Support online upload/download/manage resource files and also support online file creation and editing.
-
-- Support task log online viewing and scrolling, online download log, etc.
-
-- Support online viewing of `Master/Worker` cpu load, memory, etc.
-
-  
+- Define the complex tasks' dependencies & triggers  in a DAG graph by dragging and dropping.
+- Support cluster HA.
+- Support multi-tenant and parallel or serial backfilling data.
+- Support automatical failure job retry and recovery.
+- Support many data task types and process priority, task priority and relative task timeout alarm.
 
 For now, EasyScheduler has a fairly huge community in China. 
 It is also widely adopted by many [companies and organizations](https://github.com/analysys/EasyScheduler/issues/57) as its ETL scheduling tool. 
@@ -47,18 +23,18 @@ Analysys submits this proposal to donate EasyScheduler's source codes and all re
 The codes are already under Apache License Version 2.0.
 
 - Code base: https://www.github.com/analysys/easyscheduler
-- Documentations: <https://analysys.github.io/easyscheduler_docs>
+- English Documentations: <https://analysys.github.io/easyscheduler_docs>
+- Chinese Documentations: <https://analysys.github.io/easyscheduler_docs_cn>
 
 ## Background
 
 We want to find a data processing tool with the following features:
 
-- Easy to use，developers can build a ETL process with a very simple drag and drop operation. not only for ETL developers，people who can't write ETL code also can use this tool for ETL operation such as system adminitrator.
-- Support HA and automatically change master and worker node to keep whole system stable.
+- Easy to use，developers can build a ETL process with a very simple drag and drop operation. not only for ETL developers，people who can't write code also can use this tool for ETL operation such as system adminitrator.
 - Solving the problem of "complex  task dependencies" , and it can monitor the ETL running status. 
 - Support multi-tenant.
-- Support  many task types: Shell, MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Sub_Process, Procedure, etc.
-- Linear scalability.
+- Support many task types: Shell, MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Sub_Process, Procedure, etc.
+- Support HA and linear scalability.
 
 For the above reasons, we realized that no existing product met our requirements, so we decided to develop this tool ourselves. We designed EasyScheduler at the end of 2017. The first internal use version was completed in May 2018. We then iterated several internal versions and the system gradually became stabilized. 
 
@@ -96,9 +72,7 @@ Thus, it is very unlikely that EasyScheduler becomes orphaned.
 
 ### Inexperience with Open Source
 
-The core developers are all active users and followers of open source. They are already committers and contributors to the EasyScheduler Github project. All have been involved with the source code that has been released under an open source license, and several of them also have experience developing code in an open source environment, they are also active in presto, alluxio and other projects.
-
-Therefore, we believe we have enough experience to deal with open source.
+EasyScheduler's core developers have been running it as a community-oriented open source project for some time, several of them already have experience working with open source communities, they are also active in presto, alluxio and other projects.At the same time, we will learn more open source experience from the excellent apache open source project to make up for this shortcoming.
 
 ### Homogenous Developers
 
@@ -122,20 +96,18 @@ However, we prefer that the community provided by the Apache Software Foundation
 
 ## Documentation
 
-A complete set of Sharding-Sphere documentations is provided on shardingsphere.io in both English and Simplified Chinese.
+A complete set of EasyScheduler documentations is provided on github in both English and Simplified Chinese.
 
-- [English](https://github.com/analysys/easyscheduler_docs/en_US)
-- [Chinese](https://github.com/analysys/easyscheduler_docs/zh_CN)
+- [English](https://github.com/analysys/easyscheduler_docs)
+- [Chinese](https://github.com/analysys/easyscheduler_docs_cn)
 
 ## Initial Source
 
-The project consists of two distinct codebases: core and document. The address of two existed git repositories are as follows:
+The project consists of three distinct codebases: core and document. The address of two existed git repositories are as follows:
 
 - <https://github.com/analysys/easyscheduler>
-
 - <https://github.com/analysys/easyscheduler_docs> 
-
-  
+- <https://github.com/analysys/easyscheduler_docs_cn> 
 
 ## Source and Intellectual Property Submission Plan
 
@@ -1405,6 +1377,7 @@ The front-end UI currently relies on many components, which we will list separat
 
 - <https://github.com/analysys/EasyScheduler.git>
 - <https://github.com/analysys/easyscheduler_docs.git>
+- <https://github.com/analysys/easyscheduler_docs_cn.git>
 
 ### Issue Tracking
 
@@ -1422,14 +1395,14 @@ Travis  （TODO）
 
 ## Initial Committers
 
-- William-GuoWei
-- Lidong Dai
-- Zhanwei Qiao
+- William-GuoWei(guowei20m@outlook.com)
+- Lidong Dai(lidong.dai@outlook.com)
+- Zhanwei Qiao(qiaozhanwei@outlook.com)
 - Liang Bao
 - Gang Li
-- Zijian Gong
+- Zijian Gong(quanquansy@gmail.com)
 - Jun Gao
-- Baoqi Wu
+- Baoqi Wu(wubaoqi@gmail.com)
 
 ## Affiliations
 
@@ -1449,11 +1422,11 @@ Travis  （TODO）
 
 ### Mentors
 
-- Sheng Wu ( Apache Software Foundation Member  [wusheng@apache.org](mailto:wusheng@apache.org))
+- Sheng Wu ( Apache Incubator PMC,  [wusheng@apache.org](mailto:wusheng@apache.org))
 
 - ShaoFeng Shi  ( Apache Kylin committer & PMC, Apache Incubator PMC， [shaofengshi@apache.org](mailto:wusheng@apache.org))
 
-- Liang Chen ( Apache Software Foundation Member  chenliang613@apache.org](mailto:chenliang613@apache.org))
+- Liang Chen ( Apache Software Foundation Member, chenliang613@apache.org](mailto:chenliang613@apache.org))
 
   
 
