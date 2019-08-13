@@ -68,6 +68,8 @@ public interface TenantMapper {
             @Result(property = "tenantName", column = "tenant_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "queueId", column = "queue_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "queueName", column = "queue_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "queue", column = "queue", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
     })

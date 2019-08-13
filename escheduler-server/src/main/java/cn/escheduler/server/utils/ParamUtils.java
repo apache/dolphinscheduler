@@ -44,7 +44,6 @@ public class ParamUtils {
                                                            CommandType commandType,
                                                            Date scheduleTime){
         if (globalParams == null
-                && globalParams == null
                 && localParams == null){
             return null;
         }
