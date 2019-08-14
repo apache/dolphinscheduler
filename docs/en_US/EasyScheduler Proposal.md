@@ -42,19 +42,21 @@ Then we open the source code of EasyScheduler on March 2019. It soon gained lot'
 
 ## Rationale
 
-Many organizations (>30) (refer to [Who is using EasyScheduler](https://github.com/analysys/EasyScheduler/issues/57) ) already benefit from running EasyScheduler to make data process pipelines more easier. More than 100  [feature ideas](https://github.com/analysys/EasyScheduler/projects/1) come from EasyScheduler community.   Some 3th projects also wanted to integrate with EasyScheduler through task plugin, like [Scriptis](https://github.com/WeBankFinTech/Scriptis) 、[waterdrop](https://github.com/InterestingLab/waterdrop) and so on. these will strengthen the features of EasyScheduler.   
+Many organizations (>30) (refer to [Who is using EasyScheduler](https://github.com/analysys/EasyScheduler/issues/57) ) already benefit from running EasyScheduler to make data process pipelines more easier. More than 100  [feature ideas](https://github.com/analysys/EasyScheduler/projects/1) come from EasyScheduler community.   Some 3rd-party projects also plan to integrate with EasyScheduler through task plugin, such as [Scriptis](https://github.com/WeBankFinTech/Scriptis), [waterdrop](https://github.com/InterestingLab/waterdrop). These will strengthen the features of EasyScheduler.   
 
 ## Current Status
 
 ### Meritocracy
 
-EasyScheduler was incubated at Analysys in 2017 and open sourced on GitHub in March 2019.  Once open source,We have been quickly adopted by multiple organizations，EasyScheduler has contributors and users from many companies; we have set up the PMC Team and Committer Team. New contributors are guided and reviewed by existed PMC members. 
+EasyScheduler was incubated at Analysys in 2017 and open sourced on GitHub in March 2019.  Once open sourced, we have been quickly adopted by multiple organizations，EasyScheduler has contributors and users from many companies; we have set up the PMC Team and Committer Team. New contributors are guided and reviewed by existed PMC members. 
 When they are ready, PMC will start a vote to promote him/her to become a member of PMC or Committer Team. 
 Contributions are always welcomed and highly valued. 
 
+(NOTE? Are you really having PMC team? Could you give me a link? As next section said, most developers are inside the company, then why do you have PMC and committer teams?)
+
 ### Community
 
-Now we have set development teams for EasyScheduler  in Analysys, and we already have external developers who contributed the code.  We already have a user group of more than 1,000 people. 
+Now we have set development teams for EasyScheduler in Analysys, and we already have external developers who contributed the code.  We already have a user group of more than 1,000 people. 
 We hope to grow the base of contributors by inviting all those who offer contributions through The Apache Way. 
 Right now, we make use of github as code hosting as well as gitter for community communication.
 
@@ -62,11 +64,15 @@ Right now, we make use of github as code hosting as well as gitter for community
 
 The core developers, including experienced open source developers and team leaders, have formed a group full of diversity. All of these core developers have deep expertise in workflow processing and the Hadoop Ecosystem in general.
 
+(Noticed, if you want to say you have experienced open source developers, you should list the experiences, such as which projects core maintainer? Contributor? Or somthing. Otherwise, just be honest. Just say senior developer and could be guided by mentors.)
+
 ## Known Risks
 
 ### Orphaned products
 
 EasyScheduler is widely adopted in China by many [companies and organizations](https://github.com/analysys/EasyScheduler/issues/57). The core developers of EasyScheduler team plan to work full time on this project. Currently there are 10 use cases with more that  1000 activity tasks per day using EasyScheduler in the user's production environment. Furthermore, since EasyScheduler has received more than 1500 stars and been forked more than 500 times. EasyScheduler has eight major release so far and and received 365 pull requests from contributors, which further demonstrates EasyScheduler as a very active project. We plan to extend and diversify this community further through Apache.
+
+(NOTED, Orphaned risk is about diversity of your community, contributors from different entities, it isn't related how many stars.)
 
 Thus, it is very unlikely that EasyScheduler becomes orphaned.
 
@@ -83,7 +89,7 @@ Considering that fengjr and sefonsoft have shown great interest in EasyScheduler
 ### Reliance on Salaried Developers
 
 At present, eight of the core developers are paid by their employer to contribute to EasyScheduler project. 
-we also find some developers and researchers (>8) to contribute to the project, and we will make efforts to  increase the diversity of the contributors and actively lobby for Domain experts in the workflow space to contribute. 
+we also have some other developers and researchers taking part in the project, and we will make efforts to increase the diversity of the contributors and actively lobby for Domain experts in the workflow space to contribute. 
 
 ### Relationships with Other Apache Products
 
@@ -1418,13 +1424,13 @@ Travis  （TODO）
 
 ### Champion
 
-- Sheng Wu ( Apache Software Foundation Member  [wusheng@apache.org](mailto:wusheng@apache.org))
+- Sheng Wu ( Apache Incubator PMC, [wusheng@apache.org](mailto:wusheng@apache.org))
 
 ### Mentors
 
 - Sheng Wu ( Apache Incubator PMC,  [wusheng@apache.org](mailto:wusheng@apache.org))
 
-- ShaoFeng Shi  ( Apache Kylin committer & PMC, Apache Incubator PMC,  [shaofengshi@apache.org](mailto:wusheng@apache.org))
+- ShaoFeng Shi  ( Apache Incubator PMC,  [shaofengshi@apache.org](mailto:wusheng@apache.org))
 
 - Liang Chen ( Apache Software Foundation Member,  [chenliang613@apache.org](mailto:chenliang613@apache.org))
 
