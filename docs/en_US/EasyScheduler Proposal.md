@@ -1424,9 +1424,9 @@ Travis  （TODO）
 
 - Sheng Wu ( Apache Incubator PMC,  [wusheng@apache.org](mailto:wusheng@apache.org))
 
-- ShaoFeng Shi  ( Apache Kylin committer & PMC, Apache Incubator PMC， [shaofengshi@apache.org](mailto:wusheng@apache.org))
+- ShaoFeng Shi  ( Apache Kylin committer & PMC, Apache Incubator PMC,  [shaofengshi@apache.org](mailto:wusheng@apache.org))
 
-- Liang Chen ( Apache Software Foundation Member, chenliang613@apache.org](mailto:chenliang613@apache.org))
+- Liang Chen ( Apache Software Foundation Member,  [chenliang613@apache.org](mailto:chenliang613@apache.org))
 
   
 
