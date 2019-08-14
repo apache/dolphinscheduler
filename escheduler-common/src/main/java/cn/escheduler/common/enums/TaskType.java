@@ -30,7 +30,7 @@ public enum TaskType {
      * 6 PYTHON
      * 7 DEPENDENT
      */
-    SHELL,SQL, SUB_PROCESS,PROCEDURE,MR,SPARK,PYTHON,DEPENDENT;
+    SHELL,SQL, SUB_PROCESS,PROCEDURE,MR,SPARK,PYTHON,DEPENDENT,PLUGIN;
 
     public static boolean typeIsNormalTask(String typeName) {
         TaskType taskType = TaskType.valueOf(typeName);

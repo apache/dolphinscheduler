@@ -236,6 +236,8 @@ public enum Status {
 
     QUEUE_COUNT_ERROR(90001,"queue count error"),
 
+    PLUGIN_LOAD_PLUGIN_LIST_ERROR(91001, "retrieve plugin list error"),
+
     KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error"),
     ;
 

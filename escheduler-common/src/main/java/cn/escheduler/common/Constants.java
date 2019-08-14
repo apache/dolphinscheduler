@@ -901,4 +901,9 @@ public final class Constants {
      * loginUserFromKeytab path
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
+
+    /**
+     * Plugin related
+     */
+    public static final String PLUGIN_PATH = "plugin.path";
 }

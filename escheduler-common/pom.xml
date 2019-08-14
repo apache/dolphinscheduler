@@ -15,6 +15,17 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>cn.analysys</groupId>
+			<artifactId>escheduler-plugin-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>cn.analysys</groupId>
+			<artifactId>escheduler-plugin-sdk</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.alibaba</groupId>
 			<artifactId>fastjson</artifactId>
 			<scope>compile</scope>

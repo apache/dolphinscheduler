@@ -20,6 +20,7 @@ import cn.escheduler.common.enums.TaskType;
 import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.task.dependent.DependentParameters;
 import cn.escheduler.common.task.mr.MapreduceParameters;
+import cn.escheduler.common.task.plugin.PluginParameters;
 import cn.escheduler.common.task.procedure.ProcedureParameters;
 import cn.escheduler.common.task.python.PythonParameters;
 import cn.escheduler.common.task.shell.ShellParameters;
@@ -63,6 +64,8 @@ public class TaskParametersUtils {
           return JSONUtils.parseObject(parameter, PythonParameters.class);
         case DEPENDENT:
           return JSONUtils.parseObject(parameter, DependentParameters.class);
+        case PLUGIN:
+          return JSONUtils.parseObject(parameter, PluginParameters.class);
         default:
           return null;
       }
