@@ -48,11 +48,8 @@ Many organizations (>30) (refer to [Who is using EasyScheduler](https://github.c
 
 ### Meritocracy
 
-EasyScheduler was incubated at Analysys in 2017 and open sourced on GitHub in March 2019.  Once open sourced, we have been quickly adopted by multiple organizations，EasyScheduler has contributors and users from many companies; we have set up the PMC Team and Committer Team. New contributors are guided and reviewed by existed PMC members. 
-When they are ready, PMC will start a vote to promote him/her to become a member of PMC or Committer Team. 
+EasyScheduler was incubated at Analysys in 2017 and open sourced on GitHub in March 2019.  Once open sourced, we have been quickly adopted by multiple organizations，EasyScheduler has contributors and users from many companies; we have set up the Committer Team. New contributors are guided and reviewed by existed committer members. 
 Contributions are always welcomed and highly valued. 
-
-(NOTE? Are you really having PMC team? Could you give me a link? As next section said, most developers are inside the company, then why do you have PMC and committer teams?)
 
 ### Community
 
@@ -62,17 +59,13 @@ Right now, we make use of github as code hosting as well as gitter for community
 
 ### Core Developers
 
-The core developers, including experienced open source developers and team leaders, have formed a group full of diversity. All of these core developers have deep expertise in workflow processing and the Hadoop Ecosystem in general.
-
-(Noticed, if you want to say you have experienced open source developers, you should list the experiences, such as which projects core maintainer? Contributor? Or somthing. Otherwise, just be honest. Just say senior developer and could be guided by mentors.)
+The core developers, including experienced senior developers, are often guided by mentors.
 
 ## Known Risks
 
 ### Orphaned products
 
-EasyScheduler is widely adopted in China by many [companies and organizations](https://github.com/analysys/EasyScheduler/issues/57). The core developers of EasyScheduler team plan to work full time on this project. Currently there are 10 use cases with more that  1000 activity tasks per day using EasyScheduler in the user's production environment. Furthermore, since EasyScheduler has received more than 1500 stars and been forked more than 500 times. EasyScheduler has eight major release so far and and received 365 pull requests from contributors, which further demonstrates EasyScheduler as a very active project. We plan to extend and diversify this community further through Apache.
-
-(NOTED, Orphaned risk is about diversity of your community, contributors from different entities, it isn't related how many stars.)
+EasyScheduler is widely adopted in China by many [companies and organizations](https://github.com/analysys/EasyScheduler/issues/57). The core developers of EasyScheduler team plan to work full time on this project. Currently there are 10 use cases with more that 1000 activity tasks per day using EasyScheduler in the user's production environment. There is very little risk of EasyScheduler getting orphaned since at least two large company (xueqiu、fengjr) is extensively using it in their production, and developers from these companies have also joined Easy Scheduler's team of contributors, EasyScheduler has eight major release so far and and received 373 pull requests from contributors, which further demonstrates EasyScheduler as a very active project. We also plan to extend and diversify this community further through Apache.
 
 Thus, it is very unlikely that EasyScheduler becomes orphaned.
 
