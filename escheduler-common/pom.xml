@@ -148,6 +148,10 @@
 					<groupId>javax.servlet.jsp</groupId>
 					<artifactId>jsp-api</artifactId>
 				</exclusion>
+				<exclusion>
+					<artifactId>jersey-json</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
 				<!--<exclusion>-->
 					<!--<groupId>com.google.protobuf</groupId>-->
 					<!--<artifactId>protobuf-java</artifactId>-->
@@ -407,6 +411,10 @@
 					<artifactId>com.fasterxml.jackson.core</artifactId>
 					<groupId>jackson-databind</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>jaxb-api</artifactId>
+					<groupId>javax.xml.bind</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -415,8 +423,8 @@
 			<artifactId>mssql-jdbc</artifactId>
 			<exclusions>
 				<exclusion>
-					<artifactId>com.microsoft.azure</artifactId>
-					<groupId>azure-keyvault</groupId>
+					<artifactId>azure-keyvault</artifactId>
+					<groupId>com.microsoft.azure</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
