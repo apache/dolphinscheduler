@@ -65,19 +65,19 @@ The core developers, including experienced senior developers, are often guided b
 
 ### Orphaned products
 
-EasyScheduler is widely adopted in China by many [companies and organizations](https://github.com/analysys/EasyScheduler/issues/57). The core developers of EasyScheduler team plan to work full time on this project. Currently there are 10 use cases with more that 1000 activity tasks per day using EasyScheduler in the user's production environment. There is very little risk of EasyScheduler getting orphaned since at least two large company (xueqiu、fengjr) is extensively using it in their production, and developers from these companies have also joined Easy Scheduler's team of contributors, EasyScheduler has eight major release so far and and received 373 pull requests from contributors, which further demonstrates EasyScheduler as a very active project. We also plan to extend and diversify this community further through Apache.
+EasyScheduler is widely adopted in China by many [companies and organizations](https://github.com/analysys/EasyScheduler/issues/57). The core developers of EasyScheduler team plan to work full time on this project. Currently there are 10 use cases with more that 1000 activity tasks per day using EasyScheduler in the user's production environment. There is very little risk of EasyScheduler getting orphaned as at least two large companies (xueqiu、fengjr) are widely using it in their production, and developers from these companies have also joined Easy Scheduler's team of contributors, EasyScheduler has eight major releases so far, and and received 373 pull requests from contributors, which further demonstrates EasyScheduler as a very active project. We also plan to extend and diversify this community further through Apache.
 
 Thus, it is very unlikely that EasyScheduler becomes orphaned.
 
 ### Inexperience with Open Source
 
-EasyScheduler's core developers have been running it as a community-oriented open source project for some time, several of them already have experience working with open source communities, they are also active in presto, alluxio and other projects.At the same time, we will learn more open source experience from the excellent apache open source project to make up for this shortcoming.
+EasyScheduler's core developers have been running it as a community-oriented open source project for some time, several of them already have experience working with open source communities, they are also active in presto, alluxio and other projects. At the same time, we will learn more open source experiences by following the Apache way in our incubator journey.
 
 ### Homogenous Developers
 
 The current developers work across a variety of organizations including Analysys, guandata and hydee; 
 some individual developers are accepted as developers of EasyScheduler as well. 
-Considering that fengjr and sefonsoft have shown great interest in EasyScheduler, we plan to encourage them to contribute and invite them as contributors to work together.
+Considering that fengjr and sefonsoft have shown great interests in EasyScheduler, we plan to encourage them to contribute and invite them as contributors to work together.
 
 ### Reliance on Salaried Developers
 
@@ -110,7 +110,7 @@ The project consists of three distinct codebases: core and document. The address
 
 ## Source and Intellectual Property Submission Plan
 
-As soon as EasyScheduler is approved to join Apache Incubator, Analysys will execute a Software Grant Agreement and the source code will be transitioned onto ASF infrastructure. The code is already licensed under the Apache Software License, version 2.0. 
+As soon as EasyScheduler is approved to join Apache Incubator, Analysys will provide the Software Grant Agreement(SGA) and intial committers will submit ICLA(s). The code is already licensed under the Apache Software License, version 2.0. 
 
 ## External Dependencies
 
@@ -1384,7 +1384,7 @@ The community would like to continue using GitHub Issues.
 
 ### Continuous Integration tool
 
-Travis  （TODO）
+Travis
 
 ### Mailing Lists
 
