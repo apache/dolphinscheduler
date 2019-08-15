@@ -1384,7 +1384,7 @@ The community would like to continue using GitHub Issues.
 
 ### Continuous Integration tool
 
-Travis
+Jenkins
 
 ### Mailing Lists
 
