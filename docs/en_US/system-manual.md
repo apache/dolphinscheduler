@@ -1,10 +1,5 @@
 # System Use Manual
 
-
-## Quick Start
-
-  > Refer to[ Quick Start ]( Quick-Start.md)
-
 ## Operational Guidelines
 
 ### Create a project
@@ -47,7 +42,7 @@
   - Click "Save", enter the name of the process definition, the description of the process definition, and set the global parameters.
 
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_es/images/save-definition.png" width="60%" />
+   <img src="https://analysys.github.io/easyscheduler_docs/images/save-definition.png" width="60%" />
  </p>
 
   - For other types of nodes, refer to [task node types and parameter settings](#task node types and parameter settings)
@@ -74,7 +69,7 @@
   * Complement: To implement the workflow definition of a specified date, you can select the time range of the complement (currently only support for continuous days), such as the data from May 1 to May 10, as shown in the figure:
   
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_es/images/complement.png" width="60%" />
+   <img src="https://analysys.github.io/easyscheduler_docs/images/complement.png" width="60%" />
  </p>
 
 > Complement execution mode includes serial execution and parallel execution. In serial mode, the complement will be executed sequentially from May 1 to May 10. In parallel mode, the tasks from May 1 to May 10 will be executed simultaneously.
@@ -333,7 +328,7 @@ conf/common/hadoop.properties
    <img src="https://user-images.githubusercontent.com/53217792/61841562-c6e2fb80-aec7-11e9-9481-4202d63dab6f.png" width="60%" />
  </p>
 
-## Security (Privilege System)
+## Security
 
   - The security has the functions of queue management, tenant management, user management, warning group management, worker group manager, token manage and other functions. It can also authorize resources, data sources, projects, etc.
 - Administrator login, default username password: admin/escheduler 123
@@ -474,7 +469,7 @@ conf/common/hadoop.properties
 ### Shell
 
   - The shell node, when the worker executes, generates a temporary shell script, which is executed by a Linux user with the same name as the tenant.
-> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_SHELL.png) task node in the toolbar onto the palette and double-click the task node as follows:
+> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_SHELL.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
    <img src="https://user-images.githubusercontent.com/53217792/61843728-6788e980-aecf-11e9-8006-241a7ec5024b.png" width="60%" />
@@ -506,7 +501,7 @@ conf/common/hadoop.properties
 
   - Dependent nodes are **dependent checking nodes**. For example, process A depends on the successful execution of process B yesterday, and the dependent node checks whether process B has a successful execution instance yesterday.
 
-> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_DEPENDENT.png) ask node in the toolbar onto the palette and double-click the task node as follows:
+> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_DEPENDENT.png) ask node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
    <img src="https://user-images.githubusercontent.com/53217792/61844369-be8fbe00-aed1-11e9-965d-ddb9aeeba9db.png" width="60%" />
@@ -527,12 +522,12 @@ conf/common/hadoop.properties
   > If weekly A also needs to be implemented successfully on Tuesday:
 
  <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/depend-last-tuesday.png" width="80%" />
+   <img src="https://analysys.github.io/easyscheduler_docs/images/depend-last-tuesday.png" width="80%" />
  </p>
 
 ###  PROCEDURE
   - The procedure is executed according to the selected data source.
-> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_PROCEDURE.png) task node in the toolbar onto the palette and double-click the task node as follows:
+> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_PROCEDURE.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
    <img src="https://user-images.githubusercontent.com/53217792/61844464-1af2dd80-aed2-11e9-9486-6cf1b8585aa5.png" width="60%" />
@@ -549,7 +544,7 @@ conf/common/hadoop.properties
  </p>
 
   - Executing the query SQL function, you can choose to send mail in the form of tables and attachments to the designated recipients.
-> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_SQL.png) task node in the toolbar onto the palette and double-click the task node as follows:
+> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_SQL.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
    <img src="https://user-images.githubusercontent.com/53217792/61850594-4d5b0580-aee7-11e9-9c9e-1934c91962b9.png" width="60%" />
@@ -568,7 +563,7 @@ conf/common/hadoop.properties
 
   - Through SPARK node, SPARK program can be directly executed. For spark node, worker will use `spark-submit` mode to submit tasks.
 
-> Drag the   ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_SPARK.png)  task node in the toolbar onto the palette and double-click the task node as follows:
+> Drag the   ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_SPARK.png)  task node in the toolbar onto the palette and double-click the task node as follows:
 >
 > 
 
@@ -593,7 +588,7 @@ Note: JAVA and Scala are just used for identification, no difference. If it's a 
   - Using MR nodes, MR programs can be executed directly. For Mr nodes, worker submits tasks using `hadoop jar`
 
 
-> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_MR.png) task node in the toolbar onto the palette and double-click the task node as follows:
+> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_MR.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
  1. JAVA program
 
@@ -629,7 +624,7 @@ Note: JAVA and Scala are just used for identification, no difference. If it's a 
 
 
 
-> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_PYTHON.png) task node in the toolbar onto the palette and double-click the task node as follows:
+> Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_PYTHON.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
    <img src="https://user-images.githubusercontent.com/53217792/61851959-daec2480-aeea-11e9-83fd-3e00a030cb84.png" width="60%" />

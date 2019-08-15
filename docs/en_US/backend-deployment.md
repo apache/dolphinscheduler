@@ -2,10 +2,10 @@
 
 There are two deployment modes for the backend: 
 
-- 1. automatic deployment  
-- 2. source code compile and then deployment
+- automatic deployment  
+- source code compile and then deployment
 
-## 1、Preparations
+## Preparations
 
 Download the latest version of the installation package, download address： [gitee download](https://gitee.com/easyscheduler/EasyScheduler/attach_files/) or [github download](https://github.com/analysys/EasyScheduler/releases), download escheduler-backend-x.x.x.tar.gz(back-end referred to as escheduler-backend),escheduler-ui-x.x.x.tar.gz(front-end referred to as escheduler-ui)
 
@@ -27,9 +27,9 @@ Download the latest version of the installation package, download address： [gi
 
 #### Preparations 2: Create deployment users
 
-- Deployment users are created on all machines that require deployment scheduling, because the worker service executes jobs in sudo-u {linux-user}, so deployment users need sudo privileges and are confidential.
+- Deployment users are created on all machines that require deployment scheduling, because the worker service executes jobs in `sudo-u {linux-user}`, so deployment users need sudo privileges and are confidential.
 
-```Deployment account
+```
 vi /etc/sudoers
 
 # For example, the deployment user is an escheduler account
@@ -50,7 +50,7 @@ Configure SSH secret-free login on deployment machines and other installation ma
 
     Execute the following command to create database and account
     
-    ```sql 
+    ```
     CREATE DATABASE escheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
     GRANT ALL PRIVILEGES ON escheduler.* TO '{user}'@'%' IDENTIFIED BY '{password}';
     GRANT ALL PRIVILEGES ON escheduler.* TO '{user}'@'localhost' IDENTIFIED BY '{password}';
@@ -65,7 +65,9 @@ Configure SSH secret-free login on deployment machines and other installation ma
         spring.datasource.username
         spring.datasource.password
     ```
+    
     Execute scripts for creating tables and importing basic data
+    
     ```
     sh ./script/create_escheduler.sh
     ```
@@ -100,10 +102,10 @@ install.sh :  One-click deployment script
  - If you use hdfs-related functions, you need to copy**hdfs-site.xml** and **core-site.xml** to the conf directory
 
 
-## 2、Deployment
+## Deployment
 Automated deployment is recommended, and experienced partners can use source deployment as well.
 
-### 2.1 Automated Deployment
+### Automated Deployment
 
 - Install zookeeper tools
 
@@ -128,7 +130,7 @@ If all services are normal, the automatic deployment is successful
 
 After successful deployment, the log can be viewed and stored in a specified folder.
 
-```log path
+```logPath
  logs/
     ├── escheduler-alert-server.log
     ├── escheduler-master-server.log
@@ -137,7 +139,7 @@ After successful deployment, the log can be viewed and stored in a specified fol
     |—— escheduler-logger-server.log
 ```
 
-### 2.2 Compile source code to deploy
+### Compile source code to deploy
 
 After downloading the release version of the source package, unzip it into the root directory
 
@@ -152,7 +154,7 @@ After downloading the release version of the source package, unzip it into the r
 After normal compilation, ./target/escheduler-{version}/ is generated in the current directory
 
 
-### 2.3  Start-and-stop services commonly used in systems (for service purposes, please refer to System Architecture Design for details)
+### Start-and-stop services commonly used in systems (for service purposes, please refer to System Architecture Design for details)
 
 * stop all services in the cluster
   
@@ -164,38 +166,38 @@ After normal compilation, ./target/escheduler-{version}/ is generated in the cur
 
 * start and stop one master server
 
-```start master
+```master
 sh ./bin/escheduler-daemon.sh start master-server
 sh ./bin/escheduler-daemon.sh stop master-server
 ```
 
 * start and stop one worker server
 
-```start worker
+```worker
 sh ./bin/escheduler-daemon.sh start worker-server
 sh ./bin/escheduler-daemon.sh stop worker-server
 ```
 
 * start and stop api server
 
-```start Api
+```Api
 sh ./bin/escheduler-daemon.sh start api-server
 sh ./bin/escheduler-daemon.sh stop api-server
 ```
 * start and stop logger server
 
-```start Logger
+```Logger
 sh ./bin/escheduler-daemon.sh start logger-server
 sh ./bin/escheduler-daemon.sh stop logger-server
 ```
 * start and stop alert server
 
-```start Alert
+```Alert
 sh ./bin/escheduler-daemon.sh start alert-server
 sh ./bin/escheduler-daemon.sh stop alert-server
 ```
 
-## 3、Database Upgrade
+## Database Upgrade
 Database upgrade is a function added in version 1.0.2. The database can be upgraded automatically by executing the following command:
 
 ```upgrade

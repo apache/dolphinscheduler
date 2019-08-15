@@ -152,7 +152,7 @@ EasyScheduler uses ZooKeeper distributed locks to implement only one Master to e
 
 ##### Third, the thread is insufficient loop waiting problem
 
-- If there is no subprocess in a DAG, if the number of data in the Command is greater than the threshold set by the thread pool, the direct process waits or fails.
+- If there is no subProcess in a DAG, if the number of data in the Command is greater than the threshold set by the thread pool, the direct process waits or fails.
 - If a large number of sub-processes are nested in a large DAG, the following figure will result in a "dead" state:
 
  <p align="center">
