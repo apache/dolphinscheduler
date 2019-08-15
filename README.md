@@ -5,7 +5,6 @@ Easy Scheduler
 
 > Easy Scheduler for Big Data
 
-
 [![Stargazers over time](https://starchart.cc/analysys/EasyScheduler.svg)](https://starchart.cc/analysys/EasyScheduler)
 
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
