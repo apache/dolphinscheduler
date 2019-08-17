@@ -375,6 +375,18 @@
 				<version>6.1.0.jre8</version>
 			</dependency>
 
+			<dependency>
+				<groupId>cn.hutool</groupId>
+				<artifactId>hutool-all</artifactId>
+				<version>4.4.0</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi-ooxml</artifactId>
+				<version>3.17</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
