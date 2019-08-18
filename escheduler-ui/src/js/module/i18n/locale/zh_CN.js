@@ -472,5 +472,10 @@ export default {
   'Startup parameter': '启动参数',
   'Startup type': '启动类型',
   'warning of timeout': '超时告警',
-  'Complement range': '补数范围'
+  'Complement range': '补数范围',
+  'Complement range': '补数范围',
+  'slot':'slot数量',
+  'taskManager':'taskManage数量',
+  'jobManagerMemory':'jobManager内存数',
+  'taskManagerMemory':'taskManager内存数'
 }

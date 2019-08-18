@@ -1,9 +1,10 @@
-export HADOOP_HOME=/opt/soft/hadoop
-export HADOOP_CONF_DIR=/opt/soft/hadoop/etc/hadoop
-export SPARK_HOME1=/opt/soft/spark1
-export SPARK_HOME2=/opt/soft/spark2
+#!/usr/bin/env bash
+export HADOOP_HOME=/opt/cloudera/parcels/CDH-6.0.0-1.cdh6.0.0.p0.537114/lib/hadoop
+export HADOOP_CONF_DIR=/etc/hadoop/conf
+export SPARK_HOME=/opt/cloudera/parcels/CDH/lib/spark
+#export SPARK_HOME2=/opt/soft/spark2
 export PYTHON_HOME=/opt/soft/python
-export JAVA_HOME=/opt/soft/java
+export JAVA_HOME=/usr/java/default
 export HIVE_HOME=/opt/soft/hive
-	
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
+export FLINK_HOME=/home/acme_program/flink/flink-1.6.1
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH:$FLINK_HOME/bin:$PATH
