@@ -23,6 +23,7 @@ import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.FileUtils;
 import cn.escheduler.common.utils.OSUtils;
+import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.*;
 import cn.escheduler.server.zk.ZKWorkerClient;
@@ -172,30 +173,30 @@ public class FetchTaskThread implements Runnable{
                     }
 
                     // get task instance id
-                    taskInstId = Integer.parseInt(taskQueueStr.split(Constants.UNDERLINE)[3]);
+
+                    taskInstId = getTaskInstanceId(taskQueueStr);
 
                     // get task instance relation
                     taskInstance = processDao.getTaskInstanceRelationByTaskId(taskInstId);
 
                     Tenant tenant = processDao.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(),
                             taskInstance.getProcessDefine().getUserId());
-                    if(tenant == null){
-                        logger.error("tenant not exists,process define id : {},process instance id : {},task instance id : {}",
-                                taskInstance.getProcessDefine().getId(),
-                                taskInstance.getProcessInstance().getId(),
-                                taskInstance.getId());
-                        taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+
+                    // verify tenant is null
+                    if (verifyTenantIsNull(taskQueueStr, tenant)) {
                         continue;
                     }
+
+                    // set queue for process instance
+                    taskInstance.getProcessInstance().setQueue(tenant.getQueue());
 
                     logger.info("worker fetch taskId : {} from queue ", taskInstId);
 
                     // mainly to wait for the master insert task to succeed
                     waitForMasterEnterQueue();
 
-                    if (taskInstance == null ) {
-                        logger.error("task instance is null. task id : {} ", taskInstId);
-                        taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+                    // verify task instance is null
+                    if (verifyTaskInstanceIsNull(taskQueueStr)) {
                         continue;
                     }
 
@@ -203,16 +204,18 @@ public class FetchTaskThread implements Runnable{
                         continue;
                     }
 
-                    // get local execute path
-                    logger.info("task instance  local execute path : {} ", getExecLocalPath());
+                    // local execute path
+                    String execLocalPath = getExecLocalPath();
+
+                    logger.info("task instance  local execute path : {} ", execLocalPath);
 
                     // init task
                     taskInstance.init(OSUtils.getHost(),
                             new Date(),
-                            getExecLocalPath());
+                            execLocalPath);
 
                     // check and create Linux users
-                    FileUtils.createWorkDirAndUserIfAbsent(getExecLocalPath(),
+                    FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
                             tenant.getTenantCode(), logger);
 
                     logger.info("task : {} ready to submit to task scheduler thread",taskInstId);
@@ -226,15 +229,41 @@ public class FetchTaskThread implements Runnable{
             }catch (Exception e){
                 logger.error("fetch task thread failure" ,e);
             }finally {
-                if (mutex != null){
-                    try {
-                        mutex.release();
-                    } catch (Exception e) {
-                        logger.error("fetch task lock release failure ",e);
-                    }
-                }
+                AbstractZKClient.releaseMutex(mutex);
             }
         }
+    }
+
+    /**
+     * verify task instance is null
+     * @param taskQueueStr
+     * @return
+     */
+    private boolean verifyTaskInstanceIsNull(String taskQueueStr) {
+        if (taskInstance == null ) {
+            logger.error("task instance is null. task id : {} ", taskInstId);
+            taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *  verify tenant is null
+     * @param taskQueueStr
+     * @param tenant
+     * @return
+     */
+    private boolean verifyTenantIsNull(String taskQueueStr, Tenant tenant) {
+        if(tenant == null){
+            logger.error("tenant not exists,process define id : {},process instance id : {},task instance id : {}",
+                    taskInstance.getProcessDefine().getId(),
+                    taskInstance.getProcessInstance().getId(),
+                    taskInstance.getId());
+            taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -247,6 +276,7 @@ public class FetchTaskThread implements Runnable{
                 taskInstance.getProcessInstance().getId(),
                 taskInstance.getId());
     }
+
     /**
      *  check
      * @param poolExecutor
@@ -277,5 +307,15 @@ public class FetchTaskThread implements Runnable{
             taskInstance = processDao.findTaskInstanceById(taskInstId);
             retryTimes--;
         }
+    }
+
+    /**
+     * get task instance id
+     *
+     * @param taskQueueStr
+     * @return
+     */
+    private int getTaskInstanceId(String taskQueueStr){
+        return Integer.parseInt(taskQueueStr.split(Constants.UNDERLINE)[3]);
     }
 }

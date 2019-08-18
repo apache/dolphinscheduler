@@ -18,12 +18,16 @@ package cn.escheduler.common.zk;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.IStoppable;
+import cn.escheduler.common.enums.ZKNodeType;
+import cn.escheduler.common.model.MasterServer;
 import cn.escheduler.common.enums.ServerEnum;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.OSUtils;
+import cn.escheduler.common.utils.ResInfo;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -32,7 +36,6 @@ import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.hadoop.hbase.protobuf.generated.MasterProtos;
 import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,16 +63,6 @@ public abstract class AbstractZKClient {
 	 *  server node parent path
 	 */
 	protected String deadServerZNodeParentPath = null;
-
-	/**
-	 *  master node parent path
-	 */
-	protected String masterZNodeParentPath = null;
-
-	/**
-	 *  worker node parent path
-	 */
-	protected String workerZNodeParentPath = null;
 
 	/**
 	 * server stop or not
@@ -208,48 +201,11 @@ public abstract class AbstractZKClient {
 		return false;
 	}
 
-	/**
-	 *  init system znode
-	 */
-	protected void initSystemZNode(){
-		try {
-			// read master node parent path from conf
-			masterZNodeParentPath = getMasterZNodeParentPath();
-			// read worker node parent path from conf
-			workerZNodeParentPath = getWorkerZNodeParentPath();
-
-			// read server node parent path from conf
-			deadServerZNodeParentPath = conf.getString(ZOOKEEPER_ESCHEDULER_DEAD_SERVERS);
-
-			if(zkClient.checkExists().forPath(deadServerZNodeParentPath) == null){
-				//  create persistent dead server parent node
-				zkClient.create().creatingParentContainersIfNeeded()
-						.withMode(CreateMode.PERSISTENT).forPath(deadServerZNodeParentPath);
-			}
-
-			if(zkClient.checkExists().forPath(masterZNodeParentPath) == null){
-				//  create persistent master parent node
-				zkClient.create().creatingParentContainersIfNeeded()
-						.withMode(CreateMode.PERSISTENT).forPath(masterZNodeParentPath);
-			}
-
-			if(zkClient.checkExists().forPath(workerZNodeParentPath) == null){
-				// create persistent worker parent node
-				zkClient.create().creatingParentContainersIfNeeded()
-						.withMode(CreateMode.PERSISTENT).forPath(workerZNodeParentPath);
-			}
-
-		} catch (Exception e) {
-			logger.error("init system znode failed : " + e.getMessage(),e);
-		}
-	}
-
 
 	public void removeDeadServerByHost(String host, String serverType) throws Exception {
         List<String> deadServers = zkClient.getChildren().forPath(deadServerZNodeParentPath);
         for(String serverPath : deadServers){
             if(serverPath.startsWith(serverType+UNDERLINE+host)){
-
 				String server = deadServerZNodeParentPath + SINGLE_SLASH + serverPath;
 				zkClient.delete().forPath(server);
                 logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
@@ -257,28 +213,69 @@ public abstract class AbstractZKClient {
         }
 	}
 
+
+	/**
+	 * create zookeeper path according the zk node type.
+	 * @param zkNodeType
+	 * @return
+	 * @throws Exception
+	 */
+	private String createZNodePath(ZKNodeType zkNodeType) throws Exception {
+		// specify the format of stored data in ZK nodes
+		String heartbeatZKInfo = ResInfo.getHeartBeatInfo(new Date());
+		// create temporary sequence nodes for master znode
+		String parentPath = getZNodeParentPath(zkNodeType);
+		String serverPathPrefix = parentPath + "/" + OSUtils.getHost();
+		String registerPath = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(
+				serverPathPrefix + "_", heartbeatZKInfo.getBytes());
+		logger.info("register {} node {} success" , zkNodeType.toString(), registerPath);
+		return registerPath;
+	}
+
+	/**
+	 * register server,  if server already exists, return null.
+	 * @param zkNodeType
+	 * @return register server path in zookeeper
+	 */
+	public String registerServer(ZKNodeType zkNodeType) throws Exception {
+		String registerPath = null;
+		String host = OSUtils.getHost();
+		if(checkZKNodeExists(host, zkNodeType)){
+			logger.error("register failure , {} server already started on host : {}" ,
+					zkNodeType.toString(), host);
+			return registerPath;
+		}
+		registerPath = createZNodePath(ZKNodeType.MASTER);
+        logger.info("register {} node {} success", zkNodeType.toString(), registerPath);
+
+        // handle dead server
+		handleDeadServer(registerPath, zkNodeType, Constants.DELETE_ZK_OP);
+
+		return registerPath;
+	}
+
 	/**
 	 * opType(add): if find dead server , then add to zk deadServerPath
 	 * opType(delete): delete path from zk
 	 *
 	 * @param zNode   		  node path
-	 * @param serverType	  master or worker prefix
+	 * @param zkNodeType	  master or worker
 	 * @param opType		  delete or add
 	 * @throws Exception
 	 */
-	public void handleDeadServer(String zNode, String serverType, String opType) throws Exception {
+	public void handleDeadServer(String zNode, ZKNodeType zkNodeType, String opType) throws Exception {
 		//ip_sequenceno
 		String[] zNodesPath = zNode.split("\\/");
 		String ipSeqNo = zNodesPath[zNodesPath.length - 1];
 
-		String type = serverType.equals(MASTER_PREFIX) ? MASTER_PREFIX : WORKER_PREFIX;
+		String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_PREFIX : WORKER_PREFIX;
 
 
 		//check server restart, if restart , dead server path in zk should be delete
 		if(opType.equals(DELETE_ZK_OP)){
 			String[] ipAndSeqNo = ipSeqNo.split(UNDERLINE);
 			String ip = ipAndSeqNo[0];
-			removeDeadServerByHost(ip, serverType);
+			removeDeadServerByHost(ip, type);
 
 		}else if(opType.equals(ADD_ZK_OP)){
 			String deadServerPath = deadServerZNodeParentPath + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
@@ -287,7 +284,8 @@ public abstract class AbstractZKClient {
 
 				zkClient.create().forPath(deadServerPath,(type + UNDERLINE + ipSeqNo).getBytes());
 
-				logger.info("{} server dead , and {} added to zk dead server path success" , serverType, zNode);
+				logger.info("{} server dead , and {} added to zk dead server path success" ,
+						zkNodeType.toString(), zNode);
 			}
 		}
 
@@ -311,18 +309,16 @@ public abstract class AbstractZKClient {
 		List<String> childrenList = new ArrayList<>();
 		try {
 			// read master node parent path from conf
-			masterZNodeParentPath = conf.getString(Constants.ZOOKEEPER_ESCHEDULER_MASTERS);
-			if(zkClient.checkExists().forPath(masterZNodeParentPath) != null){
-				childrenList = zkClient.getChildren().forPath(masterZNodeParentPath);
+			if(zkClient.checkExists().forPath(getZNodeParentPath(ZKNodeType.MASTER)) != null){
+				childrenList = zkClient.getChildren().forPath(getZNodeParentPath(ZKNodeType.MASTER));
 			}
 		} catch (Exception e) {
 			if(!e.getMessage().contains("java.lang.IllegalStateException: instance must be started")){
 				logger.warn(e.getMessage(),e);
 			}
-
+		}finally {
 			return childrenList.size();
 		}
-		return childrenList.size();
 	}
 
 	/**
@@ -344,15 +340,33 @@ public abstract class AbstractZKClient {
 	}
 
 	/**
+	 * get server list.
+	 * @param zkNodeType
+	 * @return
+	 */
+	public List<MasterServer> getServersList(ZKNodeType zkNodeType){
+		Map<String, String> masterMap = getServerMaps(zkNodeType);
+		String parentPath = getZNodeParentPath(zkNodeType);
+
+		List<MasterServer> masterServers = new ArrayList<>();
+		for(String path : masterMap.keySet()){
+			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(masterMap.get(path));
+			masterServer.setZkDirectory( parentPath + "/"+ path);
+			masterServers.add(masterServer);
+		}
+		return masterServers;
+	}
+
+	/**
 	 * get master server list map.
 	 * result : {host : resource info}
 	 * @return
 	 */
-	public Map<String, String> getServerList(boolean isMaster ){
+	public Map<String, String> getServerMaps(ZKNodeType zkNodeType){
 
 		Map<String, String> masterMap = new HashMap<>();
 		try {
-			String path =  isMaster ? getMasterZNodeParentPath() : getWorkerZNodeParentPath();
+			String path =  getZNodeParentPath(zkNodeType);
 			List<String> serverList  = getZkClient().getChildren().forPath(path);
 			for(String server : serverList){
 				byte[] bytes  = getZkClient().getData().forPath(path + "/" + server);
@@ -363,6 +377,29 @@ public abstract class AbstractZKClient {
 		}
 
 		return masterMap;
+	}
+
+	/**
+	 * check the zookeeper node already exists
+	 * @param host
+	 * @param zkNodeType
+	 * @return
+	 * @throws Exception
+	 */
+	public boolean checkZKNodeExists(String host, ZKNodeType zkNodeType) {
+		String path = getZNodeParentPath(zkNodeType);
+		if(StringUtils.isEmpty(path)){
+			logger.error("check zk node exists error, host:{}, zk node type:{}",
+					host, zkNodeType.toString());
+			return false;
+		}
+		Map<String, String> serverMaps = getServerMaps(zkNodeType);
+		for(String hostKey : serverMaps.keySet()){
+			if(hostKey.startsWith(host)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -394,6 +431,34 @@ public abstract class AbstractZKClient {
 	}
 
 	/**
+	 * get zookeeper node parent path
+	 * @param zkNodeType
+	 * @return
+	 */
+	public String getZNodeParentPath(ZKNodeType zkNodeType) {
+		String path = "";
+		switch (zkNodeType){
+			case MASTER:
+				return getMasterZNodeParentPath();
+			case WORKER:
+				return getWorkerZNodeParentPath();
+			case DEAD_SERVER:
+				return getDeadZNodeParentPath();
+			default:
+				break;
+		}
+		return path;
+	}
+
+	/**
+	 * get dead server node parent path
+	 * @return
+	 */
+	protected String getDeadZNodeParentPath(){
+		return conf.getString(ZOOKEEPER_ESCHEDULER_DEAD_SERVERS);
+	}
+
+	/**
 	 *  get master start up lock path
 	 * @return
 	 */
@@ -418,6 +483,82 @@ public abstract class AbstractZKClient {
 	}
 
 	/**
+	 * release mutex
+	 * @param mutex
+	 */
+	public static void releaseMutex(InterProcessMutex mutex) {
+		if (mutex != null){
+			try {
+				mutex.release();
+			} catch (Exception e) {
+				if(e.getMessage().equals("instance must be started before calling this method")){
+					logger.warn("lock release");
+				}else{
+					logger.error("lock release failed : " + e.getMessage(),e);
+				}
+
+			}
+		}
+	}
+
+	/**
+	 *  init system znode
+	 */
+	protected void initSystemZNode(){
+		try {
+			createNodePath(getMasterZNodeParentPath());
+			createNodePath(getWorkerZNodeParentPath());
+			createNodePath(getDeadZNodeParentPath());
+
+		} catch (Exception e) {
+			logger.error("init system znode failed : " + e.getMessage(),e);
+		}
+	}
+
+	/**
+	 * create zookeeper node path if not exists
+	 * @param zNodeParentPath
+	 * @throws Exception
+	 */
+	private void createNodePath(String zNodeParentPath) throws Exception {
+	    if(null == zkClient.checkExists().forPath(zNodeParentPath)){
+	        zkClient.create().creatingParentContainersIfNeeded()
+					.withMode(CreateMode.PERSISTENT).forPath(zNodeParentPath);
+		}
+	}
+
+	/**
+	 * server self dead, stop all threads
+	 * @param serverHost
+	 * @param zkNodeType
+	 */
+	protected boolean checkServerSelfDead(String serverHost, ZKNodeType zkNodeType) {
+		if (serverHost.equals(OSUtils.getHost())) {
+			logger.error("{} server({}) of myself dead , stopping...",
+					zkNodeType.toString(), serverHost);
+			stoppable.stop(String.format(" {} server {} of myself dead , stopping...",
+					zkNodeType.toString(), serverHost));
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 *  get host ip, string format: masterParentPath/ip_000001/value
+	 * @param path
+	 * @return
+	 */
+	protected String getHostByEventDataPath(String path) {
+		int  startIndex = path.lastIndexOf("/")+1;
+		int endIndex = 	path.lastIndexOf("_");
+
+		if(startIndex >= endIndex){
+			logger.error("parse ip error");
+			return "";
+		}
+		return path.substring(startIndex, endIndex);
+	}
+	/**
 	 * acquire zk lock
 	 * @param zkClient
 	 * @param zNodeLockPath
@@ -433,9 +574,9 @@ public abstract class AbstractZKClient {
 	public String toString() {
 		return "AbstractZKClient{" +
 				"zkClient=" + zkClient +
-				", deadServerZNodeParentPath='" + deadServerZNodeParentPath + '\'' +
-				", masterZNodeParentPath='" + masterZNodeParentPath + '\'' +
-				", workerZNodeParentPath='" + workerZNodeParentPath + '\'' +
+				", deadServerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.DEAD_SERVER) + '\'' +
+				", masterZNodeParentPath='" + getZNodeParentPath(ZKNodeType.MASTER) + '\'' +
+				", workerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.WORKER) + '\'' +
 				", stoppable=" + stoppable +
 				'}';
 	}
