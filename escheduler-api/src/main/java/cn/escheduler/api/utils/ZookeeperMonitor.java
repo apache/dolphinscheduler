@@ -1,9 +1,9 @@
 package cn.escheduler.api.utils;
 
+import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.common.zk.AbstractZKClient;
-import cn.escheduler.dao.model.MasterServer;
+import cn.escheduler.common.model.MasterServer;
 import cn.escheduler.dao.model.ZookeeperRecord;
-import cn.escheduler.server.ResInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -37,28 +36,11 @@ public class ZookeeperMonitor extends AbstractZKClient{
 	}
 
 	/**
-	 * get server list.
-	 * @param isMaster
-	 * @return
-	 */
-	public List<MasterServer> getServers(boolean isMaster){
-		List<MasterServer> masterServers = new ArrayList<>();
-		Map<String, String> masterMap = getServerList(isMaster);
-		String parentPath = isMaster ? getMasterZNodeParentPath() : getWorkerZNodeParentPath();
-		for(String path : masterMap.keySet()){
-			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(masterMap.get(path));
-			masterServer.setZkDirectory( parentPath + "/"+ path);
-			masterServers.add(masterServer);
-		}
-		return masterServers;
-	}
-
-	/**
 	 * get master servers
 	 * @return
 	 */
 	public List<MasterServer> getMasterServers(){
-	    return getServers(true);
+	    return getServersList(ZKNodeType.MASTER);
 	}
 
 	/**
@@ -66,7 +48,7 @@ public class ZookeeperMonitor extends AbstractZKClient{
 	 * @return
 	 */
 	public List<MasterServer> getWorkerServers(){
-	    return getServers(false);
+	    return getServersList(ZKNodeType.WORKER);
 	}
 
 	private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {
