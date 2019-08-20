@@ -85,7 +85,7 @@ public class FlinkArgsUtils {
 
 
         // --files --conf --libjar ...
-    /*   if (StringUtils.isNotEmpty(param.getOthers())) {
+      if (StringUtils.isNotEmpty(param.getOthers())) {
             String others = param.getOthers();
             if(!others.contains("--queue")){
                 if (StringUtils.isNotEmpty(param.getQueue())) {
@@ -98,7 +98,7 @@ public class FlinkArgsUtils {
             args.add(Constants.SPARK_QUEUE);
             args.add(param.getQueue());
 
-        }*/
+        }
 
        if (StringUtils.isNotEmpty(param.getMainArgs())) {
             args.add(param.getMainArgs());
