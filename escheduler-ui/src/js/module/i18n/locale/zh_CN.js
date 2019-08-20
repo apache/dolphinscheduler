@@ -475,8 +475,6 @@ export default {
   'Next five execution times': '接下来五次执行时间',
   'Execute time': '执行时间',
   'Complement range': '补数范围',
-  'Complement range': '补数范围',
-  'Complement range': '补数范围',
   'slot':'slot数量',
   'taskManager':'taskManage数量',
   'jobManagerMemory':'jobManager内存数',
