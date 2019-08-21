@@ -15,25 +15,6 @@
  * limitations under the License.
  */
 
-import Vuex from 'vuex'
-import dag from './dag'
-import projects from './projects'
-import resource from './resource'
-import security from './security'
-import datasource from './datasource'
-import user from './user'
-import monitor from './monitor'
-import plugin from './plugin'
-
-export default new Vuex.Store({
-  modules: {
-    dag,
-    projects,
-    resource,
-    security,
-    datasource,
-    user,
-    monitor,
-    plugin
-  }
-})
+export default {
+  stageListAll: []
+}

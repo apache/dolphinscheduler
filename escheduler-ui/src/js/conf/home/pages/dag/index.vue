@@ -26,6 +26,7 @@
       ...mapMutations('dag', ['resetParams']),
       ...mapActions('dag', ['getProcessList', 'getResourcesList']),
       ...mapActions('security', ['getTenantList','getWorkerGroupsAll']),
+      ...mapActions('plugin', ['getAllStages']),
       /**
        * init
        */
@@ -41,7 +42,9 @@
           this.getResourcesList(),
           // get worker group list
           this.getWorkerGroupsAll(),
-          this.getTenantList()
+          this.getTenantList(),
+          // get all plugin's stages
+          this.getAllStages()
         ]).then((data) => {
           this.isLoading = false
           // Whether to pop up the box?

@@ -4,12 +4,13 @@
       <div class="title"><span>{{$t('Toolbar')}}</span></div>
       <div class="toolbar-btn">
         <div class="bar-box roundedRect jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected"
-             :class="v === dagBarId ? 'active' : ''"
-             :id="v"
-             v-for="(item,v) in tasksTypeList"
-             @mousedown="_getDagId(v)">
+             :class="item.key === dagBarId ? 'active' : ''"
+             :id="item.key"
+             v-for="item in tasksTypeList"
+             @mousedown="_getDagId(item.key)">
           <div data-toggle="tooltip" :title="item.desc">
-            <div class="icos" :class="'icos-' + v" ></div>
+            <div class="icos" :class="'icos-' + item.type" v-if="item.type !== 'PLUGIN'"></div>
+            <img class="icos" v-bind:src="'data:image/jpeg;base64,' + item.iconBase64" width="32" height="32" v-if="item.type === 'PLUGIN'"/>
           </div>
         </div>
       </div>
@@ -115,7 +116,7 @@
     name: 'dag-chart',
     data () {
       return {
-        tasksTypeList: tasksType,
+        tasksTypeList: [],
         toolOperList: toolOper(this),
         dagBarId: null,
         toolOperCode: '',
@@ -420,6 +421,13 @@
         }
 
         this.taskId = id
+        let realTaskType = type || self.dagBarId
+        let pluginStageInfo = {}
+        if (_.startsWith(realTaskType, 'PLUGIN')) {
+          let pluginName = realTaskType.substr('PLUGIN_'.length)
+          realTaskType = 'PLUGIN'
+          pluginStageInfo = _.find(this.store.state.plugin.stageListAll, d => d.name === pluginName)
+        }
 
         eventModel = this.$drawer({
           closable: false,
@@ -448,11 +456,33 @@
             },
             props: {
               id: id,
-              taskType: type || self.dagBarId,
-              self: self
+              taskType: realTaskType,
+              self: self,
+              pluginStageInfo: pluginStageInfo
             }
           })
         })
+      },
+      _getTasksTypeList() {
+        let pluginStageList = this.store.state.plugin.stageListAll || []
+        if (pluginStageList.length > 0) {
+          let pluginObjs = _.map(pluginStageList, stage => {
+            return {
+              key: 'PLUGIN_' + stage.name,
+              type: 'PLUGIN',
+              desc: stage.label,
+              iconBase64: stage.iconBase64
+            }
+          })
+          let otherTaskTypeObjs = _.filter(_.map(tasksType, function(value, key) {
+            return {
+              key: key,
+              type: key,
+              desc: value.desc
+            }
+          }), d => d.type !== 'PLUGIN')
+          this.tasksTypeList = _.concat(otherTaskTypeObjs, pluginObjs)
+        }
       }
     },
     watch: {
@@ -466,6 +496,8 @@
       }
     },
     created () {
+      this._getTasksTypeList()
+
       // Edit state does not allow deletion of node a...
       this.setIsEditDag(false)
 

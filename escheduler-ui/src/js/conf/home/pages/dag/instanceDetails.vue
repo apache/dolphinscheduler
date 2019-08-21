@@ -29,6 +29,7 @@
       ...mapMutations('dag', ['setIsDetails', 'resetParams']),
       ...mapActions('dag', ['getProcessList', 'getResourcesList', 'getInstancedetail']),
       ...mapActions('security', ['getTenantList','getWorkerGroupsAll']),
+      ...mapActions('plugin', ['getAllStages']),
       /**
        * init
        */
@@ -46,7 +47,9 @@
           this.getResourcesList(),
           // get worker group list
           this.getWorkerGroupsAll(),
-          this.getTenantList()
+          this.getTenantList(),
+          // get all plugin's stages
+          this.getAllStages()
         ]).then((data) => {
           let item = data[0]
           let flag = false

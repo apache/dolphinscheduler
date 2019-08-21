@@ -159,7 +159,15 @@
                 ref="DEPENDENT"
                 :backfill-item="backfillItem">
         </m-dependent>
-
+        <!-- plugin node -->
+        <m-plugin
+          v-if="taskType === 'PLUGIN'"
+          @on-params="_onParams"
+          ref="PLUGIN"
+          :create-node-id="id"
+          :backfill-item="backfillItem"
+          :stage-info="pluginStageInfo">
+        </m-plugin>
       </div>
     </div>
     <div class="bottom-box">
@@ -184,6 +192,7 @@
   import mDependent from './tasks/dependent'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
+  import mPlugin from './tasks/plugin'
   import mTimeoutAlarm from './_source/timeoutAlarm'
   import mWorkerGroups from './_source/workerGroups'
   import clickoutside from '@/module/util/clickoutside'
@@ -233,7 +242,8 @@
     props: {
       id: Number,
       taskType: String,
-      self: Object
+      self: Object,
+      pluginStageInfo: Object
     },
     methods: {
       /**
@@ -460,7 +470,8 @@
       mSelectInput,
       mTimeoutAlarm,
       mPriority,
-      mWorkerGroups
+      mWorkerGroups,
+      mPlugin
     }
   }
 </script>

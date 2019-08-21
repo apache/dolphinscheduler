@@ -156,6 +156,14 @@ JSP.prototype.draggable = function () {
         if (top < 25) {
           top = 25
         }
+        let realTaskType = findComponentDownward(self.dag.$root, 'dag-chart').dagBarId
+        let pluginStageInfo = {}
+        if (_.startsWith(realTaskType, 'PLUGIN')) {
+          let pluginName = realTaskType.substr('PLUGIN_'.length)
+          realTaskType = 'PLUGIN'
+          pluginStageInfo = _.find(self.dag.store.state.plugin.stageListAll, d => d.name === pluginName)
+        }
+
         // Generate template node
         $('#canvas').append(rtTasksTpl({
           id: id,
@@ -163,7 +171,8 @@ JSP.prototype.draggable = function () {
           x: left,
           y: top,
           isAttachment: self.config.isAttachment,
-          taskType: findComponentDownward(self.dag.$root, 'dag-chart').dagBarId
+          taskType: realTaskType,
+          pluginStageInfo: pluginStageInfo
         }))
 
         // Get the generated node
