@@ -53,7 +53,7 @@ public class LoggerService {
     TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
     String host = taskInstance.getHost();
     if(StringUtils.isEmpty(host)){
-      return new Result(Status.TASK_INSTANCE_HOST_NOT_FOUND.getCode(), Status.TASK_INSTANCE_HOST_NOT_FOUND.getMsg());
+      return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(), Status.TASK_INSTANCE_NOT_FOUND.getMsg());
     }
 
 
