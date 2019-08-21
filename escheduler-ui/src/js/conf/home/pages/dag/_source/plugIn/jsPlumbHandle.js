@@ -192,8 +192,14 @@ JSP.prototype.draggable = function () {
  * Echo json processing and old data structure processing
  */
 JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
+  let self = this
   _.map(largeJson, v => {
     // Generate template
+    let pluginStageInfo = null
+    if (v.type === 'PLUGIN') {
+      let pluginName = _.get(v, "params.stageConfig.name")
+      pluginStageInfo = _.find(self.dag.store.state.plugin.stageListAll, d => d.name === pluginName)
+    }
     $('#canvas').append(rtTasksTpl({
       id: v.id,
       name: v.name,
@@ -202,7 +208,8 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       targetarr: locations[v.id]['targetarr'],
       isAttachment: this.config.isAttachment,
       taskType: v.type,
-      runFlag: v.runFlag
+      runFlag: v.runFlag,
+      pluginStageInfo: pluginStageInfo
     }))
 
     // contextmenu event
@@ -547,6 +554,11 @@ JSP.prototype.copyNodes = function ($id) {
   // coordinate y
   let newY = newNodePors.y + 40
 
+  let pluginStageInfo = null
+  if (newNodeInfo.type === 'PLUGIN') {
+    let pluginName = _.get(newNodeInfo, "params.stageConfig.name")
+    pluginStageInfo = _.find(this.dag.store.state.plugin.stageListAll, d => d.name === pluginName)
+  }
   // Generate template node
   $('#canvas').append(rtTasksTpl({
     id: newId,
@@ -554,7 +566,8 @@ JSP.prototype.copyNodes = function ($id) {
     x: newX,
     y: newY,
     isAttachment: this.config.isAttachment,
-    taskType: newNodeInfo.type
+    taskType: newNodeInfo.type,
+    pluginStageInfo: pluginStageInfo
   }))
 
   // Get the generated node

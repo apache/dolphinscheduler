@@ -1,6 +1,6 @@
 <template>
   <div class="plugin-stage-model">
-    <div class="list-model"  v-if="configValue[0]">
+    <div class="list-model">
       <div class="table-box">
         <table>
           <tr>
@@ -23,7 +23,7 @@
               <span>{{'Parameter Value'}}</span>
             </th>
           </tr>
-          <tr v-for="(item, $index) in configDefinition" :key="$index" v-if="configElementVisible[$index]===true">
+          <tr v-for="(item, $index) in stageDefinition" :key="$index" v-if="configElementVisible[$index]===true">
             <td>
               <span>{{$index + 1}}</span>
             </td>
@@ -102,60 +102,23 @@
     name: 'plugin-stage',
     data () {
       return {
-        // selected ID
-        selectedStageId: {},
-        configDefinition: Array,
         configValue: Array,
         configElementVisible: Array
       }
     },
     mixins: [disabledState],
     props: {
-      stageList: Array,
-      stageWithConfig: Object,
-      pluginStageInfo: Object
+      stageConfig: Array,
+      stageDefinition: Array
     },
     methods: {
-      /**
-       * return sqlType
-       */
-      _handleStageChanged(val) {
-        let foundStage = _.filter(this.stageList, (stage) => {
-          return this._getId(stage) === val.value;
-        })[0]
-        this.$emit('on-stageChange', {
-          "name": foundStage.name,
-          "libraryName": foundStage.libraryName,
-          "stageVersion": foundStage.stageVersion,
-          "configValue": JSON.parse(foundStage.defaultConfigurationJson)
-        })
-        this.$nextTick(() => {
-          this._updateCurrentConfig()
-        })
-      },
-      _getId(stage) {
-        if (stage) {
-          return stage.name + '|' + stage.libraryName
-        } else {
-          stage
-        }
-      },
       _updateCurrentConfig() {
-        if (this.stageWithConfig !== null && this.stageWithConfig.name !== null) {
-          let self = this
-          let foundStage = _.filter(this.stageList, function (stage) {
-            return stage.name === self.stageWithConfig.name && stage.libraryName === self.stageWithConfig.libraryName;
-          })[0];
-          if (foundStage) {
-            this.configDefinition = JSON.parse(foundStage.configurationDefinitionJson)
-            this.configValue = this.stageWithConfig.configValue
-            this._refreshVisiable()
-          }
-        }
+        this.configValue = this.stageConfig.configValue
+        this._refreshVisiable()
       },
       _refreshVisiable() {
         let self = this
-        let newVisibles = _.map(self.configDefinition, (cd) => {
+        let newVisibles = _.map(self.stageDefinition, (cd) => {
           if (!_.isEmpty(cd.dependsOnMap)) {
             return _.every(cd.dependsOnMap, (varray, k) => {
               let foundDepCurrentValue = _.find(self.configValue, (x) => x.name === k)
@@ -187,9 +150,6 @@
         this._refreshVisiable()
         this.$nextTick(() => {
           this.$emit('on-stageChange', {
-            "name": this.stageWithConfig.name,
-            "libraryName": this.stageWithConfig.libraryName,
-            "stageVersion": this.stageWithConfig.stageVersion,
             "configValue": this.configValue
           })
         })
@@ -199,11 +159,6 @@
     },
     created () {
       this.$nextTick(() => {
-        if (this.stageWithConfig !== null && this.stageWithConfig.name !== null) {
-          this.selectedStageId = this._getId(this.stageWithConfig)
-        } else {
-          this.selectedStageId = {}
-        }
         this._updateCurrentConfig()
       })
     },

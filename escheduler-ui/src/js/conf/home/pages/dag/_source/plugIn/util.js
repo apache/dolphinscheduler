@@ -47,7 +47,11 @@ const rtBantpl = () => {
 const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag, pluginStageInfo }) => {
 
   let tpl = ``
-  tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
+  let combinedTaskType = taskType
+  if (taskType === 'PLUGIN') {
+    combinedTaskType = "PLUGIN_" + pluginStageInfo.name
+  }
+  tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-tasks-type="${combinedTaskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
   tpl += `<div>`
   tpl += `<div class="state-p"></div>`
   if (taskType === 'PLUGIN') {
