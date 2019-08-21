@@ -7,9 +7,6 @@
 
 ## Operational Guidelines
 
-  - Administrator accounts can only be managed in terms of authority, do not participate in specific business, can not create projects, and can not perform related operations on process definition.
-  - The following operations can only be performed by using ordinary user login system.
-
 ### Create a project
 
   - Click "Project - > Create Project", enter project name,  description, and click "Submit" to create a new project.
@@ -18,13 +15,12 @@
       <img src="https://user-images.githubusercontent.com/53217792/61776719-2ee50380-ae2e-11e9-9d11-41de8907efb5.png" width="60%" />
  </p>
 
-> Project Home Page contains task status statistics, process status statistics, process definition statistics, queue statistics, command statistics.
+> Project Home Page contains task status statistics, process status statistics.
 
  - Task State Statistics: It refers to the statistics of the number of tasks to be run, failed, running, completed and succeeded in a given time frame.
  - Process State Statistics: It refers to the statistics of the number of waiting, failing, running, completing and succeeding process instances in a specified time range.
  - Process Definition Statistics: The process definition created by the user and the process definition granted by the administrator to the user are counted.
- - Queue statistics: Worker performs queue statistics, the number of tasks to be performed and the number of tasks to be killed
- - Command Status Statistics: Statistics of the Number of Commands Executed
+
 
 ### Creating Process definitions
   - Go to the project home page, click "Process definitions" and enter the list page of process definition.
@@ -33,7 +29,7 @@
   - Fill in the Node Name, Description, and Script fields.
   - Selecting "task priority" will give priority to high-level tasks in the execution queue. Tasks with the same priority will be executed in the first-in-first-out order.
   - Timeout alarm. Fill in "Overtime Time". When the task execution time exceeds the overtime, it can alarm and fail over time.
-  - Fill in "Custom Parameters" and refer to [Custom Parameters](#用户自定义参数)
+  - Fill in "Custom Parameters" and refer to [Custom Parameters](#Custom Parameters)
     <p align="center">
     <img src="https://user-images.githubusercontent.com/53217792/61778402-42459e00-ae31-11e9-96c6-8fd7fed8fed2.png" width="60%" />
       </p>
@@ -60,15 +56,13 @@
   - **The process definition of the off-line state can be edited, but not run**, so the on-line workflow is the first step.
   > Click on the Process definition, return to the list of process definitions, click on the icon "online", online process definition.
 
-  > Before offline process, it is necessary to offline timed management before offline process can be successfully defined.
-  >
-  >
+  > Before setting workflow offline, the timed tasks in timed management should be offline, so that the definition of workflow can be set offline successfully. 
 
   - Click "Run" to execute the process. Description of operation parameters：
-    * Failure strategy：**When a task node fails to execute, other parallel task nodes need to execute the strategy**。”Continue "Representation: Other task nodes perform normally" and "End" Representation: Terminate all ongoing tasks and terminate the entire process.
+    * Failure strategy：**When a task node fails to execute, other parallel task nodes need to execute the strategy**。”Continue "Representation: Other task nodes perform normally", "End" Representation: Terminate all ongoing tasks and terminate the entire process.
     * Notification strategy：When the process is over, send process execution information notification mail according to the process status.
-    * Process priority: The priority of process running is divided into five levels:the highest , the high , the medium , the low , and the lowest . High-level processes are executed first in the execution queue, and processes with the same priority are executed first in first out order.
-    * Worker group This process can only be executed in a specified machine group. Default, by default, can be executed on any worker.
+    * Process priority: The priority of process running is divided into five levels:the highest, the high, the medium, the low, and the lowest . High-level processes are executed first in the execution queue, and processes with the same priority are executed first in first out order.
+    * Worker group: This process can only be executed in a specified machine group. Default, by default, can be executed on any worker.
     * Notification group: When the process ends or fault tolerance occurs, process information is sent to all members of the notification group by mail.
     * Recipient: Enter the mailbox and press Enter key to save. When the process ends and fault tolerance occurs, an alert message is sent to the recipient list.
     * Cc: Enter the mailbox and press Enter key to save. When the process is over and fault-tolerant occurs, alarm messages are copied to the copier list.
@@ -81,7 +75,7 @@
       <img src="https://user-images.githubusercontent.com/53217792/61780083-6a82cc00-ae34-11e9-9839-fda9153f693b.png" width="60%" />
  </p>
 
-> SComplement execution mode includes serial execution and parallel execution. In serial mode, the complement will be executed sequentially from May 1 to May 10. In parallel mode, the tasks from May 1 to May 10 will be executed simultaneously.
+> Complement execution mode includes serial execution and parallel execution. In serial mode, the complement will be executed sequentially from May 1 to May 10. In parallel mode, the tasks from May 1 to May 10 will be executed simultaneously.
 
 ### Timing Process Definition
   - Create Timing: "Process Definition - > Timing"
@@ -343,28 +337,28 @@ conf/common/hadoop.properties
 
 
 
-Create queues
+### Create queues
 
 
 
   - Queues are used to execute spark, mapreduce and other programs, which require the use of "queue" parameters.
-- Security - > Queue Manage - > Creat Queue 
+- "Security" - > "Queue Manage" - > "Creat Queue" 
      <p align="center">
     <img src="https://user-images.githubusercontent.com/53217792/61841945-078f4480-aec9-11e9-92fb-05b6f42f07d6.png" width="60%" />
   </p>
 
 
 ### Create Tenants
-  - The tenant corresponds to the user of Linux, which is used by the worker to submit jobs. If Linux does not have this user, the worker creates the user when executing the script.
-  - Tenant Code：**the tenant code is the only user on Linux that can't be duplicated.**
+  - The tenant corresponds to the account of Linux, which is used by the worker server to submit jobs. If Linux does not have this user, the worker would create the account when executing the task.
+  - Tenant Code：**the tenant code is the only account on Linux that can't be duplicated.**
 
  <p align="center">
     <img src="https://user-images.githubusercontent.com/53217792/61842372-8042d080-aeca-11e9-8c54-e3dee583eeff.png" width="60%" />
   </p>
 
 ### Create Ordinary Users
-  -  Users are divided into **administrator users** and **ordinary users**.
-    * Administrators have only **authorization and user management** privileges, and no privileges to **create project and process-defined operations**.
+  -  User types are **ordinary users** and **administrator users**..
+    * Administrators have **authorization and user management** privileges, and no privileges to **create project and process-defined operations**.
     * Ordinary users can **create projects and create, edit, and execute process definitions**.
     * Note: **If the user switches the tenant, all resources under the tenant will be copied to the switched new tenant.**
 <p align="center">
@@ -379,8 +373,8 @@ Create queues
     </p>
 
 ### Create Worker Group
-  - Worker grouping provides a mechanism for tasks to run on a specified worker. Administrators set worker groups, and each task node can set worker groups for the task to run. If the task-specified groups are deleted or no groups are specified, the task will run on the worker specified by the process instance.
-- Multiple IP addresses within a worker group (**no aliases can be written**), separated by **commas in English**
+  - Worker group provides a mechanism for tasks to run on a specified worker. Administrators create worker groups, which can be specified in task nodes and operation parameters. If the specified grouping is deleted or no grouping is specified, the task will run on any worker.
+- Multiple IP addresses within a worker group (**aliases can not be written**), separated by **commas in English**
 
   <p align="center">
     <img src="https://user-images.githubusercontent.com/53217792/61842630-6b1a7180-aecb-11e9-8988-b4444de16b36.png" width="60%" />
@@ -457,8 +451,6 @@ Create queues
 #### Worker monitor
   - Mainly related information of worker.
 
-
-
 <p align="center">
    <img src="https://user-images.githubusercontent.com/53217792/61843277-ae75df80-aecd-11e9-9667-b9f1615b6f3b.png" width="60%" />
  </p>
@@ -498,7 +490,7 @@ Create queues
 - Custom parameters: User-defined parameters that are part of SHELL replace the contents of scripts with ${variables}
 
 ### SUB_PROCESS
-  - The sub-process node is to execute an external workflow definition as its own task node.
+  - The sub-process node is to execute an external workflow definition as an task node.
 > Drag the ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_SUB_PROCESS.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">

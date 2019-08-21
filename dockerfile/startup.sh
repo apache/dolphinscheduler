@@ -30,13 +30,14 @@ else
 		echo "创建escheduler数据库"
                 mysql --user=root --password=$MYSQL_ROOT_PWD -e "CREATE DATABASE IF NOT EXISTS \`$ESZ_DB\` CHARACTER SET utf8 COLLATE utf8_general_ci; FLUSH PRIVILEGES;"
                 echo "导入mysql数据"
-                nohup /opt/escheduler/script/create_escheduler.sh & 
+                nohup /opt/escheduler/script/create_escheduler.sh &
+                sleep 90
 	fi
 fi
 
 /opt/zookeeper/bin/zkServer.sh restart 
 
-sleep 10
+sleep 90
 
 echo "启动api-server"
 /opt/escheduler/bin/escheduler-daemon.sh stop api-server

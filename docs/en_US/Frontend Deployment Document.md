@@ -31,7 +31,7 @@ esc_proxy="8888"
 esc_proxy_port="http://192.168.xx.xx:12345"
 ```
 
->Front-end automatic deployment based on Linux system`yum`operation, before deployment, please install and update`yum`
+>Front-end automatic deployment based on Linux system `yum` operation, before deployment, please install and update`yum`
 
 under this directory, execute`./install-escheduler-ui.sh` 
 

@@ -119,7 +119,7 @@ public class WorkerServer implements IStoppable {
         try {
             conf = new PropertiesConfiguration(Constants.WORKER_PROPERTIES_PATH);
         }catch (ConfigurationException e){
-            logger.error("load configuration failed : " + e.getMessage(),e);
+            logger.error("load configuration failed",e);
             System.exit(1);
         }
     }
@@ -167,13 +167,12 @@ public class WorkerServer implements IStoppable {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                String host = OSUtils.getHost();
-                // clear worker table register info
-                serverDao.deleteWorker(host);
-                logger.info("worker server stopped");
+
+                logger.warn("worker server stopped");
+                // worker server exit alert
                 if (zkWorkerClient.getActiveMasterNum() <= 1) {
                     for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
-                        alertDao.sendServerStopedAlert(1, host, "Worker-Server");
+                        alertDao.sendServerStopedAlert(1, OSUtils.getHost(), "Worker-Server");
                     }
                 }
 
@@ -231,7 +230,7 @@ public class WorkerServer implements IStoppable {
             @Override
             public void run() {
                 // send heartbeat to zk
-                if (StringUtils.isBlank(zkWorkerClient.getWorkerZNode())){
+                if (StringUtils.isEmpty(zkWorkerClient.getWorkerZNode())){
                     logger.error("worker send heartbeat to zk failed");
                 }
 
@@ -266,14 +265,8 @@ public class WorkerServer implements IStoppable {
                                     continue;
                                 }else {
                                     int taskInstId=Integer.parseInt(taskInfoArr[1]);
+                                    TaskInstance taskInstance = processDao.getTaskInstanceRelationByTaskId(taskInstId);
 
-                                    TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
-
-                                    ProcessInstance instance = processDao.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
-
-                                    if(instance != null){
-                                        taskInstance.setProcessInstance(instance);
-                                    }
                                     if(taskInstance.getTaskType().equals(TaskType.DEPENDENT.toString())){
                                         taskInstance.setState(ExecutionStatus.KILL);
                                         processDao.saveTaskInstance(taskInstance);

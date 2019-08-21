@@ -169,9 +169,8 @@ public class ZKMasterClient extends AbstractZKClient {
 		    String serverPath = registerServer(ZKNodeType.MASTER);
 		    if(StringUtils.isEmpty(serverPath)){
 		    	System.exit(-1);
-			  }else{
-					masterZNode = serverPath;
-				}
+			}
+			masterZNode = serverPath;
 		} catch (Exception e) {
 			logger.error("register master failure : "  + e.getMessage(),e);
 			System.exit(-1);
@@ -184,7 +183,8 @@ public class ZKMasterClient extends AbstractZKClient {
 	 *  monitor master
 	 */
 	public void listenerMaster(){
-		PathChildrenCache masterPc = new PathChildrenCache(zkClient, masterZNodeParentPath, true ,defaultThreadFactory);
+		PathChildrenCache masterPc = new PathChildrenCache(zkClient,
+				getZNodeParentPath(ZKNodeType.MASTER), true ,defaultThreadFactory);
 
 		try {
 			masterPc.start();
@@ -282,7 +282,8 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	public void listenerWorker(){
 
-		PathChildrenCache workerPc = new PathChildrenCache(zkClient,workerZNodeParentPath,true ,defaultThreadFactory);
+		PathChildrenCache workerPc = new PathChildrenCache(zkClient,
+				getZNodeParentPath(ZKNodeType.WORKER),true ,defaultThreadFactory);
 		try {
 			workerPc.start();
 			workerPc.getListenable().addListener(new PathChildrenCacheListener() {
