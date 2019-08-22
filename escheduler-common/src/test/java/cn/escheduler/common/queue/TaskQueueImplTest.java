@@ -19,8 +19,10 @@ package cn.escheduler.common.queue;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.IpUtils;
 import cn.escheduler.common.utils.OSUtils;
+import cn.escheduler.common.zk.StandaloneZKServerForTest;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * task queue test
  */
-public class TaskQueueImplTest {
+public class TaskQueueImplTest extends StandaloneZKServerForTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskQueueImplTest.class);
 
@@ -41,7 +43,10 @@ public class TaskQueueImplTest {
 
     @Before
     public void before(){
+        super.before();
+
         tasksQueue = TaskQueueFactory.getTaskQueueInstance();
+
         //clear all data
         tasksQueue.delete();
 
@@ -61,9 +66,9 @@ public class TaskQueueImplTest {
 
         //add
         tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_0_1_1_-1");
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"0_1_1_1_2130706433,3232236775");
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_1_0_1_2130706433,3232236775,"+IpUtils.ipToLong(OSUtils.getHost()));
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_2_1_1_2130706433,3232236775");
+        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"0_1_1_1_-1");
+        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"0_0_0_1_" + IpUtils.ipToLong(OSUtils.getHost()));
+        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_2_1_1_" + IpUtils.ipToLong(OSUtils.getHost()) + 10);
 
         List<String> tasks = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1);
 
@@ -74,13 +79,8 @@ public class TaskQueueImplTest {
         //pop
         String node1 = tasks.get(0);
 
-        assertEquals(node1,"1_0_1_1_-1");
+        assertEquals(node1,"0_0_0_1_" + IpUtils.ipToLong(OSUtils.getHost()));
 
-        tasks = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1);
-
-        if(tasks.size() <= 0){
-            return;
-        }
 
     }
 
@@ -89,6 +89,7 @@ public class TaskQueueImplTest {
     /**
      * test one million data from zookeeper queue
      */
+    @Ignore
     @Test
     public void extremeTest(){
         int total = 30 * 10000;

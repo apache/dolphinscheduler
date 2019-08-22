@@ -26,6 +26,7 @@ import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
 import cn.escheduler.server.utils.AlertManager;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import java.util.List;
 /**
  *  alert manager test
  */
+@Ignore
 public class AlertManagerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertManagerTest.class);

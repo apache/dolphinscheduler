@@ -20,11 +20,13 @@ import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.model.Tenant;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
+@Ignore
 public class TenantMapperTest {
 
 
