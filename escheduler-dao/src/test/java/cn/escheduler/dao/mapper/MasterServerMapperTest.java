@@ -20,6 +20,7 @@ import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.common.model.MasterServer;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Date;
 import java.util.List;
 
+@Ignore
 @SpringBootTest
 public class MasterServerMapperTest {
 
