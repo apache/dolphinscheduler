@@ -4,6 +4,7 @@ import cn.escheduler.common.task.plugin.PluginStageConfiguration;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.plugin.api.Config;
 import cn.escheduler.plugin.api.Stage;
+import cn.escheduler.plugin.api.impl.LocaleInContext;
 import cn.escheduler.plugin.sdk.config.StageConfiguration;
 import cn.escheduler.plugin.sdk.config.StageDefinition;
 import cn.escheduler.plugin.sdk.creation.ConfigInjector;
@@ -13,7 +14,7 @@ import cn.escheduler.plugin.sdk.util.PipelineConfigurationUtil;
 import cn.escheduler.plugin.sdk.validation.Issue;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
-import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import cn.escheduler.common.Constants;
 import org.apache.commons.io.IOUtils;
@@ -32,9 +33,8 @@ public class PluginManager {
 
     private static volatile PluginManager INSTANCE = null;
     private ClassLoaderStageLibraryTask stageLibraryTask;
-    private MetricRegistry registry = new MetricRegistry();
     private Map<String, Map<String, StageDefinition>> allStagesMap;
-    private List<StageDisplayInfo> stageDisplayInfos;
+    private Map<String, List<StageDisplayInfo>> localizedStageDisplayInfos;
 
     private PluginManager() {
     }
@@ -83,49 +83,59 @@ public class PluginManager {
                 allStagesMap.get(libName).put(stageName, l);
             });
         }
-        initStageDisplayInfos();
+
+        localizedStageDisplayInfos = ImmutableMap.of(
+                Locale.ENGLISH.getLanguage(), getStageDisplayInfos(Locale.ENGLISH),
+                Locale.CHINESE.getLanguage(), getStageDisplayInfos(Locale.CHINESE)
+        );
     }
 
-    private void initStageDisplayInfos() {
-        List<StageDisplayInfo> stageDisplayInfos = new ArrayList<>();
-        allStagesMap.entrySet().forEach( libMapEntry -> {
-            String libName = libMapEntry.getKey();
-            libMapEntry.getValue().entrySet().forEach( stageMapEntry -> {
-                String stageName = stageMapEntry.getKey();
-                StageDefinition stage = stageMapEntry.getValue();
-                StageDisplayInfo displayInfo = new StageDisplayInfo();
-                displayInfo.setLibraryName(libName);
-                displayInfo.setLibraryLabel(stage.getLibraryLabel());
-                displayInfo.setName(stageName);
-                displayInfo.setLabel(stage.getLabel());
-                displayInfo.setType(stage.getType());
-                try {
-                    String iconBase64 = Base64.getEncoder().encodeToString(
-                            IOUtils.toByteArray(stage.getStageClassLoader().getResource(stage.getIcon()))
+    private List<StageDisplayInfo> getStageDisplayInfos(Locale locale) {
+        Locale currentLocale = LocaleInContext.get();
+        try {
+            LocaleInContext.set(locale);
+            List<StageDisplayInfo> stageDisplayInfos = new ArrayList<>();
+            allStagesMap.entrySet().forEach(libMapEntry -> {
+                String libName = libMapEntry.getKey();
+                libMapEntry.getValue().entrySet().forEach(stageMapEntry -> {
+                    String stageName = stageMapEntry.getKey();
+                    StageDefinition stage = stageMapEntry.getValue().localize();
+                    StageDisplayInfo displayInfo = new StageDisplayInfo();
+                    displayInfo.setLibraryName(libName);
+                    displayInfo.setLibraryLabel(stage.getLibraryLabel());
+                    displayInfo.setName(stageName);
+                    displayInfo.setLabel(stage.getLabel());
+                    displayInfo.setType(stage.getType());
+                    try {
+                        String iconBase64 = Base64.getEncoder().encodeToString(
+                                IOUtils.toByteArray(stage.getStageClassLoader().getResource(stage.getIcon()))
+                        );
+                        displayInfo.setIconBase64(iconBase64);
+                    } catch (IOException e) {
+                        logger.warn("read stage icon failed. ", e);
+                    }
+                    StageConfiguration defaultStageConfiguration = PipelineConfigurationUtil.getStageConfigurationWithDefaultValues(
+                            stageLibraryTask,
+                            libName,
+                            stageName,
+                            stageName + "-instance",
+                            ""
                     );
-                    displayInfo.setIconBase64(iconBase64);
-                } catch (IOException e) {
-                    logger.warn("read stage icon failed. ", e);
-                }
-                StageConfiguration defaultStageConfiguration = PipelineConfigurationUtil.getStageConfigurationWithDefaultValues(
-                        stageLibraryTask,
-                        libName,
-                        stageName,
-                        stageName + "-instance",
-                        ""
-                );
-                displayInfo.setDefaultConfigurationJson(JSONUtils.toJson(defaultStageConfiguration.getConfiguration()));
-                List<Map<String, String>> groupNames = stage.getConfigGroupDefinition().getGroupNameToLabelMapList();
-                displayInfo.setGroupNames(groupNames);
-                displayInfo.setStageVersion(stage.getVersion());
-                displayInfo.setConfigurationDefinitionJson(
-                        JSONObject.toJSONString(stage.getConfigDefinitions(), fastJsonConfigDefinitionFilter)
-                );
+                    displayInfo.setDefaultConfigurationJson(JSONUtils.toJson(defaultStageConfiguration.getConfiguration()));
+                    List<Map<String, String>> groupNames = stage.getConfigGroupDefinition().getGroupNameToLabelMapList();
+                    displayInfo.setGroupNames(groupNames);
+                    displayInfo.setStageVersion(stage.getVersion());
+                    displayInfo.setConfigurationDefinitionJson(
+                            JSONObject.toJSONString(stage.getConfigDefinitions(), fastJsonConfigDefinitionFilter)
+                    );
 
-                stageDisplayInfos.add(displayInfo);
+                    stageDisplayInfos.add(displayInfo);
+                });
             });
-        });
-        this.stageDisplayInfos = stageDisplayInfos;
+            return stageDisplayInfos;
+        } finally {
+            LocaleInContext.set(currentLocale);
+        }
     }
 
     private PropertyFilter fastJsonConfigDefinitionFilter = new PropertyFilter() {
@@ -152,8 +162,12 @@ public class PluginManager {
     };
 
 
-    public List<StageDisplayInfo> getAllStages() {
-        return stageDisplayInfos;
+    public List<StageDisplayInfo> getAllStages(Locale locale) {
+        String targetLanguage = Locale.ENGLISH.getLanguage();
+        if (localizedStageDisplayInfos.containsKey(locale.getLanguage())) {
+            targetLanguage = locale.getLanguage();
+        }
+        return localizedStageDisplayInfos.get(targetLanguage);
     }
 
     public StageDefinition getStageDefinition(PluginStageConfiguration stageConfig) {

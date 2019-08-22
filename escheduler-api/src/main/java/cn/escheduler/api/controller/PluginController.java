@@ -8,6 +8,7 @@ import cn.escheduler.api.utils.Result;
 import cn.escheduler.dao.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +36,7 @@ public class PluginController extends  BaseController {
     public Result listStages(@RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         try{
             Map<String, Object> result = new HashMap<>(5);
-            List<StageDisplayInfo> stages = PluginManager.getInstance().getAllStages();
+            List<StageDisplayInfo> stages = PluginManager.getInstance().getAllStages(LocaleContextHolder.getLocale());
             result.put(Constants.DATA_LIST, stages);
             putMsg(result, Status.SUCCESS);
 

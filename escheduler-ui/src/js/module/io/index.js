@@ -16,6 +16,7 @@
  */
 
 import io from '~/@fedor/io/dist/io'
+import i18n from '@/module/i18n'
 
 const apiPrefix = '/escheduler'
 const reSlashPrefix = /^\/+/
@@ -77,6 +78,10 @@ io.interceptors.request.use(
         _t: Math.random()
       })
     }
+    // pass language information to backend servers
+    config.params = Object.assign({}, config.params, {
+      'Accept-Language': i18n.globalScope.LOCALE
+    })
     return config
   }, error => {
     // Do something with request error

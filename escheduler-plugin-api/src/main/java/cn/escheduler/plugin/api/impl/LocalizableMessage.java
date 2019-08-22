@@ -18,6 +18,7 @@ package cn.escheduler.plugin.api.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -67,7 +68,9 @@ public class LocalizableMessage implements LocalizableString {
                 try {
                     ResourceBundle rb = ResourceBundle.getBundle(bundle, locale, classLoader);
                     if (rb.containsKey(id)) {
-                        templateToUse = rb.getString(id);
+                        // for Java 8, the property file is assumed to save as ISO-8859-1, but we want to support UTF-8 as well
+                        // so work around by the following convert
+                        templateToUse = new String(rb.getString(id).getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
                     } else if (!MISSING_KEY_WARNS.contains(bundle + " " + id)) {
                         MISSING_KEY_WARNS.add(bundle + " " + id);
                         LOG.warn("ResourceBundle '{}' does not have key '{}' via ClassLoader '{}'", bundle, id, classLoader);
