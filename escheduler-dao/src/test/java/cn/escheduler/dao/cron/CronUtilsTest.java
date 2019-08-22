@@ -52,7 +52,7 @@ public class CronUtilsTest {
                 .withSecond(on(0))
                 .instance();
         // Obtain the string expression
-        String cronAsString = cron.asString(); // 0 */5 * * * ? * 每5分钟一次
+        String cronAsString = cron.asString(); // 0 */5 * * * ? *  Every five minutes(每5分钟一次)
 
         Assert.assertEquals(cronAsString, "0 */5 * * * ? *");
 
@@ -124,7 +124,7 @@ public class CronUtilsTest {
                 "* * *//*5 ? * 2/1 *"};*/
         for(String minCrontab:cronArayy){
             if (!org.quartz.CronExpression.isValidExpression(minCrontab)) {
-                throw new RuntimeException(minCrontab+"验证失败,表达式无效");
+                throw new RuntimeException(minCrontab+" verify failure, cron expression not valid");
             }
             Cron cron = CronUtils.parse2Cron(minCrontab);
             CronField minField = cron.retrieve(CronFieldName.MINUTE);
@@ -171,7 +171,7 @@ public class CronUtilsTest {
             if(cycleEnum !=null){
                 logger.info(cycleEnum.name());
             }else{
-                logger.info("无法获取到scheduleType");
+                logger.info("can't get scheduleType");
             }
         }
 

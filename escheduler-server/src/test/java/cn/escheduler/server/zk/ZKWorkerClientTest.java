@@ -2,6 +2,7 @@ package cn.escheduler.server.zk;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.zk.AbstractZKClient;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -30,6 +31,7 @@ public class ZKWorkerClientTest {
 
         List<String> ipList = Arrays.asList(ips.split(","));
 
-        System.out.println(ipList);
+
+        Assert.assertEquals(1, ipList.size());
     }
 }
