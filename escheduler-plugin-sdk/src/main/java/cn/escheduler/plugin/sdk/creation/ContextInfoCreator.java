@@ -18,6 +18,7 @@ package cn.escheduler.plugin.sdk.creation;
 import cn.escheduler.plugin.api.Configuration;
 import cn.escheduler.plugin.sdk.runner.StageContext;
 import cn.escheduler.plugin.api.Stage;
+import org.slf4j.Logger;
 
 public class ContextInfoCreator {
 
@@ -49,7 +50,8 @@ public class ContextInfoCreator {
 
     public static StageContext createContext(
             String instanceName,
-            boolean isPreview
+            boolean isPreview,
+            Logger logger
     ) {
         return new StageContext(
                 instanceName,
@@ -75,7 +77,8 @@ public class ContextInfoCreator {
                     public boolean get(String name, boolean defaultValue) {
                         return false;
                     }
-                }
+                },
+                logger
         );
     }
 }

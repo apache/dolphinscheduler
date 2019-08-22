@@ -62,7 +62,7 @@ public class PluginTask extends AbstractTask {
             }
 
             // init source
-            Command.Context srcContext = ContextInfoCreator.createContext(pluginParameters.getStageConfig().getName() + "-instance", false);
+            Command.Context srcContext = ContextInfoCreator.createContext(pluginParameters.getStageConfig().getName() + "-instance", false, logger);
             Stage.Info srcInfo = ContextInfoCreator.createInfo(pluginParameters.getStageConfig().getName(), pluginParameters.getStageConfig().getStageVersion(), pluginParameters.getStageConfig().getName() + "-instance");
             List<ConfigIssue> srcInitResult = stage.init(srcInfo, srcContext);
 

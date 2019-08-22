@@ -30,7 +30,6 @@ import cn.escheduler.plugin.sdk.validation.Issue;
 import cn.escheduler.plugin.api.ConfigIssue;
 import cn.escheduler.plugin.api.ErrorCode;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -40,12 +39,12 @@ import java.util.Map;
  */
 public abstract class ProtoContext implements Stage.Context {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProtoContext.class);
     private static final String CUSTOM_METRICS_PREFIX = "custom.";
     protected static final String STAGE_CONF_PREFIX = "stage.conf_";
 
     private final Configuration configuration;
     protected final MetricRegistry metrics;
+    protected final Logger logger;
     protected final int runnerId;
     protected final String pipelineId;
     protected final String rev;
@@ -54,6 +53,7 @@ public abstract class ProtoContext implements Stage.Context {
     protected ProtoContext(
             Configuration configuration,
             MetricRegistry metrics,
+            Logger logger,
             String pipelineId,
             String rev,
             int runnerId,
@@ -61,6 +61,7 @@ public abstract class ProtoContext implements Stage.Context {
     ) {
         this.configuration = configuration;
         this.metrics = metrics;
+        this.logger = logger;
         this.pipelineId = pipelineId;
         this.rev = rev;
         this.runnerId = runnerId;
@@ -90,6 +91,11 @@ public abstract class ProtoContext implements Stage.Context {
     @Override
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;
     }
 
     @Override

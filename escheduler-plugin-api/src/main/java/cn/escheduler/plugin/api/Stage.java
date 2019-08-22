@@ -15,6 +15,8 @@
  */
 package cn.escheduler.plugin.api;
 
+import org.slf4j.Logger;
+
 import java.util.List;
 
 /**
@@ -109,6 +111,11 @@ public interface Stage<C extends Stage.Context> {
          * Stages have their own namespace, so method won't be able to return generic SDC configuration.
          */
         public Configuration getConfiguration();
+
+        /**
+         * Return Logger of this stage
+         */
+        public Logger getLogger();
 
         /**
          * Return user context associated with currently running pipeline.

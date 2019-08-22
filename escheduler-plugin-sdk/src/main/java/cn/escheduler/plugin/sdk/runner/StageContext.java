@@ -24,6 +24,7 @@ import cn.escheduler.plugin.sdk.util.ContainerError;
 
 import cn.escheduler.plugin.api.impl.ErrorMessage;
 import cn.escheduler.plugin.api.impl.Utils;
+import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.List;
@@ -47,11 +48,13 @@ public class StageContext extends ProtoContext implements
             final String instanceName,
             int runnerId,
             boolean isPreview,
-            Configuration configuration
+            Configuration configuration,
+            Logger logger
     ) {
         super(
                 configuration,
                 new MetricRegistry(),
+                logger,
                 "myPipeline",
                 "0",
                 0,
