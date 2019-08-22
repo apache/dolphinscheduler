@@ -86,8 +86,6 @@ public class SessionService extends BaseService{
     // logined
     List<Session> sessionList = sessionMapper.queryByUserId(user.getId());
 
-
-
     Date now = new Date();
 
     /**
