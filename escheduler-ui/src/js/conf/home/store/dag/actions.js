@@ -500,12 +500,12 @@ export default {
    * export definition
    */
   exportDefinition ({ state }, payload) {
-    const downloadBlob = (data, fileNameS = 'excel') => {
+    const downloadBlob = (data, fileNameS = 'json') => {
       if (!data) {
         return
       }
       let blob = new Blob([data])
-      let fileName = `${fileNameS}.xls`
+      let fileName = `${fileNameS}.json`
       if ('download' in document.createElement('a')) { // 不是IE浏览器
         let url = window.URL.createObjectURL(blob)
         let link = document.createElement('a')
