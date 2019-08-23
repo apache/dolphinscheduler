@@ -19,6 +19,7 @@ package cn.escheduler.api.service;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -30,6 +31,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+
+@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ExecutorServiceTest {

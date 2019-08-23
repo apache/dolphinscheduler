@@ -18,6 +18,7 @@ package cn.escheduler.alert.utils;
 
 import com.alibaba.fastjson.JSON;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ import java.util.Collection;
  *   enterprise.wechat.agent.id
  *   enterprise.wechat.users
  */
+@Ignore
 public class EnterpriseWeChatUtilsTest {
 
     private String agentId = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_AGENT_ID); // app id

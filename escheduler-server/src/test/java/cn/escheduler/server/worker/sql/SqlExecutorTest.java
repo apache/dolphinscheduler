@@ -29,6 +29,7 @@ import cn.escheduler.server.worker.task.TaskManager;
 import cn.escheduler.server.worker.task.TaskProps;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,7 @@ import java.util.Date;
 /**
  *  python shell command executor test
  */
+@Ignore
 public class SqlExecutorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlExecutorTest.class);

@@ -20,12 +20,14 @@ import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.model.Resource;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
+@Ignore
 public class UdfFuncMapperTest {
 
     private final Logger logger = LoggerFactory.getLogger(UdfFuncMapperTest.class);
