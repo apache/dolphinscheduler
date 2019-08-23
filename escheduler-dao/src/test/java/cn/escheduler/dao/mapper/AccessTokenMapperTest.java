@@ -16,18 +16,18 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.common.utils.EncryptionUtils;
 import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.model.AccessToken;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Date;
 import java.util.List;
 
 
-
+@Ignore
 public class AccessTokenMapperTest {
 
 
