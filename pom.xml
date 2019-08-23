@@ -111,8 +111,14 @@
 				<groupId>org.springframework</groupId>
 				<artifactId>spring-test</artifactId>
 				<version>${spring.version}</version>
+				<scope>test</scope>
 			</dependency>
-
+			<dependency>
+				<groupId>com.h2database</groupId>
+				<artifactId>h2</artifactId>
+				<version>1.3.163</version>
+				<scope>test</scope>
+			</dependency>
 
 			<dependency>
 				<groupId>cn.analysys</groupId>
@@ -440,8 +446,34 @@
 					<includes>
 						<include>**/*Test*.java</include><!--run test classes-->
 					</includes>
-					<skip>true</skip><!--skip run test classes-->
+					<!-- <skip>true</skip> -->
 				</configuration>
+			</plugin>
+
+			<!-- jenkins plugin jacoco report-->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.4</version>
+				<configuration>
+					<destFile>target/jacoco.exec</destFile>
+					<dataFile>target/jacoco.exec</dataFile>
+				</configuration>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 
