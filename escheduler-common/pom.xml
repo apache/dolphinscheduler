@@ -219,6 +219,10 @@
 					<artifactId>jaxb-api</artifactId>
 					<groupId>javax.xml.bind</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -262,6 +266,10 @@
 				<exclusion>
 					<artifactId>jersey-server</artifactId>
 					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -490,6 +498,26 @@
 				<exclusion>
 					<artifactId>antlr-runtime</artifactId>
 					<groupId>org.antlr</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hive-shims</artifactId>
+					<groupId>org.apache.hive</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsp-api</artifactId>
+					<groupId>javax.servlet</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j-api</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j-core</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j-web</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
