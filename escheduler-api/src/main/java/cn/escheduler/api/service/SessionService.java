@@ -68,7 +68,7 @@ public class SessionService extends BaseService{
     }
 
     String ip = BaseController.getClientIpAddress(request);
-    logger.info("get session: {}, ip: {}", sessionId, ip);
+    logger.debug("get session: {}, ip: {}", sessionId, ip);
 
     return sessionMapper.queryBySessionId(sessionId);
   }
