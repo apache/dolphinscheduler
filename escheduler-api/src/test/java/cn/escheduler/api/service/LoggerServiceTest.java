@@ -21,6 +21,7 @@ import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.dao.model.User;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class LoggerServiceTest {

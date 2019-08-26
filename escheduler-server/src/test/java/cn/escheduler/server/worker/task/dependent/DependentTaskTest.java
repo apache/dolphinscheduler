@@ -19,13 +19,16 @@ package cn.escheduler.server.worker.task.dependent;
 import cn.escheduler.common.Constants;
 import cn.escheduler.server.worker.task.TaskProps;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Ignore
 public class DependentTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(DependentTaskTest.class);
+
 
     @Test
     public void testDependInit(){
