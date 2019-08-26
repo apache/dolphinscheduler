@@ -31,6 +31,7 @@ import cn.escheduler.dao.model.Command;
 import cn.escheduler.dao.model.ProcessDefinition;
 import cn.escheduler.dao.utils.DagHelper;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ import java.util.Map;
 /**
  *  master test
  */
+@Ignore
 public class MasterCommandTest {
 
     private final Logger logger = LoggerFactory.getLogger(MasterCommandTest.class);
