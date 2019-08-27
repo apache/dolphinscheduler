@@ -28,7 +28,7 @@ A: Support most mailboxes, qq, 163, 126, 139, outlook, aliyun, etc. are supporte
 
 ## Q: What are the common system variable time parameters and how do I use them?
 
-A: Please refer to  https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C.html#%E7%B3%BB%E7%BB%9F%E5%8F%82%E6%95%B0
+A: Please refer to 'System parameter' in the system-manual 
 
 ---
 
@@ -46,7 +46,7 @@ A: Use **the administrator** to create a Worker group, **specify the Worker grou
 
 ## Q: Priority of the task
 
-A: We also support t**he priority of processes and tasks**. Priority We have five levels of **HIGHEST, HIGH, MEDIUM, LOW and LOWEST**. **You can set the priority between different process instances, or you can set the priority of different task instances in the same process instance.** For details, please refer to the task priority design https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.html#%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1
+A: We also support **the priority of processes and tasks**. Priority We have five levels of **HIGHEST, HIGH, MEDIUM, LOW and LOWEST**. **You can set the priority between different process instances, or you can set the priority of different task instances in the same process instance.** For details, please refer to the task priority design in the architecture-design.
 
 ----
 
@@ -163,7 +163,7 @@ A: **Note:** **Master monitors Master and Worker services.**
 
 ​    2，If the Worker service is lost, the Master will monitor that the Worker service is gone. If there is a Yarn task, the Kill Yarn task will be retried.
 
-Please see the fault-tolerant design for details：https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.html#%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1
+Please see the fault-tolerant design in the architecture for details.
 
 ---
 
@@ -189,7 +189,7 @@ A: Yes, **if the timing start and end time is the same time, then this timing wi
 
 A：	1, the task dependency between **DAG**, is **from the zero degree** of the DAG segmentation
 
-​	2, there are **task dependent nodes**, you can achieve cross-process tasks or process dependencies, please refer to the (DEPENDENT) node：https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C.html#%E4%BB%BB%E5%8A%A1%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B%E5%92%8C%E5%8F%82%E6%95%B0%E8%AE%BE%E7%BD%AE
+​	2, there are **task dependent nodes**, you can achieve cross-process tasks or process dependencies, please refer to the (DEPENDENT) node design in the system-manual. 
 
 ​	Note: **Cross-project processes or task dependencies are not supported**
 
@@ -248,7 +248,7 @@ If it is a Spark task --queue mode specifies the queue
 ## Q : Master or Worker reports the following alarm
 
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/master_worker_lack_res.png" width="60%" />
+   <img src="https://analysys.github.io/easyscheduler_docs/images/master_worker_lack_res.png" width="60%" />
  </p>
 
 
@@ -258,9 +258,8 @@ A ： Change the value of master.properties **master.reserved.memory** under con
 ## Q: The hive version is 1.1.0+cdh5.15.0, and the SQL hive task connection is reported incorrectly.
 
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/cdh_hive_error.png" width="60%" />
+   <img src="https://analysys.github.io/easyscheduler_docs/images/cdh_hive_error.png" width="60%" />
  </p>
-
 
 
 A ： Will hive pom
