@@ -18,6 +18,7 @@ package cn.escheduler.dao.mapper;
 
 import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.model.AccessToken;
+import cn.escheduler.dao.model.User;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,6 +59,8 @@ public class AccessTokenMapperTest {
 
         Assert.assertTrue( accessTokenList.size() >= 0);
     }
+
+
 
 
 }
