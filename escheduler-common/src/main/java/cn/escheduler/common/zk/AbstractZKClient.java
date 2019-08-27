@@ -373,7 +373,7 @@ public abstract class AbstractZKClient {
 				masterMap.putIfAbsent(server, new String(bytes));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("get server list failed : " + e.getMessage(), e);
 		}
 
 		return masterMap;
