@@ -130,8 +130,9 @@ public class SessionService extends BaseService{
 
   /**
    * sign out
+   * remove ip restrictions
    *
-   * @param ip
+   * @param ip   no use
    * @param loginUser
    */
   public void signOut(String ip, User loginUser) {
