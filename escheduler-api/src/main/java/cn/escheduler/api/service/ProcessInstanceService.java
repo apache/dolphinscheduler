@@ -574,6 +574,10 @@ public class ProcessInstanceService extends BaseDAGService {
 
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(processInstanceId);
 
+        if (processInstance == null) {
+            throw new RuntimeException("workflow instance is null");
+        }
+
         Map<String, String> timeParams = BusinessTimeUtils
                 .getBusinessTime(processInstance.getCmdTypeIfComplement(),
                         processInstance.getScheduleTime());

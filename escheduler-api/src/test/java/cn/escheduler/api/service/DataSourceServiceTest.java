@@ -16,13 +16,13 @@
  */
 package cn.escheduler.api.service;
 
+import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.common.enums.DbType;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.dao.model.User;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -33,9 +33,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Map;
 
-@Ignore
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class DataSourceServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(DataSourceServiceTest.class);
 
