@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * process definition controller test
  */
-
+@Ignore
 public class ProcessDefinitionControllerTest extends AbstractControllerTest{
 
     private static Logger logger = LoggerFactory.getLogger(ProcessDefinitionControllerTest.class);
