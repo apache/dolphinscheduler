@@ -26,7 +26,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-@Ignore
 public class HttpClientTest {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpClientTest.class);
@@ -46,7 +44,7 @@ public class HttpClientTest {
         CloseableHttpClient httpclient = HttpClients.createDefault();
 
         // create http post request
-        HttpPost httpPost = new HttpPost("http://127.0.0.1:12345/escheduler/projects/create");
+        HttpPost httpPost = new HttpPost("http://localhost:12345/escheduler/projects/create");
         httpPost.setHeader("token", "123");
         // set parameters
         List<NameValuePair> parameters = new ArrayList<NameValuePair>();
@@ -64,7 +62,7 @@ public class HttpClientTest {
             // eponse status code 200
             if (response.getStatusLine().getStatusCode() == 200) {
                 String content = EntityUtils.toString(response.getEntity(), "UTF-8");
-                System.out.println(content);
+                logger.info(content);
             }
         } finally {
             if (response != null) {
@@ -87,7 +85,7 @@ public class HttpClientTest {
        // parameters.add(new BasicNameValuePair("pageSize", "10"));
 
         // define the parameters of the request
-        URI uri = new URIBuilder("http://192.168.220.247:12345/escheduler/projects/%E5%85%A8%E9%83%A8%E6%B5%81%E7%A8%8B%E6%B5%8B%E8%AF%95/process/list")
+        URI uri = new URIBuilder("http://localhost:12345/escheduler/projects/%E5%85%A8%E9%83%A8%E6%B5%81%E7%A8%8B%E6%B5%8B%E8%AF%95/process/list")
                 .build();
 
         // create http GET request
@@ -129,7 +127,7 @@ public class HttpClientTest {
         parameters.add(new BasicNameValuePair("projectId", "0"));
 
         // define the parameters of the request
-        URI uri = new URIBuilder("http://192.168.220.247:12345/escheduler/projects/analysis/queue-count")
+        URI uri = new URIBuilder("http://localhost:12345/escheduler/projects/analysis/queue-count")
                  .setParameters(parameters)
                 .build();
 
