@@ -20,14 +20,12 @@ import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.model.Resource;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-@Ignore
 public class UdfFuncMapperTest {
 
     private final Logger logger = LoggerFactory.getLogger(UdfFuncMapperTest.class);
@@ -53,10 +51,14 @@ public class UdfFuncMapperTest {
         resource.setUpdateTime(new Date());
         resourceMapper.insert(resource);
         Assert.assertNotEquals(resource.getId(), 0);
+
+
         resource.setAlias("aa123");
         resourceMapper.update(resource);
         resource = resourceMapper.queryResourceById(resource.getId());
         Assert.assertEquals(resource.getAlias(), "aa123");
+
+
         int delete = resourceMapper.delete(resource.getId());
         Assert.assertEquals(delete, 1);
     }

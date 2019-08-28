@@ -14,38 +14,77 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.api.service;
+package cn.escheduler.api.controller;
 
 import cn.escheduler.api.ApiApplicationServer;
+import cn.escheduler.api.enums.Status;
+import cn.escheduler.api.service.SessionService;
+import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.UserType;
+import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.model.User;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.context.WebApplicationContext;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
-public class SessionServiceTest {
+public class AbstractControllerTest {
+    private static Logger logger = LoggerFactory.getLogger(AbstractControllerTest.class);
+    public static final String SESSION_ID = "sessionId";
 
-    private static final Logger logger = LoggerFactory.getLogger(SessionServiceTest.class);
+    protected MockMvc mockMvc;
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private SessionService sessionService;
 
-    @Test
-    public void createSession(){
+    protected User user;
+    protected String sessionId;
+
+    @Before
+    public void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        createSession();
+    }
+
+
+    @After
+    public void after(){
+        sessionService.signOut("127.0.0.1", user);
+    }
+
+
+    private void createSession(){
 
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
+        user = loginUser;
+
         String session = sessionService.createSession(loginUser, "127.0.0.1");
+        sessionId = session;
+
         Assert.assertTrue(StringUtils.isNotEmpty(session));
 
     }

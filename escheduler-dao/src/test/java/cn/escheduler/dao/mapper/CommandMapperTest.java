@@ -24,12 +24,13 @@ import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.model.Command;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
 
-@Ignore
+/**
+ * command test
+ */
 public class CommandMapperTest {
 
     CommandMapper commandMapper;

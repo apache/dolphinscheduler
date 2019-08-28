@@ -49,8 +49,12 @@ public class LoggerService {
    */
   public Result queryLog(int taskInstId, int skipLineNum, int limit) {
 
-
     TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+
+    if (taskInstance == null){
+      return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(), Status.TASK_INSTANCE_NOT_FOUND.getMsg());
+    }
+
     String host = taskInstance.getHost();
     if(StringUtils.isEmpty(host)){
       return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(), Status.TASK_INSTANCE_NOT_FOUND.getMsg());
