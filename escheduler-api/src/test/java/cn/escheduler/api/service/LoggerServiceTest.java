@@ -16,12 +16,12 @@
  */
 package cn.escheduler.api.service;
 
+import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.dao.model.User;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -30,9 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@Ignore
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class LoggerServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(LoggerServiceTest.class);
 
@@ -45,7 +44,9 @@ public class LoggerServiceTest {
         User loginUser = new User();
         loginUser.setId(27);
         loginUser.setUserType(UserType.GENERAL_USER);
-        Result result = loggerService.queryLog(6007, 0, 100);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+
+        Result result = loggerService.queryLog(-1, 0, 100);
+
+        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(),result.getCode().intValue());
     }
 }
