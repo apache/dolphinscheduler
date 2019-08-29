@@ -21,6 +21,7 @@ import org.apache.zookeeper.server.ServerConfig;
 import org.apache.zookeeper.server.ZooKeeperServerMain;
 import org.apache.zookeeper.server.quorum.QuorumPeerConfig;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,7 @@ import java.util.Properties;
 /**
  * just for test
  */
+@Ignore
 public class StandaloneZKServerForTest {
 
     private static final Logger logger = LoggerFactory.getLogger(StandaloneZKServerForTest.class);
