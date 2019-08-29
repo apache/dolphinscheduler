@@ -22,47 +22,29 @@ import cn.escheduler.common.enums.ResourceType;
 import cn.escheduler.common.utils.JSONUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Ignore
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class ResourcesControllerTest {
+/**
+ * resources controller test
+ */
+public class ResourcesControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(ResourcesControllerTest.class);
 
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
     @Test
     public void querytResourceList() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(get("/resources/list")
-                .header("sessionId", "08fae8bf-fe2d-4fc0-8129-23c37fbfac82")
+                .header(SESSION_ID, sessionId)
                 .param("type", ResourceType.FILE.name()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -84,7 +66,7 @@ public class ResourcesControllerTest {
         paramsMap.add("type","FILE");
 
         MvcResult mvcResult = mockMvc.perform(get("/resources/verify-name")
-                .header("sessionId", "c24ed9d9-1c20-48a0-bd9c-5cfca14a4dcb")
+                .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -92,7 +74,7 @@ public class ResourcesControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.TENANT_NOT_EXIST.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }
