@@ -1,10 +1,11 @@
-# Front End Deployment Document
+# frontend-deployment
 
 The front-end has three deployment modes: automated deployment, manual deployment and compiled source deployment.
 
 
 
-## 1、Preparations
+## Preparations
+
 #### Download the installation package
 
 Please download the latest version of the installation package, download address： [gitee](https://gitee.com/easyscheduler/EasyScheduler/attach_files/)
@@ -14,10 +15,11 @@ After downloading escheduler-ui-x.x.x.tar.gz，decompress`tar -zxvf escheduler-u
 
 
 
-## 2、Deployment
+## Deployment
+
 Automated deployment is recommended for either of the following two ways
 
-### 2.1 Automated Deployment
+### Automated Deployment
 
 Edit the installation file`vi install-escheduler-ui.sh` in the` escheduler-ui` directory
 
@@ -36,7 +38,7 @@ esc_proxy_port="http://192.168.xx.xx:12345"
 under this directory, execute`./install-escheduler-ui.sh` 
 
 
-### 2.2 Manual Deployment
+### Manual Deployment
 
 Install epel source `yum install epel-release -y`
 
@@ -44,10 +46,13 @@ Install Nginx `yum install nginx -y`
 
 
 > ####  Nginx configuration file address
+
 ```
 /etc/nginx/conf.d/default.conf
 ```
+
 > ####  Configuration information (self-modifying)
+
 ```
 server {
     listen       8888;# access port
@@ -81,7 +86,9 @@ server {
     }
 }
 ```
+
 > ####  Restart the Nginx service
+
 ```
 systemctl restart nginx
 ```
@@ -95,9 +102,11 @@ systemctl restart nginx
 - status `systemctl status nginx`
 
 
-## Front-end Frequently Asked Questions
-####  1.Upload file size limit
+## FAQ
+#### Upload file size limit
+
 Edit the configuration file `vi /etc/nginx/nginx.conf`
+
 ```
 # change upload size
 client_max_body_size 1024m
