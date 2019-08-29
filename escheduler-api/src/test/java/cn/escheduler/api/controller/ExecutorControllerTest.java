@@ -20,6 +20,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.utils.JSONUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * executor controller test
  */
+@Ignore
 public class ExecutorControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(ExecutorControllerTest.class);
 
@@ -44,7 +46,7 @@ public class ExecutorControllerTest extends AbstractControllerTest{
     public void startCheckProcessDefinition() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/start-check","project_test1")
-                .header("sessionId", "08fae8bf-fe2d-4fc0-8129-23c37fbfac82")
+                .header(SESSION_ID, sessionId)
                 .param("processDefinitionId","226"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -59,9 +61,8 @@ public class ExecutorControllerTest extends AbstractControllerTest{
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         //paramsMap.add("processDefinitionId","4");
         paramsMap.add("processInstanceId","13");
-        //paramsMap.add("processInstanceId","13");
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/executors/get-receiver-cc","li_sql_test")
-                .header("sessionId", "e79b3353-e227-4680-88c0-544194e64025")
+                .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))

@@ -20,6 +20,7 @@ import cn.escheduler.common.enums.UserType;
 import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.model.AccessToken;
 import cn.escheduler.dao.model.User;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +44,14 @@ public class UserMapperTest {
         accessTokenMapper = ConnectionFactory.getSqlSession().getMapper(AccessTokenMapper.class);
     }
 
+
+    @After
+    public void testDelete() {
+        int delete = userMapper.delete(userId);
+        Assert.assertTrue(delete >= 0);
+    }
+
+
     @Test
     public void testInsert(){
         User user = new User();
@@ -57,7 +66,7 @@ public class UserMapperTest {
         userMapper.insert(user);
         Assert.assertNotEquals(user.getId(), 0);
 
-        user.setUserName("Dr.chemistry" + new Random().nextInt(10));
+        user.setUserName("Dr.chemistry" + new Date().getTime());
         int update = userMapper.update(user);
         Assert.assertEquals(update, 1);
 
@@ -88,9 +97,5 @@ public class UserMapperTest {
     }
 
 
-    @Test
-    public void testDelete() {
-        int delete = userMapper.delete(userId);
-        Assert.assertTrue(delete >= 0);
-    }
+
 }
