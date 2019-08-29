@@ -268,12 +268,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-email</artifactId>
-				<version>1.2</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.mail</groupId>
-				<artifactId>mail</artifactId>
-				<version>1.4.5</version>
+				<version>1.5</version>
 			</dependency>
 
 			<!--excel poi-->
@@ -379,6 +374,12 @@
 				<groupId>com.microsoft.sqlserver</groupId>
 				<artifactId>mssql-jdbc</artifactId>
 				<version>6.1.0.jre8</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jsp-2.1</artifactId>
+				<version>6.1.14</version>
 			</dependency>
 
 		</dependencies>
