@@ -45,7 +45,7 @@ public class ProcessInstanceServiceTest {
     ProcessInstanceService processInstanceService;
 
     @Test
-    public void viewVariables() throws Exception {
+    public void viewVariables() {
         try {
             Map<String, Object> map = processInstanceService.viewVariables(-1);
             Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
