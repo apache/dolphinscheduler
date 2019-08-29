@@ -21,12 +21,13 @@ import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.model.AlertGroup;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Date;
 
-@Ignore
+/**
+ * alert group
+ */
 public class AlertGroupMapperTest {
 
 
@@ -48,11 +49,16 @@ public class AlertGroupMapperTest {
         alertGroup.setUpdateTime(new Date());
         alertGroup.setCreateTime(new Date());
         alertGroupMapper.insert(alertGroup);
+
         Assert.assertNotEquals(alertGroup.getId(), 0);
+
         alertGroup.setDesc("test alert group");
         alertGroupMapper.update(alertGroup);
+
         alertGroup = alertGroupMapper.queryById(alertGroup.getId());
         Assert.assertEquals(alertGroup.getDesc(), "test alert group");
+
+
         int delete = alertGroupMapper.delete(alertGroup.getId());
         Assert.assertEquals(delete, 1);
 

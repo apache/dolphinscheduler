@@ -16,11 +16,11 @@
  */
 package cn.escheduler.api.service;
 
+import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.dao.model.User;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -29,10 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@Ignore
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class SessionServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(SessionServiceTest.class);
 
     @Autowired
@@ -42,7 +42,7 @@ public class SessionServiceTest {
     public void createSession(){
 
         User loginUser = new User();
-        loginUser.setId(27);
+        loginUser.setId(1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         String session = sessionService.createSession(loginUser, "127.0.0.1");
