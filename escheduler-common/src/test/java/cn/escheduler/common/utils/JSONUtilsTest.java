@@ -20,10 +20,13 @@ import cn.escheduler.common.enums.DataType;
 import cn.escheduler.common.enums.Direct;
 import cn.escheduler.common.process.Property;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +89,70 @@ public class JSONUtilsTest {
         return resultJson;
     }
 
+    @Test
+    public void testToJson() {
+        Map<String, String> map = new HashMap<>();
+        map.put("foo","bar");
 
+        Assert.assertEquals("{\"foo\":\"bar\"}", JSONUtils.toJson(map));
+        Assert.assertEquals(
+                String.valueOf((Object) null), JSONUtils.toJson(null));
+    }
 
+    @Test
+    public void testParseObject() {
+        Assert.assertEquals("{\"foo\":\"bar\"}", JSONUtils.parseObject(
+                "{\n" + "\"foo\": \"bar\",\n" + "}", String.class));
 
+        Assert.assertNull(JSONUtils.parseObject("", null));
+        Assert.assertNull(JSONUtils.parseObject("foo", String.class));
+    }
+
+    @Test
+    public void testToList() {
+        Assert.assertEquals(new ArrayList(),
+                JSONUtils.toList("A1B2C3", null));
+        Assert.assertEquals(new ArrayList(),
+                JSONUtils.toList("", null));
+    }
+
+    @Test
+    public void testCheckJsonVaild() {
+        Assert.assertTrue(JSONUtils.checkJsonVaild("3"));
+        Assert.assertFalse(JSONUtils.checkJsonVaild(""));
+    }
+
+    @Test
+    public void testFindValue() {
+        Assert.assertNull(JSONUtils.findValue(
+                new ArrayNode(new JsonNodeFactory(true)), null));
+    }
+
+    @Test
+    public void testToMap() {
+        Map<String, String> map = new HashMap<>();
+        map.put("foo","bar");
+
+        Assert.assertTrue(map.equals(JSONUtils.toMap(
+                "{\n" + "\"foo\": \"bar\",\n" + "}")));
+
+        Assert.assertFalse(map.equals(JSONUtils.toMap(
+                "{\n" + "\"bar\": \"foo\",\n" + "}")));
+
+        Assert.assertNull(JSONUtils.toMap("3"));
+        Assert.assertNull(JSONUtils.toMap(null));
+        Assert.assertNull(JSONUtils.toMap("3", null, null));
+        Assert.assertNull(JSONUtils.toMap(null, null, null));
+    }
+
+    @Test
+    public void testToJsonString() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("foo", "bar");
+
+        Assert.assertEquals("{\"foo\":\"bar\"}",
+                JSONUtils.toJsonString(map));
+        Assert.assertEquals(String.valueOf((Object) null),
+                JSONUtils.toJsonString(null));
+    }
 }
