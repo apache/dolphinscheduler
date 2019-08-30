@@ -18,6 +18,7 @@ package cn.escheduler.server.worker.log;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.sift.AbstractDiscriminator;
+import cn.escheduler.server.utils.LoggerUtils;
 
 public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
 
@@ -29,9 +30,8 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
      */
     public String getDiscriminatingValue(ILoggingEvent event) {
         String loggerName = event.getLoggerName();
-        String prefix = "TaskLogInfo-";
-        if (loggerName.startsWith(prefix)) {
-            return loggerName.substring(prefix.length());
+        if (loggerName.startsWith(LoggerUtils.TASK_LOGGER_INFO_PREFIX)) {
+            return loggerName.substring(LoggerUtils.TASK_LOGGER_INFO_PREFIX.length());
         } else {
             return "unknown_task";
         }
