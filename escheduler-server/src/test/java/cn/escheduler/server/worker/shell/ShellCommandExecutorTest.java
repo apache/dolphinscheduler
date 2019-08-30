@@ -23,7 +23,6 @@ import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.TaskInstance;
 import cn.escheduler.server.utils.LoggerUtils;
-import cn.escheduler.server.worker.log.TaskLogger;
 import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.TaskManager;
 import cn.escheduler.server.worker.task.TaskProps;
@@ -43,7 +42,6 @@ import java.util.Date;
 public class ShellCommandExecutorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellCommandExecutorTest.class);
-    private static final String TASK_PREFIX = "TASK";
 
     private ProcessDao processDao = null;
 
@@ -75,7 +73,7 @@ public class ShellCommandExecutorTest {
 
 
         // custom logger
-        TaskLogger taskLogger = new TaskLogger(LoggerUtils.buildTaskId(TASK_PREFIX,
+        Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                 taskInstance.getProcessDefinitionId(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId()));
