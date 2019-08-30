@@ -17,20 +17,36 @@
 package cn.escheduler.server.worker.log;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.filter.Filter;
-import ch.qos.logback.core.spi.FilterReply;
-import cn.escheduler.server.utils.LoggerUtils;
+import ch.qos.logback.core.sift.AbstractDiscriminator;
 
-/**
- *  task log filter
- */
-public class TaskLogFilter extends Filter<ILoggingEvent> {
+public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
+
+    private String key;
+
+    /**
+     * logger name should be like:
+     *     Task Logger name should be like: TaskLogInfo-{processDefinitionId}/{processInstanceId}/{taskInstanceId}
+     */
+    public String getDiscriminatingValue(ILoggingEvent event) {
+        String loggerName = event.getLoggerName();
+        String prefix = "TaskLogInfo-";
+        if (loggerName.startsWith(prefix)) {
+            return loggerName.substring(prefix.length());
+        } else {
+            return "unknown_task";
+        }
+    }
 
     @Override
-    public FilterReply decide(ILoggingEvent event) {
-        if (event.getLoggerName().startsWith(LoggerUtils.TASK_LOGGER_INFO_PREFIX)) {
-            return FilterReply.ACCEPT;
-        }
-        return FilterReply.DENY;
+    public void start() {
+        started = true;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
