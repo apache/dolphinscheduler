@@ -213,6 +213,8 @@ public enum Status {
     BATCH_DELETE_PROCESS_DEFINE_ERROR(50025,"batch delete process definition error"),
     BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR(50026,"batch delete process definition by ids {0} error"),
     TENANT_NOT_SUITABLE(50027,"there is not any tenant suitable, please choose a tenant available."),
+    EXPORT_PROCESS_DEFINE_BY_ID_ERROR(50028,"export process definition by id error"),
+    IMPORT_PROCESS_DEFINE_ERROR(50029,"import process definition error"),
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
     HDFS_TERANT_RESOURCES_FILE_EXISTS(60002,"resource file exists,please delete resource first"),

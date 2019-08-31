@@ -226,6 +226,22 @@ public class JSONUtils {
     }
   }
 
+  public static JSONObject parseObject(String text) {
+    try{
+      return JSONObject.parseObject(text);
+    } catch (Exception e) {
+      throw new RuntimeException("Json deserialization exception.", e);
+    }
+  }
+
+  public static JSONArray parseArray(String text) {
+    try{
+      return JSONObject.parseArray(text);
+    } catch (Exception e) {
+      throw new RuntimeException("Json deserialization exception.", e);
+    }
+  }
+
 
 
   /**
