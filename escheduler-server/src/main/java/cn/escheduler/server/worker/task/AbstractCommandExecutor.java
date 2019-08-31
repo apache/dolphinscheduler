@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -347,7 +348,8 @@ public abstract class AbstractCommandExecutor {
      */
     private void parseProcessOutput(Process process) {
         String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskAppId);
-        ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName).submit(new Runnable(){
+        ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
+        parseProcessOutputExecutorService.submit(new Runnable(){
             @Override
             public void run() {
                 BufferedReader inReader = null;
@@ -373,7 +375,7 @@ public abstract class AbstractCommandExecutor {
                 }
             }
         });
-
+        parseProcessOutputExecutorService.shutdown();
     }
 
     public int getPid() {
