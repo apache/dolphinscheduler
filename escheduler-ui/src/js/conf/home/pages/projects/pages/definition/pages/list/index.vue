@@ -4,6 +4,8 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <x-button type="ghost" size="small"  @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</x-button>
+          <x-button type="ghost" size="small"  @click="_uploading">{{$t('Import process')}}</x-button>
+
         </template>
       </m-conditions>
     </template>
@@ -32,6 +34,7 @@
   import mConditions from '@/module/components/conditions/conditions'
   import mSecondaryMenu from '@/module/components/secondaryMenu/secondaryMenu'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
+  import { findComponentDownward } from '@/module/util/'
 
   export default {
     name: 'definition-list-index',
@@ -53,6 +56,12 @@
     },
     methods: {
       ...mapActions('dag', ['getProcessListP']),
+      /**
+       * File Upload
+       */
+      _uploading () {
+        findComponentDownward(this.$root, 'roof-nav')._fileUpdate('DEFINITION')
+      },
       /**
        * page
        */
@@ -82,6 +91,11 @@
       },
       _onUpdate () {
         this._debounceGET('false')
+      },
+      _updateList () {
+        this.searchParams.pageNo = 1
+        this.searchParams.searchVal = ''
+        this._debounceGET()
       }
     },
     watch: {
