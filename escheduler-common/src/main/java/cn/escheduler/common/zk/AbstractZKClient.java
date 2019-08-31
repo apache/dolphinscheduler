@@ -60,11 +60,6 @@ public abstract class AbstractZKClient {
 	protected  CuratorFramework zkClient = null;
 
 	/**
-	 *  server node parent path
-	 */
-	protected String deadServerZNodeParentPath = null;
-
-	/**
 	 * server stop or not
 	 */
 	protected IStoppable stoppable = null;
@@ -190,7 +185,7 @@ public abstract class AbstractZKClient {
 		String ipSeqNo = zNodesPath[zNodesPath.length - 1];
 
 		String type = serverType.equals(MASTER_PREFIX) ? MASTER_PREFIX : WORKER_PREFIX;
-		String deadServerPath = deadServerZNodeParentPath + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
+		String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
 
 		if(zkClient.checkExists().forPath(zNode) == null ||
 				zkClient.checkExists().forPath(deadServerPath) != null ){
@@ -203,10 +198,10 @@ public abstract class AbstractZKClient {
 
 
 	public void removeDeadServerByHost(String host, String serverType) throws Exception {
-        List<String> deadServers = zkClient.getChildren().forPath(deadServerZNodeParentPath);
+        List<String> deadServers = zkClient.getChildren().forPath(getDeadZNodeParentPath());
         for(String serverPath : deadServers){
             if(serverPath.startsWith(serverType+UNDERLINE+host)){
-				String server = deadServerZNodeParentPath + SINGLE_SLASH + serverPath;
+				String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
 				zkClient.delete().forPath(server);
                 logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
             }
@@ -245,7 +240,7 @@ public abstract class AbstractZKClient {
 					zkNodeType.toString(), host);
 			return registerPath;
 		}
-		registerPath = createZNodePath(ZKNodeType.MASTER);
+		registerPath = createZNodePath(zkNodeType);
         logger.info("register {} node {} success", zkNodeType.toString(), registerPath);
 
         // handle dead server
@@ -278,7 +273,7 @@ public abstract class AbstractZKClient {
 			removeDeadServerByHost(ip, type);
 
 		}else if(opType.equals(ADD_ZK_OP)){
-			String deadServerPath = deadServerZNodeParentPath + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
+			String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
 			if(zkClient.checkExists().forPath(deadServerPath) == null){
 				//add dead server info to zk dead server path : /dead-servers/
 
@@ -373,7 +368,7 @@ public abstract class AbstractZKClient {
 				masterMap.putIfAbsent(server, new String(bytes));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("get server list failed : " + e.getMessage(), e);
 		}
 
 		return masterMap;

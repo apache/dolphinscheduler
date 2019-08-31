@@ -1,6 +1,7 @@
 package cn.escheduler.server.worker;
 
 import org.apache.commons.lang.StringUtils;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,18 +10,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/**
- * Created by qiaozhanwei on 2019/4/15.
- */
+
 public class EnvFileTest {
 
     private static  final Logger logger = LoggerFactory.getLogger(EnvFileTest.class);
 
-    public static void main(String[] args) {
-        String path = System.getProperty("user.dir")+"\\script\\env\\.escheduler_env.sh";
+    @Test
+    public void test() {
+        String path = System.getProperty("user.dir")+"/script/env/.escheduler_env.sh";
         String pythonHome = getPythonHome(path);
         logger.info(pythonHome);
-
     }
 
     /**
