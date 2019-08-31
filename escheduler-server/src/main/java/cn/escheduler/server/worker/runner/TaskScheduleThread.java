@@ -40,7 +40,6 @@ import cn.escheduler.dao.model.TaskInstance;
 import cn.escheduler.dao.model.Tenant;
 import cn.escheduler.server.utils.LoggerUtils;
 import cn.escheduler.server.utils.ParamUtils;
-import cn.escheduler.server.worker.log.TaskLogger;
 import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.TaskManager;
 import cn.escheduler.server.worker.task.TaskProps;
@@ -65,11 +64,6 @@ public class TaskScheduleThread implements Runnable {
      * logger
      */
     private final Logger logger = LoggerFactory.getLogger(TaskScheduleThread.class);
-
-    /**
-     * task prefix
-     */
-    private static final String TASK_PREFIX = "TASK";
 
     /**
      *  task instance
@@ -147,7 +141,7 @@ public class TaskScheduleThread implements Runnable {
                         taskInstance.getId()));
 
                 // custom logger
-                TaskLogger taskLogger = new TaskLogger(LoggerUtils.buildTaskId(TASK_PREFIX,
+                Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                         taskInstance.getProcessDefine().getId(),
                         taskInstance.getProcessInstance().getId(),
                         taskInstance.getId()));
