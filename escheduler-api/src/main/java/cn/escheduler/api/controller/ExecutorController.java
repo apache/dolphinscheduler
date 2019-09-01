@@ -92,8 +92,8 @@ public class ExecutorController extends BaseController {
             logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
                             + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
                             + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroupId: {}, timeout: {}",
-                    loginUser.getUserName(), projectName, processDefinitionId, scheduleTime, failureStrategy,
-                    taskDependType, warningType, warningGroupId,receivers,receiversCc,runMode,processInstancePriority,
+                    loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
+                    failureStrategy, startNodeList, taskDependType, warningType, warningGroupId,receivers,receiversCc,runMode,processInstancePriority,
                     workerGroupId, timeout);
 
             if (timeout == null) {
