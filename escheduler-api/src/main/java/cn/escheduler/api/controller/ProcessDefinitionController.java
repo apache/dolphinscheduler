@@ -30,9 +30,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 import static cn.escheduler.api.enums.Status.*;
+import static cn.escheduler.api.enums.Status.EXPORT_PROCESS_DEFINE_BY_ID_ERROR;
 
 
 /**
@@ -427,6 +429,33 @@ public class ProcessDefinitionController extends BaseController{
         }catch (Exception e){
             logger.error(BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(),e);
             return error(Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getCode(), Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * export process definition by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionId
+     * @return
+     */
+    @ApiOperation(value = "exportProcessDefinitionById", notes= "EXPORT_PROCCESS_DEFINITION_BY_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+    })
+    @GetMapping(value="/export")
+    @ResponseBody
+    public void exportProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @PathVariable String projectName,
+                                            @RequestParam("processDefinitionId") Integer processDefinitionId,
+                                            HttpServletResponse response){
+        try{
+            logger.info("export process definition by id, login user:{}, project name:{}, process definition id:{}",
+                    loginUser.getUserName(), projectName, processDefinitionId);
+            processDefinitionService.exportProcessDefinitionById(loginUser, projectName, processDefinitionId,response);
+        }catch (Exception e){
+            logger.error(EXPORT_PROCESS_DEFINE_BY_ID_ERROR.getMsg(),e);
         }
     }
 
