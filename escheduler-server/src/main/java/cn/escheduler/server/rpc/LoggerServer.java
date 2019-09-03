@@ -100,14 +100,6 @@ public class LoggerServer {
             StringBuilder sb = new StringBuilder();
             boolean errorLineFlag = false;
             for (String line : list){
-//                if (line.contains("TaskLogger")){
-//                    errorLineFlag = filterLine(request.getPath(),line);
-//                }
-//
-//                if (!errorLineFlag || !line.contains("TaskLogger")){
-//                    sb.append(line + "\r\n");
-//                }
-
                 sb.append(line + "\r\n");
             }
             RetStrInfo retInfoBuild = RetStrInfo.newBuilder().setMsg(sb.toString()).build();
@@ -206,14 +198,6 @@ public class LoggerServer {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
             boolean errorLineFlag = false;
             while ((line = br.readLine()) != null){
-//                if (line.contains("TaskLogger")){
-//                    errorLineFlag = filterLine(path,line);
-//                }
-//
-//                if (!errorLineFlag || !line.contains("TaskLogger")){
-//                    sb.append(line + "\r\n");
-//                }
-
                 sb.append(line + "\r\n");
             }
 
@@ -231,22 +215,5 @@ public class LoggerServer {
         }
         return null;
     }
-
-
-//    /**
-//     *
-//     * @param path
-//     * @param line
-//     * @return
-//     */
-//    private static boolean filterLine(String path,String line){
-//        String removeSuffix = path.substring(0, path.length() - 4);
-//        String[] strArrs = removeSuffix.split("/");
-//        String taskAppId = String.format("%s_%s_%s",
-//                strArrs[strArrs.length - 3],
-//                strArrs[strArrs.length-2],
-//                strArrs[strArrs.length - 1]);
-//        return !line.contains(taskAppId);
-//    }
 
 }
