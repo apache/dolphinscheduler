@@ -53,7 +53,8 @@ public class LoggerUtils {
                                   int processDefId,
                                   int processInstId,
                                   int taskId){
-        return String.format("%s-%s-%s-%s",affix,
+        // - [taskAppId=TASK_79_4084_15210]
+        return String.format(" - [taskAppId=%s-%s-%s-%s]",affix,
                 processDefId,
                 processInstId,
                 taskId);
