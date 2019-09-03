@@ -35,6 +35,11 @@ public class LoggerUtils {
     private static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
 
     /**
+     * Task Logger's prefix
+     */
+    public static final String TASK_LOGGER_INFO_PREFIX = "TaskLogInfo";
+
+    /**
      *  build job id
      * @param affix
      * @param processDefId
@@ -46,7 +51,7 @@ public class LoggerUtils {
                                   int processDefId,
                                   int processInstId,
                                   int taskId){
-        return String.format("%s_%s_%s_%s",affix,
+        return String.format("%s-%s/%s/%s",affix,
                 processDefId,
                 processInstId,
                 taskId);

@@ -15,10 +15,10 @@
           <th width="50">
             <span>{{$t('State')}}</span>
           </th>
-          <th width="140">
+          <th width="130">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th width="140">
+          <th width="130">
             <span>{{$t('Update Time')}}</span>
           </th>
           <th>
@@ -27,7 +27,7 @@
           <th width="90">
             <span>{{$t('Timing state')}}</span>
           </th>
-          <th width="220">
+          <th width="240">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -86,6 +86,8 @@
               </template>
             </x-poptip>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('TreeView')" @click="_treeView(item)"  icon="iconfont icon-juxingkaobei"><!--{{$t('树形图')}}--></x-button>
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Export')" @click="_export(item)"  icon="iconfont icon-download"><!--{{$t('导出')}}--></x-button>
+
           </td>
         </tr>
       </table>
@@ -129,7 +131,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition']),
+      ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition']),
       _rtPublishStatus (code) {
         return _.filter(publishStatus, v => v.code === code)[0].desc
       },
@@ -274,6 +276,14 @@
         this._upProcessState({
           processId: item.id,
           releaseState: 1
+        })
+      },
+      _export (item) {
+        this.exportDefinition({
+          processDefinitionId: item.id,
+          processDefinitionName: item.name
+        }).catch(e => {
+          this.$message.error(e.msg || '')
         })
       },
       /**

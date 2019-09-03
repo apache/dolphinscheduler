@@ -68,7 +68,7 @@ public class SessionService extends BaseService{
     }
 
     String ip = BaseController.getClientIpAddress(request);
-    logger.info("get session: {}, ip: {}", sessionId, ip);
+    logger.debug("get session: {}, ip: {}", sessionId, ip);
 
     return sessionMapper.queryBySessionId(sessionId);
   }
@@ -130,8 +130,9 @@ public class SessionService extends BaseService{
 
   /**
    * sign out
+   * remove ip restrictions
    *
-   * @param ip
+   * @param ip   no use
    * @param loginUser
    */
   public void signOut(String ip, User loginUser) {

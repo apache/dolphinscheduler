@@ -20,49 +20,33 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.utils.JSONUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * executor controller test
+ */
 @Ignore
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class ExecutorControllerTest {
+public class ExecutorControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(ExecutorControllerTest.class);
 
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
 
     @Test
     public void startCheckProcessDefinition() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/start-check","project_test1")
-                .header("sessionId", "08fae8bf-fe2d-4fc0-8129-23c37fbfac82")
+                .header(SESSION_ID, sessionId)
                 .param("processDefinitionId","226"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -77,9 +61,8 @@ public class ExecutorControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         //paramsMap.add("processDefinitionId","4");
         paramsMap.add("processInstanceId","13");
-        //paramsMap.add("processInstanceId","13");
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/executors/get-receiver-cc","li_sql_test")
-                .header("sessionId", "e79b3353-e227-4680-88c0-544194e64025")
+                .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))

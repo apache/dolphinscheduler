@@ -344,9 +344,12 @@ public abstract class AbstractZKClient {
 		String parentPath = getZNodeParentPath(zkNodeType);
 
 		List<MasterServer> masterServers = new ArrayList<>();
+		int i = 0;
 		for(String path : masterMap.keySet()){
 			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(masterMap.get(path));
 			masterServer.setZkDirectory( parentPath + "/"+ path);
+			masterServer.setId(i);
+			i ++;
 			masterServers.add(masterServer);
 		}
 		return masterServers;
@@ -368,7 +371,7 @@ public abstract class AbstractZKClient {
 				masterMap.putIfAbsent(server, new String(bytes));
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("get server list failed : " + e.getMessage(), e);
 		}
 
 		return masterMap;
