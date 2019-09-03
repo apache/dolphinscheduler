@@ -362,10 +362,7 @@ public abstract class AbstractCommandExecutor {
                     long lastFlushTime = System.currentTimeMillis();
 
                     while ((line = inReader.readLine()) != null) {
-                        if(checkShowLog(line)){
-                            logBuffer.add(line);
-                        }
-
+                        logBuffer.add(line);
                         lastFlushTime = flush(lastFlushTime);
                     }
                 } catch (Exception e) {
@@ -567,7 +564,6 @@ public abstract class AbstractCommandExecutor {
 
     protected abstract String buildCommandFilePath();
     protected abstract String commandType();
-    protected abstract boolean checkShowLog(String line);
     protected abstract boolean checkFindApp(String line);
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 }
