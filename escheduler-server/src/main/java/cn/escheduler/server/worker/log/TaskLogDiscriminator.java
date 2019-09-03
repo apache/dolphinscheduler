@@ -24,6 +24,8 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
 
     private String key;
 
+    private String logBase;
+
     /**
      * logger name should be like:
      *     Task Logger name should be like: TaskLogInfo-{processDefinitionId}/{processInstanceId}/{taskInstanceId}
@@ -33,7 +35,7 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
         String loggerName = event.getLoggerName();
         String prefix = LoggerUtils.TASK_LOGGER_INFO_PREFIX + "-";
         if (loggerName.startsWith(prefix)) {
-            return loggerName.substring(prefix.length());
+            return loggerName.substring(prefix.length()).replace("-","/");
         } else {
             return "unknown_task";
         }
@@ -50,6 +52,14 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
     }
 
     public void setKey(String key) {
-        this.key = key.replace("-","/");
+        this.key = key;
+    }
+
+    public String getLogBase() {
+        return logBase;
+    }
+
+    public void setLogBase(String logBase) {
+        this.logBase = logBase;
     }
 }

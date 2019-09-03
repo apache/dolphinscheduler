@@ -112,13 +112,7 @@ public class TaskScheduleThread implements Runnable {
 
             // get tenant info
             Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
-                                                    processDefine.getUserId());
-
-            String key = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
-                    .getLogger("ROOT")
-                    .getAppender("TASKLOGFILE"))
-                    .getDiscriminator()).getKey();
-
+                    processDefine.getUserId());
 
             if(tenant == null){
                 logger.error("cannot find the tenant, process definition id:{}, user id:{}",
@@ -229,8 +223,18 @@ public class TaskScheduleThread implements Runnable {
      * @return
      */
     private String getTaskLogPath() {
+        String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+                .getLogger("ROOT")
+                .getAppender("TASKLOGFILE"))
+                .getDiscriminator()).getLogBase();
+        if (baseLog.startsWith(Constants.SINGLE_SLASH)){
+            return baseLog + Constants.SINGLE_SLASH +
+                    taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
+                    taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                    taskInstance.getId() + ".log";
+        }
         return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-                "logs" +  Constants.SINGLE_SLASH +
+                baseLog +  Constants.SINGLE_SLASH +
                 taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
                 taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
                 taskInstance.getId() + ".log";
