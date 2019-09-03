@@ -17,6 +17,8 @@
 package cn.escheduler.server.worker.runner;
 
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.sift.SiftingAppender;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.enums.TaskRecordStatus;
@@ -40,6 +42,7 @@ import cn.escheduler.dao.model.TaskInstance;
 import cn.escheduler.dao.model.Tenant;
 import cn.escheduler.server.utils.LoggerUtils;
 import cn.escheduler.server.utils.ParamUtils;
+import cn.escheduler.server.worker.log.TaskLogDiscriminator;
 import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.TaskManager;
 import cn.escheduler.server.worker.task.TaskProps;
@@ -110,6 +113,12 @@ public class TaskScheduleThread implements Runnable {
             // get tenant info
             Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
                                                     processDefine.getUserId());
+
+            String key = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+                    .getLogger("ROOT")
+                    .getAppender("TASKLOGFILE"))
+                    .getDiscriminator()).getKey();
+
 
             if(tenant == null){
                 logger.error("cannot find the tenant, process definition id:{}, user id:{}",
