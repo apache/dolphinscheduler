@@ -17,6 +17,8 @@
 package cn.escheduler.server.worker.runner;
 
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.sift.SiftingAppender;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.enums.TaskRecordStatus;
@@ -40,6 +42,7 @@ import cn.escheduler.dao.model.TaskInstance;
 import cn.escheduler.dao.model.Tenant;
 import cn.escheduler.server.utils.LoggerUtils;
 import cn.escheduler.server.utils.ParamUtils;
+import cn.escheduler.server.worker.log.TaskLogDiscriminator;
 import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.TaskManager;
 import cn.escheduler.server.worker.task.TaskProps;
@@ -109,7 +112,7 @@ public class TaskScheduleThread implements Runnable {
 
             // get tenant info
             Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
-                                                    processDefine.getUserId());
+                    processDefine.getUserId());
 
             if(tenant == null){
                 logger.error("cannot find the tenant, process definition id:{}, user id:{}",
@@ -220,8 +223,18 @@ public class TaskScheduleThread implements Runnable {
      * @return
      */
     private String getTaskLogPath() {
+        String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+                .getLogger("ROOT")
+                .getAppender("TASKLOGFILE"))
+                .getDiscriminator()).getLogBase();
+        if (baseLog.startsWith(Constants.SINGLE_SLASH)){
+            return baseLog + Constants.SINGLE_SLASH +
+                    taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
+                    taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                    taskInstance.getId() + ".log";
+        }
         return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-                "logs" +  Constants.SINGLE_SLASH +
+                baseLog +  Constants.SINGLE_SLASH +
                 taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
                 taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
                 taskInstance.getId() + ".log";

@@ -22,6 +22,7 @@ import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.server.utils.LoggerUtils;
 import cn.escheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -347,7 +348,7 @@ public abstract class AbstractCommandExecutor {
      * get the standard output of the process
      */
     private void parseProcessOutput(Process process) {
-        String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskAppId);
+        String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskAppId);
         ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
         parseProcessOutputExecutorService.submit(new Runnable(){
             @Override
@@ -361,10 +362,7 @@ public abstract class AbstractCommandExecutor {
                     long lastFlushTime = System.currentTimeMillis();
 
                     while ((line = inReader.readLine()) != null) {
-                        if(checkShowLog(line)){
-                            logBuffer.add(line);
-                        }
-
+                        logBuffer.add(line);
                         lastFlushTime = flush(lastFlushTime);
                     }
                 } catch (Exception e) {
@@ -566,7 +564,6 @@ public abstract class AbstractCommandExecutor {
 
     protected abstract String buildCommandFilePath();
     protected abstract String commandType();
-    protected abstract boolean checkShowLog(String line);
     protected abstract boolean checkFindApp(String line);
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 }
