@@ -101,15 +101,19 @@ public class LoggableStatement implements PreparedStatement {
             int i = 1, limit = 0, base = 0;
             if (parameterValues.size() > 0 && paramIndexMap.size() > 0) {
                 while ((limit = sqlTemplate.indexOf('?', limit)) != -1) {
-                    t.append(sqlTemplate.substring(base, limit));
-                    t.append(parameterValues.get(i));
-                    i++;
-                    limit++;
-                    base = limit;
+                    if (paramIndexMap.containsKey(limit)) {
+                        t.append(sqlTemplate.substring(base, limit));
+                        t.append(parameterValues.get(i));
+                        i++;
+                        limit++;
+                        base = limit;
+                    } else {
+                        limit ++;
+                    }
                 }
-                if (base < len) {
-                    t.append(sqlTemplate.substring(base));
-                }
+            }
+            if (base < len) {
+                t.append(sqlTemplate.substring(base));
             }
         }
         return t.toString();
