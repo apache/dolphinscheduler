@@ -390,10 +390,14 @@ public class ProcessDefinitionController extends BaseController{
      * @param processDefinitionId
      * @return
      */
+    @ApiOperation(value = "deleteProcessDefinitionById", notes= "DELETE_PROCESS_DEFINITION_BY_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", dataType = "Int", example = "100")
+    })
     @GetMapping(value="/delete")
     @ResponseStatus(HttpStatus.OK)
-    public Result deleteProcessDefinitionById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @PathVariable String projectName,
+    public Result deleteProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                              @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                             @RequestParam("processDefinitionId") Integer processDefinitionId
     ){
         try{
@@ -415,10 +419,14 @@ public class ProcessDefinitionController extends BaseController{
      * @param processDefinitionIds
      * @return
      */
+    @ApiOperation(value = "batchDeleteProcessDefinitionByIds", notes= "BATCH_DELETE_PROCESS_DEFINITION_BY_IDS_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", type = "String")
+    })
     @GetMapping(value="/batch-delete")
     @ResponseStatus(HttpStatus.OK)
-    public Result batchDeleteProcessDefinitionByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                              @PathVariable String projectName,
+    public Result batchDeleteProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                    @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                               @RequestParam("processDefinitionIds") String processDefinitionIds
     ){
         try{
