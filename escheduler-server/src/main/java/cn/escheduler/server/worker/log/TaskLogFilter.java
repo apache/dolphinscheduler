@@ -28,7 +28,7 @@ public class TaskLogFilter extends Filter<ILoggingEvent> {
 
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getLoggerName().startsWith(LoggerUtils.TASK_LOGGER_INFO_PREFIX)) {
+        if (event.getThreadName().startsWith(LoggerUtils.TASK_LOGGER_THREAD_NAME)) {
             return FilterReply.ACCEPT;
         }
         return FilterReply.DENY;
