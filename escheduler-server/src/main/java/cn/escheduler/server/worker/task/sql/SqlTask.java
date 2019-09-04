@@ -37,6 +37,7 @@ import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.*;
 import cn.escheduler.server.utils.ParamUtils;
+import cn.escheduler.server.utils.SqlTaskUtils;
 import cn.escheduler.server.utils.UDFUtils;
 import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.TaskProps;
@@ -51,8 +52,6 @@ import org.slf4j.Logger;
 
 import java.sql.*;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static cn.escheduler.common.utils.PropertyUtils.getString;
@@ -76,7 +75,6 @@ public class SqlTask extends AbstractTask {
      *  alert dao
      */
     private AlertDao alertDao;
-
 
     public SqlTask(TaskProps props, Logger logger) {
         super(props, logger);
@@ -176,7 +174,7 @@ public class SqlTask extends AbstractTask {
      *  ready to execute SQL and parameter entity Map
      * @return
      */
-    private SqlBinds getSqlAndSqlParamsMap(String sql) {
+    protected SqlBinds getSqlAndSqlParamsMap(String sql) {
         Map<Integer,Property> sqlParamsMap =  new HashMap<>();
         StringBuilder sqlBuilder = new StringBuilder();
 
@@ -201,18 +199,20 @@ public class SqlTask extends AbstractTask {
             sqlParameters.setTitle(title);
         }
 
-        // special characters need to be escaped, ${} needs to be escaped
-        String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
-        setSqlParamsMap(sql,rgex,sqlParamsMap,paramsMap);
+
+        SqlTaskUtils.setSqlParamsMap(sql,sqlParamsMap,paramsMap);
 
         // replace the ${} of the SQL statement with the Placeholder
-        String formatSql = sql.replaceAll(rgex,"?");
+        Map<Integer,Boolean> paramIndexMap = new HashMap<Integer,Boolean>(10);
+        String formatSql = SqlTaskUtils.getFormatSql(sql,paramIndexMap);
         sqlBuilder.append(formatSql);
 
         // print repalce sql
-        printReplacedSql(sql,formatSql,rgex,sqlParamsMap);
-        return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
+        SqlTaskUtils.printReplacedSql(sql,formatSql,sqlParamsMap);
+        return new SqlBinds(sqlBuilder.toString(), sqlParamsMap,paramIndexMap);
     }
+
+
 
     @Override
     public AbstractParameters getParameters() {
@@ -330,7 +330,7 @@ public class SqlTask extends AbstractTask {
     }
 
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
-        PreparedStatement  stmt = new LoggableStatement(connection,sqlBinds.getSql());
+        PreparedStatement  stmt = new LoggableStatement(connection,sqlBinds);
         if(taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED || taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED){
             stmt.setQueryTimeout(taskProps.getTaskTimeout());
         }
@@ -398,39 +398,6 @@ public class SqlTask extends AbstractTask {
         }
     }
 
-    /**
-     *  regular expressions match the contents between two specified strings
-     * @param content
-     * @return
-     */
-    public void setSqlParamsMap(String content, String rgex, Map<Integer,Property> sqlParamsMap, Map<String,Property> paramsPropsMap){
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
-        int index = 1;
-        while (m.find()) {
 
-            String paramName = m.group(1);
-            Property prop =  paramsPropsMap.get(paramName);
 
-            sqlParamsMap.put(index,prop);
-            index ++;
-        }
-    }
-
-    /**
-     *  print replace sql
-     * @param content
-     * @param formatSql
-     * @param rgex
-     * @param sqlParamsMap
-     */
-    public void printReplacedSql(String content, String formatSql,String rgex, Map<Integer,Property> sqlParamsMap){
-        //parameter print style
-        logger.info("after replace sql , preparing : {}" , formatSql);
-        StringBuffer logPrint = new StringBuffer("replaced sql , parameters:");
-        for(int i=1;i<=sqlParamsMap.size();i++){
-            logPrint.append(sqlParamsMap.get(i).getValue()+"("+sqlParamsMap.get(i).getType()+")");
-        }
-        logger.info(logPrint.toString());
-    }
 }
