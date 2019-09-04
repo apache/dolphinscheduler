@@ -101,11 +101,6 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     }
 
     @Override
-    protected boolean checkShowLog(String line) {
-        return true;
-    }
-
-    @Override
     protected boolean checkFindApp(String line) {
         return true;
     }
