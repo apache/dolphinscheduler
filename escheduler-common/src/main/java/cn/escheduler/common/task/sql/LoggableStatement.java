@@ -23,6 +23,7 @@ import java.net.URL;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Map;
 
 /**
  * added logging capability.
@@ -35,6 +36,11 @@ public class LoggableStatement implements PreparedStatement {
     private ArrayList parameterValues;
 
     /**
+     * used for storing parameter index
+     */
+    private Map<Integer,Boolean> paramIndexMap;
+
+    /**
      * the query string with question marks as parameter placeholders
      */
     private String sqlTemplate;
@@ -44,12 +50,22 @@ public class LoggableStatement implements PreparedStatement {
      */
     private PreparedStatement wrappedStatement;
 
-    public LoggableStatement(Connection connection, String sql)
+    public LoggableStatement(Connection connection, SqlBinds sqlBinds)
+            throws SQLException {
+        // use connection to make a prepared statement
+        wrappedStatement = connection.prepareStatement(sqlBinds.getSql());
+        sqlTemplate = sqlBinds.getSql();
+        parameterValues = new ArrayList();
+        this.paramIndexMap = sqlBinds.getParamIndexMap();
+    }
+
+    public LoggableStatement(Connection connection, String sql,Map<Integer,Boolean> paramIndexMap)
             throws SQLException {
         // use connection to make a prepared statement
         wrappedStatement = connection.prepareStatement(sql);
         sqlTemplate = sql;
         parameterValues = new ArrayList();
+        this.paramIndexMap = paramIndexMap;
     }
 
     private void saveQueryParamValue(int position, Object obj) {
@@ -83,13 +99,18 @@ public class LoggableStatement implements PreparedStatement {
 
         if (parameterValues != null) {
             int i = 1, limit = 0, base = 0;
-
-            while ((limit = sqlTemplate.indexOf('?', limit)) != -1) {
-                t.append(sqlTemplate.substring(base, limit));
-                t.append(parameterValues.get(i));
-                i++;
-                limit++;
-                base = limit;
+            if (parameterValues.size() > 0 && paramIndexMap.size() > 0) {
+                while ((limit = sqlTemplate.indexOf('?', limit)) != -1) {
+                    if (paramIndexMap.containsKey(limit)) {
+                        t.append(sqlTemplate.substring(base, limit));
+                        t.append(parameterValues.get(i));
+                        i++;
+                        limit++;
+                        base = limit;
+                    } else {
+                        limit ++;
+                    }
+                }
             }
             if (base < len) {
                 t.append(sqlTemplate.substring(base));

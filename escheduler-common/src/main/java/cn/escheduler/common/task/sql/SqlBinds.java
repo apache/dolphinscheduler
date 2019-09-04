@@ -18,6 +18,7 @@ package cn.escheduler.common.task.sql;
 
 import cn.escheduler.common.process.Property;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,10 +27,17 @@ import java.util.Map;
 public class SqlBinds {
     private final String sql;
     private final Map<Integer, Property> paramsMap;
+    private Map<Integer,Boolean> paramIndexMap = new HashMap<>();
 
     public SqlBinds(String sql, Map<Integer, Property> paramsMap) {
         this.sql = sql;
         this.paramsMap = paramsMap;
+    }
+
+    public SqlBinds(String sql, Map<Integer, Property> paramsMap, Map<Integer, Boolean> paramIndexMap) {
+        this.sql = sql;
+        this.paramsMap = paramsMap;
+        this.paramIndexMap = paramIndexMap;
     }
 
     public String getSql() {
@@ -38,5 +46,9 @@ public class SqlBinds {
 
     public Map<Integer, Property> getParamsMap() {
         return paramsMap;
+    }
+
+    public Map<Integer, Boolean> getParamIndexMap() {
+        return paramIndexMap;
     }
 }
