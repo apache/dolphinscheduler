@@ -20,7 +20,6 @@ import cn.escheduler.common.process.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,15 +59,8 @@ public class SqlTaskUtils {
         Matcher m = pattern.matcher(content);
         int index = 1;
         while (m.find()) {
-
             String paramName = m.group(1);
             Property prop =  paramsPropsMap.get(paramName);
-
-            logger.info(paramName);
-            logger.info(""+m.start());
-            logger.info(""+m.end());
-
-            logger.info(content.substring(m.start(),m.end()));
 
             sqlParamsMap.put(index,prop);
             index ++;
@@ -109,7 +101,6 @@ public class SqlTaskUtils {
             do {
                 m.appendReplacement(sb, "?");
                 paramIndexMap.put(sb.length()-1,true);
-                logger.info("{}",sb.length()-1);
                 result = m.find();
             } while (result);
             m.appendTail(sb);
@@ -117,69 +108,5 @@ public class SqlTaskUtils {
             return sb.toString();
         }
         return sql.toString();
-    }
-
-    /**
-     * get query string to print the complete SQL statement
-     * @param sqlTemplate
-     * @param parameterValues
-     * @return
-     */
-    public static String getQueryString(String sqlTemplate, ArrayList parameterValues) {
-        int len = sqlTemplate.length();
-        StringBuffer t = new StringBuffer(len * 2);
-
-        if (parameterValues != null) {
-            int i = 1, limit = 0, base = 0;
-
-            while ((limit = sqlTemplate.indexOf('?', limit)) != -1) {
-                logger.info("index {} value is {}",i,limit);
-                t.append(sqlTemplate.substring(base, limit));
-                t.append(parameterValues.get(i));
-                i++;
-                limit++;
-                base = limit;
-            }
-            if (base < len) {
-                t.append(sqlTemplate.substring(base));
-            }
-        }
-        return t.toString();
-    }
-
-    /**
-     * get query string to print the complete SQL statement
-     * @param sqlTemplate
-     * @param parameterValues
-     * @param paramIndexMap
-     * @return
-     */
-    public static String getQueryString(String sqlTemplate, ArrayList parameterValues,Map<Integer,Boolean> paramIndexMap) {
-        int len = sqlTemplate.length();
-        StringBuffer t = new StringBuffer(len * 2);
-
-        if (parameterValues != null) {
-            int i = 1, limit = 0, base = 0;
-            if (parameterValues.size() > 0 && paramIndexMap.size() > 0) {
-                while ((limit = sqlTemplate.indexOf('?', limit)) != -1) {
-                    logger.info("index {} value is {}",i,limit);
-                    if (paramIndexMap.get(limit)) {
-                        t.append(sqlTemplate.substring(base, limit));
-                        t.append(parameterValues.get(i));
-                        i++;
-                        limit++;
-                        base = limit;
-                    } else {
-                        limit ++;
-                    }
-
-                }
-            }
-
-            if (base < len) {
-                t.append(sqlTemplate.substring(base));
-            }
-        }
-        return t.toString();
     }
 }
