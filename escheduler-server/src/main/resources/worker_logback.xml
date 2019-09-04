@@ -16,6 +16,7 @@
         <filter class="cn.escheduler.server.worker.log.TaskLogFilter"></filter>
         <Discriminator class="cn.escheduler.server.worker.log.TaskLogDiscriminator">
             <key>taskAppId</key>
+            <logBase>${log.base}</logBase>
         </Discriminator>
         <sift>
             <appender name="FILE-${taskAppId}" class="ch.qos.logback.core.FileAppender">
