@@ -327,6 +327,11 @@ public class ZKMasterClient extends AbstractZKClient {
 
 		boolean taskNeedFailover = true;
 
+		//now no host will execute this task instance,so no need to failover the task
+		if(taskInstance.getHost() == null){
+			return false;
+		}
+
 		// if the worker node exists in zookeeper, we must check the task starts after the worker
 	    if(checkZKNodeExists(taskInstance.getHost(), ZKNodeType.WORKER)){
 	        //if task start after worker starts, there is no need to failover the task.
