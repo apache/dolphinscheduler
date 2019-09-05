@@ -263,8 +263,7 @@ public class DataAnalysisService {
         List<ExecuteStatusCount> errorCommandStateCounts =
                 errorCommandMapper.countCommandState(loginUser.getId(),
                         loginUser.getUserType(), start, end, projectId);
-
-        //
+        
         Map<ExecutionStatus,Map<String,Integer>> dataMap = new HashMap<>();
 
         Map<String,Integer> commonCommand = new HashMap<>();
