@@ -242,8 +242,12 @@ public class DataAnalysisService {
         Date end = null;
 
         try {
-            start = DateUtils.getScheduleDate(startDate);
-            end = DateUtils.getScheduleDate(endDate);
+            if(startDate != null){
+                start = DateUtils.getScheduleDate(startDate);
+            }
+            if(endDate != null){
+                end = DateUtils.getScheduleDate(endDate);
+            }
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             putErrorRequestParamsMsg(result);
