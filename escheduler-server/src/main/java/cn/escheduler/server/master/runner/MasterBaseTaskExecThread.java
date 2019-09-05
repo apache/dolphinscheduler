@@ -23,7 +23,7 @@ import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
-import cn.escheduler.server.BeanContext;
+import cn.escheduler.dao.utils.BeanContext;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;

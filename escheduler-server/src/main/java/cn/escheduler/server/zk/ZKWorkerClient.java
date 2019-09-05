@@ -18,18 +18,13 @@ package cn.escheduler.server.zk;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ZKNodeType;
-import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.zk.AbstractZKClient;
-import cn.escheduler.dao.DaoFactory;
-import cn.escheduler.dao.ServerDao;
-import cn.escheduler.common.utils.ResInfo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.utils.ThreadUtils;
-import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,11 +50,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 	private String workerZNode = null;
 
 	/**
-	 *  worker database access
-	 */
-	private ServerDao serverDao = null;
-
-	/**
 	 *  create time
 	 */
 	private Date createTime = null;
@@ -77,8 +67,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 	 *  init
 	 */
 	private void init(){
-		// init worker dao
-		serverDao = DaoFactory.getDaoInstance(ServerDao.class);
 
 		// init system znode
 		this.initSystemZNode();
@@ -103,13 +91,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 		return zkWorkerClient;
 	}
 
-	/**
-	 *  get worker dao
-	 * @return
-	 */
-	public ServerDao getServerDao(){
-		return serverDao;
-	}
 
 	/**
 	 *  register worker
