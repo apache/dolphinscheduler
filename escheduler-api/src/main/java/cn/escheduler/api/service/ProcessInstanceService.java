@@ -509,8 +509,9 @@ public class ProcessInstanceService extends BaseDAGService {
                             .append(UNDERLINE)
                             .append(taskInstance.getId())
                             .append(UNDERLINE);
-                    int workerGroupId = processInstance.getWorkerGroupId();
-                    WorkerGroup workerGroup = workerGroupMapper.queryById(workerGroupId);
+
+                    int taskWorkerGroupId = processDao.getTaskWorkerGroupId(taskInstance);
+                    WorkerGroup workerGroup = workerGroupMapper.queryById(taskWorkerGroupId);
 
                     if(workerGroup == null){
                         nodeValueSb.append(DEFAULT_WORKER_ID);
