@@ -32,10 +32,7 @@ import cn.escheduler.common.model.TaskNodeRelation;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.queue.ITaskQueue;
 import cn.escheduler.common.queue.TaskQueueFactory;
-import cn.escheduler.common.utils.CollectionUtils;
-import cn.escheduler.common.utils.DateUtils;
-import cn.escheduler.common.utils.JSONUtils;
-import cn.escheduler.common.utils.ParameterUtils;
+import cn.escheduler.common.utils.*;
 import cn.escheduler.common.utils.placeholder.BusinessTimeUtils;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.mapper.*;
@@ -502,12 +499,43 @@ public class ProcessInstanceService extends BaseDAGService {
                 for (TaskInstance taskInstance : taskInstanceList){
                     // task instance priority
                     int taskInstancePriority = taskInstance.getTaskInstancePriority().ordinal();
-                    String nodeValue=processInstancePriority + "_" + processInstanceId + "_" +taskInstancePriority + "_" + taskInstance.getId();
+
+                    StringBuilder nodeValueSb = new StringBuilder(100);
+                    nodeValueSb.append(processInstancePriority)
+                            .append(UNDERLINE)
+                            .append(processInstanceId)
+                            .append(UNDERLINE)
+                            .append(taskInstancePriority)
+                            .append(UNDERLINE)
+                            .append(taskInstance.getId())
+                            .append(UNDERLINE);
+                    int workerGroupId = processInstance.getWorkerGroupId();
+                    WorkerGroup workerGroup = workerGroupMapper.queryById(workerGroupId);
+
+                    if(workerGroup == null){
+                        nodeValueSb.append(DEFAULT_WORKER_ID);
+                    }else {
+
+                        String ips = workerGroup.getIpList();
+                        StringBuilder ipSb = new StringBuilder(100);
+                        String[] ipArray = ips.split(COMMA);
+
+                        for (String ip : ipArray) {
+                            long ipLong = IpUtils.ipToLong(ip);
+                            ipSb.append(ipLong).append(COMMA);
+                        }
+
+                        if(ipSb.length() > 0) {
+                            ipSb.deleteCharAt(ipSb.length() - 1);
+                        }
+                        nodeValueSb.append(ipSb);
+                    }
+
                     try {
-                        logger.info("delete task queue node : {}",nodeValue);
-                        tasksQueue.removeNode(cn.escheduler.common.Constants.SCHEDULER_TASKS_QUEUE, nodeValue);
+                        logger.info("delete task queue node : {}",nodeValueSb.toString());
+                        tasksQueue.removeNode(cn.escheduler.common.Constants.SCHEDULER_TASKS_QUEUE, nodeValueSb.toString());
                     }catch (Exception e){
-                        logger.error("delete task queue node : {}", nodeValue);
+                        logger.error("delete task queue node : {}", nodeValueSb.toString());
                     }
                 }
             }
