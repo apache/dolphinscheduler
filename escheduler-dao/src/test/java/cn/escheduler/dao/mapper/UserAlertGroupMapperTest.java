@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
-
 public class UserAlertGroupMapperTest {
 
 
@@ -46,12 +45,10 @@ public class UserAlertGroupMapperTest {
         userAlertGroup.setUpdateTime(new Date());
         userAlertGroupMapper.insert(userAlertGroup);
         Assert.assertNotEquals(userAlertGroup.getId(), 0);
+
+
         int delete = userAlertGroupMapper.deleteByAlertgroupId(userAlertGroup.getAlertgroupId());
         Assert.assertEquals(delete, 1);
-
-
-
-
     }
 
 

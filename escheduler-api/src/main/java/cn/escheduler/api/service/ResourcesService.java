@@ -27,6 +27,7 @@ import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.common.utils.PropertyUtils;
 import cn.escheduler.dao.mapper.*;
 import cn.escheduler.dao.model.Resource;
+import cn.escheduler.dao.model.Tenant;
 import cn.escheduler.dao.model.UdfFunc;
 import cn.escheduler.dao.model.User;
 import org.apache.commons.collections.BeanMap;
@@ -441,18 +442,23 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
             // query tenant
-            String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
+            Tenant tenant = tenantMapper.queryById(loginUser.getTenantId());
+            if(tenant != null){
+                String tenantCode = tenant.getTenantCode();
 
-            try {
-                String hdfsFilename = getHdfsFileName(type,tenantCode,name);
-                if(HadoopUtils.getInstance().exists(hdfsFilename)){
-                    logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, name,hdfsFilename);
-                    putMsg(result, Status.RESOURCE_FILE_EXIST,hdfsFilename);
+                try {
+                    String hdfsFilename = getHdfsFileName(type,tenantCode,name);
+                    if(HadoopUtils.getInstance().exists(hdfsFilename)){
+                        logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, name,hdfsFilename);
+                        putMsg(result, Status.RESOURCE_FILE_EXIST,hdfsFilename);
+                    }
+
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                    putMsg(result,Status.HDFS_OPERATION_ERROR);
                 }
-
-            } catch (Exception e) {
-                logger.error(e.getMessage(),e);
-                putMsg(result,Status.HDFS_OPERATION_ERROR);
+            }else{
+                putMsg(result,Status.TENANT_NOT_EXIST);
             }
         }
 

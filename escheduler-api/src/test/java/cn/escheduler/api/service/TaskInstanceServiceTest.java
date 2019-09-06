@@ -16,6 +16,7 @@
  */
 package cn.escheduler.api.service;
 
+import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
@@ -33,7 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Map;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class TaskInstanceServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(TaskInstanceServiceTest.class);
 
@@ -44,14 +45,18 @@ public class TaskInstanceServiceTest {
     public void queryTaskListPaging(){
 
         User loginUser = new User();
-        loginUser.setId(27);
+        loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> map = taskInstanceService.queryTaskListPaging(loginUser, "project_test1", 0, "",
                 "2019-02-26 19:48:00", "2019-02-26 19:48:22", "", null, "", 1, 20);
-        Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
         PageInfo pageInfo = (PageInfo) map.get("data");
-        logger.info(pageInfo.getLists().toString());
+
+        if(pageInfo != null){
+            logger.info(pageInfo.getLists().toString());
+        }
+
 
     }
 }
