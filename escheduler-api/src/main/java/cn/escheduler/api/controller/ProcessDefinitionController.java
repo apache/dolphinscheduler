@@ -467,4 +467,26 @@ public class ProcessDefinitionController extends BaseController{
         }
     }
 
+
+    /**
+     * query proccess definition all by project id
+     *
+     * @param loginUser
+     * @return
+     */
+    @ApiOperation(value = "queryProccessDefinitionAllByProjectId", notes= "QUERY_PROCCESS_DEFINITION_All_BY_PROJECT_ID_NOTES")
+    @GetMapping(value="/queryProccessDefinitionAllByProjectId")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryProccessDefinitionAllByProjectId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                        @RequestParam("projectId") Integer projectId){
+        try{
+            logger.info("query proccess definition list, login user:{}, project id:{}",
+                    loginUser.getUserName(),projectId);
+            Map<String, Object> result = processDefinitionService.queryProccessDefinitionAllByProjectId(projectId);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(QUERY_PROCCESS_DEFINITION_LIST.getMsg(),e);
+            return error(QUERY_PROCCESS_DEFINITION_LIST.getCode(), QUERY_PROCCESS_DEFINITION_LIST.getMsg());
+        }
+    }
 }
