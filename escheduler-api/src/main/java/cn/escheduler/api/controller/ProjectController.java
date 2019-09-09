@@ -284,7 +284,7 @@ public class ProjectController extends BaseController {
      * @param loginUser
      * @return
      */
-    @ApiOperation(value = "queryAllProjectList", notes= "QUERY_ALL_PROJECT_LIST")
+    @ApiOperation(value = "queryAllProjectList", notes= "QUERY_ALL_PROJECT_LIST_NOTES")
     @GetMapping(value = "/queryAllProjectList")
     @ResponseStatus(HttpStatus.OK)
     public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
