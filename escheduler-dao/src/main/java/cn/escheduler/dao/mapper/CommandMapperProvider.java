@@ -163,7 +163,13 @@ public class CommandMapperProvider {
 
                     }
                 }
-                WHERE("cmd.start_time >= #{startTime} and cmd.update_time <= #{endTime}");
+                if (parameter.get("startTime") != null) {
+                    WHERE("cmd.start_time >= #{startTime}");
+                }
+
+                if (parameter.get("endTime") != null) {
+                    WHERE("cmd.update_time <= #{endTime}");
+                }
                 GROUP_BY("cmd.command_type");
             }
         }.toString();
