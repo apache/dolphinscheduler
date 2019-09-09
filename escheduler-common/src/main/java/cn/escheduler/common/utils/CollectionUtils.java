@@ -21,6 +21,7 @@ import org.apache.commons.collections.BeanMap;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -287,6 +288,28 @@ public class CollectionUtils {
             instanceList.add(instanceMap);
         }
         return instanceList;
+    }
+
+    /**
+     * Splits a List collection into lists of specified length
+     *
+     * @param list parent list
+     * @param len The length of the sublist
+     * @return resultList result list<List>
+     */
+    public static <T extends Object> List<List<T>> getSubList(List<T> list,int len) {
+        if (list == null || list.size() == 0 || len < 1) {
+            return null;
+        }
+        List<List<T>> resultList = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            if (i % len == 0) {
+                int count = i / len;
+                List subList = (List) list.stream().limit((count + 1) * len).skip(count * len).collect(Collectors.toList());
+                resultList.add(subList);
+            }
+        }
+        return resultList;
     }
 
 }

@@ -44,9 +44,15 @@ public class EnterpriseWeChatManager {
         String users = EnterpriseWeChatUtils.enterpriseWeChatUsers;
         List<String> userList = Arrays.asList(users.split(","));
         logger.info("send message {}",alert);
-        String msg = EnterpriseWeChatUtils.makeUserSendMsg(userList, agentId,EnterpriseWeChatUtils.markdownByAlert(alert));
+
+        List<String> alertMsgList = EnterpriseWeChatUtils.markdownByAlert(alert);
+
         try {
-            EnterpriseWeChatUtils.sendEnterpriseWeChat(Constants.UTF_8, msg, token);
+            for(String alertMsg:alertMsgList){
+                String msg = EnterpriseWeChatUtils.makeUserSendMsg(userList, agentId,alertMsg);
+                EnterpriseWeChatUtils.sendEnterpriseWeChat(Constants.UTF_8, msg, token);
+            }
+
         } catch (IOException e) {
             logger.error(e.getMessage(),e);
         }
