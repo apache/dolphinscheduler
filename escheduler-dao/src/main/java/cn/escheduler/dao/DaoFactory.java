@@ -48,10 +48,10 @@ public class DaoFactory {
     synchronized (daoMap) {
       if (!daoMap.containsKey(className)) {
         try {
-          T t = BeanContext.getBean(clazz);
-//          T t = clazz.getConstructor().newInstance();
-//          // 实例初始化
-//          t.init();
+//          T t = BeanContext.getBean(clazz);
+          T t = clazz.getConstructor().newInstance();
+          // 实例初始化
+          t.init();
           daoMap.put(className, t);
         } catch (Exception e) {
           logger.error(e.getMessage(), e);
