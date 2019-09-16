@@ -70,8 +70,8 @@ public class MapReduceTask extends AbstractYarnTask {
         Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
                 taskProps.getDefinedParams(),
                 mapreduceParameters.getLocalParametersMap(),
-                processInstance.getCmdTypeIfComplement(),
-                processInstance.getScheduleTime());
+                taskProps.getCmdTypeIfComplement(),
+                taskProps.getScheduleTime());
         if (paramsMap != null){
             String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),  ParamUtils.convert(paramsMap));
             mapreduceParameters.setMainArgs(args);
@@ -86,7 +86,8 @@ public class MapReduceTask extends AbstractYarnTask {
     protected String buildCommand() throws Exception {
         List<String> parameterList = buildParameters(mapreduceParameters);
 
-        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", parameterList), taskProps.getDefinedParams());
+        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", parameterList),
+                taskProps.getDefinedParams());
         logger.info("mapreduce task command: {}", command);
 
         return command;

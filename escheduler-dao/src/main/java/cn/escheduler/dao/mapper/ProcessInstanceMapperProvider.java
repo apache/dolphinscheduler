@@ -69,6 +69,7 @@ public class ProcessInstanceMapperProvider {
                 VALUES("`executor_id`", "#{processInstance.executorId}");
                 VALUES("`worker_group_id`", "#{processInstance.workerGroupId}");
                 VALUES("`timeout`", "#{processInstance.timeout}");
+                VALUES("`tenant_id`", "#{processInstance.tenantId}");
                 VALUES("`process_instance_priority`", EnumFieldUtil.genFieldStr("processInstance.processInstancePriority", Priority.class));
             }
         }.toString();
@@ -141,6 +142,7 @@ public class ProcessInstanceMapperProvider {
                 SET("`dependence_schedule_times`=#{processInstance.dependenceScheduleTimes}");
                 SET("`is_sub_process`="+EnumFieldUtil.genFieldStr("processInstance.isSubProcess", Flag.class));
                 SET("`executor_id`=#{processInstance.executorId}");
+                SET("`tenant_id`=#{processInstance.tenantId}");
                 SET("`worker_group_id`=#{processInstance.workerGroupId}");
                 SET("`timeout`=#{processInstance.timeout}");
 
@@ -220,11 +222,11 @@ public class ProcessInstanceMapperProvider {
     public String queryDetailById(Map<String, Object> parameter) {
         return new SQL() {
             {
-                SELECT("inst.*,q.queue_name as queue,t.tenant_code,UNIX_TIMESTAMP(inst.end_time)-UNIX_TIMESTAMP(inst.start_time) as duration");
+                SELECT("inst.*,UNIX_TIMESTAMP(inst.end_time)-UNIX_TIMESTAMP(inst.start_time) as duration");
 
-                FROM(TABLE_NAME + "  inst, t_escheduler_user u,t_escheduler_tenant t,t_escheduler_queue q");
+                FROM(TABLE_NAME + "  inst");
 
-                WHERE("inst.executor_id = u.id AND u.tenant_id = t.id AND t.queue_id = q.id AND inst.id = #{processId}");
+                WHERE("inst.id = #{processId}");
             }
         }.toString();
     }
@@ -402,7 +404,12 @@ public class ProcessInstanceMapperProvider {
 
                 FROM(TABLE_NAME);
 
-                WHERE("`host` = #{host} and `state` in (" + strStates.toString() +")");
+                Object host = parameter.get("host");
+                if(host != null && StringUtils.isNotEmpty(host.toString())){
+
+                    WHERE("`host` = #{host} ");
+                }
+                WHERE("`state` in (" + strStates.toString() +")");
                 ORDER_BY("`id` asc");
 
 
@@ -572,11 +579,10 @@ public class ProcessInstanceMapperProvider {
 
                 FROM(TABLE_NAME);
 
-                WHERE("process_definition_id=#{processDefinitionId} ");
                 if(parameter.get("startTime") != null && parameter.get("endTime") != null
                         ){
-                    WHERE("schedule_time between #{startTime} and #{endTime} " +
-                            "or start_time between #{startTime} and #{endTime}");
+                    WHERE("process_definition_id=#{processDefinitionId} and (schedule_time between #{startTime} and #{endTime} " +
+                            "or start_time between #{startTime} and #{endTime})");
                 }
                 WHERE("`state` in (" + strStates.toString() + ")");
                 ORDER_BY("start_time desc limit 1");

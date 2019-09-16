@@ -20,9 +20,11 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.common.enums.UserType;
+import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
 import cn.escheduler.dao.mapper.ProjectMapper;
 import cn.escheduler.dao.mapper.ProjectUserMapper;
 import cn.escheduler.dao.mapper.UserMapper;
+import cn.escheduler.dao.model.ProcessDefinition;
 import cn.escheduler.dao.model.Project;
 import cn.escheduler.dao.model.ProjectUser;
 import cn.escheduler.dao.model.User;
@@ -44,16 +46,13 @@ public class ProjectService extends BaseService{
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private UsersService userService;
-
-    @Autowired
     private ProjectMapper projectMapper;
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * create project
@@ -69,15 +68,6 @@ public class ProjectService extends BaseService{
         Map<String, Object> descCheck = checkDesc(desc);
         if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
             return descCheck;
-        }
-
-        /**
-         * only general users can create projects. administrators have no corresponding tenants and can only view
-         * 管理员没有对应的租户,只能查看,只有普通用户才可以创建项目
-         */
-        if (!userService.isGeneral(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
         }
 
         Project project = projectMapper.queryByName(name);
@@ -198,6 +188,12 @@ public class ProjectService extends BaseService{
         Map<String, Object> checkResult = getCheckResult(loginUser, project);
         if (checkResult != null) {
             return checkResult;
+        }
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(projectId);
+
+        if(processDefinitionList.size() > 0){
+            putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
+            return result;
         }
 
         int delete = projectMapper.delete(projectId);

@@ -22,6 +22,9 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.enums.Flag;
+import cn.escheduler.common.queue.ITaskQueue;
+import cn.escheduler.common.queue.TaskQueueFactory;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -60,14 +63,14 @@ public class ProcessInstanceController extends BaseController{
      */
     @ApiOperation(value = "queryProcessInstanceList", notes= "QUERY_PROCESS_INSTANCE_LIST_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", type = "Int"),
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type ="String"),
             @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type ="ExecutionStatus"),
             @ApiImplicitParam(name = "host", value = "HOST", type ="String"),
             @ApiImplicitParam(name = "startDate", value = "START_DATE", type ="String"),
             @ApiImplicitParam(name = "endDate", value = "END_DATE", type ="String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", type ="Int"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", type ="Int")
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "100")
     })
     @GetMapping(value="list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -86,6 +89,7 @@ public class ProcessInstanceController extends BaseController{
                     "search value:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
                     loginUser.getUserName(), projectName, processDefinitionId, searchVal, stateType,host,
                     startTime, endTime, pageNo, pageSize);
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = processInstanceService.queryProcessInstanceList(
                     loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
             return returnDataListPaging(result);
@@ -105,7 +109,7 @@ public class ProcessInstanceController extends BaseController{
      */
     @ApiOperation(value = "queryTaskListByProcessId", notes= "QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", type = "Int")
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
     })
     @GetMapping(value="/task-list-by-process-id")
     @ResponseStatus(HttpStatus.OK)
@@ -139,7 +143,7 @@ public class ProcessInstanceController extends BaseController{
     @ApiOperation(value = "updateProcessInstance", notes= "UPDATE_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processInstanceJson", value = "PROCESS_INSTANCE_JSON", type = "String"),
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", type = "Int"),
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", type = "String"),
             @ApiImplicitParam(name = "syncDefine", value = "SYNC_DEFINE", type = "Boolean"),
             @ApiImplicitParam(name = "locations", value = "PROCESS_INSTANCE_LOCATIONS", type = "String"),
@@ -182,7 +186,7 @@ public class ProcessInstanceController extends BaseController{
      */
     @ApiOperation(value = "queryProcessInstanceById", notes= "QUERY_PROCESS_INSTANCE_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", type = "Int")
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
     })
     @GetMapping(value="/select-by-id")
     @ResponseStatus(HttpStatus.OK)
@@ -212,7 +216,7 @@ public class ProcessInstanceController extends BaseController{
      */
     @ApiOperation(value = "deleteProcessInstanceById", notes= "DELETE_PROCESS_INSTANCE_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", type = "Int")
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
     })
     @GetMapping(value="/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -223,7 +227,9 @@ public class ProcessInstanceController extends BaseController{
         try{
             logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
                     loginUser.getUserName(), projectName, processInstanceId);
-            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
+            // task queue
+            ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
+            Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getMsg(),e);
@@ -241,7 +247,7 @@ public class ProcessInstanceController extends BaseController{
      */
     @ApiOperation(value = "querySubProcessInstanceByTaskId", notes= "QUERY_SUBPROCESS_INSTANCE_BY_TASK_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskId", value = "TASK_ID", type = "Int")
+            @ApiImplicitParam(name = "taskId", value = "TASK_ID", dataType = "Int", example = "100")
     })
     @GetMapping(value="/select-sub-process")
     @ResponseStatus(HttpStatus.OK)
@@ -267,7 +273,7 @@ public class ProcessInstanceController extends BaseController{
      */
     @ApiOperation(value = "queryParentInstanceBySubId", notes= "QUERY_PARENT_PROCESS_INSTANCE_BY_SUB_PROCESS_INSTANCE_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "subId", value = "SUB_PROCESS_INSTANCE_ID", type = "Int")
+            @ApiImplicitParam(name = "subId", value = "SUB_PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
     })
     @GetMapping(value="/select-parent-process")
     @ResponseStatus(HttpStatus.OK)
@@ -292,7 +298,7 @@ public class ProcessInstanceController extends BaseController{
      */
     @ApiOperation(value = "viewVariables", notes= "QUERY_PROCESS_INSTANCE_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", type = "Int")
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
     })
     @GetMapping(value="/view-variables")
     @ResponseStatus(HttpStatus.OK)
@@ -317,7 +323,7 @@ public class ProcessInstanceController extends BaseController{
      */
     @ApiOperation(value = "vieGanttTree", notes= "VIEW_GANTT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", type = "Int")
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
     })
     @GetMapping(value="/view-gantt")
     @ResponseStatus(HttpStatus.OK)
@@ -330,6 +336,32 @@ public class ProcessInstanceController extends BaseController{
         }catch (Exception e){
             logger.error(ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR.getMsg(),e);
             return error(Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR.getCode(),ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * batch delete process instance by ids, at the same time,
+     * delete task instance and their mapping relation data
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processInstanceIds
+     * @return
+     */
+    @GetMapping(value="/batch-delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result batchDeleteProcessInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @PathVariable String projectName,
+                                            @RequestParam("processInstanceIds") String processInstanceIds
+    ){
+        try{
+            logger.info("delete process instance by ids, login user:{}, project name:{}, process instance ids :{}",
+                    loginUser.getUserName(), projectName, processInstanceIds);
+            Map<String, Object> result = processInstanceService.batchDeleteProcessInstanceByIds(loginUser, projectName, processInstanceIds);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR.getMsg(),e);
+            return error(Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR.getCode(), Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR.getMsg());
         }
     }
 }

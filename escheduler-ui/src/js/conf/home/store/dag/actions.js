@@ -115,6 +115,7 @@ export default {
         // timeout
         state.timeout = processDefinitionJson.timeout
 
+        state.tenantId = processDefinitionJson.tenantId
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -146,6 +147,12 @@ export default {
         // timeout
         state.timeout = processInstanceJson.timeout
 
+        state.tenantId = processInstanceJson.tenantId
+
+        //startup parameters
+        state.startup = _.assign(state.startup, _.pick(res.data, ['commandType', 'failureStrategy', 'processInstancePriority', 'workerGroupId', 'warningType', 'warningGroupId', 'receivers', 'receiversCc']))
+        state.startup.commandParam = JSON.parse(res.data.commandParam)
+
         resolve(res.data)
       }).catch(res => {
         reject(res)
@@ -160,6 +167,7 @@ export default {
       let data = {
         globalParams: state.globalParams,
         tasks: state.tasks,
+        tenantId: state.tenantId,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/save`, {
@@ -183,6 +191,7 @@ export default {
       let data = {
         globalParams: state.globalParams,
         tasks: state.tasks,
+        tenantId: state.tenantId,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/process/update`, {
@@ -207,6 +216,7 @@ export default {
       let data = {
         globalParams: state.globalParams,
         tasks: state.tasks,
+        tenantId: state.tenantId,
         timeout: state.timeout
       }
       io.post(`projects/${state.projectName}/instance/update`, {
@@ -378,6 +388,19 @@ export default {
     })
   },
   /**
+   * Preview timing
+   */
+  previewSchedule ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`projects/${state.projectName}/schedule/preview`, payload, res => {
+        resolve(res.data)
+        //alert(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * Timing list paging
    */
   getScheduleList ({ state }, payload) {
@@ -435,6 +458,75 @@ export default {
       }).catch(e => {
         reject(e)
       })
+    })
+  },
+  /**
+   * Batch delete process instance
+   */
+  batchDeleteInstance ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/instance/batch-delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Delete definition
+   */
+  deleteDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * Batch delete definition
+   */
+  batchDeleteDefinition ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/batch-delete`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * export definition
+   */
+  exportDefinition ({ state }, payload) {
+    const downloadBlob = (data, fileNameS = 'json') => {
+      if (!data) {
+        return
+      }
+      let blob = new Blob([data])
+      let fileName = `${fileNameS}.json`
+      if ('download' in document.createElement('a')) { // 不是IE浏览器
+        let url = window.URL.createObjectURL(blob)
+        let link = document.createElement('a')
+        link.style.display = 'none'
+        link.href = url
+        link.setAttribute('download', fileName)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link) // 下载完成移除元素
+        window.URL.revokeObjectURL(url) // 释放掉blob对象
+      } else { // IE 10+
+        window.navigator.msSaveBlob(blob, fileName)
+      }
+    }
+
+    io.get(`projects/${state.projectName}/process/export`,{processDefinitionId: payload.processDefinitionId,}, res => {
+      downloadBlob(res, payload.processDefinitionName)
+  }, e => {
+
+    }, {
+      responseType: 'blob'
     })
   },
   /**
@@ -538,7 +630,7 @@ export default {
    */
   getReceiver ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/{projectName}/executors/get-receiver-cc`, payload, res => {
+      io.get(`projects/${state.projectName}/executors/get-receiver-cc`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -547,8 +639,20 @@ export default {
   },
   getTaskListDefIdAll ({ state }, payload) {
     return new Promise((resolve, reject) => {
-      io.get(`projects/{projectName}/process/get-task-list`, payload, res => {
+      io.get(`projects/${state.projectName}/process/get-task-list`, payload, res => {
         resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * remove timing
+   */
+  deleteTiming({ state }, payload){
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/schedule/delete`, payload, res => {
+        resolve(res)
       }).catch(e => {
         reject(e)
       })

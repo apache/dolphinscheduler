@@ -21,6 +21,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.UsersService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -66,10 +67,10 @@ public class UsersController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userName", value = "USER_NAME",type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type ="String"),
-            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", type ="Int"),
-            @ApiImplicitParam(name = "queue", value = "QUEUE", type ="Int"),
-            @ApiImplicitParam(name = "email", value = "EMAIL", type ="Int"),
-            @ApiImplicitParam(name = "phone", value = "PHONE", type ="Int")
+            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "Int", example = "100")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
@@ -103,7 +104,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "queryUserList", notes= "QUERY_USER_LIST_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO",type = "Int"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", type ="String"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type ="String")
     })
@@ -120,6 +121,7 @@ public class UsersController extends BaseController{
             if(result.get(Constants.STATUS) != Status.SUCCESS){
                 return returnDataListPaging(result);
             }
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = usersService.queryUserList(loginUser, searchVal, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){
@@ -143,13 +145,13 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "updateUser", notes= "UPDATE_USER_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "USER_ID",type = "Int"),
+            @ApiImplicitParam(name = "id", value = "USER_ID",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "userName", value = "USER_NAME",type = "String"),
             @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", type ="String"),
-            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", type ="Int"),
-            @ApiImplicitParam(name = "queue", value = "QUEUE", type ="Int"),
-            @ApiImplicitParam(name = "email", value = "EMAIL", type ="Int"),
-            @ApiImplicitParam(name = "phone", value = "PHONE", type ="Int")
+            @ApiImplicitParam(name = "tenantId", value = "TENANT_ID", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "queue", value = "QUEUE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "email", value = "EMAIL", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "phone", value = "PHONE", dataType = "Int", example = "100")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -164,7 +166,7 @@ public class UsersController extends BaseController{
         logger.info("login user {}, updateProcessInstance user, userName: {}, email: {}, tenantId: {}, userPassword: {}, phone: {}, user queue: {}",
                 loginUser.getUserName(), userName, email, tenantId, Constants.PASSWORD_DEFAULT, phone,queue);
         try {
-            Map<String, Object> result = usersService.updateUser(id,userName,userPassword,email,tenantId,phone,queue);
+            Map<String, Object> result = usersService.updateUser(id, userName, userPassword, email, tenantId, phone, queue);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(UPDATE_USER_ERROR.getMsg(),e);
@@ -180,7 +182,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "delUserById", notes= "DELETE_USER_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "USER_ID",type = "Int")
+            @ApiImplicitParam(name = "id", value = "USER_ID",dataType = "Int", example = "100")
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
@@ -205,7 +207,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "grantProject", notes= "GRANT_PROJECT_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID",type = "Int"),
+            @ApiImplicitParam(name = "userId", value = "USER_ID",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "projectIds", value = "PROJECT_IDS",type = "String")
     })
     @PostMapping(value = "/grant-project")
@@ -232,7 +234,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "grantResource", notes= "GRANT_RESOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID",type = "Int"),
+            @ApiImplicitParam(name = "userId", value = "USER_ID",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "resourceIds", value = "RESOURCE_IDS",type = "String")
     })
     @PostMapping(value = "/grant-file")
@@ -260,7 +262,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "grantUDFFunc", notes= "GRANT_UDF_FUNC_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID",type = "Int"),
+            @ApiImplicitParam(name = "userId", value = "USER_ID",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "udfIds", value = "UDF_IDS",type = "String")
     })
     @PostMapping(value = "/grant-udf-func")
@@ -289,7 +291,7 @@ public class UsersController extends BaseController{
      */
     @ApiOperation(value = "grantDataSource", notes= "GRANT_DATASOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID",type = "Int"),
+            @ApiImplicitParam(name = "userId", value = "USER_ID",dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "datasourceIds", value = "DATASOURCE_IDS",type = "String")
     })
     @PostMapping(value = "/grant-datasource")
@@ -340,6 +342,26 @@ public class UsersController extends BaseController{
     public Result listUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
         logger.info("login user {}, user list");
         try{
+            Map<String, Object> result = usersService.queryAllGeneralUsers(loginUser);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(USER_LIST_ERROR.getMsg(),e);
+            return error(Status.USER_LIST_ERROR.getCode(), Status.USER_LIST_ERROR.getMsg());
+        }
+    }
+
+
+    /**
+     * user list no paging
+     *
+     * @param loginUser
+     * @return
+     */
+    @GetMapping(value="/list-all")
+    @ResponseStatus(HttpStatus.OK)
+    public Result listAll(@RequestAttribute(value = Constants.SESSION_USER) User loginUser){
+        logger.info("login user {}, user list");
+        try{
             Map<String, Object> result = usersService.queryUserList(loginUser);
             return returnDataList(result);
         }catch (Exception e){
@@ -347,6 +369,7 @@ public class UsersController extends BaseController{
             return error(Status.USER_LIST_ERROR.getCode(), Status.USER_LIST_ERROR.getMsg());
         }
     }
+
 
     /**
      * verify username

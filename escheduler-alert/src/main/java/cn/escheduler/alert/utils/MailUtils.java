@@ -33,6 +33,7 @@ import org.springframework.util.ResourceUtils;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.*;
+import java.security.Security;
 import java.util.*;
 
 import static cn.escheduler.alert.utils.PropertyUtils.getBoolean;
@@ -62,6 +63,10 @@ public class MailUtils {
     public static final Boolean mailUseSSL = getBoolean(Constants.MAIL_SMTP_SSL_ENABLE);
 
     public static final String xlsFilePath = getString(Constants.XLS_FILE_PATH);
+
+    public static final String starttlsEnable = getString(Constants.MAIL_SMTP_STARTTLS_ENABLE);
+
+    public static final String sslEnable = getString(Constants.MAIL_SMTP_SSL_ENABLE);
 
     private static Template MAIL_TEMPLATE;
 
@@ -127,9 +132,10 @@ public class MailUtils {
                 //set charset
                 email.setCharset(Constants.UTF_8);
                 // TLS verification
-                email.setTLS(mailUseStartTLS);
+                email.setTLS(Boolean.valueOf(starttlsEnable));
+
                 // SSL verification
-                email.setSSL(mailUseSSL);
+                email.setSSL(Boolean.valueOf(sslEnable));
                 if (CollectionUtils.isNotEmpty(receivers)){
                     // receivers mail
                     for (String receiver : receivers) {
@@ -159,6 +165,7 @@ public class MailUtils {
                 return retMap;
             }catch (Exception e){
                 handleException(receivers, retMap, e);
+                return retMap;
             }
         }
         return retMap;
@@ -276,11 +283,15 @@ public class MailUtils {
      * @throws MessagingException
      */
     private static MimeMessage getMimeMessage(Collection<String> receivers) throws MessagingException {
+//        Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+//        final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+
         Properties props = new Properties();
         props.setProperty(Constants.MAIL_HOST, mailServerHost);
         props.setProperty(Constants.MAIL_SMTP_AUTH, Constants.STRING_TRUE);
         props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, mailProtocol);
-        props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, Constants.STRING_TRUE);
+        props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, starttlsEnable);
+        props.setProperty("mail.smtp.ssl.enable", sslEnable);
         Authenticator auth = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {

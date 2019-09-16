@@ -139,6 +139,7 @@
   import { mapState, mapActions } from 'vuex'
   import { findComponentDownward } from '@/module/util/'
   import mFileUpdate from '@/module/components/fileUpdate/fileUpdate'
+  import mDefinitionUpdate from '@/module/components/fileUpdate/definitionUpdate'
   import mProgressBar from '@/module/components/progressBar/progressBar'
 
   import { findLocale, localeList } from '@/module/i18n/config'
@@ -191,29 +192,55 @@
           className: 'update-file-modal',
           transitionName: 'opacityp',
           render (h) {
-            return h(mFileUpdate, {
-              on: {
-                onProgress (val) {
-                  self.progress = val
+            if(type === 'DEFINITION'){
+              return h(mDefinitionUpdate, {
+                on: {
+                  onProgress (val) {
+                    self.progress = val
+                  },
+                  onUpdate () {
+                    findComponentDownward(self.$root, `definition-list-index`)._updateList()
+                    self.isUpdate = false
+                    self.progress = 0
+                    modal.remove()
+                  },
+                  onArchive () {
+                    self.isUpdate = true
+                  },
+                  close () {
+                    self.progress = 0
+                    modal.remove()
+                  }
                 },
-                onUpdate () {
-                  findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList()
-                  self.isUpdate = false
-                  self.progress = 0
-                  modal.remove()
-                },
-                onArchive () {
-                  self.isUpdate = true
-                },
-                close () {
-                  self.progress = 0
-                  modal.remove()
+                props: {
+                  type: type
                 }
-              },
-              props: {
-                type: type
-              }
-            })
+              })
+            }else{
+              return h(mFileUpdate, {
+                on: {
+                  onProgress (val) {
+                    self.progress = val
+                  },
+                  onUpdate () {
+                    findComponentDownward(self.$root, `resource-list-index-${type}`)._updateList()
+                    self.isUpdate = false
+                    self.progress = 0
+                    modal.remove()
+                  },
+                  onArchive () {
+                    self.isUpdate = true
+                  },
+                  close () {
+                    self.progress = 0
+                    modal.remove()
+                  }
+                },
+                props: {
+                  type: type
+                }
+              })
+            }
           }
         })
       },
@@ -247,7 +274,7 @@
     computed: {
       ...mapState('user', ['userInfo'])
     },
-    components: { mFileUpdate, mProgressBar }
+    components: { mFileUpdate, mProgressBar, mDefinitionUpdate }
   }
 </script>
 

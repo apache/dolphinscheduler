@@ -220,7 +220,7 @@ public class OSUtils {
    * @throws IOException
    */
   public static String exeShell(String command) throws IOException {
-    return ShellExecutor.execCommand("groups");
+    return ShellExecutor.execCommand(command);
   }
 
   /**

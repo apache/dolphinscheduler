@@ -20,6 +20,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.ProcessDefinitionService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -29,9 +30,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 import static cn.escheduler.api.enums.Status.*;
+import static cn.escheduler.api.enums.Status.EXPORT_PROCESS_DEFINE_BY_ID_ERROR;
 
 
 /**
@@ -130,7 +133,7 @@ public class ProcessDefinitionController extends BaseController{
     @ApiOperation(value = "updateProccessDefinition", notes= "UPDATE_PROCCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
-            @ApiImplicitParam(name = "id", value = "PROCESS_DEFINITION_ID", required = true, type = "Int"),
+            @ApiImplicitParam(name = "id", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "processDefinitionJson", value = "PROCESS_DEFINITION_JSON", required = true, type ="String"),
             @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type ="String"),
             @ApiImplicitParam(name = "connects", value = "PROCESS_DEFINITION_CONNECTS", required = true, type ="String"),
@@ -172,8 +175,8 @@ public class ProcessDefinitionController extends BaseController{
     @ApiOperation(value = "releaseProccessDefinition", notes= "RELEASE_PROCCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "PROCESS_DEFINITION_NAME", required = true, type = "String"),
-            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, type = "Int"),
-            @ApiImplicitParam(name = "releaseState", value = "PROCESS_DEFINITION_CONNECTS", required = true, type ="Int"),
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "releaseState", value = "PROCESS_DEFINITION_CONNECTS", required = true, dataType = "Int", example = "100"),
     })
     @PostMapping(value = "/release")
     @ResponseStatus(HttpStatus.OK)
@@ -204,7 +207,7 @@ public class ProcessDefinitionController extends BaseController{
      */
     @ApiOperation(value = "queryProccessDefinitionById", notes= "QUERY_PROCCESS_DEFINITION_BY_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, type = "Int")
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value="/select-by-id")
     @ResponseStatus(HttpStatus.OK)
@@ -258,10 +261,10 @@ public class ProcessDefinitionController extends BaseController{
      */
     @ApiOperation(value = "queryProcessDefinitionListPaging", notes= "QUERY_PROCCESS_DEFINITION_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, type = "Int"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", required = true, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", required = false, type = "String"),
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = false, type = "Int"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, type = "Int")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = false, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value="/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -277,6 +280,7 @@ public class ProcessDefinitionController extends BaseController{
             if(result.get(Constants.STATUS) != Status.SUCCESS){
                 return returnDataListPaging(result);
             }
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             result = processDefinitionService.queryProcessDefinitionListPaging(loginUser, projectName, searchVal, pageNo, pageSize, userId);
             return returnDataListPaging(result);
         }catch (Exception e){
@@ -296,8 +300,8 @@ public class ProcessDefinitionController extends BaseController{
      */
     @ApiOperation(value = "viewTree", notes= "VIEW_TREE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, type = "Int"),
-            @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, type = "Int")
+            @ApiImplicitParam(name = "processId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "limit", value = "LIMIT", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value="/view-tree")
     @ResponseStatus(HttpStatus.OK)
@@ -327,7 +331,7 @@ public class ProcessDefinitionController extends BaseController{
      */
     @ApiOperation(value = "getNodeListByDefinitionId", notes= "GET_NODE_LIST_BY_DEFINITION_ID_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, type = "Int")
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value="gen-task-list")
     @ResponseStatus(HttpStatus.OK)
@@ -375,6 +379,83 @@ public class ProcessDefinitionController extends BaseController{
         }catch (Exception e){
             logger.error(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR.getMsg(), e);
             return error(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR.getCode(), GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * delete process definition by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionId
+     * @return
+     */
+    @GetMapping(value="/delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result deleteProcessDefinitionById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @PathVariable String projectName,
+                                            @RequestParam("processDefinitionId") Integer processDefinitionId
+    ){
+        try{
+            logger.info("delete process definition by id, login user:{}, project name:{}, process definition id:{}",
+                    loginUser.getUserName(), projectName, processDefinitionId);
+            Map<String, Object> result = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(DELETE_PROCESS_DEFINE_BY_ID_ERROR.getMsg(),e);
+            return error(Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR.getCode(), Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * batch delete process definition by ids
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionIds
+     * @return
+     */
+    @GetMapping(value="/batch-delete")
+    @ResponseStatus(HttpStatus.OK)
+    public Result batchDeleteProcessDefinitionByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                              @PathVariable String projectName,
+                                              @RequestParam("processDefinitionIds") String processDefinitionIds
+    ){
+        try{
+            logger.info("delete process definition by ids, login user:{}, project name:{}, process definition ids:{}",
+                    loginUser.getUserName(), projectName, processDefinitionIds);
+            Map<String, Object> result = processDefinitionService.batchDeleteProcessDefinitionByIds(loginUser, projectName, processDefinitionIds);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(),e);
+            return error(Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getCode(), Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * export process definition by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionId
+     * @return
+     */
+    @ApiOperation(value = "exportProcessDefinitionById", notes= "EXPORT_PROCCESS_DEFINITION_BY_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100")
+    })
+    @GetMapping(value="/export")
+    @ResponseBody
+    public void exportProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @PathVariable String projectName,
+                                            @RequestParam("processDefinitionId") Integer processDefinitionId,
+                                            HttpServletResponse response){
+        try{
+            logger.info("export process definition by id, login user:{}, project name:{}, process definition id:{}",
+                    loginUser.getUserName(), projectName, processDefinitionId);
+            processDefinitionService.exportProcessDefinitionById(loginUser, projectName, processDefinitionId,response);
+        }catch (Exception e){
+            logger.error(EXPORT_PROCESS_DEFINE_BY_ID_ERROR.getMsg(),e);
         }
     }
 
