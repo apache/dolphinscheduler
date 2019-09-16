@@ -271,6 +271,10 @@ let tasksType = {
   'DEPENDENT': {
     desc: 'DEPENDENT',
     color: '#2FBFD8'
+  },
+  'FLINK': {
+    desc: 'FLINK',
+    color: '#BF0060'
   }
 }
 

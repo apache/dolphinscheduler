@@ -878,6 +878,19 @@ public final class Constants {
     /**
      * hadoop.security.authentication
      */
+    /**
+     * flink command
+     */
+    public static final String FLINK_CLASS = "-c";
+    public static final String FLINK_RUN = "run";
+
+    public static final String FLINK_MODE = "-m";
+    public static final String FLINK_YARN_CONTAINER = "-yn";
+    public static final String FLINK_YARN_JOB_NAME = "-ynm";
+    public static final String FLINK_JOB_MANAGER_MEMORY = "-yjm";
+    public static final String FLINK_TASK_MANAGER_MEMORY = "-ytm";
+
+
     public static final String HADOOP_SECURITY_AUTHENTICATION = "hadoop.security.authentication";
 
     /**

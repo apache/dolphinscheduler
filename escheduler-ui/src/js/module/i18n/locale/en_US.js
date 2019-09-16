@@ -475,5 +475,13 @@ export default {
   'warning of timeout': 'warning of timeout',
   'Next five execution times': 'Next five execution times',
   'Execute time': 'Execute time',
-  'Complement range': 'Complement range'
+  'Complement range': 'Complement range',
+  'task manager memory(M)': 'task manager memory(M)',
+  'job manager memory(M)': 'job manager memory(M)',
+  'Number of task manager': 'Number of task manager',
+  'Please enter task manager number': 'Please enter task manager number',
+  'Please enter job manager use': 'Please enter job manager use',
+  'yarn application name':'yarn application name',
+  'Please enter yarn application name':'Please enter yarn application name',
+  'The number of task manager should be a positive integer':'The number of task manager should be a positive integer'
 }

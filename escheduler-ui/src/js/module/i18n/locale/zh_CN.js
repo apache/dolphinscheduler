@@ -476,5 +476,13 @@ export default {
   'warning of timeout': '超时告警',
   'Next five execution times': '接下来五次执行时间',
   'Execute time': '执行时间',
-  'Complement range': '补数范围'
+  'Complement range': '补数范围',
+  'task manager memory(M)': 'task manager内存(M)',
+  'job manager memory(M)': 'job manager内存(M)',
+  'Number of task manager': 'task manager数',
+  'Please enter task manager number': '请输入taskmanager数量',
+  'Please enter job manager use': '请输入job manager内存量',
+  'yarn application name':'yarn application name',
+  'Please enter yarn application name':'请输入实例名称',
+  'The number of task manager should be a positive integer':'task manager必须是正整数'
 }

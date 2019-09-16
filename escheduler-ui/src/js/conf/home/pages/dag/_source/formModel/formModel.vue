@@ -152,6 +152,13 @@
                 ref="PYTHON"
                 :backfill-item="backfillItem">
         </m-python>
+        <!-- flink node -->
+        <m-flink
+          v-if="taskType === 'FLINK'"
+          @on-params="_onParams"
+          ref="FLINK"
+          :backfill-item="backfillItem">
+        </m-flink>
         <!-- dependent node -->
         <m-dependent
                 v-if="taskType === 'DEPENDENT'"
@@ -178,6 +185,7 @@
   import i18n from '@/module/i18n'
   import mShell from './tasks/shell'
   import mSpark from './tasks/spark'
+  import mFlink from './tasks/flink'
   import mPython from './tasks/python'
   import JSP from './../plugIn/jsPlumbHandle'
   import mProcedure from './tasks/procedure'
@@ -456,6 +464,7 @@
       mLog,
       mSpark,
       mPython,
+      mFlink,
       mDependent,
       mSelectInput,
       mTimeoutAlarm,
