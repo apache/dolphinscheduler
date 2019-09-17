@@ -16,30 +16,23 @@
  */
 package cn.escheduler.dao.upgrade.shell;
 
-import cn.escheduler.dao.upgrade.EschedulerManager;
+import cn.escheduler.dao.upgrade.DolphinSchedulerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * upgrade escheduler database
+ * init DolphinScheduler
+ *
  */
-public class UpgradeEscheduler {
-	private static final Logger logger = LoggerFactory.getLogger(UpgradeEscheduler.class);
+public class InitDolphinScheduler {
+
+	private static final Logger logger = LoggerFactory.getLogger(InitDolphinScheduler.class);
 
 	public static void main(String[] args) {
-		EschedulerManager eschedulerManager = new EschedulerManager();
-		try {
-			eschedulerManager.upgradeEscheduler();
-			logger.info("upgrade escheduler success");
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			logger.info("Upgrade escheduler failed");
-			throw new RuntimeException(e);
-		}
-
+		Thread.currentThread().setName("manager-InitDolphinScheduler");
+		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
+		dolphinSchedulerManager.initDolphinScheduler();
+		logger.info("init DolphinScheduler finished");
 		
 	}
-	
-	
-	
 }
