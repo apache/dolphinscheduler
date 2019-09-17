@@ -65,17 +65,17 @@ ENV PATH $PATH:$NODE_HOME/bin
 RUN cd /opt && \
     wget https://github.com/analysys/EasyScheduler/archive/${version}.tar.gz && \
     tar -zxvf ${version}.tar.gz && \
-    mv EasyScheduler-${version} easyscheduler_source && \
+    mv incubator-dolphinscheduler-${version} incubator-dolphinscheduler_source && \
     rm -rf ./${version}.tar.gz
 
 #6,后端编译
-RUN cd /opt/easyscheduler_source && \
+RUN cd /opt/incubator-dolphinscheduler_source && \
     mvn -U clean package assembly:assembly -Dmaven.test.skip=true
 
 #7,前端编译
-RUN chmod -R 777 /opt/easyscheduler_source/escheduler-ui && \
-    cd /opt/easyscheduler_source/escheduler-ui && \
-    rm -rf /opt/easyscheduler_source/escheduler-ui/node_modules && \
+RUN chmod -R 777 /opt/incubator-dolphinscheduler_source/escheduler-ui && \
+    cd /opt/incubator-dolphinscheduler_source/escheduler-ui && \
+    rm -rf /opt/incubator-dolphinscheduler_source/escheduler-ui/node_modules && \
     npm install node-sass --unsafe-perm && \
     npm install && \
     npm run build
@@ -112,7 +112,7 @@ RUN apt-get update && \
 #10,修改escheduler配置文件
 #后端配置
 RUN mkdir -p /opt/escheduler && \
-    tar -zxvf /opt/easyscheduler_source/target/escheduler-${tar_version}.tar.gz -C /opt/escheduler && \
+    tar -zxvf /opt/incubator-dolphinscheduler_source/target/escheduler-${tar_version}.tar.gz -C /opt/escheduler && \
     rm -rf /opt/escheduler/conf
 ADD ./conf/escheduler/conf /opt/escheduler/conf
 #前端nginx配置

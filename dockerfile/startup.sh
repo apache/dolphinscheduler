@@ -5,7 +5,7 @@ if [ `netstat -anop|grep mysql|wc -l` -gt 0 ];then
                 echo "MySQL is Running."
 else
 	MYSQL_ROOT_PWD="root@123"
-        ESZ_DB="escheduler"
+        ESZ_DB="c"
 	echo "启动mysql服务"
 	chown -R mysql:mysql /var/lib/mysql /var/run/mysqld
 	find /var/lib/mysql -type f -exec touch {} \; && service mysql restart $ sleep 10
