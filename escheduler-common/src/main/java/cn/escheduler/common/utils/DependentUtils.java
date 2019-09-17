@@ -23,6 +23,7 @@ import cn.escheduler.common.utils.dependent.DependentDateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -140,5 +141,8 @@ public class DependentUtils {
         return result;
     }
 
+    public static List<DateInterval> getDateIntervalList(Instant businessDate, String dateValue) {
+        return getDateIntervalList(Date.from(businessDate),dateValue);
+    }
 
 }

@@ -20,11 +20,8 @@ import cn.escheduler.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -41,7 +38,7 @@ public class DateUtils {
      * @return
      */
     private static LocalDateTime date2LocalDateTime(Date date) {
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     /**
@@ -206,10 +203,9 @@ public class DateUtils {
      * @return
      */
     public static Date getSomeDay(Date date, int day) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DATE, day);
-        return calendar.getTime();
+        ZonedDateTime zonedDateTime =
+                date.toInstant().atZone(ZoneId.systemDefault()).plusDays(day);
+        return Date.from(zonedDateTime.toInstant());
     }
 
     /**
@@ -252,74 +248,56 @@ public class DateUtils {
 
     /**
      * get monday
-     * <p>
-     * note: Set the first day of the week to Monday, the default is Sunday
      */
     public static Date getMonday(Date date) {
-        Calendar cal = Calendar.getInstance();
-
-        cal.setTime(date);
-
-        cal.setFirstDayOfWeek(Calendar.MONDAY);
-        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-
-        return cal.getTime();
+        Instant instant = date.toInstant().atZone(ZoneId.systemDefault()).with(DayOfWeek.MONDAY).toInstant();
+        return Date.from(instant);
     }
 
     /**
      * get sunday
-     * <p>
-     * note: Set the first day of the week to Monday, the default is Sunday
      */
     public static Date getSunday(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-
-        cal.setFirstDayOfWeek(Calendar.MONDAY);
-        cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-
-        return cal.getTime();
+        Instant instant = date.toInstant().atZone(ZoneId.systemDefault()).with(DayOfWeek.SUNDAY).toInstant();
+        return Date.from(instant);
     }
 
     /**
      * get first day of month
      */
     public static Date getFirstDayOfMonth(Date date) {
-        Calendar cal = Calendar.getInstance();
-
-        cal.setTime(date);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-
-        return cal.getTime();
+        Instant instant = date.toInstant().atZone(ZoneId.systemDefault()).withDayOfMonth(1).toInstant();
+        return Date.from(instant);
     }
 
     /**
-     * get first day of month
+     * get several hours ago
      */
+
     public static Date getSomeHourOfDay(Date date, int hours) {
-        Calendar cal = Calendar.getInstance();
+        Instant instant =
+                date.toInstant().atZone(ZoneId.systemDefault())
+                        .minusHours(hours)
+                        .withMinute(0)
+                        .withSecond(0)
+                        .withNano(0)
+                        .toInstant();
 
-        cal.setTime(date);
-        cal.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY) - hours);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-
-        return cal.getTime();
+        return Date.from(instant);
     }
 
     /**
      * get last day of month
      */
     public static Date getLastDayOfMonth(Date date) {
-        Calendar cal = Calendar.getInstance();
+        Instant instant =
+                date.toInstant().atZone(ZoneId.systemDefault())
+                        .withDayOfMonth(1)
+                        .plusMonths(1)
+                        .minusDays(1)
+                        .toInstant();
 
-        cal.setTime(date);
-
-        cal.add(Calendar.MONTH, 1);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.add(Calendar.DAY_OF_MONTH, -1);
-
-        return cal.getTime();
+        return Date.from(instant);
     }
 
     /**
@@ -329,12 +307,13 @@ public class DateUtils {
      * @return
      */
     public static Date getStartOfDay(Date inputDay) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(inputDay);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        return cal.getTime();
+        Instant instant =
+                inputDay.toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                        .atStartOfDay(ZoneId.systemDefault()).toInstant();
+
+        return Date.from(instant);
     }
 
     /**
@@ -344,12 +323,16 @@ public class DateUtils {
      * @return
      */
     public static Date getEndOfDay(Date inputDay) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(inputDay);
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        return cal.getTime();
+        Instant instant =
+                inputDay.toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                        .atStartOfDay(ZoneId.systemDefault())
+                        .plusDays(1)
+                        .minusSeconds(1)
+                        .toInstant();
+
+        return Date.from(instant);
     }
 
     /**
@@ -359,11 +342,14 @@ public class DateUtils {
      * @return
      */
     public static Date getStartOfHour(Date inputDay) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(inputDay);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        return cal.getTime();
+        Instant instant =
+                inputDay.toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .withMinute(0)
+                        .withSecond(0)
+                        .withNano(0).toInstant();
+
+        return Date.from(instant);
     }
 
     /**
@@ -373,11 +359,16 @@ public class DateUtils {
      * @return
      */
     public static Date getEndOfHour(Date inputDay) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(inputDay);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        return cal.getTime();
+        Instant instant =
+                inputDay.toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .plusHours(1)
+                        .withMinute(0)
+                        .withSecond(0)
+                        .withNano(0)
+                        .minusSeconds(1).toInstant();
+
+        return Date.from(instant);
     }
 
 

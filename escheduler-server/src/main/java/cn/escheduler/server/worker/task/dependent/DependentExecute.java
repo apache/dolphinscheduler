@@ -30,6 +30,7 @@ import cn.escheduler.dao.model.TaskInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -59,7 +60,7 @@ public class DependentExecute {
      * @param dependentItem
      * @return
      */
-    public DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime){
+    public DependResult getDependentResultForItem(DependentItem dependentItem, Instant currentTime){
         List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
         return calculateResultForTasks(dependentItem, dateIntervals );
     }
@@ -201,7 +202,7 @@ public class DependentExecute {
         if(dependResultMap.containsKey(key)){
             return dependResultMap.get(key);
         }
-        return getDependentResultForItem(item, currentTime);
+        return getDependentResultForItem(item, currentTime.toInstant());
     }
 
     public Map<String, DependResult> getDependResultMap(){
