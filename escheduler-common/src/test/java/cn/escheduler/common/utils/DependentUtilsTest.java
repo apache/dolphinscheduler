@@ -69,7 +69,7 @@ public class DependentUtilsTest {
         dateValue = "last2Days";
         dateIntervals = DependentUtils.getDateIntervalList(curDay, dateValue);
         for(DateInterval dateInterval : dateIntervals){
-            logger.info(dateInterval.getStartTime().toString() + " == " + dateInterval.getEndTime().toString());
+            logger.info(dateInterval.getStartInstant() + " == " + dateInterval.getEndInstant());
         }
 
         Assert.assertEquals(dateIntervals.get(1), di1);

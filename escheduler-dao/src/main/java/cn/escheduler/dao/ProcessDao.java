@@ -1717,20 +1717,20 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public ProcessInstance findLastSchedulerProcessInterval(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastSchedulerProcess(definitionId,
-                DateUtils.dateToString(dateInterval.getStartTime()),
-                DateUtils.dateToString(dateInterval.getEndTime()));
+                DateUtils.instantToString(dateInterval.getStartInstant()),
+                DateUtils.instantToString(dateInterval.getEndInstant()));
     }
 
     public ProcessInstance findLastManualProcessInterval(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastManualProcess(definitionId,
-                DateUtils.dateToString(dateInterval.getStartTime()),
-                DateUtils.dateToString(dateInterval.getEndTime()));
+                DateUtils.instantToString(dateInterval.getStartInstant()),
+                DateUtils.instantToString(dateInterval.getEndInstant()));
     }
 
     public ProcessInstance findLastRunningProcess(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastRunningProcess(definitionId,
-                DateUtils.dateToString(dateInterval.getStartTime()),
-                DateUtils.dateToString(dateInterval.getEndTime()),
+                DateUtils.instantToString(dateInterval.getStartInstant()),
+                DateUtils.instantToString(dateInterval.getEndInstant()),
                 stateArray);
     }
 

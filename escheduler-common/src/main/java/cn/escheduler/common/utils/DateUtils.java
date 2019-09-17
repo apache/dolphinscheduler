@@ -98,6 +98,15 @@ public class DateUtils {
         return format(date, Constants.YYYY_MM_DD_HH_MM_SS);
     }
 
+    /**
+     * @param instant
+     * @return convert time to yyyy-MM-dd HH:mm:ss format with default time zone
+     */
+    public static String instantToString(Instant instant) {
+        return instant.atZone(ZoneId.systemDefault())
+                .format(DateTimeFormatter.ofPattern(Constants.YYYY_MM_DD_HH_MM_SS));
+    }
+
 
     /**
      * @param date

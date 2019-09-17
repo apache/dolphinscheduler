@@ -39,18 +39,35 @@ public class DateInterval {
         this.endInstant = endTime;
     }
 
+    /**
+     * @deprecated use {@link #getStartInstant} instead
+     */
+    @Deprecated
     public Date getStartTime() {
         return Date.from(startInstant);
     }
 
+    /**
+     * @deprecated use {@link #setStartInstant(Instant)} instead
+     */
+    @Deprecated
     public void setStartTime(Date startTime) {
         this.startInstant = startTime.toInstant();
     }
 
+    /**
+     * @deprecated use {@link #getEndInstant()} instead
+     */
+    @Deprecated
     public Date getEndTime() {
         return Date.from(endInstant);
     }
 
+    /**
+     * @deprecated use {@link #setEndInstant(Instant)} instead
+     * @param endTime
+     */
+    @Deprecated
     public void setEndTime(Date endTime) {
         this.endInstant = endTime.toInstant();
     }

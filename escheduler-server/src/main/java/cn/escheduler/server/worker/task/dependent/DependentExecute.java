@@ -78,7 +78,7 @@ public class DependentExecute {
                                                     dateInterval);
             if(processInstance == null){
                 logger.error("cannot find the right process instance: definition id:{}, start:{}, end:{}",
-                       dependentItem.getDefinitionId(), dateInterval.getStartTime(), dateInterval.getEndTime() );
+                       dependentItem.getDefinitionId(), dateInterval.getStartInstant(), dateInterval.getEndInstant() );
                 return DependResult.FAILED;
             }
             if(dependentItem.getDepTasks().equals(Constants.DEPENDENT_ALL)){
