@@ -16,6 +16,7 @@
  */
 package cn.escheduler.common.model;
 
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -23,40 +24,60 @@ import java.util.Date;
  */
 public class DateInterval {
 
-    private Date startTime;
+    private Instant startInstant;
 
-    private Date endTime;
+    private Instant endInstant;
 
-    public DateInterval(Date beginTime, Date endTime){
-        this.startTime = beginTime;
-        this.endTime = endTime;
+    public DateInterval(Date startDate, Date endDate){
+        this.startInstant = startDate.toInstant();
+        this.endInstant = endDate.toInstant();
+    }
 
+    public DateInterval(Instant startInstant, Instant endTime) {
+        this.startInstant = startInstant;
+        this.endInstant = endTime;
     }
 
     @Override
     public boolean equals(Object obj) {
         try{
             DateInterval dateInterval = (DateInterval) obj;
-            return startTime.equals(dateInterval.getStartTime()) &&
-                    endTime.equals(dateInterval.getEndTime());
+            return startInstant.equals(dateInterval.getStartTime()) &&
+                    endInstant.equals(dateInterval.getEndTime());
         }catch (Exception e){
             return false;
         }
     }
 
     public Date getStartTime() {
-        return startTime;
+        return Date.from(startInstant);
     }
 
     public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+        this.startInstant = startTime.toInstant();
     }
 
     public Date getEndTime() {
-        return endTime;
+        return Date.from(endInstant);
     }
 
     public void setEndTime(Date endTime) {
-        this.endTime = endTime;
+        this.endInstant = endTime.toInstant();
+    }
+
+    public Instant getStartInstant() {
+        return startInstant;
+    }
+
+    public void setStartInstant(Instant startInstant) {
+        this.startInstant = startInstant;
+    }
+
+    public Instant getEndInstant() {
+        return endInstant;
+    }
+
+    public void setEndInstant(Instant endInstant) {
+        this.endInstant = endInstant;
     }
 }
