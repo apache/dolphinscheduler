@@ -53,6 +53,7 @@
 		<clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
 		<mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
 		<jsp.version>6.1.14</jsp.version>
+		<javax.annotation-api.version>1.3.2</javax.annotation-api.version>
 	</properties>
 
 	<dependencyManagement>
@@ -413,6 +414,12 @@
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jsp-2.1</artifactId>
 				<version>${jsp.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>javax.annotation</groupId>
+				<artifactId>javax.annotation-api</artifactId>
+				<version>${javax.annotation-api.version}</version>
 			</dependency>
 
 		</dependencies>
