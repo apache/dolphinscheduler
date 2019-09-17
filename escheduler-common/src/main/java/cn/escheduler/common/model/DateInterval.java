@@ -18,6 +18,7 @@ package cn.escheduler.common.model;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * date interval class
@@ -36,17 +37,6 @@ public class DateInterval {
     public DateInterval(Instant startInstant, Instant endTime) {
         this.startInstant = startInstant;
         this.endInstant = endTime;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        try{
-            DateInterval dateInterval = (DateInterval) obj;
-            return startInstant.equals(dateInterval.getStartTime()) &&
-                    endInstant.equals(dateInterval.getEndTime());
-        }catch (Exception e){
-            return false;
-        }
     }
 
     public Date getStartTime() {
@@ -79,5 +69,27 @@ public class DateInterval {
 
     public void setEndInstant(Instant endInstant) {
         this.endInstant = endInstant;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startInstant, endInstant);
+    }
+
+    @Override
+    public String toString() {
+        return "DateInterval{" +
+                "startInstant=" + startInstant +
+                ", endInstant=" + endInstant +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DateInterval that = (DateInterval) o;
+        return startInstant.equals(that.startInstant) &&
+                endInstant.equals(that.endInstant);
     }
 }
