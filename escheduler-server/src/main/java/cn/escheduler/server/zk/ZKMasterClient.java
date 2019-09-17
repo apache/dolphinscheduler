@@ -38,6 +38,7 @@ import org.apache.curator.utils.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadFactory;
@@ -351,7 +352,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	    if(StringUtils.isEmpty(taskInstance.getHost())){
 	    	return false;
 		}
-	    Date workerServerStartDate = null;
+	    Instant workerServerStartDate = null;
 	    List<MasterServer> workerServers= getServersList(ZKNodeType.WORKER);
 	    for(MasterServer server : workerServers){
 	    	if(server.getHost().equals(taskInstance.getHost())){
@@ -361,7 +362,7 @@ public class ZKMasterClient extends AbstractZKClient {
 		}
 
 		if(workerServerStartDate != null){
-			return taskInstance.getStartTime().after(workerServerStartDate);
+			return taskInstance.getStartTime().toInstant().isAfter(workerServerStartDate);
 		}else{
 			return false;
 		}

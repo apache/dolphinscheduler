@@ -124,6 +124,22 @@ public class DateUtils {
     }
 
     /**
+     * @param date
+     * @param format
+     * @return convert string to instant
+     */
+    public static Instant parseInstant(String date,String format) {
+        try {
+            //     return new SimpleDateFormat(format).parse(date);
+            LocalDateTime ldt = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(format));
+            return ldt.atZone(ZoneId.systemDefault()).toInstant();
+        } catch (Exception e) {
+            logger.error("error while parse date:" + date, e);
+        }
+        return null;
+    }
+
+    /**
      * convert date str to yyyy-MM-dd HH:mm:ss format
      *
      * @param str
@@ -133,6 +149,9 @@ public class DateUtils {
         return parse(str, Constants.YYYY_MM_DD_HH_MM_SS);
     }
 
+    public static Instant stringToInstant(String str) {
+        return parseInstant(str, Constants.YYYY_MM_DD_HH_MM_SS);
+    }
     /**
      * get seconds between two dates
      *

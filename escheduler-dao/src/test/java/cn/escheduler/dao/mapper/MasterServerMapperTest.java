@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -45,9 +46,9 @@ public class MasterServerMapperTest {
         MasterServer masterServer = new MasterServer();
         String host = OSUtils.getHost();
         masterServer.setHost(host);
-        masterServer.setLastHeartbeatTime(new Date());
+        masterServer.setLastHeartbeatTime(Instant.now());
         masterServer.setPort(19282);
-        masterServer.setCreateTime(new Date());
+        masterServer.setCreateTime(Instant.now());
         masterServer.setZkDirectory("/escheduler/masters/" + host + "_0000000001");
 
         masterServerMapper.insert(masterServer);

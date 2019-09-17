@@ -66,8 +66,8 @@ public class ServerDao extends AbstractBaseDao {
         masterServer.setPort(port);
         masterServer.setZkDirectory(zkDirectory);
         masterServer.setResInfo(resInfo);
-        masterServer.setCreateTime(createTime);
-        masterServer.setLastHeartbeatTime(lastHeartbeatTime);
+        masterServer.setCreateTime(createTime.toInstant());
+        masterServer.setLastHeartbeatTime(lastHeartbeatTime.toInstant());
 
         return masterServerMapper.insert(masterServer);
     }
@@ -88,7 +88,7 @@ public class ServerDao extends AbstractBaseDao {
         masterServer.setHost(host);
         masterServer.setPort(port);
         masterServer.setResInfo(resInfo);
-        masterServer.setLastHeartbeatTime(lastHeartbeatTime);
+        masterServer.setLastHeartbeatTime(lastHeartbeatTime.toInstant());
 
         return masterServerMapper.update(masterServer);
     }

@@ -17,7 +17,7 @@
 package cn.escheduler.common.model;
 
 
-import java.util.Date;
+import java.time.Instant;
 
 /**
  * master server
@@ -52,12 +52,12 @@ public class MasterServer {
     /**
      * create time
      */
-    private Date createTime;
+    private Instant createTime;
 
     /**
      * laster heart beat time
      */
-    private Date lastHeartbeatTime;
+    private Instant lastHeartbeatTime;
 
     public int getId() {
         return id;
@@ -83,11 +83,11 @@ public class MasterServer {
         this.port = port;
     }
 
-    public Date getCreateTime() {
+    public Instant getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(Instant createTime) {
         this.createTime = createTime;
     }
 
@@ -99,11 +99,11 @@ public class MasterServer {
         this.zkDirectory = zkDirectory;
     }
 
-    public Date getLastHeartbeatTime() {
+    public Instant getLastHeartbeatTime() {
         return lastHeartbeatTime;
     }
 
-    public void setLastHeartbeatTime(Date lastHeartbeatTime) {
+    public void setLastHeartbeatTime(Instant lastHeartbeatTime) {
         this.lastHeartbeatTime = lastHeartbeatTime;
     }
 

@@ -146,8 +146,8 @@ public class ResInfo {
         masterServer.setHost(masterArray[0]);
         masterServer.setPort(Integer.parseInt(masterArray[1]));
         masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[2]), Double.parseDouble(masterArray[3])));
-        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[4]));
-        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[5]));
+        masterServer.setCreateTime(DateUtils.stringToInstant(masterArray[4]));
+        masterServer.setLastHeartbeatTime(DateUtils.stringToInstant(masterArray[5]));
         return masterServer;
     }
 
