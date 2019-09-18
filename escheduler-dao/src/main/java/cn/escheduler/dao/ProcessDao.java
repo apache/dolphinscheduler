@@ -1739,7 +1739,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param processInstanceId
      * @return
      */
-    public String queryQueueByProcessInstanceId(int processInstanceId){
+    public String queryUserQueueByProcessInstanceId(int processInstanceId){
         return userMapper.queryQueueByProcessInstanceId(processInstanceId);
     }
 
@@ -1772,7 +1772,10 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public int getTaskWorkerGroupId(TaskInstance taskInstance) {
         int taskWorkerGroupId = taskInstance.getWorkerGroupId();
-        ProcessInstance processInstance = findProcessInstanceByTaskId(taskInstance.getId());
+        int processInstanceId = taskInstance.getProcessInstanceId();
+
+        ProcessInstance processInstance = findProcessInstanceById(processInstanceId);
+
         if(processInstance == null){
             logger.error("cannot find the task:{} process instance", taskInstance.getId());
             return Constants.DEFAULT_WORKER_ID;

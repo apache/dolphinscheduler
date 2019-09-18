@@ -20,7 +20,6 @@ import cn.escheduler.common.Constants;
 import cn.escheduler.common.IStoppable;
 import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.common.model.MasterServer;
-import cn.escheduler.common.enums.ServerEnum;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.utils.ResInfo;
@@ -308,9 +307,12 @@ public abstract class AbstractZKClient {
 				childrenList = zkClient.getChildren().forPath(getZNodeParentPath(ZKNodeType.MASTER));
 			}
 		} catch (Exception e) {
-			if(!e.getMessage().contains("java.lang.IllegalStateException: instance must be started")){
-				logger.warn(e.getMessage(),e);
+			if(e.getMessage().contains("java.lang.IllegalStateException: instance must be started")){
+				logger.error("zookeeper service not started",e);
+			}else{
+				logger.error(e.getMessage(),e);
 			}
+
 		}finally {
 			return childrenList.size();
 		}
@@ -344,9 +346,12 @@ public abstract class AbstractZKClient {
 		String parentPath = getZNodeParentPath(zkNodeType);
 
 		List<MasterServer> masterServers = new ArrayList<>();
+		int i = 0;
 		for(String path : masterMap.keySet()){
 			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(masterMap.get(path));
 			masterServer.setZkDirectory( parentPath + "/"+ path);
+			masterServer.setId(i);
+			i ++;
 			masterServers.add(masterServer);
 		}
 		return masterServers;
