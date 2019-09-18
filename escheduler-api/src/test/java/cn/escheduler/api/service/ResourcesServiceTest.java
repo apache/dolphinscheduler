@@ -16,6 +16,7 @@
  */
 package cn.escheduler.api.service;
 
+import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.common.enums.ResourceType;
@@ -33,7 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Map;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class ResourcesServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(ResourcesServiceTest.class);
 
@@ -43,7 +44,7 @@ public class ResourcesServiceTest {
     @Test
     public void querytResourceList(){
         User loginUser = new User();
-        loginUser.setId(27);
+        loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> map = resourcesService.queryResourceList(loginUser, ResourceType.FILE);

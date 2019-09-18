@@ -55,7 +55,10 @@ public class ProcessDefinitionMapperProvider {
                 VALUES("`connects`", "#{processDefinition.connects}");
                 VALUES("`create_time`", "#{processDefinition.createTime}");
                 VALUES("`update_time`", "#{processDefinition.updateTime}");
+                VALUES("`receivers` ","#{processDefinition.receivers}");
+                VALUES("`receivers_cc`", "#{processDefinition.receiversCc}");
                 VALUES("`timeout`", "#{processDefinition.timeout}");
+                VALUES("`tenant_id`", "#{processDefinition.tenantId}");
                 VALUES("`flag`", EnumFieldUtil.genFieldStr("processDefinition.flag", ReleaseState.class));
                 VALUES("`user_id`", "#{processDefinition.userId}");
 
@@ -101,7 +104,10 @@ public class ProcessDefinitionMapperProvider {
                 SET("`global_params`=#{processDefinition.globalParams}");
                 SET("`create_time`=#{processDefinition.createTime}");
                 SET("`update_time`=#{processDefinition.updateTime}");
+                SET("`receivers`=#{processDefinition.receivers}");
+                SET("`receivers_cc`=#{processDefinition.receiversCc}");
                 SET("`timeout`=#{processDefinition.timeout}");
+                SET("`tenant_id`=#{processDefinition.tenantId}");
                 SET("`flag`="+EnumFieldUtil.genFieldStr("processDefinition.flag", Flag.class));
                 SET("`user_id`=#{processDefinition.userId}");
 
@@ -134,7 +140,7 @@ public class ProcessDefinitionMapperProvider {
     public String queryByDefineId(Map<String, Object> parameter) {
         return new SQL() {
             {
-                SELECT("pd.*,u.user_name,p.name as projectName");
+                SELECT("pd.*,u.user_name,p.name as project_name");
 
                 FROM(TABLE_NAME + " pd");
                 JOIN("t_escheduler_user u ON pd.user_id = u.id");
@@ -189,7 +195,7 @@ public class ProcessDefinitionMapperProvider {
             if(userId != null && 0 != Integer.parseInt(userId.toString())){
                 WHERE("td.user_id = #{userId}");
             }
-            ORDER_BY(" td.update_time desc limit #{offset},#{pageSize} ");
+            ORDER_BY(" sc.schedule_release_state desc,td.update_time desc limit #{offset},#{pageSize} ");
         }}.toString();
     }
     /**
@@ -290,5 +296,20 @@ public class ProcessDefinitionMapperProvider {
 
             }
         }.toString();
+    }
+
+
+    /**
+     * query all
+     * @return
+     */
+    public String queryAll() {
+        return new SQL() {{
+            SELECT("id,name,version,release_state,project_id,user_id,`desc`,create_time,update_time,flag,global_params,receivers,receivers_cc");
+
+            FROM(TABLE_NAME );
+
+            ORDER_BY("create_time desc ");
+        }}.toString();
     }
 }

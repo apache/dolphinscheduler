@@ -13,6 +13,12 @@
             <span>{{$t('Owned Users')}}</span>
           </th>
           <th>
+            <span>{{$t('Process Define Count')}}</span>
+          </th>
+          <th>
+            <span>{{$t('Process Instance Running Count')}}</span>
+          </th>
+          <th>
             <span>{{$t('Description')}}</span>
           </th>
           <th>
@@ -38,6 +44,12 @@
             <span>{{item.userName || '-'}}</span>
           </td>
           <td>
+            <span>{{item.defCount}}</span>
+          </td>
+          <td>
+            <span>{{item.instRunningCount}}</span>
+          </td>
+          <td>
             <span>{{item.desc}}</span>
           </td>
           <td><span>{{item.createTime | formatDate}}</span></td>
@@ -51,8 +63,7 @@
                     data-toggle="tooltip"
                     :title="$t('Edit')"
                     @click="_edit(item)"
-                    icon="iconfont icon-bianjixiugai"
-                    v-ps="['GENERAL_USER']">
+                    icon="iconfont icon-bianjixiugai">
             </x-button>
             <x-poptip
                     :ref="'poptip-' + $index"
@@ -70,8 +81,7 @@
                         size="xsmall"
                         data-toggle="tooltip"
                         :title="$t('delete')"
-                        icon="iconfont icon-shanchu"
-                        v-ps="['GENERAL_USER']">
+                        icon="iconfont icon-shanchu">
                 </x-button>
               </template>
             </x-poptip>

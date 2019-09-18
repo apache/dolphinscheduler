@@ -18,27 +18,46 @@ package cn.escheduler.server.master;
 
 import cn.escheduler.common.enums.CommandType;
 import cn.escheduler.common.enums.FailureStrategy;
+import cn.escheduler.common.enums.TaskDependType;
 import cn.escheduler.common.enums.WarningType;
+import cn.escheduler.common.graph.DAG;
+import cn.escheduler.common.model.TaskNode;
+import cn.escheduler.common.model.TaskNodeRelation;
+import cn.escheduler.common.process.ProcessDag;
 import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.mapper.CommandMapper;
+import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
 import cn.escheduler.dao.model.Command;
+import cn.escheduler.dao.model.ProcessDefinition;
+import cn.escheduler.dao.utils.DagHelper;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
 /**
  *  master test
  */
+@Ignore
 public class MasterCommandTest {
 
     private final Logger logger = LoggerFactory.getLogger(MasterCommandTest.class);
 
     private CommandMapper commandMapper;
 
+    private ProcessDefinitionMapper processDefinitionMapper;
+
+
     @Before
     public void before(){
+
         commandMapper = ConnectionFactory.getSqlSession().getMapper(CommandMapper.class);
+        processDefinitionMapper = ConnectionFactory.getSqlSession().getMapper(ProcessDefinitionMapper.class);
     }
 
 
@@ -102,6 +121,31 @@ public class MasterCommandTest {
         cmd.setExecutorId(10);
         commandMapper.insert(cmd);
     }
+
+
+    @Test
+    public void testDagHelper(){
+
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(19);
+
+        try {
+            ProcessDag processDag = DagHelper.generateFlowDag(processDefinition.getProcessDefinitionJson(),
+                    new ArrayList<>(), new ArrayList<>(), TaskDependType.TASK_POST);
+
+            DAG<String,TaskNode,TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+            Collection<String> start = DagHelper.getStartVertex("1", dag, null);
+
+            System.out.println(start.toString());
+
+            Map<String, TaskNode> forbidden = DagHelper.getForbiddenTaskNodeMaps(processDefinition.getProcessDefinitionJson());
+            System.out.println(forbidden);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
 
 
 }

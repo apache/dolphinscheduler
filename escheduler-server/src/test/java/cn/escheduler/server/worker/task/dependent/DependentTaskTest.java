@@ -27,13 +27,11 @@ public class DependentTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(DependentTaskTest.class);
 
+
     @Test
     public void testDependInit(){
 
-
         TaskProps taskProps = new TaskProps();
-
-
 
         String dependString = "{\n" +
                 "\"dependTaskList\":[\n" +

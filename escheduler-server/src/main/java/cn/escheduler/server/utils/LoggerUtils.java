@@ -16,6 +16,7 @@
  */
 package cn.escheduler.server.utils;
 
+import cn.escheduler.common.Constants;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -31,7 +32,14 @@ public class LoggerUtils {
     /**
      * rules for extracting application ID
      */
-    private static final Pattern APPLICATION_REGEX = Pattern.compile("\\d+_\\d+");
+    private static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
+
+    /**
+     * Task Logger's prefix
+     */
+    public static final String TASK_LOGGER_INFO_PREFIX = "TASK";
+
+    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
 
     /**
      *  build job id
@@ -45,7 +53,8 @@ public class LoggerUtils {
                                   int processDefId,
                                   int processInstId,
                                   int taskId){
-        return String.format("%s_%s_%s_%s",affix,
+        // - [taskAppId=TASK_79_4084_15210]
+        return String.format(" - [taskAppId=%s-%s-%s-%s]",affix,
                 processDefId,
                 processInstId,
                 taskId);

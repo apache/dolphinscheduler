@@ -16,6 +16,7 @@
  */
 package cn.escheduler.api.service;
 
+import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.common.enums.UserType;
@@ -32,7 +33,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Map;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class TenantServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(TenantServiceTest.class);
 

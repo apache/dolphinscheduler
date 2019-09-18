@@ -16,12 +16,16 @@
  */
 package cn.escheduler.common.utils;
 
+import cn.escheduler.common.Constants;
+import cn.escheduler.common.enums.ResUploadType;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import static cn.escheduler.common.Constants.COMMON_PROPERTIES_PATH;
@@ -63,11 +67,15 @@ public class PropertyUtils {
         }
     }
 
-/*
-    public static PropertyUtils getInstance(){
-        return propertyUtils;
+    /**
+     * judge whether resource upload startup
+     * @return
+     */
+    public static Boolean getResUploadStartupState(){
+        String resUploadStartupType = PropertyUtils.getString(Constants.RES_UPLOAD_STARTUP_TYPE);
+        ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
+        return resUploadType == ResUploadType.HDFS || resUploadType == ResUploadType.S3;
     }
-*/
 
     /**
      * get property value
@@ -188,5 +196,20 @@ public class PropertyUtils {
                                          T defaultValue) {
         String val = getString(key);
         return val == null ? defaultValue : Enum.valueOf(type, val);
+    }
+
+    /**
+     * get all properties with specified prefix, like: fs.
+     * @param prefix prefix to search
+     * @return
+     */
+    public static Map<String, String> getPrefixedProperties(String prefix) {
+        Map<String, String> matchedProperties = new HashMap<>();
+        for (String propName : properties.stringPropertyNames()) {
+            if (propName.startsWith(prefix)) {
+                matchedProperties.put(propName, properties.getProperty(propName));
+            }
+        }
+        return matchedProperties;
     }
 }

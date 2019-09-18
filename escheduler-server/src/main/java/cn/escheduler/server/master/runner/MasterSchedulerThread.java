@@ -20,6 +20,7 @@ import cn.escheduler.common.Constants;
 import cn.escheduler.common.thread.Stopper;
 import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.OSUtils;
+import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.server.zk.ZKMasterClient;
@@ -98,18 +99,7 @@ public class MasterSchedulerThread implements Runnable {
             }catch (Exception e){
                 logger.error("master scheduler thread exception : " + e.getMessage(),e);
             }finally{
-                if (mutex != null){
-                    try {
-                        mutex.release();
-                    } catch (Exception e) {
-                        if(e.getMessage().equals("instance must be started before calling this method")){
-                            logger.warn("lock release");
-                        }else{
-                            logger.error("lock release failed : " + e.getMessage(),e);
-                        }
-
-                    }
-                }
+                AbstractZKClient.releaseMutex(mutex);
             }
         }
     }

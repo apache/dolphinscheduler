@@ -20,58 +20,39 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.utils.JSONUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class LoggerControllerTest {
+/**
+ * logger controller test
+ */
+public class LoggerControllerTest extends AbstractControllerTest {
+
     private static Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
-
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
 
     @Test
     public void queryLog() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("taskInstId","6007");
+        paramsMap.add("taskInstId","-1");
         paramsMap.add("skipLineNum","0");
         paramsMap.add("limit","1000");
 
         MvcResult mvcResult = mockMvc.perform(get("/log/detail")
-                .header("sessionId", "08fae8bf-fe2d-4fc0-8129-23c37fbfac82")
+                .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+//                .andExpect(status().isOk())
+//                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

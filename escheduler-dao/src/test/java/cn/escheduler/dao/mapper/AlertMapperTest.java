@@ -27,6 +27,9 @@ import org.junit.Test;
 
 import java.util.Date;
 
+/**
+ * alert mapper test
+ */
 public class AlertMapperTest {
 
 

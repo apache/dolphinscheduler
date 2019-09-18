@@ -1,6 +1,7 @@
 <template>
   <div class="home-main index-model">
     <m-variable></m-variable>
+    <m-starting-param></m-starting-param>
     <m-dag v-if="!isLoading" :type="'instance'"></m-dag>
     <m-spin :is-spin="isLoading"></m-spin>
   </div>
@@ -10,6 +11,7 @@
   import { mapActions, mapMutations } from 'vuex'
   import mSpin from '@/module/components/spin/spin'
   import mVariable from './_source/variable'
+  import mStartingParam from './_source/startingParam'
   import Affirm from './_source/jumpAffirm'
   import disabledState from '@/module/mixin/disabledState'
 
@@ -25,8 +27,8 @@
     props: {},
     methods: {
       ...mapMutations('dag', ['setIsDetails', 'resetParams']),
-      ...mapActions('dag', ['getProcessList', 'getResourcesList', 'getInstancedetail']),
-      ...mapActions('security', ['getWorkerGroupsAll']),
+      ...mapActions('dag', ['getProcessList','getProcessByProjectId','getProjectList', 'getResourcesList', 'getInstancedetail']),
+      ...mapActions('security', ['getTenantList','getWorkerGroupsAll']),
       /**
        * init
        */
@@ -40,10 +42,15 @@
           this.getInstancedetail(this.$route.params.id),
           // get process definition
           this.getProcessList(),
+          // get project
+          this.getProjectList(),
+          // get process definition by project id
+          this.getProcessByProjectId(),
           // get resources
           this.getResourcesList(),
           // get worker group list
-          this.getWorkerGroupsAll()
+          this.getWorkerGroupsAll(),
+          this.getTenantList()
         ]).then((data) => {
           let item = data[0]
           let flag = false
@@ -90,6 +97,6 @@
     },
     mounted () {
     },
-    components: { mDag, mSpin, mVariable }
+    components: { mDag, mSpin, mVariable, mStartingParam }
   }
 </script>

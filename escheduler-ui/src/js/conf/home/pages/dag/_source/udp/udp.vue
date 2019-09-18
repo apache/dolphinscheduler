@@ -27,7 +27,11 @@
       </template>
 
       <div class="title" style="padding-top: 6px;">
-        <span>超时告警</span>
+        <span class="text-b">{{$t('select tenant')}}</span>
+        <form-tenant v-model="tenantId"></form-tenant>
+      </div>
+      <div class="title" style="padding-top: 6px;">
+        <span class="text-b">{{$t('warning of timeout')}}</span>
         <span style="padding-left: 6px;">
           <x-switch v-model="checkedTimeout"></x-switch>
         </span>
@@ -62,7 +66,7 @@
           </div>
         </template>
         <x-button type="text" @click="close()"> {{$t('Cancel')}} </x-button>
-        <x-button type="primary" shape="circle" @click="ok()" v-ps="['GENERAL_USER']" >{{$t('Add')}}</x-button>
+        <x-button type="primary" shape="circle" @click="ok()">{{$t('Add')}}</x-button>
       </div>
     </div>
   </div>
@@ -73,6 +77,7 @@
   import mLocalParams from '../formModel/tasks/_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
   import Affirm from '../jumpAffirm'
+  import FormTenant from "./_source/selectTenant";
 
   export default {
     name: 'udp',
@@ -84,10 +89,14 @@
         desc: '',
         // Global custom parameters
         udpList: [],
+        // Global custom parameters
+        udpListCache: [],
         // Whether to update the process definition
         syncDefine: true,
         // Timeout alarm
         timeout: 0,
+
+        tenantId: -1,
         // checked Timeout alarm
         checkedTimeout: true
       }
@@ -110,6 +119,14 @@
         }
         return true
       },
+      _accuStore(){
+        this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
+        this.store.commit('dag/setName', _.cloneDeep(this.name))
+        this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
+        this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
+        this.store.commit('dag/setDesc', _.cloneDeep(this.desc))
+        this.store.commit('dag/setSyncDefine', this.syncDefine)
+      },
       /**
        * submit
        */
@@ -130,11 +147,8 @@
           }
 
           // Storage global globalParams
-          this.store.commit('dag/setGlobalParams', _.cloneDeep(this.udpList))
-          this.store.commit('dag/setName', _.cloneDeep(this.name))
-          this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
-          this.store.commit('dag/setDesc', _.cloneDeep(this.desc))
-          this.store.commit('dag/setSyncDefine', this.syncDefine)
+          this._accuStore()
+
           Affirm.setIsPop(false)
           this.$emit('onUdp')
         }
@@ -167,15 +181,18 @@
       }
     },
     created () {
-      this.udpList = this.store.state.dag.globalParams
-      this.name = this.store.state.dag.name
-      this.desc = this.store.state.dag.desc
-      this.syncDefine = this.store.state.dag.syncDefine
-      this.timeout = this.store.state.dag.timeout || 0
+      const dag = _.cloneDeep(this.store.state.dag)
+      this.udpList = dag.globalParams
+      this.udpListCache = dag.globalParams
+      this.name = dag.name
+      this.desc = dag.desc
+      this.syncDefine = dag.syncDefine
+      this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
+      this.tenantId = dag.tenantId || -1
     },
     mounted () {},
-    components: { mLocalParams }
+    components: {FormTenant, mLocalParams }
   }
 </script>
 

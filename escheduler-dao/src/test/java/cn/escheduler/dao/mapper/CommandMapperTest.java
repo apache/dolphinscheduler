@@ -28,6 +28,9 @@ import org.junit.Test;
 
 import java.util.List;
 
+/**
+ * command test
+ */
 public class CommandMapperTest {
 
     CommandMapper commandMapper;

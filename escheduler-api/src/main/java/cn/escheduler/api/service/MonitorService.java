@@ -18,13 +18,16 @@ package cn.escheduler.api.service;
 
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
-import cn.escheduler.api.utils.ZookeeperMonitorUtils;
+import cn.escheduler.api.utils.ZookeeperMonitor;
+import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.dao.MonitorDBDao;
+import cn.escheduler.common.model.MasterServer;
 import cn.escheduler.dao.model.MonitorRecord;
 import cn.escheduler.dao.model.User;
 import cn.escheduler.dao.model.ZookeeperRecord;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +55,22 @@ public class MonitorService extends BaseService{
 
   }
 
+  /**
+   * query master list
+   *
+   * @param loginUser
+   * @return
+   */
+  public Map<String,Object> queryMaster(User loginUser) {
+
+    Map<String, Object> result = new HashMap<>(5);
+
+    List<MasterServer> masterServers = getServerListFromZK(true);
+    result.put(Constants.DATA_LIST, masterServers);
+    putMsg(result,Status.SUCCESS);
+
+    return result;
+  }
 
   /**
    * query zookeeper state
@@ -61,7 +80,7 @@ public class MonitorService extends BaseService{
   public Map<String,Object> queryZookeeperState(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
 
-    List<ZookeeperRecord> zookeeperRecordList = ZookeeperMonitorUtils.zookeeperInfoList();
+    List<ZookeeperRecord> zookeeperRecordList = ZookeeperMonitor.zookeeperInfoList();
 
     result.put(Constants.DATA_LIST, zookeeperRecordList);
     putMsg(result, Status.SUCCESS);
@@ -69,4 +88,40 @@ public class MonitorService extends BaseService{
     return result;
 
   }
+
+
+  /**
+   * query master list
+   *
+   * @param loginUser
+   * @return
+   */
+  public Map<String,Object> queryWorker(User loginUser) {
+
+    Map<String, Object> result = new HashMap<>(5);
+    List<MasterServer> workerServers = getServerListFromZK(false);
+
+    result.put(Constants.DATA_LIST, workerServers);
+    putMsg(result,Status.SUCCESS);
+
+    return result;
+  }
+
+  private List<MasterServer> getServerListFromZK(boolean isMaster){
+    List<MasterServer> servers = new ArrayList<>();
+    ZookeeperMonitor zookeeperMonitor = null;
+    try{
+      zookeeperMonitor = new ZookeeperMonitor();
+      ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
+      servers = zookeeperMonitor.getServersList(zkNodeType);
+    }catch (Exception e){
+      throw e;
+    }finally {
+      if(zookeeperMonitor != null){
+        zookeeperMonitor.close();
+      }
+    }
+    return servers;
+  }
+
 }

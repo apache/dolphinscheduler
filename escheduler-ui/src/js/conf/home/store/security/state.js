@@ -15,5 +15,6 @@
  * limitations under the License.
  */
 export default {
-  workerGroupsListAll: []
+  workerGroupsListAll: [],
+  tenantAllList : []
 }

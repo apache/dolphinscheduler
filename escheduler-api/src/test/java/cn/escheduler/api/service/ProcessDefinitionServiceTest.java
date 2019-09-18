@@ -16,6 +16,7 @@
  */
 package cn.escheduler.api.service;
 
+import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.common.enums.UserType;
@@ -33,7 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Map;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class ProcessDefinitionServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionServiceTest.class);
 
@@ -44,11 +45,11 @@ public class ProcessDefinitionServiceTest {
     public void queryProccessDefinitionList() throws Exception {
 
         User loginUser = new User();
-        loginUser.setId(27);
+        loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> map = processDefinitionService.queryProccessDefinitionList(loginUser,"project_test1");
-        Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
         logger.info(JSON.toJSONString(map));
     }
 
@@ -56,11 +57,34 @@ public class ProcessDefinitionServiceTest {
     public void queryProcessDefinitionListPagingTest() throws Exception {
 
         User loginUser = new User();
-        loginUser.setId(27);
+        loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
         Map<String, Object> map = processDefinitionService.queryProcessDefinitionListPaging(loginUser, "project_test1", "",1, 5,0);
 
-        Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
+        logger.info(JSON.toJSONString(map));
+    }
+
+    @Test
+    public void deleteProcessDefinitionByIdTest() throws Exception {
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> map = processDefinitionService.deleteProcessDefinitionById(loginUser, "li_sql_test", 6);
+
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
+        logger.info(JSON.toJSONString(map));
+    }
+
+    @Test
+    public void batchDeleteProcessDefinitionByIds() throws Exception {
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> map = processDefinitionService.batchDeleteProcessDefinitionByIds(loginUser, "li_test_1", "2,3");
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
         logger.info(JSON.toJSONString(map));
     }
 }

@@ -111,7 +111,7 @@ public class DataSourceMapperProvider {
    */
   public String queryById(Map<String, Object> parameter) {
     return new SQL() {{
-      SELECT("r.*,u.user_name as userName");
+      SELECT("r.*,u.user_name");
 
       FROM(TABLE_NAME + " r");
 
@@ -175,8 +175,7 @@ public class DataSourceMapperProvider {
   }
 
   /**
-   * 查询总的数据源数目
-   *
+   * Query the total number of data sources
    * @param parameter
    * @return
    */
@@ -228,4 +227,20 @@ public class DataSourceMapperProvider {
       WHERE("user_id <> #{userId}");
     }}.toString();
   }
+
+
+  /**
+   * list all data source by type
+   *
+   * @param parameter
+   * @return
+   */
+  public String listAllDataSourceByType(Map<String, Object> parameter) {
+    return new SQL() {{
+      SELECT("*");
+      FROM(TABLE_NAME);
+      WHERE("type = #{type}");
+    }}.toString();
+  }
+
 }

@@ -67,6 +67,7 @@ public interface ProjectMapper {
             @Result(property = "userId", column = "user_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
     })
@@ -82,6 +83,7 @@ public interface ProjectMapper {
             @Result(property = "userId", column = "user_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
             @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
     })
@@ -115,6 +117,8 @@ public interface ProjectMapper {
             @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "defCount", column = "def_count", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "instRunningCount", column = "inst_running_count", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
     })
     @SelectProvider(type = ProjectMapperProvider.class, method = "queryProjectListPaging")
     List<Project> queryProjectListPaging(@Param("userId") Integer userId,
@@ -145,6 +149,8 @@ public interface ProjectMapper {
             @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
             @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
             @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "defCount", column = "def_count", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "instRunningCount", column = "inst_running_count", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
     })
     @SelectProvider(type = ProjectMapperProvider.class, method = "queryAllProjectListPaging")
     List<Project> queryAllProjectListPaging(
@@ -185,6 +191,22 @@ public interface ProjectMapper {
     })
     @SelectProvider(type = ProjectMapperProvider.class, method = "queryProjectExceptUserId")
     List<Project> queryProjectExceptUserId(@Param("userId") Integer userId);
+
+    /**
+     * query all project list
+     * @return
+     */
+    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "userId", column = "user_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+    })
+    @SelectProvider(type = ProjectMapperProvider.class, method = "queryAllProjectList")
+    List<Project> queryAllProjectList();
 
 
 }

@@ -40,18 +40,22 @@ public class TenantMapperTest {
     public void testMapper(){
 
         Tenant tenant = new Tenant();
-        tenant.setTenantName("大数据平台部");
+        tenant.setTenantName("bigdata");
         tenant.setQueueId(1);
         tenant.setCreateTime(new Date());
         tenant.setUpdateTime(new Date());
         tenantMapper.insert(tenant);
         Assert.assertNotEquals(tenant.getId(), 0);
-        tenant.setTenantName("大数据平台部test");
+
+
+        tenant.setTenantName("bigdata-test");
         int update = tenantMapper.update(tenant);
         Assert.assertEquals(update, 1);
 
+
         tenant = tenantMapper.queryById(tenant.getId());
-        Assert.assertEquals(tenant.getTenantName(), "大数据平台部test");
+        Assert.assertEquals(tenant.getTenantName(), "bigdata-test");
+
 
         int delete = tenantMapper.deleteById(tenant.getId());
         Assert.assertEquals(delete, 1);

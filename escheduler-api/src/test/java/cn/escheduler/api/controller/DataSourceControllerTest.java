@@ -20,46 +20,31 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.utils.JSONUtils;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class DataSourceControllerTest {
+
+/**
+ * data source controller test
+ */
+public class DataSourceControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(DataSourceControllerTest.class);
-
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
 
 
     @Test
     public void queryDataSource() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/list").header("sessionId", "08fae8bf-fe2d-4fc0-8129-23c37fbfac82").param("type","HIVE"))
+        MvcResult mvcResult = mockMvc.perform(get("/datasources/list").header("sessionId", sessionId).param("type","HIVE"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
@@ -68,11 +53,12 @@ public class DataSourceControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
+    @Ignore
     @Test
     public void connectDataSource() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","hvie数据源");
+        paramsMap.add("name","hive data source");
         paramsMap.add("type","HIVE");
         paramsMap.add("host","192.168.xx.xx");
         paramsMap.add("port","10000");
@@ -81,7 +67,7 @@ public class DataSourceControllerTest {
         paramsMap.add("password","");
         paramsMap.add("other","");
         MvcResult mvcResult = mockMvc.perform(post("/datasources/connect")
-                .header("sessionId", "08fae8bf-fe2d-4fc0-8129-23c37fbfac82")
+                .header("sessionId", sessionId)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -90,5 +76,6 @@ public class DataSourceControllerTest {
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
+
 
 }

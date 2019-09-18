@@ -20,43 +20,28 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.utils.JSONUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class UsersControllerTest {
+/**
+ * users controller test
+ */
+public class UsersControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(QueueControllerTest.class);
 
-    private MockMvc mockMvc;
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
     @Test
     public void queryList() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(get("/users/list")
-                .header("sessionId", "d199af92-d8e0-4f1b-bacb-5b3414567e5c"))
+                .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();

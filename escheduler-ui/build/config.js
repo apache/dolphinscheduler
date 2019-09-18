@@ -189,11 +189,15 @@ const baseConfig = {
   },
   plugins: [
     new webpack.ProvidePlugin({ vue: 'Vue', _: 'lodash' }),
+    new webpack.DefinePlugin({
+      PUBLIC_PATH: JSON.stringify(process.env.PUBLIC_PATH ? process.env.PUBLIC_PATH : '')
+    }),
     new HtmlWebpackExtPlugin({
       cache: true,
       delimiter: '$',
       locals: {
-        NODE_ENV:isProduction
+        NODE_ENV:isProduction,
+        PUBLIC_PATH: process.env.PUBLIC_PATH ? process.env.PUBLIC_PATH : ''
       }
     }),
     ...pages

@@ -25,8 +25,8 @@
     props: {},
     methods: {
       ...mapMutations('dag', ['resetParams', 'setIsDetails']),
-      ...mapActions('dag', ['getProcessList', 'getResourcesList', 'getProcessDetails']),
-      ...mapActions('security', ['getWorkerGroupsAll']),
+      ...mapActions('dag', ['getProcessList','getProcessByProjectId','getProjectList', 'getResourcesList', 'getProcessDetails']),
+      ...mapActions('security', ['getTenantList','getWorkerGroupsAll']),
       /**
        * init
        */
@@ -40,10 +40,15 @@
           this.getProcessDetails(this.$route.params.id),
           // get process definition
           this.getProcessList(),
+          // get project
+          this.getProjectList(),
+          // get process definition by project id
+          this.getProcessByProjectId(),
           // get resource
           this.getResourcesList(),
           // get worker group list
-          this.getWorkerGroupsAll()
+          this.getWorkerGroupsAll(),
+          this.getTenantList()
         ]).then((data) => {
           let item = data[0]
           this.setIsDetails(item.releaseState === 'ONLINE')

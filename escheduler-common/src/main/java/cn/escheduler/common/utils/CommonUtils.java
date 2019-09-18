@@ -17,7 +17,10 @@
 package cn.escheduler.common.utils;
 
 import cn.escheduler.common.Constants;
+import cn.escheduler.common.enums.ResUploadType;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,4 +66,29 @@ public class CommonUtils {
 
 
 
+  /**
+   * if upload resource is HDFS and kerberos startup is true , else false
+   * @return
+   */
+  public static boolean getKerberosStartupState(){
+    String resUploadStartupType = PropertyUtils.getString(cn.escheduler.common.Constants.RES_UPLOAD_STARTUP_TYPE);
+    ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
+    Boolean kerberosStartupState = getBoolean(cn.escheduler.common.Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE);
+    return resUploadType == ResUploadType.HDFS && kerberosStartupState;
+  }
+
+  /**
+   * load kerberos configuration
+   * @throws Exception
+   */
+  public static void loadKerberosConf()throws Exception{
+    if (CommonUtils.getKerberosStartupState())  {
+      System.setProperty(JAVA_SECURITY_KRB5_CONF, getString(JAVA_SECURITY_KRB5_CONF_PATH));
+      Configuration configuration = new Configuration();
+      configuration.set(HADOOP_SECURITY_AUTHENTICATION, KERBEROS);
+      UserGroupInformation.setConfiguration(configuration);
+      UserGroupInformation.loginUserFromKeytab(getString(LOGIN_USER_KEY_TAB_USERNAME),
+              getString(cn.escheduler.common.Constants.LOGIN_USER_KEY_TAB_PATH));
+    }
+  }
 }

@@ -18,6 +18,6 @@
 /**
  * Create file type
  */
-let filtTypeArr = ['txt', 'log', 'sh', 'conf', 'cfg', 'py', 'java', 'sql', 'xml', 'hql']
+let filtTypeArr = ['txt', 'log', 'sh', 'conf', 'cfg', 'py', 'java', 'sql', 'xml', 'hql', 'properties']
 
 export { filtTypeArr }

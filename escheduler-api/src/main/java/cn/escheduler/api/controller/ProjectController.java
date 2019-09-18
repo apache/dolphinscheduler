@@ -18,15 +18,23 @@ package cn.escheduler.api.controller;
 
 
 import cn.escheduler.api.enums.Status;
+import cn.escheduler.api.service.ProcessDefinitionService;
 import cn.escheduler.api.service.ProjectService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
@@ -35,6 +43,7 @@ import static cn.escheduler.api.enums.Status.*;
 /**
  * project controller
  */
+@Api(tags = "PROJECT_TAG", position = 1)
 @RestController
 @RequestMapping("projects")
 public class ProjectController extends BaseController {
@@ -44,6 +53,9 @@ public class ProjectController extends BaseController {
     @Autowired
     private ProjectService projectService;
 
+    @Autowired
+    private ProcessDefinitionService processDefinitionService;
+
     /**
      * create project
      *
@@ -52,9 +64,14 @@ public class ProjectController extends BaseController {
      * @param desc
      * @return returns an error if it exists
      */
+    @ApiOperation(value = "createProject", notes= "CREATE_PROJECT_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType ="String"),
+            @ApiImplicitParam(name = "desc", value = "PROJECT_DESC", dataType = "String")
+    })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public Result createProject(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "desc", required = false) String desc) {
 
@@ -77,9 +94,15 @@ public class ProjectController extends BaseController {
      * @param desc
      * @return
      */
+    @ApiOperation(value = "updateProject", notes= "UPDATE_PROJECT_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType ="Int", example = "100"),
+            @ApiImplicitParam(name = "projectName",value = "PROJECT_NAME",dataType = "String"),
+            @ApiImplicitParam(name = "desc", value = "PROJECT_DESC", dataType = "String")
+    })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
-    public Result updateProject(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result updateProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectId") Integer projectId,
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "desc", required = false) String desc) {
@@ -100,9 +123,13 @@ public class ProjectController extends BaseController {
      * @param projectId
      * @return
      */
+    @ApiOperation(value = "queryProjectById", notes= "QUERY_PROJECT_BY_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType ="Int", example = "100")
+    })
     @GetMapping(value = "/query-by-id")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryProjectById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryProjectById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("projectId") Integer projectId) {
         logger.info("login user {}, query project by id: {}", loginUser.getUserName(), projectId);
 
@@ -124,9 +151,15 @@ public class ProjectController extends BaseController {
      * @param pageNo
      * @return
      */
+    @ApiOperation(value = "queryProjectListPaging", notes= "QUERY_PROJECT_LIST_PAGING_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType ="String"),
+            @ApiImplicitParam(name = "projectId", value = "PAGE_SIZE", dataType ="Int", example = "20"),
+            @ApiImplicitParam(name = "projectId", value = "PAGE_NO", dataType ="Int", example = "1")
+    })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryProjectListPaging(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryProjectListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "searchVal", required = false) String searchVal,
                                          @RequestParam("pageSize") Integer pageSize,
                                          @RequestParam("pageNo") Integer pageNo
@@ -134,6 +167,7 @@ public class ProjectController extends BaseController {
 
         try {
             logger.info("login user {}, query project list paging", loginUser.getUserName());
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
             return returnDataListPaging(result);
         } catch (Exception e) {
@@ -149,9 +183,13 @@ public class ProjectController extends BaseController {
      * @param projectId
      * @return
      */
+    @ApiOperation(value = "deleteProjectById", notes= "DELETE_PROJECT_BY_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType ="Int", example = "100")
+    })
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
-    public Result deleteProject(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result deleteProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectId") Integer projectId
     ) {
 
@@ -172,9 +210,13 @@ public class ProjectController extends BaseController {
      * @param userId
      * @return
      */
+    @ApiOperation(value = "queryUnauthorizedProject", notes= "QUERY_UNAUTHORIZED_PROJECT_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "USER_ID", dataType ="Int", example = "100")
+    })
     @GetMapping(value = "/unauth-project")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryUnauthorizedProject(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryUnauthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
         try {
             logger.info("login user {}, query unauthorized project by user id: {}.", loginUser.getUserName(), userId);
@@ -194,9 +236,13 @@ public class ProjectController extends BaseController {
      * @param userId
      * @return
      */
+    @ApiOperation(value = "queryAuthorizedProject", notes= "QUERY_AUTHORIZED_PROJECT_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userId", value = "USER_ID", dataType ="Int", example = "100")
+    })
     @GetMapping(value = "/authed-project")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryAuthorizedProject(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryAuthorizedProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("userId") Integer userId) {
         try {
             logger.info("login user {}, query authorized project by user id: {}.", loginUser.getUserName(), userId);
@@ -207,6 +253,52 @@ public class ProjectController extends BaseController {
             return error(QUERY_AUTHORIZED_PROJECT.getCode(), QUERY_AUTHORIZED_PROJECT.getMsg());
         }
     }
+
+    /**
+     * import process definition
+     *
+     * @param loginUser
+     * @param file
+     * @return
+     */
+    @ApiOperation(value = "importProcessDefinition", notes= "EXPORT_PROCCESS_DEFINITION_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
+    })
+    @PostMapping(value="/importProcessDefinition")
+    public Result importProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @RequestParam("file") MultipartFile file){
+        try{
+            logger.info("import process definition by id, login user:{}",
+                    loginUser.getUserName());
+            Map<String, Object> result = processDefinitionService.importProcessDefinition(loginUser,file);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(IMPORT_PROCESS_DEFINE_ERROR.getMsg(),e);
+            return error(IMPORT_PROCESS_DEFINE_ERROR.getCode(), IMPORT_PROCESS_DEFINE_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * query all project list
+     * @param loginUser
+     * @return
+     */
+    @ApiOperation(value = "queryAllProjectList", notes= "QUERY_ALL_PROJECT_LIST_NOTES")
+    @GetMapping(value = "/queryAllProjectList")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+
+        try {
+            logger.info("login user {}, query all project list", loginUser.getUserName());
+            Map<String, Object> result = projectService.queryAllProjectList();
+            return returnDataList(result);
+        } catch (Exception e) {
+            logger.error(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR.getMsg(), e);
+            return error(Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR.getCode(), Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR.getMsg());
+        }
+    }
+
 
 
 }

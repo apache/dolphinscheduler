@@ -20,7 +20,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.dao.mapper.MasterServerMapper;
 import cn.escheduler.dao.mapper.WorkerServerMapper;
-import cn.escheduler.dao.model.MasterServer;
+import cn.escheduler.common.model.MasterServer;
 import cn.escheduler.dao.model.User;
 import cn.escheduler.dao.model.WorkerServer;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -19,6 +19,7 @@ package cn.escheduler.server.worker.log;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
+import cn.escheduler.server.utils.LoggerUtils;
 
 /**
  *  task log filter
@@ -27,7 +28,7 @@ public class TaskLogFilter extends Filter<ILoggingEvent> {
 
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("TaskLogInfo-")){
+        if (event.getThreadName().startsWith(LoggerUtils.TASK_LOGGER_THREAD_NAME)) {
             return FilterReply.ACCEPT;
         }
         return FilterReply.DENY;

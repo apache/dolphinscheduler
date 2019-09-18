@@ -51,10 +51,14 @@ public class UdfFuncMapperTest {
         resource.setUpdateTime(new Date());
         resourceMapper.insert(resource);
         Assert.assertNotEquals(resource.getId(), 0);
+
+
         resource.setAlias("aa123");
         resourceMapper.update(resource);
         resource = resourceMapper.queryResourceById(resource.getId());
         Assert.assertEquals(resource.getAlias(), "aa123");
+
+
         int delete = resourceMapper.delete(resource.getId());
         Assert.assertEquals(delete, 1);
     }

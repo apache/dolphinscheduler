@@ -16,19 +16,21 @@
  */
 package cn.escheduler.dao;
 
+import cn.escheduler.common.model.MasterServer;
 import cn.escheduler.dao.mapper.MasterServerMapper;
 import cn.escheduler.dao.mapper.WorkerServerMapper;
-import cn.escheduler.dao.model.MasterServer;
 import cn.escheduler.dao.model.WorkerServer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 import static cn.escheduler.dao.datasource.ConnectionFactory.getMapper;
 
 /**
- * master server
+ * server dao
  */
+@Component
 public class ServerDao extends AbstractBaseDao {
 
     @Autowired

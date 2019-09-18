@@ -37,7 +37,7 @@ export default {
   signOut () {
     io.post(`signOut`, res => {
       setTimeout(() => {
-        window.location.href = '/view/login/index.html'
+        window.location.href = `${PUBLIC_PATH}/view/login/index.html`
       }, 100)
     }).catch(e => {
       console.log(e)

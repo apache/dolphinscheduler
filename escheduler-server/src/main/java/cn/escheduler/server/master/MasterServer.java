@@ -16,20 +16,16 @@
  */
 package cn.escheduler.server.master;
 
-import cn.escheduler.api.quartz.ProcessScheduleJob;
-import cn.escheduler.api.quartz.QuartzExecutors;
 import cn.escheduler.common.Constants;
-import cn.escheduler.common.IStoppable;
 import cn.escheduler.common.thread.Stopper;
 import cn.escheduler.common.thread.ThreadPoolExecutors;
 import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.OSUtils;
-import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.ServerDao;
 import cn.escheduler.server.master.runner.MasterSchedulerThread;
+import cn.escheduler.server.quartz.ProcessScheduleJob;
+import cn.escheduler.server.quartz.QuartzExecutors;
 import cn.escheduler.server.zk.ZKMasterClient;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang3.StringUtils;
@@ -37,8 +33,9 @@ import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 import java.util.concurrent.ExecutorService;
@@ -49,84 +46,80 @@ import java.util.concurrent.TimeUnit;
  *   master server
  */
 @ComponentScan("cn.escheduler")
-public class MasterServer implements CommandLineRunner, IStoppable {
+public class MasterServer extends AbstractServer {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
     /**
-     *  conf
-     */
-    private static Configuration conf;
-
-    /**
-     *  object lock
-     */
-    private final Object lock = new Object();
-
-    /**
-     * whether or not to close the state
-     */
-    private boolean terminated = false;
-
-    /**
      *  zk master client
      */
-    private static ZKMasterClient zkMasterClient=null;
-
-
-    /**
-     *  master dao database access
-     */
-    private ServerDao serverDao = null;
-
-    /**
-     *  alert database access
-     */
-    private AlertDao alertDao = null;
-
-    /**
-     *  escheduler database interface
-     */
-    @Autowired
-    private ProcessDao processDao;
+    private static ZKMasterClient zkMasterClient = null;
 
     /**
      *  heartbeat thread pool
      */
     private ScheduledExecutorService heartbeatMasterService;
 
+    /**
+     *  escheduler database interface
+     */
+    @Autowired
+    protected ProcessDao processDao;
 
     /**
      *  master exec thread pool
      */
-    private final ExecutorService masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
+    private ExecutorService masterSchedulerService;
 
-    /**
-     *  heartbeat interval, unit second
-     */
-    private int heartBeatInterval;
+    public MasterServer(){}
 
-    static {
+    public MasterServer(ProcessDao processDao){
         try {
             conf = new PropertiesConfiguration(Constants.MASTER_PROPERTIES_PATH);
         }catch (ConfigurationException e){
             logger.error("load configuration failed : " + e.getMessage(),e);
             System.exit(1);
         }
-    }
-
-    public MasterServer(){}
-
-    public MasterServer(ProcessDao processDao){
         zkMasterClient = ZKMasterClient.getZKMasterClient(processDao);
-        this.serverDao = zkMasterClient.getServerDao();
-        this.alertDao = zkMasterClient.getAlertDao();
+        this.masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
     }
+
+
+    /**
+     * master server startup
+     *
+     * master server not use web service
+     */
+    public static void main(String[] args) {
+        SpringApplication app = new SpringApplication(MasterServer.class);
+
+        app.run(args);
+    }
+
+
+    @Override
+    public void run(String... strings) throws Exception {
+
+        MasterServer masterServer = new MasterServer(processDao);
+
+        masterServer.run(processDao);
+
+        logger.info("master server started");
+        // blocking
+        masterServer.awaitTermination();
+    }
+
+
     public void run(ProcessDao processDao){
 
         // heartbeat interval
         heartBeatInterval = conf.getInt(Constants.MASTER_HEARTBEAT_INTERVAL,
                 Constants.defaultMasterHeartbeatInterval);
+
+        // master exec thread pool num
+        int masterExecThreadNum = conf.getInt(Constants.MASTER_EXEC_THREADS,
+                Constants.defaultMasterExecThreadNum);
+
 
         heartbeatMasterService = ThreadUtils.newDaemonThreadScheduledExecutor("Master-Main-Thread",Constants.defaulMasterHeartbeatThreadNum);
 
@@ -140,10 +133,6 @@ public class MasterServer implements CommandLineRunner, IStoppable {
         heartbeatMasterService.
                 scheduleAtFixedRate(heartBeatThread, 5, heartBeatInterval, TimeUnit.SECONDS);
 
-        // master exec thread pool num
-        int masterExecThreadNum = conf.getInt(Constants.MASTER_EXEC_THREADS,
-                Constants.defaultMasterExecThreadNum);
-
         // master scheduler thread
         MasterSchedulerThread masterSchedulerThread = new MasterSchedulerThread(
                 zkMasterClient,
@@ -154,6 +143,7 @@ public class MasterServer implements CommandLineRunner, IStoppable {
         masterSchedulerService.execute(masterSchedulerThread);
 
         // start QuartzExecutors
+        // what system should do if exception
         try {
             ProcessScheduleJob.init(processDao);
             QuartzExecutors.getInstance().start();
@@ -173,74 +163,17 @@ public class MasterServer implements CommandLineRunner, IStoppable {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                String host = OSUtils.getHost();
-                // clear master table register info
-                serverDao.deleteMaster(host);
                 logger.info("master server stopped");
                 if (zkMasterClient.getActiveMasterNum() <= 1) {
                     for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
-                        alertDao.sendServerStopedAlert(1, host, "Master-Server");
+                        zkMasterClient.getAlertDao().sendServerStopedAlert(
+                                1, OSUtils.getHost(), "Master-Server");
                     }
                 }
             }
         }));
     }
 
-
-    public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(MasterServer.class);
-        app.setWebEnvironment(false);
-        app.run(args);
-    }
-
-
-    /**
-     *  blocking implement
-     * @throws InterruptedException
-     */
-    public void awaitTermination() throws InterruptedException {
-        synchronized (lock) {
-            while (!terminated) {
-                lock.wait();
-            }
-        }
-    }
-
-    /**
-     *  heartbeat thread implement
-     * @return
-     */
-    public Runnable heartBeatThread(){
-        Runnable heartBeatThread  = new Runnable() {
-            @Override
-            public void run() {
-                if(Stopper.isRunning()) {
-                    // send heartbeat to zk
-                    if (StringUtils.isBlank(zkMasterClient.getMasterZNode())) {
-                        logger.error("master send heartbeat to zk failed");
-                        return;
-                    }
-
-                    zkMasterClient.heartBeatForZk(zkMasterClient.getMasterZNode(), Constants.MASTER_PREFIX);
-                }
-            }
-        };
-        return heartBeatThread;
-    }
-
-    @Override
-    public void run(String... strings) throws Exception {
-
-        MasterServer masterServer = new MasterServer(processDao);
-
-        masterServer.run(processDao);
-
-        logger.info("master server started");
-        // blocking
-        masterServer.awaitTermination();
-
-
-    }
 
     /**
      * gracefully stop
@@ -316,6 +249,29 @@ public class MasterServer implements CommandLineRunner, IStoppable {
             logger.error("master server stop exception : " + e.getMessage(), e);
             System.exit(-1);
         }
+    }
+
+
+    /**
+     *  heartbeat thread implement
+     * @return
+     */
+    private Runnable heartBeatThread(){
+        Runnable heartBeatThread  = new Runnable() {
+            @Override
+            public void run() {
+                if(Stopper.isRunning()) {
+                    // send heartbeat to zk
+                    if (StringUtils.isBlank(zkMasterClient.getMasterZNode())) {
+                        logger.error("master send heartbeat to zk failed: can't find zookeeper path of master server");
+                        return;
+                    }
+
+                    zkMasterClient.heartBeatForZk(zkMasterClient.getMasterZNode(), Constants.MASTER_PREFIX);
+                }
+            }
+        };
+        return heartBeatThread;
     }
 }
 

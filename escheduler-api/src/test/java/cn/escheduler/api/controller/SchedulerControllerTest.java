@@ -20,43 +20,42 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.utils.JSONUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class SchedulerControllerTest {
+/**
+ * scheduler controller test
+ */
+public class SchedulerControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
 
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
     @Test
     public void queryScheduleList() throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/list","project_test1")
-                .header("sessionId", "08fae8bf-fe2d-4fc0-8129-23c37fbfac82"))
+                .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+
+    @Test
+    public void previewSchedule() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/schedule/preview","li_test_1")
+                .header(SESSION_ID, sessionId)
+                .param("schedule","{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"))
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
