@@ -297,4 +297,19 @@ public class ProcessDefinitionMapperProvider {
             }
         }.toString();
     }
+
+
+    /**
+     * query all
+     * @return
+     */
+    public String queryAll() {
+        return new SQL() {{
+            SELECT("id,name,version,release_state,project_id,user_id,`desc`,create_time,update_time,flag,global_params,receivers,receivers_cc");
+
+            FROM(TABLE_NAME );
+
+            ORDER_BY("create_time desc ");
+        }}.toString();
+    }
 }

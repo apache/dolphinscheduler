@@ -48,7 +48,7 @@
     <div class="clearfix list">
       <div style = "padding-left: 150px;">{{$t('Next five execution times')}}</div>
       <ul style = "padding-left: 150px;">
-          <li v-for="time in previewTimes">{{time}}</li>
+        <li v-for="(time,i) in previewTimes" :key='i'>{{time}}</li>
       </ul>
     </div>
 
@@ -289,6 +289,9 @@
     watch: {
     },
     created () {
+      if(this.item.crontab !== null){
+        this.crontab = this.item.crontab
+      }
       this.receivers = _.cloneDeep(this.receiversD)
       this.receiversCc = _.cloneDeep(this.receiversCcD)
     },

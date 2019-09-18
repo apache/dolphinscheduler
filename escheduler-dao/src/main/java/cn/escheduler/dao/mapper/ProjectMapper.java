@@ -192,5 +192,21 @@ public interface ProjectMapper {
     @SelectProvider(type = ProjectMapperProvider.class, method = "queryProjectExceptUserId")
     List<Project> queryProjectExceptUserId(@Param("userId") Integer userId);
 
+    /**
+     * query all project list
+     * @return
+     */
+    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "userId", column = "user_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "perm", column = "perm", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+    })
+    @SelectProvider(type = ProjectMapperProvider.class, method = "queryAllProjectList")
+    List<Project> queryAllProjectList();
+
 
 }

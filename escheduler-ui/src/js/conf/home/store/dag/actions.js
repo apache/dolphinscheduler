@@ -262,6 +262,35 @@ export default {
     })
   },
   /**
+   * Get a list of project
+   */
+  getProjectList ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      if (state.projectListS.length) {
+      resolve()
+      return
+    }
+    io.get(`projects/queryAllProjectList`, payload, res => {
+      state.projectListS = res.data
+      resolve(res.data)
+  }).catch(res => {
+      reject(res)
+    })
+  })
+  },
+  /**
+   * Get a list of process definitions by project id
+   */
+  getProcessByProjectId ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`projects/${state.projectName}/process/queryProccessDefinitionAllByProjectId`, payload, res => {
+        resolve(res.data)
+  }).catch(res => {
+      reject(res)
+    })
+  })
+  },
+  /**
    * get datasource
    */
   getDatasourceList ({ state }, payload) {

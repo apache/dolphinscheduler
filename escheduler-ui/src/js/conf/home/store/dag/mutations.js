@@ -109,6 +109,7 @@ export default {
     state.tenantId = payload && payload.tenantId || -1
     state.processListS = payload && payload.processListS || []
     state.resourcesListS = payload && payload.resourcesListS || []
+    state.projectListS = payload && payload.projectListS || []
     state.isDetails = payload && payload.isDetails || false
     state.runFlag = payload && payload.runFlag || ''
     state.locations = payload && payload.locations || {}
