@@ -255,4 +255,26 @@ public interface ProcessDefinitionMapper {
     int updateReceiversAndCcById(@Param("receivers") String receivers,
                                  @Param("receiversCc") String receiversCc,
                                  @Param("processDefinitionId") int processDefinitionId);
+
+    /**
+     * query all
+     * @return
+     */
+    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "version", column = "version", javaType = Integer.class, jdbcType = JdbcType.TINYINT),
+            @Result(property = "releaseState", column = "release_state",  typeHandler = EnumOrdinalTypeHandler.class, javaType = ReleaseState.class, jdbcType = JdbcType.TINYINT),
+            @Result(property = "projectId", column = "project_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "userId", column = "user_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "desc", column = "desc", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
+            @Result(property = "flag", column = "flag", typeHandler = EnumOrdinalTypeHandler.class, javaType = Flag.class, jdbcType = JdbcType.TINYINT),
+            @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
+            @Result(property = "timeout", column = "timeout", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
+            @Result(property = "projectName", column = "project_name", javaType = String.class, jdbcType = JdbcType.VARCHAR)
+    })
+    @SelectProvider(type = ProcessDefinitionMapperProvider.class, method = "queryAll")
+    List<ProcessDefinition> queryAll();
 }
