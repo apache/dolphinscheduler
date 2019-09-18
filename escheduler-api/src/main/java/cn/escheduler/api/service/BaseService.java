@@ -21,7 +21,7 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.utils.HadoopUtils;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.Cookie;

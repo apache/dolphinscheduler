@@ -3,7 +3,7 @@ package cn.escheduler.api.utils;
 import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.common.model.MasterServer;
-import cn.escheduler.dao.model.ZookeeperRecord;
+import cn.escheduler.dao.entity.ZookeeperRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

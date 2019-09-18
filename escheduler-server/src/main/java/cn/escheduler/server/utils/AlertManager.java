@@ -25,10 +25,9 @@ import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.DaoFactory;
-import cn.escheduler.dao.model.Alert;
-import cn.escheduler.dao.model.ProcessDefinition;
-import cn.escheduler.dao.model.ProcessInstance;
-import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.entity.ProcessDefinition;
+import cn.escheduler.dao.entity.ProcessInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +167,7 @@ public class AlertManager {
      * @param toleranceTaskList
      */
     public void sendAlertWorkerToleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList){
-        Alert alert = new Alert();
+        Tenant.Alert alert = new Tenant.Alert();
         alert.setTitle("worker fault tolerance");
         alert.setShowType(ShowType.TABLE);
         String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
@@ -214,7 +213,7 @@ public class AlertManager {
         if(!sendWarnning){
             return;
         }
-        Alert alert = new Alert();
+        Tenant.Alert alert = new Tenant.Alert();
 
 
         String cmdName = getCommandCnName(processInstance.getCommandType());

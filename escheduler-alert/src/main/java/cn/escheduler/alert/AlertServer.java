@@ -21,7 +21,7 @@ import cn.escheduler.alert.utils.Constants;
 import cn.escheduler.common.thread.Stopper;
 import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.DaoFactory;
-import cn.escheduler.dao.model.Alert;
+import cn.escheduler.dao.entity.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -22,22 +22,19 @@ import cn.escheduler.api.service.SessionService;
 import cn.escheduler.api.service.UsersService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.util.Locale;
 
 import static cn.escheduler.api.enums.Status.*;
 

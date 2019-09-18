@@ -25,7 +25,9 @@ import cn.escheduler.common.utils.FileUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.*;
+import cn.escheduler.dao.entity.TaskInstance;
+import cn.escheduler.dao.entity.Tenant;
+import cn.escheduler.dao.entity.WorkerGroup;
 import cn.escheduler.server.zk.ZKWorkerClient;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang3.StringUtils;
@@ -83,7 +85,7 @@ public class FetchTaskThread implements Runnable{
     /**
      *  task instance
      */
-    private  TaskInstance taskInstance;
+    private TaskInstance taskInstance;
 
     /**
      * task instance id

@@ -1,66 +1,69 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.AccessToken;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.AccessToken;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
-/**
- * access token test
- */
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class AccessTokenMapperTest {
 
 
+    @Resource
     AccessTokenMapper accessTokenMapper;
 
-    @Before
-    public void before(){
-        accessTokenMapper = ConnectionFactory.getSqlSession().getMapper(AccessTokenMapper.class);
-    }
-
     @Test
-    public void testInsert(){
+    public void insert(){
         AccessToken accessToken = new AccessToken();
-        accessToken.setUserId(10);
-        accessToken.setExpireTime(new Date());
-        accessToken.setToken("ssssssssssssssssssssssssss");
+        accessToken.setUserId(4);
+        accessToken.setToken("你好,hello");
         accessToken.setCreateTime(new Date());
         accessToken.setUpdateTime(new Date());
+        accessToken.setExpireTime(new Date());
+        accessToken.setUserName("apple");
         accessTokenMapper.insert(accessToken);
+        Assert.assertNotEquals(accessToken.getId(), 0);
     }
 
     @Test
-    public void testListPaging(){
-        Integer count = accessTokenMapper.countAccessTokenPaging(1,"");
-        Assert.assertTrue( count >= 0);
+    public void queryAll(){
+        List<AccessToken> accessTokens = accessTokenMapper.selectList(null);
 
-        List<AccessToken> accessTokenList = accessTokenMapper.queryAccessTokenPaging(1,"", 0, 2);
+        for(AccessToken accessToken1 : accessTokens){
+            System.out.println(accessToken1.toString());
+        }
 
-        Assert.assertTrue( accessTokenList.size() >= 0);
+
     }
 
+    @Test
+    public void query(){
 
+        Page page = new Page(1, 3);
+
+        String userName = "app";
+
+        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 4);
+
+        System.out.println("total:" + accessTokenPage.getTotal());
+
+        for(AccessToken accessToken1 : accessTokenPage.getRecords()){
+            System.out.println(accessToken1.toString());
+        }
+        System.out.println();
+
+
+    }
 
 
 }

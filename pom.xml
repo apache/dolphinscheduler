@@ -20,31 +20,32 @@
 		<hadoop.version>2.7.3</hadoop.version>
 		<quartz.version>2.2.3</quartz.version>
 		<jackson.version>2.9.8</jackson.version>
+		<mybatis-plus.version>3.0.7.1</mybatis-plus.version>
+		<lombok.version>1.18.4</lombok.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
-
-			<dependency>
-				<groupId>org.mybatis</groupId>
-				<artifactId>mybatis</artifactId>
-				<version>3.5.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mybatis</groupId>
-				<artifactId>mybatis-spring</artifactId>
-				<version>2.0.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mybatis.spring.boot</groupId>
-				<artifactId>mybatis-spring-boot-autoconfigure</artifactId>
-				<version>2.0.1</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mybatis.spring.boot</groupId>
-				<artifactId>mybatis-spring-boot-starter</artifactId>
-				<version>2.0.1</version>
-			</dependency>
+			<!--<dependency>-->
+				<!--<groupId>org.mybatis</groupId>-->
+				<!--<artifactId>mybatis</artifactId>-->
+				<!--<version>3.5.1</version>-->
+			<!--</dependency>-->
+			<!--<dependency>-->
+				<!--<groupId>org.mybatis</groupId>-->
+				<!--<artifactId>mybatis-spring</artifactId>-->
+				<!--<version>2.0.1</version>-->
+			<!--</dependency>-->
+			<!--<dependency>-->
+				<!--<groupId>org.mybatis.spring.boot</groupId>-->
+				<!--<artifactId>mybatis-spring-boot-autoconfigure</artifactId>-->
+				<!--<version>2.0.1</version>-->
+			<!--</dependency>-->
+			<!--<dependency>-->
+				<!--<groupId>org.mybatis.spring.boot</groupId>-->
+				<!--<artifactId>mybatis-spring-boot-starter</artifactId>-->
+				<!--<version>2.0.1</version>-->
+			<!--</dependency>-->
 
 			<!-- quartz-->
 			<dependency>
@@ -382,6 +383,26 @@
 				<version>6.1.14</version>
 			</dependency>
 
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus-boot-starter</artifactId>
+				<version>${mybatis-plus.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus</artifactId>
+				<version>${mybatis-plus.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus-generator</artifactId>
+				<version>${mybatis-plus.version}</version>
+			</dependency>
+			<!--<dependency>-->
+				<!--<groupId>com.baomidou</groupId>-->
+				<!--<artifactId>mybatis-plus-dts</artifactId>-->
+				<!--<version>${mybatis-plus.version}</version>-->
+			<!--</dependency>-->
 		</dependencies>
 	</dependencyManagement>
 
@@ -393,6 +414,15 @@
 	</scm>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>**/mapper/*.xml</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

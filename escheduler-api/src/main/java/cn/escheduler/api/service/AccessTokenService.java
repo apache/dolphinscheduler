@@ -17,20 +17,16 @@
 package cn.escheduler.api.service;
 
 import cn.escheduler.api.enums.Status;
-import cn.escheduler.api.utils.CheckUtils;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
-import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.utils.*;
+import cn.escheduler.dao.entity.User;
 import cn.escheduler.dao.mapper.*;
-import cn.escheduler.dao.model.*;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 

@@ -18,8 +18,8 @@ package cn.escheduler.server.worker.task;
 
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.ProcessInstance;
-import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.entity.ProcessInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import cn.escheduler.server.utils.ProcessUtils;
 import org.slf4j.Logger;
 

@@ -17,7 +17,6 @@
 package cn.escheduler.dao.datasource;
 
 import cn.escheduler.common.Constants;
-import cn.escheduler.common.utils.CommonUtils;
 import cn.escheduler.dao.mapper.ProjectMapper;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.ibatis.mapping.Environment;
@@ -32,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 
 import static cn.escheduler.dao.utils.PropertyUtils.*;
 

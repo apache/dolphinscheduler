@@ -18,18 +18,19 @@ package cn.escheduler.server.master;
 
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.dao.datasource.ConnectionFactory;
+import cn.escheduler.dao.entity.ProcessDefinition;
+import cn.escheduler.dao.entity.ProcessInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
 import cn.escheduler.dao.mapper.ProcessInstanceMapper;
 import cn.escheduler.dao.mapper.TaskInstanceMapper;
-import cn.escheduler.dao.model.ProcessDefinition;
-import cn.escheduler.dao.model.ProcessInstance;
-import cn.escheduler.dao.model.TaskInstance;
 import cn.escheduler.server.utils.AlertManager;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +44,13 @@ public class AlertManagerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertManagerTest.class);
 
+    @Autowired
     ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
     ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
     TaskInstanceMapper taskInstanceMapper;
 
     AlertManager alertManager;
@@ -66,7 +72,7 @@ public class AlertManagerTest {
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(13028);
 
         // set process definition
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(47);
+        ProcessDefinition processDefinition = processDefinitionMapper.selectById(47);
         processInstance.setProcessDefinition(processDefinition);
 
 
@@ -91,7 +97,7 @@ public class AlertManagerTest {
         ProcessInstance processInstance = processInstanceMapper.queryDetailById(13028);
 
         // set process definition
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(47);
+        ProcessDefinition processDefinition = processDefinitionMapper.selectById(47);
         processInstance.setProcessDefinition(processDefinition);
 
 

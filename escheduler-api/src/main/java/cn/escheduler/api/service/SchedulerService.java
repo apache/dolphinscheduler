@@ -29,11 +29,10 @@ import cn.escheduler.common.model.MasterServer;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.mapper.MasterServerMapper;
-import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
-import cn.escheduler.dao.mapper.ProjectMapper;
-import cn.escheduler.dao.mapper.ScheduleMapper;
-import cn.escheduler.dao.model.*;
+import cn.escheduler.dao.entity.ProcessDefinition;
+import cn.escheduler.dao.entity.Project;
+import cn.escheduler.dao.entity.Schedule;
+import cn.escheduler.dao.entity.User;
 import cn.escheduler.dao.utils.cron.CronUtils;
 import cn.escheduler.server.quartz.ProcessScheduleJob;
 import cn.escheduler.server.quartz.QuartzExecutors;
@@ -93,7 +92,7 @@ public class SchedulerService extends BaseService {
     @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName, Integer processDefineId, String schedule, WarningType warningType,
                                               int warningGroupId, FailureStrategy failureStrategy,
-                                              String receivers, String receiversCc,Priority processInstancePriority, int workerGroupId) throws IOException {
+                                              String receivers, String receiversCc, Priority processInstancePriority, int workerGroupId) throws IOException {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
 

@@ -20,12 +20,12 @@ import cn.escheduler.common.enums.AlertStatus;
 import cn.escheduler.common.enums.AlertType;
 import cn.escheduler.common.enums.ShowType;
 import cn.escheduler.dao.datasource.ConnectionFactory;
+import cn.escheduler.dao.entity.Alert;
 import cn.escheduler.dao.mapper.AlertMapper;
 import cn.escheduler.dao.mapper.UserAlertGroupMapper;
-import cn.escheduler.dao.model.Alert;
-import cn.escheduler.dao.model.ProcessDefinition;
-import cn.escheduler.dao.model.ProcessInstance;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.ProcessDefinition;
+import cn.escheduler.dao.entity.ProcessInstance;
+import cn.escheduler.dao.entity.User;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +69,11 @@ public class AlertDao extends AbstractBaseDao {
      * @return
      */
     public int updateAlert(AlertStatus alertStatus,String log,int id){
-        return alertMapper.update(alertStatus, log, new Date(), id);
+        Alert alert = alertMapper.selectById(id);
+        alert.setAlertStatus(alertStatus);
+        alert.setUpdateTime(new Date());
+        alert.setLog(log);
+        return alertMapper.updateById(alert);
     }
 
     /**
@@ -78,6 +82,7 @@ public class AlertDao extends AbstractBaseDao {
      * @return
      */
     public List<User> queryUserByAlertGroupId(int alerGroupId){
+
         return userAlertGroupMapper.queryForUser(alerGroupId);
     }
     /**

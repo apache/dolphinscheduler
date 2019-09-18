@@ -18,9 +18,8 @@ package cn.escheduler.api.interceptor;
 
 import cn.escheduler.api.service.SessionService;
 import cn.escheduler.api.utils.Constants;
-import cn.escheduler.dao.mapper.UserMapper;
-import cn.escheduler.dao.model.Session;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.Session;
+import cn.escheduler.dao.entity.User;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
