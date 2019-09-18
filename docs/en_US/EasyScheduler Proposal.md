@@ -6,7 +6,7 @@ EasyScheduler is a distributed ETL scheduling engine with powerful DAG visualiza
 
 ## Proposal
 
-EasyScheduler provides many easy-to-use features to accelerate the engineer enficiency on data ETL workflow job. We propose a new concept of 'instance of process' and 'instance of task' to let developers to tuning their jobs on the running state of workflow instead of changing the task's template. Its main objectives are as follows:
+EasyScheduler provides many easy-to-use features to accelerate the engineer efficiency on data ETL workflow job. We propose a new concept of 'instance of process' and 'instance of task' to let developers to tuning their jobs on the running state of workflow instead of changing the task's template. Its main objectives are as follows:
 
 - Define the complex tasks' dependencies & triggers  in a DAG graph by dragging and dropping.
 - Support cluster HA.
