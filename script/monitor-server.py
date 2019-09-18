@@ -14,7 +14,7 @@ or
 conda install -c conda-forge kazoo
 
 run script and parameter description：
-nohup python -u monitor_server.py /data1_1T/escheduler 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181 /escheduler/masters /escheduler/workers> monitor_server.log 2>&1 &
+nohup python -u monitor-server.py /data1_1T/escheduler 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181 /escheduler/masters /escheduler/workers> monitor-server.log 2>&1 &
 the parameters are as follows:
 /data1_1T/escheduler : the value comes from the installPath in install.sh
 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181 : the value comes from zkQuorum in install.sh
