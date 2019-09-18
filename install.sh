@@ -184,28 +184,28 @@ keytabPath="$installPath/conf/hdfs.headless.keytab"
 zkRoot="/escheduler"
 
 # 用来记录挂掉机器的zk目录
-zkDeadServers="/escheduler/dead-servers"
+zkDeadServers="$zkRoot/dead-servers"
 
 # masters目录
-zkMasters="/escheduler/masters"
+zkMasters="$zkRoot/masters"
 
 # workers目录
-zkWorkers="/escheduler/workers"
+zkWorkers="$zkRoot/workers"
 
 # zk master分布式锁
-mastersLock="/escheduler/lock/masters"
+mastersLock="$zkRoot/lock/masters"
 
 # zk worker分布式锁
-workersLock="/escheduler/lock/workers"
+workersLock="$zkRoot/lock/workers"
 
 # zk master容错分布式锁
-mastersFailover="/escheduler/lock/failover/masters"
+mastersFailover="$zkRoot/lock/failover/masters"
 
 # zk worker容错分布式锁
-workersFailover="/escheduler/lock/failover/workers"
+workersFailover="$zkRoot/lock/failover/workers"
 
 # zk master启动容错分布式锁
-mastersStartupFailover="/escheduler/lock/failover/startup-masters"
+mastersStartupFailover="$zkRoot/lock/failover/startup-masters"
 
 # zk session 超时
 zkSessionTimeout="300"
