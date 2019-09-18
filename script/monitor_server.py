@@ -1,21 +1,26 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-# Author:qiaozhanwei
 
 '''
-yum 安装pip
+1, yum install pip
 yum -y install python-pip
 
-pip install kazoo 安装
-conda install -c conda-forge kazoo 安装
+2, pip install kazoo
+pip install kazoo
 
-运行脚本及参数说明：
+or
+
+3, conda install kazoo
+conda install -c conda-forge kazoo
+
+run script and parameter description：
 nohup python -u monitor_server.py /data1_1T/escheduler 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181 /escheduler/masters /escheduler/workers> monitor_server.log 2>&1 &
-参数说明如下:
-/data1_1T/escheduler的值来自install.sh中的installPath
-192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181的值来自install.sh中的zkQuorum
-/escheduler/masters的值来自install.sh中的zkMasters
-/escheduler/workers的值来自install.sh中的zkWorkers
+the parameters are as follows:
+/data1_1T/escheduler : the value comes from the installPath in install.sh
+192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181 : the value comes from zkQuorum in install.sh
+the value comes from zkWorkers in install.sh
+/escheduler/masters : the value comes from zkMasters in install.sh
+/escheduler/workers : the value comes from zkWorkers in install.sh
 '''
 import sys
 import socket
@@ -29,11 +34,11 @@ schedule = sched.scheduler(time.time, time.sleep)
 
 class ZkClient:
     def __init__(self):
-        # hosts配置zk地址集群
+        # hosts configuration zk address cluster
 	    self.zk = KazooClient(hosts=zookeepers)
 	    self.zk.start()
 
-    # 读取配置文件，组装成字典
+    # read configuration files and assemble them into a dictionary
     def read_file(self,path):
         with open(path, 'r') as f:
             dict = {}
@@ -43,11 +48,11 @@ class ZkClient:
                     dict[arr[0]] = arr[1]
             return dict
 
-    # 根据hostname获取ip地址
+    # get the ip address according to hostname
     def get_ip_by_hostname(self,hostname):
         return socket.gethostbyname(hostname)
 
-    # 重启服务
+    # restart server
     def restart_server(self,inc):
         config_dict = self.read_file(install_path + '/conf/config/run_config.conf')
 
@@ -67,7 +72,7 @@ class ZkClient:
             restart_master_list = list(set(master_list) - set(zk_master_list))
             if (len(restart_master_list) != 0):
                 for master in restart_master_list:
-                    print("master " + self.get_ip_by_hostname(master) + " 服务已经掉了")
+                    print("master " + self.get_ip_by_hostname(master) + " server has down")
                     os.system('ssh ' + self.get_ip_by_hostname(master) + ' sh ' + install_path + '/bin/escheduler-daemon.sh start master-server')
 
         if (self.zk.exists(workers_zk_path)):
@@ -78,15 +83,15 @@ class ZkClient:
             restart_worker_list = list(set(worker_list) - set(zk_worker_list))
             if (len(restart_worker_list) != 0):
                 for worker in restart_worker_list:
-                    print("worker " + self.get_ip_by_hostname(worker) + " 服务已经掉了")
+                    print("worker " + self.get_ip_by_hostname(worker) + " server has down")
                     os.system('ssh  ' + self.get_ip_by_hostname(worker) + ' sh ' + install_path + '/bin/escheduler-daemon.sh start worker-server')
 
         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         schedule.enter(inc, 0, self.restart_server, (inc,))
-    # 默认参数60s
+    # default parameter 60s
     def main(self,inc=60):
-        # enter四个参数分别为：间隔事件、优先级（用于同时间到达的两个事件同时执行时定序）、被调用触发的函数，
-        # 给该触发函数的参数（tuple形式）
+        # the enter four parameters are: interval event, priority (sequence for simultaneous execution of two events arriving at the same time), function triggered by the call，
+        # the argument to the trigger function (tuple form)
         schedule.enter(0, 0, self.restart_server, (inc,))
         schedule.run()
 if __name__ == '__main__':
