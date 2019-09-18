@@ -79,6 +79,7 @@ public class MasterExecThread implements Runnable {
     private Map<String, TaskInstance> completeTaskList = new ConcurrentHashMap<>();
     private Map<String, TaskInstance> readyToSubmitTaskList = new ConcurrentHashMap<>();
     private Map<String, TaskInstance> dependFailedTask = new ConcurrentHashMap<>();
+    private Map<String, TaskNode> forbiddenTaskList = new ConcurrentHashMap<>();
     private List<TaskInstance> recoverToleranceFaultTaskList = new ArrayList<>();
 
     private AlertManager alertManager = new AlertManager();
@@ -269,17 +270,20 @@ public class MasterExecThread implements Runnable {
     private void buildFlowDag() throws Exception {
         recoverNodeIdList = getStartTaskInstanceList(processInstance.getCommandParam());
 
+        forbiddenTaskList = DagHelper.getForbiddenTaskNodeMaps(processInstance.getProcessInstanceJson());
         // generate process to get DAG info
         List<String> recoveryNameList = getRecoveryNodeNameList();
         List<String> startNodeNameList = parseStartNodeName(processInstance.getCommandParam());
         ProcessDag processDag = generateFlowDag(processInstance.getProcessInstanceJson(),
                 startNodeNameList, recoveryNameList, processInstance.getTaskDependType());
         if(processDag == null){
+            //TODO...
             logger.error("processDag is null");
             return;
         }
         // generate process dag
-        dag = buildDagGraph(processDag);
+        dag = DagHelper.buildDagGraph(processDag);
+
     }
 
     private void initTaskQueue(){
@@ -411,6 +415,8 @@ public class MasterExecThread implements Runnable {
         return taskInstance;
     }
 
+
+
     /**
      *  get post task instance by node
      *
@@ -421,14 +427,12 @@ public class MasterExecThread implements Runnable {
     private List<TaskInstance> getPostTaskInstanceByNode(DAG<String, TaskNode, TaskNodeRelation> dag, String parentNodeName){
 
         List<TaskInstance> postTaskList = new ArrayList<>();
-        Collection<String> startVertex = null;
-        if(StringUtils.isNotEmpty(parentNodeName)){
-            startVertex = dag.getSubsequentNodes(parentNodeName);
-        }else{
-            startVertex = dag.getBeginNode();
+        Collection<String> startVertex = DagHelper.getStartVertex(parentNodeName, dag, completeTaskList);
+        if(startVertex == null){
+            return postTaskList;
         }
-        for (String nodeName : startVertex){
 
+        for (String nodeName : startVertex){
             // encapsulation task instance
             TaskInstance taskInstance = createTaskInstance(processInstance, nodeName ,
                     dag.getNode(nodeName),parentNodeName);
@@ -517,7 +521,10 @@ public class MasterExecThread implements Runnable {
         List<String> depsNameList = taskNode.getDepList();
         for(String depsNode : depsNameList ){
 
-            // dependencies must be all complete
+            if(forbiddenTaskList.containsKey(depsNode)){
+                continue;
+            }
+            // dependencies must be fully completed
             if(!completeTaskList.containsKey(depsNode)){
                 return DependResult.WAITING;
             }
@@ -869,7 +876,7 @@ public class MasterExecThread implements Runnable {
         }
 
         Date now = new Date();
-        long runningTime =  DateUtils.differMs(now, processInstance.getStartTime());
+        long runningTime =  DateUtils.diffMin(now, processInstance.getStartTime());
 
         if(runningTime > processInstance.getTimeout()){
             return true;
@@ -902,35 +909,6 @@ public class MasterExecThread implements Runnable {
                 taskExecThread.kill();
             }
         }
-    }
-
-    /***
-     * generate dag graph
-     * @param processDag
-     * @return
-     */
-    public DAG<String, TaskNode, TaskNodeRelation> buildDagGraph(ProcessDag processDag) {
-
-        DAG<String,TaskNode,TaskNodeRelation> dag = new DAG<>();
-
-        /**
-         * add vertex
-         */
-        if (CollectionUtils.isNotEmpty(processDag.getNodes())){
-            for (TaskNode node : processDag.getNodes()){
-                dag.addNode(node.getName(),node);
-            }
-        }
-
-        /**
-         * add edge
-         */
-        if (CollectionUtils.isNotEmpty(processDag.getEdges())){
-            for (TaskNodeRelation edge : processDag.getEdges()){
-                dag.addEdge(edge.getStartNode(),edge.getEndNode());
-            }
-        }
-        return dag;
     }
 
     /**

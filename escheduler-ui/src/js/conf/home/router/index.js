@@ -439,6 +439,14 @@ const router = new Router({
           meta: {
             title: `Mysql`
           }
+        },
+        {
+          path: '/monitor/servers/statistics',
+          name: 'statistics',
+          component: resolve => require(['../pages/monitor/pages/servers/statistics'], resolve),
+          meta: {
+            title: `statistics`
+          }
         }
       ]
     }

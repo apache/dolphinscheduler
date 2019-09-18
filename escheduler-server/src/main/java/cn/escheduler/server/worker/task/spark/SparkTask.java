@@ -66,8 +66,6 @@ public class SparkTask extends AbstractYarnTask {
 
     if (StringUtils.isNotEmpty(sparkParameters.getMainArgs())) {
       String args = sparkParameters.getMainArgs();
-      // get process instance by task instance id
-      ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
 
       /**
        *  combining local and global parameters
@@ -75,8 +73,8 @@ public class SparkTask extends AbstractYarnTask {
       Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
               taskProps.getDefinedParams(),
               sparkParameters.getLocalParametersMap(),
-              processInstance.getCmdTypeIfComplement(),
-              processInstance.getScheduleTime());
+              taskProps.getCmdTypeIfComplement(),
+              taskProps.getScheduleTime());
       if (paramsMap != null ){
         args = ParameterUtils.convertParameterPlaceholders(args, ParamUtils.convert(paramsMap));
       }

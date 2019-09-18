@@ -23,33 +23,43 @@ import cn.escheduler.api.service.UsersService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.*;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.Locale;
+
 import static cn.escheduler.api.enums.Status.*;
 
 /**
  * user login controller
+ *
+ * swagger bootstrap ui docs refer : https://doc.xiaominfo.com/guide/enh-func.html
  */
+@Api(tags = "LOGIN_TAG", position = 1)
 @RestController
 @RequestMapping("")
 public class LoginController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
+
     @Autowired
     private SessionService sessionService;
 
     @Autowired
     private UsersService userService;
+
 
     /**
      * login
@@ -60,12 +70,16 @@ public class LoginController extends BaseController {
      * @param response
      * @return
      */
-    @RequestMapping(value = "/login")
+    @ApiOperation(value = "login", notes= "LOGIN_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "userPassword", value = "USER_PASSWORD", required = true, dataType ="String")
+    })
+    @PostMapping(value = "/login")
     public Result login(@RequestParam(value = "userName") String userName,
                         @RequestParam(value = "userPassword") String userPassword,
                         HttpServletRequest request,
                         HttpServletResponse response) {
-
 
         try {
             logger.info("login user name: {} ", userName);
@@ -75,7 +89,6 @@ public class LoginController extends BaseController {
                 return error(Status.USER_NAME_NULL.getCode(),
                         Status.USER_NAME_NULL.getMsg());
             }
-
 
             // user ip check
             String ip = getClientIpAddress(request);
@@ -103,7 +116,7 @@ public class LoginController extends BaseController {
             response.setStatus(HttpStatus.SC_OK);
             response.addCookie(new Cookie(Constants.SESSION_ID, sessionId));
 
-            logger.info("sessionId = " + sessionId);
+            logger.info("sessionId : {}" , sessionId);
             return success(LOGIN_SUCCESS.getMsg(), sessionId);
         } catch (Exception e) {
             logger.error(USER_LOGIN_FAILURE.getMsg(),e);
@@ -117,8 +130,9 @@ public class LoginController extends BaseController {
      * @param loginUser
      * @return
      */
+    @ApiOperation(value = "signOut", notes = "SIGNOUT_NOTES")
     @PostMapping(value = "/signOut")
-    public Result signOut(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result signOut(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           HttpServletRequest request) {
 
         try {

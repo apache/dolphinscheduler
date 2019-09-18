@@ -22,6 +22,7 @@ import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.server.utils.LoggerUtils;
 import cn.escheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -68,6 +70,11 @@ public abstract class AbstractCommandExecutor {
     protected final String taskAppId;
 
     /**
+     *  task appId
+     */
+    protected final int taskInstId;
+
+    /**
      *  tenant code , execute task linux user
      */
     protected final String tenantCode;
@@ -99,11 +106,12 @@ public abstract class AbstractCommandExecutor {
 
 
     public AbstractCommandExecutor(Consumer<List<String>> logHandler,
-                                   String taskDir, String taskAppId, String tenantCode, String envFile,
+                                   String taskDir, String taskAppId,int taskInstId,String tenantCode, String envFile,
                                    Date startTime, int timeout, Logger logger){
         this.logHandler = logHandler;
         this.taskDir = taskDir;
         this.taskAppId = taskAppId;
+        this.taskInstId = taskInstId;
         this.tenantCode = tenantCode;
         this.envFile = envFile;
         this.startTime = startTime;
@@ -162,7 +170,12 @@ public abstract class AbstractCommandExecutor {
                 exitStatusCode = updateState(processDao, exitStatusCode, pid, taskInstId);
 
             } else {
-                cancelApplication();
+                TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+                if (taskInstance == null) {
+                    logger.error("task instance id:{} not exist", taskInstId);
+                } else {
+                    ProcessUtils.kill(taskInstance);
+                }
                 exitStatusCode = -1;
                 logger.warn("process timeout, work dir:{}, pid:{}", taskDir, pid);
             }
@@ -213,7 +226,7 @@ public abstract class AbstractCommandExecutor {
      */
     private int updateState(ProcessDao processDao, int exitStatusCode, int pid, int taskInstId) {
         //get yarn state by log
-        if (exitStatusCode != -1) {
+        if (exitStatusCode != 0) {
             TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
             logger.info("process id is {}", pid);
 
@@ -335,8 +348,9 @@ public abstract class AbstractCommandExecutor {
      * get the standard output of the process
      */
     private void parseProcessOutput(Process process) {
-        String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskAppId);
-        ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName).submit(new Runnable(){
+        String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskAppId);
+        ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
+        parseProcessOutputExecutorService.submit(new Runnable(){
             @Override
             public void run() {
                 BufferedReader inReader = null;
@@ -348,10 +362,7 @@ public abstract class AbstractCommandExecutor {
                     long lastFlushTime = System.currentTimeMillis();
 
                     while ((line = inReader.readLine()) != null) {
-                        if(checkShowLog(line)){
-                            logBuffer.add(line);
-                        }
-
+                        logBuffer.add(line);
                         lastFlushTime = flush(lastFlushTime);
                     }
                 } catch (Exception e) {
@@ -362,7 +373,7 @@ public abstract class AbstractCommandExecutor {
                 }
             }
         });
-
+        parseProcessOutputExecutorService.shutdown();
     }
 
     public int getPid() {
@@ -380,14 +391,22 @@ public abstract class AbstractCommandExecutor {
         boolean result = true;
         try {
             for (String appId : appIds) {
-                ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
-                if (!applicationStatus.equals(ExecutionStatus.SUCCESS)) {
-                    result = false;
+                while(true){
+                    ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
+                    logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
+                    if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
+                            applicationStatus.equals(ExecutionStatus.KILL)) {
+                        return false;
+                    }
+
+                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)){
+                        break;
+                    }
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
-            }
+           }
         } catch (Exception e) {
-            logger.error(String.format("mapreduce applications: %s  status failed : " + e.getMessage(), appIds.toString()),e);
+            logger.error(String.format("yarn applications: %s  status failed : " + e.getMessage(), appIds.toString()),e);
             result = false;
         }
         return result;
@@ -545,13 +564,6 @@ public abstract class AbstractCommandExecutor {
 
     protected abstract String buildCommandFilePath();
     protected abstract String commandType();
-    protected abstract boolean checkShowLog(String line);
     protected abstract boolean checkFindApp(String line);
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
-
-
-
-//    if(line.contains(taskAppId) || !line.contains("cn.escheduler.server.worker.log.TaskLogger")){
-//        logs.add(line);
-//    }
 }

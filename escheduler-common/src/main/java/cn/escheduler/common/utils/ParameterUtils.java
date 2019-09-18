@@ -159,4 +159,18 @@ public class ParameterUtils {
     }
     return null;
   }
+
+
+  /**
+   * handle escapes
+   * @param inputString
+   * @return
+   */
+  public static String handleEscapes(String inputString){
+
+    if(StringUtils.isNotEmpty(inputString)){
+      return inputString.replace("%", "////%");
+    }
+    return inputString;
+  }
 }

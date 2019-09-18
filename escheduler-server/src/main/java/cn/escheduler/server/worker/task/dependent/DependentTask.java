@@ -22,6 +22,7 @@ import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.model.DependentTaskModel;
 import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.task.dependent.DependentParameters;
+import cn.escheduler.common.thread.Stopper;
 import cn.escheduler.common.utils.DependentUtils;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.DaoFactory;
@@ -85,17 +86,25 @@ public class DependentTask extends AbstractTask {
 
         try{
             TaskInstance taskInstance = null;
-            while(true){
+            while(Stopper.isRunning()){
                 taskInstance = processDao.findTaskInstanceById(this.taskProps.getTaskInstId());
+
+                if(taskInstance == null){
+                    exitStatusCode = -1;
+                    break;
+                }
+
                 if(taskInstance.getState() == ExecutionStatus.KILL){
                     this.cancel = true;
                 }
+
                 if(this.cancel || allDependentTaskFinish()){
                     break;
                 }
-                Thread.sleep(Constants.SLEEP_TIME_MILLIS);
 
+                Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             }
+
             if(cancel){
                 exitStatusCode = Constants.EXIT_CODE_KILL;
             }else{
@@ -104,7 +113,7 @@ public class DependentTask extends AbstractTask {
                         Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
             }
         }catch (Exception e){
-            logger.error("Exception " + e);
+            logger.error(e.getMessage(),e);
             exitStatusCode = -1;
         }
     }

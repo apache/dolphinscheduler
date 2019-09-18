@@ -17,12 +17,12 @@
 package cn.escheduler.common.job.db;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * data source of hive
@@ -30,6 +30,8 @@ import java.sql.SQLException;
 public class HiveDataSource extends BaseDataSource {
 
   private static final Logger logger = LoggerFactory.getLogger(HiveDataSource.class);
+
+
 
 
   /**
@@ -44,6 +46,12 @@ public class HiveDataSource extends BaseDataSource {
     }
 
     jdbcUrl += getDatabase();
+
+    if (StringUtils.isNotEmpty(getPrincipal())){
+      jdbcUrl += ";principal=" + getPrincipal();
+    }
+
+
 
     if (StringUtils.isNotEmpty(getOther())) {
       jdbcUrl += ";" + getOther();
@@ -67,11 +75,10 @@ public class HiveDataSource extends BaseDataSource {
         try {
           con.close();
         } catch (SQLException e) {
-          logger.error("Postgre datasource try conn close conn error", e);
+          logger.error("hive datasource try conn close conn error", e);
           throw e;
         }
       }
     }
-
   }
 }

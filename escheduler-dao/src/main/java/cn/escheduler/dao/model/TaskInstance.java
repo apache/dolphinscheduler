@@ -189,6 +189,14 @@ public class TaskInstance {
     private int workerGroupId;
 
 
+
+    public void  init(String host,Date startTime,String executePath){
+        this.host = host;
+        this.startTime = startTime;
+        this.executePath = executePath;
+    }
+
+
     public ProcessInstance getProcessInstance() {
         return processInstance;
     }
@@ -422,8 +430,12 @@ public class TaskInstance {
         if(this.isSubProcess()){
             return false;
         }
-        return (this.getState().typeIsFailure()
+        if(this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE){
+            return true;
+        }else {
+            return (this.getState().typeIsFailure()
                 && this.getRetryTimes() < this.getMaxRetryTimes());
+        }
     }
 
     public void setDependency(String dependency) {

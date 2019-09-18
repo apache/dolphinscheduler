@@ -47,17 +47,25 @@ public class Constants {
 
     public static final String MAIL_SENDER = "mail.sender";
 
+    public static final String MAIL_USER = "mail.user";
+
     public static final String MAIL_PASSWD = "mail.passwd";
 
     public static final String XLS_FILE_PATH = "xls.file.path";
 
-    public static final String MAIL_HOST = "mail.host";
+    public static final String MAIL_HOST = "mail.smtp.host";
+
+    public static final String MAIL_PORT = "mail.smtp.port";
 
     public static final String MAIL_SMTP_AUTH = "mail.smtp.auth";
 
     public static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
 
     public static final String MAIL_SMTP_STARTTLS_ENABLE = "mail.smtp.starttls.enable";
+
+    public static final String MAIL_SMTP_SSL_ENABLE = "mail.smtp.ssl.enable";
+
+    public static final String MAIL_SMTP_SSL_TRUST="mail.smtp.ssl.trust";
 
     public static final String TEXT_HTML_CHARSET_UTF_8 = "text/html;charset=utf-8";
 
@@ -126,4 +134,24 @@ public class Constants {
     public static final String TH_END = "</th>";
 
     public static final int ALERT_SCAN_INTERVEL = 5000;
+
+    public static final String MARKDOWN_QUOTE = ">";
+
+    public static final String MARKDOWN_ENTER = "\n";
+
+    public static final String ENTERPRISE_WECHAT_CORP_ID = "enterprise.wechat.corp.id";
+
+    public static final String ENTERPRISE_WECHAT_SECRET = "enterprise.wechat.secret";
+
+    public static final String ENTERPRISE_WECHAT_TOKEN_URL = "enterprise.wechat.token.url";
+
+    public static final String ENTERPRISE_WECHAT_PUSH_URL = "enterprise.wechat.push.url";
+
+    public static final String ENTERPRISE_WECHAT_TEAM_SEND_MSG = "enterprise.wechat.team.send.msg";
+
+    public static final String ENTERPRISE_WECHAT_USER_SEND_MSG = "enterprise.wechat.user.send.msg";
+
+    public static final String ENTERPRISE_WECHAT_AGENT_ID = "enterprise.wechat.agent.id";
+
+    public static final String ENTERPRISE_WECHAT_USERS = "enterprise.wechat.users";
 }

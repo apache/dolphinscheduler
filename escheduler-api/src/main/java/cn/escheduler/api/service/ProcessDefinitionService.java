@@ -21,9 +21,7 @@ import cn.escheduler.api.dto.treeview.TreeViewDto;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
-import cn.escheduler.common.enums.Flag;
-import cn.escheduler.common.enums.ReleaseState;
-import cn.escheduler.common.enums.TaskType;
+import cn.escheduler.common.enums.*;
 import cn.escheduler.common.graph.DAG;
 import cn.escheduler.common.model.TaskNode;
 import cn.escheduler.common.model.TaskNodeRelation;
@@ -37,13 +35,25 @@ import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.mapper.*;
 import cn.escheduler.dao.model.*;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -83,6 +93,12 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     @Autowired
     private ProcessDao processDao;
+
+    @Autowired
+    private DataSourceMapper dataSourceMapper;
+
+    @Autowired
+    private WorkerGroupMapper workerGroupMapper;
 
     /**
      * create process definition
@@ -126,6 +142,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setLocations(locations);
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
+        processDefine.setTenantId(processData.getTenantId());
 
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
@@ -139,7 +156,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setFlag(Flag.YES);
         processDefineMapper.insert(processDefine);
         putMsg(result, Status.SUCCESS);
-
+        result.put("processDefinitionId",processDefine.getId());
         return result;
     }
 
@@ -290,14 +307,15 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setLocations(locations);
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
+        processDefine.setTenantId(processData.getTenantId());
 
         //custom global params
-        List<Property> globalParamsList = processData.getGlobalParams();
-        if (globalParamsList != null && globalParamsList.size() > 0) {
-            Set<Property> userDefParamsSet = new HashSet<>(globalParamsList);
+        List<Property> globalParamsList = new ArrayList<>();
+        if (processData.getGlobalParams() != null && processData.getGlobalParams().size() > 0) {
+            Set<Property> userDefParamsSet = new HashSet<>(processData.getGlobalParams());
             globalParamsList = new ArrayList<>(userDefParamsSet);
-            processDefine.setGlobalParamList(globalParamsList);
         }
+        processDefine.setGlobalParamList(globalParamsList);
         processDefine.setUpdateTime(now);
         processDefine.setFlag(Flag.YES);
         if (processDefineMapper.update(processDefine) > 0) {
@@ -337,6 +355,120 @@ public class ProcessDefinitionService extends BaseDAGService {
     }
 
     /**
+     * delete process definition by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionId
+     * @return
+     */
+    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    public Map<String, Object> deleteProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId) {
+
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
+
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
+            return result;
+        }
+
+        // Determine if the login user is the owner of the process definition
+        if (loginUser.getId() != processDefinition.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        // check process definition is already online
+        if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
+            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE,processDefinitionId);
+            return result;
+        }
+
+        // get the timing according to the process definition
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
+        if (!schedules.isEmpty() && schedules.size() > 1) {
+            logger.warn("scheduler num is {},Greater than 1",schedules.size());
+            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
+            return result;
+        }else if(schedules.size() == 1){
+            Schedule schedule = schedules.get(0);
+            if(schedule.getReleaseState() == ReleaseState.OFFLINE){
+                scheduleMapper.delete(schedule.getId());
+            }else if(schedule.getReleaseState() == ReleaseState.ONLINE){
+                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE,schedule.getId());
+                return result;
+            }
+        }
+
+        int delete = processDefineMapper.delete(processDefinitionId);
+
+        if (delete > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
+        }
+        return result;
+    }
+
+    /**
+     * batch delete process definition by ids
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionIds
+     * @return
+     */
+    public Map<String, Object> batchDeleteProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds) {
+
+        Map<String, Object> result = new HashMap<>(5);
+
+        Map<String, Object> deleteReuslt = new HashMap<>(5);
+
+        List<Integer> deleteFailedIdList = new ArrayList<Integer>();
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+
+        if(StringUtils.isNotEmpty(processDefinitionIds)){
+            String[] processInstanceIdArray = processDefinitionIds.split(",");
+
+            for (String strProcessInstanceId:processInstanceIdArray) {
+                int processInstanceId = Integer.parseInt(strProcessInstanceId);
+                try {
+                    deleteReuslt = deleteProcessDefinitionById(loginUser, projectName, processInstanceId);
+                    if(!Status.SUCCESS.equals(deleteReuslt.get(Constants.STATUS))){
+                        deleteFailedIdList.add(processInstanceId);
+                        logger.error((String)deleteReuslt.get(Constants.MSG));
+                    }
+                } catch (Exception e) {
+                    deleteFailedIdList.add(processInstanceId);
+                }
+            }
+        }
+
+        if(deleteFailedIdList.size() > 0){
+            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
+        }else{
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
+    }
+
+    /**
      * release process definition: online / offline
      *
      * @param loginUser
@@ -372,7 +504,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     // set status
                     schedule.setReleaseState(ReleaseState.OFFLINE);
                     scheduleMapper.update(schedule);
-                    deleteSchedule(project.getId(), id);
+                    deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
             }
@@ -382,6 +514,239 @@ public class ProcessDefinitionService extends BaseDAGService {
             }
         }
 
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * export process definition by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionId
+     * @return
+     */
+    public void exportProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId, HttpServletResponse response) {
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus == Status.SUCCESS) {
+            ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
+            if (processDefinition != null) {
+                JSONObject jsonObject = JSONUtils.parseObject(processDefinition.getProcessDefinitionJson());
+                JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject taskNode = jsonArray.getJSONObject(i);
+                    if (taskNode.get("type") != null && taskNode.get("type") != "") {
+                        String taskType = taskNode.getString("type");
+                        if(taskType.equals(TaskType.SQL.name())  || taskType.equals(TaskType.PROCEDURE.name())){
+                            JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
+                            DataSource dataSource = dataSourceMapper.queryById((Integer) sqlParameters.get("datasource"));
+                            if (dataSource != null) {
+                                sqlParameters.put("datasourceName", dataSource.getName());
+                            }
+                            taskNode.put("params", sqlParameters);
+                        }
+                    }
+                }
+                jsonObject.put("tasks", jsonArray);
+                processDefinition.setProcessDefinitionJson(jsonObject.toString());
+
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("projectName", processDefinition.getProjectName());
+                row.put("processDefinitionName", processDefinition.getName());
+                row.put("processDefinitionJson", processDefinition.getProcessDefinitionJson());
+                row.put("processDefinitionDesc", processDefinition.getDesc());
+                row.put("processDefinitionLocations", processDefinition.getLocations());
+                row.put("processDefinitionConnects", processDefinition.getConnects());
+
+                List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
+                if (schedules.size() > 0) {
+                    Schedule schedule = schedules.get(0);
+                    row.put("scheduleWarningType", schedule.getWarningType());
+                    row.put("scheduleWarningGroupId", schedule.getWarningGroupId());
+                    row.put("scheduleStartTime", schedule.getStartTime());
+                    row.put("scheduleEndTime", schedule.getEndTime());
+                    row.put("scheduleCrontab", schedule.getCrontab());
+                    row.put("scheduleFailureStrategy", schedule.getFailureStrategy());
+                    row.put("scheduleReleaseState", schedule.getReleaseState());
+                    row.put("scheduleProcessInstancePriority", schedule.getProcessInstancePriority());
+                    if(schedule.getId() == -1){
+                        row.put("scheduleWorkerGroupId", -1);
+                    }else{
+                        WorkerGroup workerGroup = workerGroupMapper.queryById(schedule.getId());
+                        if(workerGroup != null){
+                            row.put("scheduleWorkerGroupName", workerGroup.getName());
+                        }
+                    }
+
+                }
+                String rowsJson = JSONUtils.toJsonString(row);
+                response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
+                response.setHeader("Content-Disposition", "attachment;filename="+processDefinition.getName()+".json");
+                BufferedOutputStream buff = null;
+                ServletOutputStream out = null;
+                try {
+                    out = response.getOutputStream();
+                    buff = new BufferedOutputStream(out);
+                    buff.write(rowsJson.getBytes("UTF-8"));
+                    buff.flush();
+                    buff.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }finally {
+                    try {
+                        buff.close();
+                        out.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file) {
+        Map<String, Object> result = new HashMap<>(5);
+
+        JSONObject json = null;
+        try(InputStreamReader inputStreamReader = new InputStreamReader( file.getInputStream(), "UTF-8" )) {
+            BufferedReader streamReader = new BufferedReader(inputStreamReader);
+            StringBuilder respomseStrBuilder = new StringBuilder();
+            String inputStr = "";
+            while ((inputStr = streamReader.readLine())!= null){
+                respomseStrBuilder.append( inputStr );
+            }
+            json = JSONObject.parseObject( respomseStrBuilder.toString() );
+            if(json != null){
+                String projectName = null;
+                String processDefinitionName = null;
+                String processDefinitionJson = null;
+                String processDefinitionDesc = null;
+                String processDefinitionLocations = null;
+                String processDefinitionConnects = null;
+
+                String scheduleWarningType = null;
+                String scheduleWarningGroupId = null;
+                String scheduleStartTime = null;
+                String scheduleEndTime = null;
+                String scheduleCrontab = null;
+                String scheduleFailureStrategy = null;
+                String scheduleReleaseState = null;
+                String scheduleProcessInstancePriority = null;
+                String scheduleWorkerGroupId = null;
+                String scheduleWorkerGroupName = null;
+
+                if (ObjectUtils.allNotNull(json.get("projectName"))) {
+                    projectName = json.get("projectName").toString();
+                } else {
+                    putMsg(result, Status.DATA_IS_NULL, "processDefinitionName");
+                }
+                if (ObjectUtils.allNotNull(json.get("processDefinitionName"))) {
+                    processDefinitionName = json.get("processDefinitionName").toString();
+                } else {
+                    putMsg(result, Status.DATA_IS_NULL, "processDefinitionName");
+                }
+                if (ObjectUtils.allNotNull(json.get("processDefinitionJson"))) {
+                    processDefinitionJson = json.get("processDefinitionJson").toString();
+                } else {
+                    putMsg(result, Status.DATA_IS_NULL, "processDefinitionJson");
+                }
+                if (ObjectUtils.allNotNull(json.get("processDefinitionDesc"))) {
+                    processDefinitionDesc = json.get("processDefinitionDesc").toString();
+                }
+                if (ObjectUtils.allNotNull(json.get("processDefinitionLocations"))) {
+                    processDefinitionLocations = json.get("processDefinitionLocations").toString();
+                }
+                if (ObjectUtils.allNotNull(json.get("processDefinitionConnects"))) {
+                    processDefinitionConnects = json.get("processDefinitionConnects").toString();
+                }
+
+                JSONObject jsonObject = JSONUtils.parseObject(processDefinitionJson);
+                JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
+                for (int j = 0; j < jsonArray.size(); j++) {
+                    JSONObject taskNode = jsonArray.getJSONObject(j);
+                    JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
+                    List<DataSource> dataSources = dataSourceMapper.queryDataSourceByName(sqlParameters.getString("datasourceName"));
+                    if (dataSources.size() > 0) {
+                        DataSource dataSource = dataSources.get(0);
+                        sqlParameters.put("datasource", dataSource.getId());
+                    }
+                    taskNode.put("params", sqlParameters);
+                }
+                jsonObject.put("tasks", jsonArray);
+
+                Map<String, Object> createProcessDefinitionResult = createProcessDefinition(loginUser,projectName,processDefinitionName,jsonObject.toString(),processDefinitionDesc,processDefinitionLocations,processDefinitionConnects);
+                Integer processDefinitionId = null;
+                if (ObjectUtils.allNotNull(createProcessDefinitionResult.get("processDefinitionId"))) {
+                    processDefinitionId = Integer.parseInt(createProcessDefinitionResult.get("processDefinitionId").toString());
+                }
+                if (ObjectUtils.allNotNull(json.get("scheduleCrontab")) && processDefinitionId != null) {
+                    Date now = new Date();
+                    Schedule scheduleObj = new Schedule();
+                    scheduleObj.setProjectName(projectName);
+                    scheduleObj.setProcessDefinitionId(processDefinitionId);
+                    scheduleObj.setProcessDefinitionName(processDefinitionName);
+                    scheduleObj.setCreateTime(now);
+                    scheduleObj.setUpdateTime(now);
+                    scheduleObj.setUserId(loginUser.getId());
+                    scheduleObj.setUserName(loginUser.getUserName());
+
+                    scheduleCrontab = json.get("scheduleCrontab").toString();
+                    scheduleObj.setCrontab(scheduleCrontab);
+                    if (ObjectUtils.allNotNull(json.get("scheduleStartTime"))) {
+                        scheduleStartTime = json.get("scheduleStartTime").toString();
+                        scheduleObj.setStartTime(DateUtils.stringToDate(scheduleStartTime));
+                    }
+                    if (ObjectUtils.allNotNull(json.get("scheduleEndTime"))) {
+                        scheduleEndTime = json.get("scheduleEndTime").toString();
+                        scheduleObj.setEndTime(DateUtils.stringToDate(scheduleEndTime));
+                    }
+                    if (ObjectUtils.allNotNull(json.get("scheduleWarningType"))) {
+                        scheduleWarningType = json.get("scheduleWarningType").toString();
+                        scheduleObj.setWarningType(WarningType.valueOf(scheduleWarningType));
+                    }
+                    if (ObjectUtils.allNotNull(json.get("scheduleWarningGroupId"))) {
+                        scheduleWarningGroupId = json.get("scheduleWarningGroupId").toString();
+                        scheduleObj.setWarningGroupId(Integer.parseInt(scheduleWarningGroupId));
+                    }
+                    if (ObjectUtils.allNotNull(json.get("scheduleFailureStrategy"))) {
+                        scheduleFailureStrategy = json.get("scheduleFailureStrategy").toString();
+                        scheduleObj.setFailureStrategy(FailureStrategy.valueOf(scheduleFailureStrategy));
+                    }
+                    if (ObjectUtils.allNotNull(json.get("scheduleReleaseState"))) {
+                        scheduleReleaseState = json.get("scheduleReleaseState").toString();
+                        scheduleObj.setReleaseState(ReleaseState.valueOf(scheduleReleaseState));
+                    }
+                    if (ObjectUtils.allNotNull(json.get("scheduleProcessInstancePriority"))) {
+                        scheduleProcessInstancePriority = json.get("scheduleProcessInstancePriority").toString();
+                        scheduleObj.setProcessInstancePriority(Priority.valueOf(scheduleProcessInstancePriority));
+                    }
+                    if (ObjectUtils.allNotNull(json.get("scheduleWorkerGroupId"))) {
+                        scheduleWorkerGroupId = json.get("scheduleWorkerGroupId").toString();
+                        if(scheduleWorkerGroupId != null){
+                            scheduleObj.setWorkerGroupId(Integer.parseInt(scheduleWorkerGroupId));
+                        }else{
+                            if (ObjectUtils.allNotNull(json.get("scheduleWorkerGroupName"))) {
+                                scheduleWorkerGroupName = json.get("scheduleWorkerGroupName").toString();
+                                List<WorkerGroup> workerGroups = workerGroupMapper.queryWorkerGroupByName(scheduleWorkerGroupName);
+                                if(workerGroups.size() > 0){
+                                    scheduleObj.setWorkerGroupId(workerGroups.get(0).getId());
+                                }
+                            }
+                        }
+                    }
+                    scheduleMapper.insert(scheduleObj);
+                }
+            }else{
+                putMsg(result, Status.EXPORT_PROCESS_DEFINE_BY_ID_ERROR);
+                return result;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -495,6 +860,24 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         return result;
 
+    }
+
+
+    /**
+     * query proccess definition all by project id
+     *
+     * @param projectId
+     * @return
+     */
+    public Map<String, Object> queryProccessDefinitionAllByProjectId(Integer projectId) {
+
+        HashMap<String, Object> result = new HashMap<>(5);
+
+        List<ProcessDefinition> resourceList = processDefineMapper.queryAllDefinitionList(projectId);
+        result.put(Constants.DATA_LIST, resourceList);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
     }
 
     /**
