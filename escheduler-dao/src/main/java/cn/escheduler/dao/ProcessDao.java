@@ -1739,7 +1739,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param processInstanceId
      * @return
      */
-    public String queryQueueByProcessInstanceId(int processInstanceId){
+    public String queryUserQueueByProcessInstanceId(int processInstanceId){
         return userMapper.queryQueueByProcessInstanceId(processInstanceId);
     }
 
