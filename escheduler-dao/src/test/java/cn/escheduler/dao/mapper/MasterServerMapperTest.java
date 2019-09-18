@@ -16,8 +16,9 @@
  */
 package cn.escheduler.dao.mapper;
 
+import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.MasterServer;
+import cn.escheduler.common.model.MasterServer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,26 +36,29 @@ public class MasterServerMapperTest {
 
     @Before
     public void before(){
-        masterServerMapper =ConnectionFactory.getSqlSession().getMapper(MasterServerMapper.class);
+        masterServerMapper = ConnectionFactory.getSqlSession().getMapper(MasterServerMapper.class);
     }
 
     @Test
     public void queryAllMaster() {
 
         MasterServer masterServer = new MasterServer();
-        String host = "127.22.2.1";
+        String host = OSUtils.getHost();
         masterServer.setHost(host);
         masterServer.setLastHeartbeatTime(new Date());
         masterServer.setPort(19282);
         masterServer.setCreateTime(new Date());
-        masterServer.setZkDirectory("/root");
+        masterServer.setZkDirectory("/escheduler/masters/" + host + "_0000000001");
 
         masterServerMapper.insert(masterServer);
         Assert.assertNotEquals(masterServer.getId(), 0);
 
+
         masterServer.setPort(12892);
         int update = masterServerMapper.update(masterServer);
         Assert.assertEquals(update, 1);
+
+
         List<MasterServer> masterServers = masterServerMapper.queryAllMaster();
 
         MasterServer findMaster = null;

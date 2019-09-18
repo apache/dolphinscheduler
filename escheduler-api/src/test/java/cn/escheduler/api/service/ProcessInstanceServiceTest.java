@@ -16,6 +16,7 @@
  */
 package cn.escheduler.api.service;
 
+import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.common.enums.DependResult;
@@ -36,7 +37,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class ProcessInstanceServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceServiceTest.class);
 
@@ -44,10 +45,14 @@ public class ProcessInstanceServiceTest {
     ProcessInstanceService processInstanceService;
 
     @Test
-    public void viewVariables() throws Exception {
-        Map<String, Object> map = processInstanceService.viewVariables(1389);
-        Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
-        logger.info(JSON.toJSONString(map));
+    public void viewVariables() {
+        try {
+            Map<String, Object> map = processInstanceService.viewVariables(-1);
+            Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+            logger.info(JSON.toJSONString(map));
+        }catch (Exception e){
+            logger.error(e.getMessage(), e);
+        }
     }
 
     @Test
@@ -72,7 +77,19 @@ public class ProcessInstanceServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
         Map<String, Object> map = processInstanceService.queryProcessInstanceList(loginUser, "project_test1", 0, "", "", "", ExecutionStatus.FAILURE, "", 1, 5);
 
-        Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
+        logger.info(JSON.toJSONString(map));
+    }
+
+    @Test
+    public void batchDeleteProcessInstanceByIds() throws Exception {
+
+        User loginUser = new User();
+        loginUser.setId(-1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Map<String, Object> map = processInstanceService.batchDeleteProcessInstanceByIds(loginUser, "li_test_1", "4,2,300");
+
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
         logger.info(JSON.toJSONString(map));
     }
 }

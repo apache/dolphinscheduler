@@ -30,7 +30,7 @@ public enum Status {
 //    DB_OPERATION_ERROR(10005, "database operation error"),
     HDFS_OPERATION_ERROR(10006, "hdfs operation error"),
     UPDATE_FAILED(10007, "updateProcessInstance failed"),
-    TASK_INSTANCE_HOST_NOT_FOUND(10008, "task instance does not set host"),
+    TASK_INSTANCE_NOT_FOUND(10008, "task instance not found"),
     TENANT_NAME_EXIST(10009, "tenant code already exists"),
     USER_NOT_EXIST(10010, "user {0} not exists"),
     ALERT_GROUP_NOT_EXIST(10011, "alarm group not found"),
@@ -159,7 +159,11 @@ public enum Status {
     NAME_NULL(10134,"name must be not null"),
     NAME_EXIST(10135, "name {0} already exists"),
     SAVE_ERROR(10136, "save error"),
-
+    DELETE_PROJECT_ERROR_DEFINES_NOT_NULL(10137, "please delete the process definitions in project first!"),
+    BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117,"batch delete process instance by ids {0} error"),
+    PREVIEW_SCHEDULE_ERROR(10139,"preview schedule error"),
+    PARSE_TO_CRON_EXPRESSION_ERROR(10140,"parse cron to cron expression error"),
+    SCHEDULE_START_TIME_END_TIME_SAME(10141,"The start time must not be the same as the end"),
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
@@ -172,6 +176,8 @@ public enum Status {
     RESOURCE_SUFFIX_FORBID_CHANGE(20008, "resource suffix not allowed to be modified"),
     UDF_RESOURCE_SUFFIX_NOT_JAR(20009, "UDF resource suffix name must be jar"),
     HDFS_COPY_FAIL(20009, "hdfs copy {0} -> {1} fail"),
+    RESOURCE_FILE_EXIST(20010, "resource file {0} already exists in hdfs,please delete it or change name!"),
+    RESOURCE_FILE_NOT_EXIST(20011, "resource file {0} not exists in hdfs!"),
 
 
 
@@ -200,8 +206,19 @@ public enum Status {
     DATA_IS_NULL(50018,"data %s is null"),
     PROCESS_NODE_HAS_CYCLE(50019,"process node has cycle"),
     PROCESS_NODE_S_PARAMETER_INVALID(50020,"process node %s parameter invalid"),
+    PROCESS_DEFINE_STATE_ONLINE(50021, "process definition {0} is already on line"),
+    DELETE_PROCESS_DEFINE_BY_ID_ERROR(50022,"delete process definition by id error"),
+    SCHEDULE_CRON_STATE_ONLINE(50023,"the status of schedule {0} is already on line"),
+    DELETE_SCHEDULE_CRON_BY_ID_ERROR(50024,"delete schedule by id error"),
+    BATCH_DELETE_PROCESS_DEFINE_ERROR(50025,"batch delete process definition error"),
+    BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR(50026,"batch delete process definition by ids {0} error"),
+    TENANT_NOT_SUITABLE(50027,"there is not any tenant suitable, please choose a tenant available."),
+    EXPORT_PROCESS_DEFINE_BY_ID_ERROR(50028,"export process definition by id error"),
+    IMPORT_PROCESS_DEFINE_ERROR(50029,"import process definition error"),
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
+    HDFS_TERANT_RESOURCES_FILE_EXISTS(60002,"resource file exists,please delete resource first"),
+    HDFS_TERANT_UDFS_FILE_EXISTS(60003,"udf file exists,please delete resource first"),
 
     /**
      * for monitor
@@ -220,6 +237,7 @@ public enum Status {
 
     QUEUE_COUNT_ERROR(90001,"queue count error"),
 
+    KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error"),
     ;
 
     private int code;

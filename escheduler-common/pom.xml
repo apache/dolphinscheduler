@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>escheduler</artifactId>
 		<groupId>cn.analysys</groupId>
-		<version>1.0.2-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>escheduler-common</artifactId>
 	<name>escheduler-common</name>
@@ -149,9 +149,25 @@
 					<artifactId>jsp-api</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.google.protobuf</groupId>
-					<artifactId>protobuf-java</artifactId>
+					<artifactId>jersey-json</artifactId>
+					<groupId>com.sun.jersey</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>jersey-server</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-core</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>xz</artifactId>
+					<groupId>org.tukaani</groupId>
+				</exclusion>
+				<!--<exclusion>-->
+					<!--<groupId>com.google.protobuf</groupId>-->
+					<!--<artifactId>protobuf-java</artifactId>-->
+				<!--</exclusion>-->
 
 			</exclusions>
 		</dependency>
@@ -175,10 +191,10 @@
 					<groupId>org.codehaus.jackson</groupId>
 					<artifactId>jackson-xc</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>com.google.protobuf</groupId>
-					<artifactId>protobuf-java</artifactId>
-				</exclusion>
+				<!--<exclusion>-->
+					<!--<groupId>com.google.protobuf</groupId>-->
+					<!--<artifactId>protobuf-java</artifactId>-->
+				<!--</exclusion>-->
 				<exclusion>
 					<groupId>org.fusesource.leveldbjni</groupId>
 					<artifactId>leveldbjni-all</artifactId>
@@ -190,6 +206,22 @@
 				<exclusion>
 					<groupId>org.apache.hadoop</groupId>
 					<artifactId>hadoop-mapreduce-client-shuffle</artifactId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-client</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-core</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jaxb-api</artifactId>
+					<groupId>javax.xml.bind</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -227,6 +259,41 @@
 					<groupId>org.fusesource.leveldbjni</groupId>
 					<artifactId>leveldbjni-all</artifactId>
 				</exclusion>
+				<exclusion>
+					<artifactId>jersey-core</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-server</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-aws</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.hadoop</groupId>
+					<artifactId>hadoop-common</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-annotations</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -240,10 +307,6 @@
 			<artifactId>postgresql</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.hive</groupId>
 			<artifactId>hive-jdbc</artifactId>
@@ -352,6 +415,110 @@
 					<artifactId>servlet-api-2.5</artifactId>
 					<groupId>org.mortbay.jetty</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>jasper-runtime</artifactId>
+					<groupId>tomcat</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>slider-core</artifactId>
+					<groupId>org.apache.slider</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hbase-server</artifactId>
+					<groupId>org.apache.hbase</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-client</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-core</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-json</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-server</artifactId>
+					<groupId>com.sun.jersey</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jersey-guice</artifactId>
+					<groupId>com.sun.jersey.contribs</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hbase-common</artifactId>
+					<groupId>org.apache.hbase</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hbase-hadoop2-compat</artifactId>
+					<groupId>org.apache.hbase</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hbase-client</artifactId>
+					<groupId>org.apache.hbase</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hbase-hadoop-compat</artifactId>
+					<groupId>org.apache.hbase</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>tephra-hbase-compat-1.0</artifactId>
+					<groupId>co.cask.tephra</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jaxb-api</artifactId>
+					<groupId>javax.xml.bind</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hive-llap-client</artifactId>
+					<groupId>org.apache.hive</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hive-llap-common</artifactId>
+					<groupId>org.apache.hive</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hive-llap-server</artifactId>
+					<groupId>org.apache.hive</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>tephra-core</artifactId>
+					<groupId>co.cask.tephra</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>ant</artifactId>
+					<groupId>ant</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>stringtemplate</artifactId>
+					<groupId>org.antlr</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>antlr-runtime</artifactId>
+					<groupId>org.antlr</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hive-shims</artifactId>
+					<groupId>org.apache.hive</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jsp-api</artifactId>
+					<groupId>javax.servlet</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j-api</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j-core</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>log4j-web</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -384,6 +551,10 @@
 					<artifactId>com.fasterxml.jackson.core</artifactId>
 					<groupId>jackson-databind</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>jaxb-api</artifactId>
+					<groupId>javax.xml.bind</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -392,10 +563,15 @@
 			<artifactId>mssql-jdbc</artifactId>
 			<exclusions>
 				<exclusion>
-					<artifactId>com.microsoft.azure</artifactId>
-					<groupId>azure-keyvault</groupId>
+					<artifactId>azure-keyvault</artifactId>
+					<groupId>com.microsoft.azure</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jsp-2.1</artifactId>
 		</dependency>
 	</dependencies>
 

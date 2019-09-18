@@ -54,7 +54,7 @@ public class ShellTask extends AbstractTask {
    */
   private String taskDir;
 
-  private ShellCommandExecutor processTask;
+  private ShellCommandExecutor shellCommandExecutor;
 
   /**
    * process database access
@@ -62,15 +62,19 @@ public class ShellTask extends AbstractTask {
   private ProcessDao processDao;
 
 
-  public ShellTask(TaskProps props, Logger logger) {
-    super(props, logger);
+  public ShellTask(TaskProps taskProps, Logger logger) {
+    super(taskProps, logger);
 
-    this.taskDir = props.getTaskDir();
+    this.taskDir = taskProps.getTaskDir();
 
-    this.processTask = new ShellCommandExecutor(this::logHandle,
-        props.getTaskDir(), props.getTaskAppId(),
-        props.getTenantCode(), props.getEnvFile(), props.getTaskStartTime(),
-        props.getTaskTimeout(), logger);
+    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskProps.getTaskDir(),
+            taskProps.getTaskAppId(),
+            taskProps.getTaskInstId(),
+            taskProps.getTenantCode(),
+            taskProps.getEnvFile(),
+            taskProps.getTaskStartTime(),
+            taskProps.getTaskTimeout(),
+            logger);
     this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
   }
 
@@ -89,9 +93,9 @@ public class ShellTask extends AbstractTask {
   public void handle() throws Exception {
     try {
       // construct process
-      exitStatusCode = processTask.run(buildCommand(), processDao);
+      exitStatusCode = shellCommandExecutor.run(buildCommand(), processDao);
     } catch (Exception e) {
-      logger.error(e.getMessage(), e);
+      logger.error("shell task failure", e);
       exitStatusCode = -1;
     }
   }
@@ -99,7 +103,7 @@ public class ShellTask extends AbstractTask {
   @Override
   public void cancelApplication(boolean cancelApplication) throws Exception {
     // cancel process
-    processTask.cancelApplication();
+    shellCommandExecutor.cancelApplication();
   }
 
   /**
@@ -118,8 +122,6 @@ public class ShellTask extends AbstractTask {
 
     String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
 
-    // find process instance by task id
-    ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
 
     /**
      *  combining local and global parameters
@@ -127,8 +129,8 @@ public class ShellTask extends AbstractTask {
     Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
             taskProps.getDefinedParams(),
             shellParameters.getLocalParametersMap(),
-            processInstance.getCmdTypeIfComplement(),
-            processInstance.getScheduleTime());
+            taskProps.getCmdTypeIfComplement(),
+            taskProps.getScheduleTime());
     if (paramsMap != null){
       script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
     }

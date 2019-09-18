@@ -8,7 +8,7 @@
              :id="v"
              v-for="(item,v) in tasksTypeList"
              @mousedown="_getDagId(v)">
-          <div data-toggle="tooltip" :title="item.desc" :class="_isDetails">
+          <div data-toggle="tooltip" :title="item.desc">
             <div class="icos" :class="'icos-' + v" ></div>
           </div>
         </div>
@@ -28,7 +28,20 @@
                   @click="_toggleView"
                   icon="fa fa-code">
           </x-button>
+          <x-button
+            style="vertical-align: middle;"
+            data-toggle="tooltip"
+            :title="$t('Startup parameter')"
+            data-container="body"
+            type="primary"
+            size="xsmall"
+            :disabled="$route.name !== 'projects-instance-details'"
+            @click="_toggleParam"
+            icon="fa fa-chevron-circle-right">
+          </x-button>
           <span class="name">{{name}}</span>
+          &nbsp;
+          <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><i class="iconfont" data-container="body"  data-toggle="tooltip" title="复制名称" >&#xe61e;</i></span>
         </div>
         <div class="save-btn">
           <div class="operation" style="vertical-align: middle;">
@@ -66,10 +79,9 @@
                   type="primary"
                   size="xsmall"
                   :loading="spinnerLoading"
-                  v-ps="['GENERAL_USER']"
                   @click="_saveChart"
                   icon="fa fa-save"
-                  :disabled="isDetails">
+                  >
             {{spinnerLoading ? 'Loading...' : $t('Save')}}
           </x-button>
         </div>
@@ -88,6 +100,7 @@
   import mUdp from './udp/udp'
   import i18n from '@/module/i18n'
   import { jsPlumb } from 'jsplumb'
+  import Clipboard from 'clipboard'
   import { allNodesId } from './plugIn/util'
   import { toolOper, tasksType } from './config'
   import mFormModel from './formModel/formModel'
@@ -140,6 +153,23 @@
         }
       },
       /**
+       * copy name
+       */
+      _copyName(){
+        let clipboard = new Clipboard(`.copy-name`)
+        clipboard.on('success', e => {
+          this.$message.success(`${i18n.$t('Copy success')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+        clipboard.on('error', e => {
+          // Copy is not supported
+          this.$message.warning(`${i18n.$t('The browser does not support automatic copying')}`)
+          // Free memory
+          clipboard.destroy()
+        })
+      },
+      /**
        * Get state interface
        * @param isReset Whether to manually refresh
        */
@@ -154,6 +184,10 @@
               let $item = _.filter(taskList, v => v.name === item.name)[0]
               return `<div style="text-align: left">${i18n.$t('Name')}：${$item.name}</br>${i18n.$t('State')}：${desc}</br>${i18n.$t('type')}：${$item.taskType}</br>${i18n.$t('host')}：${$item.host || '-'}</br>${i18n.$t('Retry Count')}：${$item.retryTimes}</br>${i18n.$t('Submit Time')}：${formatDate($item.submitTime)}</br>${i18n.$t('Start Time')}：${formatDate($item.startTime)}</br>${i18n.$t('End Time')}：${$item.endTime ? formatDate($item.endTime) : '-'}</br></div>`
             }
+
+            // remove tip state dom
+            $('.w').find('.state-p').html('')
+
             data.forEach(v1 => {
               idArr.forEach(v2 => {
                 if (v2.name === v1.name) {
@@ -161,7 +195,6 @@
                   let state = dom.find('.state-p')
                   dom.attr('data-state-id', v1.stateId)
                   dom.attr('data-dependent-result', v1.dependentResult || '')
-                  state.html('')
                   state.append(`<b class="iconfont ${v1.isSpin ? 'fa fa-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body">${v1.icoUnicode}</b>`)
                   state.find('b').attr('title', titleTpl(v2, v1.desc))
                 }
@@ -182,9 +215,9 @@
        * @param item
        */
       _getDagId (v) {
-        if (this.isDetails) {
-          return
-        }
+        // if (this.isDetails) {
+        //   return
+        // }
         this.dagBarId = v
       },
       /**
@@ -216,11 +249,12 @@
         })
       },
       _operationClass (item) {
-        if (item.disable) {
-          return this.toolOperCode === item.code ? 'active' : ''
-        } else {
-          return 'disable'
-        }
+        return this.toolOperCode === item.code ? 'active' : ''
+        // if (item.disable) {
+        //   return this.toolOperCode === item.code ? 'active' : ''
+        // } else {
+        //   return 'disable'
+        // }
       },
       /**
        * Storage interface
@@ -360,6 +394,13 @@
       _toggleView () {
         findComponentDownward(this.$root, `assist-dag-index`)._toggleView()
       },
+
+      /**
+       * Starting parameters
+       */
+      _toggleParam () {
+        findComponentDownward(this.$root, `starting-params-dag-index`)._toggleParam()
+      },
       /**
        * Create a node popup layer
        * @param Object id
@@ -418,8 +459,6 @@
       'tasks': {
         deep: true,
         handler (o) {
-          console.log('+++++ save dag params +++++')
-          console.log(o)
 
           // Edit state does not allow deletion of node a...
           this.setIsEditDag(true)

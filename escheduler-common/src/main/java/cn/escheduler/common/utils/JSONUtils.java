@@ -27,10 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * json utils
@@ -109,7 +106,7 @@ public class JSONUtils {
    */
   public static <T> List<T> toList(String json, Class<T> clazz) {
     if (StringUtils.isEmpty(json)) {
-      return null;
+      return new ArrayList<>();
     }
     try {
       return JSONArray.parseArray(json, clazz);
@@ -117,7 +114,7 @@ public class JSONUtils {
       logger.error("JSONArray.parseArray exception!",e);
     }
 
-    return null;
+    return new ArrayList<>();
   }
 
 
@@ -224,6 +221,22 @@ public class JSONUtils {
   public static String toJsonString(Object object) {
     try{
       return JSONObject.toJSONString(object,false);
+    } catch (Exception e) {
+      throw new RuntimeException("Json deserialization exception.", e);
+    }
+  }
+
+  public static JSONObject parseObject(String text) {
+    try{
+      return JSONObject.parseObject(text);
+    } catch (Exception e) {
+      throw new RuntimeException("Json deserialization exception.", e);
+    }
+  }
+
+  public static JSONArray parseArray(String text) {
+    try{
+      return JSONObject.parseArray(text);
     } catch (Exception e) {
       throw new RuntimeException("Json deserialization exception.", e);
     }
