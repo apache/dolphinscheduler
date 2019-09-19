@@ -176,7 +176,6 @@
       <groupId>cn.analysys</groupId>
       <artifactId>escheduler-rpc</artifactId>
     </dependency>
-statstat
     <dependency>
       <groupId>org.apache.zookeeper</groupId>
       <artifactId>zookeeper</artifactId>
