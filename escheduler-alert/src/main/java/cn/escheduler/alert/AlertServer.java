@@ -39,7 +39,7 @@ public class AlertServer {
 
     private AlertSender alertSender;
 
-    private static AlertServer instance;
+    private static volatile AlertServer instance;
 
     private AlertServer() {
 
