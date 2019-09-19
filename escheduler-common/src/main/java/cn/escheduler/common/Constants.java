@@ -906,4 +906,18 @@ public final class Constants {
      * hive conf
      */
     public static final String HIVE_CONF = "hiveconf:";
+
+    //flink 任务
+    public static final String FLINK_YARN_CLUSTER = "yarn-cluster";
+    public static final String FLINK_RUN_MODE = "-m";
+    public static final String FLINK_YARN_SLOT = "-ys";
+    public static final String FLINK_APP_NAME = "-ynm";
+    public static final String FLINK_TASK_MANAGE = "-yn";
+
+    public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
+    public static final String FLINK_TASK_MANAGE_MEM = "-ytm";
+    public static final String FLINK_detach = "-d";
+    public static final String FLINK_MAIN_CLASS = "-c";
+
+
 }

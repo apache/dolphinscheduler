@@ -19,13 +19,13 @@
           <div class="cont-box">
             <label class="label-box">
               <x-input
-                      type="text"
-                      v-model="name"
-                      :disabled="isDetails"
-                      :placeholder="$t('Please enter name(required)')"
-                      maxlength="100"
-                      @on-blur="_verifName()"
-                      autocomplete="off">
+                type="text"
+                v-model="name"
+                :disabled="isDetails"
+                :placeholder="$t('Please enter name(required)')"
+                maxlength="100"
+                @on-blur="_verifName()"
+                autocomplete="off">
               </x-input>
             </label>
           </div>
@@ -52,13 +52,13 @@
           <div class="cont-box">
             <label class="label-box">
               <x-input
-                      resize
-                      :autosize="{minRows:2}"
-                      type="textarea"
-                      :disabled="isDetails"
-                      v-model="desc"
-                      :placeholder="$t('Please enter description')"
-                      autocomplete="off">
+                resize
+                :autosize="{minRows:2}"
+                type="textarea"
+                :disabled="isDetails"
+                v-model="desc"
+                :placeholder="$t('Please enter description')"
+                autocomplete="off">
               </x-input>
             </label>
           </div>
@@ -96,68 +96,74 @@
 
         <!-- Task timeout alarm -->
         <m-timeout-alarm
-                ref="timeout"
-                :backfill-item="backfillItem"
-                @on-timeout="_onTimeout">
+          ref="timeout"
+          :backfill-item="backfillItem"
+          @on-timeout="_onTimeout">
         </m-timeout-alarm>
 
         <!-- shell node -->
         <m-shell
-                v-if="taskType === 'SHELL'"
-                @on-params="_onParams"
-                ref="SHELL"
-                :backfill-item="backfillItem">
+          v-if="taskType === 'SHELL'"
+          @on-params="_onParams"
+          ref="SHELL"
+          :backfill-item="backfillItem">
         </m-shell>
         <!-- sub_process node -->
         <m-sub-process
-                v-if="taskType === 'SUB_PROCESS'"
-                @on-params="_onParams"
-                @on-set-process-name="_onSetProcessName"
-                ref="SUB_PROCESS"
-                :backfill-item="backfillItem">
+          v-if="taskType === 'SUB_PROCESS'"
+          @on-params="_onParams"
+          @on-set-process-name="_onSetProcessName"
+          ref="SUB_PROCESS"
+          :backfill-item="backfillItem">
         </m-sub-process>
         <!-- procedure node -->
         <m-procedure
-                v-if="taskType === 'PROCEDURE'"
-                @on-params="_onParams"
-                ref="PROCEDURE"
-                :backfill-item="backfillItem">
+          v-if="taskType === 'PROCEDURE'"
+          @on-params="_onParams"
+          ref="PROCEDURE"
+          :backfill-item="backfillItem">
         </m-procedure>
         <!-- sql node -->
         <m-sql
-                v-if="taskType === 'SQL'"
-                @on-params="_onParams"
-                ref="SQL"
-                :create-node-id="id"
-                :backfill-item="backfillItem">
+          v-if="taskType === 'SQL'"
+          @on-params="_onParams"
+          ref="SQL"
+          :create-node-id="id"
+          :backfill-item="backfillItem">
         </m-sql>
         <!-- spark node -->
         <m-spark
-                v-if="taskType === 'SPARK'"
-                @on-params="_onParams"
-                ref="SPARK"
-                :backfill-item="backfillItem">
+          v-if="taskType === 'SPARK'"
+          @on-params="_onParams"
+          ref="SPARK"
+          :backfill-item="backfillItem">
         </m-spark>
+        <m-flink
+          v-if="taskType === 'FLINK'"
+          @on-params="_onParams"
+          ref="FLINK"
+          :backfill-item="backfillItem">
+        </m-flink>
         <!-- mr node -->
         <m-mr
-                v-if="taskType === 'MR'"
-                @on-params="_onParams"
-                ref="MR"
-                :backfill-item="backfillItem">
+          v-if="taskType === 'MR'"
+          @on-params="_onParams"
+          ref="MR"
+          :backfill-item="backfillItem">
         </m-mr>
         <!-- python node -->
         <m-python
-                v-if="taskType === 'PYTHON'"
-                @on-params="_onParams"
-                ref="PYTHON"
-                :backfill-item="backfillItem">
+          v-if="taskType === 'PYTHON'"
+          @on-params="_onParams"
+          ref="PYTHON"
+          :backfill-item="backfillItem">
         </m-python>
         <!-- dependent node -->
         <m-dependent
-                v-if="taskType === 'DEPENDENT'"
-                @on-dependent="_onDependent"
-                ref="DEPENDENT"
-                :backfill-item="backfillItem">
+          v-if="taskType === 'DEPENDENT'"
+          @on-dependent="_onDependent"
+          ref="DEPENDENT"
+          :backfill-item="backfillItem">
         </m-dependent>
 
       </div>
@@ -178,6 +184,7 @@
   import i18n from '@/module/i18n'
   import mShell from './tasks/shell'
   import mSpark from './tasks/spark'
+  import mFlink from './tasks/flink'
   import mPython from './tasks/python'
   import JSP from './../plugIn/jsPlumbHandle'
   import mProcedure from './tasks/procedure'
@@ -284,12 +291,12 @@
           }
           this.store.dispatch('dag/getSubProcessId', { taskId: stateId }).then(res => {
             this.$emit('onSubProcess', {
-              subProcessId: res.data.subProcessInstanceId,
-              fromThis: this
-            })
-          }).catch(e => {
-            this.$message.error(e.msg || '')
+            subProcessId: res.data.subProcessInstanceId,
+            fromThis: this
           })
+        }).catch(e => {
+            this.$message.error(e.msg || '')
+        })
         } else {
           this.$emit('onSubProcess', {
             subProcessId: this.backfillItem.params.processDefinitionId,
@@ -413,10 +420,10 @@
       if (taskList.length) {
         taskList.forEach(v => {
           if (v.id === this.id) {
-            o = v
-            this.backfillItem = v
-          }
-        })
+          o = v
+          this.backfillItem = v
+        }
+      })
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.name = o.name
@@ -455,6 +462,7 @@
       mSql,
       mLog,
       mSpark,
+      mFlink,
       mPython,
       mDependent,
       mSelectInput,
