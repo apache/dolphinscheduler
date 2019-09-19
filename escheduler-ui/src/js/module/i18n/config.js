@@ -36,5 +36,6 @@ export function localeList () {
 }
 
 export function findLocale (code) {
+  code=code.replace("-","_")
   return _.find(localeList(), ['code', code])
 }
