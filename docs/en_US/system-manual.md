@@ -340,7 +340,7 @@ conf/common/hadoop.properties
 
 
   - Queues are used to execute spark, mapreduce and other programs, which require the use of "queue" parameters.
-- "Security" - > "Queue Manage" - > "Creat Queue" 
+- "Security" - > "Queue Manage" - > "Create Queue" 
      <p align="center">
     <img src="https://user-images.githubusercontent.com/53217792/61841945-078f4480-aec9-11e9-92fb-05b6f42f07d6.png" width="60%" />
   </p>
@@ -403,7 +403,7 @@ conf/common/hadoop.properties
         try {
             // execute
             response = httpclient.execute(httpPost);
-            // eponse status code 200
+            // response status code 200
             if (response.getStatusLine().getStatusCode() == 200) {
                 String content = EntityUtils.toString(response.getEntity(), "UTF-8");
                 System.out.println(content);
@@ -533,7 +533,7 @@ conf/common/hadoop.properties
    <img src="https://user-images.githubusercontent.com/53217792/61844464-1af2dd80-aed2-11e9-9486-6cf1b8585aa5.png" width="60%" />
  </p>
 
-- Datasource: The data source type of stored procedure supports MySQL and POSTGRRESQL, and chooses the corresponding data source.
+- Datasource: The data source type of stored procedure supports MySQL and POSTGRESQL, and chooses the corresponding data source.
 - Method: The method name of the stored procedure
 - Custom parameters: Custom parameter types of stored procedures support IN and OUT, and data types support nine data types: VARCHAR, INTEGER, LONG, FLOAT, DOUBLE, DATE, TIME, TIMESTAMP and BOOLEAN.
 
