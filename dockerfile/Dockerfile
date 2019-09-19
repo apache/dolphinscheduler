@@ -2,6 +2,8 @@ FROM ubuntu:18.04
 
 MAINTAINER journey "825193156@qq.com"
 
+Test
+
 ENV LANG=C.UTF-8
 
 ARG version
