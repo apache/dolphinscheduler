@@ -279,5 +279,26 @@ public class ProjectController extends BaseController {
         }
     }
 
+    /**
+     * query all project list
+     * @param loginUser
+     * @return
+     */
+    @ApiOperation(value = "queryAllProjectList", notes= "QUERY_ALL_PROJECT_LIST_NOTES")
+    @GetMapping(value = "/queryAllProjectList")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+
+        try {
+            logger.info("login user {}, query all project list", loginUser.getUserName());
+            Map<String, Object> result = projectService.queryAllProjectList();
+            return returnDataList(result);
+        } catch (Exception e) {
+            logger.error(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR.getMsg(), e);
+            return error(Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR.getCode(), Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR.getMsg());
+        }
+    }
+
+
 
 }
