@@ -19,6 +19,7 @@ package cn.escheduler.common.utils;
 import cn.escheduler.common.enums.TaskType;
 import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.task.dependent.DependentParameters;
+import cn.escheduler.common.task.flink.FlinkParameters;
 import cn.escheduler.common.task.mr.MapreduceParameters;
 import cn.escheduler.common.task.procedure.ProcedureParameters;
 import cn.escheduler.common.task.python.PythonParameters;
@@ -63,6 +64,8 @@ public class TaskParametersUtils {
           return JSONUtils.parseObject(parameter, PythonParameters.class);
         case DEPENDENT:
           return JSONUtils.parseObject(parameter, DependentParameters.class);
+        case FLINK:
+          return JSONUtils.parseObject(parameter, FlinkParameters.class);
         default:
           return null;
       }
