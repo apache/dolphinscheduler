@@ -202,10 +202,22 @@ const sqlTypeList = [
   }
 ]
 
+const positionList = [
+  {
+    id: 'IN',
+    code: "Parameter"
+  },
+  {
+    id: 'OUT',
+    code: "Headers"
+  }
+]
+
 export {
   cycleList,
   dateValueList,
   typeList,
   directList,
-  sqlTypeList
+  sqlTypeList,
+  positionList
 }

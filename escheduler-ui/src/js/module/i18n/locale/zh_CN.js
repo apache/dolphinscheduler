@@ -480,5 +480,15 @@ export default {
   'slot':'slot数量',
   'taskManager':'taskManage数量',
   'jobManagerMemory':'jobManager内存数',
-  'taskManagerMemory':'taskManager内存数'
+  'taskManagerMemory':'taskManager内存数',
+  'Complement range': '补数范围',
+  'Http Url':'请求地址',
+  'Http Method':'请求类型',
+  'Http Parameters Key':'参数名',
+  'Http Parameters Position':'参数位置',
+  'Http Parameters Value':'参数值',
+  'Http Check Condition':'校验条件',
+  'Http Condition':'校验内容',
+  'Please Enter Http Url': '请填写请求地址(必填)',
+  'Please Enter Http Condition': '请填写校验内容'
 }

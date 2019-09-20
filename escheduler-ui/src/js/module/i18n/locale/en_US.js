@@ -475,5 +475,14 @@ export default {
   'warning of timeout': 'warning of timeout',
   'Next five execution times': 'Next five execution times',
   'Execute time': 'Execute time',
-  'Complement range': 'Complement range'
+  'Complement range': 'Complement range',
+  'Http Url':'Http Url',
+  'Http Method':'Http Method',
+  'Http Parameters Key':'Http Parameters Key',
+  'Http Parameters Position':'Http Parameters Position',
+  'Http Parameters Value':'Http Parameters Value',
+  'Http Check Condition':'Http Check Condition',
+  'Http Condition':'Http Condition',
+  'Please Enter Http Url': 'Please Enter Http Url(required)',
+  'Please Enter Http Condition': 'Please Enter Http Condition'
 }
