@@ -70,8 +70,8 @@
 		<fileSet>
 			<directory>script</directory>
 			<includes>
-				<include>start_all.sh</include>
-				<include>stop_all.sh</include>
+				<include>start-all.sh</include>
+				<include>stop-all.sh</include>
 				<include>escheduler-daemon.sh</include>
 			</includes>
 			<outputDirectory>./bin</outputDirectory>
