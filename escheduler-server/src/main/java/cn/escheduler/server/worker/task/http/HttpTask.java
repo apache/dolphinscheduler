@@ -59,7 +59,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * api task
+ * http task
  */
 public class HttpTask extends AbstractTask {
 
@@ -73,12 +73,7 @@ public class HttpTask extends AbstractTask {
     /**
      * Convert mill seconds to second unit
      */
-    protected static final int MS_TO_S_UNIT = 1000;
-
-    /**
-     * https prefix
-     */
-    protected static final String HTTPS = "https";
+    protected static final int MAX_CONNECTION_MILLISECONDS = 60000;
 
     protected static final String CONTENT_TYPE = "Content-Type";
 
@@ -88,10 +83,6 @@ public class HttpTask extends AbstractTask {
 
     protected String output;
 
-    /**
-     * cookie保存
-     */
-    CookieStore cookieStore = new BasicCookieStore();
 
     public HttpTask(TaskProps props, Logger logger) {
         super(props, logger);
@@ -171,21 +162,21 @@ public class HttpTask extends AbstractTask {
     protected int validResponse(String body, String statusCode) throws Exception {
         int exitStatusCode = 0;
         switch (httpParameters.getHttpCheckCondition()) {
-            case CONTAINS:
+            case BODY_CONTAINS:
                 if (StringUtils.isEmpty(body) || !body.contains(httpParameters.getCondition())) {
                     appendMessage(httpParameters.getUrl() + " doesn contain "
                             + XmlEscapers.xmlContentEscaper().escape(httpParameters.getCondition()));
                     exitStatusCode = -1;
                 }
                 break;
-            case DOESNT_CONTAIN:
+            case BODY_NOT_CONTAINS:
                 if (StringUtils.isEmpty(body) || body.contains(httpParameters.getCondition())) {
                     appendMessage(httpParameters.getUrl() + " contains "
                             + XmlEscapers.xmlContentEscaper().escape(httpParameters.getCondition()));
                     exitStatusCode = -1;
                 }
                 break;
-            case STATUSCODE:
+            case STATUS_CODE_CUSTOM:
                 if (!statusCode.equals(httpParameters.getCondition())) {
                     appendMessage(httpParameters.getUrl() + " statuscode: " + statusCode + ", Must be: " + httpParameters.getCondition());
                     exitStatusCode = -1;
@@ -253,21 +244,12 @@ public class HttpTask extends AbstractTask {
     protected CloseableHttpClient createHttpClient() {
         final RequestConfig requestConfig = requestConfig();
         HttpClientBuilder httpClientBuilder;
-        if (isHttps()) {
-            // Support SSL
-            SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(createSSLContext());
-            httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(requestConfig)
-                    .setSSLSocketFactory(sslConnectionSocketFactory);
-        } else {
-            httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(requestConfig);
-        }
-        httpClientBuilder.setDefaultCookieStore(cookieStore);
+        httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(requestConfig);
         return httpClientBuilder.build();
     }
 
     private RequestConfig requestConfig() {
-        final int maxConnMillSeconds = httpParameters.getMaxConnectionSeconds() * MS_TO_S_UNIT;
-        return RequestConfig.custom().setSocketTimeout(maxConnMillSeconds).setConnectTimeout(maxConnMillSeconds).build();
+        return RequestConfig.custom().setSocketTimeout(MAX_CONNECTION_MILLISECONDS).setConnectTimeout(MAX_CONNECTION_MILLISECONDS).build();
     }
 
     private SSLContext createSSLContext() {
@@ -278,10 +260,6 @@ public class HttpTask extends AbstractTask {
         } catch (Exception e) {
             throw new IllegalStateException("Create SSLContext error", e);
         }
-    }
-
-    protected boolean isHttps() {
-        return httpParameters.getUrl().toLowerCase().startsWith(HTTPS);
     }
 
     protected RequestBuilder createRequestBuilder() {

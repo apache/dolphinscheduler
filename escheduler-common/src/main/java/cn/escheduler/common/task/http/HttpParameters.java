@@ -41,17 +41,12 @@ public class HttpParameters extends AbstractParameters {
     /**
      * httpCheckCondition
      */
-    private HttpCheckCondition httpCheckCondition = HttpCheckCondition.DEFAULT;// default=200
+    private HttpCheckCondition httpCheckCondition = HttpCheckCondition.STATUS_CODE_DEFAULT;
 
     /**
      * condition
      */
     private String condition;
-
-    /**
-     * maxConnectionSeconds
-     */
-    private int maxConnectionSeconds = 120;
 
 
 
@@ -95,13 +90,5 @@ public class HttpParameters extends AbstractParameters {
 
     public void setCondition(String condition) {
         this.condition = condition;
-    }
-
-    public int getMaxConnectionSeconds() {
-        return maxConnectionSeconds;
-    }
-
-    public void setMaxConnectionSeconds(int maxConnectionSeconds) {
-        this.maxConnectionSeconds = maxConnectionSeconds;
     }
 }

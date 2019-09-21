@@ -86,8 +86,8 @@
         localParams: [],
         httpMethod: 'GET',
         httpMethodList: [{ code: 'GET' }, { code: 'POST' }, { code: 'HEAD' }, { code: 'PUT' }, { code: 'DELETE' }],
-        httpCheckCondition: 'DEFAULT',
-        httpCheckConditionList: [{ code: 'DEFAULT',value:'默认响应码200' }, { code: 'STATUSCODE',value:'响应码' }, { code: 'CONTAINS',value:'内容包含' }, { code: 'DOESNT_CONTAIN',value:'内容不包含' }]
+        httpCheckCondition: 'STATUS_CODE_DEFAULT',
+        httpCheckConditionList: [{ code: 'STATUS_CODE_DEFAULT',value:'默认响应码200' }, { code: 'STATUS_CODE_CUSTOM',value:'自定义响应码' }, { code: 'BODY_CONTAINS',value:'内容包含' }, { code: 'BODY_NOT_CONTAINS',value:'内容不包含' }]
       }
     },
     props: {
