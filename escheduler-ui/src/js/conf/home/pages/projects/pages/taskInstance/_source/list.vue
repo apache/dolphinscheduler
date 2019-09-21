@@ -47,7 +47,8 @@
           <td>
             <span class="ellipsis"><a href="javascript:" class="links">{{item.name}}</a></span>
           </td>
-          <td><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis">{{item.processInstanceName}}</span></a></td>
+          <td><a href="javascript:" class="links" @click="_go(item)"><span
+            class="ellipsis">{{item.processInstanceName}}</span></a></td>
           <td><span>{{item.taskType}}</span></td>
           <td><span v-html="_rtState(item.state)" style="cursor: pointer;"></span></td>
           <td><span>{{item.submitTime | formatDate}}</span></td>
@@ -61,13 +62,26 @@
           <td><span>{{item.retryTimes}}</span></td>
           <td>
             <x-button
-                    type="info"
-                    shape="circle"
-                    size="xsmall"
-                    data-toggle="tooltip"
-                    :title="$t('View log')"
-                    icon="iconfont icon-xitongcaozuorizhi"
-                    @click="_refreshLog(item)">
+              type="info"
+              shape="circle"
+              size="xsmall"
+              data-toggle="tooltip"
+              :title="$t('View log')"
+              icon="iconfont icon-xitongcaozuorizhi"
+              @click="_refreshLog(item)">
+            </x-button>
+          </td>
+          <!--Determine whether this  task is spark or Flink type -->
+          <td v-if="_judgeType(item)">
+
+            <x-button
+              type="info"
+              shape="circle"
+              size="xsmall"
+              data-toggle="tooltip"
+              :title="$t('Open yarn page')"
+              icon="iconfont iconyanjing-"
+              @click="_openYarnPage(item)">
             </x-button>
           </td>
         </tr>
@@ -78,11 +92,12 @@
 <script>
   import Permissions from '@/module/permissions'
   import mLog from '@/conf/home/pages/dag/_source/formModel/log'
-  import { tasksState } from '@/conf/home/pages/dag/_source/config'
+  import {tasksState} from '@/conf/home/pages/dag/_source/config'
+  import io from '@/module/io'
 
   export default {
     name: 'list',
-    data () {
+    data() {
       return {
         list: [],
         isAuth: Permissions.getAuth(),
@@ -95,11 +110,11 @@
       pageSize: Number
     },
     methods: {
-      _rtState (code) {
+      _rtState(code) {
         let o = tasksState[code]
         return `<em class="iconfont ${o.isSpin ? 'fa fa-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}">${o.icoUnicode}</em>`
       },
-      _refreshLog (item) {
+      _refreshLog(item) {
         let self = this
         let instance = this.$modal.dialog({
           closable: false,
@@ -107,12 +122,12 @@
           escClose: true,
           className: 'v-modal-custom',
           transitionName: 'opacityp',
-          render (h) {
+          render(h) {
             return h(mLog, {
               on: {
-                ok () {
+                ok() {
                 },
-                close () {
+                close() {
                   instance.remove()
                 }
               },
@@ -125,23 +140,59 @@
           }
         })
       },
-      _go (item) {
-        this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })
+      _judgeType(item) {
+        if (item.taskType == 'FLINK' || item.taskType == 'SPARK') {
+
+          return true;
+        } else {
+
+          return false;
+        }
+      },
+      <!--Enter yarn page address-->
+      _openYarnPage(item) {
+        return new Promise((resolve, reject) = > {
+
+          io.post(`/escheduler/log/openYarnPage`, {
+          taskInstId: item.id
+
+        }, res = > {
+
+          if(res.data != ""
+      )
+        {
+          window.open(`yarnPageAddress/${res.data}`)
+
+        }
+      else
+        {
+          window.alert("An error occurred in the task and the page was not retrieved.")
+        }
+
+      }).
+        catch(e = > {
+          reject(e)
+        }
+      )
+      })
+      },
+      _go(item) {
+        this.$router.push({path: `/projects/instance/list/${item.processInstanceId}`})
       },
     },
     watch: {
-      taskInstanceList (a) {
+      taskInstanceList(a) {
         this.list = []
-        setTimeout(() => {
+        setTimeout(() = > {
           this.list = a
-        })
+      })
       }
     },
-    created () {
+    created() {
     },
-    mounted () {
+    mounted() {
       this.list = this.taskInstanceList
     },
-    components: { }
+    components: {}
   }
 </script>

@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import static cn.escheduler.api.enums.Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR;
+import static cn.escheduler.api.enums.Status.OPEN_YARN_PAGE_ERROR_ERROR;
 import static cn.escheduler.api.enums.Status.QUERY_TASK_INSTANCE_LOG_ERROR;
 
 
@@ -55,11 +56,11 @@ public class LoggerController extends BaseController {
     /**
      * query task log
      */
-    @ApiOperation(value = "queryLog", notes= "QUERY_TASK_INSTANCE_LOG_NOTES")
+    @ApiOperation(value = "queryLog", notes = "QUERY_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "taskInstId", value = "TASK_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", dataType ="Int", example = "100"),
-            @ApiImplicitParam(name = "limit", value = "LIMIT", dataType ="Int", example = "100")
+            @ApiImplicitParam(name = "skipLineNum", value = "SKIP_LINE_NUM", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "limit", value = "LIMIT", dataType = "Int", example = "100")
     })
     @GetMapping(value = "/detail")
     @ResponseStatus(HttpStatus.OK)
@@ -85,9 +86,9 @@ public class LoggerController extends BaseController {
      * @param loginUser
      * @param taskInstanceId
      */
-    @ApiOperation(value = "downloadTaskLog", notes= "DOWNLOAD_TASK_INSTANCE_LOG_NOTES")
+    @ApiOperation(value = "downloadTaskLog", notes = "DOWNLOAD_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskInstId", value = "TASK_ID",dataType = "Int", example = "100")
+            @ApiImplicitParam(name = "taskInstId", value = "TASK_ID", dataType = "Int", example = "100")
     })
     @GetMapping(value = "/download-log")
     @ResponseBody
@@ -102,6 +103,25 @@ public class LoggerController extends BaseController {
         } catch (Exception e) {
             logger.error(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR.getMsg(), e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * open yarn page
+     *
+     * @param loginUser
+     * @param taskInstanceId
+     */
+    @PostMapping(value = "/openYarnPage")
+    @ResponseStatus(HttpStatus.OK)
+    public Result openYarnPage(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                               @RequestParam(value = "taskInstId") int taskInstanceId) {
+        try {
+
+            return loggerService.openYarnPage(taskInstanceId);
+        } catch (Exception e) {
+            logger.error(OPEN_YARN_PAGE_ERROR_ERROR.getMsg(), e);
+            return error(OPEN_YARN_PAGE_ERROR_ERROR.getCode(), OPEN_YARN_PAGE_ERROR_ERROR.getMsg());
         }
     }
 

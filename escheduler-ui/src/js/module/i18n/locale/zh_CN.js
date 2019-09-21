@@ -30,7 +30,7 @@ export default {
   'Whether to save the DAG graph': '是否保存DAG图',
   'Current node settings': '当前节点设置',
   'View history': '查看历史',
-  'View log': '查看日志',
+  'Open yarn page': '打开yarn页面',
   'Enter this child node': '进入该子节点',
   'Node name': '节点名称',
   'Please enter name(required)': '请输入名称(必填)',

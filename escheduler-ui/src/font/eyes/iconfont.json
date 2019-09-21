@@ -1,0 +1,72 @@
+{
+  "id": "1355114",
+  "name": "lipanpan",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "109731",
+      "name": "display",
+      "font_class": "display",
+      "unicode": "e612",
+      "unicode_decimal": 58898
+    },
+    {
+      "icon_id": "5772874",
+      "name": "复制",
+      "font_class": "copy",
+      "unicode": "e617",
+      "unicode_decimal": 58903
+    },
+    {
+      "icon_id": "7081780",
+      "name": "眼睛",
+      "font_class": "yanjing-",
+      "unicode": "e65c",
+      "unicode_decimal": 58972
+    },
+    {
+      "icon_id": "7617414",
+      "name": "复制",
+      "font_class": "fuzhi",
+      "unicode": "e628",
+      "unicode_decimal": 58920
+    },
+    {
+      "icon_id": "8060676",
+      "name": "复制",
+      "font_class": "fuzhi1",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "8575328",
+      "name": "复制",
+      "font_class": "fuzhi2",
+      "unicode": "e62c",
+      "unicode_decimal": 58924
+    },
+    {
+      "icon_id": "8776631",
+      "name": "view",
+      "font_class": "icon-test",
+      "unicode": "e633",
+      "unicode_decimal": 58931
+    },
+    {
+      "icon_id": "9214972",
+      "name": "彩蛋_line",
+      "font_class": "caidan",
+      "unicode": "e872",
+      "unicode_decimal": 59506
+    },
+    {
+      "icon_id": "9884403",
+      "name": "graphcompute 图计算服务",
+      "font_class": "graphcompute",
+      "unicode": "e925",
+      "unicode_decimal": 59685
+    }
+  ]
+}
