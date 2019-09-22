@@ -17,12 +17,15 @@
 package cn.escheduler.dao.model;
 
 import cn.escheduler.common.enums.UserType;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
 
 /**
  * user
  */
+@ApiModel(description = "UserModelDesc")
 public class  User {
 
     /**
@@ -33,21 +36,25 @@ public class  User {
     /**
      * user name
      */
+    @ApiModelProperty(name = "userName", notes = "USER_NAME",dataType = "String",required = true)
     private String userName;
 
     /**
      * user password
      */
+    @ApiModelProperty(name = "userPassword", notes = "USER_PASSWORD",dataType = "String",required = true)
     private String userPassword;
 
     /**
      * mail
      */
+    @ApiModelProperty(name = "email", notes = "email",dataType = "String",required = true)
     private String email;
 
     /**
      * phone
      */
+    @ApiModelProperty(name = "phone", notes = "phone",dataType = "String",required = true)
     private String phone;
 
     /**

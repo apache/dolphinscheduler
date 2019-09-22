@@ -16,6 +16,7 @@
  */
 package cn.escheduler.api.service;
 
+import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.common.enums.ReleaseState;
@@ -34,7 +35,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Map;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class SchedulerServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceTest.class);
 
@@ -44,14 +45,14 @@ public class SchedulerServiceTest {
     @Test
     public void testSetScheduleState(){
         User loginUser = new User();
-        loginUser.setId(27);
+        loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
         Project project = new Project();
         project.setName("project_test1");
-        project.setId(21);
+        project.setId(-1);
 
         Map<String, Object> map = schedulerService.setScheduleState(loginUser, project.getName(), 44, ReleaseState.ONLINE);
-        Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
     }
 
 }

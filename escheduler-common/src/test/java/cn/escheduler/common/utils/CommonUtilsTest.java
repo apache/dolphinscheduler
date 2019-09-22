@@ -45,7 +45,7 @@ public class CommonUtilsTest {
 
     @Test
     public void getHdfsDir() {
-        logger.info(HadoopUtils.getHdfsDir("1234"));
+        logger.info(HadoopUtils.getHdfsResDir("1234"));
     }
 
     @Test

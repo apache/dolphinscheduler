@@ -16,6 +16,7 @@
  */
 package cn.escheduler.api.service;
 
+import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
@@ -32,9 +33,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Map;
 
-
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = ApiApplicationServer.class)
 public class UdfFuncServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(UdfFuncServiceTest.class);
 
@@ -45,7 +45,7 @@ public class UdfFuncServiceTest {
     public void queryUdfFuncListPaging(){
 
         User loginUser = new User();
-        loginUser.setId(19);
+        loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> map = udfFuncService.queryUdfFuncListPaging(loginUser, "", 1, 10);

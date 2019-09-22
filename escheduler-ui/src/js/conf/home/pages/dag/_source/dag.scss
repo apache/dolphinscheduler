@@ -70,6 +70,9 @@
   .icos-SPARK {
     background: url("../img/toolbar_SPARK.png") no-repeat 50% 50%;
   }
+  .icos-FLINK {
+    background: url("../img/toobar_flink.svg") no-repeat 50% 50%;
+  }
   .icos-MR {
     background: url("../img/toolbar_MR.png") no-repeat 50% 50%;
   }
@@ -138,10 +141,26 @@
       .assist-btn {
         position: absolute;
         left: 10px;
-        top: 8px;
+        top: 7px;
         >.name {
           padding-left: 6px;
           vertical-align: middle;
+        }
+        >.copy-name {
+          cursor: pointer;
+          padding-left: 4px;
+          position: relative;
+          top: -2px;
+          &:hover {
+            i {
+              color: #47c3ff;
+            }
+          }
+          i {
+            color: #333;
+            font-size: 18px;
+            vertical-align: middle;
+          }
         }
       }
       .save-btn {

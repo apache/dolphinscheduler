@@ -32,9 +32,12 @@
                   v-model="email"
                   :disabled="disabled"
                   :placeholder="$t('Please enter email')"
+                  @blur="_emailEnter"
                   @keydown.tab="_emailTab"
                   @keyup.delete="_emailDelete"
                   @keyup.enter="_emailEnter"
+                  @keyup.space="_emailEnter"
+                  @keyup.186="_emailEnter"
                   @keyup.up="_emailKeyup('up')"
                   @keyup.down="_emailKeyup('down')">
         </span>
@@ -78,6 +81,11 @@
        * Manually add a mailbox
        */
       _manualEmail () {
+        if (this.email === '') {
+          return
+        }
+        this.email = _.trim(this.email).replace(/(;$)|(；$)/g, "")
+
         let email = this.email
 
         let is = (n) => {
@@ -263,13 +271,11 @@
         $(this).prop('comStart', true)
         // Check mailbox index initialization
         this.activeIndex = null
-        // console.log('中文输入：开始');
         this.isCn = true
       }).on('compositionend', () => {
         $(this).prop('comStart', false)
         // Check mailbox index initialization
         this.activeIndex = null
-        // console.log('中文输入：结束');
         this.isCn = false
       })
     }

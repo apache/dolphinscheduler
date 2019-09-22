@@ -175,7 +175,7 @@ public class AlertManager {
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
         alert.setCreateTime(new Date());
-        alert.setAlertGroupId(processInstance.getWarningGroupId());
+        alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1:processInstance.getWarningGroupId());
         alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
         alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
 

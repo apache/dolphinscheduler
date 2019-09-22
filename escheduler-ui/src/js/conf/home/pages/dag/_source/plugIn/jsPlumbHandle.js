@@ -71,7 +71,7 @@ JSP.prototype.init = function ({ dag, instance }) {
   this.setConfig({
     isDrag: !store.state.dag.isDetails,
     isAttachment: false,
-    isNewNodes: Permissions.getAuth() === false ? false : !store.state.dag.isDetails,
+    isNewNodes: !store.state.dag.isDetails,//Permissions.getAuth() === false ? false : !store.state.dag.isDetails,
     isDblclick: true,
     isContextmenu: true,
     isClick: false
@@ -645,7 +645,6 @@ JSP.prototype.saveStore = function () {
       })
     })
 
-    console.log(tasksAll())
 
     _.map(tasksAll(), v => {
       locations[v.id] = {
@@ -656,7 +655,6 @@ JSP.prototype.saveStore = function () {
       }
     })
 
-    console.log(locations)
 
     // Storage node
     store.commit('dag/setTasks', tasks)

@@ -17,7 +17,9 @@
 package cn.escheduler.alert.runner;
 
 import cn.escheduler.alert.manager.EmailManager;
+import cn.escheduler.alert.manager.EnterpriseWeChatManager;
 import cn.escheduler.alert.utils.Constants;
+import cn.escheduler.alert.utils.EnterpriseWeChatUtils;
 import cn.escheduler.common.enums.AlertStatus;
 import cn.escheduler.common.enums.AlertType;
 import cn.escheduler.dao.AlertDao;
@@ -40,6 +42,7 @@ public class AlertSender{
     private static final Logger logger = LoggerFactory.getLogger(AlertSender.class);
 
     private static final EmailManager emailManager= new EmailManager();
+    private static final EnterpriseWeChatManager weChatManager= new EnterpriseWeChatManager();
 
 
     private List<Alert> alertList;
@@ -109,6 +112,12 @@ public class AlertSender{
             if (flag){
                 alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, "execution success", alert.getId());
                 logger.info("alert send success");
+                try {
+                    String token = EnterpriseWeChatUtils.getToken();
+                    weChatManager.send(alert,token);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                }
             }else {
                 alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE,String.valueOf(retMaps.get(Constants.MESSAGE)),alert.getId());
                 logger.info("alert send error : {}" , String.valueOf(retMaps.get(Constants.MESSAGE)));

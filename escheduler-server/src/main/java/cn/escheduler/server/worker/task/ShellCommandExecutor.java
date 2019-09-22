@@ -29,9 +29,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- *  command executor
- *
- *  进程，真正在worker服务器上执行的任务
+ *  shell command executor
  */
 public class ShellCommandExecutor extends AbstractCommandExecutor {
 
@@ -39,9 +37,15 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
 
     public ShellCommandExecutor(Consumer<List<String>> logHandler,
-                                String taskDir, String taskAppId, String tenantCode, String envFile,
-                                Date startTime, int timeout, Logger logger) {
-        super(logHandler,taskDir,taskAppId, tenantCode, envFile, startTime, timeout, logger);
+                                String taskDir,
+                                String taskAppId,
+                                int taskInstId,
+                                String tenantCode,
+                                String envFile,
+                                Date startTime,
+                                int timeout,
+                                Logger logger) {
+        super(logHandler,taskDir,taskAppId,taskInstId,tenantCode, envFile, startTime, timeout, logger);
     }
 
 
@@ -54,11 +58,6 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String commandType() {
         return SH;
-    }
-
-    @Override
-    protected boolean checkShowLog(String line) {
-        return line.contains(taskAppId) || !line.contains("cn.escheduler.server.worker.log.TaskLogger");
     }
 
     @Override

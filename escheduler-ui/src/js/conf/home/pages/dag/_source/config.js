@@ -26,7 +26,7 @@ import Permissions from '@/module/permissions'
  * @desc tooltip
  */
 const toolOper = (dagThis) => {
-  let disabled = Permissions.getAuth() === false ? false : !dagThis.$store.state.dag.isDetails
+  let disabled =!dagThis.$store.state.dag.isDetails// Permissions.getAuth() === false ? false : !dagThis.$store.state.dag.isDetails
   return [
     {
       code: 'pointer',
@@ -258,6 +258,10 @@ let tasksType = {
   },
   'SPARK': {
     desc: 'SPARK',
+    color: '#E46F13'
+  },
+  'FLINK': {
+    desc: 'FLINK',
     color: '#E46F13'
   },
   'MR': {

@@ -40,9 +40,13 @@
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isADMIN">
-          <template slot="name"><b>*</b>{{$t('Queue')}}</template>
+          <template slot="name">{{$t('Queue')}}</template>
           <template slot="content">
             <x-select v-model="queueName">
+              <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="queueName = {}">
+                <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="queueName.id"></i>
+                <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!queueName.id"></i>
+              </x-input>
               <x-option
                       v-for="city in queueList"
                       :key="city.id"
@@ -94,7 +98,9 @@
         userName: '',
         userPassword: '',
         tenantId: {},
-        queueName: {},
+        queueName: {
+          id:''
+        },
         email: '',
         phone: '',
         tenantList: [],
@@ -125,7 +131,8 @@
         }
       },
       _verification () {
-        let regEmail = /^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/ // eslint-disable-line
+        let regEmail = /^([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\-|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,}$/ // eslint-disable-line
+
         // Mobile phone number regular
         let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
 
@@ -178,7 +185,10 @@
       _getTenantList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('security/getTenantList').then(res => {
-            this.tenantList = _.map(res, v => {
+            let arr = _.filter(res, (o) => {
+              return o.id !== -1
+            })
+            this.tenantList = _.map(arr, v => {
               return {
                 id: v.id,
                 code: v.tenantName
@@ -201,9 +211,11 @@
           queue: this.queueName.code,
           phone: this.phone
         }
+
         if (this.item) {
           param.id = this.item.id
         }
+
         this.store.dispatch(`security/${this.item ? 'updateUser' : 'createUser'}`, param).then(res => {
           setTimeout(() => {
             this.$refs['popup'].spinnerLoading = false
@@ -228,7 +240,7 @@
             this.phone = this.item.phone
             this.tenantId = _.find(this.tenantList, ['id', this.item.tenantId])
             this.$nextTick(() => {
-              this.queueName = _.find(this.queueList, ['code', this.item.queue])
+              this.queueName = _.find(this.queueList, ['code', this.item.queue])||{id:''}
             })
           }
         })
@@ -239,7 +251,7 @@
           this.email = this.item.email
           this.phone = this.item.phone
           this.tenantId.id = this.item.tenantId
-          this.queueName = { queue: this.item.queue }
+          this.queueName = { queue: this.item.queue}
         }
       }
     },

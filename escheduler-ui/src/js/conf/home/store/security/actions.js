@@ -100,11 +100,23 @@ export default {
     })
   },
   /**
-   * Paging query user list
+   * user list expect admin
    */
   getUsersList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`users/list`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
+   * user all  list
+   */
+  getUsersAll ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`users/list-all`, payload, res => {
         resolve(res.data)
       }).catch(e => {
         reject(e)
@@ -228,7 +240,13 @@ export default {
   getTenantList ({ state }, payload) {
     return new Promise((resolve, reject) => {
       io.get(`tenant/list`, payload, res => {
-        resolve(res.data)
+        let list=res.data
+        list.unshift({
+          id: -1,
+          tenantName: 'Default'
+        })
+        state.tenantAllList = list
+        resolve(list)
       }).catch(e => {
         reject(e)
       })

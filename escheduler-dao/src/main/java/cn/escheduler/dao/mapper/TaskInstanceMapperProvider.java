@@ -213,7 +213,7 @@ public class TaskInstanceMapperProvider {
      * @return
      */
     public String queryByHostAndStatus(Map<String, Object> parameter) {
-        StringBuffer strStates = new StringBuffer();
+        StringBuilder strStates = new StringBuilder();
         int[] stateArray = (int[]) parameter.get("states");
         for(int i=0;i<stateArray.length;i++){
             strStates.append(stateArray[i]);
@@ -228,7 +228,12 @@ public class TaskInstanceMapperProvider {
                 SELECT("*, UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(start_time) as duration");
                 FROM(TABLE_NAME);
 
-                WHERE("`host` = #{host} and `state` in (" + strStates.toString() +")");
+                Object host = parameter.get("host");
+                if(host != null && StringUtils.isNotEmpty(host.toString())){
+
+                    WHERE("`host` = #{host} ");
+                }
+                WHERE("`state` in (" + strStates.toString() +")");
                 ORDER_BY("`id` asc");
             }
         }.toString();
@@ -241,7 +246,7 @@ public class TaskInstanceMapperProvider {
      * @return
      */
     public String queryLimitNumByHostAndStatus(Map<String, Object> parameter) {
-        StringBuffer strStates = new StringBuffer();
+        StringBuilder strStates = new StringBuilder();
         int[] stateArray = (int[]) parameter.get("states");
         for(int i=0;i<stateArray.length;i++){
             strStates.append(stateArray[i]);
@@ -273,7 +278,7 @@ public class TaskInstanceMapperProvider {
      * @return
      */
     public String setFailoverByHostAndStateArray(Map<String, Object> parameter) {
-        StringBuffer strStates = new StringBuffer();
+        StringBuilder strStates = new StringBuilder();
         int[] stateArray = (int[]) parameter.get("states");
         int state = ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal();
         for(int i=0;i<stateArray.length;i++){
@@ -414,7 +419,7 @@ public class TaskInstanceMapperProvider {
      */
     public String countTask(Map<String, Object> parameter){
 
-        StringBuffer taskIdsStr = new StringBuffer();
+        StringBuilder taskIdsStr = new StringBuilder();
         int[] stateArray = (int[]) parameter.get("taskIds");
         for(int i=0;i<stateArray.length;i++){
             taskIdsStr.append(stateArray[i]);

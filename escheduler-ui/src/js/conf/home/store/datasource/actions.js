@@ -116,5 +116,14 @@ export default {
         reject(e)
       })
     })
+  },
+  getKerberosStartupState ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`datasources/kerberos-startup-state`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 }

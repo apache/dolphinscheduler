@@ -21,12 +21,15 @@ import cn.escheduler.api.service.TaskInstanceService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ExecutionStatus;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.model.User;
+import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
@@ -35,6 +38,7 @@ import static cn.escheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
 /**
  * task instance controller
  */
+@Api(tags = "TASK_INSTANCE_TAG", position = 11)
 @RestController
 @RequestMapping("/projects/{projectName}/task-instance")
 public class TaskInstanceController extends BaseController{
@@ -51,10 +55,22 @@ public class TaskInstanceController extends BaseController{
      * @param loginUser
      * @return
      */
+    @ApiOperation(value = "queryTaskListPaging", notes= "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID",required = false, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type ="String"),
+            @ApiImplicitParam(name = "taskName", value = "TASK_NAME", type ="String"),
+            @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type ="ExecutionStatus"),
+            @ApiImplicitParam(name = "host", value = "HOST", type ="String"),
+            @ApiImplicitParam(name = "startDate", value = "START_DATE", type ="String"),
+            @ApiImplicitParam(name = "endDate", value = "END_DATE", type ="String"),
+            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+    })
     @GetMapping("/list-paging")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryTaskListPaging(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @PathVariable String projectName,
+    public Result queryTaskListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                      @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                       @RequestParam(value = "processInstanceId", required = false, defaultValue = "0") Integer processInstanceId,
                                       @RequestParam(value = "searchVal", required = false) String searchVal,
                                       @RequestParam(value = "taskName", required = false) String taskName,
@@ -68,6 +84,7 @@ public class TaskInstanceController extends BaseController{
         try{
             logger.info("query task instance list, project name:{},process instance:{}, search value:{},task name:{}, state type:{}, host:{}, start:{}, end:{}",
                     projectName, processInstanceId, searchVal, taskName, stateType, host, startTime, endTime);
+            searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = taskInstanceService.queryTaskListPaging(
                     loginUser, projectName, processInstanceId, taskName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
             return returnDataListPaging(result);

@@ -163,7 +163,7 @@ public class ScheduleMapperProvider {
    */
   public String selectAllByProcessDefineArray(Map<String, Object> parameter) {
 
-    StringBuffer strIds = new StringBuffer();
+    StringBuilder strIds = new StringBuilder();
     int[] idsArray = (int[]) parameter.get("processDefineIds");
     for(int i=0;i<idsArray.length;i++){
       strIds.append(idsArray[i]);
@@ -180,4 +180,35 @@ public class ScheduleMapperProvider {
       WHERE("release_state = 1");
     }}.toString();
   }
+
+  /**
+   * query schedule by process definition id
+   * @param parameter
+   * @return
+   */
+  public String queryByProcessDefinitionId(Map<String, Object> parameter) {
+
+    return new SQL() {{
+      SELECT("*");
+      FROM(DB_NAME);
+      WHERE("process_definition_id = #{processDefinitionId}");
+    }}.toString();
+  }
+
+  /**
+   * delete schedule by id
+   *
+   * @param parameter
+   * @return
+   */
+  public String delete(Map<String, Object> parameter) {
+    return new SQL() {
+      {
+        DELETE_FROM(DB_NAME);
+
+        WHERE("`id`=#{scheduleId}");
+      }
+    }.toString();
+  }
+
 }
