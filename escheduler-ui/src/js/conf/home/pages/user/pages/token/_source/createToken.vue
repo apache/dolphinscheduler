@@ -140,7 +140,7 @@
         }
       }
       if (this.auth) {
-        this.store.dispatch(`security/getUsersList`).then(res => {
+        this.store.dispatch(`security/getUsersAll`).then(res => {
           this.userIdList = _.map(res, v => _.pick(v, ['id', 'userName']))
           d(this.userIdList[0].id)
         })

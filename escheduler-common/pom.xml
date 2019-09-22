@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>escheduler</artifactId>
 		<groupId>cn.analysys</groupId>
-		<version>1.0.2-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>escheduler-common</artifactId>
 	<name>escheduler-common</name>
@@ -148,10 +148,10 @@
 					<groupId>javax.servlet.jsp</groupId>
 					<artifactId>jsp-api</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>com.google.protobuf</groupId>
-					<artifactId>protobuf-java</artifactId>
-				</exclusion>
+				<!--<exclusion>-->
+					<!--<groupId>com.google.protobuf</groupId>-->
+					<!--<artifactId>protobuf-java</artifactId>-->
+				<!--</exclusion>-->
 
 			</exclusions>
 		</dependency>
@@ -175,10 +175,10 @@
 					<groupId>org.codehaus.jackson</groupId>
 					<artifactId>jackson-xc</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>com.google.protobuf</groupId>
-					<artifactId>protobuf-java</artifactId>
-				</exclusion>
+				<!--<exclusion>-->
+					<!--<groupId>com.google.protobuf</groupId>-->
+					<!--<artifactId>protobuf-java</artifactId>-->
+				<!--</exclusion>-->
 				<exclusion>
 					<groupId>org.fusesource.leveldbjni</groupId>
 					<artifactId>leveldbjni-all</artifactId>
@@ -231,6 +231,29 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-aws</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.hadoop</groupId>
+					<artifactId>hadoop-common</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-databind</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-annotations</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
@@ -240,10 +263,6 @@
 			<artifactId>postgresql</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.hive</groupId>
 			<artifactId>hive-jdbc</artifactId>
@@ -351,6 +370,10 @@
 				<exclusion>
 					<artifactId>servlet-api-2.5</artifactId>
 					<groupId>org.mortbay.jetty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jasper-runtime</artifactId>
+					<groupId>tomcat</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>

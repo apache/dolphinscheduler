@@ -30,16 +30,15 @@ import cn.escheduler.common.graph.DAG;
 import cn.escheduler.common.model.TaskNode;
 import cn.escheduler.common.model.TaskNodeRelation;
 import cn.escheduler.common.process.Property;
+import cn.escheduler.common.queue.ITaskQueue;
+import cn.escheduler.common.queue.TaskQueueFactory;
 import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.common.utils.placeholder.BusinessTimeUtils;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
-import cn.escheduler.dao.mapper.ProcessInstanceMapper;
-import cn.escheduler.dao.mapper.ProjectMapper;
-import cn.escheduler.dao.mapper.TaskInstanceMapper;
+import cn.escheduler.dao.mapper.*;
 import cn.escheduler.dao.model.*;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
@@ -95,6 +94,9 @@ public class ProcessInstanceService extends BaseDAGService {
     @Autowired
     LoggerService loggerService;
 
+    @Autowired
+    WorkerGroupMapper workerGroupMapper;
+
     /**
      * query process instance by id
      *
@@ -113,6 +115,21 @@ public class ProcessInstanceService extends BaseDAGService {
             return checkResult;
         }
         ProcessInstance processInstance = processDao.findProcessInstanceDetailById(processId);
+        String workerGroupName = "";
+        if(processInstance.getWorkerGroupId() == -1){
+            workerGroupName = DEFAULT;
+        }else{
+            WorkerGroup workerGroup = workerGroupMapper.queryById(processInstance.getWorkerGroupId());
+            if(workerGroup != null){
+                workerGroupName = DEFAULT;
+            }else{
+                workerGroupName = workerGroup.getName();
+            }
+        }
+        processInstance.setWorkerGroupName(workerGroupName);
+        ProcessDefinition processDefinition = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
+        processInstance.setReceivers(processDefinition.getReceivers());
+        processInstance.setReceiversCc(processDefinition.getReceiversCc());
         result.put(Constants.DATA_LIST, processInstance);
         putMsg(result, Status.SUCCESS);
 
@@ -362,6 +379,7 @@ public class ProcessInstanceService extends BaseDAGService {
         String globalParams = null;
         String originDefParams = null;
         int timeout = processInstance.getTimeout();
+        ProcessDefinition processDefinition = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
         if (StringUtils.isNotEmpty(processInstanceJson)) {
             ProcessData processData = JSONUtils.parseObject(processInstanceJson, ProcessData.class);
             //check workflow json is valid
@@ -377,6 +395,11 @@ public class ProcessInstanceService extends BaseDAGService {
                     processInstance.getCmdTypeIfComplement(), schedule);
             timeout = processData.getTimeout();
             processInstance.setTimeout(timeout);
+            Tenant tenant = processDao.getTenantForProcess(processData.getTenantId(),
+                    processDefinition.getUserId());
+            if(tenant != null){
+                processInstance.setTenantCode(tenant.getTenantCode());
+            }
             processInstance.setProcessInstanceJson(processInstanceJson);
             processInstance.setGlobalParams(globalParams);
         }
@@ -385,7 +408,6 @@ public class ProcessInstanceService extends BaseDAGService {
         int update = processDao.updateProcessInstance(processInstance);
         int updateDefine = 1;
         if (syncDefine && StringUtils.isNotEmpty(processInstanceJson)) {
-            ProcessDefinition processDefinition = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
             processDefinition.setProcessDefinitionJson(processInstanceJson);
             processDefinition.setGlobalParams(originDefParams);
             processDefinition.setLocations(locations);
@@ -446,13 +468,13 @@ public class ProcessInstanceService extends BaseDAGService {
 
     /**
      * delete process instance by id, at the same time，delete task instance and their mapping relation data
-     *
      * @param loginUser
      * @param projectName
-     * @param workflowId
+     * @param processInstanceId
+     * @param tasksQueue
      * @return
      */
-    public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer workflowId) {
+    public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId,ITaskQueue tasksQueue) {
 
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
@@ -462,20 +484,82 @@ public class ProcessInstanceService extends BaseDAGService {
         if (resultEnum != Status.SUCCESS) {
             return checkResult;
         }
-        ProcessInstance processInstance = processDao.findProcessInstanceDetailById(workflowId);
+        ProcessInstance processInstance = processDao.findProcessInstanceDetailById(processInstanceId);
+        List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstanceId);
+        //process instance priority
+        int processInstancePriority = processInstance.getProcessInstancePriority().ordinal();
         if (processInstance == null) {
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, workflowId);
+            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
-        int delete = processDao.deleteWorkProcessInstanceById(workflowId);
-        processDao.deleteAllSubWorkProcessByParentId(workflowId);
-        processDao.deleteWorkProcessMapByParentId(workflowId);
+
+        int delete = processDao.deleteWorkProcessInstanceById(processInstanceId);
+        processDao.deleteAllSubWorkProcessByParentId(processInstanceId);
+        processDao.deleteWorkProcessMapByParentId(processInstanceId);
 
         if (delete > 0) {
+            if (CollectionUtils.isNotEmpty(taskInstanceList)){
+                for (TaskInstance taskInstance : taskInstanceList){
+                    // task instance priority
+                    int taskInstancePriority = taskInstance.getTaskInstancePriority().ordinal();
+                    String nodeValue=processInstancePriority + "_" + processInstanceId + "_" +taskInstancePriority + "_" + taskInstance.getId();
+                    try {
+                        logger.info("delete task queue node : {}",nodeValue);
+                        tasksQueue.removeNode(cn.escheduler.common.Constants.SCHEDULER_TASKS_QUEUE, nodeValue);
+                    }catch (Exception e){
+                        logger.error("delete task queue node : {}", nodeValue);
+                    }
+                }
+            }
+
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR);
         }
+        return result;
+    }
+
+    /**
+     * batch delete process instance by ids, at the same time，delete task instance and their mapping relation data
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processInstanceIds
+     * @return
+     */
+    public Map<String, Object> batchDeleteProcessInstanceByIds(User loginUser, String projectName, String processInstanceIds) {
+        // task queue
+        ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
+
+        Map<String, Object> result = new HashMap<>(5);
+        List<Integer> deleteFailedIdList = new ArrayList<Integer>();
+
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        if(StringUtils.isNotEmpty(processInstanceIds)){
+            String[] processInstanceIdArray = processInstanceIds.split(",");
+
+            for (String strProcessInstanceId:processInstanceIdArray) {
+                int processInstanceId = Integer.parseInt(strProcessInstanceId);
+                try {
+                    deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
+                } catch (Exception e) {
+                    deleteFailedIdList.add(processInstanceId);
+                }
+            }
+        }
+        if(deleteFailedIdList.size() > 0){
+            putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
+        }else{
+            putMsg(result, Status.SUCCESS);
+        }
+
         return result;
     }
 

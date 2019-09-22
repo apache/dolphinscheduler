@@ -213,7 +213,7 @@ public abstract class AbstractCommandExecutor {
      */
     private int updateState(ProcessDao processDao, int exitStatusCode, int pid, int taskInstId) {
         //get yarn state by log
-        if (exitStatusCode != -1) {
+        if (exitStatusCode != 0) {
             TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
             logger.info("process id is {}", pid);
 
@@ -352,6 +352,7 @@ public abstract class AbstractCommandExecutor {
                             logBuffer.add(line);
                         }
 
+
                         lastFlushTime = flush(lastFlushTime);
                     }
                 } catch (Exception e) {
@@ -380,14 +381,22 @@ public abstract class AbstractCommandExecutor {
         boolean result = true;
         try {
             for (String appId : appIds) {
-                ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-                logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
-                if (!applicationStatus.equals(ExecutionStatus.SUCCESS)) {
-                    result = false;
+                while(true){
+                    ExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
+                    logger.info("appId:{}, final state:{}",appId,applicationStatus.name());
+                    if (applicationStatus.equals(ExecutionStatus.FAILURE) ||
+                            applicationStatus.equals(ExecutionStatus.KILL)) {
+                        return false;
+                    }
+
+                    if (applicationStatus.equals(ExecutionStatus.SUCCESS)){
+                        break;
+                    }
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
-            }
+           }
         } catch (Exception e) {
-            logger.error(String.format("mapreduce applications: %s  status failed : " + e.getMessage(), appIds.toString()),e);
+            logger.error(String.format("yarn applications: %s  status failed : " + e.getMessage(), appIds.toString()),e);
             result = false;
         }
         return result;
@@ -548,10 +557,4 @@ public abstract class AbstractCommandExecutor {
     protected abstract boolean checkShowLog(String line);
     protected abstract boolean checkFindApp(String line);
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
-
-
-
-//    if(line.contains(taskAppId) || !line.contains("cn.escheduler.server.worker.log.TaskLogger")){
-//        logs.add(line);
-//    }
 }

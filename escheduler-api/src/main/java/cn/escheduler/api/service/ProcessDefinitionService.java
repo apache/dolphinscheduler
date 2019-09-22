@@ -24,6 +24,7 @@ import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.common.enums.Flag;
 import cn.escheduler.common.enums.ReleaseState;
 import cn.escheduler.common.enums.TaskType;
+import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.graph.DAG;
 import cn.escheduler.common.model.TaskNode;
 import cn.escheduler.common.model.TaskNodeRelation;
@@ -38,6 +39,7 @@ import cn.escheduler.dao.mapper.*;
 import cn.escheduler.dao.model.*;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +128,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setLocations(locations);
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
+        processDefine.setTenantId(processData.getTenantId());
 
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
@@ -290,14 +293,15 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setLocations(locations);
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
+        processDefine.setTenantId(processData.getTenantId());
 
         //custom global params
-        List<Property> globalParamsList = processData.getGlobalParams();
-        if (globalParamsList != null && globalParamsList.size() > 0) {
-            Set<Property> userDefParamsSet = new HashSet<>(globalParamsList);
+        List<Property> globalParamsList = new ArrayList<>();
+        if (processData.getGlobalParams() != null && processData.getGlobalParams().size() > 0) {
+            Set<Property> userDefParamsSet = new HashSet<>(processData.getGlobalParams());
             globalParamsList = new ArrayList<>(userDefParamsSet);
-            processDefine.setGlobalParamList(globalParamsList);
         }
+        processDefine.setGlobalParamList(globalParamsList);
         processDefine.setUpdateTime(now);
         processDefine.setFlag(Flag.YES);
         if (processDefineMapper.update(processDefine) > 0) {
@@ -337,6 +341,120 @@ public class ProcessDefinitionService extends BaseDAGService {
     }
 
     /**
+     * delete process definition by id
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionId
+     * @return
+     */
+    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    public Map<String, Object> deleteProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId) {
+
+        Map<String, Object> result = new HashMap<>(5);
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
+
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
+            return result;
+        }
+
+        // Determine if the login user is the owner of the process definition
+        if (loginUser.getId() != processDefinition.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        // check process definition is already online
+        if (processDefinition.getReleaseState() == ReleaseState.ONLINE) {
+            putMsg(result, Status.PROCESS_DEFINE_STATE_ONLINE,processDefinitionId);
+            return result;
+        }
+
+        // get the timing according to the process definition
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
+        if (!schedules.isEmpty() && schedules.size() > 1) {
+            logger.warn("scheduler num is {},Greater than 1",schedules.size());
+            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
+            return result;
+        }else if(schedules.size() == 1){
+            Schedule schedule = schedules.get(0);
+            if(schedule.getReleaseState() == ReleaseState.OFFLINE){
+                scheduleMapper.delete(schedule.getId());
+            }else if(schedule.getReleaseState() == ReleaseState.ONLINE){
+                putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE,schedule.getId());
+                return result;
+            }
+        }
+
+        int delete = processDefineMapper.delete(processDefinitionId);
+
+        if (delete > 0) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
+        }
+        return result;
+    }
+
+    /**
+     * batch delete process definition by ids
+     *
+     * @param loginUser
+     * @param projectName
+     * @param processDefinitionIds
+     * @return
+     */
+    public Map<String, Object> batchDeleteProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds) {
+
+        Map<String, Object> result = new HashMap<>(5);
+
+        Map<String, Object> deleteReuslt = new HashMap<>(5);
+
+        List<Integer> deleteFailedIdList = new ArrayList<Integer>();
+        Project project = projectMapper.queryByName(projectName);
+
+        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
+        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
+        if (resultEnum != Status.SUCCESS) {
+            return checkResult;
+        }
+
+
+        if(StringUtils.isNotEmpty(processDefinitionIds)){
+            String[] processInstanceIdArray = processDefinitionIds.split(",");
+
+            for (String strProcessInstanceId:processInstanceIdArray) {
+                int processInstanceId = Integer.parseInt(strProcessInstanceId);
+                try {
+                    deleteReuslt = deleteProcessDefinitionById(loginUser, projectName, processInstanceId);
+                    if(!Status.SUCCESS.equals(deleteReuslt.get(Constants.STATUS))){
+                        deleteFailedIdList.add(processInstanceId);
+                        logger.error((String)deleteReuslt.get(Constants.MSG));
+                    }
+                } catch (Exception e) {
+                    deleteFailedIdList.add(processInstanceId);
+                }
+            }
+        }
+
+        if(deleteFailedIdList.size() > 0){
+            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
+        }else{
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
+    }
+
+    /**
      * release process definition: online / offline
      *
      * @param loginUser
@@ -372,7 +490,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     // set status
                     schedule.setReleaseState(ReleaseState.OFFLINE);
                     scheduleMapper.update(schedule);
-                    deleteSchedule(project.getId(), id);
+                    deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
             }

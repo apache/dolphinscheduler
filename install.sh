@@ -45,32 +45,39 @@ mysqlDb="escheduler"
 mysqlUserName="xx"
 
 # mysql 密码
+# 注意：如果有特殊字符，请用 \ 转移符进行转移
 mysqlPassword="xx"
 
 # conf/config/install_config.conf配置
-# 安装路径,不要当前路径(pwd)一样
+# 注意：安装路径,不要当前路径(pwd)一样
 installPath="/data1_1T/escheduler"
 
 # 部署用户
+# 注意：部署用户需要有sudo权限及操作hdfs的权限，如果开启hdfs，根目录需要自行创建
 deployUser="escheduler"
 
 # zk集群
 zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
 
 # 安装hosts
+# 注意：安装调度的机器hostname列表，如果是伪分布式，则只需写一个伪分布式hostname即可
 ips="ark0,ark1,ark2,ark3,ark4"
 
 # conf/config/run_config.conf配置
 # 运行Master的机器
+# 注意：部署master的机器hostname列表
 masters="ark0,ark1"
 
 # 运行Worker的机器
+# 注意：部署worker的机器hostname列表
 workers="ark2,ark3,ark4"
 
 # 运行Alert的机器
+# 注意：部署alert server的机器hostname列表
 alertServer="ark3"
 
 # 运行Api的机器
+# 注意：部署api server的机器hostname列表
 apiServers="ark1"
 
 # alert配置
@@ -89,26 +96,56 @@ mailSender="xxxxxxxxxx"
 # 发送人密码
 mailPassword="xxxxxxxxxx"
 
+# TLS邮件协议支持
+starttlsEnable="false"
+
+# SSL邮件协议支持
+# 注意：默认开启的是SSL协议，TLS和SSL只能有一个处于true状态
+sslEnable="true"
+
 # 下载Excel路径
 xlsFilePath="/tmp/xls"
 
+# 企业微信企业ID配置
+enterpriseWechatCorpId="xxxxxxxxxx"
 
-# hadoop 配置
-# 是否启动hdfs,如果启动则为true,需要配置以下hadoop相关参数;
-# 不启动设置为false,如果为false,以下配置不需要修改
-hdfsStartupSate="false"
+# 企业微信应用Secret配置
+enterpriseWechatSecret="xxxxxxxxxx"
 
-# namenode地址,支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
-namenodeFs="hdfs://mycluster:8020"
+# 企业微信应用AgentId配置
+enterpriseWechatAgentId="xxxxxxxxxx"
 
-# resourcemanager HA配置，如果是单resourcemanager,这里为空即可
+# 企业微信用户配置,多个用户以,分割
+enterpriseWechatUsers="xxxxx,xxxxx"
+
+
+#是否启动监控自启动脚本
+monitorServerState="false"
+
+# 资源中心上传选择存储方式：HDFS,S3,NONE
+resUploadStartupType="NONE"
+
+# 如果resUploadStartupType为HDFS，defaultFS写namenode地址，支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
+# 如果是S3，则写S3地址，比如说：s3a://escheduler，注意，一定要创建根目录/escheduler
+defaultFS="hdfs://mycluster:8020"
+
+# 如果配置了S3，则需要有以下配置
+s3Endpoint="http://192.168.199.91:9010"
+s3AccessKey="A3DXS30FO22544RE"
+s3SecretKey="OloCLq3n+8+sdPHUhJ21XrSxTC+JK"
+
+# resourcemanager HA配置，如果是单resourcemanager,这里为yarnHaIps=""
 yarnHaIps="192.168.xx.xx,192.168.xx.xx"
 
 # 如果是单 resourcemanager,只需要配置一个主机名称,如果是resourcemanager HA,则默认配置就好
 singleYarnIp="ark1"
 
-# hdfs根路径,根路径的owner必须是部署用户
+# hdfs根路径，根路径的owner必须是部署用户。1.1.0之前版本不会自动创建hdfs根目录，需要自行创建
 hdfsPath="/escheduler"
+
+# 拥有在hdfs根路径/下创建目录权限的用户
+# 注意：如果开启了kerberos，则直接hdfsRootUser=""，就可以
+hdfsRootUser="hdfs"
 
 # common 配置
 # 程序路径
@@ -128,6 +165,19 @@ resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
 
 # 开发状态,如果是true,对于SHELL脚本可以在execPath目录下查看封装后的SHELL脚本,如果是false则执行完成直接删除
 devState="true"
+
+# kerberos 配置
+# kerberos 是否启动
+kerberosStartUp="false"
+
+# kdc krb5 配置文件路径
+krb5ConfPath="$installPath/conf/krb5.conf"
+
+# keytab 用户名
+keytabUserName="hdfs-mycluster@ESZ.COM"
+
+# 用户 keytab路径
+keytabPath="$installPath/conf/hdfs.headless.keytab"
 
 # zk 配置
 # zk根目录
@@ -152,7 +202,10 @@ workersLock="/escheduler/lock/workers"
 mastersFailover="/escheduler/lock/failover/masters"
 
 # zk worker容错分布式锁
-workersFailover="/escheduler/lock/failover/masters"
+workersFailover="/escheduler/lock/failover/workers"
+
+# zk master启动容错分布式锁
+mastersStartupFailover="/escheduler/lock/failover/startup-masters"
 
 # zk session 超时
 zkSessionTimeout="300"
@@ -236,18 +289,27 @@ sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.us
 sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${mysqlPassword}#g" conf/quartz.properties
 
 
-sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${namenodeFs}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.s3a.endpoint.*#fs.s3a.endpoint=${s3Endpoint}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.s3a.access.key.*#fs.s3a.access.key=${s3AccessKey}#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.s3a.secret.key.*#fs.s3a.secret.key=${s3SecretKey}#g" conf/common/hadoop/hadoop.properties
 sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common/hadoop/hadoop.properties
 sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common/hadoop/hadoop.properties
+
 
 sed -i ${txt} "s#data.basedir.path.*#data.basedir.path=${programPath}#g" conf/common/common.properties
 sed -i ${txt} "s#data.download.basedir.path.*#data.download.basedir.path=${downloadPath}#g" conf/common/common.properties
 sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" conf/common/common.properties
+sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common/common.properties
 sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
-sed -i ${txt} "s#hdfs.startup.state.*#hdfs.startup.state=${hdfsStartupSate}#g" conf/common/common.properties
+sed -i ${txt} "s#res.upload.startup.type.*#res.upload.startup.type=${resUploadStartupType}#g" conf/common/common.properties
 sed -i ${txt} "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
 sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
 sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
+sed -i ${txt} "s#hadoop.security.authentication.startup.state.*#hadoop.security.authentication.startup.state=${kerberosStartUp}#g" conf/common/common.properties
+sed -i ${txt} "s#java.security.krb5.conf.path.*#java.security.krb5.conf.path=${krb5ConfPath}#g" conf/common/common.properties
+sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keytabUserName}#g" conf/common/common.properties
+sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common/common.properties
 
 sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.escheduler.root.*#zookeeper.escheduler.root=${zkRoot}#g" conf/zookeeper.properties
@@ -258,6 +320,7 @@ sed -i ${txt} "s#zookeeper.escheduler.lock.masters.*#zookeeper.escheduler.lock.m
 sed -i ${txt} "s#zookeeper.escheduler.lock.workers.*#zookeeper.escheduler.lock.workers=${workersLock}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.escheduler.lock.failover.masters.*#zookeeper.escheduler.lock.failover.masters=${mastersFailover}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.escheduler.lock.failover.workers.*#zookeeper.escheduler.lock.failover.workers=${workersFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.escheduler.lock.failover.startup.masters.*#zookeeper.escheduler.lock.failover.startup.masters=${mastersStartupFailover}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/zookeeper.properties
@@ -268,7 +331,7 @@ sed -i ${txt} "s#master.exec.task.number.*#master.exec.task.number=${masterExecT
 sed -i ${txt} "s#master.heartbeat.interval.*#master.heartbeat.interval=${masterHeartbeatInterval}#g" conf/master.properties
 sed -i ${txt} "s#master.task.commit.retryTimes.*#master.task.commit.retryTimes=${masterTaskCommitRetryTimes}#g" conf/master.properties
 sed -i ${txt} "s#master.task.commit.interval.*#master.task.commit.interval=${masterTaskCommitInterval}#g" conf/master.properties
-sed -i ${txt} "s#master.max.cpuload.avg.*#master.max.cpuload.avg=${masterMaxCpuLoadAvg}#g" conf/master.properties
+#sed -i ${txt} "s#master.max.cpuload.avg.*#master.max.cpuload.avg=${masterMaxCpuLoadAvg}#g" conf/master.properties
 sed -i ${txt} "s#master.reserved.memory.*#master.reserved.memory=${masterReservedMemory}#g" conf/master.properties
 
 
@@ -292,7 +355,13 @@ sed -i ${txt} "s#mail.server.host.*#mail.server.host=${mailServerHost}#g" conf/a
 sed -i ${txt} "s#mail.server.port.*#mail.server.port=${mailServerPort}#g" conf/alert.properties
 sed -i ${txt} "s#mail.sender.*#mail.sender=${mailSender}#g" conf/alert.properties
 sed -i ${txt} "s#mail.passwd.*#mail.passwd=${mailPassword}#g" conf/alert.properties
+sed -i ${txt} "s#mail.smtp.starttls.enable.*#mail.smtp.starttls.enable=${starttlsEnable}#g" conf/alert.properties
+sed -i ${txt} "s#mail.smtp.ssl.enable.*#mail.smtp.ssl.enable=${sslEnable}#g" conf/alert.properties
 sed -i ${txt} "s#xls.file.path.*#xls.file.path=${xlsFilePath}#g" conf/alert.properties
+sed -i ${txt} "s#enterprise.wechat.corp.id.*#enterprise.wechat.corp.id=${enterpriseWechatCorpId}#g" conf/alert.properties
+sed -i ${txt} "s#enterprise.wechat.secret.*#enterprise.wechat.secret=${enterpriseWechatSecret}#g" conf/alert.properties
+sed -i ${txt} "s#enterprise.wechat.agent.id.*#enterprise.wechat.agent.id=${enterpriseWechatAgentId}#g" conf/alert.properties
+sed -i ${txt} "s#enterprise.wechat.users.*#enterprise.wechat.users=${enterpriseWechatUsers}#g" conf/alert.properties
 
 
 sed -i ${txt} "s#installPath.*#installPath=${installPath}#g" conf/config/install_config.conf
@@ -364,3 +433,29 @@ fi
 # 6,启动
 echo "6,启动"
 sh ${workDir}/script/start_all.sh
+
+# 7,启动监控自启动脚本
+monitor_pid=${workDir}/monitor_server.pid
+if [ "true" = $monitorServerState ];then
+        if [ -f $monitor_pid ]; then
+                TARGET_PID=`cat $monitor_pid`
+                if kill -0 $TARGET_PID > /dev/null 2>&1; then
+                        echo "monitor server running as process ${TARGET_PID}.Stopping"
+                        kill $TARGET_PID
+                        sleep 5
+                        if kill -0 $TARGET_PID > /dev/null 2>&1; then
+                                echo "monitor server did not stop gracefully after 5 seconds: killing with kill -9"
+                                kill -9 $TARGET_PID
+                        fi
+                else
+                        echo "no monitor server to stop"
+                fi
+                echo "monitor server running as process ${TARGET_PID}.Stopped success"
+                rm -f $monitor_pid
+        fi
+        nohup python -u ${workDir}/script/monitor_server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor_server.log 2>&1 &
+        echo $! > $monitor_pid
+        echo "start monitor server success as process `cat $monitor_pid`"
+
+fi
+

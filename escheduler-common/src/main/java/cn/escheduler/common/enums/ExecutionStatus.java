@@ -18,7 +18,7 @@ package cn.escheduler.common.enums;
 
 
 /**
- * runing status for work flow and task nodes
+ * runing status for workflow and task nodes
  *
  */
 public enum ExecutionStatus {

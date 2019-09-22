@@ -228,7 +228,12 @@ public class TaskInstanceMapperProvider {
                 SELECT("*, UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(start_time) as duration");
                 FROM(TABLE_NAME);
 
-                WHERE("`host` = #{host} and `state` in (" + strStates.toString() +")");
+                Object host = parameter.get("host");
+                if(host != null && StringUtils.isNotEmpty(host.toString())){
+
+                    WHERE("`host` = #{host} ");
+                }
+                WHERE("`state` in (" + strStates.toString() +")");
                 ORDER_BY("`id` asc");
             }
         }.toString();

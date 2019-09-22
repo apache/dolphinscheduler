@@ -1,5 +1,5 @@
 Easy Scheduler
-============
+==============
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 > Easy Scheduler for Big Data
@@ -50,7 +50,7 @@ Easy Scheduler
 
 ### 近期研发计划
 
-EasyScheduler的工作计划：<a href="https://github.com/analysys/EasyScheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是1.0.2版本的功能，TODO卡片是待做事项(包括 feature ideas)
+EasyScheduler的工作计划：<a href="https://github.com/analysys/EasyScheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是1.1.0版本的功能，TODO卡片是待做事项(包括 feature ideas)
 
 ### 贡献代码
 

@@ -188,6 +188,27 @@ public class ProcessInstance {
      */
     private int timeout;
 
+
+    /**
+     * tenant id
+     */
+    private int tenantId;
+
+    /**
+     * worker group name. for api.
+     */
+    private String workerGroupName;
+
+    /**
+     * receivers for api
+     */
+    private String receivers;
+
+    /**
+     * receivers cc for api
+     */
+    private String receiversCc;
+
     public ProcessInstance(){
 
     }
@@ -534,6 +555,7 @@ public class ProcessInstance {
                 ", processInstanceJson='" + processInstanceJson + '\'' +
                 ", executorId=" + executorId +
                 ", tenantCode='" + tenantCode + '\'' +
+                ", tenantId='" + tenantId + '\'' +
                 ", queue='" + queue + '\'' +
                 ", isSubProcess=" + isSubProcess +
                 ", locations='" + locations + '\'' +
@@ -546,4 +568,35 @@ public class ProcessInstance {
                 '}';
     }
 
+    public void setTenantId(int tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public int getTenantId() {
+        return this.tenantId ;
+    }
+
+    public String getWorkerGroupName() {
+        return workerGroupName;
+    }
+
+    public void setWorkerGroupName(String workerGroupName) {
+        this.workerGroupName = workerGroupName;
+    }
+
+    public String getReceivers() {
+        return receivers;
+    }
+
+    public void setReceivers(String receivers) {
+        this.receivers = receivers;
+    }
+
+    public String getReceiversCc() {
+        return receiversCc;
+    }
+
+    public void setReceiversCc(String receiversCc) {
+        this.receiversCc = receiversCc;
+    }
 }

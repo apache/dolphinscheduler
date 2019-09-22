@@ -115,6 +115,9 @@ public class UsersService extends BaseService {
         user.setUserType(UserType.GENERAL_USER);
         user.setCreateTime(now);
         user.setUpdateTime(now);
+        if (StringUtils.isEmpty(queue)){
+            queue = "";
+        }
         user.setQueue(queue);
 
         // save user
@@ -122,7 +125,7 @@ public class UsersService extends BaseService {
 
         Tenant tenant = tenantMapper.queryById(tenantId);
         // if hdfs startup
-        if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
+        if (PropertyUtils.getResUploadStartupState()){
             String userPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode() + "/home/" + user.getId();
 
             HadoopUtils.getInstance().mkdir(userPath);
@@ -242,35 +245,35 @@ public class UsersService extends BaseService {
             Tenant newTenant = tenantMapper.queryById(tenantId);
             if (newTenant != null) {
                 // if hdfs startup
-                if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
+                if (PropertyUtils.getResUploadStartupState() && oldTenant != null){
                     String newTenantCode = newTenant.getTenantCode();
                     String oldResourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + oldTenant.getTenantCode() + "/resources";
                     String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
 
+                    if (HadoopUtils.getInstance().exists(oldResourcePath)){
+                        String newResourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + newTenantCode + "/resources";
+                        String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
 
-                    String newResourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + newTenantCode + "/resources";
-                    String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
-
-                    //file resources list
-                    List<Resource> fileResourcesList = resourceMapper.queryResourceCreatedByUser(userId, 0);
-                    if (CollectionUtils.isNotEmpty(fileResourcesList)) {
-                        for (Resource resource : fileResourcesList) {
-                            HadoopUtils.getInstance().copy(oldResourcePath + "/" + resource.getAlias(), newResourcePath, false, true);
+                        //file resources list
+                        List<Resource> fileResourcesList = resourceMapper.queryResourceCreatedByUser(userId, 0);
+                        if (CollectionUtils.isNotEmpty(fileResourcesList)) {
+                            for (Resource resource : fileResourcesList) {
+                                HadoopUtils.getInstance().copy(oldResourcePath + "/" + resource.getAlias(), newResourcePath, false, true);
+                            }
                         }
-                    }
 
-                    //udf resources
-                    List<Resource> udfResourceList = resourceMapper.queryResourceCreatedByUser(userId, 1);
-                    if (CollectionUtils.isNotEmpty(udfResourceList)) {
-                        for (Resource resource : udfResourceList) {
-                            HadoopUtils.getInstance().copy(oldUdfsPath + "/" + resource.getAlias(), newUdfsPath, false, true);
+                        //udf resources
+                        List<Resource> udfResourceList = resourceMapper.queryResourceCreatedByUser(userId, 1);
+                        if (CollectionUtils.isNotEmpty(udfResourceList)) {
+                            for (Resource resource : udfResourceList) {
+                                HadoopUtils.getInstance().copy(oldUdfsPath + "/" + resource.getAlias(), newUdfsPath, false, true);
+                            }
                         }
+
+                        //Delete the user from the old tenant directory
+                        String oldUserPath = HadoopUtils.getHdfsDataBasePath() + "/" + oldTenant.getTenantCode() + "/home/" + userId;
+                        HadoopUtils.getInstance().delete(oldUserPath, true);
                     }
-
-                    //Delete the user from the old tenant directory
-                    String oldUserPath = HadoopUtils.getHdfsDataBasePath() + "/" + oldTenant.getTenantCode() + "/home/" + userId;
-                    HadoopUtils.getInstance().delete(oldUserPath, true);
-
 
                     //create user in the new tenant directory
                     String newUserPath = HadoopUtils.getHdfsDataBasePath() + "/" + newTenant.getTenantCode() + "/home/" + user.getId();
@@ -304,11 +307,13 @@ public class UsersService extends BaseService {
         // delete user
         User user = userMapper.queryTenantCodeByUserId(id);
 
-
-        if (PropertyUtils.getBoolean(cn.escheduler.common.Constants.HDFS_STARTUP_STATE)){
-            String userPath = HadoopUtils.getHdfsDataBasePath() + "/" + user.getTenantCode() + "/home/" + id;
-
-            HadoopUtils.getInstance().delete(userPath, true);
+        if (user != null) {
+            if (PropertyUtils.getResUploadStartupState()) {
+                String userPath = HadoopUtils.getHdfsDataBasePath() + "/" + user.getTenantCode() + "/home/" + id;
+                if (HadoopUtils.getInstance().exists(userPath)) {
+                    HadoopUtils.getInstance().delete(userPath, true);
+                }
+            }
         }
 
         userMapper.delete(id);
@@ -517,6 +522,27 @@ public class UsersService extends BaseService {
         putMsg(result, Status.SUCCESS);
         return result;
     }
+
+    /**
+     * query user list
+     *
+     * @param loginUser
+     * @return
+     */
+    public Map<String, Object> queryAllGeneralUsers(User loginUser) {
+        Map<String, Object> result = new HashMap<>(5);
+        //only admin can operate
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+            return result;
+        }
+
+        List<User> userList = userMapper.queryAllGeneralUsers();
+        result.put(Constants.DATA_LIST, userList);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
 
     /**
      * query user list

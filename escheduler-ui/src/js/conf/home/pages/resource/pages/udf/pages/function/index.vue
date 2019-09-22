@@ -3,7 +3,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" @click="_create" v-ps="['GENERAL_USER']" size="small" >{{$t('Create UDF Function')}}</x-button>
+          <x-button type="ghost" @click="_create"  size="small" >{{$t('Create UDF Function')}}</x-button>
         </template>
       </m-conditions>
     </template>

@@ -3,7 +3,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" size="small"  v-ps="['GENERAL_USER']" @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</x-button>
+          <x-button type="ghost" size="small"  @click="() => this.$router.push({name: 'definition-create'})">{{$t('Create process')}}</x-button>
         </template>
       </m-conditions>
     </template>

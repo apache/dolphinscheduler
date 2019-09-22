@@ -16,8 +16,8 @@
  */
 package cn.escheduler.server.master;
 
-import cn.escheduler.api.quartz.ProcessScheduleJob;
-import cn.escheduler.api.quartz.QuartzExecutors;
+import cn.escheduler.server.quartz.ProcessScheduleJob;
+import cn.escheduler.server.quartz.QuartzExecutors;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.IStoppable;
 import cn.escheduler.common.thread.Stopper;
@@ -189,7 +189,6 @@ public class MasterServer implements CommandLineRunner, IStoppable {
 
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(MasterServer.class);
-        app.setWebEnvironment(false);
         app.run(args);
     }
 
@@ -217,7 +216,7 @@ public class MasterServer implements CommandLineRunner, IStoppable {
                 if(Stopper.isRunning()) {
                     // send heartbeat to zk
                     if (StringUtils.isBlank(zkMasterClient.getMasterZNode())) {
-                        logger.error("master send heartbeat to zk failed");
+                        logger.error("master send heartbeat to zk failed: can't find zookeeper regist path of master server");
                         return;
                     }
 

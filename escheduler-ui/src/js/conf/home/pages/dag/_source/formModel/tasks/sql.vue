@@ -29,6 +29,17 @@
     </m-list-box>
     <template v-if="!sqlType && showType.length">
       <m-list-box>
+        <div slot="text">{{$t('Title')}}</div>
+        <div slot="content">
+          <x-input
+            type="input"
+            v-model="title"
+            :placeholder="$t('Please enter the title of email')"
+            autocomplete="off">
+          </x-input>
+        </div>
+      </m-list-box>
+      <m-list-box>
         <div slot="text">{{$t('Recipient')}}</div>
         <div slot="content">
           <m-email v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
@@ -86,6 +97,26 @@
         </m-local-params>
       </div>
     </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('Pre Statement')}}</div>
+      <div slot="content">
+        <m-statement-list
+          ref="refPreStatements"
+          @on-statement-list="_onPreStatements"
+          :statement-list="preStatements">
+        </m-statement-list>
+      </div>
+    </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('Post Statement')}}</div>
+      <div slot="content">
+        <m-statement-list
+          ref="refPostStatements"
+          @on-statement-list="_onPostStatements"
+          :statement-list="postStatements">
+        </m-statement-list>
+      </div>
+    </m-list-box>
   </div>
 </template>
 <script>
@@ -96,6 +127,7 @@
   import mSqlType from './_source/sqlType'
   import mDatasource from './_source/datasource'
   import mLocalParams from './_source/localParams'
+  import mStatementList from './_source/statementList'
   import disabledState from '@/module/mixin/disabledState'
   import mEmail from '@/conf/home/pages/projects/pages/definition/pages/list/_source/email'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
@@ -120,10 +152,16 @@
         udfs: '',
         // Sql type
         sqlType: 0,
+        // Email title
+        title: '',
         // Form/attachment
         showType: ['TABLE'],
         // Sql parameter
         connParams: '',
+        // Pre statements
+        preStatements: [],
+        // Post statements
+        postStatements: [],
         // recipients
         receivers: [],
         // copy to
@@ -162,6 +200,18 @@
         this.rtDatasource = o.datasource
       },
       /**
+       * return pre statements
+       */
+      _onPreStatements (a) {
+        this.preStatements = a
+      },
+      /**
+       * return post statements
+       */
+      _onPostStatements (a) {
+        this.postStatements = a
+      },
+      /**
        * verification
        */
       _verification () {
@@ -187,6 +237,16 @@
           return false
         }
 
+        // preStatements Subcomponent verification
+        if (!this.$refs.refPreStatements._verifProp()) {
+          return false
+        }
+
+        // postStatements Subcomponent verification
+        if (!this.$refs.refPostStatements._verifProp()) {
+          return false
+        }
+
         // storage
         this.$emit('on-params', {
           type: this.type,
@@ -194,6 +254,7 @@
           sql: editor.getValue(),
           udfs: this.udfs,
           sqlType: this.sqlType,
+          title: this.title,
           receivers: this.receivers.join(','),
           receiversCc: this.receiversCc.join(','),
           showType: (() => {
@@ -209,7 +270,9 @@
             }
           })(),
           localParams: this.localParams,
-          connParams: this.connParams
+          connParams: this.connParams,
+          preStatements: this.preStatements,
+          postStatements: this.postStatements
         })
         return true
       },
@@ -259,6 +322,7 @@
           this.showType = []
         }
         if (val !== 0) {
+          this.title = ''
           this.receivers = []
           this.receiversCc = []
         }
@@ -272,6 +336,7 @@
       //
       showType (val) {
         if (!val.length) {
+          this.title = ''
           this.receivers = []
           this.receiversCc = []
         }
@@ -291,6 +356,9 @@
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
         this.showType = o.params.showType.split(',') || []
+        this.preStatements = o.params.preStatements || []
+        this.postStatements = o.params.postStatements || []
+        this.title = o.params.title || ''
         this.receivers = o.params.receivers && o.params.receivers.split(',') || []
         this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
       }
@@ -314,6 +382,6 @@
       }
     },
     computed: {},
-    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mEmail }
+    components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
   }
 </script>
