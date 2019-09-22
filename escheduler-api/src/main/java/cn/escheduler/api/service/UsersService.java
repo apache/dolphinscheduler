@@ -124,10 +124,13 @@ public class UsersService extends BaseService {
         userMapper.insert(user);
 
         Tenant tenant = tenantMapper.queryById(tenantId);
-        // if hdfs startup
+        // resource upload startup
         if (PropertyUtils.getResUploadStartupState()){
-            String userPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode() + "/home/" + user.getId();
-
+            // if tenant not exists
+            if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))){
+                createTenantDirIfNotExists(tenant.getTenantCode());
+            }
+            String userPath = HadoopUtils.getHdfsUserDir(tenant.getTenantCode(),user.getId());
             HadoopUtils.getInstance().mkdir(userPath);
         }
 
@@ -247,11 +250,12 @@ public class UsersService extends BaseService {
                 // if hdfs startup
                 if (PropertyUtils.getResUploadStartupState() && oldTenant != null){
                     String newTenantCode = newTenant.getTenantCode();
-                    String oldResourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + oldTenant.getTenantCode() + "/resources";
+                    String oldResourcePath = HadoopUtils.getHdfsResDir(oldTenant.getTenantCode());
                     String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
 
+                    // if old tenant dir exists
                     if (HadoopUtils.getInstance().exists(oldResourcePath)){
-                        String newResourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + newTenantCode + "/resources";
+                        String newResourcePath = HadoopUtils.getHdfsResDir(newTenantCode);
                         String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
 
                         //file resources list
@@ -271,13 +275,22 @@ public class UsersService extends BaseService {
                         }
 
                         //Delete the user from the old tenant directory
-                        String oldUserPath = HadoopUtils.getHdfsDataBasePath() + "/" + oldTenant.getTenantCode() + "/home/" + userId;
+                        String oldUserPath = HadoopUtils.getHdfsUserDir(oldTenant.getTenantCode(),userId);
                         HadoopUtils.getInstance().delete(oldUserPath, true);
+                    }else {
+                        // if old tenant dir not exists , create
+                        createTenantDirIfNotExists(oldTenant.getTenantCode());
                     }
 
-                    //create user in the new tenant directory
-                    String newUserPath = HadoopUtils.getHdfsDataBasePath() + "/" + newTenant.getTenantCode() + "/home/" + user.getId();
-                    HadoopUtils.getInstance().mkdir(newUserPath);
+                    if (HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(newTenant.getTenantCode()))){
+                        //create user in the new tenant directory
+                        String newUserPath = HadoopUtils.getHdfsUserDir(newTenant.getTenantCode(),user.getId());
+                        HadoopUtils.getInstance().mkdir(newUserPath);
+                    }else {
+                        // if new tenant dir not exists , create
+                        createTenantDirIfNotExists(newTenant.getTenantCode());
+                    }
+
                 }
             }
             user.setTenantId(tenantId);
@@ -309,7 +322,7 @@ public class UsersService extends BaseService {
 
         if (user != null) {
             if (PropertyUtils.getResUploadStartupState()) {
-                String userPath = HadoopUtils.getHdfsDataBasePath() + "/" + user.getTenantCode() + "/home/" + id;
+                String userPath = HadoopUtils.getHdfsUserDir(user.getTenantCode(),id);
                 if (HadoopUtils.getInstance().exists(userPath)) {
                     HadoopUtils.getInstance().delete(userPath, true);
                 }

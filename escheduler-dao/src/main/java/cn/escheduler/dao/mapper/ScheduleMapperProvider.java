@@ -163,7 +163,7 @@ public class ScheduleMapperProvider {
    */
   public String selectAllByProcessDefineArray(Map<String, Object> parameter) {
 
-    StringBuffer strIds = new StringBuffer();
+    StringBuilder strIds = new StringBuilder();
     int[] idsArray = (int[]) parameter.get("processDefineIds");
     for(int i=0;i<idsArray.length;i++){
       strIds.append(idsArray[i]);

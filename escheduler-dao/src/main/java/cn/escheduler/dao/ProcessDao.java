@@ -931,6 +931,9 @@ public class ProcessDao extends AbstractBaseDao {
             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, startTime);
             processMapStr = JSONUtils.toJson(cmdParam);
         }
+
+        updateSubProcessDefinitionByParent(parentProcessInstance, childDefineId);
+
         Command command = new Command();
         command.setWarningType(parentProcessInstance.getWarningType());
         command.setWarningGroupId(parentProcessInstance.getWarningGroupId());
@@ -943,6 +946,16 @@ public class ProcessDao extends AbstractBaseDao {
         command.setProcessInstancePriority(parentProcessInstance.getProcessInstancePriority());
         createCommand(command);
         logger.info("sub process command created: {} ", command.toString());
+    }
+
+    private void updateSubProcessDefinitionByParent(ProcessInstance parentProcessInstance, int childDefinitionId) {
+        ProcessDefinition fatherDefinition = this.findProcessDefineById(parentProcessInstance.getProcessDefinitionId());
+        ProcessDefinition childDefinition = this.findProcessDefineById(childDefinitionId);
+        if(childDefinition != null && fatherDefinition != null){
+            childDefinition.setReceivers(fatherDefinition.getReceivers());
+            childDefinition.setReceiversCc(fatherDefinition.getReceiversCc());
+            processDefineMapper.update(childDefinition);
+        }
     }
 
     /**
@@ -1207,6 +1220,26 @@ public class ProcessDao extends AbstractBaseDao {
         return taskInstanceMapper.queryById(taskId);
     }
 
+
+    /**
+     * package task instance，associate processInstance and processDefine
+     * @param taskInstId
+     * @return
+     */
+    public TaskInstance getTaskInstanceRelationByTaskId(int taskInstId){
+        // get task instance
+        TaskInstance taskInstance = findTaskInstanceById(taskInstId);
+        // get process instance
+        ProcessInstance processInstance = findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
+        // get process define
+        ProcessDefinition processDefine = findProcessDefineById(taskInstance.getProcessDefinitionId());
+
+        taskInstance.setProcessInstance(processInstance);
+        taskInstance.setProcessDefine(processDefine);
+        return taskInstance;
+    }
+
+
     /**
      * get id list by task state
      * @param instanceId
@@ -1311,7 +1344,6 @@ public class ProcessDao extends AbstractBaseDao {
                                 String executePath,
                                 String logPath,
                                 int taskInstId) {
-
         TaskInstance taskInstance = taskInstanceMapper.queryById(taskInstId);
         taskInstance.setState(state);
         taskInstance.setStartTime(startTime);
@@ -1707,7 +1739,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param processInstanceId
      * @return
      */
-    public String queryQueueByProcessInstanceId(int processInstanceId){
+    public String queryUserQueueByProcessInstanceId(int processInstanceId){
         return userMapper.queryQueueByProcessInstanceId(processInstanceId);
     }
 
@@ -1740,7 +1772,10 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public int getTaskWorkerGroupId(TaskInstance taskInstance) {
         int taskWorkerGroupId = taskInstance.getWorkerGroupId();
-        ProcessInstance processInstance = findProcessInstanceByTaskId(taskInstance.getId());
+        int processInstanceId = taskInstance.getProcessInstanceId();
+
+        ProcessInstance processInstance = findProcessInstanceById(processInstanceId);
+
         if(processInstance == null){
             logger.error("cannot find the task:{} process instance", taskInstance.getId());
             return Constants.DEFAULT_WORKER_ID;

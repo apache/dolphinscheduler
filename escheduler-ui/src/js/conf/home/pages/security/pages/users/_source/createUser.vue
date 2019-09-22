@@ -203,7 +203,6 @@
       },
       _submit () {
         this.$refs['popup'].spinnerLoading = true
-        console.log(this.tenantId.id)
         let param = {
           userName: this.userName,
           userPassword: this.userPassword,

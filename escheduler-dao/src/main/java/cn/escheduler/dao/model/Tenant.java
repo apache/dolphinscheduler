@@ -53,6 +53,12 @@ public class Tenant {
      */
     private String queueName;
 
+
+    /**
+     * queue
+     */
+    private String queue;
+
     /**
      * queue
      */

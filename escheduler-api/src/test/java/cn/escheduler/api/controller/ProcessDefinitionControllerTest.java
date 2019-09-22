@@ -20,83 +20,46 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.utils.JSONUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class ProcessDefinitionControllerTest {
+/**
+ * process definition controller test
+ */
+public class ProcessDefinitionControllerTest extends AbstractControllerTest{
+
     private static Logger logger = LoggerFactory.getLogger(ProcessDefinitionControllerTest.class);
 
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
     @Test
     public void createProcessDefinition() throws Exception {
-        //String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-50438\",\"name\":\"shell_01\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo \\\"123\\\"\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{\"self\":\"NO_DEP_PRE\",\"outer\":{\"strategy\":\"NONE\",\"taskList\":[]}},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"preTasks\":[]}]}";
-        String json = "{\n" +
-                "    \"globalParams\": [ ], \n" +
-                "    \"tasks\": [\n" +
-                "        {\n" +
-                "            \"type\": \"SHELL\", \n" +
-                "            \"id\": \"tasks-50438\", \n" +
-                "            \"name\": \"shell_01\", \n" +
-                "            \"params\": {\n" +
-                "                \"resourceList\": [ ], \n" +
-                "                \"localParams\": [ ], \n" +
-                "                \"rawScript\": \"echo \\\"123\\\"\"\n" +
-                "            }, \n" +
-                "            \"desc\": \"\", \n" +
-                "            \"runFlag\": \"NORMAL\", \n" +
-                "            \"dependence\": {\n" +
-                "                \"self\": \"NO_DEP_PRE\", \n" +
-                "                \"outer\": {\n" +
-                "                    \"strategy\": \"NONE\", \n" +
-                "                    \"taskList\": [ ]\n" +
-                "                }\n" +
-                "            }, \n" +
-                "            \"maxRetryTimes\": \"0\", \n" +
-                "            \"retryInterval\": \"1\", \n" +
-                "            \"preTasks\": [ ]\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
+        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
+
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("name","shell_process_01_test");
+        paramsMap.add("name","dag_test");
         paramsMap.add("processDefinitionJson",json);
+        paramsMap.add("locations", locations);
+        paramsMap.add("connects", "[]");
+        paramsMap.add("desc", "desc test");
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/process/save","project_test1")
-                .header("sessionId", "08fae8bf-fe2d-4fc0-8129-23c37fbfac82")
+                .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

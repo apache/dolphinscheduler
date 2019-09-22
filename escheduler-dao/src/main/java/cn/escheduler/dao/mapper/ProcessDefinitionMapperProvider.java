@@ -55,6 +55,8 @@ public class ProcessDefinitionMapperProvider {
                 VALUES("`connects`", "#{processDefinition.connects}");
                 VALUES("`create_time`", "#{processDefinition.createTime}");
                 VALUES("`update_time`", "#{processDefinition.updateTime}");
+                VALUES("`receivers` ","#{processDefinition.receivers}");
+                VALUES("`receivers_cc`", "#{processDefinition.receiversCc}");
                 VALUES("`timeout`", "#{processDefinition.timeout}");
                 VALUES("`tenant_id`", "#{processDefinition.tenantId}");
                 VALUES("`flag`", EnumFieldUtil.genFieldStr("processDefinition.flag", ReleaseState.class));
@@ -102,6 +104,8 @@ public class ProcessDefinitionMapperProvider {
                 SET("`global_params`=#{processDefinition.globalParams}");
                 SET("`create_time`=#{processDefinition.createTime}");
                 SET("`update_time`=#{processDefinition.updateTime}");
+                SET("`receivers`=#{processDefinition.receivers}");
+                SET("`receivers_cc`=#{processDefinition.receiversCc}");
                 SET("`timeout`=#{processDefinition.timeout}");
                 SET("`tenant_id`=#{processDefinition.tenantId}");
                 SET("`flag`="+EnumFieldUtil.genFieldStr("processDefinition.flag", Flag.class));
@@ -292,5 +296,20 @@ public class ProcessDefinitionMapperProvider {
 
             }
         }.toString();
+    }
+
+
+    /**
+     * query all
+     * @return
+     */
+    public String queryAll() {
+        return new SQL() {{
+            SELECT("id,name,version,release_state,project_id,user_id,`desc`,create_time,update_time,flag,global_params,receivers,receivers_cc");
+
+            FROM(TABLE_NAME );
+
+            ORDER_BY("create_time desc ");
+        }}.toString();
     }
 }

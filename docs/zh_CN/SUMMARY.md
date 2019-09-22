@@ -29,13 +29,15 @@
     * [开发环境搭建](后端开发文档.md#项目编译)
     * [自定义任务插件文档](任务插件开发.md#任务插件开发)
     
-* [接口文档](http://52.82.13.76:8888/easyscheduler/doc.html?language=zh_CN&lang=cn)
+* [接口文档](http://52.82.13.76:8888/escheduler/doc.html?language=zh_CN&lang=cn)
 * FAQ
     * [FAQ](EasyScheduler-FAQ.md)
 * 系统版本升级文档
     * [版本升级](升级文档.md)
 * 历次版本发布内容
     * [1.1.0 release](1.1.0-release.md)
+    * [1.0.5 release](1.0.5-release.md)
+    * [1.0.4 release](1.0.4-release.md)
     * [1.0.3 release](1.0.3-release.md)
     * [1.0.2 release](1.0.2-release.md)
     * [1.0.1 release](1.0.1-release.md)

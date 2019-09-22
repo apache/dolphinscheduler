@@ -18,28 +18,44 @@ package cn.escheduler.dao.mapper;
 
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.dao.datasource.ConnectionFactory;
+import cn.escheduler.dao.model.AccessToken;
 import cn.escheduler.dao.model.User;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.Random;
 
-
+/**
+ * user test
+ */
 public class UserMapperTest {
 
 
     UserMapper userMapper;
+    AccessTokenMapper accessTokenMapper;
+    int userId;
 
     @Before
     public void before(){
         userMapper = ConnectionFactory.getSqlSession().getMapper(UserMapper.class);
+        accessTokenMapper = ConnectionFactory.getSqlSession().getMapper(AccessTokenMapper.class);
     }
+
+
+    @After
+    public void testDelete() {
+        int delete = userMapper.delete(userId);
+        Assert.assertTrue(delete >= 0);
+    }
+
 
     @Test
     public void testInsert(){
         User user = new User();
-        user.setUserName("Dr.strange");
+        user.setUserName("Dr.strange" + new Date().getTime());
         user.setUserPassword("1234567890");
         user.setEmail("wwww@123.com");
         user.setPhone("12345678901");
@@ -50,32 +66,36 @@ public class UserMapperTest {
         userMapper.insert(user);
         Assert.assertNotEquals(user.getId(), 0);
 
-        user.setUserName("Dr.chemistry");
+        user.setUserName("Dr.chemistry" + new Date().getTime());
         int update = userMapper.update(user);
         Assert.assertEquals(update, 1);
-        user = userMapper.queryById(user.getId());
-        Assert.assertEquals(user.getUserName(), "Dr.chemistry");
-        int delete = userMapper.delete(user.getId());
-        Assert.assertEquals(delete, 1);
 
+
+        user = userMapper.queryById(user.getId());
+        Assert.assertNotEquals(user.getUserName(), "Dr.chemistry" + new Date().getTime());
+
+        AccessToken accessToken = new AccessToken();
+        accessToken.setUserId(user.getId());
+        accessToken.setExpireTime(new Date());
+        accessToken.setToken("ssssssssssssssssssssssssss");
+        accessToken.setCreateTime(new Date());
+        accessToken.setUpdateTime(new Date());
+        accessTokenMapper.insert(accessToken);
+
+        userId = user.getId();
+
+
+        User user2 = userMapper.queryUserByToken("ssssssssssssssssssssssssss");
+        Assert.assertTrue(user2.getId() >= 0);
     }
+
 
     @Test
     public void queryQueueByProcessInstanceId(){
-        String queue = userMapper.queryQueueByProcessInstanceId(41388);
-        Assert.assertEquals(queue, "ait");
+        String queue = userMapper.queryQueueByProcessInstanceId(-1000);
+        Assert.assertNotEquals(queue, "ait");
     }
 
-    @Test
-    public void testQueryUserByToken(){
-        User user = userMapper.queryUserByToken("ad9e8fccfc11bd18bb45aa994568b8ef");
-        Assert.assertEquals(user.getUserName(), "qiaozhanwei");
-    }
 
-    @Test
-    public void test(){
-        User user = userMapper.queryDetailsById(19);
-        System.out.println(user);
-    }
 
 }

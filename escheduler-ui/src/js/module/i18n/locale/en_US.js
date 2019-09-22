@@ -253,6 +253,7 @@ export default {
   'Size': 'Size',
   'Rename': 'Rename',
   'Download': 'Download',
+  'Export': 'Export',
   'Submit': 'Submit',
   'Edit UDF Function': 'Edit UDF Function',
   'type': 'type',
@@ -324,6 +325,7 @@ export default {
   'Edit password': 'Edit password',
   'Ordinary users': 'Ordinary users',
   'Create process': 'Create process',
+  'Import process': 'Import process',
   'Timing state': 'Timing state',
   'Timing': 'Timing',
   'TreeView': 'TreeView',
@@ -471,5 +473,7 @@ export default {
   'Startup parameter': 'Startup parameter',
   'Startup type': 'Startup type',
   'warning of timeout': 'warning of timeout',
+  'Next five execution times': 'Next five execution times',
+  'Execute time': 'Execute time',
   'Complement range': 'Complement range'
 }

@@ -253,6 +253,7 @@ export default {
   'Size': '大小',
   'Rename': '重命名',
   'Download': '下载',
+  'Export': '导出',
   'Submit': '提交',
   'Edit UDF Function': '编辑UDF函数',
   'type': '类型',
@@ -324,6 +325,7 @@ export default {
   'Edit password': '修改密码',
   'Ordinary users': '普通用户',
   'Create process': '创建工作流',
+  'Import process': '导入工作流',
   'Timing state': '定时状态',
   'Timing': '定时',
   'TreeView': '树形图',
@@ -472,5 +474,11 @@ export default {
   'Startup parameter': '启动参数',
   'Startup type': '启动类型',
   'warning of timeout': '超时告警',
-  'Complement range': '补数范围'
+  'Next five execution times': '接下来五次执行时间',
+  'Execute time': '执行时间',
+  'Complement range': '补数范围',
+  'slot':'slot数量',
+  'taskManager':'taskManage数量',
+  'jobManagerMemory':'jobManager内存数',
+  'taskManagerMemory':'taskManager内存数'
 }

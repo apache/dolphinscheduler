@@ -46,12 +46,6 @@ public class ProjectService extends BaseService{
     private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private UsersService userService;
-
-    @Autowired
     private ProjectMapper projectMapper;
 
     @Autowired
@@ -371,6 +365,32 @@ public class ProjectService extends BaseService{
 
         return projectUser.getPerm();
 
+    }
+
+    /**
+     * query all project list
+     * @return
+     */
+    public Map<String, Object> queryAllProjectList() {
+        Map<String, Object> result = new HashMap<>();
+        List<Project> projects = projectMapper.queryAllProjectList();
+        List<ProcessDefinition>  processDefinitions = processDefinitionMapper.queryAll();
+        if(projects != null){
+            Set set = new HashSet<>();
+            for (ProcessDefinition processDefinition : processDefinitions){
+                set.add(processDefinition.getProjectId());
+            }
+            List<Project> tempDeletelist = new ArrayList<Project>();
+            for (Project project : projects) {
+                if(!set.contains(project.getId())){
+                    tempDeletelist.add(project);
+                }
+            }
+            projects.removeAll(tempDeletelist);
+        }
+        result.put(Constants.DATA_LIST, projects);
+        putMsg(result,Status.SUCCESS);
+        return result;
     }
 
 }

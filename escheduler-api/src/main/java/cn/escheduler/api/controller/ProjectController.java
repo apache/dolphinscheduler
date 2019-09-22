@@ -18,6 +18,7 @@ package cn.escheduler.api.controller;
 
 
 import cn.escheduler.api.enums.Status;
+import cn.escheduler.api.service.ProcessDefinitionService;
 import cn.escheduler.api.service.ProjectService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
@@ -50,6 +52,9 @@ public class ProjectController extends BaseController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private ProcessDefinitionService processDefinitionService;
 
     /**
      * create project
@@ -248,6 +253,52 @@ public class ProjectController extends BaseController {
             return error(QUERY_AUTHORIZED_PROJECT.getCode(), QUERY_AUTHORIZED_PROJECT.getMsg());
         }
     }
+
+    /**
+     * import process definition
+     *
+     * @param loginUser
+     * @param file
+     * @return
+     */
+    @ApiOperation(value = "importProcessDefinition", notes= "EXPORT_PROCCESS_DEFINITION_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
+    })
+    @PostMapping(value="/importProcessDefinition")
+    public Result importProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @RequestParam("file") MultipartFile file){
+        try{
+            logger.info("import process definition by id, login user:{}",
+                    loginUser.getUserName());
+            Map<String, Object> result = processDefinitionService.importProcessDefinition(loginUser,file);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(IMPORT_PROCESS_DEFINE_ERROR.getMsg(),e);
+            return error(IMPORT_PROCESS_DEFINE_ERROR.getCode(), IMPORT_PROCESS_DEFINE_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * query all project list
+     * @param loginUser
+     * @return
+     */
+    @ApiOperation(value = "queryAllProjectList", notes= "QUERY_ALL_PROJECT_LIST_NOTES")
+    @GetMapping(value = "/queryAllProjectList")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+
+        try {
+            logger.info("login user {}, query all project list", loginUser.getUserName());
+            Map<String, Object> result = projectService.queryAllProjectList();
+            return returnDataList(result);
+        } catch (Exception e) {
+            logger.error(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR.getMsg(), e);
+            return error(Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR.getCode(), Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR.getMsg());
+        }
+    }
+
 
 
 }

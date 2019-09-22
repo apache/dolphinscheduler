@@ -30,7 +30,7 @@ public enum Status {
 //    DB_OPERATION_ERROR(10005, "database operation error"),
     HDFS_OPERATION_ERROR(10006, "hdfs operation error"),
     UPDATE_FAILED(10007, "updateProcessInstance failed"),
-    TASK_INSTANCE_HOST_NOT_FOUND(10008, "The task has not yet begun"),
+    TASK_INSTANCE_NOT_FOUND(10008, "task instance not found"),
     TENANT_NAME_EXIST(10009, "tenant code already exists"),
     USER_NOT_EXIST(10010, "user {0} not exists"),
     ALERT_GROUP_NOT_EXIST(10011, "alarm group not found"),
@@ -164,7 +164,6 @@ public enum Status {
     PREVIEW_SCHEDULE_ERROR(10139,"preview schedule error"),
     PARSE_TO_CRON_EXPRESSION_ERROR(10140,"parse cron to cron expression error"),
     SCHEDULE_START_TIME_END_TIME_SAME(10141,"The start time must not be the same as the end"),
-    SUB_PROCESS_TASK_HAS_NOT_LOG(10142, "Child process task has not log"),
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
@@ -214,6 +213,8 @@ public enum Status {
     BATCH_DELETE_PROCESS_DEFINE_ERROR(50025,"batch delete process definition error"),
     BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR(50026,"batch delete process definition by ids {0} error"),
     TENANT_NOT_SUITABLE(50027,"there is not any tenant suitable, please choose a tenant available."),
+    EXPORT_PROCESS_DEFINE_BY_ID_ERROR(50028,"export process definition by id error"),
+    IMPORT_PROCESS_DEFINE_ERROR(50029,"import process definition error"),
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
     HDFS_TERANT_RESOURCES_FILE_EXISTS(60002,"resource file exists,please delete resource first"),

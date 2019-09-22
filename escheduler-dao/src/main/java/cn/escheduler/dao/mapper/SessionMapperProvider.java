@@ -103,7 +103,7 @@ public class SessionMapperProvider {
     }
 
     /**
-     * query by session id and ip
+     * query by session id
      * @param parameter
      * @return
      */
@@ -118,7 +118,7 @@ public class SessionMapperProvider {
     }
 
     /**
-     * query by user id and ip
+     * query by user id
      * @param parameter
      * @return
      */

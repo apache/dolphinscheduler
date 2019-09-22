@@ -27,6 +27,7 @@ import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.common.utils.PropertyUtils;
 import cn.escheduler.dao.mapper.*;
 import cn.escheduler.dao.model.Resource;
+import cn.escheduler.dao.model.Tenant;
 import cn.escheduler.dao.model.UdfFunc;
 import cn.escheduler.dao.model.User;
 import org.apache.commons.collections.BeanMap;
@@ -339,19 +340,18 @@ public class ResourcesService extends BaseService {
         String resourcePath = "";
         if (type.equals(ResourceType.FILE)) {
             hdfsFilename = HadoopUtils.getHdfsFilename(tenantCode, name);
-            resourcePath = HadoopUtils.getHdfsDir(tenantCode);
+            resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
         } else if (type.equals(ResourceType.UDF)) {
             hdfsFilename = HadoopUtils.getHdfsUdfFilename(tenantCode, name);
             resourcePath = HadoopUtils.getHdfsUdfDir(tenantCode);
         }
         try {
-            if (HadoopUtils.getInstance().exists(resourcePath)) {
-                cn.escheduler.api.utils.FileUtils.copyFile(file, localFilename);
-                HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
-            } else {
-                logger.error("{} is not exist", resourcePath);
-                return false;
+            // if tenant dir not exists
+            if (!HadoopUtils.getInstance().exists(resourcePath)) {
+                createTenantDirIfNotExists(tenantCode);
             }
+            cn.escheduler.api.utils.FileUtils.copyFile(file, localFilename);
+            HadoopUtils.getInstance().copyLocalToHdfs(localFilename, hdfsFilename, true, true);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return false;
@@ -442,18 +442,23 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
             // query tenant
-            String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
+            Tenant tenant = tenantMapper.queryById(loginUser.getTenantId());
+            if(tenant != null){
+                String tenantCode = tenant.getTenantCode();
 
-            try {
-                String hdfsFilename = getHdfsFileName(type,tenantCode,name);
-                if(HadoopUtils.getInstance().exists(hdfsFilename)){
-                    logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, name,hdfsFilename);
-                    putMsg(result, Status.RESOURCE_FILE_EXIST,hdfsFilename);
+                try {
+                    String hdfsFilename = getHdfsFileName(type,tenantCode,name);
+                    if(HadoopUtils.getInstance().exists(hdfsFilename)){
+                        logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, name,hdfsFilename);
+                        putMsg(result, Status.RESOURCE_FILE_EXIST,hdfsFilename);
+                    }
+
+                } catch (Exception e) {
+                    logger.error(e.getMessage(),e);
+                    putMsg(result,Status.HDFS_OPERATION_ERROR);
                 }
-
-            } catch (Exception e) {
-                logger.error(e.getMessage(),e);
-                putMsg(result,Status.HDFS_OPERATION_ERROR);
+            }else{
+                putMsg(result,Status.TENANT_NOT_EXIST);
             }
         }
 
@@ -678,22 +683,19 @@ public class ResourcesService extends BaseService {
 
             // get file hdfs path
             hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resourceName);
-            String resourcePath = HadoopUtils.getHdfsDir(tenantCode);
+            String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
             logger.info("resource hdfs path is {} ", hdfsFileName);
 
             HadoopUtils hadoopUtils = HadoopUtils.getInstance();
-            if (hadoopUtils.exists(resourcePath)) {
-                if (hadoopUtils.exists(hdfsFileName)) {
-                    hadoopUtils.delete(hdfsFileName, false);
-                }
-
-                hadoopUtils.copyLocalToHdfs(localFilename, hdfsFileName, true, true);
-            } else {
-                logger.error("{} is not exist", resourcePath);
-                result.setCode(Status.HDFS_OPERATION_ERROR.getCode());
-                result.setMsg(String.format("%s is not exist", resourcePath));
-                return result;
+            if (!hadoopUtils.exists(resourcePath)) {
+                // create if tenant dir not exists
+                createTenantDirIfNotExists(tenantCode);
             }
+            if (hadoopUtils.exists(hdfsFileName)) {
+                hadoopUtils.delete(hdfsFileName, false);
+            }
+
+            hadoopUtils.copyLocalToHdfs(localFilename, hdfsFileName, true, true);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             result.setCode(Status.HDFS_OPERATION_ERROR.getCode());
