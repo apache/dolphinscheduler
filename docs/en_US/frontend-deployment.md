@@ -64,7 +64,7 @@ server {
         index  index.html index.html;
     }
     location /escheduler {
-        proxy_pass http://192.168.xx.xx:12345; # nterface address (self-modifying)
+        proxy_pass http://192.168.xx.xx:12345; # interface address (self-modifying)
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header x_real_ipP $remote_addr;

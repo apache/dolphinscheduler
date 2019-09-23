@@ -19,6 +19,7 @@ package cn.escheduler.server.worker.task;
 
 import cn.escheduler.common.enums.TaskType;
 import cn.escheduler.server.worker.task.dependent.DependentTask;
+import cn.escheduler.server.worker.task.flink.FlinkTask;
 import cn.escheduler.server.worker.task.mr.MapReduceTask;
 import cn.escheduler.server.worker.task.processdure.ProcedureTask;
 import cn.escheduler.server.worker.task.python.PythonTask;
@@ -55,6 +56,8 @@ public class TaskManager {
         return new MapReduceTask(props, logger);
       case SPARK:
         return new SparkTask(props, logger);
+      case FLINK:
+        return new FlinkTask(props, logger);
       case PYTHON:
         return new PythonTask(props, logger);
       case DEPENDENT:

@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
@@ -121,10 +122,9 @@ public class WorkerServer extends AbstractServer {
      */
     public static void main(String[] args) {
 
-        SpringApplicationBuilder app = new SpringApplicationBuilder(WorkerServer.class);
+        SpringApplication app = new SpringApplication(WorkerServer.class);
 
-        app.web(WebApplicationType.NONE)
-                .run(args);
+        app.run(args);
     }
 
 

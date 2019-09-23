@@ -47,6 +47,8 @@ export default {
   syncDefine: true,
   // tasks processList
   processListS: [],
+  // projectList
+  projectListS: [],
   // tasks resourcesList
   resourcesListS: [],
   // tasks datasource Type

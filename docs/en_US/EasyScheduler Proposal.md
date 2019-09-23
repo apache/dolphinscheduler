@@ -6,7 +6,7 @@ EasyScheduler is a distributed ETL scheduling engine with powerful DAG visualiza
 
 ## Proposal
 
-EasyScheduler provides many easy-to-use features to accelerate the engineer enficiency on data ETL workflow job. We propose a new concept of 'instance of process' and 'instance of task' to let developers to tuning their jobs on the running state of workflow instead of changing the task's template. Its main objectives are as follows:
+EasyScheduler provides many easy-to-use features to accelerate the engineer efficiency on data ETL workflow job. We propose a new concept of 'instance of process' and 'instance of task' to let developers to tuning their jobs on the running state of workflow instead of changing the task's template. Its main objectives are as follows:
 
 - Define the complex tasks' dependencies & triggers  in a DAG graph by dragging and dropping.
 - Support cluster HA.
@@ -30,7 +30,7 @@ The codes are already under Apache License Version 2.0.
 
 We want to find a data processing tool with the following features:
 
-- Easy to use，developers can build a ETL process with a very simple drag and drop operation. not only for ETL developers，people who can't write code also can use this tool for ETL operation such as system adminitrator.
+- Easy to use，developers can build a ETL process with a very simple drag and drop operation. not only for ETL developers，people who can't write code also can use this tool for ETL operation such as system administrator.
 - Solving the problem of "complex  task dependencies" , and it can monitor the ETL running status. 
 - Support multi-tenant.
 - Support many task types: Shell, MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Sub_Process, Procedure, etc.
@@ -73,7 +73,7 @@ Thus, it is very unlikely that EasyScheduler becomes orphaned.
 
 EasyScheduler's core developers have been running it as a community-oriented open source project for some time, several of them already have experience working with open source communities, they are also active in presto, alluxio and other projects. At the same time, we will learn more open source experiences by following the Apache way in our incubator journey.
 
-### Homogenous Developers
+### Homogeneous Developers
 
 The current developers work across a variety of organizations including Analysys, guandata and hydee; 
 some individual developers are accepted as developers of EasyScheduler as well. 
@@ -110,7 +110,7 @@ The project consists of three distinct codebases: core and document. The address
 
 ## Source and Intellectual Property Submission Plan
 
-As soon as EasyScheduler is approved to join Apache Incubator, Analysys will provide the Software Grant Agreement(SGA) and intial committers will submit ICLA(s). The code is already licensed under the Apache Software License, version 2.0. 
+As soon as EasyScheduler is approved to join Apache Incubator, Analysys will provide the Software Grant Agreement(SGA) and initial committers will submit ICLA(s). The code is already licensed under the Apache Software License, version 2.0. 
 
 ## External Dependencies
 

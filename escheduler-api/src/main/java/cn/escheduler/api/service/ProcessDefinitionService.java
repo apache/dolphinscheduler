@@ -862,6 +862,24 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     }
 
+
+    /**
+     * query proccess definition all by project id
+     *
+     * @param projectId
+     * @return
+     */
+    public Map<String, Object> queryProccessDefinitionAllByProjectId(Integer projectId) {
+
+        HashMap<String, Object> result = new HashMap<>(5);
+
+        List<ProcessDefinition> resourceList = processDefineMapper.queryAllDefinitionList(projectId);
+        result.put(Constants.DATA_LIST, resourceList);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
     /**
      * Encapsulates the TreeView structure
      *

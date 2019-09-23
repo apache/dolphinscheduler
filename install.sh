@@ -34,252 +34,257 @@ fi
 source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
-# mysql配置
-# mysql 地址,端口
+# mysql config
+# mysql address and port
 mysqlHost="192.168.xx.xx:3306"
 
-# mysql 数据库名称
+# mysql database
 mysqlDb="escheduler"
 
-# mysql 用户名
+# mysql username
 mysqlUserName="xx"
 
-# mysql 密码
-# 注意：如果有特殊字符，请用 \ 转移符进行转移
+# mysql passwprd
+# Note: if there are special characters, please use the \ transfer character to transfer
 mysqlPassword="xx"
 
-# conf/config/install_config.conf配置
-# 注意：安装路径,不要当前路径(pwd)一样
+# conf/config/install_config.conf config
+# Note: the installation path is not the same as the current path (pwd)
 installPath="/data1_1T/escheduler"
 
-# 部署用户
-# 注意：部署用户需要有sudo权限及操作hdfs的权限，如果开启hdfs，根目录需要自行创建
+# deployment user
+# Note: the deployment user needs to have sudo privileges and permissions to operate hdfs. If hdfs is enabled, the root directory needs to be created by itself
 deployUser="escheduler"
 
-# zk集群
+# zk cluster
 zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
 
-# 安装hosts
-# 注意：安装调度的机器hostname列表，如果是伪分布式，则只需写一个伪分布式hostname即可
+# install hosts
+# Note: install the scheduled hostname list. If it is pseudo-distributed, just write a pseudo-distributed hostname
 ips="ark0,ark1,ark2,ark3,ark4"
 
-# conf/config/run_config.conf配置
-# 运行Master的机器
-# 注意：部署master的机器hostname列表
+# conf/config/run_config.conf config
+# run master machine
+# Note: list of hosts hostname for deploying master
 masters="ark0,ark1"
 
-# 运行Worker的机器
-# 注意：部署worker的机器hostname列表
+# run worker machine
+# note: list of machine hostnames for deploying workers
 workers="ark2,ark3,ark4"
 
-# 运行Alert的机器
-# 注意：部署alert server的机器hostname列表
+# run alert machine
+# note: list of machine hostnames for deploying alert server
 alertServer="ark3"
 
-# 运行Api的机器
-# 注意：部署api server的机器hostname列表
+# run api machine
+# note: list of machine hostnames for deploying api server
 apiServers="ark1"
 
-# alert配置
-# 邮件协议
+# alert config
+# mail protocol
 mailProtocol="SMTP"
 
-# 邮件服务host
+# mail server host
 mailServerHost="smtp.exmail.qq.com"
 
-# 邮件服务端口
+# mail server port
 mailServerPort="25"
 
-# 发送人
+# sender
 mailSender="xxxxxxxxxx"
 
-# 发送人密码
+# sender password
 mailPassword="xxxxxxxxxx"
 
-# TLS邮件协议支持
+# TLS mail protocol support
 starttlsEnable="false"
 
-# SSL邮件协议支持
-# 注意：默认开启的是SSL协议，TLS和SSL只能有一个处于true状态
+# SSL mail protocol support
+# note: The SSL protocol is enabled by default. 
+# only one of TLS and SSL can be in the true state.
 sslEnable="true"
 
-# 下载Excel路径
+# download excel path
 xlsFilePath="/tmp/xls"
 
-# 企业微信企业ID配置
+# Enterprise WeChat Enterprise ID Configuration
 enterpriseWechatCorpId="xxxxxxxxxx"
 
-# 企业微信应用Secret配置
+# Enterprise WeChat application Secret configuration
 enterpriseWechatSecret="xxxxxxxxxx"
 
-# 企业微信应用AgentId配置
+# Enterprise WeChat Application AgentId Configuration
 enterpriseWechatAgentId="xxxxxxxxxx"
 
-# 企业微信用户配置,多个用户以,分割
+# Enterprise WeChat user configuration, multiple users to , split
 enterpriseWechatUsers="xxxxx,xxxxx"
 
 
-#是否启动监控自启动脚本
+# whether to start monitoring self-starting scripts
 monitorServerState="false"
 
-# 资源中心上传选择存储方式：HDFS,S3,NONE
+# resource Center upload and select storage method：HDFS,S3,NONE
 resUploadStartupType="NONE"
 
-# 如果resUploadStartupType为HDFS，defaultFS写namenode地址，支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
-# 如果是S3，则写S3地址，比如说：s3a://escheduler，注意，一定要创建根目录/escheduler
+# if resUploadStartupType is HDFS，defaultFS write namenode address，HA you need to put core-site.xml and hdfs-site.xml in the conf directory.
+# if S3，write S3 address，HA，for example ：s3a://escheduler，
+# Note，s3 be sure to create the root directory /escheduler
 defaultFS="hdfs://mycluster:8020"
 
-# 如果配置了S3，则需要有以下配置
+# if S3 is configured, the following configuration is required.
 s3Endpoint="http://192.168.xx.xx:9010"
 s3AccessKey="xxxxxxxxxx"
 s3SecretKey="xxxxxxxxxx"
 
-# resourcemanager HA配置，如果是单resourcemanager,这里为yarnHaIps=""
+# resourcemanager HA configuration, if it is a single resourcemanager, here is yarnHaIps=""
 yarnHaIps="192.168.xx.xx,192.168.xx.xx"
 
-# 如果是单 resourcemanager,只需要配置一个主机名称,如果是resourcemanager HA,则默认配置就好
+# if it is a single resourcemanager, you only need to configure one host name. If it is resourcemanager HA, the default configuration is fine.
 singleYarnIp="ark1"
 
-# hdfs根路径，根路径的owner必须是部署用户。1.1.0之前版本不会自动创建hdfs根目录，需要自行创建
+# hdfs root path, the owner of the root path must be the deployment user. 
+# versions prior to 1.1.0 do not automatically create the hdfs root directory, you need to create it yourself.
 hdfsPath="/escheduler"
 
-# 拥有在hdfs根路径/下创建目录权限的用户
-# 注意：如果开启了kerberos，则直接hdfsRootUser=""，就可以
+# have users who create directory permissions under hdfs root path /
+# Note: if kerberos is enabled, hdfsRootUser="" can be used directly.
 hdfsRootUser="hdfs"
 
-# common 配置
-# 程序路径
+# common config
+# Program root path
 programPath="/tmp/escheduler"
 
-#下载路径
+# download path
 downloadPath="/tmp/escheduler/download"
 
-# 任务执行路径
+# task execute path
 execPath="/tmp/escheduler/exec"
 
-# SHELL环境变量路径
+# SHELL environmental variable path
 shellEnvPath="$installPath/conf/env/.escheduler_env.sh"
 
-# 资源文件的后缀
+# suffix of the resource file
 resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
 
-# 开发状态,如果是true,对于SHELL脚本可以在execPath目录下查看封装后的SHELL脚本,如果是false则执行完成直接删除
+# development status, if true, for the SHELL script, you can view the encapsulated SHELL script in the execPath directory. 
+# If it is false, execute the direct delete
 devState="true"
 
-# kerberos 配置
-# kerberos 是否启动
+# kerberos config
+# kerberos whether to start
 kerberosStartUp="false"
 
-# kdc krb5 配置文件路径
+# kdc krb5 config file path
 krb5ConfPath="$installPath/conf/krb5.conf"
 
-# keytab 用户名
+# keytab username
 keytabUserName="hdfs-mycluster@ESZ.COM"
 
-# 用户 keytab路径
+# username keytab path
 keytabPath="$installPath/conf/hdfs.headless.keytab"
 
-# zk 配置
-# zk根目录
+# zk config
+# zk root directory
 zkRoot="/escheduler"
 
-# 用来记录挂掉机器的zk目录
+# used to record the zk directory of the hanging machine
 zkDeadServers="/escheduler/dead-servers"
 
-# masters目录
-zkMasters="/escheduler/masters"
+# masters directory
+zkMasters="$zkRoot/masters"
 
-# workers目录
-zkWorkers="/escheduler/workers"
+# workers directory
+zkWorkers="$zkRoot/workers"
 
-# zk master分布式锁
-mastersLock="/escheduler/lock/masters"
+# zk master distributed lock
+mastersLock="$zkRoot/lock/masters"
 
-# zk worker分布式锁
-workersLock="/escheduler/lock/workers"
+# zk worker distributed lock
+workersLock="$zkRoot/lock/workers"
 
-# zk master容错分布式锁
-mastersFailover="/escheduler/lock/failover/masters"
+# zk master fault-tolerant distributed lock
+mastersFailover="$zkRoot/lock/failover/masters"
 
-# zk worker容错分布式锁
-workersFailover="/escheduler/lock/failover/workers"
+# zk worker fault-tolerant distributed lock
+workersFailover="$zkRoot/lock/failover/workers"
 
-# zk master启动容错分布式锁
-mastersStartupFailover="/escheduler/lock/failover/startup-masters"
+# zk master start fault tolerant distributed lock
+mastersStartupFailover="$zkRoot/lock/failover/startup-masters"
 
-# zk session 超时
+# zk session timeout
 zkSessionTimeout="300"
 
-# zk 连接超时
+# zk connection timeout
 zkConnectionTimeout="300"
 
-# zk 重试间隔
+# zk retry interval
 zkRetrySleep="100"
 
-# zk重试最大次数
+# zk retry maximum number of times
 zkRetryMaxtime="5"
 
 
-# master 配置
-# master执行线程最大数,流程实例的最大并行度
+# master config 
+# master execution thread maximum number, maximum parallelism of process instance
 masterExecThreads="100"
 
-# master任务执行线程最大数,每一个流程实例的最大并行度
+# the maximum number of master task execution threads, the maximum degree of parallelism for each process instance
 masterExecTaskNum="20"
 
-# master心跳间隔
+# master heartbeat interval
 masterHeartbeatInterval="10"
 
-# master任务提交重试次数
+# master task submission retries
 masterTaskCommitRetryTimes="5"
 
-# master任务提交重试时间间隔
+# master task submission retry interval
 masterTaskCommitInterval="100"
 
-# master最大cpu平均负载,用来判断master是否还有执行能力
+# master maximum cpu average load, used to determine whether the master has execution capability
 masterMaxCpuLoadAvg="10"
 
-# master预留内存,用来判断master是否还有执行能力
+# master reserve memory to determine if the master has execution capability
 masterReservedMemory="1"
 
 
-# worker 配置
-# worker执行线程
+# worker config 
+# worker execution thread
 workerExecThreads="100"
 
-# worker心跳间隔
+# worker heartbeat interval
 workerHeartbeatInterval="10"
 
-# worker一次抓取任务数
+# worker number of fetch tasks
 workerFetchTaskNum="3"
 
-# worker最大cpu平均负载,用来判断worker是否还有执行能力,保持系统默认，默认为cpu核数的2倍，当负载达到2倍时，
+# workerThe maximum cpu average load, used to determine whether the worker still has the ability to execute, 
+# keep the system default, the default is twice the number of cpu cores, when the load reaches 2 times
 #workerMaxCupLoadAvg="10"
 
-# worker预留内存,用来判断master是否还有执行能力
+# worker reserve memory to determine if the master has execution capability
 workerReservedMemory="1"
 
-# api 配置
-# api 服务端口
+# api config
+# api server port
 apiServerPort="12345"
 
-# api session 超时
+# api session timeout
 apiServerSessionTimeout="7200"
 
-# api 上下文路径
+# api server context path
 apiServerContextPath="/escheduler/"
 
-# spring 最大文件大小
+# spring max file size
 springMaxFileSize="1024MB"
 
-# spring 最大请求文件大小
+# spring max request size
 springMaxRequestSize="1024MB"
 
-# api 最大post请求大小
+# api max http post size
 apiMaxHttpPostSize="5000000"
 
-# 1,替换文件
-echo "1,替换文件"
+# 1,replace file
+echo "1,replace file"
 sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${mysqlHost}/${mysqlDb}?characterEncoding=UTF-8#g" conf/dao/data_source.properties
 sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${mysqlUserName}#g" conf/dao/data_source.properties
 sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${mysqlPassword}#g" conf/dao/data_source.properties
@@ -375,8 +380,8 @@ sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/run_con
 sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/run_config.conf
 
 
-# 2,创建目录
-echo "2,创建目录"
+# 2,create directory
+echo "2,create directory"
 
 if [ ! -d $installPath ];then
   sudo mkdir -p $installPath
@@ -387,22 +392,22 @@ hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
 do
 
-# 如果programPath不存在,则创建
+# create if programPath does not exist
 if ! ssh $host test -e $programPath; then
   ssh $host "sudo mkdir -p $programPath;sudo chown -R $deployUser:$deployUser $programPath"
 fi
 
-# 如果downloadPath不存在,则创建
+# create if downloadPath does not exist
 if ! ssh $host test -e $downloadPath; then
   ssh $host "sudo mkdir -p $downloadPath;sudo chown -R $deployUser:$deployUser $downloadPath"
 fi
 
-# 如果$execPath不存在,则创建
+# create if execPath does not exist
 if ! ssh $host test -e $execPath; then
   ssh $host "sudo mkdir -p $execPath; sudo chown -R $deployUser:$deployUser $execPath"
 fi
 
-# 如果$xlsFilePath不存在,则创建
+# create if xlsFilePath does not exist
 if ! ssh $host test -e $xlsFilePath; then
   ssh $host "sudo mkdir -p $xlsFilePath; sudo chown -R $deployUser:$deployUser $xlsFilePath"
 fi
@@ -410,31 +415,31 @@ fi
 done
 
 
-# 3,停止服务
-echo "3,停止服务"
-sh ${workDir}/script/stop_all.sh
+# 3,stop server
+echo "3,stop server"
+sh ${workDir}/script/stop-all.sh
 
-# 4,删除zk节点
-echo "4,删除zk节点"
+# 4,delete zk node
+echo "4,delete zk node"
 sleep 1
-python ${workDir}/script/del_zk_node.py $zkQuorum $zkRoot
+python ${workDir}/script/del-zk-node.py $zkQuorum $zkRoot
 
-# 5,scp资源
-echo "5,scp资源"
-sh ${workDir}/script/scp_hosts.sh
+# 5,scp resources
+echo "5,scp resources"
+sh ${workDir}/script/scp-hosts.sh
 if [ $? -eq 0 ]
 then
-	echo 'scp拷贝完成'
+	echo 'scp copy completed'
 else
-	echo 'sc 拷贝失败退出'
+	echo 'sc copy failed to exit'
 	exit -1
 fi
 
-# 6,启动
-echo "6,启动"
-sh ${workDir}/script/start_all.sh
+# 6,startup
+echo "6,startup"
+sh ${workDir}/script/start-all.sh
 
-# 7,启动监控自启动脚本
+# 7,start monitoring self-starting script
 monitor_pid=${workDir}/monitor_server.pid
 if [ "true" = $monitorServerState ];then
         if [ -f $monitor_pid ]; then
@@ -453,9 +458,8 @@ if [ "true" = $monitorServerState ];then
                 echo "monitor server running as process ${TARGET_PID}.Stopped success"
                 rm -f $monitor_pid
         fi
-        nohup python -u ${workDir}/script/monitor_server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor_server.log 2>&1 &
+        nohup python -u ${workDir}/script/monitor-server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor-server.log 2>&1 &
         echo $! > $monitor_pid
         echo "start monitor server success as process `cat $monitor_pid`"
 
 fi
-

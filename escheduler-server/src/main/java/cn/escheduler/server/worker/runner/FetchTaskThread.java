@@ -187,8 +187,9 @@ public class FetchTaskThread implements Runnable{
                         continue;
                     }
 
-                    // set queue for process instance
-                    taskInstance.getProcessInstance().setQueue(tenant.getQueue());
+                    // set queue for process instance, user-specified queue takes precedence over tenant queue
+                    String userQueue = processDao.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
+                    taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
 
                     logger.info("worker fetch taskId : {} from queue ", taskInstId);
 

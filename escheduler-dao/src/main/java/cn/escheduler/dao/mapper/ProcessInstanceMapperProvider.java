@@ -354,7 +354,7 @@ public class ProcessInstanceMapperProvider {
      * @return
      */
     public String listByStatus(Map<String, Object> parameter) {
-        StringBuffer strStates = new StringBuffer();
+        StringBuilder strStates = new StringBuilder();
         int[] stateArray = (int[]) parameter.get("states");
 
         for(int i=0;i<stateArray.length;i++){
@@ -387,7 +387,7 @@ public class ProcessInstanceMapperProvider {
      * @return
      */
     public String queryByHostAndStatus(Map<String, Object> parameter) {
-        StringBuffer strStates = new StringBuffer();
+        StringBuilder strStates = new StringBuilder();
         int[] stateArray = (int[]) parameter.get("states");
 
         for(int i=0;i<stateArray.length;i++){
@@ -425,7 +425,7 @@ public class ProcessInstanceMapperProvider {
      * @return
      */
     public String setFailoverByHostAndStateArray(Map<String, Object> parameter) {
-        StringBuffer strStates = new StringBuffer();
+        StringBuilder strStates = new StringBuilder();
         int[] stateArray = (int[]) parameter.get("states");
 
         for(int i=0;i<stateArray.length;i++){
@@ -563,7 +563,7 @@ public class ProcessInstanceMapperProvider {
     }
 
     public String queryLastRunningProcess(Map<String, Object> parameter) {
-        StringBuffer strStates = new StringBuffer();
+        StringBuilder strStates = new StringBuilder();
         int[] stateArray = (int[]) parameter.get("states");
 
         for(int i=0;i<stateArray.length;i++){

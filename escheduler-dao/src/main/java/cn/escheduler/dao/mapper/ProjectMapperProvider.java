@@ -240,4 +240,17 @@ public class ProjectMapperProvider {
         }}.toString();
     }
 
+    /**
+     * query  all project list
+     * @return
+     */
+    public String queryAllProjectList() {
+        return new SQL() {{
+            SELECT("*");
+            FROM(TABLE_NAME);
+            WHERE("flag = 1");
+            ORDER_BY("create_time desc");
+        }}.toString();
+    }
+
 }
