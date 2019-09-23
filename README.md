@@ -64,7 +64,7 @@ Overload processing: Task queue mechanism, the number of schedulable tasks on a 
 
 - <a href="http://106.75.43.194:8888" target="_blank">Online Demo</a> 
 
-More documentation please refer to <a href="https://analysys.github.io/easyscheduler_docs_cn/" target="_blank">[EasyScheduler online documentation]</a>
+More documentation please refer to <a href="https://analysys.github.io/easyscheduler_docs/" target="_blank">[EasyScheduler online documentation]</a>
 
 ### Recent R&D plan
 Work plan of Easy Scheduler: [R&D plan](https://github.com/analysys/EasyScheduler/projects/1), where `In Develop` card is the features of 1.1.0 version , TODO card is to be done (including feature ideas)
