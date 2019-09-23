@@ -24,7 +24,7 @@
     props: {},
     methods: {
       ...mapMutations('dag', ['resetParams']),
-      ...mapActions('dag', ['getProcessList','getProcessByProjectId','getProjectList', 'getResourcesList']),
+      ...mapActions('dag', ['getProcessList','getProjectList', 'getResourcesList']),
       ...mapActions('security', ['getTenantList','getWorkerGroupsAll']),
       /**
        * init
@@ -39,8 +39,6 @@
           this.getProcessList(),
           // get project
           this.getProjectList(),
-          // get process definition by project id
-          this.getProcessByProjectId(),
           // get resource
           this.getResourcesList(),
           // get worker group list

@@ -22,7 +22,7 @@
                   v-if="dependTaskList.length">
             {{relation === 'AND' ? $t('and') : $t('or')}}
           </span>
-          <div class="dep-list" v-for="(el,$index) in dependTaskList">
+          <div class="dep-list" v-for="(el,$index) in dependTaskList" :key='$index'>
             <span class="dep-line-pie"
                   v-if="el.dependItemList.length"
                   @click="!isDetails && _setRelation($index)">
@@ -37,8 +37,10 @@
               &#xe611;
             </i>
             <m-depend-item-list
+                    :dependTaskList='dependTaskList'
                     v-model="el.dependItemList"
                     @on-delete-all="_onDeleteAll"
+                    @getDependTaskList="getDependTaskList"
                     :index="$index">
             </m-depend-item-list>
           </div>
@@ -84,10 +86,17 @@
         $('body').find('.tooltip.fade.top.in').remove()
       },
       _onDeleteAll (i) {
-        this._deleteDep(i)
+        this.dependTaskList.map((item,i)=>{
+          if(item.dependItemList.length === 0){
+            this.dependTaskList.splice(i,1)
+          }
+        })
       },
       _setGlobalRelation () {
         this.relation = this.relation === 'AND' ? 'OR' : 'AND'
+      },
+      getDependTaskList(i){
+        // console.log('getDependTaskList',i)
       },
       _setRelation (i) {
         this.dependTaskList[i].relation = this.dependTaskList[i].relation === 'AND' ? 'OR' : 'AND'
