@@ -1271,8 +1271,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @return
      */
     public int updateWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap){
-
-        return processInstanceMapMapper.updateById(processInstanceMap);
+        return processInstanceMapMapper.update(processInstanceMap);
     }
 
 
@@ -1708,6 +1707,15 @@ public class ProcessDao extends AbstractBaseDao {
                 DateUtils.dateToString(dateInterval.getStartTime()),
                 DateUtils.dateToString(dateInterval.getEndTime()),
                 stateArray);
+    }
+
+    /**
+     *  query user queue by process instance id
+     * @param processInstanceId
+     * @return
+     */
+    public String queryUserQueueByProcessInstanceId(int processInstanceId){
+        return userMapper.queryQueueByProcessInstanceId(processInstanceId);
     }
 
     /**
