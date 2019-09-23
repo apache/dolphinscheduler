@@ -81,7 +81,9 @@ public class DolphinSchedulerManager {
             String version = "";
             // Gets the version of the current system
             if (upgradeDao.isExistsTable("t_escheduler_version")) {
-                version = upgradeDao.getCurrentVersion();
+                version = upgradeDao.getCurrentVersion("t_escheduler_version");
+            }else if(upgradeDao.isExistsTable("t_dolphinscheduler_version")){
+                version = upgradeDao.getCurrentVersion("t_dolphinscheduler_version");
             }else if(upgradeDao.isExistsColumn("t_escheduler_queue","create_time")){
                 version = "1.0.1";
             }else if(upgradeDao.isExistsTable("t_escheduler_queue")){
@@ -93,21 +95,14 @@ public class DolphinSchedulerManager {
             // The target version of the upgrade
             String schemaVersion = "";
             for(String schemaDir : schemaList) {
-
-
                 schemaVersion = schemaDir.split("_")[0];
                 if(SchemaUtils.isAGreatVersion(schemaVersion , version)) {
 
                     logger.info("upgrade DolphinScheduler metadata version from " + version + " to " + schemaVersion);
 
-
                     logger.info("Begin upgrading DolphinScheduler's table structure");
                     upgradeDao.upgradeDolphinScheduler(schemaDir);
-                    if(SchemaUtils.isAGreatVersion(version,"1.0.1")){
-                        version = upgradeDao.getCurrentVersion();
-                    }else {
-                        version = schemaVersion;
-                    }
+                    version = schemaVersion;
                 }
 
             }
