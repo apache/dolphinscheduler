@@ -271,13 +271,11 @@
         $(this).prop('comStart', true)
         // Check mailbox index initialization
         this.activeIndex = null
-        // console.log('中文输入：开始');
         this.isCn = true
       }).on('compositionend', () => {
         $(this).prop('comStart', false)
         // Check mailbox index initialization
         this.activeIndex = null
-        // console.log('中文输入：结束');
         this.isCn = false
       })
     }

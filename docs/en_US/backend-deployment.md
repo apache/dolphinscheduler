@@ -69,7 +69,7 @@ Configure SSH secret-free login on deployment machines and other installation ma
     Execute scripts for creating tables and importing basic data
     
     ```
-    sh ./script/create_escheduler.sh
+    sh ./script/create-escheduler.sh
     ```
 
 #### Preparations 5: Modify the deployment directory permissions and operation parameters
@@ -158,11 +158,11 @@ After normal compilation, ./target/escheduler-{version}/ is generated in the cur
 
 * stop all services in the cluster
   
-   ` sh ./bin/stop_all.sh`
+   ` sh ./bin/stop-all.sh`
    
 * start all services in the cluster
   
-   ` sh ./bin/start_all.sh`
+   ` sh ./bin/start-all.sh`
 
 * start and stop one master server
 
@@ -201,7 +201,7 @@ sh ./bin/escheduler-daemon.sh stop alert-server
 Database upgrade is a function added in version 1.0.2. The database can be upgraded automatically by executing the following command:
 
 ```upgrade
-sh ./script/upgrade_escheduler.sh
+sh ./script/upgrade-escheduler.sh
 ```
 
 

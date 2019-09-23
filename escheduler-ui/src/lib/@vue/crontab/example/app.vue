@@ -36,7 +36,6 @@
       _lang (type) {
         this.is = false
         this.lang = type
-        console.log(this.lang)
         setTimeout(() => {
           this.is = true
         }, 1)
