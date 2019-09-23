@@ -20,6 +20,39 @@
 		<hadoop.version>2.7.3</hadoop.version>
 		<quartz.version>2.2.3</quartz.version>
 		<jackson.version>2.9.8</jackson.version>
+		<mybatis.version>3.5.1</mybatis.version>
+		<mybatis.spring.version>2.0.1</mybatis.spring.version>
+		<cron.utils.version>5.0.5</cron.utils.version>
+		<fastjson.version>1.2.61</fastjson.version>
+		<druid.version>1.1.14</druid.version>
+		<h2.version>1.3.163</h2.version>
+		<commons.codec.version>1.6</commons.codec.version>
+		<commons.logging.version>1.1.1</commons.logging.version>
+		<httpclient.version>4.4.1</httpclient.version>
+		<httpcore.version>4.4.1</httpcore.version>
+		<junit.version>4.12</junit.version>
+		<mysql.connector.version>5.1.34</mysql.connector.version>
+		<slf4j.api.version>1.7.5</slf4j.api.version>
+		<slf4j.log4j12.version>1.7.5</slf4j.log4j12.version>
+		<commons.collections.version>3.2.2</commons.collections.version>
+		<commons.lang.version>2.3</commons.lang.version>
+		<commons.lang3.version>3.5</commons.lang3.version>
+		<commons.httpclient>3.0.1</commons.httpclient>
+		<commons.beanutils.version>1.7.0</commons.beanutils.version>
+		<commons.configuration.version>1.10</commons.configuration.version>
+		<commons.email.version>1.5</commons.email.version>
+		<poi.version>3.17</poi.version>
+		<freemarker.version>2.3.21</freemarker.version>
+		<javax.servlet.api.version>3.1.0</javax.servlet.api.version>
+		<commons.collections4.version>4.1</commons.collections4.version>
+		<guava.version>20.0</guava.version>
+		<postgresql.version>42.1.4</postgresql.version>
+		<hive.jdbc.version>2.1.0</hive.jdbc.version>
+		<commons.io.version>2.4</commons.io.version>
+		<oshi.core.version>3.5.0</oshi.core.version>
+		<clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
+		<mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
+		<jsp.version>6.1.14</jsp.version>
 	</properties>
 
 	<dependencyManagement>
@@ -28,22 +61,22 @@
 			<dependency>
 				<groupId>org.mybatis</groupId>
 				<artifactId>mybatis</artifactId>
-				<version>3.5.1</version>
+				<version>${mybatis.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mybatis</groupId>
 				<artifactId>mybatis-spring</artifactId>
-				<version>2.0.1</version>
+				<version>${mybatis.spring.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mybatis.spring.boot</groupId>
 				<artifactId>mybatis-spring-boot-autoconfigure</artifactId>
-				<version>2.0.1</version>
+				<version>${mybatis.spring.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mybatis.spring.boot</groupId>
 				<artifactId>mybatis-spring-boot-starter</artifactId>
-				<version>2.0.1</version>
+				<version>${mybatis.spring.version}</version>
 			</dependency>
 
 			<!-- quartz-->
@@ -60,18 +93,18 @@
 			<dependency>
 				<groupId>com.cronutils</groupId>
 				<artifactId>cron-utils</artifactId>
-				<version>5.0.5</version>
+				<version>${cron.utils.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.alibaba</groupId>
 				<artifactId>fastjson</artifactId>
-				<version>1.2.29</version>
+				<version>${fastjson.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.alibaba</groupId>
 				<artifactId>druid</artifactId>
-				<version>1.1.14</version>
+				<version>${druid.version}</version>
 			</dependency>
 
 			<dependency>
@@ -116,7 +149,7 @@
 			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
-				<version>1.3.163</version>
+				<version>${h2.version}</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -165,22 +198,22 @@
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.6</version>
+				<version>${commons.codec.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-logging</groupId>
 				<artifactId>commons-logging</artifactId>
-				<version>1.1.1</version>
+				<version>${commons.logging.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.4.1</version>
+				<version>${httpclient.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore</artifactId>
-				<version>4.4.1</version>
+				<version>${httpcore.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.fasterxml.jackson.core</groupId>
@@ -201,56 +234,56 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>4.12</version>
+				<version>${junit.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
-				<version>5.1.34</version>
+				<version>${mysql.connector.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.7.5</version>
+				<version>${slf4j.api.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-log4j12</artifactId>
-				<version>1.7.5</version>
+				<version>${slf4j.log4j12.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>commons-collections</groupId>
 				<artifactId>commons-collections</artifactId>
-				<version>3.2.2</version>
+				<version>${commons.collections.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>commons-lang</groupId>
 				<artifactId>commons-lang</artifactId>
-				<version>2.3</version>
+				<version>${commons.lang.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.5</version>
+				<version>${commons.lang3.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-httpclient</groupId>
 				<artifactId>commons-httpclient</artifactId>
-				<version>3.0.1</version>
+				<version>${commons.httpclient}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-beanutils</groupId>
 				<artifactId>commons-beanutils</artifactId>
-				<version>1.7.0</version>
+				<version>${commons.beanutils.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>commons-configuration</groupId>
 				<artifactId>commons-configuration</artifactId>
-				<version>1.10</version>
+				<version>${commons.configuration.version}</version>
 			</dependency>
 
 			<dependency>
@@ -268,20 +301,20 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-email</artifactId>
-				<version>1.5</version>
+				<version>${commons.email.version}</version>
 			</dependency>
 
 			<!--excel poi-->
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi</artifactId>
-				<version>3.17</version>
+				<version>${poi.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.freemarker</groupId>
 				<artifactId>freemarker</artifactId>
-				<version>2.3.21</version>
+				<version>${freemarker.version}</version>
 			</dependency>
 
 
@@ -325,61 +358,61 @@
 			<dependency>
 				<groupId>javax.servlet</groupId>
 				<artifactId>javax.servlet-api</artifactId>
-				<version>3.1.0</version>
+				<version>${javax.servlet.api.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-collections4</artifactId>
-				<version>4.1</version>
+				<version>${commons.collections4.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>20.0</version>
+				<version>${guava.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
-				<version>42.1.4</version>
+				<version>${postgresql.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.apache.hive</groupId>
 				<artifactId>hive-jdbc</artifactId>
-				<version>2.1.0</version>
+				<version>${hive.jdbc.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.4</version>
+				<version>${commons.io.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.github.oshi</groupId>
 				<artifactId>oshi-core</artifactId>
-				<version>3.5.0</version>
+				<version>${oshi.core.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>ru.yandex.clickhouse</groupId>
 				<artifactId>clickhouse-jdbc</artifactId>
-				<version>0.1.52</version>
+				<version>${clickhouse.jdbc.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.microsoft.sqlserver</groupId>
 				<artifactId>mssql-jdbc</artifactId>
-				<version>6.1.0.jre8</version>
+				<version>${mssql.jdbc.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>jsp-2.1</artifactId>
-				<version>6.1.14</version>
+				<version>${jsp.version}</version>
 			</dependency>
 
 		</dependencies>

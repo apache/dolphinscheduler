@@ -53,7 +53,6 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-plugin-transform-vue-jsx": "^3.7.0",
     "babel-preset-env": "^1.5.2",
-    "babel-runtime": "^6.26.0",
     "cross-env": "^5.2.0",
     "css-loader": "0.28.8",
     "cssnano": "^4.0.3",

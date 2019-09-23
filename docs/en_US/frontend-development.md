@@ -63,7 +63,7 @@ Copy it to the corresponding directory of the server (front-end service static p
 Visit address` http://localhost:8888/#/`
 
 
-#### Start with node and daemon under Liunx
+#### Start with node and daemon under Linux
 
 Install pm2 `npm install -g pm2`
 
@@ -238,7 +238,7 @@ The internal common component of the `src/js/module/components` project writes t
     ├── conditions
         ├── conditions.vue
         └── _source
-            └── serach.vue
+            └── search.vue
             └── util.js
 ```
 
