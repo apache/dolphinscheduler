@@ -196,7 +196,9 @@ export default {
   'Non Query': 'Non Query',
   'prop(required)': 'prop(required)',
   'value(optional)': 'value(optional)',
+  'value(required)': 'value(required)',
   'prop is empty': 'prop is empty',
+  'value is empty': 'value is empty',
   'prop is repeat': 'prop is repeat',
   'Start Time': 'Start Time',
   'End Time': 'End Time',
@@ -475,5 +477,15 @@ export default {
   'warning of timeout': 'warning of timeout',
   'Next five execution times': 'Next five execution times',
   'Execute time': 'Execute time',
-  'Complement range': 'Complement range'
+  'Complement range': 'Complement range',
+  'Http Url':'Http Url',
+  'Http Method':'Http Method',
+  'Http Parameters':'Http Parameters',
+  'Http Parameters Key':'Http Parameters Key',
+  'Http Parameters Position':'Http Parameters Position',
+  'Http Parameters Value':'Http Parameters Value',
+  'Http Check Condition':'Http Check Condition',
+  'Http Condition':'Http Condition',
+  'Please Enter Http Url': 'Please Enter Http Url(required)',
+  'Please Enter Http Condition': 'Please Enter Http Condition'
 }
