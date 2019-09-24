@@ -18,6 +18,7 @@ package cn.escheduler.common.task.http;
 
 import cn.escheduler.common.enums.HttpCheckCondition;
 import cn.escheduler.common.enums.HttpMethod;
+import cn.escheduler.common.process.HttpProperty;
 import cn.escheduler.common.task.AbstractParameters;
 import org.apache.commons.lang.StringUtils;
 
@@ -37,6 +38,11 @@ public class HttpParameters extends AbstractParameters {
      * httpMethod
      */
     private HttpMethod httpMethod;
+
+    /**
+     *  http params
+     */
+    private List<HttpProperty> httpParams;
 
     /**
      * httpCheckCondition
@@ -74,6 +80,14 @@ public class HttpParameters extends AbstractParameters {
 
     public void setHttpMethod(HttpMethod httpMethod) {
         this.httpMethod = httpMethod;
+    }
+
+    public List<HttpProperty> getHttpParams() {
+        return httpParams;
+    }
+
+    public void setHttpParams(List<HttpProperty> httpParams) {
+        this.httpParams = httpParams;
     }
 
     public HttpCheckCondition getHttpCheckCondition() {

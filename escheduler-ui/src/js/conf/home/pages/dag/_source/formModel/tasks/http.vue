@@ -1,5 +1,21 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 <template>
-  <div class="flink-model">
+  <div class="http-model">
     <m-list-box>
       <div slot="text">{{$t('Http Url')}}</div>
       <div slot="content">
@@ -27,6 +43,17 @@
             :label="city.code">
           </x-option>
         </x-select>
+      </div>
+    </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('Http Parameters')}}</div>
+      <div slot="content">
+        <m-http-params
+          ref="refHttpParams"
+          @on-http-params="_onHttpParams"
+          :udp-list="httpParams"
+          :hide="false">
+        </m-http-params>
       </div>
     </m-list-box>
     <m-list-box>
@@ -74,7 +101,8 @@
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
-  import mLocalParams from './_source/httpParams'
+  import mLocalParams from './_source/localParams'
+  import mHttpParams from './_source/httpParams'
   import mListBox from './_source/listBox'
   import disabledState from '@/module/mixin/disabledState'
   export default {
@@ -84,6 +112,7 @@
         url: '',
         condition: '',
         localParams: [],
+        httpParams: [],
         httpMethod: 'GET',
         httpMethodList: [{ code: 'GET' }, { code: 'POST' }, { code: 'HEAD' }, { code: 'PUT' }, { code: 'DELETE' }],
         httpCheckCondition: 'STATUS_CODE_DEFAULT',
@@ -101,6 +130,9 @@
       _onLocalParams (a) {
         this.localParams = a
       },
+      _onHttpParams (a) {
+        this.httpParams = a
+      },
       /**
        * verification
        */
@@ -113,9 +145,16 @@
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
         }
+        if (!this.$refs.refHttpParams._verifProp()) {
+          return false
+        }
+        if (!this.$refs.refHttpParams._verifValue()) {
+          return false
+        }
         // storage
         this.$emit('on-params', {
           localParams: this.localParams,
+          httpParams: this.httpParams,
           url: this.url,
           httpMethod: this.httpMethod,
           httpCheckCondition: this.httpCheckCondition,
@@ -139,10 +178,14 @@
           if (localParams.length) {
             this.localParams = localParams
           }
+          let httpParams = o.params.httpParams || []
+          if (httpParams.length) {
+            this.httpParams = httpParams
+          }
         }
     },
     mounted () {
     },
-    components: { mLocalParams, mListBox }
+    components: { mLocalParams, mHttpParams, mListBox }
   }
 </script>

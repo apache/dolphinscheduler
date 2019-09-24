@@ -204,11 +204,15 @@ const sqlTypeList = [
 
 const positionList = [
   {
-    id: 'IN',
+    id: 'PARAMETER',
     code: "Parameter"
   },
   {
-    id: 'OUT',
+    id: 'BODY',
+    code: "Body"
+  },
+  {
+    id: 'HEADERS',
     code: "Headers"
   }
 ]

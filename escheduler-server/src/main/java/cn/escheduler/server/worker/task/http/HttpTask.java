@@ -17,12 +17,15 @@
 package cn.escheduler.server.worker.task.http;
 
 
-import cn.escheduler.common.enums.Direct;
 import cn.escheduler.common.enums.HttpMethod;
+import cn.escheduler.common.enums.HttpParametersType;
+import cn.escheduler.common.process.HttpProperty;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.task.http.HttpParameters;
+import cn.escheduler.common.utils.Bytes;
 import cn.escheduler.common.utils.DateUtils;
+import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.model.ProcessInstance;
@@ -30,32 +33,24 @@ import cn.escheduler.server.utils.ParamUtils;
 import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.TaskProps;
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.xml.XmlEscapers;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,11 +70,7 @@ public class HttpTask extends AbstractTask {
      */
     protected static final int MAX_CONNECTION_MILLISECONDS = 60000;
 
-    protected static final String CONTENT_TYPE = "Content-Type";
-
     protected static final String APPLICATION_JSON = "application/json";
-
-    protected static HttpsTrustManager httpsTrustManager = new HttpsTrustManager();
 
     protected String output;
 
@@ -125,7 +116,7 @@ public class HttpTask extends AbstractTask {
         }
     }
 
-    protected CloseableHttpResponse sendRequest() throws ClientProtocolException, IOException {
+    protected CloseableHttpResponse sendRequest() throws IOException {
         RequestBuilder builder = createRequestBuilder();
         ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
 
@@ -134,10 +125,18 @@ public class HttpTask extends AbstractTask {
                 httpParameters.getLocalParametersMap(),
                 processInstance.getCmdTypeIfComplement(),
                 processInstance.getScheduleTime());
-
-        addRequestParams(builder,paramsMap);
+        List<HttpProperty> httpPropertyList = new ArrayList<>();
+        if(httpParameters.getHttpParams() != null && httpParameters.getHttpParams().size() > 0){
+            for (HttpProperty httpProperty: httpParameters.getHttpParams()) {
+                String jsonObject = JSONObject.toJSONString(httpProperty);
+                String params = ParameterUtils.convertParameterPlaceholders(jsonObject,ParamUtils.convert(paramsMap));
+                logger.info("http request params：{}",params);
+                httpPropertyList.add(JSONObject.parseObject(params,HttpProperty.class));
+            }
+        }
+        addRequestParams(builder,httpPropertyList);
         HttpUriRequest request = builder.setUri(httpParameters.getUrl()).build();
-        setHeaders(request,paramsMap);
+        setHeaders(request,httpPropertyList);
         CloseableHttpClient client = createHttpClient();
         return client.execute(request);
     }
@@ -150,7 +149,7 @@ public class HttpTask extends AbstractTask {
         if (entity == null) {
             return null;
         }
-        String webPage = EntityUtils.toString(entity, "UTF-8");
+        String webPage = EntityUtils.toString(entity, Bytes.UTF8_ENCODING);
         return webPage;
     }
 
@@ -159,20 +158,20 @@ public class HttpTask extends AbstractTask {
         return status;
     }
 
-    protected int validResponse(String body, String statusCode) throws Exception {
+    protected int validResponse(String body, String statusCode){
         int exitStatusCode = 0;
         switch (httpParameters.getHttpCheckCondition()) {
             case BODY_CONTAINS:
                 if (StringUtils.isEmpty(body) || !body.contains(httpParameters.getCondition())) {
                     appendMessage(httpParameters.getUrl() + " doesn contain "
-                            + XmlEscapers.xmlContentEscaper().escape(httpParameters.getCondition()));
+                            + httpParameters.getCondition());
                     exitStatusCode = -1;
                 }
                 break;
             case BODY_NOT_CONTAINS:
                 if (StringUtils.isEmpty(body) || body.contains(httpParameters.getCondition())) {
                     appendMessage(httpParameters.getUrl() + " contains "
-                            + XmlEscapers.xmlContentEscaper().escape(httpParameters.getCondition()));
+                            + httpParameters.getCondition());
                     exitStatusCode = -1;
                 }
                 break;
@@ -205,37 +204,32 @@ public class HttpTask extends AbstractTask {
         }
     }
 
-    protected void addRequestParams(RequestBuilder builder,Map<String, Property> paramsMap) {
-        Iterator<Map.Entry<String, Property>> iter = paramsMap.entrySet().iterator();
-        while (iter.hasNext()){
-            Map.Entry<String, Property> en = iter.next();
-            Property property = en.getValue();
-            if (property.getValue() != null && property.getValue().length() > 0){
-                if (property.getDirect().equals(Direct.IN)){
-                    builder.addParameter(property.getProp(), property.getValue());
-                }else{
-                    if(CONTENT_TYPE.equals(property.getProp()) && property.getValue().contains(APPLICATION_JSON)){
-                        StringEntity postingString = null;
-                        try {
-                            postingString = new StringEntity("{}");
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-                        builder.setEntity(postingString);
+    protected void addRequestParams(RequestBuilder builder,List<HttpProperty> httpPropertyList) {
+        if(httpPropertyList != null && httpPropertyList.size() > 0){
+            JSONObject jsonParam = new JSONObject();
+            for (HttpProperty property: httpPropertyList){
+                if(property.getHttpParametersType() != null){
+                    if (property.getHttpParametersType().equals(HttpParametersType.PARAMETER)){
+                        builder.addParameter(property.getProp(), property.getValue());
+                    }else if(property.getHttpParametersType().equals(HttpParametersType.BODY)){
+                        jsonParam.put(property.getProp(), property.getValue());
                     }
                 }
             }
+            StringEntity postingString = new StringEntity(jsonParam.toString(), Charsets.UTF_8);
+            postingString.setContentEncoding(Bytes.UTF8_ENCODING);
+            postingString.setContentType(APPLICATION_JSON);
+            builder.setEntity(postingString);
         }
     }
 
-    protected void setHeaders(HttpUriRequest request,Map<String, Property> paramsMap) {
-        Iterator<Map.Entry<String, Property>> iter = paramsMap.entrySet().iterator();
-        while (iter.hasNext()){
-            Map.Entry<String, Property> en = iter.next();
-            Property property = en.getValue();
-            if (property.getValue() != null && property.getValue().length() > 0){
-                if (property.getDirect().equals(Direct.OUT)){
-                    request.addHeader(property.getProp(), property.getValue());
+    protected void setHeaders(HttpUriRequest request,List<HttpProperty> httpPropertyList) {
+        if(httpPropertyList != null && httpPropertyList.size() > 0){
+            for (HttpProperty property: httpPropertyList){
+                if(property.getHttpParametersType() != null) {
+                    if (property.getHttpParametersType().equals(HttpParametersType.HEADERS)) {
+                        request.addHeader(property.getProp(), property.getValue());
+                    }
                 }
             }
         }
@@ -252,16 +246,6 @@ public class HttpTask extends AbstractTask {
         return RequestConfig.custom().setSocketTimeout(MAX_CONNECTION_MILLISECONDS).setConnectTimeout(MAX_CONNECTION_MILLISECONDS).build();
     }
 
-    private SSLContext createSSLContext() {
-        try {
-            SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new HttpsTrustManager[]{httpsTrustManager}, null);
-            return sslContext;
-        } catch (Exception e) {
-            throw new IllegalStateException("Create SSLContext error", e);
-        }
-    }
-
     protected RequestBuilder createRequestBuilder() {
         if (httpParameters.getHttpMethod().equals(HttpMethod.GET)) {
             return RequestBuilder.get();
@@ -276,31 +260,6 @@ public class HttpTask extends AbstractTask {
         } else {
             return null;
         }
-    }
-
-    /**
-     * Default X509TrustManager implement
-     */
-    private static class HttpsTrustManager implements X509TrustManager {
-
-        @Override
-        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-            // ignore
-        }
-
-        @Override
-        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-            // ignore
-        }
-
-        @Override
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-    }
-
-    public static String xmlReplaceChar(String xml) {
-        return xml.replaceAll("&nbsp;", "&amp;nbsp;").replaceAll("&raquo;", "&amp;raquo;");
     }
 
     @Override

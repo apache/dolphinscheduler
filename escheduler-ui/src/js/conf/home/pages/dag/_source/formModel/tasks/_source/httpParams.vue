@@ -1,51 +1,67 @@
+/*
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 <template>
   <div class="user-def-params-model">
     <div class="select-listpp"
-         v-for="(item,$index) in localParamsList"
+         v-for="(item,$index) in httpParamsList"
          :key="item.id"
          @click="_getIndex($index)">
       <x-input
-          :disabled="isDetails"
-          type="text"
-          v-model="localParamsList[$index].prop"
-          :placeholder="$t('prop(required)')"
-          @on-blur="_verifProp()"
-          :style="inputStyle">
+        :disabled="isDetails"
+        type="text"
+        v-model="httpParamsList[$index].prop"
+        :placeholder="$t('prop(required)')"
+        @on-blur="_verifProp()"
+        :style="inputStyle">
       </x-input>
       <x-select
-                @change="_handlePositionChanged"
-                v-model="localParamsList[$index].direct"
-                :placeholder="$t('Http Parameters Position')"
-                :disabled="isDetails"
-                :style="inputStyle"
-                >
-          <x-option
-                  v-for="position in positionList"
-                  :key="position.code"
-                  :value="position.id"
-                  :label="position.code">
-          </x-option>
+        @change="_handlePositionChanged"
+        v-model="httpParamsList[$index].httpParametersType"
+        :placeholder="$t('Http Parameters Position')"
+        :disabled="isDetails"
+        :style="inputStyle"
+      >
+        <x-option
+          v-for="position in positionList"
+          :key="position.code"
+          :value="position.id"
+          :label="position.code">
+        </x-option>
       </x-select>
       <x-input
-          :disabled="isDetails"
-          type="text"
-          v-model="localParamsList[$index].value"
-          :placeholder="$t('value(optional)')"
-          @on-blur="_verifProp()"
-          :style="inputStyle">
+        :disabled="isDetails"
+        type="text"
+        v-model="httpParamsList[$index].value"
+        :placeholder="$t('value(required)')"
+        @on-blur="_handleValue()"
+        :style="inputStyle">
       </x-input>
       <span class="lt-add">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
           <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" >&#xe611;</i>
         </a>
       </span>
-      <span class="add" v-if="$index === (localParamsList.length - 1)">
+      <span class="add" v-if="$index === (httpParamsList.length - 1)">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
           <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
         </a>
       </span>
     </div>
-    <span class="add-dp" v-if="!localParamsList.length">
+    <span class="add-dp" v-if="!httpParamsList.length">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
         <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
       </a>
@@ -62,9 +78,9 @@
     data () {
       return {
         // Increased data
-        localParamsList: [],
+        httpParamsList: [],
         // Current execution index
-        localParamsIndex: null,
+        httpParamsIndex: null,
         // 参数位置的下拉框
         positionList:positionList
       }
@@ -83,7 +99,7 @@
        * Current index
        */
       _getIndex (index) {
-        this.localParamsIndex = index
+        this.httpParamsIndex = index
       },
       /**
        * 获取参数位置
@@ -95,17 +111,16 @@
        * delete item
        */
       _removeUdp (index) {
-        this.localParamsList.splice(index, 1)
+        this.httpParamsList.splice(index, 1)
         this._verifProp('value')
       },
       /**
        * add
        */
       _addUdp () {
-        this.localParamsList.push({
+        this.httpParamsList.push({
           prop: '',
-          direct: 'IN',
-          type: 'VARCHAR',
+          httpParametersType: 'PARAMETER',
           value: ''
         })
       },
@@ -113,7 +128,7 @@
        * blur verification
        */
       _handleValue () {
-        this._verifProp('value')
+        this._verifValue('value')
       },
       /**
        * Verify that the value exists or is empty
@@ -121,10 +136,14 @@
       _verifProp (type) {
         let arr = []
         let flag = true
-        _.map(this.localParamsList, v => {
+        _.map(this.httpParamsList, v => {
           arr.push(v.prop)
           if (!v.prop) {
             flag = false
+          }
+          if(v.value === ''){
+            this.$message.warning(`${i18n.$t('value is empty')}`)
+            return false
           }
         })
         if (!flag) {
@@ -140,19 +159,34 @@
           }
           return false
         }
-        this.$emit('on-local-params', _.cloneDeep(this.localParamsList))
+        this.$emit('on-http-params', _.cloneDeep(this.httpParamsList))
         return true
+      },
+      _verifValue (type) {
+        let arr = []
+        let flag = true
+        _.map(this.httpParamsList, v => {
+          arr.push(v.value)
+          if (!v.value) {
+            flag = false
+          }
+        })
+        if (!flag) {
+            this.$message.warning(`${i18n.$t('value is empty')}`)
+          return false
+        }
+        this.$emit('on-http-params', _.cloneDeep(this.httpParamsList))
         return true
       }
     },
     watch: {
       // Monitor data changes
       udpList () {
-        this.localParamsList = this.udpList
+        this.httpParamsList = this.udpList
       }
     },
     created () {
-      this.localParamsList = this.udpList
+      this.httpParamsList = this.udpList
     },
     computed: {
       inputStyle () {
@@ -205,3 +239,4 @@
     }
   }
 </style>
+
