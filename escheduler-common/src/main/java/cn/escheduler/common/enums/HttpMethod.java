@@ -17,26 +17,15 @@
 package cn.escheduler.common.enums;
 
 /**
- * task node type
+ * http method
  */
-public enum TaskType {
-    /**
-     * 0 SHELL
-     * 1 SQL
-     * 2 SUB_PROCESS
-     * 3 PROCEDURE
-     * 4 MR
-     * 5 SPARK
-     * 6 PYTHON
-     * 7 DEPENDENT
-     * 8 FLINK
-     * 9 HTTP
-     */
-    SHELL,SQL, SUB_PROCESS,PROCEDURE,MR,SPARK,PYTHON,DEPENDENT,FLINK,HTTP;
-
-    public static boolean typeIsNormalTask(String typeName) {
-        TaskType taskType = TaskType.valueOf(typeName);
-        return !(taskType == TaskType.SUB_PROCESS || taskType == TaskType.DEPENDENT);
-    }
-
+public enum HttpMethod {
+	/**
+	 * 0 get
+	 * 1 post
+	 * 2 head
+	 * 3 put
+	 * 4 delete
+	 */
+	GET, POST, HEAD, PUT, DELETE
 }
