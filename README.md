@@ -64,7 +64,7 @@ Overload processing: Task queue mechanism, the number of schedulable tasks on a 
 
 - <a href="http://106.75.43.194:8888" target="_blank">Online Demo</a> 
 
-More documentation please refer to <a href="https://analysys.github.io/easyscheduler_docs_cn/" target="_blank">[EasyScheduler online documentation]</a>
+More documentation please refer to <a href="https://analysys.github.io/easyscheduler_docs/" target="_blank">[EasyScheduler online documentation]</a>
 
 ### Recent R&D plan
 Work plan of Easy Scheduler: [R&D plan](https://github.com/analysys/EasyScheduler/projects/1), where `In Develop` card is the features of 1.1.0 version , TODO card is to be done (including feature ideas)
@@ -80,7 +80,9 @@ Easy Scheduler uses a lot of excellent open source projects, such as google guav
 It is because of the shoulders of these open source projects that the birth of the Easy Scheduler is possible. We are very grateful for all the open source software used! We also hope that we will not only be the beneficiaries of open source, but also be open source contributors, so we decided to contribute to easy scheduling and promised long-term updates. We also hope that partners who have the same passion and conviction for open source will join in and contribute to open source!
 
 ### Get Help
-The fastest way to get response from our developers is to submit issues,  or add our wechat : 510570367
+1. Submit an issue
+1. Mail list: dev@dolphinscheduler.apache.org. Mail to dev-subscribe@dolphinscheduler.apache.org, follow the reply to subscribe the mail list.
+1. Contact WeChat group manager, ID 510570367. This is for Mandarin(CN) discussion.
 
 ### License
 Please refer to [LICENSE](https://github.com/analysys/EasyScheduler/blob/dev/LICENSE) file.
