@@ -17,26 +17,14 @@
 package cn.escheduler.common.enums;
 
 /**
- * task node type
+ * http check condition
  */
-public enum TaskType {
-    /**
-     * 0 SHELL
-     * 1 SQL
-     * 2 SUB_PROCESS
-     * 3 PROCEDURE
-     * 4 MR
-     * 5 SPARK
-     * 6 PYTHON
-     * 7 DEPENDENT
-     * 8 FLINK
-     * 9 HTTP
-     */
-    SHELL,SQL, SUB_PROCESS,PROCEDURE,MR,SPARK,PYTHON,DEPENDENT,FLINK,HTTP;
-
-    public static boolean typeIsNormalTask(String typeName) {
-        TaskType taskType = TaskType.valueOf(typeName);
-        return !(taskType == TaskType.SUB_PROCESS || taskType == TaskType.DEPENDENT);
-    }
-
+public enum HttpCheckCondition {
+	/**
+	 * 0 status_code_default:200
+	 * 1 status_code_custom
+	 * 2 body_contains
+	 * 3 body_not_contains
+	 */
+	STATUS_CODE_DEFAULT,STATUS_CODE_CUSTOM, BODY_CONTAINS, BODY_NOT_CONTAINS
 }
