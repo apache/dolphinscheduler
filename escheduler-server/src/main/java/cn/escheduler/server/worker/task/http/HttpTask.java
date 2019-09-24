@@ -98,17 +98,19 @@ public class HttpTask extends AbstractTask {
         long startTime = System.currentTimeMillis();
         String statusCode = null;
         String body = null;
-        boolean status = true;
-        try {
-            CloseableHttpResponse response = sendRequest();
-            statusCode = String.valueOf(getStatusCode(response));
-            body = getResponseBody(response);
-            response.close();
-            exitStatusCode = validResponse(body, statusCode);
-            long costTime = System.currentTimeMillis() - startTime;
-            status = StringUtils.isEmpty(output);
-            logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, status : {}, costTime : {}Millisecond, statusCode : {}, body : {}, log : {}",
-                    DateUtils.format2Readable(startTime), httpParameters.getUrl(),httpParameters.getHttpMethod(), status, costTime, statusCode, body, output);
+        try(CloseableHttpClient client = createHttpClient()) {
+            try(CloseableHttpResponse response = sendRequest(client)) {
+                statusCode = String.valueOf(getStatusCode(response));
+                body = getResponseBody(response);
+                exitStatusCode = validResponse(body, statusCode);
+                long costTime = System.currentTimeMillis() - startTime;
+                logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {}Millisecond, statusCode : {}, body : {}, log : {}",
+                        DateUtils.format2Readable(startTime), httpParameters.getUrl(),httpParameters.getHttpMethod(), costTime, statusCode, body, output);
+            }catch (Exception e) {
+                appendMessage(e.toString());
+                exitStatusCode = -1;
+                logger.error("httpUrl[" + httpParameters.getUrl() + "] connection failed："+output, e);
+            }
         } catch (Exception e) {
             appendMessage(e.toString());
             exitStatusCode = -1;
@@ -116,7 +118,7 @@ public class HttpTask extends AbstractTask {
         }
     }
 
-    protected CloseableHttpResponse sendRequest() throws IOException {
+    protected CloseableHttpResponse sendRequest(CloseableHttpClient client) throws IOException {
         RequestBuilder builder = createRequestBuilder();
         ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
 
@@ -137,7 +139,6 @@ public class HttpTask extends AbstractTask {
         addRequestParams(builder,httpPropertyList);
         HttpUriRequest request = builder.setUri(httpParameters.getUrl()).build();
         setHeaders(request,httpPropertyList);
-        CloseableHttpClient client = createHttpClient();
         return client.execute(request);
     }
 
