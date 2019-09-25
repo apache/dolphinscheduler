@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.escheduler.dao.mapper.ScheduleMapper">
+    <select id="queryByProcessDefineIdPaging" resultType="cn.escheduler.dao.entity.Schedule">
+        select p_f.name as process_definition_name, p.name as project_name,u.user_name,s.*
+        from t_escheduler_schedules s
+        join t_escheduler_process_definition p_f on s.process_definition_id = p_f.id
+        join t_escheduler_project as p on p_f.project_id = p.id
+        join t_escheduler_user as u on s.user_id = u.id
+        where 1=1
+        <if test="processDefinitionId!= 0">
+            and s.process_definition_id = #{processDefinitionId}
+        </if>
+        order by s.update_time desc
+    </select>
+    <select id="querySchedulerListByProjectName" resultType="cn.escheduler.dao.entity.Schedule">
+        select p_f.name as process_definition_name, p_f.desc as `desc`, p.name as project_name,u.user_name,s.*
+        from t_escheduler_schedules s
+        join t_escheduler_process_definition p_f on s.process_definition_id = p_f.id
+        join t_escheduler_project as p on p_f.project_id = p.id
+        join t_escheduler_user as u on s.user_id = u.id
+        where p.name = #{projectName}
+    </select>
+    <select id="selectAllByProcessDefineArray" resultType="cn.escheduler.dao.entity.Schedule">
+        select *
+        from t_escheduler_schedules
+        where process_definition_id in (#{processDefineIds})
+        and release_state = 1
+    </select>
+    <select id="queryByProcessDefinitionId" resultType="cn.escheduler.dao.entity.Schedule">
+        select *
+        from t_escheduler_schedules
+        where process_definition_id =#{processDefinitionId}
+    </select>
+</mapper>
