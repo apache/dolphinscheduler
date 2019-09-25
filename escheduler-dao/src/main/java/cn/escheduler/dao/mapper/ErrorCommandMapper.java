@@ -16,44 +16,19 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.common.enums.*;
-import cn.escheduler.dao.model.Command;
-import cn.escheduler.dao.model.ErrorCommand;
-import cn.escheduler.dao.model.ExecuteStatusCount;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.type.EnumOrdinalTypeHandler;
-import org.apache.ibatis.type.JdbcType;
+import cn.escheduler.common.enums.UserType;
+import cn.escheduler.dao.entity.CommandCount;
+import cn.escheduler.dao.entity.ErrorCommand;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-/**
- * command mapper
- */
-public interface ErrorCommandMapper {
+public interface ErrorCommandMapper extends BaseMapper<ErrorCommand> {
 
-    /**
-     * inert error command
-     * @param errorCommand
-     * @return
-     */
-    @InsertProvider(type = ErrorCommandMapperProvider.class, method = "insert")
-    @Options(useGeneratedKeys = true,keyProperty = "errorCommand.id")
-    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "errorCommand.id", before = false, resultType = int.class)
-    int insert(@Param("errorCommand") ErrorCommand errorCommand);
-
-    @Results(value = {
-            @Result(property = "state", column = "state", typeHandler = EnumOrdinalTypeHandler.class, javaType = ExecutionStatus.class, jdbcType = JdbcType.TINYINT),
-            @Result(property = "count", column = "count", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-    })
-    @SelectProvider(type = ErrorCommandMapperProvider.class, method = "countCommandState")
-    List<ExecuteStatusCount> countCommandState(
-            @Param("userId") int userId,
-            @Param("userType") UserType userType,
+    List<CommandCount> countCommandState(
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
-            @Param("projectId") int projectId);
-
-
+            @Param("projectIdArray") Integer[] projectIdArray);
 }

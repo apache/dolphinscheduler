@@ -24,7 +24,7 @@ import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.ResourceType;
 import cn.escheduler.common.enums.UdfType;
 import cn.escheduler.common.utils.ParameterUtils;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

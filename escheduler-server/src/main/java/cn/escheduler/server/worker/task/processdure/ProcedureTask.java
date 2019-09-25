@@ -16,9 +16,7 @@
  */
 package cn.escheduler.server.worker.task.processdure;
 
-import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.DataType;
-import cn.escheduler.common.enums.DbType;
 import cn.escheduler.common.enums.Direct;
 import cn.escheduler.common.enums.TaskTimeoutStrategy;
 import cn.escheduler.common.job.db.*;
@@ -29,8 +27,7 @@ import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.DataSource;
-import cn.escheduler.dao.model.ProcessInstance;
+import cn.escheduler.dao.entity.DataSource;
 import cn.escheduler.server.utils.ParamUtils;
 import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.TaskProps;

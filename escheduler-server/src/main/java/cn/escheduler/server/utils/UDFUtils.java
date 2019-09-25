@@ -18,7 +18,7 @@ package cn.escheduler.server.utils;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.HadoopUtils;
-import cn.escheduler.dao.model.UdfFunc;
+import cn.escheduler.dao.entity.UdfFunc;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 

@@ -22,11 +22,13 @@ import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.AlertType;
 import cn.escheduler.common.enums.UserType;
+import cn.escheduler.dao.entity.AlertGroup;
+import cn.escheduler.dao.entity.User;
+import cn.escheduler.dao.entity.UserAlertGroup;
 import cn.escheduler.dao.mapper.AlertGroupMapper;
 import cn.escheduler.dao.mapper.UserAlertGroupMapper;
-import cn.escheduler.dao.model.AlertGroup;
-import cn.escheduler.dao.model.User;
-import cn.escheduler.dao.model.UserAlertGroup;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,14 +82,12 @@ public class AlertGroupService {
 
         Map<String, Object> result = new HashMap<>(5);
 
-        Integer count = alertGroupMapper.countAlertGroupPaging(searchVal);
-
+        Page<AlertGroup> page = new Page(pageNo, pageSize);
+        IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(
+                page, searchVal);
         PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-        List<AlertGroup> scheduleList = alertGroupMapper.queryAlertGroupPaging(searchVal, pageInfo.getStart(), pageSize);
-
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(scheduleList);
+        pageInfo.setTotalCount((int)alertGroupIPage.getTotal());
+        pageInfo.setLists(alertGroupIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
@@ -115,7 +115,7 @@ public class AlertGroupService {
 
         alertGroup.setGroupName(groupName);
         alertGroup.setGroupType(groupType);
-        alertGroup.setDesc(desc);
+        alertGroup.setDescription(desc);
         alertGroup.setCreateTime(now);
         alertGroup.setUpdateTime(now);
 
@@ -158,7 +158,7 @@ public class AlertGroupService {
         }
 
 
-        AlertGroup alertGroup = alertGroupMapper.queryById(id);
+        AlertGroup alertGroup = alertGroupMapper.selectById(id);
 
         if (alertGroup == null) {
             putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
@@ -175,10 +175,10 @@ public class AlertGroupService {
         if (groupType != null) {
             alertGroup.setGroupType(groupType);
         }
-        alertGroup.setDesc(desc);
+        alertGroup.setDescription(desc);
         alertGroup.setUpdateTime(now);
         // updateProcessInstance
-        alertGroupMapper.update(alertGroup);
+        alertGroupMapper.updateById(alertGroup);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -200,7 +200,7 @@ public class AlertGroupService {
         }
 
 
-        alertGroupMapper.delete(id);
+        alertGroupMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -254,8 +254,8 @@ public class AlertGroupService {
      */
     public Result verifyGroupName(User loginUser, String groupName) {
         Result result = new Result();
-        AlertGroup alertGroup = alertGroupMapper.queryByGroupName(groupName);
-        if (alertGroup != null) {
+        List<AlertGroup> alertGroup = alertGroupMapper.queryByGroupName(groupName);
+        if (alertGroup != null && alertGroup.size() > 0) {
             logger.error("group {} has exist, can't create again.", groupName);
             result.setCode(Status.ALERT_GROUP_EXIST.getCode());
             result.setMsg(Status.ALERT_GROUP_EXIST.getMsg());

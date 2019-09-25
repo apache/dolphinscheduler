@@ -18,7 +18,7 @@ package cn.escheduler.api.service;
 
 import cn.escheduler.api.ApiApplicationServer;
 import cn.escheduler.common.enums.UserType;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;

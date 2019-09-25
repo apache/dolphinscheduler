@@ -25,8 +25,8 @@ import cn.escheduler.common.model.DependentItem;
 import cn.escheduler.common.utils.DependentUtils;
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.ProcessInstance;
-import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.entity.ProcessInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

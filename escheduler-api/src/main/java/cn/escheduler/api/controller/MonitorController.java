@@ -18,10 +18,9 @@ package cn.escheduler.api.controller;
 
 
 import cn.escheduler.api.service.MonitorService;
-import cn.escheduler.api.service.ServerService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -45,9 +44,6 @@ import static cn.escheduler.api.enums.Status.*;
 public class MonitorController extends BaseController{
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorController.class);
-
-    @Autowired
-    private ServerService serverService;
 
     @Autowired
     private MonitorService monitorService;

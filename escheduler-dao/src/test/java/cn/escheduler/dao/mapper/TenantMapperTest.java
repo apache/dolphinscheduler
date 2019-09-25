@@ -16,49 +16,25 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.Tenant;
-import org.junit.Assert;
-import org.junit.Before;
+
 import org.junit.Test;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class TenantMapperTest {
 
-
-    TenantMapper tenantMapper;
-
-    @Before
-    public void before(){
-        tenantMapper = ConnectionFactory.getSqlSession().getMapper(TenantMapper.class);
+    @Test
+    public void testQueryById() {
     }
 
     @Test
-    @Transactional
-    public void testMapper(){
-
-        Tenant tenant = new Tenant();
-        tenant.setTenantName("bigdata");
-        tenant.setQueueId(1);
-        tenant.setCreateTime(new Date());
-        tenant.setUpdateTime(new Date());
-        tenantMapper.insert(tenant);
-        Assert.assertNotEquals(tenant.getId(), 0);
-
-
-        tenant.setTenantName("bigdata-test");
-        int update = tenantMapper.update(tenant);
-        Assert.assertEquals(update, 1);
-
-
-        tenant = tenantMapper.queryById(tenant.getId());
-        Assert.assertEquals(tenant.getTenantName(), "bigdata-test");
-
-
-        int delete = tenantMapper.deleteById(tenant.getId());
-        Assert.assertEquals(delete, 1);
+    public void testQueryByTenantCode() {
     }
 
+    @Test
+    public void testQueryTenantPaging() {
+    }
 }

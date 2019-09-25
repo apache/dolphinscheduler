@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.escheduler.dao.mapper.ResourceUserMapper">
+    <delete id="deleteResourceUser">
+        delete
+        from t_escheduler_relation_resources_user
+        where 1 = 1
+        <if test="userId != 0">
+            and user_id = #{userId}
+        </if>
+        <if test="resourceId != 0">
+            and resource_id = #{resourceId}
+        </if>
+    </delete>
+</mapper>

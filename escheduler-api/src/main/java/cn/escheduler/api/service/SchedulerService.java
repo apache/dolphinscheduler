@@ -29,14 +29,18 @@ import cn.escheduler.common.model.MasterServer;
 import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.mapper.MasterServerMapper;
+import cn.escheduler.dao.entity.ProcessDefinition;
+import cn.escheduler.dao.entity.Project;
+import cn.escheduler.dao.entity.Schedule;
+import cn.escheduler.dao.entity.User;
 import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
 import cn.escheduler.dao.mapper.ProjectMapper;
 import cn.escheduler.dao.mapper.ScheduleMapper;
-import cn.escheduler.dao.model.*;
 import cn.escheduler.dao.utils.cron.CronUtils;
 import cn.escheduler.server.quartz.ProcessScheduleJob;
 import cn.escheduler.server.quartz.QuartzExecutors;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
@@ -64,10 +68,10 @@ public class SchedulerService extends BaseService {
     private ExecutorService executorService;
 
     @Autowired
-    private ProcessDao processDao;
+    private MonitorService monitorService;
 
     @Autowired
-    private MasterServerMapper masterServerMapper;
+    private ProcessDao processDao;
 
     @Autowired
     private ScheduleMapper scheduleMapper;
@@ -93,7 +97,7 @@ public class SchedulerService extends BaseService {
     @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName, Integer processDefineId, String schedule, WarningType warningType,
                                               int warningGroupId, FailureStrategy failureStrategy,
-                                              String receivers, String receiversCc,Priority processInstancePriority, int workerGroupId) throws IOException {
+                                              String receivers, String receiversCc, Priority processInstancePriority, int workerGroupId) throws IOException {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
 
@@ -149,7 +153,9 @@ public class SchedulerService extends BaseService {
         /**
          * updateProcessInstance receivers and cc by process definition id
          */
-        processDefinitionMapper.updateReceiversAndCcById(receivers, receiversCc, processDefineId);
+        processDefinition.setReceivers(receivers);
+        processDefinition.setReceiversCc(receiversCc);
+        processDefinitionMapper.updateById(processDefinition);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -186,7 +192,7 @@ public class SchedulerService extends BaseService {
         }
 
         // check schedule exists
-        Schedule schedule = scheduleMapper.queryById(id);
+        Schedule schedule = scheduleMapper.selectById(id);
 
         if (schedule == null) {
             putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, id);
@@ -241,12 +247,14 @@ public class SchedulerService extends BaseService {
         schedule.setWorkerGroupId(workerGroupId);
         schedule.setUpdateTime(now);
         schedule.setProcessInstancePriority(processInstancePriority);
-        scheduleMapper.update(schedule);
+        scheduleMapper.updateById(schedule);
 
         /**
          * updateProcessInstance recipients and cc by process definition ID
          */
-        processDefinitionMapper.updateReceiversAndCcById(receivers, receiversCc, schedule.getProcessDefinitionId());
+        processDefinition.setReceivers(receivers);
+        processDefinition.setReceiversCc(receiversCc);
+        processDefinitionMapper.updateById(processDefinition);
 
         putMsg(result, Status.SUCCESS);
         return result;
@@ -274,7 +282,7 @@ public class SchedulerService extends BaseService {
         }
 
         // check schedule exists
-        Schedule scheduleObj = scheduleMapper.queryById(id);
+        Schedule scheduleObj = scheduleMapper.selectById(id);
 
         if (scheduleObj == null) {
             putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, id);
@@ -302,10 +310,12 @@ public class SchedulerService extends BaseService {
                 return result;
             }
             // check sub process definition release state
-            List<String> subProcessDefineIds = new ArrayList<>();
+            List<Integer> subProcessDefineIds = new ArrayList<>();
             processDao.recurseFindSubProcessId(scheduleObj.getProcessDefinitionId(), subProcessDefineIds);
+            Integer[] idArray = subProcessDefineIds.toArray(new Integer[subProcessDefineIds.size()]);
             if (subProcessDefineIds.size() > 0){
-                List<ProcessDefinition> subProcessDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(subProcessDefineIds);
+                List<ProcessDefinition> subProcessDefinitionList =
+                        processDefinitionMapper.queryDefinitionListByIdList(idArray);
                 if (subProcessDefinitionList != null && subProcessDefinitionList.size() > 0){
                     for (ProcessDefinition subProcessDefinition : subProcessDefinitionList){
                         /**
@@ -323,7 +333,8 @@ public class SchedulerService extends BaseService {
         }
 
         // check master server exists
-        List<MasterServer> masterServers = masterServerMapper.queryAllMaster();
+        List<MasterServer> masterServers = monitorService.getServerListFromZK(true);
+
 
         if (masterServers.size() == 0) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
@@ -332,7 +343,7 @@ public class SchedulerService extends BaseService {
         // set status
         scheduleObj.setReleaseState(scheduleStatus);
 
-        scheduleMapper.update(scheduleObj);
+        scheduleMapper.updateById(scheduleObj);
 
         try {
             switch (scheduleStatus) {
@@ -387,15 +398,15 @@ public class SchedulerService extends BaseService {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineId);
             return result;
         }
+        Page<Schedule> page = new Page(pageNo, pageSize);
+        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineIdPaging(
+                page, processDefineId, searchVal
+        );
 
-        Integer count = scheduleMapper.countByProcessDefineId(processDefineId, searchVal);
 
         PageInfo pageInfo = new PageInfo<Schedule>(pageNo, pageSize);
-
-        List<Schedule> scheduleList = scheduleMapper.queryByProcessDefineIdPaging(processDefinition.getId(), searchVal, pageInfo.getStart(), pageSize);
-
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(scheduleList);
+        pageInfo.setTotalCount((int)scheduleIPage.getTotal());
+        pageInfo.setLists(scheduleIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
@@ -523,7 +534,7 @@ public class SchedulerService extends BaseService {
             return checkResult;
         }
 
-        Schedule schedule = scheduleMapper.queryById(scheduleId);
+        Schedule schedule = scheduleMapper.selectById(scheduleId);
 
         if (schedule == null) {
             putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, scheduleId);
@@ -543,7 +554,7 @@ public class SchedulerService extends BaseService {
         }
 
 
-        int delete = scheduleMapper.delete(scheduleId);
+        int delete = scheduleMapper.deleteById(scheduleId);
 
         if (delete > 0) {
             putMsg(result, Status.SUCCESS);

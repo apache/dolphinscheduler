@@ -22,8 +22,8 @@ import cn.escheduler.common.model.TaskNodeRelation;
 import cn.escheduler.common.process.ProcessDag;
 import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.JSONUtils;
-import cn.escheduler.dao.model.ProcessData;
-import cn.escheduler.dao.model.ProcessInstance;
+import cn.escheduler.dao.entity.ProcessData;
+import cn.escheduler.dao.entity.ProcessInstance;
 
 import java.util.ArrayList;
 import java.util.List;

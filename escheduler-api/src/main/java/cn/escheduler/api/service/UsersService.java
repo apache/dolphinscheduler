@@ -21,13 +21,16 @@ import cn.escheduler.api.utils.CheckUtils;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.api.utils.Result;
+import cn.escheduler.common.enums.ResourceType;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.EncryptionUtils;
 import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.common.utils.PropertyUtils;
+import cn.escheduler.dao.entity.*;
 import cn.escheduler.dao.mapper.*;
-import cn.escheduler.dao.model.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,13 +58,13 @@ public class UsersService extends BaseService {
     private ProjectUserMapper projectUserMapper;
 
     @Autowired
-    private ResourcesUserMapper resourcesUserMapper;
+    private ResourceUserMapper resourcesUserMapper;
 
     @Autowired
     private ResourceMapper resourceMapper;
 
     @Autowired
-    private DatasourceUserMapper datasourceUserMapper;
+    private DataSourceUserMapper datasourceUserMapper;
 
     @Autowired
     private UDFUserMapper udfUserMapper;
@@ -148,7 +151,7 @@ public class UsersService extends BaseService {
      */
     public User queryUser(String name, String password) {
         String md5 = EncryptionUtils.getMd5(password);
-        return userMapper.queryForCheck(name, md5);
+        return userMapper.queryUserByNamePassword(name, md5);
     }
 
     /**
@@ -177,14 +180,13 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        Integer count = userMapper.countUserPaging(searchVal);
+        Page<User> page = new Page(pageNo, pageSize);
+
+        IPage<User> scheduleList = userMapper.queryUserPaging(page, searchVal);
 
         PageInfo<User> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-        List<User> scheduleList = userMapper.queryUserPaging(searchVal, pageInfo.getStart(), pageSize);
-
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(scheduleList);
+        pageInfo.setTotalCount((int)scheduleList.getTotal());
+        pageInfo.setLists(scheduleList.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
@@ -212,7 +214,7 @@ public class UsersService extends BaseService {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
 
-        User user = userMapper.queryById(userId);
+        User user = userMapper.selectById(userId);
 
         if (user == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
@@ -222,7 +224,7 @@ public class UsersService extends BaseService {
         Date now = new Date();
 
         if (StringUtils.isNotEmpty(userName)) {
-            User tempUser = userMapper.queryByUserName(userName);
+            User tempUser = userMapper.queryByUserNameAccurately(userName);
             if (tempUser != null && tempUser.getId() != userId) {
                 putMsg(result, Status.USER_NAME_EXIST);
                 return result;
@@ -259,7 +261,8 @@ public class UsersService extends BaseService {
                         String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
 
                         //file resources list
-                        List<Resource> fileResourcesList = resourceMapper.queryResourceCreatedByUser(userId, 0);
+                        List<Resource> fileResourcesList = resourceMapper.queryResourceList(
+                                null, userId, ResourceType.FILE.ordinal());
                         if (CollectionUtils.isNotEmpty(fileResourcesList)) {
                             for (Resource resource : fileResourcesList) {
                                 HadoopUtils.getInstance().copy(oldResourcePath + "/" + resource.getAlias(), newResourcePath, false, true);
@@ -267,7 +270,8 @@ public class UsersService extends BaseService {
                         }
 
                         //udf resources
-                        List<Resource> udfResourceList = resourceMapper.queryResourceCreatedByUser(userId, 1);
+                        List<Resource> udfResourceList = resourceMapper.queryResourceList(
+                                null, userId, ResourceType.UDF.ordinal());
                         if (CollectionUtils.isNotEmpty(udfResourceList)) {
                             for (Resource resource : udfResourceList) {
                                 HadoopUtils.getInstance().copy(oldUdfsPath + "/" + resource.getAlias(), newUdfsPath, false, true);
@@ -297,7 +301,7 @@ public class UsersService extends BaseService {
         }
 
         // updateProcessInstance user
-        userMapper.update(user);
+        userMapper.updateById(user);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -329,7 +333,7 @@ public class UsersService extends BaseService {
             }
         }
 
-        userMapper.delete(id);
+        userMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -353,7 +357,7 @@ public class UsersService extends BaseService {
         }
 
         //if the selected projectIds are empty, delete all items associated with the user
-        projectUserMapper.deleteByUserId(userId);
+        projectUserMapper.deleteProjectRelation(0, userId);
 
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS, Constants.MSG)) {
             return result;
@@ -393,7 +397,7 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        resourcesUserMapper.deleteByUserId(userId);
+        resourcesUserMapper.deleteResourceUser(userId, 0);
 
         if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS, Constants.MSG)) {
             return result;
@@ -549,7 +553,7 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        List<User> userList = userMapper.queryAllGeneralUsers();
+        List<User> userList = userMapper.queryAllGeneralUser();
         result.put(Constants.DATA_LIST, userList);
         putMsg(result, Status.SUCCESS);
 
@@ -570,7 +574,7 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        List<User> userList = userMapper.queryAllUsers();
+        List<User> userList = userMapper.selectList(null );
         result.put(Constants.DATA_LIST, userList);
         putMsg(result, Status.SUCCESS);
 
@@ -586,7 +590,7 @@ public class UsersService extends BaseService {
     public Result verifyUserName(String userName) {
 
         cn.escheduler.api.utils.Result result = new cn.escheduler.api.utils.Result();
-        User user = userMapper.queryByUserName(userName);
+        User user = userMapper.queryByUserNameAccurately(userName);
         if (user != null) {
             logger.error("user {} has exist, can't create again.", userName);
 
@@ -614,7 +618,7 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        List<User> userList = userMapper.queryAllUsers();
+        List<User> userList = userMapper.selectList(null);
         List<User> resultUsers = new ArrayList<>();
         Set<User> userSet = null;
         if (userList != null && userList.size() > 0) {

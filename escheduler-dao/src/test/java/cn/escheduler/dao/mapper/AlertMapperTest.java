@@ -17,49 +17,73 @@
 package cn.escheduler.dao.mapper;
 
 import cn.escheduler.common.enums.AlertStatus;
-import cn.escheduler.common.enums.AlertType;
-import cn.escheduler.common.enums.ShowType;
-import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.Alert;
+import cn.escheduler.dao.entity.Alert;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
+import java.util.List;
 
-/**
- * alert mapper test
- */
+
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class AlertMapperTest {
 
-
+    @Autowired
     AlertMapper alertMapper;
 
-    @Before
-    public void before(){
-        alertMapper = ConnectionFactory.getSqlSession().getMapper(AlertMapper.class);
+    private Alert insertOne(){
+        //insertOne
+        Alert alert = new Alert();
+        alert.setLog("success");
+        alert.setReceivers("xx@aa.com");
+        alert.setAlertGroupId(1);
+        alert.setAlertStatus(AlertStatus.EXECUTION_SUCCESS);
+        alert.setCreateTime(new Date());
+        alert.setUpdateTime(new Date());
+        alertMapper.insert(alert);
+        return alert;
     }
 
     @Test
-    public void testMapper(){
-        Alert alert = new Alert();
-        alert.setAlertType(AlertType.EMAIL);
-        alert.setContent("content test ");
-        alert.setShowType(ShowType.TABLE);
-        alert.setTitle("alert test");
-        alert.setAlertGroupId(1);
-        alert.setCreateTime(new Date());
-        alert.setUpdateTime(new Date());
-        alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
-        alertMapper.insert(alert);
-        Assert.assertNotEquals(alert.getId(), 0);
-
-        alert.setTitle("alert title");
-        int update = alertMapper.update(AlertStatus.EXECUTION_SUCCESS, "execute successfully",
-                new Date(), alert.getId());
-
+    public void testUpdate(){
+        //insertOne
+        Alert alert = insertOne();
+        //update
+        alert.setTitle("hello");
+        int update = alertMapper.updateById(alert);
         Assert.assertEquals(update, 1);
-        int delete = alertMapper.delete(alert.getId());
+        alertMapper.deleteById(alert.getId());
+    }
+
+    @Test
+    public void testDelete(){
+
+        Alert alert = insertOne();
+        int delete = alertMapper.deleteById(alert.getId());
         Assert.assertEquals(delete, 1);
+    }
+
+    @Test
+    public void testQuery() {
+        Alert alert = insertOne();
+        //query
+        List<Alert> alerts = alertMapper.selectList(null);
+        Assert.assertNotEquals(alerts.size(), 0);
+        alertMapper.deleteById(alert.getId());
+    }
+
+    @Test
+    public void testListAlertByStatus() {
+        Alert alert = insertOne();
+        //query
+        List<Alert> alerts = alertMapper.listAlertByStatus(AlertStatus.EXECUTION_SUCCESS);
+        Assert.assertNotEquals(alerts.size(), 0);
+        alertMapper.deleteById(alert.getId());
     }
 }

@@ -16,40 +16,25 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.UserAlertGroup;
-import org.junit.Assert;
-import org.junit.Before;
+
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class UserAlertGroupMapperTest {
 
-
-    @Autowired
-    UserAlertGroupMapper userAlertGroupMapper;
-
-    @Before
-    public void before(){
-        userAlertGroupMapper = ConnectionFactory.getSqlSession().getMapper(UserAlertGroupMapper.class);
+    @Test
+    public void testQueryForUser() {
     }
 
     @Test
-    public void testInsert(){
-        UserAlertGroup userAlertGroup = new UserAlertGroup();
-        userAlertGroup.setUserId(2);
-        userAlertGroup.setAlertgroupId(10021);
-        userAlertGroup.setCreateTime(new Date());
-        userAlertGroup.setUpdateTime(new Date());
-        userAlertGroupMapper.insert(userAlertGroup);
-        Assert.assertNotEquals(userAlertGroup.getId(), 0);
-
-
-        int delete = userAlertGroupMapper.deleteByAlertgroupId(userAlertGroup.getAlertgroupId());
-        Assert.assertEquals(delete, 1);
+    public void testDeleteByAlertgroupId() {
     }
 
-
+    @Test
+    public void testListUserByAlertgroupId() {
+    }
 }

@@ -35,9 +35,11 @@ import cn.escheduler.common.queue.TaskQueueFactory;
 import cn.escheduler.common.utils.*;
 import cn.escheduler.common.utils.placeholder.BusinessTimeUtils;
 import cn.escheduler.dao.ProcessDao;
+import cn.escheduler.dao.entity.*;
 import cn.escheduler.dao.mapper.*;
-import cn.escheduler.dao.model.*;
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,7 +118,7 @@ public class ProcessInstanceService extends BaseDAGService {
         if(processInstance.getWorkerGroupId() == -1){
             workerGroupName = DEFAULT;
         }else{
-            WorkerGroup workerGroup = workerGroupMapper.queryById(processInstance.getWorkerGroupId());
+            WorkerGroup workerGroup = workerGroupMapper.selectById(processInstance.getWorkerGroupId());
             if(workerGroup != null){
                 workerGroupName = DEFAULT;
             }else{
@@ -185,12 +187,11 @@ public class ProcessInstanceService extends BaseDAGService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startDate,endDate");
             return result;
         }
-        Integer count = processInstanceMapper.countProcessInstance(project.getId(), processDefineId, statesStr,
-                host, start, end, searchVal);
+        Page<ProcessInstance> page = new Page(pageNo, pageSize);
 
-        PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
-        List<ProcessInstance> processInstanceList = processInstanceMapper.queryProcessInstanceListPaging(
-                project.getId(), processDefineId, searchVal, statesStr, host, start, end, pageInfo.getStart(), pageSize);
+        IPage<ProcessInstance> processInstanceList =
+                processInstanceMapper.queryProcessInstanceListPaging(page,
+                project.getId(), processDefineId, searchVal, statesStr, host, start, end);
 
         Set<String> exclusionSet = new HashSet<String>(){{
             add(Constants.CLASS);
@@ -199,8 +200,9 @@ public class ProcessInstanceService extends BaseDAGService {
             add("processInstanceJson");
         }};
 
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(CollectionUtils.getListByExclusion(processInstanceList, exclusionSet));
+        PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
+        pageInfo.setTotalCount((int)processInstanceList.getTotal());
+        pageInfo.setLists(CollectionUtils.getListByExclusion(processInstanceList.getRecords(), exclusionSet));
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -410,7 +412,7 @@ public class ProcessInstanceService extends BaseDAGService {
             processDefinition.setLocations(locations);
             processDefinition.setConnects(connects);
             processDefinition.setTimeout(timeout);
-            updateDefine = processDefineMapper.update(processDefinition);
+            updateDefine = processDefineMapper.updateById(processDefinition);
         }
         if (update > 0 && updateDefine > 0) {
             putMsg(result, Status.SUCCESS);
@@ -507,7 +509,7 @@ public class ProcessInstanceService extends BaseDAGService {
                         .append(UNDERLINE);
 
                 int taskWorkerGroupId = processDao.getTaskWorkerGroupId(taskInstance);
-                WorkerGroup workerGroup = workerGroupMapper.queryById(taskWorkerGroupId);
+                WorkerGroup workerGroup = workerGroupMapper.selectById(taskWorkerGroupId);
 
                 if(workerGroup == null){
                     nodeValueSb.append(DEFAULT_WORKER_ID);

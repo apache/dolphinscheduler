@@ -22,9 +22,9 @@ import cn.escheduler.api.utils.ZookeeperMonitor;
 import cn.escheduler.common.enums.ZKNodeType;
 import cn.escheduler.dao.MonitorDBDao;
 import cn.escheduler.common.model.MasterServer;
-import cn.escheduler.dao.model.MonitorRecord;
-import cn.escheduler.dao.model.User;
-import cn.escheduler.dao.model.ZookeeperRecord;
+import cn.escheduler.dao.entity.MonitorRecord;
+import cn.escheduler.dao.entity.User;
+import cn.escheduler.dao.entity.ZookeeperRecord;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -107,7 +107,7 @@ public class MonitorService extends BaseService{
     return result;
   }
 
-  private List<MasterServer> getServerListFromZK(boolean isMaster){
+  public List<MasterServer> getServerListFromZK(boolean isMaster){
     List<MasterServer> servers = new ArrayList<>();
     ZookeeperMonitor zookeeperMonitor = null;
     try{

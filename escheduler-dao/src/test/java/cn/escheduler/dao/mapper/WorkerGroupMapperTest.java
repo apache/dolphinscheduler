@@ -16,54 +16,25 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.WorkerGroup;
-import org.junit.Assert;
-import org.junit.Before;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
-import java.util.List;
-
-/**
- * worker group mapper test
- */
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class WorkerGroupMapperTest {
 
-    WorkerGroupMapper workerGroupMapper;
-
-
-    @Before
-    public void before() {
-        workerGroupMapper = ConnectionFactory.getSqlSession().getMapper(WorkerGroupMapper.class);
+    @Test
+    public void testQueryAllWorkerGroup() {
     }
-
 
     @Test
-    public void test() {
-        WorkerGroup workerGroup = new WorkerGroup();
-
-        String name = "workerGroup3";
-        workerGroup.setName(name);
-        workerGroup.setIpList("192.168.220.154,192.168.220.188");
-        workerGroup.setCreateTime(new Date());
-        workerGroup.setUpdateTime(new Date());
-        workerGroupMapper.insert(workerGroup);
-        Assert.assertNotEquals(workerGroup.getId(), 0);
-
-        List<WorkerGroup> workerGroups2 = workerGroupMapper.queryWorkerGroupByName(name);
-        Assert.assertEquals(workerGroups2.size(), 1);
-
-        workerGroup.setName("workerGroup11");
-        workerGroupMapper.update(workerGroup);
-
-        List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
-        Assert.assertNotEquals(workerGroups.size(), 0);
-
-        workerGroupMapper.deleteById(workerGroup.getId());
-
-        workerGroups = workerGroupMapper.queryAllWorkerGroup();
-        Assert.assertEquals(workerGroups.size(), 0);
+    public void testQueryWorkerGroupByName() {
     }
 
+    @Test
+    public void testQueryListPaging() {
+    }
 }

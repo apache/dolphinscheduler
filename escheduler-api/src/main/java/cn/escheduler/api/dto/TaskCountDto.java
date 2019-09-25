@@ -17,7 +17,7 @@
 package cn.escheduler.api.dto;
 
 import cn.escheduler.common.enums.ExecutionStatus;
-import cn.escheduler.dao.model.ExecuteStatusCount;
+import cn.escheduler.dao.entity.ExecuteStatusCount;
 
 import java.util.ArrayList;
 import java.util.List;

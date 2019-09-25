@@ -19,7 +19,7 @@ package cn.escheduler.server.utils;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.CommonUtils;
 import cn.escheduler.common.utils.OSUtils;
-import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import cn.escheduler.server.rpc.LogClient;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;

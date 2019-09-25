@@ -25,7 +25,7 @@ import cn.escheduler.common.enums.Flag;
 import cn.escheduler.common.queue.ITaskQueue;
 import cn.escheduler.common.queue.TaskQueueFactory;
 import cn.escheduler.common.utils.ParameterUtils;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

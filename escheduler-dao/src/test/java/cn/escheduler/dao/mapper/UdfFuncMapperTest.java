@@ -16,50 +16,33 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.Resource;
-import org.junit.Assert;
-import org.junit.Before;
+
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
-
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class UdfFuncMapperTest {
 
-    private final Logger logger = LoggerFactory.getLogger(UdfFuncMapperTest.class);
-
-    ResourceMapper resourceMapper;
-    UdfFuncMapper udfFuncMapper;
-
-    @Before
-    public void before(){
-
-        resourceMapper = ConnectionFactory.getSqlSession().getMapper(ResourceMapper.class);
-        udfFuncMapper = ConnectionFactory.getSqlSession().getMapper(UdfFuncMapper.class);
+    @Test
+    public void testQueryUdfByIdStr() {
     }
 
     @Test
-    public void testMapper(){
-        Resource resource  = new Resource();
-        resource.setAlias("aa");
-        resource.setFileName("aa");
-        resource.setDesc("aa");
-        resource.setUserId(2);
-        resource.setCreateTime(new Date());
-        resource.setUpdateTime(new Date());
-        resourceMapper.insert(resource);
-        Assert.assertNotEquals(resource.getId(), 0);
+    public void testQueryUdfFuncPaging() {
+    }
 
+    @Test
+    public void testGetUdfFuncByType() {
+    }
 
-        resource.setAlias("aa123");
-        resourceMapper.update(resource);
-        resource = resourceMapper.queryResourceById(resource.getId());
-        Assert.assertEquals(resource.getAlias(), "aa123");
+    @Test
+    public void testQueryUdfFuncExceptUserId() {
+    }
 
-
-        int delete = resourceMapper.delete(resource.getId());
-        Assert.assertEquals(delete, 1);
+    @Test
+    public void testQueryAuthedUdfFunc() {
     }
 }

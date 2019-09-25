@@ -20,14 +20,15 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.common.enums.UserType;
+import cn.escheduler.dao.entity.ProcessDefinition;
+import cn.escheduler.dao.entity.Project;
+import cn.escheduler.dao.entity.ProjectUser;
+import cn.escheduler.dao.entity.User;
 import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
 import cn.escheduler.dao.mapper.ProjectMapper;
 import cn.escheduler.dao.mapper.ProjectUserMapper;
-import cn.escheduler.dao.mapper.UserMapper;
-import cn.escheduler.dao.model.ProcessDefinition;
-import cn.escheduler.dao.model.Project;
-import cn.escheduler.dao.model.ProjectUser;
-import cn.escheduler.dao.model.User;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,8 @@ import static cn.escheduler.api.utils.CheckUtils.checkDesc;
 
 /**
  * project service
- */
+ *HttpTask./
+**/
 @Service
 public class ProjectService extends BaseService{
 
@@ -102,7 +104,7 @@ public class ProjectService extends BaseService{
     public Map<String, Object> queryById(Integer projectId) {
 
         Map<String, Object> result = new HashMap<>(5);
-        Project project = projectMapper.queryById(projectId);
+        Project project = projectMapper.selectById(projectId);
 
         if (project != null) {
             result.put(Constants.DATA_LIST, project);
@@ -151,24 +153,22 @@ public class ProjectService extends BaseService{
      */
     public Map<String, Object> queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
         Map<String, Object> result = new HashMap<>();
-        int count = 0;
         PageInfo pageInfo = new PageInfo<Project>(pageNo, pageSize);
-        List<Project> projectList = null;
-        if (loginUser.getUserType() == UserType.ADMIN_USER) {
-            count = projectMapper.countAllProjects(searchVal);
-            projectList = projectMapper.queryAllProjectListPaging(pageInfo.getStart(), pageSize, searchVal);
+
+        Page<Project> page = new Page(pageNo, pageSize);
+
+        int userId = loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId();
+        IPage<Project> projectIPage = projectMapper.queryProjectListPaging(page, userId, searchVal);
+
+        List<Project> projectList = projectIPage.getRecords();
+        if(userId != 0){
             for (Project project : projectList) {
                 project.setPerm(cn.escheduler.common.Constants.DEFAULT_ADMIN_PERMISSION);
             }
-
-        } else {
-            count = projectMapper.countProjects(loginUser.getId(), searchVal);
-            projectList = projectMapper.queryProjectListPaging(loginUser.getId(),
-                    pageInfo.getStart(), pageSize, searchVal);
         }
-        pageInfo.setTotalCount(count);
+        pageInfo.setTotalCount((int)projectIPage.getTotal());
         pageInfo.setLists(projectList);
-        result.put(Constants.COUNT, count);
+        result.put(Constants.COUNT, (int)projectIPage.getTotal());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
@@ -184,7 +184,7 @@ public class ProjectService extends BaseService{
      */
     public Map<String, Object> deleteProject(User loginUser, Integer projectId) {
         Map<String, Object> result = new HashMap<>(5);
-        Project project = projectMapper.queryById(projectId);
+        Project project = projectMapper.selectById(projectId);
         Map<String, Object> checkResult = getCheckResult(loginUser, project);
         if (checkResult != null) {
             return checkResult;
@@ -196,7 +196,7 @@ public class ProjectService extends BaseService{
             return result;
         }
 
-        int delete = projectMapper.delete(projectId);
+        int delete = projectMapper.deleteById(projectId);
         if (delete > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -233,7 +233,7 @@ public class ProjectService extends BaseService{
     public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc) {
         Map<String, Object> result = new HashMap<>(5);
 
-        Project project = projectMapper.queryById(projectId);
+        Project project = projectMapper.selectById(projectId);
         Map<String, Object> checkResult = getCheckResult(loginUser, project);
         if (checkResult != null) {
             return checkResult;
@@ -247,7 +247,7 @@ public class ProjectService extends BaseService{
         project.setDesc(desc);
         project.setUpdateTime(new Date());
 
-        int update = projectMapper.update(project);
+        int update = projectMapper.updateById(project);
         if (update > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -278,7 +278,7 @@ public class ProjectService extends BaseService{
         if (projectList != null && projectList.size() > 0) {
             projectSet = new HashSet<>(projectList);
 
-            List<Project> authedProjectList = projectMapper.authedProject(userId);
+            List<Project> authedProjectList = projectMapper.queryAuthedProjectListByUserId(userId);
 
             resultList = getUnauthorizedProjects(projectSet, authedProjectList);
         }
@@ -321,7 +321,7 @@ public class ProjectService extends BaseService{
             return result;
         }
 
-        List<Project> projects = projectMapper.authedProject(userId);
+        List<Project> projects = projectMapper.queryAuthedProjectListByUserId(userId);
         result.put(Constants.DATA_LIST, projects);
         putMsg(result,Status.SUCCESS);
 
@@ -357,7 +357,7 @@ public class ProjectService extends BaseService{
             return cn.escheduler.common.Constants.ALL_PERMISSIONS;
         }
 
-        ProjectUser projectUser = projectUserMapper.query(project.getId(), user.getId());
+        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
 
         if (projectUser == null) {
             return 0;
@@ -373,8 +373,8 @@ public class ProjectService extends BaseService{
      */
     public Map<String, Object> queryAllProjectList() {
         Map<String, Object> result = new HashMap<>();
-        List<Project> projects = projectMapper.queryAllProjectList();
-        List<ProcessDefinition>  processDefinitions = processDefinitionMapper.queryAll();
+        List<Project> projects = projectMapper.selectList(null);
+        List<ProcessDefinition>  processDefinitions = processDefinitionMapper.selectList(null);
         if(projects != null){
             Set set = new HashSet<>();
             for (ProcessDefinition processDefinition : processDefinitions){

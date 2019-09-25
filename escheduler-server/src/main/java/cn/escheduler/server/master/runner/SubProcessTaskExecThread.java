@@ -19,8 +19,8 @@ package cn.escheduler.server.master.runner;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.thread.Stopper;
-import cn.escheduler.dao.model.ProcessInstance;
-import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.entity.ProcessInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

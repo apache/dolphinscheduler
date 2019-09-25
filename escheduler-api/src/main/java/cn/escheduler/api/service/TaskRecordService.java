@@ -20,7 +20,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.dao.TaskRecordDao;
-import cn.escheduler.dao.model.TaskRecord;
+import cn.escheduler.dao.entity.TaskRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

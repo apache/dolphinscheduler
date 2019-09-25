@@ -18,7 +18,7 @@ package cn.escheduler.alert.manager;
 
 import cn.escheduler.alert.utils.Constants;
 import cn.escheduler.alert.utils.EnterpriseWeChatUtils;
-import cn.escheduler.dao.model.Alert;
+import cn.escheduler.dao.entity.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

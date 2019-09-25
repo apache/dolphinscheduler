@@ -17,7 +17,7 @@
 package cn.escheduler.dao.utils;
 
 import cn.escheduler.common.Constants;
-import org.apache.commons.io.IOUtils;
+import com.baomidou.mybatisplus.core.toolkit.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

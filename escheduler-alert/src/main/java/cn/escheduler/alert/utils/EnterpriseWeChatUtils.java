@@ -17,7 +17,7 @@
 package cn.escheduler.alert.utils;
 
 import cn.escheduler.common.enums.ShowType;
-import cn.escheduler.dao.model.Alert;
+import cn.escheduler.dao.entity.Alert;
 import com.alibaba.fastjson.JSON;
 
 import com.google.common.reflect.TypeToken;

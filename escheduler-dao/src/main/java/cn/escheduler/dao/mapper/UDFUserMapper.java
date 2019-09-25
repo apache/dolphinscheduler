@@ -16,40 +16,15 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.model.UDFUser;
-import org.apache.ibatis.annotations.DeleteProvider;
-import org.apache.ibatis.annotations.InsertProvider;
+import cn.escheduler.dao.entity.UDFUser;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+public interface UDFUserMapper extends BaseMapper<UDFUser> {
 
-/**
- * udf user relation mapper
- */
-public interface UDFUserMapper {
-
-    /**
-     * insert udf user
-     * @param udfUser
-     * @return
-     */
-     @InsertProvider(type = UDFUserMapperProvider.class, method = "insert")
-     int insert(@Param("udfUser") UDFUser udfUser);
-
-
-    /**
-     * delete by user id
-     * @param userId
-     * @return
-     */
-    @DeleteProvider(type = UDFUserMapperProvider.class, method = "deleteByUserId")
     int deleteByUserId(@Param("userId") int userId);
 
-    /**
-     * delete by udf function id
-     * @param udfFuncId
-     * @return
-     */
-    @DeleteProvider(type = UDFUserMapperProvider.class, method = "deleteByUdfFuncId")
     int deleteByUdfFuncId(@Param("udfFuncId") int udfFuncId);
 
 }
+

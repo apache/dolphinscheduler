@@ -21,7 +21,7 @@ import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.model.TaskNode;
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import cn.escheduler.server.utils.LoggerUtils;
 import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.TaskManager;

@@ -20,7 +20,7 @@ import cn.escheduler.alert.runner.AlertSender;
 import cn.escheduler.alert.utils.Constants;
 import cn.escheduler.common.thread.Stopper;
 import cn.escheduler.dao.AlertDao;
-import cn.escheduler.dao.model.Alert;
+import cn.escheduler.dao.entity.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

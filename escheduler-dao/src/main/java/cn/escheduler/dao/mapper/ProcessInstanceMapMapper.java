@@ -16,88 +16,19 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.model.ProcessInstanceMap;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.type.JdbcType;
+import cn.escheduler.dao.entity.ProcessInstanceMap;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
-/**
- * work process instance map mapper
- */
-public interface ProcessInstanceMapMapper {
-
-    /**
-     * insert process instance relation
-     * @param processInstanceMap
-     * @return
-     */
-    @InsertProvider(type = ProcessInstanceMapMapperProvider.class, method = "insert")
-    @Options(useGeneratedKeys = true,keyProperty = "processInstanceMap.id")
-    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "processInstanceMap.id", before = false, resultType = int.class)
-    int insert(@Param("processInstanceMap") ProcessInstanceMap processInstanceMap);
+public interface ProcessInstanceMapMapper extends BaseMapper<ProcessInstanceMap> {
 
 
-    /**
-     * delete process instance relation by id
-     * @param processInstanceMapId
-     * @return
-     */
-    @DeleteProvider(type = ProcessInstanceMapMapperProvider.class, method = "delete")
-    int delete(@Param("processInstanceMapId") int processInstanceMapId);
 
-    /**
-     * delete process instance relation by parent work process id
-     * @param parentProcessId
-     * @return
-     */
-    @DeleteProvider(type = ProcessInstanceMapMapperProvider.class, method = "deleteByParentProcessId")
-    int deleteByParentProcessId(@Param("parentProcessId") int parentProcessId);
-
-    /**
-     * update process instance relation
-     *
-     * @param processInstanceMap
-     * @return
-     */
-    @UpdateProvider(type = ProcessInstanceMapMapperProvider.class, method = "update")
-    int update(@Param("processInstanceMap") ProcessInstanceMap processInstanceMap);
-
-    /**
-     * query process instance relation by id
-     * @param processMapId
-     * @return
-     */
-    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "parentProcessInstanceId", column = "parent_process_instance_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "parentTaskInstanceId", column = "parent_task_instance_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "processInstanceId", column = "process_instance_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER)
-    })
-    @SelectProvider(type = ProcessInstanceMapMapperProvider.class, method = "queryById")
-    ProcessInstanceMap queryById(@Param("processMapId") int processMapId);
-
-    /**
-     * query by parent instance id
-     * @param parentProcessId
-     * @param parentTaskId
-     * @return
-     */
-    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "parentProcessInstanceId", column = "parent_process_instance_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "parentTaskInstanceId", column = "parent_task_instance_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "processInstanceId", column = "process_instance_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER)
-    })
-    @SelectProvider(type = ProcessInstanceMapMapperProvider.class, method = "queryByParentId")
     ProcessInstanceMap queryByParentId(@Param("parentProcessId") int parentProcessId, @Param("parentTaskId") int parentTaskId);
 
-    /**
-     * query relation by sub process id
-     * @param subProcessId
-     * @return
-     */
-    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "parentProcessInstanceId", column = "parent_process_instance_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "parentTaskInstanceId", column = "parent_task_instance_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "processInstanceId", column = "process_instance_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER)
-    })
-    @SelectProvider(type = ProcessInstanceMapMapperProvider.class, method = "queryBySubProcessId")
-    ProcessInstanceMap queryBySubProcessId(@Param("subProcessId")Integer subProcessId);
+
+    ProcessInstanceMap queryBySubProcessId(@Param("subProcessId") Integer subProcessId);
+
+    int deleteByParentProcessId(@Param("parentProcessId") int parentProcessId);
+
 }
