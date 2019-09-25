@@ -20,7 +20,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.api.utils.Result;
-import cn.escheduler.dao.model.Resource;
+import cn.escheduler.dao.entity.Resource;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;

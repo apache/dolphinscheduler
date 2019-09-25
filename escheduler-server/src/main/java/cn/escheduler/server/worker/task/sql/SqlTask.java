@@ -17,7 +17,6 @@
 package cn.escheduler.server.worker.task.sql;
 
 import cn.escheduler.alert.utils.MailUtils;
-import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ShowType;
 import cn.escheduler.common.enums.TaskTimeoutStrategy;
 import cn.escheduler.common.enums.UdfType;
@@ -33,7 +32,10 @@ import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.*;
+import cn.escheduler.dao.entity.DataSource;
+import cn.escheduler.dao.entity.ProcessInstance;
+import cn.escheduler.dao.entity.UdfFunc;
+import cn.escheduler.dao.entity.User;
 import cn.escheduler.server.utils.ParamUtils;
 import cn.escheduler.server.utils.UDFUtils;
 import cn.escheduler.server.worker.task.AbstractTask;

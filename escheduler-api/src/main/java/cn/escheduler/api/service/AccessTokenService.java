@@ -17,20 +17,19 @@
 package cn.escheduler.api.service;
 
 import cn.escheduler.api.enums.Status;
-import cn.escheduler.api.utils.CheckUtils;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
-import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.utils.*;
+import cn.escheduler.dao.entity.AccessToken;
+import cn.escheduler.dao.entity.User;
 import cn.escheduler.dao.mapper.*;
-import cn.escheduler.dao.model.*;
-import org.apache.commons.lang3.StringUtils;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -59,18 +58,14 @@ public class AccessTokenService extends BaseService {
         Map<String, Object> result = new HashMap<>(5);
 
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Integer count;
-        List<AccessToken> accessTokenList;
+        Page<AccessToken> page = new Page(pageNo, pageSize);
+        int userId = loginUser.getId();
         if (loginUser.getUserType() == UserType.ADMIN_USER){
-             count = accessTokenMapper.countAccessTokenPaging(0,searchVal);
-            accessTokenList = accessTokenMapper.queryAccessTokenPaging(0,searchVal, pageInfo.getStart(), pageSize);
-        }else {
-            count = accessTokenMapper.countAccessTokenPaging(loginUser.getId(),searchVal);
-            accessTokenList = accessTokenMapper.queryAccessTokenPaging(loginUser.getId(),searchVal, pageInfo.getStart(), pageSize);
+            userId = 0;
         }
-
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(accessTokenList);
+        IPage<AccessToken> accessTokenList = accessTokenMapper.selectAccessTokenPage(page, searchVal, userId);
+        pageInfo.setTotalCount((int)accessTokenList.getTotal());
+        pageInfo.setLists(accessTokenList.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
@@ -155,7 +150,7 @@ public class AccessTokenService extends BaseService {
             return result;
         }
 
-        accessTokenMapper.delete(id);
+        accessTokenMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -177,7 +172,7 @@ public class AccessTokenService extends BaseService {
         accessToken.setToken(token);
         accessToken.setUpdateTime(new Date());
 
-        accessTokenMapper.update(accessToken);
+        accessTokenMapper.updateById(accessToken);
 
         putMsg(result, Status.SUCCESS);
         return result;

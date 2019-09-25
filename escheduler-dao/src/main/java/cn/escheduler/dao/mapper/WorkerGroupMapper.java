@@ -16,116 +16,21 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.model.WorkerGroup;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.type.JdbcType;
+import cn.escheduler.dao.entity.WorkerGroup;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
-/**
- * worker group mapper
- */
-public interface WorkerGroupMapper {
+public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
 
-    /**
-     * query all worker group list
-     *
-     * @return
-     */
-    @Results(value = {
-            @Result(property = "id", column = "id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "ipList", column = "ip_list", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-            @Result(property = "updateTime", column = "update_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-    })
-    @SelectProvider(type = WorkerGroupMapperProvider.class, method = "queryAllWorkerGroup")
     List<WorkerGroup> queryAllWorkerGroup();
 
-    /**
-     * query worker group by name
-     *
-     * @return
-     */
-    @Results(value = {
-            @Result(property = "id", column = "id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "ipList", column = "ip_list", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-            @Result(property = "updateTime", column = "update_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-    })
-    @SelectProvider(type = WorkerGroupMapperProvider.class, method = "queryWorkerGroupByName")
     List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
 
-     /**
-     * query worker group paging by search value
-     *
-     * @return
-     */
-    @Results(value = {
-            @Result(property = "id", column = "id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "ipList", column = "ip_list", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-            @Result(property = "updateTime", column = "update_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-    })
-    @SelectProvider(type = WorkerGroupMapperProvider.class, method = "queryListPaging")
-    List<WorkerGroup> queryListPaging(@Param("offset") int offset,
-                                      @Param("pageSize") int pageSize,
-                                      @Param("searchVal") String searchVal);
-
-    /**
-     * count worker group by search value
-     * @param searchVal
-     * @return
-     */
-    @SelectProvider(type = WorkerGroupMapperProvider.class, method = "countPaging")
-    int countPaging(@Param("searchVal") String searchVal);
-
-    /**
-     * insert worker server
-     *
-     * @param workerGroup
-     * @return
-     */
-    @InsertProvider(type = WorkerGroupMapperProvider.class, method = "insert")
-    @Options(useGeneratedKeys = true,keyProperty = "workerGroup.id")
-    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "workerGroup.id", before = false, resultType = int.class)
-    int insert(@Param("workerGroup") WorkerGroup workerGroup);
-
-    /**
-     * update worker
-     *
-     * @param workerGroup
-     * @return
-     */
-    @UpdateProvider(type = WorkerGroupMapperProvider.class, method = "update")
-    int update(@Param("workerGroup") WorkerGroup workerGroup);
-
-    /**
-     * delete work group by id
-     * @param id
-     * @return
-     */
-    @DeleteProvider(type = WorkerGroupMapperProvider.class, method = "deleteById")
-    int deleteById(@Param("id") int id);
-
-    /**
-     * query work group by id
-     * @param id
-     * @return
-     */
-    @Results(value = {
-            @Result(property = "id", column = "id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "ipList", column = "ip_list", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "name", column = "name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "createTime", column = "create_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-            @Result(property = "updateTime", column = "update_time", javaType = Date.class, jdbcType = JdbcType.TIMESTAMP),
-    })
-    @SelectProvider(type = WorkerGroupMapperProvider.class, method = "queryById")
-    WorkerGroup queryById(@Param("id") int id);
-
-
+    IPage<WorkerGroup> queryListPaging(IPage<WorkerGroup> page,
+                                       @Param("searchVal") String searchVal);
 
 }
+

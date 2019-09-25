@@ -21,7 +21,7 @@ import cn.escheduler.api.log.LogClient;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.Constants;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

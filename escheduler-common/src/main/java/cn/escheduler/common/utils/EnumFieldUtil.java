@@ -16,8 +16,6 @@
  */
 package cn.escheduler.common.utils;
 
-import org.apache.ibatis.type.EnumOrdinalTypeHandler;
-
 /**
  * enum field util
  */
@@ -30,7 +28,10 @@ public class EnumFieldUtil {
      * @return
      */
     public static String genFieldStr(String field, Class<?> enumClass) {
-        return "#{" + field + ",javaType=" + enumClass.getName() + ",typeHandler=" + EnumOrdinalTypeHandler.class.getName() + "}";
+        //TODO...
+        // delete this class when mybatisplus is ok
+        return "";
+//        return "#{" + field + ",javaType=" + enumClass.getName() + ",typeHandler=" + EnumOrdinalTypeHandler.class.getName() + "}";
     }
 
 }

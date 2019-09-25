@@ -16,77 +16,19 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.common.enums.UserType;
-import cn.escheduler.dao.model.User;
-import cn.escheduler.dao.model.UserAlertGroup;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.type.EnumOrdinalTypeHandler;
-import org.apache.ibatis.type.JdbcType;
+import cn.escheduler.dao.entity.User;
+import cn.escheduler.dao.entity.UserAlertGroup;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
-import java.sql.Timestamp;
 import java.util.List;
 
-/**
- * user alert group mapper
- */
-public interface UserAlertGroupMapper {
+public interface UserAlertGroupMapper extends BaseMapper<UserAlertGroup> {
 
-    /**
-     * insert user alert group
-     * @param userAlertGroup
-     * @return
-     */
-    @InsertProvider(type = UserAlertGroupMapperProvider.class, method = "insert")
-    @Options(useGeneratedKeys = true,keyProperty = "userAlertGroup.id")
-    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "userAlertGroup.id", before = false, resultType = int.class)
-    int insert(@Param("userAlertGroup") UserAlertGroup userAlertGroup);
-
-
-    /**
-     * query user list by alert group id
-     *
-     * @param alertgroupId
-     * @return
-     */
-    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "userPassword", column = "user_password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "userType", column = "user_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = UserType.class, jdbcType = JdbcType.TINYINT),
-            @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
-    })
-    @SelectProvider(type = UserAlertGroupMapperProvider.class, method = "queryForUser")
     List<User> queryForUser(@Param("alertgroupId") int alertgroupId);
 
-
-    /**
-     * delete by alert group id
-     * @param alertgroupId
-     * @return
-     */
-    @DeleteProvider(type = UserAlertGroupMapperProvider.class, method = "deleteByAlertgroupId")
     int deleteByAlertgroupId(@Param("alertgroupId") int alertgroupId);
 
-    /**
-     * list user information by alert group id
-     *
-     * @param alertgroupId
-     * @return
-     */
-    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "userPassword", column = "user_password", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "email", column = "email", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "phone", column = "phone", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "userType", column = "user_type", typeHandler = EnumOrdinalTypeHandler.class, javaType = UserType.class, jdbcType = JdbcType.TINYINT),
-            @Result(property = "tenantId", column = "tenant_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-    })
-    @SelectProvider(type = UserAlertGroupMapperProvider.class, method = "listUserByAlertgroupId")
     List<User> listUserByAlertgroupId(@Param("alertgroupId") int alertgroupId);
 
 }

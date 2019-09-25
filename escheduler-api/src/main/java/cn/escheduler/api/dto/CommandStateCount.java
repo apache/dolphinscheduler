@@ -16,6 +16,7 @@
  */
 package cn.escheduler.api.dto;
 
+import cn.escheduler.common.enums.CommandType;
 import cn.escheduler.common.enums.ExecutionStatus;
 
 /**
@@ -25,10 +26,10 @@ public class CommandStateCount {
 
     private int errorCount;
     private int normalCount;
-    private ExecutionStatus commandState;
+    private CommandType commandState;
 
     public CommandStateCount(){}
-    public CommandStateCount(int errorCount, int normalCount, ExecutionStatus commandState) {
+    public CommandStateCount(int errorCount, int normalCount, CommandType commandState) {
         this.errorCount = errorCount;
         this.normalCount = normalCount;
         this.commandState = commandState;
@@ -50,11 +51,11 @@ public class CommandStateCount {
         this.normalCount = normalCount;
     }
 
-    public ExecutionStatus getCommandState() {
+    public CommandType getCommandState() {
         return commandState;
     }
 
-    public void setCommandState(ExecutionStatus commandState) {
+    public void setCommandState(CommandType commandState) {
         this.commandState = commandState;
     }
 }
