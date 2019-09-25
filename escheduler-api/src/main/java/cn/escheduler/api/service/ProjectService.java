@@ -40,7 +40,8 @@ import static cn.escheduler.api.utils.CheckUtils.checkDesc;
 
 /**
  * project service
- */
+ *HttpTask./
+**/
 @Service
 public class ProjectService extends BaseService{
 
@@ -372,8 +373,8 @@ public class ProjectService extends BaseService{
      */
     public Map<String, Object> queryAllProjectList() {
         Map<String, Object> result = new HashMap<>();
-        List<Project> projects = projectMapper.queryAllProjectList();
-        List<ProcessDefinition>  processDefinitions = processDefinitionMapper.queryAll();
+        List<Project> projects = projectMapper.selectList(null);
+        List<ProcessDefinition>  processDefinitions = processDefinitionMapper.selectList(null);
         if(projects != null){
             Set set = new HashSet<>();
             for (ProcessDefinition processDefinition : processDefinitions){

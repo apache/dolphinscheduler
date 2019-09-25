@@ -14,21 +14,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.dao.mapper;
+package cn.escheduler.dao.entity;
 
-import cn.escheduler.common.enums.UserType;
-import cn.escheduler.dao.entity.CommandCount;
-import cn.escheduler.dao.entity.ErrorCommand;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
-import java.util.List;
+import cn.escheduler.common.enums.CommandType;
 
-public interface ErrorCommandMapper extends BaseMapper<ErrorCommand> {
+public class CommandCount {
 
-    List<CommandCount> countCommandState(
-            @Param("startTime") Date startTime,
-            @Param("endTime") Date endTime,
-            @Param("projectIdArray") Integer[] projectIdArray);
+
+    /**
+     * execution state
+     */
+    private CommandType commandType;
+
+    /**
+     * count for state
+     */
+    private int count;
+
+
+    @Override
+    public String toString(){
+        return "command count:" +
+                " commandType: "+ commandType.toString() +
+                " count: "+ count;
+    }
+
+    public CommandType getCommandType() {
+        return commandType;
+    }
+
+    public void setCommandType(CommandType commandType) {
+        this.commandType = commandType;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
 }

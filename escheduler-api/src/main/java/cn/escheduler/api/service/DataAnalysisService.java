@@ -248,18 +248,29 @@ public class DataAnalysisService {
             return result;
         }
 
+        List<Integer> projectIds = new ArrayList<>();
+        if(projectId !=0){
+            projectIds.add(projectId);
+        }else if(loginUser.getUserType() == UserType.GENERAL_USER){
+            List<Project> authedProjectList = projectMapper.queryAuthedProjectListByUserId(loginUser.getId());
+            for(Project project : authedProjectList){
+                projectIds.add(project.getId());
+            }
+        }
+
+        Integer[] projectIdArray = projectIds.toArray(new Integer[projectIds.size()]);
         // count command state
         List<CommandCount> commandStateCounts =
                 commandMapper.countCommandState(
                         loginUser.getId(),
                         start,
                         end,
-                        String.valueOf(projectId));
+                        projectIdArray);
 
         // count error command state
         List<CommandCount> errorCommandStateCounts =
-                errorCommandMapper.countCommandState(loginUser.getId(),
-                        loginUser.getUserType(), start, end, projectId);
+                errorCommandMapper.countCommandState(
+                         start, end, projectIdArray);
 
         //
         Map<CommandType,Map<String,Integer>> dataMap = new HashMap<>();

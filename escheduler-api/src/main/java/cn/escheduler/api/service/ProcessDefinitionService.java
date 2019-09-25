@@ -140,7 +140,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setProjectId(project.getId());
         processDefine.setUserId(loginUser.getId());
         processDefine.setProcessDefinitionJson(processDefinitionJson);
-        processDefine.setDesc(desc);
+        processDefine.setDescription(desc);
         processDefine.setLocations(locations);
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
@@ -305,7 +305,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setReleaseState(ReleaseState.OFFLINE);
         processDefine.setProjectId(project.getId());
         processDefine.setProcessDefinitionJson(processDefinitionJson);
-        processDefine.setDesc(desc);
+        processDefine.setDescription(desc);
         processDefine.setLocations(locations);
         processDefine.setConnects(connects);
         processDefine.setTimeout(processData.getTimeout());
@@ -562,7 +562,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                 row.put("projectName", processDefinition.getProjectName());
                 row.put("processDefinitionName", processDefinition.getName());
                 row.put("processDefinitionJson", processDefinition.getProcessDefinitionJson());
-                row.put("processDefinitionDesc", processDefinition.getDesc());
+                row.put("processDefinitionDesc", processDefinition.getDescription());
                 row.put("processDefinitionLocations", processDefinition.getLocations());
                 row.put("processDefinitionConnects", processDefinition.getConnects());
 
@@ -846,7 +846,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
         String[] idList = defineIdList.split(",");
         List<String> definitionIdList = Arrays.asList(idList);
-        List<ProcessDefinition> processDefinitionList = processDefineMapper.queryDefinitionListByIdList(defineIdList);
+        List<ProcessDefinition> processDefinitionList = processDefineMapper.queryDefinitionListByIdList( definitionIdList.toArray(new Integer[definitionIdList.size()]));
         if (processDefinitionList == null || processDefinitionList.size() ==0) {
             logger.info("process definition not exists");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineIdList);

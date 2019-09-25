@@ -40,7 +40,7 @@ public interface CommandMapper extends BaseMapper<Command> {
             @Param("userId") int userId,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
-            @Param("projectIdString") String projectIdString);
+            @Param("projectIdArray") Integer[] projectIdArray);
 
 
 

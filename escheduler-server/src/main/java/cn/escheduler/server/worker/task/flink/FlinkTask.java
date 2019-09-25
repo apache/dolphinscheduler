@@ -21,7 +21,7 @@ import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.task.flink.FlinkParameters;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.common.utils.ParameterUtils;
-import cn.escheduler.dao.model.ProcessInstance;
+import cn.escheduler.dao.entity.ProcessInstance;
 import cn.escheduler.server.utils.FlinkArgsUtils;
 import cn.escheduler.server.utils.ParamUtils;
 import cn.escheduler.server.worker.task.AbstractYarnTask;

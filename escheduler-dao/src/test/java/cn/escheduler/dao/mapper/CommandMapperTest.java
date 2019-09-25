@@ -121,10 +121,33 @@ public class CommandMapperTest {
     public void testCountCommandState() {
         Command command = insertOne();
 
+        //insertOne
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName("def 1");
+        processDefinition.setProjectId(1010);
+        processDefinition.setUserId(101);
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinitionMapper.insert(processDefinition);
+
+        command.setProcessDefinitionId(processDefinition.getId());
+        commandMapper.updateById(command);
+
+
         List<CommandCount> commandCounts = commandMapper.countCommandState(
-                4, null, null, null
+                4, null, null, new Integer[0]
         );
-        Assert.assertNotEquals(commandCounts.size(), 0);
+
+        Integer[] projectIdArray = new Integer[2];
+        projectIdArray[0] = processDefinition.getProjectId();
+        projectIdArray[1] = 200;
+        List<CommandCount> commandCounts2 = commandMapper.countCommandState(
+                4, null, null, projectIdArray
+        );
+
         commandMapper.deleteById(command.getId());
+        processDefinitionMapper.deleteById(processDefinition.getId());
+        Assert.assertNotEquals(commandCounts.size(), 0);
+        Assert.assertNotEquals(commandCounts2.size(), 0);
     }
 }

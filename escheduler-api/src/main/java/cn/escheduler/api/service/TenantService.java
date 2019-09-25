@@ -90,7 +90,7 @@ public class TenantService extends BaseService{
     tenant.setTenantCode(tenantCode);
     tenant.setTenantName(tenantName);
     tenant.setQueueId(queueId);
-    tenant.setDesc(desc);
+    tenant.setDescription(desc);
     tenant.setCreateTime(now);
     tenant.setUpdateTime(now);
 
@@ -197,7 +197,7 @@ public class TenantService extends BaseService{
     if (queueId != 0){
       tenant.setQueueId(queueId);
     }
-    tenant.setDesc(desc);
+    tenant.setDescription(desc);
     tenant.setUpdateTime(now);
     tenantMapper.updateById(tenant);
 

@@ -115,7 +115,7 @@ public class AlertGroupService {
 
         alertGroup.setGroupName(groupName);
         alertGroup.setGroupType(groupType);
-        alertGroup.setDesc(desc);
+        alertGroup.setDescription(desc);
         alertGroup.setCreateTime(now);
         alertGroup.setUpdateTime(now);
 
@@ -175,7 +175,7 @@ public class AlertGroupService {
         if (groupType != null) {
             alertGroup.setGroupType(groupType);
         }
-        alertGroup.setDesc(desc);
+        alertGroup.setDescription(desc);
         alertGroup.setUpdateTime(now);
         // updateProcessInstance
         alertGroupMapper.updateById(alertGroup);
