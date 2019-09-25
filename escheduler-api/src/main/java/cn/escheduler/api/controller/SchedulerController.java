@@ -25,7 +25,7 @@ import cn.escheduler.common.enums.Priority;
 import cn.escheduler.common.enums.ReleaseState;
 import cn.escheduler.common.enums.WarningType;
 import cn.escheduler.common.utils.ParameterUtils;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

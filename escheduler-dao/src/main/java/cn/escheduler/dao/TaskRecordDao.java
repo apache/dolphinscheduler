@@ -20,7 +20,7 @@ import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.TaskRecordStatus;
 import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.DateUtils;
-import cn.escheduler.dao.model.TaskRecord;
+import cn.escheduler.dao.entity.TaskRecord;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 

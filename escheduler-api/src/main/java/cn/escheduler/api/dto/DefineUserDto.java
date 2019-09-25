@@ -16,7 +16,7 @@
  */
 package cn.escheduler.api.dto;
 
-import cn.escheduler.dao.model.DefinitionGroupByUser;
+import cn.escheduler.dao.entity.DefinitionGroupByUser;
 
 import java.util.List;
 

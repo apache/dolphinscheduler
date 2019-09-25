@@ -16,75 +16,23 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.common.enums.UserType;
-import cn.escheduler.dao.model.AccessToken;
-import cn.escheduler.dao.model.User;
-import org.apache.ibatis.annotations.*;
-import org.apache.ibatis.type.EnumOrdinalTypeHandler;
-import org.apache.ibatis.type.JdbcType;
+import cn.escheduler.dao.entity.AccessToken;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 
-import java.sql.Timestamp;
-import java.util.List;
-
-public interface AccessTokenMapper {
+public interface AccessTokenMapper extends BaseMapper<AccessToken> {
 
     /**
-     * insert accessToken
-     * @param accessToken
-     * @return
-     */
-    @InsertProvider(type = AccessTokenMapperProvider.class, method = "insert")
-    @Options(useGeneratedKeys = true,keyProperty = "accessToken.id")
-    @SelectKey(statement = "SELECT LAST_INSERT_ID()", keyProperty = "accessToken.id", before = false, resultType = int.class)
-    int insert(@Param("accessToken") AccessToken accessToken);
-
-
-    /**
-     * delete accessToken
-     * @param accessTokenId
-     * @return
-     */
-    @DeleteProvider(type = AccessTokenMapperProvider.class, method = "delete")
-    int delete(@Param("accessTokenId") int accessTokenId);
-
-
-    /**
-     * update accessToken
      *
-     * @param accessToken
+     * @param page
+     * @param userName
+     * @param userId
      * @return
      */
-    @UpdateProvider(type = AccessTokenMapperProvider.class, method = "update")
-    int update(@Param("accessToken") AccessToken accessToken);
-
-
-    /**
-     * query access token list paging
-     * @param searchVal
-     * @param offset
-     * @param pageSize
-     * @return
-     */
-    @Results(value = {@Result(property = "id", column = "id", id = true, javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "userId", column = "user_id", javaType = Integer.class, jdbcType = JdbcType.INTEGER),
-            @Result(property = "token", column = "token", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "userName", column = "user_name", javaType = String.class, jdbcType = JdbcType.VARCHAR),
-            @Result(property = "expireTime", column = "expire_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-            @Result(property = "createTime", column = "create_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE),
-            @Result(property = "updateTime", column = "update_time", javaType = Timestamp.class, jdbcType = JdbcType.DATE)
-    })
-    @SelectProvider(type = AccessTokenMapperProvider.class, method = "queryAccessTokenPaging")
-    List<AccessToken> queryAccessTokenPaging(@Param("userId") Integer userId,
-                                             @Param("searchVal") String searchVal,
-                                             @Param("offset") Integer offset,
-                                             @Param("pageSize") Integer pageSize);
-
-    /**
-     * count access token by search value
-     * @param searchVal
-     * @return
-     */
-    @SelectProvider(type = AccessTokenMapperProvider.class, method = "countAccessTokenPaging")
-    Integer countAccessTokenPaging(@Param("userId") Integer userId
-                            ,@Param("searchVal") String searchVal);
+    IPage<AccessToken> selectAccessTokenPage(Page page,
+                                             @Param("userName") String userName,
+                                             @Param("userId") int userId
+    );
 }

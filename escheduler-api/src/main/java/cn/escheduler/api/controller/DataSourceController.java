@@ -18,15 +18,12 @@ package cn.escheduler.api.controller;
 
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.DataSourceService;
-import cn.escheduler.api.utils.CheckUtils;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.DbType;
-import cn.escheduler.common.enums.ResUploadType;
 import cn.escheduler.common.utils.CommonUtils;
 import cn.escheduler.common.utils.ParameterUtils;
-import cn.escheduler.common.utils.PropertyUtils;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -38,11 +35,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static cn.escheduler.api.enums.Status.*;
-import static cn.escheduler.common.utils.PropertyUtils.getBoolean;
 
 
 /**

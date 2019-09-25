@@ -24,9 +24,8 @@ import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.ServerDao;
-import cn.escheduler.dao.model.ProcessInstance;
-import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.entity.ProcessInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import cn.escheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -58,11 +57,6 @@ public class ZKMasterClient extends AbstractZKClient {
 	 *  master znode
 	 */
 	private String masterZNode = null;
-
-	/**
-	 *  master database access
-	 */
-	private ServerDao serverDao = null;
 
 	/**
 	 *  alert database access
@@ -146,7 +140,6 @@ public class ZKMasterClient extends AbstractZKClient {
 	 *  init dao
 	 */
 	public void initDao(){
-		this.serverDao = DaoFactory.getDaoInstance(ServerDao.class);
 		this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 		this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
 	}

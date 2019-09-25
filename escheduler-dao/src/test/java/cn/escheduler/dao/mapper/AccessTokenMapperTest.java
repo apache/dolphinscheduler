@@ -16,51 +16,79 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.AccessToken;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.AccessToken;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
-/**
- * access token test
- */
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class AccessTokenMapperTest {
 
 
+    @Resource
     AccessTokenMapper accessTokenMapper;
 
-    @Before
-    public void before(){
-        accessTokenMapper = ConnectionFactory.getSqlSession().getMapper(AccessTokenMapper.class);
-    }
 
-    @Test
-    public void testInsert(){
+    private AccessToken insertOne(){
+        //insertOne
         AccessToken accessToken = new AccessToken();
-        accessToken.setUserId(10);
-        accessToken.setExpireTime(new Date());
-        accessToken.setToken("ssssssssssssssssssssssssss");
+        accessToken.setUserId(4);
+        accessToken.setToken("hello, access token");
         accessToken.setCreateTime(new Date());
         accessToken.setUpdateTime(new Date());
+        accessToken.setExpireTime(new Date());
         accessTokenMapper.insert(accessToken);
+        return accessToken;
     }
 
     @Test
-    public void testListPaging(){
-        Integer count = accessTokenMapper.countAccessTokenPaging(1,"");
-        Assert.assertTrue( count >= 0);
-
-        List<AccessToken> accessTokenList = accessTokenMapper.queryAccessTokenPaging(1,"", 0, 2);
-
-        Assert.assertTrue( accessTokenList.size() >= 0);
+    public void testUpdate(){
+        //insertOne
+        AccessToken accessToken = insertOne();
+        //update
+        accessToken.setToken("hello, token");
+        int update = accessTokenMapper.updateById(accessToken);
+        Assert.assertEquals(update, 1);
+        accessTokenMapper.deleteById(accessToken.getId());
     }
 
+    @Test
+    public void testDelete(){
 
+        AccessToken accessToken = insertOne();
+        int delete = accessTokenMapper.deleteById(accessToken.getId());
+        Assert.assertEquals(delete, 1);
+    }
+
+    @Test
+    public void testQuery(){
+
+        AccessToken accessToken = insertOne();
+        //query
+        List<AccessToken> token = accessTokenMapper.selectList(null);
+        Assert.assertNotEquals(token.size(), 0);
+        accessTokenMapper.deleteById(accessToken.getId());
+    }
+
+    @Test
+    public void selectAccessTokenPage() {
+        AccessToken accessToken = insertOne();
+        Page page = new Page(1, 3);
+        String userName = "";
+        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 4);
+        Assert.assertNotEquals(accessTokenPage.getTotal(), 0);
+        accessTokenMapper.deleteById(accessToken.getId());
+    }
 
 
 }

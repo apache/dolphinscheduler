@@ -28,7 +28,7 @@ import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.dao.AlertDao;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import cn.escheduler.server.master.AbstractServer;
 import cn.escheduler.server.utils.ProcessUtils;
 import cn.escheduler.server.worker.runner.FetchTaskThread;

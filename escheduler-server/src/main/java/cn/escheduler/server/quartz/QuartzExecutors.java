@@ -18,7 +18,7 @@ package cn.escheduler.server.quartz;
 
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.utils.JSONUtils;
-import cn.escheduler.dao.model.Schedule;
+import cn.escheduler.dao.entity.Schedule;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;

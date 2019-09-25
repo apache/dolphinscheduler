@@ -22,7 +22,7 @@ import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.common.zk.AbstractZKClient;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.ProcessInstance;
+import cn.escheduler.dao.entity.ProcessInstance;
 import cn.escheduler.server.zk.ZKMasterClient;
 import org.apache.commons.configuration.Configuration;
 import org.apache.curator.framework.imps.CuratorFrameworkState;

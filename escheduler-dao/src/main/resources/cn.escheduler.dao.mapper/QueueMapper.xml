@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.escheduler.dao.mapper.QueueMapper">
+    <select id="queryQueuePaging" resultType="cn.escheduler.dao.entity.Queue">
+        select *
+        from t_escheduler_queue
+        where  queue_name like concat('%', #{searchVal}, '%')
+        order by  update_time desc
+    </select>
+    <select id="queryByQueue" resultType="cn.escheduler.dao.entity.Queue">
+       select *
+        from t_escheduler_queue
+        where  queue=#{queue}
+        order by  update_time desc
+    </select>
+    <select id="queryByQueueName" resultType="cn.escheduler.dao.entity.Queue">
+        select *
+        from t_escheduler_queue
+        where  queue_name =#{queueName}
+    </select>
+
+</mapper>

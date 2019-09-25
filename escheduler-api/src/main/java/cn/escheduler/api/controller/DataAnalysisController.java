@@ -20,7 +20,7 @@ package cn.escheduler.api.controller;
 import cn.escheduler.api.service.DataAnalysisService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.Result;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

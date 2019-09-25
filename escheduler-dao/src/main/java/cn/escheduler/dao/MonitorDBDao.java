@@ -17,7 +17,7 @@
 package cn.escheduler.dao;
 
 import cn.escheduler.common.Constants;
-import cn.escheduler.dao.model.MonitorRecord;
+import cn.escheduler.dao.entity.MonitorRecord;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;

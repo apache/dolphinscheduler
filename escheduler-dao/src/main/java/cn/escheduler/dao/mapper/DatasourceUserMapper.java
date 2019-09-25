@@ -16,40 +16,16 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.dao.model.DatasourceUser;
-import org.apache.ibatis.annotations.DeleteProvider;
-import org.apache.ibatis.annotations.InsertProvider;
+import cn.escheduler.dao.entity.DatasourceUser;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
-/**
- * data source user relation mapper
- */
-public interface DatasourceUserMapper {
-      /**
-       * insert data source user relation
-       *
-       * @param datasourceUser
-       * @return
-       */
-      @InsertProvider(type = DatasourceUserMapperProvider.class, method = "insert")
-      int insert(@Param("datasourceUser") DatasourceUser datasourceUser);
+public interface DataSourceUserMapper extends BaseMapper<DatasourceUser> {
 
 
-    /**
-     * delete data source user relation by user id
-     *
-     * @param userId
-     * @return
-     */
-    @DeleteProvider(type = DatasourceUserMapperProvider.class, method = "deleteByUserId")
     int deleteByUserId(@Param("userId") int userId);
 
-    /**
-     * delete by data source id
-     * @param datasourceId
-     * @return
-     */
-    @DeleteProvider(type = DatasourceUserMapperProvider.class, method = "deleteByDatasourceId")
     int deleteByDatasourceId(@Param("datasourceId") int datasourceId);
+
 
 }

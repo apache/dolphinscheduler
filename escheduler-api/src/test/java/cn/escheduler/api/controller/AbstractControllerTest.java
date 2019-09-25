@@ -17,12 +17,9 @@
 package cn.escheduler.api.controller;
 
 import cn.escheduler.api.ApiApplicationServer;
-import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.SessionService;
-import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.enums.UserType;
-import cn.escheduler.common.utils.JSONUtils;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -30,19 +27,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Ignore
 @RunWith(SpringRunner.class)

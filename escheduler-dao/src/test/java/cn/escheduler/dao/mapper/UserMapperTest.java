@@ -18,84 +18,107 @@ package cn.escheduler.dao.mapper;
 
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.AccessToken;
-import cn.escheduler.dao.model.User;
-import org.junit.After;
+import cn.escheduler.dao.entity.User;
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Date;
-import java.util.Random;
+import java.util.List;
 
-/**
- * user test
- */
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class UserMapperTest {
 
 
-    UserMapper userMapper;
-    AccessTokenMapper accessTokenMapper;
-    int userId;
-
-    @Before
-    public void before(){
-        userMapper = ConnectionFactory.getSqlSession().getMapper(UserMapper.class);
-        accessTokenMapper = ConnectionFactory.getSqlSession().getMapper(AccessTokenMapper.class);
-    }
-
-
-    @After
-    public void testDelete() {
-        int delete = userMapper.delete(userId);
-        Assert.assertTrue(delete >= 0);
-    }
-
+    @Autowired
+    private UserMapper userMapper;
 
     @Test
     public void testInsert(){
         User user = new User();
-        user.setUserName("Dr.strange" + new Date().getTime());
-        user.setUserPassword("1234567890");
-        user.setEmail("wwww@123.com");
-        user.setPhone("12345678901");
+        user.setUserName("user1");
+        user.setUserPassword("1");
+        user.setEmail("xx@123.com");
         user.setUserType(UserType.GENERAL_USER);
-        user.setTenantId(1);
         user.setCreateTime(new Date());
+        user.setTenantId(1);
         user.setUpdateTime(new Date());
-        userMapper.insert(user);
-        Assert.assertNotEquals(user.getId(), 0);
-
-        user.setUserName("Dr.chemistry" + new Date().getTime());
-        int update = userMapper.update(user);
-        Assert.assertEquals(update, 1);
-
-
-        user = userMapper.queryById(user.getId());
-        Assert.assertNotEquals(user.getUserName(), "Dr.chemistry" + new Date().getTime());
-
-        AccessToken accessToken = new AccessToken();
-        accessToken.setUserId(user.getId());
-        accessToken.setExpireTime(new Date());
-        accessToken.setToken("ssssssssssssssssssssssssss");
-        accessToken.setCreateTime(new Date());
-        accessToken.setUpdateTime(new Date());
-        accessTokenMapper.insert(accessToken);
-
-        userId = user.getId();
-
-
-        User user2 = userMapper.queryUserByToken("ssssssssssssssssssssssssss");
-        Assert.assertTrue(user2.getId() >= 0);
+        int res = userMapper.insert(user);
+        Assert.assertEquals(res,1);
     }
 
 
     @Test
-    public void queryQueueByProcessInstanceId(){
-        String queue = userMapper.queryQueueByProcessInstanceId(-1000);
-        Assert.assertNotEquals(queue, "ait");
+    public void testQueryAllGeneralUser() {
+        List<User> users = userMapper.queryAllGeneralUser();
+        System.out.println(users.size());
+        List<User> user1 = userMapper.selectList(null);
+        System.out.println(user1.size());
     }
 
+    @Test
+    public void testQueryByUserNameAccurately() {
+    }
 
+    @Test
+    public void testQueryUserByNamePassword() {
+    }
 
+    @Test
+    public void testQueryUserPaging() {
+    }
+
+    @Test
+    public void testGetDetailsById() {
+    }
+
+    @Test
+    public void testQueryUserListByAlertGroupId() {
+    }
+
+    @Test
+    public void testQueryTenantCodeByUserId() {
+    }
+
+    @Test
+    public void testQueryUserByToken() {
+    }
+
+    @Test
+    public void testQueryAllGeneralUser1() {
+    }
+
+    @Test
+    public void testQueryByUserNameAccurately1() {
+    }
+
+    @Test
+    public void testQueryUserByNamePassword1() {
+    }
+
+    @Test
+    public void testQueryUserPaging1() {
+    }
+
+    @Test
+    public void testGetDetailsById1() {
+    }
+
+    @Test
+    public void testQueryUserListByAlertGroupId1() {
+    }
+
+    @Test
+    public void testQueryTenantCodeByUserId1() {
+    }
+
+    @Test
+    public void testQueryUserByToken1() {
+    }
 }

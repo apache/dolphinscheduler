@@ -21,7 +21,7 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.service.WorkerGroupService;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.common.utils.ParameterUtils;
-import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

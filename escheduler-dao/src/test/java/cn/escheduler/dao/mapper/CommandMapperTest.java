@@ -16,58 +16,138 @@
  */
 package cn.escheduler.dao.mapper;
 
-import cn.escheduler.common.enums.CommandType;
-import cn.escheduler.common.enums.FailureStrategy;
-import cn.escheduler.common.enums.TaskDependType;
-import cn.escheduler.common.enums.WarningType;
-import cn.escheduler.dao.datasource.ConnectionFactory;
-import cn.escheduler.dao.model.Command;
+import cn.escheduler.common.enums.*;
+import cn.escheduler.dao.entity.Command;
+import cn.escheduler.dao.entity.CommandCount;
+import cn.escheduler.dao.entity.ProcessDefinition;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Date;
 import java.util.List;
 
-/**
- * command test
- */
+@RunWith(SpringRunner.class)
+@SpringBootTest
 public class CommandMapperTest {
 
+
+    @Autowired
     CommandMapper commandMapper;
 
+    @Autowired
+    ProcessDefinitionMapper processDefinitionMapper;
 
-    @Before
-    public void before(){
-        commandMapper = ConnectionFactory.getSqlSession().getMapper(CommandMapper.class);
-    }
-
-    @Test
-    public void testMapper(){
-
+    private Command insertOne(){
+        //insertOne
         Command command = new Command();
         command.setCommandType(CommandType.START_PROCESS);
         command.setProcessDefinitionId(1);
-        command.setExecutorId(10);
+        command.setExecutorId(4);
+        command.setProcessInstancePriority(Priority.MEDIUM);
         command.setFailureStrategy(FailureStrategy.CONTINUE);
-        command.setWarningType(WarningType.NONE);
+        command.setWorkerGroupId(-1);
         command.setWarningGroupId(1);
-        command.setTaskDependType(TaskDependType.TASK_POST);
+        command.setUpdateTime(new Date());
         commandMapper.insert(command);
-        Assert.assertNotEquals(command.getId(), 0);
+        return command;
+    }
 
-        command.setCommandParam("command parameter test");
-        int update = commandMapper.update(command);
+    @Test
+    public void testUpdate(){
+        //insertOne
+        Command command = insertOne();
+        //update
+        command.setStartTime(new Date());
+        int update = commandMapper.updateById(command);
         Assert.assertEquals(update, 1);
+        commandMapper.deleteById(command.getId());
+    }
 
-        int delete = commandMapper.delete(command.getId());
+    @Test
+    public void testDelete(){
+
+        Command Command = insertOne();
+        int delete = commandMapper.deleteById(Command.getId());
         Assert.assertEquals(delete, 1);
     }
 
     @Test
-    public void testQuery(){
-        List<Command> commandList = commandMapper.queryAllCommand();
-        Assert.assertNotEquals(commandList, null);
+    public void testQuery() {
+        Command command = insertOne();
+        //query
+        List<Command> commands = commandMapper.selectList(null);
+        Assert.assertNotEquals(commands.size(), 0);
+        commandMapper.deleteById(command.getId());
+    }
+    @Test
+    public void testGetAll() {
+        Command command = insertOne();
+        List<Command> commands = commandMapper.selectList(null);
+        Assert.assertNotEquals(commands.size(), 0);
+        commandMapper.deleteById(command.getId());
     }
 
+    @Test
+    public void testGetOneToRun() {
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
+        processDefinition.setName("ut test");
+        processDefinition.setProjectId(1);
+        processDefinition.setFlag(Flag.YES);
+        processDefinitionMapper.insert(processDefinition);
 
+        Command command = new Command();
+        command.setCommandType(CommandType.START_PROCESS);
+        command.setProcessDefinitionId(processDefinition.getId());
+        command.setExecutorId(4);
+        command.setProcessInstancePriority(Priority.MEDIUM);
+        command.setFailureStrategy(FailureStrategy.CONTINUE);
+        command.setWorkerGroupId(-1);
+        command.setWarningGroupId(1);
+        command.setUpdateTime(new Date());
+        commandMapper.insert(command);
+
+        Command command2 = commandMapper.getOneToRun();
+        Assert.assertNotEquals(command2, null);
+        commandMapper.deleteById(command.getId());
+        processDefinitionMapper.deleteById(processDefinition.getId());
+    }
+
+    @Test
+    public void testCountCommandState() {
+        Command command = insertOne();
+
+        //insertOne
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName("def 1");
+        processDefinition.setProjectId(1010);
+        processDefinition.setUserId(101);
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinitionMapper.insert(processDefinition);
+
+        command.setProcessDefinitionId(processDefinition.getId());
+        commandMapper.updateById(command);
+
+
+        List<CommandCount> commandCounts = commandMapper.countCommandState(
+                4, null, null, new Integer[0]
+        );
+
+        Integer[] projectIdArray = new Integer[2];
+        projectIdArray[0] = processDefinition.getProjectId();
+        projectIdArray[1] = 200;
+        List<CommandCount> commandCounts2 = commandMapper.countCommandState(
+                4, null, null, projectIdArray
+        );
+
+        commandMapper.deleteById(command.getId());
+        processDefinitionMapper.deleteById(processDefinition.getId());
+        Assert.assertNotEquals(commandCounts.size(), 0);
+        Assert.assertNotEquals(commandCounts2.size(), 0);
+    }
 }

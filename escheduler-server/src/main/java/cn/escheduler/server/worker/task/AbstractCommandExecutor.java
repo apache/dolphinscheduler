@@ -21,7 +21,7 @@ import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.dao.entity.TaskInstance;
 import cn.escheduler.server.utils.LoggerUtils;
 import cn.escheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang3.StringUtils;
