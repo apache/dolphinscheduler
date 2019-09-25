@@ -390,10 +390,14 @@ public class ProcessDefinitionController extends BaseController{
      * @param processDefinitionId
      * @return
      */
+    @ApiOperation(value = "deleteProcessDefinitionById", notes= "DELETE_PROCESS_DEFINITION_BY_ID_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", dataType = "Int", example = "100")
+    })
     @GetMapping(value="/delete")
     @ResponseStatus(HttpStatus.OK)
-    public Result deleteProcessDefinitionById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @PathVariable String projectName,
+    public Result deleteProcessDefinitionById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                              @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                             @RequestParam("processDefinitionId") Integer processDefinitionId
     ){
         try{
@@ -415,10 +419,14 @@ public class ProcessDefinitionController extends BaseController{
      * @param processDefinitionIds
      * @return
      */
+    @ApiOperation(value = "batchDeleteProcessDefinitionByIds", notes= "BATCH_DELETE_PROCESS_DEFINITION_BY_IDS_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "processDefinitionIds", value = "PROCESS_DEFINITION_IDS", type = "String")
+    })
     @GetMapping(value="/batch-delete")
     @ResponseStatus(HttpStatus.OK)
-    public Result batchDeleteProcessDefinitionByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                              @PathVariable String projectName,
+    public Result batchDeleteProcessDefinitionByIds(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                    @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                               @RequestParam("processDefinitionIds") String processDefinitionIds
     ){
         try{
@@ -456,6 +464,30 @@ public class ProcessDefinitionController extends BaseController{
             processDefinitionService.exportProcessDefinitionById(loginUser, projectName, processDefinitionId,response);
         }catch (Exception e){
             logger.error(EXPORT_PROCESS_DEFINE_BY_ID_ERROR.getMsg(),e);
+        }
+    }
+
+
+
+    /**
+     * query proccess definition all by project id
+     *
+     * @param loginUser
+     * @return
+     */
+    @ApiOperation(value = "queryProccessDefinitionAllByProjectId", notes= "QUERY_PROCCESS_DEFINITION_All_BY_PROJECT_ID_NOTES")
+    @GetMapping(value="/queryProccessDefinitionAllByProjectId")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryProccessDefinitionAllByProjectId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                        @RequestParam("projectId") Integer projectId){
+        try{
+            logger.info("query proccess definition list, login user:{}, project id:{}",
+                    loginUser.getUserName(),projectId);
+            Map<String, Object> result = processDefinitionService.queryProccessDefinitionAllByProjectId(projectId);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(QUERY_PROCCESS_DEFINITION_LIST.getMsg(),e);
+            return error(QUERY_PROCCESS_DEFINITION_LIST.getCode(), QUERY_PROCCESS_DEFINITION_LIST.getMsg());
         }
     }
 

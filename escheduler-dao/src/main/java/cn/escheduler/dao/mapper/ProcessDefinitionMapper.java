@@ -16,6 +16,8 @@
  */
 package cn.escheduler.dao.mapper;
 
+import cn.escheduler.common.enums.Flag;
+import cn.escheduler.common.enums.ReleaseState;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.dao.entity.DefinitionGroupByUser;
 import cn.escheduler.dao.entity.ProcessDefinition;
