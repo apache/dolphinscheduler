@@ -483,7 +483,6 @@ export default {
   'taskManager':'taskManage数量',
   'jobManagerMemory':'jobManager内存数',
   'taskManagerMemory':'taskManager内存数',
-  'Complement range': '补数范围',
   'Http Url':'请求地址',
   'Http Method':'请求类型',
   'Http Parameters':'请求参数',
