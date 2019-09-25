@@ -20,6 +20,7 @@ import cn.escheduler.common.enums.AlertStatus;
 import cn.escheduler.common.enums.AlertType;
 import cn.escheduler.common.enums.ShowType;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -54,7 +55,7 @@ public class Tenant {
     /**
      * description
      */
-    private String desc;
+    private String description;
 
     /**
      * queue id
@@ -64,6 +65,7 @@ public class Tenant {
     /**
      * queue name
      */
+    @TableField(exist = false)
     private String queueName;
 
 
@@ -104,14 +106,6 @@ public class Tenant {
 
     public void setTenantName(String tenantName) {
         this.tenantName = tenantName;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
     }
 
     public int getQueueId() {
@@ -160,12 +154,19 @@ public class Tenant {
                 "id=" + id +
                 ", tenantCode='" + tenantCode + '\'' +
                 ", tenantName='" + tenantName + '\'' +
-                ", desc='" + desc + '\'' +
                 ", queueId=" + queueId +
                 ", queueName='" + queueName + '\'' +
                 ", queue='" + queue + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 '}';
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

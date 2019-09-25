@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cn.escheduler.dao.mapper;
 
 import cn.escheduler.dao.entity.AccessToken;
@@ -22,47 +38,56 @@ public class AccessTokenMapperTest {
     @Resource
     AccessTokenMapper accessTokenMapper;
 
-    @Test
-    public void insert(){
+
+    private AccessToken insertOne(){
+        //insertOne
         AccessToken accessToken = new AccessToken();
         accessToken.setUserId(4);
-        accessToken.setToken("你好,hello");
+        accessToken.setToken("hello, access token");
         accessToken.setCreateTime(new Date());
         accessToken.setUpdateTime(new Date());
         accessToken.setExpireTime(new Date());
-        accessToken.setUserName("apple");
         accessTokenMapper.insert(accessToken);
-        Assert.assertNotEquals(accessToken.getId(), 0);
+        return accessToken;
     }
 
     @Test
-    public void queryAll(){
-        List<AccessToken> accessTokens = accessTokenMapper.selectList(null);
-
-        for(AccessToken accessToken1 : accessTokens){
-            System.out.println(accessToken1.toString());
-        }
-
-
+    public void testUpdate(){
+        //insertOne
+        AccessToken accessToken = insertOne();
+        //update
+        accessToken.setToken("hello, token");
+        int update = accessTokenMapper.updateById(accessToken);
+        Assert.assertEquals(update, 1);
+        accessTokenMapper.deleteById(accessToken.getId());
     }
 
     @Test
-    public void query(){
+    public void testDelete(){
 
+        AccessToken accessToken = insertOne();
+        int delete = accessTokenMapper.deleteById(accessToken.getId());
+        Assert.assertEquals(delete, 1);
+    }
+
+    @Test
+    public void testQuery(){
+
+        AccessToken accessToken = insertOne();
+        //query
+        List<AccessToken> token = accessTokenMapper.selectList(null);
+        Assert.assertNotEquals(token.size(), 0);
+        accessTokenMapper.deleteById(accessToken.getId());
+    }
+
+    @Test
+    public void selectAccessTokenPage() {
+        AccessToken accessToken = insertOne();
         Page page = new Page(1, 3);
-
-        String userName = "app";
-
+        String userName = "";
         IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 4);
-
-        System.out.println("total:" + accessTokenPage.getTotal());
-
-        for(AccessToken accessToken1 : accessTokenPage.getRecords()){
-            System.out.println(accessToken1.toString());
-        }
-        System.out.println();
-
-
+        Assert.assertNotEquals(accessTokenPage.getTotal(), 0);
+        accessTokenMapper.deleteById(accessToken.getId());
     }
 
 

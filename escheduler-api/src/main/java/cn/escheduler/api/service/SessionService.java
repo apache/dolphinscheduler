@@ -22,6 +22,7 @@ import cn.escheduler.api.utils.Constants;
 import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.dao.entity.Session;
 import cn.escheduler.dao.entity.User;
+import cn.escheduler.dao.mapper.SessionMapper;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class SessionService extends BaseService{
     String ip = BaseController.getClientIpAddress(request);
     logger.debug("get session: {}, ip: {}", sessionId, ip);
 
-    return sessionMapper.queryBySessionId(sessionId);
+    return sessionMapper.selectById(sessionId);
   }
 
   /**
@@ -102,7 +103,8 @@ public class SessionService extends BaseService{
         /**
          * updateProcessInstance the latest login time
          */
-        sessionMapper.update(session.getId(), now);
+        session.setLastLoginTime(now);
+        sessionMapper.updateById(session);
 
         return session.getId();
 

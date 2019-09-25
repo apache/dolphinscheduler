@@ -107,7 +107,7 @@ public class ProcessDao extends AbstractBaseDao {
     protected ITaskQueue taskQueue;
 
     public ProcessDao(){
-        init();
+//        init();
     }
 
     /**
@@ -342,7 +342,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @return
      */
     private Integer workProcessThreadNumCount(Integer processDefinitionId){
-        List<String> ids = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
         recurseFindSubProcessId(processDefinitionId, ids);
         return ids.size()+1;
     }
@@ -352,7 +352,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param parentId
      * @param ids
      */
-    public void recurseFindSubProcessId(int parentId, List<String> ids){
+    public void recurseFindSubProcessId(int parentId, List<Integer> ids){
         ProcessDefinition processDefinition = processDefineMapper.selectById(parentId);
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
 
@@ -366,7 +366,7 @@ public class ProcessDao extends AbstractBaseDao {
                 String parameter = taskNode.getParams();
                 if (parameter.contains(CMDPARAM_SUB_PROCESS_DEFINE_ID)){
                     SubProcessParameters subProcessParam = JSONObject.parseObject(parameter, SubProcessParameters.class);
-                    ids.add(String.valueOf(subProcessParam.getProcessDefinitionId()));
+                    ids.add(subProcessParam.getProcessDefinitionId());
                     recurseFindSubProcessId(subProcessParam.getProcessDefinitionId(),ids);
                 }
             }
@@ -1271,7 +1271,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @return
      */
     public int updateWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap){
-        return processInstanceMapMapper.update(processInstanceMap);
+        return processInstanceMapMapper.updateById(processInstanceMap);
     }
 
 
@@ -1715,7 +1715,17 @@ public class ProcessDao extends AbstractBaseDao {
      * @return
      */
     public String queryUserQueueByProcessInstanceId(int processInstanceId){
-        return userMapper.queryQueueByProcessInstanceId(processInstanceId);
+
+        String queue = "";
+        ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
+        if(processInstance == null){
+            return queue;
+        }
+        User executor = userMapper.selectById(processInstance.getExecutorId());
+        if(executor != null){
+            queue = executor.getQueue();
+        }
+        return queue;
     }
 
     /**

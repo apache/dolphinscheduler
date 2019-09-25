@@ -107,7 +107,7 @@ public class MonitorService extends BaseService{
     return result;
   }
 
-  private List<MasterServer> getServerListFromZK(boolean isMaster){
+  public List<MasterServer> getServerListFromZK(boolean isMaster){
     List<MasterServer> servers = new ArrayList<>();
     ZookeeperMonitor zookeeperMonitor = null;
     try{

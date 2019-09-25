@@ -37,6 +37,8 @@ import cn.escheduler.dao.mapper.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -209,13 +211,13 @@ public class ProcessDefinitionService extends BaseDAGService {
             return checkResult;
         }
 
-        Integer count = processDefineMapper.countDefineNumber(project.getId(), userId, searchVal);
+        Page<ProcessDefinition> page = new Page(pageNo, pageSize);
+        IPage<ProcessDefinition> processDefinitionIPage = processDefineMapper.queryDefineListPaging(
+                page, searchVal, userId, project.getId());
 
         PageInfo pageInfo = new PageInfo<ProcessData>(pageNo, pageSize);
-        List<ProcessDefinition> resourceList = processDefineMapper.queryDefineListPaging(project.getId(),
-                searchVal, userId, pageInfo.getStart(), pageSize);
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(resourceList);
+        pageInfo.setTotalCount((int)processDefinitionIPage.getTotal());
+        pageInfo.setLists(processDefinitionIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
@@ -242,7 +244,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             return checkResult;
         }
 
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processId);
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processId);
         } else {
@@ -318,7 +320,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setGlobalParamList(globalParamsList);
         processDefine.setUpdateTime(now);
         processDefine.setFlag(Flag.YES);
-        if (processDefineMapper.update(processDefine) > 0) {
+        if (processDefineMapper.updateById(processDefine) > 0) {
             putMsg(result, Status.SUCCESS);
 
         } else {
@@ -374,7 +376,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             return checkResult;
         }
 
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processDefinitionId);
 
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionId);
@@ -402,14 +404,14 @@ public class ProcessDefinitionService extends BaseDAGService {
         }else if(schedules.size() == 1){
             Schedule schedule = schedules.get(0);
             if(schedule.getReleaseState() == ReleaseState.OFFLINE){
-                scheduleMapper.delete(schedule.getId());
+                scheduleMapper.deleteById(schedule.getId());
             }else if(schedule.getReleaseState() == ReleaseState.ONLINE){
                 putMsg(result, Status.SCHEDULE_CRON_STATE_ONLINE,schedule.getId());
                 return result;
             }
         }
 
-        int delete = processDefineMapper.delete(processDefinitionId);
+        int delete = processDefineMapper.deleteById(processDefinitionId);
 
         if (delete > 0) {
             putMsg(result, Status.SUCCESS);
@@ -489,21 +491,24 @@ public class ProcessDefinitionService extends BaseDAGService {
         }
 
         ReleaseState state = ReleaseState.getEnum(releaseState);
+        ProcessDefinition processDefinition = processDefineMapper.selectById(id);
 
         switch (state) {
             case ONLINE: {
-                processDefineMapper.updateProcessDefinitionReleaseState(id, state);
+                processDefinition.setReleaseState(state);
+                processDefineMapper.updateById(processDefinition);
                 break;
             }
             case OFFLINE: {
-                processDefineMapper.updateProcessDefinitionReleaseState(id, state);
-                List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(new int[]{id});
+                processDefinition.setReleaseState(state);
+                processDefineMapper.updateById(processDefinition);
+                List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(String.valueOf(id));
 
                 for(Schedule schedule:scheduleList){
                     logger.info("set schedule offline, schedule id: {}, process definition id: {}", project.getId(), schedule.getId(), id);
                     // set status
                     schedule.setReleaseState(ReleaseState.OFFLINE);
-                    scheduleMapper.update(schedule);
+                    scheduleMapper.updateById(schedule);
                     deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
@@ -532,7 +537,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus == Status.SUCCESS) {
-            ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
+            ProcessDefinition processDefinition = processDefineMapper.selectById(processDefinitionId);
             if (processDefinition != null) {
                 JSONObject jsonObject = JSONUtils.parseObject(processDefinition.getProcessDefinitionJson());
                 JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
@@ -542,7 +547,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                         String taskType = taskNode.getString("type");
                         if(taskType.equals(TaskType.SQL.name())  || taskType.equals(TaskType.PROCEDURE.name())){
                             JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
-                            DataSource dataSource = dataSourceMapper.queryById((Integer) sqlParameters.get("datasource"));
+                            DataSource dataSource = dataSourceMapper.selectById((Integer) sqlParameters.get("datasource"));
                             if (dataSource != null) {
                                 sqlParameters.put("datasourceName", dataSource.getName());
                             }
@@ -575,7 +580,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     if(schedule.getId() == -1){
                         row.put("scheduleWorkerGroupId", -1);
                     }else{
-                        WorkerGroup workerGroup = workerGroupMapper.queryById(schedule.getId());
+                        WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
                         if(workerGroup != null){
                             row.put("scheduleWorkerGroupName", workerGroup.getName());
                         }
@@ -810,7 +815,7 @@ public class ProcessDefinitionService extends BaseDAGService {
     public Map<String, Object> getTaskNodeListByDefinitionId(Integer defineId) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(defineId);
+        ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
         if (processDefinition == null) {
             logger.info("process define not exists");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinition.getId());
@@ -841,7 +846,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
         String[] idList = defineIdList.split(",");
         List<String> definitionIdList = Arrays.asList(idList);
-        List<ProcessDefinition> processDefinitionList = processDefineMapper.queryDefinitionListByIdList(definitionIdList);
+        List<ProcessDefinition> processDefinitionList = processDefineMapper.queryDefinitionListByIdList(defineIdList);
         if (processDefinitionList == null || processDefinitionList.size() ==0) {
             logger.info("process definition not exists");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineIdList);
@@ -872,7 +877,7 @@ public class ProcessDefinitionService extends BaseDAGService {
     public Map<String, Object> viewTree(Integer processId, Integer limit) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
-        ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processId);
+        ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
         if (processDefinition == null) {
             logger.info("process define not exists");
             throw new RuntimeException("process define not exists");

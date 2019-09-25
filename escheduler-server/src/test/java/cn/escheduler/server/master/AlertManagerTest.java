@@ -17,7 +17,6 @@
 package cn.escheduler.server.master;
 
 import cn.escheduler.common.enums.ExecutionStatus;
-import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.entity.ProcessDefinition;
 import cn.escheduler.dao.entity.ProcessInstance;
 import cn.escheduler.dao.entity.TaskInstance;
@@ -25,7 +24,6 @@ import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
 import cn.escheduler.dao.mapper.ProcessInstanceMapper;
 import cn.escheduler.dao.mapper.TaskInstanceMapper;
 import cn.escheduler.server.utils.AlertManager;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -54,14 +52,6 @@ public class AlertManagerTest {
     TaskInstanceMapper taskInstanceMapper;
 
     AlertManager alertManager;
-
-    @Before
-    public void before(){
-        processDefinitionMapper = ConnectionFactory.getSqlSession().getMapper(ProcessDefinitionMapper.class);
-        processInstanceMapper = ConnectionFactory.getSqlSession().getMapper(ProcessInstanceMapper.class);
-        taskInstanceMapper = ConnectionFactory.getSqlSession().getMapper(TaskInstanceMapper.class);
-        alertManager = new AlertManager();
-    }
 
     /**
      * send worker alert fault tolerance

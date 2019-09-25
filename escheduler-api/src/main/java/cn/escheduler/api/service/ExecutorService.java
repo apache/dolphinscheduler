@@ -25,6 +25,9 @@ import cn.escheduler.common.utils.DateUtils;
 import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.entity.*;
+import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
+import cn.escheduler.dao.mapper.ProcessInstanceMapper;
+import cn.escheduler.dao.mapper.ProjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +104,7 @@ public class ExecutorService extends BaseService{
         }
 
         // check process define release state
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(processDefinitionId);
+        ProcessDefinition processDefinition = processDefinitionMapper.selectById(processDefinitionId);
         result = checkProcessDefinitionValid(processDefinition, processDefinitionId);
         if(result.get(Constants.STATUS) != Status.SUCCESS){
             return result;
@@ -124,7 +127,9 @@ public class ExecutorService extends BaseService{
             /**
              * according to the process definition ID updateProcessInstance and CC recipient
              */
-            processDefinitionMapper.updateReceiversAndCcById(receivers,receiversCc,processDefinitionId);
+            processDefinition.setReceivers(receivers);
+            processDefinition.setReceiversCc(receiversCc);
+            processDefinitionMapper.updateById(processDefinition);
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.START_PROCESS_INSTANCE_ERROR);
@@ -364,10 +369,12 @@ public class ExecutorService extends BaseService{
             logger.error("process definition id is null");
             putMsg(result,Status.REQUEST_PARAMS_NOT_VALID_ERROR,"process definition id");
         }
-        List<String> ids = new ArrayList<>();
+        List<Integer> ids = new ArrayList<>();
         processDao.recurseFindSubProcessId(processDefineId, ids);
+        Integer[] idArray = ids.toArray(new Integer[ids.size()]);
         if (ids.size() > 0){
-            List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(ids);
+            List<ProcessDefinition> processDefinitionList;
+            processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(idArray);
             if (processDefinitionList != null && processDefinitionList.size() > 0){
                 for (ProcessDefinition processDefinition : processDefinitionList){
                     /**
@@ -399,13 +406,13 @@ public class ExecutorService extends BaseService{
             throw new RuntimeException("You must set values for parameters processDefineId or processInstanceId");
         }
         if(processDefineId == null && processInstanceId != null) {
-            ProcessInstance processInstance = processInstanceMapper.queryById(processInstanceId);
+            ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
             if (processInstance == null) {
                 throw new RuntimeException("processInstanceId is not exists");
             }
             processDefineId = processInstance.getProcessDefinitionId();
         }
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(processDefineId);
+        ProcessDefinition processDefinition = processDefinitionMapper.selectById(processDefineId);
         if (processDefinition == null){
             throw new RuntimeException(String.format("processDefineId %d is not exists",processDefineId));
         }

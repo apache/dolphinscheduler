@@ -20,10 +20,14 @@ import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.dao.entity.WorkerGroup;
+import cn.escheduler.dao.mapper.WorkerGroupMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.invoke.WrongMethodTypeException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +61,7 @@ public class WorkerGroupService extends BaseService {
         Date now = new Date();
         WorkerGroup workerGroup = null;
         if(id != 0){
-            workerGroup = workerGroupMapper.queryById(id);
+            workerGroup = workerGroupMapper.selectById(id);
         }else{
             workerGroup = new WorkerGroup();
             workerGroup.setCreateTime(now);
@@ -71,7 +75,7 @@ public class WorkerGroupService extends BaseService {
             return result;
         }
         if(workerGroup.getId() != 0 ){
-            workerGroupMapper.update(workerGroup);
+            workerGroupMapper.updateById(workerGroup);
         }else{
             workerGroupMapper.insert(workerGroup);
         }
@@ -113,13 +117,13 @@ public class WorkerGroupService extends BaseService {
     public Map<String,Object> queryAllGroupPaging(Integer pageNo, Integer pageSize, String searchVal) {
 
         Map<String, Object> result = new HashMap<>(5);
-        int count = workerGroupMapper.countPaging(searchVal);
 
-
+        Page<WorkerGroup> page = new Page(pageNo, pageSize);
+        IPage<WorkerGroup> workerGroupIPage = workerGroupMapper.queryListPaging(
+                page, searchVal);
         PageInfo<WorkerGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        List<WorkerGroup> workerGroupList = workerGroupMapper.queryListPaging(pageInfo.getStart(), pageSize, searchVal);
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(workerGroupList);
+        pageInfo.setTotalCount((int)workerGroupIPage.getTotal());
+        pageInfo.setLists(workerGroupIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;

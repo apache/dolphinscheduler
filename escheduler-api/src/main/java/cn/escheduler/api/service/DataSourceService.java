@@ -28,8 +28,12 @@ import cn.escheduler.common.utils.JSONUtils;
 import cn.escheduler.dao.entity.DataSource;
 import cn.escheduler.dao.entity.Resource;
 import cn.escheduler.dao.entity.User;
+import cn.escheduler.dao.mapper.DataSourceMapper;
+import cn.escheduler.dao.mapper.DataSourceUserMapper;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
@@ -70,7 +74,7 @@ public class DataSourceService extends BaseService{
 
 
     @Autowired
-    private DatasourceUserMapper datasourceUserMapper;
+    private DataSourceUserMapper datasourceUserMapper;
 
     /**
      * create data source
@@ -136,7 +140,7 @@ public class DataSourceService extends BaseService{
 
         Map<String, Object> result = new HashMap<>();
         // determine whether the data source exists
-        DataSource dataSource = dataSourceMapper.queryById(id);
+        DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
@@ -161,7 +165,7 @@ public class DataSourceService extends BaseService{
         dataSource.setType(type);
         dataSource.setConnectionParams(parameter);
         dataSource.setUpdateTime(now);
-        dataSourceMapper.update(dataSource);
+        dataSourceMapper.updateById(dataSource);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -182,7 +186,7 @@ public class DataSourceService extends BaseService{
     public Map<String, Object> queryDataSource(int id) {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
-        DataSource dataSource = dataSourceMapper.queryById(id);
+        DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
@@ -262,14 +266,20 @@ public class DataSourceService extends BaseService{
      */
     public Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
+        IPage<DataSource> dataSourceList = null;
+        Page<DataSource> dataSourcePage = new Page(pageNo, pageSize);
 
-        Integer count = getTotalCount(loginUser);
+        if (isAdmin(loginUser)) {
+            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, 0, searchVal);
+        }else{
+            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, loginUser.getId(), searchVal);
+        }
 
+        List<DataSource> dataSources = dataSourceList.getRecords();
+        handlePasswd(dataSources);
         PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
-        pageInfo.setTotalCount(count);
-        List<DataSource> datasourceList = getDataSources(loginUser, searchVal, pageSize, pageInfo);
-
-        pageInfo.setLists(datasourceList);
+        pageInfo.setTotalCount((int)(dataSourceList.getTotal()));
+        pageInfo.setLists(dataSources);
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
@@ -286,17 +296,18 @@ public class DataSourceService extends BaseService{
      * @return
      */
     private List<DataSource> getDataSources(User loginUser, String searchVal, Integer pageSize, PageInfo pageInfo) {
-        List<DataSource> dataSourceList = null;
+        IPage<DataSource> dataSourceList = null;
+        Page<DataSource> dataSourcePage = new Page(pageInfo.getStart(), pageSize);
+
         if (isAdmin(loginUser)) {
-            dataSourceList = dataSourceMapper.queryAllDataSourcePaging(searchVal, pageInfo.getStart(), pageSize);
+            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, 0, searchVal);
         }else{
-            dataSourceList = dataSourceMapper.queryDataSourcePaging(loginUser.getId(), searchVal,
-                    pageInfo.getStart(), pageSize);
+            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, loginUser.getId(), searchVal);
         }
+        List<DataSource> dataSources = dataSourceList.getRecords();
 
-        handlePasswd(dataSourceList);
-
-        return dataSourceList;
+        handlePasswd(dataSources);
+        return dataSources;
     }
 
 
@@ -314,20 +325,6 @@ public class DataSourceService extends BaseService{
             dataSource.setConnectionParams(JSONUtils.toJson(object));
 
         }
-    }
-
-
-    /**
-     * get datasource total num
-     *
-     * @param loginUser
-     * @return
-     */
-    private Integer getTotalCount(User loginUser) {
-        if (isAdmin(loginUser)) {
-            return dataSourceMapper.countAllDatasource();
-        }
-        return dataSourceMapper.countUserDatasource(loginUser.getId());
     }
 
     /**
@@ -467,7 +464,7 @@ public class DataSourceService extends BaseService{
      * @return
      */
     public boolean connectionTest(User loginUser, int id) {
-        DataSource dataSource = dataSourceMapper.queryById(id);
+        DataSource dataSource = dataSourceMapper.selectById(id);
         return checkConnection(dataSource.getType(), dataSource.getConnectionParams());
     }
 
@@ -586,7 +583,7 @@ public class DataSourceService extends BaseService{
         Result result = new Result();
         try {
             //query datasource by id
-            DataSource dataSource = dataSourceMapper.queryById(datasourceId);
+            DataSource dataSource = dataSourceMapper.selectById(datasourceId);
             if(dataSource == null){
                 logger.error("resource id {} not exist", datasourceId);
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -596,7 +593,7 @@ public class DataSourceService extends BaseService{
                 putMsg(result, Status.USER_NO_OPERATION_PERM);
                 return result;
             }
-            dataSourceMapper.deleteDataSourceById(datasourceId);
+            dataSourceMapper.deleteById(datasourceId);
             datasourceUserMapper.deleteByDatasourceId(datasourceId);
             putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
@@ -631,7 +628,7 @@ public class DataSourceService extends BaseService{
         if (datasourceList != null && datasourceList.size() > 0) {
             datasourceSet = new HashSet<>(datasourceList);
 
-            List<DataSource> authedDataSourceList = dataSourceMapper.authedDatasource(userId);
+            List<DataSource> authedDataSourceList = dataSourceMapper.queryAuthedDatasource(userId);
 
             Set<DataSource> authedDataSourceSet = null;
             if (authedDataSourceList != null && authedDataSourceList.size() > 0) {
@@ -662,7 +659,7 @@ public class DataSourceService extends BaseService{
             return result;
         }
 
-        List<DataSource> authedDatasourceList = dataSourceMapper.authedDatasource(userId);
+        List<DataSource> authedDatasourceList = dataSourceMapper.queryAuthedDatasource(userId);
         result.put(Constants.DATA_LIST, authedDatasourceList);
         putMsg(result, Status.SUCCESS);
         return result;

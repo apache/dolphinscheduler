@@ -39,6 +39,23 @@ public class ProjectUser {
     @TableField("project_id")
     private int projectId;
 
+    /**
+     * project name
+     */
+    @TableField(exist = false)
+    private String projectName;
+
+    /**
+     * user name
+     */
+    @TableField(exist = false)
+    private String userName;
+
+    /**
+     * permission
+     */
+    private int perm;
+
     @TableField("create_time")
     private Date createTime;
 
@@ -83,5 +100,42 @@ public class ProjectUser {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public int getPerm() {
+        return perm;
+    }
+
+    public void setPerm(int perm) {
+        this.perm = perm;
+    }
+    @Override
+    public String toString() {
+        return "ProjectUser{" +
+                "id=" + id +
+                ", projectId=" + projectId +
+                ", projectName='" + projectName + '\'' +
+                ", userId=" + userId +
+                ", userName='" + userName + '\'' +
+                ", perm=" + perm +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

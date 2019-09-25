@@ -17,6 +17,8 @@
 package cn.escheduler.dao.entity;
 
 import cn.escheduler.common.enums.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
@@ -30,6 +32,7 @@ public class ErrorCommand {
     /**
      * id
      */
+    @TableId(value="id", type = IdType.INPUT)
     private int id;
 
     /**
@@ -102,6 +105,7 @@ public class ErrorCommand {
      */
     private int workerGroupId;
 
+    public ErrorCommand(){}
 
     public ErrorCommand(Command command, String message){
         this.id = command.getId();

@@ -72,8 +72,7 @@ public class ProcessDefinition {
     /**
      * description
      */
-    @TableField("`desc`")
-    private String desc;
+    private String description;
 
     /**
      * user defined parameters
@@ -291,15 +290,6 @@ public class ProcessDefinition {
         this.globalParamMap = globalParamMap;
     }
 
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
     public String getLocations() {
         return locations;
     }
@@ -357,7 +347,6 @@ public class ProcessDefinition {
                 ", releaseState=" + releaseState +
                 ", projectId=" + projectId +
                 ", processDefinitionJson='" + processDefinitionJson + '\'' +
-                ", desc='" + desc + '\'' +
                 ", globalParams='" + globalParams + '\'' +
                 ", globalParamList=" + globalParamList +
                 ", globalParamMap=" + globalParamMap +
@@ -383,5 +372,13 @@ public class ProcessDefinition {
 
     public void setTenantId(int tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

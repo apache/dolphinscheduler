@@ -25,7 +25,7 @@ import java.util.Date;
 /**
  * data source user relation
  */
-@TableName("t_escheduler_datasource_user")
+@TableName("t_escheduler_relation_datasource_user")
 public class DatasourceUser {
 
   /**

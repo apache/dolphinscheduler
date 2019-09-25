@@ -30,6 +30,8 @@ import cn.escheduler.dao.entity.Resource;
 import cn.escheduler.dao.entity.Tenant;
 import cn.escheduler.dao.entity.UdfFunc;
 import cn.escheduler.dao.entity.User;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.BeanMap;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -66,7 +68,7 @@ public class ResourcesService extends BaseService {
     private UserMapper userMapper;
 
     @Autowired
-    private ResourcesUserMapper resourcesUserMapper;
+    private ResourceUserMapper resourceUserMapper;
 
     /**
      * create resource
@@ -129,8 +131,7 @@ public class ResourcesService extends BaseService {
         }
 
         // check resoure name exists
-        Resource resource = resourcesMapper.queryResourceByNameAndType(name, type.ordinal());
-        if (resource != null) {
+        if (checkResourceExists(name, 0, type.ordinal())) {
             logger.error("resource {} has exist, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -138,7 +139,7 @@ public class ResourcesService extends BaseService {
 
         Date now = new Date();
 
-        resource = new Resource(name,file.getOriginalFilename(),desc,loginUser.getId(),type,file.getSize(),now,now);
+        Resource resource = new Resource(name,file.getOriginalFilename(),desc,loginUser.getId(),type,file.getSize(),now,now);
 
         try {
             resourcesMapper.insert(resource);
@@ -167,6 +168,15 @@ public class ResourcesService extends BaseService {
         return result;
     }
 
+    private boolean checkResourceExists(String alias, int userId, int type ){
+
+        List<Resource> resources = resourcesMapper.queryResourceList(alias, userId, type);
+        if (resources != null && resources.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
 
 
     /**
@@ -193,7 +203,7 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        Resource resource = resourcesMapper.queryResourceById(resourceId);
+        Resource resource = resourcesMapper.selectById(resourceId);
         String originResourceName = resource.getAlias();
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -212,8 +222,7 @@ public class ResourcesService extends BaseService {
 
         //check resource aleady exists
         if (!resource.getAlias().equals(name)) {
-            Resource needUpdateResource = resourcesMapper.queryResourceByNameAndType(name, type.ordinal());
-            if (needUpdateResource != null) {
+            if (checkResourceExists(name, 0, type.ordinal())) {
                 logger.error("resource {} already exists, can't recreate", name);
                 putMsg(result, Status.RESOURCE_EXIST);
                 return result;
@@ -227,7 +236,7 @@ public class ResourcesService extends BaseService {
         resource.setUpdateTime(now);
 
         try {
-            resourcesMapper.update(resource);
+            resourcesMapper.updateById(resource);
 
             putMsg(result, Status.SUCCESS);
             Map dataMap = new BeanMap(resource);
@@ -293,21 +302,16 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> queryResourceListPaging(User loginUser, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
         HashMap<String, Object> result = new HashMap<>(5);
-        Integer count = 0;
-        List<Resource> resourceList = new ArrayList<>();
-        PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
+        Page<Resource> page = new Page(pageNo, pageSize);
+        int userId = loginUser.getId();
         if (isAdmin(loginUser)) {
-            count = resourcesMapper.countAllResourceNumberByType(type.ordinal());
-            resourceList = resourcesMapper.queryAllResourceListPaging(type.ordinal(), searchVal,
-                    pageInfo.getStart(), pageSize);
-        } else {
-            count = resourcesMapper.countResourceNumberByType(loginUser.getId(), type.ordinal());
-            resourceList = resourcesMapper.queryResourceAuthoredPaging(loginUser.getId(), type.ordinal(), searchVal,
-                    pageInfo.getStart(), pageSize);
+            userId= 0;
         }
-
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(resourceList);
+        IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page,
+                userId, type.ordinal(), searchVal);
+        PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
+        pageInfo.setTotalCount((int)resourceIPage.getTotal());
+        pageInfo.setLists(resourceIPage.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result,Status.SUCCESS);
         return result;
@@ -370,11 +374,11 @@ public class ResourcesService extends BaseService {
 
         Map<String, Object> result = new HashMap<>(5);
         List<Resource> resourceList;
+        int userId = loginUser.getId();
         if(isAdmin(loginUser)){
-            resourceList = resourcesMapper.listAllResourceByType(type.ordinal());
-        }else{
-            resourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), type.ordinal());
+            userId = 0;
         }
+        resourceList = resourcesMapper.queryResourceList(null, userId, type.ordinal());
         result.put(Constants.DATA_LIST, resourceList);
         putMsg(result,Status.SUCCESS);
 
@@ -399,7 +403,7 @@ public class ResourcesService extends BaseService {
         }
 
         //get resource and  hdfs path
-        Resource resource = resourcesMapper.queryResourceById(resourceId);
+        Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             logger.error("resource file not exist,  resource id {}", resourceId);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -417,8 +421,8 @@ public class ResourcesService extends BaseService {
         hdfsFilename = getHdfsFileName(resource, tenantCode, hdfsFilename);
 
         //delete data in database
-        resourcesMapper.delete(resourceId);
-        resourcesUserMapper.deleteByResourceId(resourceId);
+        resourcesMapper.deleteById(resourceId);
+        resourceUserMapper.deleteResourceUser(0, resourceId);
         //delete file on hdfs
         HadoopUtils.getInstance().delete(hdfsFilename, false);
         putMsg(result, Status.SUCCESS);
@@ -436,8 +440,7 @@ public class ResourcesService extends BaseService {
     public Result verifyResourceName(String name, ResourceType type,User loginUser) {
         Result result = new Result();
         putMsg(result, Status.SUCCESS);
-        Resource resource = resourcesMapper.queryResourceByNameAndType(name, type.ordinal());
-        if (resource != null) {
+        if (checkResourceExists(name, 0, type.ordinal())) {
             logger.error("resource type:{} name:{} has exist, can't create again.", type, name);
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
@@ -474,8 +477,7 @@ public class ResourcesService extends BaseService {
      */
     public Result verifyResourceName(String name, ResourceType type) {
         Result result = new Result();
-        Resource resource = resourcesMapper.queryResourceByNameAndType(name, type.ordinal());
-        if (resource != null) {
+        if (checkResourceExists(name, 0, type.ordinal())) {
             logger.error("resource type:{} name:{} has exist, can't create again.", type, name);
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
@@ -502,7 +504,7 @@ public class ResourcesService extends BaseService {
         }
 
         // get resource by id
-        Resource resource = resourcesMapper.queryResourceById(resourceId);
+        Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             logger.error("resouce file not exist,  resource id {}", resourceId);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -629,7 +631,7 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        Resource resource = resourcesMapper.queryResourceById(resourceId);
+        Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             logger.error("read file not exist,  resource id {}", resourceId);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
@@ -649,7 +651,7 @@ public class ResourcesService extends BaseService {
 
         resource.setSize(content.getBytes().length);
         resource.setUpdateTime(new Date());
-        resourcesMapper.update(resource);
+        resourcesMapper.updateById(resource);
 
         User user = userMapper.queryDetailsById(resource.getUserId());
         String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
@@ -720,7 +722,7 @@ public class ResourcesService extends BaseService {
             throw new RuntimeException("hdfs not startup");
         }
 
-        Resource resource = resourcesMapper.queryResourceById(resourceId);
+        Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
             logger.error("download file not exist,  resource id {}", resourceId);
             return null;
@@ -793,7 +795,7 @@ public class ResourcesService extends BaseService {
         if (udfFuncList != null && udfFuncList.size() > 0) {
             udfFuncSet = new HashSet<>(udfFuncList);
 
-            List<UdfFunc> authedUDFFuncList = udfFunctionMapper.authedUdfFunc(userId);
+            List<UdfFunc> authedUDFFuncList = udfFunctionMapper.queryAuthedUdfFunc(userId);
 
             getAuthorizedResourceList(udfFuncSet, authedUDFFuncList);
             resultList = new ArrayList<>(udfFuncSet);
@@ -818,7 +820,7 @@ public class ResourcesService extends BaseService {
         if (checkAdmin(loginUser, result)) {
             return result;
         }
-        List<UdfFunc> udfFuncs = udfFunctionMapper.authedUdfFunc(userId);
+        List<UdfFunc> udfFuncs = udfFunctionMapper.queryAuthedUdfFunc(userId);
         result.put(Constants.DATA_LIST, udfFuncs);
         putMsg(result,Status.SUCCESS);
         return result;

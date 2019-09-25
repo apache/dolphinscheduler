@@ -22,7 +22,6 @@
 		<jackson.version>2.9.8</jackson.version>
 		<mybatis-plus.version>3.0.7.1</mybatis-plus.version>
 		<lombok.version>1.18.4</lombok.version>
-		<mybatis.version>3.5.1</mybatis.version>
 		<mybatis.spring.version>2.0.1</mybatis.spring.version>
 		<cron.utils.version>5.0.5</cron.utils.version>
 		<fastjson.version>1.2.29</fastjson.version>
@@ -59,28 +58,16 @@
 
 	<dependencyManagement>
 		<dependencies>
-
 			<dependency>
-				<groupId>org.mybatis</groupId>
-				<artifactId>mybatis</artifactId>
-				<version>${mybatis.version}</version>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus-boot-starter</artifactId>
+				<version>${mybatis-plus.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.mybatis</groupId>
-				<artifactId>mybatis-spring</artifactId>
-				<version>${mybatis.spring.version}</version>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus</artifactId>
+				<version>${mybatis-plus.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.mybatis.spring.boot</groupId>
-				<artifactId>mybatis-spring-boot-autoconfigure</artifactId>
-				<version>${mybatis.spring.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mybatis.spring.boot</groupId>
-				<artifactId>mybatis-spring-boot-starter</artifactId>
-				<version>${mybatis.spring.version}</version>
-			</dependency>
-
 			<!-- quartz-->
 			<dependency>
 				<groupId>org.quartz-scheduler</groupId>
@@ -416,27 +403,6 @@
 				<artifactId>jsp-2.1</artifactId>
 				<version>${jsp.version}</version>
 			</dependency>
-
-			<dependency>
-				<groupId>com.baomidou</groupId>
-				<artifactId>mybatis-plus-boot-starter</artifactId>
-				<version>${mybatis-plus.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.baomidou</groupId>
-				<artifactId>mybatis-plus</artifactId>
-				<version>${mybatis-plus.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.baomidou</groupId>
-				<artifactId>mybatis-plus-generator</artifactId>
-				<version>${mybatis-plus.version}</version>
-			</dependency>
-			<!--<dependency>-->
-				<!--<groupId>com.baomidou</groupId>-->
-				<!--<artifactId>mybatis-plus-dts</artifactId>-->
-				<!--<version>${mybatis-plus.version}</version>-->
-			<!--</dependency>-->
 		</dependencies>
 	</dependencyManagement>
 

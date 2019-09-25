@@ -24,6 +24,9 @@ import cn.escheduler.common.utils.HadoopUtils;
 import cn.escheduler.common.utils.PropertyUtils;
 import cn.escheduler.dao.entity.Tenant;
 import cn.escheduler.dao.entity.User;
+import cn.escheduler.dao.mapper.TenantMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
@@ -122,14 +125,11 @@ public class TenantService extends BaseService{
       return result;
     }
 
-    Integer count = tenantMapper.countTenantPaging(searchVal);
-
+    Page<Tenant> page = new Page(pageNo, pageSize);
+    IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, searchVal);
     PageInfo<Tenant> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-    List<Tenant> scheduleList = tenantMapper.queryTenantPaging(searchVal, pageInfo.getStart(), pageSize);
-
-    pageInfo.setTotalCount(count);
-    pageInfo.setLists(scheduleList);
+    pageInfo.setTotalCount((int)tenantIPage.getTotal());
+    pageInfo.setLists(tenantIPage.getRecords());
     result.put(Constants.DATA_LIST, pageInfo);
 
     putMsg(result, Status.SUCCESS);
@@ -199,7 +199,7 @@ public class TenantService extends BaseService{
     }
     tenant.setDesc(desc);
     tenant.setUpdateTime(now);
-    tenantMapper.update(tenant);
+    tenantMapper.updateById(tenant);
 
     result.put(Constants.STATUS, Status.SUCCESS);
     result.put(Constants.MSG, Status.SUCCESS.getMsg());
@@ -264,7 +264,7 @@ public class TenantService extends BaseService{
 
     Map<String, Object> result = new HashMap<>(5);
 
-    List<Tenant> resourceList = tenantMapper.queryAllTenant();
+    List<Tenant> resourceList = tenantMapper.selectList(null);
     result.put(Constants.DATA_LIST, resourceList);
     putMsg(result, Status.SUCCESS);
     

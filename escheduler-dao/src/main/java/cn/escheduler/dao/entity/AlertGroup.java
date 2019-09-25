@@ -39,31 +39,26 @@ public class AlertGroup {
     /**
      * alert group name
      */
-    @TableField("group_name")
     private String groupName;
 
     /**
      * alert group type
      */
-    @TableField(value="group_type")
     private AlertType groupType;
 
     /**
      * alert group description
      */
-    @TableField("`desc`")
-    private String desc;
+    private String description;
 
     /**
      * create time
      */
-    @TableField("create_time")
     private Date createTime;
 
     /**
      * update time
      */
-    @TableField("update_time")
     private Date updateTime;
 
     public int getId() {
@@ -90,14 +85,6 @@ public class AlertGroup {
         this.groupType = groupType;
     }
 
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -112,5 +99,13 @@ public class AlertGroup {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

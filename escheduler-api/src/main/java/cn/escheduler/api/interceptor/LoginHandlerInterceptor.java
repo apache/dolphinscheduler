@@ -20,6 +20,7 @@ import cn.escheduler.api.service.SessionService;
 import cn.escheduler.api.utils.Constants;
 import cn.escheduler.dao.entity.Session;
 import cn.escheduler.dao.entity.User;
+import cn.escheduler.dao.mapper.UserMapper;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -77,7 +78,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
       }
 
       //get user object from session
-      user = userMapper.queryById(session.getUserId());
+      user = userMapper.selectById(session.getUserId());
 
       // if user is null
       if (user == null) {

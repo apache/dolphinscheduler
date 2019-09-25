@@ -16,8 +16,6 @@
  */
 package cn.escheduler.dao.datasource;
 
-import cn.escheduler.common.Constants;
-import cn.escheduler.dao.mapper.ProjectMapper;
 import com.alibaba.druid.pool.DruidDataSource;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
@@ -32,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
 
-import static cn.escheduler.dao.utils.PropertyUtils.*;
 
 
 /**
@@ -49,39 +46,17 @@ public class ConnectionFactory {
   public static DruidDataSource getDataSource() {
     DruidDataSource druidDataSource = new DruidDataSource();
 
-    druidDataSource.setDriverClassName(getString(Constants.SPRING_DATASOURCE_DRIVER_CLASS_NAME));
-    druidDataSource.setUrl(getString(Constants.SPRING_DATASOURCE_URL));
-    druidDataSource.setUsername(getString(Constants.SPRING_DATASOURCE_USERNAME));
-    druidDataSource.setPassword(getString(Constants.SPRING_DATASOURCE_PASSWORD));
-    druidDataSource.setValidationQuery(getString(Constants.SPRING_DATASOURCE_VALIDATION_QUERY));
-
-    druidDataSource.setPoolPreparedStatements(getBoolean(Constants.SPRING_DATASOURCE_POOL_PREPARED_STATEMENTS));
-    druidDataSource.setTestWhileIdle(getBoolean(Constants.SPRING_DATASOURCE_TEST_WHILE_IDLE));
-    druidDataSource.setTestOnBorrow(getBoolean(Constants.SPRING_DATASOURCE_TEST_ON_BORROW));
-    druidDataSource.setTestOnReturn(getBoolean(Constants.SPRING_DATASOURCE_TEST_ON_RETURN));
-    druidDataSource.setKeepAlive(getBoolean(Constants.SPRING_DATASOURCE_KEEP_ALIVE));
-    //just for development
-    /*if (CommonUtils.isDevelopMode()) {
-      //Configure filters that are intercepted by monitoring statistics, and SQL can not be counted after removing them.'wall'is used for firewall
-      try {
-        druidDataSource.setFilters("stat,wall,log4j");
-      } catch (SQLException e) {
-        logger.error(e.getMessage(), e);
-      }
-    }*/
-
-    druidDataSource.setMinIdle(getInt(Constants.SPRING_DATASOURCE_MIN_IDLE));
-    druidDataSource.setMaxActive(getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE));
-    druidDataSource.setMaxWait(getInt(Constants.SPRING_DATASOURCE_MAX_WAIT));
-    druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(getInt(Constants.SPRING_DATASOURCE_MAX_POOL_PREPARED_STATEMENT_PER_CONNECTION_SIZE));
-    druidDataSource.setInitialSize(getInt(Constants.SPRING_DATASOURCE_INITIAL_SIZE));
-    druidDataSource.setTimeBetweenEvictionRunsMillis(getLong(Constants.SPRING_DATASOURCE_TIME_BETWEEN_EVICTION_RUNS_MILLIS));
-    druidDataSource.setTimeBetweenConnectErrorMillis(getLong(Constants.SPRING_DATASOURCE_TIME_BETWEEN_CONNECT_ERROR_MILLIS));
-    druidDataSource.setMinEvictableIdleTimeMillis(getLong(Constants.SPRING_DATASOURCE_MIN_EVICTABLE_IDLE_TIME_MILLIS));
-    druidDataSource.setValidationQueryTimeout(getInt(Constants.SPRING_DATASOURCE_VALIDATION_QUERY_TIMEOUT));
-    //auto commit
-    druidDataSource.setDefaultAutoCommit(getBoolean(Constants.SPRING_DATASOURCE_DEFAULT_AUTO_COMMIT));
-
+    druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
+    druidDataSource.setUrl("jdbc:mysql://192.168.220.188:3306/escheduler?useUnicode=true&characterEncoding=UTF-8");
+    druidDataSource.setUsername("root");
+    druidDataSource.setPassword("root@123");
+    druidDataSource.setInitialSize(5);
+    druidDataSource.setMinIdle(5);
+    druidDataSource.setMaxActive(20);
+    druidDataSource.setMaxWait(60000);
+    druidDataSource.setTimeBetweenEvictionRunsMillis(60000);
+    druidDataSource.setMinEvictableIdleTimeMillis(300000);
+    druidDataSource.setValidationQuery("SELECT 1");
     return druidDataSource;
   }
 
@@ -95,12 +70,12 @@ public class ConnectionFactory {
           DataSource dataSource = getDataSource();
           TransactionFactory transactionFactory = new JdbcTransactionFactory();
 
-          Environment environment = new Environment(Constants.DEVELOPMENT, transactionFactory, dataSource);
+          Environment environment = new Environment("development", transactionFactory, dataSource);
 
           Configuration configuration = new Configuration(environment);
           configuration.setLazyLoadingEnabled(true);
+          configuration.addMappers("cn.escheduler.dao.mapper");
 
-          configuration.addMappers(ProjectMapper.class.getPackage().getName());
 
           SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
           sqlSessionFactory = builder.build(configuration);

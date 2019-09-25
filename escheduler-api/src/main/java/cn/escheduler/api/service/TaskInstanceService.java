@@ -28,6 +28,10 @@ import cn.escheduler.dao.entity.ProcessInstance;
 import cn.escheduler.dao.entity.Project;
 import cn.escheduler.dao.entity.TaskInstance;
 import cn.escheduler.dao.entity.User;
+import cn.escheduler.dao.mapper.ProjectMapper;
+import cn.escheduler.dao.mapper.TaskInstanceMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,18 +114,18 @@ public class TaskInstanceService extends BaseService {
             result.put(Constants.MSG, MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "startDate,endDate"));
             return result;
         }
-        Integer count = taskInstanceMapper.countTaskInstance(project.getId(), processInstanceId, taskName, statesStr,
-                host,start, end, searchVal);
 
+        Page<TaskInstance> page = new Page(pageNo, pageSize);
+        IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
+                page, project.getId(), processInstanceId, searchVal, taskName, statesStr, host, start, end
+        );
         PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
         Set<String> exclusionSet = new HashSet<String>(){{
             add(Constants.CLASS);
             add("taskJson");
         }};
-        List<TaskInstance> taskInstanceList = taskInstanceMapper.queryTaskInstanceListPaging(
-                project.getId(), processInstanceId, searchVal, taskName, statesStr, host, start, end, pageInfo.getStart(), pageSize);
-        pageInfo.setTotalCount(count);
-        pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceList,exclusionSet));
+        pageInfo.setTotalCount((int)taskInstanceIPage.getTotal());
+        pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(),exclusionSet));
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 

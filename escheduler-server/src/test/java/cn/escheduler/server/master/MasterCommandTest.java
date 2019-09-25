@@ -24,9 +24,10 @@ import cn.escheduler.common.graph.DAG;
 import cn.escheduler.common.model.TaskNode;
 import cn.escheduler.common.model.TaskNodeRelation;
 import cn.escheduler.common.process.ProcessDag;
-import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.entity.Command;
 import cn.escheduler.dao.entity.ProcessDefinition;
+import cn.escheduler.dao.mapper.CommandMapper;
+import cn.escheduler.dao.mapper.ProcessDefinitionMapper;
 import cn.escheduler.dao.utils.DagHelper;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -49,16 +50,6 @@ public class MasterCommandTest {
     private CommandMapper commandMapper;
 
     private ProcessDefinitionMapper processDefinitionMapper;
-
-
-    @Before
-    public void before(){
-
-        commandMapper = ConnectionFactory.getSqlSession().getMapper(CommandMapper.class);
-        processDefinitionMapper = ConnectionFactory.getSqlSession().getMapper(ProcessDefinitionMapper.class);
-    }
-
-
 
 
     @Test
@@ -124,7 +115,7 @@ public class MasterCommandTest {
     @Test
     public void testDagHelper(){
 
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByDefineId(19);
+        ProcessDefinition processDefinition = processDefinitionMapper.selectById(19);
 
         try {
             ProcessDag processDag = DagHelper.generateFlowDag(processDefinition.getProcessDefinitionJson(),

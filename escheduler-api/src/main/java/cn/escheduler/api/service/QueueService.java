@@ -22,6 +22,9 @@ import cn.escheduler.api.utils.PageInfo;
 import cn.escheduler.api.utils.Result;
 import cn.escheduler.dao.entity.Queue;
 import cn.escheduler.dao.entity.User;
+import cn.escheduler.dao.mapper.QueueMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +59,7 @@ public class QueueService extends BaseService {
             return result;
         }
 
-        List<Queue> queueList = queueMapper.queryAllQueue();
+        List<Queue> queueList = queueMapper.selectList(null);
         result.put(Constants.DATA_LIST, queueList);
         putMsg(result, Status.SUCCESS);
 
@@ -78,14 +81,15 @@ public class QueueService extends BaseService {
             return result;
         }
 
-        Integer count = queueMapper.countQueuePaging(searchVal);
+        Page<Queue> page = new Page(pageNo, pageSize);
 
+
+        IPage<Queue> queueList = queueMapper.queryQueuePaging(page, searchVal);
+
+        Integer count = (int)queueList.getTotal();
         PageInfo<Queue> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-        List<Queue> queueList = queueMapper.queryQueuePaging(searchVal, pageInfo.getStart(), pageSize);
-
         pageInfo.setTotalCount(count);
-        pageInfo.setLists(queueList);
+        pageInfo.setLists(queueList.getRecords());
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
@@ -155,7 +159,7 @@ public class QueueService extends BaseService {
             return result;
         }
 
-        Queue queueObj = queueMapper.queryById(id);
+        Queue queueObj = queueMapper.selectById(id);
         if (queueObj == null) {
             putMsg(result, Status.QUEUE_NOT_EXIST, id);
             return result;
@@ -189,7 +193,7 @@ public class QueueService extends BaseService {
         queueObj.setQueueName(queueName);
         queueObj.setUpdateTime(now);
 
-        queueMapper.update(queueObj);
+        queueMapper.updateById(queueObj);
         putMsg(result, Status.SUCCESS);
 
         return result;

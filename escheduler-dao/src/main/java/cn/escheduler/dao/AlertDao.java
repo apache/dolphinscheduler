@@ -19,7 +19,6 @@ package cn.escheduler.dao;
 import cn.escheduler.common.enums.AlertStatus;
 import cn.escheduler.common.enums.AlertType;
 import cn.escheduler.common.enums.ShowType;
-import cn.escheduler.dao.datasource.ConnectionFactory;
 import cn.escheduler.dao.entity.Alert;
 import cn.escheduler.dao.mapper.AlertMapper;
 import cn.escheduler.dao.mapper.UserAlertGroupMapper;
@@ -48,8 +47,8 @@ public class AlertDao extends AbstractBaseDao {
 
     @Override
     protected void init() {
-        alertMapper = ConnectionFactory.getSqlSession().getMapper(AlertMapper.class);
-        userAlertGroupMapper = ConnectionFactory.getSqlSession().getMapper(UserAlertGroupMapper.class);
+//        alertMapper = ConnectionFactory.getSqlSession().getMapper(AlertMapper.class);
+//        userAlertGroupMapper = ConnectionFactory.getSqlSession().getMapper(UserAlertGroupMapper.class);
     }
 
     /**

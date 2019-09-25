@@ -19,6 +19,7 @@ package cn.escheduler.dao.entity;
 
 import cn.escheduler.common.enums.UserType;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
@@ -76,21 +77,25 @@ public class  User {
     /**
      * tenant code
      */
+    @TableField(exist = false)
     private String tenantCode;
 
     /**
      * tenant name
      */
+    @TableField(exist = false)
     private String tenantName;
 
     /**
      * queue name
      */
+    @TableField(exist = false)
     private String queueName;
 
     /**
      * alert group
      */
+    @TableField(exist = false)
     private String alertGroup;
 
     /**

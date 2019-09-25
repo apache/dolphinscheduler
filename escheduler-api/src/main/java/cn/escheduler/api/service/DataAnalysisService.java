@@ -22,17 +22,14 @@ import cn.escheduler.api.dto.DefineUserDto;
 import cn.escheduler.api.dto.TaskCountDto;
 import cn.escheduler.api.enums.Status;
 import cn.escheduler.api.utils.Constants;
-import cn.escheduler.common.enums.ExecutionStatus;
+import cn.escheduler.common.enums.CommandType;
 import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.queue.ITaskQueue;
 import cn.escheduler.common.queue.TaskQueueFactory;
 import cn.escheduler.common.utils.DateUtils;
+import cn.escheduler.dao.entity.*;
 import cn.escheduler.dao.mapper.*;
-import cn.escheduler.dao.entity.DefinitionGroupByUser;
-import cn.escheduler.dao.entity.ExecuteStatusCount;
-import cn.escheduler.dao.entity.Project;
-import cn.escheduler.dao.entity.User;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,7 +80,7 @@ public class DataAnalysisService {
 
         Map<String, Object> result = new HashMap<>(5);
         if(projectId != 0){
-            Project project = projectMapper.queryById(projectId);
+            Project project = projectMapper.selectById(projectId);
             result = projectService.checkProjectAndAuth(loginUser, project, String.valueOf(projectId));
 
             if (getResultStatus(result)){
@@ -109,7 +106,7 @@ public class DataAnalysisService {
 
         List<ExecuteStatusCount> taskInstanceStateCounts =
                 taskInstanceMapper.countTaskInstanceStateByUser(loginUser.getId(),
-                       loginUser.getUserType(),  start, end, projectId);
+                       loginUser.getUserType(),  start, end, String.valueOf(projectId));
 
         TaskCountDto taskCountResult = new TaskCountDto(taskInstanceStateCounts);
         if (taskInstanceStateCounts != null) {
@@ -139,7 +136,7 @@ public class DataAnalysisService {
 
         Map<String, Object> result = new HashMap<>(5);
         if(projectId != 0){
-            Project project = projectMapper.queryById(projectId);
+            Project project = projectMapper.selectById(projectId);
             result = projectService.checkProjectAndAuth(loginUser, project, String.valueOf(projectId));
 
             if (getResultStatus(result)){
@@ -159,7 +156,7 @@ public class DataAnalysisService {
         }
         List<ExecuteStatusCount> processInstanceStateCounts =
                 processInstanceMapper.countInstanceStateByUser(loginUser.getId(),
-                        loginUser.getUserType(), start, end, projectId );
+                        loginUser.getUserType(), start, end, String.valueOf(projectId));
 
         TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
         if (processInstanceStateCounts != null) {
@@ -182,7 +179,8 @@ public class DataAnalysisService {
     public Map<String,Object> countDefinitionByUser(User loginUser, int projectId) {
         Map<String, Object> result = new HashMap<>();
 
-        List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(loginUser.getId(), loginUser.getUserType(), projectId);
+        List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
+                loginUser.getId(), loginUser.getUserType(), String.valueOf(projectId));
 
         DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
         result.put(Constants.DATA_LIST, dto);
@@ -226,7 +224,7 @@ public class DataAnalysisService {
 
         Map<String, Object> result = new HashMap<>(5);
         if(projectId != 0){
-            Project project = projectMapper.queryById(projectId);
+            Project project = projectMapper.selectById(projectId);
             result = projectService.checkProjectAndAuth(loginUser, project, String.valueOf(projectId));
 
             if (getResultStatus(result)){
@@ -251,17 +249,20 @@ public class DataAnalysisService {
         }
 
         // count command state
-        List<ExecuteStatusCount> commandStateCounts =
-                commandMapper.countCommandState(loginUser.getId(),
-                        loginUser.getUserType(), start, end, projectId);
+        List<CommandCount> commandStateCounts =
+                commandMapper.countCommandState(
+                        loginUser.getId(),
+                        start,
+                        end,
+                        String.valueOf(projectId));
 
         // count error command state
-        List<ExecuteStatusCount> errorCommandStateCounts =
+        List<CommandCount> errorCommandStateCounts =
                 errorCommandMapper.countCommandState(loginUser.getId(),
                         loginUser.getUserType(), start, end, projectId);
 
         //
-        Map<ExecutionStatus,Map<String,Integer>> dataMap = new HashMap<>();
+        Map<CommandType,Map<String,Integer>> dataMap = new HashMap<>();
 
         Map<String,Integer> commonCommand = new HashMap<>();
         commonCommand.put("commandState",0);
@@ -269,37 +270,37 @@ public class DataAnalysisService {
 
 
         // init data map
-        dataMap.put(ExecutionStatus.SUBMITTED_SUCCESS,commonCommand);
-        dataMap.put(ExecutionStatus.RUNNING_EXEUTION,commonCommand);
-        dataMap.put(ExecutionStatus.READY_PAUSE,commonCommand);
-        dataMap.put(ExecutionStatus.PAUSE,commonCommand);
-        dataMap.put(ExecutionStatus.READY_STOP,commonCommand);
-        dataMap.put(ExecutionStatus.STOP,commonCommand);
-        dataMap.put(ExecutionStatus.FAILURE,commonCommand);
-        dataMap.put(ExecutionStatus.SUCCESS,commonCommand);
-        dataMap.put(ExecutionStatus.NEED_FAULT_TOLERANCE,commonCommand);
-        dataMap.put(ExecutionStatus.KILL,commonCommand);
-        dataMap.put(ExecutionStatus.WAITTING_THREAD,commonCommand);
-        dataMap.put(ExecutionStatus.WAITTING_DEPEND,commonCommand);
+//        dataMap.put(ExecutionStatus.SUBMITTED_SUCCESS,commonCommand);
+//        dataMap.put(ExecutionStatus.RUNNING_EXEUTION,commonCommand);
+//        dataMap.put(ExecutionStatus.READY_PAUSE,commonCommand);
+//        dataMap.put(ExecutionStatus.PAUSE,commonCommand);
+//        dataMap.put(ExecutionStatus.READY_STOP,commonCommand);
+//        dataMap.put(ExecutionStatus.STOP,commonCommand);
+//        dataMap.put(ExecutionStatus.FAILURE,commonCommand);
+//        dataMap.put(ExecutionStatus.SUCCESS,commonCommand);
+//        dataMap.put(ExecutionStatus.NEED_FAULT_TOLERANCE,commonCommand);
+//        dataMap.put(ExecutionStatus.KILL,commonCommand);
+//        dataMap.put(ExecutionStatus.WAITTING_THREAD,commonCommand);
+//        dataMap.put(ExecutionStatus.WAITTING_DEPEND,commonCommand);
 
         // put command state
-        for (ExecuteStatusCount executeStatusCount : commandStateCounts){
-            Map<String,Integer> commandStateCountsMap = new HashMap<>(dataMap.get(executeStatusCount.getExecutionStatus()));
+        for (CommandCount executeStatusCount : commandStateCounts){
+            Map<String,Integer> commandStateCountsMap = new HashMap<>(dataMap.get(executeStatusCount.getCommandType()));
             commandStateCountsMap.put("commandState", executeStatusCount.getCount());
-            dataMap.put(executeStatusCount.getExecutionStatus(),commandStateCountsMap);
+            dataMap.put(executeStatusCount.getCommandType(),commandStateCountsMap);
         }
 
         // put error command state
-        for (ExecuteStatusCount errorExecutionStatus : errorCommandStateCounts){
-            Map<String,Integer> errorCommandStateCountsMap = new HashMap<>(dataMap.get(errorExecutionStatus.getExecutionStatus()));
+        for (CommandCount errorExecutionStatus : errorCommandStateCounts){
+            Map<String,Integer> errorCommandStateCountsMap = new HashMap<>(dataMap.get(errorExecutionStatus.getCommandType()));
             errorCommandStateCountsMap.put("errorCommandState",errorExecutionStatus.getCount());
-            dataMap.put(errorExecutionStatus.getExecutionStatus(),errorCommandStateCountsMap);
+            dataMap.put(errorExecutionStatus.getCommandType(),errorCommandStateCountsMap);
         }
 
         List<CommandStateCount> list = new ArrayList<>();
-        Iterator<Map.Entry<ExecutionStatus, Map<String, Integer>>> iterator = dataMap.entrySet().iterator();
+        Iterator<Map.Entry<CommandType, Map<String, Integer>>> iterator = dataMap.entrySet().iterator();
         while (iterator.hasNext()){
-            Map.Entry<ExecutionStatus, Map<String, Integer>> next = iterator.next();
+            Map.Entry<CommandType, Map<String, Integer>> next = iterator.next();
             CommandStateCount commandStateCount = new CommandStateCount(next.getValue().get("errorCommandState"),
                     next.getValue().get("commandState"),next.getKey());
             list.add(commandStateCount);
@@ -319,7 +320,7 @@ public class DataAnalysisService {
     public Map<String, Object> countQueueState(User loginUser, int projectId) {
         Map<String, Object> result = new HashMap<>(5);
         if(projectId != 0){
-            Project project = projectMapper.queryById(projectId);
+            Project project = projectMapper.selectById(projectId);
             result = projectService.checkProjectAndAuth(loginUser, project, String.valueOf(projectId));
 
             if (getResultStatus(result)){
@@ -367,11 +368,15 @@ public class DataAnalysisService {
         Integer taskKillCount = 0;
 
         if (tasksQueueIds.length != 0){
-            taskQueueCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksQueueIds);
+            taskQueueCount = taskInstanceMapper.countTask(
+                    loginUser.getId(),loginUser.getUserType(),String.valueOf(projectId),
+                    StringUtils.join(tasksQueueIds, ","));
         }
 
         if (tasksKillIds.length != 0){
-            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksKillIds);
+            taskKillCount = taskInstanceMapper.countTask(
+                    loginUser.getId(),loginUser.getUserType(),String.valueOf(projectId),
+                    StringUtils.join(tasksKillIds, ","));
         }
 
 
