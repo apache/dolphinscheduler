@@ -27,7 +27,7 @@
           <template slot="content">
             <x-input
                     type="input"
-                    maxlength="40"
+                    maxlength="100"
                     v-model="className"
                     :placeholder="$t('Please enter a Package name')">
             </x-input>
