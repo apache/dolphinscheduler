@@ -392,9 +392,7 @@ public class DataAnalysisService {
         }
 
         if (tasksKillIds.length != 0){
-            taskKillCount = taskInstanceMapper.countTask(
-                    loginUser.getId(),loginUser.getUserType(),String.valueOf(projectId),
-                    StringUtils.join(tasksKillIds, ","));
+            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksKillIds);
         }
 
 
