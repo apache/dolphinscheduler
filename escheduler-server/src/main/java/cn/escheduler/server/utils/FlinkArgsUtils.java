@@ -28,24 +28,26 @@ import java.util.List;
 
 
 /**
- *  spark args utils
+ * spark args utils
  */
 public class FlinkArgsUtils {
 
     /**
-     *  build args
+     * build args
+     *
      * @param param
      * @return
      */
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FlinkArgsUtils.class);
+
     public static List<String> buildArgs(FlinkParameters param) {
         List<String> args = new ArrayList<>();
         String deployMode = "cluster";
-        if(StringUtils.isNotEmpty(param.getDeployMode())){
+        if (StringUtils.isNotEmpty(param.getDeployMode())) {
             deployMode = param.getDeployMode();
 
         }
-        if(!"local".equals(deployMode)){
+        if (!"local".equals(deployMode)) {
             args.add(Constants.FLINK_RUN_MODE);  //-m
 
             args.add(Constants.FLINK_YARN_CLUSTER);   //yarn-cluster
@@ -81,8 +83,8 @@ public class FlinkArgsUtils {
 
         }
 
-        if(param.getProgramType() !=null ){
-            if(param.getProgramType()!=ProgramType.PYTHON){
+        if (param.getProgramType() != null) {
+            if (param.getProgramType() != ProgramType.PYTHON) {
                 if (StringUtils.isNotEmpty(param.getMainClass())) {
                     args.add(Constants.FLINK_MAIN_CLASS);    //-c
                     args.add(param.getMainClass());          //main class
@@ -101,14 +103,14 @@ public class FlinkArgsUtils {
         // --files --conf --libjar ...
         if (StringUtils.isNotEmpty(param.getOthers())) {
             String others = param.getOthers();
-            if(!others.contains("--qu")){
+            if (!others.contains("--qu")) {
                 if (StringUtils.isNotEmpty(param.getQueue()) && !deployMode.equals("local")) {
                     args.add(Constants.FLINK_QUEUE);
                     args.add(param.getQueue());
                 }
             }
             args.add(param.getOthers());
-        }else if (StringUtils.isNotEmpty(param.getQueue()) && !deployMode.equals("local")) {
+        } else if (StringUtils.isNotEmpty(param.getQueue()) && !deployMode.equals("local")) {
             args.add(Constants.FLINK_QUEUE);
             args.add(param.getQueue());
 
