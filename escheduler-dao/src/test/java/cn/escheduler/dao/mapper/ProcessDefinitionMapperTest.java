@@ -172,5 +172,28 @@ public class ProcessDefinitionMapperTest {
 
     @Test
     public void testCountDefinitionGroupByUser() {
+
+        User user= new User();
+        user.setUserName("user1");
+        user.setUserPassword("1");
+        user.setEmail("xx@123.com");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setCreateTime(new Date());
+        user.setTenantId(1);
+        user.setUpdateTime(new Date());
+        userMapper.insert(user);
+
+        ProcessDefinition processDefinition = insertOne();
+        processDefinition.setUserId(user.getId());
+        processDefinitionMapper.updateById(processDefinition);
+
+        Integer[] projectIds = new Integer[1];
+        projectIds[0] = processDefinition.getProjectId();
+        List<DefinitionGroupByUser> processDefinitions = processDefinitionMapper.countDefinitionGroupByUser(
+                processDefinition.getUserId(),
+                projectIds
+        );
+        processDefinitionMapper.deleteById(processDefinition.getId());
+        Assert.assertNotEquals(processDefinitions.size(), 0);
     }
 }

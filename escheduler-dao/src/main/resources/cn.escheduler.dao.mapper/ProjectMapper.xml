@@ -56,7 +56,7 @@
         from t_escheduler_project
         where flag=1 and user_id <![CDATA[ <> ]]> #{userId}
     </select>
-    <select id="queryProjectCreatedByUser" resultType="java.lang.Integer">
+    <select id="queryProjectCreatedByUser" resultType="cn.escheduler.dao.entity.Project">
         select *
         from t_escheduler_project
         where user_id = #{userId}

@@ -17,6 +17,7 @@
 package cn.escheduler.dao.mapper;
 
 import cn.escheduler.dao.entity.Project;
+import com.amazonaws.services.dynamodbv2.model.transform.ProjectionJsonUnmarshaller;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Param;
@@ -36,7 +37,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
     IPage<Project> queryAllProjectListPaging(IPage<Project> page,
                                              @Param("searchName") String searchName);
 
-    List<Integer> queryProjectCreatedByUser(@Param("userId") int userId);
+    List<Project> queryProjectCreatedByUser(@Param("userId") int userId);
 
     List<Project> queryAuthedProjectListByUserId(@Param("userId") int userId);
 
