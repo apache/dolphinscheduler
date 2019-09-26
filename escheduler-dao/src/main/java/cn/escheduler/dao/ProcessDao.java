@@ -101,6 +101,9 @@ public class ProcessDao extends AbstractBaseDao {
     @Autowired
     private TenantMapper tenantMapper;
 
+    @Autowired
+    private  ProjectMapper projectMapper;
+
     /**
      * task queue impl
      */
@@ -1758,6 +1761,15 @@ public class ProcessDao extends AbstractBaseDao {
 
         taskWorkerGroupId = (taskWorkerGroupId <= 0 ? processWorkerGroupId : taskWorkerGroupId);
         return taskWorkerGroupId;
+    }
+
+    public List<Project> getProjectListHavePerm(int userId){
+        List<Project> createProjects = projectMapper.queryProjectCreatedByUser(userId);
+        List<Project> authedProjects = projectMapper.queryAuthedProjectListByUserId(userId);
+
+        createProjects.addAll(authedProjects);
+        return createProjects;
+
     }
 
 
