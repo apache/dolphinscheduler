@@ -570,7 +570,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     row.put("scheduleEndTime", schedule.getEndTime());
                     row.put("scheduleCrontab", schedule.getCrontab());
                     row.put("scheduleFailureStrategy", schedule.getFailureStrategy());
-                    row.put("scheduleReleaseState", schedule.getReleaseState());
+                    row.put("scheduleReleaseState", ReleaseState.OFFLINE);
                     row.put("scheduleProcessInstancePriority", schedule.getProcessInstancePriority());
                     if(schedule.getId() == -1){
                         row.put("scheduleWorkerGroupId", -1);
