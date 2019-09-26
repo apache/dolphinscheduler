@@ -18,6 +18,7 @@ package cn.escheduler.dao.upgrade;
 
 import cn.escheduler.common.enums.DbType;
 import cn.escheduler.common.utils.ConnectionUtils;
+import cn.escheduler.common.utils.SchemaUtils;
 import cn.escheduler.common.utils.ScriptRunner;
 import cn.escheduler.dao.AbstractBaseDao;
 import cn.escheduler.dao.datasource.ConnectionFactory;
@@ -36,7 +37,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
     private static final String T_VERSION_NAME = "t_escheduler_version";
+    private static final String T_NEW_VERSION_NAME = "t_dolphinscheduler_version";
     private static final String rootDir = System.getProperty("user.dir");
+    private static final DbType dbType = getCurrentDbType();
 
     @Override
     protected void init() {
@@ -48,13 +51,24 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * @return
      */
     public static DbType getDbType(){
+        return dbType;
+    }
+
+    /**
+     * get db type
+     * @return
+     */
+    private static DbType getCurrentDbType(){
+        Connection conn = null;
         try {
-            Connection conn = ConnectionFactory.getDataSource().getConnection();
+            conn = ConnectionFactory.getDataSource().getConnection();
             String name = conn.getMetaData().getDatabaseProductName().toUpperCase();
             return DbType.valueOf(name);
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             return null;
+        }finally {
+            ConnectionUtils.releaseResource(null, null, conn);
         }
     }
 
@@ -175,8 +189,8 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     public abstract boolean isExistsColumn(String tableName,String columnName);
 
 
-    public String getCurrentVersion() {
-        String sql = String.format("select version from %s",T_VERSION_NAME);
+    public String getCurrentVersion(String versionName) {
+        String sql = String.format("select version from %s",versionName);
         Connection conn = null;
         ResultSet rs = null;
         PreparedStatement pstmt = null;
@@ -231,6 +245,12 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                 pstmt = conn.prepareStatement(upgradeSQL);
                 pstmt.setString(1, schemaVersion);
                 pstmt.executeUpdate();
+            }else if (isExistsTable(T_NEW_VERSION_NAME)) {
+                // Change version in the version table to the new version
+                String upgradeSQL = String.format("update %s set version = ?",T_NEW_VERSION_NAME);
+                pstmt = conn.prepareStatement(upgradeSQL);
+                pstmt.setString(1, schemaVersion);
+                pstmt.executeUpdate();
             }
             conn.commit();
         } catch (FileNotFoundException e) {
@@ -275,7 +295,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String mysqlSQLFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql",rootDir,schemaDir,getDbType().name().toLowerCase());
+        String mysqlSQLFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_ddl.sql",rootDir,schemaDir,getDbType().name().toLowerCase());
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -314,7 +334,11 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     public void updateVersion(String version) {
         // Change version in the version table to the new version
-        String upgradeSQL = String.format("update %s set version = ?",T_VERSION_NAME);
+        String versionName = T_VERSION_NAME;
+        if(!SchemaUtils.isAGreatVersion("1.2.0" , version)){
+            versionName = "t_dolphinscheduler_version";
+        }
+        String upgradeSQL = String.format("update %s set version = ?",versionName);
         PreparedStatement pstmt = null;
         Connection conn = null;
         try {

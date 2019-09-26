@@ -20,6 +20,7 @@ package cn.escheduler.server.worker.task;
 import cn.escheduler.common.enums.TaskType;
 import cn.escheduler.server.worker.task.dependent.DependentTask;
 import cn.escheduler.server.worker.task.flink.FlinkTask;
+import cn.escheduler.server.worker.task.http.HttpTask;
 import cn.escheduler.server.worker.task.mr.MapReduceTask;
 import cn.escheduler.server.worker.task.processdure.ProcedureTask;
 import cn.escheduler.server.worker.task.python.PythonTask;
@@ -62,6 +63,8 @@ public class TaskManager {
         return new PythonTask(props, logger);
       case DEPENDENT:
         return new DependentTask(props, logger);
+      case HTTP:
+        return new HttpTask(props, logger);
       default:
         logger.error("unsupport task type: {}", taskType);
         throw new IllegalArgumentException("not support task type");
