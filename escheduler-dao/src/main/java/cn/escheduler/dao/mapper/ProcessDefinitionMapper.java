@@ -44,7 +44,6 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     List<DefinitionGroupByUser> countDefinitionGroupByUser(
             @Param("userId") Integer userId,
-            @Param("userType") UserType userType,
-            @Param("projectIds") String projectIds);
+            @Param("projectIds") Integer[] projectIds);
 
 }

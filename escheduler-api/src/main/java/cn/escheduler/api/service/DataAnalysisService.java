@@ -27,6 +27,7 @@ import cn.escheduler.common.enums.UserType;
 import cn.escheduler.common.queue.ITaskQueue;
 import cn.escheduler.common.queue.TaskQueueFactory;
 import cn.escheduler.common.utils.DateUtils;
+import cn.escheduler.dao.ProcessDao;
 import cn.escheduler.dao.entity.*;
 import cn.escheduler.dao.mapper.*;
 import org.apache.commons.lang3.StringUtils;
@@ -66,6 +67,9 @@ public class DataAnalysisService {
 
     @Autowired
     TaskInstanceMapper taskInstanceMapper;
+
+    @Autowired
+    ProcessDao processDao;
 
     /**
      * statistical task instance status data
@@ -179,8 +183,11 @@ public class DataAnalysisService {
     public Map<String,Object> countDefinitionByUser(User loginUser, int projectId) {
         Map<String, Object> result = new HashMap<>();
 
+
+        Integer[] projectIdArray = new Integer[1];
+        projectIdArray[0] = projectId;
         List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
-                loginUser.getId(), loginUser.getUserType(), String.valueOf(projectId));
+                loginUser.getId(),  projectIdArray);
 
         DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
         result.put(Constants.DATA_LIST, dto);
@@ -252,8 +259,8 @@ public class DataAnalysisService {
         if(projectId !=0){
             projectIds.add(projectId);
         }else if(loginUser.getUserType() == UserType.GENERAL_USER){
-            List<Project> authedProjectList = projectMapper.queryAuthedProjectListByUserId(loginUser.getId());
-            for(Project project : authedProjectList){
+            List<Project> projects = processDao.getProjectListHavePerm(loginUser.getId());
+            for(Project project : projects){
                 projectIds.add(project.getId());
             }
         }

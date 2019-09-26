@@ -368,7 +368,7 @@ public class ProjectService extends BaseService{
     }
 
     /**
-     * query all project list
+     * query all project list that have one or more process definitions.
      * @return
      */
     public Map<String, Object> queryAllProjectList() {
