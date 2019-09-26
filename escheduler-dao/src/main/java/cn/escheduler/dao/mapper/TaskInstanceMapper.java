@@ -50,8 +50,8 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
     Integer countTask(@Param("userId") int userId,
                       @Param("userType") UserType userType,
-                      @Param("projectIds") String projectIds,
-                      @Param("taskIds") String taskIds);
+                      @Param("projectIds") int[] projectIds,
+                      @Param("taskIds") int[] taskIds);
 
     List<ExecuteStatusCount> countTaskInstanceStateByUser(@Param("userId") int userId,
                                                           @Param("userType") UserType userType,

@@ -60,7 +60,12 @@
         <if test="projectIds != null and projectIds != ''">
             and process.project_id in (#{projectIds})
         </if>
-        and task.id in (#{taskIds})
+        <if test="taskIds != null and taskIds.length != 0">
+            and task.id in
+            <foreach collection="taskIds" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
     </select>
     <select id="queryTaskInstanceListPaging" resultType="cn.escheduler.dao.entity.TaskInstance">
         select instance.*,process.name as process_instance_name, UNIX_TIMESTAMP(instance.end_time)-UNIX_TIMESTAMP(instance.start_time) as duration

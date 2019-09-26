@@ -384,15 +384,17 @@ public class DataAnalysisService {
         }
         Integer taskQueueCount = 0;
         Integer taskKillCount = 0;
+        int[] projectIds = new int[1];
+        projectIds[0] = projectId;
 
         if (tasksQueueIds.length != 0){
             taskQueueCount = taskInstanceMapper.countTask(
-                    loginUser.getId(),loginUser.getUserType(),String.valueOf(projectId),
-                    StringUtils.join(tasksQueueIds, ","));
+                    loginUser.getId(),loginUser.getUserType(),projectIds,
+                    tasksQueueIds);
         }
 
         if (tasksKillIds.length != 0){
-            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(),projectId, tasksKillIds);
+            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(), projectIds, tasksKillIds);
         }
 
 
