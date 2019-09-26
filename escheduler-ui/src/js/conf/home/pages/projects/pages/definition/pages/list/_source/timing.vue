@@ -253,7 +253,12 @@
                 let msg = ''
 
                 this.store.dispatch(api, searchParams).then(res => {
-                  this.previewTimes = res
+                  if (res.length) {
+                    this.previewTimes = res
+                  } else {
+                    this.$message.warning('该时间段无数据')
+                    this.$message.warning(`${i18n.$t('There is no data for this period of time')}`)
+                  }
                 })
               }
             },
