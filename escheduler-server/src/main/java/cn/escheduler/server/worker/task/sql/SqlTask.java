@@ -256,6 +256,21 @@ public class SqlTask extends AbstractTask {
 
                 connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
                         paramProp);
+
+                Map<String, String> otherParamMap = CollectionUtils.stringToMap(baseDataSource.getOther(),
+                        Constants.SEMICOLON);
+                if (otherParamMap != null) {
+                    String customHiveRole = otherParamMap.get("dolphinscheduler:customHiveRole");
+                    if (StringUtils.isNotBlank(customHiveRole)) {
+                        try (Statement roleStmt = connection.createStatement()) {
+                            String hiveRoleSql = "set role " + customHiveRole;
+                            logger.info("hive role sql: {}", hiveRoleSql);
+                            roleStmt.execute(hiveRoleSql);
+                        } catch (SQLException e) {
+                            logger.error("set role faild", e);
+                        }
+                    }
+                }
             }else{
                 connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
                         baseDataSource.getUser(),
