@@ -16,9 +16,6 @@
  */
 package cn.escheduler.dao.entity;
 
-import cn.escheduler.common.enums.AlertStatus;
-import cn.escheduler.common.enums.AlertType;
-import cn.escheduler.common.enums.ShowType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -26,8 +23,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * tenant
@@ -68,10 +63,10 @@ public class Tenant {
     @TableField(exist = false)
     private String queueName;
 
-
     /**
      * queue
      */
+    @TableField(exist = false)
     private String queue;
 
     /**
