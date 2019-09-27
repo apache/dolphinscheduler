@@ -59,6 +59,8 @@ public class ParameterUtils {
 
     if (StringUtils.isNotEmpty(cronTimeStr)) {
       try {
+        // prevent having ${}
+        cronTimeStr = PlaceholderUtils.replacePlaceholders(cronTimeStr, parameterMap, true);
         cronTime = DateUtils.parseDate(cronTimeStr, new String[]{Constants.PARAMETER_FORMAT_TIME});
       } catch (ParseException e) {
         logger.error(String.format("parse %s exception", cronTimeStr), e);

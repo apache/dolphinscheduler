@@ -17,14 +17,13 @@
 package cn.escheduler.server.utils;
 
 import cn.escheduler.common.enums.CommandType;
+import cn.escheduler.common.enums.DataType;
+import cn.escheduler.common.enums.Direct;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.utils.ParameterUtils;
 import cn.escheduler.common.utils.placeholder.BusinessTimeUtils;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  *  param utils
@@ -58,12 +57,18 @@ public class ParamUtils {
             timeParams.putAll(globalParamsMap);
         }
 
-        if (globalParams != null && localParams != null){
-            globalParams.putAll(localParams);
-        }else if (globalParams == null && localParams != null){
-            globalParams = localParams;
+        // use LinkedHashMap. Pay attention to param order when defining params
+        Map<String, Property> allParams = new LinkedHashMap<>();
+        timeParams.forEach((key, value) -> {
+            allParams.put(key, new Property(key, Direct.IN, DataType.VARCHAR, value));
+        });
+        if (globalParams != null){
+            allParams.putAll(globalParams);
         }
-        Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
+        if (localParams != null){
+            allParams.putAll(localParams);
+        }
+        Iterator<Map.Entry<String, Property>> iter = allParams.entrySet().iterator();
         while (iter.hasNext()){
             Map.Entry<String, Property> en = iter.next();
             Property property = en.getValue();
@@ -76,13 +81,14 @@ public class ParamUtils {
                      *  and there are no variables in them.
                      */
                     String val = property.getValue();
-                    val  = ParameterUtils.convertParameterPlaceholders(val, timeParams);
+                    // local params support cross-reference(attention to sort)
+                    val = ParameterUtils.convertParameterPlaceholders(val, ParamUtils.convert(allParams));
                     property.setValue(val);
                 }
             }
         }
 
-        return globalParams;
+        return allParams;
     }
 
     /**
