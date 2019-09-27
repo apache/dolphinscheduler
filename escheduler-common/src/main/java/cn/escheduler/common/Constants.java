@@ -696,6 +696,10 @@ public final class Constants {
      */
     public static final String SPARK_QUEUE = "--queue";
 
+    /**
+     * --queue --qu
+     */
+    public static final String FLINK_QUEUE = "--qu";
 
     /**
      * exit code success
