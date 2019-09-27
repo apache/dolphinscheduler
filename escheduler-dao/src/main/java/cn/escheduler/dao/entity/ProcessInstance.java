@@ -18,6 +18,7 @@ package cn.escheduler.dao.entity;
 
 import cn.escheduler.common.enums.*;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -77,6 +78,7 @@ public class ProcessInstance {
     /**
      * process definition structure
      */
+    @TableField(exist = false)
     private ProcessDefinition processDefinition;
     /**
      * process command type
@@ -141,11 +143,13 @@ public class ProcessInstance {
     /**
      * tenant code
      */
+    @TableField(exist = false)
     private String tenantCode;
 
     /**
      * queue
      */
+    @TableField(exist = false)
     private String queue;
 
     /**
@@ -177,6 +181,7 @@ public class ProcessInstance {
      * process duration
      * @return
      */
+    @TableField(exist = false)
     private Long duration;
 
     /**
@@ -202,16 +207,19 @@ public class ProcessInstance {
     /**
      * worker group name. for api.
      */
+    @TableField(exist = false)
     private String workerGroupName;
 
     /**
      * receivers for api
      */
+    @TableField(exist = false)
     private String receivers;
 
     /**
      * receivers cc for api
      */
+    @TableField(exist = false)
     private String receiversCc;
 
     public ProcessInstance(){
