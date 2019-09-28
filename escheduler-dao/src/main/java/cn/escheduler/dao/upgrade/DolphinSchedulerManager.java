@@ -16,6 +16,7 @@
  */
 package cn.escheduler.dao.upgrade;
 
+import cn.escheduler.common.enums.DbType;
 import cn.escheduler.common.utils.SchemaUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,30 +26,51 @@ import java.util.List;
 /**
  * upgrade manager
  */
-public class EschedulerManager {
-    private static final Logger logger = LoggerFactory.getLogger(EschedulerManager.class);
-    UpgradeDao upgradeDao = UpgradeDao.getInstance();
+public class DolphinSchedulerManager {
+    private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerManager.class);
+    UpgradeDao upgradeDao;
 
-    public void initEscheduler() {
+    private void initUpgradeDao() {
+        DbType dbType = UpgradeDao.getDbType();
+        if (dbType != null) {
+            switch (dbType) {
+                case MYSQL:
+                    upgradeDao = MysqlUpgradeDao.getInstance();
+                    break;
+                case POSTGRESQL:
+                    upgradeDao = PostgresqlUpgradeDao.getInstance();
+                    break;
+                default:
+                    logger.error("not support sql type: {},can't upgrade", dbType);
+                    throw new IllegalArgumentException("not support sql type,can't upgrade");
+            }
+        }
+    }
+
+    public DolphinSchedulerManager() {
+        initUpgradeDao();
+    }
+
+    public void initDolphinScheduler() {
         // Determines whether the escheduler table structure has been init
         if(upgradeDao.isExistsTable("t_escheduler_version") || upgradeDao.isExistsTable("t_escheduler_queue")) {
             logger.info("The database has been initialized. Skip the initialization step");
             return;
         }
-        this.initEschedulerSchema();
+        this.initDolphinSchedulerSchema();
     }
 
-    public void initEschedulerSchema() {
+    public void initDolphinSchedulerSchema() {
 
-        logger.info("Start initializing the escheduler manager mysql table structure");
-        upgradeDao.initEschedulerSchema();
+        logger.info("Start initializing the DolphinScheduler manager table structure");
+        upgradeDao.initSchema();
     }
 
 
     /**
-     * upgrade escheduler
+     * upgrade DolphinScheduler
      */
-    public void upgradeEscheduler() throws Exception{
+    public void upgradeDolphinScheduler() throws Exception{
 
         // Gets a list of all upgrades
         List<String> schemaList = SchemaUtils.getAllSchemaList();
@@ -59,7 +81,9 @@ public class EschedulerManager {
             String version = "";
             // Gets the version of the current system
             if (upgradeDao.isExistsTable("t_escheduler_version")) {
-                version = upgradeDao.getCurrentVersion();
+                version = upgradeDao.getCurrentVersion("t_escheduler_version");
+            }else if(upgradeDao.isExistsTable("t_dolphinscheduler_version")){
+                version = upgradeDao.getCurrentVersion("t_dolphinscheduler_version");
             }else if(upgradeDao.isExistsColumn("t_escheduler_queue","create_time")){
                 version = "1.0.1";
             }else if(upgradeDao.isExistsTable("t_escheduler_queue")){
@@ -71,21 +95,14 @@ public class EschedulerManager {
             // The target version of the upgrade
             String schemaVersion = "";
             for(String schemaDir : schemaList) {
-
-
                 schemaVersion = schemaDir.split("_")[0];
                 if(SchemaUtils.isAGreatVersion(schemaVersion , version)) {
 
-                    logger.info("upgrade escheduler metadata version from " + version + " to " + schemaVersion);
+                    logger.info("upgrade DolphinScheduler metadata version from " + version + " to " + schemaVersion);
 
-
-                    logger.info("Begin upgrading escheduler's mysql table structure");
-                    upgradeDao.upgradeEscheduler(schemaDir);
-                    if(SchemaUtils.isAGreatVersion(version,"1.0.1")){
-                        version = upgradeDao.getCurrentVersion();
-                    }else {
-                        version = schemaVersion;
-                    }
+                    logger.info("Begin upgrading DolphinScheduler's table structure");
+                    upgradeDao.upgradeDolphinScheduler(schemaDir);
+                    version = schemaVersion;
                 }
 
             }

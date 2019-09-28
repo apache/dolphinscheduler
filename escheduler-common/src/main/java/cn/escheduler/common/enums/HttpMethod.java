@@ -14,25 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.dao.upgrade.shell;
-
-import cn.escheduler.dao.upgrade.EschedulerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package cn.escheduler.common.enums;
 
 /**
- * init escheduler
- *
+ * http method
  */
-public class InitEscheduler {
-
-	private static final Logger logger = LoggerFactory.getLogger(InitEscheduler.class);
-
-	public static void main(String[] args) {
-		Thread.currentThread().setName("manager-InitEscheduler");
-		EschedulerManager eschedulerManager = new EschedulerManager();
-		eschedulerManager.initEscheduler();
-		logger.info("init escheduler finished");
-		
-	}
+public enum HttpMethod {
+	/**
+	 * 0 get
+	 * 1 post
+	 * 2 head
+	 * 3 put
+	 * 4 delete
+	 */
+	GET, POST, HEAD, PUT, DELETE
 }

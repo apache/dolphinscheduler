@@ -1024,11 +1024,11 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_${task executed by ip1},${ip2}...
+     * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskInstanceId}_${task executed by ip1},${ip2}...
      *
      * The tasks with the highest priority are selected by comparing the priorities of the above four levels from high to low.
      *
-     * 流程实例优先级_流程实例id_任务优先级_任务id_任务执行机器ip1，ip2...          high <- low
+     * 流程实例优先级_流程实例id_任务优先级_任务实例id_任务执行机器ip1，ip2...          high <- low
      *
      * @param taskInstance
      * @return
@@ -1739,7 +1739,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param processInstanceId
      * @return
      */
-    public String queryQueueByProcessInstanceId(int processInstanceId){
+    public String queryUserQueueByProcessInstanceId(int processInstanceId){
         return userMapper.queryQueueByProcessInstanceId(processInstanceId);
     }
 

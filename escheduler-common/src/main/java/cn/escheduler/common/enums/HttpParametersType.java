@@ -14,32 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.dao.upgrade.shell;
-
-import cn.escheduler.dao.upgrade.EschedulerManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package cn.escheduler.common.enums;
 
 /**
- * init escheduler
- *
+ * http parameters type
  */
-public class CreateEscheduler {
-
-	private static final Logger logger = LoggerFactory.getLogger(CreateEscheduler.class);
-
-	public static void main(String[] args) {
-		EschedulerManager eschedulerManager = new EschedulerManager();
-
-		try {
-			eschedulerManager.initEscheduler();
-			logger.info("init escheduler finished");
-			eschedulerManager.upgradeEscheduler();
-			logger.info("upgrade escheduler finished");
-			logger.info("create escheduler success");
-		} catch (Exception e) {
-			logger.error("create escheduler failed",e);
-		}
-
-	}
+public enum HttpParametersType {
+    /**
+     * 0 parameter;
+     * 1 body;
+     * 2 headers;
+     */
+    PARAMETER,BODY,HEADERS
 }

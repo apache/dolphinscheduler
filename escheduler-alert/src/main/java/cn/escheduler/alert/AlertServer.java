@@ -20,28 +20,33 @@ import cn.escheduler.alert.runner.AlertSender;
 import cn.escheduler.alert.utils.Constants;
 import cn.escheduler.common.thread.Stopper;
 import cn.escheduler.dao.AlertDao;
-import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.model.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.util.List;
 
 /**
  * alert of start
  */
-public class AlertServer {
+@ComponentScan("cn.escheduler")
+public class AlertServer implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
     /**
      * Alert Dao
      */
-    private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+    @Autowired
+    private AlertDao alertDao;
 
     private AlertSender alertSender;
 
-    private static AlertServer instance;
+    private static volatile AlertServer instance;
 
-    private AlertServer() {
+    public AlertServer() {
 
     }
 
@@ -72,7 +77,12 @@ public class AlertServer {
 
 
     public static void main(String[] args){
+        SpringApplication app = new SpringApplication(AlertServer.class);
+        app.run(args);
+    }
 
+    @Override
+    public void run(String... strings) throws Exception {
         AlertServer alertServer = AlertServer.getInstance();
         alertServer.start();
     }
