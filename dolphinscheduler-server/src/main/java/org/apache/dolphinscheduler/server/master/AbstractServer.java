@@ -26,7 +26,7 @@ import org.springframework.context.annotation.ComponentScan;
 /**
  *   master server
  */
-@ComponentScan("cn.escheduler")
+@ComponentScan("org.apache.dolphinscheduler")
 public abstract class AbstractServer implements CommandLineRunner, IStoppable {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractServer.class);
