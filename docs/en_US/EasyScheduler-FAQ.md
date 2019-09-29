@@ -50,7 +50,7 @@ A: We also support **the priority of processes and tasks**. Priority We have fiv
 
 ----
 
-## Q: Escheduler-grpc gives an error
+## Q: dolphinscheduler-grpc gives an error
 
 A: Execute in the root directory: mvn -U clean package assembly:assembly -Dmaven.test.skip=true , then refresh the entire project
 
@@ -70,11 +70,11 @@ A: Install **npm install node-sass --unsafe-perm** separately, then **npm instal
 
 ## Q: UI cannot log in normally.
 
-A: 1, if it is node startup, check whether the .env API_BASE configuration under escheduler-ui is the Api Server service address.
+A: 1, if it is node startup, check whether the .env API_BASE configuration under dolphinscheduler-ui is the Api Server service address.
 
-    2, If it is nginx booted and installed via **install-escheduler-ui.sh**, check if the proxy_pass configuration in **/etc/nginx/conf.d/escheduler.conf** is the Api Server service. address
+    2, If it is nginx booted and installed via **install-dolphinscheduler-ui.sh**, check if the proxy_pass configuration in **/etc/nginx/conf.d/dolphinscheduler.conf** is the Api Server service. address
     
-     3, if the above configuration is correct, then please check if the Api Server service is normal, curl http://192.168.xx.xx:12345/escheduler/users/get-user-info, check the Api Server log, if Prompt cn.escheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null, which proves that the Api Server service is normal.
+     3, if the above configuration is correct, then please check if the Api Server service is normal, curl http://192.168.xx.xx:12345/dolphinscheduler/users/get-user-info, check the Api Server log, if Prompt cn.dolphinscheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null, which proves that the Api Server service is normal.
     
     4, if there is no problem above, you need to check if **server.context-path and server.port configuration** in **application.properties** is correct
 
@@ -84,7 +84,7 @@ A: 1, if it is node startup, check whether the .env API_BASE configuration under
 
 A:   1, first **check whether the MasterServer service exists through jps**, or directly check whether there is a master service in zk from the service monitoring.
 
-​       2,If there is a master service, check **the command status statistics** or whether new records are added in **t_escheduler_error_command**. If it is added, **please check the message field.**
+​       2,If there is a master service, check **the command status statistics** or whether new records are added in **t_dolphinscheduler_error_command**. If it is added, **please check the message field.**
 
 ---
 
@@ -102,9 +102,9 @@ A:   1, **first check whether the WorkerServer service exists through jps**, or 
 
 A: Provide Docker image and Dockerfile.
 
-Docker image address: https://hub.docker.com/r/escheduler/escheduler_images
+Docker image address: https://hub.docker.com/r/dolphinscheduler/dolphinscheduler_images
 
-Dockerfile address: https://github.com/qiaozhanwei/escheduler_dockerfile/tree/master/docker_escheduler
+Dockerfile address: https://github.com/qiaozhanwei/dolphinscheduler_dockerfile/tree/master/docker_dolphinscheduler
 
 ------
 
@@ -112,9 +112,9 @@ Dockerfile address: https://github.com/qiaozhanwei/escheduler_dockerfile/tree/ma
 
 A:   1, if the replacement variable contains special characters, **use the \ transfer character to transfer**
 
-​       2, installPath="/data1_1T/escheduler", **this directory can not be the same as the install.sh directory currently installed with one click.**
+​       2, installPath="/data1_1T/dolphinscheduler", **this directory can not be the same as the install.sh directory currently installed with one click.**
 
-​       3, deployUser = "escheduler", **the deployment user must have sudo privileges**, because the worker is executed by sudo -u tenant sh xxx.command
+​       3, deployUser = "dolphinscheduler", **the deployment user must have sudo privileges**, because the worker is executed by sudo -u tenant sh xxx.command
 
 ​       4, monitorServerState = "false", whether the service monitoring script is started, the default is not to start the service monitoring script. **If the service monitoring script is started, the master and worker services are monitored every 5 minutes, and if the machine is down, it will automatically restart.**
 
@@ -126,7 +126,7 @@ A:   1, if the replacement variable contains special characters, **use the \ tra
 
 ## Q : Process definition and process instance offline exception
 
-A : For **versions prior to 1.0.4**, modify the code under the escheduler-api cn.escheduler.api.quartz package.
+A : For **versions prior to 1.0.4**, modify the code under the dolphinscheduler-api cn.dolphinscheduler.api.quartz package.
 
 ```
 public boolean deleteJob(String jobName, String jobGroupName) {
@@ -207,7 +207,7 @@ A:   1, in **the process definition list**, click the **Start** button.
 
 ## Q : Python task setting Python version
 
-A：  1，**for the version after 1.0.3** only need to modify PYTHON_HOME in conf/env/.escheduler_env.sh
+A：  1，**for the version after 1.0.3** only need to modify PYTHON_HOME in conf/env/.dolphinscheduler_env.sh
 
 ```
 export PYTHON_HOME=/bin/python
