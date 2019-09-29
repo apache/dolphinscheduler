@@ -114,4 +114,20 @@ public class ProcessInstanceMapMapperTest {
         );
         Assert.assertEquals(delete, 1);
     }
+
+    @Test
+    public void querySubIdListByParentId() {
+        ProcessInstanceMap processInstanceMap = insertOne();
+        processInstanceMap.setProcessInstanceId(1);
+        processInstanceMap.setParentProcessInstanceId(1010);
+
+        processInstanceMapMapper.updateById(processInstanceMap);
+
+        List<Integer> subIds = processInstanceMapMapper.querySubIdListByParentId(processInstanceMap.getParentProcessInstanceId());
+
+        Assert.assertNotEquals(subIds.size(), 0);
+
+        processInstanceMapMapper.deleteById(processInstanceMap.getId());
+
+    }
 }

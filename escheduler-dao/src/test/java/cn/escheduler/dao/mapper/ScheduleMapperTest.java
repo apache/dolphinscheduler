@@ -17,28 +17,177 @@
 package cn.escheduler.dao.mapper;
 
 
+import cn.escheduler.common.enums.FailureStrategy;
+import cn.escheduler.common.enums.ReleaseState;
+import cn.escheduler.common.enums.WarningType;
+import cn.escheduler.dao.entity.ProcessDefinition;
+import cn.escheduler.dao.entity.Project;
+import cn.escheduler.dao.entity.Schedule;
+import cn.escheduler.dao.entity.User;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Date;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ScheduleMapperTest {
 
+    
+    @Autowired
+    ScheduleMapper scheduleMapper;
+
+    @Autowired
+    UserMapper userMapper;
+
+    @Autowired
+    ProjectMapper projectMapper;
+
+    @Autowired
+    ProcessDefinitionMapper processDefinitionMapper;
+
+    private Schedule insertOne(){
+        //insertOne
+        Schedule schedule = new Schedule();
+        schedule.setStartTime(new Date());
+        schedule.setEndTime(new Date());
+        schedule.setCrontab("");
+        schedule.setFailureStrategy(FailureStrategy.CONTINUE);
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setWarningType(WarningType.NONE);
+        schedule.setCreateTime(new Date());
+        schedule.setUpdateTime(new Date());
+        scheduleMapper.insert(schedule);
+        return schedule;
+    }
+
+    @Test
+    public void testUpdate(){
+        //insertOne
+        Schedule schedule = insertOne();
+        schedule.setCreateTime(new Date());
+        //update
+        int update = scheduleMapper.updateById(schedule);
+        Assert.assertEquals(update, 1);
+        scheduleMapper.deleteById(schedule.getId());
+    }
+
+    @Test
+    public void testDelete(){
+        Schedule schedule = insertOne();
+        int delete = scheduleMapper.deleteById(schedule.getId());
+        Assert.assertEquals(delete, 1);
+    }
+
+    @Test
+    public void testQuery() {
+        Schedule schedule = insertOne();
+        //query
+        List<Schedule> schedules = scheduleMapper.selectList(null);
+        Assert.assertNotEquals(schedules.size(), 0);
+        scheduleMapper.deleteById(schedule.getId());
+    }
+
     @Test
     public void testQueryByProcessDefineIdPaging() {
+
+        User user = new User();
+        user.setUserName("ut name");
+        userMapper.insert(user);
+
+        Project project = new Project();
+        project.setName("ut project");
+        project.setUserId(user.getId());
+        projectMapper.insert(project);
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setProjectId(project.getId());
+        processDefinition.setUserId(user.getId());
+        processDefinition.setLocations("");
+        processDefinitionMapper.insert(processDefinition);
+
+        Schedule schedule= insertOne();
+        schedule.setUserId(user.getId());
+        schedule.setProcessDefinitionId(processDefinition.getId());
+        scheduleMapper.insert(schedule);
+
+        Page<Schedule> page = new Page(1,3);
+        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineIdPaging(page,
+                processDefinition.getId(), ""
+                );
+        Assert.assertNotEquals(scheduleIPage.getSize(), 0);
+
+
+        projectMapper.deleteById(project.getId());
+        processDefinitionMapper.deleteById(processDefinition.getId());
+        userMapper.deleteById(user.getId());
+        scheduleMapper.deleteById(schedule.getId());
     }
 
     @Test
     public void testQuerySchedulerListByProjectName() {
+
+
+        User user = new User();
+        user.setUserName("ut name");
+        userMapper.insert(user);
+
+        Project project = new Project();
+        project.setName("ut project");
+        project.setUserId(user.getId());
+        projectMapper.insert(project);
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setProjectId(project.getId());
+        processDefinition.setUserId(user.getId());
+        processDefinition.setLocations("");
+        processDefinitionMapper.insert(processDefinition);
+
+        Schedule schedule= insertOne();
+        schedule.setUserId(user.getId());
+        schedule.setProcessDefinitionId(processDefinition.getId());
+        scheduleMapper.insert(schedule);
+
+        Page<Schedule> page = new Page(1,3);
+        List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(
+                project.getName()
+        );
+        projectMapper.deleteById(project.getId());
+        processDefinitionMapper.deleteById(processDefinition.getId());
+        userMapper.deleteById(user.getId());
+        scheduleMapper.deleteById(schedule.getId());
+
+        Assert.assertNotEquals(schedules.size(), 0);
     }
 
     @Test
     public void testSelectAllByProcessDefineArray() {
+
+        Schedule schedule = insertOne();
+        schedule.setProcessDefinitionId(12345);
+        schedule.setReleaseState(ReleaseState.ONLINE);
+        scheduleMapper.updateById(schedule);
+
+        List<Schedule> schedules= scheduleMapper.selectAllByProcessDefineArray(new int[] {schedule.getProcessDefinitionId()});
+        scheduleMapper.deleteById(schedule.getId());
+        Assert.assertNotEquals(schedules.size(), 0);
     }
 
     @Test
-    public void testQueryByProcessDefinitionId() {
+    public void queryByProcessDefinitionId() {
+        Schedule schedule = insertOne();
+        schedule.setProcessDefinitionId(12345);
+        scheduleMapper.updateById(schedule);
+
+        List<Schedule> schedules= scheduleMapper.queryByProcessDefinitionId(schedule.getProcessDefinitionId());
+        scheduleMapper.deleteById(schedule.getId());
+        Assert.assertNotEquals(schedules.size(), 0);
     }
 }

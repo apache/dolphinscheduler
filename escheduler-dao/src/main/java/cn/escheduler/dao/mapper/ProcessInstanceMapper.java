@@ -31,47 +31,33 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
 
     ProcessInstance queryDetailById(@Param("processId") int processId);
 
-    List<ProcessInstance> queryByHostAndStatus(@Param("host") String host, @Param("states") String stateArray);
+    List<ProcessInstance> queryByHostAndStatus(@Param("host") String host,
+                                               @Param("states") int[] stateArray);
 
     IPage<ProcessInstance> queryProcessInstanceListPaging(Page<ProcessInstance> page,
                                                           @Param("projectId") int projectId,
                                                           @Param("processDefinitionId") Integer processDefinitionId,
                                                           @Param("searchVal") String searchVal,
-                                                          @Param("states") String statusArray,
+                                                          @Param("states") int[] statusArray,
                                                           @Param("host") String host,
                                                           @Param("startTime") Date startTime,
                                                           @Param("endTime") Date endTime
     );
 
     int setFailoverByHostAndStateArray(@Param("host") String host,
-                                       @Param("states") String stateArray);
+                                       @Param("states") int[] stateArray);
 
     int updateProcessInstanceByState(@Param("originState") ExecutionStatus originState,
                                      @Param("destState") ExecutionStatus destState);
 
-
-    ProcessInstance queryByTaskId(@Param("taskId") int taskId);
-
-
     List<ExecuteStatusCount> countInstanceStateByUser(
-            @Param("userId") int userId,
-            @Param("userType") UserType userType,
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,
-            @Param("projectIds") String projectIds);
+            @Param("projectIds") Integer[] projectIds);
 
-    List<Integer> querySubIdListByParentId(@Param("parentInstanceId") int parentInstanceId);
-
-
-    List<ProcessInstance> queryByProcessDefineId(@Param("processDefinitionId") int processDefinitionId,
-                                                 @Param("size") int size);
-
-    ProcessInstance queryByScheduleTime(@Param("processDefinitionId") int processDefinitionId,
-                                        @Param("scheduleTime") String scheduleTime,
-                                        @Param("excludeId") int excludeId,
-                                        @Param("startTime") String startTime,
-                                        @Param("endTime") String endTime);
-
+    List<ProcessInstance> queryByProcessDefineId(
+            @Param("processDefinitionId") int processDefinitionId,
+            @Param("size") int size);
 
     ProcessInstance queryLastSchedulerProcess(@Param("processDefinitionId") int definitionId,
                                               @Param("startTime") String startTime,
@@ -83,6 +69,6 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                             @Param("states") int[] stateArray);
 
     ProcessInstance queryLastManualProcess(@Param("processDefinitionId") int definitionId,
-                                           @Param("startTime") String startTime,
-                                           @Param("endTime") String endTime);
+                                           @Param("startTime") Date startTime,
+                                           @Param("endTime") Date endTime);
 }

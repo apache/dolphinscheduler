@@ -21,11 +21,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface TenantMapper extends BaseMapper<Tenant> {
 
     Tenant queryById(@Param("tenantId") int tenantId);
 
-    Tenant queryByTenantCode(@Param("tenantCode") String tenantCode);
+    List<Tenant> queryByTenantCode(@Param("tenantCode") String tenantCode);
 
     IPage<Tenant> queryTenantPaging(IPage<Tenant> page,
                                     @Param("searchVal") String searchVal);

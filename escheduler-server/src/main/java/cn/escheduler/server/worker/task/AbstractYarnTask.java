@@ -33,7 +33,6 @@ public abstract class AbstractYarnTask extends AbstractTask {
   /**
    *  process instance
    */
-  protected ProcessInstance processInstance;
 
   /**
    *  process task
@@ -53,7 +52,6 @@ public abstract class AbstractYarnTask extends AbstractTask {
   public AbstractYarnTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
     this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
-    this.processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
     this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
             taskProps.getTaskDir(),
             taskProps.getTaskAppId(),

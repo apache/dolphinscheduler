@@ -17,24 +17,109 @@
 package cn.escheduler.dao.mapper;
 
 
+import cn.escheduler.dao.entity.Queue;
+import cn.escheduler.dao.entity.Tenant;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Date;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class TenantMapperTest {
 
+    @Autowired
+    TenantMapper tenantMapper;
+
+    @Autowired
+    QueueMapper queueMapper;
+
+    private Tenant insertOne(){
+        //insertOne
+        Tenant tenant = new Tenant();
+        tenant.setCreateTime(new Date());
+        tenant.setUpdateTime(new Date());
+        tenantMapper.insert(tenant);
+        return tenant;
+    }
+
+    @Test
+    public void testUpdate(){
+        //insertOne
+        Tenant tenant = insertOne();
+        tenant.setUpdateTime(new Date());
+        //update
+        int update = tenantMapper.updateById(tenant);
+        Assert.assertEquals(update, 1);
+        tenantMapper.deleteById(tenant.getId());
+    }
+
+    @Test
+    public void testDelete(){
+        Tenant tenant = insertOne();
+        int delete = tenantMapper.deleteById(tenant.getId());
+        Assert.assertEquals(delete, 1);
+    }
+
+    @Test
+    public void testQuery() {
+        Tenant tenant = insertOne();
+        //query
+        List<Tenant> tenants = tenantMapper.selectList(null);
+        Assert.assertNotEquals(tenants.size(), 0);
+        tenantMapper.deleteById(tenant.getId());
+    }
+
     @Test
     public void testQueryById() {
+
+        Queue queue = new Queue();
+        queue.setQueueName("ut queue name");
+        queue.setQueue("ut queue");
+        queueMapper.insert(queue);
+
+
+        Tenant tenant = insertOne();
+        tenant.setQueueId(queue.getId());
+        tenantMapper.updateById(tenant);
+
+        Tenant tenant1 = tenantMapper.queryById(tenant.getId());
+
+        tenantMapper.deleteById(tenant.getId());
+        Assert.assertNotEquals(tenant1, null);
     }
 
     @Test
     public void testQueryByTenantCode() {
+
+        Tenant tenant = insertOne();
+        tenant.setTenantCode("ut code");
+        tenantMapper.updateById(tenant);
+
+        List<Tenant> tenant1 = tenantMapper.queryByTenantCode(tenant.getTenantCode());
+
+        tenantMapper.deleteById(tenant.getId());
+        Assert.assertNotEquals(tenant1.size(), 0);
     }
 
     @Test
     public void testQueryTenantPaging() {
+        Tenant tenant = insertOne();
+        tenant.setTenantCode("ut code");
+        tenant.setTenantName("ut name");
+        tenantMapper.updateById(tenant);
+        Page<Tenant> page = new Page(1,3);
+
+        IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, tenant.getTenantName());
+
+        tenantMapper.deleteById(tenant.getId());
+        Assert.assertNotEquals(tenantIPage.getTotal(), 0);
     }
 }

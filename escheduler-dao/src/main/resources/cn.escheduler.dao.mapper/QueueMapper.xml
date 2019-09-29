@@ -4,19 +4,22 @@
     <select id="queryQueuePaging" resultType="cn.escheduler.dao.entity.Queue">
         select *
         from t_escheduler_queue
-        where  queue_name like concat('%', #{searchVal}, '%')
+        where  1= 1
+        <if test="searchVal != null and searchVal != ''">
+            and queue_name like concat('%', #{searchVal}, '%')
+        </if>
         order by  update_time desc
     </select>
-    <select id="queryByQueue" resultType="cn.escheduler.dao.entity.Queue">
-       select *
-        from t_escheduler_queue
-        where  queue=#{queue}
-        order by  update_time desc
-    </select>
-    <select id="queryByQueueName" resultType="cn.escheduler.dao.entity.Queue">
+    <select id="queryAllQueueList" resultType="cn.escheduler.dao.entity.Queue">
         select *
         from t_escheduler_queue
-        where  queue_name =#{queueName}
+        where  1=1
+        <if test="queue != null and queue != ''">
+            and queue = #{queue}
+        </if>
+        <if test="queueName != null and queueName != ''">
+            and queue_name =#{queueName}
+        </if>
     </select>
 
 </mapper>

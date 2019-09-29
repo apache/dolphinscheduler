@@ -18,4 +18,9 @@
         from t_escheduler_relation_process_instance
         where process_instance_id = #{subProcessId}
     </select>
+    <select id="querySubIdListByParentId" resultType="java.lang.Integer">
+        select process_instance_id
+        from t_escheduler_process_instance_map
+        where parent_process_instance_id = #{parentInstanceId}
+    </select>
 </mapper>

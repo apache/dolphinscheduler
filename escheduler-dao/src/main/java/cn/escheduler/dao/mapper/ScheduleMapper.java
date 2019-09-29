@@ -32,7 +32,7 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
     List<Schedule> querySchedulerListByProjectName(@Param("projectName") String projectName);
 
 
-    List<Schedule> selectAllByProcessDefineArray(@Param("processDefineIds") String processDefineIds);
+    List<Schedule> selectAllByProcessDefineArray(@Param("processDefineIds") int[] processDefineIds);
 
     List<Schedule> queryByProcessDefinitionId(@Param("processDefinitionId") int processDefinitionId);
 

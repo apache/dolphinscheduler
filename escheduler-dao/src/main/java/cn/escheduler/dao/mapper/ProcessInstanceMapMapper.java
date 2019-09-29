@@ -20,6 +20,8 @@ import cn.escheduler.dao.entity.ProcessInstanceMap;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface ProcessInstanceMapMapper extends BaseMapper<ProcessInstanceMap> {
 
 
@@ -30,5 +32,7 @@ public interface ProcessInstanceMapMapper extends BaseMapper<ProcessInstanceMap>
     ProcessInstanceMap queryBySubProcessId(@Param("subProcessId") Integer subProcessId);
 
     int deleteByParentProcessId(@Param("parentProcessId") int parentProcessId);
+
+    List<Integer> querySubIdListByParentId(@Param("parentInstanceId") int parentInstanceId);
 
 }
