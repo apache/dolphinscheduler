@@ -279,18 +279,6 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     * find process instance by scheduler time.
-     * @param defineId
-     * @param scheduleTime
-     * @return
-     */
-    public ProcessInstance findProcessInstanceByScheduleTime(int defineId, Date scheduleTime){
-
-        return processInstanceMapper.queryByScheduleTime(defineId,
-                DateUtils.dateToString(scheduleTime), 0, null, null);
-    }
-
-    /**
      * find process define by id.
      * @param processDefinitionId
      * @return
@@ -315,7 +303,7 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public int deleteAllSubWorkProcessByParentId(int processInstanceId){
 
-        List<Integer> subProcessIdList = processInstanceMapper.querySubIdListByParentId(processInstanceId);
+        List<Integer> subProcessIdList = processInstanceMapMapper.querySubIdListByParentId(processInstanceId);
 
         for(Integer subId : subProcessIdList ){
             deleteAllSubWorkProcessByParentId(subId);
@@ -1465,8 +1453,7 @@ public class ProcessDao extends AbstractBaseDao {
 
     public List<ProcessInstance> queryNeedFailoverProcessInstances(String host){
 
-        String states = StringUtils.join(stateArray, ",");
-        return processInstanceMapper.queryByHostAndStatus(host, states);
+        return processInstanceMapper.queryByHostAndStatus(host, stateArray);
     }
 
 
@@ -1533,7 +1520,11 @@ public class ProcessDao extends AbstractBaseDao {
      * @return
      */
     public ProcessInstance findProcessInstanceByTaskId(int taskId){
-        return processInstanceMapper.queryByTaskId(taskId);
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskId);
+        if(taskInstance!= null){
+            return processInstanceMapper.selectById(taskInstance.getProcessInstanceId());
+        }
+        return null;
     }
 
     /**
@@ -1562,7 +1553,7 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public List<Schedule> selectAllByProcessDefineId(int[] ids){
         return scheduleMapper.selectAllByProcessDefineArray(
-                StringUtils.join(ids, ","));
+                ids);
     }
 
     /**
@@ -1654,40 +1645,6 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     * find process instance by time interval
-     * @param defineId
-     * @param startTime
-     * @param endTime
-     * @return
-     */
-    public ProcessInstance findProcessInstanceByTimeInterval(int defineId, Date startTime, Date endTime, int excludeId) {
-
-        return processInstanceMapper.queryByScheduleTime(defineId, null, excludeId,
-                DateUtils.dateToString(startTime), DateUtils.dateToString(endTime));
-    }
-
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
-    public void selfFaultTolerant(ProcessInstance processInstance){
-
-        processInstance.setState(ExecutionStatus.FAILURE);
-        processInstanceMapper.updateById(processInstance);
-        // insert to command
-
-        Command command = new Command();
-        command.setCommandType(CommandType.START_FAILURE_TASK_PROCESS);
-        command.setProcessDefinitionId(processInstance.getProcessDefinitionId());
-        command.setCommandParam(String.format("{\"%s\":%d}",
-                CMDPARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId()));
-
-
-        command.setExecutorId(processInstance.getExecutorId());
-        command.setProcessInstancePriority(processInstance.getProcessInstancePriority());
-
-        createCommand(command);
-
-    }
-
-    /**
      * find last scheduler process instance in the date interval
      * @param definitionId
      * @param dateInterval
@@ -1701,8 +1658,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     public ProcessInstance findLastManualProcessInterval(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastManualProcess(definitionId,
-                DateUtils.dateToString(dateInterval.getStartTime()),
-                DateUtils.dateToString(dateInterval.getEndTime()));
+                dateInterval.getStartTime(),
+                dateInterval.getEndTime());
     }
 
     public ProcessInstance findLastRunningProcess(int definitionId, DateInterval dateInterval) {
@@ -1767,9 +1724,23 @@ public class ProcessDao extends AbstractBaseDao {
         List<Project> createProjects = projectMapper.queryProjectCreatedByUser(userId);
         List<Project> authedProjects = projectMapper.queryAuthedProjectListByUserId(userId);
 
-        createProjects.addAll(authedProjects);
-        return createProjects;
+        if(createProjects == null){
+            createProjects = new ArrayList<>();
+        }
 
+        if(authedProjects != null){
+            createProjects.addAll(authedProjects);
+        }
+        return createProjects;
+    }
+
+    public List<Integer> getProjectIdListHavePerm(int userId){
+
+        List<Integer> projectIdList = new ArrayList<>();
+        for(Project project : getProjectListHavePerm(userId)){
+            projectIdList.add(project.getId());
+        }
+        return projectIdList;
     }
 
 

@@ -17,24 +17,92 @@
 package cn.escheduler.dao.mapper;
 
 
+import cn.escheduler.dao.entity.Queue;
+import cn.escheduler.dao.entity.Queue;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Date;
+import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class QueueMapperTest {
 
+    
+    @Autowired
+    QueueMapper queueMapper;
+
+
+    private Queue insertOne(){
+        //insertOne
+        Queue queue = new Queue();
+        queue.setQueueName("queue");
+        queue.setQueue("queue");
+        queue.setCreateTime(new Date());
+        queue.setUpdateTime(new Date());
+        queueMapper.insert(queue);
+        return queue;
+    }
+
+    @Test
+    public void testUpdate(){
+        //insertOne
+        Queue queue = insertOne();
+        queue.setCreateTime(new Date());
+        //update
+        int update = queueMapper.updateById(queue);
+        Assert.assertEquals(update, 1);
+        queueMapper.deleteById(queue.getId());
+    }
+
+    @Test
+    public void testDelete(){
+        Queue queue = insertOne();
+        int delete = queueMapper.deleteById(queue.getId());
+        Assert.assertEquals(delete, 1);
+    }
+
+    @Test
+    public void testQuery() {
+        Queue queue = insertOne();
+        //query
+        List<Queue> queues = queueMapper.selectList(null);
+        Assert.assertNotEquals(queues.size(), 0);
+        queueMapper.deleteById(queue.getId());
+    } 
+    
     @Test
     public void testQueryQueuePaging() {
+
+        Queue queue = insertOne();
+        Page<Queue> page = new Page(1,3);
+
+        IPage<Queue> queueIPage= queueMapper.queryQueuePaging(page,
+                null);
+        Assert.assertNotEquals(queueIPage.getTotal(), 0);
+
+        queueIPage= queueMapper.queryQueuePaging(page,
+                queue.getQueueName());
+        Assert.assertNotEquals(queueIPage.getTotal(), 0);
+        queueMapper.deleteById(queue.getId());
     }
 
     @Test
-    public void testQueryByQueue() {
-    }
+    public void queryAllQueueList() {
+        Queue queue = insertOne();
 
-    @Test
-    public void testQueryByQueueName() {
+        List<Queue> queues = queueMapper.queryAllQueueList(queue.getQueue(), null);
+        Assert.assertNotEquals(queues.size(), 0);
+
+        queues = queueMapper.queryAllQueueList(null, queue.getQueueName());
+        Assert.assertNotEquals(queues.size(), 0);
+        queueMapper.deleteById(queue.getId());
     }
 }

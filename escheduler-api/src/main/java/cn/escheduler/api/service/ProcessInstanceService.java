@@ -191,7 +191,7 @@ public class ProcessInstanceService extends BaseDAGService {
 
         IPage<ProcessInstance> processInstanceList =
                 processInstanceMapper.queryProcessInstanceListPaging(page,
-                project.getId(), processDefineId, searchVal, statesStr, host, start, end);
+                project.getId(), processDefineId, searchVal, statusArray, host, start, end);
 
         Set<String> exclusionSet = new HashSet<String>(){{
             add(Constants.CLASS);

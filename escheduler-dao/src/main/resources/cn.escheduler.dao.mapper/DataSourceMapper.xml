@@ -25,12 +25,12 @@
         <if test="userId != 0">
          and id in
           (select datasource_id
-          from t_escheduler_relation_datasource_user
-          where user_id=#{userId}
-          union select id as datasource_id
-                from t_escheduler_datasource
-                where user_id=#{userId}
-         )
+            from t_escheduler_relation_datasource_user
+            where user_id=#{userId}
+            union select id as datasource_id
+            from t_escheduler_datasource
+            where user_id=#{userId}
+            )
         </if>
         <if test="name != null and name != ''">
              and name like concat ('%', #{name}, '%')

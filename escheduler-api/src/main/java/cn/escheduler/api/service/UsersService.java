@@ -396,6 +396,11 @@ public class UsersService extends BaseService {
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
             return result;
         }
+        User user = userMapper.selectById(userId);
+        if(user == null){
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
 
         resourcesUserMapper.deleteResourceUser(userId, 0);
 

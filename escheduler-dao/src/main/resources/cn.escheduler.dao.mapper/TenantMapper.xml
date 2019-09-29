@@ -10,11 +10,11 @@
     <select id="queryByTenantCode" resultType="cn.escheduler.dao.entity.Tenant">
       select *
       from t_escheduler_tenant
-      where `tenant_code` = #{tenantCode}
+      where tenant_code = #{tenantCode}
     </select>
     <select id="queryTenantPaging" resultType="cn.escheduler.dao.entity.Tenant">
         SELECT t.*,q.queue_name
-        FROM t_escheduler_tenantt,t_escheduler_queue q
+        FROM t_escheduler_tenant t,t_escheduler_queue q
         WHERE t.queue_id = q.id
         <if test="searchVal != null and searchVal != ''">
             and  t.tenant_name like concat('%', #{searchVal}, '%')

@@ -18,6 +18,7 @@ package cn.escheduler.dao.entity;
 
 import cn.escheduler.common.enums.*;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -42,17 +43,20 @@ public class Schedule {
   /**
    * process definition name
    */
+  @TableField(exist = false)
   private String processDefinitionName;
 
   /**
    * project name
    */
+  @TableField(exist = false)
   private String projectName;
 
   /**
    * schedule description
    */
-  private String desc;
+  @TableField(exist = false)
+  private String definitionDescription;
 
   /**
    * schedule start time
@@ -97,6 +101,7 @@ public class Schedule {
   /**
    * created user name
    */
+  @TableField(exist = false)
   private String userName;
 
   /**
@@ -201,13 +206,7 @@ public class Schedule {
     this.releaseState = releaseState;
   }
 
-  public String getDesc() {
-    return desc;
-  }
 
-  public void setDesc(String desc) {
-    this.desc = desc;
-  }
 
   public int getProcessDefinitionId() {
     return processDefinitionId;
@@ -281,7 +280,7 @@ public class Schedule {
             ", processDefinitionId=" + processDefinitionId +
             ", processDefinitionName='" + processDefinitionName + '\'' +
             ", projectName='" + projectName + '\'' +
-            ", desc='" + desc + '\'' +
+            ", description='" + definitionDescription + '\'' +
             ", startTime=" + startTime +
             ", endTime=" + endTime +
             ", crontab='" + crontab + '\'' +
@@ -298,4 +297,11 @@ public class Schedule {
             '}';
   }
 
+  public String getDefinitionDescription() {
+    return definitionDescription;
+  }
+
+  public void setDefinitionDescription(String definitionDescription) {
+    this.definitionDescription = definitionDescription;
+  }
 }
