@@ -1,8 +1,8 @@
 <!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
 <configuration scan="true" scanPeriod="120 seconds">
 	<logger name="org.apache.zookeeper" level="WARN"/>
- 	<logger name="org.apache.hbase" level="WARN"/>
- 	<logger name="org.apache.hadoop" level="WARN"/>
+	<logger name="org.apache.hbase" level="WARN"/>
+	<logger name="org.apache.hadoop" level="WARN"/>
 
 	<property name="log.base" value="logs" />
 
@@ -20,7 +20,7 @@
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>INFO</level>
 		</filter>
-        <file>${log.base}/escheduler-api-server.log</file>
+		<file>${log.base}/escheduler-api-server.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
 			<fileNamePattern>${log.base}/escheduler-api-server.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
 			<maxHistory>168</maxHistory>
