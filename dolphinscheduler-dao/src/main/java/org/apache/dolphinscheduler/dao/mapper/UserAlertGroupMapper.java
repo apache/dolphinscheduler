@@ -25,8 +25,6 @@ import java.util.List;
 
 public interface UserAlertGroupMapper extends BaseMapper<UserAlertGroup> {
 
-    List<User> queryForUser(@Param("alertgroupId") int alertgroupId);
-
     int deleteByAlertgroupId(@Param("alertgroupId") int alertgroupId);
 
     List<User> listUserByAlertgroupId(@Param("alertgroupId") int alertgroupId);

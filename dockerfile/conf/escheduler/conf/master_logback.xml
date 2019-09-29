@@ -12,7 +12,7 @@
 
 	<appender name="MASTERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${log.base}/escheduler-master.log</file>
-		<filter class="cn.escheduler.server.master.log.MasterLogFilter">
+		<filter class="org.apache.dolphinscheduler.server.master.log.MasterLogFilter">
 			<level>INFO</level>
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">

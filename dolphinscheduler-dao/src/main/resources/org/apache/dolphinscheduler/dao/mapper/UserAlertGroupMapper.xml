@@ -5,12 +5,6 @@
         delete from t_escheduler_relation_user_alertgroup
         where `alertgroup_id` = #{alertgroupId}
     </delete>
-    <select id="queryForUser" resultType="org.apache.dolphinscheduler.dao.entity.User">
-           SELECT u.*
-           FROM  t_escheduler_relation_user_alertgroup g_u
-           JOIN t_escheduler_user u on g_u.user_id = u.id
-           WHERE g_u.alertgroup_id = #{alertgroupId}
-    </select>
     <select id="listUserByAlertgroupId" resultType="org.apache.dolphinscheduler.dao.entity.User">
            SELECT u.*
            FROM t_escheduler_relation_user_alertgroup g_u

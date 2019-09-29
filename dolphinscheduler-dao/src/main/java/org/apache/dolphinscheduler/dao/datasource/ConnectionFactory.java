@@ -74,7 +74,7 @@ public class ConnectionFactory {
 
           Configuration configuration = new Configuration(environment);
           configuration.setLazyLoadingEnabled(true);
-          configuration.addMappers("cn.escheduler.dao.mapper");
+          configuration.addMappers("org.apache.dolphinscheduler.dao.mapper");
 
 
           SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();

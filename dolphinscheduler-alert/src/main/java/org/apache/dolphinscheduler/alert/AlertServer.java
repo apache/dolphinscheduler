@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * alert of start
  */
-@ComponentScan("cn.escheduler")
+@ComponentScan("org.apache.dolphinscheduler")
 public class AlertServer implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
     /**

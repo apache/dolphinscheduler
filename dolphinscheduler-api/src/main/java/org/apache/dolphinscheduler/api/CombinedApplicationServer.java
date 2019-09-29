@@ -32,7 +32,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @ServletComponentScan
-@ComponentScan("cn.escheduler")
+@ComponentScan("org.apache.dolphinscheduler")
 @EnableSwagger2
 public class CombinedApplicationServer extends SpringBootServletInitializer {
 

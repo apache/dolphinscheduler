@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit;
 /**
  *  worker server
  */
-@ComponentScan("cn.escheduler")
+@ComponentScan("org.apache.dolphinscheduler")
 public class WorkerServer extends AbstractServer {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);

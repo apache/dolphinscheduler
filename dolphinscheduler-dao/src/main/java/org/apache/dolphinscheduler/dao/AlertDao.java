@@ -82,7 +82,7 @@ public class AlertDao extends AbstractBaseDao {
      */
     public List<User> queryUserByAlertGroupId(int alerGroupId){
 
-        return userAlertGroupMapper.queryForUser(alerGroupId);
+        return userAlertGroupMapper.listUserByAlertgroupId(alerGroupId);
     }
     /**
      * MasterServer or WorkerServer stoped

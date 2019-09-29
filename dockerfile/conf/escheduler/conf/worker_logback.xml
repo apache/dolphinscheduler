@@ -13,8 +13,8 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
-        <filter class="cn.escheduler.server.worker.log.TaskLogFilter"></filter>
-        <Discriminator class="cn.escheduler.server.worker.log.TaskLogDiscriminator">
+        <filter class="org.apache.dolphinscheduler.server.worker.log.TaskLogFilter"></filter>
+        <Discriminator class="org.apache.dolphinscheduler.server.worker.log.TaskLogDiscriminator">
             <key>taskAppId</key>
         </Discriminator>
         <sift>
@@ -33,7 +33,7 @@
 
     <appender name="WORKERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/escheduler-worker.log</file>
-        <filter class="cn.escheduler.server.worker.log.WorkerLogFilter">
+        <filter class="org.apache.dolphinscheduler.server.worker.log.WorkerLogFilter">
             <level>INFO</level>
         </filter>
 

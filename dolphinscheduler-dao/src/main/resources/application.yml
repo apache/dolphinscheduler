@@ -5,18 +5,18 @@ spring:
 #    driver-class-name:  com.mysql.jdbc.Driver
     url: jdbc:postgresql://192.168.220.154:5432/escheduler
 #    url: jdbc:mysql://192.168.220.188:3306/escheduler_new?useUnicode=true&characterEncoding=UTF-8
-    username: root
-    password: root@123
+    username: xx
+    password: xx
 #    platform:
     continue-on-error: true
 
 
 #mybatis
 mybatis-plus:
-  mapper-locations: classpath*:/cn.escheduler.dao.mapper/*.xml
-  typeEnumsPackage: cn.escheduler.*.enums
+  mapper-locations: classpath*:/org.apache.dolphinscheduler.dao.mapper/*.xml
+  typeEnumsPackage: org.apache.dolphinscheduler.*.enums
   #实体扫描，多个package用逗号或者分号分隔
-  typeAliasesPackage: cn.escheduler.dao.entity
+  typeAliasesPackage: org.apache.dolphinscheduler.dao.entity
   global-config:
     #数据库相关配置
     db-config:
@@ -40,5 +40,5 @@ mybatis-plus:
 # Logger Config
 logging:
   level:
-    cn.escheduler.dao: debug
+    org.apache.dolphinscheduler.dao: debug
 

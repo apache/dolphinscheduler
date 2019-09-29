@@ -57,6 +57,7 @@ public class UserAlertGroup {
     /**
      * user name
      */
+    @TableField(exist = false)
     private String userName;
 
     /**

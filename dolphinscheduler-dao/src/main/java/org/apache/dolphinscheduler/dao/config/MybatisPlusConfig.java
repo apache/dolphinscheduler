@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
-@MapperScan("cn.escheduler.*.mapper")
+@MapperScan("org.apache.dolphinscheduler.*.mapper")
 public class MybatisPlusConfig {
     @Bean
     public PaginationInterceptor paginationInterceptor() {
