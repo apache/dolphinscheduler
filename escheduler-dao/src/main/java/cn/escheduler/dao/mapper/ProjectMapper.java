@@ -34,9 +34,6 @@ public interface ProjectMapper extends BaseMapper<Project> {
                                           @Param("userId") int userId,
                                           @Param("searchName") String searchName);
 
-    IPage<Project> queryAllProjectListPaging(IPage<Project> page,
-                                             @Param("searchName") String searchName);
-
     List<Project> queryProjectCreatedByUser(@Param("userId") int userId);
 
     List<Project> queryAuthedProjectListByUserId(@Param("userId") int userId);

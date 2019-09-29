@@ -195,9 +195,6 @@ public class ProcessInstanceMapperTest {
     @Test
     public void testCountInstanceStateByUser() {
 
-        processDefinitionMapper.delete(null);
-        processInstanceMapper.delete(null);
-
         Project project = new Project();
         project.setName("testProject");
         projectMapper.insert(project);
