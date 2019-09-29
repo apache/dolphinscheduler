@@ -42,12 +42,12 @@ public class SwaggerConfig implements WebMvcConfigurer {
     @Bean
     public Docket createRestApi() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(apiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("cn.escheduler.api.controller")).paths(PathSelectors.any())
+                .apis(RequestHandlerSelectors.basePackage("org.apache.dolphinscheduler.api.controller")).paths(PathSelectors.any())
                 .build();
     }
 
     private ApiInfo apiInfo() {
-        return new ApiInfoBuilder().title("Easy Scheduler Api Docs").description("Easy Scheduler Api Docs")
+        return new ApiInfoBuilder().title("Dolphin Scheduler Api Docs").description("Dolphin Scheduler Api Docs")
                 .build();
     }
 

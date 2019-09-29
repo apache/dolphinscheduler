@@ -14,7 +14,7 @@
 // * See the License for the specific language governing permissions and
 // * limitations under the License.
 // */
-//package cn.escheduler.dao.datasource;
+//package org.apache.dolphinscheduler.dao.datasource;
 //
 //import com.alibaba.druid.pool.DruidDataSource;
 //import org.apache.ibatis.session.SqlSessionFactory;
@@ -34,7 +34,7 @@
 // */
 //@Configuration
 //@PropertySource({"classpath:application.yml"})
-//@MapperScan(basePackages = "cn.escheduler.dao.mapper", sqlSessionFactoryRef = "SqlSessionFactory")
+//@MapperScan(basePackages = "org.apache.dolphinscheduler.dao.mapper", sqlSessionFactoryRef = "SqlSessionFactory")
 //public class DatabaseConfiguration {
 //
 //  /**
