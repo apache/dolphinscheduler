@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.config;
+package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.sql.Connection;
 
 
-@Configuration
-@MapperScan("org.apache.dolphinscheduler.*.mapper")
-public class MybatisPlusConfig {
-    @Bean
-    public PaginationInterceptor paginationInterceptor() {
-        return new PaginationInterceptor();
+public class ConnectionFactoryTest {
+
+    @Test
+    public void testConnection()throws Exception{
+        Connection connection = ConnectionFactory.getDataSource().getPooledConnection().getConnection();
+        Assert.assertEquals(connection != null , true);
     }
-
 }
