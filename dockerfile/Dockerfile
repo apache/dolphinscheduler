@@ -135,7 +135,7 @@ RUN apt-get update && \
 COPY ./startup.sh /root/startup.sh
 #13,修改权限和设置软连
 RUN chmod +x /root/startup.sh && \
-  chmod +x /opt/escheduler/script/create_escheduler.sh && \
+  chmod +x /opt/escheduler/script/create-escheduler.sh && \
   chmod +x /opt/zookeeper/bin/zkServer.sh && \
   chmod +x /opt/escheduler/bin/escheduler-daemon.sh && \
   rm -rf /bin/sh && \

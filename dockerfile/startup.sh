@@ -47,12 +47,12 @@ echo "启动api-server"
 
 echo "启动master-server"
 /opt/escheduler/bin/escheduler-daemon.sh stop master-server
-python /opt/escheduler/script/del_zk_node.py 127.0.0.1 /escheduler/masters
+python /opt/escheduler/script/del-zk-node.py 127.0.0.1 /escheduler/masters
 /opt/escheduler/bin/escheduler-daemon.sh start master-server
 
 echo "启动worker-server"
 /opt/escheduler/bin/escheduler-daemon.sh stop worker-server
-python /opt/escheduler/script/del_zk_node.py 127.0.0.1 /escheduler/workers
+python /opt/escheduler/script/del-zk-node.py 127.0.0.1 /escheduler/workers
 /opt/escheduler/bin/escheduler-daemon.sh start worker-server
 
 
