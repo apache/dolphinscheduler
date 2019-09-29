@@ -34,7 +34,7 @@
 * Backend development documentation
     * [Environmental requirements](backend-development.md#Environmental requirements)
     * [Project compilation](backend-development.md#Project compilation)
-* [Interface documentation](http://52.82.13.76:8888/escheduler/doc.html?language=en_US&lang=en)
+* [Interface documentation](http://52.82.13.76:8888/dolphinscheduler/doc.html?language=en_US&lang=en)
 * FAQ
     * [FAQ](EasyScheduler-FAQ.md)
 * EasyScheduler upgrade documentation

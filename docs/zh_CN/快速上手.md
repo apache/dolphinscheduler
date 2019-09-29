@@ -1,7 +1,7 @@
 # 快速上手
 
 * 管理员用户登录
-  >地址：192.168.xx.xx:8888 用户名密码：admin/escheduler123
+  >地址：192.168.xx.xx:8888 用户名密码：admin/dolphinscheduler123
 
 <p align="center">
    <img src="https://analysys.github.io/easyscheduler_docs_cn/images/login.jpg" width="60%" />
