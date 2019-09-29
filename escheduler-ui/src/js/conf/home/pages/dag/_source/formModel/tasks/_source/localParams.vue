@@ -9,7 +9,7 @@
               type="text"
               v-model="localParamsList[$index].prop"
               :placeholder="$t('prop(required)')"
-              maxlength="64"
+              maxlength="128"
               @on-blur="_verifProp()"
               :style="inputStyle">
       </x-input>
@@ -44,7 +44,7 @@
               type="text"
               v-model="localParamsList[$index].value"
               :placeholder="$t('value(optional)')"
-              maxlength="64"
+              maxlength="128"
               @on-blur="_handleValue()"
               :style="inputStyle">
       </x-input>
