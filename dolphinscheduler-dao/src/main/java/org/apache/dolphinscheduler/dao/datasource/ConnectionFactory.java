@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.dolphinscheduler.dao.config.YmlConfig;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
@@ -29,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-
+import java.util.Map;
 
 
 /**
@@ -45,11 +46,11 @@ public class ConnectionFactory {
    */
   public static DruidDataSource getDataSource() {
     DruidDataSource druidDataSource = new DruidDataSource();
-
-    druidDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-    druidDataSource.setUrl("jdbc:mysql://192.168.220.188:3306/escheduler?useUnicode=true&characterEncoding=UTF-8");
-    druidDataSource.setUsername("root");
-    druidDataSource.setPassword("root@123");
+    Map<String, String> allMap = YmlConfig.allMap;
+    druidDataSource.setDriverClassName(allMap.get("spring.datasource.driver-class-name"));
+    druidDataSource.setUrl(allMap.get("spring.datasource.url"));
+    druidDataSource.setUsername(allMap.get("spring.datasource.username"));
+    druidDataSource.setPassword(allMap.get("spring.datasource.password"));
     druidDataSource.setInitialSize(5);
     druidDataSource.setMinIdle(5);
     druidDataSource.setMaxActive(20);
