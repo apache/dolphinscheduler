@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="cn.escheduler.dao.mapper.SessionMapper">
-    <select id="queryByUserId" resultType="cn.escheduler.dao.entity.Session">
-        select *
-        from t_escheduler_session
-        where user_id = #{userId}
-    </select>
-</mapper>

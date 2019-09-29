@@ -3,13 +3,13 @@
 
 ## 1. Back up the previous version of the files and database
 
-## 2. Stop all services of escheduler
+## 2. Stop all services of dolphinscheduler
 
  `sh ./script/stop-all.sh`
 
 ## 3. Download the new version of the installation package
 
-- [gitee](https://gitee.com/easyscheduler/EasyScheduler/attach_files), download the latest version of the front and back installation packages (backend referred to as escheduler-backend, front end referred to as escheduler-ui)
+- [gitee](https://gitee.com/easyscheduler/EasyScheduler/attach_files), download the latest version of the front and back installation packages (backend referred to as dolphinscheduler-backend, front end referred to as dolphinscheduler-ui)
 - The following upgrade operations need to be performed in the new version of the directory
 
 ## 4. Database upgrade
@@ -23,7 +23,7 @@
 
 - Execute database upgrade script
 
-`sh ./script/upgrade-escheduler.sh`
+`sh ./script/upgrade-dolphinscheduler.sh`
 
 ## 5. Backend service upgrade
 
