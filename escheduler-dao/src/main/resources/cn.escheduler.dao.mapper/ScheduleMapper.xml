@@ -14,7 +14,7 @@
         order by s.update_time desc
     </select>
     <select id="querySchedulerListByProjectName" resultType="cn.escheduler.dao.entity.Schedule">
-        select p_f.name as process_definition_name, p_f.desc as `desc`, p.name as project_name,u.user_name,s.*
+        select p_f.name as process_definition_name, p_f.description as definition_description, p.name as project_name,u.user_name,s.*
         from t_escheduler_schedules s
         join t_escheduler_process_definition p_f on s.process_definition_id = p_f.id
         join t_escheduler_project as p on p_f.project_id = p.id
@@ -24,7 +24,13 @@
     <select id="selectAllByProcessDefineArray" resultType="cn.escheduler.dao.entity.Schedule">
         select *
         from t_escheduler_schedules
-        where process_definition_id in (#{processDefineIds})
+        where  1= 1
+        <if test="processDefineIds != null and processDefineIds.length != 0 ">
+            and process_definition_id in
+            <foreach collection="processDefineIds" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
         and release_state = 1
     </select>
     <select id="queryByProcessDefinitionId" resultType="cn.escheduler.dao.entity.Schedule">

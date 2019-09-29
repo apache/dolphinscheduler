@@ -3,17 +3,17 @@
 <mapper namespace="cn.escheduler.dao.mapper.ProjectUserMapper">
     <delete id="deleteProjectRelation">
         delete from t_escheduler_relation_project_user
-        where user_id = #{userId}
+        where 1=1
+        and user_id = #{userId}
         <if test="projectId != 0 ">
             and project_id = #{projectId}
         </if>
     </delete>
     <select id="queryProjectRelation" resultType="cn.escheduler.dao.entity.ProjectUser">
-      select p_u.*, u.user_name as user_name,  p.name as proect_name
-      from t_escheduler_relation_project_user p_u
-      join t_escheduler_user u on u.id = p_u.user_id
-      join t_escheduler_project p on p.id = p_u.project_id
-      where p_u.project_id = #{projectId}
-      and p_u.user_id = #{userId}
+      select *
+      from t_escheduler_relation_project_user
+      where project_id = #{projectId}
+      and user_id = #{userId}
+      limit 1
     </select>
 </mapper>

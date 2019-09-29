@@ -21,6 +21,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  *
  */
@@ -29,7 +31,7 @@ public interface QueueMapper extends BaseMapper<Queue> {
     IPage<Queue> queryQueuePaging(IPage<Queue> page,
                                   @Param("searchVal") String searchVal);
 
-    Queue queryByQueue(@Param("queue") String queue);
+    List<Queue> queryAllQueueList(@Param("queue") String queue,
+                             @Param("queueName") String queueName);
 
-    Queue queryByQueueName(@Param("queueName") String queueName);
 }
