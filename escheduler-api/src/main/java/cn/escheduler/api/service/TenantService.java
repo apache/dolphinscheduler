@@ -168,8 +168,7 @@ public class TenantService extends BaseService{
      * if the tenant code is modified, the original resource needs to be copied to the new tenant.
      */
     if (!tenant.getTenantCode().equals(tenantCode)){
-      Tenant newTenant = tenantMapper.queryByTenantCode(tenantCode);
-      if (newTenant == null){
+      if (checkTenant(tenantCode)){
         // if hdfs startup
         if (PropertyUtils.getResUploadStartupState()){
           String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
@@ -279,8 +278,7 @@ public class TenantService extends BaseService{
    */
   public Result verifyTenantCode(String tenantCode) {
     Result result=new Result();
-    Tenant tenant= tenantMapper.queryByTenantCode(tenantCode);
-    if (tenant != null) {
+    if (checkTenant(tenantCode)) {
       logger.error("tenant {} has exist, can't create again.", tenantCode);
       putMsg(result, Status.TENANT_NAME_EXIST);
     }else{

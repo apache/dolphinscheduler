@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.escheduler.dao.mapper.ProcessInstanceMapper">
     <select id="queryDetailById" resultType="cn.escheduler.dao.entity.ProcessInstance">
-        select inst.*,UNIX_TIMESTAMP(inst.end_time)-UNIX_TIMESTAMP(inst.start_time) as duration
-        from t_escheduler_process_instance
+        select inst.*
+        from t_escheduler_process_instance inst
         where inst.id = #{processId}
     </select>
     <select id="queryByHostAndStatus" resultType="cn.escheduler.dao.entity.ProcessInstance">
@@ -13,15 +13,19 @@
         <if test="host != null and host != ''">
             and host=#{host}
         </if>
-        and state in (#{states})
+        and state in
+        <foreach collection="states" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
         order by id asc
     </select>
     <select id="queryProcessInstanceListPaging" resultType="cn.escheduler.dao.entity.ProcessInstance">
-        select instance.*,  (UNIX_TIMESTAMP(instance.end_time) - UNIX_TIMESTAMP(instance.start_time)) as duration
+        select instance.*
         from t_escheduler_process_instance instance
         join t_escheduler_process_definition define ON instance.process_definition_id = define.id
         where 1=1
-        and instance.is_sub_process=0 and define.project_id = #{projectId}
+        and instance.is_sub_process=0
+        and define.project_id = #{projectId}
         <if test="processDefinitionId != 0">
             and instance.process_definition_id = #{processDefinitionId}
         </if>
@@ -32,7 +36,10 @@
             and instance.start_time > #{startTime} and instance.start_time <![CDATA[ <=]]> #{endTime}
         </if>
         <if test="states != null and states != ''">
-            and instance.state in ( #{states} )
+            and instance.state in
+            <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
         </if>
         <if test="host != null and host != ''">
             and instance.host like concat('%', #{host}, '%')
@@ -42,60 +49,42 @@
     <update id="setFailoverByHostAndStateArray">
         update t_escheduler_process_instance
         set host=null
-        where host =#{host} and state in (#{states})
+        where host =#{host} and state in
+        <foreach collection="states" index="index" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
     </update>
     <update id="updateProcessInstanceByState">
         update t_escheduler_process_instance
         set state = #{destState}
         where state = #{originState}
     </update>
-    <select id="queryByTaskId" resultType="cn.escheduler.dao.entity.ProcessInstance">
-        select process.*, UNIX_TIMESTAMP(process.end_time)-UNIX_TIMESTAMP(process.start_time) as duration
-        from t_escheduler_process_instance process
-        join t_escheduler_task_instance task on task.process_instance_id = process.id
-        where task.id = #{taskId}
-    </select>
     <select id="countInstanceStateByUser" resultType="cn.escheduler.dao.entity.ExecuteStatusCount">
-        select state, count(0) as count
+        select t.state, count(0) as count
         from t_escheduler_process_instance t
         join t_escheduler_process_definition d on d.id=t.process_definition_id
         join t_escheduler_project p on p.id=d.project_id
-        where t.flag = 1
+        where 1 = 1
         and t.is_sub_process = 0
-        and  t.start_time > #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
+        <if test="startTime != null and endTime != null">
+            and  t.start_time >= #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
+        </if>
         <if test="projectIds != null and projectIds != ''">
-            and p.id in (#projectIds)
+            and p.id in
+            <foreach collection="projectIds" index="index" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
         </if>
         group by t.state
     </select>
-    <select id="querySubIdListByParentId" resultType="java.lang.Integer">
-        select process_instance_id
-        from t_escheduler_process_instance
-        where parent_process_instance_id = #{parentInstanceId}
-    </select>
     <select id="queryByProcessDefineId" resultType="cn.escheduler.dao.entity.ProcessInstance">
-        select *,UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(start_time) as duration
+        select *
         from t_escheduler_process_instance
         where process_definition_id=#{processDefinitionId}
         order by start_time desc limit #{size}
     </select>
-    <select id="queryByScheduleTime" resultType="cn.escheduler.dao.entity.ProcessInstance">
-        select *,UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(start_time) as duration
-        from t_escheduler_process_instance
-        where process_definition_id=#{processDefinitionId}
-        <if test="scheduleTime != null" >
-            and schedule_time=#{scheduleTime}
-        </if>
-        <if test="startTime!=null and endTime != null ">
-            and command_start_time between #{startTime} and #{endTime}
-        </if>
-        <if test="excludeId != 0">
-            where id not in (#{excludeId})
-        </if>
-        order by startTime desc limit 1
-    </select>
     <select id="queryLastSchedulerProcess" resultType="cn.escheduler.dao.entity.ProcessInstance">
-        select *,UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(start_time) as duration
+        select *
         from t_escheduler_process_instance
         where process_definition_id=#{processDefinitionId}
         <if test="startTime!=null and endTime != null ">
@@ -104,16 +93,23 @@
         order by end_time desc limit 1
     </select>
     <select id="queryLastRunningProcess" resultType="cn.escheduler.dao.entity.ProcessInstance">
-        select *,UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(start_time) as duration
+        select *
         from t_escheduler_process_instance
-        where state in (#{states})
+        where 1=1
+        <if test="states !=null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" index="index" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
         <if test="startTime!=null and endTime != null ">
             and process_definition_id=#{processDefinitionId}
             and (schedule_time between #{startTime} and #{endTime} or start_time between #{startTime} and #{endTime})
         </if>
+        order by start_time desc limit 1
     </select>
     <select id="queryLastManualProcess" resultType="cn.escheduler.dao.entity.ProcessInstance">
-        select *,UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(start_time) as duration
+        select *
         from t_escheduler_process_instance
         where process_definition_id=#{processDefinitionId}
         and schedule_time is null

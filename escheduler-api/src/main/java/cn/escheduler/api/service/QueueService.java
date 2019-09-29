@@ -243,7 +243,7 @@ public class QueueService extends BaseService {
      * @return
      */
     private boolean checkQueueExist(String queue) {
-        return queueMapper.queryByQueue(queue) == null ? false : true;
+        return queueMapper.queryAllQueueList(queue, null).size()>0 ? false : true;
     }
 
     /**
@@ -253,7 +253,7 @@ public class QueueService extends BaseService {
      * @return
      */
     private boolean checkQueueNameExist(String queueName) {
-        return queueMapper.queryByQueueName(queueName) == null ? false : true;
+        return queueMapper.queryAllQueueList(null ,queueName).size()>0 ? false : true;
     }
 
 }

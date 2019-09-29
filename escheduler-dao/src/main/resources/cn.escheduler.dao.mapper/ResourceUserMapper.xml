@@ -9,7 +9,7 @@
             and user_id = #{userId}
         </if>
         <if test="resourceId != 0">
-            and resource_id = #{resourceId}
+            and resources_id = #{resourceId}
         </if>
     </delete>
 </mapper>

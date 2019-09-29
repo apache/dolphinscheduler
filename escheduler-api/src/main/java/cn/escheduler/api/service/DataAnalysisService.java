@@ -158,9 +158,19 @@ public class DataAnalysisService {
             putErrorRequestParamsMsg(result);
             return result;
         }
+
+        List<Integer> projectIds = new ArrayList<>();
+        if(projectId !=0){
+            projectIds.add(projectId);
+        }else if(loginUser.getUserType() == UserType.GENERAL_USER){
+            projectIds = processDao.getProjectIdListHavePerm(loginUser.getId());
+
+        }
+        Integer[] projectIdArray = projectIds.toArray(new Integer[projectIds.size()]);
+
         List<ExecuteStatusCount> processInstanceStateCounts =
-                processInstanceMapper.countInstanceStateByUser(loginUser.getId(),
-                        loginUser.getUserType(), start, end, String.valueOf(projectId));
+                processInstanceMapper.countInstanceStateByUser(start, end,
+                        projectIdArray);
 
         TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
         if (processInstanceStateCounts != null) {
@@ -259,12 +269,9 @@ public class DataAnalysisService {
         if(projectId !=0){
             projectIds.add(projectId);
         }else if(loginUser.getUserType() == UserType.GENERAL_USER){
-            List<Project> projects = processDao.getProjectListHavePerm(loginUser.getId());
-            for(Project project : projects){
-                projectIds.add(project.getId());
-            }
-        }
+            projectIds = processDao.getProjectIdListHavePerm(loginUser.getId());
 
+        }
         Integer[] projectIdArray = projectIds.toArray(new Integer[projectIds.size()]);
         // count command state
         List<CommandCount> commandStateCounts =
