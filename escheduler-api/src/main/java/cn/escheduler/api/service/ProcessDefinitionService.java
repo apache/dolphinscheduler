@@ -502,7 +502,9 @@ public class ProcessDefinitionService extends BaseDAGService {
             case OFFLINE: {
                 processDefinition.setReleaseState(state);
                 processDefineMapper.updateById(processDefinition);
-                List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(String.valueOf(id));
+                List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(
+                        new int[]{processDefinition.getId()}
+                );
 
                 for(Schedule schedule:scheduleList){
                     logger.info("set schedule offline, schedule id: {}, process definition id: {}", project.getId(), schedule.getId(), id);

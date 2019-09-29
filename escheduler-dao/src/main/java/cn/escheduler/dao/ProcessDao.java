@@ -1553,7 +1553,7 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public List<Schedule> selectAllByProcessDefineId(int[] ids){
         return scheduleMapper.selectAllByProcessDefineArray(
-                StringUtils.join(ids, ","));
+                ids);
     }
 
     /**
