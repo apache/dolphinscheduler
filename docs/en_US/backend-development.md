@@ -7,7 +7,7 @@
  * [ZooKeeper](https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper)(3.4.6+) ：Must be installed
  * [Maven](http://maven.apache.org/download.cgi)(3.3+) ：Must be installed
 
-Because the escheduler-rpc module in EasyScheduler uses Grpc, you need to use Maven to compile the generated classes.
+Because the dolphinscheduler-rpc module in EasyScheduler uses Grpc, you need to use Maven to compile the generated classes.
 For those who are not familiar with maven, please refer to: [maven in five minutes](http://maven.apache.org/guides/getting-started/maven-in-five-minutes.html)(3.3+)
 
 http://maven.apache.org/install.html
@@ -23,7 +23,7 @@ After importing the EasyScheduler source code into the development tools such as
 
 * View directory
 
-After normal compilation, it will generate ./target/escheduler-{version}/ in the current directory.
+After normal compilation, it will generate ./target/dolphinscheduler-{version}/ in the current directory.
 
 ```
     bin

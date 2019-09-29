@@ -10,7 +10,7 @@ The front-end has three deployment modes: automated deployment, manual deploymen
 
 Please download the latest version of the installation package, download address： [gitee](https://gitee.com/easyscheduler/EasyScheduler/attach_files/)
 
-After downloading escheduler-ui-x.x.x.tar.gz，decompress`tar -zxvf escheduler-ui-x.x.x.tar.gz ./`and enter the`escheduler-ui`directory
+After downloading dolphinscheduler-ui-x.x.x.tar.gz，decompress`tar -zxvf dolphinscheduler-ui-x.x.x.tar.gz ./`and enter the`dolphinscheduler-ui`directory
 
 
 
@@ -21,7 +21,7 @@ Automated deployment is recommended for either of the following two ways
 
 ### Automated Deployment
 
-Edit the installation file`vi install-escheduler-ui.sh` in the` escheduler-ui` directory
+Edit the installation file`vi install-dolphinscheduler-ui.sh` in the` dolphinscheduler-ui` directory
 
 Change the front-end access port and the back-end proxy interface address
 
@@ -35,7 +35,7 @@ esc_proxy_port="http://192.168.xx.xx:12345"
 
 >Front-end automatic deployment based on Linux system `yum` operation, before deployment, please install and update`yum`
 
-under this directory, execute`./install-escheduler-ui.sh` 
+under this directory, execute`./install-dolphinscheduler-ui.sh` 
 
 
 ### Manual Deployment
@@ -63,7 +63,7 @@ server {
         root   /xx/dist; # the dist directory address decompressed by the front end above (self-modifying)
         index  index.html index.html;
     }
-    location /escheduler {
+    location /dolphinscheduler {
         proxy_pass http://192.168.xx.xx:12345; # interface address (self-modifying)
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

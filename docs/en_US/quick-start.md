@@ -2,7 +2,7 @@
 
 * Administrator user login
 
-  > Address：192.168.xx.xx:8888  Username and password：admin/escheduler123
+  > Address：192.168.xx.xx:8888  Username and password：admin/dolphinscheduler123
 
 <p align="center">
    <img src="https://user-images.githubusercontent.com/48329107/61701549-ee738000-ad70-11e9-8d75-87ce04a0152f.png" width="60%" />

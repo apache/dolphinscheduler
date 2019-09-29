@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>cn.analysys</groupId>
-	<artifactId>escheduler</artifactId>
+	<groupId>org.apache.dolphinscheduler</groupId>
+	<artifactId>dolphinscheduler</artifactId>
 	<version>1.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>escheduler</name>
+	<name>dolphinscheduler</name>
 	<url>http://maven.apache.org</url>
 
 
@@ -143,33 +143,33 @@
 			</dependency>
 
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-server</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-server</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-common</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-common</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-dao</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-dao</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-api</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-rpc</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-rpc</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-alert</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-alert</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -511,12 +511,12 @@
 	</build>
 
 	<modules>
-		<module>escheduler-server</module>
-		<module>escheduler-common</module>
-		<module>escheduler-api</module>
-		<module>escheduler-dao</module>
-		<module>escheduler-alert</module>
-		<module>escheduler-rpc</module>
+		<module>dolphinscheduler-server</module>
+		<module>dolphinscheduler-common</module>
+		<module>dolphinscheduler-api</module>
+		<module>dolphinscheduler-dao</module>
+		<module>dolphinscheduler-alert</module>
+		<module>dolphinscheduler-rpc</module>
 	</modules>
 
 </project>

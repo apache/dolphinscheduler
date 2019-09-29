@@ -7,7 +7,7 @@ There are two deployment modes for the backend:
 
 ## Preparations
 
-Download the latest version of the installation package, download address： [gitee download](https://gitee.com/easyscheduler/EasyScheduler/attach_files/) or [github download](https://github.com/analysys/EasyScheduler/releases), download escheduler-backend-x.x.x.tar.gz(back-end referred to as escheduler-backend),escheduler-ui-x.x.x.tar.gz(front-end referred to as escheduler-ui)
+Download the latest version of the installation package, download address： [gitee download](https://gitee.com/easyscheduler/EasyScheduler/attach_files/) or [github download](https://github.com/apache/incubator-dolphinscheduler/releases), download dolphinscheduler-backend-x.x.x.tar.gz(back-end referred to as dolphinscheduler-backend),dolphinscheduler-ui-x.x.x.tar.gz(front-end referred to as dolphinscheduler-ui)
 
 
 
@@ -32,8 +32,8 @@ Download the latest version of the installation package, download address： [gi
 ```
 vi /etc/sudoers
 
-# For example, the deployment user is an escheduler account
-escheduler  ALL=(ALL)       NOPASSWD: NOPASSWD: ALL
+# For example, the deployment user is an dolphinscheduler account
+dolphinscheduler  ALL=(ALL)       NOPASSWD: NOPASSWD: ALL
 
 # And you need to comment out the Default requiretty line
 #Default requiretty
@@ -51,9 +51,9 @@ Configure SSH secret-free login on deployment machines and other installation ma
     Execute the following command to create database and account
     
     ```
-    CREATE DATABASE escheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
-    GRANT ALL PRIVILEGES ON escheduler.* TO '{user}'@'%' IDENTIFIED BY '{password}';
-    GRANT ALL PRIVILEGES ON escheduler.* TO '{user}'@'localhost' IDENTIFIED BY '{password}';
+    CREATE DATABASE dolphinscheduler DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci;
+    GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'%' IDENTIFIED BY '{password}';
+    GRANT ALL PRIVILEGES ON dolphinscheduler.* TO '{user}'@'localhost' IDENTIFIED BY '{password}';
     flush privileges;
     ```
 
@@ -69,12 +69,12 @@ Configure SSH secret-free login on deployment machines and other installation ma
     Execute scripts for creating tables and importing basic data
     
     ```
-    sh ./script/create-escheduler.sh
+    sh ./script/create-dolphinscheduler.sh
     ```
 
 #### Preparations 5: Modify the deployment directory permissions and operation parameters
 
-     instruction of escheduler-backend directory 
+     instruction of dolphinscheduler-backend directory 
 
 ```directory
 bin : Basic service startup script
@@ -85,11 +85,11 @@ sql : The project relies on SQL files
 install.sh :  One-click deployment script
 ```
 
-- Modify permissions (please modify the 'deployUser' to the corresponding deployment user) so that the deployment user has operational privileges on the escheduler-backend directory
+- Modify permissions (please modify the 'deployUser' to the corresponding deployment user) so that the deployment user has operational privileges on the dolphinscheduler-backend directory
 
-    `sudo chown -R deployUser:deployUser escheduler-backend`
+    `sudo chown -R deployUser:deployUser dolphinscheduler-backend`
 
-- Modify the `.escheduler_env.sh` environment variable in the conf/env/directory
+- Modify the `.dolphinscheduler_env.sh` environment variable in the conf/env/directory
 
 - Modify deployment parameters (depending on your server and business situation):
 
@@ -132,11 +132,11 @@ After successful deployment, the log can be viewed and stored in a specified fol
 
 ```logPath
  logs/
-    ├── escheduler-alert-server.log
-    ├── escheduler-master-server.log
-    |—— escheduler-worker-server.log
-    |—— escheduler-api-server.log
-    |—— escheduler-logger-server.log
+    ├── dolphinscheduler-alert-server.log
+    ├── dolphinscheduler-master-server.log
+    |—— dolphinscheduler-worker-server.log
+    |—— dolphinscheduler-api-server.log
+    |—— dolphinscheduler-logger-server.log
 ```
 
 ### Compile source code to deploy
@@ -151,7 +151,7 @@ After downloading the release version of the source package, unzip it into the r
 
 * View directory
 
-After normal compilation, ./target/escheduler-{version}/ is generated in the current directory
+After normal compilation, ./target/dolphinscheduler-{version}/ is generated in the current directory
 
 
 ### Start-and-stop services commonly used in systems (for service purposes, please refer to System Architecture Design for details)
@@ -167,41 +167,41 @@ After normal compilation, ./target/escheduler-{version}/ is generated in the cur
 * start and stop one master server
 
 ```master
-sh ./bin/escheduler-daemon.sh start master-server
-sh ./bin/escheduler-daemon.sh stop master-server
+sh ./bin/dolphinscheduler-daemon.sh start master-server
+sh ./bin/dolphinscheduler-daemon.sh stop master-server
 ```
 
 * start and stop one worker server
 
 ```worker
-sh ./bin/escheduler-daemon.sh start worker-server
-sh ./bin/escheduler-daemon.sh stop worker-server
+sh ./bin/dolphinscheduler-daemon.sh start worker-server
+sh ./bin/dolphinscheduler-daemon.sh stop worker-server
 ```
 
 * start and stop api server
 
 ```Api
-sh ./bin/escheduler-daemon.sh start api-server
-sh ./bin/escheduler-daemon.sh stop api-server
+sh ./bin/dolphinscheduler-daemon.sh start api-server
+sh ./bin/dolphinscheduler-daemon.sh stop api-server
 ```
 * start and stop logger server
 
 ```Logger
-sh ./bin/escheduler-daemon.sh start logger-server
-sh ./bin/escheduler-daemon.sh stop logger-server
+sh ./bin/dolphinscheduler-daemon.sh start logger-server
+sh ./bin/dolphinscheduler-daemon.sh stop logger-server
 ```
 * start and stop alert server
 
 ```Alert
-sh ./bin/escheduler-daemon.sh start alert-server
-sh ./bin/escheduler-daemon.sh stop alert-server
+sh ./bin/dolphinscheduler-daemon.sh start alert-server
+sh ./bin/dolphinscheduler-daemon.sh stop alert-server
 ```
 
 ## Database Upgrade
 Database upgrade is a function added in version 1.0.2. The database can be upgraded automatically by executing the following command:
 
 ```upgrade
-sh ./script/upgrade-escheduler.sh
+sh ./script/upgrade-dolphinscheduler.sh
 ```
 
 

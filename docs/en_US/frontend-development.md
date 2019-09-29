@@ -23,7 +23,7 @@ Node package download (note version 8.9.4) `https://nodejs.org/download/release/
 
 
 - #### Front-end project construction
-Use the command line mode `cd`  enter the `escheduler-ui` project directory and execute `npm install` to pull the project dependency package.
+Use the command line mode `cd`  enter the `dolphinscheduler-ui` project directory and execute `npm install` to pull the project dependency package.
 
 > If `npm install` is very slow
 
@@ -34,7 +34,7 @@ Use the command line mode `cd`  enter the `escheduler-ui` project directory and 
 
 - Create a new `.env`  file or the interface that interacts with the backend
 
-Create a new` .env` file in the `escheduler-ui `directory, add the ip address and port of the backend service to the file, and use it to interact with the backend. The contents of the` .env` file are as follows:
+Create a new` .env` file in the `dolphinscheduler-ui `directory, add the ip address and port of the backend service to the file, and use it to interact with the backend. The contents of the` .env` file are as follows:
 ```
 # Proxy interface address (modified by yourself)
 API_BASE = http://192.168.xx.xx:12345
@@ -67,7 +67,7 @@ Visit address` http://localhost:8888/#/`
 
 Install pm2 `npm install -g pm2`
 
-Execute `pm2 start npm -- run dev` to start the project in the project `escheduler-ui `root directory
+Execute `pm2 start npm -- run dev` to start the project in the project `dolphinscheduler-ui `root directory
 
 #### command
 
@@ -81,7 +81,7 @@ Execute `pm2 start npm -- run dev` to start the project in the project `eschedul
 
 ```
 
-[root@localhost escheduler-ui]# pm2 start npm -- run dev
+[root@localhost dolphinscheduler-ui]# pm2 start npm -- run dev
 [PM2] Applying action restartProcessId on app [npm](ids: 0)
 [PM2] [npm](0) ✓
 [PM2] Process successfully started

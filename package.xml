@@ -11,7 +11,7 @@
 	<fileSets>
 		
 		<fileSet>
-			<directory>escheduler-server/target/escheduler-server-${project.version}</directory>
+			<directory>dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -19,7 +19,7 @@
 		</fileSet>
 		
 		<fileSet>
-			<directory>escheduler-api/target/escheduler-api-${project.version}</directory>
+			<directory>dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -27,7 +27,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>escheduler-alert/target/escheduler-alert-${project.version}</directory>
+			<directory>dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -35,7 +35,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>escheduler-ui/dist</directory>
+			<directory>dolphinscheduler-ui/dist</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -72,7 +72,7 @@
 			<includes>
 				<include>start-all.sh</include>
 				<include>stop-all.sh</include>
-				<include>escheduler-daemon.sh</include>
+				<include>dolphinscheduler-daemon.sh</include>
 			</includes>
 			<outputDirectory>./bin</outputDirectory>
 		</fileSet>
