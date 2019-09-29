@@ -13,10 +13,10 @@ spring:
 
 #mybatis
 mybatis-plus:
-  mapper-locations: classpath*:/cn.escheduler.dao.mapper/*.xml
-  typeEnumsPackage: cn.escheduler.*.enums
+  mapper-locations: classpath*:/org.apache.dolphinscheduler.dao.mapper/*.xml
+  typeEnumsPackage: org.apache.dolphinscheduler.*.enums
   #实体扫描，多个package用逗号或者分号分隔
-  typeAliasesPackage: cn.escheduler.dao.entity
+  typeAliasesPackage: org.apache.dolphinscheduler.dao.entity
   global-config:
     #数据库相关配置
     db-config:
@@ -40,5 +40,5 @@ mybatis-plus:
 # Logger Config
 logging:
   level:
-    cn.escheduler.dao: debug
+    org.apache.dolphinscheduler.dao: debug
 

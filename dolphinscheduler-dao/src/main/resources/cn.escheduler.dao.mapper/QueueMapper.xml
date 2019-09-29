@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.apache.dolphinscheduler.dao.mapper.QueueMapper">
-    <select id="queryQueuePaging" resultType="org.apache.dolphinscheduler.dao.entity.Queue">
+<mapper namespace="cn.escheduler.dao.mapper.QueueMapper">
+    <select id="queryQueuePaging" resultType="cn.escheduler.dao.entity.Queue">
         select *
         from t_escheduler_queue
         where  1= 1
@@ -10,7 +10,7 @@
         </if>
         order by  update_time desc
     </select>
-    <select id="queryAllQueueList" resultType="org.apache.dolphinscheduler.dao.entity.Queue">
+    <select id="queryAllQueueList" resultType="cn.escheduler.dao.entity.Queue">
         select *
         from t_escheduler_queue
         where  1=1

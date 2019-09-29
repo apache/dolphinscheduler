@@ -17,8 +17,8 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 
-import cn.escheduler.common.enums.ResourceType;
-import cn.escheduler.dao.entity.*;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.dao.entity.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.Assert;
