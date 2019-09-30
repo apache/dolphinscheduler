@@ -6,9 +6,12 @@
         from t_escheduler_udfs
         where 1 = 1
         <if test="ids != null and ids != ''">
-            and id in (#{ids})
+            and id in
+            <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
         </if>
-        <if test="funcName != null and funcName != ''">
+        <if test="funcNames != null and funcNames != ''">
             and func_name = #{funcName}
         </if>
         order by id asc
