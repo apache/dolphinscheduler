@@ -193,6 +193,10 @@ public class ProcessInstanceService extends BaseDAGService {
                 processInstanceMapper.queryProcessInstanceListPaging(page,
                 project.getId(), processDefineId, searchVal, statusArray, host, start, end);
 
+        for(ProcessInstance processInstance:processInstanceList.getRecords()){
+            processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
+        }
+
         Set<String> exclusionSet = new HashSet<String>(){{
             add(Constants.CLASS);
             add("locations");
