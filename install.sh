@@ -161,7 +161,7 @@ downloadPath="/tmp/escheduler/download"
 execPath="/tmp/escheduler/exec"
 
 # SHELL environmental variable path
-shellEnvPath="$installPath/conf/env/.escheduler_env.sh"
+shellEnvPath="$installPath/conf/env/.dolphinscheduler_env.sh"
 
 # suffix of the resource file
 resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
