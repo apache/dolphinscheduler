@@ -34,16 +34,12 @@
           </td>
           <td>
             <span>
-              <a href="javascript:" class="links">
                 {{item.tenantCode}}
-              </a>
             </span>
           </td>
           <td>
             <span>
-              <a href="javascript:" class="links">
                 {{item.tenantName}}
-              </a>
             </span>
           </td>
           <td>

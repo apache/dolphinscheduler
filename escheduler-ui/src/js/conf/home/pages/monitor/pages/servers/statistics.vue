@@ -64,7 +64,7 @@
         isLoading: false,
         queueCount: {},
         commandCountData: {},
-        color: themeData.color
+        color: themeData.color,
       }
     },
     props:{},
