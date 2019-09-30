@@ -20,7 +20,7 @@
     </select>
     <select id="querySubIdListByParentId" resultType="java.lang.Integer">
         select process_instance_id
-        from t_ds_process_instance_map
+        from t_ds_relation_process_instance
         where parent_process_instance_id = #{parentInstanceId}
     </select>
 </mapper>
