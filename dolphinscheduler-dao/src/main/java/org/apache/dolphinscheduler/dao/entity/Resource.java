@@ -26,7 +26,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("t_escheduler_resources")
+@TableName("t_ds_resources")
 public class Resource {
   /**
    * id

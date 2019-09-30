@@ -33,7 +33,7 @@ import java.util.Date;
  *
  */
 @Data
-@TableName("t_escheduler_schedules")
+@TableName("t_ds_schedules")
 public class Schedule {
 
   @TableId(value="id", type=IdType.AUTO)

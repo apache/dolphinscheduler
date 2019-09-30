@@ -28,7 +28,7 @@ import java.util.Date;
  * project
  */
 @Data
-@TableName("t_escheduler_project")
+@TableName("t_ds_project")
 public class Project {
 
     /**

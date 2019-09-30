@@ -25,7 +25,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("t_escheduler_alertgroup")
+@TableName("t_ds_alertgroup")
 public class AlertGroup {
 
 

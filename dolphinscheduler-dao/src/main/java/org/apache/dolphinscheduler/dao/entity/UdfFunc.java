@@ -29,7 +29,7 @@ import java.util.Date;
  * udf function
  */
 @Data
-@TableName("t_escheduler_udfs")
+@TableName("t_ds_udfs")
 public class UdfFunc {
     /**
      * id

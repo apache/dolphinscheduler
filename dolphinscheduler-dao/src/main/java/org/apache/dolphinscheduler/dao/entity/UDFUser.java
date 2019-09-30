@@ -27,7 +27,7 @@ import java.util.Date;
  * udf user relation
  */
 @Data
-@TableName("t_escheduler_relation_udfs_user")
+@TableName("t_ds_relation_udfs_user")
 public class UDFUser {
 
   /**

@@ -28,7 +28,7 @@ import java.util.Date;
  * user alert group
  */
 @Data
-@TableName("t_escheduler_relation_user_alertgroup")
+@TableName("t_ds_relation_user_alertgroup")
 public class UserAlertGroup {
 
     /**

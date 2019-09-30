@@ -27,7 +27,7 @@ import java.util.Date;
  * session
  */
 @Data
-@TableName("t_escheduler_session")
+@TableName("t_ds_session")
 public class Session {
 
     /**

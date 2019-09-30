@@ -29,7 +29,7 @@ import java.util.Date;
  * command
  */
 @Data
-@TableName("t_escheduler_command")
+@TableName("t_ds_command")
 public class Command {
 
     /**

@@ -25,7 +25,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("t_escheduler_access_token")
+@TableName("t_ds_access_token")
 public class AccessToken {
 
     @TableId(value="id", type=IdType.AUTO)

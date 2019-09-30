@@ -32,7 +32,7 @@ import java.util.Date;
  * user
  */
 @Data
-@TableName("t_escheduler_user")
+@TableName("t_ds_user")
 @ApiModel(description = "UserModelDesc")
 public class  User {
 

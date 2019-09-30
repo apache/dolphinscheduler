@@ -30,7 +30,7 @@ import java.util.Date;
  * process instance
  */
 @Data
-@TableName("t_escheduler_process_instance")
+@TableName("t_ds_process_instance")
 public class ProcessInstance {
 
     /**

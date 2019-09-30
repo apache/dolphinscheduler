@@ -26,7 +26,7 @@ import java.util.Date;
 /**
  * command
  */
-@TableName("t_escheduler_error_command")
+@TableName("t_ds_error_command")
 public class ErrorCommand {
 
     /**
