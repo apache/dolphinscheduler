@@ -42,7 +42,7 @@ public class Resource {
   /**
    * description
    */
-  private String desc;
+  private String description;
 
   /**
    * file alias
@@ -77,13 +77,13 @@ public class Resource {
   public Resource() {
   }
 
-  public Resource(int id, String alias, String fileName, String desc, int userId,
+  public Resource(int id, String alias, String fileName, String description, int userId,
                   ResourceType type, long size,
                   Date createTime, Date updateTime) {
     this.id = id;
     this.alias = alias;
     this.fileName = fileName;
-    this.desc = desc;
+    this.description = description;
     this.userId = userId;
     this.type = type;
     this.size = size;
@@ -91,10 +91,10 @@ public class Resource {
     this.updateTime = updateTime;
   }
 
-  public Resource(String alias, String fileName, String desc, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
+  public Resource(String alias, String fileName, String description, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
     this.alias = alias;
     this.fileName = fileName;
-    this.desc = desc;
+    this.description = description;
     this.userId = userId;
     this.type = type;
     this.size = size;
@@ -126,12 +126,12 @@ public class Resource {
     this.fileName = fileName;
   }
 
-  public String getDesc() {
-    return desc;
+  public String getDescription() {
+    return description;
   }
 
-  public void setDesc(String desc) {
-    this.desc = desc;
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public int getUserId() {
@@ -181,7 +181,7 @@ public class Resource {
             "id=" + id +
             ", alias='" + alias + '\'' +
             ", fileName='" + fileName + '\'' +
-            ", desc='" + desc + '\'' +
+            ", description='" + description + '\'' +
             ", userId=" + userId +
             ", type=" + type +
             ", size=" + size +
