@@ -82,8 +82,8 @@ public class DolphinSchedulerManager {
             // Gets the version of the current system
             if (upgradeDao.isExistsTable("t_escheduler_version")) {
                 version = upgradeDao.getCurrentVersion("t_escheduler_version");
-            }else if(upgradeDao.isExistsTable("t_dolphinscheduler_version")){
-                version = upgradeDao.getCurrentVersion("t_dolphinscheduler_version");
+            }else if(upgradeDao.isExistsTable("t_ds_version")){
+                version = upgradeDao.getCurrentVersion("t_ds_version");
             }else if(upgradeDao.isExistsColumn("t_escheduler_queue","create_time")){
                 version = "1.0.1";
             }else if(upgradeDao.isExistsTable("t_escheduler_queue")){
