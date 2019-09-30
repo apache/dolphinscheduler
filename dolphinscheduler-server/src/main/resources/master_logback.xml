@@ -11,12 +11,12 @@
 	</appender>
 
 	<appender name="MASTERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${log.base}/escheduler-master.log</file>
+		<file>${log.base}/dolphinscheduler-master.log</file>
 		<filter class="org.apache.dolphinscheduler.server.master.log.MasterLogFilter">
 			<level>INFO</level>
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-			<fileNamePattern>${log.base}/escheduler-master.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+			<fileNamePattern>${log.base}/dolphinscheduler-master.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
 			<maxHistory>168</maxHistory>
 			<maxFileSize>200MB</maxFileSize>
 		</rollingPolicy>
