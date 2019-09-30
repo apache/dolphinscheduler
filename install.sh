@@ -13,14 +13,14 @@ elif [[ "$OSTYPE" == "linux-gnu" ]]; then
     txt=""
 elif [[ "$OSTYPE" == "cygwin" ]]; then
     # POSIX compatibility layer and Linux environment emulation for Windows
-    echo "Easy Scheduler not support Windows operating system"
+    echo "Dolphin Scheduler not support Windows operating system"
     exit 1
 elif [[ "$OSTYPE" == "msys" ]]; then
     # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
-    echo "Easy Scheduler not support Windows operating system"
+    echo "Dolphin Scheduler not support Windows operating system"
     exit 1
 elif [[ "$OSTYPE" == "win32" ]]; then
-    echo "Easy Scheduler not support Windows operating system"
+    echo "Dolphin Scheduler not support Windows operating system"
     exit 1
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
     # ...
@@ -164,7 +164,7 @@ execPath="/tmp/escheduler/exec"
 shellEnvPath="$installPath/conf/env/.escheduler_env.sh"
 
 # suffix of the resource file
-resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
+resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties"
 
 # development status, if true, for the SHELL script, you can view the encapsulated SHELL script in the execPath directory. 
 # If it is false, execute the direct delete
