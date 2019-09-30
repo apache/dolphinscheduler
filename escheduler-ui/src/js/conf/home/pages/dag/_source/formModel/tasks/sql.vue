@@ -371,7 +371,11 @@
         this.sqlType = o.params.sqlType
         this.connParams = o.params.connParams || ''
         this.localParams = o.params.localParams || []
-        this.showType = o.params.showType.split(',') || []
+        if(o.params.showType == '') {
+          this.showType = []
+        } else {
+          this.showType = o.params.showType.split(',') || []
+        }
         this.preStatements = o.params.preStatements || []
         this.postStatements = o.params.postStatements || []
         this.title = o.params.title || ''

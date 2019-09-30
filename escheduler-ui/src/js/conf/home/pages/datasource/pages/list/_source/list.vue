@@ -50,7 +50,7 @@
           </td>
           <td>
             <span class="ellipsis">
-              <a href="javascript:" class="links">{{item.name}}</a>
+              {{item.name}}
             </span>
           </td>
           <td>

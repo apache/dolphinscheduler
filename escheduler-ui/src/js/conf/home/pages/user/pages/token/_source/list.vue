@@ -46,8 +46,7 @@
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
-            <span>
-              <a href="javascript:" class="links">{{item.userName}}</a>
+            <span>{{item.userName}}
             </span>
           </td>
           <td><span>{{item.token}}</span></td>
