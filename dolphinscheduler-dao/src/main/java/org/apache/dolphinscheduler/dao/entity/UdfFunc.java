@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -58,12 +59,13 @@ public class UdfFunc {
     /**
      * udf data base
      */
+    @TableField("`database`")
     private String database;
 
     /**
      * udf description
      */
-    private String desc;
+    private String description;
 
     /**
      * resource id
@@ -138,12 +140,12 @@ public class UdfFunc {
         this.database = database;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getResourceId() {
@@ -196,7 +198,7 @@ public class UdfFunc {
                 ", className='" + className + '\'' +
                 ", argTypes='" + argTypes + '\'' +
                 ", database='" + database + '\'' +
-                ", desc='" + desc + '\'' +
+                ", description='" + description + '\'' +
                 ", resourceId=" + resourceId +
                 ", resourceName='" + resourceName + '\'' +
                 ", type=" + type +

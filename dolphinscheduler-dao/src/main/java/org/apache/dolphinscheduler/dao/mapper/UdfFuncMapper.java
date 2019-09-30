@@ -26,7 +26,7 @@ import java.util.List;
 public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
 
 
-    List<UdfFunc> queryUdfByIdStr(@Param("ids") String ids,
+    List<UdfFunc> queryUdfByIdStr(@Param("ids") int[] ids,
                                   @Param("funcNames") String funcNames);
 
     IPage<UdfFunc> queryUdfFuncPaging(IPage<UdfFunc> page,
