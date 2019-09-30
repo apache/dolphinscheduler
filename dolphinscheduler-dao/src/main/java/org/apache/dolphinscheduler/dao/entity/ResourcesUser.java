@@ -27,7 +27,7 @@ import java.util.Date;
  * resource user relation
  */
 @Data
-@TableName("t_escheduler_relation_resources_user")
+@TableName("t_ds_relation_resources_user")
 public class ResourcesUser {
 
   /**
