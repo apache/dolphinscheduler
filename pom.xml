@@ -509,6 +509,34 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.rat</groupId>
+				<artifactId>apache-rat-plugin</artifactId>
+				<configuration>
+					<includes>
+						<include>**/*.java</include>
+						<include>**/escheduler-ui/src/**.scss</include>
+						<include>**/escheduler-ui/src/**.css</include>
+						<include>**/escheduler-ui/src/**.vue</include>
+						<include>**/escheduler-ui/src/**.js</include>
+					</includes>
+					<excludes>
+						<exclude>**/escheduler-ui/src/lib/**</exclude>
+						<exclude>**/escheduler-ui/src/js/module/util/cookie.js</exclude>
+						<exclude>**/escheduler-ui/src/font/awesome/font-awesome.css</exclude>
+						<exclude>**/escheduler-ui/src/sass/common/_animation.scss</exclude>
+						<exclude>**/escheduler-ui/src/sass/common/_normalize.scss</exclude>
+						<exclude>**/escheduler-ui/src/combo/1.0.0/es5.js</exclude>
+						<exclude>**/escheduler-ui/src/combo/1.0.0/base.css</exclude>
+						<exclude>**/escheduler-ui/src/view/home/index.html</exclude>
+						<exclude>**/escheduler-ui/src/view/common/outro.inc</exclude>
+						<exclude>**/escheduler-ui/src/view/common/meta.inc</exclude>
+						<exclude>**/escheduler-ui/src/view/login/index.html</exclude>
+						<exclude>**/escheduler-ui/src/font/demo_index.html</exclude>
+					</excludes>
+					<consoleOutput>true</consoleOutput>
+				</configuration>
+			</plugin>
 		</plugins>
 
 	</build>
