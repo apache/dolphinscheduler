@@ -1532,7 +1532,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param ids
      * @return
      */
-    public List<UdfFunc> queryUdfFunListByids(String ids){
+    public List<UdfFunc> queryUdfFunListByids(int[] ids){
 
         return udfFuncMapper.queryUdfByIdStr(ids, null);
     }
