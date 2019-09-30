@@ -28,7 +28,7 @@ import java.util.Date;
  * tenant
  */
 @Data
-@TableName("t_escheduler_tenant")
+@TableName("t_ds_tenant")
 public class Tenant {
 
     /**

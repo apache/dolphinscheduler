@@ -27,7 +27,7 @@ import java.util.Date;
  * queue
  */
 @Data
-@TableName("t_escheduler_queue")
+@TableName("t_ds_queue")
 public class Queue {
 
     /**
