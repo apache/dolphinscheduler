@@ -37,7 +37,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
     private static final String T_VERSION_NAME = "t_escheduler_version";
-    private static final String T_NEW_VERSION_NAME = "t_dolphinscheduler_version";
+    private static final String T_NEW_VERSION_NAME = "t_ds_version";
     private static final String rootDir = System.getProperty("user.dir");
     private static final DbType dbType = getCurrentDbType();
 
@@ -336,7 +336,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         // Change version in the version table to the new version
         String versionName = T_VERSION_NAME;
         if(!SchemaUtils.isAGreatVersion("1.2.0" , version)){
-            versionName = "t_dolphinscheduler_version";
+            versionName = "t_ds_version";
         }
         String upgradeSQL = String.format("update %s set version = ?",versionName);
         PreparedStatement pstmt = null;
