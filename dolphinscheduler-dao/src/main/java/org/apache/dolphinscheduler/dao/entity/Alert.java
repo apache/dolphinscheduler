@@ -33,7 +33,7 @@ import java.util.Map;
  *  alert
  */
 @Data
-@TableName("t_escheduler_alert")
+@TableName("t_ds_alert")
 public class Alert {
 
     /**

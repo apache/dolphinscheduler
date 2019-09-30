@@ -33,7 +33,7 @@ import java.util.Date;
  * task instance
  */
 @Data
-@TableName("t_escheduler_task_instance")
+@TableName("t_ds_task_instance")
 public class TaskInstance {
 
     /**

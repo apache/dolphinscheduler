@@ -28,7 +28,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("t_escheduler_datasource")
+@TableName("t_ds_datasource")
 public class DataSource {
   /**
    * id

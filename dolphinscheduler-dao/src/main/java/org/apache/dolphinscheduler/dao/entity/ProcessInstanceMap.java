@@ -25,7 +25,7 @@ import lombok.Data;
  * process instance map
  */
 @Data
-@TableName("t_escheduler_relation_process_instance")
+@TableName("t_ds_relation_process_instance")
 public class ProcessInstanceMap {
 
     /**

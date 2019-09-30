@@ -27,7 +27,7 @@ import java.util.Date;
  * worker group for task running
  */
 @Data
-@TableName("t_escheduler_worker_group")
+@TableName("t_ds_worker_group")
 public class WorkerGroup {
 
     @TableId(value="id", type=IdType.AUTO)
