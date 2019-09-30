@@ -115,7 +115,7 @@ public class UdfFuncService extends BaseService{
         if (StringUtils.isNotEmpty(argTypes)) {
             udf.setDatabase(database);
         }
-        udf.setDesc(desc);
+        udf.setDescription(desc);
         udf.setResourceId(resourceId);
         udf.setResourceName(resource.getAlias());
         udf.setType(type);
@@ -220,7 +220,7 @@ public class UdfFuncService extends BaseService{
         if (StringUtils.isNotEmpty(argTypes)) {
             udf.setDatabase(database);
         }
-        udf.setDesc(desc);
+        udf.setDescription(desc);
         udf.setResourceId(resourceId);
         udf.setResourceName(resource.getAlias());
         udf.setType(type);
