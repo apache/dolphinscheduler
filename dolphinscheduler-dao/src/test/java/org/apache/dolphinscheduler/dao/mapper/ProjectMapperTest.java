@@ -121,6 +121,8 @@ public class ProjectMapperTest {
         User user = new User();
         user.setUserName("ut user");
         userMapper.insert(user);
+        project.setUserId(user.getId());
+        projectMapper.updateById(project);
 
         Page<Project> page = new Page(1,3);
         IPage<Project> projectIPage = projectMapper.queryProjectListPaging(
