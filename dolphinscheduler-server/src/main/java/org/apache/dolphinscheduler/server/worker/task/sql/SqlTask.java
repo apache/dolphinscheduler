@@ -16,6 +16,11 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -41,11 +46,6 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.EnumUtils;
 import org.slf4j.Logger;
 
 import java.sql.*;
@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
-import static org.apache.dolphinscheduler.common.enums.DbType.*;
+import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
 /**
  *  sql task
  */
@@ -162,7 +162,12 @@ public class SqlTask extends AbstractTask {
             boolean udfTypeFlag = EnumUtils.isValidEnum(UdfType.class, sqlParameters.getType())
                     && StringUtils.isNotEmpty(sqlParameters.getUdfs());
             if(udfTypeFlag){
-                List<UdfFunc> udfFuncList = processDao.queryUdfFunListByids(sqlParameters.getUdfs());
+                String[] ids = sqlParameters.getUdfs().split(",");
+                int[] idsArray = new int[ids.length];
+                for(int i=0;i<ids.length;i++){
+                    idsArray[i]=Integer.parseInt(ids[i]);
+                }
+                List<UdfFunc> udfFuncList = processDao.queryUdfFunListByids(idsArray);
                 createFuncs = UDFUtils.createFuncs(udfFuncList, taskProps.getTenantCode(), logger);
             }
 
