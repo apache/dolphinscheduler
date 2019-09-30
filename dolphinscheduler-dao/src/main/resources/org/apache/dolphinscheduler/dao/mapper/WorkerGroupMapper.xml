@@ -3,17 +3,17 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper">
     <select id="queryAllWorkerGroup" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
         select *
-        from t_escheduler_worker_group
+        from t_ds_worker_group
         order by update_time desc
     </select>
     <select id="queryWorkerGroupByName" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
         select *
-        from t_escheduler_worker_group
+        from t_ds_worker_group
         where `name` = #{name}
     </select>
     <select id="queryListPaging" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
         select *
-        from t_escheduler_worker_group
+        from t_ds_worker_group
         where 1 = 1
         <if test="searchVal != null and searchVal != ''">
             and  name like concat('%', #{searchVal}, '%')

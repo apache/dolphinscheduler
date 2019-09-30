@@ -3,7 +3,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertMapper">
     <select id="listAlertByStatus" resultType="org.apache.dolphinscheduler.dao.entity.Alert">
         select *
-        from t_escheduler_alert
+        from t_ds_alert
         where alert_status = #{alertStatus}
     </select>
 </mapper>
