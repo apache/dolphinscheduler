@@ -40,7 +40,7 @@ public interface ResourceMapper extends BaseMapper<Resource> {
     /**
      *
      * @param page
-     * @param userId query all if -1, then query the authed resources
+     * @param userId query all if 0, then query the authed resources
      * @param type
      * @param searchVal
      * @return
@@ -53,7 +53,7 @@ public interface ResourceMapper extends BaseMapper<Resource> {
     /**
      *
      * @param userId
-     * @param type
+     * @param type query all if -1
      * @return
      */
     List<Resource> queryResourceListAuthored(@Param("userId") int userId, @Param("type") int type);

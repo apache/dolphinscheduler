@@ -74,8 +74,6 @@ public class ErrorCommandMapperTest {
 
     @Test
     public void testQuery() {
-        errorCommandMapper.delete(null);
-
         ErrorCommand errorCommand = insertOne();
 
         ProcessDefinition processDefinition = new ProcessDefinition();

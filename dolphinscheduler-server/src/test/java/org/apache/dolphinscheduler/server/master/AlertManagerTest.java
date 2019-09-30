@@ -67,8 +67,8 @@ public class AlertManagerTest {
 
 
         // fault task instance
-        TaskInstance toleranceTask1 = taskInstanceMapper.queryById(5038);
-        TaskInstance toleranceTask2 = taskInstanceMapper.queryById(5039);
+        TaskInstance toleranceTask1 = taskInstanceMapper.selectById(5038);
+        TaskInstance toleranceTask2 = taskInstanceMapper.selectById(5039);
 
         List<TaskInstance> toleranceTaskList = new ArrayList<>(2);
         toleranceTaskList.add(toleranceTask1);
@@ -92,9 +92,9 @@ public class AlertManagerTest {
 
 
         // fault task instance
-        TaskInstance toleranceTask1 = taskInstanceMapper.queryById(5038);
+        TaskInstance toleranceTask1 = taskInstanceMapper.selectById(5038);
         toleranceTask1.setState(ExecutionStatus.FAILURE);
-        TaskInstance toleranceTask2 = taskInstanceMapper.queryById(5039);
+        TaskInstance toleranceTask2 = taskInstanceMapper.selectById(5039);
         toleranceTask2.setState(ExecutionStatus.FAILURE);
 
         List<TaskInstance> toleranceTaskList = new ArrayList<>(2);

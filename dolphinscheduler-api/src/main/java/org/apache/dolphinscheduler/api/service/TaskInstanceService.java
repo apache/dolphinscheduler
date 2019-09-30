@@ -91,13 +91,8 @@ public class TaskInstanceService extends BaseService {
         }
 
         int[] statusArray = null;
-        String statesStr = null;
-        // filter by status
         if(stateType != null){
             statusArray = new int[]{stateType.ordinal()};
-        }
-        if(statusArray != null){
-            statesStr = Arrays.toString(statusArray).replace("[", "").replace("]","");
         }
 
         Date start = null;
@@ -117,7 +112,7 @@ public class TaskInstanceService extends BaseService {
 
         Page<TaskInstance> page = new Page(pageNo, pageSize);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page, project.getId(), processInstanceId, searchVal, taskName, statesStr, host, start, end
+                page, project.getId(), processInstanceId, searchVal, taskName, statusArray, host, start, end
         );
         PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
         Set<String> exclusionSet = new HashSet<String>(){{

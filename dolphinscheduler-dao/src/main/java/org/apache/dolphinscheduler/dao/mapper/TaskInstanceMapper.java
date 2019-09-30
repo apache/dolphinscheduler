@@ -34,39 +34,34 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     List<Integer> queryTaskByProcessIdAndState(@Param("processInstanceId") Integer processInstanceId,
                                                @Param("state") Integer state);
 
-
-    TaskInstance queryById(@Param("taskInstanceId") int taskInstanceId);
-
     List<TaskInstance> findValidTaskListByProcessId(@Param("processInstanceId") Integer processInstanceId,
                                                     @Param("flag") Flag flag);
 
     List<TaskInstance> queryByHostAndStatus(@Param("host") String host,
-                                            @Param("states") String stateArray);
+                                            @Param("states") int[] stateArray);
 
     int setFailoverByHostAndStateArray(@Param("host") String host,
-                                       @Param("states") String stateArray,
+                                       @Param("states") int[] stateArray,
                                        @Param("destStatus") ExecutionStatus destStatus);
 
     TaskInstance queryByInstanceIdAndName(@Param("processInstanceId") int processInstanceId,
                                           @Param("name") String name);
 
-    Integer countTask(@Param("userId") int userId,
-                      @Param("userType") UserType userType,
-                      @Param("projectIds") int[] projectIds,
+    Integer countTask(
+                      @Param("projectIds") Integer[] projectIds,
                       @Param("taskIds") int[] taskIds);
 
-    List<ExecuteStatusCount> countTaskInstanceStateByUser(@Param("userId") int userId,
-                                                          @Param("userType") UserType userType,
+    List<ExecuteStatusCount> countTaskInstanceStateByUser(
                                                           @Param("startTime") Date startTime,
                                                           @Param("endTime") Date endTime,
-                                                          @Param("projectIds") String projectIds);
+                                                          @Param("projectIds") Integer[] projectIds);
 
     IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
                                                     @Param("projectId") int projectId,
                                                     @Param("processInstanceId") Integer processInstanceId,
                                                     @Param("searchVal") String searchVal,
                                                     @Param("taskName") String taskName,
-                                                    @Param("states") String statusArray,
+                                                    @Param("states") int[] statusArray,
                                                     @Param("host") String host,
                                                     @Param("startTime") Date startTime,
                                                     @Param("endTime") Date endTime

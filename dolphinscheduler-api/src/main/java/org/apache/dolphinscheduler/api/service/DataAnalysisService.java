@@ -108,9 +108,9 @@ public class DataAnalysisService {
             return result;
         }
 
+        Integer[] projectIds = getProjectIdsArrays(loginUser, projectId);
         List<ExecuteStatusCount> taskInstanceStateCounts =
-                taskInstanceMapper.countTaskInstanceStateByUser(loginUser.getId(),
-                       loginUser.getUserType(),  start, end, String.valueOf(projectId));
+                taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds);
 
         TaskCountDto taskCountResult = new TaskCountDto(taskInstanceStateCounts);
         if (taskInstanceStateCounts != null) {
@@ -158,16 +158,7 @@ public class DataAnalysisService {
             putErrorRequestParamsMsg(result);
             return result;
         }
-
-        List<Integer> projectIds = new ArrayList<>();
-        if(projectId !=0){
-            projectIds.add(projectId);
-        }else if(loginUser.getUserType() == UserType.GENERAL_USER){
-            projectIds = processDao.getProjectIdListHavePerm(loginUser.getId());
-
-        }
-        Integer[] projectIdArray = projectIds.toArray(new Integer[projectIds.size()]);
-
+        Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         List<ExecuteStatusCount> processInstanceStateCounts =
                 processInstanceMapper.countInstanceStateByUser(start, end,
                         projectIdArray);
@@ -194,8 +185,7 @@ public class DataAnalysisService {
         Map<String, Object> result = new HashMap<>();
 
 
-        Integer[] projectIdArray = new Integer[1];
-        projectIdArray[0] = projectId;
+        Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
                 loginUser.getId(),  projectIdArray);
 
@@ -265,14 +255,7 @@ public class DataAnalysisService {
             return result;
         }
 
-        List<Integer> projectIds = new ArrayList<>();
-        if(projectId !=0){
-            projectIds.add(projectId);
-        }else if(loginUser.getUserType() == UserType.GENERAL_USER){
-            projectIds = processDao.getProjectIdListHavePerm(loginUser.getId());
-
-        }
-        Integer[] projectIdArray = projectIds.toArray(new Integer[projectIds.size()]);
+        Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         // count command state
         List<CommandCount> commandStateCounts =
                 commandMapper.countCommandState(
@@ -336,6 +319,16 @@ public class DataAnalysisService {
         return  result;
     }
 
+    private Integer[] getProjectIdsArrays(User loginUser, int projectId) {
+        List<Integer> projectIds = new ArrayList<>();
+        if(projectId !=0){
+            projectIds.add(projectId);
+        }else if(loginUser.getUserType() == UserType.GENERAL_USER){
+            projectIds = processDao.getProjectIdListHavePerm(loginUser.getId());
+        }
+        return projectIds.toArray(new Integer[projectIds.size()]);
+    }
+
     /**
      * count queue state
      * @param loginUser
@@ -391,20 +384,17 @@ public class DataAnalysisService {
         }
         Integer taskQueueCount = 0;
         Integer taskKillCount = 0;
-        int[] projectIds = new int[1];
-        projectIds[0] = projectId;
 
+        Integer[] projectIds = getProjectIdsArrays(loginUser, projectId);
         if (tasksQueueIds.length != 0){
             taskQueueCount = taskInstanceMapper.countTask(
-                    loginUser.getId(),loginUser.getUserType(),projectIds,
+                    projectIds,
                     tasksQueueIds);
         }
 
         if (tasksKillIds.length != 0){
-            taskKillCount = taskInstanceMapper.countTask(loginUser.getId(),loginUser.getUserType(), projectIds, tasksKillIds);
+            taskKillCount = taskInstanceMapper.countTask(projectIds, tasksKillIds);
         }
-
-
 
         dataMap.put("taskQueue",taskQueueCount);
         dataMap.put("taskKill",taskKillCount);
