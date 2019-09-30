@@ -98,7 +98,6 @@ public class LoggerServer {
                     request.getLimit());
             List<String> list = readFile(request.getPath(), request.getSkipLineNum(), request.getLimit());
             StringBuilder sb = new StringBuilder();
-            boolean errorLineFlag = false;
             for (String line : list){
                 sb.append(line + "\r\n");
             }
@@ -196,7 +195,6 @@ public class LoggerServer {
         StringBuilder sb = new StringBuilder();
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
-            boolean errorLineFlag = false;
             while ((line = br.readLine()) != null){
                 sb.append(line + "\r\n");
             }
