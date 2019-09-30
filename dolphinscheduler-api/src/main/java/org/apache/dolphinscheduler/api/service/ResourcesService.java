@@ -214,7 +214,7 @@ public class ResourcesService extends BaseService {
         }
 
 
-        if (name.equals(resource.getAlias()) && desc.equals(resource.getDesc())) {
+        if (name.equals(resource.getAlias()) && desc.equals(resource.getDescription())) {
             putMsg(result, Status.SUCCESS);
             return result;
         }
@@ -231,7 +231,7 @@ public class ResourcesService extends BaseService {
         // updateProcessInstance data
         Date now = new Date();
         resource.setAlias(name);
-        resource.setDesc(desc);
+        resource.setDescription(desc);
         resource.setUpdateTime(now);
 
         try {

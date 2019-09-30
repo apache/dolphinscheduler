@@ -1204,7 +1204,7 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     public TaskInstance findTaskInstanceById(Integer taskId){
-        return taskInstanceMapper.queryById(taskId);
+        return taskInstanceMapper.selectById(taskId);
     }
 
 
@@ -1331,7 +1331,7 @@ public class ProcessDao extends AbstractBaseDao {
                                 String executePath,
                                 String logPath,
                                 int taskInstId) {
-        TaskInstance taskInstance = taskInstanceMapper.queryById(taskInstId);
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
         taskInstance.setState(state);
         taskInstance.setStartTime(startTime);
         taskInstance.setHost(host);
@@ -1384,7 +1384,7 @@ public class ProcessDao extends AbstractBaseDao {
     public void changeTaskState(ExecutionStatus state,
                                 Date endTime,
                                 int taskInstId) {
-        TaskInstance taskInstance = taskInstanceMapper.queryById(taskInstId);
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
         taskInstance.setState(state);
         taskInstance.setEndTime(endTime);
         saveTaskInstance(taskInstance);
@@ -1407,39 +1407,16 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     * set task
-     * 根据任务实例id设置pid
-     * @param taskInstId
-     * @param pid
-     */
-    public void updatePidByTaskInstId(int taskInstId, int pid) {
-        TaskInstance taskInstance = taskInstanceMapper.queryById(taskInstId);
-        taskInstance.setPid(pid);
-        taskInstance.setAppLink("");
-        saveTaskInstance(taskInstance);
-    }
-
-    /**
      * update pid and app links field by task instance id
      * @param taskInstId
      * @param pid
      */
     public void updatePidByTaskInstId(int taskInstId, int pid,String appLinks) {
 
-        TaskInstance taskInstance = taskInstanceMapper.queryById(taskInstId);
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
         taskInstance.setPid(pid);
         taskInstance.setAppLink(appLinks);
         saveTaskInstance(taskInstance);
-    }
-
-    /**
-     * query  ProcessDefinition by name
-     *
-     * @see ProcessDefinition
-     */
-    public ProcessDefinition findProcessDefineByName(int projectId, String name) {
-        ProcessDefinition projectFlow = processDefineMapper.queryByDefineName(projectId, name);
-        return projectFlow;
     }
 
     /**
@@ -1488,7 +1465,7 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public List<TaskInstance> queryNeedFailoverTaskInstances(String host){
         return taskInstanceMapper.queryByHostAndStatus(host,
-                StringUtils.join(stateArray, ","));
+                stateArray);
     }
 
     /**

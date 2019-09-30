@@ -111,14 +111,22 @@ public class TenantMapperTest {
 
     @Test
     public void testQueryTenantPaging() {
+
+        Queue queue = new Queue();
+        queue.setQueue("ut queue");
+        queue.setQueueName("ut queue name");
+        queueMapper.insert(queue);
+
         Tenant tenant = insertOne();
         tenant.setTenantCode("ut code");
         tenant.setTenantName("ut name");
+        tenant.setQueueId(queue.getId());
         tenantMapper.updateById(tenant);
         Page<Tenant> page = new Page(1,3);
 
         IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, tenant.getTenantName());
 
+        queueMapper.deleteById(queue.getId());
         tenantMapper.deleteById(tenant.getId());
         Assert.assertNotEquals(tenantIPage.getTotal(), 0);
     }

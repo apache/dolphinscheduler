@@ -81,7 +81,7 @@ public class ProjectService extends BaseService{
         Date now = new Date();
 
         project.setName(name);
-        project.setDesc(desc);
+        project.setDescription(desc);
         project.setUserId(loginUser.getId());
         project.setUserName(loginUser.getUserName());
         project.setCreateTime(now);
@@ -244,7 +244,7 @@ public class ProjectService extends BaseService{
             return result;
         }
         project.setName(projectName);
-        project.setDesc(desc);
+        project.setDescription(desc);
         project.setUpdateTime(new Date());
 
         int update = projectMapper.updateById(project);
