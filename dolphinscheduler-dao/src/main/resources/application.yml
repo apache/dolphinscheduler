@@ -5,8 +5,8 @@ spring:
 #    driver-class-name:  com.mysql.jdbc.Driver
     url: jdbc:postgresql://192.168.220.154:5432/escheduler
 #    url: jdbc:mysql://192.168.220.188:3306/escheduler_new?useUnicode=true&characterEncoding=UTF-8
-    username: xx
-    password: xx
+    username: root
+    password: root@123
 #    platform:
     continue-on-error: true
 
