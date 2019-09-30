@@ -36,7 +36,7 @@
           <template slot="name"><b>*</b>{{$t('Password')}}</template>
           <template slot="content">
             <x-input
-                    type="input"
+                    type="password"
                     v-model="userPassword"
                     :placeholder="$t('Please enter your password')">
             </x-input>
