@@ -46,8 +46,7 @@
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
-            <span>
-              <a href="javascript:" class="links">{{item.groupName}}</a>
+            <span>{{item.groupName}}
             </span>
           </td>
           <td><span>{{item.groupType === 'EMAIL' ? `${$t('Email')}` : `${$t('SMS')}`}}</span></td>

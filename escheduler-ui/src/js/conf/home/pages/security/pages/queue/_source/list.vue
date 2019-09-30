@@ -44,16 +44,12 @@
           </td>
           <td>
             <span>
-              <a href="javascript:" class="links">
                 {{item.queueName}}
-              </a>
             </span>
           </td>
           <td>
             <span>
-              <a href="javascript:" class="links">
                 {{item.queue}}
-              </a>
             </span>
           </td>
           <td>

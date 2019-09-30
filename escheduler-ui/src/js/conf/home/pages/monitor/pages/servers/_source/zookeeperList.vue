@@ -64,8 +64,7 @@
             <span>{{$index + 1}}</span>
           </td>
           <td>
-            <span>
-              <a href="javascript:" class="links">{{item.hostname}}</a>
+            <span>{{item.hostname}}
             </span>
           </td>
           <td><span>{{item.connections}}</span></td>
