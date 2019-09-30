@@ -915,6 +915,9 @@ public class ProcessDefinitionService extends BaseDAGService {
          */
         List<ProcessInstance> processInstanceList = processInstanceMapper.queryByProcessDefineId(processId, limit);
 
+        for(ProcessInstance processInstance:processInstanceList){
+            processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
+        }
 
         if (limit > processInstanceList.size()) {
             limit = processInstanceList.size();

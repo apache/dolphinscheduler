@@ -24,7 +24,7 @@
         <if test="userId != 0">
             and p.id in
             (select project_id from t_escheduler_relation_project_user  where user_id=#{userId}
-            union select id as project_id  from t_escheduler_project where user_id=#{userId}
+            union select id as project_id  from t_escheduler_project where user_id=#{userId})
             )
         </if>
         <if test="searchName!=null and searchName != ''">

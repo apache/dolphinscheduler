@@ -3,7 +3,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.SessionMapper">
     <select id="queryByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Session">
         select *
-        from t_escheduler_session
+        from t_ds_session
         where user_id = #{userId}
     </select>
 </mapper>

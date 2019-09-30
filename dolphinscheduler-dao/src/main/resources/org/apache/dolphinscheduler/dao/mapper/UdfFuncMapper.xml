@@ -3,7 +3,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper">
     <select id="queryUdfByIdStr" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
         select *
-        from t_escheduler_udfs
+        from t_ds_udfs
         where 1 = 1
         <if test="ids != null and ids != ''">
             and id in
@@ -18,36 +18,36 @@
     </select>
     <select id="queryUdfFuncPaging" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
         select *
-        from t_escheduler_udfs
+        from t_ds_udfs
         where 1=1
         <if test="searchVal!= null and searchVal != ''">
             and `name` like concat('%', #{searchVal}, '%')
         </if>
         <if test="userId != 0">
             and id in (
-              select udf_id from t_escheduler_relation_udfs_user where user_id=#{userId}
-              union select id as udf_id  from t_escheduler_udfs where user_id=#{userId})
+              select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+              union select id as udf_id  from t_ds_udfs where user_id=#{userId})
         </if>
         order by create_time desc
     </select>
     <select id="getUdfFuncByType" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
         select *
-        from t_escheduler_udfs
+        from t_ds_udfs
         where `type` = #{type}
         <if test="userId != 0">
             and id in (
-            select udf_id from t_escheduler_relation_udfs_user where user_id=#{userId}
-            union select id as udf_id  from t_escheduler_udfs where user_id=#{userId})
+            select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+            union select id as udf_id  from t_ds_udfs where user_id=#{userId})
         </if>
     </select>
     <select id="queryUdfFuncExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
         select *
-        from t_escheduler_udfs
+        from t_ds_udfs
         where user_id <![CDATA[ <> ]]> #{userId}
     </select>
     <select id="queryAuthedUdfFunc" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
         SELECT u.*
-        from t_escheduler_udfs u,t_escheduler_relation_udfs_user rel
+        from t_ds_udfs u,t_ds_relation_udfs_user rel
         WHERE u.id = rel.udf_id
         AND rel.user_id = #{userId}
     </select>
