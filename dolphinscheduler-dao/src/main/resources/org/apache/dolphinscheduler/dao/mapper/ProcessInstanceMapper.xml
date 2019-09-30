@@ -3,12 +3,12 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper">
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select inst.*
-        from t_escheduler_process_instance inst
+        from t_ds_process_instance inst
         where inst.id = #{processId}
     </select>
     <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *
-        from t_escheduler_process_instance
+        from t_ds_process_instance
         where 1=1
         <if test="host != null and host != ''">
             and host=#{host}
@@ -21,8 +21,8 @@
     </select>
     <select id="queryProcessInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select instance.*
-        from t_escheduler_process_instance instance
-        join t_escheduler_process_definition define ON instance.process_definition_id = define.id
+        from t_ds_process_instance instance
+        join t_ds_process_definition define ON instance.process_definition_id = define.id
         where 1=1
         and instance.is_sub_process=0
         and define.project_id = #{projectId}
@@ -47,7 +47,7 @@
         order by instance.start_time desc
     </select>
     <update id="setFailoverByHostAndStateArray">
-        update t_escheduler_process_instance
+        update t_ds_process_instance
         set host=null
         where host =#{host} and state in
         <foreach collection="states" index="index" item="i" open="(" close=")" separator=",">
@@ -55,15 +55,15 @@
         </foreach>
     </update>
     <update id="updateProcessInstanceByState">
-        update t_escheduler_process_instance
+        update t_ds_process_instance
         set state = #{destState}
         where state = #{originState}
     </update>
     <select id="countInstanceStateByUser" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select t.state, count(0) as count
-        from t_escheduler_process_instance t
-        join t_escheduler_process_definition d on d.id=t.process_definition_id
-        join t_escheduler_project p on p.id=d.project_id
+        from t_ds_process_instance t
+        join t_ds_process_definition d on d.id=t.process_definition_id
+        join t_ds_project p on p.id=d.project_id
         where 1 = 1
         and t.is_sub_process = 0
         <if test="startTime != null and endTime != null">
@@ -79,13 +79,13 @@
     </select>
     <select id="queryByProcessDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *
-        from t_escheduler_process_instance
+        from t_ds_process_instance
         where process_definition_id=#{processDefinitionId}
         order by start_time desc limit #{size}
     </select>
     <select id="queryLastSchedulerProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *
-        from t_escheduler_process_instance
+        from t_ds_process_instance
         where process_definition_id=#{processDefinitionId}
         <if test="startTime!=null and endTime != null ">
             and schedule_time between #{startTime} and #{endTime}
@@ -94,7 +94,7 @@
     </select>
     <select id="queryLastRunningProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *
-        from t_escheduler_process_instance
+        from t_ds_process_instance
         where 1=1
         <if test="states !=null and states.length != 0">
             and state in
@@ -110,7 +110,7 @@
     </select>
     <select id="queryLastManualProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select *
-        from t_escheduler_process_instance
+        from t_ds_process_instance
         where process_definition_id=#{processDefinitionId}
         and schedule_time is null
         <if test="startTime!=null and endTime != null ">

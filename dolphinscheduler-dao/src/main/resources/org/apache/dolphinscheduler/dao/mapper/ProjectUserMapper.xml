@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper">
     <delete id="deleteProjectRelation">
-        delete from t_escheduler_relation_project_user
+        delete from t_ds_relation_project_user
         where 1=1
         and user_id = #{userId}
         <if test="projectId != 0 ">
@@ -11,7 +11,7 @@
     </delete>
     <select id="queryProjectRelation" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
       select *
-      from t_escheduler_relation_project_user
+      from t_ds_relation_project_user
       where project_id = #{projectId}
       and user_id = #{userId}
       limit 1
