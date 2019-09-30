@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.junit.Assert;
 import org.junit.Test;
