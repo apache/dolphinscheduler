@@ -44,6 +44,7 @@ public class DataSourceUserMapperTest {
         dataSourceUser.setPerm(7);
         dataSourceUser.setUpdateTime(new Date());
         dataSourceUser.setCreateTime(new Date());
+        dataSourceUserMapper.insert(dataSourceUser);
         return dataSourceUser;
     }
 

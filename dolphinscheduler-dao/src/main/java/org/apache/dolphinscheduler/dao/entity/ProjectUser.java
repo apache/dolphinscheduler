@@ -25,7 +25,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("t_escheduler_relation_project_user")
+@TableName("t_ds_relation_project_user")
 public class ProjectUser {
     /**
      * id

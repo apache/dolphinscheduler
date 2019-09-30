@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
  * process definition
  */
 @Data
-@TableName("t_escheduler_process_definition")
+@TableName("t_ds_process_definition")
 public class ProcessDefinition {
     /**
      * id

@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -33,7 +34,7 @@ import java.util.Date;
  * task instance
  */
 @Data
-@TableName("t_escheduler_task_instance")
+@TableName("t_ds_task_instance")
 public class TaskInstance {
 
     /**
@@ -65,6 +66,7 @@ public class TaskInstance {
     /**
      * process instance name
      */
+    @TableField(exist = false)
     private String processInstanceName;
 
     /**
@@ -120,18 +122,15 @@ public class TaskInstance {
     private Flag alertFlag;
 
     /**
-     * run flag
-     */
-    private Flag runFlag;
-
-    /**
      * process instance
      */
+    @TableField(exist = false)
     private ProcessInstance processInstance;
 
     /**
      * process definition
      */
+    @TableField(exist = false)
     private ProcessDefinition processDefine;
 
     /**
@@ -152,12 +151,14 @@ public class TaskInstance {
     /**
      * dependency
      */
+    @TableField(exist = false)
     private String dependency;
 
     /**
      * duration
      * @return
      */
+    @TableField(exist = false)
     private Long duration;
 
     /**
@@ -180,12 +181,14 @@ public class TaskInstance {
     /**
      * process intance priority
      */
+    @TableField(exist = false)
     private Priority processInstancePriority;
 
     /**
      * dependent state
      * @return
      */
+    @TableField(exist = false)
     private String dependentResult;
 
 
@@ -390,14 +393,6 @@ public class TaskInstance {
         this.processInstanceName = processInstanceName;
     }
 
-    public Flag getRunFlag() {
-        return runFlag;
-    }
-
-    public void setRunFlag(Flag runFlag) {
-        this.runFlag = runFlag;
-    }
-
     public Long getDuration() {
         return duration;
     }
@@ -492,7 +487,7 @@ public class TaskInstance {
                 ", logPath='" + logPath + '\'' +
                 ", retryTimes=" + retryTimes +
                 ", alertFlag=" + alertFlag +
-                ", runFlag=" + runFlag +
+                ", flag=" + flag +
                 ", processInstance=" + processInstance +
                 ", processDefine=" + processDefine +
                 ", pid=" + pid +

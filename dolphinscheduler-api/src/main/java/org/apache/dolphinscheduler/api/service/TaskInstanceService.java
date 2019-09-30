@@ -119,6 +119,11 @@ public class TaskInstanceService extends BaseService {
             add(Constants.CLASS);
             add("taskJson");
         }};
+        List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
+        for(TaskInstance taskInstance : taskInstanceList){
+            taskInstance.setDuration(DateUtils.differSec(taskInstance.getStartTime(),
+                    taskInstance.getEndTime()));
+        }
         pageInfo.setTotalCount((int)taskInstanceIPage.getTotal());
         pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(),exclusionSet));
         result.put(Constants.DATA_LIST, pageInfo);
