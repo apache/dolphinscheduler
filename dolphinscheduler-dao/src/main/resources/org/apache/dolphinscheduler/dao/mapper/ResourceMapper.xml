@@ -9,7 +9,7 @@
             and alias = #{alias}
         </if>
         <if test="type != -1">
-            and `type` = #{type}
+            and type = #{type}
         </if>
         <if test="userId != 0">
             and user_id = #{userId}
@@ -20,7 +20,7 @@
         from t_ds_resources
         where 1 = 1
         <if test="type != -1">
-            and `type`=#{type}
+            and type=#{type}
         </if>
         and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
                   union select id as resources_id  from t_ds_resources where user_id=#{userId})
@@ -28,7 +28,7 @@
     <select id="queryResourcePaging" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select *
         from t_ds_resources
-        where `type`=#{type}
+        where type=#{type}
         <if test="userId != 0">
             and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
             union select id as resources_id  from t_ds_resources where user_id=#{userId})

@@ -52,25 +52,21 @@ public class Project {
     /**
      * project name
      */
-    @TableField("name")
     private String name;
 
     /**
      * project description
      */
-    @TableField("`desc`")
-    private String desc;
+    private String description;
 
     /**
      * create time
      */
-    @TableField("`create_time`")
     private Date createTime;
 
     /**
      * update time
      */
-    @TableField("`update_time`")
     private Date updateTime;
 
     /**
@@ -123,14 +119,6 @@ public class Project {
         this.name = name;
     }
 
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -145,6 +133,13 @@ public class Project {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public String getDescription() {
+        return description;
     }
 
     public int getUserId() {
@@ -177,7 +172,7 @@ public class Project {
                 ", userId=" + userId +
                 ", userName='" + userName + '\'' +
                 ", name='" + name + '\'' +
-                ", desc='" + desc + '\'' +
+                ", description='" + description + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 '}';
@@ -208,4 +203,5 @@ public class Project {
         result = 31 * result + name.hashCode();
         return result;
     }
+
 }
