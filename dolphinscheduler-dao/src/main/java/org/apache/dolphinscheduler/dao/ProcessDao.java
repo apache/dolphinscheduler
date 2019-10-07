@@ -141,7 +141,8 @@ public class ProcessDao extends AbstractBaseDao {
      * @param validThreadNum
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    //@Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public ProcessInstance scanCommand(Logger logger, String host, int validThreadNum){
 
         ProcessInstance processInstance = null;
@@ -799,7 +800,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param taskInstance
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public TaskInstance submitTask(TaskInstance taskInstance, ProcessInstance processInstance){
         logger.info("start submit task : {}, instance id:{}, state: {}, ",
                 taskInstance.getName(), processInstance.getId(), processInstance.getState() );

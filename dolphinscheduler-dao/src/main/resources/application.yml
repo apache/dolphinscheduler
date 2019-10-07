@@ -1,10 +1,10 @@
 # mysql
 spring:
    datasource:
-    driver-class-name: org.postgresql.Driver
-#    driver-class-name:  com.mysql.jdbc.Driver
-    url: jdbc:postgresql://192.168.220.154:5432/escheduler
-#    url: jdbc:mysql://192.168.220.188:3306/escheduler_new?useUnicode=true&characterEncoding=UTF-8
+#    driver-class-name: org.postgresql.Driver
+    driver-class-name:  com.mysql.jdbc.Driver
+#    url: jdbc:postgresql://192.168.220.154:5432/escheduler
+    url: jdbc:mysql://192.168.220.188:3306/dolphinscheduler_bl?useUnicode=true&characterEncoding=UTF-8
     username: root
     password: root@123
 #    platform:

@@ -476,7 +476,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param releaseState
      * @return
      */
-    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> releaseProcessDefinition(User loginUser, String projectName, int id, int releaseState) {
         HashMap<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByName(projectName);
