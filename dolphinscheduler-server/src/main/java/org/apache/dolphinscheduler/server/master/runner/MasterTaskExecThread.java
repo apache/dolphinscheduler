@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-import static org.apache.dolphinscheduler.common.Constants.SCHEDULER_TASKS_KILL;
+import static org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_KILL;
 
 /**
  *  master task exec thread
@@ -134,7 +134,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         alreadyKilled = true;
         String queueValue = String.format("%s-%d",
                 taskInstance.getHost(), taskInstance.getId());
-        taskQueue.sadd(SCHEDULER_TASKS_KILL, queueValue);
+        taskQueue.sadd(DOLPHINSCHEDULER_TASKS_KILL, queueValue);
 
         logger.info("master add kill task :{} id:{} to kill queue",
                 taskInstance.getName(), taskInstance.getId() );
