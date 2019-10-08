@@ -14,13 +14,13 @@ or
 conda install -c conda-forge kazoo
 
 run script and parameter description：
-nohup python -u monitor_server.py /data1_1T/escheduler 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181 /escheduler/masters /escheduler/workers> monitor_server.log 2>&1 &
+nohup python -u monitor_server.py /data1_1T/dolphinscheduler 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181 /dolphinscheduler/masters /dolphinscheduler/workers> monitor_server.log 2>&1 &
 the parameters are as follows:
-/data1_1T/escheduler : the value comes from the installPath in install.sh
+/data1_1T/dolphinscheduler : the value comes from the installPath in install.sh
 192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181 : the value comes from zkQuorum in install.sh
 the value comes from zkWorkers in install.sh
-/escheduler/masters : the value comes from zkMasters in install.sh
-/escheduler/workers : the value comes from zkWorkers in install.sh
+/dolphinscheduler/masters : the value comes from zkMasters in install.sh
+/dolphinscheduler/workers : the value comes from zkWorkers in install.sh
 '''
 import sys
 import socket
@@ -73,7 +73,7 @@ class ZkClient:
             if (len(restart_master_list) != 0):
                 for master in restart_master_list:
                     print("master " + self.get_ip_by_hostname(master) + " server has down")
-                    os.system('ssh ' + self.get_ip_by_hostname(master) + ' sh ' + install_path + '/bin/escheduler-daemon.sh start master-server')
+                    os.system('ssh ' + self.get_ip_by_hostname(master) + ' sh ' + install_path + '/bin/dolphinscheduler-daemon.sh start master-server')
 
         if (self.zk.exists(workers_zk_path)):
             zk_worker_list = []
@@ -84,7 +84,7 @@ class ZkClient:
             if (len(restart_worker_list) != 0):
                 for worker in restart_worker_list:
                     print("worker " + self.get_ip_by_hostname(worker) + " server has down")
-                    os.system('ssh  ' + self.get_ip_by_hostname(worker) + ' sh ' + install_path + '/bin/escheduler-daemon.sh start worker-server')
+                    os.system('ssh  ' + self.get_ip_by_hostname(worker) + ' sh ' + install_path + '/bin/dolphinscheduler-daemon.sh start worker-server')
 
         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         schedule.enter(inc, 0, self.restart_server, (inc,))

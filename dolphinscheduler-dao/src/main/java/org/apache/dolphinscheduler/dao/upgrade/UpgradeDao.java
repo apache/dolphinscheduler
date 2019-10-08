@@ -95,10 +95,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     public void initSchema(String initSqlPath) {
 
-        // Execute the escheduler DDL, it cannot be rolled back
+        // Execute the dolphinscheduler DDL, it cannot be rolled back
         runInitDDL(initSqlPath);
 
-        // Execute the escheduler DML, it can be rolled back
+        // Execute the dolphinscheduler DML, it can be rolled back
         runInitDML(initSqlPath);
 
     }
@@ -108,14 +108,12 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        //String mysqlSQLFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/escheduler_dml.sql";
         String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_dml.sql";
         try {
             conn = ConnectionFactory.getDataSource().getConnection();
             conn.setAutoCommit(false);
-            // 执行escheduler_dml.sql脚本，导入escheduler相关的数据
-            // Execute the ark_manager_dml.sql script to import the data related to escheduler
 
+            // Execute the dolphinscheduler_dml.sql script to import related data of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, false, true);
             Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
             initScriptRunner.runScript(initSqlReader);
@@ -153,7 +151,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_ddl.sql";
         try {
             conn = ConnectionFactory.getDataSource().getConnection();
-            // Execute the escheduler_ddl.sql script to create the table structure of escheduler
+            // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
             Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
             initScriptRunner.runScript(initSqlReader);
@@ -228,16 +226,16 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String mysqlSQLFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql",rootDir,schemaDir,getDbType().name().toLowerCase());
-        logger.info("mysqlSQLFilePath"+mysqlSQLFilePath);
+        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql",rootDir,schemaDir,getDbType().name().toLowerCase());
+        logger.info("sqlSQLFilePath"+sqlFilePath);
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
             conn = ConnectionFactory.getDataSource().getConnection();
             conn.setAutoCommit(false);
-            // Execute the upgraded escheduler dml
+            // Execute the upgraded dolphinscheduler dml
             ScriptRunner scriptRunner = new ScriptRunner(conn, false, true);
-            Reader sqlReader = new FileReader(new File(mysqlSQLFilePath));
+            Reader sqlReader = new FileReader(new File(sqlFilePath));
             scriptRunner.runScript(sqlReader);
             if (isExistsTable(T_VERSION_NAME)) {
                 // Change version in the version table to the new version
@@ -295,7 +293,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String mysqlSQLFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_ddl.sql",rootDir,schemaDir,getDbType().name().toLowerCase());
+        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_ddl.sql",rootDir,schemaDir,getDbType().name().toLowerCase());
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -303,9 +301,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             String dbName = conn.getCatalog();
             logger.info(dbName);
             conn.setAutoCommit(true);
-            // Execute the escheduler ddl.sql for the upgrade
+            // Execute the dolphinscheduler ddl.sql for the upgrade
             ScriptRunner scriptRunner = new ScriptRunner(conn, true, true);
-            Reader sqlReader = new FileReader(new File(mysqlSQLFilePath));
+            Reader sqlReader = new FileReader(new File(sqlFilePath));
             scriptRunner.runScript(sqlReader);
 
         } catch (FileNotFoundException e) {

@@ -115,7 +115,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      *  for example :
      *  your PYTHON_HOM is /opt/python3.7/
      *  you must set PYTHON_HOME is /opt/python3.7/python under nder common.properties
-     *  escheduler.env.path file.
+     *  dolphinscheduler.env.path file.
      *
      * @param envPath
      * @return

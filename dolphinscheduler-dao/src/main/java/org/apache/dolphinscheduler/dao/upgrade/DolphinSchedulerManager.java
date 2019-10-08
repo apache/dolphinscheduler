@@ -52,7 +52,7 @@ public class DolphinSchedulerManager {
     }
 
     public void initDolphinScheduler() {
-        // Determines whether the escheduler table structure has been init
+        // Determines whether the dolphinscheduler table structure has been init
         if(upgradeDao.isExistsTable("t_escheduler_version") || upgradeDao.isExistsTable("t_escheduler_queue")) {
             logger.info("The database has been initialized. Skip the initialization step");
             return;
