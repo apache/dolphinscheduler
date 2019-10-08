@@ -26,7 +26,7 @@ public class Constants {
      */
     public static final String ALERT_PROPERTIES_PATH = "/alert.properties";
 
-    public static final String DATA_SOURCE_PROPERTIES_PATH = "/dao/data_source.properties__";
+    public static final String DATA_SOURCE_PROPERTIES_PATH = "/dao/data_source.properties";
 
     public static final String SINGLE_SLASH = "/";
 
