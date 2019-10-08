@@ -61,7 +61,7 @@ public class AlertServer implements CommandLineRunner {
         return instance;
     }
 
-    public void start(){
+    public void start(AlertDao alertDao){
         logger.info("Alert Server ready start!");
         while (Stopper.isRunning()){
             try {
@@ -84,6 +84,6 @@ public class AlertServer implements CommandLineRunner {
     @Override
     public void run(String... strings) throws Exception {
         AlertServer alertServer = AlertServer.getInstance();
-        alertServer.start();
+        alertServer.start(alertDao);
     }
 }

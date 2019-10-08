@@ -142,7 +142,7 @@ public class TaskScheduleThread implements Runnable {
 
                 task = TaskManager.newTask(taskInstance.getTaskType(),
                         taskProps,
-                        taskLogger);
+                        taskLogger,processDao);
 
                 // task init
                 task.init();

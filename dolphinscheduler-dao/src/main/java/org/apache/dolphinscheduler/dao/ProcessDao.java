@@ -110,7 +110,7 @@ public class ProcessDao extends AbstractBaseDao {
     protected ITaskQueue taskQueue;
 
     public ProcessDao(){
-//        init();
+        init();
     }
 
     /**
@@ -118,19 +118,7 @@ public class ProcessDao extends AbstractBaseDao {
      */
     @Override
     protected void init() {
-        userMapper = ConnectionFactory.getMapper(UserMapper.class);
-        processDefineMapper = ConnectionFactory.getMapper(ProcessDefinitionMapper.class);
-        processInstanceMapper = ConnectionFactory.getMapper(ProcessInstanceMapper.class);
-        dataSourceMapper = ConnectionFactory.getMapper(DataSourceMapper.class);
-        processInstanceMapMapper = ConnectionFactory.getMapper(ProcessInstanceMapMapper.class);
-        taskInstanceMapper = ConnectionFactory.getMapper(TaskInstanceMapper.class);
-        commandMapper = ConnectionFactory.getMapper(CommandMapper.class);
-        scheduleMapper = ConnectionFactory.getMapper(ScheduleMapper.class);
-        udfFuncMapper = ConnectionFactory.getMapper(UdfFuncMapper.class);
-        resourceMapper = ConnectionFactory.getMapper(ResourceMapper.class);
-        workerGroupMapper = ConnectionFactory.getMapper(WorkerGroupMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
-        tenantMapper = ConnectionFactory.getMapper(TenantMapper.class);
     }
 
 
@@ -141,7 +129,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param validThreadNum
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public ProcessInstance scanCommand(Logger logger, String host, int validThreadNum){
 
         ProcessInstance processInstance = null;
@@ -799,7 +787,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param taskInstance
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public TaskInstance submitTask(TaskInstance taskInstance, ProcessInstance processInstance){
         logger.info("start submit task : {}, instance id:{}, state: {}, ",
                 taskInstance.getName(), processInstance.getId(), processInstance.getState() );
@@ -1440,7 +1428,7 @@ public class ProcessDao extends AbstractBaseDao {
      * process need failover process instance
      * @param processInstance
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance){
 
 

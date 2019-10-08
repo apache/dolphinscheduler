@@ -83,7 +83,7 @@ public class Command {
     /**
      * warning group id
      */
-    @TableField("warning_type")
+    @TableField("warning_group_id")
     private Integer warningGroupId;
 
     /**

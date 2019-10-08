@@ -27,7 +27,7 @@ public interface TenantMapper extends BaseMapper<Tenant> {
 
     Tenant queryById(@Param("tenantId") int tenantId);
 
-    List<Tenant> queryByTenantCode(@Param("tenantCode") String tenantCode);
+    Tenant queryByTenantCode(@Param("tenantCode") String tenantCode);
 
     IPage<Tenant> queryTenantPaging(IPage<Tenant> page,
                                     @Param("searchVal") String searchVal);

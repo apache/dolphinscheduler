@@ -578,7 +578,7 @@ public class DataSourceService extends BaseService{
      * @param datasourceId
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Result delete(User loginUser, int datasourceId) {
         Result result = new Result();
         try {

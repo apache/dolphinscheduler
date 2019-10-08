@@ -75,9 +75,9 @@ public class HttpTask extends AbstractTask {
     protected String output;
 
 
-    public HttpTask(TaskProps props, Logger logger) {
+    public HttpTask(TaskProps props, Logger logger,ProcessDao processDao) {
         super(props, logger);
-        this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+        this.processDao = processDao;
     }
 
     @Override

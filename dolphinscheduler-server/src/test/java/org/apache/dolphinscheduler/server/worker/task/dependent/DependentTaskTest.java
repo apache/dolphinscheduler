@@ -52,7 +52,7 @@ public class DependentTaskTest {
 
         taskProps.setTaskInstId(252612);
         taskProps.setDependence(dependString);
-        DependentTask dependentTask = new DependentTask(taskProps, logger);
+        DependentTask dependentTask = new DependentTask(taskProps, logger,null);
         dependentTask.init();
         dependentTask.handle();
         Assert.assertEquals(dependentTask.getExitStatusCode(), Constants.EXIT_CODE_FAILURE );

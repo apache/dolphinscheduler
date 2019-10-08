@@ -64,7 +64,7 @@ public class ProcedureTask extends AbstractTask {
      */
     private BaseDataSource baseDataSource;
 
-    public ProcedureTask(TaskProps taskProps, Logger logger) {
+    public ProcedureTask(TaskProps taskProps, Logger logger,ProcessDao processDao) {
         super(taskProps, logger);
 
         logger.info("procedure task params {}", taskProps.getTaskParams());
@@ -76,7 +76,7 @@ public class ProcedureTask extends AbstractTask {
             throw new RuntimeException("procedure task params is not valid");
         }
 
-        this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+        this.processDao = processDao;
     }
 
     @Override
