@@ -163,7 +163,7 @@ public class MasterServer extends AbstractServer {
             public void run() {
                 logger.info("master server stopped");
                 if (zkMasterClient.getActiveMasterNum() <= 1) {
-                    for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
+                    for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
                         zkMasterClient.getAlertDao().sendServerStopedAlert(
                                 1, OSUtils.getHost(), "Master-Server");
                     }
