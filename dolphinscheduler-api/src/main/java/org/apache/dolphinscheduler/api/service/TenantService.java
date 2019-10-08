@@ -61,7 +61,7 @@ public class TenantService extends BaseService{
    * @param desc
    * @return
    */
-  @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Map<String,Object> createTenant(User loginUser,
                          String tenantCode,
                          String tenantName,
@@ -212,7 +212,7 @@ public class TenantService extends BaseService{
    * @param id
    * @return
    */
-  @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
     Map<String, Object> result = new HashMap<>(5);
 
@@ -278,7 +278,8 @@ public class TenantService extends BaseService{
    */
   public Result verifyTenantCode(String tenantCode) {
     Result result=new Result();
-    if (checkTenant(tenantCode)) {
+    Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+    if (tenant != null) {
       logger.error("tenant {} has exist, can't create again.", tenantCode);
       putMsg(result, Status.TENANT_NAME_EXIST);
     }else{
