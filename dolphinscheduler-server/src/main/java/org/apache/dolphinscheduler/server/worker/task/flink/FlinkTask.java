@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.utils.FlinkArgsUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
@@ -49,8 +50,8 @@ public class FlinkTask extends AbstractYarnTask {
    */
   private FlinkParameters flinkParameters;
 
-  public FlinkTask(TaskProps props, Logger logger) {
-    super(props, logger);
+  public FlinkTask(TaskProps props, Logger logger,ProcessDao processDao) {
+    super(props, logger,processDao);
   }
 
   @Override

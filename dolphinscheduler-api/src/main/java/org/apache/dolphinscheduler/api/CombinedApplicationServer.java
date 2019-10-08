@@ -52,6 +52,6 @@ public class CombinedApplicationServer extends SpringBootServletInitializer {
         server.start();
 
         AlertServer alertServer = AlertServer.getInstance();
-        alertServer.start();
+        alertServer.start(alertDao);
     }
 }

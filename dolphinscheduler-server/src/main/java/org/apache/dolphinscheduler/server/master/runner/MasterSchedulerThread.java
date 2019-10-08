@@ -88,7 +88,7 @@ public class MasterSchedulerThread implements Runnable {
                         processInstance = processDao.scanCommand(logger, OSUtils.getHost(), this.masterExecThreadNum - activeCount);
                         if (processInstance != null) {
                             logger.info("start master exex thread , split DAG ...");
-                            masterExecService.execute(new MasterExecThread(processInstance));
+                            masterExecService.execute(new MasterExecThread(processInstance,processDao));
                         }
                     }
                 }
