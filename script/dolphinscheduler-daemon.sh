@@ -1,6 +1,6 @@
 #!/bin/sh
 
-usage="Usage: escheduler-daemon.sh (start|stop) <command> "
+usage="Usage: dolphinscheduler-daemon.sh (start|stop) <command> "
 
 # if no args specified, show usage
 if [ $# -le 1 ]; then
@@ -17,28 +17,28 @@ echo "Begin $startStop $command......"
 
 BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
-ESCHEDULER_HOME=$BIN_DIR/..
+DOLPHINSCHEDULER_HOME=$BIN_DIR/..
 
 export JAVA_HOME=$JAVA_HOME
 #export JAVA_HOME=/opt/soft/jdk
 export HOSTNAME=`hostname`
 
-export ESCHEDULER_PID_DIR=/tmp/
-export ESCHEDULER_LOG_DIR=$ESCHEDULER_HOME/logs
-export ESCHEDULER_CONF_DIR=$ESCHEDULER_HOME/conf
-export ESCHEDULER_LIB_JARS=$ESCHEDULER_HOME/lib/*
+export DOLPHINSCHEDULER_PID_DIR=/tmp/
+export DOLPHINSCHEDULER_LOG_DIR=$DOLPHINSCHEDULER_HOME/logs
+export DOLPHINSCHEDULER_CONF_DIR=$DOLPHINSCHEDULER_HOME/conf
+export DOLPHINSCHEDULER_LIB_JARS=$DOLPHINSCHEDULER_HOME/lib/*
 
-export ESCHEDULER_OPTS="-server -Xmx16g -Xms4g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
+export DOLPHINSCHEDULER_OPTS="-server -Xmx16g -Xms4g -Xss512k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70"
 export STOP_TIMEOUT=5
 
-if [ ! -d "$ESCHEDULER_LOG_DIR" ]; then
-  mkdir $ESCHEDULER_LOG_DIR
+if [ ! -d "$DOLPHINSCHEDULER_LOG_DIR" ]; then
+  mkdir $DOLPHINSCHEDULER_LOG_DIR
 fi
 
-log=$ESCHEDULER_LOG_DIR/escheduler-$command-$HOSTNAME.out
-pid=$ESCHEDULER_LOG_DIR/escheduler-$command.pid
+log=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command-$HOSTNAME.out
+pid=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command.pid
 
-cd $ESCHEDULER_HOME
+cd $DOLPHINSCHEDULER_HOME
 
 if [ "$command" = "api-server" ]; then
   LOG_FILE="-Dlogging.config=conf/apiserver_logback.xml"
@@ -61,7 +61,7 @@ fi
 
 case $startStop in
   (start)
-    [ -w "$ESCHEDULER_PID_DIR" ] ||  mkdir -p "$ESCHEDULER_PID_DIR"
+    [ -w "$DOLPHINSCHEDULER_PID_DIR" ] ||  mkdir -p "$DOLPHINSCHEDULER_PID_DIR"
 
     if [ -f $pid ]; then
       if kill -0 `cat $pid` > /dev/null 2>&1; then
@@ -72,7 +72,7 @@ case $startStop in
 
     echo starting $command, logging to $log
 
-    exec_command="$LOG_FILE $ESCHEDULER_OPTS -classpath $ESCHEDULER_CONF_DIR:$ESCHEDULER_LIB_JARS $CLASS"
+    exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
 
     echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 < /dev/null &"
     nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 < /dev/null &
