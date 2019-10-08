@@ -94,7 +94,7 @@ public class SchedulerService extends BaseService {
      * @param failureStrategy
      * @return
      */
-    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName, Integer processDefineId, String schedule, WarningType warningType,
                                               int warningGroupId, FailureStrategy failureStrategy,
                                               String receivers, String receiversCc, Priority processInstancePriority, int workerGroupId) throws IOException {
@@ -176,7 +176,7 @@ public class SchedulerService extends BaseService {
      * @param workerGroupId
      * @return
      */
-    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> updateSchedule(User loginUser, String projectName, Integer id, String scheduleExpression, WarningType warningType,
                                               int warningGroupId, FailureStrategy failureStrategy,
                                               String receivers, String receiversCc, ReleaseState scheduleStatus,
@@ -270,7 +270,7 @@ public class SchedulerService extends BaseService {
      * @param scheduleStatus
      * @return
      */
-    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> setScheduleState(User loginUser, String projectName, Integer id, ReleaseState scheduleStatus) {
 
         Map<String, Object> result = new HashMap<String, Object>(5);

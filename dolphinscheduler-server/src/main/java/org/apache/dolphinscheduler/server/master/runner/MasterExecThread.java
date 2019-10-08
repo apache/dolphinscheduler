@@ -89,7 +89,6 @@ public class MasterExecThread implements Runnable {
     /**
      *  process dao
      */
-    @Autowired
     private ProcessDao processDao;
 
     /**
@@ -97,10 +96,10 @@ public class MasterExecThread implements Runnable {
      */
     private static Configuration conf;
 
-    public MasterExecThread(ProcessDao processDao, ProcessInstance processInstance){
-//        this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
-        this.processInstance = processInstance;
+    public MasterExecThread(ProcessInstance processInstance,ProcessDao processDao){
         this.processDao = processDao;
+
+        this.processInstance = processInstance;
 
         int masterTaskExecNum = conf.getInt(Constants.MASTER_EXEC_TASK_THREADS,
                 Constants.defaultMasterTaskExecNum);

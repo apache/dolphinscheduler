@@ -33,7 +33,7 @@ public class Session {
     /**
      * id
      */
-    @TableId(value="id", type = IdType.INPUT)
+    @TableId(value="id", type=IdType.INPUT)
     private String id;
 
     /**

@@ -361,7 +361,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processDefinitionId
      * @return
      */
-    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId) {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -611,7 +611,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         }
     }
 
-    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file) {
         Map<String, Object> result = new HashMap<>(5);
 

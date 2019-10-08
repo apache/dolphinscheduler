@@ -52,8 +52,9 @@ public class DependentTask extends AbstractTask {
 
     private ProcessDao processDao;
 
-    public DependentTask(TaskProps props, Logger logger) {
+    public DependentTask(TaskProps props, Logger logger,ProcessDao processDao) {
         super(props, logger);
+        this.processDao = processDao;
     }
 
     @Override
@@ -68,7 +69,7 @@ public class DependentTask extends AbstractTask {
                             taskModel.getDependItemList(), taskModel.getRelation()));
         }
 
-        this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+
 
         if(taskProps.getScheduleTime() != null){
             this.dependentDate = taskProps.getScheduleTime();

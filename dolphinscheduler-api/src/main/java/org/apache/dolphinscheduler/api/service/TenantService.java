@@ -212,7 +212,7 @@ public class TenantService extends BaseService{
    * @param id
    * @return
    */
-  @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+  @Transactional(rollbackFor = Exception.class)
   public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
     Map<String, Object> result = new HashMap<>(5);
 
