@@ -380,8 +380,8 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      */
     private void init(){
         try {
-            String tasksQueuePath = getTasksPath(Constants.SCHEDULER_TASKS_QUEUE);
-            String tasksCancelPath = getTasksPath(Constants.SCHEDULER_TASKS_KILL);
+            String tasksQueuePath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
+            String tasksCancelPath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_KILL);
 
             for(String taskQueuePath : new String[]{tasksQueuePath,tasksCancelPath}){
                 if(zkClient.checkExists().forPath(taskQueuePath) == null){
@@ -404,8 +404,8 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
     @Override
     public void delete(){
         try {
-            String tasksQueuePath = getTasksPath(Constants.SCHEDULER_TASKS_QUEUE);
-            String tasksCancelPath = getTasksPath(Constants.SCHEDULER_TASKS_KILL);
+            String tasksQueuePath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
+            String tasksCancelPath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_KILL);
 
             for(String taskQueuePath : new String[]{tasksQueuePath,tasksCancelPath}){
                 if(zkClient.checkExists().forPath(taskQueuePath) != null){
@@ -432,7 +432,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      * @return
      */
     public String getTasksPath(String key){
-        return conf.getString(Constants.ZOOKEEPER_SCHEDULER_ROOT) + Constants.SINGLE_SLASH + key;
+        return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_ROOT) + Constants.SINGLE_SLASH + key;
     }
 
 

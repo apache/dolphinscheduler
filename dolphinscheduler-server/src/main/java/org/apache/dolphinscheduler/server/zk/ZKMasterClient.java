@@ -265,7 +265,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	private void alertServerDown(String serverHost, ZKNodeType zkNodeType) {
 
 	    String serverType = zkNodeType.toString();
-		for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER; i++) {
+		for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
 			alertDao.sendServerStopedAlert(1, serverHost, serverType);
 		}
 	}

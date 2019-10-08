@@ -33,7 +33,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.quartz.CronExpression;
@@ -987,7 +986,7 @@ public class ProcessDao extends AbstractBaseDao {
                 return true;
             }
             logger.info("task ready to queue: {}" , task);
-            taskQueue.add(SCHEDULER_TASKS_QUEUE, taskZkInfo(task));
+            taskQueue.add(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo(task));
             logger.info(String.format("master insert into queue success, task : %s", task.getName()) );
             return true;
         }catch (Exception e){
@@ -1106,7 +1105,7 @@ public class ProcessDao extends AbstractBaseDao {
 
         String taskZkInfo = taskZkInfo(task);
 
-        return taskQueue.checkTaskExists(SCHEDULER_TASKS_QUEUE, taskZkInfo);
+        return taskQueue.checkTaskExists(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo);
     }
 
     /**

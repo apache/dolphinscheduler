@@ -176,7 +176,7 @@ public class WorkerServer extends AbstractServer {
                 logger.warn("worker server stopped");
                 // worker server exit alert
                 if (zkWorkerClient.getActiveMasterNum() <= 1) {
-                    for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
+                    for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
                         alertDao.sendServerStopedAlert(1, OSUtils.getHost(), "Worker-Server");
                     }
                 }
@@ -291,7 +291,7 @@ public class WorkerServer extends AbstractServer {
         Runnable killProcessThread  = new Runnable() {
             @Override
             public void run() {
-                Set<String> taskInfoSet = taskQueue.smembers(Constants.SCHEDULER_TASKS_KILL);
+                Set<String> taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                 while (Stopper.isRunning()){
                     try {
                         Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -316,13 +316,13 @@ public class WorkerServer extends AbstractServer {
                                     }else{
                                         ProcessUtils.kill(taskInstance);
                                     }
-                                    taskQueue.srem(Constants.SCHEDULER_TASKS_KILL,taskInfo);
+                                    taskQueue.srem(Constants.DOLPHINSCHEDULER_TASKS_KILL,taskInfo);
                                 }
                             }
                         }
                     }
 
-                    taskInfoSet = taskQueue.smembers(Constants.SCHEDULER_TASKS_KILL);
+                    taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                 }
             }
         };

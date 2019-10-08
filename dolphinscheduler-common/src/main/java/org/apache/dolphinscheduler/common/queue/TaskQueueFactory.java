@@ -45,7 +45,7 @@ public class TaskQueueFactory {
         logger.info("task queue impl use zookeeper ");
         return TaskQueueZkImpl.getInstance();
     }else{
-      logger.error("property escheduler.queue.impl can't be blank, system will exit ");
+      logger.error("property dolphinscheduler.queue.impl can't be blank, system will exit ");
       System.exit(-1);
     }
 

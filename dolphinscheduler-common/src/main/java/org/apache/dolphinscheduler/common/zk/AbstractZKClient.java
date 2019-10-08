@@ -414,20 +414,20 @@ public abstract class AbstractZKClient {
 	 * get worker node parent path
 	 * @return
 	 */
-	protected String getWorkerZNodeParentPath(){return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_WORKERS);};
+	protected String getWorkerZNodeParentPath(){return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS);};
 
 	/**
 	 * get master node parent path
 	 * @return
 	 */
-	protected String getMasterZNodeParentPath(){return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_MASTERS);}
+	protected String getMasterZNodeParentPath(){return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_MASTERS);}
 
 	/**
 	 *  get master lock path
 	 * @return
 	 */
 	public String getMasterLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_MASTERS);
+		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS);
 	}
 
 	/**
@@ -455,7 +455,7 @@ public abstract class AbstractZKClient {
 	 * @return
 	 */
 	protected String getDeadZNodeParentPath(){
-		return conf.getString(ZOOKEEPER_ESCHEDULER_DEAD_SERVERS);
+		return conf.getString(ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS);
 	}
 
 	/**
@@ -463,7 +463,7 @@ public abstract class AbstractZKClient {
 	 * @return
 	 */
 	public String getMasterStartUpLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS);
+		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS);
 	}
 
 	/**
@@ -471,7 +471,7 @@ public abstract class AbstractZKClient {
 	 * @return
 	 */
 	public String getMasterFailoverLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_MASTERS);
+		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS);
 	}
 
 	/**
@@ -479,7 +479,7 @@ public abstract class AbstractZKClient {
 	 * @return
 	 */
 	public String getWorkerFailoverLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_WORKERS);
+		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS);
 	}
 
 	/**

@@ -70,7 +70,7 @@ public class HadoopUtils implements Closeable {
     }
 
     /**
-     * init escheduler root path in hdfs
+     * init dolphinscheduler root path in hdfs
      */
     private void initHdfsPath(){
         String hdfsPath = PropertyUtils.getString(Constants.DATA_STORE_2_HDFS_BASEPATH);

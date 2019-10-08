@@ -37,7 +37,7 @@ public class CommonUtils {
    * @return get the path of system environment variables
    */
   public static String getSystemEnvPath() {
-    String envPath = PropertyUtils.getString(Constants.ESCHEDULER_ENV_PATH);
+    String envPath = PropertyUtils.getString(Constants.DOLPHINSCHEDULER_ENV_PATH);
     if (StringUtils.isEmpty(envPath)) {
       envPath = System.getProperty("user.home") + File.separator + ".bash_profile";
     }

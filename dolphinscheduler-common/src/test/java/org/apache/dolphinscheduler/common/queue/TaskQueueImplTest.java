@@ -65,12 +65,12 @@ public class TaskQueueImplTest extends StandaloneZKServerForTest {
 
 
         //add
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_0_1_1_-1");
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"0_1_1_1_-1");
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"0_0_0_1_" + IpUtils.ipToLong(OSUtils.getHost()));
-        tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE,"1_2_1_1_" + IpUtils.ipToLong(OSUtils.getHost()) + 10);
+        tasksQueue.add(Constants.DOLPHINSCHEDULER_TASKS_QUEUE,"1_0_1_1_-1");
+        tasksQueue.add(Constants.DOLPHINSCHEDULER_TASKS_QUEUE,"0_1_1_1_-1");
+        tasksQueue.add(Constants.DOLPHINSCHEDULER_TASKS_QUEUE,"0_0_0_1_" + IpUtils.ipToLong(OSUtils.getHost()));
+        tasksQueue.add(Constants.DOLPHINSCHEDULER_TASKS_QUEUE,"1_2_1_1_" + IpUtils.ipToLong(OSUtils.getHost()) + 10);
 
-        List<String> tasks = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1);
+        List<String> tasks = tasksQueue.poll(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, 1);
 
         if(tasks.size() <= 0){
             return;
@@ -100,11 +100,11 @@ public class TaskQueueImplTest extends StandaloneZKServerForTest {
                 //${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
                 //format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
                 String formatTask = String.format("%s_%d_%s_%d", i, i + 1, j, j == 0 ?  0 : j + new Random().nextInt(100));
-                tasksQueue.add(Constants.SCHEDULER_TASKS_QUEUE, formatTask);
+                tasksQueue.add(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, formatTask);
             }
         }
 
-        String node1 = tasksQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, 1).get(0);
+        String node1 = tasksQueue.poll(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, 1).get(0);
         assertEquals(node1,"0");
 
     }

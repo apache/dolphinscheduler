@@ -159,7 +159,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 	 * @return
 	 */
 	public String getWorkerLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_ESCHEDULER_LOCK_WORKERS);
+		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS);
 	}
 
 

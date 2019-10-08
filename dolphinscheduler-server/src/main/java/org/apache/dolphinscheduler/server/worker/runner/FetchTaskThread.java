@@ -153,17 +153,17 @@ public class FetchTaskThread implements Runnable{
                 }
 
                 //whether have tasks, if no tasks , no need lock  //get all tasks
-                List<String> tasksQueueList = taskQueue.getAllTasks(Constants.SCHEDULER_TASKS_QUEUE);
+                List<String> tasksQueueList = taskQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
                 if (CollectionUtils.isEmpty(tasksQueueList)){
                     continue;
                 }
-                // creating distributed locks, lock path /escheduler/lock/worker
+                // creating distributed locks, lock path /dolphinscheduler/lock/worker
                 mutex = zkWorkerClient.acquireZkLock(zkWorkerClient.getZkClient(),
                         zkWorkerClient.getWorkerLockPath());
 
 
                 // task instance id str
-                List<String> taskQueueStrArr = taskQueue.poll(Constants.SCHEDULER_TASKS_QUEUE, taskNum);
+                List<String> taskQueueStrArr = taskQueue.poll(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskNum);
 
                 for(String taskQueueStr : taskQueueStrArr){
                     if (StringUtils.isEmpty(taskQueueStr)) {
@@ -226,7 +226,7 @@ public class FetchTaskThread implements Runnable{
                     workerExecService.submit(new TaskScheduleThread(taskInstance, processDao));
 
                     // remove node from zk
-                    taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+                    taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
                 }
 
             }catch (Exception e){
@@ -245,7 +245,7 @@ public class FetchTaskThread implements Runnable{
     private boolean verifyTaskInstanceIsNull(String taskQueueStr) {
         if (taskInstance == null ) {
             logger.error("task instance is null. task id : {} ", taskInstId);
-            taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+            taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
             return true;
         }
         return false;
@@ -263,7 +263,7 @@ public class FetchTaskThread implements Runnable{
                     taskInstance.getProcessDefine().getId(),
                     taskInstance.getProcessInstance().getId(),
                     taskInstance.getId());
-            taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
+            taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
             return true;
         }
         return false;
