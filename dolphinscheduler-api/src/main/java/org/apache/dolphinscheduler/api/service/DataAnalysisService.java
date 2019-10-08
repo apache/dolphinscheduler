@@ -347,8 +347,8 @@ public class DataAnalysisService {
         }
 
         ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-        List<String> tasksQueueList = tasksQueue.getAllTasks(org.apache.dolphinscheduler.common.Constants.SCHEDULER_TASKS_QUEUE);
-        List<String> tasksKillList = tasksQueue.getAllTasks(org.apache.dolphinscheduler.common.Constants.SCHEDULER_TASKS_KILL);
+        List<String> tasksQueueList = tasksQueue.getAllTasks(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
+        List<String> tasksKillList = tasksQueue.getAllTasks(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_KILL);
 
         Map<String,Integer> dataMap = new HashMap<>();
         if (loginUser.getUserType() == UserType.ADMIN_USER){
