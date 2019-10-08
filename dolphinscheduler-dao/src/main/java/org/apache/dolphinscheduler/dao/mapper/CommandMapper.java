@@ -31,7 +31,7 @@ public interface CommandMapper extends BaseMapper<Command> {
 
 
 
-    @Select("select * from t_escheduler_command ${ew.customSqlSegment}")
+    @Select("select * from t_ds_command ${ew.customSqlSegment}")
     List<Command> getAll(@Param(Constants.WRAPPER) Wrapper wrapper);
 
     Command getOneToRun();

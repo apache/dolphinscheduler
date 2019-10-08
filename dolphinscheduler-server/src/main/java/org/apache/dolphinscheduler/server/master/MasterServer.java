@@ -59,7 +59,7 @@ public class MasterServer extends AbstractServer {
     private ScheduledExecutorService heartbeatMasterService;
 
     /**
-     *  escheduler database interface
+     *  dolphinscheduler database interface
      */
     @Autowired
     protected ProcessDao processDao;

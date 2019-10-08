@@ -55,7 +55,7 @@ public class ShellCommandExecutorTest {
 
         TaskProps taskProps = new TaskProps();
         // processDefineId_processInstanceId_taskInstanceId
-        taskProps.setTaskDir("/opt/soft/program/tmp/escheduler/exec/flow/5/36/2864/7657");
+        taskProps.setTaskDir("/opt/soft/program/tmp/dolphinscheduler/exec/flow/5/36/2864/7657");
         taskProps.setTaskAppId("36_2864_7657");
         // set tenant -> task execute linux user
         taskProps.setTenantCode("hdfs");
