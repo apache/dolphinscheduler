@@ -118,19 +118,19 @@ public class ProcessDao extends AbstractBaseDao {
      */
     @Override
     protected void init() {
-        userMapper = ConnectionFactory.getMapper(UserMapper.class);
-        processDefineMapper = ConnectionFactory.getMapper(ProcessDefinitionMapper.class);
-        processInstanceMapper = ConnectionFactory.getMapper(ProcessInstanceMapper.class);
-        dataSourceMapper = ConnectionFactory.getMapper(DataSourceMapper.class);
-        processInstanceMapMapper = ConnectionFactory.getMapper(ProcessInstanceMapMapper.class);
-        taskInstanceMapper = ConnectionFactory.getMapper(TaskInstanceMapper.class);
-        commandMapper = ConnectionFactory.getMapper(CommandMapper.class);
-        scheduleMapper = ConnectionFactory.getMapper(ScheduleMapper.class);
-        udfFuncMapper = ConnectionFactory.getMapper(UdfFuncMapper.class);
-        resourceMapper = ConnectionFactory.getMapper(ResourceMapper.class);
-        workerGroupMapper = ConnectionFactory.getMapper(WorkerGroupMapper.class);
+//        userMapper = ConnectionFactory.getMapper(UserMapper.class);
+//        processDefineMapper = ConnectionFactory.getMapper(ProcessDefinitionMapper.class);
+//        processInstanceMapper = ConnectionFactory.getMapper(ProcessInstanceMapper.class);
+//        dataSourceMapper = ConnectionFactory.getMapper(DataSourceMapper.class);
+//        processInstanceMapMapper = ConnectionFactory.getMapper(ProcessInstanceMapMapper.class);
+//        taskInstanceMapper = ConnectionFactory.getMapper(TaskInstanceMapper.class);
+//        commandMapper = ConnectionFactory.getMapper(CommandMapper.class);
+//        scheduleMapper = ConnectionFactory.getMapper(ScheduleMapper.class);
+//        udfFuncMapper = ConnectionFactory.getMapper(UdfFuncMapper.class);
+//        resourceMapper = ConnectionFactory.getMapper(ResourceMapper.class);
+//        workerGroupMapper = ConnectionFactory.getMapper(WorkerGroupMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
-        tenantMapper = ConnectionFactory.getMapper(TenantMapper.class);
+//        tenantMapper = ConnectionFactory.getMapper(TenantMapper.class);
     }
 
 
@@ -160,17 +160,17 @@ public class ProcessDao extends AbstractBaseDao {
                 delCommandByid(command.getId());
                 saveErrorCommand(command, "process instance is null");
                 return null;
-            }else if(!checkThreadNum(command, validThreadNum)){
-                    logger.info("there is not enough thread for this command: {}",command.toString() );
-                    return setWaitingThreadProcess(command, processInstance);
-            }else{
-                    processInstance.setCommandType(command.getCommandType());
-                    processInstance.addHistoryCmd(command.getCommandType());
-                    saveProcessInstance(processInstance);
-                    this.setSubProcessParam(processInstance);
-                    delCommandByid(command.getId());
-                    return processInstance;
             }
+            if(!checkThreadNum(command, validThreadNum)){
+                logger.info("there is not enough thread for this command: {}",command.toString() );
+                return setWaitingThreadProcess(command, processInstance);
+            }
+            processInstance.setCommandType(command.getCommandType());
+            processInstance.addHistoryCmd(command.getCommandType());
+            saveProcessInstance(processInstance);
+            this.setSubProcessParam(processInstance);
+            delCommandByid(command.getId());
+            return processInstance;
         }catch (Exception e){
             logger.error("scan command error ", e);
             saveErrorCommand(command, e.toString());
