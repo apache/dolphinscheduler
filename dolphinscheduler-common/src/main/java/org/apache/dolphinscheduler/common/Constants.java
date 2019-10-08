@@ -148,42 +148,42 @@ public final class Constants {
     /**
      * MasterServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_ESCHEDULER_MASTERS = "zookeeper.escheduler.masters";
+    public static final String ZOOKEEPER_ESCHEDULER_MASTERS = "zookeeper.dolphinscheduler.masters";
 
     /**
      * WorkerServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_ESCHEDULER_WORKERS = "zookeeper.escheduler.workers";
+    public static final String ZOOKEEPER_ESCHEDULER_WORKERS = "zookeeper.dolphinscheduler.workers";
 
     /**
      * all servers directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_ESCHEDULER_DEAD_SERVERS = "zookeeper.escheduler.dead.servers";
+    public static final String ZOOKEEPER_ESCHEDULER_DEAD_SERVERS = "zookeeper.dolphinscheduler.dead.servers";
 
     /**
      * MasterServer lock directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_ESCHEDULER_LOCK_MASTERS = "zookeeper.escheduler.lock.masters";
+    public static final String ZOOKEEPER_ESCHEDULER_LOCK_MASTERS = "zookeeper.dolphinscheduler.lock.masters";
 
     /**
      * WorkerServer lock directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_ESCHEDULER_LOCK_WORKERS = "zookeeper.escheduler.lock.workers";
+    public static final String ZOOKEEPER_ESCHEDULER_LOCK_WORKERS = "zookeeper.dolphinscheduler.lock.workers";
 
     /**
      * MasterServer failover directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_MASTERS = "zookeeper.escheduler.lock.failover.masters";
+    public static final String ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_MASTERS = "zookeeper.dolphinscheduler.lock.failover.masters";
 
     /**
      * WorkerServer failover directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_WORKERS = "zookeeper.escheduler.lock.failover.workers";
+    public static final String ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_WORKERS = "zookeeper.dolphinscheduler.lock.failover.workers";
 
     /**
      * MasterServer startup  failover runing and fault tolerance process
      */
-    public static final String ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "zookeeper.escheduler.lock.failover.startup.masters";
+    public static final String ZOOKEEPER_ESCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "zookeeper.dolphinscheduler.lock.failover.startup.masters";
 
     /**
      * need send warn times when master server or worker server failover
@@ -269,9 +269,9 @@ public final class Constants {
      */
     public static final String SCHEDULER_TASKS_KILL = "tasks_kill";
 
-    public static final String ZOOKEEPER_SCHEDULER_ROOT = "zookeeper.escheduler.root";
+    public static final String ZOOKEEPER_SCHEDULER_ROOT = "zookeeper.dolphinscheduler.root";
 
-    public static final String SCHEDULER_QUEUE_IMPL = "escheduler.queue.impl";
+    public static final String SCHEDULER_QUEUE_IMPL = "dolphinscheduler.queue.impl";
 
 
     /**
