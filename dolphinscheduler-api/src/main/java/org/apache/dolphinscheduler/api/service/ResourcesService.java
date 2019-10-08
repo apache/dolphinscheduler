@@ -79,7 +79,7 @@ public class ResourcesService extends BaseService {
      * @param file
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Result createResource(User loginUser,
                                  String name,
                                  String desc,
@@ -187,7 +187,7 @@ public class ResourcesService extends BaseService {
      * @param desc
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Result updateResource(User loginUser,
                                  int resourceId,
                                  String name,
@@ -390,7 +390,7 @@ public class ResourcesService extends BaseService {
      * @param loginUser
      * @param resourceId
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Result delete(User loginUser, int resourceId) throws Exception {
         Result result = new Result();
 
@@ -559,7 +559,7 @@ public class ResourcesService extends BaseService {
      * @param content
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content) {
         Result result = new Result();
         // if resource upload startup
@@ -619,7 +619,7 @@ public class ResourcesService extends BaseService {
      * @param resourceId
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Result updateResourceContent(int resourceId, String content) {
         Result result = new Result();
 

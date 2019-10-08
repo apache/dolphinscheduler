@@ -95,8 +95,8 @@ public class MasterExecThread implements Runnable {
      */
     private static Configuration conf;
 
-    public MasterExecThread(ProcessInstance processInstance){
-        this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+    public MasterExecThread(ProcessInstance processInstance,ProcessDao processDao){
+        this.processDao = processDao;
 
         this.processInstance = processInstance;
 
