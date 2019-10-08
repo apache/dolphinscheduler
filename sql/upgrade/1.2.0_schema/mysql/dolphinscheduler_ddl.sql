@@ -511,11 +511,11 @@ delimiter d//
 CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_C_desc()
    BEGIN
        IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_dolphinscheduler_process_definition'
+           WHERE TABLE_NAME='t_ds_process_definition'
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME='desc')
    THEN
-         ALTER TABLE t_dolphinscheduler_process_definition CHANGE COLUMN `desc` description text;
+         ALTER TABLE t_ds_process_definition CHANGE COLUMN `desc` description text;
        END IF;
  END;
 

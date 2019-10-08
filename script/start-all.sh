@@ -9,7 +9,7 @@ mastersHost=(${masters//,/ })
 for master in ${mastersHost[@]}
 do
         echo $master
-	ssh $master  "cd $installPath/; sh bin/escheduler-daemon.sh start master-server;"
+	ssh $master  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start master-server;"
 
 done
 
@@ -18,17 +18,17 @@ for worker in ${workersHost[@]}
 do
         echo $worker
 
-        ssh $worker  "cd $installPath/; sh bin/escheduler-daemon.sh start worker-server;"
-        ssh $worker  "cd $installPath/; sh bin/escheduler-daemon.sh start logger-server;"
+        ssh $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start worker-server;"
+        ssh $worker  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start logger-server;"
 done
 
-ssh $alertServer  "cd $installPath/; sh bin/escheduler-daemon.sh start alert-server;"
+ssh $alertServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start alert-server;"
 
 apiServersHost=(${apiServers//,/ })
 for apiServer in ${apiServersHost[@]}
 do
         echo $apiServer
 
-        ssh $apiServer  "cd $installPath/; sh bin/escheduler-daemon.sh start api-server;"
+        ssh $apiServer  "cd $installPath/; sh bin/dolphinscheduler-daemon.sh start api-server;"
 done
 
