@@ -91,7 +91,7 @@
             <artifactId>dolphinscheduler-dao</artifactId>
             <exclusions>
                 <exclusion>
-                    <artifactId>log4j-1.2-api</artifactId>
+                    <artifactId>log4j-api</artifactId>
                     <groupId>org.apache.logging.log4j</groupId>
                 </exclusion>
             </exclusions>
