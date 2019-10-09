@@ -22,7 +22,7 @@
           <div class="col-md-3">
             <div class="text-num-model text">
               <div class="title">
-                <span >{{$t('process number of waiting for running')}}</span>
+                <span>{{$t('process number of waiting for running')}}</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[0]}"> {{commandCountData.normalCount}}</b>
