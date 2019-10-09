@@ -34,19 +34,22 @@ fi
 source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
-# mysql config
-# mysql address and port
-mysqlHost="192.168.xx.xx:3306"
+# for example mysql or postgresql ...
+dbtype="mysql"
+
+# db config
+# db address and port
+dbhost="192.168.xx.xx:3306"
 
 # mysql database
-mysqlDb="dolphinscheduler"
+dbname="dolphinscheduler"
 
 # mysql username
-mysqlUserName="xx"
+username="xx"
 
 # mysql passwprd
 # Note: if there are special characters, please use the \ transfer character to transfer
-mysqlPassword="xx"
+passowrd="xx"
 
 # conf/config/install_config.conf config
 # Note: the installation path is not the same as the current path (pwd)
@@ -129,8 +132,8 @@ monitorServerState="false"
 resUploadStartupType="NONE"
 
 # if resUploadStartupType is HDFS，defaultFS write namenode address，HA you need to put core-site.xml and hdfs-site.xml in the conf directory.
-# if S3，write S3 address，HA，for example ：s3a://escheduler，
-# Note，s3 be sure to create the root directory /escheduler
+# if S3，write S3 address，HA，for example ：s3a://dolphinscheduler，
+# Note，s3 be sure to create the root directory /dolphinscheduler
 defaultFS="hdfs://mycluster:8020"
 
 # if S3 is configured, the following configuration is required.
@@ -187,7 +190,7 @@ keytabPath="$installPath/conf/hdfs.headless.keytab"
 
 # zk config
 # zk root directory
-zkRoot="/escheduler"
+zkRoot="/dolphinscheduler"
 
 # used to record the zk directory of the hanging machine
 zkDeadServers="$zkRoot/dead-servers"
@@ -274,7 +277,7 @@ apiServerPort="12345"
 apiServerSessionTimeout="7200"
 
 # api server context path
-apiServerContextPath="/escheduler/"
+apiServerContextPath="/dolphinscheduler/"
 
 # spring max file size
 springMaxFileSize="1024MB"
@@ -285,15 +288,48 @@ springMaxRequestSize="1024MB"
 # api max http post size
 apiMaxHttpPostSize="5000000"
 
+
+# db config
+# db address and port
+dbhost="192.168.xx.xx:3306"
+
+# mysql database
+dbname="dolphinscheduler"
+
+# mysql username
+username="xx"
+
+# mysql passwprd
+# Note: if there are special characters, please use the \ transfer character to transfer
+passowrd="xx"
+
 # 1,replace file
 echo "1,replace file"
-sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${mysqlHost}/${mysqlDb}?characterEncoding=UTF-8#g" conf/dao/data_source.properties
-sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${mysqlUserName}#g" conf/dao/data_source.properties
-sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${mysqlPassword}#g" conf/dao/data_source.properties
+if [ $dbtype == "mysql" ];then
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" application.yml
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" application.yml
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" application.yml
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=com.mysql.jdbc.Driver#g" application.yml
 
-sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${mysqlHost}/${mysqlDb}?characterEncoding=UTF-8#g" conf/quartz.properties
-sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${mysqlUserName}#g" conf/quartz.properties
-sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${mysqlPassword}#g" conf/quartz.properties
+
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${passowrd}#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.driver.*#org.quartz.dataSource.myDs.driver=com.mysql.jdbc.Driver#g" conf/quartz.properties
+fi
+
+if [ $dbtype == "postgresql" ];then
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" application.yml
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" application.yml
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" application.yml
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=org.postgresql.Driver#g" application.yml
+
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${passowrd}#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.driver.*#org.quartz.dataSource.myDs.driver=org.postgresql.Driver#g" conf/quartz.properties
+fi
+
 
 
 sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common/hadoop/hadoop.properties
@@ -310,7 +346,7 @@ sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" co
 sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common/common.properties
 sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
 sed -i ${txt} "s#res.upload.startup.type.*#res.upload.startup.type=${resUploadStartupType}#g" conf/common/common.properties
-sed -i ${txt} "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
+sed -i ${txt} "s#dolphinscheduler.env.path.*#dolphinscheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
 sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
 sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
 sed -i ${txt} "s#hadoop.security.authentication.startup.state.*#hadoop.security.authentication.startup.state=${kerberosStartUp}#g" conf/common/common.properties
@@ -319,15 +355,15 @@ sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keyta
 sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common/common.properties
 
 sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.root.*#zookeeper.escheduler.root=${zkRoot}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.dead.servers.*#zookeeper.escheduler.dead.servers=${zkDeadServers}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.masters.*#zookeeper.escheduler.masters=${zkMasters}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.workers.*#zookeeper.escheduler.workers=${zkWorkers}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.lock.masters.*#zookeeper.escheduler.lock.masters=${mastersLock}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.lock.workers.*#zookeeper.escheduler.lock.workers=${workersLock}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.lock.failover.masters.*#zookeeper.escheduler.lock.failover.masters=${mastersFailover}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.lock.failover.workers.*#zookeeper.escheduler.lock.failover.workers=${workersFailover}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.lock.failover.startup.masters.*#zookeeper.escheduler.lock.failover.startup.masters=${mastersStartupFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.root.*#zookeeper.dolphinscheduler.root=${zkRoot}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.dead.servers.*#zookeeper.dolphinscheduler.dead.servers=${zkDeadServers}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.masters.*#zookeeper.dolphinscheduler.masters=${zkMasters}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.workers.*#zookeeper.dolphinscheduler.workers=${zkWorkers}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.masters.*#zookeeper.dolphinscheduler.lock.masters=${mastersLock}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.workers.*#zookeeper.dolphinscheduler.lock.workers=${workersLock}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.failover.masters.*#zookeeper.dolphinscheduler.lock.failover.masters=${mastersFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.failover.workers.*#zookeeper.dolphinscheduler.lock.failover.workers=${workersFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.failover.startup.masters.*#zookeeper.dolphinscheduler.lock.failover.startup.masters=${mastersStartupFailover}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/zookeeper.properties
