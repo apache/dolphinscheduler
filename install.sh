@@ -13,14 +13,14 @@ elif [[ "$OSTYPE" == "linux-gnu" ]]; then
     txt=""
 elif [[ "$OSTYPE" == "cygwin" ]]; then
     # POSIX compatibility layer and Linux environment emulation for Windows
-    echo "Easy Scheduler not support Windows operating system"
+    echo "DolphinScheduler not support Windows operating system"
     exit 1
 elif [[ "$OSTYPE" == "msys" ]]; then
     # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
-    echo "Easy Scheduler not support Windows operating system"
+    echo "DolphinScheduler not support Windows operating system"
     exit 1
 elif [[ "$OSTYPE" == "win32" ]]; then
-    echo "Easy Scheduler not support Windows operating system"
+    echo "DolphinScheduler not support Windows operating system"
     exit 1
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
     # ...
@@ -39,7 +39,7 @@ source ${workDir}/conf/config/install_config.conf
 mysqlHost="192.168.xx.xx:3306"
 
 # mysql database
-mysqlDb="escheduler"
+mysqlDb="dolphinscheduler"
 
 # mysql username
 mysqlUserName="xx"
@@ -50,11 +50,11 @@ mysqlPassword="xx"
 
 # conf/config/install_config.conf config
 # Note: the installation path is not the same as the current path (pwd)
-installPath="/data1_1T/escheduler"
+installPath="/data1_1T/dolphinscheduler"
 
 # deployment user
 # Note: the deployment user needs to have sudo privileges and permissions to operate hdfs. If hdfs is enabled, the root directory needs to be created by itself
-deployUser="escheduler"
+deployUser="dolphinscheduler"
 
 # zk cluster
 zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
@@ -98,6 +98,8 @@ mailPassword="xxxxxxxxxx"
 
 # TLS mail protocol support
 starttlsEnable="false"
+
+sslTrust="xxxxxxxxxx"
 
 # SSL mail protocol support
 # note: The SSL protocol is enabled by default. 
@@ -144,7 +146,7 @@ singleYarnIp="ark1"
 
 # hdfs root path, the owner of the root path must be the deployment user. 
 # versions prior to 1.1.0 do not automatically create the hdfs root directory, you need to create it yourself.
-hdfsPath="/escheduler"
+hdfsPath="/dolphinscheduler"
 
 # have users who create directory permissions under hdfs root path /
 # Note: if kerberos is enabled, hdfsRootUser="" can be used directly.
@@ -152,13 +154,13 @@ hdfsRootUser="hdfs"
 
 # common config
 # Program root path
-programPath="/tmp/escheduler"
+programPath="/tmp/dolphinscheduler"
 
 # download path
-downloadPath="/tmp/escheduler/download"
+downloadPath="/tmp/dolphinscheduler/download"
 
 # task execute path
-execPath="/tmp/escheduler/exec"
+execPath="/tmp/dolphinscheduler/exec"
 
 # SHELL environmental variable path
 shellEnvPath="$installPath/conf/env/.dolphinscheduler_env.sh"
@@ -188,7 +190,7 @@ keytabPath="$installPath/conf/hdfs.headless.keytab"
 zkRoot="/escheduler"
 
 # used to record the zk directory of the hanging machine
-zkDeadServers="/escheduler/dead-servers"
+zkDeadServers="$zkRoot/dead-servers"
 
 # masters directory
 zkMasters="$zkRoot/masters"
@@ -361,6 +363,7 @@ sed -i ${txt} "s#mail.server.port.*#mail.server.port=${mailServerPort}#g" conf/a
 sed -i ${txt} "s#mail.sender.*#mail.sender=${mailSender}#g" conf/alert.properties
 sed -i ${txt} "s#mail.passwd.*#mail.passwd=${mailPassword}#g" conf/alert.properties
 sed -i ${txt} "s#mail.smtp.starttls.enable.*#mail.smtp.starttls.enable=${starttlsEnable}#g" conf/alert.properties
+sed -i ${txt} "s#mail.smtp.ssl.trust.*#mail.smtp.ssl.trust=${sslTrust}#g" conf/alert.properties
 sed -i ${txt} "s#mail.smtp.ssl.enable.*#mail.smtp.ssl.enable=${sslEnable}#g" conf/alert.properties
 sed -i ${txt} "s#xls.file.path.*#xls.file.path=${xlsFilePath}#g" conf/alert.properties
 sed -i ${txt} "s#enterprise.wechat.corp.id.*#enterprise.wechat.corp.id=${enterpriseWechatCorpId}#g" conf/alert.properties
