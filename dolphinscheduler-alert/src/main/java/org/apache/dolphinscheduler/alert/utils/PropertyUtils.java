@@ -47,7 +47,7 @@ public class PropertyUtils {
     }
 
     private void init(){
-        String[] propertyFiles = new String[]{ALERT_PROPERTIES_PATH,DATA_SOURCE_PROPERTIES_PATH};
+        String[] propertyFiles = new String[]{ALERT_PROPERTIES_PATH};
         for (String fileName : propertyFiles) {
             InputStream fis = null;
             try {

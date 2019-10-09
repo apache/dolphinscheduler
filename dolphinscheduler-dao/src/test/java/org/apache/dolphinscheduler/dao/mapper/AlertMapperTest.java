@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.AlertType;
+import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.junit.Assert;
 import org.junit.Test;
@@ -40,8 +42,11 @@ public class AlertMapperTest {
     private Alert insertOne(){
         //insertOne
         Alert alert = new Alert();
+        alert.setContent("[{'type':'WORKER','host':'192.168.xx.xx','event':'server down','warning level':'serious'}]");
         alert.setLog("success");
         alert.setReceivers("xx@aa.com");
+        alert.setAlertType(AlertType.EMAIL);
+        alert.setShowType(ShowType.TABLE);
         alert.setAlertGroupId(1);
         alert.setAlertStatus(AlertStatus.EXECUTION_SUCCESS);
         alert.setCreateTime(new Date());
