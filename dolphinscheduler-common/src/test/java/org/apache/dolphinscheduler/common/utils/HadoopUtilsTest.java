@@ -47,7 +47,7 @@ public class HadoopUtilsTest {
     @Test
     public void readFileTest(){
         try {
-            byte[] bytes = HadoopUtils.getInstance().catFile("/escheduler/hdfs/resources/35435.sh");
+            byte[] bytes = HadoopUtils.getInstance().catFile("/dolphinscheduler/hdfs/resources/35435.sh");
             logger.info("------------------start");
             logger.info(new String(bytes));
             logger.info("---------------------end");
@@ -84,7 +84,7 @@ public class HadoopUtilsTest {
 
     @Test
     public void catFileTest()throws Exception{
-        List<String> stringList = HadoopUtils.getInstance().catFile("/escheduler/hdfs/resources/WCSparkPython.py", 0, 1000);
+        List<String> stringList = HadoopUtils.getInstance().catFile("/dolphinscheduler/hdfs/resources/WCSparkPython.py", 0, 1000);
         logger.info(String.join(",",stringList));
     }
 }
