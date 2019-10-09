@@ -58,8 +58,8 @@ public class AccessTokenMapperTest {
         //update
         accessToken.setToken("hello, token");
         int update = accessTokenMapper.updateById(accessToken);
-        Assert.assertEquals(update, 1);
         accessTokenMapper.deleteById(accessToken.getId());
+        Assert.assertEquals(update, 1);
     }
 
     @Test
