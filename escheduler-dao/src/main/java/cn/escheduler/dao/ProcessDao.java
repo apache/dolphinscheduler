@@ -137,13 +137,12 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find one command from command queue, construct process instance
-     * @param logger
      * @param host
      * @param validThreadNum
      * @return
      */
     @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
-    public ProcessInstance scanCommand(Logger logger, String host, int validThreadNum){
+    public ProcessInstance scanCommand(String host, int validThreadNum){
 
         ProcessInstance processInstance = null;
         Command command = findOneCommand();

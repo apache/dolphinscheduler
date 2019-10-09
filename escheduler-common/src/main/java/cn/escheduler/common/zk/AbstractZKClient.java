@@ -78,16 +78,16 @@ public abstract class AbstractZKClient {
 
 		// retry strategy
 		RetryPolicy retryPolicy = new ExponentialBackoffRetry(
-				Integer.parseInt(conf.getString(Constants.ZOOKEEPER_RETRY_SLEEP)),
-				Integer.parseInt(conf.getString(Constants.ZOOKEEPER_RETRY_MAXTIME)));
+				conf.getInt(Constants.ZOOKEEPER_RETRY_SLEEP),
+				conf.getInt(Constants.ZOOKEEPER_RETRY_MAXTIME));
 
 		try{
 			// crate zookeeper client
 			zkClient = CuratorFrameworkFactory.builder()
 						.connectString(getZookeeperQuorum())
 						.retryPolicy(retryPolicy)
-						.sessionTimeoutMs(1000 * Integer.parseInt(conf.getString(Constants.ZOOKEEPER_SESSION_TIMEOUT)))
-						.connectionTimeoutMs(1000 * Integer.parseInt(conf.getString(Constants.ZOOKEEPER_CONNECTION_TIMEOUT)))
+						.sessionTimeoutMs(1000 * conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT))
+						.connectionTimeoutMs(1000 * conf.getInt(Constants.ZOOKEEPER_CONNECTION_TIMEOUT))
 						.build();
 
 			zkClient.start();

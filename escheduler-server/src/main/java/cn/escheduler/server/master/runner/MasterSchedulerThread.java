@@ -85,7 +85,7 @@ public class MasterSchedulerThread implements Runnable {
                         ThreadPoolExecutor poolExecutor = (ThreadPoolExecutor) masterExecService;
                         int activeCount = poolExecutor.getActiveCount();
                         // make sure to scan and delete command  table in one transaction
-                        processInstance = processDao.scanCommand(logger, OSUtils.getHost(), this.masterExecThreadNum - activeCount);
+                        processInstance = processDao.scanCommand(OSUtils.getHost(), this.masterExecThreadNum - activeCount);
                         if (processInstance != null) {
                             logger.info("start master exex thread , split DAG ...");
                             masterExecService.execute(new MasterExecThread(processInstance));
