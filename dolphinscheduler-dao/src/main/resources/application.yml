@@ -66,7 +66,26 @@ logging:
   level:
     org.apache.dolphinscheduler.dao: debug
 
-server:
+---
+# master settings
+spring:
   profiles: master
-  port:
 
+server:
+    port: 5566
+
+---
+# worker settings
+spring:
+  profiles: worker
+
+server:
+  port: 7788
+
+---
+# alert settings
+spring:
+  profiles: alert
+
+server:
+  port: 7789
