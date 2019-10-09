@@ -88,7 +88,7 @@ const config = merge.smart(baseConfig, {
     historyApiFallback: true,
     disableHostCheck: true,
     proxy: {
-      '/escheduler': {
+      '/dolphinscheduler': {
         target: getEnv('API_BASE', 'http://local.dev:8080/backend'),
         changeOrigin: true
       }

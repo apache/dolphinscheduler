@@ -17,7 +17,7 @@
 
 import io from '~/@fedor/io/dist/io'
 
-const apiPrefix = '/escheduler'
+const apiPrefix = '/dolphinscheduler'
 const reSlashPrefix = /^\/+/
 
 const resolveURL = (url) => {

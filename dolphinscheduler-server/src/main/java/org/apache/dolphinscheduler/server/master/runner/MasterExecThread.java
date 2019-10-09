@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;

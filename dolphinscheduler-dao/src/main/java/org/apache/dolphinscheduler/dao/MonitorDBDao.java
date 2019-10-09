@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.dao.config.YmlConfig;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -41,25 +42,26 @@ public class MonitorDBDao {
     /**
      * 加载配置文件
      */
-    private static Configuration conf;
+//    private static Configuration conf;
 
-    static {
-        try {
-            conf = new PropertiesConfiguration(Constants.DATA_SOURCE_PROPERTIES);
-        }catch (ConfigurationException e){
-            logger.error("load configuration excetpion",e);
-            System.exit(1);
-        }
-    }
+//    static {
+//        try {
+//            conf = new PropertiesConfiguration(Constants.DATA_SOURCE_PROPERTIES);
+//        }catch (ConfigurationException e){
+//            logger.error("load configuration excetpion",e);
+//            System.exit(1);
+//        }
+//    }
+
 
     /**
      * create connection
      * @return
      */
     private static Connection getConn() {
-        String url = conf.getString(Constants.SPRING_DATASOURCE_URL);
-        String username = conf.getString(Constants.SPRING_DATASOURCE_USERNAME);
-        String password = conf.getString(Constants.SPRING_DATASOURCE_PASSWORD);
+        String url =  YmlConfig.allMap.get(Constants.SPRING_DATASOURCE_URL);
+        String username = YmlConfig.allMap.get(Constants.SPRING_DATASOURCE_USERNAME);
+        String password = YmlConfig.allMap.get(Constants.SPRING_DATASOURCE_PASSWORD);
         Connection conn = null;
         try {
             //classloader,load driver

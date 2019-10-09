@@ -146,17 +146,17 @@ public class ProcessDao extends AbstractBaseDao {
                 delCommandByid(command.getId());
                 saveErrorCommand(command, "process instance is null");
                 return null;
-            }else if(!checkThreadNum(command, validThreadNum)){
-                    logger.info("there is not enough thread for this command: {}",command.toString() );
-                    return setWaitingThreadProcess(command, processInstance);
-            }else{
-                    processInstance.setCommandType(command.getCommandType());
-                    processInstance.addHistoryCmd(command.getCommandType());
-                    saveProcessInstance(processInstance);
-                    this.setSubProcessParam(processInstance);
-                    delCommandByid(command.getId());
-                    return processInstance;
             }
+            if(!checkThreadNum(command, validThreadNum)){
+                logger.info("there is not enough thread for this command: {}",command.toString() );
+                return setWaitingThreadProcess(command, processInstance);
+            }
+            processInstance.setCommandType(command.getCommandType());
+            processInstance.addHistoryCmd(command.getCommandType());
+            saveProcessInstance(processInstance);
+            this.setSubProcessParam(processInstance);
+            delCommandByid(command.getId());
+            return processInstance;
         }catch (Exception e){
             logger.error("scan command error ", e);
             saveErrorCommand(command, e.toString());

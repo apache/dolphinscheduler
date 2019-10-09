@@ -74,7 +74,7 @@ public class TenantService extends BaseService{
       return result;
     }
 
-    if (!checkTenant(tenantCode)){
+    if (checkTenantExists(tenantCode)){
       putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenantCode);
       return result;
     }
@@ -168,7 +168,7 @@ public class TenantService extends BaseService{
      * if the tenant code is modified, the original resource needs to be copied to the new tenant.
      */
     if (!tenant.getTenantCode().equals(tenantCode)){
-      if (checkTenant(tenantCode)){
+      if (checkTenantExists(tenantCode)){
         // if hdfs startup
         if (PropertyUtils.getResUploadStartupState()){
           String resourcePath = HadoopUtils.getHdfsDataBasePath() + "/" + tenantCode + "/resources";
@@ -278,8 +278,7 @@ public class TenantService extends BaseService{
    */
   public Result verifyTenantCode(String tenantCode) {
     Result result=new Result();
-    Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-    if (tenant != null) {
+    if (checkTenantExists(tenantCode)) {
       logger.error("tenant {} has exist, can't create again.", tenantCode);
       putMsg(result, Status.TENANT_NAME_EXIST);
     }else{
@@ -295,7 +294,8 @@ public class TenantService extends BaseService{
    * @param tenantCode
    * @return
    */
-  private boolean checkTenant(String tenantCode) {
-    return tenantMapper.queryByTenantCode(tenantCode) == null ? true : false;
+  private boolean checkTenantExists(String tenantCode) {
+      List<Tenant> tenants = tenantMapper.queryByTenantCode(tenantCode);
+      return (tenants != null && tenants.size() > 0);
   }
 }
