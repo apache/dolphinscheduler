@@ -1,14 +1,38 @@
 # mysql
 spring:
-   datasource:
+
+    datasource:
+        url: jdbc:mysql://192.168.220.188:3306/dolphinscheduler_bl?useUnicode=true&characterEncoding=UTF-8
+        username: root
+        password: root@123
+        #
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        initialSize: 5
+        minIdle: 5
+        maxActive: 20
+        maxWait: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        spring.datasource.filters: stat,wall,log4j
+        connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+
+#    jpa:
+#      hibernate:
+#        ddl-auto : update
+#    datasource:
+#      platform:
+#      continue-on-error: true
+#      druid:
 #    driver-class-name: org.postgresql.Driver
-    driver-class-name:  com.mysql.jdbc.Driver
 #    url: jdbc:postgresql://192.168.220.154:5432/escheduler
-    url: jdbc:mysql://192.168.220.188:3306/dolphinscheduler_bl?useUnicode=true&characterEncoding=UTF-8
-    username: root
-    password: root@123
-#    platform:
-    continue-on-error: true
+
 
 
 #mybatis
@@ -41,4 +65,8 @@ mybatis-plus:
 logging:
   level:
     org.apache.dolphinscheduler.dao: debug
+
+server:
+  profiles: master
+  port:
 
