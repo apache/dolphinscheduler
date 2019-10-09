@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
 import org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob;
@@ -64,6 +65,9 @@ public class MasterServer extends AbstractServer {
     @Autowired
     protected ProcessDao processDao;
 
+    @Autowired
+    protected AlertDao alertDao;
+
     /**
      *  master exec thread pool
      */
@@ -71,14 +75,14 @@ public class MasterServer extends AbstractServer {
 
     public MasterServer(){}
 
-    public MasterServer(ProcessDao processDao){
+    public MasterServer(ProcessDao processDao,AlertDao alertDao){
         try {
             conf = new PropertiesConfiguration(Constants.MASTER_PROPERTIES_PATH);
         }catch (ConfigurationException e){
             logger.error("load configuration failed : " + e.getMessage(),e);
             System.exit(1);
         }
-        zkMasterClient = ZKMasterClient.getZKMasterClient(processDao);
+        zkMasterClient = ZKMasterClient.getZKMasterClient(processDao,alertDao);
         this.masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
     }
 
@@ -98,7 +102,7 @@ public class MasterServer extends AbstractServer {
     @Override
     public void run(String... strings) throws Exception {
 
-        MasterServer masterServer = new MasterServer(processDao);
+        MasterServer masterServer = new MasterServer(processDao,alertDao);
 
         masterServer.run(processDao);
 
