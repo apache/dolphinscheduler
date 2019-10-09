@@ -132,6 +132,9 @@ public class DateUtils {
      * @return
      */
     public static long differSec(Date d1, Date d2) {
+        if(d1 == null || d2 == null){
+            return 0;
+        }
         return (long) Math.ceil(differMs(d1, d2) / 1000.0);
     }
 
