@@ -126,6 +126,7 @@ public class FetchTaskThread implements Runnable{
         if(StringUtils.isBlank(ips)){
             logger.error("task:{} worker group:{} parameters(ip_list) is null, this task would be running on all workers",
                     taskInstance.getId(), workerGroup.getId());
+            return true;
         }
         String[] ipArray = ips.split(Constants.COMMA);
         List<String> ipList =  Arrays.asList(ipArray);
