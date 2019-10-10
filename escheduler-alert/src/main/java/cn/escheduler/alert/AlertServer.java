@@ -39,22 +39,21 @@ public class AlertServer implements CommandLineRunner {
     /**
      * Alert Dao
      */
-    @Autowired
     private AlertDao alertDao;
 
     private AlertSender alertSender;
 
     private static volatile AlertServer instance;
 
-    public AlertServer() {
-
+    public AlertServer(AlertDao alertDao) {
+        this.alertDao = alertDao;
     }
 
-    public static AlertServer getInstance(){
+    public static AlertServer getInstance(AlertDao alertDao){
         if (null == instance) {
             synchronized (AlertServer.class) {
                 if(null == instance) {
-                    instance = new AlertServer();
+                    instance = new AlertServer(alertDao);
                 }
             }
         }
@@ -83,7 +82,7 @@ public class AlertServer implements CommandLineRunner {
 
     @Override
     public void run(String... strings) throws Exception {
-        AlertServer alertServer = AlertServer.getInstance();
+        AlertServer alertServer = AlertServer.getInstance(alertDao);
         alertServer.start();
     }
 }
