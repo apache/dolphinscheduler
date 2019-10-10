@@ -124,6 +124,9 @@ enterpriseWechatAgentId="xxxxxxxxxx"
 # Enterprise WeChat user configuration, multiple users to , split
 enterpriseWechatUsers="xxxxx,xxxxx"
 
+# alert port
+alertPort=7789
+
 
 # whether to start monitoring self-starting scripts
 monitorServerState="false"
@@ -251,6 +254,9 @@ masterMaxCpuLoadAvg="10"
 # master reserve memory to determine if the master has execution capability
 masterReservedMemory="1"
 
+# master port
+masterPort=5566
+
 
 # worker config 
 # worker execution thread
@@ -262,12 +268,12 @@ workerHeartbeatInterval="10"
 # worker number of fetch tasks
 workerFetchTaskNum="3"
 
-# workerThe maximum cpu average load, used to determine whether the worker still has the ability to execute, 
-# keep the system default, the default is twice the number of cpu cores, when the load reaches 2 times
-#workerMaxCupLoadAvg="10"
-
 # worker reserve memory to determine if the master has execution capability
 workerReservedMemory="1"
+
+# master port
+workerPort=7788
+
 
 # api config
 # api server port
@@ -306,10 +312,10 @@ passowrd="xx"
 # 1,replace file
 echo "1,replace file"
 if [ $dbtype == "mysql" ];then
-    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" application.yml
-    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" application.yml
-    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" application.yml
-    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=com.mysql.jdbc.Driver#g" application.yml
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" application.properties
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" application.properties
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" application.properties
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=com.mysql.jdbc.Driver#g" application.properties
 
 
     sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
@@ -319,10 +325,10 @@ if [ $dbtype == "mysql" ];then
 fi
 
 if [ $dbtype == "postgresql" ];then
-    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" application.yml
-    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" application.yml
-    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" application.yml
-    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=org.postgresql.Driver#g" application.yml
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" application.properties
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" application.properties
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" application.properties
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=org.postgresql.Driver#g" application.properties
 
     sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
     sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties
@@ -374,23 +380,23 @@ sed -i ${txt} "s#master.exec.task.number.*#master.exec.task.number=${masterExecT
 sed -i ${txt} "s#master.heartbeat.interval.*#master.heartbeat.interval=${masterHeartbeatInterval}#g" conf/master.properties
 sed -i ${txt} "s#master.task.commit.retryTimes.*#master.task.commit.retryTimes=${masterTaskCommitRetryTimes}#g" conf/master.properties
 sed -i ${txt} "s#master.task.commit.interval.*#master.task.commit.interval=${masterTaskCommitInterval}#g" conf/master.properties
-#sed -i ${txt} "s#master.max.cpuload.avg.*#master.max.cpuload.avg=${masterMaxCpuLoadAvg}#g" conf/master.properties
 sed -i ${txt} "s#master.reserved.memory.*#master.reserved.memory=${masterReservedMemory}#g" conf/master.properties
+sed -i ${txt} "s#server.port.*#server.port=${masterPort}#g" conf/application-master.properties
 
 
 sed -i ${txt} "s#worker.exec.threads.*#worker.exec.threads=${workerExecThreads}#g" conf/worker.properties
 sed -i ${txt} "s#worker.heartbeat.interval.*#worker.heartbeat.interval=${workerHeartbeatInterval}#g" conf/worker.properties
 sed -i ${txt} "s#worker.fetch.task.num.*#worker.fetch.task.num=${workerFetchTaskNum}#g" conf/worker.properties
-#sed -i ${txt} "s#worker.max.cpuload.avg.*#worker.max.cpuload.avg=${workerMaxCupLoadAvg}#g" conf/worker.properties
 sed -i ${txt} "s#worker.reserved.memory.*#worker.reserved.memory=${workerReservedMemory}#g" conf/worker.properties
+sed -i ${txt} "s#server.port.*#server.port=${workerPort}#g" conf/application-worker.properties
 
 
-sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application.properties
-sed -i ${txt} "s#server.servlet.session.timeout.*#server.servlet.session.timeout=${apiServerSessionTimeout}#g" conf/application.properties
-sed -i ${txt} "s#server.servlet.context-path.*#server.servlet.context-path=${apiServerContextPath}#g" conf/application.properties
-sed -i ${txt} "s#spring.servlet.multipart.max-file-size.*#spring.servlet.multipart.max-file-size=${springMaxFileSize}#g" conf/application.properties
-sed -i ${txt} "s#spring.servlet.multipart.max-request-size.*#spring.servlet.multipart.max-request-size=${springMaxRequestSize}#g" conf/application.properties
-sed -i ${txt} "s#server.jetty.max-http-post-size.*#server.jetty.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application.properties
+sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
+sed -i ${txt} "s#server.servlet.session.timeout.*#server.servlet.session.timeout=${apiServerSessionTimeout}#g" conf/application-api.properties
+sed -i ${txt} "s#server.servlet.context-path.*#server.servlet.context-path=${apiServerContextPath}#g" conf/application-api.properties
+sed -i ${txt} "s#spring.servlet.multipart.max-file-size.*#spring.servlet.multipart.max-file-size=${springMaxFileSize}#g" conf/application-api.properties
+sed -i ${txt} "s#spring.servlet.multipart.max-request-size.*#spring.servlet.multipart.max-request-size=${springMaxRequestSize}#g" conf/application-api.properties
+sed -i ${txt} "s#server.jetty.max-http-post-size.*#server.jetty.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application-api.properties
 
 
 sed -i ${txt} "s#mail.protocol.*#mail.protocol=${mailProtocol}#g" conf/alert.properties
@@ -406,6 +412,8 @@ sed -i ${txt} "s#enterprise.wechat.corp.id.*#enterprise.wechat.corp.id=${enterpr
 sed -i ${txt} "s#enterprise.wechat.secret.*#enterprise.wechat.secret=${enterpriseWechatSecret}#g" conf/alert.properties
 sed -i ${txt} "s#enterprise.wechat.agent.id.*#enterprise.wechat.agent.id=${enterpriseWechatAgentId}#g" conf/alert.properties
 sed -i ${txt} "s#enterprise.wechat.users.*#enterprise.wechat.users=${enterpriseWechatUsers}#g" conf/alert.properties
+sed -i ${txt} "s#server.port.*#server.port=${alertPort}#g" conf/application-alert.properties
+
 
 
 sed -i ${txt} "s#installPath.*#installPath=${installPath}#g" conf/config/install_config.conf
