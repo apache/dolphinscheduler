@@ -157,11 +157,11 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * list user information by alert group id
-     * @param alergroupId
+     * @param alertgroupId
      * @return
      */
-    public List<User> listUserByAlertgroupId(int alergroupId){
-        return userAlertGroupMapper.listUserByAlertgroupId(alergroupId);
+    public List<User> listUserByAlertgroupId(int alertgroupId){
+        return userAlertGroupMapper.listUserByAlertgroupId(alertgroupId);
     }
 
 
