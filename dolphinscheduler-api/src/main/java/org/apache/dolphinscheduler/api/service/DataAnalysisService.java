@@ -258,6 +258,7 @@ public class DataAnalysisService {
             }
         }
 
+
         Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         // count command state
         List<CommandCount> commandStateCounts =
@@ -281,18 +282,21 @@ public class DataAnalysisService {
 
 
         // init data map
-//        dataMap.put(ExecutionStatus.SUBMITTED_SUCCESS,commonCommand);
-//        dataMap.put(ExecutionStatus.RUNNING_EXEUTION,commonCommand);
-//        dataMap.put(ExecutionStatus.READY_PAUSE,commonCommand);
-//        dataMap.put(ExecutionStatus.PAUSE,commonCommand);
-//        dataMap.put(ExecutionStatus.READY_STOP,commonCommand);
-//        dataMap.put(ExecutionStatus.STOP,commonCommand);
-//        dataMap.put(ExecutionStatus.FAILURE,commonCommand);
-//        dataMap.put(ExecutionStatus.SUCCESS,commonCommand);
-//        dataMap.put(ExecutionStatus.NEED_FAULT_TOLERANCE,commonCommand);
-//        dataMap.put(ExecutionStatus.KILL,commonCommand);
-//        dataMap.put(ExecutionStatus.WAITTING_THREAD,commonCommand);
-//        dataMap.put(ExecutionStatus.WAITTING_DEPEND,commonCommand);
+        /**
+         * START_PROCESS, START_CURRENT_TASK_PROCESS, RECOVER_TOLERANCE_FAULT_PROCESS, RECOVER_SUSPENDED_PROCESS,
+         START_FAILURE_TASK_PROCESS,COMPLEMENT_DATA,SCHEDULER, REPEAT_RUNNING,PAUSE,STOP,RECOVER_WAITTING_THREAD;
+         */
+        dataMap.put(CommandType.START_PROCESS,commonCommand);
+        dataMap.put(CommandType.START_CURRENT_TASK_PROCESS,commonCommand);
+        dataMap.put(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS,commonCommand);
+        dataMap.put(CommandType.RECOVER_SUSPENDED_PROCESS,commonCommand);
+        dataMap.put(CommandType.START_FAILURE_TASK_PROCESS,commonCommand);
+        dataMap.put(CommandType.COMPLEMENT_DATA,commonCommand);
+        dataMap.put(CommandType.SCHEDULER,commonCommand);
+        dataMap.put(CommandType.REPEAT_RUNNING,commonCommand);
+        dataMap.put(CommandType.PAUSE,commonCommand);
+        dataMap.put(CommandType.STOP,commonCommand);
+        dataMap.put(CommandType.RECOVER_WAITTING_THREAD,commonCommand);
 
         // put command state
         for (CommandCount executeStatusCount : commandStateCounts){
