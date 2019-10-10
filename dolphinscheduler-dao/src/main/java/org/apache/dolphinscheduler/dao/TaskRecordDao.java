@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.config.YmlConfig;
 import org.apache.dolphinscheduler.dao.entity.TaskRecord;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -42,42 +43,25 @@ public class TaskRecordDao {
 
     private static Logger logger = LoggerFactory.getLogger(TaskRecordDao.class.getName());
 
-
-
-    /**
-     * load conf file
-     */
-    private static Configuration conf;
-
-    static {
-        try {
-            conf = new PropertiesConfiguration(Constants.DATA_SOURCE_PROPERTIES);
-        }catch (ConfigurationException e){
-            logger.error("load configuration excetpion",e);
-            System.exit(1);
-        }
-    }
-
-
     /**
      *  get task record flag
      * @return
      */
     public static boolean getTaskRecordFlag(){
-       return conf.getBoolean(Constants.TASK_RECORD_FLAG);
+       return Boolean.parseBoolean(YmlConfig.allMap.get(Constants.TASK_RECORD_FLAG));
     }
     /**
      * create connection
      * @return
      */
     private static Connection getConn() {
-        if(!conf.getBoolean(Constants.TASK_RECORD_FLAG)){
+        if(!getTaskRecordFlag()){
             return null;
         }
         String driver = "com.mysql.jdbc.Driver";
-        String url = conf.getString(Constants.TASK_RECORD_URL);
-        String username = conf.getString(Constants.TASK_RECORD_USER);
-        String password = conf.getString(Constants.TASK_RECORD_PWD);
+        String url = YmlConfig.allMap.get(Constants.TASK_RECORD_URL);
+        String username = YmlConfig.allMap.get(Constants.TASK_RECORD_USER);
+        String password = YmlConfig.allMap.get(Constants.TASK_RECORD_PWD);
         Connection conn = null;
         try {
             //classLoader,加载对应驱动
