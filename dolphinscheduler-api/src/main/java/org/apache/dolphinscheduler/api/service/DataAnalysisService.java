@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
 import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
@@ -246,13 +247,15 @@ public class DataAnalysisService {
         Date start = null;
         Date end = null;
 
-        try {
-            start = DateUtils.getScheduleDate(startDate);
-            end = DateUtils.getScheduleDate(endDate);
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-            putErrorRequestParamsMsg(result);
-            return result;
+        if (startDate != null && endDate != null){
+            try {
+                start = DateUtils.getScheduleDate(startDate);
+                end = DateUtils.getScheduleDate(endDate);
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                putErrorRequestParamsMsg(result);
+                return result;
+            }
         }
 
         Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
