@@ -2,7 +2,7 @@
 spring:
 
     datasource:
-        url: jdbc:mysql://192.168.220.188:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+        url: jdbc:mysql://192.168.220.188:3306/dolphinscheduler_bl?useUnicode=true&characterEncoding=UTF-8
         username: root
         password: root@123
         #
@@ -61,31 +61,16 @@ mybatis-plus:
     jdbc-type-for-null: 'null'
 
 
+task:
+#task record settings
+  record:
+    flag: false
+    datasource:
+      url: jdbc:mysql://192.168.xx.xx:3306/etl?characterEncoding=UTF-8
+      username: xx
+      password: xx
+
 # Logger Config
 logging:
   level:
     org.apache.dolphinscheduler.dao: debug
-
----
-# master settings
-spring:
-  profiles: master
-
-server:
-    port: 5566
-
----
-# worker settings
-spring:
-  profiles: worker
-
-server:
-  port: 7788
-
----
-# alert settings
-spring:
-  profiles: alert
-
-server:
-  port: 7789
