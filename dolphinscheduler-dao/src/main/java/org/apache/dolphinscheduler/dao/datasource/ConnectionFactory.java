@@ -17,7 +17,9 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import org.apache.dolphinscheduler.dao.config.YmlConfig;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
@@ -30,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.sql.DataSource;
-import java.util.Map;
 
 
 /**
@@ -42,15 +43,29 @@ public class ConnectionFactory {
   private static SqlSessionFactory sqlSessionFactory;
 
   /**
+   * 加载配置文件
+   */
+  private static org.apache.commons.configuration.Configuration conf;
+
+  static {
+    try {
+      conf = new PropertiesConfiguration(Constants.DATA_SOURCE_PROPERTIES);
+    }catch (ConfigurationException e){
+      logger.error("load configuration excetpion",e);
+      System.exit(1);
+    }
+  }
+
+  /**
    * get the data source
    */
   public static DruidDataSource getDataSource() {
     DruidDataSource druidDataSource = new DruidDataSource();
-    Map<String, String> allMap = YmlConfig.allMap;
-    druidDataSource.setDriverClassName(allMap.get("spring.datasource.driver-class-name"));
-    druidDataSource.setUrl(allMap.get("spring.datasource.url"));
-    druidDataSource.setUsername(allMap.get("spring.datasource.username"));
-    druidDataSource.setPassword(allMap.get("spring.datasource.password"));
+//    Map<String, String> allMap = YmlConfig.allMap;
+    druidDataSource.setDriverClassName(conf.getString("spring.datasource.driver-class-name"));
+    druidDataSource.setUrl(conf.getString("spring.datasource.url"));
+    druidDataSource.setUsername(conf.getString("spring.datasource.username"));
+    druidDataSource.setPassword(conf.getString("spring.datasource.password"));
     druidDataSource.setInitialSize(5);
     druidDataSource.setMinIdle(5);
     druidDataSource.setMaxActive(20);

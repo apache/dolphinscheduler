@@ -42,10 +42,8 @@ public class TaskRecordDao {
 
     private static Logger logger = LoggerFactory.getLogger(TaskRecordDao.class.getName());
 
-
-
     /**
-     * load conf file
+     * 加载配置文件
      */
     private static Configuration conf;
 
@@ -57,7 +55,6 @@ public class TaskRecordDao {
             System.exit(1);
         }
     }
-
 
     /**
      *  get task record flag
@@ -71,7 +68,7 @@ public class TaskRecordDao {
      * @return
      */
     private static Connection getConn() {
-        if(!conf.getBoolean(Constants.TASK_RECORD_FLAG)){
+        if(!getTaskRecordFlag()){
             return null;
         }
         String driver = "com.mysql.jdbc.Driver";
