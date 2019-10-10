@@ -121,7 +121,7 @@ public class AccessTokenService extends BaseService {
         if (insert > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.CREATE_ALERT_GROUP_ERROR);
+            putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
         }
 
         return result;
@@ -151,7 +151,7 @@ public class AccessTokenService extends BaseService {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NOT_EXIST, id);
+            putMsg(result, Status.DELETE_TOKEN_ERROR, id);
             return result;
         }
 
