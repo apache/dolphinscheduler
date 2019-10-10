@@ -129,7 +129,7 @@ public class PropertyUtils {
             return Boolean.parseBoolean(value);
         }
 
-        return null;
+        return false;
     }
 
     /**
