@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 <template>
   <div class="list-model" style="position: relative;">
     <div class="table-box">
@@ -12,31 +28,34 @@
           <th>
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th>
+          <th width="70">
             <span>{{$t('Run Type')}}</span>
           </th>
-          <th width="140">
+          <th width="130">
+            <span>{{$t('Scheduling Time')}}</span>
+          </th>
+          <th width="130">
             <span>{{$t('Start Time')}}</span>
           </th>
-          <th width="140">
+          <th width="130">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th width="70">
+          <th width="60">
             <span>{{$t('Duration')}}s</span>
           </th>
-          <th width="70">
+          <th width="60">
             <span>{{$t('Run Times')}}</span>
           </th>
           <th width="100">
             <span>{{$t('host')}}</span>
           </th>
-          <th width="70">
+          <th width="60">
             <span>{{$t('fault-tolerant sign')}}</span>
           </th>
-          <th width="50">
+          <th width="30">
             <span>{{$t('State')}}</span>
           </th>
-          <th width="220">
+          <th width="210">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -46,9 +65,13 @@
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
-            <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id}" tag="a" class="links">{{item.name}}</router-link></span>
+            <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
           </td>
           <td><span>{{_rtRunningType(item.commandType)}}</span></td>
+          <td>
+              <span v-if="!item.scheduleTime"></span>
+              <span v-else>{{item.scheduleTime | formatDate}}</span>
+          </td>
           <td><span>{{item.startTime | formatDate}}</span></td>
           <td>
             <span v-if="item.endTime">{{item.endTime | formatDate}}</span>
