@@ -231,7 +231,7 @@ public class ProcessDao extends AbstractBaseDao {
             JSONObject tempObj;
             int processInstanceId = cmdParamObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING);
 
-            List<Command> commands = commandMapper.getAll(null);
+            List<Command> commands = commandMapper.selectList(null);
             //遍历所有命令
             for (Command tmpCommand:commands){
                 if(cmdTypeMap.containsKey(tmpCommand.getCommandType())){
