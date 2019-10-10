@@ -295,27 +295,13 @@ springMaxRequestSize="1024MB"
 apiMaxHttpPostSize="5000000"
 
 
-# db config
-# db address and port
-dbhost="192.168.xx.xx:3306"
-
-# mysql database
-dbname="dolphinscheduler"
-
-# mysql username
-username="xx"
-
-# mysql passwprd
-# Note: if there are special characters, please use the \ transfer character to transfer
-passowrd="xx"
-
 # 1,replace file
 echo "1,replace file"
 if [ $dbtype == "mysql" ];then
-    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" application.properties
-    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" application.properties
-    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" application.properties
-    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=com.mysql.jdbc.Driver#g" application.properties
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=com.mysql.jdbc.Driver#g" conf/application.properties
 
 
     sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
@@ -325,10 +311,10 @@ if [ $dbtype == "mysql" ];then
 fi
 
 if [ $dbtype == "postgresql" ];then
-    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" application.properties
-    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" application.properties
-    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" application.properties
-    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=org.postgresql.Driver#g" application.properties
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=org.postgresql.Driver#g" conf/application.properties
 
     sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
     sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties
