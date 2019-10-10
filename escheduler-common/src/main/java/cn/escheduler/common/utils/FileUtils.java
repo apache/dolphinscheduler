@@ -111,10 +111,9 @@ public class FileUtils {
      * create directory and user
      * @param execLocalPath
      * @param userName
-     * @param logger
      * @throws IOException
      */
-    public static void createWorkDirAndUserIfAbsent(String execLocalPath, String userName, Logger logger) throws IOException{
+    public static void createWorkDirAndUserIfAbsent(String execLocalPath, String userName) throws IOException{
         //if work dir exists, first delete
         File execLocalPathFile = new File(execLocalPath);
 

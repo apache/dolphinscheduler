@@ -193,6 +193,7 @@ public class FetchTaskThread implements Runnable{
                     // set queue for process instance, user-specified queue takes precedence over tenant queue
                     String userQueue = processDao.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
                     taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
+                    taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
 
                     logger.info("worker fetch taskId : {} from queue ", taskInstId);
 
@@ -221,8 +222,7 @@ public class FetchTaskThread implements Runnable{
                             execLocalPath);
 
                     // check and create Linux users
-                    FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
-                            tenant.getTenantCode(), logger);
+                    FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, tenant.getTenantCode());
 
                     logger.info("task : {} ready to submit to task scheduler thread",taskInstId);
                     // submit task

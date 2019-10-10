@@ -21,40 +21,30 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import cn.escheduler.common.Constants;
 import cn.escheduler.common.enums.ExecutionStatus;
-import cn.escheduler.common.enums.TaskRecordStatus;
 import cn.escheduler.common.enums.TaskType;
 import cn.escheduler.common.model.TaskNode;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.task.AbstractParameters;
 import cn.escheduler.common.task.TaskTimeoutParameter;
-import cn.escheduler.common.task.mr.MapreduceParameters;
-import cn.escheduler.common.task.procedure.ProcedureParameters;
-import cn.escheduler.common.task.python.PythonParameters;
-import cn.escheduler.common.task.shell.ShellParameters;
-import cn.escheduler.common.task.spark.SparkParameters;
-import cn.escheduler.common.task.sql.SqlParameters;
-import cn.escheduler.common.utils.*;
+import cn.escheduler.common.utils.CommonUtils;
+import cn.escheduler.common.utils.HadoopUtils;
+import cn.escheduler.common.utils.TaskParametersUtils;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.TaskRecordDao;
 import cn.escheduler.dao.model.ProcessDefinition;
 import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
-import cn.escheduler.dao.model.Tenant;
 import cn.escheduler.server.utils.LoggerUtils;
-import cn.escheduler.server.utils.ParamUtils;
 import cn.escheduler.server.worker.log.TaskLogDiscriminator;
 import cn.escheduler.server.worker.task.AbstractTask;
 import cn.escheduler.server.worker.task.TaskManager;
 import cn.escheduler.server.worker.task.TaskProps;
 import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 
@@ -106,61 +96,48 @@ public class TaskScheduleThread implements Runnable {
 
             // get process instance according to tak instance
             ProcessInstance processInstance = taskInstance.getProcessInstance();
-            // get process define according to tak instance
-            ProcessDefinition processDefine = taskInstance.getProcessDefine();
 
-            // get tenant info
-            Tenant tenant = processDao.getTenantForProcess(processInstance.getTenantId(),
-                    processDefine.getUserId());
+            // set task props
+            TaskProps taskProps = new TaskProps(taskNode.getParams(),
+                    taskInstance.getExecutePath(),
+                    processInstance.getScheduleTime(),
+                    taskInstance.getName(),
+                    taskInstance.getTaskType(),
+                    taskInstance.getId(),
+                    CommonUtils.getSystemEnvPath(),
+                    processInstance.getTenantCode(),
+                    processInstance.getQueue(),
+                    taskInstance.getStartTime(),
+                    getGlobalParamsMap(),
+                    taskInstance.getDependency(),
+                    processInstance.getCmdTypeIfComplement());
+            // set task timeout
+            setTaskTimeout(taskProps, taskNode);
 
-            if(tenant == null){
-                logger.error("cannot find the tenant, process definition id:{}, user id:{}",
-                        processDefine.getId(),
-                        processDefine.getUserId());
-                task.setExitStatusCode(Constants.EXIT_CODE_FAILURE);
-            }else{
+            taskProps.setTaskAppId(String.format("%s_%s_%s",
+                    taskInstance.getProcessDefine().getId(),
+                    taskInstance.getProcessInstance().getId(),
+                    taskInstance.getId()));
 
-                // set task props
-                TaskProps taskProps = new TaskProps(taskNode.getParams(),
-                        taskInstance.getExecutePath(),
-                        processInstance.getScheduleTime(),
-                        taskInstance.getName(),
-                        taskInstance.getTaskType(),
-                        taskInstance.getId(),
-                        CommonUtils.getSystemEnvPath(),
-                        tenant.getTenantCode(),
-                        tenant.getQueue(),
-                        taskInstance.getStartTime(),
-                        getGlobalParamsMap(),
-                        taskInstance.getDependency(),
-                        processInstance.getCmdTypeIfComplement());
-                // set task timeout
-                setTaskTimeout(taskProps, taskNode);
+            // custom logger
+            Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                    taskInstance.getProcessDefine().getId(),
+                    taskInstance.getProcessInstance().getId(),
+                    taskInstance.getId()));
 
-                taskProps.setTaskAppId(String.format("%s_%s_%s",
-                        taskInstance.getProcessDefine().getId(),
-                        taskInstance.getProcessInstance().getId(),
-                        taskInstance.getId()));
+            task = TaskManager.newTask(taskInstance.getTaskType(),
+                    taskProps,
+                    taskLogger);
 
-                // custom logger
-                Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                        taskInstance.getProcessDefine().getId(),
-                        taskInstance.getProcessInstance().getId(),
-                        taskInstance.getId()));
+            // task init
+            task.init();
 
-                task = TaskManager.newTask(taskInstance.getTaskType(),
-                        taskProps,
-                        taskLogger);
+            // task handle
+            task.handle();
 
-                // task init
-                task.init();
+            // task result process
+            task.after();
 
-                // task handle
-                task.handle();
-
-                // task result process
-                task.after();
-            }
         }catch (Exception e){
             logger.error("task scheduler failure", e);
             task.setExitStatusCode(Constants.EXIT_CODE_FAILURE);
