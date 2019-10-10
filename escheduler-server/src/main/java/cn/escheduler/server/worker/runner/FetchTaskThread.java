@@ -183,7 +183,9 @@ public class FetchTaskThread implements Runnable{
                             taskInstance.getProcessDefine().getUserId());
 
                     // verify tenant is null
-                    if (verifyTenantIsNull(taskQueueStr, tenant)) {
+                    if (verifyTenantIsNull(tenant)) {
+                        logger.info("remove task queue : {} ", taskQueueStr);
+                        taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
                         continue;
                     }
 
@@ -198,6 +200,8 @@ public class FetchTaskThread implements Runnable{
 
                     // verify task instance is null
                     if (verifyTaskInstanceIsNull(taskQueueStr)) {
+                        logger.info("remove task queue : {} ", taskQueueStr);
+                        taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
                         continue;
                     }
 
@@ -243,7 +247,6 @@ public class FetchTaskThread implements Runnable{
     private boolean verifyTaskInstanceIsNull(String taskQueueStr) {
         if (taskInstance == null ) {
             logger.error("task instance is null. task id : {} ", taskInstId);
-            taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
             return true;
         }
         return false;
@@ -251,17 +254,15 @@ public class FetchTaskThread implements Runnable{
 
     /**
      *  verify tenant is null
-     * @param taskQueueStr
      * @param tenant
      * @return
      */
-    private boolean verifyTenantIsNull(String taskQueueStr, Tenant tenant) {
+    private boolean verifyTenantIsNull(Tenant tenant) {
         if(tenant == null){
             logger.error("tenant not exists,process define id : {},process instance id : {},task instance id : {}",
                     taskInstance.getProcessDefine().getId(),
                     taskInstance.getProcessInstance().getId(),
                     taskInstance.getId());
-            taskQueue.removeNode(Constants.SCHEDULER_TASKS_QUEUE, taskQueueStr);
             return true;
         }
         return false;
