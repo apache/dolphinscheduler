@@ -41,7 +41,7 @@ pid=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command.pid
 cd $DOLPHINSCHEDULER_HOME
 
 if [ "$command" = "api-server" ]; then
-  LOG_FILE="-Dlogging.config=conf/apiserver_logback.xml"
+  LOG_FILE="-Dspring.profiles.active=api -Dlogging.config=conf/apiserver_logback.xml"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
 elif [ "$command" = "master-server" ]; then
   LOG_FILE="-Dspring.profiles.active=master -Ddruid.mysql.usePingMethod=false"
