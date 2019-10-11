@@ -79,7 +79,7 @@ public class ShellCommandExecutorTest {
                 taskInstance.getId()));
 
 
-        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger,null);
+        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
 
         logger.info("task info : {}", task);
 

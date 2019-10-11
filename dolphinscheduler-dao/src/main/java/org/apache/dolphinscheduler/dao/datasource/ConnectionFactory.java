@@ -30,7 +30,6 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import javax.sql.DataSource;
 
@@ -50,7 +49,7 @@ public class ConnectionFactory {
 
   static {
     try {
-      conf = new PropertiesConfiguration(Constants.DATA_SOURCE_PROPERTIES);
+      conf = new PropertiesConfiguration(Constants.APPLICATION_PROPERTIES);
     }catch (ConfigurationException e){
       logger.error("load configuration excetpion",e);
       System.exit(1);
@@ -97,7 +96,6 @@ public class ConnectionFactory {
           MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
           sqlSessionFactoryBean.setDataSource(dataSource);
           sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
-          sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath*:org/apache/dolphinscheduler/dao/mapper/*.xml"));
           sqlSessionFactoryBean.setConfiguration(configuration);
           return sqlSessionFactoryBean.getObject();
         }
