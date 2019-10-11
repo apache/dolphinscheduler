@@ -414,15 +414,15 @@
 	</scm>
 
 	<build>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<filtering>false</filtering>
-				<includes>
-					<include>**/mapper/*.xml</include>
-				</includes>
-			</resource>
-		</resources>
+		<!--<resources>-->
+			<!--<resource>-->
+				<!--<directory>src/main/java</directory>-->
+				<!--<filtering>false</filtering>-->
+				<!--<includes>-->
+					<!--<include>**/mapper/*.xml</include>-->
+				<!--</includes>-->
+			<!--</resource>-->
+		<!--</resources>-->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
