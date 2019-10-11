@@ -464,7 +464,7 @@ export default {
   'Statement cannot be empty': 'Statement cannot be empty',
   'Process Define Count': 'Process Define Count',
   'Process Instance Running Count': 'Process Instance Running Count',
-  'process number of waiting for running': 'process number of waiting for running',
+  'command number of waiting for running': 'command number of waiting for running',
   'failure command number': 'failure command number',
   'tasks number of waiting running': 'tasks number of waiting running',
   'task number of ready to kill': 'task number of ready to kill',

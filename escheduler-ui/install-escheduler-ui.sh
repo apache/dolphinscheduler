@@ -46,7 +46,7 @@ dolphinschedulerConf(){
             root   ${esc_basepath}/dist; # static file directory
             index  index.html index.html;
             }
-            location /escheduler {
+            location /dolphinscheduler {
             proxy_pass $2; # interface address
             proxy_set_header Host $E_host;
             proxy_set_header X-Real-IP $E_remote_addr;
