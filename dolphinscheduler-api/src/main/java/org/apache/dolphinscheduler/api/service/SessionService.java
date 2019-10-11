@@ -140,11 +140,9 @@ public class SessionService extends BaseService{
     /**
      * query session by user id and ip
      */
-    List<Session> sessionList = sessionMapper.queryByUserId(loginUser.getId());
+    Session session = sessionMapper.queryByUserIdAndIp(loginUser.getId(),ip);
 
-    for (Session session : sessionList){
-      //delete session
-      sessionMapper.deleteById(session.getId());
-    }
+    //delete session
+    sessionMapper.deleteById(session.getId());
   }
 }

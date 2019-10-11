@@ -26,4 +26,6 @@ public interface SessionMapper extends BaseMapper<Session> {
 
     List<Session> queryByUserId(@Param("userId") int userId);
 
+    Session queryByUserIdAndIp(@Param("userId") int userId,@Param("ip") String ip);
+
 }
