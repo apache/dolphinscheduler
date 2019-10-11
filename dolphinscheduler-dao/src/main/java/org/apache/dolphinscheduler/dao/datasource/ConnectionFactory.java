@@ -17,19 +17,20 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.ibatis.mapping.Environment;
-import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import javax.sql.DataSource;
 
@@ -43,7 +44,7 @@ public class ConnectionFactory {
   private static SqlSessionFactory sqlSessionFactory;
 
   /**
-   * 加载配置文件
+   * Load configuration file
    */
   private static org.apache.commons.configuration.Configuration conf;
 
@@ -79,7 +80,7 @@ public class ConnectionFactory {
   /**
    * get sql session factory
    */
-  public static SqlSessionFactory getSqlSessionFactory() {
+  public static SqlSessionFactory getSqlSessionFactory() throws Exception {
     if (sqlSessionFactory == null) {
       synchronized (ConnectionFactory.class) {
         if (sqlSessionFactory == null) {
@@ -88,13 +89,17 @@ public class ConnectionFactory {
 
           Environment environment = new Environment("development", transactionFactory, dataSource);
 
-          Configuration configuration = new Configuration(environment);
+          MybatisConfiguration configuration = new MybatisConfiguration();
+          configuration.setEnvironment(environment);
           configuration.setLazyLoadingEnabled(true);
           configuration.addMappers("org.apache.dolphinscheduler.dao.mapper");
 
-
-          SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
-          sqlSessionFactory = builder.build(configuration);
+          MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
+          sqlSessionFactoryBean.setDataSource(dataSource);
+          sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
+          sqlSessionFactoryBean.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath*:org/apache/dolphinscheduler/dao/mapper/*.xml"));
+          sqlSessionFactoryBean.setConfiguration(configuration);
+          return sqlSessionFactoryBean.getObject();
         }
       }
     }
@@ -106,10 +111,20 @@ public class ConnectionFactory {
    * get sql session
    */
   public static SqlSession getSqlSession() {
-    return new SqlSessionTemplate(getSqlSessionFactory());
+    try {
+      return new SqlSessionTemplate(getSqlSessionFactory());
+    } catch (Exception e) {
+      logger.error(e.getMessage(),e);
+      throw new RuntimeException("get sqlSession failed!");
+    }
   }
 
   public static <T> T getMapper(Class<T> type){
-    return getSqlSession().getMapper(type);
+    try {
+      return getSqlSession().getMapper(type);
+    } catch (Exception e) {
+      logger.error(e.getMessage(),e);
+      throw new RuntimeException("get mapper failed!");
+    }
   }
 }
