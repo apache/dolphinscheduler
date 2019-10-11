@@ -470,7 +470,7 @@ public final class Constants {
     /**
      * task record configuration path
      */
-    public static final String DATA_SOURCE_PROPERTIES = "dao/data_source.properties";
+    public static final String DATA_SOURCE_PROPERTIES = "application.properties";
 
     public static final String TASK_RECORD_URL = "task.record.datasource.url";
 
