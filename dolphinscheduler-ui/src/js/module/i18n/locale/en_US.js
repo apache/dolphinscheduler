@@ -232,6 +232,7 @@ export default {
   'Service-Worker': 'Service-Worker',
   'Process Name': 'Process Name',
   'Run Type': 'Run Type',
+  'Scheduling Time': 'Scheduling Time',
   'Run Times': 'Run Times',
   'host': 'host',
   'fault-tolerant sign': 'fault-tolerant sign',
@@ -487,5 +488,6 @@ export default {
   'Http Check Condition':'Http Check Condition',
   'Http Condition':'Http Condition',
   'Please Enter Http Url': 'Please Enter Http Url(required)',
-  'Please Enter Http Condition': 'Please Enter Http Condition'
+  'Please Enter Http Condition': 'Please Enter Http Condition',
+  'There is no data for this period of time': 'There is no data for this period of time'
 }

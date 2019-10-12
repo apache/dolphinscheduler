@@ -12,7 +12,7 @@
           <th>
             <span>{{$t('Process Instance')}}</span>
           </th>
-          <th width="80">
+          <th width="90">
             <span>{{$t('Node Type')}}</span>
           </th>
           <th width="40">
