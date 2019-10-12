@@ -28,7 +28,7 @@
           </td>
           <td>
             <span>
-              <a href="javascript:" class="links">{{item.name}}</a>
+              {{item.name}}
             </span>
           </td>
           <td>
