@@ -97,7 +97,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Database Name')}}</template>
+          <template slot="name"><b :class="{hidden:showdDatabase}">*</b>{{$t('Database Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -165,6 +165,7 @@
         // btn test loading
         testLoading: false,
         showPrincipal: true,
+        showdDatabase: false,
         isShowPrincipal:true
       }
     },
@@ -264,7 +265,7 @@
           return false
         }
 
-        if (!this.database) {
+        if (!this.database && this.showdDatabase == false) {
           this.$message.warning(`${i18n.$t('Please enter database name')}`)
           return false
         }
@@ -322,6 +323,11 @@
           this.showPrincipal = false
         }else{
           this.showPrincipal = true
+        }
+        if(value == 'POSTGRESQL') {
+          this.showdDatabase = true;
+        } else {
+          this.showdDatabase = false;
         }
       }
     },

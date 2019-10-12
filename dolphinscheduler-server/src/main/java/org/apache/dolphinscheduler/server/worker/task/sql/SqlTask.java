@@ -48,7 +48,6 @@ import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.sql.*;
 import java.util.*;
@@ -76,7 +75,6 @@ public class SqlTask extends AbstractTask {
     /**
      *  alert dao
      */
-    @Autowired
     private AlertDao alertDao;
 
     /**
@@ -90,7 +88,7 @@ public class SqlTask extends AbstractTask {
     private BaseDataSource baseDataSource;
 
 
-    public SqlTask(TaskProps taskProps, Logger logger,ProcessDao processDao) {
+    public SqlTask(TaskProps taskProps, Logger logger) {
         super(taskProps, logger);
 
         logger.info("sql task params {}", taskProps.getTaskParams());
@@ -99,8 +97,8 @@ public class SqlTask extends AbstractTask {
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
         }
-        this.processDao = processDao;
-//        this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+        this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
     }
 
     @Override

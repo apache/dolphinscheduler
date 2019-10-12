@@ -232,6 +232,7 @@ export default {
   'Service-Worker': '服务管理-Worker',
   'Process Name': '工作流名称',
   'Run Type': '运行类型',
+  'Scheduling Time': '调度时间',
   'Run Times': '运行次数',
   'host': 'host',
   'fault-tolerant sign': '容错标识',
@@ -464,7 +465,7 @@ export default {
   'Process Define Count': '流程定义个数',
   'Process Instance Running Count': '运行流程实例个数',
   'Please select a queue': '请选择队列',
-  'process number of waiting for running': '待执行的流程数',
+  'command number of waiting for running': '待执行的命令数',
   'failure command number': '执行失败的命令数',
   'tasks number of waiting running': '待运行任务数',
   'task number of ready to kill': '待杀死任务数',
@@ -493,5 +494,6 @@ export default {
   'Http Check Condition':'校验条件',
   'Http Condition':'校验内容',
   'Please Enter Http Url': '请填写请求地址(必填)',
-  'Please Enter Http Condition': '请填写校验内容'
+  'Please Enter Http Condition': '请填写校验内容',
+  'There is no data for this period of time': '该时间段无数据'
 }

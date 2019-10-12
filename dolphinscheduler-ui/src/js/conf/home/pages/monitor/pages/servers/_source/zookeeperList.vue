@@ -49,7 +49,7 @@
           </td>
           <td>
             <span>
-              <a href="javascript:" class="links">{{item.hostname}}</a>
+              {{item.hostname}}
             </span>
           </td>
           <td><span>{{item.connections}}</span></td>

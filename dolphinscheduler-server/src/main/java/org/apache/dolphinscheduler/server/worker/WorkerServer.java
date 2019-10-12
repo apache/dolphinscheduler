@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.server.worker;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -27,15 +30,13 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.AbstractServer;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.runner.FetchTaskThread;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,8 +71,7 @@ public class WorkerServer extends AbstractServer {
     /**
      *  alert database access
      */
-    @Autowired
-    private AlertDao alertDao;
+    private final AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);;
 
     /**
      * heartbeat thread pool
@@ -93,9 +93,10 @@ public class WorkerServer extends AbstractServer {
      */
     private ExecutorService fetchTaskExecutorService;
 
-    public WorkerServer(){}
+    public WorkerServer(){
+    }
 
-    public WorkerServer(ProcessDao processDao, AlertDao alertDao){
+    public WorkerServer(ProcessDao processDao){
         try {
             conf = new PropertiesConfiguration(Constants.WORKER_PROPERTIES_PATH);
         }catch (ConfigurationException e){
@@ -131,9 +132,9 @@ public class WorkerServer extends AbstractServer {
         // set the name of the current thread
         Thread.currentThread().setName("Worker-Main-Thread");
 
-        WorkerServer workerServer = new WorkerServer(processDao,alertDao);
+        WorkerServer workerServer = new WorkerServer(processDao);
 
-        workerServer.run(processDao,alertDao);
+        workerServer.run(processDao);
 
         logger.info("worker server started");
 
@@ -142,7 +143,7 @@ public class WorkerServer extends AbstractServer {
     }
 
 
-    public void run(ProcessDao processDao, AlertDao alertDao){
+    public void run(ProcessDao processDao){
 
         //  heartbeat interval
         heartBeatInterval = conf.getInt(Constants.WORKER_HEARTBEAT_INTERVAL,
@@ -161,7 +162,7 @@ public class WorkerServer extends AbstractServer {
                 scheduleAtFixedRate(heartBeatThread, 5, heartBeatInterval, TimeUnit.SECONDS);
 
         // kill process thread implement
-        Runnable killProcessThread = getKillProcessThread();
+        Runnable killProcessThread = getKillProcessThread(processDao);
 
         // submit kill process thread
         killExecutorService.execute(killProcessThread);
@@ -287,7 +288,7 @@ public class WorkerServer extends AbstractServer {
      *  kill process thread implement
      * @return
      */
-    private Runnable getKillProcessThread(){
+    private Runnable getKillProcessThread(ProcessDao processDao){
         Runnable killProcessThread  = new Runnable() {
             @Override
             public void run() {

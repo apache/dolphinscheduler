@@ -59,7 +59,7 @@ public class PythonTask extends AbstractTask {
   private ProcessDao processDao;
 
 
-  public PythonTask(TaskProps taskProps, Logger logger,ProcessDao processDao) {
+  public PythonTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
 
     this.taskDir = taskProps.getTaskDir();
@@ -73,7 +73,7 @@ public class PythonTask extends AbstractTask {
             taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(),
             logger);
-    this.processDao = processDao;
+    this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
   }
 
   @Override
