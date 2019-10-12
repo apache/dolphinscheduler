@@ -25,7 +25,7 @@ import com.alibaba.druid.support.http.StatViewServlet;
 //                @WebInitParam(name="allow",value="127.0.0.1"),
 //                @WebInitParam(name="deny",value="192.168.16.111"),
                 @WebInitParam(name="loginUsername",value="admin"),
-                @WebInitParam(name="loginPassword",value="escheduler123"),
+                @WebInitParam(name="loginPassword",value="dolphinscheduler123"),
                 @WebInitParam(name="resetEnable",value="true")
         }) */
 public class DruidStatViewServlet extends StatViewServlet {

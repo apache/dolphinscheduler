@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.sql;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.dao.DaoFactory;
@@ -55,7 +56,7 @@ public class SqlExecutorTest {
         String nodeName = "mysql sql test";
         String taskAppId = "51_11282_263978";
         String tenantCode = "hdfs";
-        int taskInstId = 263978;
+        int taskInstId = 7;
         sharedTestSqlTask(nodeName, taskAppId, tenantCode, taskInstId);
     }
 
@@ -105,7 +106,7 @@ public class SqlExecutorTest {
         taskProps.setTaskTimeout(360000);
         taskProps.setTaskInstId(taskInstId);
         taskProps.setNodeName(nodeName);
-
+        taskProps.setCmdTypeIfComplement(CommandType.START_PROCESS);
 
 
         TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);

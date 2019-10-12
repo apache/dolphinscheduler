@@ -45,8 +45,8 @@ public class CombinedApplicationServer extends SpringBootServletInitializer {
         MasterServer master = new MasterServer(processDao);
         master.run(processDao);
 
-        WorkerServer workerServer = new WorkerServer(processDao, alertDao);
-        workerServer.run(processDao, alertDao);
+        WorkerServer workerServer = new WorkerServer(processDao);
+        workerServer.run(processDao);
 
         LoggerServer server = new LoggerServer();
         server.start();

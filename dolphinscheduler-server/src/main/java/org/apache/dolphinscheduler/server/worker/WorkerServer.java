@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.server.worker;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -27,15 +30,13 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.AbstractServer;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.runner.FetchTaskThread;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,8 +71,7 @@ public class WorkerServer extends AbstractServer {
     /**
      *  alert database access
      */
-    @Autowired
-    private AlertDao alertDao;
+    private final AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);;
 
     /**
      * heartbeat thread pool
@@ -93,9 +93,10 @@ public class WorkerServer extends AbstractServer {
      */
     private ExecutorService fetchTaskExecutorService;
 
-    public WorkerServer(){}
+    public WorkerServer(){
+    }
 
-    public WorkerServer(ProcessDao processDao, AlertDao alertDao){
+    public WorkerServer(ProcessDao processDao){
         try {
             conf = new PropertiesConfiguration(Constants.WORKER_PROPERTIES_PATH);
         }catch (ConfigurationException e){
@@ -131,9 +132,9 @@ public class WorkerServer extends AbstractServer {
         // set the name of the current thread
         Thread.currentThread().setName("Worker-Main-Thread");
 
-        WorkerServer workerServer = new WorkerServer(processDao,alertDao);
+        WorkerServer workerServer = new WorkerServer(processDao);
 
-        workerServer.run(processDao,alertDao);
+        workerServer.run(processDao);
 
         logger.info("worker server started");
 
@@ -142,7 +143,7 @@ public class WorkerServer extends AbstractServer {
     }
 
 
-    public void run(ProcessDao processDao, AlertDao alertDao){
+    public void run(ProcessDao processDao){
 
         //  heartbeat interval
         heartBeatInterval = conf.getInt(Constants.WORKER_HEARTBEAT_INTERVAL,
@@ -176,7 +177,7 @@ public class WorkerServer extends AbstractServer {
                 logger.warn("worker server stopped");
                 // worker server exit alert
                 if (zkWorkerClient.getActiveMasterNum() <= 1) {
-                    for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
+                    for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
                         alertDao.sendServerStopedAlert(1, OSUtils.getHost(), "Worker-Server");
                     }
                 }
@@ -291,7 +292,7 @@ public class WorkerServer extends AbstractServer {
         Runnable killProcessThread  = new Runnable() {
             @Override
             public void run() {
-                Set<String> taskInfoSet = taskQueue.smembers(Constants.SCHEDULER_TASKS_KILL);
+                Set<String> taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                 while (Stopper.isRunning()){
                     try {
                         Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -316,13 +317,13 @@ public class WorkerServer extends AbstractServer {
                                     }else{
                                         ProcessUtils.kill(taskInstance);
                                     }
-                                    taskQueue.srem(Constants.SCHEDULER_TASKS_KILL,taskInfo);
+                                    taskQueue.srem(Constants.DOLPHINSCHEDULER_TASKS_KILL,taskInfo);
                                 }
                             }
                         }
                     }
 
-                    taskInfoSet = taskQueue.smembers(Constants.SCHEDULER_TASKS_KILL);
+                    taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                 }
             }
         };

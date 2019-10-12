@@ -33,7 +33,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.quartz.CronExpression;
@@ -47,6 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.dao.datasource.ConnectionFactory.getMapper;
 
 /**
  * process relative dao that some mappers in this.
@@ -110,7 +110,7 @@ public class ProcessDao extends AbstractBaseDao {
     protected ITaskQueue taskQueue;
 
     public ProcessDao(){
-//        init();
+        init();
     }
 
     /**
@@ -118,19 +118,22 @@ public class ProcessDao extends AbstractBaseDao {
      */
     @Override
     protected void init() {
-        userMapper = ConnectionFactory.getMapper(UserMapper.class);
-        processDefineMapper = ConnectionFactory.getMapper(ProcessDefinitionMapper.class);
-        processInstanceMapper = ConnectionFactory.getMapper(ProcessInstanceMapper.class);
-        dataSourceMapper = ConnectionFactory.getMapper(DataSourceMapper.class);
-        processInstanceMapMapper = ConnectionFactory.getMapper(ProcessInstanceMapMapper.class);
-        taskInstanceMapper = ConnectionFactory.getMapper(TaskInstanceMapper.class);
-        commandMapper = ConnectionFactory.getMapper(CommandMapper.class);
-        scheduleMapper = ConnectionFactory.getMapper(ScheduleMapper.class);
-        udfFuncMapper = ConnectionFactory.getMapper(UdfFuncMapper.class);
-        resourceMapper = ConnectionFactory.getMapper(ResourceMapper.class);
-        workerGroupMapper = ConnectionFactory.getMapper(WorkerGroupMapper.class);
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
-        tenantMapper = ConnectionFactory.getMapper(TenantMapper.class);
+
+
+        userMapper = getMapper(UserMapper.class);
+        processDefineMapper = getMapper(ProcessDefinitionMapper.class);
+        processInstanceMapper = getMapper(ProcessInstanceMapper.class);
+        dataSourceMapper = getMapper(DataSourceMapper.class);
+        processInstanceMapMapper = getMapper(ProcessInstanceMapMapper.class);
+        taskInstanceMapper = getMapper(TaskInstanceMapper.class);
+        commandMapper = getMapper(CommandMapper.class);
+        scheduleMapper = getMapper(ScheduleMapper.class);
+        udfFuncMapper = getMapper(UdfFuncMapper.class);
+        resourceMapper = getMapper(ResourceMapper.class);
+        workerGroupMapper = getMapper(WorkerGroupMapper.class);
+        taskQueue = TaskQueueFactory.getTaskQueueInstance();
+        tenantMapper = getMapper(TenantMapper.class);
     }
 
 
@@ -141,7 +144,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param validThreadNum
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public ProcessInstance scanCommand(Logger logger, String host, int validThreadNum){
 
         ProcessInstance processInstance = null;
@@ -159,17 +162,17 @@ public class ProcessDao extends AbstractBaseDao {
                 delCommandByid(command.getId());
                 saveErrorCommand(command, "process instance is null");
                 return null;
-            }else if(!checkThreadNum(command, validThreadNum)){
-                    logger.info("there is not enough thread for this command: {}",command.toString() );
-                    return setWaitingThreadProcess(command, processInstance);
-            }else{
-                    processInstance.setCommandType(command.getCommandType());
-                    processInstance.addHistoryCmd(command.getCommandType());
-                    saveProcessInstance(processInstance);
-                    this.setSubProcessParam(processInstance);
-                    delCommandByid(command.getId());
-                    return processInstance;
             }
+            if(!checkThreadNum(command, validThreadNum)){
+                logger.info("there is not enough thread for this command: {}",command.toString() );
+                return setWaitingThreadProcess(command, processInstance);
+            }
+            processInstance.setCommandType(command.getCommandType());
+            processInstance.addHistoryCmd(command.getCommandType());
+            saveProcessInstance(processInstance);
+            this.setSubProcessParam(processInstance);
+            delCommandByid(command.getId());
+            return processInstance;
         }catch (Exception e){
             logger.error("scan command error ", e);
             saveErrorCommand(command, e.toString());
@@ -244,7 +247,7 @@ public class ProcessDao extends AbstractBaseDao {
             JSONObject tempObj;
             int processInstanceId = cmdParamObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING);
 
-            List<Command> commands = commandMapper.getAll(null);
+            List<Command> commands = commandMapper.selectList(null);
             //遍历所有命令
             for (Command tmpCommand:commands){
                 if(cmdTypeMap.containsKey(tmpCommand.getCommandType())){
@@ -799,7 +802,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param taskInstance
      * @return
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public TaskInstance submitTask(TaskInstance taskInstance, ProcessInstance processInstance){
         logger.info("start submit task : {}, instance id:{}, state: {}, ",
                 taskInstance.getName(), processInstance.getId(), processInstance.getState() );
@@ -999,7 +1002,7 @@ public class ProcessDao extends AbstractBaseDao {
                 return true;
             }
             logger.info("task ready to queue: {}" , task);
-            taskQueue.add(SCHEDULER_TASKS_QUEUE, taskZkInfo(task));
+            taskQueue.add(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo(task));
             logger.info(String.format("master insert into queue success, task : %s", task.getName()) );
             return true;
         }catch (Exception e){
@@ -1118,7 +1121,7 @@ public class ProcessDao extends AbstractBaseDao {
 
         String taskZkInfo = taskZkInfo(task);
 
-        return taskQueue.checkTaskExists(SCHEDULER_TASKS_QUEUE, taskZkInfo);
+        return taskQueue.checkTaskExists(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo);
     }
 
     /**
@@ -1440,7 +1443,7 @@ public class ProcessDao extends AbstractBaseDao {
      * process need failover process instance
      * @param processInstance
      */
-    @Transactional(value = "TransactionManager",rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance){
 
 

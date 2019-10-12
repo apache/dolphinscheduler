@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
@@ -26,9 +29,6 @@ import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
 import org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.server.quartz.QuartzExecutors;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang3.StringUtils;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class MasterServer extends AbstractServer {
     private ScheduledExecutorService heartbeatMasterService;
 
     /**
-     *  escheduler database interface
+     *  dolphinscheduler database interface
      */
     @Autowired
     protected ProcessDao processDao;
@@ -163,7 +163,7 @@ public class MasterServer extends AbstractServer {
             public void run() {
                 logger.info("master server stopped");
                 if (zkMasterClient.getActiveMasterNum() <= 1) {
-                    for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER;i++) {
+                    for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
                         zkMasterClient.getAlertDao().sendServerStopedAlert(
                                 1, OSUtils.getHost(), "Master-Server");
                     }

@@ -137,14 +137,16 @@ public class SessionService extends BaseService{
    * @param loginUser
    */
   public void signOut(String ip, User loginUser) {
-    /**
-     * query session by user id and ip
-     */
-    List<Session> sessionList = sessionMapper.queryByUserId(loginUser.getId());
+    try {
+      /**
+       * query session by user id and ip
+       */
+      Session session = sessionMapper.queryByUserIdAndIp(loginUser.getId(),ip);
 
-    for (Session session : sessionList){
       //delete session
       sessionMapper.deleteById(session.getId());
+    }catch (Exception e){
+
     }
   }
 }

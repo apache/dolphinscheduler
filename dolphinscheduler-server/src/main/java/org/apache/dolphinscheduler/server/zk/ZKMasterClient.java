@@ -103,7 +103,7 @@ public class ZKMasterClient extends AbstractZKClient {
 
 		InterProcessMutex mutex = null;
 		try {
-			// create distributed lock with the root node path of the lock space as /escheduler/lock/failover/master
+			// create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
 			String znodeLock = getMasterStartUpLockPath();
 			mutex = new InterProcessMutex(zkClient, znodeLock);
 			mutex.acquire();
@@ -141,7 +141,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	public void initDao(){
 		this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-		this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+//		this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
 	}
 	/**
 	 * get alert dao
@@ -265,7 +265,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	private void alertServerDown(String serverHost, ZKNodeType zkNodeType) {
 
 	    String serverType = zkNodeType.toString();
-		for (int i = 0; i < Constants.ESCHEDULER_WARN_TIMES_FAILOVER; i++) {
+		for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
 			alertDao.sendServerStopedAlert(1, serverHost, serverType);
 		}
 	}

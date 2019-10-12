@@ -49,8 +49,8 @@
 			<version>2.12.0</version>
 			<exclusions>
 				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
+					<groupId>log4j-1.2-api</groupId>
+					<artifactId>org.apache.logging.log4j</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>io.netty</groupId>
@@ -580,6 +580,22 @@
 
 
 	<build>
+		<!--<resources>-->
+			<!--<resource>-->
+				<!--<directory>src/main/java</directory>-->
+				<!--<includes>-->
+					<!--<include>**/*.xml</include>-->
+				<!--</includes>-->
+				<!--<filtering>false</filtering>-->
+			<!--</resource>-->
+			<!--<resource>-->
+				<!--<directory>src/main/resources</directory>-->
+				<!--<includes>-->
+					<!--<include>**/*.*</include>-->
+				<!--</includes>-->
+				<!--<filtering>false</filtering>-->
+			<!--</resource>-->
+		<!--</resources>-->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

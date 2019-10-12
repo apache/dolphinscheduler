@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
 import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
@@ -246,14 +247,17 @@ public class DataAnalysisService {
         Date start = null;
         Date end = null;
 
-        try {
-            start = DateUtils.getScheduleDate(startDate);
-            end = DateUtils.getScheduleDate(endDate);
-        } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-            putErrorRequestParamsMsg(result);
-            return result;
+        if (startDate != null && endDate != null){
+            try {
+                start = DateUtils.getScheduleDate(startDate);
+                end = DateUtils.getScheduleDate(endDate);
+            } catch (Exception e) {
+                logger.error(e.getMessage(),e);
+                putErrorRequestParamsMsg(result);
+                return result;
+            }
         }
+
 
         Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         // count command state
@@ -278,18 +282,21 @@ public class DataAnalysisService {
 
 
         // init data map
-//        dataMap.put(ExecutionStatus.SUBMITTED_SUCCESS,commonCommand);
-//        dataMap.put(ExecutionStatus.RUNNING_EXEUTION,commonCommand);
-//        dataMap.put(ExecutionStatus.READY_PAUSE,commonCommand);
-//        dataMap.put(ExecutionStatus.PAUSE,commonCommand);
-//        dataMap.put(ExecutionStatus.READY_STOP,commonCommand);
-//        dataMap.put(ExecutionStatus.STOP,commonCommand);
-//        dataMap.put(ExecutionStatus.FAILURE,commonCommand);
-//        dataMap.put(ExecutionStatus.SUCCESS,commonCommand);
-//        dataMap.put(ExecutionStatus.NEED_FAULT_TOLERANCE,commonCommand);
-//        dataMap.put(ExecutionStatus.KILL,commonCommand);
-//        dataMap.put(ExecutionStatus.WAITTING_THREAD,commonCommand);
-//        dataMap.put(ExecutionStatus.WAITTING_DEPEND,commonCommand);
+        /**
+         * START_PROCESS, START_CURRENT_TASK_PROCESS, RECOVER_TOLERANCE_FAULT_PROCESS, RECOVER_SUSPENDED_PROCESS,
+         START_FAILURE_TASK_PROCESS,COMPLEMENT_DATA,SCHEDULER, REPEAT_RUNNING,PAUSE,STOP,RECOVER_WAITTING_THREAD;
+         */
+        dataMap.put(CommandType.START_PROCESS,commonCommand);
+        dataMap.put(CommandType.START_CURRENT_TASK_PROCESS,commonCommand);
+        dataMap.put(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS,commonCommand);
+        dataMap.put(CommandType.RECOVER_SUSPENDED_PROCESS,commonCommand);
+        dataMap.put(CommandType.START_FAILURE_TASK_PROCESS,commonCommand);
+        dataMap.put(CommandType.COMPLEMENT_DATA,commonCommand);
+        dataMap.put(CommandType.SCHEDULER,commonCommand);
+        dataMap.put(CommandType.REPEAT_RUNNING,commonCommand);
+        dataMap.put(CommandType.PAUSE,commonCommand);
+        dataMap.put(CommandType.STOP,commonCommand);
+        dataMap.put(CommandType.RECOVER_WAITTING_THREAD,commonCommand);
 
         // put command state
         for (CommandCount executeStatusCount : commandStateCounts){
@@ -347,8 +354,8 @@ public class DataAnalysisService {
         }
 
         ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-        List<String> tasksQueueList = tasksQueue.getAllTasks(org.apache.dolphinscheduler.common.Constants.SCHEDULER_TASKS_QUEUE);
-        List<String> tasksKillList = tasksQueue.getAllTasks(org.apache.dolphinscheduler.common.Constants.SCHEDULER_TASKS_KILL);
+        List<String> tasksQueueList = tasksQueue.getAllTasks(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
+        List<String> tasksKillList = tasksQueue.getAllTasks(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_KILL);
 
         Map<String,Integer> dataMap = new HashMap<>();
         if (loginUser.getUserType() == UserType.ADMIN_USER){

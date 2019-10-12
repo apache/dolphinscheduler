@@ -45,19 +45,20 @@ public class MonitorDBDao {
 
     static {
         try {
-            conf = new PropertiesConfiguration(Constants.DATA_SOURCE_PROPERTIES);
+            conf = new PropertiesConfiguration(Constants.APPLICATION_PROPERTIES);
         }catch (ConfigurationException e){
             logger.error("load configuration excetpion",e);
             System.exit(1);
         }
     }
 
+
     /**
      * create connection
      * @return
      */
     private static Connection getConn() {
-        String url = conf.getString(Constants.SPRING_DATASOURCE_URL);
+        String url =  conf.getString(Constants.SPRING_DATASOURCE_URL);
         String username = conf.getString(Constants.SPRING_DATASOURCE_USERNAME);
         String password = conf.getString(Constants.SPRING_DATASOURCE_PASSWORD);
         Connection conn = null;

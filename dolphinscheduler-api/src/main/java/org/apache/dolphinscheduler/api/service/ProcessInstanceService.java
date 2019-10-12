@@ -194,7 +194,11 @@ public class ProcessInstanceService extends BaseDAGService {
                 project.getId(), processDefineId, searchVal, statusArray, host, start, end);
 
         for(ProcessInstance processInstance:processInstanceList.getRecords()){
-            processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
+            if (StringUtils.isNotEmpty(startDate)
+                    && StringUtils.isNotEmpty(endDate)){
+                processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
+            }
+
         }
 
         Set<String> exclusionSet = new HashSet<String>(){{
@@ -205,7 +209,7 @@ public class ProcessInstanceService extends BaseDAGService {
         }};
 
         PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
-        pageInfo.setTotalCount((int)processInstanceList.getTotal());
+        pageInfo.setTotalCount((int) processInstanceList.getTotal());
         pageInfo.setLists(CollectionUtils.getListByExclusion(processInstanceList.getRecords(), exclusionSet));
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -536,7 +540,7 @@ public class ProcessInstanceService extends BaseDAGService {
 
                 try {
                     logger.info("delete task queue node : {}",nodeValueSb.toString());
-                    tasksQueue.removeNode(org.apache.dolphinscheduler.common.Constants.SCHEDULER_TASKS_QUEUE, nodeValueSb.toString());
+                    tasksQueue.removeNode(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE, nodeValueSb.toString());
                 }catch (Exception e){
                     logger.error("delete task queue node : {}", nodeValueSb.toString());
                 }

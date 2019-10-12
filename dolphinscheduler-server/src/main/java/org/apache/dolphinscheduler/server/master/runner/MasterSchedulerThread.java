@@ -43,7 +43,7 @@ public class MasterSchedulerThread implements Runnable {
     private final ExecutorService masterExecService;
 
     /**
-     * escheduler database interface
+     * dolphinscheduler database interface
      */
     private final ProcessDao processDao;
 
@@ -76,7 +76,7 @@ public class MasterSchedulerThread implements Runnable {
                 if(OSUtils.checkResource(conf, true)){
                     if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
 
-                        // create distributed lock with the root node path of the lock space as /escheduler/lock/failover/master
+                        // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
                         String znodeLock = zkMasterClient.getMasterLockPath();
 
                         mutex = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
@@ -88,7 +88,7 @@ public class MasterSchedulerThread implements Runnable {
                         processInstance = processDao.scanCommand(logger, OSUtils.getHost(), this.masterExecThreadNum - activeCount);
                         if (processInstance != null) {
                             logger.info("start master exex thread , split DAG ...");
-                            masterExecService.execute(new MasterExecThread(processInstance));
+                            masterExecService.execute(new MasterExecThread(processInstance,processDao));
                         }
                     }
                 }

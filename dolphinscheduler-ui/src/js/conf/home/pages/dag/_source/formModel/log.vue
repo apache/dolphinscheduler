@@ -153,7 +153,7 @@
        * Download log
        */
       _downloadLog () {
-        downloadFile('/escheduler/log/download-log', {
+        downloadFile('/dolphinscheduler/log/download-log', {
           taskInstId: this.stateId || this.logId
         })
       },

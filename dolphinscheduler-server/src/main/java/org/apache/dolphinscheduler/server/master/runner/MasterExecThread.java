@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
@@ -95,8 +96,8 @@ public class MasterExecThread implements Runnable {
      */
     private static Configuration conf;
 
-    public MasterExecThread(ProcessInstance processInstance){
-        this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+    public MasterExecThread(ProcessInstance processInstance,ProcessDao processDao){
+        this.processDao = processDao;
 
         this.processInstance = processInstance;
 

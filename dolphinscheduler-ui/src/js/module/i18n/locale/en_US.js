@@ -232,6 +232,7 @@ export default {
   'Service-Worker': 'Service-Worker',
   'Process Name': 'Process Name',
   'Run Type': 'Run Type',
+  'Scheduling Time': 'Scheduling Time',
   'Run Times': 'Run Times',
   'host': 'host',
   'fault-tolerant sign': 'fault-tolerant sign',
@@ -463,7 +464,7 @@ export default {
   'Statement cannot be empty': 'Statement cannot be empty',
   'Process Define Count': 'Process Define Count',
   'Process Instance Running Count': 'Process Instance Running Count',
-  'process number of waiting for running': 'process number of waiting for running',
+  'command number of waiting for running': 'command number of waiting for running',
   'failure command number': 'failure command number',
   'tasks number of waiting running': 'tasks number of waiting running',
   'task number of ready to kill': 'task number of ready to kill',
@@ -487,5 +488,6 @@ export default {
   'Http Check Condition':'Http Check Condition',
   'Http Condition':'Http Condition',
   'Please Enter Http Url': 'Please Enter Http Url(required)',
-  'Please Enter Http Condition': 'Please Enter Http Condition'
+  'Please Enter Http Condition': 'Please Enter Http Condition',
+  'There is no data for this period of time': 'There is no data for this period of time'
 }
