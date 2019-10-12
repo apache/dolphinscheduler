@@ -465,7 +465,7 @@ export default {
   'Process Define Count': '流程定义个数',
   'Process Instance Running Count': '运行流程实例个数',
   'Please select a queue': '请选择队列',
-  'process number of waiting for running': '待执行的流程数',
+  'command number of waiting for running': '待执行的命令数',
   'failure command number': '执行失败的命令数',
   'tasks number of waiting running': '待运行任务数',
   'task number of ready to kill': '待杀死任务数',
