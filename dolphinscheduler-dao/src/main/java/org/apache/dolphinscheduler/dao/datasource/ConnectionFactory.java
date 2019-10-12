@@ -17,14 +17,14 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.ibatis.mapping.Environment;
-import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -43,13 +43,13 @@ public class ConnectionFactory {
   private static SqlSessionFactory sqlSessionFactory;
 
   /**
-   * 加载配置文件
+   * Load configuration file
    */
   private static org.apache.commons.configuration.Configuration conf;
 
   static {
     try {
-      conf = new PropertiesConfiguration(Constants.DATA_SOURCE_PROPERTIES);
+      conf = new PropertiesConfiguration(Constants.APPLICATION_PROPERTIES);
     }catch (ConfigurationException e){
       logger.error("load configuration excetpion",e);
       System.exit(1);
@@ -60,26 +60,40 @@ public class ConnectionFactory {
    * get the data source
    */
   public static DruidDataSource getDataSource() {
+
     DruidDataSource druidDataSource = new DruidDataSource();
-//    Map<String, String> allMap = YmlConfig.allMap;
-    druidDataSource.setDriverClassName(conf.getString("spring.datasource.driver-class-name"));
-    druidDataSource.setUrl(conf.getString("spring.datasource.url"));
-    druidDataSource.setUsername(conf.getString("spring.datasource.username"));
-    druidDataSource.setPassword(conf.getString("spring.datasource.password"));
-    druidDataSource.setInitialSize(5);
-    druidDataSource.setMinIdle(5);
-    druidDataSource.setMaxActive(20);
-    druidDataSource.setMaxWait(60000);
-    druidDataSource.setTimeBetweenEvictionRunsMillis(60000);
-    druidDataSource.setMinEvictableIdleTimeMillis(300000);
-    druidDataSource.setValidationQuery("SELECT 1");
+
+    druidDataSource.setDriverClassName(conf.getString(Constants.SPRING_DATASOURCE_DRIVER_CLASS_NAME));
+    druidDataSource.setUrl(conf.getString(Constants.SPRING_DATASOURCE_URL));
+    druidDataSource.setUsername(conf.getString(Constants.SPRING_DATASOURCE_USERNAME));
+    druidDataSource.setPassword(conf.getString(Constants.SPRING_DATASOURCE_PASSWORD));
+    druidDataSource.setValidationQuery(conf.getString(Constants.SPRING_DATASOURCE_VALIDATION_QUERY));
+
+    druidDataSource.setPoolPreparedStatements(conf.getBoolean(Constants.SPRING_DATASOURCE_POOL_PREPARED_STATEMENTS));
+    druidDataSource.setTestWhileIdle(conf.getBoolean(Constants.SPRING_DATASOURCE_TEST_WHILE_IDLE));
+    druidDataSource.setTestOnBorrow(conf.getBoolean(Constants.SPRING_DATASOURCE_TEST_ON_BORROW));
+    druidDataSource.setTestOnReturn(conf.getBoolean(Constants.SPRING_DATASOURCE_TEST_ON_RETURN));
+    druidDataSource.setKeepAlive(conf.getBoolean(Constants.SPRING_DATASOURCE_KEEP_ALIVE));
+
+    druidDataSource.setMinIdle(conf.getInt(Constants.SPRING_DATASOURCE_MIN_IDLE));
+    druidDataSource.setMaxActive(conf.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE));
+    druidDataSource.setMaxWait(conf.getInt(Constants.SPRING_DATASOURCE_MAX_WAIT));
+    druidDataSource.setMaxPoolPreparedStatementPerConnectionSize(conf.getInt(Constants.SPRING_DATASOURCE_MAX_POOL_PREPARED_STATEMENT_PER_CONNECTION_SIZE));
+    druidDataSource.setInitialSize(conf.getInt(Constants.SPRING_DATASOURCE_INITIAL_SIZE));
+    druidDataSource.setTimeBetweenEvictionRunsMillis(conf.getLong(Constants.SPRING_DATASOURCE_TIME_BETWEEN_EVICTION_RUNS_MILLIS));
+    druidDataSource.setTimeBetweenConnectErrorMillis(conf.getLong(Constants.SPRING_DATASOURCE_TIME_BETWEEN_CONNECT_ERROR_MILLIS));
+    druidDataSource.setMinEvictableIdleTimeMillis(conf.getLong(Constants.SPRING_DATASOURCE_MIN_EVICTABLE_IDLE_TIME_MILLIS));
+    druidDataSource.setValidationQueryTimeout(conf.getInt(Constants.SPRING_DATASOURCE_VALIDATION_QUERY_TIMEOUT));
+    //auto commit
+    druidDataSource.setDefaultAutoCommit(conf.getBoolean(Constants.SPRING_DATASOURCE_DEFAULT_AUTO_COMMIT));
+
     return druidDataSource;
   }
 
   /**
    * get sql session factory
    */
-  public static SqlSessionFactory getSqlSessionFactory() {
+  public static SqlSessionFactory getSqlSessionFactory() throws Exception {
     if (sqlSessionFactory == null) {
       synchronized (ConnectionFactory.class) {
         if (sqlSessionFactory == null) {
@@ -88,13 +102,18 @@ public class ConnectionFactory {
 
           Environment environment = new Environment("development", transactionFactory, dataSource);
 
-          Configuration configuration = new Configuration(environment);
+          MybatisConfiguration configuration = new MybatisConfiguration();
+          configuration.setEnvironment(environment);
           configuration.setLazyLoadingEnabled(true);
           configuration.addMappers("org.apache.dolphinscheduler.dao.mapper");
 
+          MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
+          sqlSessionFactoryBean.setConfiguration(configuration);
+          sqlSessionFactoryBean.setDataSource(dataSource);
 
-          SqlSessionFactoryBuilder builder = new SqlSessionFactoryBuilder();
-          sqlSessionFactory = builder.build(configuration);
+          sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
+          sqlSessionFactory = sqlSessionFactoryBean.getObject();
+          return sqlSessionFactory;
         }
       }
     }
@@ -106,10 +125,20 @@ public class ConnectionFactory {
    * get sql session
    */
   public static SqlSession getSqlSession() {
-    return new SqlSessionTemplate(getSqlSessionFactory());
+    try {
+      return new SqlSessionTemplate(getSqlSessionFactory());
+    } catch (Exception e) {
+      logger.error(e.getMessage(),e);
+      throw new RuntimeException("get sqlSession failed!");
+    }
   }
 
   public static <T> T getMapper(Class<T> type){
-    return getSqlSession().getMapper(type);
+    try {
+      return getSqlSession().getMapper(type);
+    } catch (Exception e) {
+      logger.error(e.getMessage(),e);
+      throw new RuntimeException("get mapper failed!");
+    }
   }
 }

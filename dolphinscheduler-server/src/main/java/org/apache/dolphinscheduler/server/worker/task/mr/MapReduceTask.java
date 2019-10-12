@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -49,8 +48,8 @@ public class MapReduceTask extends AbstractYarnTask {
      * @param props
      * @param logger
      */
-    public MapReduceTask(TaskProps props, Logger logger,ProcessDao processDao) {
-        super(props, logger,processDao);
+    public MapReduceTask(TaskProps props, Logger logger) {
+        super(props, logger);
     }
 
     @Override
