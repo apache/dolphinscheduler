@@ -464,7 +464,7 @@ if [ $? -eq 0 ]
 then
 	echo 'scp copy completed'
 else
-	echo 'sc copy failed to exit'
+	echo 'scp copy failed to exit'
 	exit -1
 fi
 
