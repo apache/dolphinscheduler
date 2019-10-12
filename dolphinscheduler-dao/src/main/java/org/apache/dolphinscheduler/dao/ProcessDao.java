@@ -46,6 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
+import static org.apache.dolphinscheduler.dao.datasource.ConnectionFactory.getMapper;
 
 /**
  * process relative dao that some mappers in this.
@@ -118,6 +119,21 @@ public class ProcessDao extends AbstractBaseDao {
     @Override
     protected void init() {
         taskQueue = TaskQueueFactory.getTaskQueueInstance();
+
+
+        userMapper = getMapper(UserMapper.class);
+        processDefineMapper = getMapper(ProcessDefinitionMapper.class);
+        processInstanceMapper = getMapper(ProcessInstanceMapper.class);
+        dataSourceMapper = getMapper(DataSourceMapper.class);
+        processInstanceMapMapper = getMapper(ProcessInstanceMapMapper.class);
+        taskInstanceMapper = getMapper(TaskInstanceMapper.class);
+        commandMapper = getMapper(CommandMapper.class);
+        scheduleMapper = getMapper(ScheduleMapper.class);
+        udfFuncMapper = getMapper(UdfFuncMapper.class);
+        resourceMapper = getMapper(ResourceMapper.class);
+        workerGroupMapper = getMapper(WorkerGroupMapper.class);
+        taskQueue = TaskQueueFactory.getTaskQueueInstance();
+        tenantMapper = getMapper(TenantMapper.class);
     }
 
 

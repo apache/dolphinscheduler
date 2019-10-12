@@ -49,7 +49,7 @@ public class TaskRecordDao {
 
     static {
         try {
-            conf = new PropertiesConfiguration(Constants.DATA_SOURCE_PROPERTIES);
+            conf = new PropertiesConfiguration(Constants.APPLICATION_PROPERTIES);
         }catch (ConfigurationException e){
             logger.error("load configuration excetpion",e);
             System.exit(1);

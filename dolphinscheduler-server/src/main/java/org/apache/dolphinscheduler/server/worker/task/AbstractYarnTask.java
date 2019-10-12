@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
@@ -42,7 +41,6 @@ public abstract class AbstractYarnTask extends AbstractTask {
   /**
    *  process database access
    */
-  @Autowired
   protected ProcessDao processDao;
 
   /**
@@ -50,9 +48,9 @@ public abstract class AbstractYarnTask extends AbstractTask {
    * @param logger
    * @throws IOException
    */
-  public AbstractYarnTask(TaskProps taskProps, Logger logger,ProcessDao processDao) {
+  public AbstractYarnTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
-    this.processDao = processDao;
+    this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
     this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
             taskProps.getTaskDir(),
             taskProps.getTaskAppId(),

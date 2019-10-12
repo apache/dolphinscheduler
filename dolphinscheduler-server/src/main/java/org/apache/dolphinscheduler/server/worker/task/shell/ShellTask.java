@@ -61,7 +61,7 @@ public class ShellTask extends AbstractTask {
   private ProcessDao processDao;
 
 
-  public ShellTask(TaskProps taskProps, Logger logger,ProcessDao processDao) {
+  public ShellTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
 
     this.taskDir = taskProps.getTaskDir();
@@ -74,7 +74,7 @@ public class ShellTask extends AbstractTask {
             taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(),
             logger);
-    this.processDao = processDao;
+    this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
   }
 
   @Override
