@@ -238,22 +238,23 @@ public class QueueService extends BaseService {
 
     /**
      * check queue exist
-     *
+     * if exists return true，not exists return false
+     * check queue exist
      * @param queue
      * @return
      */
     private boolean checkQueueExist(String queue) {
-        return queueMapper.queryAllQueueList(queue, null).size()>0 ? false : true;
+        return queueMapper.queryAllQueueList(queue, null).size()>0 ? true : false;
     }
 
     /**
      * check queue name exist
-     *
+     * if exists return true，not exists return false
      * @param queueName
      * @return
      */
     private boolean checkQueueNameExist(String queueName) {
-        return queueMapper.queryAllQueueList(null ,queueName).size()>0 ? false : true;
+        return queueMapper.queryAllQueueList(null ,queueName).size() > 0 ? true : false;
     }
 
 }
