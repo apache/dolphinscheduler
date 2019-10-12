@@ -31,7 +31,7 @@
           </td>
           <td>
             <span>
-              <a href="javascript:" class="links">{{item.groupName}}</a>
+              {{item.groupName}}
             </span>
           </td>
           <td><span>{{item.groupType === 'EMAIL' ? `${$t('Email')}` : `${$t('SMS')}`}}</span></td>
