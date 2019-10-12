@@ -37,7 +37,7 @@ RUN cd /opt && \
     mkdir -p /tmp/zookeeper && \
     rm -rf /opt/zookeeper/conf/zoo_sample.cfg
 
-ADD ./conf/zookeeper/zoo.cfg /opt/zookeeper/conf
+ADD ./dockerfile/conf/zookeeper/zoo.cfg /opt/zookeeper/conf
 ENV ZK_HOME=/opt/zookeeper
 ENV PATH $PATH:$ZK_HOME/bin
 
@@ -48,7 +48,7 @@ RUN cd /opt && \
     mv apache-maven-3.3.9 maven && \
     rm -rf ./apache-maven-*tar.gz && \
     rm -rf /opt/maven/conf/settings.xml
-ADD ./conf/maven/settings.xml /opt/maven/conf
+ADD ./dockerfile/conf/maven/settings.xml /opt/maven/conf
 ENV MAVEN_HOME=/opt/maven
 ENV PATH $PATH:$MAVEN_HOME/bin
 
@@ -61,21 +61,16 @@ RUN cd /opt && \
 ENV NODE_HOME=/opt/node
 ENV PATH $PATH:$NODE_HOME/bin
 
-#5,下载escheduler
-RUN cd /opt && \
-    wget https://github.com/analysys/EasyScheduler/archive/${version}.tar.gz && \
-    tar -zxvf ${version}.tar.gz && \
-    mv EasyScheduler-${version} easyscheduler_source && \
-    rm -rf ./${version}.tar.gz
+ADD . /opt/easyscheduler_source
 
 #6,后端编译
 RUN cd /opt/easyscheduler_source && \
     mvn -U clean package assembly:assembly -Dmaven.test.skip=true
 
 #7,前端编译
-RUN chmod -R 777 /opt/easyscheduler_source/escheduler-ui && \
-    cd /opt/easyscheduler_source/escheduler-ui && \
-    rm -rf /opt/easyscheduler_source/escheduler-ui/node_modules && \
+RUN chmod -R 777 /opt/easyscheduler_source/dolphinscheduler-ui && \
+    cd /opt/easyscheduler_source/dolphinscheduler-ui && \
+    rm -rf /opt/easyscheduler_source/dolphinscheduler-ui/node_modules && \
     npm install node-sass --unsafe-perm && \
     npm install && \
     npm run build
@@ -109,14 +104,14 @@ RUN apt-get update && \
   echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
   chown -R www-data:www-data /var/lib/nginx
 
-#10,修改escheduler配置文件
+#10,修改dolphinscheduler配置文件
 #后端配置
-RUN mkdir -p /opt/escheduler && \
-    tar -zxvf /opt/easyscheduler_source/target/escheduler-${tar_version}.tar.gz -C /opt/escheduler && \
-    rm -rf /opt/escheduler/conf
-ADD ./conf/escheduler/conf /opt/escheduler/conf
+RUN mkdir -p /opt/dolphinscheduler && \
+    tar -zxvf /opt/easyscheduler_source/target/dolphinscheduler-${tar_version}.tar.gz -C /opt/dolphinscheduler && \
+    rm -rf /opt/dolphinscheduler/conf
+ADD ./dockerfile/conf/dolphinscheduler/conf /opt/dolphinscheduler/conf
 #前端nginx配置
-ADD ./conf/nginx/default.conf /etc/nginx/conf.d
+ADD ./dockerfile/conf/nginx/default.conf /etc/nginx/conf.d
 
 #11,开放端口
 EXPOSE 2181 2888 3888 3306 80 12345 8888
@@ -132,12 +127,12 @@ RUN apt-get update && \
   apt-get -y install python-pip && \
   pip install kazoo
 
-COPY ./startup.sh /root/startup.sh
+COPY ./dockerfile/startup.sh /root/startup.sh
 #13,修改权限和设置软连
 RUN chmod +x /root/startup.sh && \
-  chmod +x /opt/escheduler/script/create_escheduler.sh && \
+  chmod +x /opt/dolphinscheduler/script/create-dolphinscheduler.sh && \
   chmod +x /opt/zookeeper/bin/zkServer.sh && \
-  chmod +x /opt/escheduler/bin/escheduler-daemon.sh && \
+  chmod +x /opt/dolphinscheduler/bin/dolphinscheduler-daemon.sh && \
   rm -rf /bin/sh && \
   ln -s /bin/bash /bin/sh && \
   mkdir -p /tmp/xls
