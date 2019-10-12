@@ -19,7 +19,7 @@ const prodConfig = require('./webpack.config.prod')
 
 const config = merge.smart(prodConfig, {
   output: {
-    publicPath: '/escheduler/ui/'
+    publicPath: '/dolphinscheduler/ui/'
   }
 })
 

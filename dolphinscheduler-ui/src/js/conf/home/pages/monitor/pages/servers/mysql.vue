@@ -6,7 +6,7 @@
           <div class="col-md-2">
             <div class="text-num-model text">
               <div class="title">
-                <span :title="$t('Health status')">{{$t('Health status')}}</span>
+                <span>{{$t('Health status')}}</span>
               </div>
               <div class="value-p">
                 <span class="state">
@@ -22,7 +22,7 @@
           <div class="col-md-3">
             <div class="text-num-model text">
               <div class="title">
-                <span :title="$t('Max connections')">{{$t('Max connections')}} - {{item.date | formatDate}}</span>
+                <span>{{$t('Max connections')}} - {{item.date | formatDate}}</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[0]}">{{item.maxConnections}}</b>
@@ -35,7 +35,7 @@
           <div class="col-md-3">
             <div class="text-num-model text">
               <div class="title">
-                <span :title="$t('Threads connections')">{{$t('Threads connections')}}</span>
+                <span>{{$t('Threads connections')}}</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[8]}">{{item.threadsConnections}}</b>
@@ -48,7 +48,7 @@
           <div class="col-md-2">
             <div class="text-num-model text">
               <div class="title">
-                <span :title="$t('Max used connections')">{{$t('Max used connections')}}</span>
+                <span>{{$t('Max used connections')}}</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[2]}">{{item.maxUsedConnections}}</b>
@@ -61,7 +61,7 @@
           <div class="col-md-2">
             <div class="text-num-model text">
               <div class="title">
-                <span :title="$t('Threads running connections')">{{$t('Threads running connections')}}</span>
+                <span>{{$t('Threads running connections')}}</span>
               </div>
               <div class="value-p">
                 <b :style="{color:color[4]}">{{item.threadsRunningConnections}}</b>

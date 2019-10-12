@@ -65,7 +65,7 @@
         this.$router.push({ name: 'file' })
       },
       _downloadFile () {
-        downloadFile('/escheduler/resources/download', {
+        downloadFile('/dolphinscheduler/resources/download', {
           id: this.$route.params.id
         })
       },
