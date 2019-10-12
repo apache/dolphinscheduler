@@ -85,12 +85,11 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @param processDao
 	 * @return
 	 */
-	public static synchronized ZKMasterClient getZKMasterClient(ProcessDao processDao,AlertDao alertDao){
+	public static synchronized ZKMasterClient getZKMasterClient(ProcessDao processDao){
 		if(zkMasterClient == null){
 			zkMasterClient = new ZKMasterClient(processDao);
 		}
 		zkMasterClient.processDao = processDao;
-		zkMasterClient.alertDao = alertDao;
 
 		return zkMasterClient;
 	}
@@ -99,6 +98,8 @@ public class ZKMasterClient extends AbstractZKClient {
 	 *  init
 	 */
 	public void init(){
+		// init dao
+		this.initDao();
 
 		InterProcessMutex mutex = null;
 		try {
@@ -134,6 +135,14 @@ public class ZKMasterClient extends AbstractZKClient {
 
 
 
+
+	/**
+	 *  init dao
+	 */
+	public void initDao(){
+		this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+//		this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+	}
 	/**
 	 * get alert dao
 	 * @return
