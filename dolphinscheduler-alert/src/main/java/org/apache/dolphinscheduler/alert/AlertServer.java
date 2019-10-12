@@ -20,27 +20,22 @@ import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.annotation.ComponentScan;
 
 import java.util.List;
 
 /**
  * alert of start
  */
-@ComponentScan("org.apache.dolphinscheduler")
-public class AlertServer implements CommandLineRunner {
+public class AlertServer {
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
     /**
      * Alert Dao
      */
-    @Autowired
-    private AlertDao alertDao;
+    private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 
     private AlertSender alertSender;
 
@@ -61,7 +56,7 @@ public class AlertServer implements CommandLineRunner {
         return instance;
     }
 
-    public void start(AlertDao alertDao){
+    public void start(){
         logger.info("Alert Server ready start!");
         while (Stopper.isRunning()){
             try {
@@ -77,13 +72,8 @@ public class AlertServer implements CommandLineRunner {
 
 
     public static void main(String[] args){
-        SpringApplication app = new SpringApplication(AlertServer.class);
-        app.run(args);
+        AlertServer alertServer = AlertServer.getInstance();
+        alertServer.start();
     }
 
-    @Override
-    public void run(String... strings) throws Exception {
-        AlertServer alertServer = AlertServer.getInstance();
-        alertServer.start(alertDao);
-    }
 }

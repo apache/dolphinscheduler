@@ -42,16 +42,16 @@ public class CombinedApplicationServer extends SpringBootServletInitializer {
         ProcessDao processDao = context.getBean(ProcessDao.class);
         AlertDao alertDao = context.getBean(AlertDao.class);
 
-        MasterServer master = new MasterServer(processDao,alertDao);
+        MasterServer master = new MasterServer(processDao);
         master.run(processDao);
 
-        WorkerServer workerServer = new WorkerServer(processDao, alertDao);
-        workerServer.run(processDao, alertDao);
+        WorkerServer workerServer = new WorkerServer(processDao);
+        workerServer.run(processDao);
 
         LoggerServer server = new LoggerServer();
         server.start();
 
         AlertServer alertServer = AlertServer.getInstance();
-        alertServer.start(alertDao);
+        alertServer.start();
     }
 }
