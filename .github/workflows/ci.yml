@@ -16,4 +16,4 @@ jobs:
       - name: Apache license check
         run: echo "Apache license check(TODO)"
       - name: Spotbugs Check
-        run: mvn -U clean package spotbugs:check -Dmaven.test.skip=true
+        run: mvn -B -U clean package spotbugs:check -Dmaven.test.skip=true
