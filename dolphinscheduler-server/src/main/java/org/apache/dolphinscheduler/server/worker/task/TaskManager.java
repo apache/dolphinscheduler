@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.worker.task.dependent.DependentTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
 import org.apache.dolphinscheduler.server.worker.task.http.HttpTask;
@@ -45,27 +44,27 @@ public class TaskManager {
    * @return
    * @throws IllegalArgumentException
    */
-  public static AbstractTask newTask(String taskType, TaskProps props, Logger logger,ProcessDao processDao)
+  public static AbstractTask newTask(String taskType, TaskProps props, Logger logger)
       throws IllegalArgumentException {
     switch (EnumUtils.getEnum(TaskType.class,taskType)) {
         case SHELL:
-        return new ShellTask(props, logger,processDao);
+        return new ShellTask(props, logger);
       case PROCEDURE:
-        return new ProcedureTask(props, logger,processDao);
+        return new ProcedureTask(props, logger);
       case SQL:
-        return new SqlTask(props, logger,processDao);
+        return new SqlTask(props, logger);
       case MR:
-        return new MapReduceTask(props, logger,processDao);
+        return new MapReduceTask(props, logger);
       case SPARK:
-        return new SparkTask(props, logger,processDao);
+        return new SparkTask(props, logger);
       case FLINK:
-        return new FlinkTask(props, logger,processDao);
+        return new FlinkTask(props, logger);
       case PYTHON:
-        return new PythonTask(props, logger,processDao);
+        return new PythonTask(props, logger);
       case DEPENDENT:
-        return new DependentTask(props, logger,processDao);
+        return new DependentTask(props, logger);
       case HTTP:
-        return new HttpTask(props, logger,processDao);
+        return new HttpTask(props, logger);
       default:
         logger.error("unsupport task type: {}", taskType);
         throw new IllegalArgumentException("not support task type");
