@@ -50,7 +50,6 @@
                 #{i}
             </foreach>
         </if>
-        and t.flag = 1
         <if test="startTime != null and endTime != null">
             and t.start_time > #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
