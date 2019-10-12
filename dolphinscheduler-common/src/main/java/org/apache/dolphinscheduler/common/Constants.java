@@ -53,7 +53,7 @@ public final class Constants {
     /**
      * dao properties path
      */
-    public static final String DAO_PROPERTIES_PATH = "/dao/data_source.properties";
+    public static final String DAO_PROPERTIES_PATH = "application.properties";
 
     /**
      * fs.defaultFS
@@ -470,7 +470,7 @@ public final class Constants {
     /**
      * task record configuration path
      */
-    public static final String DATA_SOURCE_PROPERTIES = "dao/data_source.properties";
+    public static final String APPLICATION_PROPERTIES = "application.properties";
 
     public static final String TASK_RECORD_URL = "task.record.datasource.url";
 
