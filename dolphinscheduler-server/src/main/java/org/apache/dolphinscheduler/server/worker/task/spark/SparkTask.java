@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.SparkArgsUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
@@ -48,8 +47,8 @@ public class SparkTask extends AbstractYarnTask {
    */
   private SparkParameters sparkParameters;
 
-  public SparkTask(TaskProps props, Logger logger,ProcessDao processDao) {
-    super(props, logger,processDao);
+  public SparkTask(TaskProps props, Logger logger) {
+    super(props, logger);
   }
 
   @Override
