@@ -144,10 +144,9 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mEmail from './email.vue'
-  import '~/@vue/crontab/dist/index.css'
   import store from '@/conf/home/store'
   import { warningTypeList } from './util'
-  import { vCrontab } from '~/@vue/crontab/dist'
+  import { vCrontab } from '@/module/components/crontab/index'
   import { formatDate } from '@/module/filter/filter'
   import mPriority from '@/module/components/priority/priority'
   import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
@@ -253,7 +252,11 @@
                 let msg = ''
 
                 this.store.dispatch(api, searchParams).then(res => {
-                  this.previewTimes = res
+                  if (res.length) {
+                    this.previewTimes = res
+                  } else {
+                    this.$message.warning(`${i18n.$t('There is no data for this period of time')}`)
+                  }
                 })
               }
             },

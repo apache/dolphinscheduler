@@ -16,20 +16,19 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
 import org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.server.quartz.QuartzExecutors;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang3.StringUtils;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,9 +64,6 @@ public class MasterServer extends AbstractServer {
     @Autowired
     protected ProcessDao processDao;
 
-    @Autowired
-    protected AlertDao alertDao;
-
     /**
      *  master exec thread pool
      */
@@ -75,14 +71,14 @@ public class MasterServer extends AbstractServer {
 
     public MasterServer(){}
 
-    public MasterServer(ProcessDao processDao,AlertDao alertDao){
+    public MasterServer(ProcessDao processDao){
         try {
             conf = new PropertiesConfiguration(Constants.MASTER_PROPERTIES_PATH);
         }catch (ConfigurationException e){
             logger.error("load configuration failed : " + e.getMessage(),e);
             System.exit(1);
         }
-        zkMasterClient = ZKMasterClient.getZKMasterClient(processDao,alertDao);
+        zkMasterClient = ZKMasterClient.getZKMasterClient(processDao);
         this.masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
     }
 
@@ -102,7 +98,7 @@ public class MasterServer extends AbstractServer {
     @Override
     public void run(String... strings) throws Exception {
 
-        MasterServer masterServer = new MasterServer(processDao,alertDao);
+        MasterServer masterServer = new MasterServer(processDao);
 
         masterServer.run(processDao);
 
