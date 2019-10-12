@@ -50,7 +50,7 @@ elif [ "$command" = "worker-server" ]; then
   LOG_FILE="-Dspring.profiles.active=worker -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
 elif [ "$command" = "alert-server" ]; then
-  LOG_FILE="-Dspring.profiles.active=alert -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogback.configurationFile=conf/alert_logback.xml"
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "logger-server" ]; then
   CLASS=org.apache.dolphinscheduler.server.rpc.LoggerServer
