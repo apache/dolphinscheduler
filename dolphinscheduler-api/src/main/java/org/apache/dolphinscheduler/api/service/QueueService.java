@@ -248,12 +248,12 @@ public class QueueService extends BaseService {
 
     /**
      * check queue name exist
-     *
+     * if exists return true，not exists return false
      * @param queueName
      * @return
      */
     private boolean checkQueueNameExist(String queueName) {
-        return queueMapper.queryAllQueueList(null ,queueName).size()>0 ? false : true;
+        return queueMapper.queryAllQueueList(null ,queueName).size() > 0 ? true : false;
     }
 
 }
