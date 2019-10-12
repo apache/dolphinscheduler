@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.commons.configuration.Configuration;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public abstract class AbstractServer implements CommandLineRunner, IStoppable {
     /**
      *  conf
      */
+    @SuppressFBWarnings("MS_CANNOT_BE_FINAL")
     protected static Configuration conf;
 
     /**

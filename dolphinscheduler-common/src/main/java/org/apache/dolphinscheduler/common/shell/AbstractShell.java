@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.shell;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
@@ -151,12 +153,12 @@ public abstract class AbstractShell {
       //One time scheduling.
       timeOutTimer.schedule(timeoutTimerTask, timeOutInterval);
     }
-    final BufferedReader errReader = 
+    final BufferedReader errReader =
             new BufferedReader(new InputStreamReader(process
-                                                     .getErrorStream()));
-    BufferedReader inReader = 
+                                                     .getErrorStream(), StandardCharsets.UTF_8));
+ 	BufferedReader inReader =
             new BufferedReader(new InputStreamReader(process
-                                                     .getInputStream()));
+													 .getInputStream(), StandardCharsets.UTF_8));
     final StringBuilder errMsg = new StringBuilder();
     
     // read error and input streams as this would free up the buffers
@@ -305,6 +307,7 @@ public abstract class AbstractShell {
    * process manage container
    *
    */
+  @SuppressFBWarnings("SE_NO_SERIALVERSIONID")
   public static class ProcessContainer extends ConcurrentHashMap<Integer, Process>{
 	  private static final ProcessContainer container = new ProcessContainer();
 	  private ProcessContainer(){

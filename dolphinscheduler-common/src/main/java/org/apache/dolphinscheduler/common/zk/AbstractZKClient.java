@@ -39,6 +39,7 @@ import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
@@ -54,8 +55,8 @@ public abstract class AbstractZKClient {
 	/**
 	 *  load configuration file
 	 */
-	protected static Configuration conf;
-	
+	protected static final Configuration conf = AbstractZKClient.initPropertiesConfiguration();
+
 	protected  CuratorFramework zkClient = null;
 
 	/**
@@ -63,16 +64,15 @@ public abstract class AbstractZKClient {
 	 */
 	protected IStoppable stoppable = null;
 
-
-	static {
+	private static PropertiesConfiguration initPropertiesConfiguration(){
 		try {
-			conf = new PropertiesConfiguration(Constants.ZOOKEEPER_PROPERTIES_PATH);
+			return new PropertiesConfiguration(Constants.ZOOKEEPER_PROPERTIES_PATH);
 		}catch (ConfigurationException e){
 			logger.error("load configuration failed : " + e.getMessage(),e);
 			System.exit(1);
 		}
+		return null;
 	}
-
 
 	public AbstractZKClient() {
 
@@ -153,7 +153,7 @@ public abstract class AbstractZKClient {
 			}
 
 			byte[] bytes = zkClient.getData().forPath(znode);
-			String resInfoStr = new String(bytes);
+			String resInfoStr = new String(bytes, StandardCharsets.UTF_8);
 			String[] splits = resInfoStr.split(Constants.COMMA);
 			if (splits.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
 				return;
@@ -163,7 +163,7 @@ public abstract class AbstractZKClient {
 					+ OSUtils.memoryUsage() + Constants.COMMA
 					+ splits[4] + Constants.COMMA
 					+ DateUtils.dateToString(new Date());
-			zkClient.setData().forPath(znode,str.getBytes());
+			zkClient.setData().forPath(znode,str.getBytes(StandardCharsets.UTF_8));
 
 		} catch (Exception e) {
 			logger.error("heartbeat for zk failed : " + e.getMessage(), e);
@@ -221,7 +221,7 @@ public abstract class AbstractZKClient {
 		String parentPath = getZNodeParentPath(zkNodeType);
 		String serverPathPrefix = parentPath + "/" + OSUtils.getHost();
 		String registerPath = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(
-				serverPathPrefix + "_", heartbeatZKInfo.getBytes());
+				serverPathPrefix + "_", heartbeatZKInfo.getBytes(StandardCharsets.UTF_8));
 		logger.info("register {} node {} success" , zkNodeType.toString(), registerPath);
 		return registerPath;
 	}
@@ -276,7 +276,7 @@ public abstract class AbstractZKClient {
 			if(zkClient.checkExists().forPath(deadServerPath) == null){
 				//add dead server info to zk dead server path : /dead-servers/
 
-				zkClient.create().forPath(deadServerPath,(type + UNDERLINE + ipSeqNo).getBytes());
+				zkClient.create().forPath(deadServerPath,(type + UNDERLINE + ipSeqNo).getBytes(StandardCharsets.UTF_8));
 
 				logger.info("{} server dead , and {} added to zk dead server path success" ,
 						zkNodeType.toString(), zNode);
@@ -346,12 +346,9 @@ public abstract class AbstractZKClient {
 		String parentPath = getZNodeParentPath(zkNodeType);
 
 		List<MasterServer> masterServers = new ArrayList<>();
-		int i = 0;
-		for(String path : masterMap.keySet()){
-			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(masterMap.get(path));
-			masterServer.setZkDirectory( parentPath + "/"+ path);
-			masterServer.setId(i);
-			i ++;
+		for (Map.Entry<String, String> entry : masterMap.entrySet()) {
+			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
+			masterServer.setZkDirectory( parentPath + "/"+ entry.getKey());
 			masterServers.add(masterServer);
 		}
 		return masterServers;
@@ -370,7 +367,7 @@ public abstract class AbstractZKClient {
 			List<String> serverList  = getZkClient().getChildren().forPath(path);
 			for(String server : serverList){
 				byte[] bytes  = getZkClient().getData().forPath(path + "/" + server);
-				masterMap.putIfAbsent(server, new String(bytes));
+				masterMap.putIfAbsent(server, new String(bytes, StandardCharsets.UTF_8));
 			}
 		} catch (Exception e) {
 			logger.error("get server list failed : " + e.getMessage(), e);

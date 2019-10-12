@@ -76,7 +76,7 @@ public class DruidConnectionProvider implements ConnectionProvider {
      * hinder performance.
      * Default is 120, as Quartz uses over 100 unique statements. 0 disables the feature.
      */
-    public String maxCachedStatementsPerConnection;
+//    public String maxCachedStatementsPerConnection;
 
     /**
      * Discard connections after they have been idle this many seconds.  0 disables the feature. Default is 0.

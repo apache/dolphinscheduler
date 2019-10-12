@@ -410,8 +410,6 @@ public class ResourcesController extends BaseController{
                                 @RequestParam(value = "resourceId") int resourceId) {
         logger.info("login user {}, create udf function, type: {},  funcName: {},argTypes: {} ,database: {},desc: {},resourceId: {}",
                 loginUser.getUserName(),type, funcName, argTypes,database,desc, resourceId);
-        Result result = new Result();
-
         try {
             return udfFuncService.createUdfFunction(loginUser,funcName,className,argTypes,database,desc,type,resourceId);
         } catch (Exception e) {
@@ -437,7 +435,6 @@ public class ResourcesController extends BaseController{
     public Result viewUIUdfFunction(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam("id") int id)
     {
-        Result result = new Result();
         logger.info("login user {}, query udf{}",
                 loginUser.getUserName(), id);
         try {

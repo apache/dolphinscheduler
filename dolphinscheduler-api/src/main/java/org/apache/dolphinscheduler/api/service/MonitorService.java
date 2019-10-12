@@ -108,12 +108,11 @@ public class MonitorService extends BaseService{
   }
 
   public List<MasterServer> getServerListFromZK(boolean isMaster){
-    List<MasterServer> servers = new ArrayList<>();
     ZookeeperMonitor zookeeperMonitor = null;
     try{
       zookeeperMonitor = new ZookeeperMonitor();
       ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
-      servers = zookeeperMonitor.getServersList(zkNodeType);
+      return zookeeperMonitor.getServersList(zkNodeType);
     }catch (Exception e){
       throw e;
     }finally {
@@ -121,7 +120,6 @@ public class MonitorService extends BaseService{
         zookeeperMonitor.close();
       }
     }
-    return servers;
   }
 
 }

@@ -101,9 +101,9 @@ public class SchemaUtils {
 		String[] versionArr = version.split("\\.");
 		int arrLength = schemaVersionArr.length < versionArr.length ? schemaVersionArr.length : versionArr.length;
 		for(int i = 0 ; i < arrLength ; i++) {
-			if(Integer.valueOf(schemaVersionArr[i]) > Integer.valueOf(versionArr[i])) {
+			if(Integer.parseInt(schemaVersionArr[i])> Integer.parseInt(versionArr[i])) {
 				return true;
-			}else if(Integer.valueOf(schemaVersionArr[i]) < Integer.valueOf(versionArr[i])) {
+			}else if(Integer.parseInt(schemaVersionArr[i]) < Integer.parseInt(versionArr[i])) {
 				return false;
 			}
 		}

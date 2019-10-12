@@ -161,6 +161,14 @@
 			<artifactId>snakeyaml</artifactId>
 			<!--<version>1.10</version>-->
 		</dependency>
+		<dependency>
+			<groupId>net.jcip</groupId>
+			<artifactId>jcip-annotations</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.spotbugs</groupId>
+			<artifactId>spotbugs-annotations</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

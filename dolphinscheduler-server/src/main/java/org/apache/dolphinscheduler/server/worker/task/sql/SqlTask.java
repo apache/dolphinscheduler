@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -304,7 +305,7 @@ public class SqlTask extends AbstractTask {
                         }
                         resultJSONArray.add(mapOfColValues);
                     }
-
+                    resultSet.close();
                     logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
 
                     // if there is a result set
@@ -347,6 +348,7 @@ public class SqlTask extends AbstractTask {
      * @return
      * @throws Exception
      */
+    @SuppressFBWarnings("OBL_UNSATISFIED_OBLIGATION_EXCEPTION_EDGE")
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
         PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql());
         // is the timeout set
@@ -357,9 +359,8 @@ public class SqlTask extends AbstractTask {
         }
         Map<Integer, Property> params = sqlBinds.getParamsMap();
         if(params != null){
-            for(Integer key : params.keySet()){
-                Property prop = params.get(key);
-                ParameterUtils.setInParameter(key,stmt,prop.getType(),prop.getValue());
+            for(Map.Entry<Integer, Property> entry: sqlBinds.getParamsMap().entrySet()) {
+                ParameterUtils.setInParameter(entry.getKey(),stmt,entry.getValue().getType(),entry.getValue().getValue());
             }
         }
         logger.info("prepare statement replace sql : {} ",stmt.toString());

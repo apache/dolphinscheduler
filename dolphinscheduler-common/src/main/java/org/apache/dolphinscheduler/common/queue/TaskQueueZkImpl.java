@@ -130,7 +130,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
 
     }
 
-
     /**
      * An element pops out of the queue <p>
      * note:
@@ -146,7 +145,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
     public List<String> poll(String key, int tasksNum) {
         try{
             CuratorFramework zk = getZkClient();
-            String tasksQueuePath = getTasksPath(key) + Constants.SINGLE_SLASH;
             List<String> list = zk.getChildren().forPath(getTasksPath(key));
 
             if(list != null && list.size() > 0){
@@ -155,7 +153,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                 String workerIpLongStr = String.valueOf(IpUtils.ipToLong(workerIp));
 
                 int size = list.size();
-
 
                 Set<String> taskTreeSet = new TreeSet<>(new Comparator<String>() {
                     @Override

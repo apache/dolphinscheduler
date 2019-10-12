@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -144,11 +145,11 @@ public class ResourcesService extends BaseService {
             resourcesMapper.insert(resource);
 
             putMsg(result, Status.SUCCESS);
-            Map dataMap = new BeanMap(resource);
+            Map<Object, Object> dataMap = new BeanMap(resource);
             Map<String, Object> resultMap = new HashMap<String, Object>();
-            for (Object key : dataMap.keySet()) {
-                if (!"class".equalsIgnoreCase(key.toString())) {
-                    resultMap.put(key.toString(), dataMap.get(key));
+            for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
+                if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
+                    resultMap.put(entry.getKey().toString(), entry.getValue());
                 }
             }
             result.setData(resultMap);
@@ -238,11 +239,11 @@ public class ResourcesService extends BaseService {
             resourcesMapper.updateById(resource);
 
             putMsg(result, Status.SUCCESS);
-            Map dataMap = new BeanMap(resource);
+            Map<Object, Object> dataMap = new BeanMap(resource);
             Map<String, Object> resultMap = new HashMap<>(5);
-            for (Object key : dataMap.keySet()) {
-                if (!Constants.CLASS.equalsIgnoreCase(key.toString())) {
-                    resultMap.put(key.toString(), dataMap.get(key));
+            for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
+                if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
+                    resultMap.put(entry.getKey().toString(), entry.getValue());
                 }
             }
             result.setData(resultMap);
@@ -590,16 +591,17 @@ public class ResourcesService extends BaseService {
 
         // save data
         Date now = new Date();
-        Resource resource = new Resource(name,name,desc,loginUser.getId(),type,content.getBytes().length,now,now);
+        Resource resource = new Resource(name,name,desc,loginUser.getId(),type,
+                content.getBytes(StandardCharsets.UTF_8).length,now,now);
 
         resourcesMapper.insert(resource);
 
         putMsg(result, Status.SUCCESS);
-        Map dataMap = new BeanMap(resource);
+        Map<Object, Object> dataMap = new BeanMap(resource);
         Map<String, Object> resultMap = new HashMap<>(5);
-        for (Object key : dataMap.keySet()) {
-            if (!Constants.CLASS.equalsIgnoreCase(key.toString())) {
-                resultMap.put(key.toString(), dataMap.get(key));
+        for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
+            if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
+                resultMap.put(entry.getKey().toString(), entry.getValue());
             }
         }
         result.setData(resultMap);
@@ -648,7 +650,7 @@ public class ResourcesService extends BaseService {
             }
         }
 
-        resource.setSize(content.getBytes().length);
+        resource.setSize(content.getBytes(StandardCharsets.UTF_8).length);
         resource.setUpdateTime(new Date());
         resourcesMapper.updateById(resource);
 

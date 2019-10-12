@@ -56,26 +56,26 @@ public class QuartzExecutors {
    */
   private static Scheduler scheduler;
 
-  private static volatile QuartzExecutors INSTANCE = null;
+  private static volatile QuartzExecutors instance;
 
-  private QuartzExecutors() {}
+  private QuartzExecutors() {
+    this.init();
+  }
 
   /**
    * thread safe and performance promote
    * @return
    */
   public static QuartzExecutors getInstance() {
-    if (INSTANCE == null) {
+    if (instance == null) {
       synchronized (QuartzExecutors.class) {
         // when more than two threads run into the first null check same time, to avoid instanced more than one time, it needs to be checked again.
-        if (INSTANCE == null) {
-          INSTANCE = new QuartzExecutors();
-          //finish QuartzExecutors init
-          INSTANCE.init();
+        if (instance == null) {
+          instance = new QuartzExecutors();
         }
       }
     }
-    return INSTANCE;
+    return instance;
   }
 
 

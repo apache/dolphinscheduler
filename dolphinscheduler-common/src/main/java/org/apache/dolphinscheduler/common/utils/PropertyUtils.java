@@ -60,6 +60,9 @@ public class PropertyUtils {
 
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
+                if (fis != null) {
+                    IOUtils.closeQuietly(fis);
+                }
                 System.exit(1);
             } finally {
                 IOUtils.closeQuietly(fis);
@@ -129,7 +132,7 @@ public class PropertyUtils {
             return Boolean.parseBoolean(value);
         }
 
-        return null;
+        return false;
     }
 
     /**
@@ -173,7 +176,7 @@ public class PropertyUtils {
     public static String[] getArray(String key, String splitStr) {
         String value = getString(key);
         if (value == null) {
-            return null;
+            return new String[0];
         }
         try {
             String[] propertyArray = value.split(splitStr);
@@ -181,7 +184,7 @@ public class PropertyUtils {
         } catch (NumberFormatException e) {
             logger.info(e.getMessage(),e);
         }
-        return null;
+        return new String[0];
     }
 
     /**

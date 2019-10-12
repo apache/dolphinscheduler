@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -145,7 +146,7 @@ public class ShellTask extends AbstractTask {
 
     Files.createFile(path, attr);
 
-    Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
+    Files.write(path, shellParameters.getRawScript().getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
 
     return fileName;
   }

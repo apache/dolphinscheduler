@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,7 +142,9 @@ public class ScriptRunner {
 	 * @throws IOException
 	 *             if there is an error reading from the Reader
 	 */
+	@SuppressFBWarnings("SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE")
 	private void runScript(Connection conn, Reader reader) throws IOException, SQLException {
+		String sql = "";
 		StringBuffer command = null;
 		try {
 			LineNumberReader lineReader = new LineNumberReader(reader);
@@ -153,11 +156,6 @@ public class ScriptRunner {
 				String trimmedLine = line.trim();
 				if (trimmedLine.startsWith("--")) {
 					logger.info(trimmedLine);
-				} else if (trimmedLine.length() < 1 || trimmedLine.startsWith("//")) {
-					// Do nothing
-				} else if (trimmedLine.length() < 1 || trimmedLine.startsWith("--")) {
-					// Do nothing
-
 				} else if (trimmedLine.startsWith("delimiter")) {
 					String newDelimiter = trimmedLine.split(" ")[1];
 					this.setDelimiter(newDelimiter, fullLineDelimiter);
@@ -169,45 +167,9 @@ public class ScriptRunner {
 					Statement statement = conn.createStatement();
 
 					// logger.info(command.toString());
-
-					boolean hasResults = false;
-					logger.info("sql:"+command.toString());
-					if (stopOnError) {
-						hasResults = statement.execute(command.toString());
-					} else {
-						try {
-							statement.execute(command.toString());
-						} catch (SQLException e) {
-							logger.error(e.getMessage(),e);
-							throw e;
-						}
-					}
-
-					ResultSet rs = statement.getResultSet();
-					if (hasResults && rs != null) {
-						ResultSetMetaData md = rs.getMetaData();
-						int cols = md.getColumnCount();
-						for (int i = 0; i < cols; i++) {
-							String name = md.getColumnLabel(i);
-							logger.info(name + "\t");
-						}
-						logger.info("");
-						while (rs.next()) {
-							for (int i = 0; i < cols; i++) {
-								String value = rs.getString(i);
-								logger.info(value + "\t");
-							}
-							logger.info("");
-						}
-					}
-
+					sql = command.toString();
 					command = null;
-					try {
-						statement.close();
-					} catch (Exception e) {
-						// Ignore to workaround a bug in Jakarta DBCP
-					}
-					Thread.yield();
+					yieldWithLog(sql, statement);
 				} else {
 					command.append(line);
 					command.append(" ");
@@ -215,19 +177,18 @@ public class ScriptRunner {
 			}
 
 		} catch (SQLException e) {
-			logger.error("Error executing: " + command.toString());
+			logger.error("Error executing: " + (command == null ? "null" : command.toString()));
 			throw e;
 		} catch (IOException e) {
 			e.fillInStackTrace();
-			logger.error("Error executing: " + command.toString());
+			logger.error("Error executing: " +  (command == null ? "null" : command.toString()));
 			throw e;
 		}
 	}
-
+	@SuppressFBWarnings("SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE")
 	private void runScript(Connection conn, Reader reader , String dbName) throws IOException, SQLException {
 		StringBuffer command = null;
 		String sql = "";
-		String appKey = dbName.substring(dbName.lastIndexOf("_")+1, dbName.length());
 		try {
 			LineNumberReader lineReader = new LineNumberReader(reader);
 			String line = null;
@@ -238,11 +199,6 @@ public class ScriptRunner {
 				String trimmedLine = line.trim();
 				if (trimmedLine.startsWith("--")) {
 					logger.info(trimmedLine);
-				} else if (trimmedLine.length() < 1 || trimmedLine.startsWith("//")) {
-					// Do nothing
-				} else if (trimmedLine.length() < 1 || trimmedLine.startsWith("--")) {
-					// Do nothing
-
 				} else if (trimmedLine.startsWith("delimiter")) {
 					String newDelimiter = trimmedLine.split(" ")[1];
 					this.setDelimiter(newDelimiter, fullLineDelimiter);
@@ -256,44 +212,7 @@ public class ScriptRunner {
 					// logger.info(command.toString());
 
 					sql = command.toString().replaceAll("\\{\\{APPDB\\}\\}", dbName);
-					boolean hasResults = false;
-					logger.info("sql:"+sql);
-					if (stopOnError) {
-						hasResults = statement.execute(sql);
-					} else {
-						try {
-							statement.execute(sql);
-						} catch (SQLException e) {
-							logger.error(e.getMessage(),e);
-							throw e;
-						}
-					}
-
-					ResultSet rs = statement.getResultSet();
-					if (hasResults && rs != null) {
-						ResultSetMetaData md = rs.getMetaData();
-						int cols = md.getColumnCount();
-						for (int i = 0; i < cols; i++) {
-							String name = md.getColumnLabel(i);
-							logger.info(name + "\t");
-						}
-						logger.info("");
-						while (rs.next()) {
-							for (int i = 0; i < cols; i++) {
-								String value = rs.getString(i);
-								logger.info(value + "\t");
-							}
-							logger.info("");
-						}
-					}
-
-					command = null;
-					try {
-						statement.close();
-					} catch (Exception e) {
-						// Ignore to workaround a bug in Jakarta DBCP
-					}
-					Thread.yield();
+					yieldWithLog(sql, statement);
 				} else {
 					command.append(line);
 					command.append(" ");
@@ -310,8 +229,47 @@ public class ScriptRunner {
 		}
 	}
 
+	private void yieldWithLog(String sql, Statement statement) throws SQLException {
+		boolean hasResults = false;
+		logger.info("sql:" + sql);
+		if (stopOnError) {
+			hasResults = statement.execute(sql);
+		} else {
+			try {
+				statement.execute(sql);
+			} catch (SQLException e) {
+				logger.error(e.getMessage(), e);
+				throw e;
+			}
+		}
+
+		ResultSet rs = statement.getResultSet();
+		if (hasResults && rs != null) {
+			ResultSetMetaData md = rs.getMetaData();
+			int cols = md.getColumnCount();
+			for (int i = 0; i < cols; i++) {
+				logger.info(md.getColumnLabel(i) + "\t");
+			}
+			logger.info("");
+			while (rs.next()) {
+				for (int i = 1; i <= cols; i++) {
+					logger.info(rs.getString(i) + "\t");
+				}
+				logger.info("");
+			}
+		}
+
+		try {
+			statement.close();
+		} catch (Exception e) {
+			logger.warn("close failed");
+			// Ignore to workaround a bug in Jakarta DBCP
+		}
+		Thread.yield();
+	}
+
 	private String getDelimiter() {
 		return delimiter;
 	}
-	
+
 }

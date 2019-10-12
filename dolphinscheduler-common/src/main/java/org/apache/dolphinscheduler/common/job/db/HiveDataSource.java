@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 package org.apache.dolphinscheduler.common.job.db;
-
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,7 @@ public class HiveDataSource extends BaseDataSource {
    * test whether the data source can be connected successfully
    * @throws Exception
    */
-  @Override
+  @Override @SuppressFBWarnings("DMI_EMPTY_DB_PASSWORD")
   public void isConnectable() throws Exception {
     Connection con = null;
     try {

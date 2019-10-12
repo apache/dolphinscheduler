@@ -124,7 +124,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
         try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath)));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(envPath), StandardCharsets.UTF_8));
             String line;
             while ((line = br.readLine()) != null){
                 if (line.contains(Constants.PYTHON_HOME)){

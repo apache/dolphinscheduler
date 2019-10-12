@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -108,15 +109,14 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_dml.sql";
+        String sqlFilePath = rootDir + initSqlPath + "dolphinscheduler_dml.sql";
         try {
             conn = ConnectionFactory.getDataSource().getConnection();
             conn.setAutoCommit(false);
 
             // Execute the dolphinscheduler_dml.sql script to import related data of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, false, true);
-            Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
-            initScriptRunner.runScript(initSqlReader);
+            initScriptRunner.runScript(this.getFileReader(sqlFilePath));
 
             conn.commit();
         } catch (IOException e) {
@@ -129,7 +129,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
             try {
-                conn.rollback();
+                if (conn != null) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
@@ -147,14 +149,13 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        //String mysqlSQLFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/dolphinscheduler_ddl.sql";
-        String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_ddl.sql";
+        //String sqlFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/dolphinscheduler_ddl.sql";
+        String sqlFilePath = rootDir + initSqlPath + "dolphinscheduler_ddl.sql";
         try {
             conn = ConnectionFactory.getDataSource().getConnection();
             // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
-            Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
-            initScriptRunner.runScript(initSqlReader);
+            initScriptRunner.runScript(this.getFileReader(sqlFilePath));
 
         } catch (IOException e) {
 
@@ -220,6 +221,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         upgradeDolphinSchedulerDML(schemaDir);
 
     }
+    private Reader getFileReader(String sqlFilePath) throws IOException{
+        return new InputStreamReader(new FileInputStream(sqlFilePath), StandardCharsets.UTF_8);
+    }
 
     private void upgradeDolphinSchedulerDML(String schemaDir) {
         String schemaVersion = schemaDir.split("_")[0];
@@ -235,8 +239,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             conn.setAutoCommit(false);
             // Execute the upgraded dolphinscheduler dml
             ScriptRunner scriptRunner = new ScriptRunner(conn, false, true);
-            Reader sqlReader = new FileReader(new File(sqlFilePath));
-            scriptRunner.runScript(sqlReader);
+            scriptRunner.runScript(this.getFileReader(sqlFilePath));
             if (isExistsTable(T_VERSION_NAME)) {
                 // Change version in the version table to the new version
                 String upgradeSQL = String.format("update %s set version = ?",T_VERSION_NAME);
@@ -269,7 +272,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (SQLException e) {
             try {
-                conn.rollback();
+                if (conn != null) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
@@ -277,7 +282,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
             try {
-                conn.rollback();
+                if (conn != null) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
@@ -303,8 +310,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             conn.setAutoCommit(true);
             // Execute the dolphinscheduler ddl.sql for the upgrade
             ScriptRunner scriptRunner = new ScriptRunner(conn, true, true);
-            Reader sqlReader = new FileReader(new File(sqlFilePath));
-            scriptRunner.runScript(sqlReader);
+            scriptRunner.runScript(this.getFileReader(sqlFilePath));
 
         } catch (FileNotFoundException e) {
 

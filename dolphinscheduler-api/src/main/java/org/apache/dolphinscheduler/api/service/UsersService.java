@@ -92,9 +92,7 @@ public class UsersService extends BaseService {
                                           int tenantId,
                                           String phone,
                                           String queue) throws Exception {
-
-        Map<String, Object> result = new HashMap<>(5);
-        result = CheckUtils.checkUserParams(userName, userPassword, email, phone);
+        Map<String, Object> result = CheckUtils.checkUserParams(userName, userPassword, email, phone);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }

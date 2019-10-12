@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.PrivilegedExceptionAction;
 import java.util.List;
 import java.util.Map;
@@ -54,9 +56,6 @@ public class HadoopUtils implements Closeable {
 
 
     private HadoopUtils(){
-        if(StringUtils.isEmpty(hdfsUser)){
-            hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
-        }
         init();
         initHdfsPath();
     }
@@ -89,6 +88,7 @@ public class HadoopUtils implements Closeable {
     /**
      * init hadoop configuration
      */
+    @SuppressFBWarnings("DC_PARTIALLY_CONSTRUCTED")
     private void init() {
         if (configuration == null) {
             synchronized (HadoopUtils.class) {
@@ -194,11 +194,14 @@ public class HadoopUtils implements Closeable {
 
         if(StringUtils.isBlank(hdfsFilePath)){
             logger.error("hdfs file path:{} is blank",hdfsFilePath);
-            return null;
+            return new byte[0];
         }
-
-        FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath));
-        return IOUtils.toByteArray(fsDataInputStream);
+        try(FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath))) {
+            return IOUtils.toByteArray(fsDataInputStream);
+        }  catch (IOException e) {
+            logger.error("hdfs file path:{} open failed",hdfsFilePath);
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
 
@@ -218,10 +221,14 @@ public class HadoopUtils implements Closeable {
             return null;
         }
 
-        FSDataInputStream in = fs.open(new Path(hdfsFilePath));
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        Stream<String> stream = br.lines().skip(skipLineNums).limit(limit);
-        return stream.collect(Collectors.toList());
+        try(FSDataInputStream in = fs.open(new Path(hdfsFilePath));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+            Stream<String> stream = br.lines().skip(skipLineNums).limit(limit);
+            return stream.collect(Collectors.toList());
+        } catch (IOException e) {
+            logger.error("hdfs file path:{} open failed",hdfsFilePath);
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     /**
@@ -282,16 +289,22 @@ public class HadoopUtils implements Closeable {
 
         if (dstPath.exists()) {
             if (dstPath.isFile()) {
-                if (overwrite) {
-                    dstPath.delete();
+                if (overwrite && !dstPath.delete()) {
+                    String err = "destination file is busy";
+                    logger.error(err);
+                    throw new IOException(err);
                 }
             } else {
-                logger.error("destination file must be a file");
+                String err = "destination file must be a file";
+                logger.error(err);
+                throw new IOException(err);
             }
         }
 
-        if(!dstPath.getParentFile().exists()){
-            dstPath.getParentFile().mkdirs();
+        if(!dstPath.getParentFile().exists() && !dstPath.getParentFile().mkdirs()){
+            String err = "parent dir can not be created";
+            logger.error(err);
+            throw new IOException(err);
         }
 
         return FileUtil.copy(fs, srcPath, dstPath, deleteSource, fs.getConf());
@@ -329,7 +342,6 @@ public class HadoopUtils implements Closeable {
      * @return {@link FileStatus}
      */
     public FileStatus[] listFileStatus(String filePath)throws Exception{
-        Path path = new Path(filePath);
         try {
             return fs.listStatus(new Path(filePath));
         } catch (IOException e) {

@@ -429,9 +429,6 @@ public class ProcessDefinitionService extends BaseDAGService {
     public Map<String, Object> batchDeleteProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds) {
 
         Map<String, Object> result = new HashMap<>(5);
-
-        Map<String, Object> deleteReuslt = new HashMap<>(5);
-
         List<Integer> deleteFailedIdList = new ArrayList<Integer>();
         Project project = projectMapper.queryByName(projectName);
 
@@ -448,7 +445,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             for (String strProcessInstanceId:processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    deleteReuslt = deleteProcessDefinitionById(loginUser, projectName, processInstanceId);
+                    Map<String, Object> deleteReuslt = deleteProcessDefinitionById(loginUser, projectName, processInstanceId);
                     if(!Status.SUCCESS.equals(deleteReuslt.get(Constants.STATUS))){
                         deleteFailedIdList.add(processInstanceId);
                         logger.error((String)deleteReuslt.get(Constants.MSG));
@@ -817,7 +814,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
         if (processDefinition == null) {
             logger.info("process define not exists");
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinition.getId());
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST);
             return result;
         }
 

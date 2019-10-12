@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+
+<!--
+  To enforce Spotbugs into the codebase, first, all the errors are
+  ignored, so we can add them one by one.
+  Some of the bugs will only occur once or twice on the codebase,
+  while others will occur potentially a lot.
+  Reference: https://github.com/apache/incubator-druid/pull/7894/files
+-->
+<FindBugsFilter>
+    <Bug pattern="AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION"/>
+    <Bug pattern="BC_UNCONFIRMED_CAST"/>
+    <Bug pattern="BIT_SIGNED_CHECK_HIGH_BIT"/>
+    <Bug pattern="BX_UNBOXING_IMMEDIATELY_REBOXED"/>
+    <Bug pattern="CN_IDIOM_NO_SUPER_CALL"/>
+    <Bug pattern="CN_IMPLEMENTS_CLONE_BUT_NOT_CLONEABLE"/>
+    <Bug pattern="DC_DOUBLECHECK"/>
+    <Bug pattern="DM_BOXED_PRIMITIVE_FOR_PARSING"/>
+    <Bug pattern="DM_EXIT"/>
+    <Bug pattern="DP_CREATE_CLASSLOADER_INSIDE_DO_PRIVILEGED"/>
+    <Bug pattern="EI_EXPOSE_REP"/>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+    <Bug pattern="EQ_COMPARETO_USE_OBJECT_EQUALS"/>
+    <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
+    <Bug pattern="EQ_UNUSUAL"/>
+    <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+    <Bug pattern="FE_FLOATING_POINT_EQUALITY"/>
+    <Bug pattern="HE_EQUALS_USE_HASHCODE"/>
+    <Bug pattern="IA_AMBIGUOUS_INVOCATION_OF_INHERITED_OR_OUTER_METHOD"/>
+    <Bug pattern="ICAST_IDIV_CAST_TO_DOUBLE"/>
+    <Bug pattern="ICAST_INT_CAST_TO_DOUBLE_PASSED_TO_CEIL"/>
+    <Bug pattern="ICAST_QUESTIONABLE_UNSIGNED_RIGHT_SHIFT"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+    <Bug pattern="JLM_JSR166_UTILCONCURRENT_MONITORENTER"/>
+    <Bug pattern="JLM_JSR166_UTILCONCURRENT_MONITORENTER"/>
+    <Bug pattern="MS_FINAL_PKGPROTECT"/>
+    <Bug pattern="MS_PKGPROTECT"/>
+    <Bug pattern="NP_EQUALS_SHOULD_HANDLE_NULL_ARGUMENT"/>
+    <Bug pattern="NP_GUARANTEED_DEREF"/>
+    <Bug pattern="NP_LOAD_OF_KNOWN_NULL_VALUE"/>
+    <Bug pattern="NP_METHOD_PARAMETER_TIGHTENS_ANNOTATION"/>
+    <Bug pattern="NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH_MIGHT_BE_INFEASIBLE"/>
+    <Bug pattern="NP_NULL_PARAM_DEREF"/>
+    <Bug pattern="NP_NULL_PARAM_DEREF_NONVIRTUAL"/>
+    <Bug pattern="NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE"/>
+    <Bug pattern="NS_DANGEROUS_NON_SHORT_CIRCUIT"/>
+    <Bug pattern="OBL_UNSATISFIED_OBLIGATION"/>
+    <Bug pattern="OS_OPEN_STREAM"/>
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE"/>
+    <Bug pattern="REC_CATCH_EXCEPTION"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+    <Bug pattern="SBSC_USE_STRINGBUFFER_CONCATENATION"/>
+    <Bug pattern="SE_BAD_FIELD"/>
+    <Bug pattern="SE_COMPARATOR_SHOULD_BE_SERIALIZABLE"/>
+    <Bug pattern="SF_SWITCH_FALLTHROUGH"/>
+    <Bug pattern="SF_SWITCH_NO_DEFAULT"/>
+    <Bug pattern="SR_NOT_CHECKED"/>
+    <Bug pattern="SWL_SLEEP_WITH_LOCK_HELD"/>
+    <Bug pattern="UL_UNRELEASED_LOCK_EXCEPTION_PATH"/>
+    <Bug pattern="URF_UNREAD_FIELD"/>
+    <Bug pattern="SIC_INNER_SHOULD_BE_STATIC_ANON"/>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+    <Match>
+        <Method name="maybeForceBuilderInitialization"/>
+    </Match>
+</FindBugsFilter>

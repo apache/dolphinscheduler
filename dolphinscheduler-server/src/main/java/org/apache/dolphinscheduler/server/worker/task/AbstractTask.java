@@ -181,6 +181,7 @@ public abstract class AbstractTask {
                 break;
             case FLINK:
                 paramsClass = FlinkParameters.class;
+                break;
             case PYTHON:
                 paramsClass = PythonParameters.class;
                 break;

@@ -97,10 +97,7 @@ public class SchedulerService extends BaseService {
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName, Integer processDefineId, String schedule, WarningType warningType,
                                               int warningGroupId, FailureStrategy failureStrategy,
-                                              String receivers, String receiversCc, Priority processInstancePriority, int workerGroupId) throws IOException {
-
-        Map<String, Object> result = new HashMap<String, Object>(5);
-
+                                              String receivers, String receiversCc,Priority processInstancePriority, int workerGroupId) throws IOException {
         Project project = projectMapper.queryByName(projectName);
 
         // check project auth
@@ -111,7 +108,7 @@ public class SchedulerService extends BaseService {
 
         // check work flow define release state
         ProcessDefinition processDefinition = processDao.findProcessDefineById(processDefineId);
-        result = executorService.checkProcessDefinitionValid(processDefinition, processDefineId);
+        Map<String, Object> result = executorService.checkProcessDefinitionValid(processDefinition, processDefineId);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }

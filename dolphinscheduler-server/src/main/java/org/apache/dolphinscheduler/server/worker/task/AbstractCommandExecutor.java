@@ -356,7 +356,7 @@ public abstract class AbstractCommandExecutor {
                 BufferedReader inReader = null;
 
                 try {
-                    inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    inReader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8));
                     String line;
 
                     long lastFlushTime = System.currentTimeMillis();

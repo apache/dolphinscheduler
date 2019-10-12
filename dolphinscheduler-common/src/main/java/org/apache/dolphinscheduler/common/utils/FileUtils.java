@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
@@ -153,11 +154,13 @@ public class FileUtils {
         BufferedWriter bufferedWriter = null;
         try {
             File distFile = new File(filePath);
-            if (!distFile.getParentFile().exists()) {
-                distFile.getParentFile().mkdirs();
+            if (!distFile.getParentFile().exists() && !distFile.getParentFile().mkdirs()) {
+                FileUtils.logger.error("mkdir parent failed");
+                flag = false;
+                return flag;
             }
             bufferedReader = new BufferedReader(new StringReader(content));
-            bufferedWriter = new BufferedWriter(new FileWriter(distFile));
+            bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(distFile),StandardCharsets.UTF_8));
             char buf[] = new char[1024];
             int len;
             while ((len = bufferedReader.read(buf)) != -1) {
@@ -405,9 +408,7 @@ public class FileUtils {
      * @throws IOException
      */
     public static String readFile2Str(InputStream inputStream) throws IOException{
-        String all_content=null;
         try {
-            all_content = new String();
             InputStream ins = inputStream;
             ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
             byte[] str_b = new byte[1024];
@@ -415,8 +416,7 @@ public class FileUtils {
             while ((i=ins.read(str_b)) > 0) {
                 outputstream.write(str_b,0,i);
             }
-            all_content = outputstream.toString();
-            return all_content;
+            return outputstream.toString("utf-8");
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e);

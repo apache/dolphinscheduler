@@ -34,7 +34,7 @@ public abstract class AbstractCycle {
   protected CronField dayOfMonthField;
   protected CronField dayOfWeekField;
   protected CronField monthField;
-  protected CronField yearField;
+  private CronField yearField;
 
   public CycleLinks addCycle(AbstractCycle cycle) {
     return new CycleLinks(this.cron).addCycle(this).addCycle(cycle);

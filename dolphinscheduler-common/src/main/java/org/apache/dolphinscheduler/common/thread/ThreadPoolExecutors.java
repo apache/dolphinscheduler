@@ -23,8 +23,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.management.ThreadInfo;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
@@ -138,7 +140,7 @@ public class ThreadPoolExecutors {
         /**
          * how long to retain excess threads
          */
-        final long keepAliveTimeInMillis = 1000;
+        static final long keepAliveTimeInMillis = 1000;
         /**
          *  the thread pool executor that services the requests
          */
@@ -264,8 +266,7 @@ public class ThreadPoolExecutors {
         }
 
         public void dumpInfo() {
-
-            PrintWriter out = new PrintWriter(System.out);
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(System.out, StandardCharsets.UTF_8));
 
             out.write("Status for executor: " + executor + "\n");
             out.write("=======================================\n");

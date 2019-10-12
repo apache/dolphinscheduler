@@ -36,6 +36,7 @@ import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,7 +144,7 @@ public class OSUtils {
     BufferedReader bufferedReader = null;
 
     try {
-      bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("/etc/passwd")));
+      bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("/etc/passwd"), StandardCharsets.UTF_8));
       String line;
 
       while ((line = bufferedReader.readLine()) != null) {
@@ -156,7 +157,9 @@ public class OSUtils {
       logger.error(e.getMessage(), e);
     } finally {
       try {
-        bufferedReader.close();
+        if (bufferedReader != null) {
+          bufferedReader.close();
+        }
       } catch (IOException e) {
         logger.error(e.getMessage(), e);
       }
@@ -193,7 +196,7 @@ public class OSUtils {
 
     try {
       Process p = Runtime.getRuntime().exec(command);
-      br = new BufferedReader(new InputStreamReader(p.getInputStream()));
+      br = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8));
       String line;
       StringBuilder sb = new StringBuilder();
 
