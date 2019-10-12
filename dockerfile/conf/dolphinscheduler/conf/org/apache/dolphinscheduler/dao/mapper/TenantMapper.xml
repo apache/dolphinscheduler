@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.TenantMapper">
+    <select id="queryById" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
+            SELECT t.*,q.queue_name,q.queue
+            FROM t_ds_tenant t,t_ds_queue q
+            WHERE t.queue_id = q.id
+            and t.id = #{tenantId}
+    </select>
+    <select id="queryByTenantCode" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
+      select *
+      from t_ds_tenant
+      where tenant_code = #{tenantCode}
+    </select>
+    <select id="queryTenantPaging" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
+        SELECT t.*,q.queue_name
+        FROM t_ds_tenant t,t_ds_queue q
+        WHERE t.queue_id = q.id
+        <if test="searchVal != null and searchVal != ''">
+            and  t.tenant_name like concat('%', #{searchVal}, '%')
+        </if>
+        order by  t.update_time desc
+    </select>
+</mapper>

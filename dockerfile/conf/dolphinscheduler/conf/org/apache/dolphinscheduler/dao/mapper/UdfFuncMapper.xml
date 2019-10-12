@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper">
+    <select id="queryUdfByIdStr" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        select *
+        from t_ds_udfs
+        where 1 = 1
+        <if test="ids != null and ids != ''">
+            and id in
+            <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        <if test="funcNames != null and funcNames != ''">
+            and func_name = #{funcName}
+        </if>
+        order by id asc
+    </select>
+    <select id="queryUdfFuncPaging" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        select *
+        from t_ds_udfs
+        where 1=1
+        <if test="searchVal!= null and searchVal != ''">
+            and `name` like concat('%', #{searchVal}, '%')
+        </if>
+        <if test="userId != 0">
+            and id in (
+              select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+              union select id as udf_id  from t_ds_udfs where user_id=#{userId})
+        </if>
+        order by create_time desc
+    </select>
+    <select id="getUdfFuncByType" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        select *
+        from t_ds_udfs
+        where `type` = #{type}
+        <if test="userId != 0">
+            and id in (
+            select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+            union select id as udf_id  from t_ds_udfs where user_id=#{userId})
+        </if>
+    </select>
+    <select id="queryUdfFuncExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        select *
+        from t_ds_udfs
+        where user_id <![CDATA[ <> ]]> #{userId}
+    </select>
+    <select id="queryAuthedUdfFunc" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        SELECT u.*
+        from t_ds_udfs u,t_ds_relation_udfs_user rel
+        WHERE u.id = rel.udf_id
+        AND rel.user_id = #{userId}
+    </select>
+</mapper>

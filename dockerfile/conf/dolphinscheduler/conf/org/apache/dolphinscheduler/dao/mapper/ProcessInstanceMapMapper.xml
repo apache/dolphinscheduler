@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper">
+    <delete id="deleteByParentProcessId">
+        delete
+        from t_ds_relation_process_instance
+        where parent_process_instance_id=#{parentProcessId}
+
+    </delete>
+    <select id="queryByParentId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap">
+        select *
+        from t_ds_relation_process_instance
+        where parent_process_instance_id = #{parentProcessId}
+        and parent_task_instance_id = #{parentTaskId}
+    </select>
+    <select id="queryBySubProcessId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap">
+        select *
+        from t_ds_relation_process_instance
+        where process_instance_id = #{subProcessId}
+    </select>
+    <select id="querySubIdListByParentId" resultType="java.lang.Integer">
+        select process_instance_id
+        from t_ds_relation_process_instance
+        where parent_process_instance_id = #{parentInstanceId}
+    </select>
+</mapper>
