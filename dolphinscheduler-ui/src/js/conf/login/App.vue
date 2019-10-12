@@ -143,7 +143,7 @@
         width: 280px;
         height: 60px;
         display: block;
-        background: url("img/login-logo.png");
+        background: url("img/login-logo.svg") no-repeat 23px;
         margin: 0 auto;
       }
     }

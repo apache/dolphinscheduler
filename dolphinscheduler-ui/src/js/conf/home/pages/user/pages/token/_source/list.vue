@@ -31,7 +31,7 @@
           </td>
           <td>
             <span>
-              <a href="javascript:" class="links">{{item.userName}}</a>
+              {{item.userName}}
             </span>
           </td>
           <td><span>{{item.token}}</span></td>
