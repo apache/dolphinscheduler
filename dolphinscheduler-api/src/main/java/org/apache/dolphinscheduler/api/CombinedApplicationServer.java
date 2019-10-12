@@ -40,7 +40,6 @@ public class CombinedApplicationServer extends SpringBootServletInitializer {
 
         ConfigurableApplicationContext context = SpringApplication.run(ApiApplicationServer.class, args);
         ProcessDao processDao = context.getBean(ProcessDao.class);
-        AlertDao alertDao = context.getBean(AlertDao.class);
 
         MasterServer master = new MasterServer(processDao);
         master.run(processDao);
