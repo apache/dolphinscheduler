@@ -98,7 +98,6 @@ public class LoggerServer {
                     request.getLimit());
             List<String> list = readFile(request.getPath(), request.getSkipLineNum(), request.getLimit());
             StringBuilder sb = new StringBuilder();
-            boolean errorLineFlag = false;
             for (String line : list){
                 if (line.contains("TaskLogger")){
                     errorLineFlag = filterLine(request.getPath(),line);
@@ -202,7 +201,6 @@ public class LoggerServer {
         StringBuilder sb = new StringBuilder();
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
-            boolean errorLineFlag = false;
             while ((line = br.readLine()) != null){
                 if (line.contains("TaskLogger")){
                     errorLineFlag = filterLine(path,line);

@@ -50,7 +50,7 @@ elif [ "$command" = "worker-server" ]; then
   LOG_FILE="-Dspring.config.location=conf/application_worker.properties -Ddruid.mysql.usePingMethod=false"
   CLASS=cn.escheduler.server.worker.WorkerServer
 elif [ "$command" = "alert-server" ]; then
-  LOG_FILE="-Dlogback.configurationFile=conf/alert_logback.xml"
+  LOG_FILE="-Dspring.config.location=conf/application_alert.properties -Ddruid.mysql.usePingMethod=false"
   CLASS=cn.escheduler.alert.AlertServer
 elif [ "$command" = "logger-server" ]; then
   CLASS=cn.escheduler.server.rpc.LoggerServer
