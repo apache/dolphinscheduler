@@ -45,7 +45,7 @@ public class LoggerServer {
     private Server server;
 
     public void start() throws IOException {
-	    /* The port on which the server should run */
+        /* The port on which the server should run */
         int port = Constants.RPC_PORT;
         server = ServerBuilder.forPort(port)
                 .addService(new LogViewServiceGrpcImpl())
@@ -99,13 +99,7 @@ public class LoggerServer {
             List<String> list = readFile(request.getPath(), request.getSkipLineNum(), request.getLimit());
             StringBuilder sb = new StringBuilder();
             for (String line : list){
-                if (line.contains("TaskLogger")){
-                    errorLineFlag = filterLine(request.getPath(),line);
-                }
-
-                if (!errorLineFlag || !line.contains("TaskLogger")){
-                    sb.append(line + "\r\n");
-                }
+                sb.append(line + "\r\n");
             }
             RetStrInfo retInfoBuild = RetStrInfo.newBuilder().setMsg(sb.toString()).build();
             responseObserver.onNext(retInfoBuild);
@@ -202,13 +196,7 @@ public class LoggerServer {
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
             while ((line = br.readLine()) != null){
-                if (line.contains("TaskLogger")){
-                    errorLineFlag = filterLine(path,line);
-                }
-
-                if (!errorLineFlag || !line.contains("TaskLogger")){
-                    sb.append(line + "\r\n");
-                }
+                sb.append(line + "\r\n");
             }
 
             return sb.toString();
@@ -226,20 +214,4 @@ public class LoggerServer {
         return null;
     }
 
-
-    /**
-     *
-     * @param path
-     * @param line
-     * @return
-     */
-    private static boolean filterLine(String path,String line){
-        String removeSuffix = path.substring(0, path.length() - 4);
-        String[] strArrs = removeSuffix.split("/");
-        String taskAppId = String.format("%s_%s_%s",
-                strArrs[strArrs.length - 3],
-                strArrs[strArrs.length-2],
-                strArrs[strArrs.length - 1]);
-        return !line.contains(taskAppId);
-    }
 }
