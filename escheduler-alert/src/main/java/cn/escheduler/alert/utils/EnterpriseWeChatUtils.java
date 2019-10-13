@@ -17,9 +17,9 @@
 package cn.escheduler.alert.utils;
 
 import cn.escheduler.common.enums.ShowType;
+import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.dao.model.Alert;
 import com.alibaba.fastjson.JSON;
-
 import com.google.common.reflect.TypeToken;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.escheduler.alert.utils.PropertyUtils.getString;
 
@@ -66,6 +67,7 @@ public class EnterpriseWeChatUtils {
 
     /**
      * get Enterprise WeChat token info
+     *
      * @return token string info
      * @throws IOException
      */
@@ -91,6 +93,7 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team single Enterprise WeChat message
+     *
      * @param toParty
      * @param agentId
      * @param msg
@@ -104,6 +107,7 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team multi Enterprise WeChat message
+     *
      * @param toParty
      * @param agentId
      * @param msg
@@ -118,6 +122,7 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team single user message
+     *
      * @param toUser
      * @param agentId
      * @param msg
@@ -131,6 +136,7 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team multi user message
+     *
      * @param toUser
      * @param agentId
      * @param msg
@@ -145,6 +151,7 @@ public class EnterpriseWeChatUtils {
 
     /**
      * send Enterprise WeChat
+     *
      * @param charset
      * @param data
      * @param token
@@ -172,58 +179,80 @@ public class EnterpriseWeChatUtils {
 
     /**
      * convert table to markdown style
+     *
      * @param title
      * @param content
      * @return
      */
-    public static String markdownTable(String title,String content){
+    public static List<String> markdownTable(String title, String content) {
+        List<String> contentList = new ArrayList<String>();
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
+        List<List<LinkedHashMap>> allSubList = CollectionUtils.getSubList(mapItemsList, 10);
         StringBuilder contents = new StringBuilder(200);
-        for (LinkedHashMap mapItems : mapItemsList){
+        for (List<LinkedHashMap> sublist : allSubList) {
+            contents.setLength(0);
+            for (LinkedHashMap mapItems : sublist) {
 
-            Set<Map.Entry<String, String>> entries = mapItems.entrySet();
+                Set<Map.Entry<String, String>> entries = mapItems.entrySet();
 
-            Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+                Iterator<Map.Entry<String, String>> iterator = entries.iterator();
 
-            StringBuilder t = new StringBuilder(String.format("`%s`%s",title,Constants.MARKDOWN_ENTER));
-            while (iterator.hasNext()){
+                StringBuilder t = new StringBuilder(String.format("`%s`%s", title, Constants.MARKDOWN_ENTER));
+                while (iterator.hasNext()) {
 
-                Map.Entry<String, String> entry = iterator.next();
-                t.append(Constants.MARKDOWN_QUOTE);
-                t.append(entry.getKey()).append(":").append(entry.getValue());
-                t.append(Constants.MARKDOWN_ENTER);
+                    Map.Entry<String, String> entry = iterator.next();
+                    t.append(Constants.MARKDOWN_QUOTE);
+                    t.append(entry.getKey()).append(":").append(entry.getValue());
+                    t.append(Constants.MARKDOWN_ENTER);
+                }
+
+                contents.append(t);
             }
-
-            contents.append(t);
+            contentList.add(contents.toString());
         }
-        return contents.toString();
+
+        return contentList;
     }
 
     /**
      * convert text to markdown style
+     *
      * @param title
      * @param content
      * @return
      */
-    public static String markdownText(String title,String content){
-        if (StringUtils.isNotEmpty(content)){
-            List<String> list;
+    public static List<String> markdownText(String title, String content) {
+        List<String> contentList = new ArrayList<String>();
+        if (StringUtils.isNotEmpty(content)) {
+            List<Object> list;
             try {
-                list = JSONUtils.toList(content,String.class);
-            }catch (Exception e){
-                logger.error("json format exception",e);
-                return null;
+                list = JSONUtils.toList(content, Object.class);
+            } catch (Exception e) {
+                logger.error("json format exception", e);
+                throw new RuntimeException("json format exception", e);
             }
-
+            if (list.size() > 0) {
+                Object o = list.get(0);
+                if (!(o instanceof String)) {
+                    logger.error("{} is not instanceof string", o.toString());
+                    throw new RuntimeException(String.format("{1} is not instanceof string", o.toString()));
+                }
+            }
+            List<List<String>> allList = CollectionUtils.getSubList(list.stream().map(s -> s.toString()).collect(Collectors.toList()), 50);
             StringBuilder contents = new StringBuilder(100);
-            contents.append(String.format("`%s`\n",title));
-            for (String str : list){
-                contents.append(Constants.MARKDOWN_QUOTE);
-                contents.append(str);
-                contents.append(Constants.MARKDOWN_ENTER);
+
+            for (List<String> sublist : allList) {
+                contents.setLength(0);
+                contents.append(String.format("`%s`\n", title));
+                for (String str : sublist) {
+                    contents.append(Constants.MARKDOWN_QUOTE);
+                    contents.append(str);
+                    contents.append(Constants.MARKDOWN_ENTER);
+                }
+                contentList.add(contents.toString());
             }
 
-            return contents.toString();
+            return contentList;
 
         }
         return null;
@@ -231,15 +260,16 @@ public class EnterpriseWeChatUtils {
 
     /**
      * Determine the mardown style based on the show type of the alert
+     *
      * @param alert
      * @return
      */
-    public static String markdownByAlert(Alert alert){
-        String result = "";
+    public static List<String> markdownByAlert(Alert alert) {
+        List<String> result = new ArrayList<String>();
         if (alert.getShowType() == ShowType.TABLE) {
-            result = markdownTable(alert.getTitle(),alert.getContent());
-        }else if(alert.getShowType() == ShowType.TEXT){
-            result = markdownText(alert.getTitle(),alert.getContent());
+            result = markdownTable(alert.getTitle(), alert.getContent());
+        } else if (alert.getShowType() == ShowType.TEXT) {
+            result = markdownText(alert.getTitle(), alert.getContent());
         }
         return result;
 

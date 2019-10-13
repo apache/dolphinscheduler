@@ -34,257 +34,252 @@ fi
 source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
-# mysql config
-# mysql address and port
+# mysql配置
+# mysql 地址,端口
 mysqlHost="192.168.xx.xx:3306"
 
-# mysql database
+# mysql 数据库名称
 mysqlDb="escheduler"
 
-# mysql username
+# mysql 用户名
 mysqlUserName="xx"
 
-# mysql passwprd
-# Note: if there are special characters, please use the \ transfer character to transfer
+# mysql 密码
+# 注意：如果有特殊字符，请用 \ 转移符进行转移
 mysqlPassword="xx"
 
-# conf/config/install_config.conf config
-# Note: the installation path is not the same as the current path (pwd)
+# conf/config/install_config.conf配置
+# 注意：安装路径,不要当前路径(pwd)一样
 installPath="/data1_1T/escheduler"
 
-# deployment user
-# Note: the deployment user needs to have sudo privileges and permissions to operate hdfs. If hdfs is enabled, the root directory needs to be created by itself
+# 部署用户
+# 注意：部署用户需要有sudo权限及操作hdfs的权限，如果开启hdfs，根目录需要自行创建
 deployUser="escheduler"
 
-# zk cluster
+# zk集群
 zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
 
-# install hosts
-# Note: install the scheduled hostname list. If it is pseudo-distributed, just write a pseudo-distributed hostname
+# 安装hosts
+# 注意：安装调度的机器hostname列表，如果是伪分布式，则只需写一个伪分布式hostname即可
 ips="ark0,ark1,ark2,ark3,ark4"
 
-# conf/config/run_config.conf config
-# run master machine
-# Note: list of hosts hostname for deploying master
+# conf/config/run_config.conf配置
+# 运行Master的机器
+# 注意：部署master的机器hostname列表
 masters="ark0,ark1"
 
-# run worker machine
-# note: list of machine hostnames for deploying workers
+# 运行Worker的机器
+# 注意：部署worker的机器hostname列表
 workers="ark2,ark3,ark4"
 
-# run alert machine
-# note: list of machine hostnames for deploying alert server
+# 运行Alert的机器
+# 注意：部署alert server的机器hostname列表
 alertServer="ark3"
 
-# run api machine
-# note: list of machine hostnames for deploying api server
+# 运行Api的机器
+# 注意：部署api server的机器hostname列表
 apiServers="ark1"
 
-# alert config
-# mail protocol
+# alert配置
+# 邮件协议
 mailProtocol="SMTP"
 
-# mail server host
+# 邮件服务host
 mailServerHost="smtp.exmail.qq.com"
 
-# mail server port
+# 邮件服务端口
 mailServerPort="25"
 
-# sender
+# 发送人
 mailSender="xxxxxxxxxx"
 
-# sender password
+# 发送人密码
 mailPassword="xxxxxxxxxx"
 
-# TLS mail protocol support
+# TLS邮件协议支持
 starttlsEnable="false"
 
-# SSL mail protocol support
-# note: The SSL protocol is enabled by default. 
-# only one of TLS and SSL can be in the true state.
+# SSL邮件协议支持
+# 注意：默认开启的是SSL协议，TLS和SSL只能有一个处于true状态
 sslEnable="true"
 
-# download excel path
+# 下载Excel路径
 xlsFilePath="/tmp/xls"
 
-# Enterprise WeChat Enterprise ID Configuration
+# 企业微信企业ID配置
 enterpriseWechatCorpId="xxxxxxxxxx"
 
-# Enterprise WeChat application Secret configuration
+# 企业微信应用Secret配置
 enterpriseWechatSecret="xxxxxxxxxx"
 
-# Enterprise WeChat Application AgentId Configuration
+# 企业微信应用AgentId配置
 enterpriseWechatAgentId="xxxxxxxxxx"
 
-# Enterprise WeChat user configuration, multiple users to , split
+# 企业微信用户配置,多个用户以,分割
 enterpriseWechatUsers="xxxxx,xxxxx"
 
 
-# whether to start monitoring self-starting scripts
+#是否启动监控自启动脚本
 monitorServerState="false"
 
-# resource Center upload and select storage method：HDFS,S3,NONE
+# 资源中心上传选择存储方式：HDFS,S3,NONE
 resUploadStartupType="NONE"
 
-# if resUploadStartupType is HDFS，defaultFS write namenode address，HA you need to put core-site.xml and hdfs-site.xml in the conf directory.
-# if S3，write S3 address，HA，for example ：s3a://escheduler，
-# Note，s3 be sure to create the root directory /escheduler
+# 如果resUploadStartupType为HDFS，defaultFS写namenode地址，支持HA,需要将core-site.xml和hdfs-site.xml放到conf目录下
+# 如果是S3，则写S3地址，比如说：s3a://escheduler，注意，一定要创建根目录/escheduler
 defaultFS="hdfs://mycluster:8020"
 
-# if S3 is configured, the following configuration is required.
-s3Endpoint="http://192.168.xx.xx:9010"
-s3AccessKey="xxxxxxxxxx"
-s3SecretKey="xxxxxxxxxx"
+# 如果配置了S3，则需要有以下配置
+s3Endpoint="http://192.168.199.91:9010"
+s3AccessKey="A3DXS30FO22544RE"
+s3SecretKey="OloCLq3n+8+sdPHUhJ21XrSxTC+JK"
 
-# resourcemanager HA configuration, if it is a single resourcemanager, here is yarnHaIps=""
+# resourcemanager HA配置，如果是单resourcemanager,这里为yarnHaIps=""
 yarnHaIps="192.168.xx.xx,192.168.xx.xx"
 
-# if it is a single resourcemanager, you only need to configure one host name. If it is resourcemanager HA, the default configuration is fine.
+# 如果是单 resourcemanager,只需要配置一个主机名称,如果是resourcemanager HA,则默认配置就好
 singleYarnIp="ark1"
 
-# hdfs root path, the owner of the root path must be the deployment user. 
-# versions prior to 1.1.0 do not automatically create the hdfs root directory, you need to create it yourself.
+# hdfs根路径，根路径的owner必须是部署用户。1.1.0之前版本不会自动创建hdfs根目录，需要自行创建
 hdfsPath="/escheduler"
 
-# have users who create directory permissions under hdfs root path /
-# Note: if kerberos is enabled, hdfsRootUser="" can be used directly.
+# 拥有在hdfs根路径/下创建目录权限的用户
+# 注意：如果开启了kerberos，则直接hdfsRootUser=""，就可以
 hdfsRootUser="hdfs"
 
-# common config
-# Program root path
+# common 配置
+# 程序路径
 programPath="/tmp/escheduler"
 
-# download path
+#下载路径
 downloadPath="/tmp/escheduler/download"
 
-# task execute path
+# 任务执行路径
 execPath="/tmp/escheduler/exec"
 
-# SHELL environmental variable path
+# SHELL环境变量路径
 shellEnvPath="$installPath/conf/env/.escheduler_env.sh"
 
-# suffix of the resource file
+# 资源文件的后缀
 resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
 
-# development status, if true, for the SHELL script, you can view the encapsulated SHELL script in the execPath directory. 
-# If it is false, execute the direct delete
+# 开发状态,如果是true,对于SHELL脚本可以在execPath目录下查看封装后的SHELL脚本,如果是false则执行完成直接删除
 devState="true"
 
-# kerberos config
-# kerberos whether to start
+# kerberos 配置
+# kerberos 是否启动
 kerberosStartUp="false"
 
-# kdc krb5 config file path
+# kdc krb5 配置文件路径
 krb5ConfPath="$installPath/conf/krb5.conf"
 
-# keytab username
+# keytab 用户名
 keytabUserName="hdfs-mycluster@ESZ.COM"
 
-# username keytab path
+# 用户 keytab路径
 keytabPath="$installPath/conf/hdfs.headless.keytab"
 
-# zk config
-# zk root directory
+# zk 配置
+# zk根目录
 zkRoot="/escheduler"
 
-# used to record the zk directory of the hanging machine
-zkDeadServers="/escheduler/dead-servers"
+# 用来记录挂掉机器的zk目录
+zkDeadServers="$zkRoot/dead-servers"
 
-# masters directory
+# masters目录
 zkMasters="$zkRoot/masters"
 
-# workers directory
+# workers目录
 zkWorkers="$zkRoot/workers"
 
-# zk master distributed lock
+# zk master分布式锁
 mastersLock="$zkRoot/lock/masters"
 
-# zk worker distributed lock
+# zk worker分布式锁
 workersLock="$zkRoot/lock/workers"
 
-# zk master fault-tolerant distributed lock
+# zk master容错分布式锁
 mastersFailover="$zkRoot/lock/failover/masters"
 
-# zk worker fault-tolerant distributed lock
+# zk worker容错分布式锁
 workersFailover="$zkRoot/lock/failover/workers"
 
-# zk master start fault tolerant distributed lock
+# zk master启动容错分布式锁
 mastersStartupFailover="$zkRoot/lock/failover/startup-masters"
 
-# zk session timeout
+# zk session 超时
 zkSessionTimeout="300"
 
-# zk connection timeout
+# zk 连接超时
 zkConnectionTimeout="300"
 
-# zk retry interval
+# zk 重试间隔
 zkRetrySleep="100"
 
-# zk retry maximum number of times
+# zk重试最大次数
 zkRetryMaxtime="5"
 
 
-# master config 
-# master execution thread maximum number, maximum parallelism of process instance
+# master 配置
+# master执行线程最大数,流程实例的最大并行度
 masterExecThreads="100"
 
-# the maximum number of master task execution threads, the maximum degree of parallelism for each process instance
+# master任务执行线程最大数,每一个流程实例的最大并行度
 masterExecTaskNum="20"
 
-# master heartbeat interval
+# master心跳间隔
 masterHeartbeatInterval="10"
 
-# master task submission retries
+# master任务提交重试次数
 masterTaskCommitRetryTimes="5"
 
-# master task submission retry interval
+# master任务提交重试时间间隔
 masterTaskCommitInterval="100"
 
-# master maximum cpu average load, used to determine whether the master has execution capability
+# master最大cpu平均负载,用来判断master是否还有执行能力
 masterMaxCpuLoadAvg="10"
 
-# master reserve memory to determine if the master has execution capability
+# master预留内存,用来判断master是否还有执行能力
 masterReservedMemory="1"
 
 
-# worker config 
-# worker execution thread
+# worker 配置
+# worker执行线程
 workerExecThreads="100"
 
-# worker heartbeat interval
+# worker心跳间隔
 workerHeartbeatInterval="10"
 
-# worker number of fetch tasks
+# worker一次抓取任务数
 workerFetchTaskNum="3"
 
-# workerThe maximum cpu average load, used to determine whether the worker still has the ability to execute, 
-# keep the system default, the default is twice the number of cpu cores, when the load reaches 2 times
+# worker最大cpu平均负载,用来判断worker是否还有执行能力,保持系统默认，默认为cpu核数的2倍，当负载达到2倍时，
 #workerMaxCupLoadAvg="10"
 
-# worker reserve memory to determine if the master has execution capability
+# worker预留内存,用来判断master是否还有执行能力
 workerReservedMemory="1"
 
-# api config
-# api server port
+# api 配置
+# api 服务端口
 apiServerPort="12345"
 
-# api session timeout
+# api session 超时
 apiServerSessionTimeout="7200"
 
-# api server context path
+# api 上下文路径
 apiServerContextPath="/escheduler/"
 
-# spring max file size
+# spring 最大文件大小
 springMaxFileSize="1024MB"
 
-# spring max request size
+# spring 最大请求文件大小
 springMaxRequestSize="1024MB"
 
-# api max http post size
+# api 最大post请求大小
 apiMaxHttpPostSize="5000000"
 
-# 1,replace file
-echo "1,replace file"
+# 1,替换文件
+echo "1,替换文件"
 sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${mysqlHost}/${mysqlDb}?characterEncoding=UTF-8#g" conf/dao/data_source.properties
 sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${mysqlUserName}#g" conf/dao/data_source.properties
 sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${mysqlPassword}#g" conf/dao/data_source.properties
@@ -348,11 +343,11 @@ sed -i ${txt} "s#worker.reserved.memory.*#worker.reserved.memory=${workerReserve
 
 
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application.properties
-sed -i ${txt} "s#server.servlet.session.timeout.*#server.servlet.session.timeout=${apiServerSessionTimeout}#g" conf/application.properties
-sed -i ${txt} "s#server.servlet.context-path.*#server.servlet.context-path=${apiServerContextPath}#g" conf/application.properties
-sed -i ${txt} "s#spring.servlet.multipart.max-file-size.*#spring.servlet.multipart.max-file-size=${springMaxFileSize}#g" conf/application.properties
-sed -i ${txt} "s#spring.servlet.multipart.max-request-size.*#spring.servlet.multipart.max-request-size=${springMaxRequestSize}#g" conf/application.properties
-sed -i ${txt} "s#server.jetty.max-http-post-size.*#server.jetty.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application.properties
+sed -i ${txt} "s#server.session.timeout.*#server.session.timeout=${apiServerSessionTimeout}#g" conf/application.properties
+sed -i ${txt} "s#server.context-path.*#server.context-path=${apiServerContextPath}#g" conf/application.properties
+sed -i ${txt} "s#spring.http.multipart.max-file-size.*#spring.http.multipart.max-file-size=${springMaxFileSize}#g" conf/application.properties
+sed -i ${txt} "s#spring.http.multipart.max-request-size.*#spring.http.multipart.max-request-size=${springMaxRequestSize}#g" conf/application.properties
+sed -i ${txt} "s#server.max-http-post-size.*#server.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application.properties
 
 
 sed -i ${txt} "s#mail.protocol.*#mail.protocol=${mailProtocol}#g" conf/alert.properties
@@ -380,8 +375,8 @@ sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/run_con
 sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/run_config.conf
 
 
-# 2,create directory
-echo "2,create directory"
+# 2,创建目录
+echo "2,创建目录"
 
 if [ ! -d $installPath ];then
   sudo mkdir -p $installPath
@@ -392,22 +387,22 @@ hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
 do
 
-# create if programPath does not exist
+# 如果programPath不存在,则创建
 if ! ssh $host test -e $programPath; then
   ssh $host "sudo mkdir -p $programPath;sudo chown -R $deployUser:$deployUser $programPath"
 fi
 
-# create if downloadPath does not exist
+# 如果downloadPath不存在,则创建
 if ! ssh $host test -e $downloadPath; then
   ssh $host "sudo mkdir -p $downloadPath;sudo chown -R $deployUser:$deployUser $downloadPath"
 fi
 
-# create if execPath does not exist
+# 如果$execPath不存在,则创建
 if ! ssh $host test -e $execPath; then
   ssh $host "sudo mkdir -p $execPath; sudo chown -R $deployUser:$deployUser $execPath"
 fi
 
-# create if xlsFilePath does not exist
+# 如果$xlsFilePath不存在,则创建
 if ! ssh $host test -e $xlsFilePath; then
   ssh $host "sudo mkdir -p $xlsFilePath; sudo chown -R $deployUser:$deployUser $xlsFilePath"
 fi
@@ -415,31 +410,31 @@ fi
 done
 
 
-# 3,stop server
-echo "3,stop server"
-sh ${workDir}/script/stop-all.sh
+# 3,停止服务
+echo "3,停止服务"
+sh ${workDir}/script/stop_all.sh
 
-# 4,delete zk node
-echo "4,delete zk node"
+# 4,删除zk节点
+echo "4,删除zk节点"
 sleep 1
-python ${workDir}/script/del-zk-node.py $zkQuorum $zkRoot
+python ${workDir}/script/del_zk_node.py $zkQuorum $zkRoot
 
-# 5,scp resources
-echo "5,scp resources"
-sh ${workDir}/script/scp-hosts.sh
+# 5,scp资源
+echo "5,scp资源"
+sh ${workDir}/script/scp_hosts.sh
 if [ $? -eq 0 ]
 then
-	echo 'scp copy completed'
+	echo 'scp拷贝完成'
 else
-	echo 'sc copy failed to exit'
+	echo 'sc 拷贝失败退出'
 	exit -1
 fi
 
-# 6,startup
-echo "6,startup"
-sh ${workDir}/script/start-all.sh
+# 6,启动
+echo "6,启动"
+sh ${workDir}/script/start_all.sh
 
-# 7,start monitoring self-starting script
+# 7,启动监控自启动脚本
 monitor_pid=${workDir}/monitor_server.pid
 if [ "true" = $monitorServerState ];then
         if [ -f $monitor_pid ]; then
@@ -458,8 +453,9 @@ if [ "true" = $monitorServerState ];then
                 echo "monitor server running as process ${TARGET_PID}.Stopped success"
                 rm -f $monitor_pid
         fi
-        nohup python -u ${workDir}/script/monitor-server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor-server.log 2>&1 &
+        nohup python -u ${workDir}/script/monitor_server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor_server.log 2>&1 &
         echo $! > $monitor_pid
         echo "start monitor server success as process `cat $monitor_pid`"
 
 fi
+

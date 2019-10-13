@@ -66,8 +66,8 @@ public class HadoopUtils implements Closeable {
     }
 
     public static HadoopUtils getInstance(){
-        // if kerberos startup , renew HadoopUtils
-        if (CommonUtils.getKerberosStartupState()){
+        // if kerberos startup，need new instance
+        if (CommonUtils.getKerberosStartupState())  {
             return new HadoopUtils();
         }
         return instance;
@@ -414,22 +414,12 @@ public class HadoopUtils implements Closeable {
      * @param tenantCode tenant code
      * @return hdfs resource dir
      */
-    public static String getHdfsResDir(String tenantCode) {
+    public static String getHdfsDir(String tenantCode) {
         return String.format("%s/resources", getHdfsTenantDir(tenantCode));
     }
 
     /**
-     * hdfs user dir
-     *
-     * @param tenantCode tenant code
-     * @return hdfs resource dir
-     */
-    public static String getHdfsUserDir(String tenantCode,int userId) {
-        return String.format("%s/home/%d", getHdfsTenantDir(tenantCode),userId);
-    }
-
-    /**
-     * hdfs udf dir
+     * get udf dir on hdfs
      *
      * @param tenantCode tenant code
      * @return get udf dir on hdfs
@@ -446,7 +436,7 @@ public class HadoopUtils implements Closeable {
      * @return get absolute path and name for file on hdfs
      */
     public static String getHdfsFilename(String tenantCode, String filename) {
-        return String.format("%s/%s", getHdfsResDir(tenantCode), filename);
+        return String.format("%s/%s", getHdfsDir(tenantCode), filename);
     }
 
     /**
@@ -463,7 +453,7 @@ public class HadoopUtils implements Closeable {
     /**
      * @return file directory of tenants on hdfs
      */
-    public static String getHdfsTenantDir(String tenantCode) {
+    private static String getHdfsTenantDir(String tenantCode) {
         return String.format("%s/%s", getHdfsDataBasePath(), tenantCode);
     }
 
