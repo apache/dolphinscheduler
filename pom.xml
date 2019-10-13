@@ -529,10 +529,11 @@
 				<configuration>
 					<includes>
 						<include>**/*.java</include>
-						<include>**/dolphinscheduler-ui/src/**.scss</include>
-						<include>**/dolphinscheduler-ui/src/**.css</include>
-						<include>**/dolphinscheduler-ui/src/**.vue</include>
-						<include>**/dolphinscheduler-ui/src/**.js</include>
+						<include>**/dolphinscheduler-ui/src/**/*.scss</include>
+						<include>**/dolphinscheduler-ui/src/**/*.css</include>
+						<include>**/dolphinscheduler-ui/src/**/*.vue</include>
+						<include>**/dolphinscheduler-ui/src/**/*.js</include>
+						<include>**/dolphinscheduler-ui/src/**/*.html</include>
 					</includes>
 					<excludes>
 						<exclude>**/dolphinscheduler-ui/src/lib/**</exclude>
@@ -542,11 +543,8 @@
 						<exclude>**/dolphinscheduler-ui/src/sass/common/_normalize.scss</exclude>
 						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/es5.js</exclude>
 						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/base.css</exclude>
-						<exclude>**/dolphinscheduler-ui/src/view/home/index.html</exclude>
 						<exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
 						<exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
-						<exclude>**/dolphinscheduler-ui/src/view/login/index.html</exclude>
-						<exclude>**/dolphinscheduler-ui/src/font/demo_index.html</exclude>
 					</excludes>
 					<consoleOutput>true</consoleOutput>
 				</configuration>
