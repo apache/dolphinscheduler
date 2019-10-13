@@ -27,6 +27,11 @@ public class Resource {
   private int id;
 
   /**
+   * parent id
+   */
+  private int pid;
+
+  /**
    * resource alias
    */
   private String alias;
@@ -69,10 +74,11 @@ public class Resource {
   public Resource() {
   }
 
-  public Resource(int id, String alias, String fileName, String desc, int userId,
+  public Resource(int id, int pid,String alias, String fileName, String desc, int userId,
                   ResourceType type, long size,
                   Date createTime, Date updateTime) {
     this.id = id;
+    this.pid = pid;
     this.alias = alias;
     this.fileName = fileName;
     this.desc = desc;
@@ -94,12 +100,32 @@ public class Resource {
     this.updateTime = updateTime;
   }
 
+  public Resource(int pid,String alias, String fileName, String desc, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
+    this.pid = pid;
+    this.alias = alias;
+    this.fileName = fileName;
+    this.desc = desc;
+    this.userId = userId;
+    this.type = type;
+    this.size = size;
+    this.createTime = createTime;
+    this.updateTime = updateTime;
+  }
+
   public int getId() {
     return id;
   }
 
   public void setId(int id) {
     this.id = id;
+  }
+
+  public int getPid() {
+    return pid;
+  }
+
+  public void setPid(int pid) {
+    this.pid = pid;
   }
 
   public String getAlias() {
@@ -171,6 +197,7 @@ public class Resource {
   public String toString() {
     return "Resource{" +
             "id=" + id +
+            ", pid=" + pid +
             ", alias='" + alias + '\'' +
             ", fileName='" + fileName + '\'' +
             ", desc='" + desc + '\'' +
