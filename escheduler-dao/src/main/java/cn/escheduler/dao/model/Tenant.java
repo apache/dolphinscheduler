@@ -60,11 +60,6 @@ public class Tenant {
     private String queue;
 
     /**
-     * queue
-     */
-    private String queue;
-
-    /**
      * create time
      */
     private Date createTime;
