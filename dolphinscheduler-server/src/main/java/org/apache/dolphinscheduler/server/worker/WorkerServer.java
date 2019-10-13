@@ -162,7 +162,7 @@ public class WorkerServer extends AbstractServer {
                 scheduleAtFixedRate(heartBeatThread, 5, heartBeatInterval, TimeUnit.SECONDS);
 
         // kill process thread implement
-        Runnable killProcessThread = getKillProcessThread();
+        Runnable killProcessThread = getKillProcessThread(processDao);
 
         // submit kill process thread
         killExecutorService.execute(killProcessThread);
@@ -288,7 +288,7 @@ public class WorkerServer extends AbstractServer {
      *  kill process thread implement
      * @return
      */
-    private Runnable getKillProcessThread(){
+    private Runnable getKillProcessThread(ProcessDao processDao){
         Runnable killProcessThread  = new Runnable() {
             @Override
             public void run() {
