@@ -450,6 +450,7 @@ public class SchedulerService extends BaseService {
         Schedule schedule = processDao.querySchedule(scheduleId);
         if (schedule == null) {
             logger.warn("process schedule info not exists");
+            return;
         }
 
         Date startDate = schedule.getStartTime();

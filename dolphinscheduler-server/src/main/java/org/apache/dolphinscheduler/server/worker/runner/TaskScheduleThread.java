@@ -82,10 +82,10 @@ public class TaskScheduleThread implements Runnable {
     @Override
     public void run() {
 
-        // update task state is running according to task type
-        updateTaskState(taskInstance.getTaskType());
-
         try {
+            // update task state is running according to task type
+            updateTaskState(taskInstance.getTaskType());
+
             logger.info("script path : {}", taskInstance.getExecutePath());
             // task node
             TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
