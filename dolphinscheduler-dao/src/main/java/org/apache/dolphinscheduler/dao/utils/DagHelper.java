@@ -49,7 +49,7 @@ public class DagHelper {
      * @param taskNodeList
      * @return
      */
-    private static List<TaskNodeRelation> generateRelationListByFlowNodes(List<TaskNode> taskNodeList) {
+    public static List<TaskNodeRelation> generateRelationListByFlowNodes(List<TaskNode> taskNodeList) {
         List<TaskNodeRelation> nodeRelationList = new ArrayList<>();
         for (TaskNode taskNode : taskNodeList) {
             String preTasks = taskNode.getPreTasks();
@@ -73,8 +73,8 @@ public class DagHelper {
      * @param taskDependType
      * @return
      */
-    private static List<TaskNode> generateFlowNodeListByStartNode(List<TaskNode> taskNodeList, List<String> startNodeNameList,
-                                                                  List<String> recoveryNodeNameList, TaskDependType taskDependType) {
+    public static List<TaskNode> generateFlowNodeListByStartNode(List<TaskNode> taskNodeList, List<String> startNodeNameList,
+                                                                 List<String> recoveryNodeNameList, TaskDependType taskDependType) {
         List<TaskNode> destFlowNodeList = new ArrayList<>();
         List<String> startNodeList = startNodeNameList;
 
@@ -262,41 +262,46 @@ public class DagHelper {
         for(String start : startVertexs){
             TaskNode startNode = dag.getNode(start);
             if(!startNode.isForbidden() && !completeTaskList.containsKey(start)){
+                // the start can be submit if not forbidden and not in complete tasks
                 continue;
             }
+            // then submit the post nodes
             Collection<String> postNodes = getStartVertex(start, dag, completeTaskList);
-
             for(String post : postNodes){
-                if(checkForbiddenPostCanSubmit(post, dag)){
+                TaskNode postNode = dag.getNode(post);
+                if(taskNodeCanSubmit(postNode, dag, completeTaskList)){
                     tmpStartVertexs.add(post);
                 }
             }
             tmpStartVertexs.remove(start);
         }
-
         return tmpStartVertexs;
     }
 
     /**
-     *
-     * @param postNodeName
+     * the task can be submit when  all the depends nodes are forbidden or complete
+     * @param taskNode
      * @param dag
+     * @param completeTaskList
      * @return
      */
-    private static boolean checkForbiddenPostCanSubmit(String postNodeName,  DAG<String, TaskNode, TaskNodeRelation> dag){
+    public static boolean taskNodeCanSubmit(TaskNode taskNode,
+                                            DAG<String, TaskNode, TaskNodeRelation> dag,
+                                            Map<String, TaskInstance> completeTaskList) {
 
-        TaskNode postNode = dag.getNode(postNodeName);
-        List<String> dependList = postNode.getDepList();
+        List<String> dependList = taskNode.getDepList();
+        if(dependList == null){
+            return true;
+        }
 
         for(String dependNodeName : dependList){
             TaskNode dependNode = dag.getNode(dependNodeName);
-            if(!dependNode.isForbidden()){
+            if(!dependNode.isForbidden() && !completeTaskList.containsKey(dependNodeName)){
                 return false;
             }
         }
         return true;
     }
-
 
 
     /***
