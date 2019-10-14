@@ -1686,18 +1686,17 @@ public class ProcessDao extends AbstractBaseDao {
      */
     public int getTaskWorkerGroupId(TaskInstance taskInstance) {
         int taskWorkerGroupId = taskInstance.getWorkerGroupId();
-        int processInstanceId = taskInstance.getProcessInstanceId();
 
+        if(taskWorkerGroupId > 0){
+            return taskWorkerGroupId;
+        }
+        int processInstanceId = taskInstance.getProcessInstanceId();
         ProcessInstance processInstance = findProcessInstanceById(processInstanceId);
 
-        if(processInstance == null){
-            logger.error("cannot find the task:{} process instance", taskInstance.getId());
-            return Constants.DEFAULT_WORKER_ID;
+        if(processInstance != null){
+            return processInstance.getWorkerGroupId();
         }
-        int processWorkerGroupId = processInstance.getWorkerGroupId();
-
-        taskWorkerGroupId = (taskWorkerGroupId <= 0 ? processWorkerGroupId : taskWorkerGroupId);
-        return taskWorkerGroupId;
+        return Constants.DEFAULT_WORKER_ID;
     }
 
     public List<Project> getProjectListHavePerm(int userId){
