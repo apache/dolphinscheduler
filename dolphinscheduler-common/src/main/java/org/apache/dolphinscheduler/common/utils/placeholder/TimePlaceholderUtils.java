@@ -186,11 +186,7 @@ public class TimePlaceholderUtils {
                         res = frontInt + backInt;
                         break;
                     case N:
-                        res = frontInt - backInt;
-                        break;
                     case ADD_CHAR:
-                        res = frontInt + backInt;
-                        break;
                     case SUBTRACT_CHAR:
                         res = frontInt - backInt;
                         break;

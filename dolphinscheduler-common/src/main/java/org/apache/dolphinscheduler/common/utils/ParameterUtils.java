@@ -143,9 +143,7 @@ public class ParameterUtils {
       }
     }
 
-    if (globalMap != null){
-      globalMap.putAll(resolveMap);
-    }
+    globalMap.putAll(resolveMap);
 
     if (globalParamList != null && globalParamList.size() > 0){
 

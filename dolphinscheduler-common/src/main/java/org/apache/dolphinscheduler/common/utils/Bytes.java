@@ -597,7 +597,7 @@ public class Bytes {
    */
   public static byte [] head(final byte [] a, final int length) {
     if (a.length < length) {
-      return null;
+      return new byte[0];
     }
     byte [] result = new byte[length];
     System.arraycopy(a, 0, result, 0, length);
@@ -611,7 +611,7 @@ public class Bytes {
    */
   public static byte [] tail(final byte [] a, final int length) {
     if (a.length < length) {
-      return null;
+      return new byte[0];
     }
     byte [] result = new byte[length];
     System.arraycopy(a, a.length - length, result, 0, length);

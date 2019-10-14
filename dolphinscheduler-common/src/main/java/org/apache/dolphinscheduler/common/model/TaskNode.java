@@ -58,7 +58,7 @@ public class TaskNode {
   /**
    * the run flag has two states, NORMAL or FORBIDDEN
    */
-  private String runFlag;
+  private String runFlag = "";
 
   /**
    * the front field
