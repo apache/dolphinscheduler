@@ -193,7 +193,9 @@ public class ProcessInstanceService extends BaseDAGService {
                 processInstanceMapper.queryProcessInstanceListPaging(page,
                 project.getId(), processDefineId, searchVal, statusArray, host, start, end);
 
-        for(ProcessInstance processInstance:processInstanceList.getRecords()){
+        List<ProcessInstance> processInstances = processInstanceList.getRecords();
+
+        for(ProcessInstance processInstance: processInstances){
             if (StringUtils.isNotEmpty(startDate)
                     && StringUtils.isNotEmpty(endDate)){
                 processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
@@ -210,7 +212,7 @@ public class ProcessInstanceService extends BaseDAGService {
 
         PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
         pageInfo.setTotalCount((int) processInstanceList.getTotal());
-        pageInfo.setLists(CollectionUtils.getListByExclusion(processInstanceList.getRecords(), exclusionSet));
+        pageInfo.setLists(CollectionUtils.getListByExclusion(processInstances, exclusionSet));
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
