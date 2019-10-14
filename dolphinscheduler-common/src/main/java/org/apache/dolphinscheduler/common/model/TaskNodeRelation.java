@@ -53,8 +53,11 @@ public class TaskNodeRelation {
   }
 
 
-  public boolean equals(TaskNodeRelation e){
-      return (e.getStartNode() == this.startNode && e.getEndNode() == this.endNode);
+  public boolean equals(Object o){
+    if (!(o instanceof TaskNodeRelation)) {
+      return false;
+    }
+    return (((TaskNodeRelation)o).getStartNode().equals(this.startNode) && ((TaskNodeRelation)o).getEndNode().equals(this.endNode));
   }
 
   @Override
