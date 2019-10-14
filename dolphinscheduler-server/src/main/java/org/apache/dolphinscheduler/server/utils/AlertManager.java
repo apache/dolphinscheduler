@@ -168,19 +168,23 @@ public class AlertManager {
      * @param toleranceTaskList
      */
     public void sendAlertWorkerToleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList){
-        Alert alert = new Alert();
-        alert.setTitle("worker fault tolerance");
-        alert.setShowType(ShowType.TABLE);
-        String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
-        alert.setContent(content);
-        alert.setAlertType(AlertType.EMAIL);
-        alert.setCreateTime(new Date());
-        alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1:processInstance.getWarningGroupId());
-        alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
-        alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
+        try{
+            Alert alert = new Alert();
+            alert.setTitle("worker fault tolerance");
+            alert.setShowType(ShowType.TABLE);
+            String content = getWorkerToleranceContent(processInstance, toleranceTaskList);
+            alert.setContent(content);
+            alert.setAlertType(AlertType.EMAIL);
+            alert.setCreateTime(new Date());
+            alert.setAlertGroupId(processInstance.getWarningGroupId() == null ? 1:processInstance.getWarningGroupId());
+            alert.setReceivers(processInstance.getProcessDefinition().getReceivers());
+            alert.setReceiversCc(processInstance.getProcessDefinition().getReceiversCc());
+            alertDao.addAlert(alert);
+            logger.info("add alert to db , alert : {}", alert.toString());
 
-        alertDao.addAlert(alert);
-        logger.info("add alert to db , alert : {}", alert.toString());
+        }catch (Exception e){
+            logger.error("send alert failed! " + e);
+        }
 
     }
 

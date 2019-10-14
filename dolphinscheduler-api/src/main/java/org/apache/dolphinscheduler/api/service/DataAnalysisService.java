@@ -332,6 +332,9 @@ public class DataAnalysisService {
             projectIds.add(projectId);
         }else if(loginUser.getUserType() == UserType.GENERAL_USER){
             projectIds = processDao.getProjectIdListHavePerm(loginUser.getId());
+            if(projectIds.size() ==0 ){
+                projectIds.add(0);
+            }
         }
         return projectIds.toArray(new Integer[projectIds.size()]);
     }
