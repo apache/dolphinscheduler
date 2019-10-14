@@ -1696,6 +1696,7 @@ public class ProcessDao extends AbstractBaseDao {
         if(processInstance != null){
             return processInstance.getWorkerGroupId();
         }
+        logger.info("task : {} will use default worker group id", taskInstance.getId());
         return Constants.DEFAULT_WORKER_ID;
     }
 
