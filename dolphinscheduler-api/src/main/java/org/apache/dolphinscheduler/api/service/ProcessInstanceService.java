@@ -196,11 +196,7 @@ public class ProcessInstanceService extends BaseDAGService {
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
 
         for(ProcessInstance processInstance: processInstances){
-            if (StringUtils.isNotEmpty(startDate)
-                    && StringUtils.isNotEmpty(endDate)){
-                processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
-            }
-
+            processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
         }
 
         Set<String> exclusionSet = new HashSet<String>(){{
