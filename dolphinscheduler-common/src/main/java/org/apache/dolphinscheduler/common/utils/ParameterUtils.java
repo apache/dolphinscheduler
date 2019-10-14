@@ -122,7 +122,7 @@ public class ParameterUtils {
     Map<String,String> allParamMap = new HashMap<>();
     //如果是补数，需要传入一个补数时间，根据任务类型
     Map<String,String> timeParams = BusinessTimeUtils
-            .getBusinessTime(commandType, scheduleTime);
+            .getBusinessTime(commandType,scheduleTime);
 
     if (timeParams != null) {
       allParamMap.putAll(timeParams);
@@ -143,9 +143,7 @@ public class ParameterUtils {
       }
     }
 
-    if (globalMap != null){
-      globalMap.putAll(resolveMap);
-    }
+    globalMap.putAll(resolveMap);
 
     if (globalParamList != null && globalParamList.size() > 0){
 

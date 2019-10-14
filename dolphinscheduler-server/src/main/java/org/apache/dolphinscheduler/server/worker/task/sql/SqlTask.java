@@ -302,7 +302,7 @@ public class SqlTask extends AbstractTask {
                         }
                         resultJSONArray.add(mapOfColValues);
                     }
-
+                    resultSet.close();
                     logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
 
                     // if there is a result set

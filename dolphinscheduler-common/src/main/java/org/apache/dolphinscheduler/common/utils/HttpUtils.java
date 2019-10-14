@@ -33,8 +33,8 @@ import java.io.IOException;
  * http utils
  */
 public class HttpUtils {
-	
-	
+
+
 	public static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
 	/**
