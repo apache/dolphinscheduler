@@ -551,6 +551,25 @@ public class ProcessDefinitionService extends BaseDAGService {
                                 sqlParameters.put("datasourceName", dataSource.getName());
                             }
                             taskNode.put("params", sqlParameters);
+                        }else if(taskType.equals(TaskType.DEPENDENT.name())){
+                            JSONObject dependentParameters =  JSONUtils.parseObject(taskNode.getString("dependence"));
+                            if(dependentParameters != null){
+                                JSONArray dependTaskList = (JSONArray) dependentParameters.get("dependTaskList");
+                                for (int j = 0; j < dependTaskList.size(); j++) {
+                                    JSONObject dependentTaskModel = dependTaskList.getJSONObject(j);
+                                    JSONArray dependItemList = (JSONArray) dependentTaskModel.get("dependItemList");
+                                    for (int k = 0; k < dependItemList.size(); k++) {
+                                        JSONObject dependentItem = dependItemList.getJSONObject(k);
+                                        int definitionId = dependentItem.getInteger("definitionId");
+                                        ProcessDefinition definition = processDefineMapper.selectById(definitionId);
+                                        if(definition != null){
+                                            dependentItem.put("projectName",definition.getProjectName());
+                                            dependentItem.put("definitionName",definition.getName());
+                                        }
+                                    }
+                                }
+                                taskNode.put("dependence", dependentParameters);
+                            }
                         }
                     }
                 }
@@ -561,7 +580,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                 row.put("projectName", processDefinition.getProjectName());
                 row.put("processDefinitionName", processDefinition.getName());
                 row.put("processDefinitionJson", processDefinition.getProcessDefinitionJson());
-                row.put("processDefinitionDesc", processDefinition.getDescription());
+                row.put("processDefinitionDescription", processDefinition.getDescription());
                 row.put("processDefinitionLocations", processDefinition.getLocations());
                 row.put("processDefinitionConnects", processDefinition.getConnects());
 
@@ -574,7 +593,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     row.put("scheduleEndTime", schedule.getEndTime());
                     row.put("scheduleCrontab", schedule.getCrontab());
                     row.put("scheduleFailureStrategy", schedule.getFailureStrategy());
-                    row.put("scheduleReleaseState", schedule.getReleaseState());
+                    row.put("scheduleReleaseState", ReleaseState.OFFLINE);
                     row.put("scheduleProcessInstancePriority", schedule.getProcessInstancePriority());
                     if(schedule.getId() == -1){
                         row.put("scheduleWorkerGroupId", -1);
@@ -661,8 +680,8 @@ public class ProcessDefinitionService extends BaseDAGService {
                     putMsg(result, Status.DATA_IS_NULL, "processDefinitionJson");
                     return result;
                 }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionDesc"))) {
-                    processDefinitionDesc = json.get("processDefinitionDesc").toString();
+                if (ObjectUtils.allNotNull(json.get("processDefinitionDescription"))) {
+                    processDefinitionDesc = json.get("processDefinitionDescription").toString();
                 }
                 if (ObjectUtils.allNotNull(json.get("processDefinitionLocations"))) {
                     processDefinitionLocations = json.get("processDefinitionLocations").toString();
