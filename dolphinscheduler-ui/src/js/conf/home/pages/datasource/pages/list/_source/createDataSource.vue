@@ -317,37 +317,36 @@
         })
       }
     },
-    watch: {
-      'type'(value){
-        if((value =='HIVE'||value == 'SPARK')&&this.isShowPrincipal== true){
-          this.showPrincipal = false
-        }else{
-          this.showPrincipal = true
-        }
-        if(value == 'POSTGRESQL') {
-          this.showdDatabase = true;
-        } else {
-          this.showdDatabase = false;
-        }
-      }
-    },
     created () {
       // Backfill
       if (this.item.id) {
         this._getEditDatasource()
       }
 
-      return new Promise((resolve, reject) => {
-        this.store.dispatch('datasource/getKerberosStartupState').then(res => {
-          this.isShowPrincipal=res
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          reject(e)
-        })
-      })
-
-
     },
+    watch: {
+      type(value){
+        if(value == 'POSTGRESQL') {
+          this.showdDatabase = true;
+        } else {
+          this.showdDatabase = false;
+        }
+        return new Promise((resolve, reject) => {
+          this.store.dispatch('datasource/getKerberosStartupState').then(res => {
+            this.isShowPrincipal=res
+            if((value =='HIVE'||value == 'SPARK')&&this.isShowPrincipal== true){
+              this.showPrincipal = false
+            }else{
+              this.showPrincipal = true
+            }
+          }).catch(e => {
+            this.$message.error(e.msg || '')
+            reject(e)
+          })
+        })
+      }
+    },
+    
     mounted () {
     },
     components: { mPopup, mListBoxF }
