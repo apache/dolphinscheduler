@@ -139,7 +139,8 @@ public class HttpTask extends AbstractTask {
             }
         }
         addRequestParams(builder,httpPropertyList);
-        HttpUriRequest request = builder.setUri(httpParameters.getUrl()).build();
+        String requestUrl = ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(),ParamUtils.convert(paramsMap));
+        HttpUriRequest request = builder.setUri(requestUrl).build();
         setHeaders(request,httpPropertyList);
         return client.execute(request);
     }
