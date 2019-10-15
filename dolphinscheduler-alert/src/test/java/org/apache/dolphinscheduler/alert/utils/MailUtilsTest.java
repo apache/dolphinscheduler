@@ -48,8 +48,8 @@ public class MailUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(MailUtilsTest.class);
     @Test
     public void testSendMails() {
-        String[] receivers = new String[]{"xx@xx.com"};
-        String[] receiversCc = new String[]{"xxx@xxx.com"};
+        String[] receivers = new String[]{"825193156@qq.com"};
+        String[] receiversCc = new String[]{"825193156@qq.com"};
 
         String content ="[\"id:69\"," +
                 "\"name:UserBehavior-0--1193959466\"," +
@@ -114,7 +114,7 @@ public class MailUtilsTest {
 
     @Test
     public void testSendTableMail(){
-        String[] mails = new String[]{"xx@xx.com"};
+        String[] mails = new String[]{"825193156@qq.com"};
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
         alert.setShowType(ShowType.TABLE);

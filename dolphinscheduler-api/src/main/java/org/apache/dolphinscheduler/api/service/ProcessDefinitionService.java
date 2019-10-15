@@ -536,7 +536,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
         Status resultStatus = (Status) checkResult.get(Constants.STATUS);
         if (resultStatus == Status.SUCCESS) {
-            ProcessDefinition processDefinition = processDefineMapper.selectById(processDefinitionId);
+            ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
             if (processDefinition != null) {
                 JSONObject jsonObject = JSONUtils.parseObject(processDefinition.getProcessDefinitionJson());
                 JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
