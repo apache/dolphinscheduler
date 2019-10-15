@@ -78,6 +78,10 @@
        */
       _getList (flag) {
         this.isLoading = !flag
+        if(this.searchParams.pageNo == undefined) {
+          this.$router.push({ path: `/projects/index` })
+          return false
+        }
         this.getTaskInstanceList(this.searchParams).then(res => {
           this.taskInstanceList = []
           this.taskInstanceList = res.totalList

@@ -133,6 +133,7 @@ export default {
   'jdbc connect parameters': 'jdbc连接参数',
   'Test Connect': '测试连接',
   'Please enter resource name': '请输入数据源名称',
+  'Please enter a non-query SQL statement': '请输入非查询sql语句',
   'Please enter IP/hostname': '请输入IP/主机名',
   'jdbc connection parameters is not a correct JSON format': 'jdbc连接参数不是一个正确的JSON格式',
   '#': '编号',

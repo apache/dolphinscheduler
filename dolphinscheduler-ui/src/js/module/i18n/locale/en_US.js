@@ -133,6 +133,7 @@ export default {
   'jdbc connect parameters': 'jdbc connect parameters',
   'Test Connect': 'Test Connect',
   'Please enter resource name': 'Please enter resource name',
+  'Please enter a non-query SQL statement': 'Please enter a non-query SQL statement',
   'Please enter IP/hostname': 'Please enter IP/hostname',
   'jdbc connection parameters is not a correct JSON format': 'jdbc connection parameters is not a correct JSON format',
   '#': '#',
