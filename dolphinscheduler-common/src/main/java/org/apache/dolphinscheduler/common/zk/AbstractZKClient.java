@@ -1,4 +1,4 @@
-/*
+	/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -347,9 +347,9 @@ public abstract class AbstractZKClient {
 
 		List<MasterServer> masterServers = new ArrayList<>();
 		int i = 0;
-		for(String path : masterMap.keySet()){
-			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(masterMap.get(path));
-			masterServer.setZkDirectory( parentPath + "/"+ path);
+		for (Map.Entry<String, String> entry : masterMap.entrySet()) {
+			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
+			masterServer.setZkDirectory( parentPath + "/"+ entry.getKey());
 			masterServer.setId(i);
 			i ++;
 			masterServers.add(masterServer);
