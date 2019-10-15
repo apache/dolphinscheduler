@@ -54,6 +54,8 @@
 		<clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
 		<mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
 		<jsp.version>6.1.14</jsp.version>
+		<spotbugs.version>3.1.12</spotbugs.version>
+		<apache.rat.version>0.13</apache.rat.version>
 	</properties>
 
 	<dependencyManagement>
@@ -403,6 +405,13 @@
 				<artifactId>jsp-2.1</artifactId>
 				<version>${jsp.version}</version>
 			</dependency>
+
+			<dependency>
+				<groupId>net.jcip</groupId>
+				<artifactId>jcip-annotations</artifactId>
+				<version>${jcip.version}</version>
+				<optional>true</optional>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -505,6 +514,52 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.rat</groupId>
+				<artifactId>apache-rat-plugin</artifactId>
+				<version>${apache.rat.version}</version>
+				<configuration>
+					<includes>
+						<include>**/*.java</include>
+						<include>**/dolphinscheduler-ui/src/**/*.scss</include>
+						<include>**/dolphinscheduler-ui/src/**/*.css</include>
+						<include>**/dolphinscheduler-ui/src/**/*.vue</include>
+						<include>**/dolphinscheduler-ui/src/**/*.js</include>
+						<include>**/dolphinscheduler-ui/src/**/*.html</include>
+					</includes>
+					<excludes>
+						<exclude>**/dolphinscheduler-ui/src/lib/**</exclude>
+						<exclude>**/dolphinscheduler-ui/src/js/module/util/cookie.js</exclude>
+						<exclude>**/dolphinscheduler-ui/src/font/awesome/font-awesome.css</exclude>
+						<exclude>**/dolphinscheduler-ui/src/sass/common/_animation.scss</exclude>
+						<exclude>**/dolphinscheduler-ui/src/sass/common/_normalize.scss</exclude>
+						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/es5.js</exclude>
+						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/base.css</exclude>
+						<exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
+						<exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
+					</excludes>
+					<consoleOutput>true</consoleOutput>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${spotbugs.version}</version>
+				<configuration>
+					<xmlOutput>true</xmlOutput>
+					<threshold>medium</threshold>
+					<effort>default</effort>
+					<excludeFilterFile>dev-config/spotbugs-exclude.xml</excludeFilterFile>
+					<failOnError>true</failOnError>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.github.spotbugs</groupId>
+						<artifactId>spotbugs</artifactId>
+						<version>4.0.0-beta4</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 
