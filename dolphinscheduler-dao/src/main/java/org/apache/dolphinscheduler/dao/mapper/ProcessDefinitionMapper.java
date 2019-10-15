@@ -30,6 +30,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     ProcessDefinition queryByDefineName(@Param("projectId") int projectId,
                                         @Param("processDefinitionName") String name);
 
+    ProcessDefinition queryByDefineId(@Param("processDefineId") int processDefineId);
+
     IPage<ProcessDefinition> queryDefineListPaging(IPage<ProcessDefinition> page,
                                                    @Param("searchVal") String searchVal,
                                                    @Param("userId") int userId,
