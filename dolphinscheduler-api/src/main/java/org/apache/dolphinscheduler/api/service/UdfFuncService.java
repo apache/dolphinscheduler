@@ -297,7 +297,7 @@ public class UdfFuncService extends BaseService{
      *
      * @param id
      */
-    @Transactional(value = "TransactionManager", rollbackFor = Exception.class)
+    @Transactional(value = "transactionManager",rollbackFor = Exception.class)
     public Result delete(int id) {
         Result result = new Result();
 

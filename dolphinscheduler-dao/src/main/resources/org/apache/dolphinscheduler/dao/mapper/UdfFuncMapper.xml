@@ -12,7 +12,7 @@
             </foreach>
         </if>
         <if test="funcNames != null and funcNames != ''">
-            and func_name = #{funcName}
+            and func_name = #{funcNames}
         </if>
         order by id asc
     </select>
