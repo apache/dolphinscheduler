@@ -901,6 +901,10 @@ public final class Constants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
+    /**
+     * task log info format
+     */
+    public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
     /**
      * hive conf
