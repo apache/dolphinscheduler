@@ -9,6 +9,7 @@
         type="textarea"
         resize="none"
         :autosize="{minRows:1}"
+        :placeholder="$t('Please enter a non-query SQL statement')"
         v-model="localStatementList[$index]"
         @on-blur="_verifProp()"
         style="width: 525px;">
