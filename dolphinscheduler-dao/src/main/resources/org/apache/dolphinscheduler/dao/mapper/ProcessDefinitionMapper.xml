@@ -52,5 +52,18 @@
         group by td.user_id,tu.user_name
     </select>
 
+    <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        SELECT
+            pd.*, u.user_name,
+            p.`name` AS project_name
+        FROM
+            t_ds_process_definition pd,
+            t_ds_user u,
+            t_ds_project p
+        WHERE
+            pd.user_id = u.id AND pd.project_id = p.id
+        AND pd.id = #{processDefineId}
+    </select>
+
 
 </mapper>
