@@ -42,7 +42,11 @@ public class SparkDataSource extends BaseDataSource {
       jdbcUrl += "/";
     }
 
-    jdbcUrl += getDatabase() + ";principal=" + getPrincipal();
+    jdbcUrl += getDatabase();
+
+    if (StringUtils.isNotEmpty(getPrincipal())){
+      jdbcUrl += ";principal=" + getPrincipal();
+    }
 
     if (StringUtils.isNotEmpty(getOther())) {
       jdbcUrl += ";" + getOther();
