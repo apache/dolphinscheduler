@@ -893,11 +893,15 @@ public class ProcessDefinitionService extends BaseDAGService {
     public Map<String, Object> getTaskNodeListByDefinitionIdList(String defineIdList) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
-
         Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
         String[] idList = defineIdList.split(",");
         List<String> definitionIdList = Arrays.asList(idList);
-        List<ProcessDefinition> processDefinitionList = processDefineMapper.queryDefinitionListByIdList( definitionIdList.toArray(new Integer[definitionIdList.size()]));
+        List<Integer> idIntList = new ArrayList<>();
+        for(String definitionId : definitionIdList) {
+            idIntList.add(Integer.parseInt(definitionId));
+        }
+        Integer[] idArray = idIntList.toArray(new Integer[idIntList.size()]);
+        List<ProcessDefinition> processDefinitionList = processDefineMapper.queryDefinitionListByIdList(idArray);
         if (processDefinitionList == null || processDefinitionList.size() ==0) {
             logger.info("process definition not exists");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineIdList);

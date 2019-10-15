@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.processdure;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -82,7 +83,7 @@ public class ProcedureTask extends AbstractTask {
     @Override
     public void handle() throws Exception {
         // set the name of the current thread
-        String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskProps.getTaskAppId());
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
 
         logger.info("processdure type : {}, datasource : {}, method : {} , localParams : {}",

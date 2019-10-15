@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task.http;
 
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
 import org.apache.dolphinscheduler.common.enums.HttpParametersType;
 import org.apache.dolphinscheduler.common.process.HttpProperty;
@@ -52,6 +53,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * http task
@@ -92,7 +94,7 @@ public class HttpTask extends AbstractTask {
 
     @Override
     public void handle() throws Exception {
-        String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskProps.getTaskAppId());
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
 
         long startTime = System.currentTimeMillis();
