@@ -357,7 +357,7 @@ public class MailUtils {
         ExcelUtils.genExcelFile(content,title,xlsFilePath);
         File file = new File(xlsFilePath + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
         part2.attachFile(file);
-        part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS));
+        part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS,Constants.UTF_8,"B"));
         // add components to collection
         partList.addBodyPart(part1);
         partList.addBodyPart(part2);
