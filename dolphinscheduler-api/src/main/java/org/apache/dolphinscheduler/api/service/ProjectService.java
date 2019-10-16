@@ -191,11 +191,15 @@ public class ProjectService extends BaseService{
         }
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(projectId);
 
+        if (loginUser.getId() != project.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
         if(processDefinitionList.size() > 0){
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
             return result;
         }
-
         int delete = projectMapper.deleteById(projectId);
         if (delete > 0) {
             putMsg(result, Status.SUCCESS);
