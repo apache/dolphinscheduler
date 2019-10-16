@@ -1023,7 +1023,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param taskInstance
      * @return
      */
-    private String taskZkInfo(TaskInstance taskInstance) {
+    public String taskZkInfo(TaskInstance taskInstance) {
 
         int taskWorkerGroupId = getTaskWorkerGroupId(taskInstance);
 
@@ -1216,7 +1216,7 @@ public class ProcessDao extends AbstractBaseDao {
      * @param taskInstId
      * @return
      */
-    public TaskInstance getTaskInstanceRelationByTaskId(int taskInstId){
+    public TaskInstance getTaskInstanceDetailByTaskId(int taskInstId){
         // get task instance
         TaskInstance taskInstance = findTaskInstanceById(taskInstId);
         // get process instance

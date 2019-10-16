@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.ProcessDao;
@@ -302,24 +304,8 @@ public class WorkerServer extends AbstractServer {
                     // if set is null , return
                     if (CollectionUtils.isNotEmpty(taskInfoSet)){
                         for (String taskInfo : taskInfoSet){
-                            // task info start with current host
-                            if (taskInfo.startsWith(OSUtils.getHost())){
-                                String[] taskInfoArr = taskInfo.split("-");
-                                if (taskInfoArr.length != 2){
-                                    continue;
-                                }else {
-                                    int taskInstId=Integer.parseInt(taskInfoArr[1]);
-                                    TaskInstance taskInstance = processDao.getTaskInstanceRelationByTaskId(taskInstId);
-
-                                    if(taskInstance.getTaskType().equals(TaskType.DEPENDENT.toString())){
-                                        taskInstance.setState(ExecutionStatus.KILL);
-                                        processDao.saveTaskInstance(taskInstance);
-                                    }else{
-                                        ProcessUtils.kill(taskInstance);
-                                    }
-                                    taskQueue.srem(Constants.DOLPHINSCHEDULER_TASKS_KILL,taskInfo);
-                                }
-                            }
+                            killTask(taskInfo);
+                            removeKillInfoFromQueue(taskInfo);
                         }
                     }
 
@@ -328,6 +314,55 @@ public class WorkerServer extends AbstractServer {
             }
         };
         return killProcessThread;
+    }
+
+    private void killTask(String taskInfo) {
+        String[] taskInfoArray = taskInfo.split("-");
+        if(taskInfoArray.length != 2){
+            logger.error("error format kill info: " + taskInfo);
+            return ;
+        }
+        String host = taskInfoArray[0];
+        int taskInstanceId = Integer.parseInt(taskInfoArray[1]);
+        TaskInstance taskInstance = processDao.getTaskInstanceDetailByTaskId(taskInstanceId);
+        if(taskInstance == null){
+            logger.error("cannot find the kill task :" + taskInfo);
+            return;
+        }
+
+        if(StringUtils.isEmpty(host) && StringUtils.isEmpty(taskInstance.getHost())){
+            deleteTaskFromQueue(taskInstance);
+        }else{
+            if(taskInstance.getTaskType().equals(TaskType.DEPENDENT.toString())){
+                taskInstance.setState(ExecutionStatus.KILL);
+                processDao.saveTaskInstance(taskInstance);
+            }else{
+                ProcessUtils.kill(taskInstance);
+            }
+        }
+    }
+
+    private void deleteTaskFromQueue(TaskInstance taskInstance){
+        // creating distributed locks, lock path /dolphinscheduler/lock/worker
+        InterProcessMutex mutex = null;
+
+        try {
+            mutex = zkWorkerClient.acquireZkLock(zkWorkerClient.getZkClient(),
+                    zkWorkerClient.getWorkerLockPath());
+            if(processDao.checkTaskExistsInTaskQueue(taskInstance)){
+                String taskQueueStr = processDao.taskZkInfo(taskInstance);
+                taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
+            }
+
+        } catch (Exception e){
+            logger.error("remove task thread failure" ,e);
+        }finally {
+            AbstractZKClient.releaseMutex(mutex);
+        }
+    }
+
+    private void removeKillInfoFromQueue(String taskInfo){
+        taskQueue.srem(Constants.DOLPHINSCHEDULER_TASKS_KILL,taskInfo);
     }
 
 }
