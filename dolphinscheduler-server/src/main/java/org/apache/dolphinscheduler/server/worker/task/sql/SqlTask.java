@@ -358,7 +358,6 @@ public class SqlTask extends AbstractTask {
             for(Map.Entry<Integer, Property> entry: params.entrySet()) {
                 Property prop = entry.getValue();
                 ParameterUtils.setInParameter(entry.getKey(),stmt,prop.getType(),prop.getValue());
-            }
         }
         logger.info("prepare statement replace sql : {} ",stmt.toString());
         return stmt;
