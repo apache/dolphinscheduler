@@ -22,6 +22,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.UdfType;
@@ -103,7 +104,7 @@ public class SqlTask extends AbstractTask {
     @Override
     public void handle() throws Exception {
         // set the name of the current thread
-        String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskProps.getTaskAppId());
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
         logger.info(sqlParameters.toString());
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {}",
