@@ -60,7 +60,7 @@ export default {
     },
 
     width () {
-      return this.viewWidth * this.wrapperWidth / this.contentWidth
+      return Math.max(40, this.viewWidth * this.wrapperWidth / this.contentWidth)
     },
 
     maxLeft () {
@@ -69,9 +69,13 @@ export default {
   },
 
   methods: {
-    setLeft (left) {
+    _getValidLeft (left) {
+      return Math.min(this.maxLeft, Math.max(left, 0))
+    },
+
+    setLeft (percentage) {
       if (this.contentWidth) {
-        this.left = -left * this.wrapperWidth / this.contentWidth
+        this.left = this._getValidLeft(percentage * this.maxLeft)
       }
     },
 
@@ -97,9 +101,8 @@ export default {
 
         const delta = event.clientX - this.startClientX
         let left = this.startLeft + delta
-        left = Math.min(this.maxLeft, Math.max(left, 0))
-        this.left = left
-        this.$emit('on-horizontal-drag', left / this.wrapperWidth)
+        this.left = this._getValidLeft(left)
+        this.$emit('on-horizontal-drag', left / this.maxLeft)
       }
     },
 
@@ -122,7 +125,7 @@ export default {
         let left = this.left + delta
         left = Math.min(this.maxLeft, Math.max(left, 0))
         this.left = left
-        this.$emit('on-horizontal-drag', left / this.wrapperWidth)
+        this.$emit('on-horizontal-drag', left / this.maxLeft)
       }
     }
   },
