@@ -174,6 +174,8 @@ export default {
   'Please enter the correct mobile phone format': 'Please enter the correct mobile phone format',
   'Project': 'Project',
   'Authorize': 'Authorize',
+  'File resources': 'File resources',
+  'UDF resources': 'UDF resources',
   'Edit alarm group': 'Edit alarm group',
   'Create alarm group': 'Create alarm group',
   'Group Name': 'Group Name',
