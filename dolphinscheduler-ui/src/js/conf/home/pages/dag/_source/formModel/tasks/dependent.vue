@@ -33,9 +33,9 @@
         </div>
         <div class="dep-box">
           <span
-                  class="dep-relation"
-                  @click="!isDetails && _setGlobalRelation()"
-                  v-if="dependTaskList.length">
+            class="dep-relation"
+            @click="!isDetails && _setGlobalRelation()"
+            v-if="dependTaskList.length">
             {{relation === 'AND' ? $t('and') : $t('or')}}
           </span>
           <div class="dep-list" v-for="(el,$index) in dependTaskList" :key='$index'>
@@ -53,11 +53,11 @@
               &#xe611;
             </i>
             <m-depend-item-list
-                    :dependTaskList='dependTaskList'
-                    v-model="el.dependItemList"
-                    @on-delete-all="_onDeleteAll"
-                    @getDependTaskList="getDependTaskList"
-                    :index="$index">
+              :dependTaskList='dependTaskList'
+              v-model="el.dependItemList"
+              @on-delete-all="_onDeleteAll"
+              @getDependTaskList="getDependTaskList"
+              :index="$index">
             </m-depend-item-list>
           </div>
         </div>
@@ -107,6 +107,7 @@
             this.dependTaskList.splice(i,1)
           }
         })
+        // this._deleteDep(i)
       },
       _setGlobalRelation () {
         this.relation = this.relation === 'AND' ? 'OR' : 'AND'
@@ -131,7 +132,7 @@
       }
     },
     watch: {
-      dependTaskList () {
+      dependTaskList (e) {
         setTimeout(() => {
           this.isLoading = false
         }, 600)
