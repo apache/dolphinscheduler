@@ -330,7 +330,7 @@ public class WorkerServer extends AbstractServer {
             return;
         }
 
-        if(StringUtils.isEmpty(host) && StringUtils.isEmpty(taskInstance.getHost())){
+        if(host.equals(Constants.NULL) && StringUtils.isEmpty(taskInstance.getHost())){
             deleteTaskFromQueue(taskInstance);
             taskInstance.setState(ExecutionStatus.KILL);
             processDao.saveTaskInstance(taskInstance);

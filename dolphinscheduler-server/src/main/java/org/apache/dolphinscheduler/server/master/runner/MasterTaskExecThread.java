@@ -134,7 +134,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         alreadyKilled = true;
         String host = taskInstance.getHost();
         if(host == null){
-            host = "";
+            host = Constants.NULL;
         }
         String queueValue = String.format("%s-%d",
                 host, taskInstance.getId());
