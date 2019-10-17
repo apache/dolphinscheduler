@@ -304,7 +304,7 @@ public class WorkerServer extends AbstractServer {
                     // if set is null , return
                     if (CollectionUtils.isNotEmpty(taskInfoSet)){
                         for (String taskInfo : taskInfoSet){
-                            killTask(taskInfo);
+                            killTask(taskInfo, processDao);
                             removeKillInfoFromQueue(taskInfo);
                         }
                     }
@@ -316,7 +316,7 @@ public class WorkerServer extends AbstractServer {
         return killProcessThread;
     }
 
-    private void killTask(String taskInfo) {
+    private void killTask(String taskInfo, ProcessDao pd) {
         String[] taskInfoArray = taskInfo.split("-");
         if(taskInfoArray.length != 2){
             logger.error("error format kill info: " + taskInfo);
@@ -324,35 +324,35 @@ public class WorkerServer extends AbstractServer {
         }
         String host = taskInfoArray[0];
         int taskInstanceId = Integer.parseInt(taskInfoArray[1]);
-        TaskInstance taskInstance = processDao.getTaskInstanceDetailByTaskId(taskInstanceId);
+        TaskInstance taskInstance = pd.getTaskInstanceDetailByTaskId(taskInstanceId);
         if(taskInstance == null){
             logger.error("cannot find the kill task :" + taskInfo);
             return;
         }
 
         if(host.equals(Constants.NULL) && StringUtils.isEmpty(taskInstance.getHost())){
-            deleteTaskFromQueue(taskInstance);
+            deleteTaskFromQueue(taskInstance, pd);
             taskInstance.setState(ExecutionStatus.KILL);
-            processDao.saveTaskInstance(taskInstance);
+            pd.saveTaskInstance(taskInstance);
         }else{
             if(taskInstance.getTaskType().equals(TaskType.DEPENDENT.toString())){
                 taskInstance.setState(ExecutionStatus.KILL);
-                processDao.saveTaskInstance(taskInstance);
+                pd.saveTaskInstance(taskInstance);
             }else{
                 ProcessUtils.kill(taskInstance);
             }
         }
     }
 
-    private void deleteTaskFromQueue(TaskInstance taskInstance){
+    private void deleteTaskFromQueue(TaskInstance taskInstance, ProcessDao pd){
         // creating distributed locks, lock path /dolphinscheduler/lock/worker
         InterProcessMutex mutex = null;
 
         try {
             mutex = zkWorkerClient.acquireZkLock(zkWorkerClient.getZkClient(),
                     zkWorkerClient.getWorkerLockPath());
-            if(processDao.checkTaskExistsInTaskQueue(taskInstance)){
-                String taskQueueStr = processDao.taskZkInfo(taskInstance);
+            if(pd.checkTaskExistsInTaskQueue(taskInstance)){
+                String taskQueueStr = pd.taskZkInfo(taskInstance);
                 taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
             }
 
