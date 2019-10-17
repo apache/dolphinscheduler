@@ -23,7 +23,7 @@ export default {
   data () {
     return {
       currentValue: this.value,
-      childrens: []
+      children: []
     }
   },
   computed: {
@@ -37,9 +37,9 @@ export default {
   methods: {
     updateModel (update) {
       const value = this.value
-      this.childrens = findComponentsDownward(this, 'xCheckbox')
-      if (this.childrens) {
-        this.childrens.forEach(child => {
+      this.children = findComponentsDownward(this, 'xCheckbox')
+      if (this.children) {
+        this.children.forEach(child => {
           child.model = value
           if (update) {
             child.currentValue = value.indexOf(child.label) >= 0

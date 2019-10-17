@@ -48,15 +48,17 @@ const install = (Vue, config = {}) => {
   Vue.component(xForm.name, xForm)
   Vue.component(xFormItem.name, xFormItem)
 
-  const { message, notice, spin = {} } = config
+  let { message, notice, modal, spin = {}, slotI18n } = config
 
-  if (message) {
-    xMessage.config(message)
+  if (slotI18n) {
+    message = Object.assign({}, message, { i18n: slotI18n })
+    notice = Object.assign({}, notice, { i18n: slotI18n })
+    modal = Object.assign({}, modal, { i18n: slotI18n })
   }
 
-  if (notice) {
-    xNotice.config(notice)
-  }
+  xMessage.config(message)
+  xNotice.config(notice)
+  xModal.config(modal)
 
   Vue.$message = Vue.prototype.$message = xMessage
   Vue.$modal = Vue.prototype.$modal = xModal

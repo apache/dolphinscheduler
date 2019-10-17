@@ -17,6 +17,7 @@ cancel | 点击取消的回调 | Object | {show [Boolean] ,text [String], handle
 render | 自定义内容 | Function | 使用时 content, title ,ok , cancel 失效 | -
 showMask | 是否显示遮罩 | Boolean | - | false
 maskClosable | 点击遮罩是否关闭 | Boolean | - | false
+i18n | 国际化对象 | VueI18n | - | -
 
 #### Modal 实例方法
 
@@ -34,6 +35,7 @@ content | 内容 | String | - | -
 duration | 自动关闭的延时，单位秒，不关闭可以写 0 | Number | - | 1.5
 onClose | 关闭时的回调 | Function | - | -
 closable | 是否显示关闭图标 | Boolean | - | false
+i18n | 国际化对象 | VueI18n | - | -
 
 #### Message 全局相关
 
@@ -57,6 +59,7 @@ content | 内容 | String | - | -
 duration | 自动关闭的延时，单位秒，不关闭可以写 0 | Number | - | 1.5
 onClose | 关闭时的回调 | Function | - | -
 closable | 是否显示关闭图标 | Boolean | - | false
+i18n | 国际化对象 | VueI18n | - | -
 
 #### Notice 全局相关
 

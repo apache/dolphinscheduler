@@ -3,7 +3,14 @@
     <section class="demo-section">
       <h4>键盘导航</h4>
       <div>
-        <x-select multiple filterable height="150" highlight-matched-text>
+        <x-select
+          multiple
+          filterable
+          height="150"
+          highlight-matched-text
+          ignore-case
+          :filter-props="['label', 'value']"
+        >
           <x-option
             v-for="city in cities"
             :key="city.value"
@@ -28,27 +35,27 @@ export default {
       cities: [{
         id: 1,
         value: 'Beijing',
-        label: '北京'
+        label: '北京-Beijing'
       }, {
         id: 2,
         value: 'Shanghai',
-        label: '上海'
+        label: '上海-Shanghai'
       }, {
         id: 3,
         value: 'Nanjing',
-        label: '南京'
+        label: '南京-Nanjing'
       }, {
         id: 4,
         value: 'Chengdu',
-        label: '成都'
+        label: '成都-Chengdu'
       }, {
         id: 5,
         value: 'Shenzhen',
-        label: '深圳'
+        label: '深圳-Shenzhen'
       }, {
         id: 6,
         value: 'Guangzhou',
-        label: '广州'
+        label: '广州-Guangzhou'
       }]
     }
   }

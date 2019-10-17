@@ -1,18 +1,21 @@
 <template>
   <div class="select-demo-wrapper">
     <section class="demo-section">
-      <h4>动态 Option</h4>
+      <h4>手动触发</h4>
       <div>
-        <x-select height="500">
-          <div style="padding:10px 20px;" slot="header" slot-scope="header">
-            <x-input v-model="keyword"/>
-          </div>
+        <x-select ref="select" v-model="value" valueKey="id" multiple :popperOptions="{placement:'bottom-start'}">
           <x-option
-            v-for="city in list"
+            v-for="city in cities"
             :key="city.value"
             :value="city"
             :label="city.label"
-          ></x-option>
+          >
+          </x-option>
+          <div slot="trigger">
+            <x-button @click="handle">第一个</x-button>
+            <x-button @click="handle">第二个</x-button>
+            <x-button @click="handle">第三个</x-button>
+          </div>
         </x-select>
       </div>
     </section>
@@ -20,16 +23,15 @@
 </template>
 
 <script>
-import { xInput } from '../../vue-input/src'
-import { xSelect, xOption } from '../src'
+import { xButton } from '../../vue-button/src'
+import { xSelect, xOption, xOptionGroup } from '../src'
 
 export default {
   name: 'app',
-  components: { xInput, xSelect, xOption },
+  components: { xSelect, xOption, xOptionGroup, xButton },
   data () {
     return {
-      keyword: '',
-      list: [],
+      value: 1,
       cities: [{
         id: 1,
         value: 'Beijing',
@@ -57,16 +59,11 @@ export default {
       }]
     }
   },
-  watch: {
-    keyword: {
-      immediate: true,
-      handler (v) {
-        if (v) {
-          this.list = this.cities.filter(c => c.value.includes(v))
-        } else {
-          this.list = this.cities
-        }
-      }
+  methods: {
+    handle (e) {
+      this.value = 1
+      this.$refs.select.setDropdownReference(e.currentTarget)
+      this.$nextTick(() => this.$refs.select.focus())
     }
   }
 }

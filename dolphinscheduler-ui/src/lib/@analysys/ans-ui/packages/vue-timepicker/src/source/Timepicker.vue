@@ -3,16 +3,15 @@
     popper-class="date-poptip"
     class="x-datepicker"
     :placement="placement"
-    transition="datepicker-animation"
     :append-to-body="appendToBody"
     :position-fixed="positionFixed"
     :viewport="viewport"
     :popper-options="popperOptions"
     ref="timepickerPoptip"
-    @show="poperShow"
-    @hide="poperHide"
+    @on-show="poperShow"
+    @on-hide="poperHide"
   >
-    <div slot="reference">
+    <div slot="reference" ref="timepickerPoptipInput">
       <slot
         name="input"
         :placeholder="placeholder"
@@ -24,17 +23,22 @@
         :readonly="readonly"
       >
         <x-input
-          :value="text"
+          v-model="text"
           :placeholder="placeholder"
           :suffix-icon="suffixIcon"
           :prefix-icon="prefixIcon"
           :size="size"
           :readonly="readonly"
+          @on-blur="blur"
+          @input="pattern = 'edit'"
         ></x-input>
       </slot>
     </div>
     <div>
-      <x-time :format="format" :type="timeType" ref="xTime" @change="timeChange"></x-time>
+      <x-time :format="format" 
+              :type="timeType" ref="xTime" 
+              :step="step"
+              @change="timeChange" @_hoverBlock="hoverBlock"></x-time>
       <div class="x-date-packer-confirm" v-if="confirm">
         <div class="confirm-slot">
           <slot name="confirm"></slot>
@@ -148,6 +152,14 @@ export default {
     prefixIcon: {
       type: String,
       default: ''
+    },
+
+    // 步长
+    step: {
+      type: Array,
+      default () {
+        return [1, 1, 1]
+      }
     }
   },
 
@@ -158,7 +170,10 @@ export default {
       dateValue: null,
       dateValueBar: '',
       startDate: null,
-      endDate: null
+      endDate: null,
+
+      // 模式 select:选择模式  edit:编辑模式
+      pattern: 'select'
     }
   },
 
@@ -172,28 +187,46 @@ export default {
 
   methods: {
     init () {
-      this.setDate()
+      this.setDate(null, true)
       this.setText()
       this.$refs.xTime.init(this.startDate, this.endDate)
     },
 
     // 设置初始值
-    setDate (value) {
+    setDate (value, isInit) {
       let date = value || this.value
       if (isType(date) === 'array') {
+       
         if (date[0] && isValid(date[0])) {
           this.startDate = date[0]
         }
         if (date[1] && isValid(date[1])) {
           this.endDate = date[1]
         }
+
+        // 初始化
+        if(isInit) {
+          this.dateValue = [this.startDate, this.endDate]
+          this.dateValueBar = [this.startDate, this.endDate]
+        }
       } else {
-        if (isValid(date)) this.startDate = date
+        if (isValid(date)) {
+          this.startDate = date
+
+          // 是否初始化
+          if(isInit) {
+            this.dateValue = new Date(date)
+            this.dateValueBar = new Date(date)
+          }
+        }
       }
     },
 
     dateFormat (date) {
-      return moment(date).format(this.format)
+      if(date) {
+        return moment(date).format(this.format)
+      }
+      return date
     },
 
     setText () {
@@ -208,6 +241,7 @@ export default {
 
     // timeChange
     timeChange (date) {
+      this.pattern = 'select'
       this.dateValue = date
       this.setDate(date)
       this.setText()
@@ -219,7 +253,9 @@ export default {
     },
 
     poperHide () {
-      this.change()
+      if(this.pattern === 'select') {
+        this.change()
+      }
       this.$emit('on-hide')
     },
 
@@ -238,23 +274,112 @@ export default {
       this.$emit('on-clear')
     },
 
-    fmtDateValue () {
+    fmtDateValue (key = 'dateValue') {
       let dateValueFmt = []
-      if (isType(this.dateValue) === 'array') {
-        this.dateValue.forEach(o => {
+      if (isType(this[key]) === 'array') {
+        this[key].forEach(o => {
           dateValueFmt.push(this.dateFormat(o))
         })
       } else {
-        dateValueFmt = this.dateFormat(this.dateValue)
+        dateValueFmt = this.dateFormat(this[key])
       }
       return dateValueFmt
     },
 
     change () {
       if (this.dateValue) {
-        if (this.dateValue.toString() !== this.dateValueBar.toString()) {
+        // debugger
+        if (this.fmtDateValue().toString() !== this.fmtDateValue('dateValueBar').toString()) {
           this.$emit('on-change', this.fmtDateValue(), this.dateValue)
           this.dateValueBar = this.dateValue
+          this.$refs.xTime.init(this.startDate, this.endDate)
+        }
+      }
+    },
+
+    // 选中文本框内容
+    setSelectionRange (selectionStart, selectionEnd) {
+      if (this.readonly || this.disabled) {
+        return false
+      }
+      let input = this.$refs.timepickerPoptipInput.querySelector('input')
+      if (input.setSelectionRange) {
+        input.focus()
+        input.setSelectionRange(selectionStart, selectionEnd)
+      }
+      else if (input.createTextRange) {
+        var range = input.createTextRange();
+        range.collapse(true)
+        range.moveEnd('character', selectionEnd)
+        range.moveStart('character', selectionStart)
+        range.select()
+      }
+    },
+
+    // 失去焦点
+    blur () {
+      let isDate = (date) => {
+        return new Date(date) != 'Invalid Date'
+      }
+      setTimeout(()=> {
+        let input = this.$refs.timepickerPoptipInput.querySelector('input').value
+
+        if(this.readonly || this.disabled || !input || this.pattern !== 'edit') return
+
+        if (this.type === 'time') {
+          let date = moment(this.dateValue || new Date()).format('YYYY-MM-DD') + ' ' + input
+          if(isDate(date)) {
+            this.timeChange(new Date(date))
+            this.change()
+          } else {
+            this.timeChange(this.dateValueBar)
+          }
+        } else {
+
+          let setDate = (index, input) => {
+           return moment(this.dateValue[index] || new Date()).format('YYYY-MM-DD') + ' ' + input
+          }
+          let inputRange = input.split(' - '), inputDate = setDate(0, inputRange[0]), inputDate1 = setDate(1, inputRange[1])
+          if(inputRange.length === 2 && isDate(inputDate) && isDate(inputDate1)) {
+
+            // 结束时间不能小于开始时间
+            if(new Date(inputDate).getTime() > new Date(inputDate1).getTime()) {
+              this.timeChange(this.dateValueBar)
+            } else {
+              // debugger
+              this.timeChange([new Date(inputDate), new Date(inputDate1)])
+              this.change()
+            }
+            
+          } else {
+            this.timeChange(this.dateValueBar)
+          }
+        }
+      }, 100)
+    },
+
+    hoverBlock (type, index) {
+
+      if(type === 'start') {
+        if(index === 0) {
+          this.setSelectionRange(0, 2)
+        }
+        if(index === 1) {
+          this.setSelectionRange(3, 5)
+        }
+        if(index === 2) {
+          this.setSelectionRange(6, 8)
+        }
+      } else {
+        let start = this.text.indexOf(' - ') + 3
+        if(index === 0) {
+          this.setSelectionRange(start, start + 2)
+        }
+        if(index === 1) {
+          this.setSelectionRange(start + 3, start + 5)
+        }
+        if(index === 2) {
+          this.setSelectionRange(start + 6, start + 8)
         }
       }
     }
