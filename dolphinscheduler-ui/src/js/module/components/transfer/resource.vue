@@ -18,6 +18,12 @@
   <m-popup :ok-text="$t('Submit')" :nameText="type.name + $t('Authorize')" @ok="_ok" ref="popup">
     <template slot="content">
       <div class="clearfix transfer-model">
+        <div>
+            <x-button-group v-model="checkedValue" size="small">
+                <x-button type="ghost" value="fileResource" @click="_ckFile">{{$t('File resources')}}</x-button>
+                <x-button type="ghost" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</x-button>
+            </x-button-group>
+        </div>
         <div class="select-list-box">
           <div class="tf-header">
             <div class="title">{{type.name}}{{$t('List')}}</div>
@@ -79,26 +85,48 @@
     name: 'transfer',
     data () {
       return {
-        sourceList: this.sourceListPrs,
-        targetList: this.targetListPrs,
-        cacheSourceList: this.sourceListPrs,
-        cacheTargetList: this.targetListPrs,
+        checkedValue: 'fileResource',
+        sourceList: this.fileSourceList,
+        targetList: this.fileTargetList,
+        cacheSourceList: this.fileSourceList,
+        cacheTargetList: this.fileTargetList,
+
+        fileSource: this.fileSourceList,
+        fileTarget: this.fileTargetList,
+        udfSource: this.udfSourceList,
+        udfTarget: this.udfTargetList,
         searchSourceVal: '',
         searchTargetVal: ''
       }
     },
     props: {
-      sourceListPrs: Array,
-      targetListPrs: Array,
-      type: Object
+      type: Object,
+      fileSourceList: Array,
+      udfSourceList: Array,
+      fileTargetList: Array,
+      udfTargetList: Array,
     },
     methods: {
       _ok () {
         this.$refs['popup'].spinnerLoading = true
         setTimeout(() => {
           this.$refs['popup'].spinnerLoading = false
-          this.$emit('onUpdate', _.map(this.targetList, v => v.id).join(','))
+          this.$emit('onUpdate', _.map(this.fileTarget.concat(this.udfTarget), v => v.id).join(','))
         }, 800)
+      },
+      _ckFile() {
+        this.checkedValue = "fileResource"
+        this.sourceList = this.fileSource
+        this.targetList = this.fileTarget
+        this.cacheSourceList = this.fileSource
+        this.cacheTargetList = this.fileTarget
+      },
+      _ckUDf() {
+        this.checkedValue = "udfResource"
+        this.sourceList = this.udfSource
+        this.targetList = this.udfTarget
+        this.cacheSourceList = this.udfSource
+        this.cacheTargetList = this.udfTarget
       },
       _sourceQuery () {
         this.sourceList = this.sourceList.filter(v => v.name.indexOf(this.searchSourceVal) > -1)
@@ -116,6 +144,13 @@
         if (i2 !== -1) {
           this.cacheSourceList.splice(i2, 1)
         }
+        if(this.checkedValue == "fileResource") {
+            this.fileTarget = this.targetList
+            this.fileSource = this.sourceList
+        } else {
+            this.udfTarget = this.targetList
+            this.udfSource = this.sourceList
+        }
       },
       _ckTarget (item) {
         this.sourceList = this.cacheSourceList
@@ -126,6 +161,13 @@
         let i2 = _.findIndex(this.cacheTargetList, v => item.id === v.id)
         if (i2 !== -1) {
           this.cacheTargetList.splice(i2, 1)
+        }
+        if(this.checkedValue == "fileResource") {
+            this.fileSource = this.sourceList
+            this.fileTarget = this.targetList
+        } else {
+            this.udfSource = this.sourceList
+            this.udfTarget = this.targetList
         }
       }
     },

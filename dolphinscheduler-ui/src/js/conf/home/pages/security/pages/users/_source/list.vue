@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 <template>
   <div class="list-model user-list-model">
     <div class="table-box">
@@ -107,6 +123,7 @@
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
   import mTransfer from '@/module/components/transfer/transfer'
+  import mResource from '@/module/components/transfer/resource'
 
   export default {
     name: 'user-list',
@@ -202,13 +219,33 @@
           let sourceListPrs = _.map(data[0], v => {
             return {
               id: v.id,
-              name: v.alias
+              name: v.alias,
+              type: v.type
+            }
+          })
+          let fileSourceList = []
+          let udfSourceList = []
+          sourceListPrs.forEach((value,index,array)=>{
+            if(value.type =='FILE'){
+              fileSourceList.push(value)
+            } else{
+              udfSourceList.push(value)
             }
           })
           let targetListPrs = _.map(data[1], v => {
             return {
               id: v.id,
-              name: v.alias
+              name: v.alias,
+              type: v.type
+            }
+          })
+          let fileTargetList = []
+          let udfTargetList = []
+          targetListPrs.forEach((value,index,array)=>{
+            if(value.type =='FILE'){
+              fileTargetList.push(value)
+            } else{
+              udfTargetList.push(value)
             }
           })
           let self = this
@@ -219,7 +256,7 @@
             className: 'v-modal-custom',
             transitionName: 'opacityp',
             render (h) {
-              return h(mTransfer, {
+              return h(mResource, {
                 on: {
                   onUpdate (resourceIds) {
                     self._grantAuthorization('users/grant-file', {
@@ -233,8 +270,12 @@
                   }
                 },
                 props: {
-                  sourceListPrs: sourceListPrs,
-                  targetListPrs: targetListPrs,
+                  // sourceListPrs: sourceListPrs,
+                  // targetListPrs: targetListPrs,
+                  fileSourceList: fileSourceList,
+                  udfSourceList: udfSourceList,
+                  fileTargetList: fileTargetList,
+                  udfTargetList: udfTargetList,
                   type: {
                     name: `${i18n.$t('Resources')}`
                   }
