@@ -5,7 +5,14 @@
       <x-cuctom-render v-if="customHeader" :render="customHeader"></x-cuctom-render>
       <slot name="search"></slot>
       <div ref="wrapper" class="inner-wrapper" :style="innerStyles">
-        <x-scroller ref="scroller" :scrollbar-class="scrollbarClass" :style="innerStyles" width="100%">
+        <x-scroller
+          ref="scroller"
+          :scrollbar-class="scrollbarClass"
+          :style="innerStyles"
+          width="100%"
+          @start-drag="handleStartDrag"
+          @dragging="handleDragging"
+        >
           <slot></slot>
         </x-scroller>
       </div>
@@ -28,11 +35,12 @@ export default {
     hasArrow: Boolean,
     customHeader: Function,
     customFooter: Function,
+    customClass: String,
     scrollbarClass: String
   },
   data () {
     return {
-      arrowClass: `${LIB_NAME}-popper-arrow`,
+      arrowClass: `${LIB_NAME}-popper-arrow large`,
       wrapperStyles: {},
       innerStyles: {}
     }
@@ -45,11 +53,18 @@ export default {
       return [
         `${LIB_NAME}-select-dropdown`,
         { light: this.hasArrow },
-        { 'no-box-shadow': this.noBoxShadow }
+        { 'no-box-shadow': this.noBoxShadow },
+        this.customClass
       ]
     }
   },
   methods: {
+    handleStartDrag () {
+      this.$parent.dragging = false
+    },
+    handleDragging () {
+      this.$parent.dragging = true
+    },
     toggle () {
       if (this.visible) {
         this.hide()
@@ -86,14 +101,14 @@ export default {
       if (option && option.$el) {
         this.$refs.scroller.scrollToTarget(option.$el)
       }
+    },
+    setReference (reference) {
+      this.destroyPopper()
+      this.referenceEl = reference
     }
   },
   mounted () {
     this.$refs.reference = this.$parent.$el
-  },
-  beforeDestroy () {
-    // 调用 Popper 方法
-    this.destroyPopper()
   }
 }
 </script>

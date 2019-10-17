@@ -1,7 +1,6 @@
 $switch-name: $lib-name + "-switch";
-$switch-border-color: $border-color-base;
+$switch-border-color: $disabled-text-color-light;
 $switch-background-color: $background-color-base;
-$switch-background-color-gray: $disabled-text-color-light;
 $switch-time: $transition-time;
 $switch-text-color: $title-color-dark;
 $switch-checked-color: $primary-color;
@@ -127,7 +126,9 @@ $switch-color-disabled: $background-color-disabled;
           background: $switch-color-disabled;
           &:after {
             cursor: not-allowed;
-            background: $switch-background-color-gray;
+          }
+          &.is-checked {
+            background: lighten($color: $switch-checked-color, $amount: 36)
           }
         }
       }
