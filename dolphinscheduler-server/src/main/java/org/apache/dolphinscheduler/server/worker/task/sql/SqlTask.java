@@ -354,10 +354,11 @@ public class SqlTask extends AbstractTask {
             stmt.setQueryTimeout(taskProps.getTaskTimeout());
         }
         Map<Integer, Property> params = sqlBinds.getParamsMap();
-        if(params != null){
-            for(Map.Entry<Integer, Property> entry: params.entrySet()) {
+        if(params != null) {
+            for (Map.Entry<Integer, Property> entry : params.entrySet()) {
                 Property prop = entry.getValue();
-                ParameterUtils.setInParameter(entry.getKey(),stmt,prop.getType(),prop.getValue());
+                ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+            }
         }
         logger.info("prepare statement replace sql : {} ",stmt.toString());
         return stmt;
