@@ -58,7 +58,7 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
         PreparedStatement pstmt = null;
         ResultSet resultSet = null;
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             pstmt = conn.prepareStatement("select current_schema()");
             resultSet = pstmt.executeQuery();
             while (resultSet.next()){
@@ -84,7 +84,7 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
         Connection conn = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
 
             rs = conn.getMetaData().getTables(null, schema, tableName, null);
             if (rs.next()) {
@@ -112,7 +112,7 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
         Connection conn = null;
         ResultSet rs = null;
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             rs = conn.getMetaData().getColumns(null,schema,tableName,columnName);
             if (rs.next()) {
                 return true;

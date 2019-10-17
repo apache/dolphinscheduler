@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.dao.upgrade;
 
+import com.alibaba.druid.pool.DruidDataSource;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
@@ -39,11 +41,25 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     private static final String T_VERSION_NAME = "t_escheduler_version";
     private static final String T_NEW_VERSION_NAME = "t_ds_version";
     private static final String rootDir = System.getProperty("user.dir");
+    protected static final DruidDataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
 
     @Override
     protected void init() {
 
+    }
+
+    /**
+     * get db type
+     * @return
+     */
+    public static DruidDataSource getDataSource(){
+        DruidDataSource dataSource = ConnectionFactory.getDataSource();
+        dataSource.setInitialSize(2);
+        dataSource.setMinIdle(2);
+        dataSource.setMaxActive(2);
+
+        return dataSource;
     }
 
     /**
@@ -61,7 +77,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     private static DbType getCurrentDbType(){
         Connection conn = null;
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             String name = conn.getMetaData().getDatabaseProductName().toUpperCase();
             return DbType.valueOf(name);
         } catch (Exception e) {
@@ -110,7 +126,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         }
         String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_dml.sql";
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             conn.setAutoCommit(false);
 
             // Execute the dolphinscheduler_dml.sql script to import related data of dolphinscheduler
@@ -150,7 +166,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         //String mysqlSQLFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/dolphinscheduler_ddl.sql";
         String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_ddl.sql";
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
             ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
             Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
@@ -194,7 +210,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         PreparedStatement pstmt = null;
         String version = null;
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
 
@@ -231,7 +247,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             conn.setAutoCommit(false);
             // Execute the upgraded dolphinscheduler dml
             ScriptRunner scriptRunner = new ScriptRunner(conn, false, true);
@@ -297,7 +313,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             String dbName = conn.getCatalog();
             logger.info(dbName);
             conn.setAutoCommit(true);
@@ -340,7 +356,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         PreparedStatement pstmt = null;
         Connection conn = null;
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             pstmt = conn.prepareStatement(upgradeSQL);
             pstmt.setString(1, version);
             pstmt.executeUpdate();
