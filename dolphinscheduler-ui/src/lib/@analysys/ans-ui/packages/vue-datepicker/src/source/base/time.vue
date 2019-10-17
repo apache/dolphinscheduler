@@ -2,37 +2,49 @@
   <div class="x-date-packer-time" :style="{width: type==='daterange' ? '305px' : 'auto'}">
     <div class="packer-time-body" :class="[getType()]">
       <div class="hd-text" v-if="type==='daterange'">{{t('ans.datepicker.startTime')}}</div>
-      <div class="picker-time-div time-hours" ref="hours">
-        <ul>
-          <li v-for="(item,index) in 24" :class="{'time-act': index == hours}" @click="change(index, 'hours')">{{numLen(index)}}</li>
+      <div class="picker-time-div time-hours" ref="hours" >
+        <ul @mouseover="hoverBlock('start', 0)">
+          <li v-for="(item,index) in setStep(24, step[0])" :key="index"
+            :class="{'time-act': item == hours}" 
+            @click="change(item, 'hours')">{{numLen(item)}}</li>
         </ul>
       </div>
       <div class="picker-time-div time-minute" ref="minute">
-        <ul>
-          <li v-for="(item,index) in 60" :class="{'time-act': index == minute}" @click="change(index, 'minute')">{{numLen(index)}}</li>
+        <ul @mouseover="hoverBlock('start', 1)">
+          <li v-for="(item,index) in setStep(60, step[1])" :key="index"
+              :class="{'time-act': item == minute}" 
+              @click="change(item, 'minute')">{{numLen(item)}}</li>
         </ul>
       </div>
       <div class="picker-time-div time-second"  ref="second">
-        <ul>
-          <li v-for="(item,index) in 60" :class="{'time-act': index == second}" @click="change(index, 'second')">{{numLen(index)}}</li>
+        <ul @mouseover="hoverBlock('start', 2)">
+          <li v-for="(item,index) in setStep(60, step[2])" :key="index"
+              :class="{'time-act': item == second}" 
+              @click="change(item, 'second')">{{numLen(item)}}</li>
         </ul>
       </div>
     </div>
     <div class="packer-time-body" :class="[getType()]" v-if="type==='daterange'" style="float:right">
       <div class="hd-text" v-if="type==='daterange'">{{t('ans.datepicker.endTime')}}</div>
       <div class="picker-time-div time-hours bd-left" ref="hours1">
-        <ul>
-          <li v-for="(item,index) in 24" :class="{'time-act': index == hours1}" @click="changeLast(index, 'hours1')">{{numLen(index)}}</li>
+        <ul @mouseover="hoverBlock('end', 0)">
+          <li v-for="(item,index) in setStep(24, step[0])" :key="index"
+          :class="{'time-act': item == hours1}"
+          @click="changeLast(item, 'hours1')">{{numLen(item)}}</li>
         </ul>
       </div>
       <div class="picker-time-div time-minute" ref="minute1">
-        <ul>
-          <li v-for="(item,index) in 60" :class="{'time-act': index == minute1}" @click="changeLast(index, 'minute1')">{{numLen(index)}}</li>
+        <ul @mouseover="hoverBlock('end', 1)">
+          <li v-for="(item,index) in setStep(60, step[1])" :key="index"
+              :class="{'time-act': item == minute1}" 
+              @click="changeLast(item, 'minute1')">{{numLen(item)}}</li>
         </ul>
       </div>
       <div class="picker-time-div time-second" ref="second1">
-        <ul>
-          <li v-for="(item,index) in 60" :class="{'time-act': index == second1}" @click="changeLast(index, 'second1')">{{numLen(index)}}</li>
+        <ul @mouseover="hoverBlock('end', 2)">
+          <li v-for="(item,index) in setStep(60, step[2])" :key="index"
+              :class="{'time-act': item == second1}" 
+              @click="changeLast(item, 'second1')">{{numLen(item)}}</li>
         </ul>
       </div>
     </div>
@@ -58,7 +70,13 @@ export default {
   },
   props: {
     format: String,
-    type: String
+    type: String,
+    step: {
+      type: Array,
+      default() {
+        return [1, 1, 1]
+      }
+    }
   },
   mixins: [Locale],
   methods: {
@@ -84,15 +102,47 @@ export default {
         this.second1 = null
       }
     },
+    setStep (num, step) {
+      if(!step) {
+        step = 1
+      }
+      if (num === 1 || !num) {
+        return num
+      }
+      let n = []
+      for (let i = 0; i < num; i++) {
+        if(i % step === 0) {
+          n.push(i)
+        }
+      }
+      return n
+    },
+
+    getStepScrollTop (num, index) {
+      let selfStep = this.step[index]
+      if(selfStep && selfStep > 1) {
+        return num % selfStep === 0 ? (num / selfStep) * 25 : 0
+      }
+      return num * 25
+    },
 
     setScrollTop () {
+      
+      // let step = (num, index) => {
+      //   let selfStep = this.step[index]
+      //   if(selfStep && selfStep > 1) {
+      //     return num % selfStep === 0 ? num / selfStep : 0
+      //   }
+      //   return num
+      // }
+
       setTimeout(() => {
-        this.$refs.hours.scrollTop = this.hours * 25
-        this.$refs.minute.scrollTop = this.minute * 25
-        this.$refs.second.scrollTop = this.second * 25
-        if (this.$refs.hours1) this.$refs.hours1.scrollTop = this.hours1 * 25
-        if (this.$refs.minute1) this.$refs.minute1.scrollTop = this.minute1 * 25
-        if (this.$refs.second1) this.$refs.second1.scrollTop = this.second1 * 25
+        this.$refs.hours.scrollTop = this.getStepScrollTop(this.hours, 0)
+        this.$refs.minute.scrollTop = this.getStepScrollTop(this.minute, 1)
+        this.$refs.second.scrollTop = this.getStepScrollTop(this.second, 2)
+        if (this.$refs.hours1) this.$refs.hours1.scrollTop = this.getStepScrollTop(this.hours1, 0)
+        if (this.$refs.minute1) this.$refs.minute1.scrollTop = this.getStepScrollTop(this.minute1, 1)
+        if (this.$refs.second1) this.$refs.second1.scrollTop = this.getStepScrollTop(this.second1, 2)
       }, 10)
     },
 
@@ -111,7 +161,18 @@ export default {
 
     setHms (value, type) {
       this[type] = value
-      this.$refs[type].scrollTop = value * 25
+
+      let index = 0
+
+      if(/minute/.test(type)) {
+        index = 1
+      }
+
+      if(/second/.test(type)) {
+        index = 2
+      }
+
+      this.$refs[type].scrollTop = this.getStepScrollTop(value, index)
 
       let key = ['hours', 'minute', 'second', 'hours1', 'minute1', 'second1']
       key.forEach(item => {
@@ -121,25 +182,25 @@ export default {
 
     change (value, type) {
       this.setHms(value, type)
-
+      
       if (this.year === this.year1 && this.month === this.month1 && this.day === this.day1) {
         if (type === 'hours') {
           if (this.hours1 <= value && this.minute > this.minute1) {
             this.minute1 = this.minute
-            this.$refs.minute1.scrollTop = this.minute * 25
+            this.$refs.minute1.scrollTop = this.getStepScrollTop(this.minute, 1)
           }
           if (this.hours1 < value) {
             this.hours1 = value
-            if (this.$refs.hours1) this.$refs.hours1.scrollTop = value * 25
+            if (this.$refs.hours1) this.$refs.hours1.scrollTop = this.getStepScrollTop(value, 0)
           }
         }
         if (type === 'minute' && this.hours1 === this.hours && this.minute1 < value) {
           this.minute1 = value
-          if (this.$refs.minute1) this.$refs.minute1.scrollTop = value * 25
+          if (this.$refs.minute1) this.$refs.minute1.scrollTop = this.getStepScrollTop(value, 1)
         }
         if (type === 'second' && this.hours1 === this.hours && this.minute1 === this.minute && this.second1 < value) {
           this.second1 = value
-          if (this.$refs.second1) this.$refs.second1.scrollTop = value * 25
+          if (this.$refs.second1) this.$refs.second1.scrollTop = this.getStepScrollTop(value, 2)
         }
       }
 
@@ -173,6 +234,10 @@ export default {
       if (/H|h/.test(fmt) && /m/.test(fmt) && /s/.test(fmt)) return 'hms'
       if (/H|h/.test(fmt) && /m/.test(fmt)) return 'hm'
       if (/H|h/.test(fmt)) return 'h'
+    },
+
+    hoverBlock (type, index) {
+      this.$emit('_hoverBlock', type, index)
     }
   }
 }

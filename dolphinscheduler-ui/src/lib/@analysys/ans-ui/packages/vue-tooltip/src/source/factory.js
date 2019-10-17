@@ -1,39 +1,42 @@
 import Vue from 'vue'
 import Tooltip from './Tooltip.vue'
-import { LIB_NAME } from '../../../../src/util'
 
 // 组件构造器
 const TooltipConstructor = Vue.extend(Tooltip)
 
 export default (options = {}) => {
   const {
-    containerID = `${LIB_NAME}-tooltip-container`,
+    triggerEvent,
     text = '',
     placement,
     theme,
     maxWidth,
     el,
     positionFixed,
-    viewport
+    viewport,
+    large,
+    reveal
   } = options
   const instance = new TooltipConstructor({
     propsData: {
+      triggerEvent,
       content: text,
       placement,
       theme,
       maxWidth,
       reference: el,
       positionFixed: positionFixed,
-      viewport: viewport
+      viewport: viewport,
+      large,
+      reveal
     }
   }).$mount()
-  const selector = `#${containerID}`
-  let target = document.querySelector(selector)
-  if (!target) {
-    target = document.createElement('div')
-    target.id = containerID
-    document.body.appendChild(target)
+  document.body.appendChild(instance.$el)
+  instance.$el.destroy = () => {
+    instance.$destroy()
   }
-  target.appendChild(instance.$el)
+  instance.$el.hide = () => {
+    instance.hide()
+  }
   return instance
 }

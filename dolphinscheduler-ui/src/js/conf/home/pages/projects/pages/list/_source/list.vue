@@ -66,11 +66,16 @@
             <span>{{item.instRunningCount}}</span>
           </td>
           <td>
-            <span>{{item.desc}}</span>
+            <span class="ellipsis" v-tooltip="item.desc">{{item.desc || '-'}}</span>
           </td>
-          <td><span>{{item.createTime | formatDate}}</span></td>
-          <td><span>{{item.updateTime | formatDate}}</span></td>
-
+          <td>
+            <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
+          <td>
+            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
           <td>
             <x-button
                     type="info"
