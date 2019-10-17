@@ -141,14 +141,12 @@ public class DependentTask extends AbstractTask {
     private boolean allDependentTaskFinish(){
         boolean finish = true;
         for(DependentExecute dependentExecute : dependentTaskList){
-            Map<String, DependResult> resultMap = dependentExecute.getDependResultMap();
-            Set<String> keySet = resultMap.keySet();
-            for(String key : keySet){
-                if(!dependResultMap.containsKey(key)){
-                    dependResultMap.put(key, resultMap.get(key));
+            for(Map.Entry<String, DependResult> entry: dependentExecute.getDependResultMap().entrySet()) {
+                if(!dependResultMap.containsKey(entry.getKey())){
+                    dependResultMap.put(entry.getKey(), entry.getValue());
                     //save depend result to log
                     logger.info("dependent item complete {} {},{}",
-                            DEPENDENT_SPLIT, key, resultMap.get(key).toString());
+                            DEPENDENT_SPLIT, entry.getKey(), entry.getValue().toString());
                 }
             }
             if(!dependentExecute.finish(dependentDate)){

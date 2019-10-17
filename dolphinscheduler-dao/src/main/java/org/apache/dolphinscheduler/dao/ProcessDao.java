@@ -580,9 +580,9 @@ public class ProcessDao extends AbstractBaseDao {
             //reset command parameter
             if(processInstance.getCommandParam() != null){
                 Map<String, String> processCmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-                for(String key : processCmdParam.keySet()){
-                    if(!cmdParam.containsKey(key)){
-                        cmdParam.put(key,processCmdParam.get(key));
+                for(Map.Entry<String, String> entry: processCmdParam.entrySet()) {
+                    if(!cmdParam.containsKey(entry.getKey())){
+                        cmdParam.put(entry.getKey(), entry.getValue());
                     }
                 }
             }

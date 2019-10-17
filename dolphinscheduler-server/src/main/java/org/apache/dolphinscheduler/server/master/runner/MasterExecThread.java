@@ -550,11 +550,9 @@ public class MasterExecThread implements Runnable {
      */
     private List<TaskInstance> getCompleteTaskByState(ExecutionStatus state){
         List<TaskInstance> resultList = new ArrayList<>();
-        Set<String> taskList  = completeTaskList.keySet();
-        for(String taskName : taskList){
-            TaskInstance taskInstance = completeTaskList.get(taskName);
-            if(taskInstance.getState() == state){
-                resultList.add(taskInstance);
+        for (Map.Entry<String, TaskInstance> entry: completeTaskList.entrySet()) {
+            if(entry.getValue().getState() == state){
+                resultList.add(entry.getValue());
             }
         }
         return resultList;
@@ -766,10 +764,8 @@ public class MasterExecThread implements Runnable {
      * @return
      */
     private Boolean hasRetryTaskInStandBy(){
-        Set<String> taskNameSet = this.readyToSubmitTaskList.keySet();
-        for(String taskName : taskNameSet){
-            TaskInstance task = this.readyToSubmitTaskList.get(taskName);
-            if(task.getState().typeIsFailure()){
+        for (Map.Entry<String, TaskInstance> entry: readyToSubmitTaskList.entrySet()) {
+            if(entry.getValue().getState().typeIsFailure()){
                 return true;
             }
         }
@@ -791,16 +787,15 @@ public class MasterExecThread implements Runnable {
                         processDao.findProcessDefineById(processInstance.getProcessDefinitionId()));
                 sendTimeWarning = true;
             }
-            Set<MasterBaseTaskExecThread> keys = activeTaskNode.keySet();
-            for (MasterBaseTaskExecThread taskExecThread : keys) {
-                Future<Boolean> future = activeTaskNode.get(taskExecThread);
-                TaskInstance task  = taskExecThread.getTaskInstance();
+            for(Map.Entry<MasterBaseTaskExecThread,Future<Boolean>> entry: activeTaskNode.entrySet()) {
+                Future<Boolean> future = entry.getValue();
+                TaskInstance task  = entry.getKey().getTaskInstance();
 
                 if(!future.isDone()){
                     continue;
                 }
                 // node monitor thread complete
-                activeTaskNode.remove(taskExecThread);
+                activeTaskNode.remove(entry.getKey());
                 if(task == null){
                     this.taskFailedSubmit = true;
                     continue;
@@ -842,11 +837,11 @@ public class MasterExecThread implements Runnable {
             // failure priority is higher than pause
             // if a task fails, other suspended tasks need to be reset kill
             if(errorTaskList.size() > 0){
-                for(String taskName : completeTaskList.keySet()){
-                    TaskInstance completeTask = completeTaskList.get(taskName);
+                for(Map.Entry<String, TaskInstance> entry: completeTaskList.entrySet()) {
+                    TaskInstance completeTask = entry.getValue();
                     if(completeTask.getState()== ExecutionStatus.PAUSE){
                         completeTask.setState(ExecutionStatus.KILL);
-                        completeTaskList.put(taskName, completeTask);
+                        completeTaskList.put(entry.getKey(), completeTask);
                         processDao.updateTaskInstance(completeTask);
                     }
                 }
@@ -938,9 +933,8 @@ public class MasterExecThread implements Runnable {
      * handling the list of tasks to be submitted
      */
     private void submitStandByTask(){
-        Set<String> readySubmitTaskNames = readyToSubmitTaskList.keySet();
-        for(String readySubmitTaskName : readySubmitTaskNames){
-            TaskInstance task = readyToSubmitTaskList.get(readySubmitTaskName);
+        for(Map.Entry<String, TaskInstance> entry: readyToSubmitTaskList.entrySet()) {
+            TaskInstance task = entry.getValue();
             DependResult dependResult = getDependResultForTask(task);
             if(DependResult.SUCCESS == dependResult){
                 if(retryTaskIntervalOverTime(task)){
@@ -949,7 +943,7 @@ public class MasterExecThread implements Runnable {
                 }
             }else if(DependResult.FAILED == dependResult){
                 // if the dependency fails, the current node is not submitted and the state changes to failure.
-                dependFailedTask.put(readySubmitTaskName, task);
+                dependFailedTask.put(entry.getKey(), task);
                 removeTaskFromStandbyList(task);
                 logger.info("task {},id:{} depend result : {}",task.getName(), task.getId(), dependResult);
             }
