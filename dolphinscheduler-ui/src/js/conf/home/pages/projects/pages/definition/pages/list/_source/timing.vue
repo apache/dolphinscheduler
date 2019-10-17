@@ -193,7 +193,8 @@
     props: {
       item: Object,
       receiversD: Array,
-      receiversCcD: Array
+      receiversCcD: Array,
+      type: String
     },
     methods: {
       _datepicker (val) {
@@ -310,6 +311,9 @@
     created () {
       if(this.item.crontab !== null){
         this.crontab = this.item.crontab
+      }
+      if(this.type == 'timing') {
+        this.crontab = '* * * * * ? *'
       }
       this.receivers = _.cloneDeep(this.receiversD)
       this.receiversCc = _.cloneDeep(this.receiversCcD)

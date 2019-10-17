@@ -194,7 +194,7 @@
             this.radioSecond = 'cycleSecond'
             this.cycleStartVal = parseInt($cycle[0])
             this.cycleEndVal = parseInt($cycle[1])
-            this.secondValue = `${this.cycleStartVal}/${this.cycleEndVal}`
+            this.secondValue = `${this.cycleStartVal}-${this.cycleEndVal}`
             return
           }
           resolve()
