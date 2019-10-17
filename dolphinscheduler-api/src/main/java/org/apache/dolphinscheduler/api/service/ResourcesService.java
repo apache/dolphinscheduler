@@ -144,11 +144,11 @@ public class ResourcesService extends BaseService {
             resourcesMapper.insert(resource);
 
             putMsg(result, Status.SUCCESS);
-            Map dataMap = new BeanMap(resource);
+            Map<Object, Object> dataMap = new BeanMap(resource);
             Map<String, Object> resultMap = new HashMap<String, Object>();
-            for (Object key : dataMap.keySet()) {
-                if (!"class".equalsIgnoreCase(key.toString())) {
-                    resultMap.put(key.toString(), dataMap.get(key));
+            for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
+                if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
+                    resultMap.put(entry.getKey().toString(), entry.getValue());
                 }
             }
             result.setData(resultMap);
@@ -238,11 +238,11 @@ public class ResourcesService extends BaseService {
             resourcesMapper.updateById(resource);
 
             putMsg(result, Status.SUCCESS);
-            Map dataMap = new BeanMap(resource);
+            Map<Object, Object> dataMap = new BeanMap(resource);
             Map<String, Object> resultMap = new HashMap<>(5);
-            for (Object key : dataMap.keySet()) {
-                if (!Constants.CLASS.equalsIgnoreCase(key.toString())) {
-                    resultMap.put(key.toString(), dataMap.get(key));
+            for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
+                if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
+                    resultMap.put(entry.getKey().toString(), entry.getValue());
                 }
             }
             result.setData(resultMap);
@@ -595,11 +595,11 @@ public class ResourcesService extends BaseService {
         resourcesMapper.insert(resource);
 
         putMsg(result, Status.SUCCESS);
-        Map dataMap = new BeanMap(resource);
+        Map<Object, Object> dataMap = new BeanMap(resource);
         Map<String, Object> resultMap = new HashMap<>(5);
-        for (Object key : dataMap.keySet()) {
-            if (!Constants.CLASS.equalsIgnoreCase(key.toString())) {
-                resultMap.put(key.toString(), dataMap.get(key));
+        for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
+            if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
+                resultMap.put(entry.getKey().toString(), entry.getValue());
             }
         }
         result.setData(resultMap);
