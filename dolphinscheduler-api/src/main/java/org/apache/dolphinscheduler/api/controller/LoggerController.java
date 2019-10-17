@@ -95,7 +95,7 @@ public class LoggerController extends BaseController {
             byte[] logBytes = loggerService.getLogBytes(taskInstanceId);
             return ResponseEntity
                     .ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + System.currentTimeMillis() + ".queryLog" + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
                     .body(logBytes);
         } catch (Exception e) {
             logger.error(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR.getMsg(), e);
