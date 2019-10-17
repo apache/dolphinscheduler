@@ -52,12 +52,16 @@
           </td>
           <td><span>{{item.groupType === 'EMAIL' ? `${$t('Email')}` : `${$t('SMS')}`}}</span></td>
           <td>
-            <span>{{item.desc}}</span>
+            <span class="ellipsis" v-tooltip="item.desc">{{item.desc || '-'}}</span>
           </td>
           <td>
-            <span>{{item.createTime | formatDate}}</span>
+            <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
+            <span v-else>-</span>
           </td>
-          <td><span>{{item.updateTime | formatDate}}</span></td>
+          <td>
+            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
           <td>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-yonghu1" :title="$t('Managing Users')" @click="_mangeUser(item)">
             </x-button>

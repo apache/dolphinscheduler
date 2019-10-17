@@ -453,7 +453,7 @@ export default {
   'Avg latency': '平均延时',
   'Max latency': '最大延时',
   'Node count': '节点数',
-  'Query time': '当前查询时间戳',
+  'Query time': '当前查询时间',
   'Node self-test status': '节点自检状态',
   'Health status': '健康状态',
   'Max connections': '最大连接数',

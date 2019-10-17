@@ -69,19 +69,22 @@
           </td>
           <td><span>{{_rtRunningType(item.commandType)}}</span></td>
           <td>
-            <span v-if="!item.scheduleTime"></span>
-            <span v-else>{{item.scheduleTime | formatDate}}</span>
+            <span v-if="item.scheduleTime">{{item.scheduleTime | formatDate}}</span>
+            <span v-else>-</span>
           </td>
-          <td><span>{{item.startTime | formatDate}}</span></td>
+          <td>
+            <span v-if="item.startTime">{{item.startTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
           <td>
             <span v-if="item.endTime">{{item.endTime | formatDate}}</span>
-            <span v-if="!item.endTime">-</span>
+            <span v-else>-</span>
           </td>
           <td width="70"><span>{{item.duration || '-'}}</span></td>
           <td width="70"><span>{{item.runTimes}}</span></td>
           <td>
             <span v-if="item.host">{{item.host}}</span>
-            <span v-if="!item.host">-</span>
+            <span v-else>-</span>
           </td>
           <td><span>{{item.recovery}}</span></td>
 
