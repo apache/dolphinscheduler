@@ -24,13 +24,21 @@
 }
 
 /* 弹出层箭头样式 */
-$dark-arrow-height: 5px;
+$dark-arrow-height: 4px;
 // 三角形宽的一半
-$dark-arrow-width-half: $dark-arrow-height;
+$dark-arrow-width-half: 6px;
 
 $light-arrow-offset: 1px;
 $light-arrow-height: $light-arrow-offset + $dark-arrow-height;
-$light-arrow-width-half: $light-arrow-height;
+$light-arrow-width-half: $light-arrow-offset + $dark-arrow-width-half;
+
+// 大号箭头
+$dark-arrow-height-large: 6px;
+$dark-arrow-width-half-large: 8px;
+$light-arrow-height-large: $light-arrow-offset + $dark-arrow-height-large;
+$light-arrow-width-half-large: $light-arrow-offset + $dark-arrow-width-half-large;
+
+$arrow-color: rgba($title-color-light, 0.95);
 
 .#{$lib-name}-popper-arrow {
   position: absolute;
@@ -46,7 +54,11 @@ $light-arrow-width-half: $light-arrow-height;
     & > .#{$lib-name}-popper-arrow {
       bottom: -$dark-arrow-height;
       border-width: $dark-arrow-height $dark-arrow-width-half 0 $dark-arrow-width-half;
-      border-color: $background-color-dark transparent transparent transparent;
+      border-color: $arrow-color transparent transparent transparent;
+      &.large {
+        bottom: -$dark-arrow-height-large;
+        border-width: $dark-arrow-height-large $dark-arrow-width-half-large 0 $dark-arrow-width-half-large;
+      }
     }
   }
   &[x-placement^="bottom"] {
@@ -54,7 +66,11 @@ $light-arrow-width-half: $light-arrow-height;
     & > .#{$lib-name}-popper-arrow {
       top: -$dark-arrow-height;
       border-width: 0 $dark-arrow-width-half $dark-arrow-height $dark-arrow-width-half;
-      border-color: transparent transparent $background-color-dark transparent;
+      border-color: transparent transparent $arrow-color transparent;
+      &.large {
+        top: -$dark-arrow-height-large;
+        border-width: 0 $dark-arrow-width-half-large $dark-arrow-height-large $dark-arrow-width-half-large;
+      }
     }
   }
   &[x-placement^="right"] {
@@ -62,7 +78,11 @@ $light-arrow-width-half: $light-arrow-height;
     & > .#{$lib-name}-popper-arrow {
       left: -$dark-arrow-height;
       border-width: $dark-arrow-width-half $dark-arrow-height $dark-arrow-width-half 0;
-      border-color: transparent $background-color-dark transparent transparent;
+      border-color: transparent $arrow-color transparent transparent;
+      &.large {
+        left: -$dark-arrow-height-large;
+        border-width: $dark-arrow-width-half-large $dark-arrow-height-large $dark-arrow-width-half-large 0;
+      }
     }
   }
   &[x-placement^="left"] {
@@ -70,7 +90,11 @@ $light-arrow-width-half: $light-arrow-height;
     & > .#{$lib-name}-popper-arrow {
       right: -$dark-arrow-height;
       border-width: $dark-arrow-width-half 0 $dark-arrow-width-half $dark-arrow-height;
-      border-color: transparent transparent transparent $background-color-dark;
+      border-color: transparent transparent transparent $arrow-color;
+      &.large {
+        right: -$dark-arrow-height-large;
+        border-width: $dark-arrow-width-half-large 0 $dark-arrow-width-half-large $dark-arrow-height-large;
+      }
     }
   }
 }
@@ -93,9 +117,17 @@ $light-arrow-width-half: $light-arrow-height;
       border-color: $border-color-base transparent transparent transparent;
       &::after {
         bottom: $light-arrow-offset;
-        left: -$dark-arrow-height;
+        left: -$dark-arrow-width-half;
         border-width: $dark-arrow-height $dark-arrow-width-half 0 $dark-arrow-width-half;
         border-color: $background-color-base transparent transparent transparent;
+      }
+      &.large {
+        bottom: -$light-arrow-height-large;
+        border-width: $light-arrow-height-large $light-arrow-width-half-large 0 $light-arrow-width-half-large;
+        &::after {
+          left: -$dark-arrow-width-half-large;
+          border-width: $dark-arrow-height-large $dark-arrow-width-half-large 0 $dark-arrow-width-half-large;
+        }
       }
     }
   }
@@ -107,9 +139,17 @@ $light-arrow-width-half: $light-arrow-height;
       border-color: transparent transparent $border-color-base transparent;
       &::after {
         top: $light-arrow-offset;
-        left: -$dark-arrow-height;
+        left: -$dark-arrow-width-half;
         border-width: 0 $dark-arrow-width-half $dark-arrow-height $dark-arrow-width-half;
         border-color: transparent transparent $background-color-base transparent;
+      }
+      &.large {
+        top: -$light-arrow-height-large;
+        border-width: 0 $light-arrow-width-half-large $light-arrow-height-large $light-arrow-width-half-large;
+        &::after {
+          left: -$dark-arrow-width-half-large;
+          border-width: 0 $dark-arrow-width-half-large $dark-arrow-height-large $dark-arrow-width-half-large;
+        }
       }
     }
   }
@@ -121,9 +161,17 @@ $light-arrow-width-half: $light-arrow-height;
       border-color: transparent $border-color-base transparent transparent;
       &::after {
         left: $light-arrow-offset;
-        top: -$dark-arrow-height;
+        top: -$dark-arrow-width-half;
         border-width: $dark-arrow-width-half $dark-arrow-height $dark-arrow-width-half 0;
         border-color: transparent $background-color-base transparent transparent;
+      }
+      &.large {
+        left: -$light-arrow-height-large;
+        border-width: $light-arrow-width-half-large $light-arrow-height-large $light-arrow-width-half-large 0;
+        &::after {
+          top: -$dark-arrow-width-half-large;
+          border-width: $dark-arrow-width-half-large $dark-arrow-height-large $dark-arrow-width-half-large 0;
+        }
       }
     }
   }
@@ -135,9 +183,17 @@ $light-arrow-width-half: $light-arrow-height;
       border-color: transparent transparent transparent $border-color-base;
       &::after {
         right: $light-arrow-offset;
-        top: -$dark-arrow-height;
+        top: -$dark-arrow-width-half;
         border-width: $dark-arrow-width-half 0 $dark-arrow-width-half $dark-arrow-height;
         border-color: transparent transparent transparent $background-color-base;
+      }
+      &.large {
+        right: -$light-arrow-height-large;
+        border-width: $light-arrow-width-half-large 0 $light-arrow-width-half-large $light-arrow-height-large;
+        &::after {
+          top: -$dark-arrow-width-half-large;
+          border-width: $dark-arrow-width-half-large 0 $dark-arrow-width-half-large $dark-arrow-height-large;
+        }
       }
     }
   }

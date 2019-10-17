@@ -1,18 +1,17 @@
 <template>
   <td
-    v-if="visible"
-    :rowspan="rowspan"
-    :colspan="colspan"
-    :class="{ 'sorting-column': sortingColumn === column, 'hidden-column': fixed && column.__hiddenInFixed }"
+    v-if="visible && !column.destroyed"
+    :rowspan="cell.spanModel.rowspan"
+    :colspan="cell.spanModel.colspan"
     class="table-cell">
     <x-cell-renderer
       v-if="column.customRender"
-      :content="getCellContent()"
+      :content="cell.content"
       :row="row"
       :column="column"
       :r-index="rowIndex"
-      :c-index="columnIndex"
-      :render="column.customRender">
+      :c-index="cell.columnIndex"
+      :custom-render="column.customRender">
     </x-cell-renderer>
     <template v-else>
       <div v-if="column.type === 'selection'" class="table-cell-content icon-column">
@@ -29,17 +28,40 @@
       </div>
       <div
         v-else
+        :title="titleText"
         class="table-cell-content"
         :class="contentClasses">
         <template v-if="showUnfoldIcon">
-          <span class="tree-branch-text">{{getCellContent()}}</span>
           <i
             class="unfold-icon ans-icon-arrow-right"
             :class="{'rotate-down':unfold}"
             @click="store.commit('rowUnfoldingChanged', row)"
           ></i>
+          <span class="tree-branch-text" @click="store.commit('rowUnfoldingChanged', row)">
+            <x-cell-renderer
+              v-if="column.treeText && first"
+              :content="cell.content"
+              :row="row"
+              :column="column"
+              :r-index="rowIndex"
+              :c-index="cell.columnIndex"
+              :custom-render="column.treeText">
+            </x-cell-renderer>
+            <template v-else>{{cell.content}}</template>
+          </span>
         </template>
-        <template v-else>{{getCellContent()}}</template>
+        <template v-else>
+          <x-cell-renderer
+            v-if="column.treeText && first"
+            :content="cell.content"
+            :row="row"
+            :column="column"
+            :r-index="rowIndex"
+            :c-index="cell.columnIndex"
+            :custom-render="column.treeText">
+          </x-cell-renderer>
+          <template v-else>{{cell.content}}</template>
+        </template>
       </div>
     </template>
   </td>
@@ -47,8 +69,7 @@
 
 <script>
 import { xCheckbox } from '../../../vue-checkbox/src'
-import xCellRenderer from './cellRenderer.js'
-import { getValueByPath } from '../../../../src/util'
+import xCellRenderer from './CellRenderer.vue'
 
 export default {
   name: 'xTableTd',
@@ -68,18 +89,10 @@ export default {
     rowIndex: {
       required: true
     },
-    columnIndex: {
+    cell: {
       required: true
     },
-    first: Boolean,
-    fixed: String
-  },
-
-  data () {
-    return {
-      rowspan: 1,
-      colspan: 1
-    }
+    first: Boolean
   },
 
   computed: {
@@ -88,7 +101,7 @@ export default {
     },
 
     visible () {
-      return this.rowspan || this.colspan
+      return this.cell.spanModel.rowspan || this.cell.spanModel.colspan
     },
 
     selection () {
@@ -103,49 +116,26 @@ export default {
       return this.store.states.treeType && this.store.states.parentRows.includes(this.row) && this.first
     },
 
-    unfold () {
-      return this.store.states.unfoldedRows.includes(this.row)
+    titleText () {
+      return this.store.states.treeType && this.table.treeTitle ? this.cell.content : undefined
     },
 
-    sortingColumn () {
-      return this.store.states.sortingColumn
+    unfold () {
+      return this.store.states.unfoldedRows.includes(this.row)
     },
 
     contentClasses () {
       let classes = `align-${this.column.align}`
       if (this.store.states.treeType && this.first) {
         classes += ` row-level-${this.row.__level}`
+        if (this.showUnfoldIcon) {
+          classes += ' flex-wrapper'
+        }
+        if (this.table.treeTitle) {
+          classes += ' ellipsis-text'
+        }
       }
       return classes
-    }
-  },
-
-  methods: {
-    getCellContent () {
-      const { row, column, rowIndex, columnIndex } = this
-      const value = getValueByPath(row, column.prop)
-      if (column.formatter) {
-        return column.formatter(row, column, value, rowIndex, columnIndex)
-      }
-      return value
-    }
-  },
-
-  created () {
-    const cellSpanMethod = this.table.cellSpanMethod
-    const { row, column, rowIndex, columnIndex } = this
-    if (cellSpanMethod) {
-      const result = cellSpanMethod({ row, column, rowIndex, columnIndex })
-      let rowspan, colspan
-      if (Array.isArray(result)) {
-        rowspan = result[0]
-        colspan = result[1]
-      } else if (typeof result === 'object') {
-        rowspan = result.rowspan
-        colspan = result.colspan
-      }
-      this.colspan = colspan
-      this.rowspan = rowspan
     }
   }
 }

@@ -58,13 +58,15 @@
             <span>{{_rtSize(item.size)}}</span>
           </td>
           <td>
-            <span class="ellipsis">{{item.desc || '-'}}</span>
+            <span class="ellipsis" v-tooltip="item.desc">{{item.desc || '-'}}</span>
           </td>
           <td>
-            <span>{{item.createTime | formatDate}}</span>
+            <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
+            <span v-else>-</span>
           </td>
           <td>
-            <span>{{item.updateTime | formatDate}}</span>
+            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
+            <span v-else>-</span>
           </td>
           <td>
             <x-button

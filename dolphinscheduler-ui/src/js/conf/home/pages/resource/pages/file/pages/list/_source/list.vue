@@ -51,12 +51,15 @@
             </span>
           </td>
           <td><span class="ellipsis">{{item.fileName}}</span></td>
-          <td><span class="ellipsis">{{item.desc}}</span></td>
+          <td>
+            <span class="ellipsis" v-tooltip="item.desc">{{item.desc || '-'}}</span>
+          </td>
           <td>
             <span>{{_rtSize(item.size)}}</span>
           </td>
           <td>
-            <span>{{item.updateTime | formatDate}}</span>
+            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
+            <span v-else>-</span>
           </td>
           <td>
             <x-button

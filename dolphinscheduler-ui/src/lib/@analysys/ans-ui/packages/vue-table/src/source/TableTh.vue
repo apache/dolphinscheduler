@@ -1,8 +1,8 @@
 <template>
   <th
+    v-if="!column.destroyed"
     :colspan="colspan"
     :rowspan="rowspan"
-    :class="{ [sortOrder]: sortingColumn === column, 'hidden-column': fixed && column.__hiddenInFixed }"
     class="table-header-cell"
     @mousedown="handleMouseDown($event, column)"
     @mousemove="handleMouseMove($event, column)"
@@ -12,11 +12,12 @@
       header
       :column="column"
       :c-index="columnIndex"
-      :render="column.customHeader"
+      :custom-render="column.customHeader"
     ></x-cell-renderer>
     <template v-else>
       <div v-if="column.type === 'selection'" class="table-header-cell-content icon-column">
         <x-checkbox
+          :indeterminate="store.states.isIndeterminate"
           :value="store.states.isAllSelected"
           @on-change="store.commit('allSelectionChanged')">
         </x-checkbox>
@@ -34,7 +35,7 @@
             header
             :column="column"
             :c-index="columnIndex"
-            :render="column.prependHeader"
+            :custom-render="column.prependHeader"
           ></x-cell-renderer>
           <span
             v-if="column.headerText"
@@ -46,7 +47,7 @@
               header
               :column="column"
               :c-index="columnIndex"
-              :render="column.headerText"
+              :custom-render="column.headerText"
             ></x-cell-renderer>
           </span>
           <span
@@ -64,7 +65,7 @@
             header
             :column="column"
             :c-index="columnIndex"
-            :render="column.appendHeader"
+            :custom-render="column.appendHeader"
           ></x-cell-renderer>
         </div>
       </template>
@@ -74,7 +75,7 @@
 
 <script>
 import { xCheckbox } from '../../../vue-checkbox/src'
-import xCellRenderer from './cellRenderer.js'
+import xCellRenderer from './CellRenderer.vue'
 
 const PROXY_GAP = 8
 
@@ -95,21 +96,12 @@ export default {
     },
     border: Boolean,
     rowspan: Number,
-    colspan: Number,
-    fixed: String
+    colspan: Number
   },
 
   computed: {
     table () {
       return this.store.table
-    },
-
-    sortingColumn () {
-      return this.store.states.sortingColumn
-    },
-
-    sortOrder () {
-      return this.store.states.sortOrder
     },
 
     dragging () {
@@ -171,7 +163,7 @@ export default {
             const columnWidth = finalLeft - startColumnLeft
             column.width = column.currentWidth = columnWidth
 
-            table.doLayout()
+            store.scheduleLayout()
 
             document.body.style.cursor = ''
             store.commit('setDraggingState', false)

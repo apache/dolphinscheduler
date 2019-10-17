@@ -51,9 +51,13 @@
             <span>{{item.ipList}}</span>
           </td>
           <td>
-            <span>{{item.createTime | formatDate}}</span>
+            <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
+            <span v-else>-</span>
           </td>
-          <td><span>{{item.updateTime | formatDate}}</span></td>
+          <td>
+            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
           <td>
             <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-bianjixiugai" :title="$t('Edit')" @click="_edit(item)">
             </x-button>

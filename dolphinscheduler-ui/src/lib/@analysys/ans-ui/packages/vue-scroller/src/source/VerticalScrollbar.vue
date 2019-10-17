@@ -60,18 +60,22 @@ export default {
     },
 
     height () {
-      return this.viewHeight * this.wrapperHeight / this.contentHeight
+      return Math.max(40, this.viewHeight * this.wrapperHeight / this.contentHeight)
     },
 
     maxTop () {
-      return this.viewHeight - this.height
+      return this.wrapperHeight - this.height
     }
   },
 
   methods: {
-    setTop (top) {
+    _getValidTop (top) {
+      return Math.min(this.maxTop, Math.max(top, 0))
+    },
+
+    setTop (percentage) {
       if (this.contentHeight) {
-        this.top = -top * this.wrapperHeight / this.contentHeight
+        this.top = this._getValidTop(percentage * this.maxTop)
       }
     },
 
@@ -97,9 +101,8 @@ export default {
 
         const delta = event.clientY - this.startClientY
         let top = this.startTop + delta
-        top = Math.min(this.maxTop, Math.max(top, 0))
-        this.top = top
-        this.$emit('on-vertical-drag', top / this.wrapperHeight)
+        this.top = this._getValidTop(top)
+        this.$emit('on-vertical-drag', top / this.maxTop)
       }
     },
 
@@ -122,7 +125,7 @@ export default {
         let top = this.top + delta
         top = Math.min(this.maxTop, Math.max(top, 0))
         this.top = top
-        this.$emit('on-vertical-drag', top / this.wrapperHeight)
+        this.$emit('on-vertical-drag', top / this.maxTop)
       }
     }
   },

@@ -24,10 +24,7 @@ export default {
     onColumnsChange () {
       const cols = this.$el.querySelectorAll('colgroup > col')
       if (!cols.length) return
-      const columnsMap = {}
-      this.store.states.leafColumns.forEach((column) => {
-        columnsMap[column.id] = column
-      })
+      const columnsMap = this.store.states.leafColumnMap
       for (let i = 0, j = cols.length; i < j; i++) {
         const col = cols[i]
         const name = col.getAttribute('name')

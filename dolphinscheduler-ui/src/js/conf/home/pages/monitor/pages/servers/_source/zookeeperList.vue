@@ -92,7 +92,8 @@
             <span>{{item.nodeCount}}</span>
           </td>
           <td>
-            <span>{{item.date | formatDate}}</span>
+            <span v-if="item.date">{{item.date | formatDate}}</span>
+            <span v-else>-</span>
           </td>
           <td>
             <span class="state">

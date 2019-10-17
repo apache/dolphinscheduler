@@ -38,13 +38,12 @@ for (let i = 10; i < 100; i++) {
 }
 
 const WEEKS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
-const daysInWeek = WEEKS.map(w => t(`ans.datepicker.weeks.${w}`))
 
 export default {
   components: { ym },
   data () {
     return {
-      week: daysInWeek,
+      week: WEEKS.map(w => t(`ans.datepicker.weeks.${w}`)),
 
       // 本月一号星期几
       weeks: 0,

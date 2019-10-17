@@ -9,6 +9,7 @@ BoxManager.newInstance = properties => {
 
   const Instance = new Vue({
     data: _props,
+    i18n: _props.i18n,
     render (h) {
       return h(BoxManager, {
         props: _props

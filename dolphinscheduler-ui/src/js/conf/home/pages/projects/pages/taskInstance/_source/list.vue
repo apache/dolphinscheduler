@@ -66,11 +66,17 @@
           <td><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis">{{item.processInstanceName}}</span></a></td>
           <td><span>{{item.taskType}}</span></td>
           <td><span v-html="_rtState(item.state)" style="cursor: pointer;"></span></td>
-          <td><span>{{item.submitTime | formatDate}}</span></td>
-          <td><span>{{item.startTime | formatDate}}</span></td>
+          <td>
+            <span v-if="item.submitTime">{{item.submitTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
+          <td>
+            <span v-if="item.startTime">{{item.startTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
           <td>
             <span v-if="item.endTime">{{item.endTime | formatDate}}</span>
-            <span v-if="!item.endTime">-</span>
+            <span v-else>-</span>
           </td>
           <td><span>{{item.host || '-'}}</span></td>
           <td><span>{{item.duration}}</span></td>
