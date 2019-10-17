@@ -174,6 +174,8 @@ export default {
   'Please enter the correct mobile phone format': '请输入正确的手机格式',
   'Project': '项目',
   'Authorize': '授权',
+  'File resources': '文件资源',
+  'UDF resources': 'UDF资源',
   'Edit alarm group': '编辑告警组',
   'Create alarm group': '创建告警组',
   'Group Name': '组名称',

@@ -517,14 +517,12 @@ public class DataSourceService extends BaseService{
             parameterMap.put(Constants.PRINCIPAL,principal);
         }
         if (other != null && !"".equals(other)) {
-            Map map = JSONObject.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
+            LinkedHashMap<String, String> map = JSONObject.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
             });
             if (map.size() > 0) {
-                Set<String> keys = map.keySet();
                 StringBuilder otherSb = new StringBuilder();
-                for (String key : keys) {
-                    otherSb.append(String.format("%s=%s%s", key, map.get(key), separator));
-
+                for (Map.Entry<String, String> entry: map.entrySet()) {
+                    otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
                 }
                 otherSb.deleteCharAt(otherSb.length() - 1);
                 parameterMap.put(Constants.OTHER, otherSb);
