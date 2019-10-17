@@ -226,7 +226,8 @@
                 props: {
                   item: item,
                   receiversD: res.receivers,
-                  receiversCcD: res.receiversCc
+                  receiversCcD: res.receiversCc,
+                  type: 'timing'
                 }
               })
             }
