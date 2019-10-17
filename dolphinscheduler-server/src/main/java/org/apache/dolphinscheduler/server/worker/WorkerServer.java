@@ -317,6 +317,7 @@ public class WorkerServer extends AbstractServer {
     }
 
     private void killTask(String taskInfo, ProcessDao pd) {
+        logger.info("get one kill command from tasks kill queue: " + taskInfo);
         String[] taskInfoArray = taskInfo.split("-");
         if(taskInfoArray.length != 2){
             logger.error("error format kill info: " + taskInfo);
@@ -338,8 +339,11 @@ public class WorkerServer extends AbstractServer {
             if(taskInstance.getTaskType().equals(TaskType.DEPENDENT.toString())){
                 taskInstance.setState(ExecutionStatus.KILL);
                 pd.saveTaskInstance(taskInstance);
-            }else{
+            }else if(!taskInstance.getState().typeIsFinished()){
                 ProcessUtils.kill(taskInstance);
+            }else{
+                logger.info("the task aleady finish: task id: " + taskInstance.getId()
+                        + " state: " + taskInstance.getState().toString());
             }
         }
     }
@@ -347,6 +351,7 @@ public class WorkerServer extends AbstractServer {
     private void deleteTaskFromQueue(TaskInstance taskInstance, ProcessDao pd){
         // creating distributed locks, lock path /dolphinscheduler/lock/worker
         InterProcessMutex mutex = null;
+        logger.info("delete task from tasks queue: " + taskInstance.getId());
 
         try {
             mutex = zkWorkerClient.acquireZkLock(zkWorkerClient.getZkClient(),
