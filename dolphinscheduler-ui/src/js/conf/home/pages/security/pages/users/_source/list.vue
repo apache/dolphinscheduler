@@ -123,6 +123,7 @@
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
   import mTransfer from '@/module/components/transfer/transfer'
+  import mResource from '@/module/components/transfer/resource'
 
   export default {
     name: 'user-list',
@@ -218,13 +219,33 @@
           let sourceListPrs = _.map(data[0], v => {
             return {
               id: v.id,
-              name: v.alias
+              name: v.alias,
+              type: v.type
+            }
+          })
+          let fileSourceList = []
+          let udfSourceList = []
+          sourceListPrs.forEach((value,index,array)=>{
+            if(value.type =='FILE'){
+              fileSourceList.push(value)
+            } else{
+              udfSourceList.push(value)
             }
           })
           let targetListPrs = _.map(data[1], v => {
             return {
               id: v.id,
-              name: v.alias
+              name: v.alias,
+              type: v.type
+            }
+          })
+          let fileTargetList = []
+          let udfTargetList = []
+          targetListPrs.forEach((value,index,array)=>{
+            if(value.type =='FILE'){
+              fileTargetList.push(value)
+            } else{
+              udfTargetList.push(value)
             }
           })
           let self = this
@@ -235,7 +256,7 @@
             className: 'v-modal-custom',
             transitionName: 'opacityp',
             render (h) {
-              return h(mTransfer, {
+              return h(mResource, {
                 on: {
                   onUpdate (resourceIds) {
                     self._grantAuthorization('users/grant-file', {
@@ -249,8 +270,12 @@
                   }
                 },
                 props: {
-                  sourceListPrs: sourceListPrs,
-                  targetListPrs: targetListPrs,
+                  // sourceListPrs: sourceListPrs,
+                  // targetListPrs: targetListPrs,
+                  fileSourceList: fileSourceList,
+                  udfSourceList: udfSourceList,
+                  fileTargetList: fileTargetList,
+                  udfTargetList: udfTargetList,
                   type: {
                     name: `${i18n.$t('Resources')}`
                   }
