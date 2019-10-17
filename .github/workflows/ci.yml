@@ -3,7 +3,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  Complie-check:
+  Compile-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -12,7 +12,7 @@ jobs:
         with:
           java-version: 1.8
       - name: check
-        run: mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+        run: mvn -U -B clean package assembly:assembly -Dmaven.test.skip=true
   License-check:
     runs-on: ubuntu-latest
     steps:
