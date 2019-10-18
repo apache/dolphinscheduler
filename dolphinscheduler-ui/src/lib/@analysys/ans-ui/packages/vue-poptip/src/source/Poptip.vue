@@ -1,6 +1,6 @@
 <template>
   <span>
-    <transition :name="transition" @after-leave="destroyPopper">
+    <transition name="x-ani-fade" @after-leave="destroyPopper">
       <div
         :class="wrapperClass"
         ref="popper"
@@ -45,7 +45,7 @@ export default {
       prefixCls: prefixCls,
       delayTime: 0,
       timer: null,
-      arrowClass: `${LIB_NAME}-popper-arrow large`
+      arrowClass: `${LIB_NAME}-popper-arrow`
     }
   },
   props: {
@@ -96,10 +96,6 @@ export default {
     distance: {
       type: Number,
       default: 5
-    },
-    transition: {
-      type: String,
-      default: 'x-ani-fade'
     },
     popperClass: String
   },

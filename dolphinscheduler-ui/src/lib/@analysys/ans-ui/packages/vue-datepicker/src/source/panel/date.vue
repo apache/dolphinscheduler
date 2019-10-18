@@ -1,5 +1,5 @@
 <template>
-	<div class="x-date-panel" @click.stop>
+	<div class="x-date-panel">
     <div class="x-date-panel-day">
       <!-- <template v-if="isTimes()">
         <times v-show="isTimesShow" ref="times" @change="timeChange"></times>

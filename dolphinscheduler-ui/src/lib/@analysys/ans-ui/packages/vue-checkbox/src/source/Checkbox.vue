@@ -60,11 +60,6 @@ export default {
     falseValue: {
       type: [Boolean, String, Number],
       default: false
-    },
-    // 不确定状态
-    indeterminate: {
-      type: Boolean,
-      default: false
     }
   },
   computed: {
@@ -78,7 +73,6 @@ export default {
     checkedClass () {
       return [{
         [`${prefixCls}`]: true,
-        ['is-indeterminate']: this.indeterminate,
         [`${prefixCls}-checked`]: !!this.currentValue
       }]
     }

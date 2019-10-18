@@ -14,15 +14,15 @@
         ref="headerScroller"
         width="100%"
         height="100%"
-        :inner-width="scrollerContentWidth"
         :show-scrollbar="false"
         :disabled="scrollerDisabled"
         :reverse-scroll-y="reverseScrollY"
-        @on-scroll-x="handleHeaderScrollX">
+        @on-scroll-x="handleHeaderScrollX"
+        @on-x-start="handleBodyScrollXStart"
+        @on-x-end="handleBodyScrollXEnd">
         <x-table-header
           :style="{
-            width: bodyWidth,
-            transform: transformX ? `translateX(${transformX}px)` : undefined
+            width: layout.bodyWidth ? layout.bodyWidth + 'px' : ''
           }"
           :store="store"
           :stripe="stripe"
@@ -36,25 +36,31 @@
         bodyHeight,
         { marginTop: bodyTopMargin }
       ]"
+      v-spin.lock.fullscreen="layout.loading"
       ref="bodyWrapper">
       <x-scroller
         width="100%"
         height="100%"
-        :inner-width="scrollerContentWidth"
-        :inner-height="scrollerContentHeight"
         ref="scroller"
         :scrollbar-class="bodyScrollbarClass"
         :reverse-scroll-y="reverseScrollY"
         :disabled="scrollerDisabled"
+        show-scrollbar="active"
         :bar-offset-left="layout.fixedLeftWidth"
         :bar-offset-right="layout.fixedRightWidth"
         @on-scroll-x="handleBodyScrollX"
         @on-scroll-y="handleBodyScrollY"
+        @on-x-start="handleBodyScrollXStart"
+        @on-x-end="handleBodyScrollXEnd"
+        @on-y-start="handleBodyScrollYStart"
+        @on-y-end="handleBodyScrollYEnd"
         @on-start-drag-bar="handleStartDragBar"
         @on-end-drag-bar="handleEndDragBar">
         <x-table-body
           ref="bodyTable"
-          :style="tableBodyStyles"
+          :style="{
+            width: bodyWidth
+          }"
           :store="store"
           :stripe="stripe"
           :border="hasBorder">
@@ -73,7 +79,6 @@
     </div>
     <div
       v-if="fixedLeftColumns.length > 0"
-      v-show="layout.scrollX"
       :style="{
         width: layout.fixedLeftWidth + 'px',
         height: layout.tableHeight + 'px'
@@ -98,8 +103,7 @@
       <div
         :style="[
           { top: layout.headerHeight + 'px' },
-          fixedBodyHeight,
-          { width: this.layout.tableWrapperWidth + 'px' }
+          fixedBodyHeight
         ]"
         class="table-body-wrapper"
         ref="fixedLeftBodyWrapper">
@@ -107,14 +111,16 @@
           ref="fixedLeftScroller"
           width="100%"
           height="100%"
-          :inner-width="scrollerContentWidth"
-          :inner-height="scrollerContentHeight"
           :show-scrollbar="false"
-          :disabled="scrollerDisabled || 'x'"
+          :disabled="scrollerDisabled"
+          @on-y-start="handleBodyScrollYStart"
+          @on-y-end="handleBodyScrollYEnd"
           @on-scroll-y="handleFixedScrollY">
           <x-table-body
             fixed="left"
-            :style="fixedBodyStyles"
+            :style="{
+              width: '100%'
+            }"
             :store="store"
             :stripe="stripe"
             :border="hasBorder">
@@ -124,7 +130,6 @@
     </div>
     <div
       v-if="fixedRightColumns.length > 0"
-      v-show="layout.scrollX"
       :style="{
         width: layout.fixedRightWidth + 'px',
         height: layout.tableHeight + 'px',
@@ -139,7 +144,9 @@
         class="table-header-wrapper">
         <x-table-header
           fixed="right"
-          :style="fixedRightTableHeaderStyles"
+          :style="{
+            width: '100%'
+          }"
           :store="store"
           :stripe="stripe"
           :border="hasBorder">
@@ -148,8 +155,7 @@
       <div
         :style="[
           { top: layout.headerHeight + 'px' },
-          fixedBodyHeight,
-          { width: this.layout.tableWrapperWidth + 'px' }
+          fixedBodyHeight
         ]"
         class="table-body-wrapper"
         ref="fixedRightBodyWrapper">
@@ -157,14 +163,16 @@
           ref="fixedRightScroller"
           width="100%"
           height="100%"
-          :inner-width="scrollerContentWidth"
-          :inner-height="scrollerContentHeight"
           :show-scrollbar="false"
-          :disabled="scrollerDisabled || 'x'"
+          :disabled="scrollerDisabled"
+          @on-y-start="handleBodyScrollYStart"
+          @on-y-end="handleBodyScrollYEnd"
           @on-scroll-y="handleFixedScrollY">
           <x-table-body
             fixed="right"
-            :style="[fixedBodyStyles, fixedRightBodyStyles]"
+            :style="{
+              width: '100%'
+            }"
             :store="store"
             :stripe="stripe"
             :border="hasBorder">
@@ -177,14 +185,17 @@
 </template>
 
 <script>
-import { debounce } from 'throttle-debounce'
 import { LIB_NAME } from '../../../../src/util'
+import directive from '../../../vue-spin/src/source/directive.js'
 import { xScroller } from '../../../vue-scroller/src'
 import TableStore from './store.js'
 import TableLayout from './layout.js'
 import xTableBody from './TableBody'
 import xTableHeader from './TableHeader'
+import Vue from 'vue'
 import { t } from '../../../../src/locale'
+
+Vue.directive('spin', directive)
 
 let tableIdSeed = 1
 
@@ -204,6 +215,7 @@ export default {
     return {
       store,
       layout,
+      multiLayerHeader: false,
       resizeState: {
         width: null,
         height: null
@@ -213,12 +225,10 @@ export default {
       affixHeaderWidth: '',
       isScrollXStart: true,
       isScrollXEnd: false,
-      isScrollYStart: true,
-      isScrollYEnd: false,
       expendRender: null,
       resizeProxyVisible: false,
-      scrollerDisabled: false,
-      translateY: 0
+      windowScrolled: false,
+      scrollerDisabled: false
     }
   },
 
@@ -279,10 +289,8 @@ export default {
     // 合并行或列的计算方法
     cellSpanMethod: Function,
 
-    // 表格行的 key 值，当 reserve-states 为 true 时，必须设置该属性
+    // 表格行的 key 值，用于优化渲染
     rowKey: String,
-
-    currentRowKey: [String, Number],
 
     reserveStates: {
       type: Boolean,
@@ -292,12 +300,6 @@ export default {
     childrenProp: {
       type: String,
       default: 'children'
-    },
-
-    // 树结构的第一列是否需要加上 title 属性
-    treeTitle: {
-      type: Boolean,
-      default: false
     },
 
     // tree table 是否默认打开
@@ -311,22 +313,22 @@ export default {
       default: true
     },
 
-    // 是否启用虚拟滚动
-    virtualScroll: {
+    // 是否启用内部分页
+    internalPaging: {
       type: Boolean,
       default: false
     },
 
-    // 行高，启动虚拟滚动时需要设置
-    rowHeight: {
+    // 内部分页模式下，最多同时存在的行数
+    rowLimit: {
       type: Number,
-      default: 38
+      default: 100
     },
 
-    // 当表格为树结构时，开启虚拟滚动后，最大渲染的行数
-    maxTreeRow: {
+    // 未设置 table 高度时，激活上一页/下一页时的边界距离
+    pagingActiveDistance: {
       type: Number,
-      default: 15
+      default: 300
     },
 
     // 是否反转 Y 轴滚轮，当该值为 true 时，滚动 Y 轴将控制水平方向的滚动
@@ -335,17 +337,12 @@ export default {
       default: false
     },
 
-    scrollBarClass: String,
-
-    frozenData: {
-      type: Boolean,
-      default: true
-    }
+    scrollBarClass: String
   },
 
   computed: {
     hasBorder () {
-      return this.border || this.store.states.multiLayer
+      return this.border || this.multiLayerHeader
     },
 
     wrapperClasses () {
@@ -354,10 +351,6 @@ export default {
         { [`${LIB_NAME}-table--border`]: this.hasBorder },
         { 'scrollable-x': this.layout.scrollX },
         { 'scrollable-y': this.layout.scrollY },
-        { 'hit-left': this.layout.scrollX && this.isScrollXStart },
-        { 'hit-right': this.layout.scrollX && this.isScrollXEnd },
-        { 'hit-top': this.layout.scrollY && this.isScrollYStart },
-        { 'hit-bottom': this.layout.scrollY && this.isScrollYEnd },
         { 'affix-table-header': this.affix }
       ]
     },
@@ -385,37 +378,29 @@ export default {
     fixedLeftHeaderStyles () {
       if (this.activeAffix) {
         return {
-          width: this.layout.tableWrapperWidth + 'px',
+          width: this.layout.fixedLeftWidth + 'px',
           position: 'fixed',
           top: this.affixDistance + 'px'
         }
       } else {
-        return {
-          width: this.layout.tableWrapperWidth + 'px'
-        }
+        return null
       }
     },
 
     fixedRightHeaderStyles () {
       if (this.activeAffix) {
         return {
-          width: this.layout.tableWrapperWidth + 'px',
+          width: this.layout.fixedRightWidth + 'px',
           position: 'fixed',
-          top: this.affixDistance + 'px',
-          left: this.$el.getBoundingClientRect().left + 'px'
+          top: this.affixDistance + 'px'
         }
       } else {
-        return {
-          width: this.layout.tableWrapperWidth + 'px'
-        }
+        return null
       }
     },
 
     bodyWidth () {
-      const { bodyWidth, tableWidth, scrollX } = this.layout
-      if (this.virtualScroll && scrollX) {
-        return tableWidth ? tableWidth + 'px' : ''
-      }
+      const { bodyWidth } = this.layout
       return bodyWidth ? bodyWidth + 'px' : ''
     },
 
@@ -444,67 +429,6 @@ export default {
 
     bodyScrollbarClass () {
       return this.scrollBarClass ? `${this.scrollBarClass} table-body-scroller` : 'table-body-scroller'
-    },
-
-    scrollerContentWidth () {
-      return this.layout.scrollX && this.virtualScroll ? this.layout.bodyWidth + 'px' : undefined
-    },
-
-    scrollerContentHeight () {
-      return this.store.states.transformBodyY ? this.store.states.contentHeight + 'px' : undefined
-    },
-
-    transformX () {
-      return this.layout.scrollX && this.store.states.transformXAmount
-        ? this.store.states.transformXAmount
-        : 0
-    },
-
-    tableBodyStyles () {
-      const result = {
-        width: this.bodyWidth
-      }
-      if (this.virtualScroll) {
-        result['will-change'] = 'transform'
-        const x = this.transformX
-        if (this.store.states.transformBodyY) {
-          result.transform = `translate(${x}px, ${this.translateY}px)`
-        } else {
-          result.transform = `translateX(${x}px)`
-        }
-      }
-      return result
-    },
-
-    fixedBodyStyles () {
-      const result = {}
-      if (this.store.states.transformBodyY) {
-        result['will-change'] = 'transform'
-        result.transform = `translateY(${this.translateY}px)`
-      }
-      if (this.layout.scrollX && this.virtualScroll) {
-        result.width = this.bodyWidth
-      } else {
-        result.width = '100%'
-      }
-      return result
-    },
-
-    fixedRightTransformX () {
-      const { tableWidth, bodyWidth } = this.layout
-      return bodyWidth - tableWidth
-    },
-
-    fixedRightTableHeaderStyles () {
-      return {
-        width: '100%',
-        position: 'relative',
-        left: this.$refs.scroller.minLeft + this.fixedRightTransformX + 'px'
-      }
-    },
-
-    fixedRightBodyStyles () {
-      return this.transformX ? { transform: `translateX(${this.fixedRightTransformX}px)` } : {}
     }
   },
 
@@ -535,6 +459,10 @@ export default {
       handler (newVal) {
         this.layout.setHeight(newVal)
       }
+    },
+
+    multiLayerHeader () {
+      this.$nextTick(() => this.doLayout())
     }
   },
 
@@ -550,7 +478,6 @@ export default {
         this.$refs.scroller.stickToBoundary(false, true, false)
         this.isScrollXStart = true
         this.isScrollXEnd = false
-        this.store.states.transformXAmount = 0
       } else if (position === 'right') {
         this.$refs.headerScroller && this.$refs.headerScroller.stickToBoundary(false, false, false)
         this.$refs.scroller.stickToBoundary(false, false, false)
@@ -560,17 +487,10 @@ export default {
         this.$refs.fixedLeftScroller && this.$refs.fixedLeftScroller.stickToBoundary(true, true, false)
         this.$refs.fixedRightScroller && this.$refs.fixedRightScroller.stickToBoundary(true, true, false)
         this.$refs.scroller.stickToBoundary(true, true, false)
-        this.isScrollYStart = true
-        this.isScrollYEnd = false
       } else if (position === 'bottom') {
         this.$refs.fixedLeftScroller && this.$refs.fixedLeftScroller.stickToBoundary(true, false, false)
         this.$refs.fixedRightScroller && this.$refs.fixedRightScroller.stickToBoundary(true, false, false)
         this.$refs.scroller.stickToBoundary(true, false, false)
-        this.isScrollYStart = false
-        this.isScrollYEnd = true
-      }
-      if (this.virtualScroll) {
-        this.store.sliceData()
       }
     },
 
@@ -603,7 +523,7 @@ export default {
     },
 
     bindEvent () {
-      if (this.affix) {
+      if (this.affix || this.internalPaging) {
         window.addEventListener('scroll', this.windowScrollListener)
       }
 
@@ -630,78 +550,90 @@ export default {
       }
     },
 
-    handleHeaderScrollX (left, hitLeft, hitRight) {
-      this._setScrollXStates(hitLeft, hitRight)
+    handleHeaderScrollX (left) {
+      this.isScrollXStart = false
+      this.isScrollXEnd = false
       if (this.layout.scrollX) {
         this.$refs.scroller.setContentLeft(left)
       }
-      this.store.throttleCalculateColumnIndexes(left)
-      this.$emit('on-scroll', false, left)
     },
 
-    _setScrollXStates (hitLeft, hitRight) {
-      if (hitLeft) {
-        this.isScrollXStart = true
-        this.$emit('on-hit', 'left')
-      } else if (hitRight) {
-        this.isScrollXEnd = true
-        this.$emit('on-hit', 'right')
-      } else {
-        this.isScrollXStart = false
-        this.isScrollXEnd = false
-      }
-    },
-
-    handleFixedScrollY (top, hitTop, hitBottom) {
-      this._setScrollYStates(hitTop, hitBottom)
+    handleFixedScrollY (top) {
       this.$refs.scroller.setContentTop(top)
-      this._afterScrollY(top)
-    },
-
-    _setScrollYStates (hitTop, hitBottom) {
-      if (hitTop) {
-        this.isScrollYStart = true
-        this.$emit('on-hit', 'top')
-      } else if (hitBottom) {
-        this.isScrollYEnd = true
-        this.$emit('on-hit', 'bottom')
-      } else {
-        this.isScrollYStart = false
-        this.isScrollYEnd = false
-      }
-    },
-
-    _afterScrollY (top) {
       if (this.$refs.fixedLeftScroller) {
         this.$refs.fixedLeftScroller.setContentTop(top)
       }
       if (this.$refs.fixedRightScroller) {
         this.$refs.fixedRightScroller.setContentTop(top)
       }
-      this.store.throttleCalculateIndexes(top)
-      this.$emit('on-scroll', true, top)
-      this.updateTranslateY(undefined, top)
-    },
-
-    handleBodyScrollX (left, hitLeft, hitRight) {
-      this._setScrollXStates(hitLeft, hitRight)
-      if (this.showHeader) {
-        this.$refs.headerScroller.setContentLeft(left)
-      }
-      this.store.throttleCalculateColumnIndexes(left)
-      this.$emit('on-scroll', false, left)
-    },
-
-    handleBodyScrollY (top, hitTop, hitBottom) {
-      this._setScrollYStates(hitTop, hitBottom)
-      this._afterScrollY(top)
     },
 
     windowScrollListener () {
-      const boundingRect = this.$el.getBoundingClientRect()
-      this.activeAffix = boundingRect.top < this.affixDistance &&
-        boundingRect.top + this.$el.offsetHeight > this.$refs.headerWrapper.offsetHeight
-      this.updateAffixHeaderWidth()
+      if (this.affix) {
+        const boundingRect = this.$el.getBoundingClientRect()
+        this.activeAffix = boundingRect.top < this.affixDistance &&
+          boundingRect.top + this.$el.offsetHeight > this.$refs.headerWrapper.offsetHeight
+        this.updateAffixHeaderWidth()
+      }
+      if (this.windowScrolled && !this.layout.scrollY && this.store.states.paging) {
+        const bodyWrapper = this.$refs.bodyWrapper
+        const y = bodyWrapper.getBoundingClientRect().top
+        if (y + bodyWrapper.clientHeight < window.innerHeight + this.pagingActiveDistance) {
+          if (!this.layout.slicing) {
+            this.store.nextPage()
+          }
+        } else if (y > -this.pagingActiveDistance) {
+          if (!this.layout.slicing) {
+            this.store.prevPage()
+          }
+        }
+      }
+      this.windowScrolled = true
+    },
+
+    handleBodyScrollX (left) {
+      this.isScrollXStart = false
+      this.isScrollXEnd = false
+      if (this.showHeader) {
+        this.$refs.headerScroller.setContentLeft(left)
+      }
+    },
+
+    handleBodyScrollY (top) {
+      if (this.$refs.fixedLeftScroller) {
+        this.$refs.fixedLeftScroller.setContentTop(top)
+      }
+      if (this.$refs.fixedRightScroller) {
+        this.$refs.fixedRightScroller.setContentTop(top)
+      }
+    },
+
+    handleBodyScrollXStart () {
+      this.isScrollXStart = true
+      this.$emit('on-hit', 'left')
+    },
+
+    handleBodyScrollXEnd () {
+      this.isScrollXEnd = true
+      this.$emit('on-hit', 'right')
+    },
+
+    handleBodyScrollYStart () {
+      if (this.store.states.paging) {
+        if (!this.layout.slicing) {
+          this.store.prevPage()
+        }
+      }
+      this.$emit('on-hit', 'top')
+    },
+
+    handleBodyScrollYEnd () {
+      if (this.store.states.paging) {
+        if (!this.layout.slicing) {
+          this.store.nextPage()
+        }
+      }
+      this.$emit('on-hit', 'bottom')
     },
 
     resizeListener () {
@@ -720,7 +652,7 @@ export default {
         shouldUpdateLayout = true
       }
 
-      if (shouldUpdateLayout || this.restrict) {
+      if (shouldUpdateLayout) {
         this.resizeState.width = width
         this.resizeState.height = height
         this.doLayout()
@@ -751,65 +683,46 @@ export default {
     },
 
     checkScrollable () {
-      const { scroller, headerScroller, fixedLeftScroller, fixedRightScroller } = this.$refs
-      if (!scroller) return
+      if (this.$refs.scroller) {
+        this.$refs.scroller.checkScrollable()
+      }
+      if (this.$refs.headerScroller) {
+        this.$refs.headerScroller.checkScrollable()
+      }
+      if (this.$refs.fixedLeftScroller) {
+        this.$refs.fixedLeftScroller.checkScrollable()
+      }
+      if (this.$refs.fixedRightScroller) {
+        this.$refs.fixedRightScroller.checkScrollable()
+      }
+    },
 
-      const prevTop = scroller.currentTop
-      const prevLeft = scroller.currentLeft
-      if (prevLeft === 0) {
-        this.store.states.transformXAmount = 0
-      }
-      scroller.checkScrollable()
-      this.isScrollXStart = scroller.currentLeft === 0
-      this.isScrollXEnd = scroller.currentLeft === scroller.minLeft
-      this.isScrollYStart = scroller.currentTop === 0
-      this.isScrollYEnd = scroller.currentTop === scroller.minTop
-      if (Math.abs(prevTop - scroller.currentTop) > 1 || Math.abs(prevLeft - scroller.currentLeft) > 1) {
-        return this.store.sliceData()
-      }
+    moveBodyTopByDiff (diff) {
+      const top = this.$refs.scroller.currentTop - diff
+      this.setBodyTop(top)
+    },
 
-      if (headerScroller) {
-        headerScroller.checkScrollable()
+    setBodyTop (top) {
+      this.$refs.scroller.setContentTop(top, false)
+      if (this.$refs.fixedLeftScroller) {
+        this.$refs.fixedLeftScroller.setContentTop(top, false)
       }
-      if (fixedLeftScroller) {
-        fixedLeftScroller.checkScrollable()
-        if (scroller.currentTop !== fixedLeftScroller.currentTop) {
-          fixedLeftScroller.setContentTop(scroller.currentTop)
-        }
-      }
-      if (fixedRightScroller) {
-        fixedRightScroller.checkScrollable()
-        fixedRightScroller.stickToBoundary(false, false, false)
-        if (scroller.currentTop !== fixedRightScroller.currentTop) {
-          fixedRightScroller.setContentTop(scroller.currentTop)
-        }
+      if (this.$refs.fixedRightScroller) {
+        this.$refs.fixedRightScroller.setContentTop(top, false)
       }
     },
 
     windowLoadListener () {
       this.doLayout()
-    },
-
-    updateTranslateY (amount, top) {
-      if (amount !== undefined) {
-        this.translateY = amount
-      } else {
-        const { bodyHeight } = this.layout
-        const tableHeight = this.$refs.bodyTable.$el.offsetHeight
-        if (bodyHeight - top > this.translateY + tableHeight) {
-          this.translateY = 1.5 * bodyHeight - top - tableHeight
-        } else if (top + this.translateY > 0) {
-          this.translateY = -top - 0.5 * bodyHeight
-        }
-      }
     }
   },
 
   created () {
     this.tableId = `${LIB_NAME}-table_${tableIdSeed++}`
+    if (this.internalPaging && !this.rowKey) {
+      throw new Error('Table: Prop row-key should not be empty when internal-paging enabled.')
+    }
     window.addEventListener('load', this.windowLoadListener)
-    this.debouncedUpdateLayout = debounce(50, () => this.doLayout())
-    this.debouncedCheckScrollable = debounce(10, () => this.checkScrollable())
   },
 
   mounted () {
@@ -828,8 +741,7 @@ export default {
     })
   },
 
-  beforeDestroy () {
-    this.store.states.destroying = true
+  destroyed () {
     window.removeEventListener('load', this.windowLoadListener)
     window.removeEventListener('scroll', this.windowScrollListener)
     window.removeEventListener('resize', this.resizeListener)
