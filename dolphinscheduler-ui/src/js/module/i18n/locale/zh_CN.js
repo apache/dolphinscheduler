@@ -221,6 +221,7 @@ export default {
   'File Name': '文件名称',
   'File Format': '文件格式',
   'File Content': '文件内容',
+  'Upload File Size': '文件大小不能超过1G',
   'Create': '创建',
   'Please enter the resource content': '请输入资源内容',
   'File Details': '文件详情',

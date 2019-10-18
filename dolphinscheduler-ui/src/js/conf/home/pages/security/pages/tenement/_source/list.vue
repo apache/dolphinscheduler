@@ -59,7 +59,8 @@
             </span>
           </td>
           <td>
-            <span class="ellipsis" v-tooltip="item.desc">{{item.desc || '-'}}</span>
+            <span v-if="item.desc" class="ellipsis" v-tooltip="item.desc">{{item.desc}}</span>
+            <span v-else>-</span>
           </td>
           <td>
             <span>{{item.queueName}}</span>

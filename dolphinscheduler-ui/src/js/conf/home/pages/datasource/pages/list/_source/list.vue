@@ -63,7 +63,10 @@
               </span>
             </m-tooltips-JSON>
           </td>
-          <td><span class="ellipsis" v-tooltip="item.note">{{item.note || '-'}}</span></td>
+          <td>
+            <span v-if="item.note" class="ellipsis" v-tooltip="item.note">{{item.note}}</span>
+            <span v-else>-</span>
+          </td>
           <td>
             <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
             <span v-else>-</span>
