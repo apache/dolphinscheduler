@@ -68,6 +68,7 @@
       <div slot="content">
         <x-radio-group v-model="deployMode">
           <x-radio :label="'cluster'" :disabled="isDetails"></x-radio>
+          <x-radio :label="'local'" :disabled="isDetails"></x-radio>
         </x-radio-group>
       </div>
     </m-list-box>
