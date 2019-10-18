@@ -589,8 +589,8 @@ public class ProcessDefinitionService extends BaseDAGService {
                     Schedule schedule = schedules.get(0);
                     row.put("scheduleWarningType", schedule.getWarningType());
                     row.put("scheduleWarningGroupId", schedule.getWarningGroupId());
-                    row.put("scheduleStartTime", schedule.getStartTime());
-                    row.put("scheduleEndTime", schedule.getEndTime());
+                    row.put("scheduleStartTime", DateUtils.dateToString(schedule.getStartTime()));
+                    row.put("scheduleEndTime", DateUtils.dateToString(schedule.getEndTime()));
                     row.put("scheduleCrontab", schedule.getCrontab());
                     row.put("scheduleFailureStrategy", schedule.getFailureStrategy());
                     row.put("scheduleReleaseState", ReleaseState.OFFLINE);
@@ -748,6 +748,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     scheduleObj.setUpdateTime(now);
                     scheduleObj.setUserId(loginUser.getId());
                     scheduleObj.setUserName(loginUser.getUserName());
+
 
                     scheduleCrontab = json.get("scheduleCrontab").toString();
                     scheduleObj.setCrontab(scheduleCrontab);
