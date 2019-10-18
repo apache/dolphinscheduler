@@ -1026,10 +1026,15 @@ public class ProcessDao extends AbstractBaseDao {
     public String taskZkInfo(TaskInstance taskInstance) {
 
         int taskWorkerGroupId = getTaskWorkerGroupId(taskInstance);
+        ProcessInstance processInstance = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
+        if(processInstance == null){
+            logger.error("process instance is null. please check the task info, task id: " + taskInstance.getId());
+            return "";
+        }
 
         StringBuilder sb = new StringBuilder(100);
 
-        sb.append(taskInstance.getProcessInstancePriority().ordinal()).append(Constants.UNDERLINE)
+        sb.append(processInstance.getProcessInstancePriority().ordinal()).append(Constants.UNDERLINE)
                 .append(taskInstance.getProcessInstanceId()).append(Constants.UNDERLINE)
                 .append(taskInstance.getTaskInstancePriority().ordinal()).append(Constants.UNDERLINE)
                 .append(taskInstance.getId()).append(Constants.UNDERLINE);
