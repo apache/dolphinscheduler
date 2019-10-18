@@ -1,7 +1,7 @@
 <template>
   <div style="margin-bottom: 20px;">
     <div style="line-height: 40px;">性能演示</div>
-    <x-table affix border virtual-scroll height="300" :default-column-width="200" row-key="rowId" :data="tableData" :cellSpanMethod="cellSpanMethod">
+    <x-table affix internal-paging border height="400" :default-column-width="200" row-key="rowId" :data="tableData">
       <x-table-column type="selection"></x-table-column>
       <x-table-column
         v-for="(header, i) in headers"
@@ -12,18 +12,7 @@
         :label="header.label"
         sortable
         :sort-method="sortMethod"
-      >
-        <template slot="prepend" slot-scope="scope">
-          <div :style="{margin:i === 2 ? '0 0 0 10px' : '0 10px 0 0'}">这是前置插槽{{scope.$index}}</div>
-        </template>
-        <template slot="append" slot-scope="scope">
-          <div>这是后置插槽{{scope.$index}}</div>
-        </template>
-        <template slot="headerText" slot-scope="scope">
-          <div>这是表头文本插槽</div>
-          <div>{{scope.column.label}}</div>
-        </template>
-      </x-table-column>
+      ></x-table-column>
     </x-table>
   </div>
 </template>
@@ -59,24 +48,6 @@ export default {
     },
     sortMethod (a, b) {
       return a - b
-    },
-    cellSpanMethod ({ row, column, rowIndex, columnIndex }) {
-      // console.log('span')
-      if (rowIndex % 2 === 0) {
-        if (columnIndex === 1) {
-          return [1, 2]
-        } else if (columnIndex === 2) {
-          return [0, 0]
-        }
-      }
-      if (columnIndex === 3) {
-        if (rowIndex === 10) {
-          return [5, 1]
-        } else if ([11, 12, 13, 14].includes(rowIndex)) {
-          return [0, 0]
-        }
-      }
-      return [1, 1]
     }
   }
 }

@@ -21,17 +21,13 @@ multiple | 是否开启多选 | Boolean | — | false
 filterable | 是否开启搜索功能 | Boolean | — | false
 filter-props | 当 option 的绑定值为对象时，搜索查找的对应属性列表 | Array | — | —
 no-data-text | 选项为空时显示的文字 | String | — | 暂无数据
-no-data-icon | 选项为空时显示的图标类名 | String | — | ans-icon-no-data
-highlight-matched-text | 搜索时是否高亮选项中匹配的文字 | Boolean | — | false
-ignore-case | 搜索时是否忽略大小写，可以和 filter-props 以及 highlight-matched-text 配合使用 | Boolean | — | false
+highlight-matched-text | 搜索时是否高亮选项中匹配的文字，(仅当未设置 filter-props 时可用) | Boolean | — | false
 no-match-text | 搜索没有任何匹配项时显示的文字 | String | — | 搜索无结果
-no-match-icon | 搜索没有任何匹配项时显示的图标类名 | String | — | ans-icon-search-no-data
 has-arrow | 下拉框是否显示指示箭头 | Boolean | — | false
 append-to-body | 下拉框是否插入 body | Boolean | — | false
 position-fixed | 下拉框是否 fixed 定位 | Boolean | — | false
 viewport | 下拉框是否基于 viewport 定位 | Boolean | — | false
 popper-options | Popper.js 的可选项 | Object | — | —
-dropdown-class | 下拉框样式 | String | — | —
 scrollbar-class | 滚动条样式 | String | — | —
 drop-animation | 下拉框动画 | String | — | —
 
@@ -41,7 +37,6 @@ drop-animation | 下拉框动画 | String | — | —
 --- | --- | ---
 on-change | 选中值发生变化时触发 | 目前的选中值，{ value: value, label: label }
 on-visible-change | 下拉框状态改变时触发 | 出现则为 true，隐藏则为 false
-on-keyword-change | 搜索关键字改变时触发 | keyword
 
 ### Select methods
 
@@ -52,7 +47,6 @@ blur | 使 input 失去焦点并且隐藏下拉框 | —
 search | 搜索 | keyword
 updateScrollbar | 更新下拉框内的滚动条 | —
 resetScrollbar | 将滚动条移回到顶部 | —
-setDropdownReference | 手动指定下拉框的触发元素 | dom 元素
 
 ### Select slots
 
@@ -62,6 +56,7 @@ trigger | Select 组件触发元素的插槽 | selectedModel
 multiple | 开启多选时，控制 input 内如何显示的插槽 | selectedList
 header | 下拉框头部插槽，必须使用作用域插槽 | —
 footer | 下拉框底部插槽，必须使用作用域插槽 | —
+empty | 数据为空时可使用该插槽 | —
 
 ### OptionGroup props
 

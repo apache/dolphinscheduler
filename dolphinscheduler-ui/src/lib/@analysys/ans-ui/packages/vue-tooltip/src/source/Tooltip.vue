@@ -1,8 +1,8 @@
 <template>
   <transition :name="transitionName">
-    <div v-show="visible" :class="[wrapperClass, theme, {large}]">
+    <div v-show="visible" :class="[wrapperClass, theme]">
       <div class="tooltip-content" :style="contentStyles" v-html="content"></div>
-      <div :class="[arrowClass, {large}]" x-arrow ref="arrow"></div>
+      <div :class="arrowClass" x-arrow ref="arrow"></div>
     </div>
   </transition>
 </template>
@@ -21,24 +21,12 @@ export default {
     }
   },
   props: {
-    // 触发事件
-    triggerEvent: {
-      type: String,
-      validator (v) {
-        return ['click', 'mouseenter', 'manual'].includes(v)
-      },
-      default: 'mouseenter'
-    },
     // 提示文本
     content: String,
     // 主题
     theme: String,
     // 提示框最大宽度
-    maxWidth: String,
-    // 是否启用大号 Tooltip
-    large: Boolean,
-    // 当 triggerEvent 为 `manual` 的时候，控制 tooltip 是否显示
-    reveal: Boolean
+    maxWidth: String
   },
   computed: {
     contentStyles () {
@@ -55,27 +43,17 @@ export default {
       this.visible = false
     },
     update (options) {
-      if (options.triggerEvent === 'manual') {
-        if (options.reveal === false) {
-          return this.hide()
-        } else if (options.reveal === true) {
-          this.show()
-        }
-      }
-
       this.content = options.text
       this.theme = options.theme
-      this.large = !!options.large
       this.maxWidth = options.maxWidth
       if (this.visible) {
         this.updateElementHandler()
       }
     }
   },
-  mounted () {
-    if (this.triggerEvent === 'manual' && this.reveal) {
-      this.show()
-    }
+  beforeDestroy () {
+    // 调用 Popper 方法
+    this.destroyPopper()
   }
 }
 </script>

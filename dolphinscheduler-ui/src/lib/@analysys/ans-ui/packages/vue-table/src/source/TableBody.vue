@@ -5,35 +5,37 @@
     cellpadding="0"
     border="0">
     <colgroup>
-      <col :name="column.id" v-for="(column, i) in renderedColColumns" :key="i">
+      <col :name="column.id" v-for="column in colColumns" :key="column.id">
     </colgroup>
     <tbody>
       <template v-for="(row, i) in data">
         <tr
-          :key="row.key"
+          :key="getRowKey(i, row)"
+          :table-row-key="getRowKey(i, row)"
           class="table-row"
-          :class="[row.classes, {'highlight-row': row.key === table.currentRowKey}]"
+          :class="getRowClasses(i)"
           @mouseenter="handleMouseEnter(i)"
           @mouseleave="handleMouseLeave()">
           <x-table-td
-            v-for="(cell, j) in row.renderedCells"
-            :key="row.key + '-' + cell.column.id"
-            :class="columnClasses[cell.columnIndex]"
+            v-for="(column, j) in colColumns"
+            :key="column.id"
+            :class="getCellClasses(j === colColumns.length -1)"
             :store="store"
-            :row="row.item"
-            :column="cell.column"
+            :row="row"
+            :column="column"
             :first="firstTextColumnIndex === j"
-            :row-index="row.rowIndex"
-            :cell="cell"
+            :row-index="i"
+            :column-index="j"
+            :fixed="fixed"
           ></x-table-td>
         </tr>
-        <tr v-if="expandable && expandRows.includes(row.item)" :key="'expand_' + i">
-          <td class="table-cell" :class="getCellClasses(false)" :colspan="renderedColColumns.length">
+        <tr v-if="expandable && expandRows.includes(row)" :key="'expand_' + getRowKey(i, row)">
+          <td class="table-cell" :class="getCellClasses(false)" :colspan="colColumns.length">
             <x-cell-renderer
               expand
-              :row="row.item"
-              :r-index="row.rowIndex"
-              :custom-render="table.expendRender">
+              :row="row"
+              :r-index="i"
+              :render="table.expendRender">
             </x-cell-renderer>
           </td>
         </tr>
@@ -43,9 +45,9 @@
 </template>
 
 <script>
-import { LIB_NAME, addClass, removeClass } from '../../../../src/util'
+import { LIB_NAME, addClass, removeClass, getValueByPath } from '../../../../src/util'
 import xTableTd from './TableTd'
-import xCellRenderer from './CellRenderer.vue'
+import xCellRenderer from './cellRenderer.js'
 import layoutObserver from './layoutObserver.js'
 
 export default {
@@ -70,18 +72,16 @@ export default {
       return this.store.states.data
     },
 
-    renderedColColumns () {
-      return this.store.states.renderedColColumns
+    columns () {
+      return this.store.states.columns
+    },
+
+    leafColumns () {
+      return this.store.states.leafColumns
     },
 
     colColumns () {
-      return this.store.states.colColumns
-    },
-
-    columnClasses () {
-      const target = this.colColumns
-      const maxIndex = target.length - 1
-      return target.map((c, i) => this.getCellClasses(i === maxIndex, c))
+      return this.table.multiLayerHeader ? this.leafColumns : this.columns
     },
 
     firstTextColumnIndex () {
@@ -94,10 +94,6 @@ export default {
 
     expandRows () {
       return this.store.states.expandRows
-    },
-
-    sortingColumn () {
-      return this.store.states.sortingColumn
     }
   },
 
@@ -128,13 +124,30 @@ export default {
   },
 
   methods: {
-    getCellClasses (transparent, column) {
+    getRowKey (i, row) {
+      if (!row) {
+        throw new Error('Table Body: Find invalid row!')
+      }
+      const rowKey = this.table.rowKey
+      if (rowKey) {
+        return getValueByPath(row, rowKey)
+      }
+      return i
+    },
+
+    getRowClasses (i) {
+      const classes = []
+      if (this.stripe) {
+        classes.push(i % 2 === 1 ? 'striped-row' : 'no-striped-row')
+      }
+      return classes
+    },
+
+    getCellClasses (transparent) {
       return {
         'right-border': this.border,
         'bottom-border': this.border || !this.stripe,
-        'transparent-border': this.fixed && transparent,
-        'sorting-column': column && this.sortingColumn === column,
-        'hidden-column': column && ((this.fixed && !column.fixed) || (!this.fixed && column.fixed))
+        'transparent-border': this.fixed && transparent
       }
     },
 

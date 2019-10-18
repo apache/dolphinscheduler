@@ -1,14 +1,14 @@
 $tooltip-wrapper-name: $lib-name + "-tooltip";
 
-$tooltip-dark-bg-color: rgba($title-color-light, 0.95);
-$tooltip-dark-text-color: $background-color-disabled;
+$tooltip-dark-bg-color: $background-color-dark;
+$tooltip-dark-text-color: $title-color-dark;
 
 $tooltip-light-bg-color: $background-color-base;
 $tooltip-light-border-color: $border-color-base;
 $tooltip-light-text-color: $title-color-light;
 
 .#{$tooltip-wrapper-name} {
-  padding: 8px;
+  padding: 6px 10px;
   border-radius: 4px;
   &.dark {
     background: $tooltip-dark-bg-color;
@@ -26,16 +26,8 @@ $tooltip-light-text-color: $title-color-light;
     }
   }
   .tooltip-content {
-    font-size: 12px;
-    line-height: 1;
+    font-size: 14px;
+    line-height: 20px;
     text-align: justify;
-  }
-  &.large {
-    padding: 12px 16px;
-    border-radius: 6px;
-    .tooltip-content {
-      font-size: 13px;
-      line-height: 21px;
-    }
   }
 }

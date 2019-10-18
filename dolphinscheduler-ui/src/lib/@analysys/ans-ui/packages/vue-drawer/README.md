@@ -13,4 +13,3 @@ escClose | 是否按 esc 键关闭 | Boolean | - | true
 transitionName | 动画类名 | String | - | -
 showMask | 是否显示遮罩 | Boolean | - | true
 maskClosable | 是否关闭遮罩 | Boolean | - | true
-i18n | 国际化对象 | VueI18n | - | -

@@ -13,8 +13,7 @@ let defaultConfig = {
   // 设置出现的位置在浏览器顶部的距离
   top: 60,
   transitionName: `${ANIMATION_PREFIX}move-in`,
-  fixed: true,
-  i18n: null
+  fixed: true
 }
 
 let iconTypes = {
@@ -25,28 +24,20 @@ let iconTypes = {
   'loading': 'ans-icon-spinner'
 }
 
-function getMessageInstance (i18n) {
+function getMessageInstance () {
   messageInstance = messageInstance || BoxManager.newInstance({
     prefixCls: prefixCls,
     styles: {
       top: defaultConfig.top + 'px',
       left: '50%'
     },
-    className: defaultConfig.fixed ? `${prefixCls}-fixed` : '',
-    i18n
+    className: defaultConfig.fixed ? `${prefixCls}-fixed` : ''
   })
   return messageInstance
 }
 
-function notice (
-  content = '',
-  duration = defaultConfig.duration,
-  type,
-  onClose = function () {},
-  closable = false,
-  i18n = defaultConfig.i18n
-) {
-  let instance = getMessageInstance(i18n)
+function notice (content = '', duration = defaultConfig.duration, type, onClose = function () {}, closable = false) {
+  let instance = getMessageInstance()
 
   instance.notice({
     name: `${prefixKey}${name}`,
@@ -79,23 +70,23 @@ export default {
   name: 'Message',
   info (options) {
     options = formatOptions(options)
-    return notice(options.content, options.duration, 'info', options.onClose, options.closable, options.i18n)
+    return notice(options.content, options.duration, 'info', options.onClose, options.closable)
   },
   success (options) {
     options = formatOptions(options)
-    return notice(options.content, options.duration, 'success', options.onClose, options.closable, options.i18n)
+    return notice(options.content, options.duration, 'success', options.onClose, options.closable)
   },
   warning (options) {
     options = formatOptions(options)
-    return notice(options.content, options.duration, 'warning', options.onClose, options.closable, options.i18n)
+    return notice(options.content, options.duration, 'warning', options.onClose, options.closable)
   },
   error (options) {
     options = formatOptions(options)
-    return notice(options.content, options.duration, 'error', options.onClose, options.closable, options.i18n)
+    return notice(options.content, options.duration, 'error', options.onClose, options.closable)
   },
   loading (options) {
     options = formatOptions(options)
-    return notice(options.content, options.duration, 'loading', options.onClose, options.closable, options.i18n)
+    return notice(options.content, options.duration, 'loading', options.onClose, options.closable)
   },
   config (cfg = {}) {
     defaultConfig = Object.assign(defaultConfig, cfg)

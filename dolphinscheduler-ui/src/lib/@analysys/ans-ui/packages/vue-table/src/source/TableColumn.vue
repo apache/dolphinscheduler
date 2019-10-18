@@ -32,23 +32,13 @@ const getDefaultColumn = (type, options) => {
   }
 
   if (column.width !== undefined) {
-    column.width = parseWidth(column.width)
+    column.width = parseInt(column.width)
   }
 
   column.currentWidth = column.width || column.minWidth
 
   return column
 }
-
-const parseWidth = (width) => {
-  if (width !== undefined) {
-    width = parseInt(width, 10);
-    if (isNaN(width)) {
-      width = null;
-    }
-  }
-  return width;
-};
 
 export default {
   name: 'xTableColumn',
@@ -68,9 +58,6 @@ export default {
 
     // 列宽
     width: [Number, String],
-
-    // 最小列宽
-    minWidth: [Number, String],
 
     // 是否固定列，也可传字符串 `left` 或  `right`
     fixed: [Boolean, String],
@@ -145,22 +132,16 @@ export default {
 
     width (newVal) {
       if (this.columnConfig) {
-        this.columnConfig.width = parseWidth(newVal)
-        this.owner.store.scheduleLayout()
-      }
-    },
-
-    minWidth (newVal) {
-      if (this.columnConfig) {
-        this.columnConfig.minWidth = parseWidth(newVal)
-        this.owner.store.scheduleLayout()
+        this.columnConfig.width = typeof newVal === 'string' ? parseInt(newVal) : newVal
+        this.owner.doLayout()
       }
     },
 
     fixed (newVal) {
       if (this.columnConfig) {
         this.columnConfig.fixed = newVal
-        this.owner.store.scheduleLayout(true)
+        this.owner.store.updateColumns()
+        this.owner.doLayout()
       }
     },
 
@@ -185,7 +166,6 @@ export default {
       label: this.label,
       prop: this.prop,
       width: this.width,
-      minWidth: parseWidth(this.minWidth),
       fixed: this.fixed,
       sortable: this.sortable === '' ? true : this.sortable,
       sortMethod: this.sortMethod,
@@ -193,9 +173,7 @@ export default {
       resizable: this.resizable,
       formatter: this.formatter,
       align: this.align,
-      headerAlign: this.headerAlign,
-      parent: parent.columnConfig,
-      destroyed: false
+      headerAlign: this.headerAlign
     })
   },
 
@@ -250,18 +228,12 @@ export default {
       columnConfig.headerText = (h, scope) => $scopedSlots.headerText(scope)
     }
 
-    // 树结构文本插槽
-    if ($scopedSlots.treeText) {
-      columnConfig.treeText = (h, scope) => $scopedSlots.treeText(scope)
-    }
-
     owner.store.commit('insertColumn', columnConfig, columnIndex, isSubColumn ? parent.columnConfig : null)
   },
 
   destroyed () {
     if (!this.$parent) return
     const parent = this.$parent
-    this.columnConfig.destroyed = true
     this.owner.store.commit('removeColumn', this.columnConfig, this.isSubColumn ? parent.columnConfig : null)
   }
 }

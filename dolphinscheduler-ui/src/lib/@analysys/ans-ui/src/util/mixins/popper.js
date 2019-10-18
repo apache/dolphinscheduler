@@ -1,5 +1,4 @@
 import PopperJS from 'popper.js'
-import merge from 'deepmerge'
 
 export default {
   data () {
@@ -23,6 +22,7 @@ export default {
       default: 8
     },
     // 是否将弹出元素插入到 body
+    // 当弹出元素的父元素设置了 overflow: hidden 的时候可设置为 true
     appendToBody: {
       type: Boolean,
       default: false
@@ -53,6 +53,14 @@ export default {
 
         if (appendToBody) document.body.appendChild(popperEl)
 
+        const options = Object.assign({}, this.popperOptions)
+        options.placement = this.placement
+        if (!options.modifiers) {
+          options.modifiers = {}
+        }
+        if (!options.modifiers.offset) {
+          options.modifiers.offset = {}
+        }
         // 控制偏移的函数
         const addDistance = (data) => {
           const { arrowStyles, offsets, placement, styles } = data
@@ -103,38 +111,29 @@ export default {
           }
           return data
         }
-
-        const options = {
-          placement: this.placement,
-          modifiers: {
-            computeStyle: {},
-            preventOverflow: {},
-            hide: {}
-          }
+        if (!options.modifiers.computeStyle) {
+          options.modifiers.computeStyle = {}
         }
-
-        const merged = merge(options, this.popperOptions || {})
-
         // 关闭 GPU 加速，防止字体模糊
-        merged.modifiers.computeStyle.gpuAcceleration = false
-        merged.modifiers.computeStyle.fn = (data, options) => {
+        options.modifiers.computeStyle.gpuAcceleration = false
+        options.modifiers.computeStyle.fn = (data, options) => {
           data = PopperJS.Defaults.modifiers.computeStyle.fn(data, options)
           return addDistance(data)
         }
 
-        if (this.positionFixed) {
-          merged.positionFixed = true
+        // fix position bug
+        if (!options.hasOwnProperty('positionFixed') && this.positionFixed) {
+          options.positionFixed = true
         }
-        if (this.viewport) {
-          merged.modifiers.preventOverflow.boundariesElement = 'viewport'
+        // fix overflow bug
+        if (!options.modifiers.preventOverflow) {
+          options.modifiers.preventOverflow = {}
         }
-        // fix popper.js warning
-        if (merged.modifiers.preventOverflow.hasOwnProperty('enabled') &&
-          !merged.modifiers.preventOverflow.enabled) {
-          merged.modifiers.hide.enabled = false
+        if (!options.modifiers.preventOverflow.hasOwnProperty('boundariesElement') && this.viewport) {
+          options.modifiers.preventOverflow.boundariesElement = 'viewport'
         }
 
-        this.popperInstance = new PopperJS(referenceEl, popperEl, merged)
+        this.popperInstance = new PopperJS(referenceEl, popperEl, options)
       }
     },
     hideElementHandler () {

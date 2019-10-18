@@ -1,5 +1,5 @@
 <template>
-	<div class="x-date-packer-panel" @click.stop>
+	<div class="x-date-packer-panel">
 		<years :types="type" ref="years" style="position:inherit;" @change="change"></years>
 	</div>
 </template>

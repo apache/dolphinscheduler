@@ -2,7 +2,7 @@ $component-name: $lib-name + "-table";
 $table-border-color: $border-color-base;
 $table-header-bg: $background-color-disabled;
 $table-stripe-row-bg: lighten($background-color-disabled, 1);
-$table-row-hover-bg: lighten($primary-color, 49);
+$table-row-hover-bg: lighten($primary-color-hover, 45);
 $order-triangle-height: 4px;
 
 .#{$component-name} {
@@ -35,21 +35,6 @@ $order-triangle-height: 4px;
       height: 100%;
       background: $table-border-color;
       content: "";
-    }
-    .fixed-left-table-wrapper.no-shadow::after,
-    .fixed-right-table-wrapper.no-shadow::after {
-      position: absolute;
-      content: "";
-      top: 0;
-      width: 1px;
-      height: 100%;
-      background: $table-border-color;
-    }
-    .fixed-left-table-wrapper.no-shadow::after {
-      right: 0;
-    }
-    .fixed-right-table-wrapper.no-shadow::after {
-      right: left;
     }
   }
   .hidden-content {
@@ -96,6 +81,9 @@ $order-triangle-height: 4px;
     &.bottom-border {
       border-bottom: 1px solid $table-border-color;
     }
+    &.hidden-column {
+      visibility: hidden;
+    }
   }
   .table-header-cell-content,
   .table-cell-content {
@@ -121,6 +109,19 @@ $order-triangle-height: 4px;
         &:hover {
           color: $primary-color;
         }
+      }
+    }
+    .unfold-icon {
+      margin-left: 8px;
+      cursor: pointer;
+      color: $sub-text-color-light;
+      font-size: 12px;
+      transition: transform $transition-time;
+      &:hover {
+        color: $primary-color;
+      }
+      &.rotate-down {
+        transform: rotate(90deg);
       }
     }
   }
@@ -175,34 +176,9 @@ $order-triangle-height: 4px;
     color: $content-color-light;
     @for $i from 1 through 9 {
       &.row-level-#{$i} {
-        padding-left: 8px + 20px * ($i - 1);
+        padding-left: 12px * $i;
       }
     }
-    &.flex-wrapper {
-      display: flex;
-    }
-    .unfold-icon {
-      margin-right: 8px;
-      cursor: pointer;
-      color: $sub-text-color-light;
-      font-size: 12px;
-      transition: transform $transition-time;
-      &:hover {
-        color: $primary-color;
-      }
-      &.rotate-down {
-        transform: rotate(90deg);
-      }
-    }
-  }
-  .tree-branch-text {
-    cursor: pointer;
-  }
-  .ellipsis-text,
-  .ellipsis-text .tree-branch-text {
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
   }
   &.affix-table-header {
     .affix {
@@ -228,7 +204,6 @@ $order-triangle-height: 4px;
     }
     .affix {
       z-index: 15;
-      background: transparent;
     }
     .table-header-wrapper,
     .table-body-wrapper {
@@ -274,12 +249,6 @@ $order-triangle-height: 4px;
       }
       &.#{$lib-name}-v-scrollbar {
         z-index: 16;
-      }
-    }
-    .table-header-cell,
-    .table-cell {
-      &.hidden-column {
-        visibility: hidden;
       }
     }
   }

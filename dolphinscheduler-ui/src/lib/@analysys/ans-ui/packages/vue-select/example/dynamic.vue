@@ -3,7 +3,7 @@
     <section class="demo-section">
       <h4>动态 Option</h4>
       <div>
-        <x-select height="500">
+        <x-select>
           <div style="padding:10px 20px;" slot="header" slot-scope="header">
             <x-input v-model="keyword"/>
           </div>

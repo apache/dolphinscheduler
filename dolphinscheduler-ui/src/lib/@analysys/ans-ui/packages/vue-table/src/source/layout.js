@@ -11,8 +11,6 @@ export default class TableLayout {
     this.scrollX = false
     this.scrollY = false
     this.bodyWidth = null
-    this.tableWidth = null
-    this.tableWrapperWidth = null
     this.fixedLeftWidth = 0
     this.fixedRightWidth = 0
     this.height = null
@@ -20,6 +18,12 @@ export default class TableLayout {
     this.headerHeight = null
     this.bodyHeight = null
     this.parentHeight = null
+    this.referenceRowId = null
+    this.referenceRowIndex = null
+    this.referenceRowPositionY = null
+    this.referenceRowOffsetTop = null
+    this.loading = false
+    this.slicing = false
 
     this.observers = []
     for (let name in options) {
@@ -68,12 +72,10 @@ export default class TableLayout {
         // can't use nexttick, dead loop
         return limitedLoop.setTimeout(this.updateScrollY, this, 0)
       }
-      // reset
-      this.updateScrollY.startTime = null
 
       if (this.table.restrict) {
         const parentHeight = this.parentHeight = this.table.$el.parentNode.clientHeight
-        if (this.table.$refs.scroller.$refs.content.clientHeight + this.headerHeight > parentHeight) {
+        if (this.tableHeight > parentHeight) {
           this.table.$el.style.height = parentHeight + 'px'
           this.tableHeight = parentHeight
           this.bodyHeight = this.tableHeight - this.headerHeight
@@ -83,7 +85,7 @@ export default class TableLayout {
             this.scrollY = false
           }
         }
-        Vue.nextTick(() => this.table.debouncedCheckScrollable())
+        Vue.nextTick(() => this.table.checkScrollable())
       } else {
         this.scrollY = tableBodyHeight > this.bodyHeight
       }
@@ -103,9 +105,6 @@ export default class TableLayout {
     if (!el && (value || value === 0)) {
       return limitedLoop.nextTick(this.setHeight, this, value)
     }
-    // reset
-    this.setHeight.startTime = null
-
     if (typeof value === 'number') {
       el.style.height = value + 'px'
       this.updateElsHeight()
@@ -117,7 +116,7 @@ export default class TableLayout {
 
   updateElsHeight () {
     if (!this.table.$ready) return
-    const { headerWrapper, scroller } = this.table.$refs
+    const { headerWrapper } = this.table.$refs
     const { $el, restrict } = this.table
 
     if (this.showHeader && !headerWrapper) return
@@ -125,40 +124,27 @@ export default class TableLayout {
     if (this.showHeader && headerWrapper.clientWidth > 0 && (this.store.states.columns || []).length > 0 && headerHeight < 10) {
       return limitedLoop.nextTick(this.updateElsHeight, this)
     }
-    // reset
-    this.updateElsHeight.startTime = null
-
-    if (restrict && this.parentHeight) {
-      const data = this.store.states.data
-      if (!data || !data.length) return
-
-      if (scroller.$el.clientHeight > scroller.$refs.content.clientHeight) {
-        $el.style.height = scroller.$refs.content.clientHeight + this.headerHeight + 'px'
-        this.bodyHeight = null
-        return limitedLoop.nextTick(this.updateElsHeight, this)
-      } else if (Math.abs(scroller.$el.clientHeight + this.headerHeight - $el.clientHeight) > 2) {
-        $el.style.height = 'auto'
-        this.bodyHeight = null
-        return limitedLoop.nextTick(this.updateElsHeight, this)
-      } else if ($el.parentNode && this.parentHeight !== $el.parentNode.clientHeight) {
-        $el.style.height = 'auto'
-        this.bodyHeight = null
-        this.parentHeight = $el.parentNode.clientHeight
-        return limitedLoop.nextTick(this.updateElsHeight, this)
-      }
+    if (restrict && this.parentHeight && this.parentHeight !== $el.parentNode.clientHeight) {
+      $el.style.height = 'auto'
+      this.bodyHeight = null
+      this.parentHeight = $el.parentNode.clientHeight
+      return Vue.nextTick(() => this.updateElsHeight())
     }
 
-    const tableHeight = this.tableHeight = $el.clientHeight
+    const tableHeight = this.tableHeight = this.table.$el.clientHeight
+    const oldBodyHeight = this.bodyHeight
     if (this.height !== null && (!isNaN(this.height) || typeof this.height === 'string')) {
       this.bodyHeight = tableHeight - headerHeight
     }
 
     this.updateScrollY()
-    Vue.nextTick(() => this.table.debouncedCheckScrollable())
+    if (oldBodyHeight !== this.bodyHeight) {
+      Vue.nextTick(() => this.table.checkScrollable())
+    }
   }
 
   updateColumnsWidth () {
-    const bodyWidth = this.tableWrapperWidth = this.table.$el.clientWidth
+    const bodyWidth = this.table.$el.clientWidth
     const fit = this.fit
     let bodyMinWidth = 0
 
@@ -212,10 +198,79 @@ export default class TableLayout {
       })
       this.fixedRightWidth = fixedRightWidth
     }
-    this.store.updateRenderData()
+
+    Vue.nextTick(() => {
+      this.notifyObservers('columns')
+      this.table.checkScrollable()
+    })
   }
 
-  updateTableWidth (width) {
-    this.tableWidth = width || this.bodyWidth
+  beforeJump (goBack) {
+    const bodyWrapper = this.table.$refs.bodyWrapper
+    if (bodyWrapper) {
+      this.loading = true
+      this.table.scrollerDisabled = true
+      this.store.commit('setHoverRowIndex', null)
+      const referenceRow = goBack
+        ? bodyWrapper.querySelector('.table-row:first-child')
+        : bodyWrapper.querySelector('.table-row:last-child')
+      if (referenceRow) {
+        this.referenceRowId = referenceRow.getAttribute('table-row-key')
+        this.referenceRowIndex = Array.prototype.indexOf.call(referenceRow.parentNode.children, referenceRow)
+        this.referenceRowPositionY = referenceRow.getBoundingClientRect().top
+        this.referenceRowOffsetTop = referenceRow.offsetTop
+      }
+    }
+  }
+
+  afterJump (noReference) {
+    const bodyWrapper = this.table.$refs.bodyWrapper
+    if (bodyWrapper) {
+      Vue.nextTick(() => {
+        if (!this.referenceRowId || noReference) return this.scrollTableToView()
+
+        const referenceRow = bodyWrapper.querySelector(`.table-row[table-row-key='${this.referenceRowId}']`)
+        if (!referenceRow) return this.scrollTableToView()
+
+        const referenceRowIndex = Array.prototype.indexOf.call(referenceRow.parentNode.children, referenceRow)
+
+        if (referenceRowIndex === this.referenceRowIndex) return limitedLoop.nextTick(this.afterJump, this)
+
+        // finished
+        let diff = this.scrollY
+          ? referenceRow.offsetTop - this.referenceRowOffsetTop
+          : referenceRow.getBoundingClientRect().top - this.referenceRowPositionY
+        if (this.scrollY) {
+          this.table.moveBodyTopByDiff(diff)
+        } else {
+          window.scrollBy(0, diff)
+        }
+        this.finishSlicing()
+      })
+    }
+  }
+
+  scrollTableToView () {
+    if (this.scrollY) {
+      this.table.setBodyTop(0)
+    } else {
+      const tableY = this.table.$el.getBoundingClientRect().top
+      if (tableY < 0) {
+        window.scrollBy(0, this.table.$el.getBoundingClientRect().top)
+      }
+    }
+    this.finishSlicing()
+  }
+
+  finishSlicing () {
+    Vue.nextTick(() => {
+      this.slicing = false
+      this.loading = false
+      // hack scroller event
+      setTimeout(() => {
+        this.table.scrollerDisabled = false
+        this.table.checkScrollable()
+      }, 500)
+    })
   }
 }

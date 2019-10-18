@@ -23,8 +23,12 @@ bar-offset-bottom | 垂直滚动条距离视图底部的偏移 | Number | — | 
 
 事件名称 | 说明 | 回调参数
 --- | --- | ---
-on-scroll-x | 水平滚动改变时触发 | 当前的 left 值，是否达到最左侧，是否达到最右侧
-on-scroll-y | 垂直滚动改变时触发 | 当前的 top 值，是否达到最顶部，是否达到最底部
+on-x-start | 水平滚动到达最左侧时触发 | —
+on-scroll-x | 水平滚动改变时触发 | 当前的 left 值
+on-x-end | 水平滚动到达最右侧时触发 | —
+on-y-start | 垂直滚动到达顶部时触发 | —
+on-scroll-y | 垂直滚动改变时触发 | 当前的 top 值
+on-y-end | 垂直滚动到达底部时触发 | —
 on-start-drag-bar | 开始拖动滚动条时触发 | 是否垂直滚动条
 on-end-drag-bar | 结束拖动滚动条时触发 | 是否垂直滚动条
 

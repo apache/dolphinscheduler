@@ -45,21 +45,6 @@ $prefixCls: $lib-name + "-checkbox";
       }
     }
   }
-  .is-indeterminate {
-    .#{$prefixCls}-inner {
-      border-color: $primary-color;
-      background-color: $primary-color;
-      &:after {
-        transition: none;
-        transform: none;
-        background: #fff;
-        border: none;
-        width: 6px;
-        height: 2px;
-        top: 5px;
-      }
-    }
-  }
   .#{$prefixCls}-inner {
     width: 14px;
     height: 14px;

@@ -67,6 +67,7 @@
       <div ref="append" class="append-area" v-if="$slots.append">
         <slot name="append"></slot>
       </div>
+      <div class="no-border-shadow" v-if="noBorder" v-show="focused"></div>
     </template>
     <textarea
       v-else
@@ -299,7 +300,6 @@ export default {
     clear () {
       this.setCurrentValue('')
       this.focus()
-      this.$emit('input', '')
     },
     /**
      * 文本域自适应

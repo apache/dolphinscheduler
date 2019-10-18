@@ -5,13 +5,19 @@ $option-font-size: 14px;
   display: inline-block;
   width: 280px;
   .inner-input {
+    .no-border-shadow {
+      display: none;
+      opacity: 0;
+    }
     &.active .input-element {
       border-color: $primary-color;
       outline: none;
+      box-shadow: 0 0 0 2px lighten($primary-color, 40);
       &.no-border {
         border-top-color: transparent;
         border-left-color: transparent;
         border-right-color: transparent;
+        box-shadow: none;
       }
     }
     .input-element {
@@ -128,6 +134,7 @@ $option-font-size: 14px;
     .input-element {
       background: $background-color-disabled;
       border: none;
+      box-shadow: none;
       border-radius: 16px;
       &:hover {
         background: lighten($border-color-base, 4);
@@ -135,6 +142,7 @@ $option-font-size: 14px;
       &.active {
         caret-color: $primary-color;
         background: $background-color-disabled;
+        box-shadow: none;
       }
     }
   }

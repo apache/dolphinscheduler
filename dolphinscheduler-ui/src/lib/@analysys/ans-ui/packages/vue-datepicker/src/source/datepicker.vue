@@ -3,6 +3,7 @@
     popper-class="date-poptip"
     class="x-datepicker"
     :placement="placement"
+    transition="datepicker-animation"
     :append-to-body="appendToBody"
     :position-fixed="positionFixed"
     :viewport="viewport"
@@ -275,7 +276,7 @@ export default {
 
     dateChange (data, optItem) {
       this.dateValueChange = data
-      this.optItem = optItem ? { ...optItem } : null
+      this.optItem = optItem ? JSON.parse(JSON.stringify(optItem)) : null
 
       let fmtDate = this.fmtDate(data)
 
@@ -284,6 +285,7 @@ export default {
       if (optItem && this.multiple === 1) {
         this.doClose()
       }
+
       !this.isConfirm() ? this.doClose() : this.$emit('on-text-change', fmtDate, optItem)
     },
 

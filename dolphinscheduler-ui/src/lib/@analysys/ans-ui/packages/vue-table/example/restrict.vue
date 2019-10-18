@@ -3,7 +3,7 @@
     <div style="line-height: 40px;">restrict 属性</div>
     <button @click="changeHeight">改变高度</button>
     <div style="width:800px;overflow:hidden;" :style="{height:height + 'px'}">
-      <x-table :data="tableData" border ref="table" restrict>
+      <x-table :data="tableData" ref="table" restrict>
         <x-table-column
           v-for="header in tableHeaders"
           :fixed="header.id === 1 ? 'left' : header.id === 2 ? 'right' : false"
@@ -38,17 +38,8 @@ export default {
   components: { xTable, xTableColumn },
   computed: {
     tableData () {
-      const list = this.getListData().slice(0, 1)
-      list[0].children = this.getListData()
-      list[0].children[2].children = this.getListData()
-      list[0].children[2].children[2].children = this.getListData()
-      return list
-    }
-  },
-  methods: {
-    getListData () {
       const list = []
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
         list.push({
           id: i + 1,
           name: '易小宝',
@@ -64,7 +55,9 @@ export default {
         })
       }
       return list
-    },
+    }
+  },
+  methods: {
     changeHeight () {
       this.height = this.height > 240 ? 200 : 400
       setTimeout(() => this.$refs.table.doLayout(), 200)

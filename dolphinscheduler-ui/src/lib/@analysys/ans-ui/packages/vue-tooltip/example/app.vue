@@ -60,13 +60,12 @@ export default {
     return {
       text: 'abc',
       options: {
-        triggerEvent: 'manual',
         text: '',
         placement: 'top',
         maxWidth: '100px',
         theme: 'dark',
-        large: true,
-        reveal: true
+        triggerEvent: 'mouseenter',
+        containerID: 'temp'
       }
     }
   },
@@ -78,13 +77,6 @@ export default {
       this.options.maxWidth = '120px'
       this.options.theme = 'light'
       this.options.text = this.optionText()
-      setTimeout(() => {
-        if (this.options.reveal) {
-          this.options.reveal = false
-        } else {
-          this.options.reveal = true
-        }
-      }, 1000)
     },
     optionText () {
       const copy = Object.assign({}, this.options)

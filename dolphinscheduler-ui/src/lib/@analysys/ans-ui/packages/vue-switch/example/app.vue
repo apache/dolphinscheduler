@@ -10,7 +10,7 @@
     <section class="demo-section">
       <h4>禁用状态</h4>
       <div>
-        <x-switch v-model="checked" disabled></x-switch>
+        <x-switch disabled></x-switch>
       </div>
     </section>
     <section class="demo-section">

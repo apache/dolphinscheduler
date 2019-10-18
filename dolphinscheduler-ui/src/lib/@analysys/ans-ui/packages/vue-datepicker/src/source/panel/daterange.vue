@@ -1,5 +1,5 @@
 <template>
-  <div class="date-packer-daterange-body" @click.stop>
+  <div class="date-packer-daterange-body">
     <div class="date-packer-daterange">
       <div class="date-packer-opt" v-if="options" :style="{width: optionsWidth + 'px'}">
         <div class="picker-panel-shortcut" :style="item.style"

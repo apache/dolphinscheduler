@@ -5,40 +5,40 @@ $lib-name: "ans";
 $icon-path: "./font";
 
 // 主要颜色
-$primary-color: #1489e2 !default;
-$primary-color-hover: #1799fc !default;
-$primary-color-active: #127ac9 !default;
-$sub-color: #ff8c00 !default;
-$sub-color-hover: #ff981a !default;
-$sub-color-active: #ef6c00 !default;
-$info-color: #1489e2 !default;
-$success-color: #4caf50 !default;
-$warning-color: #ffc107 !default;
-$error-color: #f14343 !default;
+$primary-color: #0097e0 !default;
+$primary-color-hover: #05acff !default;
+$primary-color-active: #1875d1 !default;
+$sub-color: #ff9a00 !default;
+$sub-color-hover: #ffb846 !default;
+$sub-color-active: #f97b00 !default;
+$info-color: #0097e0 !default;
+$success-color: #35cd75 !default;
+$warning-color: #ffbc01 !default;
+$error-color: #f04d4e !default;
 
 // 浅色背景文本颜色
-$title-color-light: #252d39 !default;
-$content-color-light: #4c6072 !default;
-$sub-text-color-light: #6d859e !default;
-$disabled-text-color-light: #c5ced8 !default;
+$title-color-light: #333 !default;
+$content-color-light: #666 !default;
+$sub-text-color-light: #999 !default;
+$disabled-text-color-light: #ccc !default;
 
 // 深色背景文本颜色
 $title-color-dark: #fff !default;
 $content-color-dark: #eee !default;
-$sub-text-color-dark: #c5ced8 !default;
+$sub-text-color-dark: #ccc !default;
 $disabled-text-color-dark: #888 !default;
-$bg-color-in-dark: #4c6072;
+$bg-color-in-dark: #555;
 
 // radius
 $border-radius-base: 4px;
 
 // 边框颜色
-$border-color-base: #e4eaf1 !default;
+$border-color-base: #dedede !default;
 $box-shadow-base: 0 2px 8px 0 rgba(0,0,0,0.14) !default;
 
 // 背景色
 $background-color-base: #fff;
-$background-color-disabled: #ecf3f8;
+$background-color-disabled: #f5f5f5;
 $background-color-dark: rgba(0, 0, 0, 0.6);
 
 // 动画
