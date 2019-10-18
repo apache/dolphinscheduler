@@ -57,13 +57,12 @@
     </section>
     <section class="demo-section">
       <h4>固定列</h4>
-      <x-table affix stripe :data="tableData">
+      <x-table stripe :data="tableData">
         <x-table-column
           v-for="(header, index) in detailTableHeaders"
           :fixed="index === 3 ? 'right' : index === 1 ? 'left' : false"
           :key="index"
-          :min-width="index > 2 ? 400 : undefined"
-          :width="index <= 2 ? 200 : undefined"
+          width="300"
           :label="header.label"
           :prop="header.prop">
         </x-table-column>

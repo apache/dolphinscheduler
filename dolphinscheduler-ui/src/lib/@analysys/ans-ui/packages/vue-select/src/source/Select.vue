@@ -1,10 +1,10 @@
 <template>
-  <div :class="wrapperClass" v-click-outside="clickWrapperOutside">
+  <div :class="wrapperClass" v-click-outside="blur">
     <div
       class="tag-container"
       :class="{'tag-container-disabled':disabled}"
       ref="multiple"
-      v-if="multiple && !customTrigger"
+      v-if="multiple"
       :style="tagContainerStyles"
       @click="toggleDropdown"
       @mouseenter="inputHovering = true"
@@ -52,10 +52,8 @@
       </slot>
     </div>
     <x-select-dropdown
-      v-click-outside="clickDropdownOutside"
       ref="dropdown"
       :scrollbar-class="scrollbarClass"
-      :custom-class="dropdownClass"
       :custom-header="panelHeader"
       :custom-footer="panelFooter"
       :width="width"
@@ -68,7 +66,7 @@
       :viewport="viewport"
       :popper-options="mergedOptions"
       @on-update-width="handleUpdateWidth"
-      @click.native="clickDropdown"
+      @click.native="_refocus"
       @keydown.native.esc.stop.prevent="_refocusTrigger"
       @keydown.native.down.stop.prevent="navigateOptions('next')"
       @keydown.native.up.stop.prevent="navigateOptions('prev')"
@@ -86,12 +84,15 @@
       <ul class="dropdown-container" :style="panelStyles">
         <slot></slot>
       </ul>
-      <div v-if="options.length === 0" class="empty-text">
-        <i :class="noDataIcon"></i>
+      <div v-if="hasEmptySlot" class="empty-hint-erea">
+        <slot name="empty"></slot>
+      </div>
+      <div v-if="!hasEmptySlot && options.length === 0" class="empty-text">
+        <i class="ans-icon-no-data"></i>
         <span>{{noDataText}}</span>
       </div>
-      <div v-else-if="visibleOptions.length === 0" class="empty-text">
-        <i :class="noMatchIcon"></i>
+      <div v-if="!hasEmptySlot && showNoMatchText" class="empty-text">
+        <i class="ans-icon-search-no-data"></i>
         <span>{{noMatchText}}</span>
       </div>
     </x-select-dropdown>
@@ -99,8 +100,7 @@
 </template>
 
 <script>
-import { debounce } from 'throttle-debounce'
-import { LIB_NAME, clickOutside, emitter, hasClass } from '../../../../src/util'
+import { LIB_NAME, clickOutside, emitter, getValueByPath, hasClass } from '../../../../src/util'
 import { xInput } from '../../../vue-input/src'
 import xSelectDropdown from './SelectDropdown.vue'
 import { t } from '../../../../src/locale'
@@ -133,8 +133,6 @@ export default {
       visible: false,
       // 当前 select 组件中的所有 option 子组件
       options: [],
-      // 已按照 dom 排序的可见 option 子组件
-      visibleOptions: [],
       // 多选时当前已选项对应的 option 子组件
       selectedOptions: [],
       // 单选时上一次点击选项对应的 option 子组件
@@ -149,9 +147,8 @@ export default {
       panelHeader: null,
       panelFooter: null,
       panelStyles: {},
-      focusIndex: -1,
-      dragging: false,
-      customTrigger: false
+      hasEmptySlot: false,
+      focusIndex: -1
     }
   },
 
@@ -218,19 +215,8 @@ export default {
       }
     },
 
-    noDataIcon: {
-      type: String,
-      default: 'ans-icon-no-data'
-    },
-
     // 搜索时是否高亮选项中匹配的文字，(仅当未设置 filter-props 时可用)
     highlightMatchedText: {
-      type: Boolean,
-      default: false
-    },
-
-    // 搜索时是否忽略大小写
-    ignoreCase: {
       type: Boolean,
       default: false
     },
@@ -241,11 +227,6 @@ export default {
       default () {
         return t('ans.select.noMatch')
       }
-    },
-
-    noMatchIcon: {
-      type: String,
-      default: 'ans-icon-search-no-data'
     },
 
     hasArrow: {
@@ -270,8 +251,6 @@ export default {
         return {}
       }
     },
-
-    dropdownClass: String,
 
     scrollbarClass: String,
 
@@ -317,11 +296,7 @@ export default {
     selectedModel () {
       return this.multiple
         ? this.selectedList
-        : this.lastOption ? {
-          label: this.lastOption.label,
-          value: this.lastOption.value,
-          notFound: this.lastOption.notFound
-        } : null
+        : this.lastOption ? { label: this.lastOption.label, value: this.lastOption.value } : null
     },
 
     // 是否显示清空图标
@@ -331,6 +306,10 @@ export default {
         ? value && value.length > 0
         : value !== undefined && value !== null && value !== ''
       return this.clearable && !this.disabled && this.inputHovering && hasValue
+    },
+
+    showNoMatchText () {
+      return this.options.length !== 0 && this.options.every(o => !o.visible)
     },
 
     navigatable () {
@@ -355,7 +334,7 @@ export default {
     },
 
     focusIndex (val) {
-      if (val > -1 && val < this.visibleOptions.length) {
+      if (val > -1 && val < this.options.length) {
         const target = this._getOptionByElIndex(val)
         this.options.forEach(o => {
           o.focused = target === o
@@ -369,14 +348,6 @@ export default {
   },
 
   methods: {
-    /**
-     * 设置下拉框的 reference 属性
-     */
-    setDropdownReference (reference) {
-      this.hideDropdown()
-      this.$refs.dropdown.setReference(reference)
-    },
-
     /**
      * 更新下拉框内的滚动条
      */
@@ -400,10 +371,8 @@ export default {
       this.broadcast('xOption', 'keywordChange', keyword)
       this.broadcast('xOptionGroup', 'keywordChange', keyword)
       this.$nextTick(() => {
-        this._filterVisible()
-        this.$nextTick(() => this.updateScrollbar())
+        this.updateScrollbar()
       })
-      this.$emit('on-keyword-change', keyword)
     },
 
     /**
@@ -412,8 +381,6 @@ export default {
     focus () {
       if (!this.visible) {
         this.toggleDropdown()
-      } else {
-        this.$refs.dropdown.updateLayout()
       }
     },
 
@@ -541,10 +508,10 @@ export default {
 
     resetHoverIndex () {
       if (!this.multiple) {
-        this.focusIndex = this.visibleOptions.indexOf(this.lastOption)
+        this.focusIndex = this.options.indexOf(this.lastOption)
       } else {
         if (this.selectedOptions.length > 0) {
-          this.focusIndex = Math.min.apply(null, this.selectedOptions.map(o => this.visibleOptions.indexOf(o)))
+          this.focusIndex = Math.min.apply(null, this.selectedOptions.map(o => this.options.indexOf(o)))
         } else {
           this.focusIndex = -1
         }
@@ -561,13 +528,13 @@ export default {
       }
       if (direction === 'next') {
         this.focusIndex++
-        if (this.focusIndex >= this.visibleOptions.length) {
+        if (this.focusIndex >= this.options.length) {
           this.focusIndex = 0
         }
       } else if (direction === 'prev') {
         this.focusIndex--
         if (this.focusIndex < 0) {
-          this.focusIndex = this.visibleOptions.length - 1
+          this.focusIndex = this.options.length - 1
         }
       }
       const option = this._getOptionByElIndex(this.focusIndex)
@@ -577,35 +544,12 @@ export default {
       this.$nextTick(() => this.$refs.dropdown.scrollToTarget(option))
     },
 
-    _filterVisible () {
-      if (this.options.length) {
-        const parent = this.options[0].$el.parentNode
-        let els
-        if (hasClass(parent, 'dropdown-container')) {
-          els = Array.from(parent.children)
-        } else {
-          els = []
-          const groups = Array.from(parent.parentNode.parentNode.parentNode.children)
-          for (const group of groups) {
-            els = els.concat(Array.from(group.children[1].children[0].children))
-          }
-        }
-        const visibleEls = els.filter(e => !hasClass(e, 'invisible-option'))
-        const result = []
-        visibleEls.forEach(e => {
-          const c = this.options.find(o => o.$el === e)
-          c && result.push(c)
-        })
-        this.visibleOptions = result
-      } else {
-        this.visibleOptions = []
-      }
-    },
-
     _getOptionByElIndex (index) {
       if (this.options.length) {
-        if (this.visibleOptions.length < index + 1) return null
-        return this.visibleOptions[index]
+        const els = Array.from(this.options[0].$el.parentNode.children)
+          .filter(e => !hasClass('invisible-option'))
+        if (els.length < index + 1) return null
+        return this.options.find(o => o.$el === els[index])
       } else {
         return null
       }
@@ -665,7 +609,6 @@ export default {
         } else {
           this.lastOption = this.getOption(value)
         }
-        this.resetHoverIndex()
       }
     },
 
@@ -675,14 +618,14 @@ export default {
     getOption (value) {
       const checkByProp = this.valueKey || typeof value === 'object'
       for (const option of this.options) {
-        if ((checkByProp && option.value[this.valueKey] === value[this.valueKey]) ||
+        if ((checkByProp && getValueByPath(option.value, this.valueKey) === value) ||
           option.value === value) {
           option.selected = true
           return option
         }
       }
       const label = typeof value === 'object' ? '' : value
-      return { value, label, notFound: true }
+      return { value, label }
     },
 
     /**
@@ -692,7 +635,7 @@ export default {
       if (index > -1) {
         this.options.splice(index, 1)
       }
-      this.debouncedUpdate()
+      this.focusIndex = -1
     },
 
     /**
@@ -708,52 +651,22 @@ export default {
 
     registerOption (option) {
       this.options.push(option)
-      this.debouncedUpdate()
+      this.focusIndex = -1
+      this.setSelected(this.value)
+      this.$refs.dropdown && this.$refs.dropdown.checkScrollable()
     },
 
     handleUpdateWidth (width) {
       this.panelStyles = { width }
-    },
-
-    clickWrapperOutside () {
-      if (this.appendToBody) {
-        setTimeout(() => {
-          if (!this.dropdownClicked) {
-            this.blur()
-          }
-        }, 0)
-      } else {
-        this.blur()
-      }
-    },
-
-    clickDropdownOutside () {
-      if (this.appendToBody) {
-        this.dropdownClicked = false
-      }
-    },
-
-    clickDropdown () {
-      if (this.appendToBody) {
-        this.dropdownClicked = true
-      } else {
-        this._refocus()
-      }
     }
   },
 
   created () {
     this.$on('click-option', this.handleSelect)
-    this.debouncedUpdate = debounce(50, () => {
-      this.focusIndex = -1
-      this.setSelected(this.value)
-      this._filterVisible()
-      this.$refs.dropdown && this.$refs.dropdown.checkScrollable()
-    })
   },
 
   mounted () {
-    this.customTrigger = !!(this.$slots.trigger || this.$scopedSlots.trigger)
+    this.hasEmptySlot = this.$slots.empty !== undefined
     this.setSelected(this.value)
     if (this.$refs.input) {
       this.inputWidth = this.$refs.input.$el.clientWidth

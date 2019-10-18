@@ -1,15 +1,12 @@
 <template>
-  <div style="margin: 20px;height:200px;">
+  <div style="margin: 20px;">
     <div style="line-height: 40px;">table tree</div>
-    <x-table :data="tableData" restrict ref="table" tree-title>
+    <x-table :data="tableData">
       <x-table-column
         v-for="(header, index) in tableHeaders"
         :key="index"
         :label="header.label"
         :prop="header.prop">
-        <template slot="treeText" slot-scope="{content}">
-          <div>{{content}} + 'abc'</div>
-        </template>
       </x-table-column>
     </x-table>
   </div>
@@ -46,7 +43,7 @@ export default {
       for (let i = 0; i < this.rowCount; i++) {
         list.push({
           id: i + 1,
-          name: '易小宝易小宝易小宝易小宝易小宝易小宝易小宝易小宝易小宝易小宝易小宝易小宝易小宝',
+          name: '易小宝',
           city: '长沙',
           lastUsedTime: `2018-09-${i + 1 < 10 ? '0' + (i + 1) : (i + 1)} 12:30:33`,
           province: '湖南',
@@ -60,11 +57,6 @@ export default {
       }
       return list
     }
-  },
-  mounted () {
-    setTimeout(() => {
-      this.$refs.table.toggleRowUnfolding(this.tableData[0], true)
-    }, 100)
   }
 }
 </script>
