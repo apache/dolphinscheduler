@@ -698,6 +698,12 @@ public final class Constants {
 
 
     /**
+     * --queue --qu
+     */
+    public static final String FLINK_QUEUE = "--qu";
+
+
+    /**
      * exit code success
      */
     public static final int EXIT_CODE_SUCCESS = 0;
