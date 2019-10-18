@@ -57,7 +57,8 @@ public class TaskNodeRelation {
     if (!(o instanceof TaskNodeRelation)) {
       return false;
     }
-    return (((TaskNodeRelation)o).getStartNode().equals(this.startNode) && ((TaskNodeRelation)o).getEndNode().equals(this.endNode));
+    TaskNodeRelation relation = (TaskNodeRelation)o;
+    return (relation.getStartNode().equals(this.startNode) && relation.getEndNode().equals(this.endNode));
   }
 
   @Override
