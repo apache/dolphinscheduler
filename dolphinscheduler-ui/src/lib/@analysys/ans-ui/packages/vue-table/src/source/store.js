@@ -1,47 +1,30 @@
 import Vue from 'vue'
-import * as util from './util'
-import { debounce, throttle } from 'throttle-debounce'
+import { addClass, getValueByPath } from '../../../../src/util'
+
+const ASCENDING_ORDER = 'asc'
+const DESCENDING_ORDER = 'desc'
+const ORDERS = [ASCENDING_ORDER, DESCENDING_ORDER]
 
 export default class TableStore {
   constructor (table) {
     this.table = table
-    this.scheduleMappingSortedData = debounce(10, () => {
-      table.layout.updateColumnsWidth()
-      this.mappingSortedData()
-    })
-    this.scheduleUpdateColumns = debounce(10, (flag) => this.updateColumns(flag))
-    this.throttleCalculateIndexes = throttle(50, (top) => this.calculateIndexes(top))
-    this.throttleCalculateColumnIndexes = throttle(20, (left) => this.calculateColumnIndexes(left))
     this.states = {
       // 原始数据
       _data: null,
       _sortedData: null,
-      _mappedData: null,
-      _slicedData: null,
       // 当前展示数据
       data: null,
-      rows: [],
-      renderedRows: [],
       _columns: [],
       columns: [],
-      renderedColumns: [],
-      notFixedColumns: [],
-      notFixedLeafColumns: [],
       leafColumns: [],
-      leafColumnMap: {},
-      colColumns: [],
-      colColumnIds: [],
-      renderedColColumns: [],
       fixedLeftColumns: [],
       fixedLeftLeafColumns: [],
       fixedRightColumns: [],
       fixedRightLeafColumns: [],
-      multiLayer: false,
       hasFixedTable: false,
       hoverRowIndex: null,
       selection: [],
       isAllSelected: false,
-      isIndeterminate: false,
       expandable: false,
       expandRows: [],
       treeType: false,
@@ -51,33 +34,23 @@ export default class TableStore {
       sortingColumn: null,
       sortProp: null,
       sortOrder: '',
-      defaultSortOrders: util.ORDERS,
+      defaultSortOrders: ORDERS,
       dragging: false,
       draggingColumn: null,
       dragModel: {},
-      rowLimit: null,
-      startRowIndex: 0,
-      endRowIndex: null,
-      startColumnIndex: 0,
-      transformBodyY: false,
-      transformXAmount: 0,
-      transformYAmount: 0,
-      contentHeight: null,
-      firstRowSpan: 1,
-      renderedRowCount: 0,
-      renderedColumnCount: 0,
-      destroying: false
+      paging: false,
+      startRowIndex: -1
     }
 
     if (table.defaultSortOrders) {
-      if (util.checkSortOrders(table.defaultSortOrders)) {
+      if (checkSortOrders(table.defaultSortOrders)) {
         this.states.defaultSortOrders = table.defaultSortOrders
       }
     }
 
     this.mutations = {
       insertColumn (states, column, index, parent) {
-        if (!column.sortOrders || !util.checkSortOrders(column.sortOrders)) {
+        if (!column.sortOrders || !checkSortOrders(column.sortOrders)) {
           column.sortOrders = states.defaultSortOrders
         }
 
@@ -95,8 +68,8 @@ export default class TableStore {
           states.expandable = true
         }
         if (this.table.$ready) {
-          this.scheduleUpdateColumns(true)
-          this.scheduleLayout()
+          this.updateColumns()
+          this.table.doLayout()
         }
       },
 
@@ -110,13 +83,13 @@ export default class TableStore {
           array.splice(array.indexOf(column), 1)
         }
         if (this.table.$ready) {
-          this.scheduleUpdateColumns(true)
-          this.scheduleLayout()
+          this.updateColumns()
+          this.table.doLayout()
         }
       },
 
       rowSelectionChanged (states, row) {
-        const changed = util.toggleRowSelection(states, row)
+        const changed = toggleRowSelection(states, row)
 
         if (changed) {
           const selection = states.selection ? states.selection.slice() : []
@@ -130,7 +103,6 @@ export default class TableStore {
 
       allSelectionChanged (states) {
         states.isAllSelected = !states.isAllSelected
-        states.isIndeterminate = false
         if (states.isAllSelected) {
           states.selection = states._sortedData.slice()
         } else {
@@ -151,15 +123,15 @@ export default class TableStore {
       sortConditionChanged (states, column, asc) {
         let order
         if (typeof asc === 'boolean') {
-          order = column.order = asc ? util.ASCENDING_ORDER : util.DESCENDING_ORDER
+          order = column.order = asc ? ASCENDING_ORDER : DESCENDING_ORDER
         } else {
-          order = column.order = util.getNextOrder(column)
+          order = column.order = getNextOrder(column)
         }
-        const changed = util.toggleSortCondition(states, column, order)
+        const changed = toggleSortCondition(states, column, order)
         if (changed) {
           if (column.sortable !== 'custom') {
-            states._sortedData = Object.freeze(util.sortData(states._data, states))
-            this.mappingSortedData()
+            states._sortedData = sortData(states._data, states)
+            this.jumpTo(0, 0, true)
             Vue.nextTick(() => this.table.doLayout())
           }
           this.table.$emit('on-sort-change', column, states.sortProp, states.sortOrder)
@@ -184,28 +156,21 @@ export default class TableStore {
     }
   }
 
-  scheduleLayout (updateColumns) {
-    if (updateColumns) {
-      this.updateColumns()
-    }
-    this.table.debouncedUpdateLayout()
-  }
-
   setData (data) {
     const states = this.states
     const dataInstanceChanged = states._data !== data
-    states._data = this.table.frozenData ? Object.freeze(data) : data
+    states._data = data
     if (states.childrenProp) {
-      util.processTreeData(states, this.table)
+      processTreeData(states, this.table)
     }
-    states._sortedData = Object.freeze(util.sortData(states._data, states))
+    states._sortedData = sortData(states._data, states)
 
     const { defaultExpandAll, rowKey, reserveStates, defaultUnfoldChildren } = this.table
     if (defaultExpandAll) {
       states.expandRows = (states._sortedData || []).slice()
     } else {
       if (reserveStates) {
-        states.expandRows = util.reserve(states.expandRows, states._sortedData, rowKey)
+        states.expandRows = reserve(states.expandRows, states._sortedData, rowKey)
       } else {
         if (dataInstanceChanged) {
           this.clearExpandRows()
@@ -216,7 +181,7 @@ export default class TableStore {
     }
 
     if (reserveStates) {
-      states.selection = util.reserve(states.selection, states._sortedData, rowKey)
+      states.selection = reserve(states.selection, states._sortedData, rowKey)
       this.updateAllSelected()
     } else {
       if (dataInstanceChanged) {
@@ -227,19 +192,18 @@ export default class TableStore {
       }
     }
 
+    this.jumpTo(0, 0, true)
+
     if (defaultUnfoldChildren) {
       states.parentRows.forEach((r) => {
-        util.toggleRowUnfolding(states, r, true)
+        toggleRowUnfolding(states, r, true)
       })
     }
-
-    this.mappingSortedData()
   }
 
   toggleAllSelection () {
     const states = this.states
     states.isAllSelected = !states.isAllSelected
-    states.isIndeterminate = false
     if (states.isAllSelected) {
       states.selection = states._sortedData.slice()
     } else {
@@ -251,7 +215,6 @@ export default class TableStore {
   clearSelection () {
     const states = this.states
     states.isAllSelected = false
-    states.isIndeterminate = false
     const oldSelection = states.selection
     if (states.selection.length) {
       states.selection = []
@@ -264,7 +227,7 @@ export default class TableStore {
   cleanSelection () {
     const states = this.states
     const rowKey = this.table.rowKey
-    const { changed, list: selection } = util.clean(states.selection, states._sortedData, rowKey)
+    const { changed, list: selection } = clean(states.selection, states._sortedData, rowKey)
     states.selection = selection
 
     if (changed) {
@@ -273,7 +236,7 @@ export default class TableStore {
   }
 
   toggleRowSelection (row, selected) {
-    const changed = util.toggleRowSelection(this.states, row, selected)
+    const changed = toggleRowSelection(this.states, row, selected)
     const selection = this.states.selection
     if (changed) {
       this.table.$emit('on-selection-change', selection ? selection.slice() : [])
@@ -285,7 +248,6 @@ export default class TableStore {
     const { selection, _sortedData } = this.states
     // 简易判断
     this.states.isAllSelected = selection && _sortedData && selection.length === _sortedData.length
-    this.states.isIndeterminate = !this.states.isAllSelected && selection && selection.length
   }
 
   clearExpandRows () {
@@ -302,7 +264,7 @@ export default class TableStore {
   cleanExpandRows () {
     const states = this.states
     const rowKey = this.table.rowKey
-    const { changed, list: expandRows } = util.clean(states.expandRows, states._sortedData, rowKey)
+    const { changed, list: expandRows } = clean(states.expandRows, states._sortedData, rowKey)
     states.expandRows = expandRows
 
     if (changed) {
@@ -311,27 +273,26 @@ export default class TableStore {
   }
 
   toggleRowExpansion (row, expanded) {
-    const changed = util.toggleRowExpansion(this.states, row, expanded)
+    const changed = toggleRowExpansion(this.states, row, expanded)
     if (changed) {
       this.table.$emit('on-expand-change', row, this.states.expandRows)
-      Vue.nextTick(() => this.scheduleLayout())
+      Vue.nextTick(() => this.table.doLayout())
     }
   }
 
   toggleRowUnfolding (row, unfolded) {
-    const changed = util.toggleRowUnfolding(this.states, row, unfolded)
+    const changed = toggleRowUnfolding(this.states, row, unfolded)
     if (changed) {
-      this.mappingSortedData()
       this.table.$emit('on-unfolded-change', row, this.states.unfoldedRows)
       Vue.nextTick(() => this.table.doLayout())
     }
   }
 
-  setExpandRowKeys (rowKeys) {
+  setExpandRowKeys = (rowKeys) => {
     const expandRows = []
     const rowKey = this.table.rowKey
     if (!rowKey) throw new Error('Table Store: Prop row-key should not be empty.')
-    const keysMap = util.getKeysMap(this.states._sortedData || [], rowKey)
+    const keysMap = getKeysMap(this.states._sortedData || [], rowKey)
     rowKeys.forEach((key) => {
       const info = keysMap[key]
       if (info) {
@@ -346,7 +307,7 @@ export default class TableStore {
   clearSort () {
     if (!this.states.sortingColumn) return
 
-    const changed = util.toggleSortCondition(this.states, this.states.sortingColumn, '')
+    const changed = toggleSortCondition(this.states, this.states.sortingColumn, '')
     if (changed) {
       this.table.$emit('on-sort-change', null, null, '')
       Vue.nextTick(() => this.table.doLayout())
@@ -360,71 +321,45 @@ export default class TableStore {
       throw new Error(`Table Store: Can't find target column with prop '${prop}'!`)
     }
 
-    if (typeof order === 'string' && !util.ORDERS.includes(order)) {
-      throw new Error(`Table Store: Sort order must be '${util.ASCENDING_ORDER}' or '${util.DESCENDING_ORDER}'!`)
+    if (typeof order === 'string' && !ORDERS.includes(order)) {
+      throw new Error(`Table Store: Sort order must be '${ASCENDING_ORDER}' or '${DESCENDING_ORDER}'!`)
     }
     if (typeof order === 'undefined') {
-      order = column.order = util.getNextOrder(column)
+      order = column.order = getNextOrder(column)
     }
-    const changed = util.toggleSortCondition(states, column, order)
+    const changed = toggleSortCondition(states, column, order)
     if (changed) {
       if (column.sortable !== 'custom') {
-        states._sortedData = Object.freeze(util.sortData(states._data, states))
-        this.mappingSortedData()
+        states._sortedData = sortData(states._data, states)
+        this.jumpTo(0, 0, true)
         Vue.nextTick(() => this.table.doLayout())
       }
       this.table.$emit('on-sort-change', column, states.sortProp, states.sortOrder)
     }
   }
 
-  updateColumns (debouncedMapping) {
-    if (this.states.destroying) return
+  updateColumns () {
     const states = this.states
     const _columns = states._columns || []
-    states.fixedLeftColumns = Object.freeze(_columns.filter(column => column.fixed === true || column.fixed === 'left'))
-    states.fixedRightColumns = Object.freeze(_columns.filter(column => column.fixed === 'right'))
+    states.fixedLeftColumns = _columns.filter(column => column.fixed === true || column.fixed === 'left')
+    states.fixedRightColumns = _columns.filter(column => column.fixed === 'right')
 
     if (states.fixedLeftColumns.length > 0 && _columns[0] && _columns[0].type === 'selection' && !_columns[0].fixed) {
       _columns[0].fixed = true
-      const temp = states.fixedLeftColumns.slice()
-      temp.unshift(_columns[0])
-      states.fixedLeftColumns = Object.freeze(temp)
+      states.fixedLeftColumns.unshift(_columns[0])
     }
 
-    const notFixedColumns = _columns.filter(column => !column.fixed)
-    states.notFixedColumns = Object.freeze(notFixedColumns)
-    states.notFixedLeafColumns = Object.freeze(util.doFlattenColumns(notFixedColumns))
-    states.columns = Object.freeze([].concat(states.fixedLeftColumns).concat(notFixedColumns).concat(states.fixedRightColumns))
-    for (let i = 0; i < states.columns.length; i++) {
-      const c = states.columns[i]
-      c._index = i
-    }
-    states.rows = Object.freeze(util.convertToRows(states.columns))
-    for (const r of states.rows) {
-      for (let i = 0; i < r.length; i++) {
-        const c = r[i]
-        c._indexInRow = i
-      }
-    }
-    states.multiLayer = states.rows.length > 1
-
-    states.leafColumns = Object.freeze(util.doFlattenColumns(states.columns))
-    const columnsMap = {}
-    states.leafColumns.forEach((column) => {
-      columnsMap[column.id] = column
+    const notFixedColumns = _columns.filter(column => {
+      column.__hiddenInFixed = !column.fixed
+      return !column.fixed
     })
-    states.leafColumnMap = columnsMap
-    states.colColumns = Object.freeze(states.multiLayer ? states.leafColumns : states.columns)
+    states.columns = [].concat(states.fixedLeftColumns).concat(notFixedColumns).concat(states.fixedRightColumns)
 
-    states.fixedLeftLeafColumns = Object.freeze(util.doFlattenColumns(states.fixedLeftColumns))
-    states.fixedRightLeafColumns = Object.freeze(util.doFlattenColumns(states.fixedRightColumns))
+    states.leafColumns = doFlattenColumns(states.columns)
+    states.fixedLeftLeafColumns = doFlattenColumns(states.fixedLeftColumns)
+    states.fixedRightLeafColumns = doFlattenColumns(states.fixedRightColumns)
 
     states.hasFixedTable = states.fixedLeftColumns.length > 0 || states.fixedRightColumns.length > 0
-    if (debouncedMapping) {
-      this.scheduleMappingSortedData()
-    } else {
-      this.mappingSortedData()
-    }
   }
 
   commit (name, ...args) {
@@ -436,279 +371,290 @@ export default class TableStore {
     }
   }
 
-  updateRenderData () {
-    const { colColumns, colColumnIds } = this.states
-    const changed = colColumns.some(c => !colColumnIds.includes(c.id))
-    if (changed) {
-      this.mappingSortedData()
+  jumpTo (topIndex, offset, sortChanged) {
+    const { internalPaging, rowLimit, layout } = this.table
+    const states = this.states
+
+    if (internalPaging && states._sortedData && states._sortedData.length > rowLimit) {
+      if (topIndex <= -rowLimit || topIndex >= states._sortedData.length) return
+
+      states.paging = true
+      if (typeof offset === 'undefined') {
+        offset = Math.round(rowLimit * 0.5)
+      }
+      let start = Math.max(0, topIndex - offset)
+      let end = start + rowLimit
+      if (end > states._sortedData.length) start = states._sortedData.length - rowLimit
+
+      if (!sortChanged && start === states.startRowIndex) return
+
+      const goBack = start < states.startRowIndex
+      states.startRowIndex = start
+      this.table.scrollerDisabled = true
+      layout.slicing = true
+      // disable window scroll
+      addClass(document.body, 'spin-lock-overflow')
+      // for scroll transition lag
+      setTimeout(() => {
+        layout.beforeJump(goBack)
+        // for loading lag
+        setTimeout(() => {
+          states.data = states._sortedData.slice(start, end)
+          layout.afterJump(sortChanged)
+        }, 100)
+      }, 200)
     } else {
-      this.sliceData()
+      states.data = this.states._sortedData.slice()
+      states.paging = false
     }
   }
 
-  mappingSortedData () {
-    const { rowHeight, rowKey, stripe, cellSpanMethod, $el } = this.table
-    const states = this.states
-    if (states.destroying || ($el && $el.clientHeight === 0)) return
-
-    // mapping all data
-    if (states.colColumns.length) {
-      states.colColumnIds = Object.freeze(states.colColumns.map(c => c.id))
-      states.contentHeight = states._sortedData.length * rowHeight
-
-      // data + columns => cells
-      states._mappedData = Object.freeze(states._sortedData.map((d, i) => {
-        const cells = []
-        states.colColumns.forEach((c, j) => {
-          const model = {
-            columnIndex: j,
-            column: c,
-            content: util.getCellContent(d, c, i, j),
-            spanModel: util.getSpanModel(d, c, i, j, cellSpanMethod)
-          }
-          if (model.spanModel.rowspan > 1 && states.firstRowSpan === 1) {
-            states.firstRowSpan = model.spanModel.rowspan
-          }
-          cells.push(model)
-        })
-        return {
-          item: d,
-          rowIndex: i,
-          cells,
-          key: util.getRowKey(i, d, rowKey),
-          classes: util.getRowClasses(i, stripe)
-        }
-      }))
-      this.sliceData()
-    }
+  prevPage () {
+    this.jumpTo(this.states.startRowIndex - this.table.rowLimit, -this.table.rowLimit * 0.5)
   }
 
-  sliceData () {
-    const { virtualScroll, rowHeight, layout, $el, maxTreeRow } = this.table
-    const states = this.states
-    if (!states._mappedData || ($el && $el.clientHeight === 0)) return
-
-    if (virtualScroll) {
-      if (layout.scrollY) {
-        let rowCount
-        if (!layout.bodyHeight) {
-          // init render
-          rowCount = 10
-        } else {
-          rowCount = Math.ceil(layout.bodyHeight / rowHeight)
-        }
-
-        states.transformBodyY = rowCount < states._mappedData.length
-        states.rowLimit = states.firstRowSpan !== 1
-          ? (Math.ceil(rowCount / states.firstRowSpan) + 1) * states.firstRowSpan
-          : rowCount + 6
-        this.calculateIndexes()
-        return
-      } else if (states.treeType) {
-        states._slicedData = Object.freeze(states._mappedData.slice(states.startRowIndex, states.renderedRowCount + maxTreeRow))
-        this.calculateColumnIndexes()
-        return
-      }
-    }
-    states._slicedData = Object.freeze(states._mappedData.slice())
-    states.transformBodyY = false
-    this.calculateColumnIndexes()
+  nextPage () {
+    this.jumpTo(this.states.startRowIndex + this.table.rowLimit, this.table.rowLimit * 0.5)
   }
+}
 
-  calculateIndexes (top) {
-    const states = this.states
-    const { rowLimit, _mappedData, firstRowSpan } = states
-    if (!rowLimit || !_mappedData || !_mappedData.length) return
+const toggleRowSelection = (states, row, selected) => {
+  return toggleStateWithArray(states.selection, row, selected)
+}
 
-    const { $refs, rowHeight, cellSpanMethod } = this.table
-    this.commit('setHoverRowIndex', null)
-    const currentTop = top || ($refs.scroller && $refs.scroller.currentTop) || 0
-    const remainCount = firstRowSpan === 1 ? 3 : firstRowSpan
-    let startIndex = Math.floor(Math.abs(currentTop) / rowHeight) - remainCount
-    if (startIndex < 0) {
-      startIndex = 0
-    }
+const toggleRowExpansion = (states, row, expanded) => {
+  return toggleStateWithArray(states.expandRows, row, expanded)
+}
 
-    // fix rowspan
-    let realStartIndex = startIndex
-    if (cellSpanMethod) {
-      if (startIndex > states.startRowIndex) {
-        for (let i = states.startRowIndex; i < startIndex; i++) {
-          const currentRow = _mappedData[i]
-          const targetCell = currentRow.cells.find(c => c.spanModel.rowspan > 1)
-          if (targetCell && targetCell.spanModel.rowspan + i >= startIndex) {
-            realStartIndex = i
-            break
-          }
-        }
-      } else if (startIndex < states.startRowIndex) {
-        for (let i = states.startRowIndex; i >= 0; i--) {
-          const currentRow = _mappedData[i]
-          const targetCell = currentRow.cells.find(c => c.spanModel.rowspan > 1)
-          if (targetCell && i < startIndex && targetCell.spanModel.rowspan + i >= startIndex) {
-            realStartIndex = i
-            break
-          }
-        }
-      }
-    }
-    const diff = startIndex - realStartIndex
-
-    let endIndex = realStartIndex + rowLimit + diff
-    if (endIndex - realStartIndex < states.renderedRowCount) {
-      endIndex = states.renderedRowCount + realStartIndex
-      if (endIndex > _mappedData.length) {
-        endIndex = _mappedData.length
-        realStartIndex = Math.max(0, endIndex - states.renderedRowCount)
-      }
-    }
-
-    states.renderedRowCount = endIndex - realStartIndex
-    states.startRowIndex = realStartIndex
-    states.endRowIndex = endIndex
-    states.transformYAmount = realStartIndex * rowHeight
-    this.table.updateTranslateY(states.transformYAmount)
-
-    states._slicedData = Object.freeze(_mappedData.slice(realStartIndex, endIndex))
-    this.calculateColumnIndexes()
-  }
-
-  calculateColumnIndexes (left) {
-    const { scrollX, tableWrapperWidth, fixedLeftWidth, fixedRightWidth } = this.table.layout
-    const states = this.states
-    const { notFixedColumns, notFixedLeafColumns, fixedLeftColumns, fixedRightColumns, multiLayer } = states
-    const contentWidth = tableWrapperWidth - fixedLeftWidth - fixedRightWidth
-    if (contentWidth < 0) return
-
-    if (!states._slicedData || !states._slicedData.length) {
-      states.data = []
-      Vue.nextTick(() => {
-        this.table.layout.notifyObservers('columns')
-        this.table.debouncedCheckScrollable()
+const toggleRowUnfolding = (states, row, unfolded) => {
+  let changed = toggleStateWithArray(states.unfoldedRows, row, unfolded)
+  if (changed) {
+    const index = states.data.indexOf(row)
+    if (states.unfoldedRows.includes(row)) {
+      const insertionArray = []
+      fillInsersionArray(states, row[states.childrenProp], insertionArray)
+      states.data.splice(index + 1, 0, ...insertionArray)
+    } else {
+      const nextSiblingIndex = states.data.findIndex((r, i) => {
+        return i > index && r.__level === row.__level
       })
-      return
-    }
-
-    // 不需要切割列
-    if (!scrollX || !this.table.virtualScroll) {
-      states.transformXAmount = 0
-      states.renderedColumns = Object.freeze(states.columns)
-      states.renderedColColumns = Object.freeze(states.colColumns)
-      states.renderedRows = Object.freeze(states.rows)
-      states.renderedColumnCount = 0
-      if (states._slicedData) {
-        let columnCount = states._slicedData[0] ? states._slicedData[0].cells.length : 0
-        if (states.colColumns.length === columnCount) {
-          states._slicedData.forEach(r => {
-            r.renderedCells = r.cells.slice()
-          })
-          states.data = Object.freeze(states._slicedData.slice())
-          this.table.$emit('on-slice')
-          this.table.layout.updateTableWidth()
-          Vue.nextTick(() => {
-            this.table.layout.notifyObservers('columns')
-            this.table.debouncedCheckScrollable()
-          })
-        }
-      }
-      return
-    }
-
-    const currentLeft = left || (this.table.$refs.scroller && this.table.$refs.scroller.currentLeft) || 0
-
-    let _left = 0
-    let _width = 0
-    let startIndex = 0
-    let endIndex = 1
-    let findStart = false
-    for (let i = 0; i < notFixedLeafColumns.length; i++) {
-      const leaf = notFixedLeafColumns[i]
-      const cWidth = leaf.currentWidth
-      _left -= cWidth
-      if (!findStart) {
-        if (_left < currentLeft) {
-          _width = currentLeft - _left
-          // multiLayer header
-          let parent = leaf.parent
-          if (multiLayer && parent) {
-            while (parent.parent) {
-              parent = parent.parent
-            }
-            startIndex = notFixedColumns.indexOf(parent)
-            const siblings = util.doFlattenColumns([parent])
-            for (const s of siblings) {
-              if (s === leaf) {
-                break
-              } else {
-                _width -= s.currentWidth
-              }
-            }
-          } else {
-            startIndex = Math.max(0, i - 2)
-          }
-          findStart = true
-        }
+      if (nextSiblingIndex !== -1) {
+        states.data.splice(index + 1, nextSiblingIndex - index - 1)
       } else {
-        _width += cWidth
-        if (_width >= contentWidth) {
-          let parent = leaf.parent
-          if (multiLayer && parent) {
-            while (parent.parent) {
-              parent = parent.parent
-            }
-            endIndex = notFixedColumns.indexOf(parent)
-          } else {
-            endIndex = i + 2
-          }
-          break
-        }
+        states.data.splice(index + 1, states.data.length - index - 1)
       }
     }
+  }
+  return changed
+}
 
-    if (endIndex < startIndex || endIndex > notFixedColumns.length - 1) {
-      endIndex = notFixedColumns.length - 1
-      if (states.renderedColumnCount !== 0) {
-        startIndex = Math.max(0, endIndex - states.renderedColumnCount + 1)
-      }
-    } else if (endIndex - startIndex + 1 < states.renderedColumnCount) {
-      endIndex = states.renderedColumnCount + startIndex - 1
+const fillInsersionArray = (states, children, array) => {
+  const { unfoldedRows, childrenProp } = states
+  children.forEach((c) => {
+    array.push(c)
+    const sub = c[childrenProp]
+    if (sub && sub.length && unfoldedRows.includes(c)) {
+      fillInsersionArray(states, sub, array)
     }
+  })
+}
 
-    let transformXAmount = states.transformXAmount
-    if (states.startColumnIndex > startIndex) {
-      // to right
-      const leafs = util.doFlattenColumns(notFixedColumns.slice(startIndex, states.startColumnIndex))
-      for (const l of leafs) {
-        transformXAmount -= l.currentWidth
+const toggleStateWithArray = (array, row, insert) => {
+  let changed = false
+  const index = array.indexOf(row)
+  if (typeof insert !== 'undefined') {
+    if (insert) {
+      if (index === -1) {
+        array.push(row)
+        changed = true
       }
     } else {
-      // to left
-      const leafs = util.doFlattenColumns(notFixedColumns.slice(states.startColumnIndex, startIndex))
-      for (const l of leafs) {
-        transformXAmount += l.currentWidth
+      if (index !== -1) {
+        array.splice(index, 1)
+        changed = true
       }
     }
-    states.transformXAmount = transformXAmount
+  } else {
+    if (index === -1) {
+      array.push(row)
+    } else {
+      array.splice(index, 1)
+    }
+    changed = true
+  }
+  return changed
+}
 
-    states.startColumnIndex = startIndex
+const toggleSortCondition = (states, column, order) => {
+  if (!column) {
+    throw new Error('Table Store: Column is required!')
+  }
 
-    states.renderedColumns = Object.freeze([].concat(fixedLeftColumns).concat(notFixedColumns.slice(startIndex, endIndex + 1)).concat(fixedRightColumns))
-    states.renderedColumnCount = states.renderedColumns.length - fixedLeftColumns.length - fixedRightColumns.length
-    states.renderedColColumns = Object.freeze(multiLayer ? util.doFlattenColumns(states.renderedColumns) : states.renderedColumns)
-    states.renderedRows = Object.freeze(util.convertToRows(states.renderedColumns))
+  const prevSortingColumn = states.sortingColumn
 
-    states._slicedData.forEach(r => {
-      r.renderedCells = r.cells.filter(c => states.renderedColColumns.includes(c.column))
-    })
+  if (!order) {
+    if (prevSortingColumn) {
+      states.sortingColumn = null
+    }
+  } else if (prevSortingColumn !== column) {
+    states.sortingColumn = column
+  }
 
-    states.data = Object.freeze(states._slicedData.slice())
-    this.table.$emit('on-slice')
-    const tableWidth = states.renderedColColumns.reduce((p, c) => p + c.currentWidth, 0)
-    this.table.layout.updateTableWidth(tableWidth)
+  if (prevSortingColumn && prevSortingColumn !== column) {
+    prevSortingColumn.order = ''
+  }
 
-    Vue.nextTick(() => {
-      this.table.layout.notifyObservers('columns')
-      this.table.debouncedCheckScrollable()
+  const changed = prevSortingColumn !== states.sortingColumn || states.sortOrder !== order
+
+  if (changed) {
+    states.sortProp = states.sortingColumn ? states.sortingColumn.prop : null
+    states.sortOrder = column.order = order
+  }
+
+  return changed
+}
+
+const sortData = (data, states) => {
+  data = data || []
+  const { treeType, sortingColumn, sortProp: key, sortOrder: order } = states
+  if (!sortingColumn || !key || !order || treeType || sortingColumn.sortable === 'custom') {
+    return data
+  }
+  const reverse = order === DESCENDING_ORDER ? -1 : 1
+
+  const sortMethod = sortingColumn.sortMethod
+
+  const compare = (a, b) => {
+    if (sortMethod) {
+      return sortMethod(a.content, b.content, a.row, b.row)
+    }
+    // 默认排序规则
+    for (let i = 0, len = a.content.length; i < len; i++) {
+      if (a.content[i] < b.content[i]) {
+        return -1
+      }
+      if (a.content[i] > b.content[i]) {
+        return 1
+      }
+    }
+    return 0
+  }
+
+  return data.map((row, index) => {
+    return {
+      row,
+      index,
+      content: getValueByPath(row, key)
+    }
+  }).sort((a, b) => {
+    let order = compare(a, b)
+    if (!order) {
+      // make stable https://en.wikipedia.org/wiki/Sorting_algorithm#Stability
+      order = a.index - b.index
+    }
+    return order * reverse
+  }).map(item => item.row)
+}
+
+const getKeysMap = (array, rowKey) => {
+  const arrayMap = {}
+  array.forEach((row, index) => {
+    arrayMap[getValueByPath(row, rowKey)] = { row, index }
+  })
+  return arrayMap
+}
+
+const doFlattenColumns = (columns) => {
+  const result = []
+  columns.forEach((column) => {
+    if (column.children) {
+      result.push.apply(result, doFlattenColumns(column.children))
+    } else {
+      result.push(column)
+    }
+  })
+  return result
+}
+
+const checkSortOrders = (list) => {
+  let pass = true
+  for (const order of list) {
+    if (order && !ORDERS.includes(order)) {
+      pass = false
+      break
+    }
+  }
+  return pass
+}
+
+const getNextOrder = ({ order, sortOrders }) => {
+  let index
+  if (order) {
+    index = sortOrders.indexOf(order)
+  } else {
+    index = sortOrders.findIndex(o => !o)
+  }
+  let nextOrder
+  if (index !== -1) {
+    nextOrder = sortOrders[index > sortOrders.length - 2 ? 0 : index + 1]
+  } else {
+    nextOrder = sortOrders[0]
+  }
+  return nextOrder || ''
+}
+
+const reserve = (source, dataList, rowKey) => {
+  source = source || []
+  dataList = dataList || []
+  if (!rowKey) {
+    throw new Error('Table Store: Prop row-key should not be empty when reserve-states enabled.')
+  }
+  const idMap = getKeysMap(source, rowKey)
+  const result = []
+  for (const row of dataList) {
+    const rowId = getValueByPath(row, rowKey)
+    if (idMap[rowId]) {
+      result.push(row)
+    }
+  }
+  return result
+}
+
+const clean = (source, dataList, rowKey) => {
+  source = source || []
+  dataList = dataList || []
+  let list
+  if (rowKey) {
+    list = reserve(source, dataList, rowKey)
+  } else {
+    list = source.filter((item) => {
+      return dataList.indexOf(item) !== -1
     })
   }
+
+  let changed = list.length !== source.length
+  return { changed, list }
+}
+
+const processTreeData = (states, table) => {
+  const { _data } = states
+  const { childrenProp } = table
+  if (!_data) return
+  const parentRows = []
+  const unfoldedRows = []
+  checkParentRows(_data, childrenProp, parentRows, unfoldedRows, 1)
+  states.treeType = parentRows.length !== 0
+  states.unfoldedRows = unfoldedRows
+  states.parentRows = parentRows
+}
+
+const checkParentRows = (list, childrenProp, parentRows, unfoldedRows, level) => {
+  list.forEach((row) => {
+    row.__level = level
+    const children = row[childrenProp]
+    if (children && children.length) {
+      parentRows.push(row)
+      checkParentRows(children, childrenProp, parentRows, unfoldedRows, level + 1)
+    }
+  })
 }
