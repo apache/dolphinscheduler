@@ -71,8 +71,14 @@
           <td>
             <span>{{item.phone || '-'}}</span>
           </td>
-          <td><span>{{item.createTime | formatDate}}</span></td>
-          <td><span>{{item.updateTime | formatDate}}</span></td>
+          <td>
+            <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
+          <td>
+            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
+            <span v-else>-</span>
+          </td>
           <td>
             <x-poptip
                     :ref="'poptip-auth-' + $index"

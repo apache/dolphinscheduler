@@ -4,6 +4,7 @@
       ref="content"
       class="scroll-area-wrapper"
       :class="{'scroll-transition':!dragging}"
+      :style="innerStyles"
       @touchstart="startDrag"
       @touchmove="onDrag"
       @touchend="endDrag">
@@ -18,7 +19,7 @@
       :offset-left="barOffsetLeft"
       :offset-right="barOffsetRight"
       :dragging="dragging"
-      :disabled="disabled"
+      :disabled="disableModel.disableX"
       :active="activeBar"
       @on-start-drag="handleStartDragBar"
       @on-horizontal-drag="handleHorizontalDrag"
@@ -35,7 +36,7 @@
       :offset-top="barOffsetTop"
       :offset-bottom="barOffsetBottom"
       :dragging="dragging"
-      :disabled="disabled"
+      :disabled="disableModel.disableY"
       :active="activeBar"
       @on-start-drag="handleStartDragBar"
       @on-vertical-drag="handleVerticalDrag"
@@ -50,6 +51,8 @@
 import { LIB_NAME, mousewheel, limitedLoop, formatSize } from '../../../../src/util'
 import xVerticalScrollbar from './VerticalScrollbar'
 import xHorizontalScrollbar from './HorizontalScrollbar'
+
+const maxScrollDistance = 500
 
 export default {
   name: 'xScroller',
@@ -66,6 +69,10 @@ export default {
     height: [String, Number],
 
     maxHeight: [String, Number],
+
+    innerWidth: [String, Number],
+
+    innerHeight: [String, Number],
 
     scrollbarClass: String,
 
@@ -87,7 +94,7 @@ export default {
     },
 
     disabled: {
-      type: Boolean,
+      type: [Boolean, String],
       default: false
     },
 
@@ -130,12 +137,28 @@ export default {
       startTop: null,
       startLeft: null,
       moving: false,
-      hoveringBar: false,
-      resetMovingTimer: null
+      hoveringBar: false
     }
   },
 
   computed: {
+    disableModel () {
+      if (typeof this.disabled === 'boolean' && this.disabled) {
+        return {
+          disableX: true,
+          disableY: true
+        }
+      } else if (typeof this.disabled === 'string' && ['x', 'y'].includes(this.disabled)) {
+        return this.disabled === 'x'
+          ? { disableX: true, disableY: false }
+          : { disableX: false, disableY: true }
+      }
+      return {
+        disableX: false,
+        disableY: false
+      }
+    },
+
     wrapperStyles () {
       return {
         width: formatSize(this.width),
@@ -145,12 +168,19 @@ export default {
       }
     },
 
+    innerStyles () {
+      return {
+        width: formatSize(this.innerWidth),
+        height: formatSize(this.innerHeight)
+      }
+    },
+
     minLeft () {
-      return this.wrapperWidth - this.contentWidth
+      return Math.min(0, this.wrapperWidth - this.contentWidth)
     },
 
     minTop () {
-      return this.wrapperHeight - this.contentHeight
+      return Math.min(0, this.wrapperHeight - this.contentHeight)
     },
 
     dragging () {
@@ -183,6 +213,22 @@ export default {
 
     maxHeight () {
       this.checkScrollable()
+    },
+
+    innerWidth () {
+      this.checkScrollable()
+    },
+
+    innerHeight () {
+      this.checkScrollable()
+    },
+
+    scrollX (v) {
+      if (!v) this.setContentLeft(0, false)
+    },
+
+    scrollY (v) {
+      if (!v) this.setContentTop(0, false)
     }
   },
 
@@ -201,10 +247,12 @@ export default {
       }
       this.scrollX = this.contentWidth - this.wrapperWidth > 1
       this.scrollY = this.contentHeight - this.wrapperHeight > 1
+      this.checkBoundary()
     },
 
     handleMouseWheel (event, data) {
-      if (this.disabled) {
+      const { disableX, disableY } = this.disableModel
+      if (disableX && disableY) {
         event.preventDefault()
         return
       }
@@ -213,26 +261,34 @@ export default {
       const content = this.$refs.content
       let deltaLeft = this.reverseScrollY || shift ? -data.pixelY : -data.pixelX
       let deltaTop = shift ? -data.pixelX : -data.pixelY
-      if (this.scrollX && deltaLeft) {
+
+      // mac
+      if (~navigator.userAgent.indexOf('Mac OS X')) {
+        deltaLeft = Math.min(maxScrollDistance, Math.max(-maxScrollDistance, deltaLeft))
+        deltaTop = Math.min(maxScrollDistance, Math.max(-maxScrollDistance, deltaTop))
+      }
+
+      const moveVertical = Math.abs(deltaLeft) < Math.abs(deltaTop)
+      if (!disableX && this.scrollX && deltaLeft && !moveVertical) {
         let lastLeft = this.currentLeft
         let left = this.getValidNumber(lastLeft + deltaLeft, this.minLeft, 0)
         if (left !== lastLeft) {
           this.currentLeft = left
           content.style.left = left + 'px'
           if (this.$refs.horizontal) {
-            this.$refs.horizontal.setLeft(left)
+            this.$refs.horizontal.setLeft(left / this.minLeft)
           }
           this.emitEvent(left, false)
           event.preventDefault()
         }
-      } else if (this.scrollY && deltaTop) {
+      } else if (!disableY && this.scrollY && deltaTop && moveVertical) {
         let lastTop = this.currentTop
         let top = this.getValidNumber(lastTop + deltaTop, this.minTop, 0)
         if (top !== lastTop) {
           this.currentTop = top
           content.style.top = top + 'px'
           if (this.$refs.vertical) {
-            this.$refs.vertical.setTop(top)
+            this.$refs.vertical.setTop(top / this.minTop)
           }
           this.emitEvent(top, true)
           event.preventDefault()
@@ -258,7 +314,7 @@ export default {
 
     handleVerticalDrag (barTopPercentage) {
       const content = this.$refs.content
-      let top = this.getValidNumber(-barTopPercentage * this.contentHeight, this.minTop, 0)
+      let top = this.getValidNumber(barTopPercentage * this.minTop, this.minTop, 0)
       if (top !== this.currentTop) {
         this.currentTop = top
         content.style.top = top + 'px'
@@ -270,7 +326,7 @@ export default {
     handleHorizontalDrag (barLeftPercentage) {
       const content = this.$refs.content
 
-      let left = this.getValidNumber(-barLeftPercentage * this.contentWidth, this.minLeft, 0)
+      let left = this.getValidNumber(barLeftPercentage * this.minLeft, this.minLeft, 0)
       if (left !== this.currentLeft) {
         this.currentLeft = left
         content.style.left = left + 'px'
@@ -281,7 +337,10 @@ export default {
 
     startDrag (event) {
       event.preventDefault()
-      if (this.disabled) return
+      const { disableX, disableY } = this.disableModel
+      this.$emit('start-drag')
+
+      if (disableX && disableY) return
 
       event = event.changedTouches[0]
       this.startTop = this.currentTop
@@ -293,28 +352,31 @@ export default {
 
     onDrag (e) {
       if (!this.bodyDragging) return
+      this.$emit('dragging')
+
+      const { disableX, disableY } = this.disableModel
 
       const content = this.$refs.content
       const event = e.changedTouches[0]
-      if (this.scrollX) {
+      if (!disableX && this.scrollX) {
         let left = this.getValidNumber(this.startLeft + event.clientX - this.startClientX, this.minLeft, 0)
         if (left !== this.currentLeft) {
           this.currentLeft = left
           content.style.left = left + 'px'
           if (this.$refs.horizontal) {
-            this.$refs.horizontal.setLeft(left)
+            this.$refs.horizontal.setLeft(left / this.minLeft)
           }
           this.emitEvent(left, false)
           e.preventDefault()
         }
       }
-      if (this.scrollY) {
+      if (!disableY && this.scrollY) {
         let top = this.getValidNumber(this.startTop + event.clientY - this.startClientY, this.minTop, 0)
         if (top !== this.currentTop) {
           this.currentTop = top
           content.style.top = top + 'px'
           if (this.$refs.vertical) {
-            this.$refs.vertical.setTop(top)
+            this.$refs.vertical.setTop(top / this.minTop)
           }
           this.emitEvent(top, true)
           e.preventDefault()
@@ -327,23 +389,14 @@ export default {
       if (this.bodyDragging) {
         this.bodyDragging = false
       }
+      this.$emit('end-drag')
     },
 
     emitEvent (amount, vertical) {
       if (vertical) {
-        if (amount === 0) {
-          this.$nextTick(() => this.$emit('on-y-start'))
-        } else if (amount === this.minTop) {
-          this.$nextTick(() => this.$emit('on-y-end'))
-        }
-        this.$emit('on-scroll-y', amount)
+        this.$emit('on-scroll-y', amount, amount === 0, amount === this.minTop)
       } else {
-        if (amount === 0) {
-          this.$nextTick(() => this.$emit('on-x-start'))
-        } else if (amount === this.minLeft) {
-          this.$nextTick(() => this.$emit('on-x-end'))
-        }
-        this.$emit('on-scroll-x', amount)
+        this.$emit('on-scroll-x', amount, amount === 0, amount === this.minLeft)
       }
     },
 
@@ -351,6 +404,21 @@ export default {
       this.checkScrollable()
       if (!this.contentWidth || !this.contentHeight) {
         limitedLoop.nextTick(this.forceCheck, this)
+      }
+      // reset
+      this.forceCheck.startTime = null
+    },
+
+    checkBoundary () {
+      if (this.currentLeft > 0) {
+        this.setContentLeft(0, false)
+      } else if (this.currentLeft < this.minLeft) {
+        this.setContentLeft(this.minLeft, false)
+      }
+      if (this.currentTop > 0) {
+        this.setContentTop(0, false)
+      } else if (this.currentTop < this.minTop) {
+        this.setContentTop(this.minTop, false)
       }
     },
 
@@ -360,13 +428,13 @@ export default {
       this.currentLeft = left
       if (!transition) {
         this.bodyDragging = true
-        setTimeout(() => {
+        this.timer1 = setTimeout(() => {
           this.bodyDragging = false
         }, 500)
       }
       this.$refs.content.style.left = left + 'px'
       if (this.$refs.horizontal) {
-        this.$refs.horizontal.setLeft(left)
+        this.$refs.horizontal.setLeft(left / this.minLeft)
       }
       this.handleAction()
     },
@@ -377,13 +445,13 @@ export default {
       this.currentTop = top
       if (!transition) {
         this.bodyDragging = true
-        setTimeout(() => {
+        this.timer2 = setTimeout(() => {
           this.bodyDragging = false
         }, 500)
       }
       this.$refs.content.style.top = top + 'px'
       if (this.$refs.vertical) {
-        this.$refs.vertical.setTop(top)
+        this.$refs.vertical.setTop(top / this.minTop)
       }
       this.handleAction()
     },
@@ -393,22 +461,26 @@ export default {
       const content = this.$refs.content
       if (!transition) {
         this.bodyDragging = true
-        setTimeout(() => {
+        this.timer3 = setTimeout(() => {
           this.bodyDragging = false
         }, 500)
       }
       if (vertical) {
         this.currentTop = start ? 0 : this.minTop
         content.style.top = start ? 0 : this.minTop + 'px'
-        if (this.$refs.vertical) {
-          this.$refs.vertical.setTop(this.currentTop)
-        }
+        this.$nextTick(() => {
+          if (this.$refs.vertical) {
+            this.$refs.vertical.setTop(this.currentTop / this.minTop)
+          }
+        })
       } else {
         this.currentLeft = start ? 0 : this.minLeft
         content.style.left = start ? 0 : this.minLeft + 'px'
-        if (this.$refs.horizontal) {
-          this.$refs.horizontal.setLeft(this.currentLeft)
-        }
+        this.$nextTick(() => {
+          if (this.$refs.horizontal) {
+            this.$refs.horizontal.setLeft(this.currentLeft / this.minLeft)
+          }
+        })
       }
       this.handleAction()
     },
@@ -454,6 +526,13 @@ export default {
         this.forceCheck()
       })
     }
+  },
+
+  beforeDestroy () {
+    clearTimeout(this.timer1)
+    clearTimeout(this.timer2)
+    clearTimeout(this.timer3)
+    clearTimeout(this.resetMovingTimer)
   }
 }
 </script>
