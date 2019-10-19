@@ -67,7 +67,8 @@ v-ps<template>
             <span>{{item.type}}</span>
           </td>
           <td>
-            <span class="ellipsis">{{item.desc || '-'}}</span>
+            <span v-if="item.desc" class="ellipsis" v-tooltip="item.desc">{{item.desc}}</span>
+            <span v-else>-</span>
           </td>
           <td>
             <span>{{item.resourceName}}</span>
@@ -76,7 +77,8 @@ v-ps<template>
             <span>{{item.database || '-'}}</span>
           </td>
           <td>
-            <span>{{item.updateTime | formatDate}}</span>
+            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
+            <span v-else>-</span>
           </td>
           <td>
             <x-button

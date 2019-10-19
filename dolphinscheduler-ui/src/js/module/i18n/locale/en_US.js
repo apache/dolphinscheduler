@@ -176,6 +176,7 @@ export default {
   'Authorize': 'Authorize',
   'File resources': 'File resources',
   'UDF resources': 'UDF resources',
+  'Upload File Size': 'Upload File size cannot exceed 1g',
   'Edit alarm group': 'Edit alarm group',
   'Create alarm group': 'Create alarm group',
   'Group Name': 'Group Name',

@@ -62,12 +62,16 @@
           <td><span>{{_rtPublishStatus(item.releaseState)}}</span></td>
           <td>
             <span v-if="item.createTime">{{item.createTime | formatDate}}</span>
-            <span v-if="!item.createTime">-</span>
+            <span v-else>-</span>
           </td>
           <td>
-            <span>{{item.updateTime | formatDate}}</span>
+            <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
+            <span v-else>-</span>
           </td>
-          <td><span class="ellipsis">{{item.desc}}</span></td>
+          <td>
+            <span v-if="item.desc" class="ellipsis" v-tooltip="item.desc">{{item.desc}}</span>
+            <span v-else>-</span>
+          </td>
           <td>
             <span v-if="item.scheduleReleaseState === 'OFFLINE'">{{$t('offline')}}</span>
             <span v-if="item.scheduleReleaseState === 'ONLINE'">{{$t('online')}}</span>

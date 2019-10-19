@@ -127,13 +127,19 @@
             name: this.name,
             type: this.type
           }).then(res => {
-            this._formDataUpdate().then(res => {
-              setTimeout(() => {
+            const isLt1024M = this.file.size / 1024 / 1024 < 1024
+            if(isLt1024M) {
+              this._formDataUpdate().then(res => {
+                setTimeout(() => {
+                  this.$refs['popup'].spinnerLoading = false
+                }, 800)
+              }).catch(e => {
                 this.$refs['popup'].spinnerLoading = false
-              }, 800)
-            }).catch(e => {
+              })
+            } else {
+              this.$message.warning(`${i18n.$t('Upload File Size')}`)
               this.$refs['popup'].spinnerLoading = false
-            })
+            }
           }).catch(e => {
             this.$message.error(e.msg || '')
             this.$refs['popup'].spinnerLoading = false
