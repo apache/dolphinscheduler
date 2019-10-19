@@ -55,7 +55,7 @@ public class MysqlUpgradeDao extends UpgradeDao {
         ResultSet rs = null;
         Connection conn = null;
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             rs = conn.getMetaData().getTables(null, null, tableName, null);
             if (rs.next()) {
                 return true;
@@ -81,7 +81,7 @@ public class MysqlUpgradeDao extends UpgradeDao {
     public boolean isExistsColumn(String tableName,String columnName) {
         Connection conn = null;
         try {
-            conn = ConnectionFactory.getDataSource().getConnection();
+            conn = dataSource.getConnection();
             ResultSet rs = conn.getMetaData().getColumns(null,null,tableName,columnName);
             if (rs.next()) {
                 return true;

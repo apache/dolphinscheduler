@@ -33,7 +33,7 @@ public class TaskCountDto {
     private int totalCount;
 
     /**
-     *
+     * task state count list
      */
     private List<TaskStateCount> taskCountDtos;
 
@@ -54,7 +54,6 @@ public class TaskCountDto {
         int need_fault_tolerance = 0;
         int kill = 0;
         int waitting_thread = 0;
-        int waitting_depend = 0;
 
         for(ExecuteStatusCount taskInstanceStateCount : taskInstanceStateCounts){
             ExecutionStatus status = taskInstanceStateCount.getExecutionStatus();
@@ -85,16 +84,13 @@ public class TaskCountDto {
                     success += taskInstanceStateCount.getCount();
                     break;
                 case NEED_FAULT_TOLERANCE:
-                    failure += taskInstanceStateCount.getCount();
+                    need_fault_tolerance += taskInstanceStateCount.getCount();
                     break;
                 case KILL:
                     kill += taskInstanceStateCount.getCount();
                     break;
                 case WAITTING_THREAD:
-                    kill += taskInstanceStateCount.getCount();
-                    break;
-                case WAITTING_DEPEND:
-                    kill += taskInstanceStateCount.getCount();
+                    waitting_thread += taskInstanceStateCount.getCount();
                     break;
 
                     default:
@@ -113,7 +109,6 @@ public class TaskCountDto {
         this.taskCountDtos.add(new TaskStateCount(ExecutionStatus.NEED_FAULT_TOLERANCE, need_fault_tolerance));
         this.taskCountDtos.add(new TaskStateCount(ExecutionStatus.KILL, kill));
         this.taskCountDtos.add(new TaskStateCount(ExecutionStatus.WAITTING_THREAD, waitting_thread));
-        this.taskCountDtos.add(new TaskStateCount(ExecutionStatus.WAITTING_DEPEND, waitting_depend));
     }
 
 
