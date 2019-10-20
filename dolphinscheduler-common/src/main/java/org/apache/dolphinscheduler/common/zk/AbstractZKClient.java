@@ -201,8 +201,10 @@ public abstract class AbstractZKClient {
         for(String serverPath : deadServers){
             if(serverPath.startsWith(serverType+UNDERLINE+host)){
 				String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
-				zkClient.delete().forPath(server);
-                logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
+				if(zkClient.checkExists().forPath(server) != null){
+					zkClient.delete().forPath(server);
+					logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
+				}
             }
         }
 	}
