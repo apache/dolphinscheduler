@@ -214,7 +214,7 @@ public class EnterpriseWeChatUtils {
             }
 
             StringBuilder contents = new StringBuilder(100);
-            contents.append(String.format("`%s`\n",title));
+            contents.append(String.format("`%s`%n",title));
             for (String str : list){
                 contents.append(Constants.MARKDOWN_QUOTE);
                 contents.append(str);

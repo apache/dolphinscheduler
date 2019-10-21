@@ -147,6 +147,7 @@ public class TaskRecordDao {
 
         int count = 0;
         Connection conn = null;
+        PreparedStatement pstmt = null;
         try {
             conn = getConn();
             if(conn == null){
@@ -154,7 +155,6 @@ public class TaskRecordDao {
             }
             String sql = String.format("select count(1) as count from %s", table);
             sql += getWhereString(filterMap);
-            PreparedStatement pstmt;
             pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             while(rs.next()){
@@ -165,6 +165,9 @@ public class TaskRecordDao {
             logger.error("Exception ", e);
         }finally {
             try {
+                if(pstmt != null) {
+                    pstmt.close();
+                }
                 if(conn != null){
                     conn.close();
                 }
@@ -234,12 +237,12 @@ public class TaskRecordDao {
     private static List<TaskRecord> getQueryResult(String selectSql) {
         List<TaskRecord> recordList = new ArrayList<>();
         Connection conn = null;
+        PreparedStatement pstmt = null;
         try {
             conn = getConn();
             if(conn == null){
                 return recordList;
             }
-            PreparedStatement pstmt;
             pstmt = conn.prepareStatement(selectSql);
             ResultSet rs = pstmt.executeQuery();
 
@@ -251,6 +254,9 @@ public class TaskRecordDao {
             logger.error("Exception ", e);
         }finally {
             try {
+                if(pstmt != null) {
+                    pstmt.close();
+                }
                 if(conn != null){
                     conn.close();
                 }
