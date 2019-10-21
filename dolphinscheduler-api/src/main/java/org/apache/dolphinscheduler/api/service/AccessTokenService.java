@@ -117,7 +117,7 @@ public class AccessTokenService extends BaseService {
         if (insert > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.CREATE_ALERT_GROUP_ERROR);
+            putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
         }
 
         return result;
