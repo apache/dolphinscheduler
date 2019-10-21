@@ -817,7 +817,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
         if (processDefinition == null) {
             logger.info("process define not exists");
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST);
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineId);
             return result;
         }
 
