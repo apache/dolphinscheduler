@@ -110,7 +110,7 @@ public class WorkerGroupController extends BaseController{
 
         try {
             searchVal = ParameterUtils.handleEscapes(searchVal);
-            Map<String, Object> result = workerGroupService.queryAllGroupPaging(pageNo, pageSize, searchVal);
+            Map<String, Object> result = workerGroupService.queryAllGroupPaging(loginUser,pageNo, pageSize, searchVal);
             return returnDataListPaging(result);
         }catch (Exception e){
             logger.error(Status.SAVE_ERROR.getMsg(),e);

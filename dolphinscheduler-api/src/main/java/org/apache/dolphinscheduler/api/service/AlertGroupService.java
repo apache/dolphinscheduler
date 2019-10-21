@@ -81,6 +81,9 @@ public class AlertGroupService {
     public Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>(5);
+        if (checkAdmin(loginUser, result)) {
+            return result;
+        }
 
         Page<AlertGroup> page = new Page(pageNo, pageSize);
         IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(

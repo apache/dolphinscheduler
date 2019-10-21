@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -108,14 +109,18 @@ public class WorkerGroupService extends BaseService {
 
     /**
      * query worker group paging
+     * @param loginUser
      * @param pageNo
      * @param pageSize
      * @param searchVal
      * @return
      */
-    public Map<String,Object> queryAllGroupPaging(Integer pageNo, Integer pageSize, String searchVal) {
+    public Map<String,Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
 
         Map<String, Object> result = new HashMap<>(5);
+        if (checkAdmin(loginUser, result)) {
+            return result;
+        }
 
         Page<WorkerGroup> page = new Page(pageNo, pageSize);
         IPage<WorkerGroup> workerGroupIPage = workerGroupMapper.queryListPaging(
