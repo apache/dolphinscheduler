@@ -226,7 +226,7 @@ public class FetchTaskThread implements Runnable{
                     workerExecService.submit(new TaskScheduleThread(taskInstance, processDao));
 
                     // remove node from zk
-                    taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
+                    removeNodeFromTaskQueue(taskQueueStr);
                 }
 
             }catch (Exception e){
@@ -237,6 +237,10 @@ public class FetchTaskThread implements Runnable{
         }
     }
 
+    private void removeNodeFromTaskQueue(String taskQueueStr){
+        taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
+    }
+
     /**
      * verify task instance is null
      * @param taskQueueStr
@@ -245,7 +249,7 @@ public class FetchTaskThread implements Runnable{
     private boolean verifyTaskInstanceIsNull(String taskQueueStr) {
         if (taskInstance == null ) {
             logger.error("task instance is null. task id : {} ", taskInstId);
-            taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
+            removeNodeFromTaskQueue(taskQueueStr);
             return true;
         }
         return false;
@@ -263,7 +267,7 @@ public class FetchTaskThread implements Runnable{
                     taskInstance.getProcessDefine().getId(),
                     taskInstance.getProcessInstance().getId(),
                     taskInstance.getId());
-            taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
+            removeNodeFromTaskQueue(taskQueueStr);
             return true;
         }
         return false;
