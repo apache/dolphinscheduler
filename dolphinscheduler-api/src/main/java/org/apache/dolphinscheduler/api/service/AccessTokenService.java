@@ -57,6 +57,9 @@ public class AccessTokenService extends BaseService {
      */
     public Map<String, Object> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>(5);
+        if (checkAdmin(loginUser, result)) {
+            return result;
+        }
 
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<AccessToken> page = new Page(pageNo, pageSize);
@@ -117,7 +120,7 @@ public class AccessTokenService extends BaseService {
         if (insert > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.CREATE_ALERT_GROUP_ERROR);
+            putMsg(result, Status.CREATE_ACCESS_TOKEN_ERROR);
         }
 
         return result;
