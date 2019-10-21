@@ -120,9 +120,9 @@ public class ProcessInstanceService extends BaseDAGService {
         }else{
             WorkerGroup workerGroup = workerGroupMapper.selectById(processInstance.getWorkerGroupId());
             if(workerGroup != null){
-                workerGroupName = DEFAULT;
-            }else{
                 workerGroupName = workerGroup.getName();
+            }else{
+                workerGroupName = DEFAULT;
             }
         }
         processInstance.setWorkerGroupName(workerGroupName);
@@ -165,13 +165,9 @@ public class ProcessInstanceService extends BaseDAGService {
         }
 
         int[] statusArray = null;
-        String statesStr = null;
         // filter by state
         if (stateType != null) {
             statusArray = new int[]{stateType.ordinal()};
-        }
-        if (statusArray != null) {
-            statesStr = Arrays.toString(statusArray).replace("[", "").replace("]", "");
         }
 
         Date start = null;

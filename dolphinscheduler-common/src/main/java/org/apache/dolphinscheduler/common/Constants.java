@@ -368,7 +368,7 @@ public final class Constants {
     /**
      * heartbeat threads number
      */
-    public static final int defaulWorkerHeartbeatThreadNum = 5;
+    public static final int defaulWorkerHeartbeatThreadNum = 1;
 
     /**
      * heartbeat interval
@@ -431,7 +431,7 @@ public final class Constants {
     /**
      * default master heartbeat thread number
      */
-    public static final int defaulMasterHeartbeatThreadNum = 5;
+    public static final int defaulMasterHeartbeatThreadNum = 1;
 
 
     /**

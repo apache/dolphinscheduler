@@ -589,8 +589,8 @@ public class ProcessDefinitionService extends BaseDAGService {
                     Schedule schedule = schedules.get(0);
                     row.put("scheduleWarningType", schedule.getWarningType());
                     row.put("scheduleWarningGroupId", schedule.getWarningGroupId());
-                    row.put("scheduleStartTime", schedule.getStartTime());
-                    row.put("scheduleEndTime", schedule.getEndTime());
+                    row.put("scheduleStartTime", DateUtils.dateToString(schedule.getStartTime()));
+                    row.put("scheduleEndTime", DateUtils.dateToString(schedule.getEndTime()));
                     row.put("scheduleCrontab", schedule.getCrontab());
                     row.put("scheduleFailureStrategy", schedule.getFailureStrategy());
                     row.put("scheduleReleaseState", ReleaseState.OFFLINE);
@@ -749,6 +749,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     scheduleObj.setUserId(loginUser.getId());
                     scheduleObj.setUserName(loginUser.getUserName());
 
+
                     scheduleCrontab = json.get("scheduleCrontab").toString();
                     scheduleObj.setCrontab(scheduleCrontab);
                     if (ObjectUtils.allNotNull(json.get("scheduleStartTime"))) {
@@ -869,7 +870,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
         if (processDefinition == null) {
             logger.info("process define not exists");
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefinition.getId());
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineId);
             return result;
         }
 

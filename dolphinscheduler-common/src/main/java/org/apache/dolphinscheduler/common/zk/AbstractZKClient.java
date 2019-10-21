@@ -55,7 +55,7 @@ public abstract class AbstractZKClient {
 	 *  load configuration file
 	 */
 	protected static Configuration conf;
-	
+
 	protected  CuratorFramework zkClient = null;
 
 	/**
@@ -92,13 +92,13 @@ public abstract class AbstractZKClient {
 
 			zkClient.start();
 			initStateLister();
-			
+
 		}catch(Exception e){
 			logger.error("create zookeeper connect failed : " + e.getMessage(),e);
 			System.exit(-1);
 		}
     }
-	
+
 	/**
 	 *
 	 *  register status monitoring events for zookeeper clients
@@ -109,7 +109,7 @@ public abstract class AbstractZKClient {
 		}
 		// add ConnectionStateListener monitoring zookeeper  connection state
 		ConnectionStateListener csLister = new ConnectionStateListener() {
-			
+
 			@Override
 			public void stateChanged(CuratorFramework client, ConnectionState newState) {
 				logger.info("state changed , current state : " + newState.name());
@@ -122,7 +122,7 @@ public abstract class AbstractZKClient {
 				}
 			}
 		};
-		
+
 		zkClient.getConnectionStateListenable().addListener(csLister);
 	}
 
@@ -201,8 +201,10 @@ public abstract class AbstractZKClient {
         for(String serverPath : deadServers){
             if(serverPath.startsWith(serverType+UNDERLINE+host)){
 				String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
-				zkClient.delete().forPath(server);
-                logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
+				if(zkClient.checkExists().forPath(server) != null){
+					zkClient.delete().forPath(server);
+					logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
+				}
             }
         }
 	}
@@ -346,9 +348,9 @@ public abstract class AbstractZKClient {
 
 		List<MasterServer> masterServers = new ArrayList<>();
 		int i = 0;
-		for(String path : masterMap.keySet()){
-			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(masterMap.get(path));
-			masterServer.setZkDirectory( parentPath + "/"+ path);
+		for (Map.Entry<String, String> entry : masterMap.entrySet()) {
+			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
+			masterServer.setZkDirectory( parentPath + "/"+ entry.getKey());
 			masterServer.setId(i);
 			i ++;
 			masterServers.add(masterServer);
