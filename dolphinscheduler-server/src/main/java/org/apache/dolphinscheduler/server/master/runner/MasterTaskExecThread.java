@@ -74,7 +74,6 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     public Boolean waitTaskQuit(){
         // query new state
         taskInstance = processDao.findTaskInstanceById(taskInstance.getId());
-        Boolean result = true;
         // task time out
         Boolean checkTimeout = false;
         TaskTimeoutParameter taskTimeoutParameter = getTaskTimeoutParameter();
@@ -89,7 +88,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
             try {
                 if(this.processInstance == null){
                     logger.error("process instance not exists , master task exec thread exit");
-                    return result;
+                    return true;
                 }
                 // task instance add queue , waiting worker to kill
                 if(this.cancel || this.processInstance.getState() == ExecutionStatus.READY_STOP){
@@ -116,11 +115,13 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
                 logger.error("exception: "+ e.getMessage(),e);
-                logger.error("wait task quit failed, instance id:{}, task id:{}",
-                        processInstance.getId(), taskInstance.getId());
+                if (processInstance != null) {
+                    logger.error("wait task quit failed, instance id:{}, task id:{}",
+                            processInstance.getId(), taskInstance.getId());
+                }
             }
         }
-        return  result;
+        return true;
     }
 
 

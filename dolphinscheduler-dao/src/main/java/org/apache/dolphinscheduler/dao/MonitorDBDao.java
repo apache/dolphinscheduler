@@ -83,6 +83,7 @@ public class MonitorDBDao {
         List<MonitorRecord> list = new ArrayList<>(1);
 
         Connection conn = null;
+        Statement pstmt = null;
         long maxConnections = 0;
         long maxUsedConnections = 0;
         long threadsConnections = 0;
@@ -98,7 +99,7 @@ public class MonitorDBDao {
                 return list;
             }
 
-            Statement pstmt = conn.createStatement();
+            pstmt = conn.createStatement();
 
             ResultSet rs1 = pstmt.executeQuery("show global variables");
             while(rs1.next()){
@@ -124,6 +125,9 @@ public class MonitorDBDao {
             state = 0;
         }finally {
             try {
+                if(pstmt != null) {
+                    pstmt.close();
+                }
                 if(conn != null){
                     conn.close();
                 }

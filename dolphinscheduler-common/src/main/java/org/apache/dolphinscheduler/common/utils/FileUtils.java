@@ -153,8 +153,9 @@ public class FileUtils {
         BufferedWriter bufferedWriter = null;
         try {
             File distFile = new File(filePath);
-            if (!distFile.getParentFile().exists()) {
-                distFile.getParentFile().mkdirs();
+            if (!distFile.getParentFile().exists() && !distFile.getParentFile().mkdirs()) {
+                FileUtils.logger.error("mkdir parent failed");
+                return false;
             }
             bufferedReader = new BufferedReader(new StringReader(content));
             bufferedWriter = new BufferedWriter(new FileWriter(distFile));

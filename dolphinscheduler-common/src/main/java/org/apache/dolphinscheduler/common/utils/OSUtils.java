@@ -156,7 +156,9 @@ public class OSUtils {
       logger.error(e.getMessage(), e);
     } finally {
       try {
-        bufferedReader.close();
+        if (bufferedReader != null) {
+          bufferedReader.close();
+        }
       } catch (IOException e) {
         logger.error(e.getMessage(), e);
       }
