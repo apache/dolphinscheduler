@@ -183,7 +183,7 @@ public class FetchTaskThread implements Runnable{
                     // verify task instance is null
                     if (verifyTaskInstanceIsNull(taskInstance)) {
                         logger.warn("remove task queue : {} due to taskInstance is null", taskQueueStr);
-                        taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
+                        removeNodeFromTaskQueue(taskQueueStr);
                         continue;
                     }
 
@@ -193,7 +193,7 @@ public class FetchTaskThread implements Runnable{
                     // verify tenant is null
                     if (verifyTenantIsNull(tenant)) {
                         logger.warn("remove task queue : {} due to tenant is null", taskQueueStr);
-                        taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
+                        removeNodeFromTaskQueue(taskQueueStr);
                         continue;
                     }
 
