@@ -1241,6 +1241,9 @@ public class ProcessDao extends AbstractBaseDao {
     public TaskInstance getTaskInstanceDetailByTaskId(int taskInstId){
         // get task instance
         TaskInstance taskInstance = findTaskInstanceById(taskInstId);
+        if(taskInstance == null){
+            return taskInstance;
+        }
         // get process instance
         ProcessInstance processInstance = findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         // get process define
