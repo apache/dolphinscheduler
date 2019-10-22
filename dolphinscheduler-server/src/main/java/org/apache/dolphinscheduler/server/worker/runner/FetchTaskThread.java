@@ -180,6 +180,9 @@ public class FetchTaskThread implements Runnable{
                     // get task instance relation
                     taskInstance = processDao.getTaskInstanceDetailByTaskId(taskInstId);
 
+                    // mainly to wait for the master insert task to succeed
+                    waitForMasterEnterQueue();
+
                     // verify task instance is null
                     if (verifyTaskInstanceIsNull(taskInstance)) {
                         logger.warn("remove task queue : {} due to taskInstance is null", taskQueueStr);
@@ -204,8 +207,6 @@ public class FetchTaskThread implements Runnable{
 
                     logger.info("worker fetch taskId : {} from queue ", taskInstId);
 
-                    // mainly to wait for the master insert task to succeed
-                    waitForMasterEnterQueue();
 
                     if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
                         continue;
@@ -308,7 +309,6 @@ public class FetchTaskThread implements Runnable{
      */
     private void waitForMasterEnterQueue()throws Exception{
         int retryTimes = 30;
-
         while (taskInstance == null && retryTimes > 0) {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             taskInstance = processDao.findTaskInstanceById(taskInstId);
