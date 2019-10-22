@@ -129,12 +129,16 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      *  task instance add queue , waiting worker to kill
      */
     private void cancelTaskInstance(){
-        if(alreadyKilled || taskInstance.getHost() == null){
+        if(alreadyKilled){
             return ;
         }
         alreadyKilled = true;
+        String host = taskInstance.getHost();
+        if(host == null){
+            host = Constants.NULL;
+        }
         String queueValue = String.format("%s-%d",
-                taskInstance.getHost(), taskInstance.getId());
+                host, taskInstance.getId());
         taskQueue.sadd(DOLPHINSCHEDULER_TASKS_KILL, queueValue);
 
         logger.info("master add kill task :{} id:{} to kill queue",

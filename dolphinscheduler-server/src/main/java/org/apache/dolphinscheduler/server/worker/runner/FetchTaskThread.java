@@ -104,6 +104,7 @@ public class FetchTaskThread implements Runnable{
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Fetch-Task-Thread",workerExecNums);
         this.conf = conf;
         this.taskQueue = taskQueue;
+        this.taskInstance = null;
     }
 
     /**
@@ -177,13 +178,15 @@ public class FetchTaskThread implements Runnable{
                     // get task instance id
                     taskInstId = getTaskInstanceId(taskQueueStr);
 
-                    // get task instance relation
-                    taskInstance = processDao.getTaskInstanceRelationByTaskId(taskInstId);
+                    // mainly to wait for the master insert task to succeed
+                    waitForMasterEnterQueue();
+
+                    taskInstance = processDao.getTaskInstanceDetailByTaskId(taskInstId);
 
                     // verify task instance is null
                     if (verifyTaskInstanceIsNull(taskInstance)) {
                         logger.warn("remove task queue : {} due to taskInstance is null", taskQueueStr);
-                        taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
+                        removeNodeFromTaskQueue(taskQueueStr);
                         continue;
                     }
 
@@ -193,7 +196,7 @@ public class FetchTaskThread implements Runnable{
                     // verify tenant is null
                     if (verifyTenantIsNull(tenant)) {
                         logger.warn("remove task queue : {} due to tenant is null", taskQueueStr);
-                        taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
+                        removeNodeFromTaskQueue(taskQueueStr);
                         continue;
                     }
 
@@ -204,8 +207,6 @@ public class FetchTaskThread implements Runnable{
 
                     logger.info("worker fetch taskId : {} from queue ", taskInstId);
 
-                    // mainly to wait for the master insert task to succeed
-                    waitForMasterEnterQueue();
 
                     if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
                         continue;
@@ -230,7 +231,7 @@ public class FetchTaskThread implements Runnable{
                     workerExecService.submit(new TaskScheduleThread(taskInstance, processDao));
 
                     // remove node from zk
-                    taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
+                    removeNodeFromTaskQueue(taskQueueStr);
                 }
 
             }catch (Exception e){
@@ -239,6 +240,10 @@ public class FetchTaskThread implements Runnable{
                 AbstractZKClient.releaseMutex(mutex);
             }
         }
+    }
+
+    private void removeNodeFromTaskQueue(String taskQueueStr){
+        taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
     }
 
     /**
@@ -304,7 +309,6 @@ public class FetchTaskThread implements Runnable{
      */
     private void waitForMasterEnterQueue()throws Exception{
         int retryTimes = 30;
-
         while (taskInstance == null && retryTimes > 0) {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             taskInstance = processDao.findTaskInstanceById(taskInstId);

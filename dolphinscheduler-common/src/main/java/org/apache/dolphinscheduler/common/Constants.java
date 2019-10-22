@@ -484,6 +484,7 @@ public final class Constants {
     public static final String USER = "user";
     public static final String PASSWORD = "password";
     public static final String XXXXXX = "******";
+    public static final String NULL = "NULL";
 
     public static  String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
 
