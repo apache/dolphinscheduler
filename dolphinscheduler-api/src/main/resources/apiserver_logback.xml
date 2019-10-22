@@ -38,6 +38,5 @@
 
 	<root level="INFO">
 		<appender-ref ref="APISERVERLOGFILE" />
-		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>
