@@ -28,6 +28,7 @@
             <x-input
                     type="input"
                     v-model="userName"
+                    maxlength="60"
                     :placeholder="$t('Please enter user name')">
             </x-input>
           </template>

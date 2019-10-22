@@ -353,7 +353,7 @@
     min-height: 300px;
     background: #fff;
     border-radius: 3px;
-    margin-top: -24%;
+    margin-top: 0;
     .crontab-box {
       margin: -6px;
       .v-crontab {
