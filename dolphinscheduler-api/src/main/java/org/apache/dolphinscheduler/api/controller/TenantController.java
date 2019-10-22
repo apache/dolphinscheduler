@@ -203,7 +203,7 @@ public class TenantController extends BaseController{
     @ResponseStatus(HttpStatus.OK)
     public Result deleteTenantById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "id") int id) {
-        logger.info("login user {}, delete tenant, tenantCode: {},", loginUser.getUserName(), id);
+        logger.info("login user {}, delete tenant, tenantId: {},", loginUser.getUserName(), id);
         try {
             Map<String, Object> result = tenantService.deleteTenantById(loginUser,id);
             return returnDataList(result);
