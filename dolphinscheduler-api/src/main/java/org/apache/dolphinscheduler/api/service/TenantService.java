@@ -16,18 +16,22 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +54,9 @@ public class TenantService extends BaseService{
 
   @Autowired
   private TenantMapper tenantMapper;
+
+  @Autowired
+  private ProcessInstanceMapper processInstanceMapper;
 
   /**
    * create tenant
@@ -227,6 +234,22 @@ public class TenantService extends BaseService{
       return result;
     }
 
+    int[] states = new int[]{
+            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+            ExecutionStatus.READY_PAUSE.ordinal(),
+            ExecutionStatus.READY_STOP.ordinal(),
+            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+            ExecutionStatus.WAITTING_THREAD.ordinal(),
+            ExecutionStatus.WAITTING_DEPEND.ordinal()
+            };
+
+    List<ProcessInstance> processInstances = processInstanceMapper.queryByTenantIdAndStatus(tenant.getId(), states);
+    if(CollectionUtils.isNotEmpty(processInstances)){
+      putMsg(result, Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
+      return result;
+    }
+
     // if resource upload startup
     if (PropertyUtils.getResUploadStartupState()){
       String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
@@ -249,6 +272,7 @@ public class TenantService extends BaseService{
     }
 
     tenantMapper.deleteById(id);
+    processInstanceMapper.updateProcessInstanceByTenantId(id, -1);
     putMsg(result, Status.SUCCESS);
     return result;
   }
