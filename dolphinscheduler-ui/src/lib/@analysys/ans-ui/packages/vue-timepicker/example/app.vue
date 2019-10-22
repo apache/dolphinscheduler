@@ -3,7 +3,7 @@
     <section class="demo-section">
       <h4>基础用法</h4>
       <div>
-        <x-timepicker @on-change="timeChange" :readonly="false" format="HH:mm"></x-timepicker>
+        <x-timepicker></x-timepicker>
       </div>
     </section>
 
@@ -18,7 +18,7 @@
     <section class="demo-section">
       <h4>时间区间</h4>
       <div>
-        <x-timepicker @on-change="timeChange" type="timerange" format="HH:mm:ss" :step="[1, 5]" :readonly="false" :value="['2018-01-01 05:00:00', '2018-01-01 06:00:00']"></x-timepicker>
+        <x-timepicker type="timerange" :value="['2018-01-01 05:00:06', '2018-01-01 06:00: 06']"></x-timepicker>
       </div>
     </section>
 

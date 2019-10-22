@@ -17,15 +17,13 @@ let customModal
 let defaultConfig = {
   // 设置全局的自动关闭时间，为0时不自动消失
   duration: 0,
-  transitionName: `${ANIMATION_PREFIX}modal-down`,
-  i18n: null
+  transitionName: `${ANIMATION_PREFIX}modal-down`
 }
 
-function getMessageInstance (i18n) {
+function getMessageInstance () {
   messageInstance = messageInstance || BoxManager.newInstance({
     prefixCls: prefixCls,
-    styles: {},
-    i18n
+    styles: {}
   })
   return messageInstance
 }
@@ -47,8 +45,7 @@ function getMessageInstance (i18n) {
  * maskClosable
  */
 function notice (options) {
-  const i18n = options.i18n || defaultConfig.i18n
-  let instance = getMessageInstance(i18n)
+  let instance = getMessageInstance()
   let keyName = `${prefixKey}${name}`
 
 
@@ -59,7 +56,6 @@ function notice (options) {
     let comp = instance.component.$children.find(o => o.name === keyName)
     if (options.render) {
       customModal = new Vue({
-        i18n,
         name: 'customModal',
         render: options.render,
         mounted () {
@@ -78,7 +74,6 @@ function notice (options) {
       }).$mount(comp.$refs.content)
     } else {
       customModal = new Vue({
-        i18n,
         name: 'defaultModal',
         data: {
           width: options.width ? options.width : '520',

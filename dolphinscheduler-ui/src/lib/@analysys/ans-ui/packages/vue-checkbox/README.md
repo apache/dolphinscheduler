@@ -11,7 +11,6 @@ label | 组合使用时有效，指定当前选项value值 | String / Number / B
 disabled | 是否禁用 | Boolean | - | false
 true-value | 自定义选中时的值 | String / Number / Boolean | - | true
 false-value | 自定义未选中时的值 | String / Number / Boolean | - | false
-indeterminate | 设置 indeterminate 状态，只负责样式控制	| Boolean | - | false
 
 ### Checkbox events
 

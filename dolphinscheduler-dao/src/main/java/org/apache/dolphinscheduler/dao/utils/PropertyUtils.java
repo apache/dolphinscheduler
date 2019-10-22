@@ -55,6 +55,9 @@ public class PropertyUtils {
 
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
+                if (fis != null) {
+                    IOUtils.closeQuietly(fis);
+                }
                 System.exit(1);
             } finally {
                 IOUtils.closeQuietly(fis);
@@ -120,7 +123,7 @@ public class PropertyUtils {
             return Boolean.parseBoolean(value);
         }
 
-        return null;
+        return false;
     }
 
     /**
