@@ -104,6 +104,7 @@ public class FetchTaskThread implements Runnable{
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Fetch-Task-Thread",workerExecNums);
         this.conf = conf;
         this.taskQueue = taskQueue;
+        this.taskInstance = null;
     }
 
     /**
@@ -177,11 +178,10 @@ public class FetchTaskThread implements Runnable{
                     // get task instance id
                     taskInstId = getTaskInstanceId(taskQueueStr);
 
-                    // get task instance relation
-                    taskInstance = processDao.getTaskInstanceDetailByTaskId(taskInstId);
-
                     // mainly to wait for the master insert task to succeed
                     waitForMasterEnterQueue();
+
+                    taskInstance = processDao.getTaskInstanceDetailByTaskId(taskInstId);
 
                     // verify task instance is null
                     if (verifyTaskInstanceIsNull(taskInstance)) {
