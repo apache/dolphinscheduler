@@ -16,6 +16,8 @@
  */
 
 import io from '~/@fedor/io/dist/io'
+import cookie from '@/module/util/cookie'
+
 
 const apiPrefix = '/dolphinscheduler'
 const reSlashPrefix = /^\/+/
@@ -71,13 +73,20 @@ io.interceptors.response.use(
 // Global request interceptor registion
 io.interceptors.request.use(
   config => {
-    let { method } = config
-    if (method === 'get') {
-      config.params = Object.assign({}, config.params, {
-        _t: Math.random()
-      })
+    let sIdCookie = cookie.get('sessionId')
+    let sessionId = sessionStorage.getItem("sessionId")
+    let  requstUrl = config.url.substring(config.url.lastIndexOf("/")+1)
+    if(requstUrl!=='login' && sIdCookie!=sessionId) {
+      window.location.href = `${PUBLIC_PATH}/view/login/index.html`
+    } else {
+      let { method } = config
+      if (method === 'get') {
+        config.params = Object.assign({}, config.params, {
+          _t: Math.random()
+        })
+      }
+      return config
     }
-    return config
   }, error => {
     // Do something with request error
     return Promise.reject(error)

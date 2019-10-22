@@ -28,7 +28,7 @@
                   type="text"
                   v-model="userName"
                   :placeholder="$t('Please enter user name')"
-                  maxlength="20"
+                  maxlength="60"
                   @on-enterkey="_ok">
           </x-input>
         </div>
@@ -62,6 +62,7 @@
 <script>
   import i18n from '@/module/i18n'
   import io from '@/module/io'
+  import cookie from '@/module/util/cookie'
 
   export default {
     name: 'login-model',
@@ -84,6 +85,8 @@
           this._gLogin().then(res => {
             setTimeout(() => {
               this.spinnerLoading = false
+              sessionStorage.setItem("sessionId", res.data)
+              cookie.set('sessionId', res.data,{ path: '/' })
               if (this.userName === 'admin') {
                 window.location.href = `${PUBLIC_PATH}/#/security/tenant`
               } else {
