@@ -96,14 +96,14 @@ public class ResourcesController extends BaseController{
      *
      * @param loginUser
      * @param alias
-     * @param desc
+     * @param description
      */
     @ApiOperation(value = "createResource", notes= "CREATE_RESOURCE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType ="Int", example = "100"),
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType ="String"),
-            @ApiImplicitParam(name = "des", value = "RESOURCE_DESC",  dataType ="String"),
+            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC",  dataType ="String"),
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true,dataType = "MultipartFile")
     })
     @PostMapping(value = "/update")
@@ -111,11 +111,11 @@ public class ResourcesController extends BaseController{
                                  @RequestParam(value ="id") int resourceId,
                                  @RequestParam(value = "type") ResourceType type,
                                  @RequestParam(value ="name")String alias,
-                                 @RequestParam(value = "desc", required = false) String desc) {
+                                 @RequestParam(value = "description", required = false) String description) {
         try {
             logger.info("login user {}, update resource, type: {}, resource alias: {}, desc: {}",
-                    loginUser.getUserName(),type, alias, desc);
-            return resourceService.updateResource(loginUser,resourceId,alias, desc,type);
+                    loginUser.getUserName(),type, alias, description);
+            return resourceService.updateResource(loginUser,resourceId,alias, description,type);
         } catch (Exception e) {
             logger.error(UPDATE_RESOURCE_ERROR.getMsg(),e);
             return error(Status.UPDATE_RESOURCE_ERROR.getCode(), Status.UPDATE_RESOURCE_ERROR.getMsg());
