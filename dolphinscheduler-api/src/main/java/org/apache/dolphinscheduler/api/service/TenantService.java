@@ -290,17 +290,7 @@ public class TenantService extends BaseService{
   }
 
   private List<ProcessInstance> getProcessInstancesByTenant(Tenant tenant) {
-    int[] states = new int[]{
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.RUNNING_EXEUTION.ordinal(),
-            ExecutionStatus.READY_PAUSE.ordinal(),
-            ExecutionStatus.READY_STOP.ordinal(),
-            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-            ExecutionStatus.WAITTING_THREAD.ordinal(),
-            ExecutionStatus.WAITTING_DEPEND.ordinal()
-            };
-
-    return processInstanceMapper.queryByTenantIdAndStatus(tenant.getId(), states);
+    return processInstanceMapper.queryByTenantIdAndStatus(tenant.getId(), org.apache.dolphinscheduler.common.Constants.NOT_TERMINATED_STATES);
   }
 
   /**
