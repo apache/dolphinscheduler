@@ -149,17 +149,7 @@ public class WorkerGroupService extends BaseService {
 
         Map<String, Object> result = new HashMap<>(5);
 
-        int[] states = new int[]{
-                ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-                ExecutionStatus.RUNNING_EXEUTION.ordinal(),
-                ExecutionStatus.READY_PAUSE.ordinal(),
-                ExecutionStatus.READY_STOP.ordinal(),
-                ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-                ExecutionStatus.WAITTING_THREAD.ordinal(),
-                ExecutionStatus.WAITTING_DEPEND.ordinal()
-        };
-
-        List<ProcessInstance> processInstances = processInstanceMapper.queryByWorkerGroupIdAndStatus(id, states);
+        List<ProcessInstance> processInstances = processInstanceMapper.queryByWorkerGroupIdAndStatus(id, org.apache.dolphinscheduler.common.Constants.NOT_TERMINATED_STATES);
         if(CollectionUtils.isNotEmpty(processInstances)){
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;
