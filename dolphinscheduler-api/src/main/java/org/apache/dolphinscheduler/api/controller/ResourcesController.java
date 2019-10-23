@@ -65,26 +65,26 @@ public class ResourcesController extends BaseController{
      *
      * @param loginUser
      * @param alias
-     * @param desc
+     * @param description
      * @param file
      */
     @ApiOperation(value = "createResource", notes= "CREATE_RESOURCE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType ="String"),
-            @ApiImplicitParam(name = "des", value = "RESOURCE_DESC",  dataType ="String"),
+            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC",  dataType ="String"),
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
     })
     @PostMapping(value = "/create")
     public Result createResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "type") ResourceType type,
                                  @RequestParam(value ="name")String alias,
-                                 @RequestParam(value = "desc", required = false) String desc,
+                                 @RequestParam(value = "description", required = false) String description,
                                  @RequestParam("file") MultipartFile file) {
         try {
             logger.info("login user {}, create resource, type: {}, resource alias: {}, desc: {}, file: {},{}",
-                    loginUser.getUserName(),type, alias, desc, file.getName(), file.getOriginalFilename());
-            return resourceService.createResource(loginUser,alias, desc,type ,file);
+                    loginUser.getUserName(),type, alias, description, file.getName(), file.getOriginalFilename());
+            return resourceService.createResource(loginUser,alias, description,type ,file);
         } catch (Exception e) {
             logger.error(CREATE_RESOURCE_ERROR.getMsg(),e);
             return error(CREATE_RESOURCE_ERROR.getCode(), CREATE_RESOURCE_ERROR.getMsg());
@@ -280,7 +280,7 @@ public class ResourcesController extends BaseController{
      * @param type
      * @param fileName
      * @param fileSuffix
-     * @param desc
+     * @param description
      * @param content
      * @return
      */
@@ -289,7 +289,7 @@ public class ResourcesController extends BaseController{
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
             @ApiImplicitParam(name = "fileName", value = "RESOURCE_NAME",required = true,  dataType ="String"),
             @ApiImplicitParam(name = "suffix", value = "SUFFIX", required = true, dataType ="String"),
-            @ApiImplicitParam(name = "des", value = "RESOURCE_DESC",  dataType ="String"),
+            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC",  dataType ="String"),
             @ApiImplicitParam(name = "content", value = "CONTENT",required = true,  dataType ="String")
     })
     @PostMapping(value = "/online-create")
@@ -297,17 +297,17 @@ public class ResourcesController extends BaseController{
                                        @RequestParam(value = "type") ResourceType type,
                                        @RequestParam(value ="fileName")String fileName,
                                        @RequestParam(value ="suffix")String fileSuffix,
-                                       @RequestParam(value = "desc", required = false) String desc,
+                                       @RequestParam(value = "description", required = false) String description,
                                        @RequestParam(value = "content") String content
     ) {
         try{
             logger.info("login user {}, online create resource! fileName : {}, type : {}, suffix : {},desc : {},content : {}",
-                    loginUser.getUserName(),type,fileName,fileSuffix,desc,content);
+                    loginUser.getUserName(),type,fileName,fileSuffix,description,content);
             if(StringUtils.isEmpty(content)){
                 logger.error("resource file contents are not allowed to be empty");
                 return error(Status.RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
             }
-            return resourceService.onlineCreateResource(loginUser,type,fileName,fileSuffix,desc,content);
+            return resourceService.onlineCreateResource(loginUser,type,fileName,fileSuffix,description,content);
         }catch (Exception e){
             logger.error(CREATE_RESOURCE_FILE_ON_LINE_ERROR.getMsg(),e);
             return error(Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR.getCode(), Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR.getMsg());
