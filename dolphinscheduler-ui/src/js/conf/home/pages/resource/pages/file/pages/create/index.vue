@@ -48,7 +48,7 @@
           <template slot="content">
             <x-input
                     type="textarea"
-                    v-model="desc"
+                    v-model="description"
                     style="width: 430px;"
                     :placeholder="$t('Please enter description')"
                     autocomplete="off">
@@ -92,7 +92,7 @@
       return {
         suffix: 'sh',
         fileName: '',
-        desc: '',
+        description: '',
         fileTypeList: filtTypeArr,
         content: '',
         spinnerLoading: false
@@ -108,7 +108,7 @@
             type: 'FILE',
             fileName: this.fileName,
             suffix: this.suffix,
-            desc: this.desc,
+            description: this.description,
             content: editor.getValue()
           }).then(res => {
             this.$message.success(res.msg)
