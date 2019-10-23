@@ -267,7 +267,7 @@
           this.className = this.item.className || ''
           this.argTypes = this.item.argTypes || ''
           this.database = this.item.database || ''
-          this.desc = this.item.desc || ''
+          this.desc = this.item.description || ''
           this.resourceId = _.filter(this.udfResourceList, v => v.id === this.item.resourceId)[0]
         } else {
           this.resourceId = this.udfResourceList.length && this.udfResourceList[0] || []
