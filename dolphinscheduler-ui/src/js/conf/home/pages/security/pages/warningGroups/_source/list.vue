@@ -52,7 +52,7 @@
           </td>
           <td><span>{{item.groupType === 'EMAIL' ? `${$t('Email')}` : `${$t('SMS')}`}}</span></td>
           <td>
-            <span v-if="item.desc" class="ellipsis" v-tooltip="item.desc">{{item.desc}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="item.description">{{item.description}}</span>
             <span v-else>-</span>
           </td>
           <td>

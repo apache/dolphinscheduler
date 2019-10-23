@@ -58,7 +58,7 @@
             <span>{{_rtSize(item.size)}}</span>
           </td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip="item.description">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="item.description">{{item.description}}</span>
             <span v-else>-</span>
           </td>
           <td>

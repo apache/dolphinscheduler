@@ -60,7 +60,7 @@
           </div>
         </div>
 
-        <!-- desc -->
+        <!-- description -->
         <div class="clearfix list">
           <div class="text-box">
             <span>{{$t('Description')}}</span>
@@ -72,7 +72,7 @@
                 :autosize="{minRows:2}"
                 type="textarea"
                 :disabled="isDetails"
-                v-model="desc"
+                v-model="description"
                 :placeholder="$t('Please enter description')"
                 autocomplete="off">
               </x-input>
@@ -229,8 +229,8 @@
         spinnerLoading: false,
         // node name
         name: ``,
-        // desc
-        desc: '',
+        // description
+        description: '',
         // Node echo data
         backfillItem: {},
         // Resource(list)
@@ -377,7 +377,7 @@
             id: this.id,
             name: this.name,
             params: this.params,
-            desc: this.desc,
+            description: this.description,
             runFlag: this.runFlag,
             dependence: this.dependence,
             maxRetryTimes: this.maxRetryTimes,
@@ -452,7 +452,7 @@
           this.name = o.name
           this.taskInstancePriority = o.taskInstancePriority
           this.runFlag = o.runFlag || 'NORMAL'
-          this.desc = o.desc
+          this.description = o.description
           this.maxRetryTimes = o.maxRetryTimes
           this.retryInterval = o.retryInterval
           this.workerGroupId = o.workerGroupId

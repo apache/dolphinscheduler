@@ -162,7 +162,7 @@
         type: 'MYSQL',
         // name
         name: '',
-        // desc
+        // description
         note: '',
         // host
         host: '',
