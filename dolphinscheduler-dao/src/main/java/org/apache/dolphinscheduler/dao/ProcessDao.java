@@ -1023,13 +1023,18 @@ public class ProcessDao extends AbstractBaseDao {
      * @param taskInstance
      * @return
      */
-    private String taskZkInfo(TaskInstance taskInstance) {
+    public String taskZkInfo(TaskInstance taskInstance) {
 
         int taskWorkerGroupId = getTaskWorkerGroupId(taskInstance);
+        ProcessInstance processInstance = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
+        if(processInstance == null){
+            logger.error("process instance is null. please check the task info, task id: " + taskInstance.getId());
+            return "";
+        }
 
         StringBuilder sb = new StringBuilder(100);
 
-        sb.append(taskInstance.getProcessInstancePriority().ordinal()).append(Constants.UNDERLINE)
+        sb.append(processInstance.getProcessInstancePriority().ordinal()).append(Constants.UNDERLINE)
                 .append(taskInstance.getProcessInstanceId()).append(Constants.UNDERLINE)
                 .append(taskInstance.getTaskInstancePriority().ordinal()).append(Constants.UNDERLINE)
                 .append(taskInstance.getId()).append(Constants.UNDERLINE);
@@ -1102,12 +1107,29 @@ public class ProcessDao extends AbstractBaseDao {
         // or return submit success
         if( processInstanceState == ExecutionStatus.READY_PAUSE){
             state = ExecutionStatus.PAUSE;
-        }else if(processInstanceState == ExecutionStatus.READY_STOP) {
+        }else if(processInstanceState == ExecutionStatus.READY_STOP
+                || !checkProcessStrategy(taskInstance)) {
             state = ExecutionStatus.KILL;
         }else{
             state = ExecutionStatus.SUBMITTED_SUCCESS;
         }
         return state;
+    }
+
+    private boolean checkProcessStrategy(TaskInstance taskInstance){
+        ProcessInstance processInstance = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
+        FailureStrategy failureStrategy = processInstance.getFailureStrategy();
+        if(failureStrategy == FailureStrategy.CONTINUE){
+            return true;
+        }
+        List<TaskInstance> taskInstances = this.findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
+
+        for(TaskInstance task : taskInstances){
+            if(task.getState() == ExecutionStatus.FAILURE){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -1216,9 +1238,12 @@ public class ProcessDao extends AbstractBaseDao {
      * @param taskInstId
      * @return
      */
-    public TaskInstance getTaskInstanceRelationByTaskId(int taskInstId){
+    public TaskInstance getTaskInstanceDetailByTaskId(int taskInstId){
         // get task instance
         TaskInstance taskInstance = findTaskInstanceById(taskInstId);
+        if(taskInstance == null){
+            return taskInstance;
+        }
         // get process instance
         ProcessInstance processInstance = findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
         // get process define
