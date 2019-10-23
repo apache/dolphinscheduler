@@ -820,7 +820,7 @@ public class MasterExecThread implements Runnable {
                         errorTaskList.put(task.getName(), task);
                         completeTaskList.put(task.getName(), task);
                         if(processInstance.getFailureStrategy() == FailureStrategy.END){
-                            kill();
+                            killTheOtherTasks();
                         }
                     }
                     continue;
@@ -885,16 +885,21 @@ public class MasterExecThread implements Runnable {
 
 
     /**
-     * close the ongoing tasks
+     * close the on going tasks
      */
-    private void kill() {
+    private void killTheOtherTasks() {
 
         logger.info("kill called on process instance id: {}, num: {}", processInstance.getId(),
                 activeTaskNode.size());
         for (Map.Entry<MasterBaseTaskExecThread, Future<Boolean>> entry : activeTaskNode.entrySet()) {
-
             MasterBaseTaskExecThread taskExecThread = entry.getKey();
             Future<Boolean> future = entry.getValue();
+
+            TaskInstance taskInstance = taskExecThread.getTaskInstance();
+            taskInstance = processDao.findTaskInstanceById(taskInstance.getId());
+            if(taskInstance.getState().typeIsFinished()){
+                continue;
+            }
 
             if (!future.isDone()) {
                 // record kill info
