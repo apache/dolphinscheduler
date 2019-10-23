@@ -41,6 +41,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     List<ProcessDefinition> queryDefinitionListByIdList(@Param("ids") Integer[] ids);
 
+    List<ProcessDefinition> queryDefinitionListByTenant(@Param("tenantId") int tenantId);
+
     List<DefinitionGroupByUser> countDefinitionGroupByUser(
             @Param("userId") Integer userId,
             @Param("projectIds") Integer[] projectIds);

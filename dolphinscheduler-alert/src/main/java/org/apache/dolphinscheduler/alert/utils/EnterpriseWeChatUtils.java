@@ -63,6 +63,21 @@ public class EnterpriseWeChatUtils {
     public static final String enterpriseWeChatUsers = PropertyUtils.getString(Constants.ENTERPRISE_WECHAT_USERS);
 
     /**
+     * get Enterprise WeChat is enable
+     * @return isEnable
+     */
+    public static Boolean isEnable(){
+        Boolean isEnable = false;
+        try {
+            isEnable = PropertyUtils.getBoolean(Constants.ENTERPRISE_WECHAT_ENABLE);
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+        }
+        return isEnable;
+
+    }
+
+    /**
      * get Enterprise WeChat token info
      * @return token string info
      * @throws IOException

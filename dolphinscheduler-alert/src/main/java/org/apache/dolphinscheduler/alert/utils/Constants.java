@@ -139,6 +139,8 @@ public class Constants {
 
     public static final String MARKDOWN_ENTER = "\n";
 
+    public static final String ENTERPRISE_WECHAT_ENABLE = "enterprise.wechat.enable";
+
     public static final String ENTERPRISE_WECHAT_CORP_ID = "enterprise.wechat.corp.id";
 
     public static final String ENTERPRISE_WECHAT_SECRET = "enterprise.wechat.secret";
