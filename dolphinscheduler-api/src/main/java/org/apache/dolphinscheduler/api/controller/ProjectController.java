@@ -61,23 +61,23 @@ public class ProjectController extends BaseController {
      *
      * @param loginUser
      * @param projectName
-     * @param desc
+     * @param description
      * @return returns an error if it exists
      */
     @ApiOperation(value = "createProject", notes= "CREATE_PROJECT_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectName", value = "PROJECT_NAME", dataType ="String"),
-            @ApiImplicitParam(name = "desc", value = "PROJECT_DESC", dataType = "String")
+            @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     public Result createProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectName") String projectName,
-                                @RequestParam(value = "desc", required = false) String desc) {
+                                @RequestParam(value = "description", required = false) String description) {
 
         try {
-            logger.info("login user {}, create project name: {}, desc: {}", loginUser.getUserName(), projectName, desc);
-            Map<String, Object> result = projectService.createProject(loginUser, projectName, desc);
+            logger.info("login user {}, create project name: {}, desc: {}", loginUser.getUserName(), projectName, description);
+            Map<String, Object> result = projectService.createProject(loginUser, projectName, description);
             return returnDataList(result);
         } catch (Exception e) {
             logger.error(CREATE_PROJECT_ERROR.getMsg(), e);
@@ -91,24 +91,24 @@ public class ProjectController extends BaseController {
      * @param loginUser
      * @param projectId
      * @param projectName
-     * @param desc
+     * @param description
      * @return
      */
     @ApiOperation(value = "updateProject", notes= "UPDATE_PROJECT_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "projectId", value = "PROJECT_ID", dataType ="Int", example = "100"),
             @ApiImplicitParam(name = "projectName",value = "PROJECT_NAME",dataType = "String"),
-            @ApiImplicitParam(name = "desc", value = "PROJECT_DESC", dataType = "String")
+            @ApiImplicitParam(name = "description", value = "PROJECT_DESC", dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     public Result updateProject(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectId") Integer projectId,
                                 @RequestParam("projectName") String projectName,
-                                @RequestParam(value = "desc", required = false) String desc) {
+                                @RequestParam(value = "description", required = false) String description) {
         try {
-            logger.info("login user {} , updateProcessInstance project name: {}, desc: {}", loginUser.getUserName(), projectName, desc);
-            Map<String, Object> result = projectService.update(loginUser, projectId, projectName, desc);
+            logger.info("login user {} , updateProcessInstance project name: {}, desc: {}", loginUser.getUserName(), projectName, description);
+            Map<String, Object> result = projectService.update(loginUser, projectId, projectName, description);
             return returnDataList(result);
         } catch (Exception e) {
             logger.error(UPDATE_PROJECT_ERROR.getMsg(), e);

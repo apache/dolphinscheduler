@@ -165,6 +165,8 @@ public enum Status {
     PARSE_TO_CRON_EXPRESSION_ERROR(10140,"parse cron to cron expression error"),
     SCHEDULE_START_TIME_END_TIME_SAME(10141,"The start time must not be the same as the end"),
     DELETE_TENANT_BY_ID_FAIL(100142,"delete tenant by id fail, for there are {0} process instances in executing using it"),
+    DELETE_TENANT_BY_ID_FAIL_DEFINES(100143,"delete tenant by id fail, for there are {0} process definitions using it"),
+    DELETE_TENANT_BY_ID_FAIL_USERS(100144,"delete tenant by id fail, for there are {0} users using it"),
 
     DELETE_WORKER_GROUP_BY_ID_FAIL(100143,"delete worker group by id fail, for there are {0} process instances in executing using it"),
 
