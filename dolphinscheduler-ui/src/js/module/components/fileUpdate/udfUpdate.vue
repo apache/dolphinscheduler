@@ -106,7 +106,7 @@
         formData.append('file', this.file)
         formData.append('type', 'UDF')
         formData.append('name', this.udfName)
-        formData.append('desc', this.udfDesc)
+        formData.append('description', this.udfDesc)
         this.spinnerLoading = true
         this.$emit('on-update-present', false)
         io.post(`resources/create`, res => {

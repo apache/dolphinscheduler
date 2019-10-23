@@ -18,7 +18,7 @@
   <m-list-construction :title="$t('User Manage')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
-        <template slot="button-group">
+        <template slot="button-group" v-if="userList.length">
           <x-button type="ghost" size="small" @click="_create('')">{{$t('Create User')}}</x-button>
         </template>
       </m-conditions>
