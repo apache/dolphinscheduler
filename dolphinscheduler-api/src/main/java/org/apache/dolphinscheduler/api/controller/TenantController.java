@@ -58,7 +58,7 @@ public class TenantController extends BaseController{
      * @param tenantCode
      * @param tenantName
      * @param queueId
-     * @param desc
+     * @param description
      * @return
      */
     @ApiOperation(value = "createTenant", notes= "CREATE_TENANT_NOTES")
@@ -66,7 +66,7 @@ public class TenantController extends BaseController{
             @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String"),
             @ApiImplicitParam(name = "tenantName", value = "TENANT_NAME", required = true, dataType ="String"),
             @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType ="Int",example = "100"),
-            @ApiImplicitParam(name = "desc", value = "TENANT_DESC", dataType ="String")
+            @ApiImplicitParam(name = "description", value = "TENANT_DESC", dataType ="String")
 
     })
     @PostMapping(value = "/create")
@@ -75,11 +75,11 @@ public class TenantController extends BaseController{
                                                        @RequestParam(value = "tenantCode") String tenantCode,
                                                        @RequestParam(value = "tenantName") String tenantName,
                                                        @RequestParam(value = "queueId") int queueId,
-                                                       @RequestParam(value = "desc",required = false) String desc) {
+                                                       @RequestParam(value = "description",required = false) String description) {
         logger.info("login user {}, create tenant, tenantCode: {}, tenantName: {}, queueId: {}, desc: {}",
-                loginUser.getUserName(), tenantCode, tenantName, queueId,desc);
+                loginUser.getUserName(), tenantCode, tenantName, queueId,description);
         try {
-            Map<String, Object> result = tenantService.createTenant(loginUser,tenantCode,tenantName,queueId,desc);
+            Map<String, Object> result = tenantService.createTenant(loginUser,tenantCode,tenantName,queueId,description);
             return returnDataList(result);
 
         }catch (Exception e){
@@ -156,7 +156,7 @@ public class TenantController extends BaseController{
      * @param tenantCode
      * @param tenantName
      * @param queueId
-     * @param desc
+     * @param description
      * @return
      */
     @ApiOperation(value = "updateTenant", notes= "UPDATE_TENANT_NOTES")
@@ -165,7 +165,7 @@ public class TenantController extends BaseController{
             @ApiImplicitParam(name = "tenantCode", value = "TENANT_CODE", required = true, dataType = "String"),
             @ApiImplicitParam(name = "tenantName", value = "TENANT_NAME", required = true, dataType ="String"),
             @ApiImplicitParam(name = "queueId", value = "QUEUE_ID", required = true, dataType ="Int", example = "100"),
-            @ApiImplicitParam(name = "desc", value = "TENANT_DESC", type ="String")
+            @ApiImplicitParam(name = "description", value = "TENANT_DESC", type ="String")
 
     })
     @PostMapping(value = "/update")
@@ -175,11 +175,11 @@ public class TenantController extends BaseController{
                                                        @RequestParam(value = "tenantCode") String tenantCode,
                                                        @RequestParam(value = "tenantName") String tenantName,
                                                        @RequestParam(value = "queueId") int queueId,
-                                                       @RequestParam(value = "desc",required = false) String desc) {
-        logger.info("login user {}, updateProcessInstance tenant, tenantCode: {}, tenantName: {}, queueId: {}, desc: {}",
-                loginUser.getUserName(), tenantCode, tenantName, queueId,desc);
+                                                       @RequestParam(value = "description",required = false) String description) {
+        logger.info("login user {}, updateProcessInstance tenant, tenantCode: {}, tenantName: {}, queueId: {}, description: {}",
+                loginUser.getUserName(), tenantCode, tenantName, queueId,description);
         try {
-            Map<String, Object> result = tenantService.updateTenant(loginUser,id,tenantCode, tenantName, queueId, desc);
+            Map<String, Object> result = tenantService.updateTenant(loginUser,id,tenantCode, tenantName, queueId, description);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.UPDATE_TENANT_ERROR.getMsg(),e);

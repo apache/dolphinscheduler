@@ -56,25 +56,25 @@ public class AlertGroupController extends  BaseController{
      * @param loginUser
      * @param groupName
      * @param groupType
-     * @param desc
+     * @param description
      * @return
      */
     @ApiOperation(value = "createAlertgroup", notes= "CREATE_ALERT_GROUP_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "groupType", value = "GROUP_TYPE", required = true, dataType ="AlertType"),
-            @ApiImplicitParam(name = "desc", value = "DESC",  dataType ="String")
+            @ApiImplicitParam(name = "description", value = "DESC",  dataType ="String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     public Result createAlertgroup(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @RequestParam(value = "groupName") String groupName,
                                @RequestParam(value = "groupType") AlertType groupType,
-                               @RequestParam(value = "desc",required = false) String desc) {
+                               @RequestParam(value = "description",required = false) String description) {
         logger.info("loginUser user {}, create alertgroup, groupName: {}, groupType: {}, desc: {}",
-                loginUser.getUserName(), groupName, groupType,desc);
+                loginUser.getUserName(), groupName, groupType,description);
         try {
-            Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, groupType,desc);
+            Map<String, Object> result = alertGroupService.createAlertgroup(loginUser, groupName, groupType,description);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.CREATE_ALERT_GROUP_ERROR.getMsg(),e);
@@ -146,7 +146,7 @@ public class AlertGroupController extends  BaseController{
      * @param id
      * @param groupName
      * @param groupType
-     * @param desc
+     * @param description
      * @return
      */
     @ApiOperation(value = "updateAlertgroup", notes= "UPDATE_ALERT_GROUP_NOTES")
@@ -154,7 +154,7 @@ public class AlertGroupController extends  BaseController{
             @ApiImplicitParam(name = "id", value = "ALERT_GROUP_ID", required = true, dataType = "Int",example = "100"),
             @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "groupType", value = "GROUP_TYPE", required = true, dataType ="AlertType"),
-            @ApiImplicitParam(name = "desc", value = "DESC",  dataType ="String")
+            @ApiImplicitParam(name = "description", value = "DESC",  dataType ="String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -162,11 +162,11 @@ public class AlertGroupController extends  BaseController{
                                    @RequestParam(value = "id") int id,
                                    @RequestParam(value = "groupName") String groupName,
                                    @RequestParam(value = "groupType") AlertType groupType,
-                                   @RequestParam(value = "desc",required = false) String desc) {
+                                   @RequestParam(value = "description",required = false) String description) {
         logger.info("login  user {}, updateProcessInstance alertgroup, groupName: {}, groupType: {}, desc: {}",
-                loginUser.getUserName(), groupName, groupType,desc);
+                loginUser.getUserName(), groupName, groupType,description);
         try {
-            Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, groupType, desc);
+            Map<String, Object> result = alertGroupService.updateAlertgroup(loginUser, id, groupName, groupType, description);
             return returnDataList(result);
 
         }catch (Exception e){

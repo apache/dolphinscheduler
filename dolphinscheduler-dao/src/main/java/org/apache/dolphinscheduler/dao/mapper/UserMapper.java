@@ -40,6 +40,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     List<User> queryUserListByAlertGroupId(@Param("alertgroupId") int alertgroupId);
 
+    List<User> queryUserListByTenant(@Param("tenantId") int tenantId);
 
     User queryTenantCodeByUserId(@Param("userId") int userId);
 

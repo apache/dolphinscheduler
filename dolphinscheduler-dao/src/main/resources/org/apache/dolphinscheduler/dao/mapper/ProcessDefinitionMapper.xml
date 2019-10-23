@@ -30,6 +30,11 @@
         where project_id = #{projectId}
         order by create_time desc
     </select>
+    <select id="queryDefinitionListByTenant" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
+        select *
+        from t_ds_process_definition
+        where tenant_id = #{tenantId}
+    </select>
     <select id="queryDefinitionListByIdList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select *
         from t_ds_process_definition
@@ -51,7 +56,6 @@
         </if>
         group by td.user_id,tu.user_name
     </select>
-
     <select id="queryByDefineId" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         SELECT
             pd.*, u.user_name,
@@ -64,6 +68,4 @@
             pd.user_id = u.id AND pd.project_id = p.id
         AND pd.id = #{processDefineId}
     </select>
-
-
 </mapper>

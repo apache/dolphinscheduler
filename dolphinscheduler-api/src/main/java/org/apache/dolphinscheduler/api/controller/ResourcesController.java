@@ -383,7 +383,7 @@ public class ResourcesController extends BaseController{
      * @param funcName
      * @param argTypes
      * @param database
-     * @param desc
+     * @param description
      * @param resourceId
      * @return
      */
@@ -394,7 +394,7 @@ public class ResourcesController extends BaseController{
             @ApiImplicitParam(name = "suffix", value = "CLASS_NAME", required = true, dataType ="String"),
             @ApiImplicitParam(name = "argTypes", value = "ARG_TYPES",  dataType ="String"),
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME",  dataType ="String"),
-            @ApiImplicitParam(name = "desc", value = "UDF_DESC", dataType ="String"),
+            @ApiImplicitParam(name = "description", value = "UDF_DESC", dataType ="String"),
             @ApiImplicitParam(name = "resourceId", value = "RESOURCE_ID", required = true, dataType ="Int", example = "100")
 
     })
@@ -406,14 +406,14 @@ public class ResourcesController extends BaseController{
                                 @RequestParam(value ="className")String className,
                                 @RequestParam(value ="argTypes", required = false)String argTypes,
                                 @RequestParam(value ="database", required = false)String database,
-                                @RequestParam(value = "desc", required = false) String desc,
+                                @RequestParam(value = "description", required = false) String description,
                                 @RequestParam(value = "resourceId") int resourceId) {
         logger.info("login user {}, create udf function, type: {},  funcName: {},argTypes: {} ,database: {},desc: {},resourceId: {}",
-                loginUser.getUserName(),type, funcName, argTypes,database,desc, resourceId);
+                loginUser.getUserName(),type, funcName, argTypes,database,description, resourceId);
         Result result = new Result();
 
         try {
-            return udfFuncService.createUdfFunction(loginUser,funcName,className,argTypes,database,desc,type,resourceId);
+            return udfFuncService.createUdfFunction(loginUser,funcName,className,argTypes,database,description,type,resourceId);
         } catch (Exception e) {
             logger.error(CREATE_UDF_FUNCTION_ERROR.getMsg(),e);
             return error(Status.CREATE_UDF_FUNCTION_ERROR.getCode(), Status.CREATE_UDF_FUNCTION_ERROR.getMsg());
@@ -457,7 +457,7 @@ public class ResourcesController extends BaseController{
      * @param funcName
      * @param argTypes
      * @param database
-     * @param desc
+     * @param description
      * @param resourceId
      * @return
      */
@@ -468,7 +468,7 @@ public class ResourcesController extends BaseController{
             @ApiImplicitParam(name = "suffix", value = "CLASS_NAME", required = true, dataType ="String"),
             @ApiImplicitParam(name = "argTypes", value = "ARG_TYPES",  dataType ="String"),
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME",  dataType ="String"),
-            @ApiImplicitParam(name = "desc", value = "UDF_DESC", dataType ="String"),
+            @ApiImplicitParam(name = "description", value = "UDF_DESC", dataType ="String"),
             @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType ="Int", example = "100")
 
     })
@@ -480,12 +480,12 @@ public class ResourcesController extends BaseController{
                                 @RequestParam(value ="className")String className,
                                 @RequestParam(value ="argTypes", required = false)String argTypes,
                                 @RequestParam(value ="database", required = false)String database,
-                                @RequestParam(value = "desc", required = false) String desc,
+                                @RequestParam(value = "description", required = false) String description,
                                 @RequestParam(value = "resourceId") int resourceId) {
         try {
             logger.info("login user {}, updateProcessInstance udf function id: {},type: {},  funcName: {},argTypes: {} ,database: {},desc: {},resourceId: {}",
-                    loginUser.getUserName(),udfFuncId,type, funcName, argTypes,database,desc, resourceId);
-            Map<String, Object> result = udfFuncService.updateUdfFunc(udfFuncId,funcName,className,argTypes,database,desc,type,resourceId);
+                    loginUser.getUserName(),udfFuncId,type, funcName, argTypes,database,description, resourceId);
+            Map<String, Object> result = udfFuncService.updateUdfFunc(udfFuncId,funcName,className,argTypes,database,description,type,resourceId);
             return returnDataList(result);
         } catch (Exception e) {
             logger.error(UPDATE_UDF_FUNCTION_ERROR.getMsg(),e);
