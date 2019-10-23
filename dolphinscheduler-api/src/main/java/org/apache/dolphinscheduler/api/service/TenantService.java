@@ -258,7 +258,7 @@ public class TenantService extends BaseService{
 
     List<User> userList = userMapper.queryUserListByTenant(tenant.getId());
     if(CollectionUtils.isNotEmpty(userList)){
-      putMsg(result, Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, userList.size());
+      putMsg(result, Status.DELETE_TENANT_BY_ID_FAIL_USERS, userList.size());
       return result;
     }
 
