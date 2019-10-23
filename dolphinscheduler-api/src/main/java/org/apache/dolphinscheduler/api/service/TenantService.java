@@ -27,11 +27,14 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +60,14 @@ public class TenantService extends BaseService{
 
   @Autowired
   private ProcessInstanceMapper processInstanceMapper;
+
+  @Autowired
+  private ProcessDefinitionMapper processDefinitionMapper;
+
+  @Autowired
+  private UserMapper userMapper;
+
+
 
   /**
    * create tenant
@@ -228,25 +239,26 @@ public class TenantService extends BaseService{
     }
 
     Tenant tenant = tenantMapper.queryById(id);
-
     if (tenant == null){
       putMsg(result, Status.TENANT_NOT_EXIST);
       return result;
     }
 
-    int[] states = new int[]{
-            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
-            ExecutionStatus.RUNNING_EXEUTION.ordinal(),
-            ExecutionStatus.READY_PAUSE.ordinal(),
-            ExecutionStatus.READY_STOP.ordinal(),
-            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
-            ExecutionStatus.WAITTING_THREAD.ordinal(),
-            ExecutionStatus.WAITTING_DEPEND.ordinal()
-            };
-
-    List<ProcessInstance> processInstances = processInstanceMapper.queryByTenantIdAndStatus(tenant.getId(), states);
+    List<ProcessInstance> processInstances = getProcessInstancesByTenant(tenant);
     if(CollectionUtils.isNotEmpty(processInstances)){
       putMsg(result, Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
+      return result;
+    }
+
+    List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryDefinitionListByTenant(tenant.getId());
+    if(CollectionUtils.isNotEmpty(processDefinitions)){
+      putMsg(result, Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, processDefinitions.size());
+      return result;
+    }
+
+    List<User> userList = userMapper.queryUserListByTenant(tenant.getId());
+    if(CollectionUtils.isNotEmpty(userList)){
+      putMsg(result, Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, userList.size());
       return result;
     }
 
@@ -275,6 +287,20 @@ public class TenantService extends BaseService{
     processInstanceMapper.updateProcessInstanceByTenantId(id, -1);
     putMsg(result, Status.SUCCESS);
     return result;
+  }
+
+  private List<ProcessInstance> getProcessInstancesByTenant(Tenant tenant) {
+    int[] states = new int[]{
+            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+            ExecutionStatus.READY_PAUSE.ordinal(),
+            ExecutionStatus.READY_STOP.ordinal(),
+            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+            ExecutionStatus.WAITTING_THREAD.ordinal(),
+            ExecutionStatus.WAITTING_DEPEND.ordinal()
+            };
+
+    return processInstanceMapper.queryByTenantIdAndStatus(tenant.getId(), states);
   }
 
   /**
