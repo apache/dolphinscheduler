@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common;
 
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 
 import java.util.regex.Pattern;
@@ -925,4 +926,13 @@ public final class Constants {
     public static final String FLINK_MAIN_CLASS = "-c";
 
 
+    public static final int[] NOT_TERMINATED_STATES = new int[]{
+            ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
+            ExecutionStatus.RUNNING_EXEUTION.ordinal(),
+            ExecutionStatus.READY_PAUSE.ordinal(),
+            ExecutionStatus.READY_STOP.ordinal(),
+            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
+            ExecutionStatus.WAITTING_THREAD.ordinal(),
+            ExecutionStatus.WAITTING_DEPEND.ordinal()
+    };
 }
