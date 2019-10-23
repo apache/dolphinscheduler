@@ -179,7 +179,7 @@ public class FetchTaskThread implements Runnable{
                     taskInstId = getTaskInstanceId(taskQueueStr);
 
                     // mainly to wait for the master insert task to succeed
-                    waitForMasterEnterQueue();
+                    waitForTaskInstance();
 
                     taskInstance = processDao.getTaskInstanceDetailByTaskId(taskInstId);
 
@@ -304,10 +304,10 @@ public class FetchTaskThread implements Runnable{
     }
 
     /**
-     *  mainly to wait for the master insert task to succeed
+     *  wait for task instance exists, because of db action would be delayed.
      * @throws Exception
      */
-    private void waitForMasterEnterQueue()throws Exception{
+    private void waitForTaskInstance()throws Exception{
         int retryTimes = 30;
         while (taskInstance == null && retryTimes > 0) {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
