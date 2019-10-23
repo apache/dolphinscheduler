@@ -61,7 +61,7 @@
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
-            <span class="ellipsis">{{item.name}}</span>
+            <span class="ellipsis" :title="item.name">{{item.name}}</span>
           </td>
           <td><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis">{{item.processInstanceName}}</span></a></td>
           <td><span>{{item.taskType}}</span></td>

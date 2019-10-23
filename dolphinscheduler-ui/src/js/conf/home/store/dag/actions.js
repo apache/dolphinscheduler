@@ -100,8 +100,8 @@ export default {
       }, res => {
         // name
         state.name = res.data.name
-        // desc
-        state.desc = res.data.desc
+        // description
+        state.description = res.data.description
         // connects
         state.connects = JSON.parse(res.data.connects)
         // locations
@@ -133,7 +133,7 @@ export default {
         // name
         state.name = res.data.name
         // desc
-        state.desc = res.data.desc
+        state.description = res.data.description
         // connects
         state.connects = JSON.parse(res.data.connects)
         // locations
@@ -173,7 +173,7 @@ export default {
       io.post(`projects/${state.projectName}/process/save`, {
         processDefinitionJson: JSON.stringify(data),
         name: _.trim(state.name),
-        desc: _.trim(state.desc),
+        description: _.trim(state.description),
         locations: JSON.stringify(state.locations),
         connects: JSON.stringify(state.connects)
       }, res => {
@@ -199,7 +199,7 @@ export default {
         locations: JSON.stringify(state.locations),
         connects: JSON.stringify(state.connects),
         name: _.trim(state.name),
-        desc: _.trim(state.desc),
+        description: _.trim(state.description),
         id: payload
       }, res => {
         resolve(res)

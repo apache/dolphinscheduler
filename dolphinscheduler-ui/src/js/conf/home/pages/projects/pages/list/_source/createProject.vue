@@ -34,7 +34,7 @@
           <template slot="content">
             <x-input
                     type="textarea"
-                    v-model="desc"
+                    v-model="description"
                     :placeholder="$t('Please enter description')"
                     autocomplete="off">
             </x-input>
@@ -56,7 +56,7 @@
     data () {
       return {
         store,
-        desc: '',
+        description: '',
         projectName: ''
       }
     },
@@ -71,7 +71,7 @@
 
         let param = {
           projectName: _.trim(this.projectName),
-          desc: _.trim(this.desc)
+          description: _.trim(this.description)
         }
 
         // edit
@@ -104,7 +104,7 @@
     created () {
       if (this.item) {
         this.projectName = this.item.name
-        this.desc = this.item.desc
+        this.description = this.item.description
       }
     },
     mounted () {
