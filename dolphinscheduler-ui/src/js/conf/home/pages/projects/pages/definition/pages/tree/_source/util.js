@@ -22,7 +22,7 @@ import { tasksState } from '@/conf/home/pages/dag/_source/config'
  * Node prompt dom
  */
 const rtInstancesTooltip = (data) => {
-  let str = `<div style="text-align: left;">`
+  let str = `<div style="text-align: left;word-break:break-all">`
   str += `id : ${data.id}</br>`
   str += `host : ${data.host}</br>`
   str += `name : ${data.name}</br>`
@@ -30,8 +30,8 @@ const rtInstancesTooltip = (data) => {
   if (data.type) {
     str += `type : ${data.type}</br>`
   }
-  str += `startTime : ${data.startTime ? formatDate(data.startTime) : 'null'}</br>`
-  str += `endTime : ${data.endTime ? formatDate(data.endTime) : 'null'}</br>`
+  str += `startTime : ${data.startTime ? formatDate(data.startTime) : '-'}</br>`
+  str += `endTime : ${data.endTime ? formatDate(data.endTime) : '-'}</br>`
   str += `duration : ${data.duration}</br>`
   str += `</div>`
   return str
