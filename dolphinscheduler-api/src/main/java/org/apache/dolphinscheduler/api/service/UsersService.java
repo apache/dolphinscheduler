@@ -94,15 +94,17 @@ public class UsersService extends BaseService {
                                           String queue) throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
-        result = CheckUtils.checkUserParams(userName, userPassword, email, phone);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (!CheckUtils.checkUserParams(userName, userPassword, email, phone)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             return result;
         }
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
-        if (check(result, checkTenant(tenantId), Status.TENANT_NOT_EXIST)) {
+        if (checkTenant(tenantId)) {
+            putMsg(result, Status.TENANT_NOT_EXIST);
             return result;
         }
 
