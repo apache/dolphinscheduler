@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.api.controller;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.apache.dolphinscheduler.common.enums.*;
@@ -95,7 +95,7 @@ public class ExecutorController extends BaseController {
                     workerGroupId, timeout);
 
             if (timeout == null) {
-                timeout = org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
+                timeout = Constants.MAX_TASK_TIMEOUT;
             }
 
             Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,

@@ -71,10 +71,10 @@ export default {
     state.globalParams = payload
   },
   /**
-   * set desc
+   * set description
    */
   setDesc (state, payload) {
-    state.desc = payload
+    state.description = payload
   },
   /**
    * Whether to update the process definition
@@ -104,7 +104,7 @@ export default {
     state.globalParams = payload && payload.globalParams || []
     state.tasks = payload && payload.tasks || []
     state.name = payload && payload.name || ''
-    state.desc = payload && payload.desc || ''
+    state.description = payload && payload.description || ''
     state.timeout = payload && payload.timeout || 0
     state.tenantId = payload && payload.tenantId || -1
     state.processListS = payload && payload.processListS || []

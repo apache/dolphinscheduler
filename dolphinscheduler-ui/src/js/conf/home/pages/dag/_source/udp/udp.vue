@@ -34,7 +34,7 @@
         <div style="padding-top: 12px;">
           <x-input
                   type="textarea"
-                  v-model="desc"
+                  v-model="description"
                   :autosize="{minRows:2}"
                   :placeholder="$t('Please enter description(optional)')"
                   autocomplete="off">
@@ -101,8 +101,8 @@
       return {
         // dag name
         name: '',
-        // dag desc
-        desc: '',
+        // dag description
+        description: '',
         // Global custom parameters
         udpList: [],
         // Global custom parameters
@@ -140,7 +140,7 @@
         this.store.commit('dag/setName', _.cloneDeep(this.name))
         this.store.commit('dag/setTimeout', _.cloneDeep(this.timeout))
         this.store.commit('dag/setTenantId', _.cloneDeep(this.tenantId))
-        this.store.commit('dag/setDesc', _.cloneDeep(this.desc))
+        this.store.commit('dag/setDesc', _.cloneDeep(this.description))
         this.store.commit('dag/setSyncDefine', this.syncDefine)
       },
       /**
@@ -201,7 +201,7 @@
       this.udpList = dag.globalParams
       this.udpListCache = dag.globalParams
       this.name = dag.name
-      this.desc = dag.desc
+      this.description = dag.description
       this.syncDefine = dag.syncDefine
       this.timeout = dag.timeout || 0
       this.checkedTimeout = this.timeout !== 0
