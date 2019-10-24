@@ -36,8 +36,8 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Map;
 
-import static org.apache.dolphinscheduler.api.utils.Constants.SESSION_USER;
 import static org.apache.dolphinscheduler.api.enums.Status.*;
+import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
 
 /**
  * schedule controller

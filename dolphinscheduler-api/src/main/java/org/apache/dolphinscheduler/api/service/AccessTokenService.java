@@ -17,8 +17,8 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -57,9 +57,6 @@ public class AccessTokenService extends BaseService {
      */
     public Map<String, Object> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>(5);
-        if (checkAdmin(loginUser, result)) {
-            return result;
-        }
 
         PageInfo<AccessToken> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<AccessToken> page = new Page(pageNo, pageSize);

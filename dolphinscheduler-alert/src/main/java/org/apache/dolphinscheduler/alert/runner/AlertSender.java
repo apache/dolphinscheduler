@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.alert.runner;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.alert.manager.EmailManager;
 import org.apache.dolphinscheduler.alert.manager.EnterpriseWeChatManager;
 import org.apache.dolphinscheduler.alert.utils.Constants;
@@ -25,8 +27,6 @@ import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +62,6 @@ public class AlertSender{
         Map<String, Object> retMaps = null;
         for(Alert alert:alertList){
             users = alertDao.listUserByAlertgroupId(alert.getAlertGroupId());
-
-
 
             // receiving group list
             List<String> receviersList = new ArrayList<String>();
@@ -109,18 +107,22 @@ public class AlertSender{
             }
 
             boolean flag = Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)));
-            if (flag){
+            if (flag) {
                 alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, "execution success", alert.getId());
                 logger.info("alert send success");
-                try {
-                    String token = EnterpriseWeChatUtils.getToken();
-                    weChatManager.send(alert,token);
-                } catch (Exception e) {
-                    logger.error(e.getMessage(),e);
+                if (EnterpriseWeChatUtils.isEnable()) {
+                    logger.info("Enterprise WeChat is enable!");
+                    try {
+                        String token = EnterpriseWeChatUtils.getToken();
+                        weChatManager.send(alert, token);
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
+                    }
                 }
-            }else {
-                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE,String.valueOf(retMaps.get(Constants.MESSAGE)),alert.getId());
-                logger.info("alert send error : {}" , String.valueOf(retMaps.get(Constants.MESSAGE)));
+
+            } else {
+                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(retMaps.get(Constants.MESSAGE)), alert.getId());
+                logger.info("alert send error : {}", String.valueOf(retMaps.get(Constants.MESSAGE)));
             }
         }
 

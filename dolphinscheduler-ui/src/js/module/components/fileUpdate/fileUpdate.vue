@@ -60,7 +60,7 @@
             <template slot="content">
               <x-input
                       type="textarea"
-                      v-model="desc"
+                      v-model="description"
                       :disabled="progress !== 0"
                       :placeholder="$t('Please enter description')"
                       autocomplete="off">
@@ -101,8 +101,8 @@
         store,
         // name
         name: '',
-        // desc
-        desc: '',
+        // description
+        description: '',
         // progress
         progress: 0,
         // file
@@ -172,7 +172,7 @@
           formData.append('file', this.file)
           formData.append('type', this.type)
           formData.append('name', this.name)
-          formData.append('desc', this.desc)
+          formData.append('description', this.description)
           io.post(`resources/create`, res => {
             this.$message.success(res.msg)
             resolve()

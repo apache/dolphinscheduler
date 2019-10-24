@@ -67,7 +67,7 @@
 <script>
   import _ from 'lodash'
   import dayjs from 'dayjs'
-  // import i18n from '@/module/i18n'
+  import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import Permissions from '@/module/permissions'
   import mPopup from '@/module/components/popup/popup'
@@ -98,7 +98,7 @@
       },
       _verification () {
         if (!this.token) {
-          this.$message.warning('请生成Token')
+          this.$message.warning(`${i18n.$t('Please generate token')}`)
           return false
         }
         return true

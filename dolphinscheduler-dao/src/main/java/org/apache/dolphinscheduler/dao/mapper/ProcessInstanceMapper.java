@@ -37,6 +37,9 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     List<ProcessInstance> queryByTenantIdAndStatus(@Param("tenantId") int tenantId,
                                                @Param("states") int[] states);
 
+    List<ProcessInstance> queryByWorkerGroupIdAndStatus(@Param("workerGroupId") int workerGroupId,
+                                                   @Param("states") int[] states);
+
     IPage<ProcessInstance> queryProcessInstanceListPaging(Page<ProcessInstance> page,
                                                           @Param("projectId") int projectId,
                                                           @Param("processDefinitionId") Integer processDefinitionId,
@@ -54,6 +57,8 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                      @Param("destState") ExecutionStatus destState);
 
     int updateProcessInstanceByTenantId(@Param("originTenantId") int originTenantId, @Param("destTenantId") int destTenantId);
+
+    int updateProcessInstanceByWorkerGroupId(@Param("originWorkerGroupId") int originWorkerGroupId, @Param("destWorkerGroupId") int destWorkerGroupId);
 
     List<ExecuteStatusCount> countInstanceStateByUser(
             @Param("startTime") Date startTime,
