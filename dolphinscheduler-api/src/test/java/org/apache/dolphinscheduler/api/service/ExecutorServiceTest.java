@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Constants;
+import org.apache.dolphinscheduler.common.Constants;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
