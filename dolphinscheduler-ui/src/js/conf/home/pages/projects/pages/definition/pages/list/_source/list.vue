@@ -153,7 +153,7 @@
     methods: {
       ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition']),
       _rtPublishStatus (code) {
-        return _.filter(publishStatus, v => v.code === code)[0].description
+        return _.filter(publishStatus, v => v.code === code)[0].desc
       },
       _treeView (item) {
         this.$router.push({ path: `/projects/definition/tree/${item.id}` })

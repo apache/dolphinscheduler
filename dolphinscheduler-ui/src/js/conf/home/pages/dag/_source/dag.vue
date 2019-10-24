@@ -196,9 +196,9 @@
             let state = res.processInstanceState
             let taskList = res.taskList
             let idArr = allNodesId()
-            const titleTpl = (item, description) => {
+            const titleTpl = (item, desc) => {
               let $item = _.filter(taskList, v => v.name === item.name)[0]
-              return `<div style="text-align: left">${i18n.$t('Name')}：${$item.name}</br>${i18n.$t('State')}：${description}</br>${i18n.$t('type')}：${$item.taskType}</br>${i18n.$t('host')}：${$item.host || '-'}</br>${i18n.$t('Retry Count')}：${$item.retryTimes}</br>${i18n.$t('Submit Time')}：${formatDate($item.submitTime)}</br>${i18n.$t('Start Time')}：${formatDate($item.startTime)}</br>${i18n.$t('End Time')}：${$item.endTime ? formatDate($item.endTime) : '-'}</br></div>`
+              return `<div style="text-align: left">${i18n.$t('Name')}：${$item.name}</br>${i18n.$t('State')}：${state}</br>${i18n.$t('type')}：${$item.taskType}</br>${i18n.$t('host')}：${$item.host || '-'}</br>${i18n.$t('Retry Count')}：${$item.retryTimes}</br>${i18n.$t('Submit Time')}：${formatDate($item.submitTime)}</br>${i18n.$t('Start Time')}：${formatDate($item.startTime)}</br>${i18n.$t('End Time')}：${$item.endTime ? formatDate($item.endTime) : '-'}</br></div>`
             }
 
             // remove tip state dom
@@ -212,7 +212,7 @@
                   dom.attr('data-state-id', v1.stateId)
                   dom.attr('data-dependent-result', v1.dependentResult || '')
                   state.append(`<b class="iconfont ${v1.isSpin ? 'fa fa-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body">${v1.icoUnicode}</b>`)
-                  state.find('b').attr('title', titleTpl(v2, v1.description))
+                  state.find('b').attr('title', titleTpl(v2, v1.desc))
                 }
               })
             })
