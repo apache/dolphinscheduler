@@ -498,5 +498,7 @@ export default {
   'Http Condition':'校验内容',
   'Please Enter Http Url': '请填写请求地址(必填)',
   'Please Enter Http Condition': '请填写校验内容',
-  'There is no data for this period of time': '该时间段无数据'
+  'There is no data for this period of time': '该时间段无数据',
+  'IP address cannot be empty': 'IP地址不能为空',
+  'Please generate token': '请生成Token'
 }

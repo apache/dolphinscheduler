@@ -83,7 +83,7 @@
           return false
         }
         if (!this.ipList) {
-          this.$message.warning(`IP地址不能为空`)
+          this.$message.warning(`${i18n.$t('IP address cannot be empty')}`)
           return false
         }
         return true
