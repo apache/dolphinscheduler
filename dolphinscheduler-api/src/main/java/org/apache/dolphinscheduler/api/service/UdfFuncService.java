@@ -17,9 +17,9 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -112,7 +112,7 @@ public class UdfFuncService extends BaseService{
         if (StringUtils.isNotEmpty(argTypes)) {
             udf.setArgTypes(argTypes);
         }
-        if (StringUtils.isNotEmpty(argTypes)) {
+        if (StringUtils.isNotEmpty(database)) {
             udf.setDatabase(database);
         }
         udf.setDescription(desc);
@@ -214,19 +214,13 @@ public class UdfFuncService extends BaseService{
         Date now = new Date();
         udf.setFuncName(funcName);
         udf.setClassName(className);
-        if (StringUtils.isNotEmpty(argTypes)) {
-            udf.setArgTypes(argTypes);
-        }
-        if (StringUtils.isNotEmpty(argTypes)) {
-            udf.setDatabase(database);
-        }
+        udf.setArgTypes(argTypes);
+        udf.setDatabase(database);
         udf.setDescription(desc);
         udf.setResourceId(resourceId);
         udf.setResourceName(resource.getAlias());
         udf.setType(type);
 
-
-        udf.setCreateTime(now);
         udf.setUpdateTime(now);
 
         udfFuncMapper.updateById(udf);
