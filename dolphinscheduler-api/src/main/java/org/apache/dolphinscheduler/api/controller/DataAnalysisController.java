@@ -18,8 +18,8 @@ package org.apache.dolphinscheduler.api.controller;
 
 
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;

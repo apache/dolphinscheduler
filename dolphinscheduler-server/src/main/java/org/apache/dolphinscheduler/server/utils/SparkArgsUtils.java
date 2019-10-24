@@ -55,7 +55,7 @@ public class SparkArgsUtils {
         if(param.getProgramType() !=null ){
             if(param.getProgramType()!=ProgramType.PYTHON){
                 if (StringUtils.isNotEmpty(param.getMainClass())) {
-                    args.add(Constants.CLASS);
+                    args.add(Constants.MAIN_CLASS);
                     args.add(param.getMainClass());
                 }
             }
