@@ -34,7 +34,7 @@
           <template slot="content">
             <x-input
                     type="textarea"
-                    v-model="desc"
+                    v-model="description"
                     :placeholder="$t('Please enter description')"
                     autocomplete="off">
             </x-input>
@@ -55,7 +55,7 @@
     data () {
       return {
         store,
-        desc: '',
+        description: '',
         name: ''
       }
     },
@@ -67,7 +67,7 @@
         this._verification().then(res => {
           if (this.name === this.item.alias) {
             return new Promise((resolve,reject) => {
-              this.desc === this.item.desc ? reject({msg:'内容未修改'}) : resolve()
+              this.description === this.item.description ? reject({msg:'内容未修改'}) : resolve()
             })
           }else{
             return this.store.dispatch('resource/resourceVerifyName', {
@@ -78,7 +78,7 @@
         }).then(res => {
           return this.store.dispatch('resource/resourceRename', {
             name: this.name,
-            desc: this.desc,
+            description: this.description,
             id: this.item.id,
             type: 'UDF'
           })
@@ -108,7 +108,7 @@
       let item = this.item || {}
       if (item) {
         this.name = item.alias
-        this.desc = item.desc
+        this.description = item.description
       }
     },
     mounted () {

@@ -149,7 +149,7 @@
                           shape="circle"
                           size="xsmall"
                           data-toggle="tooltip"
-                          :disabled="item.state === 'RUNNING_EXEUTION'"
+                          :disabled="item.state !== 'SUCCESS' && item.state !== 'FAILURE' && item.state !== 'STOP' && item.state !== 'PAUSE'"
                           :title="$t('delete')">
                   </x-button>
                 </template>

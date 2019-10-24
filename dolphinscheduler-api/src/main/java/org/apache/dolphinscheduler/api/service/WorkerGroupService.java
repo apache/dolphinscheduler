@@ -17,10 +17,13 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -42,6 +45,9 @@ public class WorkerGroupService extends BaseService {
 
     @Autowired
     WorkerGroupMapper workerGroupMapper;
+
+    @Autowired
+    ProcessInstanceMapper processInstanceMapper;
 
     /**
      * create or update a worker group
@@ -142,7 +148,13 @@ public class WorkerGroupService extends BaseService {
 
         Map<String, Object> result = new HashMap<>(5);
 
+        List<ProcessInstance> processInstances = processInstanceMapper.queryByWorkerGroupIdAndStatus(id, org.apache.dolphinscheduler.common.Constants.NOT_TERMINATED_STATES);
+        if(CollectionUtils.isNotEmpty(processInstances)){
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
+            return result;
+        }
         workerGroupMapper.deleteById(id);
+        processInstanceMapper.updateProcessInstanceByWorkerGroupId(id, org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_ID);
         putMsg(result, Status.SUCCESS);
         return result;
     }

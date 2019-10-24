@@ -18,9 +18,9 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
@@ -94,15 +94,17 @@ public class UsersService extends BaseService {
                                           String queue) throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
-        result = CheckUtils.checkUserParams(userName, userPassword, email, phone);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (!CheckUtils.checkUserParams(userName, userPassword, email, phone)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             return result;
         }
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
-        if (check(result, checkTenant(tenantId), Status.TENANT_NOT_EXIST, Constants.STATUS)) {
+        if (checkTenant(tenantId)) {
+            putMsg(result, Status.TENANT_NOT_EXIST);
             return result;
         }
 
@@ -176,7 +178,7 @@ public class UsersService extends BaseService {
     public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>(5);
 
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -352,14 +354,14 @@ public class UsersService extends BaseService {
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
         //if the selected projectIds are empty, delete all items associated with the user
         projectUserMapper.deleteProjectRelation(0, userId);
 
-        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS, Constants.MSG)) {
+        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
             return result;
         }
 
@@ -393,7 +395,7 @@ public class UsersService extends BaseService {
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
         User user = userMapper.selectById(userId);
@@ -404,7 +406,7 @@ public class UsersService extends BaseService {
 
         resourcesUserMapper.deleteResourceUser(userId, 0);
 
-        if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS, Constants.MSG)) {
+        if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
             return result;
         }
 
@@ -439,13 +441,13 @@ public class UsersService extends BaseService {
         Map<String, Object> result = new HashMap<>(5);
 
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
         udfUserMapper.deleteByUserId(userId);
 
-        if (check(result, StringUtils.isEmpty(udfIds), Status.SUCCESS, Constants.MSG)) {
+        if (check(result, StringUtils.isEmpty(udfIds), Status.SUCCESS)) {
             return result;
         }
 
@@ -481,13 +483,13 @@ public class UsersService extends BaseService {
         result.put(Constants.STATUS, false);
 
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
         datasourceUserMapper.deleteByUserId(userId);
 
-        if (check(result, StringUtils.isEmpty(datasourceIds), Status.SUCCESS, Constants.MSG)) {
+        if (check(result, StringUtils.isEmpty(datasourceIds), Status.SUCCESS)) {
             return result;
         }
 
@@ -554,7 +556,7 @@ public class UsersService extends BaseService {
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -575,7 +577,7 @@ public class UsersService extends BaseService {
     public Map<String, Object> queryUserList(User loginUser) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
@@ -619,11 +621,11 @@ public class UsersService extends BaseService {
 
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
-        List<User> userList = userMapper.selectList(null);
+        List<User> userList = userMapper.queryAllGeneralUser();
         List<User> resultUsers = new ArrayList<>();
         Set<User> userSet = null;
         if (userList != null && userList.size() > 0) {
@@ -655,7 +657,7 @@ public class UsersService extends BaseService {
     public Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM, Constants.STATUS)) {
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
         List<User> userList = userMapper.queryUserListByAlertGroupId(alertgroupId);
@@ -671,14 +673,13 @@ public class UsersService extends BaseService {
      * @param result
      * @param bool
      * @param userNoOperationPerm
-     * @param status
      * @return
      */
-    private boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm, String status) {
+    private boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
         //only admin can operate
         if (bool) {
             result.put(Constants.STATUS, userNoOperationPerm);
-            result.put(status, userNoOperationPerm.getMsg());
+            result.put(Constants.MSG, userNoOperationPerm.getMsg());
             return true;
         }
         return false;

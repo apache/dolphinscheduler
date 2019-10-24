@@ -17,8 +17,8 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -126,5 +126,9 @@ public class BaseService {
          */
         HadoopUtils.getInstance().mkdir(resourcePath);
         HadoopUtils.getInstance().mkdir(udfsPath);
+    }
+
+    protected boolean hasPerm(User operateUser, int createUserId){
+        return operateUser.getId() == createUserId || isAdmin(operateUser);
     }
 }

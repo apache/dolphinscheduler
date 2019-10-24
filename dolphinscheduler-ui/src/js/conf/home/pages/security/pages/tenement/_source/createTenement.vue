@@ -62,7 +62,7 @@
           <template slot="content">
             <x-input
                     type="textarea"
-                    v-model="desc"
+                    v-model="description"
                     :placeholder="$t('Please enter description')"
                     autocomplete="off">
             </x-input>
@@ -88,7 +88,7 @@
         queueId: {},
         tenantCode: '',
         tenantName: '',
-        desc: ''
+        description: ''
       }
     },
     props: {
@@ -132,7 +132,7 @@
       _verification () {
         let isEn = /^[0-9a-zA-Z_.-]{1,}$/
 
-        if (!this.tenantCode) {
+        if (!this.tenantCode.replace(/\s*/g,"")) {
           this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
@@ -140,7 +140,7 @@
           this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false
         }
-        if (!this.tenantName) {
+        if (!this.tenantName.replace(/\s*/g,"")) {
           this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
@@ -152,7 +152,7 @@
           tenantCode: this.tenantCode,
           tenantName: this.tenantName,
           queueId: this.queueId.id,
-          desc: this.desc
+          description: this.description
         }
         if (this.item) {
           param.id = this.item.id
@@ -181,7 +181,7 @@
           })
           this.tenantCode = this.item.tenantCode
           this.tenantName = this.item.tenantName
-          this.desc = this.item.desc
+          this.description = this.item.description
         }
       })
     },

@@ -23,8 +23,8 @@ let projectName = localStore.getItem('projectName')
 export default {
   // name
   name: '',
-  // desc
-  desc: '',
+  // description
+  description: '',
   // Node global parameter
   globalParams: [],
   // Node information

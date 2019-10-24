@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.api.utils;
 
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
@@ -41,7 +42,7 @@ public class CheckUtils {
    * @param userName
    */
   public static boolean checkUserName(String userName) {
-    return regexChecks(userName, org.apache.dolphinscheduler.common.Constants.REGEX_USER_NAME);
+    return regexChecks(userName, Constants.REGEX_USER_NAME);
   }
 
   /**
@@ -50,7 +51,7 @@ public class CheckUtils {
    * @param email
    */
   public static boolean checkEmail(String email) {
-    return email.length() > 5 && email.length() <= 40 && regexChecks(email, org.apache.dolphinscheduler.common.Constants.REGEX_MAIL_NAME) ;
+    return email.length() > 5 && email.length() <= 40 && regexChecks(email, Constants.REGEX_MAIL_NAME) ;
   }
 
   /**
@@ -122,25 +123,12 @@ public class CheckUtils {
    * @param phone
    * @return
    */
-  public static Map<String, Object> checkUserParams(String userName, String password, String email, String phone){
-      Map<String, Object> result = new HashMap<>();
-     try{
-       CheckUtils.checkUserName(userName);
-       CheckUtils.checkEmail(email);
-       CheckUtils.checkPassword(password);
-       CheckUtils.checkPhone(phone);
-       result.put(Constants.STATUS, Status.SUCCESS);
-       result.put(Constants.MSG, Status.SUCCESS.getMsg());
-     }catch (Exception e){
-       result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
-       result.put(Constants.MSG, e.getMessage());
-     }
-      return result;
+  public static boolean checkUserParams(String userName, String password, String email, String phone){
+    return CheckUtils.checkUserName(userName) &&
+            CheckUtils.checkEmail(email) &&
+            CheckUtils.checkPassword(password) &&
+            CheckUtils.checkPhone(phone);
   }
-
-
-
-
 
   /**
    * 正则匹配

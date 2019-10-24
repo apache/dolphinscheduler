@@ -37,7 +37,7 @@ DownChart.prototype.maxVal = function () {
     let x = parseInt(_.maxBy(tasksAllList, 'x').x + 100)
 
     resolve({
-      width: x > 600 ? x : dom.width(),
+      width: (x > 600 ? x : dom.width()) + 100,
       height: (y > 500 ? y : dom.height()) + 100
     })
   })

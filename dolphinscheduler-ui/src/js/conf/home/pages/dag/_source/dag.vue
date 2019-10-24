@@ -24,7 +24,7 @@
              :id="v"
              v-for="(item,v) in tasksTypeList"
              @mousedown="_getDagId(v)">
-          <div data-toggle="tooltip" :title="item.desc">
+          <div data-toggle="tooltip" :title="item.description">
             <div class="icos" :class="'icos-' + v" ></div>
           </div>
         </div>
@@ -66,7 +66,7 @@
                :class="_operationClass(item)"
                :id="item.code"
                @click="_ckOperation(item,$event)">
-              <i class="iconfont" v-html="item.icon" data-toggle="tooltip" :title="item.desc" ></i>
+              <i class="iconfont" v-html="item.icon" data-toggle="tooltip" :title="item.description" ></i>
             </a>
           </div>
           <x-button

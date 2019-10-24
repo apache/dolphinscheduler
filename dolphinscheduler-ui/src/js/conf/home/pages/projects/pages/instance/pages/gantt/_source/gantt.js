@@ -166,15 +166,12 @@ Gantt.prototype.drawChart = function () {
  * tip提示
  */
 Gantt.prototype.tip = function (d) {
-  let str = ''
-  str += `<div class="d3-toottip">`
-  str += `<ul>`
-  str += `<li><span class="sp1">taskName :</span><span>${d.taskName}</span></li>`
-  str += `<li><span class="sp1">status :</span><span>${tasksState[d.status].desc} (${d.status})</span></li>`
-  str += `<li><span class="sp1">startTime :</span><span>${formatDate(d.isoStart)}</span></li>`
-  str += `<li><span class="sp1">endTime :</span><span>${formatDate(d.isoEnd)}</span></li>`
-  str += `<li><span class="sp1">duration :</span><span>${d.duration}</span></li>`
-  str += `</ul>`
+  let str = `<div style="text-align: left;word-break:break-all">`
+  str += `taskName : ${d.taskName}</br>`
+  str += `status : ${tasksState[d.status].desc} (${d.status})</br>`
+  str += `startTime : ${formatDate(d.isoStart)}</br>`
+  str += `endTime : ${formatDate(d.isoEnd)}</br>`
+  str += `duration : ${d.duration}</br>`
   str += `</div>`
   return str
 }

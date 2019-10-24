@@ -89,8 +89,8 @@
         store,
         // name
         name: '',
-        // desc
-        desc: '',
+        // description
+        description: '',
         // progress
         progress: 0,
         // file
