@@ -147,7 +147,7 @@ public class DataSourceService extends BaseService{
             return result;
         }
 
-        if(loginUser.getId() != dataSource.getUserId() || loginUser.getUserType() != UserType.ADMIN_USER){
+        if(!hasDeletePerm(loginUser, dataSource.getUserId())){
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -593,7 +593,7 @@ public class DataSourceService extends BaseService{
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-            if(loginUser.getId() != dataSource.getUserId() || loginUser.getUserType() != UserType.ADMIN_USER){
+            if(!hasDeletePerm(loginUser, dataSource.getUserId())){
                 putMsg(result, Status.USER_NO_OPERATION_PERM);
                 return result;
             }
