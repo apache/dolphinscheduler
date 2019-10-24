@@ -304,9 +304,10 @@ public class SchedulerService extends BaseService {
         if(scheduleStatus == ReleaseState.ONLINE){
             // check process definition release state
             if(processDefinition.getReleaseState() != ReleaseState.ONLINE){
+                ProcessDefinition definition = processDefinitionMapper.selectById(scheduleObj.getProcessDefinitionId());
                 logger.info("not release process definition id: {} , name : {}",
                         processDefinition.getId(), processDefinition.getName());
-                putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, scheduleObj.getProcessDefinitionId());
+                putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, definition.getName());
                 return result;
             }
             // check sub process definition release state
