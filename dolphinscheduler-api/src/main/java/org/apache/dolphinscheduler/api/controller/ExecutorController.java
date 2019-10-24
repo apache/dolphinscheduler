@@ -95,7 +95,7 @@ public class ExecutorController extends BaseController {
                     workerGroupId, timeout);
 
             if (timeout == null) {
-                timeout = org.apache.dolphinscheduler.common.Constants.MAX_TASK_TIMEOUT;
+                timeout = Constants.MAX_TASK_TIMEOUT;
             }
 
             Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
