@@ -128,7 +128,7 @@ public class BaseService {
         HadoopUtils.getInstance().mkdir(udfsPath);
     }
 
-    protected boolean hasDeletePerm(User operateUser, int createUserId){
+    protected boolean hasPerm(User operateUser, int createUserId){
         return operateUser.getId() == createUserId || isAdmin(operateUser);
     }
 }

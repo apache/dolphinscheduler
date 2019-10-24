@@ -208,7 +208,7 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        if (!hasDeletePerm(loginUser, resource.getUserId())) {
+        if (!hasPerm(loginUser, resource.getUserId())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -408,7 +408,7 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        if (!hasDeletePerm(loginUser, resource.getUserId())) {
+        if (!hasPerm(loginUser, resource.getUserId())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
