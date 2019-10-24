@@ -65,7 +65,7 @@ public class DataSourceService extends BaseService{
     public static final String PRINCIPAL = "principal";
     public static final String DATABASE = "database";
     public static final String USER_NAME = "userName";
-    public static final String PASSWORD = org.apache.dolphinscheduler.common.Constants.PASSWORD;
+    public static final String PASSWORD = Constants.PASSWORD;
     public static final String OTHER = "other";
 
 
@@ -90,7 +90,8 @@ public class DataSourceService extends BaseService{
 
         Map<String, Object> result = new HashMap<>(5);
         // check name can use or not
-        if (checkName(name, result)) {
+        if (checkName(name)) {
+            putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
         Boolean isConnection = checkConnection(type, parameter);
@@ -146,8 +147,14 @@ public class DataSourceService extends BaseService{
             return result;
         }
 
+        if(loginUser.getId() != dataSource.getUserId() || loginUser.getUserType() != UserType.ADMIN_USER){
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
         //check name can use or not
-        if(!name.trim().equals(dataSource.getName()) && checkName(name, result)){
+        if(!name.trim().equals(dataSource.getName()) && checkName(name)){
+            putMsg(result, Status.DATASOURCE_EXIST);
             return result;
         }
 
@@ -170,10 +177,9 @@ public class DataSourceService extends BaseService{
         return result;
     }
 
-    private boolean checkName(String name, Map<String, Object> result) {
+    private boolean checkName(String name) {
         List<DataSource> queryDataSource = dataSourceMapper.queryDataSourceByName(name.trim());
         if (queryDataSource != null && queryDataSource.size() > 0) {
-            putMsg(result, Status.DATASOURCE_EXIST);
             return true;
         }
         return false;
@@ -321,7 +327,7 @@ public class DataSourceService extends BaseService{
 
             String connectionParams  = dataSource.getConnectionParams();
             JSONObject  object = JSONObject.parseObject(connectionParams);
-            object.put(org.apache.dolphinscheduler.common.Constants.PASSWORD, org.apache.dolphinscheduler.common.Constants.XXXXXX);
+            object.put(Constants.PASSWORD, Constants.XXXXXX);
             dataSource.setConnectionParams(JSONUtils.toJson(object));
 
         }
@@ -587,7 +593,7 @@ public class DataSourceService extends BaseService{
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
-            if(loginUser.getId() != dataSource.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER){
+            if(loginUser.getId() != dataSource.getUserId() || loginUser.getUserType() != UserType.ADMIN_USER){
                 putMsg(result, Status.USER_NO_OPERATION_PERM);
                 return result;
             }
