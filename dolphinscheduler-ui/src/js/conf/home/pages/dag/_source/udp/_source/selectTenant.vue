@@ -48,10 +48,20 @@
       prop: 'value',
       event: 'tenantSelectEvent'
     },
+    mounted() {
+      let result = this.itemList.some(item=>{
+        if(item.id == this.value) {
+          return true
+        }
+			})
+      if(!result) {
+        this.value = -1
+      }
+    },
     methods: {
       _onChange (o) {
         this.value = o.value
-        this.$emit('tenantSelectEvent', o.value)
+        // this.$emit('tenantSelectEvent', o.value)
       }
     },
     watch: {
