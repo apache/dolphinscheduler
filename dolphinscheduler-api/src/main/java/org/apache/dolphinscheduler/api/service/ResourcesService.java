@@ -208,7 +208,7 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        if (loginUser.getId() != resource.getUserId()) {
+        if (loginUser.getId() != resource.getUserId() || loginUser.getUserType() != UserType.ADMIN_USER) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -408,7 +408,7 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        if (loginUser.getId() != resource.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
+        if (loginUser.getId() != resource.getUserId() || loginUser.getUserType() != UserType.ADMIN_USER) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
