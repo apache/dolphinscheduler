@@ -56,7 +56,6 @@
         <x-button type="primary" shape="circle" size="large" :loading="spinnerLoading" long @click="_ok">{{spinnerLoading ? 'Loading...' : ` ${$t('Login')} `}} </x-button>
       </div>
     </div>
-    <div class="ctr">Copyright © 2019 Analysys Inc.</div>
   </div>
 </template>
 <script>
