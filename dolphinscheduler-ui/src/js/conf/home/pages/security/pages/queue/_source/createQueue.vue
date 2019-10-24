@@ -117,11 +117,11 @@
         }
       },
       _verification () {
-        if (!this.queueName) {
+        if (!this.queueName.replace(/\s*/g,"")) {
           this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
-        if (!this.queue) {
+        if (!this.queue.replace(/\s*/g,"")) {
           this.$message.warning(`${i18n.$t('Please enter queue value')}`)
           return false
         }

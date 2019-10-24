@@ -101,7 +101,7 @@
       },
       _verification () {
         // group name
-        if (!this.groupName) {
+        if (!this.groupName.replace(/\s*/g,"")) {
           this.$message.warning(`${i18n.$t('Please enter group name')}`)
           return false
         }
