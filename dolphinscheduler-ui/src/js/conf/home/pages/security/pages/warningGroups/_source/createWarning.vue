@@ -50,7 +50,7 @@
           <template slot="content">
             <x-input
                     type="textarea"
-                    v-model="desc"
+                    v-model="description"
                     :placeholder="$t('Please enter description')">
             </x-input>
           </template>
@@ -72,7 +72,7 @@
         store,
         groupName: '',
         groupType: 'EMAIL',
-        desc: '',
+        description: '',
         options: [{ code: `${i18n.$t('Email')}`, id: 'EMAIL' }, { code: `${i18n.$t('SMS')}`, id: 'SMS' }]
       }
     },
@@ -111,7 +111,7 @@
         let param = {
           groupName: this.groupName,
           groupType: this.groupType,
-          desc: this.desc
+          description: this.description
         }
         if (this.item) {
           param.id = this.item.id
@@ -134,7 +134,7 @@
       if (this.item) {
         this.groupName = this.item.groupName
         this.groupType = this.item.groupType
-        this.desc = this.item.desc
+        this.description = this.item.description
       }
     },
     mounted () {

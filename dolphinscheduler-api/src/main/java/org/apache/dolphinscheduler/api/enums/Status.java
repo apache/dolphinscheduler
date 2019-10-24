@@ -168,6 +168,8 @@ public enum Status {
     DELETE_TENANT_BY_ID_FAIL_DEFINES(100143,"delete tenant by id fail, for there are {0} process definitions using it"),
     DELETE_TENANT_BY_ID_FAIL_USERS(100144,"delete tenant by id fail, for there are {0} users using it"),
 
+    DELETE_WORKER_GROUP_BY_ID_FAIL(100143,"delete worker group by id fail, for there are {0} process instances in executing using it"),
+
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists"),
 //    RESOURCE_EMPTY(20003, "resource file is empty"),

@@ -17,8 +17,8 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.dao.entity.TaskRecord;
 import org.slf4j.Logger;
