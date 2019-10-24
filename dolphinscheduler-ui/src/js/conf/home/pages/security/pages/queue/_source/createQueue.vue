@@ -51,6 +51,7 @@
 </template>
 <script>
   import _ from 'lodash'
+  import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
@@ -117,11 +118,11 @@
       },
       _verification () {
         if (!this.queueName) {
-          this.$message.warning(`Please enter name`)
+          this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
         if (!this.queue) {
-          this.$message.warning(`请输入队列值`)
+          this.$message.warning(`${i18n.$t('Please enter queue value')}`)
           return false
         }
         return true
