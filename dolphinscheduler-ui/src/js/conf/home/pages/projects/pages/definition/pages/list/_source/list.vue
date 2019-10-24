@@ -69,7 +69,7 @@
             <span v-else>-</span>
           </td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="item.description">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
             <span v-else>-</span>
           </td>
           <td>
@@ -153,7 +153,7 @@
     methods: {
       ...mapActions('dag', ['editProcessState', 'getStartCheck', 'getReceiver', 'deleteDefinition', 'batchDeleteDefinition','exportDefinition']),
       _rtPublishStatus (code) {
-        return _.filter(publishStatus, v => v.code === code)[0].description
+        return _.filter(publishStatus, v => v.code === code)[0].desc
       },
       _treeView (item) {
         this.$router.push({ path: `/projects/definition/tree/${item.id}` })
