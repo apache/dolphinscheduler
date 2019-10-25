@@ -53,6 +53,7 @@
 		<clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
 		<mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
 		<jsp.version>6.1.14</jsp.version>
+		<takari-maven-plugin.version>0.6.1</takari-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -427,6 +428,12 @@
 
 	<build>
 		<plugins>
+			<!-- mvn -N io.takari:maven:wrapper -Dmaven=3.5.4 -->
+			<plugin>
+				<groupId>io.takari</groupId>
+				<artifactId>maven</artifactId>
+				<version>${takari-maven-plugin.version}</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
