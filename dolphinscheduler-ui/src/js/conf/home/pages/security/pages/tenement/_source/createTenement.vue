@@ -132,7 +132,7 @@
       _verification () {
         let isEn = /^[0-9a-zA-Z_.-]{1,}$/
 
-        if (!this.tenantCode) {
+        if (!this.tenantCode.replace(/\s*/g,"")) {
           this.$message.warning(`${i18n.$t('Please enter the tenant code in English')}`)
           return false
         }
@@ -140,7 +140,7 @@
           this.$message.warning(`${i18n.$t('Please enter tenant code in English')}`)
           return false
         }
-        if (!this.tenantName) {
+        if (!this.tenantName.replace(/\s*/g,"")) {
           this.$message.warning(`${i18n.$t('Please enter name')}`)
           return false
         }
