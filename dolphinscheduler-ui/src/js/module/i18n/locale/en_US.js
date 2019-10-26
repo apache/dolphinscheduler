@@ -493,5 +493,7 @@ export default {
   'Http Condition':'Http Condition',
   'Please Enter Http Url': 'Please Enter Http Url(required)',
   'Please Enter Http Condition': 'Please Enter Http Condition',
-  'There is no data for this period of time': 'There is no data for this period of time'
+  'There is no data for this period of time': 'There is no data for this period of time',
+  'IP address cannot be empty': 'IP address cannot be empty',
+  'Please generate token': 'Please generate token'
 }

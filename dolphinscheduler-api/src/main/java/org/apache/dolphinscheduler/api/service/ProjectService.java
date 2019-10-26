@@ -17,8 +17,8 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -141,6 +141,18 @@ public class ProjectService extends BaseService{
         return result;
     }
 
+    public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result) {
+        boolean checkResult = false;
+        if (project == null) {
+            putMsg(result, Status.PROJECT_NOT_FOUNT, project.getName());
+        } else if (!checkReadPermission(loginUser, project)) {
+            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
+        } else {
+            checkResult = true;
+        }
+        return checkResult;
+    }
+
     /**
      * admin can view all projects
      * 如果是管理员,则所有项目都可见
@@ -191,7 +203,7 @@ public class ProjectService extends BaseService{
         }
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(projectId);
 
-        if (loginUser.getId() != project.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
+        if (!hasPerm(loginUser, project.getUserId())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -238,9 +250,9 @@ public class ProjectService extends BaseService{
         Map<String, Object> result = new HashMap<>(5);
 
         Project project = projectMapper.selectById(projectId);
-        Map<String, Object> checkResult = getCheckResult(loginUser, project);
-        if (checkResult != null) {
-            return checkResult;
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result);
+        if (!hasProjectAndPerm) {
+            return result;
         }
         Project tempProject = projectMapper.queryByName(projectName);
         if (tempProject != null && tempProject.getId() != projectId) {
@@ -342,7 +354,7 @@ public class ProjectService extends BaseService{
      */
     private boolean checkReadPermission(User user, Project project) {
         int permissionId = queryPermission(user, project);
-        return (permissionId & org.apache.dolphinscheduler.common.Constants.READ_PERMISSION) != 0;
+        return (permissionId & Constants.READ_PERMISSION) != 0;
     }
 
     /**
@@ -354,11 +366,11 @@ public class ProjectService extends BaseService{
      */
     private int queryPermission(User user, Project project) {
         if (user.getUserType() == UserType.ADMIN_USER) {
-            return org.apache.dolphinscheduler.common.Constants.READ_PERMISSION;
+            return Constants.READ_PERMISSION;
         }
 
         if (project.getUserId() == user.getId()) {
-            return org.apache.dolphinscheduler.common.Constants.ALL_PERMISSIONS;
+            return Constants.ALL_PERMISSIONS;
         }
 
         ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());

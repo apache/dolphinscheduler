@@ -18,8 +18,8 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
@@ -54,7 +54,7 @@ public class ProcessDefinitionController extends BaseController{
      * @param projectName
      * @param name
      * @param json process definition json
-     * @param desc
+     * @param description
      * @return
      */
     @ApiOperation(value = "save", notes= "CREATE_PROCESS_DEFINITION_NOTES")
@@ -63,7 +63,7 @@ public class ProcessDefinitionController extends BaseController{
             @ApiImplicitParam(name = "processDefinitionJson", value = "PROCESS_DEFINITION_JSON", required = true, type ="String"),
             @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type ="String"),
             @ApiImplicitParam(name = "connects", value = "PROCESS_DEFINITION_CONNECTS", required = true, type ="String"),
-            @ApiImplicitParam(name = "desc", value = "PROCESS_DEFINITION_DESC", required = false, type ="String"),
+            @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type ="String"),
     })
     @PostMapping(value = "/save")
     @ResponseStatus(HttpStatus.CREATED)
@@ -73,14 +73,14 @@ public class ProcessDefinitionController extends BaseController{
                                           @RequestParam(value = "processDefinitionJson", required = true) String json,
                                           @RequestParam(value = "locations", required = true) String locations,
                                           @RequestParam(value = "connects", required = true) String connects,
-                                          @RequestParam(value = "desc", required = false) String desc) {
+                                          @RequestParam(value = "description", required = false) String description) {
 
         try {
             logger.info("login user {}, create  process definition, project name: {}, process definition name: {}, " +
                             "process_definition_json: {}, desc: {} locations:{}, connects:{}",
-                    loginUser.getUserName(), projectName, name, json, desc, locations, connects);
+                    loginUser.getUserName(), projectName, name, json, description, locations, connects);
             Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectName, name, json,
-                    desc, locations, connects);
+                    description, locations, connects);
             return returnDataList(result);
         } catch (Exception e) {
             logger.error(Status.CREATE_PROCESS_DEFINITION.getMsg(), e);
@@ -124,7 +124,7 @@ public class ProcessDefinitionController extends BaseController{
      * @param name
      * @param id
      * @param processDefinitionJson
-     * @param desc
+     * @param description
      * @return
      */
     @ApiOperation(value = "updateProccessDefinition", notes= "UPDATE_PROCCESS_DEFINITION_NOTES")
@@ -134,7 +134,7 @@ public class ProcessDefinitionController extends BaseController{
             @ApiImplicitParam(name = "processDefinitionJson", value = "PROCESS_DEFINITION_JSON", required = true, type ="String"),
             @ApiImplicitParam(name = "locations", value = "PROCESS_DEFINITION_LOCATIONS", required = true, type ="String"),
             @ApiImplicitParam(name = "connects", value = "PROCESS_DEFINITION_CONNECTS", required = true, type ="String"),
-            @ApiImplicitParam(name = "desc", value = "PROCESS_DEFINITION_DESC", required = false, type ="String"),
+            @ApiImplicitParam(name = "description", value = "PROCESS_DEFINITION_DESC", required = false, type ="String"),
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
@@ -145,14 +145,14 @@ public class ProcessDefinitionController extends BaseController{
                                                          @RequestParam(value = "processDefinitionJson", required = true) String processDefinitionJson,
                                                          @RequestParam(value = "locations", required = false) String locations,
                                                          @RequestParam(value = "connects", required = false) String connects,
-                                                         @RequestParam(value = "desc", required = false) String desc) {
+                                                         @RequestParam(value = "description", required = false) String description) {
 
         try {
             logger.info("login user {}, update process define, project name: {}, process define name: {}, " +
                             "process_definition_json: {}, desc: {}, locations:{}, connects:{}",
-                    loginUser.getUserName(), projectName, name, processDefinitionJson,desc, locations, connects);
+                    loginUser.getUserName(), projectName, name, processDefinitionJson,description, locations, connects);
             Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectName, id, name,
-                    processDefinitionJson, desc, locations, connects);
+                    processDefinitionJson, description, locations, connects);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.UPDATE_PROCESS_DEFINITION_ERROR.getMsg(),e);

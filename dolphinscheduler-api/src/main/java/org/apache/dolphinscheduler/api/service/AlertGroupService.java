@@ -17,9 +17,9 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Constants;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
@@ -44,7 +44,7 @@ import java.util.Map;
  * alert group service
  */
 @Service
-public class AlertGroupService {
+public class AlertGroupService extends BaseService{
 
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupService.class);
 
@@ -268,30 +268,5 @@ public class AlertGroupService {
         }
 
         return result;
-    }
-
-    /**
-     * is admin?
-     * @param loginUser
-     * @param result
-     * @return
-     */
-    private boolean checkAdmin(User loginUser, Map<String, Object> result) {
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * put message
-     *
-     * @param result
-     * @param status
-     */
-    private void putMsg(Map<String, Object> result, Status status) {
-        result.put(Constants.STATUS, status);
-        result.put(Constants.MSG, status.getMsg());
     }
 }
