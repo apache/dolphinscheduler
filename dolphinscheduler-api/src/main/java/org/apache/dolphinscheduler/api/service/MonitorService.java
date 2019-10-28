@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.api.utils.ZookeeperMonitor;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
-import org.apache.dolphinscheduler.common.model.MasterServer;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
@@ -65,7 +65,7 @@ public class MonitorService extends BaseService{
 
     Map<String, Object> result = new HashMap<>(5);
 
-    List<MasterServer> masterServers = getServerListFromZK(true);
+    List<Server> masterServers = getServerListFromZK(true);
     result.put(Constants.DATA_LIST, masterServers);
     putMsg(result,Status.SUCCESS);
 
@@ -99,7 +99,7 @@ public class MonitorService extends BaseService{
   public Map<String,Object> queryWorker(User loginUser) {
 
     Map<String, Object> result = new HashMap<>(5);
-    List<MasterServer> masterServers = getServerListFromZK(false);
+    List<Server> masterServers = getServerListFromZK(false);
 
     result.put(Constants.DATA_LIST, masterServers);
     putMsg(result,Status.SUCCESS);
@@ -107,8 +107,8 @@ public class MonitorService extends BaseService{
     return result;
   }
 
-  public List<MasterServer> getServerListFromZK(boolean isMaster){
-    List<MasterServer> servers = new ArrayList<>();
+  public List<Server> getServerListFromZK(boolean isMaster){
+    List<Server> servers = new ArrayList<>();
     ZookeeperMonitor zookeeperMonitor = null;
     try{
       zookeeperMonitor = new ZookeeperMonitor();

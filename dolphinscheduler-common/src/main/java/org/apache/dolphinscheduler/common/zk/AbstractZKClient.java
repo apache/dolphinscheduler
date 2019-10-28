@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.common.zk;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
-import org.apache.dolphinscheduler.common.model.MasterServer;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
@@ -344,14 +344,14 @@ public abstract class AbstractZKClient {
 	 * @param zkNodeType
 	 * @return
 	 */
-	public List<MasterServer> getServersList(ZKNodeType zkNodeType){
+	public List<Server> getServersList(ZKNodeType zkNodeType){
 		Map<String, String> masterMap = getServerMaps(zkNodeType);
 		String parentPath = getZNodeParentPath(zkNodeType);
 
-		List<MasterServer> masterServers = new ArrayList<>();
+		List<Server> masterServers = new ArrayList<>();
 		int i = 0;
 		for (Map.Entry<String, String> entry : masterMap.entrySet()) {
-			MasterServer masterServer = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
+			Server masterServer = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
 			masterServer.setZkDirectory( parentPath + "/"+ entry.getKey());
 			masterServer.setId(i);
 			i ++;

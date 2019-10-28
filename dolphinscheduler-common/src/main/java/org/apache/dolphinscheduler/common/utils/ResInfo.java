@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.model.MasterServer;
+import org.apache.dolphinscheduler.common.model.Server;
 
 import java.util.Date;
 
@@ -131,15 +131,15 @@ public class ResInfo {
      * @param heartBeatInfo
      * @return
      */
-    public static MasterServer parseHeartbeatForZKInfo(String heartBeatInfo){
-        MasterServer masterServer =  null;
+    public static Server parseHeartbeatForZKInfo(String heartBeatInfo){
+        Server masterServer =  null;
         String[] masterArray = heartBeatInfo.split(Constants.COMMA);
         if(masterArray == null ||
                 masterArray.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
             return masterServer;
 
         }
-        masterServer = new MasterServer();
+        masterServer = new Server();
         masterServer.setHost(masterArray[0]);
         masterServer.setPort(Integer.parseInt(masterArray[1]));
         masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[2]),

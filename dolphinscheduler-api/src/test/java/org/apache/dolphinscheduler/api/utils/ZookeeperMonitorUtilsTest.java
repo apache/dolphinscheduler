@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.utils;
 
-import org.apache.dolphinscheduler.common.model.MasterServer;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.junit.Assert;
 import org.junit.Test;
 import java.util.List;
@@ -33,9 +33,9 @@ public class ZookeeperMonitorUtilsTest {
         ZookeeperMonitor zookeeperMonitor = new ZookeeperMonitor();
 
 
-        List<MasterServer> masterServerList = zookeeperMonitor.getMasterServers();
+        List<Server> masterServerList = zookeeperMonitor.getMasterServers();
 
-        List<MasterServer> workerServerList = zookeeperMonitor.getWorkerServers();
+        List<Server> workerServerList = zookeeperMonitor.getWorkerServers();
 
         Assert.assertTrue(masterServerList.size() >= 0);
         Assert.assertTrue(workerServerList.size() >= 0);
