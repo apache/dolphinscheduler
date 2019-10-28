@@ -266,18 +266,6 @@ public class TenantService extends BaseService{
       String tenantPath = HadoopUtils.getHdfsDataBasePath() + "/" + tenant.getTenantCode();
 
       if (HadoopUtils.getInstance().exists(tenantPath)){
-        String resourcePath = HadoopUtils.getHdfsResDir(tenant.getTenantCode());
-        FileStatus[] fileStatus = HadoopUtils.getInstance().listFileStatus(resourcePath);
-        if (fileStatus.length > 0) {
-          putMsg(result, Status.HDFS_TERANT_RESOURCES_FILE_EXISTS);
-          return result;
-        }
-        fileStatus = HadoopUtils.getInstance().listFileStatus(HadoopUtils.getHdfsUdfDir(tenant.getTenantCode()));
-        if (fileStatus.length > 0) {
-          putMsg(result, Status.HDFS_TERANT_UDFS_FILE_EXISTS);
-          return result;
-        }
-
         HadoopUtils.getInstance().delete(tenantPath, true);
       }
     }
