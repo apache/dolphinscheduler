@@ -158,11 +158,12 @@ public abstract class AbstractZKClient {
 			if (splits.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
 				return;
 			}
-			String str = splits[0] + Constants.COMMA +splits[1] + Constants.COMMA
+			String str = splits[0] + Constants.COMMA
+					+ splits[1] + Constants.COMMA
 					+ OSUtils.cpuUsage() + Constants.COMMA
 					+ OSUtils.memoryUsage() + Constants.COMMA
 					+ OSUtils.loadAverage() + Constants.COMMA
-					+ splits[4] + Constants.COMMA
+					+ splits[5] + Constants.COMMA
 					+ DateUtils.dateToString(new Date());
 			zkClient.setData().forPath(znode,str.getBytes());
 

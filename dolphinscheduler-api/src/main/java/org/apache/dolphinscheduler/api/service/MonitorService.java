@@ -99,9 +99,9 @@ public class MonitorService extends BaseService{
   public Map<String,Object> queryWorker(User loginUser) {
 
     Map<String, Object> result = new HashMap<>(5);
-    List<MasterServer> workerServers = getServerListFromZK(false);
+    List<MasterServer> masterServers = getServerListFromZK(false);
 
-    result.put(Constants.DATA_LIST, workerServers);
+    result.put(Constants.DATA_LIST, masterServers);
     putMsg(result,Status.SUCCESS);
 
     return result;

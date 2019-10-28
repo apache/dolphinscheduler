@@ -141,7 +141,6 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	public void initDao(){
 		this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-//		this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
 	}
 	/**
 	 * get alert dao
