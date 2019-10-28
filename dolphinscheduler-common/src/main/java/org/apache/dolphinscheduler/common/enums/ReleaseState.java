@@ -16,17 +16,30 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
+
 /**
  * process define release state
  */
+@Getter
 public enum ReleaseState {
 
     /**
      * 0 offline
      * 1 on line
      */
-    OFFLINE,ONLINE;
+    OFFLINE(0, "offline"),
+    ONLINE(1, "online");
 
+    ReleaseState(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
+
+    @EnumValue
+    private final int code;
+    private final String descp;
 
     public static ReleaseState getEnum(int value){
         for (ReleaseState e:ReleaseState.values()) {
