@@ -625,7 +625,7 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        List<User> userList = userMapper.queryAllGeneralUser();
+        List<User> userList = userMapper.selectList(null );
         List<User> resultUsers = new ArrayList<>();
         Set<User> userSet = null;
         if (userList != null && userList.size() > 0) {
