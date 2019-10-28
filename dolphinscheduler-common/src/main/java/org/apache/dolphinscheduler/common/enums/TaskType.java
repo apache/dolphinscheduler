@@ -16,9 +16,13 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
+
 /**
  * task node type
  */
+@Getter
 public enum TaskType {
     /**
      * 0 SHELL
@@ -32,7 +36,25 @@ public enum TaskType {
      * 8 FLINK
      * 9 HTTP
      */
-    SHELL,SQL, SUB_PROCESS,PROCEDURE,MR,SPARK,PYTHON,DEPENDENT,FLINK,HTTP;
+    SHELL(0, "shell"),
+    SQL(1, "sql"),
+    SUB_PROCESS(2, "sub process"),
+    PROCEDURE(3, "procedure"),
+    MR(4, "mr"),
+    SPARK(5, "spark"),
+    PYTHON(6, "python"),
+    DEPENDENT(7, "dependent"),
+    FLINK(8, "flink"),
+    HTTP(9, "http");
+
+    TaskType(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
+
+    @EnumValue
+    private final int code;
+    private final String descp;
 
     public static boolean typeIsNormalTask(String typeName) {
         TaskType taskType = TaskType.valueOf(typeName);
