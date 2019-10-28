@@ -17,10 +17,14 @@
 package org.apache.dolphinscheduler.common.enums;
 
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
+
 /**
  * runing status for workflow and task nodes
  *
  */
+@Getter
 public enum ExecutionStatus {
 
     /**
@@ -38,8 +42,27 @@ public enum ExecutionStatus {
      * 10 waiting thread
      * 11 waiting depend node complete
      */
-    SUBMITTED_SUCCESS,RUNNING_EXEUTION,READY_PAUSE,PAUSE,READY_STOP,STOP,FAILURE,SUCCESS,
-    NEED_FAULT_TOLERANCE,KILL,WAITTING_THREAD,WAITTING_DEPEND;
+    SUBMITTED_SUCCESS(0, "submit success"),
+    RUNNING_EXEUTION(1, "running"),
+    READY_PAUSE(2, "ready pause"),
+    PAUSE(3, "pause"),
+    READY_STOP(4, "ready stop"),
+    STOP(5, "stop"),
+    FAILURE(6, "failure"),
+    SUCCESS(7, "success"),
+    NEED_FAULT_TOLERANCE(8, "need fault tolerance"),
+    KILL(9, "kill"),
+    WAITTING_THREAD(10, "waiting thread"),
+    WAITTING_DEPEND(11, "waiting depend node complete");
+
+    ExecutionStatus(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
+
+    @EnumValue
+    private final int code;
+    private final String descp;
 
 
  /**

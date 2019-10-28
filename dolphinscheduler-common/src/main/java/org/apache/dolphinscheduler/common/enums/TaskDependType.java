@@ -16,15 +16,29 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
+
 /**
  * task node depend type
  */
+@Getter
 public enum TaskDependType {
   /**
    * 0 run current tasks only
    * 1 run current tasks and previous tasks
    * 2 run current tasks and the other tasks that depend on current tasks;
    */
-  TASK_ONLY, TASK_PRE, TASK_POST;
+  TASK_ONLY(0, "task only"),
+  TASK_PRE(1, "task pre"),
+  TASK_POST(2, "task post");
 
+  TaskDependType(int code, String descp){
+    this.code = code;
+    this.descp = descp;
+  }
+
+  @EnumValue
+  private final int code;
+  private final String descp;
 }

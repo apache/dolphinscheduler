@@ -466,7 +466,7 @@ export default {
   'Pre Statement': 'Pre Statement',
   'Post Statement': 'Post Statement',
   'Statement cannot be empty': 'Statement cannot be empty',
-  'Process Define Count': 'Process Define Count',
+  'Process Define Count': 'Work flow Define Count',
   'Process Instance Running Count': 'Process Instance Running Count',
   'command number of waiting for running': 'command number of waiting for running',
   'failure command number': 'failure command number',

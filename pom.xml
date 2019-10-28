@@ -25,7 +25,7 @@
 		<hadoop.version>2.7.3</hadoop.version>
 		<quartz.version>2.2.3</quartz.version>
 		<jackson.version>2.9.8</jackson.version>
-		<mybatis-plus.version>3.0.7.1</mybatis-plus.version>
+		<mybatis-plus.version>3.2.0</mybatis-plus.version>
 		<lombok.version>1.18.4</lombok.version>
 		<mybatis.spring.version>2.0.1</mybatis.spring.version>
 		<cron.utils.version>5.0.5</cron.utils.version>

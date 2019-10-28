@@ -16,12 +16,27 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
+
 /**
  * resource type
  */
+@Getter
 public enum  ResourceType {
     /**
      * 0 file, 1 udf
      */
-    FILE,UDF
+    FILE(0, "file"),
+    UDF(1, "udf");
+
+
+    ResourceType(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
+
+    @EnumValue
+    private final int code;
+    private final String descp;
 }
