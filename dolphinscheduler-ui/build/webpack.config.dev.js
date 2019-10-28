@@ -89,6 +89,7 @@ const config = merge.smart(baseConfig, {
     disableHostCheck: true,
     proxy: {
       '/dolphinscheduler': {
+        timeout: 1800000,
         target: getEnv('API_BASE', 'http://local.dev:8080/backend'),
         changeOrigin: true
       }
