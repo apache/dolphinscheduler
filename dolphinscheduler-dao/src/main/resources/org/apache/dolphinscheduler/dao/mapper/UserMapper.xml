@@ -35,7 +35,7 @@
     <select id="queryUserListByAlertGroupId" resultType="org.apache.dolphinscheduler.dao.entity.User">
       select u.*
       from t_ds_user u, t_ds_relation_user_alertgroup rel
-      where u.id = rel.user_id AND u.user_type = 1 AND rel.alertgroup_id = #{alertgroupId}
+      where u.id = rel.user_id AND rel.alertgroup_id = #{alertgroupId}
     </select>
     <select id="queryUserListByTenant" resultType="org.apache.dolphinscheduler.dao.entity.User">
       select *
