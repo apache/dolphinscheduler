@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.model.MasterServer;
+import org.apache.dolphinscheduler.common.model.Server;
 
 import java.util.Date;
 
@@ -49,8 +49,7 @@ public class ResInfo {
     }
 
     public ResInfo(double cpuUsage, double memoryUsage, double loadAverage) {
-        this.cpuUsage = cpuUsage;
-        this.memoryUsage = memoryUsage;
+        this(cpuUsage,memoryUsage);
         this.loadAverage = loadAverage;
     }
 
@@ -80,30 +79,25 @@ public class ResInfo {
 
     /**
      * get CPU and memory usage
-     * add cpu load average by lidong for service monitor
      * @return
      */
-    public static String getResInfoJson(){
-        ResInfo resInfo = new ResInfo(OSUtils.cpuUsage(), OSUtils.memoryUsage(),OSUtils.loadAverage());
+    public static String getResInfoJson(double cpuUsage , double memoryUsage,double loadAverage){
+        ResInfo resInfo = new ResInfo(cpuUsage,memoryUsage,loadAverage);
         return JSONUtils.toJson(resInfo);
     }
 
 
     /**
-     * get CPU and memory usage
+     * get heart beat info
+     * @param now
      * @return
      */
-    public static String getResInfoJson(double cpuUsage , double memoryUsage){
-        ResInfo resInfo = new ResInfo(cpuUsage,memoryUsage);
-        return JSONUtils.toJson(resInfo);
-    }
-
-
     public static String getHeartBeatInfo(Date now){
         return buildHeartbeatForZKInfo(OSUtils.getHost(),
                 OSUtils.getProcessID(),
                 OSUtils.cpuUsage(),
                 OSUtils.memoryUsage(),
+                OSUtils.loadAverage(),
                 DateUtils.dateToString(now),
                 DateUtils.dateToString(now));
 
@@ -115,17 +109,19 @@ public class ResInfo {
      * @param port
      * @param cpuUsage
      * @param memoryUsage
+     * @param loadAverage
      * @param createTime
      * @param lastHeartbeatTime
      * @return
      */
     public static String buildHeartbeatForZKInfo(String host , int port ,
-                                         double cpuUsage , double memoryUsage,
+                                         double cpuUsage , double memoryUsage,double loadAverage,
                                          String createTime,String lastHeartbeatTime){
 
         return host + Constants.COMMA + port + Constants.COMMA
                 + cpuUsage + Constants.COMMA
                 + memoryUsage + Constants.COMMA
+                + loadAverage + Constants.COMMA
                 + createTime + Constants.COMMA
                 + lastHeartbeatTime;
     }
@@ -135,19 +131,22 @@ public class ResInfo {
      * @param heartBeatInfo
      * @return
      */
-    public static MasterServer parseHeartbeatForZKInfo(String heartBeatInfo){
-        MasterServer masterServer =  null;
+    public static Server parseHeartbeatForZKInfo(String heartBeatInfo){
+        Server masterServer =  null;
         String[] masterArray = heartBeatInfo.split(Constants.COMMA);
-        if(masterArray.length != 6){
+        if(masterArray == null ||
+                masterArray.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
             return masterServer;
 
         }
-        masterServer = new MasterServer();
+        masterServer = new Server();
         masterServer.setHost(masterArray[0]);
         masterServer.setPort(Integer.parseInt(masterArray[1]));
-        masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[2]), Double.parseDouble(masterArray[3])));
-        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[4]));
-        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[5]));
+        masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[2]),
+                Double.parseDouble(masterArray[3]),
+                Double.parseDouble(masterArray[4])));
+        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[5]));
+        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[6]));
         return masterServer;
     }
 
