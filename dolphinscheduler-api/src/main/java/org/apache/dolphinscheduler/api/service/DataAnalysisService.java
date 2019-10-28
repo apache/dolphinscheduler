@@ -43,7 +43,7 @@ import java.util.*;
  * data analysis service
  */
 @Service
-public class DataAnalysisService {
+public class DataAnalysisService extends BaseService{
 
     private static final Logger logger = LoggerFactory.getLogger(DataAnalysisService.class);
 
@@ -83,13 +83,9 @@ public class DataAnalysisService {
     public Map<String,Object> countTaskStateByProject(User loginUser, int projectId, String startDate, String endDate) {
 
         Map<String, Object> result = new HashMap<>(5);
-        if(projectId != 0){
-            Project project = projectMapper.selectById(projectId);
-            result = projectService.checkProjectAndAuth(loginUser, project, String.valueOf(projectId));
-
-            if (getResultStatus(result)){
-                return result;
-            }
+        boolean checkProject = checkProject(loginUser, projectId, result);
+        if(!checkProject){
+            return result;
         }
 
         /**
@@ -139,13 +135,9 @@ public class DataAnalysisService {
     public Map<String,Object> countProcessInstanceStateByProject(User loginUser, int projectId, String startDate, String endDate) {
 
         Map<String, Object> result = new HashMap<>(5);
-        if(projectId != 0){
-            Project project = projectMapper.selectById(projectId);
-            result = projectService.checkProjectAndAuth(loginUser, project, String.valueOf(projectId));
-
-            if (getResultStatus(result)){
-                return result;
-            }
+        boolean checkProject = checkProject(loginUser, projectId, result);
+        if(!checkProject){
+            return result;
         }
 
         Date start = null;
@@ -206,19 +198,6 @@ public class DataAnalysisService {
     }
 
     /**
-     * get result status
-     * @param result
-     * @return
-     */
-    private boolean getResultStatus(Map<String, Object> result) {
-        Status resultEnum = (Status) result.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * statistical command status data
      *
      * @param loginUser
@@ -230,13 +209,9 @@ public class DataAnalysisService {
     public Map<String, Object> countCommandState(User loginUser, int projectId, String startDate, String endDate) {
 
         Map<String, Object> result = new HashMap<>(5);
-        if(projectId != 0){
-            Project project = projectMapper.selectById(projectId);
-            result = projectService.checkProjectAndAuth(loginUser, project, String.valueOf(projectId));
-
-            if (getResultStatus(result)){
-                return result;
-            }
+        boolean checkProject = checkProject(loginUser, projectId, result);
+        if(!checkProject){
+            return result;
         }
 
         /**
@@ -346,18 +321,15 @@ public class DataAnalysisService {
      */
     public Map<String, Object> countQueueState(User loginUser, int projectId) {
         Map<String, Object> result = new HashMap<>(5);
-        if(projectId != 0){
-            Project project = projectMapper.selectById(projectId);
-            result = projectService.checkProjectAndAuth(loginUser, project, String.valueOf(projectId));
 
-            if (getResultStatus(result)){
-                return result;
-            }
+        boolean checkProject = checkProject(loginUser, projectId, result);
+        if(!checkProject){
+            return result;
         }
 
         ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-        List<String> tasksQueueList = tasksQueue.getAllTasks(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
-        List<String> tasksKillList = tasksQueue.getAllTasks(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_KILL);
+        List<String> tasksQueueList = tasksQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
+        List<String> tasksKillList = tasksQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_KILL);
 
         Map<String,Integer> dataMap = new HashMap<>();
         if (loginUser.getUserType() == UserType.ADMIN_USER){
@@ -411,5 +383,13 @@ public class DataAnalysisService {
         result.put(Constants.DATA_LIST, dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    private boolean checkProject(User loginUser, int projectId, Map<String, Object> result){
+        if(projectId != 0){
+            Project project = projectMapper.selectById(projectId);
+            return projectService.hasProjectAndPerm(loginUser, project, result);
+        }
+        return true;
     }
 }
