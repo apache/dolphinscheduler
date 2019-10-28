@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.model.MasterServer;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
@@ -334,7 +334,7 @@ public class SchedulerService extends BaseService {
         }
 
         // check master server exists
-        List<MasterServer> masterServers = monitorService.getServerListFromZK(true);
+        List<Server> masterServers = monitorService.getServerListFromZK(true);
 
 
         if (masterServers.size() == 0) {
