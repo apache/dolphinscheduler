@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.common.model;
 import java.util.Date;
 
 /**
- * master server
+ * server
  */
-public class MasterServer {
+public class Server {
 
     /**
      * id
