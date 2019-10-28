@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.zk;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
-import org.apache.dolphinscheduler.common.model.MasterServer;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
@@ -141,7 +141,6 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	public void initDao(){
 		this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-//		this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
 	}
 	/**
 	 * get alert dao
@@ -345,10 +344,10 @@ public class ZKMasterClient extends AbstractZKClient {
 	    	return false;
 		}
 	    Date workerServerStartDate = null;
-	    List<MasterServer> workerServers= getServersList(ZKNodeType.WORKER);
-	    for(MasterServer server : workerServers){
-	    	if(server.getHost().equals(taskInstance.getHost())){
-	    	    workerServerStartDate = server.getCreateTime();
+	    List<Server> workerServers= getServersList(ZKNodeType.WORKER);
+	    for(Server workerServer : workerServers){
+	    	if(workerServer.getHost().equals(taskInstance.getHost())){
+	    	    workerServerStartDate = workerServer.getCreateTime();
 	    	    break;
 			}
 		}
