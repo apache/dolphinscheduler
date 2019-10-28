@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
-import org.apache.dolphinscheduler.common.model.MasterServer;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class ZookeeperMonitor extends AbstractZKClient{
 	 * get master servers
 	 * @return
 	 */
-	public List<MasterServer> getMasterServers(){
+	public List<Server> getMasterServers(){
 	    return getServersList(ZKNodeType.MASTER);
 	}
 
@@ -63,7 +63,7 @@ public class ZookeeperMonitor extends AbstractZKClient{
 	 * master construct is the same with worker, use the master instead
 	 * @return
 	 */
-	public List<MasterServer> getWorkerServers(){
+	public List<Server> getWorkerServers(){
 	    return getServersList(ZKNodeType.WORKER);
 	}
 
