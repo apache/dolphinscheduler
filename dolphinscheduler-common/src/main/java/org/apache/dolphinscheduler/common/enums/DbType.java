@@ -16,9 +16,13 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
+
 /**
  * data base types
  */
+@Getter
 public enum DbType {
   /**
    * 0 mysql
@@ -29,5 +33,20 @@ public enum DbType {
    * 5 oracle
    * 6 sqlserver
    */
-  MYSQL, POSTGRESQL, HIVE, SPARK, CLICKHOUSE, ORACLE, SQLSERVER
+  MYSQL(0, "mysql"),
+  POSTGRESQL(1, "postgresql"),
+  HIVE(2, "hive"),
+  SPARK(3, "spark"),
+  CLICKHOUSE(4, "clickhouse"),
+  ORACLE(5, "oracle"),
+  SQLSERVER(6, "sqlserver");
+
+  DbType(int code, String descp){
+    this.code = code;
+    this.descp = descp;
+  }
+
+  @EnumValue
+  private final int code;
+  private final String descp;
 }
