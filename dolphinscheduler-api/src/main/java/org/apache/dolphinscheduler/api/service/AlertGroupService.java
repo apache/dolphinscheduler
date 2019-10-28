@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -193,6 +194,7 @@ public class AlertGroupService extends BaseService{
      * @param id
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> delAlertgroupById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>(5);
         result.put(Constants.STATUS, false);
@@ -202,7 +204,7 @@ public class AlertGroupService extends BaseService{
             return result;
         }
 
-
+        userAlertGroupMapper.deleteByAlertgroupId(id);
         alertGroupMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
         return result;
