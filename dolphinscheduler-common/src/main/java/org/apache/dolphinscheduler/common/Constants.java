@@ -587,7 +587,7 @@ public final class Constants {
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 6;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 7;
 
 
     /**
