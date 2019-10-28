@@ -8,6 +8,11 @@
 	<name>dolphinscheduler</name>
 	<url>http://maven.apache.org</url>
 
+	<parent>
+		<groupId>org.apache</groupId>
+		<artifactId>apache</artifactId>
+		<version>21</version>
+	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
