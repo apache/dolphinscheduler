@@ -56,9 +56,14 @@ public class WorkerGroupService extends BaseService {
      * @param ipList
      * @return
      */
-    public Map<String, Object> saveWorkerGroup(int id, String name, String ipList){
+    public Map<String, Object> saveWorkerGroup(User loginUser,int id, String name, String ipList){
 
         Map<String, Object> result = new HashMap<>(5);
+
+        //only admin can operate
+        if (checkAdmin(loginUser, result)){
+            return result;
+        }
 
         if(StringUtils.isEmpty(name)){
             putMsg(result, Status.NAME_NULL);

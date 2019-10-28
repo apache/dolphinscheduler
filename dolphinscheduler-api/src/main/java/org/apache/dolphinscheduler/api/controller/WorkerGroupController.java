@@ -76,7 +76,7 @@ public class WorkerGroupController extends BaseController{
                 loginUser.getUserName(), id, name, ipList);
 
         try {
-            Map<String, Object> result = workerGroupService.saveWorkerGroup(id, name, ipList);
+            Map<String, Object> result = workerGroupService.saveWorkerGroup(loginUser,id, name, ipList);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.SAVE_ERROR.getMsg(),e);
