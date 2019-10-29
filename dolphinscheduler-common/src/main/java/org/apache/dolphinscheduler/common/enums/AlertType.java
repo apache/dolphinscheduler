@@ -16,12 +16,27 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
+
 /**
  * warning message notification method
  */
+@Getter
 public enum AlertType {
     /**
      * 0 email; 1 SMS
      */
-    EMAIL,SMS
+    EMAIL(0, "email"),
+    SMS(1, "SMS");
+
+
+    AlertType(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
+
+    @EnumValue
+    private final int code;
+    private final String descp;
 }

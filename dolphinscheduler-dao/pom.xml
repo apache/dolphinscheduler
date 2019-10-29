@@ -28,11 +28,6 @@
 			<artifactId>mybatis-plus-boot-starter</artifactId>
 			<version>${mybatis-plus.version}</version>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>com.baomidou</groupId>-->
-			<!--<artifactId>mybatis-plus-dts</artifactId>-->
-		<!--</dependency>-->
-
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>

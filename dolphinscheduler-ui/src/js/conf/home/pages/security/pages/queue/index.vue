@@ -18,7 +18,7 @@
   <m-list-construction :title="$t('Queue manage')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
-        <template slot="button-group">
+        <template slot="button-group" v-if="isADMIN">
           <x-button type="ghost" size="small" @click="_create('')">{{$t('Create queue')}}</x-button>
         </template>
       </m-conditions>
@@ -46,6 +46,7 @@
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mList from './_source/list'
+  import store from '@/conf/home/store'
   import mSpin from '@/module/components/spin/spin'
   import mCreateQueue from './_source/createQueue'
   import mNoData from '@/module/components/noData/noData'
@@ -64,7 +65,8 @@
           pageSize: 10,
           pageNo: 1,
           searchVal: ''
-        }
+        },
+        isADMIN: store.state.user.userInfo.userType === 'ADMIN_USER'
       }
     },
     mixins: [listUrlParamHandle],
