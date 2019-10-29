@@ -114,7 +114,7 @@ public class Command {
     /**
      *
      */
-    @TableField("worker_group_id;")
+    @TableField("worker_group_id")
     private int workerGroupId;
 
 

@@ -29,7 +29,6 @@ public enum TaskStateType {
      */
     WAITTING, RUNNING, FINISH, FAILED, SUCCESS;
 
-
     /**
      * convert task state to execute status integer array ;
      * @param taskStateType

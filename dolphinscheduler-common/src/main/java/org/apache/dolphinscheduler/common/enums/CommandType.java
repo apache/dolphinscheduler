@@ -16,9 +16,13 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
+
 /**
  * command types
  */
+@Getter
 public enum CommandType {
 
     /**
@@ -35,6 +39,24 @@ public enum CommandType {
      * 9 stop a process
      * 10 recover waiting thread
      */
-    START_PROCESS, START_CURRENT_TASK_PROCESS, RECOVER_TOLERANCE_FAULT_PROCESS, RECOVER_SUSPENDED_PROCESS,
-    START_FAILURE_TASK_PROCESS,COMPLEMENT_DATA,SCHEDULER, REPEAT_RUNNING,PAUSE,STOP,RECOVER_WAITTING_THREAD;
+    START_PROCESS(0, "start a new process"),
+    START_CURRENT_TASK_PROCESS(1, "start a new process from current nodes"),
+    RECOVER_TOLERANCE_FAULT_PROCESS(2, "recover tolerance fault work flow"),
+    RECOVER_SUSPENDED_PROCESS(3, "start process from paused task nodes"),
+    START_FAILURE_TASK_PROCESS(4, "start a new process"),
+    COMPLEMENT_DATA(5, "complement data"),
+    SCHEDULER(6, "start a new process from scheduler"),
+    REPEAT_RUNNING(7, "start a new process"),
+    PAUSE(8, "start a new process"),
+    STOP(9, "start a new process"),
+    RECOVER_WAITTING_THREAD(10, "start a new process");
+
+    CommandType(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
+
+    @EnumValue
+    private final int code;
+    private final String descp;
 }
