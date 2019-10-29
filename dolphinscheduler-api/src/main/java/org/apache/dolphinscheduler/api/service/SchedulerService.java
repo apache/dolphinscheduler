@@ -572,8 +572,8 @@ public class SchedulerService extends BaseService {
             putMsg(result,Status.PARSE_TO_CRON_EXPRESSION_ERROR);
             return result;
         }
-        List<Date> selfFireDateList = CronUtils.getSelfFireDateList(startTime, endTime,cronExpression);
-        result.put(Constants.DATA_LIST, selfFireDateList.stream().map(t -> DateUtils.dateToString(t)).limit(Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT));
+        List<Date> selfFireDateList = CronUtils.getSelfFireDateList(startTime, endTime,cronExpression,Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT);
+        result.put(Constants.DATA_LIST, selfFireDateList.stream().map(t -> DateUtils.dateToString(t)));
         putMsg(result, Status.SUCCESS);
         return result;
     }
