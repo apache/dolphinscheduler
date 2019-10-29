@@ -104,9 +104,9 @@ public class SchedulerService extends BaseService {
         Project project = projectMapper.queryByName(projectName);
 
         // check project auth
-        Map<String, Object> checkResult = checkAuth(loginUser, projectName, project);
-        if (checkResult != null) {
-            return checkResult;
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
+        if (!hasProjectAndPerm) {
+            return result;
         }
 
         // check work flow define release state
@@ -186,9 +186,9 @@ public class SchedulerService extends BaseService {
         Project project = projectMapper.queryByName(projectName);
 
         // check project auth
-        Map<String, Object> checkResult = checkAuth(loginUser, projectName, project);
-        if (checkResult != null) {
-            return checkResult;
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
+        if (!hasProjectAndPerm) {
+            return result;
         }
 
         // check schedule exists
@@ -276,9 +276,10 @@ public class SchedulerService extends BaseService {
         Map<String, Object> result = new HashMap<String, Object>(5);
 
         Project project = projectMapper.queryByName(projectName);
-        Map<String, Object> checkResult = checkAuth(loginUser, projectName, project);
-        if (checkResult != null) {
-            return checkResult;
+        // check project auth
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
+        if (!hasProjectAndPerm) {
+            return result;
         }
 
         // check schedule exists
@@ -389,9 +390,9 @@ public class SchedulerService extends BaseService {
         Project project = projectMapper.queryByName(projectName);
 
         // check project auth
-        Map<String, Object> checkResult = checkAuth(loginUser, projectName, project);
-        if (checkResult != null) {
-            return checkResult;
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
+        if (!hasProjectAndPerm) {
+            return result;
         }
 
         ProcessDefinition processDefinition = processDao.findProcessDefineById(processDefineId);
@@ -426,9 +427,9 @@ public class SchedulerService extends BaseService {
         Project project = projectMapper.queryByName(projectName);
 
         // check project auth
-        Map<String, Object> checkResult = checkAuth(loginUser, projectName, project);
-        if (checkResult != null) {
-            return checkResult;
+        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result);
+        if (!hasProjectAndPerm) {
+            return result;
         }
 
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(projectName);
@@ -498,23 +499,6 @@ public class SchedulerService extends BaseService {
             return true;
         }
         return false;
-    }
-
-    /**
-     *
-     * @param loginUser
-     * @param projectName
-     * @param project
-     * @return
-     */
-    private Map<String, Object> checkAuth(User loginUser, String projectName, Project project) {
-        // check project auth
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
-            return checkResult;
-        }
-        return null;
     }
 
     /**
@@ -589,7 +573,7 @@ public class SchedulerService extends BaseService {
             return result;
         }
         List<Date> selfFireDateList = CronUtils.getSelfFireDateList(startTime, endTime,cronExpression);
-        result.put(Constants.DATA_LIST, selfFireDateList.stream().map(t -> DateUtils.dateToString(t)).limit(org.apache.dolphinscheduler.common.Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT));
+        result.put(Constants.DATA_LIST, selfFireDateList.stream().map(t -> DateUtils.dateToString(t)).limit(Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT));
         putMsg(result, Status.SUCCESS);
         return result;
     }
