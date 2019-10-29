@@ -130,6 +130,29 @@ public class CronUtils {
   }
 
   /**
+   * gets expect scheduled times for a period of time based on self dependency
+   * @param startTime
+   * @param endTime
+   * @param cronExpression
+   * @param fireTimes
+   * @return
+   */
+  public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression,int fireTimes) {
+    List<Date> dateList = new ArrayList<>();
+    while (fireTimes > 0) {
+      startTime = cronExpression.getNextValidTimeAfter(startTime);
+      if (startTime.after(endTime) || startTime.equals(endTime)) {
+        break;
+      }
+      dateList.add(startTime);
+      fireTimes--;
+    }
+
+    return dateList;
+  }
+
+
+  /**
    * gets all scheduled times for a period of time based on self dependency
    * @param startTime
    * @param endTime
