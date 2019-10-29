@@ -16,9 +16,13 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
+
 /**
  * show type for email
  */
+@Getter
 public enum ShowType {
     /**
      * 0 TABLE;
@@ -26,9 +30,18 @@ public enum ShowType {
      * 2 attachment;
      * 3 TABLE+attachment;
      */
-    TABLE,
-    TEXT,
-    ATTACHMENT,
-    TABLEATTACHMENT
+    TABLE(0, "table"),
+    TEXT(1, "text"),
+    ATTACHMENT(2, "attachment"),
+    TABLEATTACHMENT(3, "table attachment");
 
+
+    ShowType(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
+
+    @EnumValue
+    private final int code;
+    private final String descp;
 }

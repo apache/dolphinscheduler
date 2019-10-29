@@ -16,12 +16,26 @@
  */
 package org.apache.dolphinscheduler.common.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import lombok.Getter;
+
 /**
  * UDF type
  */
+@Getter
 public enum UdfType {
     /**
      * 0 hive; 1 spark
      */
-  HIVE, SPARK
+  HIVE(0, "hive"),
+  SPARK(1, "spark");
+
+    UdfType(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
+
+    @EnumValue
+    private final int code;
+    private final String descp;
 }
