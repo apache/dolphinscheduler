@@ -145,7 +145,7 @@ public class CronUtils {
         break;
       }
       dateList.add(startTime);
-      fireTimes --;
+      fireTimes--;
     }
 
     return dateList;
