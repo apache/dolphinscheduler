@@ -42,6 +42,8 @@ public class ConnectionFactory {
 
   private static SqlSessionFactory sqlSessionFactory;
 
+  private static SqlSessionTemplate sqlSessionTemplate;
+
   /**
    * Load configuration file
    */
@@ -124,13 +126,16 @@ public class ConnectionFactory {
   /**
    * get sql session
    */
-  public static SqlSession getSqlSession() {
-    try {
-      return new SqlSessionTemplate(getSqlSessionFactory());
-    } catch (Exception e) {
-      logger.error(e.getMessage(),e);
-      throw new RuntimeException("get sqlSession failed!");
-    }
+  public static SqlSession getSqlSession() throws Exception{
+      if (sqlSessionTemplate == null) {
+          synchronized (ConnectionFactory.class) {
+            if (sqlSessionTemplate == null) {
+                sqlSessionTemplate = new SqlSessionTemplate(getSqlSessionFactory());
+                return sqlSessionTemplate;
+          }
+        }
+      }
+      return sqlSessionTemplate;
   }
 
   public static <T> T getMapper(Class<T> type){
