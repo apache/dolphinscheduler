@@ -9,7 +9,7 @@
     <select id="queryWorkerGroupByName" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
         select *
         from t_ds_worker_group
-        where `name` = #{name}
+        where name = #{name}
     </select>
     <select id="queryListPaging" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
         select *
