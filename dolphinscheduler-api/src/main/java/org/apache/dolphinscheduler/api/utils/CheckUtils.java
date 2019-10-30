@@ -90,11 +90,11 @@ public class CheckUtils {
 
   /**
    * check phone
-   *
+   * phone can be empty.
    * @param phone
    */
   public static boolean checkPhone(String phone) {
-    return StringUtils.isNotEmpty(phone) && phone.length() > 18;
+    return StringUtils.isEmpty(phone) || phone.length() <= 11;
   }
 
 
