@@ -323,7 +323,7 @@ if [ $dbtype == "postgresql" ];then
     sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties
     sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${passowrd}#g" conf/quartz.properties
     sed -i ${txt} "s#org.quartz.dataSource.myDs.driver.*#org.quartz.dataSource.myDs.driver=org.postgresql.Driver#g" conf/quartz.properties
-    sed -i ${txt} "s#org.quartz.jobStore.driverDelegateClass.*#org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.StdJDBCDelegate#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.jobStore.driverDelegateClass.*#org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.PostgreSQLDelegate#g" conf/quartz.properties
 fi
 
 
