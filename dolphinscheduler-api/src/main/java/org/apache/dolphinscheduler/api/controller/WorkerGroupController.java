@@ -113,8 +113,8 @@ public class WorkerGroupController extends BaseController{
             Map<String, Object> result = workerGroupService.queryAllGroupPaging(loginUser,pageNo, pageSize, searchVal);
             return returnDataListPaging(result);
         }catch (Exception e){
-            logger.error(Status.SAVE_ERROR.getMsg(),e);
-            return error(Status.SAVE_ERROR.getCode(), Status.SAVE_ERROR.getMsg());
+            logger.error(Status.QUERY_WORKER_GROUP_FAIL.getMsg(),e);
+            return error(Status.QUERY_WORKER_GROUP_FAIL.getCode(), Status.QUERY_WORKER_GROUP_FAIL.getMsg());
         }
     }
 
@@ -135,8 +135,8 @@ public class WorkerGroupController extends BaseController{
             Map<String, Object> result = workerGroupService.queryAllGroup();
             return returnDataList(result);
         }catch (Exception e){
-            logger.error(Status.SAVE_ERROR.getMsg(),e);
-            return error(Status.SAVE_ERROR.getCode(), Status.SAVE_ERROR.getMsg());
+            logger.error(Status.QUERY_WORKER_GROUP_FAIL.getMsg(),e);
+            return error(Status.QUERY_WORKER_GROUP_FAIL.getCode(), Status.QUERY_WORKER_GROUP_FAIL.getMsg());
         }
     }
 
@@ -163,8 +163,8 @@ public class WorkerGroupController extends BaseController{
             Map<String, Object> result = workerGroupService.deleteWorkerGroupById(id);
             return returnDataList(result);
         }catch (Exception e){
-            logger.error(Status.SAVE_ERROR.getMsg(),e);
-            return error(Status.SAVE_ERROR.getCode(), Status.SAVE_ERROR.getMsg());
+            logger.error(Status.DELETE_WORKER_GROUP_FAIL.getMsg(),e);
+            return error(Status.DELETE_WORKER_GROUP_FAIL.getCode(), Status.DELETE_WORKER_GROUP_FAIL.getMsg());
         }
     }
 }
