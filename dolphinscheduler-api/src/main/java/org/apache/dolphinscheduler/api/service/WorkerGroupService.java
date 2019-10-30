@@ -30,6 +30,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -149,17 +150,18 @@ public class WorkerGroupService extends BaseService {
      * @param id
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> deleteWorkerGroupById(Integer id) {
 
         Map<String, Object> result = new HashMap<>(5);
 
-        List<ProcessInstance> processInstances = processInstanceMapper.queryByWorkerGroupIdAndStatus(id, org.apache.dolphinscheduler.common.Constants.NOT_TERMINATED_STATES);
+        List<ProcessInstance> processInstances = processInstanceMapper.queryByWorkerGroupIdAndStatus(id, Constants.NOT_TERMINATED_STATES);
         if(CollectionUtils.isNotEmpty(processInstances)){
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;
         }
         workerGroupMapper.deleteById(id);
-        processInstanceMapper.updateProcessInstanceByWorkerGroupId(id, org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_ID);
+        processInstanceMapper.updateProcessInstanceByWorkerGroupId(id, Constants.DEFAULT_WORKER_ID);
         putMsg(result, Status.SUCCESS);
         return result;
     }
