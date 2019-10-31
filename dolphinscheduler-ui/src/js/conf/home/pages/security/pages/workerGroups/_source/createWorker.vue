@@ -33,7 +33,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name">IP</template>
+          <template slot="name"><b>*</b>IP</template>
           <template slot="content">
             <x-input
                     :autosize="{ minRows: 4, maxRows: 6 }"
@@ -76,6 +76,16 @@
           this._submit()
         }
       },
+      checkIsIps(ips) {
+        let reg = /^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+        let valdata = ips.split(',');
+        for(let i=0;i<valdata.length;i++){
+            if(reg.test(valdata[i])== false){
+                return false;
+            }
+        }
+        return true
+      },
       _verification () {
         // group name
         if (!this.name) {
@@ -84,6 +94,10 @@
         }
         if (!this.ipList) {
           this.$message.warning(`${i18n.$t('IP address cannot be empty')}`)
+          return false
+        }
+        if(!this.checkIsIps(this.ipList)) {
+          this.$message.warning(`${i18n.$t('Please enter the correct IP')}`)
           return false
         }
         return true
