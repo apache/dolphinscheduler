@@ -210,7 +210,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         Page<ProcessDefinition> page = new Page(pageNo, pageSize);
         IPage<ProcessDefinition> processDefinitionIPage = processDefineMapper.queryDefineListPaging(
-                page, searchVal, userId, project.getId());
+                page, searchVal, userId, project.getId(),isAdmin(loginUser));
 
         PageInfo pageInfo = new PageInfo<ProcessData>(pageNo, pageSize);
         pageInfo.setTotalCount((int)processDefinitionIPage.getTotal());

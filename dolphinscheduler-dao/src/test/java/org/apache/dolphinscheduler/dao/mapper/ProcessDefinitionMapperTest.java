@@ -138,7 +138,7 @@ public class ProcessDefinitionMapperTest {
     public void testQueryDefineListPaging() {
         ProcessDefinition processDefinition = insertOne();
         Page<ProcessDefinition> page = new Page(1,3);
-        IPage<ProcessDefinition> processDefinitionIPage =  processDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010);
+        IPage<ProcessDefinition> processDefinitionIPage =  processDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010,true);
         Assert.assertNotEquals(processDefinitionIPage.getTotal(), 0);
         processDefinitionMapper.deleteById(processDefinition.getId());
     }
@@ -189,7 +189,8 @@ public class ProcessDefinitionMapperTest {
         projectIds[0] = processDefinition.getProjectId();
         List<DefinitionGroupByUser> processDefinitions = processDefinitionMapper.countDefinitionGroupByUser(
                 processDefinition.getUserId(),
-                projectIds
+                projectIds,
+                user.getUserType() == UserType.ADMIN_USER
         );
         processDefinitionMapper.deleteById(processDefinition.getId());
         Assert.assertNotEquals(processDefinitions.size(), 0);
