@@ -239,6 +239,8 @@ public enum Status {
     CREATE_ACCESS_TOKEN_ERROR(70001,"create access token error"),
     GENERATE_TOKEN_ERROR(70002,"generate token error"),
     QUERY_ACCESSTOKEN_LIST_PAGING_ERROR(70003,"query access token list paging error"),
+    UPDATE_ACCESS_TOKEN_ERROR(70004,"update access token error"),
+    DELETE_ACCESS_TOKEN_ERROR(70005,"delete access token error"),
 
 
     COMMAND_STATE_COUNT_ERROR(80001,"task instance state count error"),
