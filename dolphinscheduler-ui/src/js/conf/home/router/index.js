@@ -433,11 +433,11 @@ const router = new Router({
           }
         },
         {
-          path: '/monitor/servers/mysql',
-          name: 'servers-mysql',
-          component: resolve => require(['../pages/monitor/pages/servers/mysql'], resolve),
+          path: '/monitor/servers/db',
+          name: 'servers-db',
+          component: resolve => require(['../pages/monitor/pages/servers/db'], resolve),
           meta: {
-            title: `Mysql`
+            title: `DB`
           }
         },
         {
