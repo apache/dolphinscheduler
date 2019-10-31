@@ -348,7 +348,7 @@ public class DataAnalysisService extends BaseService{
         for (String taskQueueStr : tasksQueueList){
             if (StringUtils.isNotEmpty(taskQueueStr)){
                 String[] splits = taskQueueStr.split("_");
-                if (splits.length == 4){
+                if (splits.length >= 4){
                     tasksQueueIds[i++]=Integer.parseInt(splits[3]);
                 }
             }
