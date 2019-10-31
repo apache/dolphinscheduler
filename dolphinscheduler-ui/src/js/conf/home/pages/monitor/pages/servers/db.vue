@@ -16,11 +16,11 @@
  */
 <template>
   <div>
-    <div class="servers-wrapper mysql-model" v-show="mysqlList.length">
+    <div class="servers-wrapper mysql-model content-box" v-show="mysqlList.length">
       <div class="row" v-for="(item,$index) in mysqlList">
         <div class="col-md-12">
-          <div class="content-title">
-            <span>{{item.dbType}}</span>
+          <div class="db-title">
+            <span>{{item.dbType+$t('Manage')}}</span>
           </div>
         </div>
         <div class="col-md-3">
@@ -130,11 +130,16 @@ export default {
 </script>
 <style lang="scss" rel="stylesheet/scss">
 @import "./servers";
-.content-title {
+.content-box {
+  background: #fff;
+  min-height: calc(100vh - 100px);
+  margin: 20px;
+}
+.db-title {
   height: 48px;
   background: #f8fbfe;
   border-radius: 3px 3px 0 0;
-  margin-bottom: 10px;
+  margin: -16px -16px 10px -16px;
   span {
     font-size: 22px;
     padding-left: 18px;
