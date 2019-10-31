@@ -236,8 +236,8 @@ let menu = {
         //   disabled: true
         // },
         {
-          name: 'Mysql',
-          path: 'servers-mysql',
+          name: 'DB',
+          path: 'servers-db',
           id: 6,
           disabled: true
         }
