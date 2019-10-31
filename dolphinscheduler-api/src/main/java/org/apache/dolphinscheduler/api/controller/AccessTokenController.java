@@ -150,8 +150,8 @@ public class AccessTokenController extends BaseController{
             Map<String, Object> result = accessTokenService.delAccessTokenById(loginUser, id);
             return returnDataList(result);
         }catch (Exception e){
-            logger.error(DELETE_USER_BY_ID_ERROR.getMsg(),e);
-            return error(Status.DELETE_USER_BY_ID_ERROR.getCode(), Status.DELETE_USER_BY_ID_ERROR.getMsg());
+            logger.error(DELETE_ACCESS_TOKEN_ERROR.getMsg(),e);
+            return error(Status.DELETE_ACCESS_TOKEN_ERROR.getCode(), Status.DELETE_ACCESS_TOKEN_ERROR.getMsg());
         }
     }
 
@@ -163,7 +163,7 @@ public class AccessTokenController extends BaseController{
      */
     @ApiIgnore
     @PostMapping(value = "/update")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public Result updateToken(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "id") int id,
                               @RequestParam(value = "userId") int userId,
@@ -176,8 +176,8 @@ public class AccessTokenController extends BaseController{
             Map<String, Object> result = accessTokenService.updateToken(id,userId, expireTime, token);
             return returnDataList(result);
         }catch (Exception e){
-            logger.error(CREATE_ACCESS_TOKEN_ERROR.getMsg(),e);
-            return error(CREATE_ACCESS_TOKEN_ERROR.getCode(), CREATE_ACCESS_TOKEN_ERROR.getMsg());
+            logger.error(UPDATE_ACCESS_TOKEN_ERROR.getMsg(),e);
+            return error(UPDATE_ACCESS_TOKEN_ERROR.getCode(), UPDATE_ACCESS_TOKEN_ERROR.getMsg());
         }
     }
 
