@@ -56,33 +56,12 @@ public class MonitorDBDao {
         }
     }
 
-
-    /**
-     * create connection
-     * @return
-     */
-    private static Connection getConn() {
-        String url =  conf.getString(Constants.SPRING_DATASOURCE_URL);
-        String username = conf.getString(Constants.SPRING_DATASOURCE_USERNAME);
-        String password = conf.getString(Constants.SPRING_DATASOURCE_PASSWORD);
-        Connection conn = null;
-        try {
-            //classloader,load driver
-            Class.forName(Constants.JDBC_MYSQL_CLASS_NAME);
-            conn = DriverManager.getConnection(url, username, password);
-        } catch (ClassNotFoundException e) {
-            logger.error("ClassNotFoundException ", e);
-        } catch (SQLException e) {
-            logger.error("SQLException ", e);
-        }
-        return conn;
-    }
-
     public static MonitorRecord getCurrentDbPerformance(){
         MonitorRecord monitorRecord = null;
         Connection conn = null;
+        DruidDataSource dataSource = null;
         try{
-            DruidDataSource dataSource = ConnectionFactory.getDataSource();
+            dataSource = ConnectionFactory.getDataSource();
             dataSource.setInitialSize(2);
             dataSource.setMinIdle(2);
             dataSource.setMaxActive(2);
@@ -101,6 +80,9 @@ public class MonitorDBDao {
             try {
                 if (conn != null) {
                     conn.close();
+                }
+                if(dataSource != null){
+                    dataSource.close();
                 }
             } catch (SQLException e) {
                 logger.error("SQLException ", e);

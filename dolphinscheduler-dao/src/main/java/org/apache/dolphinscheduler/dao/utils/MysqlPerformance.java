@@ -64,7 +64,6 @@ public class MysqlPerformance extends BaseDBPerformance{
                     monitorRecord.setThreadsRunningConnections(Long.parseLong(rs2.getString("value")));
                 }
             }
-            return null;
         }catch (Exception e) {
             monitorRecord.setState(Flag.NO);
             logger.error("SQLException " + e);
