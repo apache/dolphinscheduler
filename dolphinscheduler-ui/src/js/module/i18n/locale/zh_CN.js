@@ -432,8 +432,8 @@ export default {
   'Token manage': '令牌管理',
   'Create token': '创建令牌',
   'Edit token': '编辑令牌',
-  'Please enter the IP address separated by commas': '请输入IP地址多个用逗号隔开',
-  'Note: Multiple IP addresses have been comma separated': '注意：多个IP地址以逗号分割',
+  'Please enter the IP address separated by commas': '请输入IP地址多个用英文逗号隔开',
+  'Note: Multiple IP addresses have been comma separated': '注意：多个IP地址以英文逗号分割',
   'Failure time': '失效时间',
   'User': '用户',
   'Please enter token': '请输入令牌',
@@ -500,5 +500,6 @@ export default {
   'Please Enter Http Condition': '请填写校验内容',
   'There is no data for this period of time': '该时间段无数据',
   'IP address cannot be empty': 'IP地址不能为空',
+  'Please enter the correct IP': '请输入正确的IP',
   'Please generate token': '请生成Token'
 }
