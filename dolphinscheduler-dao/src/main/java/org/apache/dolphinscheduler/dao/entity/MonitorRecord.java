@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.Flag;
+
 import java.util.Date;
 
 /**
@@ -23,10 +26,12 @@ import java.util.Date;
  */
 public class MonitorRecord {
 
+    private DbType dbType;
+
     /**
      * is normal or not , 1: normal
      */
-    private int state;
+    private Flag state;
 
     /**
      * max connections
@@ -53,11 +58,11 @@ public class MonitorRecord {
      */
     private Date date;
 
-    public int getState() {
+    public Flag getState() {
         return state;
     }
 
-    public void setState(int state) {
+    public void setState(Flag state) {
         this.state = state;
     }
 
@@ -105,11 +110,20 @@ public class MonitorRecord {
     public String toString() {
         return "MonitorRecord{" +
                 "state=" + state +
+                ", dbType=" + dbType +
                 ", maxConnections=" + maxConnections +
                 ", maxUsedConnections=" + maxUsedConnections +
                 ", threadsConnections=" + threadsConnections +
                 ", threadsRunningConnections=" + threadsRunningConnections +
                 ", date=" + date +
                 '}';
+    }
+
+    public DbType getDbType() {
+        return dbType;
+    }
+
+    public void setDbType(DbType dbType) {
+        this.dbType = dbType;
     }
 }
