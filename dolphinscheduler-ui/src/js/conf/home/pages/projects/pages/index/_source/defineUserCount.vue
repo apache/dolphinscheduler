@@ -16,13 +16,13 @@
  */
 <template>
   <div class="define-user-count-model">
-    <div v-if="!msg">
+    <div v-if="msg">
       <div class="data-area" v-spin="isSpin">
         <div id="process-definition-bar" style="height:500px"></div>
       </div>
     </div>
-    <div v-if="msg">
-      <m-no-data :msg="msg" v-if="msg" :height="530"></m-no-data>
+    <div v-else>
+      <m-no-data :height="530"></m-no-data>
     </div>
   </div>
 </template>
@@ -37,7 +37,7 @@
     data () {
       return {
         isSpin: true,
-        msg: '',
+        msg: true,
         parameter: {projectId: 0}
       }
     },
@@ -73,6 +73,7 @@
       this.isSpin = true
       this.parameter.projectId = this.projectId;
       this.getDefineUserCount(this.parameter).then(res => {
+        this.msg = res.data.count > 0 ? true : false
         this.defineUserList = []
         this._handleDefineUser(res)
         this.isSpin = false
