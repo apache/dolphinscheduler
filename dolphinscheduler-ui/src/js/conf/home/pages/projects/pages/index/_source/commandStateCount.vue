@@ -30,7 +30,7 @@
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import { simple } from './chartConfig'
-  import Chart from '~/@analysys/ana-charts'
+  import Chart from '@/module/ana-charts'
   import mNoData from '@/module/components/noData/noData'
 
   export default {
