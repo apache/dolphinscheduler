@@ -27,6 +27,7 @@
     "echarts": "^4.1.0",
     "html2canvas": "^0.5.0-beta4",
     "jsplumb": "^2.8.6",
+    "axios": "^0.16.2",
     "lodash": "^4.17.11",
     "vuex-router-sync": "^4.1.2"
   },
