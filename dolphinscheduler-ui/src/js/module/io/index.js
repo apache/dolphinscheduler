@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import io from '~/@fedor/io/dist/io'
+import io from '@/module/axios/index'
 import cookie from '@/module/util/cookie'
 
 
