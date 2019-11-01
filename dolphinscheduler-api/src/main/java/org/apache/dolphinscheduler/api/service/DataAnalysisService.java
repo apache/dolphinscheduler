@@ -179,7 +179,7 @@ public class DataAnalysisService extends BaseService{
 
         Integer[] projectIdArray = getProjectIdsArrays(loginUser, projectId);
         List<DefinitionGroupByUser> defineGroupByUsers = processDefinitionMapper.countDefinitionGroupByUser(
-                loginUser.getId(),  projectIdArray);
+                loginUser.getId(),  projectIdArray,isAdmin(loginUser));
 
         DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
         result.put(Constants.DATA_LIST, dto);
@@ -348,7 +348,7 @@ public class DataAnalysisService extends BaseService{
         for (String taskQueueStr : tasksQueueList){
             if (StringUtils.isNotEmpty(taskQueueStr)){
                 String[] splits = taskQueueStr.split("_");
-                if (splits.length == 4){
+                if (splits.length >= 4){
                     tasksQueueIds[i++]=Integer.parseInt(splits[3]);
                 }
             }
