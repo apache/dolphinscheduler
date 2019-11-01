@@ -1,3 +1,12 @@
+---
+name: question
+about: have a question wanted to be help
+title: "[QUESTION] question title"
+labels: question
+assignees: ''
+
+---
+
 *For better global communication, please give priority to using English description, thx! *
 
 **Describe the question**
