@@ -142,8 +142,11 @@ public class TaskScheduleThread implements Runnable {
 
         }catch (Exception e){
             logger.error("task scheduler failure", e);
-            task.setExitStatusCode(Constants.EXIT_CODE_FAILURE);
             kill();
+            // update task instance state
+            processDao.changeTaskState(ExecutionStatus.FAILURE,
+                    new Date(),
+                    taskInstance.getId());
         }
 
         logger.info("task instance id : {},task final status : {}",
