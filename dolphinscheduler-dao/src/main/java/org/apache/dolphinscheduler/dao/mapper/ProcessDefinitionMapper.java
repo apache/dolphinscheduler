@@ -35,7 +35,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     IPage<ProcessDefinition> queryDefineListPaging(IPage<ProcessDefinition> page,
                                                    @Param("searchVal") String searchVal,
                                                    @Param("userId") int userId,
-                                                   @Param("projectId") int projectId);
+                                                   @Param("projectId") int projectId,
+                                                   @Param("isAdmin") boolean isAdmin);
 
     List<ProcessDefinition> queryAllDefinitionList(@Param("projectId") int projectId);
 
@@ -45,5 +46,6 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     List<DefinitionGroupByUser> countDefinitionGroupByUser(
             @Param("userId") Integer userId,
-            @Param("projectIds") Integer[] projectIds);
+            @Param("projectIds") Integer[] projectIds,
+            @Param("isAdmin") boolean isAdmin);
 }
