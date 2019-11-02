@@ -61,6 +61,7 @@
 		<jsp.version>6.1.14</jsp.version>
 		<spotbugs.version>3.1.12</spotbugs.version>
 		<apache.rat.version>0.13</apache.rat.version>
+		<zookeeper.version>3.4.14</zookeeper.version>
 	</properties>
 
 	<dependencyManagement>
@@ -190,6 +191,22 @@
 				<artifactId>curator-recipes</artifactId>
 				<version>${curator.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.zookeeper</groupId>
+				<artifactId>zookeeper</artifactId>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+					<exclusion>
+						<artifactId>netty</artifactId>
+						<groupId>io.netty</groupId>
+					</exclusion>
+				</exclusions>
+				<version>${zookeeper.version}</version>
+			</dependency>
+
 
 			<dependency>
 				<groupId>commons-codec</groupId>
@@ -405,11 +422,11 @@
 				<version>${mssql.jdbc.version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>jsp-2.1</artifactId>
-				<version>${jsp.version}</version>
-			</dependency>
+			<!--<dependency>-->
+				<!--<groupId>org.mortbay.jetty</groupId>-->
+				<!--<artifactId>jsp-2.1</artifactId>-->
+				<!--<version>${jsp.version}</version>-->
+			<!--</dependency>-->
 
 			<dependency>
 				<groupId>net.jcip</groupId>
