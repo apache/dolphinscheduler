@@ -199,9 +199,8 @@ public class ZKMasterClient extends AbstractZKClient {
 							String path = event.getData().getPath();
 							String serverHost = getHostByEventDataPath(path);
 							if(checkServerSelfDead(serverHost, ZKNodeType.MASTER)){
-								return;
+								removeZKNodePath(path, ZKNodeType.MASTER, true);
 							}
-							removeZKNodePath(path, ZKNodeType.MASTER, true);
 							break;
 						case CHILD_UPDATED:
 							break;
