@@ -122,7 +122,6 @@ public class WorkerServer extends AbstractServer {
      * master server not use web service
      */
     public static void main(String[] args) {
-
         SpringApplication app = new SpringApplication(WorkerServer.class);
 
         app.run(args);
@@ -175,15 +174,13 @@ public class WorkerServer extends AbstractServer {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-
-                logger.warn("worker server stopped");
                 // worker server exit alert
                 if (zkWorkerClient.getActiveMasterNum() <= 1) {
                     for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
                         alertDao.sendServerStopedAlert(1, OSUtils.getHost(), "Worker-Server");
                     }
                 }
-
+                stop("shutdownhook");
             }
         }));
 
