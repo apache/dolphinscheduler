@@ -131,8 +131,7 @@
                             size="xsmall"
                             :disabled="item.releaseState === 'ONLINE'"
                             data-toggle="tooltip"
-                            :title="$t('delete')"
-                            v-ps="['GENERAL_USER']">
+                            :title="$t('delete')">
                     </x-button>
                   </template>
                 </x-poptip>
