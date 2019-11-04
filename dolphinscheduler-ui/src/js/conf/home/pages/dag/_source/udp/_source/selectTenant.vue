@@ -61,7 +61,7 @@
     methods: {
       _onChange (o) {
         this.value = o.value
-        // this.$emit('tenantSelectEvent', o.value)
+        this.$emit('tenantSelectEvent', o.value)
       }
     },
     watch: {
