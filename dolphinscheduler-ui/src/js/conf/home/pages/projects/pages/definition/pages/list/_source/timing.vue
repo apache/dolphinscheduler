@@ -215,6 +215,12 @@
           this.$message.warning(`${i18n.$t('Please enter crontab')}`)
           return false
         }
+
+        if (this.crontab.split(" ")[0] === "*" || this.crontab.split(" ")[1] === "*") {
+          this.$message.warning(`${i18n.$t('Crontab Exp Second/Minutes is eq *')}`)
+          return false
+        }
+
         return true
       },
       _timing () {
@@ -312,8 +318,8 @@
       if(this.item.crontab !== null){
         this.crontab = this.item.crontab
       }
-      if(this.type == 'timing') {
-        this.crontab = '* * * * * ? *'
+      if(this.type === 'timing') {
+        this.crontab = '0 0 * * * ? *'
       }
       this.receivers = _.cloneDeep(this.receiversD)
       this.receiversCc = _.cloneDeep(this.receiversCcD)

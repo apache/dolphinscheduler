@@ -496,5 +496,6 @@ export default {
   'There is no data for this period of time': 'There is no data for this period of time',
   'IP address cannot be empty': 'IP address cannot be empty',
   'Please enter the correct IP': 'Please enter the correct IP',
-  'Please generate token': 'Please generate token'
+  'Please generate token': 'Please generate token',
+  'Crontab Exp Second/Minutes is eq *': 'Crontab Exp Second/Minutes is eq *'
 }

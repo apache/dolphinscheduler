@@ -501,5 +501,6 @@ export default {
   'There is no data for this period of time': '该时间段无数据',
   'IP address cannot be empty': 'IP地址不能为空',
   'Please enter the correct IP': '请输入正确的IP',
-  'Please generate token': '请生成Token'
+  'Please generate token': '请生成Token',
+  'Crontab Exp Second/Minutes is eq *': 'Crontab定时表达式，按每秒/每分钟提交任务'
 }
