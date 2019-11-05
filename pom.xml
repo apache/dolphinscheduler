@@ -422,9 +422,9 @@
 	</dependencyManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/analysys/EasyScheduler.git</connection>
-		<developerConnection>scm:git:https://github.com/analysys/EasyScheduler.git</developerConnection>
-		<url>https://github.com/analysys/EasyScheduler.git</url>
+		<connection>scm:git:https://github.com/lgcareer/EasyScheduler.git</connection>
+		<developerConnection>scm:git:https://github.com/lgcareer/EasyScheduler.git</developerConnection>
+		<url>https://github.com/lgcareer/EasyScheduler.git</url>
 		<tag>HEAD</tag>
 	</scm>
 
