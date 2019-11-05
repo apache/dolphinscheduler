@@ -145,8 +145,18 @@ public class AccessTokenService extends BaseService {
      */
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>(5);
-        //only admin can operate
-        if (checkAdmin(loginUser, result)) {
+
+        AccessToken accessToken = accessTokenMapper.selectById(id);
+
+        if (accessToken == null) {
+            logger.error("access token not exist,  access token id {}", id);
+            putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
+            return result;
+        }
+
+        if (loginUser.getId() != accessToken.getUserId() &&
+                loginUser.getUserType() != UserType.ADMIN_USER) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
