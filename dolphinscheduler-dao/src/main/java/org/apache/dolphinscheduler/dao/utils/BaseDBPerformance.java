@@ -14,30 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.log;
+package org.apache.dolphinscheduler.dao.utils;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.filter.Filter;
-import ch.qos.logback.core.spi.FilterReply;
-import org.apache.dolphinscheduler.server.utils.LoggerUtils;
+import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
+
+import java.sql.Connection;
 
 /**
- *  task log filter
+ *
  */
-public class TaskLogFilter extends Filter<ILoggingEvent> {
+public abstract class BaseDBPerformance {
 
-    private Level level;
 
-    public void setLevel(String level) {
-        this.level = Level.toLevel(level);
-    }
+    /**
+     * return the current database performance
+     * @return
+     */
+    protected abstract MonitorRecord getMonitorRecord(Connection conn);
 
-    @Override
-    public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith(LoggerUtils.TASK_LOGGER_THREAD_NAME) || event.getLevel().isGreaterOrEqual(level)) {
-            return FilterReply.ACCEPT;
-        }
-        return FilterReply.DENY;
-    }
 }
