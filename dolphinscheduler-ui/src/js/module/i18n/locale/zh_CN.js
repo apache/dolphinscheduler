@@ -458,7 +458,7 @@ export default {
   'Node self-test status': '节点自检状态',
   'Health status': '健康状态',
   'Max connections': '最大连接数',
-  'Threads connections': '当前活跃连接',
+  'Threads connections': '当前连接数',
   'Max used connections': '同时使用连接最大数',
   'Threads running connections': '数据库当前活跃连接数',
   'Worker group': 'Worker分组',
