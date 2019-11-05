@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.log;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
@@ -26,9 +27,15 @@ import org.apache.dolphinscheduler.server.utils.LoggerUtils;
  */
 public class TaskLogFilter extends Filter<ILoggingEvent> {
 
+    private Level level;
+
+    public void setLevel(String level) {
+        this.level = Level.toLevel(level);
+    }
+
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith(LoggerUtils.TASK_LOGGER_THREAD_NAME)) {
+        if (event.getThreadName().startsWith(LoggerUtils.TASK_LOGGER_THREAD_NAME) || event.getLevel().isGreaterOrEqual(level)) {
             return FilterReply.ACCEPT;
         }
         return FilterReply.DENY;
