@@ -85,10 +85,12 @@ public class EnterpriseWeChatUtils {
             response.close();
         }
 
-        Map<String, Object> map = JSON.parseObject(resp,
-                new TypeToken<Map<String, Object>>() {
-                }.getType());
-        return map.get("access_token").toString();
+        Map<String, Object> map = JSON.parseObject(resp, new TypeToken<Map<String, Object>>() {}.getType());
+        Object  obj = map.get("access_token");
+        if(null == obj){
+            return "";
+        }
+        return obj.toString();
     }
 
     /**
