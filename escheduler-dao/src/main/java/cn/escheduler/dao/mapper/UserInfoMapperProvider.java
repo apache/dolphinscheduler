@@ -14,14 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.common.enums;
+package cn.escheduler.dao.mapper;
+
+import cn.escheduler.common.enums.UserType;
+import cn.escheduler.common.utils.EnumFieldUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.jdbc.SQL;
+
+import java.util.Map;
 
 /**
- * resource type
+ * und function mapper provider
+ *
  */
-public enum  ResourceType {
+public class UserInfoMapperProvider {
+
+    private static final String TABLE_NAME = "test.users";
+
     /**
-     * 0 file, 1 udf, 2 fileDir, 3 udfDir
+     * insert user
+     *
+     * @param parameter
+     * @return
      */
-    FILE,UDF,FILEDIR,UDFDIR
+    public String insert(Map<String, Object> parameter) {
+        return new SQL() {
+            {
+                INSERT_INTO(TABLE_NAME);
+                VALUES("name", "#{user.name}");
+                VALUES("password", "#{user.password}");
+            }
+        }.toString();
+    }
+
+
 }

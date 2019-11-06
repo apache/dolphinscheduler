@@ -255,7 +255,6 @@ public class HadoopUtils implements Closeable {
     /**
      * the src file is on the local disk.  Add it to FS at
      * the given dst name.
-
      * @param srcFile       local file
      * @param dstHdfsPath   destination hdfs path
      * @param deleteSource  whether to delete the src
@@ -288,11 +287,9 @@ public class HadoopUtils implements Closeable {
             if (dstPath.isFile()) {
                 if (overwrite) {
                     dstPath.delete();
-                }else{
-                    throw new IOException("destination file already exists!");
                 }
             } else {
-                throw new IOException("destination file must be a file!");
+                logger.error("destination file must be a file");
             }
         }
 

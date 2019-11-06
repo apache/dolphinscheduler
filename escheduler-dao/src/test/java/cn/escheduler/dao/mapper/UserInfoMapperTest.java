@@ -14,14 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.common.enums;
+package cn.escheduler.dao.mapper;
 
-/**
- * resource type
- */
-public enum  ResourceType {
-    /**
-     * 0 file, 1 udf, 2 fileDir, 3 udfDir
-     */
-    FILE,UDF,FILEDIR,UDFDIR
+import cn.escheduler.common.enums.UserType;
+import cn.escheduler.dao.datasource.ConnectionFactory;
+import cn.escheduler.dao.model.User;
+import cn.escheduler.dao.model.UserInfo;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Date;
+
+
+public class UserInfoMapperTest {
+
+
+    UserInfoMapper userInfoMapper;
+
+    @Before
+    public void before(){
+        userInfoMapper = ConnectionFactory.getSqlSession().getMapper(UserInfoMapper.class);
+    }
+
+    @Test
+    public void testInsert(){
+        UserInfo userInfo = new UserInfo();
+        userInfo.setName("mayun");
+        userInfo.setPassword("2342");
+        userInfoMapper.insert(userInfo);
+
+    }
+
+
+
 }

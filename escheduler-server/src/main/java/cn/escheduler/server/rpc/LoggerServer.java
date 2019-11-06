@@ -45,7 +45,7 @@ public class LoggerServer {
     private Server server;
 
     public void start() throws IOException {
-	    /* The port on which the server should run */
+        /* The port on which the server should run */
         int port = Constants.RPC_PORT;
         server = ServerBuilder.forPort(port)
                 .addService(new LogViewServiceGrpcImpl())

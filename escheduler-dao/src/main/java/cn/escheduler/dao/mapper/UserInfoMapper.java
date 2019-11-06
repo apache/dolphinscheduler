@@ -14,14 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.common.enums;
+package cn.escheduler.dao.mapper;
 
-/**
- * resource type
- */
-public enum  ResourceType {
-    /**
-     * 0 file, 1 udf, 2 fileDir, 3 udfDir
-     */
-    FILE,UDF,FILEDIR,UDFDIR
+import cn.escheduler.dao.model.UserInfo;
+import org.apache.ibatis.annotations.*;
+
+import java.util.List;
+public interface UserInfoMapper {
+
+
+    @InsertProvider(type = UserInfoMapperProvider.class, method = "insert")
+    @Options(useGeneratedKeys = true,keyProperty = "user.id")
+    @SelectKey(statement = "SELECT nextval('test.users_id_seq')", keyProperty = "user.id", before = false, resultType = int.class)
+    int insert(@Param("user") UserInfo user);
+
 }

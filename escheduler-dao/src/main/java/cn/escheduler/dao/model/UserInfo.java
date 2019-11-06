@@ -14,14 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.escheduler.common.enums;
-
+package cn.escheduler.dao.model;
 /**
- * resource type
+ * user
  */
-public enum  ResourceType {
-    /**
-     * 0 file, 1 udf, 2 fileDir, 3 udfDir
-     */
-    FILE,UDF,FILEDIR,UDFDIR
+public class UserInfo {
+
+    private int id;
+    private String name;
+    private String password;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
