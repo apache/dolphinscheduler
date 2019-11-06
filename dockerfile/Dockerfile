@@ -1,7 +1,5 @@
 FROM ubuntu:18.04
 
-MAINTAINER journey "qiaozhanwei@outlook.com"
-
 ENV LANG=C.UTF-8
 
 ARG version
