@@ -127,7 +127,8 @@ public class FileUtils {
 
 
         //if not exists this user,then create
-        if (!OSUtils.getUserList().contains(userName)){
+        // if not windows  os
+        if (!OSUtils.getUserList().contains(userName) && !OSUtils.isWindows()){
             String userGroup = OSUtils.getGroup();
             if (org.apache.commons.lang3.StringUtils.isNotEmpty(userGroup)){
                 logger.info("create os user : {}",userName);
