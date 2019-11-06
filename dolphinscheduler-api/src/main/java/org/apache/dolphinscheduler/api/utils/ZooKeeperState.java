@@ -133,7 +133,7 @@ public class ZooKeeperState {
 		public void run() {
 			try {
 				ret = FourLetterWordMain.send4LetterWord(host, port, cmd);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				logger.error(e.getMessage(),e);
 				return;
 			}
