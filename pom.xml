@@ -61,7 +61,7 @@
 		<jsp.version>6.1.14</jsp.version>
 		<spotbugs.version>3.1.12</spotbugs.version>
 		<apache.rat.version>0.13</apache.rat.version>
-		<zookeeper.version>3.4.14</zookeeper.version>
+		<zookeeper.version>3.5.6</zookeeper.version>
 	</properties>
 
 	<dependencyManagement>
