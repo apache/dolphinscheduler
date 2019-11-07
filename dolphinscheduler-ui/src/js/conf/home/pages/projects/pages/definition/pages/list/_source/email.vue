@@ -98,7 +98,7 @@
        */
       _manualEmail () {
         if (this.email === '') {
-          return
+          return true
         }
         this.email = _.trim(this.email).replace(/(;$)|(；$)/g, "")
 
@@ -114,11 +114,14 @@
             this.activeList.push(email)
             this.email = ''
             this._handlerEmailWitch()
+            return true
           } else {
             this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
+            return false
           }
         } else {
           this.$message.warning(`${i18n.$t('Mailbox input is illegal')}`)
+          return false
         }
       },
       /**
@@ -252,11 +255,6 @@
       _emailTab () {
         // Data processing
         this._emailEnter()
-        // Focus acquisition
-        setTimeout(() => {
-          // Focus position
-          this.$refs.emailInput.focus()
-        }, 100)
       }
     },
     watch: {

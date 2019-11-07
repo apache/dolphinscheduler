@@ -16,7 +16,7 @@
  */
 <template>
   <div>
-    <div class="servers-wrapper mysql-model content-box" v-show="mysqlList.length">
+    <div class="servers-wrapper mysql-model content-wrap" v-show="mysqlList.length">
       <div class="row" v-for="(item,$index) in mysqlList">
         <div class="col-md-12">
           <div class="db-title">
@@ -130,7 +130,7 @@ export default {
 </script>
 <style lang="scss" rel="stylesheet/scss">
 @import "./servers";
-.content-box {
+.content-wrap {
   background: #fff;
   min-height: calc(100vh - 100px);
   margin: 20px;
