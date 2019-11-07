@@ -15,7 +15,7 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>d://IdeaProjects/lgcareerGithub/EasyScheduler/target/${project.build.finalName}</outputDirectory>
+			<outputDirectory>../../../target/${project.build.finalName}</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -23,7 +23,7 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>d://IdeaProjects/lgcareerGithub/EasyScheduler/target/${project.build.finalName}</outputDirectory>
+			<outputDirectory>../../../target/${project.build.finalName}</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -31,7 +31,7 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>d://IdeaProjects/lgcareerGithub/EasyScheduler/target/${project.build.finalName}/..</outputDirectory>
+			<outputDirectory>../../../target/${project.build.finalName}</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -39,7 +39,7 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>d://IdeaProjects/lgcareerGithub/EasyScheduler/target/${project.build.finalName}/ui</outputDirectory>
+			<outputDirectory>../../../target/${project.build.finalName}/ui</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -47,7 +47,7 @@
 			<includes>
 				<include>**/*</include>
 			</includes>
-			<outputDirectory>d://IdeaProjects/lgcareerGithub/EasyScheduler/target/${project.build.finalName}/sql</outputDirectory>
+			<outputDirectory>../../../target/${project.build.finalName}/sql</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -55,7 +55,7 @@
 			<includes>
 				<include>*.*</include>
 			</includes>
-			<outputDirectory>d://IdeaProjects/lgcareerGithub/EasyScheduler/target/${project.build.finalName}/script</outputDirectory>
+			<outputDirectory>../../../target/${project.build.finalName}/script</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -64,7 +64,7 @@
 				<include>config/*.*</include>
 				<include>env/*.*</include>
 			</includes>
-			<outputDirectory>d://IdeaProjects/lgcareerGithub/EasyScheduler/target/${project.build.finalName}/conf</outputDirectory>
+			<outputDirectory>../../../target/${project.build.finalName}/conf</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -74,7 +74,7 @@
 				<include>stop-all.sh</include>
 				<include>dolphinscheduler-daemon.sh</include>
 			</includes>
-			<outputDirectory>d://IdeaProjects/lgcareerGithub/EasyScheduler/target/${project.build.finalName}/bin</outputDirectory>
+			<outputDirectory>../../../target/${project.build.finalName}/bin</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -83,7 +83,7 @@
 				<include>*.sh</include>
 				<include>*.py</include>
 			</includes>
-			<outputDirectory>d://IdeaProjects/lgcareerGithub/EasyScheduler/target/${project.build.finalName}</outputDirectory>
+			<outputDirectory>../../../target/${project.build.finalName}</outputDirectory>
 		</fileSet>
 
 	</fileSets>
