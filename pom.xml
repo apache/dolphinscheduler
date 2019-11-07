@@ -474,7 +474,7 @@
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<tagNameFormat>@{project.version}</tagNameFormat>
 					<tagBase>${project.version}</tagBase>
-					<goals>-f pom.xml deploy</goals>
+					<!--<goals>-f pom.xml deploy</goals>-->
 				</configuration>
 				<dependencies>
 					<dependency>
@@ -483,6 +483,11 @@
 						<version>1.9.5</version>
 					</dependency>
 				</dependencies>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.6</version>
 			</plugin>
 			<!--<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
@@ -508,7 +513,7 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<encoding>${project.build.sourceEncoding}</encoding>
-					<skip>false</skip><!--not skip compile test classes-->
+					<skip>true</skip><!--not skip compile test classes-->
 				</configuration>
 			</plugin>
 			<plugin>
