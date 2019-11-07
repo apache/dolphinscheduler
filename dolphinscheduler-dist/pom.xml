@@ -11,6 +11,9 @@
 
     <artifactId>dolphinscheduler-dist</artifactId>
     <packaging>pom</packaging>
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
     <modules>
         <module>dolphinscheduler-backend</module>
     </modules>
