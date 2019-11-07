@@ -106,7 +106,17 @@
         }).catch(e => {
           this.isLoading = false
         })
-      }
+      },
+      /**
+       * 防抖请求接口
+       * @desc 防止函数多次被调用
+       */
+      _debounceGET: _.debounce(function (flag) {
+        this._getList(flag)
+      }, 100, {
+        'leading': false,
+        'trailing': true
+      })
     },
     watch: {
       // router
@@ -121,6 +131,14 @@
     created () {
     },
     mounted () {
+      // 轮循获取状态
+      this.setIntervalP = setInterval(() => {
+        this._debounceGET('false')
+      }, 90000)
+    },
+    beforeDestroy () {
+      // 销毁轮循
+      clearInterval(this.setIntervalP)
     },
     components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }
