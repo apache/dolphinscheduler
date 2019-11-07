@@ -596,6 +596,7 @@
 		<module>dolphinscheduler-dao</module>
 		<module>dolphinscheduler-alert</module>
 		<module>dolphinscheduler-rpc</module>
-	</modules>
+        <module>dolphinscheduler-dist</module>
+    </modules>
 
 </project>
