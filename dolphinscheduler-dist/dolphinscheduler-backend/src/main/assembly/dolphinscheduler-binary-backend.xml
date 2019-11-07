@@ -15,7 +15,7 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>/apache-dolphinscheduler-incubating-bin</outputDirectory>
+			<outputDirectory>${basedir}/../../apache-dolphinscheduler-incubating-bin</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -23,7 +23,7 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>/apache-dolphinscheduler-incubating-bin</outputDirectory>
+			<outputDirectory>../../apache-dolphinscheduler-incubating-bin</outputDirectory>
 		</fileSet>
 
 		<fileSet>
