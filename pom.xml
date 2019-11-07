@@ -444,32 +444,6 @@
 		<tag>HEAD</tag>
 	</scm>
 
-	<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.6</version>
-						<configuration>
-							<descriptors>
-								<descriptor>package.xml</descriptor>
-							</descriptors>
-							<appendAssemblyId>false</appendAssemblyId>
-						</configuration>
-						<executions>
-							<execution>
-								<id>make-assembly</id>
-								<phase>package</phase>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-
 	<build>
 		<!--<resources>-->
 			<!--<resource>-->
@@ -622,6 +596,7 @@
 		<module>dolphinscheduler-dao</module>
 		<module>dolphinscheduler-alert</module>
 		<module>dolphinscheduler-rpc</module>
+		<module>dolphinscheduler-dist</module>
 	</modules>
 
 </project>
