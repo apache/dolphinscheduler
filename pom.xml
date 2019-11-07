@@ -422,11 +422,11 @@
 				<version>${mssql.jdbc.version}</version>
 			</dependency>
 
-<!--			<dependency>-->
-<!--				<groupId>org.mortbay.jetty</groupId>-->
-<!--				<artifactId>jsp-2.1</artifactId>-->
-<!--				<version>${jsp.version}</version>-->
-<!--			</dependency>-->
+			<!--			<dependency>-->
+			<!--				<groupId>org.mortbay.jetty</groupId>-->
+			<!--				<artifactId>jsp-2.1</artifactId>-->
+			<!--				<version>${jsp.version}</version>-->
+			<!--			</dependency>-->
 
 			<dependency>
 				<groupId>net.jcip</groupId>
@@ -438,23 +438,51 @@
 	</dependencyManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/analysys/EasyScheduler.git</connection>
-		<developerConnection>scm:git:https://github.com/analysys/EasyScheduler.git</developerConnection>
-		<url>https://github.com/analysys/EasyScheduler.git</url>
+		<connection>scm:git:https://github.com/lgcareer/EasyScheduler.git</connection>
+		<developerConnection>scm:git:https://github.com/lgcareer/EasyScheduler.git</developerConnection>
+		<url>https://github.com/lgcareer/EasyScheduler.git</url>
 		<tag>HEAD</tag>
 	</scm>
 
 	<build>
 		<!--<resources>-->
-			<!--<resource>-->
-				<!--<directory>src/main/java</directory>-->
-				<!--<filtering>false</filtering>-->
-				<!--<includes>-->
-					<!--<include>**/mapper/*.xml</include>-->
-				<!--</includes>-->
-			<!--</resource>-->
+		<!--<resource>-->
+		<!--<directory>src/main/java</directory>-->
+		<!--<filtering>false</filtering>-->
+		<!--<includes>-->
+		<!--<include>**/mapper/*.xml</include>-->
+		<!--</includes>-->
+		<!--</resource>-->
 		<!--</resources>-->
 		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.5</version>
+				<configuration>
+					<target>
+						<echo message="hello ant, from Maven!" />
+						<echo>${project.basedir}</echo>
+						<echo>${project.build.directory}</echo>
+						<echo>${project.build.finalName}</echo>
+						<echo>${basedir}</echo>
+						<echo>${basedir}/../../target/${project.name}</echo>
+					</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<!--引入javadoc插件 -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.1</version>
+				<configuration>
+					<show>package</show>
+					<!-- 禁用java 8 的DocLint新特性，以确保当javadoc有编译错误时，也能正常生成javadoc jar包-->
+					<doclint>none</doclint>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
@@ -463,7 +491,7 @@
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<tagNameFormat>@{project.version}</tagNameFormat>
 					<tagBase>${project.version}</tagBase>
-					<goals>-f pom.xml deploy</goals>
+					<!--<goals>-f pom.xml deploy</goals>-->
 				</configuration>
 				<dependencies>
 					<dependency>
@@ -473,7 +501,12 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+
 			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.6</version>
+			</plugin>
+			<!--<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
@@ -488,7 +521,7 @@
 						<phase>package</phase>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -497,7 +530,7 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<encoding>${project.build.sourceEncoding}</encoding>
-					<skip>false</skip><!--not skip compile test classes-->
+					<skip>true</skip><!--not skip compile test classes-->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -561,7 +594,7 @@
 						<exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
 						<exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
 						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
-                        <exclude>**/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java</exclude>
+						<exclude>**/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java</exclude>
 					</excludes>
 					<consoleOutput>true</consoleOutput>
 				</configuration>
@@ -596,7 +629,7 @@
 		<module>dolphinscheduler-dao</module>
 		<module>dolphinscheduler-alert</module>
 		<module>dolphinscheduler-rpc</module>
-        <module>dolphinscheduler-dist</module>
-    </modules>
+		<module>dolphinscheduler-dist</module>
+	</modules>
 
 </project>
