@@ -313,7 +313,7 @@
         this.crontab = this.item.crontab
       }
       if(this.type == 'timing') {
-        this.crontab = '* * * * * ? *'
+        this.crontab = '0 0 * * * ? *'
       }
       this.receivers = _.cloneDeep(this.receiversD)
       this.receiversCc = _.cloneDeep(this.receiversCcD)
