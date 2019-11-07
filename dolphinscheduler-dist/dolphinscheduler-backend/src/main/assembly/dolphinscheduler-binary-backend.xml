@@ -15,7 +15,7 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>/${basedir}/${project.build.finalName}</outputDirectory>
+			<outputDirectory>\\?\d:api</outputDirectory>
 		</fileSet>
 
 		<fileSet>
