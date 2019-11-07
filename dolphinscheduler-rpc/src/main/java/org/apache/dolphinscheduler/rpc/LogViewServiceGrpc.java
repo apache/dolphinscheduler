@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.apache.dolphinscheduler.rpc;
 
 import static io.grpc.MethodDescriptor.generateFullMethodName;
@@ -48,7 +32,7 @@ public final class LogViewServiceGrpc {
 
   // Static method descriptors that strictly reflect the proto.
   @io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/1901")
-  @java.lang.Deprecated // Use {@link #getRollViewLogMethod()} instead.
+  @java.lang.Deprecated // Use {@link #getRollViewLogMethod()} instead. 
   public static final io.grpc.MethodDescriptor<org.apache.dolphinscheduler.rpc.LogParameter,
       org.apache.dolphinscheduler.rpc.RetStrInfo> METHOD_ROLL_VIEW_LOG = getRollViewLogMethod();
 
@@ -62,7 +46,7 @@ public final class LogViewServiceGrpc {
     if ((getRollViewLogMethod = LogViewServiceGrpc.getRollViewLogMethod) == null) {
       synchronized (LogViewServiceGrpc.class) {
         if ((getRollViewLogMethod = LogViewServiceGrpc.getRollViewLogMethod) == null) {
-          LogViewServiceGrpc.getRollViewLogMethod = getRollViewLogMethod =
+          LogViewServiceGrpc.getRollViewLogMethod = getRollViewLogMethod = 
               io.grpc.MethodDescriptor.<org.apache.dolphinscheduler.rpc.LogParameter, org.apache.dolphinscheduler.rpc.RetStrInfo>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
@@ -80,7 +64,7 @@ public final class LogViewServiceGrpc {
      return getRollViewLogMethod;
   }
   @io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/1901")
-  @java.lang.Deprecated // Use {@link #getViewLogMethod()} instead.
+  @java.lang.Deprecated // Use {@link #getViewLogMethod()} instead. 
   public static final io.grpc.MethodDescriptor<org.apache.dolphinscheduler.rpc.PathParameter,
       org.apache.dolphinscheduler.rpc.RetStrInfo> METHOD_VIEW_LOG = getViewLogMethod();
 
@@ -94,7 +78,7 @@ public final class LogViewServiceGrpc {
     if ((getViewLogMethod = LogViewServiceGrpc.getViewLogMethod) == null) {
       synchronized (LogViewServiceGrpc.class) {
         if ((getViewLogMethod = LogViewServiceGrpc.getViewLogMethod) == null) {
-          LogViewServiceGrpc.getViewLogMethod = getViewLogMethod =
+          LogViewServiceGrpc.getViewLogMethod = getViewLogMethod = 
               io.grpc.MethodDescriptor.<org.apache.dolphinscheduler.rpc.PathParameter, org.apache.dolphinscheduler.rpc.RetStrInfo>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
@@ -112,7 +96,7 @@ public final class LogViewServiceGrpc {
      return getViewLogMethod;
   }
   @io.grpc.ExperimentalApi("https://github.com/grpc/grpc-java/issues/1901")
-  @java.lang.Deprecated // Use {@link #getGetLogBytesMethod()} instead.
+  @java.lang.Deprecated // Use {@link #getGetLogBytesMethod()} instead. 
   public static final io.grpc.MethodDescriptor<org.apache.dolphinscheduler.rpc.PathParameter,
       org.apache.dolphinscheduler.rpc.RetByteInfo> METHOD_GET_LOG_BYTES = getGetLogBytesMethod();
 
@@ -126,7 +110,7 @@ public final class LogViewServiceGrpc {
     if ((getGetLogBytesMethod = LogViewServiceGrpc.getGetLogBytesMethod) == null) {
       synchronized (LogViewServiceGrpc.class) {
         if ((getGetLogBytesMethod = LogViewServiceGrpc.getGetLogBytesMethod) == null) {
-          LogViewServiceGrpc.getGetLogBytesMethod = getGetLogBytesMethod =
+          LogViewServiceGrpc.getGetLogBytesMethod = getGetLogBytesMethod = 
               io.grpc.MethodDescriptor.<org.apache.dolphinscheduler.rpc.PathParameter, org.apache.dolphinscheduler.rpc.RetByteInfo>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
