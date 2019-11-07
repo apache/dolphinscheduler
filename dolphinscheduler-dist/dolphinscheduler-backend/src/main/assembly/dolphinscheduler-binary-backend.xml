@@ -11,7 +11,7 @@
 	<fileSets>
 
 		<fileSet>
-			<directory>${project.basedir}/dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
+			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -19,7 +19,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.basedir}/dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
+			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -27,7 +27,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.basedir}/dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
+			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -35,7 +35,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.basedir}/dolphinscheduler-ui/dist</directory>
+			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/dolphinscheduler-ui/dist</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -43,7 +43,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.basedir}/sql</directory>
+			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/sql</directory>
 			<includes>
 				<include>**/*</include>
 			</includes>
@@ -51,7 +51,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.basedir}/script</directory>
+			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/script</directory>
 			<includes>
 				<include>*.*</include>
 			</includes>
@@ -59,7 +59,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.basedir}/script</directory>
+			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/script</directory>
 			<includes>
 				<include>config/*.*</include>
 				<include>env/*.*</include>
@@ -68,7 +68,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${project.basedir}/script</directory>
+			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/script</directory>
 			<includes>
 				<include>start-all.sh</include>
 				<include>stop-all.sh</include>
