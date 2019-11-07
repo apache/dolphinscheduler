@@ -8,8 +8,8 @@
         <version>1.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>dolphinscheduler-backend</artifactId>
+    <name>${project.artifactId}</name>
 
     <!--<dependencies>
         <dependency>

@@ -467,6 +467,7 @@
 						<echo>${project.build.directory}</echo>
 						<echo>${project.build.finalName}</echo>
 						<echo>${basedir}</echo>
+						<echo>${basedir}/../../target/${project.name}</echo>
 					</target>
 				</configuration>
 			</plugin>
