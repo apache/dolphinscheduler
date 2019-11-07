@@ -10,9 +10,10 @@
         </encoder>
     </appender>
     <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-        <filter class="org.apache.dolphinscheduler.server.worker.log.TaskLogFilter">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
+        <filter class="org.apache.dolphinscheduler.server.worker.log.TaskLogFilter"></filter>
         <Discriminator class="org.apache.dolphinscheduler.server.worker.log.TaskLogDiscriminator">
             <key>taskAppId</key>
             <logBase>${log.base}</logBase>
