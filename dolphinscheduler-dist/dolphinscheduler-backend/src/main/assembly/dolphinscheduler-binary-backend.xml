@@ -1,40 +1,90 @@
 <assembly
-	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
-	<id>dolphinscheduler-binary-backend</id>
+		xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+	<id>all</id>
 	<formats>
+		<format>tar.gz</format>
 		<format>dir</format>
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<fileSets>
+
 		<fileSet>
-			<directory>src/main/resources</directory>
+			<directory>${project.basedir}/dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
 			<includes>
-				<include>**/*.properties</include>
-				<include>**/*.xml</include>
-				<include>**/*.json</include>
-				<include>**/*.ftl</include>
+				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>conf</outputDirectory>
+			<outputDirectory>.</outputDirectory>
 		</fileSet>
+
 		<fileSet>
-			<directory>target/</directory>
+			<directory>${project.basedir}/dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
 			<includes>
-				<include>dolphinscheduler-alert-${project.version}.jar</include>
+				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>lib</outputDirectory>
+			<outputDirectory>.</outputDirectory>
 		</fileSet>
+
+		<fileSet>
+			<directory>${project.basedir}/dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${project.basedir}/dolphinscheduler-ui/dist</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>./ui</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${project.basedir}/sql</directory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+			<outputDirectory>./sql</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${project.basedir}/script</directory>
+			<includes>
+				<include>*.*</include>
+			</includes>
+			<outputDirectory>./script</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${project.basedir}/script</directory>
+			<includes>
+				<include>config/*.*</include>
+				<include>env/*.*</include>
+			</includes>
+			<outputDirectory>./conf</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${project.basedir}/script</directory>
+			<includes>
+				<include>start-all.sh</include>
+				<include>stop-all.sh</include>
+				<include>dolphinscheduler-daemon.sh</include>
+			</includes>
+			<outputDirectory>./bin</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>./</directory>
+			<includes>
+				<include>*.sh</include>
+				<include>*.py</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+		</fileSet>
+
 	</fileSets>
-	<dependencySets>
-		<dependencySet>
-			<outputDirectory>lib</outputDirectory>
-			<useProjectArtifact>true</useProjectArtifact>
-			<excludes>
-				<exclude>javax.servlet:servlet-api</exclude>
-				<exclude>org.eclipse.jetty.aggregate:jetty-all</exclude>
-				<exclude>org.slf4j:slf4j-log4j12</exclude>
-			</excludes>
-		</dependencySet>
-	</dependencySets>
 </assembly>
