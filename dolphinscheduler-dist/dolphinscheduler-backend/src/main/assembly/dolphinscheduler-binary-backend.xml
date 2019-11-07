@@ -11,79 +11,79 @@
 	<fileSets>
 
 		<fileSet>
-			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
+			<directory>${basedir}/../../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>.</outputDirectory>
+			<outputDirectory>${basedir}/../..</outputDirectory>
 		</fileSet>
 
 		<fileSet>
-			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
+			<directory>${basedir}/../../dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>.</outputDirectory>
+			<outputDirectory>${basedir}/../..</outputDirectory>
 		</fileSet>
 
 		<fileSet>
-			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
+			<directory>${basedir}/../../dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>.</outputDirectory>
+			<outputDirectory>${basedir}/../..</outputDirectory>
 		</fileSet>
 
 		<fileSet>
-			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/dolphinscheduler-ui/dist</directory>
+			<directory>${basedir}/../../dolphinscheduler-ui/dist</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>./ui</outputDirectory>
+			<outputDirectory>${basedir}/../../ui</outputDirectory>
 		</fileSet>
 
 		<fileSet>
-			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/sql</directory>
+			<directory>${basedir}/../../sql</directory>
 			<includes>
 				<include>**/*</include>
 			</includes>
-			<outputDirectory>./sql</outputDirectory>
+			<outputDirectory>${basedir}/../../sql</outputDirectory>
 		</fileSet>
 
 		<fileSet>
-			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/script</directory>
+			<directory>${basedir}/../../script</directory>
 			<includes>
 				<include>*.*</include>
 			</includes>
-			<outputDirectory>./script</outputDirectory>
+			<outputDirectory>${basedir}/../../script</outputDirectory>
 		</fileSet>
 
 		<fileSet>
-			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/script</directory>
+			<directory>${basedir}/../../script</directory>
 			<includes>
 				<include>config/*.*</include>
 				<include>env/*.*</include>
 			</includes>
-			<outputDirectory>./conf</outputDirectory>
+			<outputDirectory>${basedir}/../../conf</outputDirectory>
 		</fileSet>
 
 		<fileSet>
-			<directory>d://IdeaProjects/lgcareerGithub/EasyScheduler/script</directory>
+			<directory>${basedir}/../../script</directory>
 			<includes>
 				<include>start-all.sh</include>
 				<include>stop-all.sh</include>
 				<include>dolphinscheduler-daemon.sh</include>
 			</includes>
-			<outputDirectory>./bin</outputDirectory>
+			<outputDirectory>${basedir}/../../bin</outputDirectory>
 		</fileSet>
 
 		<fileSet>
-			<directory>./</directory>
+			<directory>${basedir}/../.././</directory>
 			<includes>
 				<include>*.sh</include>
 				<include>*.py</include>
 			</includes>
-			<outputDirectory>.</outputDirectory>
+			<outputDirectory>${basedir}/../..</outputDirectory>
 		</fileSet>
 
 	</fileSets>

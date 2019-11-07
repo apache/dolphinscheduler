@@ -11,7 +11,7 @@
 
     <artifactId>dolphinscheduler-backend</artifactId>
 
-    <dependencies>
+    <!--<dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-server</artifactId>
@@ -22,7 +22,7 @@
             <artifactId>dolphinscheduler-api</artifactId>
         </dependency>
 
-    </dependencies>
+    </dependencies>-->
 
     <profiles>
         <profile>

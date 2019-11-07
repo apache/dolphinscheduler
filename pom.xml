@@ -464,6 +464,9 @@
 					<target>
 						<echo message="hello ant, from Maven!" />
 						<echo>${project.basedir}</echo>
+						<echo>${project.build.directory}</echo>
+						<echo>${project.build.finalName}</echo>
+						<echo>${basedir}</echo>
 					</target>
 				</configuration>
 			</plugin>
