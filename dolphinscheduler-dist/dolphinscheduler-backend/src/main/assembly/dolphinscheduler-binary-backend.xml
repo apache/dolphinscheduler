@@ -15,7 +15,7 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>../../../target/${project.build.finalName}</outputDirectory>
+			<outputDirectory>/target/${project.build.finalName}</outputDirectory>
 		</fileSet>
 
 		<fileSet>
@@ -23,7 +23,7 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
-			<outputDirectory>../../../target/${project.build.finalName}</outputDirectory>
+			<outputDirectory>/api</outputDirectory>
 		</fileSet>
 
 		<fileSet>
