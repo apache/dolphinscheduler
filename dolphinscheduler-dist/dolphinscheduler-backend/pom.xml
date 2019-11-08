@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dolphinscheduler-backend</artifactId>
-    <name>${project.artifactId}</name>
+   <!-- <name>${project.artifactId}</name>-->
 
     <dependencies>
         <dependency>
@@ -53,7 +53,7 @@
         </profile>
     </profiles>
 
-    <build>
+    <!--<build>
         <plugins>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -73,7 +73,7 @@
                 </executions>
             </plugin>
         </plugins>
-    </build>
+    </build>-->
 
 
 
