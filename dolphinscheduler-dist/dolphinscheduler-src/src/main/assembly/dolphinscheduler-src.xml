@@ -12,7 +12,7 @@
 	<fileSets>
 		<fileSet>
 			<directory>${basedir}/../../</directory>
-			<includeBaseDirectory>true</includeBaseDirectory>
+			<useDefaultExcludes>true</useDefaultExcludes>
 			<includes>
 				<include>**/*</include>
 			</includes>
