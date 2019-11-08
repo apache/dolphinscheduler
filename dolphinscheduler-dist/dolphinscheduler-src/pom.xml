@@ -8,21 +8,8 @@
         <version>1.1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>dolphinscheduler-backend</artifactId>
-    <name>${project.artifactId}</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-server</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-api</artifactId>
-        </dependency>
-
-    </dependencies>
+    <artifactId>dolphinscheduler-src</artifactId>
 
     <profiles>
         <profile>
@@ -34,16 +21,31 @@
                         <version>2.6</version>
                         <configuration>
                             <descriptors>
-                                <descriptor>src/main/assembly/dolphinscheduler-binary-backend.xml</descriptor>
+                                <descriptor>src/main/assembly/dolphinscheduler-src.xml</descriptor>
                             </descriptors>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
                         <executions>
                             <execution>
-                                <id>dolphinscheduler-binary-backend</id>
+                                <id>dolphinscheduler-src</id>
                                 <phase>package</phase>
                                 <goals>
-                                    <goal>assembly</goal>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.4</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
                                 </goals>
                             </execution>
                         </executions>
@@ -52,6 +54,4 @@
             </build>
         </profile>
     </profiles>
-
-
 </project>

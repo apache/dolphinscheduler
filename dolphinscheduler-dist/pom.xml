@@ -15,6 +15,7 @@
 
     <modules>
         <module>dolphinscheduler-backend</module>
+        <module>dolphinscheduler-src</module>
     </modules>
 
 

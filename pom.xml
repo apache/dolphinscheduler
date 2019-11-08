@@ -62,6 +62,15 @@
 		<spotbugs.version>3.1.12</spotbugs.version>
 		<apache.rat.version>0.13</apache.rat.version>
 		<zookeeper.version>3.5.6</zookeeper.version>
+
+		<frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
+		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+		<maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
+		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>2.4</maven-source-plugin.version>
+		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+		<jacoco.version>0.8.4</jacoco.version>
 	</properties>
 
 	<dependencyManagement>
@@ -445,6 +454,9 @@
 	</scm>
 
 	<build>
+
+		<finalName>apache-dolphinscheduler-incubating-${project.artifactId}-${project.version}</finalName>
+
 		<!--<resources>-->
 		<!--<resource>-->
 		<!--<directory>src/main/java</directory>-->
@@ -454,7 +466,64 @@
 		<!--</includes>-->
 		<!--</resource>-->
 		<!--</resources>-->
+
+		<pluginManagement>
+			<plugins>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+						<testSource>${java.version}</testSource>
+						<testTarget>${java.version}</testTarget>
+					</configuration>
+					<version>${maven-compiler-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>${maven-release-plugin.version}</version>
+					<configuration>
+						<tagNameFormat>@{project.version}</tagNameFormat>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>${maven-assembly-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven-javadoc-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${maven-source-plugin.version}</version>
+				</plugin>
+
+
+
+			</plugins>
+
+		</pluginManagement>
+
+
+
 		<plugins>
+
+
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -468,6 +537,7 @@
 						<echo>${project.build.finalName}</echo>
 						<echo>${basedir}</echo>
 						<echo>${basedir}/../../target/${project.name}</echo>
+						<echo>${project.artifactId}</echo>
 					</target>
 				</configuration>
 			</plugin>
@@ -476,7 +546,7 @@
 				<!--引入javadoc插件 -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>${maven-javadoc-plugin.version}</version>
 				<configuration>
 					<show>package</show>
 					<!-- 禁用java 8 的DocLint新特性，以确保当javadoc有编译错误时，也能正常生成javadoc jar包-->
@@ -486,7 +556,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.2</version>
+				<version>${maven-release-plugin.version}</version>
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<tagNameFormat>@{project.version}</tagNameFormat>
@@ -502,30 +572,12 @@
 				</dependencies>
 			</plugin>
 
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.6</version>
-			</plugin>
-			<!--<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<descriptors>
-						<descriptor>package.xml</descriptor>
-					</descriptors>
-					<appendAssemblyId>false</appendAssemblyId>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-					</execution>
-				</executions>
-			</plugin>-->
+
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
@@ -536,7 +588,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19.1</version>
+				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<includes>
 						<include>**/*Test*.java</include><!--run test classes-->
@@ -549,7 +601,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.4</version>
+				<version>${jacoco.version}</version>
 				<configuration>
 					<destFile>target/jacoco.exec</destFile>
 					<dataFile>target/jacoco.exec</dataFile>
@@ -623,6 +675,7 @@
 	</build>
 
 	<modules>
+		<module>dolphinscheduler-ui</module>
 		<module>dolphinscheduler-server</module>
 		<module>dolphinscheduler-common</module>
 		<module>dolphinscheduler-api</module>
@@ -630,7 +683,6 @@
 		<module>dolphinscheduler-alert</module>
 		<module>dolphinscheduler-rpc</module>
 		<module>dolphinscheduler-dist</module>
-		<module>dolphinscheduler-ui</module>
 	</modules>
 
 </project>
