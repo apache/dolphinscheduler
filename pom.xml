@@ -675,7 +675,7 @@
 	</build>
 
 	<modules>
-		<module>dolphinscheduler-ui</module>
+		<!--<module>dolphinscheduler-ui</module>-->
 		<module>dolphinscheduler-server</module>
 		<module>dolphinscheduler-common</module>
 		<module>dolphinscheduler-api</module>
