@@ -4,10 +4,32 @@
 	<groupId>org.apache.dolphinscheduler</groupId>
 	<artifactId>dolphinscheduler</artifactId>
 	<version>1.1.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>dolphinscheduler</name>
-	<url>http://maven.apache.org</url>
 
+	<packaging>pom</packaging>
+	<name>${project.artifactId}</name>
+	<url>http://dolphinscheduler.apache.org</url>
+	<description>Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.</description>
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</connection>
+		<developerConnection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</developerConnection>
+		<url>https://github.com/apache/incubator-dolphinscheduler.git</url>
+		<tag>1.2.3</tag>
+	</scm>
+	<mailingLists>
+		<mailingList>
+			<name>DolphinScheduler Developer List</name>
+			<post>dev@dolphinscheduler.incubator.apache.org</post>
+			<subscribe>dev-subscribe@dolphinscheduler.incubator.apache.org</subscribe>
+			<unsubscribe>dev-unsubscribe@dolphinscheduler.incubator.apache.org</unsubscribe>
+		</mailingList>
+	</mailingLists>
 	<parent>
 		<groupId>org.apache</groupId>
 		<artifactId>apache</artifactId>
@@ -431,12 +453,6 @@
 				<version>${mssql.jdbc.version}</version>
 			</dependency>
 
-			<!--			<dependency>-->
-			<!--				<groupId>org.mortbay.jetty</groupId>-->
-			<!--				<artifactId>jsp-2.1</artifactId>-->
-			<!--				<version>${jsp.version}</version>-->
-			<!--			</dependency>-->
-
 			<dependency>
 				<groupId>net.jcip</groupId>
 				<artifactId>jcip-annotations</artifactId>
@@ -446,26 +462,9 @@
 		</dependencies>
 	</dependencyManagement>
 
-	<scm>
-		<connection>scm:git:https://github.com/lgcareer/EasyScheduler.git</connection>
-		<developerConnection>scm:git:https://github.com/lgcareer/EasyScheduler.git</developerConnection>
-		<url>https://github.com/lgcareer/EasyScheduler.git</url>
-		<tag>HEAD</tag>
-	</scm>
-
 	<build>
 
 		<finalName>apache-dolphinscheduler-incubating-${project.artifactId}-${project.version}</finalName>
-
-		<!--<resources>-->
-		<!--<resource>-->
-		<!--<directory>src/main/java</directory>-->
-		<!--<filtering>false</filtering>-->
-		<!--<includes>-->
-		<!--<include>**/mapper/*.xml</include>-->
-		<!--</includes>-->
-		<!--</resource>-->
-		<!--</resources>-->
 
 		<pluginManagement>
 			<plugins>
@@ -543,17 +542,6 @@
 			</plugin>
 
 			<plugin>
-				<!--引入javadoc插件 -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>${maven-javadoc-plugin.version}</version>
-				<configuration>
-					<show>package</show>
-					<!-- 禁用java 8 的DocLint新特性，以确保当javadoc有编译错误时，也能正常生成javadoc jar包-->
-					<doclint>none</doclint>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
 				<version>${maven-release-plugin.version}</version>
@@ -571,8 +559,6 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-
-
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
