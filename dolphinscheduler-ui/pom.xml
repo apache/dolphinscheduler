@@ -14,8 +14,8 @@
   <name>${project.artifactId}</name>
 
   <properties>
-    <node.version>v6.10.0</node.version>
-    <npm.version>3.10.10</npm.version>
+    <node.version>v10.15.1</node.version>
+    <npm.version>6.4.1</npm.version>
   </properties>
 
   <build>
