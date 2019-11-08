@@ -28,9 +28,9 @@ import Chart from '@/module/ana-charts'
 import '@/module/filter/formatDate'
 import themeData from '@/module/echarts/themeData.json'
 import Permissions from '@/module/permissions'
-import '~/@analysys/ans-ui/lib/ans-ui.min.css'
-import ans from '~/@analysys/ans-ui/lib/ans-ui.min'
-import en_US from '~/@analysys/ans-ui/lib/locale/en' // eslint-disable-line
+import 'ans-ui/lib/ans-ui.min.css'
+import ans from 'ans-ui/lib/ans-ui.min'
+import en_US from 'ans-ui/lib/locale/en' // eslint-disable-line
 import 'sass/conf/home/index.scss'
 
 // Component internationalization

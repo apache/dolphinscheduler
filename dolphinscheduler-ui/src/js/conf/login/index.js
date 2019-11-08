@@ -21,8 +21,8 @@ import $ from 'jquery'
 import Vue from 'vue'
 import App from './App'
 import i18n from '@/module/i18n'
-import '~/@analysys/ans-ui/lib/ans-ui.min.css'
-import ans from '~/@analysys/ans-ui/lib/ans-ui.min'
+import 'ans-ui/lib/ans-ui.min.css'
+import ans from 'ans-ui/lib/ans-ui.min'
 
 import 'sass/conf/login/index.scss'
 
