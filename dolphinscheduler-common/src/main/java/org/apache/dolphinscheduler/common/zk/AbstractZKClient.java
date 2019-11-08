@@ -133,7 +133,6 @@ public abstract class AbstractZKClient {
     }
 
     public void close() {
-		zkClient.getZookeeperClient().close();
 		zkClient.close();
 		logger.info("zookeeper close ...");
     }
