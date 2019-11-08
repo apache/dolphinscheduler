@@ -675,13 +675,13 @@
 	</build>
 
 	<modules>
+		<module>dolphinscheduler-ui</module>
 		<module>dolphinscheduler-server</module>
 		<module>dolphinscheduler-common</module>
 		<module>dolphinscheduler-api</module>
 		<module>dolphinscheduler-dao</module>
 		<module>dolphinscheduler-alert</module>
 		<module>dolphinscheduler-rpc</module>
-		<module>dolphinscheduler-ui</module>
 		<module>dolphinscheduler-dist</module>
 	</modules>
 
