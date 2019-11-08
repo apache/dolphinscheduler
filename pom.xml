@@ -630,6 +630,7 @@
 		<module>dolphinscheduler-alert</module>
 		<module>dolphinscheduler-rpc</module>
 		<module>dolphinscheduler-dist</module>
+		<module>dolphinscheduler-ui</module>
 	</modules>
 
 </project>
