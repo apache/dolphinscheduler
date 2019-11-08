@@ -175,6 +175,7 @@
 			<outputDirectory>.</outputDirectory>
 		</fileSet>
 
+<!--
 		<fileSet>
 			<directory>${basedir}/../../dolphinscheduler-ui/dist</directory>
 			<includes>
@@ -190,6 +191,7 @@
 			</includes>
 			<outputDirectory>./ui</outputDirectory>
 		</fileSet>
+-->
 
 		<fileSet>
 			<directory>${basedir}/../../sql</directory>
