@@ -130,13 +130,21 @@
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>-->
 		<fileSet>
-			<directory>${basedir}/../../target/</directory>
+			<directory>${basedir}/../../dolphinscheduler-server/target/</directory>
 			<includes>
 				<include>dolphinscheduler-server-${project.version}.jar</include>
 			</includes>
 			<outputDirectory>lib</outputDirectory>
 		</fileSet>
 		<!--server end-->
+
+		<fileSet>
+			<directory>${basedir}/../../dolphinscheduler-rpc/target/</directory>
+			<includes>
+				<include>dolphinscheduler-rpc-${project.version}.jar</include>
+			</includes>
+			<outputDirectory>lib</outputDirectory>
+		</fileSet>
 
 
 
@@ -227,6 +235,7 @@
 				<exclude>javax.servlet:servlet-api</exclude>
 				<exclude>org.eclipse.jetty.aggregate:jetty-all</exclude>
 				<exclude>org.slf4j:slf4j-log4j12</exclude>
+				<exclude>org.apache.dolphinscheduler:dolphinscheduler-backend</exclude>
 			</excludes>
 		</dependencySet>
 	</dependencySets>
