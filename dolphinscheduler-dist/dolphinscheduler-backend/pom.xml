@@ -48,29 +48,34 @@
                             </execution>
                         </executions>
                     </plugin>
-
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                                <configuration>
-                                    <tasks>
-                                        <copy file="${project.build.directory}/apache-dolphinscheduler-backend.tar.gz" tofile="${project.basedir}/../../dist/apache-dolphinscheduler-incubating-backend-bin.tar.gz" overwrite="true" />
-                                        <copy file="${project.build.directory}/apache-dolphinscheduler-backend.zip" tofile="${project.basedir}/../../dist/apache-dolphinscheduler-incubating-backend-bin.zip" overwrite="true" />
-                                    </tasks>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-
                 </plugins>
             </build>
         </profile>
     </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${project.build.directory}/apache-dolphinscheduler-backend.tar.gz" tofile="${project.basedir}/../../dist/apache-dolphinscheduler-incubating-backend-bin.tar.gz" overwrite="true" />
+                                <copy file="${project.build.directory}/apache-dolphinscheduler-backend.zip" tofile="${project.basedir}/../../dist/apache-dolphinscheduler-incubating-backend-bin.zip" overwrite="true" />
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
 
 
 </project>
