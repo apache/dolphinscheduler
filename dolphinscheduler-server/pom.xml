@@ -114,7 +114,7 @@
 			<!--</resource>-->
 		<!--</resources>-->
 		<plugins>
-			<plugin>
+			<!--<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<descriptors>
@@ -131,7 +131,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
