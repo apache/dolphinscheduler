@@ -42,10 +42,10 @@ public class LoggerServiceTest {
     public void queryDataSourceList(){
 
         User loginUser = new User();
-        loginUser.setId(27);
+        loginUser.setId(3);
         loginUser.setUserType(UserType.GENERAL_USER);
 
-        Result result = loggerService.queryLog(-1, 0, 100);
+        Result result = loggerService.queryLog(128, 0, 100);
 
         Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(),result.getCode().intValue());
     }
