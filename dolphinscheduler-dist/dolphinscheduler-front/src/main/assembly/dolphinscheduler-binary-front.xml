@@ -8,7 +8,7 @@
 		<format>tar.gz</format>
 	</formats>
 	<includeBaseDirectory>true</includeBaseDirectory>
-	<baseDirectory>${project.build.finalName}-dolphinscheduler-front-bin</baseDirectory>
+	<baseDirectory>dolphinscheduler-front</baseDirectory>
 
 	<fileSets>
 		<fileSet>

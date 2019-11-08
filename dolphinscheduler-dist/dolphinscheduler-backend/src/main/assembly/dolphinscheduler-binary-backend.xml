@@ -8,7 +8,8 @@
 		<format>dir</format>
 	</formats>
 	<includeBaseDirectory>true</includeBaseDirectory>
-	<baseDirectory>${project.build.finalName}-dolphinscheduler-backend-bin</baseDirectory>
+
+	<baseDirectory>dolphinscheduler-backend</baseDirectory>
 
 	<fileSets>
 		<!--alert start-->

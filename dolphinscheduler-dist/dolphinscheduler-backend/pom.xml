@@ -7,7 +7,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dolphinscheduler-backend</artifactId>
-    <name>${project.artifactId}</name>
+    <name>backend</name>
 
     <dependencies>
         <dependency>
