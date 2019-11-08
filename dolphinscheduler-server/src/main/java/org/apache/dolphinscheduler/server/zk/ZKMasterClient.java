@@ -73,6 +73,11 @@ public class ZKMasterClient extends AbstractZKClient {
 	private static ZKMasterClient zkMasterClient = null;
 
 
+	private PathChildrenCache masterPathChildrenCache;
+
+	private PathChildrenCache workerPathChildrenCache;
+
+
 	private ZKMasterClient(ProcessDao processDao){
 		this.processDao = processDao;
 		init();
@@ -133,6 +138,19 @@ public class ZKMasterClient extends AbstractZKClient {
 		}
 	}
 
+	public void close(){
+		try {
+			if(masterPathChildrenCache != null){
+				masterPathChildrenCache.close();
+			}
+			if(workerPathChildrenCache != null){
+				workerPathChildrenCache.close();
+			}
+			super.close();
+		} catch (Exception ignore) {
+		}
+	}
+
 
 
 
@@ -175,12 +193,12 @@ public class ZKMasterClient extends AbstractZKClient {
 	 *  monitor master
 	 */
 	public void listenerMaster(){
-		PathChildrenCache masterPc = new PathChildrenCache(zkClient,
+		masterPathChildrenCache = new PathChildrenCache(zkClient,
 				getZNodeParentPath(ZKNodeType.MASTER), true ,defaultThreadFactory);
 
 		try {
-			masterPc.start();
-			masterPc.getListenable().addListener(new PathChildrenCacheListener() {
+			masterPathChildrenCache.start();
+			masterPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
 				@Override
 				public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
 					switch (event.getType()) {
@@ -273,12 +291,11 @@ public class ZKMasterClient extends AbstractZKClient {
 	 *  monitor worker
 	 */
 	public void listenerWorker(){
-
-		PathChildrenCache workerPc = new PathChildrenCache(zkClient,
+		workerPathChildrenCache = new PathChildrenCache(zkClient,
 				getZNodeParentPath(ZKNodeType.WORKER),true ,defaultThreadFactory);
 		try {
-			workerPc.start();
-			workerPc.getListenable().addListener(new PathChildrenCacheListener() {
+			workerPathChildrenCache.start();
+			workerPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
 				@Override
 				public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) {
 					switch (event.getType()) {
