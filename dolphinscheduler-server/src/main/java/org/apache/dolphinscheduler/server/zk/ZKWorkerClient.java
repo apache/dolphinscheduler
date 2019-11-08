@@ -28,7 +28,6 @@ import org.apache.curator.utils.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.concurrent.ThreadFactory;
 
 
@@ -49,15 +48,13 @@ public class ZKWorkerClient extends AbstractZKClient {
 	 */
 	private String workerZNode = null;
 
-	/**
-	 *  create time
-	 */
-	private Date createTime = null;
 
 	/**
 	 *  zkWorkerClient
 	 */
 	private static ZKWorkerClient zkWorkerClient = null;
+
+	private PathChildrenCache workerPathChildrenCache;
 
 	private ZKWorkerClient(){
 		init();
@@ -76,6 +73,16 @@ public class ZKWorkerClient extends AbstractZKClient {
 
 		// register worker
 		this.registWorker();
+	}
+
+	public void close(){
+		try {
+			if(workerPathChildrenCache != null){
+				workerPathChildrenCache.close();
+			}
+			super.close();
+		} catch (Exception ignore) {
+		}
 	}
 
 
@@ -112,13 +119,10 @@ public class ZKWorkerClient extends AbstractZKClient {
 	 *  monitor worker
 	 */
 	private void listenerWorker(){
-		PathChildrenCache workerPc = new PathChildrenCache(zkClient, getZNodeParentPath(ZKNodeType.WORKER), true, defaultThreadFactory);
+		workerPathChildrenCache = new PathChildrenCache(zkClient, getZNodeParentPath(ZKNodeType.WORKER), true, defaultThreadFactory);
 		try {
-
-			Date now = new Date();
-			createTime = now ;
-			workerPc.start();
-			workerPc.getListenable().addListener(new PathChildrenCacheListener() {
+			workerPathChildrenCache.start();
+			workerPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
 				@Override
 				public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
 					switch (event.getType()) {
