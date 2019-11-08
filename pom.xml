@@ -681,8 +681,8 @@
 		<module>dolphinscheduler-dao</module>
 		<module>dolphinscheduler-alert</module>
 		<module>dolphinscheduler-rpc</module>
-		<module>dolphinscheduler-dist</module>
 		<module>dolphinscheduler-ui</module>
+		<module>dolphinscheduler-dist</module>
 	</modules>
 
 </project>
