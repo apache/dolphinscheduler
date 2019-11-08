@@ -180,6 +180,14 @@
 			<includes>
 				<include>**/*.*</include>
 			</includes>
+			<outputDirectory>./ui/dist</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../../dolphinscheduler-ui</directory>
+			<includes>
+				<include>install-dolphinscheduler-ui.sh</include>
+			</includes>
 			<outputDirectory>./ui</outputDirectory>
 		</fileSet>
 
