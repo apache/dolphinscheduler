@@ -445,6 +445,9 @@
 	</scm>
 
 	<build>
+
+		<finalName>apache-dolphinscheduler-incubating-${project.version}</finalName>
+
 		<!--<resources>-->
 			<!--<resource>-->
 				<!--<directory>src/main/java</directory>-->
@@ -471,7 +474,7 @@
 				</executions>
 			</plugin>
 
-			<!--<plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.5</version>
@@ -483,9 +486,10 @@
 						<echo>${project.build.finalName}</echo>
 						<echo>${basedir}</echo>
 						<echo>${basedir}/../../target/${project.name}</echo>
+						<echo>${project.artifactId}</echo>
 					</target>
 				</configuration>
-			</plugin>-->
+			</plugin>
 
 			<plugin>
 				<!--引入javadoc插件 -->
