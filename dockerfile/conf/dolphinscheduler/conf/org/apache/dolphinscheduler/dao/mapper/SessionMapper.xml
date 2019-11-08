@@ -6,4 +6,10 @@
         from t_ds_session
         where user_id = #{userId}
     </select>
+
+    <select id="queryByUserIdAndIp" resultType="org.apache.dolphinscheduler.dao.entity.Session">
+        select *
+        from t_ds_session
+        where user_id = #{userId} AND ip = #{ip}
+    </select>
 </mapper>
