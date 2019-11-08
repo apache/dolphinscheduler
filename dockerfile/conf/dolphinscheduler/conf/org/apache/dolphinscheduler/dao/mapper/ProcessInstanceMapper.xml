@@ -19,6 +19,35 @@
         </foreach>
         order by id asc
     </select>
+
+    <select id="queryByTenantIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select *
+        from t_ds_process_instance
+        where 1=1
+        <if test="tenantId != -1">
+            and tenant_id =#{tenantId}
+        </if>
+        and state in
+        <foreach collection="states" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+        order by id asc
+    </select>
+
+    <select id="queryByWorkerGroupIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select *
+        from t_ds_process_instance
+        where 1=1
+        <if test="workerGroupId != -1">
+            and worker_group_id =#{workerGroupId}
+        </if>
+        and state in
+        <foreach collection="states" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+        order by id asc
+    </select>
+
     <select id="queryProcessInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select instance.*
         from t_ds_process_instance instance
@@ -59,6 +88,19 @@
         set state = #{destState}
         where state = #{originState}
     </update>
+
+    <update id="updateProcessInstanceByTenantId">
+        update t_ds_process_instance
+        set tenant_id = #{destTenantId}
+        where tenant_id = #{originTenantId}
+    </update>
+
+    <update id="updateProcessInstanceByWorkerGroupId">
+        update t_ds_process_instance
+        set worker_group_id = #{destWorkerGroupId}
+        where worker_group_id = #{originWorkerGroupId}
+    </update>
+
     <select id="countInstanceStateByUser" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select t.state, count(0) as count
         from t_ds_process_instance t

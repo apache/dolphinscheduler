@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper">
     <select id="countCommandState" resultType="org.apache.dolphinscheduler.dao.entity.CommandCount">
-        select cmd.command_type as commandType, count(1) as count
+        select cmd.command_type as command_type, count(1) as count
         from t_ds_error_command cmd, t_ds_process_definition process
         where cmd.process_definition_id = process.id
         <if test="projectIdArray != null and projectIdArray.length != 0">

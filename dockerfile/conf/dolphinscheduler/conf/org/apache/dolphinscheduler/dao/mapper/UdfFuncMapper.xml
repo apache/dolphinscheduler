@@ -12,7 +12,7 @@
             </foreach>
         </if>
         <if test="funcNames != null and funcNames != ''">
-            and func_name = #{funcName}
+            and func_name = #{funcNames}
         </if>
         order by id asc
     </select>
@@ -21,7 +21,7 @@
         from t_ds_udfs
         where 1=1
         <if test="searchVal!= null and searchVal != ''">
-            and name like concat('%', #{searchVal}, '%')
+            and func_name like concat('%', #{searchVal}, '%')
         </if>
         <if test="userId != 0">
             and id in (

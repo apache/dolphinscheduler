@@ -3,10 +3,10 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.UDFUserMapper">
     <delete id="deleteByUserId">
         delete from t_ds_relation_udfs_user
-        where user_id=#{userId}
+        where user_id = #{userId}
     </delete>
     <delete id="deleteByUdfFuncId">
         delete from t_ds_relation_udfs_user
-        where udf_id=#{udfFuncId}
+        where udf_id = #{udfFuncId}
     </delete>
 </mapper>
