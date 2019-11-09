@@ -16,17 +16,11 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-<!--	<scm>
+	<scm>
 		<connection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</connection>
 		<developerConnection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</developerConnection>
-		<url>https://github.com/apache/incubator-dolphinscheduler.git</url>
-		<tag>1.2.3</tag>
-	</scm>-->
-	<scm>
-		<connection>scm:git:https://github.com/dailidong/DolphinScheduler.git</connection>
-		<developerConnection>scm:git:https://github.com/dailidong/DolphinScheduler.git</developerConnection>
-		<url>https://github.com/dailidong/DolphinScheduler.git</url>
-		<tag>1.2.3</tag>
+		<url>https://github.com/apache/incubator-dolphinscheduler</url>
+		<tag>HEAD</tag>
 	</scm>
 	<mailingLists>
 		<mailingList>
