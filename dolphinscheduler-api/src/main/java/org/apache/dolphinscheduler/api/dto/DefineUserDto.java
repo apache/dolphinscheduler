@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import java.util.List;
 
 /**
- *
+ * user process define dto
  */
 public class DefineUserDto {
 

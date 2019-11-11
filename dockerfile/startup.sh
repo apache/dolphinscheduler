@@ -1,39 +1,17 @@
-#! /bin/bash
+#!/bin/bash
 
 set -e
-if [ `netstat -anop|grep mysql|wc -l` -gt 0 ];then
-                echo "MySQL is Running."
-else
-	MYSQL_ROOT_PWD="root@123"
-    ESZ_DB="dolphinscheduler"
-	echo "start mysql service"
-	chown -R mysql:mysql /var/lib/mysql /var/run/mysqld
-	find /var/lib/mysql -type f -exec touch {} \; && service mysql restart $ sleep 10
-	if [ ! -f /nohup.out ];then
-		echo "setting mysql password"
-		mysql --user=root --password=root -e "UPDATE mysql.user set authentication_string=password('$MYSQL_ROOT_PWD') where user='root'; FLUSH PRIVILEGES;"
-
-		echo "setting mysql permission"
-		mysql --user=root --password=$MYSQL_ROOT_PWD -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '$MYSQL_ROOT_PWD' WITH GRANT OPTION; FLUSH PRIVILEGES;"
-		echo "create dolphinscheduler database"
-		mysql --user=root --password=$MYSQL_ROOT_PWD -e "CREATE DATABASE IF NOT EXISTS \`$ESZ_DB\` CHARACTER SET utf8 COLLATE utf8_general_ci; FLUSH PRIVILEGES;"
-		echo "import mysql data"
-		nohup /opt/dolphinscheduler/script/create-dolphinscheduler.sh &
-		sleep 90
-	fi
-
-	if [ `mysql --user=root --password=$MYSQL_ROOT_PWD -s -r -e  "SELECT count(TABLE_NAME) FROM information_schema.TABLES WHERE TABLE_SCHEMA='dolphinscheduler';" | grep -v count` -eq 38 ];then
-		echo "\`$ESZ_DB\` the number of tables is correct"
-	else
-		echo "\`$ESZ_DB\` the number of tables is incorrect"
-		mysql --user=root --password=$MYSQL_ROOT_PWD  -e "DROP DATABASE \`$ESZ_DB\`;"
-		echo "create dolphinscheduler database"
-                mysql --user=root --password=$MYSQL_ROOT_PWD -e "CREATE DATABASE IF NOT EXISTS \`$ESZ_DB\` CHARACTER SET utf8 COLLATE utf8_general_ci; FLUSH PRIVILEGES;"
-                echo "import mysql data"
-                nohup /opt/dolphinscheduler/script/create-dolphinscheduler.sh &
-                sleep 90
-	fi
-fi
+	echo "start postgresql service"
+    /etc/init.d/postgresql restart
+    echo "create user and init db"
+    sudo -u postgres psql <<'ENDSSH'
+create user root with password 'root@123';
+create database dolphinscheduler owner root;
+grant all privileges on database dolphinscheduler to root;
+\q
+ENDSSH
+    echo "import sql data"
+    /opt/dolphinscheduler/script/create-dolphinscheduler.sh
 
 /opt/zookeeper/bin/zkServer.sh restart
 
