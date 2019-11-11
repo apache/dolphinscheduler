@@ -22,53 +22,44 @@ import java.util.List;
 
 /**
  * Task
- * 任务
  */
 public class Task {
     /**
      * task name
-     * 任务名称
      */
     private String taskName;
 
     /**
      * task start date
-     * 任务开始时间
      */
     private List<Long> startDate = new ArrayList<>();
     /**
      * task end date
-     * 任务结束时间
      */
     private List<Long> endDate = new ArrayList<>();
 
     /**
      * task execution date
-     * 任务执行时间
      */
     private Date executionDate;
 
     /**
      * task iso start
-     * 任务开始时间
      */
     private Date isoStart;
 
     /**
      * task iso end
-     * 任务结束时间
      */
     private Date isoEnd;
 
     /**
      * task status
-     * 执行状态
      */
     private String status;
 
     /**
      * task duration
-     * 运行时长
      */
     private String duration;
 

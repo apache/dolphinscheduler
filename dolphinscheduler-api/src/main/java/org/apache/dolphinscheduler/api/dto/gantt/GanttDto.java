@@ -23,31 +23,26 @@ import java.util.Map;
 
 /**
  * gantt DTO
- * 甘特图 DTO
  */
 public class GanttDto {
 
     /**
      * height
-     * 高度
      */
     private int height;
 
     /**
      * tasks list
-     * 任务集合
      */
     private List<Task> tasks = new ArrayList<>();
 
     /**
      * task name list
-     * 任务名称
      */
     private List<String> taskNames;
 
     /**
      * task status map
-     * 任务状态
      */
     private Map<String,String> taskStatus;
 

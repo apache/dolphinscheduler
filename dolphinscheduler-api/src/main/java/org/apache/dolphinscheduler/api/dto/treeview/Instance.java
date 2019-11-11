@@ -26,31 +26,26 @@ public class Instance {
     private int id;
     /**
      * node name
-     * 节点名称
      */
     private String name;
 
     /**
      * node type
-     * 节点类型
      */
     private String type;
 
     /**
      * node status
-     * 状态
      */
     private String state;
 
     /**
      * node start time
-     * 开始时间
      */
     private Date startTime;
 
     /**
      * node end time
-     * 结束时间
      */
     private Date endTime;
 
@@ -58,13 +53,11 @@ public class Instance {
 
     /**
      * node running on which host
-     * 运行机器
      */
     private String host;
 
     /**
      * node duration
-     * 运行时长
      */
     private String duration;
 

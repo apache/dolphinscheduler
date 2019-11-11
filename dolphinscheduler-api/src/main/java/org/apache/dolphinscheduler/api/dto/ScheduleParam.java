@@ -20,7 +20,6 @@ import java.util.Date;
 
 /**
  * schedule parameters
- * 调度参数
  */
 public class ScheduleParam {
   private Date startTime;

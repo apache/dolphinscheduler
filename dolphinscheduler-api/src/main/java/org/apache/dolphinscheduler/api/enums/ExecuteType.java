@@ -23,8 +23,12 @@ public enum ExecuteType {
 
 
     /**
-     * 操作类型
-     * 1.重跑 2.恢复暂停 3.恢复失败 4.停止 5.暂停
+     * operation type
+     * 1 repeat running
+     * 2 resume pause
+     * 3 resume failure
+     * 4 stop
+     * 5 pause
      */
     NONE,REPEAT_RUNNING, RECOVER_SUSPENDED_PROCESS, START_FAILURE_TASK_PROCESS, STOP, PAUSE;
 
@@ -35,6 +39,6 @@ public enum ExecuteType {
                 return e;
             }
         }
-        return null;//For values out of enum scope
+        return null;
     }
 }

@@ -27,9 +27,7 @@ public enum Status {
     TASK_TIMEOUT_PARAMS_ERROR(10002, "task timeout parameter is not valid"),
     USER_NAME_EXIST(10003, "user name already exists"),
     USER_NAME_NULL(10004,"user name is null"),
-//    DB_OPERATION_ERROR(10005, "database operation error"),
     HDFS_OPERATION_ERROR(10006, "hdfs operation error"),
-    UPDATE_FAILED(10007, "updateProcessInstance failed"),
     TASK_INSTANCE_NOT_FOUND(10008, "task instance not found"),
     TENANT_NAME_EXIST(10009, "tenant code already exists"),
     USER_NOT_EXIST(10010, "user {0} not exists"),
@@ -176,7 +174,6 @@ public enum Status {
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists"),
-//    RESOURCE_EMPTY(20003, "resource file is empty"),
     RESOURCE_NOT_EXIST(20004, "resource not exist"),
     RESOURCE_EXIST(20005, "resource already exists"),
     RESOURCE_SUFFIX_NOT_SUPPORT_VIEW(20006, "resource suffix do not support online viewing"),
