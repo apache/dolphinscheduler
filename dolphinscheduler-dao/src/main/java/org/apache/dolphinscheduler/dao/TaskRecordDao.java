@@ -43,7 +43,7 @@ public class TaskRecordDao {
     private static Logger logger = LoggerFactory.getLogger(TaskRecordDao.class.getName());
 
     /**
-     * 加载配置文件
+     * load conf
      */
     private static Configuration conf;
 

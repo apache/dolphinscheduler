@@ -50,9 +50,7 @@ public class StandaloneZKServerForTest {
 
                 //delete zk data dir ?
                 File zkFile = new File(System.getProperty("java.io.tmpdir"), "zookeeper");
-//                if(zkFile.exists()){
-//                    zkFile.delete();
-//                }
+
                 startStandaloneServer("2000", zkFile.getAbsolutePath(), "2181", "10", "5");
             }
         });

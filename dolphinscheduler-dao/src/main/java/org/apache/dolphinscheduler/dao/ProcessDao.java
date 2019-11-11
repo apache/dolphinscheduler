@@ -59,7 +59,6 @@ public class ProcessDao extends AbstractBaseDao {
     private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.RUNNING_EXEUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
-//            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
@@ -1017,9 +1016,6 @@ public class ProcessDao extends AbstractBaseDao {
      * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_${task executed by ip1},${ip2}...
      *
      * The tasks with the highest priority are selected by comparing the priorities of the above four levels from high to low.
-     *
-     * 流程实例优先级_流程实例id_任务优先级_任务id_任务执行机器ip1，ip2...          high <- low
-     *
      * @param taskInstance
      * @return
      */
@@ -1167,7 +1163,6 @@ public class ProcessDao extends AbstractBaseDao {
             logger.error("save error, process instance is null!");
             return ;
         }
-        //创建流程实例
         if(workProcessInstance.getId() != 0){
             processInstanceMapper.updateById(workProcessInstance);
         }else{
@@ -1602,7 +1597,7 @@ public class ProcessDao extends AbstractBaseDao {
         Cron depCron;
         List<Date> list;
         List<Schedule> schedules = this.selectAllByProcessDefineId(ids);
-        // 遍历所有的调度信息
+        // for all scheduling info
         for(Schedule depSchedule:schedules){
             strCrontab = depSchedule.getCrontab();
             depCronExpression = CronUtils.parse2CronExpression(strCrontab);
