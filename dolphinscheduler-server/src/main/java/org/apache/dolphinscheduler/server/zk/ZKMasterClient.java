@@ -138,6 +138,7 @@ public class ZKMasterClient extends AbstractZKClient {
 		}
 	}
 
+	@Override
 	public void close(){
 		try {
 			if(masterPathChildrenCache != null){

@@ -77,7 +77,7 @@ public class TaskRecordDao {
         String password = conf.getString(Constants.TASK_RECORD_PWD);
         Connection conn = null;
         try {
-            //classLoader,加载对应驱动
+            //classLoader，load driver
             Class.forName(driver);
             conn = DriverManager.getConnection(url, username, password);
         } catch (ClassNotFoundException e) {

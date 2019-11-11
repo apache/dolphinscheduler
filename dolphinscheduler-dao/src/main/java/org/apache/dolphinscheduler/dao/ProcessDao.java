@@ -247,7 +247,7 @@ public class ProcessDao extends AbstractBaseDao {
             int processInstanceId = cmdParamObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING);
 
             List<Command> commands = commandMapper.selectList(null);
-            //遍历所有命令
+            // for all commands
             for (Command tmpCommand:commands){
                 if(cmdTypeMap.containsKey(tmpCommand.getCommandType())){
                     tempObj = (JSONObject) JSONObject.parse(tmpCommand.getCommandParam());
@@ -637,7 +637,7 @@ public class ProcessDao extends AbstractBaseDao {
                         ExecutionStatus.KILL);
                 suspendedNodeList.addAll(stopNodeList);
                 for(Integer taskId : suspendedNodeList){
-                    // 把暂停状态初始化
+                    // initialize the pause state
                     initTaskInstance(this.findTaskInstanceById(taskId));
                 }
                 cmdParam.put(Constants.CMDPARAM_RECOVERY_START_NODE_STRING, String.join(",", convertIntListToString(suspendedNodeList)));
@@ -1561,7 +1561,7 @@ public class ProcessDao extends AbstractBaseDao {
      *
      * @param masterId
      * @param processDefinitionId
-     * @param scheduledFireTime 任务调度预计触发的时间
+     * @param scheduledFireTime the time the task schedule is expected to trigger
      * @return
      * @throws Exception
      */
@@ -1576,7 +1576,7 @@ public class ProcessDao extends AbstractBaseDao {
      * get dependency cycle list by work process define id list and scheduler fire time
      * @param masterId
      * @param ids
-     * @param scheduledFireTime 任务调度预计触发的时间
+     * @param scheduledFireTime the time the task schedule is expected to trigger
      * @return
      * @throws Exception
      */
@@ -1597,7 +1597,7 @@ public class ProcessDao extends AbstractBaseDao {
         Cron depCron;
         List<Date> list;
         List<Schedule> schedules = this.selectAllByProcessDefineId(ids);
-        // for all scheduling info
+        // for all scheduling information
         for(Schedule depSchedule:schedules){
             strCrontab = depSchedule.getCrontab();
             depCronExpression = CronUtils.parse2CronExpression(strCrontab);

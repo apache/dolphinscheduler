@@ -75,6 +75,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 		this.registWorker();
 	}
 
+	@Override
 	public void close(){
 		try {
 			if(workerPathChildrenCache != null){

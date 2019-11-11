@@ -167,9 +167,6 @@ public class ScriptRunner {
 					command.append(line.substring(0, line.lastIndexOf(getDelimiter())));
 					command.append(" ");
 					Statement statement = conn.createStatement();
-
-					// logger.info(command.toString());
-
 					boolean hasResults = false;
 					logger.info("sql:"+command.toString());
 					if (stopOnError) {
@@ -253,11 +250,9 @@ public class ScriptRunner {
 					command.append(" ");
 					Statement statement = conn.createStatement();
 
-					// logger.info(command.toString());
-
 					sql = command.toString().replaceAll("\\{\\{APPDB\\}\\}", dbName);
 					boolean hasResults = false;
-					logger.info("sql:"+sql);
+					logger.info("sql : " + sql);
 					if (stopOnError) {
 						hasResults = statement.execute(sql);
 					} else {

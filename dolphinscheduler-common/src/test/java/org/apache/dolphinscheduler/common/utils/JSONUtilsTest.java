@@ -67,21 +67,21 @@ public class JSONUtilsTest {
                 LinkedHashMap.class);
 
         Assert.assertEquals(maps.size(), 1);
-        Assert.assertEquals(maps.get(0).get("mysql服务名称"), "mysql200");
-        Assert.assertEquals(maps.get(0).get("mysql地址"), "192.168.xx.xx");
-        Assert.assertEquals(maps.get(0).get("端口"), "3306");
-        Assert.assertEquals(maps.get(0).get("期间内没有使用索引的查询数握"), "80");
-        Assert.assertEquals(maps.get(0).get("数据库客户端连接数"), "190");
+        Assert.assertEquals(maps.get(0).get("mysql service name"), "mysql200");
+        Assert.assertEquals(maps.get(0).get("mysql address"), "192.168.xx.xx");
+        Assert.assertEquals(maps.get(0).get("port"), "3306");
+        Assert.assertEquals(maps.get(0).get("no index of number"), "80");
+        Assert.assertEquals(maps.get(0).get("database client connections"), "190");
     }
 
     public String list2String(){
 
         LinkedHashMap<String, String> map1 = new LinkedHashMap<>();
-        map1.put("mysql服务名称","mysql200");
-        map1.put("mysql地址","192.168.xx.xx");
-        map1.put("端口","3306");
-        map1.put("期间内没有使用索引的查询数握","80");
-        map1.put("数据库客户端连接数","190");
+        map1.put("mysql service name","mysql200");
+        map1.put("mysql address","192.168.xx.xx");
+        map1.put("port","3306");
+        map1.put("no index of number","80");
+        map1.put("database client connections","190");
 
         List<LinkedHashMap<String, String>> maps = new ArrayList<>();
         maps.add(0,map1);
