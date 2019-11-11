@@ -48,12 +48,12 @@ public class MailUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(MailUtilsTest.class);
     @Test
     public void testSendMails() {
-        String[] receivers = new String[]{"825193156@qq.com"};
-        String[] receiversCc = new String[]{"825193156@qq.com"};
+        String[] receivers = new String[]{"xxx@qq.com"};
+        String[] receiversCc = new String[]{"xxx@qq.com"};
 
         String content ="[\"id:69\"," +
                 "\"name:UserBehavior-0--1193959466\"," +
-                "\"Job name: 启动工作流\"," +
+                "\"Job name: Start workflow\"," +
                 "\"State: SUCCESS\"," +
                 "\"Recovery:NO\"," +
                 "\"Run time: 1\"," +
@@ -63,7 +63,7 @@ public class MailUtilsTest {
                 "\"Notify group :4\"]";
 
         Alert alert = new Alert();
-        alert.setTitle("Mysql异常");
+        alert.setTitle("Mysql Exception");
         alert.setShowType(ShowType.TEXT);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
@@ -89,18 +89,18 @@ public class MailUtilsTest {
     public String list2String(){
 
         LinkedHashMap<String, Object> map1 = new LinkedHashMap<>();
-        map1.put("mysql服务名称","mysql200");
-        map1.put("mysql地址","192.168.xx.xx");
-        map1.put("端口","3306");
-        map1.put("期间内没有使用索引的查询数握","80");
-        map1.put("数据库客户端连接数","190");
+        map1.put("mysql service name","mysql200");
+        map1.put("mysql address","192.168.xx.xx");
+        map1.put("port","3306");
+        map1.put("no index of number","80");
+        map1.put("database client connections","190");
 
         LinkedHashMap<String, Object> map2 = new LinkedHashMap<>();
-        map2.put("mysql服务名称","mysql210");
-        map2.put("mysql地址","192.168.xx.xx");
-        map2.put("端口","3306");
-        map2.put("期间内没有使用索引的查询数握","10");
-        map2.put("数据库客户端连接数","90");
+        map2.put("mysql service name","mysql210");
+        map2.put("mysql address","192.168.xx.xx");
+        map2.put("port","3306");
+        map2.put("no index of number","10");
+        map2.put("database client connections","90");
 
         List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
         maps.add(0,map1);
@@ -135,7 +135,8 @@ public class MailUtilsTest {
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
         alert.setShowType(ShowType.TEXT);
-        alert.setContent("[\"告警时间：2018-02-05\", \"服务名：MYSQL_ALTER\", \"告警名：MYSQL_ALTER_DUMP\", \"获取告警异常！，接口报错，异常信息：timed out\", \"请求地址：http://blog.csdn.net/dreamInTheWorld/article/details/78539286\"]");
+        alert.setContent("[\"alarm time：2018-02-05\", \"service name：MYSQL_ALTER\", \"alarm name：MYSQL_ALTER_DUMP\", " +
+                "\"get the alarm exception.！，interface error，exception information：timed out\", \"request address：http://blog.csdn.net/dreamInTheWorld/article/details/78539286\"]");
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
         alertDao.addAlert(alert);

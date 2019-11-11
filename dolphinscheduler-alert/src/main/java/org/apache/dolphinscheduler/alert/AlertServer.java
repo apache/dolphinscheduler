@@ -57,7 +57,7 @@ public class AlertServer {
     }
 
     public void start(){
-        logger.info("Alert Server ready start!");
+        logger.info("alert server ready start ");
         while (Stopper.isRunning()){
             try {
                 Thread.sleep(Constants.ALERT_SCAN_INTERVEL);

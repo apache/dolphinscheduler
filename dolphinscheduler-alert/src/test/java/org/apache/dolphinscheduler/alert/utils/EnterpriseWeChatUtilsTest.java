@@ -78,19 +78,19 @@ public class EnterpriseWeChatUtilsTest {
     public void testSendSingleUserWeChat() {
         try {
             String token = EnterpriseWeChatUtils.getToken();
-            String msg = EnterpriseWeChatUtils.makeUserSendMsg(listUserId.stream().findFirst().get(), agentId, "您的会议室已经预定，稍后会同步到`邮箱` \n" +
-                    ">**事项详情** \n" +
-                    ">事　项：<font color='info'>开会</font> <br>" +
-                    ">组织者：@miglioguan \n" +
-                    ">参与者：@miglioguan、@kunliu、@jamdeezhou、@kanexiong、@kisonwang \n" +
+            String msg = EnterpriseWeChatUtils.makeUserSendMsg(listUserId.stream().findFirst().get(), agentId, "your meeting room has been booked and will be synced to the 'mailbox' later \n" +
+                    ">**matter details** \n" +
+                    ">matter：<font color='info'>meeting</font> <br>" +
+                    ">organizer：@miglioguan \n" +
+                    ">participant：@miglioguan、@kunliu、@jamdeezhou、@kanexiong、@kisonwang \n" +
                     "> \n" +
-                    ">会议室：<font color='info'>广州TIT 1楼 301</font> \n" +
-                    ">日　期：<font color='warning'>2018年5月18日</font> \n" +
-                    ">时　间：<font color='comment'>上午9:00-11:00</font> \n" +
+                    ">meeting room：<font color='info'>Guangzhou TIT 1st Floor 301</font> \n" +
+                    ">date：<font color='warning'>May 18, 2018</font> \n" +
+                    ">time：<font color='comment'>9:00-11:00 am</font> \n" +
                     "> \n" +
-                    ">请准时参加会议。 \n" +
+                    ">please attend the meeting on time\n" +
                     "> \n" +
-                    ">如需修改会议信息，请点击：[修改会议信息](https://work.weixin.qq.com)\"");
+                    ">to modify the meeting information, please click: [Modify Meeting Information](https://work.weixin.qq.com)\"");
 
             String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 
