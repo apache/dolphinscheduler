@@ -44,7 +44,6 @@ public class DagHelper {
     /**
      * generate flow node relation list by task node list;
      * Edges that are not in the task Node List will not be added to the result
-     * 根据task Node List生成node关系列表,不在task Node List中的边不会被添加到结果中
      *
      * @param taskNodeList
      * @return
@@ -67,7 +66,6 @@ public class DagHelper {
 
     /**
      * generate task nodes needed by dag
-     * 生成dag需要的task nodes
      *
      * @param taskNodeList
      * @param taskDependType
@@ -119,7 +117,6 @@ public class DagHelper {
 
     /**
      * find all the nodes that depended on the start node
-     * 找到所有依赖start node的node
      *
      * @param startNode
      * @param taskNodeList
@@ -142,7 +139,6 @@ public class DagHelper {
 
     /**
      * find all nodes that start nodes depend on.
-     * 找到所有start node依赖的node
      *
      * @param startNode
      * @param taskNodeList
@@ -170,7 +166,6 @@ public class DagHelper {
 
     /**
      * generate dag by start nodes and recovery nodes
-     * 根据start nodes 和 recovery nodes 生成dag
      * @param processDefinitionJson
      * @param startNodeNameList
      * @param recoveryNodeNameList
@@ -217,7 +212,6 @@ public class DagHelper {
 
     /**
      * find node by node name
-     * 通过 name 获取节点
      * @param nodeDetails
      * @param nodeName
      * @return

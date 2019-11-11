@@ -64,7 +64,7 @@ public class DAGTest {
       graph.addNode(i, "v(" + i + ")");
     }
 
-    // 构造边
+    // construction side
     assertTrue(graph.addEdge(1, 2));
 
     assertTrue(graph.addEdge(2, 5));
@@ -84,7 +84,7 @@ public class DAGTest {
 
 
   /**
-   * 测试增加顶点
+   * add node
    */
   @Test
   public void testAddNode() {
@@ -104,7 +104,7 @@ public class DAGTest {
 
 
   /**
-   * 添加边
+   * add edge
    */
   @Test
   public void testAddEdge() {
@@ -129,7 +129,7 @@ public class DAGTest {
 
 
   /**
-   * 测试后续结点
+   * add subsequent node
    */
   @Test
   public void testSubsequentNodes() {
@@ -141,7 +141,7 @@ public class DAGTest {
 
 
   /**
-   * 测试入度
+   * test indegree
    */
   @Test
   public void testIndegree() {
@@ -155,7 +155,7 @@ public class DAGTest {
 
 
   /**
-   * 测试起点
+   * test begin node
    */
   @Test
   public void testBeginNode() {
@@ -170,7 +170,7 @@ public class DAGTest {
 
 
   /**
-   * 测试终点
+   * test end node
    */
   @Test
   public void testEndNode() {
@@ -183,18 +183,18 @@ public class DAGTest {
 
 
   /**
-   * 测试环
+   * test cycle
    */
   @Test
   public void testCycle() {
     clear();
 
-    // 构造顶点
+
     for (int i = 1; i <= 5; ++i) {
       graph.addNode(i, "v(" + i + ")");
     }
 
-    // 构造边, 1->2, 2->3, 3->4
+    // construction side
     try {
       graph.addEdge(1, 2);
       graph.addEdge(2, 3);
@@ -208,9 +208,9 @@ public class DAGTest {
 
 
     try {
-      boolean addResult = graph.addEdge(4, 1);//有环，添加失败
+      boolean addResult = graph.addEdge(4, 1);
 
-      if(!addResult){//有环，添加失败
+      if(!addResult){
         assertTrue(true);
       }
 
@@ -222,15 +222,14 @@ public class DAGTest {
       fail();
     }
 
-    // 重新清空
     clear();
 
-    // 构造顶点
+    // construction node
     for (int i = 1; i <= 5; ++i) {
       graph.addNode(i, "v(" + i +")");
     }
 
-    // 构造边, 1->2, 2->3, 3->4
+    // construction side, 1->2, 2->3, 3->4
     try {
       graph.addEdge(1, 2);
       graph.addEdge(2, 3);
@@ -251,7 +250,8 @@ public class DAGTest {
     makeGraph();
 
     try {
-      List<Integer> topoList = new ArrayList<>();//一种拓扑结果是1 3 4 2 5 6 7
+      // topological result is : 1 3 4 2 5 6 7
+      List<Integer> topoList = new ArrayList<>();
       topoList.add(1);
       topoList.add(3);
       topoList.add(4);
@@ -276,10 +276,10 @@ public class DAGTest {
     graph.addEdge(2, 3, null, true);
     graph.addEdge(3, 4, null, true);
     graph.addEdge(4, 5, null, true);
-    graph.addEdge(5, 1, null, false); //因环会添加失败，ERROR级别日志输出
+    graph.addEdge(5, 1, null, false); //The loop will fail to add
 
     try {
-      List<Integer> topoList = new ArrayList<>();//拓扑结果是1 2 3 4 5
+      List<Integer> topoList = new ArrayList<>();// topological result is : 1 2 3 4 5
       topoList.add(1);
       topoList.add(2);
       topoList.add(3);
@@ -296,9 +296,6 @@ public class DAGTest {
   }
 
 
-  /**
-   *
-   */
   @Test
   public void testTopologicalSort3() throws Exception {
     clear();
@@ -316,7 +313,7 @@ public class DAGTest {
       graph.addNode(i, "v(" + i + ")");
     }
 
-    // 构造边
+    // construction node
     assertTrue(graph.addEdge(1, 2));
 
     assertTrue(graph.addEdge(1, 3));
@@ -345,9 +342,6 @@ public class DAGTest {
 
       logger.info(i + " subsequentNodes : " + graph.getSubsequentNodes(i));
     }
-
-//    assertArrayEquals(expectedList.toArray(),graph.topologicalSort().toArray());
-
     logger.info(6 + "  previousNodesb: " + graph.getPreviousNodes(6));
     assertEquals(5, graph.getSubsequentNodes(2).toArray()[0]);
 

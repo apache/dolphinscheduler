@@ -33,8 +33,6 @@ import java.text.DecimalFormat;
 public class OSUtilsTest {
 
     private static Logger logger = LoggerFactory.getLogger(OSUtilsTest.class);
-//    static SystemInfo si = new SystemInfo();
-//    static HardwareAbstractionLayer hal = si.getHardware();
 
 
     @Test
@@ -46,7 +44,6 @@ public class OSUtilsTest {
     @Test
     public void memoryUsage() {
         logger.info("memoryUsage : {}", OSUtils.memoryUsage());// 0.3361799418926239
-//        printMemory(hal.getMemory());// 35 %
     }
 
     @Test
@@ -81,66 +78,4 @@ public class OSUtilsTest {
 
         logger.info("cpuUsage1 : {}", df.format(cpuUsage));
     }
-
-
-//
-//    @Test
-//    public void getUserList() {
-//        logger.info("getUserList : {}", OSUtils.getUserList());
-//    }
-//
-//
-//    @Test
-//    public void getGroup() throws Exception {
-//        logger.info("getGroup : {}", OSUtils.getGroup());
-//        logger.info("getGroup : {}", OSUtils.exeShell("groups"));
-//
-//
-//    }
-//
-//
-//    @Test
-//    public void getProcessID() {
-//        logger.info("getProcessID : {}", OSUtils.getProcessID());
-//    }
-//
-//
-//    @Test
-//    public void getHost() {
-//        logger.info("getHost : {}", OSUtils.getHost());
-//    }
-//
-//
-//
-//    @Test
-//    public void anotherGetOsInfoTest() throws InterruptedException {
-//        OperatingSystemMXBean os = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
-//        final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
-//
-//        MemoryUsage memoryUsage = memoryMXBean.getHeapMemoryUsage();
-//        double usage = (double)memoryUsage.getUsed() / (double)memoryUsage.getCommitted();
-//        logger.info("memory usage : {}",usage);
-//
-//        if (os instanceof UnixOperatingSystemMXBean) {
-//            UnixOperatingSystemMXBean unixOs = (UnixOperatingSystemMXBean) os;
-//            logger.info("getMaxFileDescriptorCount : {}" ,unixOs.getMaxFileDescriptorCount()); //10240
-//            logger.info("getOpenFileDescriptorCount : {}",unixOs.getOpenFileDescriptorCount()); //241
-//            logger.info("getAvailableProcessors : {}",unixOs.getAvailableProcessors()); //8
-//
-//            logger.info("getSystemLoadAverage : {}",unixOs.getSystemLoadAverage()); //1.36083984375
-//
-//            logger.info("getFreePhysicalMemorySize : {}",unixOs.getFreePhysicalMemorySize()); //209768448
-//
-//            logger.info("getTotalPhysicalMemorySize : {}",unixOs.getTotalPhysicalMemorySize()); //17179869184  16G
-//
-//            for(int i = 0; i < 3; i++) {
-//                logger.info("getSystemCpuLoad : {}", unixOs.getSystemCpuLoad()); //0.0
-//
-//                logger.info("getProcessCpuLoad : {}", unixOs.getProcessCpuLoad() * 10); //0.0
-//                Thread.sleep(1000l);
-//            }
-//        }
-//    }
-//
-
 }

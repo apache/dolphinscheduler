@@ -48,9 +48,7 @@ public class HadoopUtilsTest {
     public void readFileTest(){
         try {
             byte[] bytes = HadoopUtils.getInstance().catFile("/dolphinscheduler/hdfs/resources/35435.sh");
-            logger.info("------------------start");
             logger.info(new String(bytes));
-            logger.info("---------------------end");
         } catch (Exception e) {
 
         }

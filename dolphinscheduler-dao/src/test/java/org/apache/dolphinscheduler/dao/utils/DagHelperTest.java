@@ -96,7 +96,6 @@ public class DagHelperTest {
         TaskNode node4 = new TaskNode();
         node4.setId("4");
         node4.setName("4");
-//        node4.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         taskNodeList.add(node4);
 
         TaskNode node3 = new TaskNode();
