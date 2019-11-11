@@ -49,15 +49,15 @@
         // if (parseInt($val) >= this.min || parseInt($val) <= this.max) {
         //   return
         // }
-        // 验证整数
+        // Verify integer
         if (!$reg.test($val)) {
           this.value = this.min
         }
-        // 最大值
+        // Maximum value
         if (this.value > this.max) {
           this.value = this.max
         }
-        // 最小值
+        // minimum value
         if (this.min > this.value) {
           this.value = this.min
         }

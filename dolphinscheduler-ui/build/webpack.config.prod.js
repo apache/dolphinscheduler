@@ -37,7 +37,7 @@ const config = merge.smart(baseConfig, {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
-          hotReload: false // 开启热重载
+          hotReload: false // Open hot overload
         }
       },
       {
@@ -101,7 +101,7 @@ const config = merge.smart(baseConfig, {
           warnings: false,
           drop_debugger: true,
           drop_console: true,
-          pure_funcs: ['console.log']//移除console
+          pure_funcs: ['console.log']// remove console
         },
         comments: function (n, c) {
           /*! IMPORTANT: Please preserve 3rd-party library license info, inspired from @allex/amd-build-worker/config/jsplumb.js */

@@ -1,7 +1,7 @@
 {
   "name": "dolphinscheduler",
   "version": "1.0.0",
-  "description": "调度平台前端项目",
+  "description": "dolphinscheduler",
   "author": "gongzijian <gongzijian@analysys.com.cn>",
   "scripts": {
     "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./build/webpack.config.prod.js",

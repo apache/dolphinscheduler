@@ -31,7 +31,7 @@ const config = merge.smart(baseConfig, {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
-          hotReload: true // 开启热重载
+          hotReload: true // Open hot overload
         }
       },
       {

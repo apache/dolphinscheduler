@@ -56,7 +56,7 @@
         })
         const myChart = Chart.bar('#process-definition-bar', this.defineUserList, {})
         myChart.echart.setOption(bar)
-        // 首页不允许跳转
+        // Jump not allowed on home page
         if (this.projectId) {
           myChart.echart.on('click', e => {
             this.$router.push({
