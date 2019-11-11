@@ -66,12 +66,6 @@ public class PropertyUtils {
         }
     }
 
-/*
-    public static PropertyUtils getInstance(){
-        return propertyUtils;
-    }
-*/
-
     /**
      * get property value
      *
