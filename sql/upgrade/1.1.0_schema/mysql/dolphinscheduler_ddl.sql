@@ -10,7 +10,7 @@ CREATE PROCEDURE ac_escheduler_T_t_escheduler_process_definition_C_tenant_id()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME='tenant_id')
    THEN
-         ALTER TABLE `t_escheduler_process_definition` ADD COLUMN `tenant_id` int(11) NOT NULL DEFAULT -1 COMMENT '租户id' AFTER `timeout`;
+         ALTER TABLE `t_escheduler_process_definition` ADD COLUMN `tenant_id` int(11) NOT NULL DEFAULT -1 COMMENT 'tenant id' AFTER `timeout`;
        END IF;
  END;
 
@@ -30,7 +30,7 @@ CREATE PROCEDURE ac_escheduler_T_t_escheduler_process_instance_C_tenant_id()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME='tenant_id')
    THEN
-         ALTER TABLE `t_escheduler_process_instance` ADD COLUMN `tenant_id` int(11) NOT NULL DEFAULT -1 COMMENT '租户id' AFTER `timeout`;
+         ALTER TABLE `t_escheduler_process_instance` ADD COLUMN `tenant_id` int(11) NOT NULL DEFAULT -1 COMMENT 'tenant id' AFTER `timeout`;
        END IF;
  END;
 
