@@ -137,7 +137,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      *   ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_host1,host2,...
      *   The tasks with the highest priority are selected by comparing the priorities of the above four levels from high to low.
      *
-     *   流程优先级_流程实例id_任务优先级_任务id_任务执行的机器id1,任务执行的机器id2,...       high <- low
      * @param  key  task queue name
      * @param  tasksNum    how many elements to poll
      * @return the task ids  to be executed
