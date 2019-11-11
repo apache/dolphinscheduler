@@ -117,8 +117,6 @@ public class ProjectService extends BaseService{
 
     /**
      * check project and authorization
-     * 检查项目权限
-     *
      * @param loginUser
      * @param project
      * @param projectName
@@ -155,8 +153,6 @@ public class ProjectService extends BaseService{
 
     /**
      * admin can view all projects
-     * 如果是管理员,则所有项目都可见
-     *
      * @param loginUser
      * @param pageSize
      * @param pageNo

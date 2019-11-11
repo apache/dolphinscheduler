@@ -52,7 +52,7 @@ public class CronUtilsTest {
                 .withSecond(on(0))
                 .instance();
         // Obtain the string expression
-        String cronAsString = cron.asString(); // 0 */5 * * * ? *  Every five minutes(每5分钟一次)
+        String cronAsString = cron.asString(); // 0 */5 * * * ? *  Every five minutes(once every 5 minutes)
 
         Assert.assertEquals(cronAsString, "0 */5 * * * ? *");
 
@@ -103,7 +103,7 @@ public class CronUtilsTest {
                 .withSecond(on(0))
                 .instance();
 
-        String cronAsString = cron1.asString(); // 0 */5 * * * ? * 每5分钟一次
+        String cronAsString = cron1.asString(); // 0 */5 * * * ? * once every 5 minutes
         //logger.info(cronAsString);
         // Obtain the string expression
         //String minCrontab = "0 0 * * * ? *";
@@ -113,13 +113,13 @@ public class CronUtilsTest {
         //String minCrontab = "* 0,3 2 SUN * 1#1 *";
         //String minCrontab = "* 0,3 * 1W * ? *";
         //cron = CronUtils.parse2Cron("0 * * * * ? *");
-        // 月份周期
+        // month cycle
         /*String[] cronArayy = new String[]{"* 0,3 * 1W * ? *","* 0 0 1W * ? *",
                 "0 0 0 L 3/5 ? *","0 0 0 ? 3/5 2/2 *"};*/
-        // 分钟周期
+        // minute cycle
         String[] cronArayy = new String[]{"* * * * * ? *","* 0 * * * ? *",
                 "* 5 * * 3/5 ? *","0 0 * * * ? *"};
-        // 周周期
+        // week cycle
         /*String[] cronArayy = new String[]{"* * * ? * 2/1 *","0 *//*5 * ? * 2/1 *",
                 "* * *//*5 ? * 2/1 *"};*/
         for(String minCrontab:cronArayy){
@@ -164,9 +164,7 @@ public class CronUtilsTest {
             logger.info("dayOfWeekField instanceof And:"+(dayOfWeekField.getExpression() instanceof And));
             logger.info("dayOfWeekField instanceof QuestionMark:"+(dayOfWeekField.getExpression() instanceof QuestionMark));
 
-            CronField yearField = cron.retrieve(CronFieldName.YEAR);
 
-            //CycleEnum cycleEnum = CronUtils.getMaxCycle("0 * * * * ? *");
             CycleEnum cycleEnum = CronUtils.getMaxCycle(minCrontab);
             if(cycleEnum !=null){
                 logger.info(cycleEnum.name());
