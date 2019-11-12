@@ -91,46 +91,46 @@
       event: 'hourValueEvent'
     },
     methods: {
-      // 间隔执行时间（1）
+      // Interval execution time（1）
       onIntervalPerform (val) {
         this.intervalPerformVal = val
         if (this.radioHour === 'intervalHour') {
           this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
         }
       },
-      // 间隔开始时间（2）
+      // Interval start time（2）
       onIntervalStart (val) {
         this.intervalStartVal = val
         if (this.radioHour === 'intervalHour') {
           this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
         }
       },
-      // 具体小时
+      // Specific hours
       onspecificHours (arr) {
       },
-      // 周期开始值
+      // Cycle start value
       onCycleStart (val) {
         this.cycleStartVal = val
         if (this.radioHour === 'cycleHour') {
           this.hourValue = `${this.cycleStartVal}-${this.cycleEndVal}`
         }
       },
-      // 周期结束值
+      // Cycle end value
       onCycleEnd (val) {
         this.cycleEndVal = val
         if (this.radioHour === 'cycleHour') {
           this.hourValue = `${this.cycleStartVal}-${this.cycleEndVal}`
         }
       },
-      // 重置每一小时
+      // Reset every hour
       everyReset () {
         this.hourValue = '*'
       },
-      // 重置间隔小时
+      // Reset interval hours
       intervalReset () {
         this.hourValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
       },
-      // 重置具体小时数
+      // Reset specific hours
       specificReset () {
         if (this.specificHoursVal.length) {
           this.hourValue = this.specificHoursVal.join(',')
@@ -138,31 +138,31 @@
           this.hourValue = '*'
         }
       },
-      // 重置周期小时数
+      // Reset cycle hours
       cycleReset () {
         this.hourValue = `${this.cycleStartVal}-${this.cycleEndVal}`
       },
       /**
-       * 解析参数值
+       * Parse parameter value
        */
       analyticalValue () {
         return new Promise((resolve, reject) => {
           let $hourVal = _.cloneDeep(this.value)
-          // 间隔小时
+          // Interval hour
           let $interval = isStr($hourVal, '/')
-          // 具体小时
+          // Specific hours
           let $specific = isStr($hourVal, ',')
-          // 周期小时
+          // Cycle hour
           let $cycle = isStr($hourVal, '-')
 
-          // 每一小时
+          // Every hour
           if ($hourVal === '*') {
             this.radioHour = 'everyHour'
             this.hourValue = '*'
             return
           }
 
-          // 正整数(时)
+          // Positive integer (hour)
           if ($hourVal.length === 1 && _.isInteger(parseInt($hourVal)) ||
             $hourVal.length === 2 && _.isInteger(parseInt($hourVal))
           ) {
@@ -171,7 +171,7 @@
             return
           }
 
-          // 间隔小时
+          // Interval hour
           if ($interval) {
             this.radioHour = 'intervalHour'
             this.intervalStartVal = parseInt($interval[0])
@@ -180,14 +180,14 @@
             return
           }
 
-          // 具体小时数
+          // Specific hours
           if ($specific) {
             this.radioHour = 'specificHour'
             this.specificHoursVal = $specific
             return
           }
 
-          // 周期小时
+          // Cycle hour
           if ($cycle) {
             this.radioHour = 'cycleHour'
             this.cycleStartVal = parseInt($cycle[0])
@@ -200,11 +200,11 @@
       }
     },
     watch: {
-      // 导出值
+      // Derived value
       hourValue (val) {
         this.$emit('hourValueEvent', val)
       },
-      // 选中类型
+      // Selected type
       radioHour (val) {
         switch (val) {
           case 'everyHour':
@@ -221,7 +221,7 @@
             break
         }
       },
-      // 具体小时数
+      // Specific hours
       specificHoursVal (arr) {
         this.hourValue = arr.join(',')
       }
@@ -230,7 +230,7 @@
     },
     created () {
       this.analyticalValue().then(() => {
-        console.log('数据结构解析成功！')
+        console.log('Data structure parsing succeeded!')
       })
     },
     beforeMount () {
