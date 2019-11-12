@@ -31,7 +31,7 @@ const config = merge.smart(baseConfig, {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
-          hotReload: true // 开启热重载
+          hotReload: true // Open hot overload
         }
       },
       {
@@ -44,7 +44,13 @@ const config = merge.smart(baseConfig, {
               options: {
                 plugins: (loader) => [
                   require('autoprefixer')({
-                    'browsers': [ '> 1%', 'last 3 versions', 'ie >= 9' ]
+                    overrideBrowserslist: [
+                      "Android 4.1",
+                      "iOS 7.1",
+                      "Chrome > 31",
+                      "ff > 31",
+                      "ie >= 8"
+                    ]       
                   }),
                   require('cssnano')
                 ]
@@ -65,7 +71,13 @@ const config = merge.smart(baseConfig, {
               options: {
                 plugins: (loader) => [
                   require('autoprefixer')({
-                    'browsers': [ '> 1%', 'last 3 versions', 'ie >= 9' ]
+                    overrideBrowserslist: [
+                      "Android 4.1",
+                      "iOS 7.1",
+                      "Chrome > 31",
+                      "ff > 31",
+                      "ie >= 8"
+                    ]              
                   }),
                   require('cssnano')
                 ]
