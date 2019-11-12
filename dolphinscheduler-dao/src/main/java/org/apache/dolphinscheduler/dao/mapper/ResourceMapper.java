@@ -23,14 +23,17 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * resource mapper interface
+ */
 public interface ResourceMapper extends BaseMapper<Resource> {
 
     /**
-     *
-     * @param alias query all if null
-     * @param userId query all if -1
-     * @param type query all type if -1
-     * @return
+     * query resource list
+     * @param alias alias
+     * @param userId userId
+     * @param type type
+     * @return resource list
      */
     List<Resource> queryResourceList(@Param("alias") String alias,
                                      @Param("userId") int userId,
@@ -38,12 +41,12 @@ public interface ResourceMapper extends BaseMapper<Resource> {
 
 
     /**
-     *
-     * @param page
+     * resource page
+     * @param page page
      * @param userId query all if 0, then query the authed resources
-     * @param type
-     * @param searchVal
-     * @return
+     * @param type type
+     * @param searchVal searchVal
+     * @return resource list
      */
     IPage<Resource> queryResourcePaging(IPage<Resource> page,
                                         @Param("userId") int userId,
@@ -51,22 +54,24 @@ public interface ResourceMapper extends BaseMapper<Resource> {
                                         @Param("searchVal") String searchVal);
 
     /**
-     *
-     * @param userId
-     * @param type query all if -1
-     * @return
-     */
-    List<Resource> queryResourceListAuthored(@Param("userId") int userId, @Param("type") int type);
-
-    /**
-     *
-     * @param userId
-     * @return
+     * query Authed resource list
+     * @param userId userId
+     * @return resource list
      */
     List<Resource> queryAuthorizedResourceList(@Param("userId") int userId);
 
+    /**
+     *  query resource except userId
+     * @param userId userId
+     * @return resource list
+     */
     List<Resource> queryResourceExceptUserId(@Param("userId") int userId);
 
 
+    /**
+     * query tenant code by name
+     * @param resName resource name
+     * @return tenant code
+     */
     String queryTenantCodeByResourceName(@Param("resName") String resName);
 }

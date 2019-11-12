@@ -64,6 +64,7 @@ public class PlaceholderUtils {
      * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
      * @param ignoreUnresolvablePlaceholders indicates whether unresolvable placeholders should
      * be ignored ({@code true}) or cause an exception ({@code false})
+     * @return PropertyPlaceholderHelper
      */
     public static PropertyPlaceholderHelper getPropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {
 

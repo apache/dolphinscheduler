@@ -27,7 +27,7 @@ public class EncryptionUtils {
 
     /**
      * 
-     * @param rawStr
+     * @param rawStr raw string
      * @return md5(rawStr)
      */
     public static String getMd5(String rawStr) {

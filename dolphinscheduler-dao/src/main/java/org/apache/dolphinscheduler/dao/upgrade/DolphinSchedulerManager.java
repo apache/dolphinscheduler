@@ -30,6 +30,9 @@ public class DolphinSchedulerManager {
     private static final Logger logger = LoggerFactory.getLogger(DolphinSchedulerManager.class);
     UpgradeDao upgradeDao;
 
+    /**
+     * init upgrade dao
+     */
     private void initUpgradeDao() {
         DbType dbType = UpgradeDao.getDbType();
         if (dbType != null) {
@@ -47,10 +50,16 @@ public class DolphinSchedulerManager {
         }
     }
 
+    /**
+     * constructor init
+     */
     public DolphinSchedulerManager() {
         initUpgradeDao();
     }
 
+    /**
+     * init DolphinScheduler
+     */
     public void initDolphinScheduler() {
         // Determines whether the dolphinscheduler table structure has been init
         if (upgradeDao.isExistsTable("t_escheduler_version") ||
@@ -62,6 +71,9 @@ public class DolphinSchedulerManager {
         this.initDolphinSchedulerSchema();
     }
 
+    /**
+     * init DolphinScheduler Schema
+     */
     public void initDolphinSchedulerSchema() {
 
         logger.info("Start initializing the DolphinScheduler manager table structure");
@@ -71,6 +83,7 @@ public class DolphinSchedulerManager {
 
     /**
      * upgrade DolphinScheduler
+     * @throws Exception if error throws Exception
      */
     public void upgradeDolphinScheduler() throws Exception{
 

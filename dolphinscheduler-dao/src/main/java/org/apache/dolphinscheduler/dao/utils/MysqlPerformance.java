@@ -32,11 +32,19 @@ import java.util.Date;
 
 import static org.apache.dolphinscheduler.dao.MonitorDBDao.VARIABLE_NAME;
 
+/**
+ * mysql performance
+ */
 public class MysqlPerformance extends BaseDBPerformance{
 
     private static Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
 
 
+    /**
+     * get monitor record
+     * @param conn connection
+     * @return MonitorRecord
+     */
     @Override
     public MonitorRecord getMonitorRecord(Connection conn) {
         MonitorRecord monitorRecord = new MonitorRecord();

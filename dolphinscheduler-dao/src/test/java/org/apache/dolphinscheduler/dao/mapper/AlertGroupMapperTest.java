@@ -43,6 +43,10 @@ public class AlertGroupMapperTest {
     @Autowired
     UserAlertGroupMapper userAlertGroupMapper;
 
+    /**
+     * insert
+     * @return AlertGroup
+     */
     private AlertGroup insertOne(){
         //insertOne
         AlertGroup alertGroup = new AlertGroup();
@@ -56,6 +60,9 @@ public class AlertGroupMapperTest {
         return alertGroup;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -67,6 +74,9 @@ public class AlertGroupMapperTest {
         alertGroupMapper.deleteById(alertGroup.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
 
@@ -75,6 +85,9 @@ public class AlertGroupMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         AlertGroup alertGroup = insertOne();
@@ -85,7 +98,10 @@ public class AlertGroupMapperTest {
     }
 
 
-        @Test
+    /**
+     * test page
+     */
+    @Test
     public void testQueryAlertGroupPage() {
             AlertGroup alertGroup = insertOne();
             Page page = new Page(1, 3);
@@ -95,6 +111,9 @@ public class AlertGroupMapperTest {
             alertGroupMapper.deleteById(alertGroup.getId());
     }
 
+    /**
+     * test query by groupname
+     */
     @Test
     public void testQueryByGroupName() {
 
@@ -104,6 +123,9 @@ public class AlertGroupMapperTest {
         alertGroupMapper.deleteById(alertGroup.getId());
     }
 
+    /**
+     * test query by userId
+     */
     @Test
     public void testQueryByUserId() {
         AlertGroup alertGroup = insertOne();
@@ -117,6 +139,9 @@ public class AlertGroupMapperTest {
         userAlertGroupMapper.deleteById(userAlertGroup.getId());
     }
 
+    /**
+     * test query by alert type
+     */
     @Test
     public void testQueryByAlertType() {
         AlertGroup alertGroup = insertOne();
@@ -125,6 +150,9 @@ public class AlertGroupMapperTest {
         alertGroupMapper.deleteById(alertGroup.getId());
     }
 
+    /**
+     * test query all group list
+     */
     @Test
     public void testQueryAllGroupList() {
         AlertGroup alertGroup = insertOne();

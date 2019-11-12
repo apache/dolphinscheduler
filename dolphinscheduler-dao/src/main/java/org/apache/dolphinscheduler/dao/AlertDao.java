@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.dao;
 
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
@@ -29,8 +32,7 @@ import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
 
 import java.util.Date;
 import java.util.List;
@@ -54,8 +56,8 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * insert alert
-     * @param alert
-     * @return
+     * @param alert alert
+     * @return add alert result
      */
     public int addAlert(Alert alert){
         return alertMapper.insert(alert);
@@ -63,10 +65,10 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * update alert
-     * @param alertStatus
-     * @param log
-     * @param id
-     * @return
+     * @param alertStatus alertStatus
+     * @param log log
+     * @param id id
+     * @return update alert result
      */
     public int updateAlert(AlertStatus alertStatus,String log,int id){
         Alert alert = alertMapper.selectById(id);
@@ -78,15 +80,19 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * query user list by alert group id
-     * @param alerGroupId
-     * @return
+     * @param alerGroupId alerGroupId
+     * @return user list
      */
     public List<User> queryUserByAlertGroupId(int alerGroupId){
 
         return userAlertGroupMapper.listUserByAlertgroupId(alerGroupId);
     }
+
     /**
      * MasterServer or WorkerServer stoped
+     * @param alertgroupId alertgroupId
+     * @param host host
+     * @param serverType serverType
      */
     public void sendServerStopedAlert(int alertgroupId,String host,String serverType){
         Alert alert = new Alert();
@@ -104,8 +110,8 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * process time out alert
-     * @param processInstance
-     * @param processDefinition
+     * @param processInstance processInstance
+     * @param processDefinition processDefinition
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition){
         int alertgroupId = processInstance.getWarningGroupId();
@@ -132,6 +138,11 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * task timeout warn
+     * @param alertgroupId alertgroupId
+     * @param receivers receivers
+     * @param receiversCc receiversCc
+     * @param taskId taskId
+     * @param taskName taskName
      */
     public void sendTaskTimeoutAlert(int alertgroupId,String receivers,String receiversCc,int taskId,String taskName){
         Alert alert = new Alert();
@@ -154,7 +165,7 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * list the alert information of waiting to be executed
-     * @return
+     * @return alert list
      */
     public List<Alert> listWaitExecutionAlert(){
         return alertMapper.listAlertByStatus(AlertStatus.WAIT_EXECUTION);
@@ -162,8 +173,8 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * list user information by alert group id
-     * @param alertgroupId
-     * @return
+     * @param alertgroupId alertgroupId
+     * @return user list
      */
     public List<User> listUserByAlertgroupId(int alertgroupId){
         return userAlertGroupMapper.listUserByAlertgroupId(alertgroupId);

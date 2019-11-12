@@ -53,6 +53,10 @@ public class ScheduleMapperTest {
     @Autowired
     ProcessDefinitionMapper processDefinitionMapper;
 
+    /**
+     * insert
+     * @return Schedule
+     */
     private Schedule insertOne(){
         //insertOne
         Schedule schedule = new Schedule();
@@ -68,6 +72,9 @@ public class ScheduleMapperTest {
         return schedule;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -79,6 +86,9 @@ public class ScheduleMapperTest {
         scheduleMapper.deleteById(schedule.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         Schedule schedule = insertOne();
@@ -86,6 +96,9 @@ public class ScheduleMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         Schedule schedule = insertOne();
@@ -95,6 +108,9 @@ public class ScheduleMapperTest {
         scheduleMapper.deleteById(schedule.getId());
     }
 
+    /**
+     * test page
+     */
     @Test
     public void testQueryByProcessDefineIdPaging() {
 
@@ -131,6 +147,9 @@ public class ScheduleMapperTest {
         scheduleMapper.deleteById(schedule.getId());
     }
 
+    /**
+     * test query schedule list by project name
+     */
     @Test
     public void testQuerySchedulerListByProjectName() {
 
@@ -167,6 +186,9 @@ public class ScheduleMapperTest {
         Assert.assertNotEquals(schedules.size(), 0);
     }
 
+    /**
+     * test query by process definition ids
+     */
     @Test
     public void testSelectAllByProcessDefineArray() {
 
@@ -180,6 +202,9 @@ public class ScheduleMapperTest {
         Assert.assertNotEquals(schedules.size(), 0);
     }
 
+    /**
+     * test query by process definition id
+     */
     @Test
     public void queryByProcessDefinitionId() {
         Schedule schedule = insertOne();
