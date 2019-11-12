@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 链接判断工具
+ * DAG Cycle judge
  */
 public class CycleLinks extends AbstractCycle {
   private final List<AbstractCycle> cycleList = new ArrayList<>();
