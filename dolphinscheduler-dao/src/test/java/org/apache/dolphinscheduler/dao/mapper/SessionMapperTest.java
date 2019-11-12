@@ -35,6 +35,10 @@ public class SessionMapperTest {
     @Autowired
     SessionMapper sessionMapper;
 
+    /**
+     * insert
+     * @return Session
+     */
     private Session insertOne(){
         //insertOne
         Session session = new Session();
@@ -44,6 +48,9 @@ public class SessionMapperTest {
         return session;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -55,6 +62,9 @@ public class SessionMapperTest {
         sessionMapper.deleteById(session.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         Session session = insertOne();
@@ -62,6 +72,9 @@ public class SessionMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         Session session = insertOne();
@@ -71,6 +84,9 @@ public class SessionMapperTest {
         sessionMapper.deleteById(session.getId());
     }
 
+    /**
+     * test query by userId
+     */
     @Test
     public void testQueryByUserId() {
         Session session = insertOne();

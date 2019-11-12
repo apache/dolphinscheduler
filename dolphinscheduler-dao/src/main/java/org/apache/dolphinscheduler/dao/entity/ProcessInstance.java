@@ -228,7 +228,7 @@ public class ProcessInstance {
 
     /**
      * set the process name with process define version and timestamp
-     * @param processDefinition
+     * @param processDefinition processDefinition
      */
     public ProcessInstance(ProcessDefinition processDefinition){
         this.processDefinition = processDefinition;
@@ -479,7 +479,7 @@ public class ProcessInstance {
 
     /**
      * add command to history
-     * @param cmd
+     * @param cmd cmd
      */
     public void addHistoryCmd(CommandType cmd){
         if(StringUtils.isNotEmpty(this.historyCmd)){
@@ -491,6 +491,7 @@ public class ProcessInstance {
 
     /**
      * check this process is start complement data
+     * @return whether complement data
      */
     public Boolean isComplementData(){
         if(!StringUtils.isNotEmpty(this.historyCmd)){
@@ -502,6 +503,7 @@ public class ProcessInstance {
     /**
      * get current command type,
      * if start with complement data,return complement
+     * @return CommandType
      */
     public CommandType getCmdTypeIfComplement(){
         if(isComplementData()){

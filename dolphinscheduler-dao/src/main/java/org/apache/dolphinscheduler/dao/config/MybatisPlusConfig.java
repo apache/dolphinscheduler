@@ -22,9 +22,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 
+/**
+ * mybatis plus config
+ */
 @Configuration
 @MapperScan("org.apache.dolphinscheduler.*.mapper")
 public class MybatisPlusConfig {
+    /**
+     *  pagination interceptor
+     * @return pagination interceptor
+     */
     @Bean
     public PaginationInterceptor paginationInterceptor() {
         return new PaginationInterceptor();

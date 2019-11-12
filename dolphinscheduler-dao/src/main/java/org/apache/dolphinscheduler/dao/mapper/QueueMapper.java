@@ -24,13 +24,25 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
- *
+ * queue mapper interface
  */
 public interface QueueMapper extends BaseMapper<Queue> {
 
+    /**
+     * queue page
+     * @param page page
+     * @param searchVal searchVal
+     * @return queue IPage
+     */
     IPage<Queue> queryQueuePaging(IPage<Queue> page,
                                   @Param("searchVal") String searchVal);
 
+    /**
+     *  query all queue list
+     * @param queue queue
+     * @param queueName queueName
+     * @return queue list
+     */
     List<Queue> queryAllQueueList(@Param("queue") String queue,
                              @Param("queueName") String queueName);
 
