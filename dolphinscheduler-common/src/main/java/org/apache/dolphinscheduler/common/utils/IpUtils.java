@@ -33,6 +33,7 @@ public class IpUtils {
    * ip str to long <p>
    *
    * @param ipStr ip string
+   * @return ip to long
    */
   public static Long ipToLong(String ipStr) {
     String[] ipSet = ipStr.split("\\" + DOT);

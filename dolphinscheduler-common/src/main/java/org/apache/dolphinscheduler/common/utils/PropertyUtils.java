@@ -71,8 +71,8 @@ public class PropertyUtils {
     }
 
     /**
-     * judge whether resource upload startup
-     * @return
+     *
+     * @return  judge whether resource upload startup
      */
     public static Boolean getResUploadStartupState(){
         String resUploadStartupType = PropertyUtils.getString(Constants.RES_UPLOAD_STARTUP_TYPE);
@@ -84,7 +84,7 @@ public class PropertyUtils {
      * get property value
      *
      * @param key property name
-     * @return
+     * @return property value
      */
     public static String getString(String key) {
         return properties.getProperty(key.trim());
@@ -102,9 +102,9 @@ public class PropertyUtils {
 
     /**
      *
-     * @param key
-     * @param defaultValue
-     * @return
+     * @param key key
+     * @param defaultValue default value
+     * @return property value
      */
     public static int getInt(String key, int defaultValue) {
         String value = getString(key);
@@ -124,7 +124,7 @@ public class PropertyUtils {
      * get property value
      *
      * @param key property name
-     * @return
+     * @return property value
      */
     public static Boolean getBoolean(String key) {
         String value = properties.getProperty(key.trim());
@@ -137,9 +137,9 @@ public class PropertyUtils {
 
     /**
      * get property long value
-     * @param key
-     * @param defaultVal
-     * @return
+     * @param key key
+     * @param defaultVal default value
+     * @return property value
      */
     public static long getLong(String key, long defaultVal) {
         String val = getString(key);
@@ -148,8 +148,8 @@ public class PropertyUtils {
 
     /**
      *
-     * @param key
-     * @return
+     * @param key key
+     * @return property value
      */
     public static long getLong(String key) {
         return getLong(key,-1);
@@ -157,9 +157,9 @@ public class PropertyUtils {
 
     /**
      *
-     * @param key
-     * @param defaultVal
-     * @return
+     * @param key key
+     * @param defaultVal default value
+     * @return property value
      */
     public double getDouble(String key, double defaultVal) {
         String val = getString(key);
@@ -171,7 +171,7 @@ public class PropertyUtils {
      *  get array
      * @param key       property name
      * @param splitStr  separator
-     * @return
+     * @return property value through array
      */
     public static String[] getArray(String key, String splitStr) {
         String value = getString(key);
@@ -189,10 +189,10 @@ public class PropertyUtils {
 
     /**
      *
-     * @param key
-     * @param type
-     * @param defaultValue
-     * @param <T>
+     * @param key key
+     * @param type type
+     * @param defaultValue default value
+     * @param <T> T
      * @return  get enum value
      */
     public <T extends Enum<T>> T getEnum(String key, Class<T> type,
@@ -204,7 +204,7 @@ public class PropertyUtils {
     /**
      * get all properties with specified prefix, like: fs.
      * @param prefix prefix to search
-     * @return
+     * @return all properties with specified prefix
      */
     public static Map<String, String> getPrefixedProperties(String prefix) {
         Map<String, String> matchedProperties = new HashMap<>();
