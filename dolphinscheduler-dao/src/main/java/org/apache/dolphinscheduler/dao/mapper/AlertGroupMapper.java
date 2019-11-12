@@ -25,21 +25,47 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-
+/**
+ * alertgroup mapper interface
+ */
 public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
 
 
+    /**
+     * alertgroup page
+     * @param page page
+     * @param groupName groupName
+     * @return alertgroup Ipage
+     */
     IPage<AlertGroup> queryAlertGroupPage(Page page,
                                           @Param("groupName") String groupName);
 
 
+    /**
+     * query by group name
+     * @param groupName groupName
+     * @return alertgroup list
+     */
     List<AlertGroup> queryByGroupName(@Param("groupName") String groupName);
 
-
+    /**
+     * query by userId
+     * @param userId userId
+     * @return alertgroup list
+     */
     List<AlertGroup> queryByUserId(@Param("userId") int userId);
 
 
+    /**
+     * query by alert type
+     * @param alertType alertType
+     * @return alertgroup list
+     */
     List<AlertGroup> queryByAlertType(@Param("alertType") AlertType alertType);
 
+    /**
+     * query all group list
+     * @return alertgroup list
+     */
     List<AlertGroup> queryAllGroupList();
 }
