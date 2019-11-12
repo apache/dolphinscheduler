@@ -81,6 +81,7 @@ public class ShellExecutor extends AbstractShell {
      * the <code>AbstractShell</code> interface.
      * @param cmd shell command to execute.
      * @return the output of the executed command.
+     * @throws IOException errors
      */
     public static String execCommand(String... cmd) throws IOException {
         return execCommand(null, cmd, 0L);
@@ -93,9 +94,9 @@ public class ShellExecutor extends AbstractShell {
      * @param env the map of environment key=value
      * @param cmd shell command to execute.
      * @param timeout time in milliseconds after which script should be marked timeout
-     * @return the output of the executed command.o
+     * @return the output of the executed command.
+     * @throws IOException errors
      */
-
     public static String execCommand(Map<String, String> env, String[] cmd,
                                      long timeout) throws IOException {
         ShellExecutor exec = new ShellExecutor(cmd, null, env,
@@ -111,6 +112,7 @@ public class ShellExecutor extends AbstractShell {
      * @param env the map of environment key=value
      * @param cmd shell command to execute.
      * @return the output of the executed command.
+     * @throws IOException errors
      */
     public static String execCommand(Map<String,String> env, String ... cmd)
             throws IOException {
@@ -119,7 +121,7 @@ public class ShellExecutor extends AbstractShell {
 
     /**
      * Execute the shell command
-     *
+     * @throws IOException errors
      */
     public void execute() throws IOException {
         this.run();
@@ -144,7 +146,7 @@ public class ShellExecutor extends AbstractShell {
 
     /**
      *
-     * Get the output of the shell command
+     * @return the output of the shell command
      */
     public String getOutput() {
         return (output == null) ? "" : output.toString();
