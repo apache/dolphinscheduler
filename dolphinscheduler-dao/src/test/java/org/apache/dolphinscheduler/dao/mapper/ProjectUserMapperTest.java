@@ -38,6 +38,10 @@ public class ProjectUserMapperTest {
     @Autowired
     ProjectUserMapper projectUserMapper;
 
+    /**
+     * insert
+     * @return ProjectUser
+     */
     private ProjectUser insertOne(){
         //insertOne
         ProjectUser projectUser = new ProjectUser();
@@ -47,6 +51,9 @@ public class ProjectUserMapperTest {
         return projectUser;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -58,6 +65,9 @@ public class ProjectUserMapperTest {
         projectUserMapper.deleteById(projectUser.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         ProjectUser projectUserMap = insertOne();
@@ -65,6 +75,9 @@ public class ProjectUserMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         ProjectUser projectUser = insertOne();
@@ -74,6 +87,9 @@ public class ProjectUserMapperTest {
         projectUserMapper.deleteById(projectUser.getId());
     }
 
+    /**
+     * test delete project relation
+     */
     @Test
     public void testDeleteProjectRelation() {
 
@@ -84,6 +100,9 @@ public class ProjectUserMapperTest {
 
     }
 
+    /**
+     * test query project relation
+     */
     @Test
     public void testQueryProjectRelation() {
         ProjectUser projectUser = insertOne();

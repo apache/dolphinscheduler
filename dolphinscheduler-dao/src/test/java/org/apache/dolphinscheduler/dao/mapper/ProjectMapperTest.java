@@ -42,6 +42,10 @@ public class ProjectMapperTest {
     UserMapper userMapper;
 
 
+    /**
+     * insert
+     * @return Project
+     */
     private Project insertOne(){
         //insertOne
         Project project = new Project();
@@ -51,6 +55,9 @@ public class ProjectMapperTest {
         return project;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -62,6 +69,9 @@ public class ProjectMapperTest {
         projectMapper.deleteById(project.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         Project projectMap = insertOne();
@@ -69,6 +79,9 @@ public class ProjectMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         Project project = insertOne();
@@ -78,6 +91,9 @@ public class ProjectMapperTest {
         projectMapper.deleteById(project.getId());
     }
 
+    /**
+     * test query detail by id
+     */
     @Test
     public void testQueryDetailById() {
 
@@ -96,6 +112,9 @@ public class ProjectMapperTest {
         Assert.assertEquals(project1.getUserName(), user.getUserName());
     }
 
+    /**
+     * test query project by name
+     */
     @Test
     public void testQueryProjectByName() {
         User user = new User();
@@ -113,6 +132,9 @@ public class ProjectMapperTest {
         Assert.assertEquals(project1.getUserName(), user.getUserName());
     }
 
+    /**
+     * test page
+     */
     @Test
     public void testQueryProjectListPaging() {
         Project project = insertOne();
@@ -142,6 +164,9 @@ public class ProjectMapperTest {
         Assert.assertNotEquals(projectIPage1.getTotal(), 0);
     }
 
+    /**
+     * test query project create user
+     */
     @Test
     public void testQueryProjectCreatedByUser() {
         Project project = insertOne();
@@ -153,6 +178,9 @@ public class ProjectMapperTest {
 
     }
 
+    /**
+     * test query authed prject list by userId
+     */
     @Test
     public void testQueryAuthedProjectListByUserId() {
         Project project = insertOne();
@@ -163,6 +191,9 @@ public class ProjectMapperTest {
         Assert.assertNotEquals(projects.size(), 0);
     }
 
+    /**
+     * test query project expect userId
+     */
     @Test
     public void testQueryProjectExceptUserId() {
         Project project = insertOne();

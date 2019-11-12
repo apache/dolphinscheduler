@@ -41,6 +41,10 @@ public class TenantMapperTest {
     @Autowired
     QueueMapper queueMapper;
 
+    /**
+     * insert
+     * @return Tenant
+     */
     private Tenant insertOne(){
         //insertOne
         Tenant tenant = new Tenant();
@@ -50,6 +54,9 @@ public class TenantMapperTest {
         return tenant;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -61,6 +68,9 @@ public class TenantMapperTest {
         tenantMapper.deleteById(tenant.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         Tenant tenant = insertOne();
@@ -68,6 +78,9 @@ public class TenantMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         Tenant tenant = insertOne();
@@ -77,6 +90,9 @@ public class TenantMapperTest {
         tenantMapper.deleteById(tenant.getId());
     }
 
+    /**
+     * test query by id
+     */
     @Test
     public void testQueryById() {
 
@@ -96,19 +112,21 @@ public class TenantMapperTest {
         Assert.assertNotEquals(tenant1, null);
     }
 
+    /**
+     * test query tenant by tenant code
+     */
     @Test
     public void testQueryByTenantCode() {
 
         Tenant tenant = insertOne();
         tenant.setTenantCode("ut code");
         tenantMapper.updateById(tenant);
-
-//        List<Tenant> tenant1 = tenantMapper.queryByTenantCode(tenant.getTenantCode());
-
         tenantMapper.deleteById(tenant.getId());
-//        Assert.assertNotEquals(tenant1.size(), 0);
     }
 
+    /**
+     * test page
+     */
     @Test
     public void testQueryTenantPaging() {
 
