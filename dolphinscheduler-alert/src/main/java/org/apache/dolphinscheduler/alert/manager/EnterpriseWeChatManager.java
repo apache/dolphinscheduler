@@ -35,7 +35,9 @@ public class EnterpriseWeChatManager {
     private static final Logger logger = LoggerFactory.getLogger(MsgManager.class);
     /**
      * Enterprise We Chat send
-     * @param alert
+     * @param alert the alert
+     * @param token the token
+     * @return the send result
      */
     public Map<String,Object> send(Alert alert, String token){
         Map<String,Object> retMap = new HashMap<>();

@@ -92,11 +92,11 @@ public class MailUtils {
 
     /**
      * send mail to receivers
-     *
-     * @param receivers
-     * @param title
-     * @param content
-     * @return
+     * @param receivers the receiver list
+     * @param title the title
+     * @param content the content
+     * @param showType the show type
+     * @return the result map
      */
     public static Map<String,Object> sendMails(Collection<String> receivers, String title, String content,ShowType showType) {
         return sendMails(receivers, null, title, content, showType);
@@ -104,12 +104,12 @@ public class MailUtils {
 
     /**
      * send mail
-     * @param receivers
-     * @param receiversCc cc
-     * @param title title
-     * @param content content
-     * @param showType mail type
-     * @return
+     * @param receivers the receiver list
+     * @param receiversCc cc list
+     * @param title the title
+     * @param content the content
+     * @param showType the show type
+     * @return the send result
      */
     public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, ShowType showType) {
         Map<String,Object> retMap = new HashMap<>();
@@ -169,9 +169,9 @@ public class MailUtils {
 
     /**
      * html table content
-     * @param content
-     * @param showAll
-     * @return
+     * @param content the content
+     * @param showAll if show the whole content
+     * @return the html table form
      */
     private static String htmlTable(String content, boolean showAll){
         if (StringUtils.isNotEmpty(content)){
@@ -198,7 +198,7 @@ public class MailUtils {
 
                     Map.Entry<String, String> entry = iterator.next();
                     t.append(Constants.TH).append(entry.getKey()).append(Constants.TH_END);
-                    cs.append(Constants.TD).append(String.valueOf(entry.getValue())).append(Constants.TD_END);
+                    cs.append(Constants.TD).append(entry.getValue()).append(Constants.TD_END);
 
                 }
                 t.append(Constants.TR_END);
@@ -218,8 +218,8 @@ public class MailUtils {
 
     /**
      * html table content
-     * @param content
-     * @return
+     * @param content the content
+     * @return the html table form
      */
     private static String htmlTable(String content){
         return htmlTable(content,true);
@@ -227,8 +227,8 @@ public class MailUtils {
 
     /**
      * html text content
-     * @param content
-     * @return
+     * @param content the content
+     * @return text in html form
      */
     private static String htmlText(String content){
 
@@ -260,9 +260,8 @@ public class MailUtils {
 
     /**
      * send mail as Excel attachment
-     *
-     * @param receivers
-     * @param title
+     * @param receivers the receiver list
+     * @param title the title
      * @throws Exception
      */
     private static void attachment(Collection<String> receivers,Collection<String> receiversCc,String title,String content,String partContent)throws Exception{
@@ -274,12 +273,10 @@ public class MailUtils {
     /**
      * get MimeMessage
      * @param receivers
-     * @return
+     * @return the MimeMessage
      * @throws MessagingException
      */
     private static MimeMessage getMimeMessage(Collection<String> receivers) throws MessagingException {
-//        Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
-//        final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 
         // 1. The first step in creating mail: creating session
         Session session = getSession();
@@ -299,7 +296,7 @@ public class MailUtils {
 
     /**
      * get session
-     * @return
+     * @return the new Session
      */
     private static Session getSession() {
         Properties props = new Properties();
@@ -324,12 +321,12 @@ public class MailUtils {
     }
 
     /**
-     *
-     * @param receiversCc
-     * @param title
-     * @param content
-     * @param partContent
-     * @param msg
+     * attach content
+     * @param receiversCc the cc list
+     * @param title the title
+     * @param content the content
+     * @param partContent the partContent
+     * @param msg the message
      * @throws MessagingException
      * @throws IOException
      */
@@ -369,13 +366,13 @@ public class MailUtils {
     }
 
     /**
-     *
-     * @param title
-     * @param content
-     * @param showType
-     * @param retMap
-     * @param email
-     * @return
+     * the string object map
+     * @param title the title
+     * @param content the content
+     * @param showType the showType
+     * @param retMap the result map
+     * @param email the email
+     * @return the result map
      * @throws EmailException
      */
     private static Map<String, Object> getStringObjectMap(String title, String content, ShowType showType, Map<String, Object> retMap, HtmlEmail email) throws EmailException {
@@ -403,7 +400,7 @@ public class MailUtils {
 
     /**
      * file delete
-     * @param file
+     * @param file the file to delete
      */
     public static void deleteFile(File file){
         if(file.exists()){
@@ -419,10 +416,10 @@ public class MailUtils {
 
 
     /**
-     *
-     * @param receivers
-     * @param retMap
-     * @param e
+     * handle exception
+     * @param receivers the receiver list
+     * @param retMap the result map
+     * @param e the exception
      */
     private static void handleException(Collection<String> receivers, Map<String, Object> retMap, Exception e) {
         logger.error("Send email to {} failed", StringUtils.join(",", receivers), e);
@@ -430,10 +427,10 @@ public class MailUtils {
     }
 
     /**
-     *
-     * @param title
-     * @param content
-     * @return
+     * get the content of the template
+     * @param title the title
+     * @param content the content to retrieve
+     * @return the content in the template or null if exception occurs
      */
     private static String getTemplateContent(String title,String content){
         StringWriter out = new StringWriter();
