@@ -33,7 +33,7 @@ public class JSONUtils {
 
   /**
    * object to json string
-   * @param object
+   * @param object the object to be converted to json
    * @return json string
    */
   public static String toJsonString(Object object) {
@@ -47,10 +47,10 @@ public class JSONUtils {
   /**
    * json to list
    *
-   * @param json
+   * @param json the json
    * @param clazz c
-   * @param <T>
-   * @return
+   * @param <T> the generic clazz
+   * @return the result list
    */
   public static <T> List<T> toList(String json, Class<T> clazz) {
     if (StringUtils.isEmpty(json)) {
