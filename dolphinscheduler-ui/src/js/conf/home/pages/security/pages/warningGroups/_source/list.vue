@@ -78,8 +78,7 @@
                 <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
               </div>
               <template slot="reference">
-                <x-button v-if="item.id==1" type="error" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-shanchu" :title="$t('delete')" disabled></x-button>
-                <x-button v-else type="error" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-shanchu" :title="$t('delete')"></x-button>
+                <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-shanchu" :title="$t('delete')" :disabled="item.id==1?true: false"></x-button>
               </template>
             </x-poptip>
           </td>

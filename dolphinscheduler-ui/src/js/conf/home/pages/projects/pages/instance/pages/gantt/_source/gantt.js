@@ -66,16 +66,16 @@ Gantt.prototype.init = function ({ el, tasks }) {
     .orient('left')
     .tickSize(0)
 
-  // 时间纬度
+  // time dimension
   this.compXAxisTimes()
-  // 时间刻度计算
+  // Timescale calculation
   this.initializeXAxis()
-  // 绘制图表
+  // Drawing charts
   this.drawChart()
 }
 
 /**
- * 计算时间纬度
+ * Calculate time latitude
  */
 Gantt.prototype.compXAxisTimes = function () {
   if (this.tasks === undefined || this.tasks.length < 1) {
@@ -90,7 +90,7 @@ Gantt.prototype.compXAxisTimes = function () {
 }
 
 /**
- * 时间刻度处理
+ * Timescale processing
  */
 Gantt.prototype.initializeXAxis = function () {
   this.x = d3.time.scale()
@@ -116,7 +116,7 @@ Gantt.prototype.initializeXAxis = function () {
 }
 
 /**
- * 绘制图表
+ * Drawing charts
  */
 Gantt.prototype.drawChart = function () {
   const svg = d3.select(this.el)
@@ -163,7 +163,7 @@ Gantt.prototype.drawChart = function () {
   })
 }
 /**
- * tip提示
+ * Tip prompt
  */
 Gantt.prototype.tip = function (d) {
   let str = `<div style="text-align: left;word-break:break-all">`

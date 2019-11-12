@@ -146,7 +146,7 @@
        * Carriage return
        */
       _emailEnter () {
-        // 没有list 手填
+        // not list Hand filling
         if (!this.emailList.length) {
           this._manualEmail()
           return
@@ -157,7 +157,7 @@
        * delete email
        */
       _emailDelete () {
-        // 输入法中文情况下禁止删除
+        // Do not delete in case of input method in Chinese
         if (!this.isCn) {
           this.emailWidth = 0
           if (_.isInteger(this.activeIndex)) {

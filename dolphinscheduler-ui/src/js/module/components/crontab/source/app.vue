@@ -42,11 +42,11 @@
           <m-hour v-model="hourVal"></m-hour>
         </template>
 
-        <!-- 天 start -->
+        <!-- day start -->
         <template v-if="tabVal === 'day'">
           <m-day @on-day-value="_onDayValue" @on-week-value="_onWeekValue" :day-val="dayVal" :week-val="weekVal"></m-day>
         </template>
-        <!-- 天 end -->
+        <!-- day end -->
 
         <template v-if="tabVal === 'month'">
           <m-month v-model="monthVal"></m-month>
@@ -131,10 +131,10 @@
     beforeCreate () {
     },
     created () {
-      // 国际化绑win下
+      // International binding under win
       window.localeCrontab = this.locale
 
-      // 初始化
+      // Initialization
       this._reset()
     },
     beforeMount () {

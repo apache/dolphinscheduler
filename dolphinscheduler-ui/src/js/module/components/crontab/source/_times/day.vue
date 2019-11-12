@@ -145,19 +145,19 @@
         dayValue: '*',
         weekValue: '?',
         everyDayVal: '*',
-        WkintervalWeekPerformVal: 2, // 每隔几天执行
-        WkintervalWeekStartVal: 2, // 从周几开始
+        WkintervalWeekPerformVal: 2, // Every few days
+        WkintervalWeekStartVal: 2, // What day of the week
         selectWeekList: _.map(_.cloneDeep(selectList['week']), v => {
           return {
             value: v.value,
             label: `${this.$t(v.label)}`
           }
         }),
-        intervalDayPerformVal: 1, // 每隔天执行
-        intervalDayStartVal: 1, // 从第几天开始
-        WkspecificWeekVal: [], // 具体星期几
+        intervalDayPerformVal: 1, // Every other day
+        intervalDayStartVal: 1, // From the day
+        WkspecificWeekVal: [], // Specific day of the week
         selectSpecificWeekList: selectList['specificWeek'],
-        WkspecificDayVal: [], // 具体星期几
+        WkspecificDayVal: [], // Specific day of the week
         selectSpecificDayList: selectList['day'],
         monthLastDaysVal: 'L',
         monthLastWorkingDays: 'LW',
@@ -185,7 +185,7 @@
       weekVal: String
     },
     methods: {
-      // 每隔几周执行
+      // Every few weeks
       onWkintervalWeekPerform (val) {
         this.WkintervalWeekPerformVal = val
         if (this.radioDay === 'WkintervalWeek') {
@@ -193,81 +193,81 @@
           this.weekValue = `${this.WkintervalWeekStartVal}/${this.WkintervalWeekPerformVal}`
         }
       },
-      // 每隔天执行
+      // Every other day
       onIntervalDayPerform (val) {
         this.intervalDayPerformVal = val
         if (this.radioDay === 'intervalDay') {
           this.dayValue = `${this.intervalDayStartVal}/${this.intervalDayPerformVal}`
         }
       },
-      // 从第天周开始
+      // From week day
       onIntervalDayStart (val) {
         this.intervalDayStartVal = val
         if (this.radioDay === 'intervalDay') {
           this.dayValue = `${this.intervalDayStartVal}/${this.intervalDayPerformVal}`
         }
       },
-      // 在本月底前
+      // By the end of this month
       onMonthTailBefore (val) {
         this.monthTailBeforeVal = val
         if (this.radioDay === 'monthTailBefore') {
           this.dayValue = `L-${this.monthTailBeforeVal}`
         }
       },
-      // 最近工作日
+      // Last working day
       onRecentlyWorkingDaysMonth (val) {
         this.recentlyWorkingDaysMonthVal = val
         if (this.radioDay === 'recentlyWorkingDaysMonth') {
           this.dayValue = `${this.recentlyWorkingDaysMonthVal}W`
         }
       },
-      // 在这个月的天
+      // On the day of this month
       onWkmonthNumWeeksDay (val) {
         this.WkmonthNumWeeksDayVal = val
         this.weekValue = `${this.WkmonthNumWeeksWeekVal}#${this.WkmonthNumWeeksDayVal}`
       },
 
-      // 重置每一天
+      // Reset every day
       everyDayReset () {
         this.dayValue = _.cloneDeep(this.everyDayVal)
       },
-      // 重置间隔周 从*开始
+      // Reset interval week starts from *
       WkintervalWeekReset () {
         this.weekValue = `${this.WkintervalWeekStartVal}/${this.WkintervalWeekPerformVal}`
       },
-      // 重置间隔天 从*开始
+      // Reset interval days from *
       intervalDayReset () {
         this.dayValue = `${this.intervalDayStartVal}/${this.intervalDayPerformVal}`
       },
-      // 具体周（多选）
+      // Specific week (multiple choices)
       WkspecificWeekReset () {
         this.weekValue = this.WkspecificWeekVal.length ? this.WkspecificWeekVal.join(',') : '*'
       },
-      // 具体天数（多选）
+      // Specific days (multiple choices)
       specificDayReset () {
         this.dayValue = this.WkspecificDayVal.length ? this.WkspecificDayVal.join(',') : '*'
       },
-      // 在这个月的最后一天
+      // On the last day of the month
       monthLastDaysReset () {
         this.dayValue = _.cloneDeep(this.monthLastDaysVal)
       },
-      // 在这个月的最后一个工作日
+      // On the last working day of the month
       monthLastWorkingDaysReset () {
         this.dayValue = _.cloneDeep(this.monthLastWorkingDays)
       },
-      // 在这个月的最后一个*
+      // At the end of the month*
       monthLastWeeksReset () {
         this.dayValue = _.cloneDeep(this.monthLastWeeksVal)
       },
-      // 在本月底前
+      // By the end of this month
       monthTailBeforeReset () {
         this.dayValue = `L-${this.monthTailBeforeVal}`
       },
-      // 最近的工作日（周一至周五）至本月
+      // Last working day (Monday to Friday) to this month
       recentlyWorkingDaysMonthReset () {
         this.dayValue = `${this.recentlyWorkingDaysMonthVal}W`
       },
-      // 在这个月的第
+      // On the day of this month
       WkmonthNumReset () {
         this.weekValue = `${this.WkmonthNumWeeksWeekVal}#${this.WkmonthNumWeeksDayVal}`
       }
@@ -281,7 +281,7 @@
         this.$emit('on-week-value', val)
         // console.log('weekValue=>  ' + val)
       },
-      // 选中类型
+      // Selected type
       radioDay (val) {
         switch (val) {
           case 'everyDay':
@@ -336,14 +336,14 @@
           this.weekValue = `${val}/${this.WkintervalWeekPerformVal}`
         }
       },
-      // 具体星期几（多选）
+      // Specific day of the week (multiple choice)
       WkspecificWeekVal (val) {
         if (this.radioDay === 'WkspecificWeek') {
           this.dayValue = `?`
           this.weekValue = val.join(',')
         }
       },
-      // 具体天数（多选）
+      // Specific days (multiple choices)
       WkspecificDayVal (val) {
         if (this.radioDay === 'specificDay') {
           this.weekValue = `?`
@@ -371,19 +371,19 @@
       let isWeek1 = $weekVal.indexOf('/') !== -1
       let isWeek2 = $weekVal.indexOf('#') !== -1
 
-      // 初始化
+      // Initialization
       if ($dayVal === '*' && $weekVal === '?') {
-        console.log('初始化')
+        console.log('Initialization')
         this.radioDay = 'everyDay'
         return
       }
 
-      // 周
+      // week
       if (isWeek1 || isWeek2 || isWeek($weekVal)) {
         this.dayValue = `?`
 
         /**
-         * 按顺序标序号处理(除去天)
+         * Processing by sequence number (excluding days)
          * @param [
          * WkintervalWeek=>(/),
          * WkspecificWeek=>(TUE,WED),
@@ -414,7 +414,7 @@
           this.radioDay = 'WkmonthNumWeeks'
         }
 
-        // 处理周
+        // Processing week
         if (isStr($weekVal, '/')) {
           hanleWeekOne()
         } else if (isStr($weekVal, '#')) {
@@ -426,7 +426,7 @@
         this.weekValue = `?`
 
         /**
-         * 按顺序标序号处理(除去周)
+         * Processing by sequence number (excluding week)
          * @param [
          * everyDay=>(*),
          * intervalDay=>(1/1),

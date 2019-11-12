@@ -18,7 +18,7 @@
 import i18n from '@/module/i18n'
 
 /**
- * 状态码表
+ * State code table
  */
 let stateType = [
   {

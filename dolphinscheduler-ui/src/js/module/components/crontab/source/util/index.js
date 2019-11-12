@@ -18,9 +18,9 @@
 import _ from 'lodash'
 
 /**
- * 生成指定区间数字
- * @param start 起始数值
- * @param end 结束数值
+ * Generate specified interval number
+ * @param start Starting value
+ * @param end End value
  */
 const range = (start, end) => {
   let length = end - start + 1

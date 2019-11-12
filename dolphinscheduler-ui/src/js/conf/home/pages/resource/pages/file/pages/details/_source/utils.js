@@ -16,7 +16,7 @@
  */
 
 /**
- * 处理后缀名
+ * Processing suffix
  */
 const handlerSuffix = {
   '.txt': 'textile',

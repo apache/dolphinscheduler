@@ -91,7 +91,7 @@
       event: 'secondValueEvent'
     },
     methods: {
-      // 间隔执行时间（1）
+      // Interval execution time（1）
       onIntervalPerform (val) {
         console.log(val)
         console.log('++')
@@ -100,39 +100,39 @@
           this.secondValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
         }
       },
-      // 间隔开始时间（2）
+      // Interval start time（2）
       onIntervalStart (val) {
         this.intervalStartVal = val
         if (this.radioSecond === 'intervalSecond') {
           this.secondValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
         }
       },
-      // 具体秒
+      // Specific seconds
       onSpecificSeconds (arr) {
       },
-      // 周期开始值
+      // Cycle start value
       onCycleStart (val) {
         this.cycleStartVal = val
         if (this.radioSecond === 'cycleSecond') {
           this.secondValue = `${this.cycleStartVal}-${this.cycleEndVal}`
         }
       },
-      // 周期结束值
+      // Cycle end value
       onCycleEnd (val) {
         this.cycleEndVal = val
         if (this.radioSecond === 'cycleSecond') {
           this.secondValue = `${this.cycleStartVal}-${this.cycleEndVal}`
         }
       },
-      // 重置每一秒
+      // Reset every second
       everyReset () {
         this.secondValue = '*'
       },
-      // 重置间隔秒
+      // Reset interval seconds
       intervalReset () {
         this.secondValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
       },
-      // 重置具体秒数
+      // Reset specific seconds
       specificReset () {
         if (this.specificSecondsVal.length) {
           this.secondValue = this.specificSecondsVal.join(',')
@@ -140,31 +140,31 @@
           this.secondValue = '*'
         }
       },
-      // 重置周期秒数
+      // Reset cycle seconds
       cycleReset () {
         this.secondValue = `${this.cycleStartVal}-${this.cycleEndVal}`
       },
       /**
-       * 解析参数值
+       * Parse parameter value
        */
       analyticalValue () {
         return new Promise((resolve, reject) => {
           let $secondVal = _.cloneDeep(this.value)
-          // 间隔秒
+          // Interval seconds
           let $interval = isStr($secondVal, '/')
-          // 具体秒
+          // Specific seconds
           let $specific = isStr($secondVal, ',')
-          // 周期秒
+          // Cycle second
           let $cycle = isStr($secondVal, '-')
 
-          // 每一秒
+          // Every second
           if ($secondVal === '*') {
             this.radioSecond = 'everySecond'
             this.secondValue = '*'
             return
           }
 
-          // 正整数(秒)
+          // Positive integer (seconds)
           if ($secondVal.length === 1 && _.isInteger(parseInt($secondVal)) ||
             $secondVal.length === 2 && _.isInteger(parseInt($secondVal))
           ) {
@@ -173,7 +173,7 @@
             return
           }
 
-          // 间隔秒
+          // Interval seconds
           if ($interval) {
             this.radioSecond = 'intervalSecond'
             this.intervalStartVal = parseInt($interval[0])
@@ -182,14 +182,14 @@
             return
           }
 
-          // 具体秒数
+          // Specific seconds
           if ($specific) {
             this.radioSecond = 'specificSecond'
             this.specificSecondsVal = $specific
             return
           }
 
-          // 周期秒
+          // Cycle second
           if ($cycle) {
             this.radioSecond = 'cycleSecond'
             this.cycleStartVal = parseInt($cycle[0])
@@ -202,17 +202,17 @@
       }
     },
     watch: {
-      // value变化重新解析结构
+      // Value change reparse structure
       value () {
         this.analyticalValue().then(() => {
           console.log('数据结构解析成功！')
         })
       },
-      // 导出值
+      // Derived value
       secondValue (val) {
         this.$emit('secondValueEvent', val)
       },
-      // 选中类型
+      // Selected type
       radioSecond (val) {
         switch (val) {
           case 'everySecond':
@@ -229,7 +229,7 @@
             break
         }
       },
-      // 具体秒数
+      // Specific seconds
       specificSecondsVal (arr) {
         this.secondValue = arr.join(',')
       }
@@ -238,7 +238,7 @@
     },
     created () {
       this.analyticalValue().then(() => {
-        console.log('数据结构解析成功！')
+        console.log('Data structure parsing succeeded!')
       })
     },
     beforeMount () {

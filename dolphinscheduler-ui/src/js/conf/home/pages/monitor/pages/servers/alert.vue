@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction title="Alert服务">
+  <m-list-construction title="Alert Service">
     <template slot="content">
       <template v-if="masterList.length">
         <m-list :list="masterList"></m-list>

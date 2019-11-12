@@ -20,29 +20,29 @@ import { checkKeyInModel, init } from '../../common'
 const TYPE = 'scatter'
 
 /**
- * 气泡图
+ * Bubble chart
  */
 export default class Scatter extends Base {
   /**
-   * 单独导出时调用的初始化方法
-   * @param {*} el 选择器或者 DOM 对象
-   * @param {*} data 数据源
-   * @param {*} options 可选项
+   * Initialization method called on separate export
+   * @param {*} el Selector or DOM object
+   * @param {*} data data source
+   * @param {*} options Optional
    */
   static init (el, data, options) {
     return init(Scatter, el, data, options)
   }
 
   /**
-   * 将用户配置转换为符合 ECharts API 格式的配置格式
+   * Convert user configuration to a configuration format that conforms to the format of echarts API
    */
   transform () {
     const {
-      // 数据
+      // data
       data = [],
-      // 图表标题
-      title = '气泡图',
-      // 属性字典
+      // Chart title
+      title = 'Bubble chart',
+      // Attribute dictionary
       keyMap = {
         xKey: 'x',
         yKey: 'y',
@@ -53,7 +53,7 @@ export default class Scatter extends Base {
     } = this.settings
 
     if (data.length === 0) {
-      throw new Error('数据源为空！')
+      throw new Error('Data source is empty!')
     }
 
     const legendData = []
@@ -72,12 +72,12 @@ export default class Scatter extends Base {
         ...other
       } = data[i]
 
-      // 图例
+      // Legend
       if (!legendData.includes(legendItem)) {
         legendData.push(legendItem)
       }
 
-      // 系列
+      // series
       let targetSeries = series.find(s => s.name === legendItem)
       if (!targetSeries) {
         targetSeries = {
@@ -115,17 +115,17 @@ export default class Scatter extends Base {
   }
 
   /**
-   * 绘制图表
+   * Drawing charts
    */
   apply () {
     const { title, series, legendData = [] } = this.options
 
     let {
-      // 自定义 x 轴
+      // Custom X axis
       xAxis,
-      // 自定义 y 轴
+      // Custom Y axis
       yAxis,
-      // 注入配置到 series
+      // Injection configuration to series
       insertSeries
     } = this.settings
     let _series = series

@@ -55,15 +55,15 @@
     name: 'instance-gantt-index',
     data () {
       return {
-        // 节点状态
+        // Node state
         tasksState: tasksState,
         // loading
         isLoading: true,
-        // gantt数据
+        // gantt data
         ganttData: {
           taskNames: []
         },
-        // 是否有数据
+        // Data available
         isNodata: false
       }
     },
@@ -71,7 +71,7 @@
     methods: {
       ...mapActions('dag', ['getViewGantt']),
       /**
-       * 获取数据
+       * get data
        */
       _getViewGantt () {
         this.isLoading = true

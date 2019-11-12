@@ -55,7 +55,7 @@ var jslibs = {
   'local': []
 }
 
-// css集合
+// css
 csslibs = {
   'base': [
     'normalize/7.0.0/normalize.min.css',
@@ -72,14 +72,14 @@ csslibs = {
   ]
 }
 
-// 创建文件夹目录
+// Create folder directory
 var dirPath = path.resolve(__dirname, '..', 'src/combo/' + version)
 
 if (!fs.existsSync(dirPath)) {
   fs.mkdirSync(dirPath)
-  console.log('文件夹创建成功')
+  console.log('Folder created successfully')
 } else {
-  console.log('文件夹已存在')
+  console.log('Folder already exists')
 }
 
 var jsKeys = Object.keys(jslibs)
@@ -93,7 +93,7 @@ jsUrl.forEach((v, i) => {
   var stream = fs.createWriteStream(path.join(dirPath, jsKeys[i] + '.js'), { encoding: 'utf-8' })
   request(url).pipe(stream).on('close', function (err) {
     if (!err) {
-      console.log('文件[' + version + '/' + jsKeys[i] + '.js' + ']下载完毕')
+      console.log('file[' + version + '/' + jsKeys[i] + '.js' + ']Download completed')
     }
   })
 })
@@ -109,7 +109,7 @@ cssUrl.forEach((v, i) => {
   var stream = fs.createWriteStream(path.join(dirPath, cssKeys[i] + '.css'), { encoding: 'utf-8' })
   request(url).pipe(stream).on('close', function (err) {
     if (!err) {
-      console.log('文件[' + version + '/' + cssKeys[i] + '.css' + ']下载完毕')
+      console.log('file[' + version + '/' + cssKeys[i] + '.css' + ']Download completed')
     }
   })
 })

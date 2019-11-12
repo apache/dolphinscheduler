@@ -20,27 +20,27 @@ import { checkKeyInModel, init } from '../../common'
 const TYPE = 'bar'
 
 /**
- * 柱状图
+ * Histogram
  */
 export default class Bar extends Base {
   /**
-   * 单独导出时调用的初始化方法
-   * @param {*} el 选择器或者 DOM 对象
-   * @param {*} data 数据源
-   * @param {*} options 可选项
+   * Initialization method called on separate export
+   * @param {*} el Selector or DOM object
+   * @param {*} data data source
+   * @param {*} options Optional
    */
   static init (el, data, options) {
     return init(Bar, el, data, options)
   }
 
   /**
-   * 将用户配置转换为符合 ECharts API 格式的配置格式
+   * Convert user configuration to a configuration format that conforms to the format of echarts API
    */
   transform () {
     const { data = [] } = this.settings
 
     if (data.length === 0) {
-      throw new Error('数据源为空！')
+      throw new Error('Data source is empty！')
     }
 
     if (Object.keys(data[0]).length > 2) {
@@ -52,22 +52,22 @@ export default class Bar extends Base {
   }
 
   /**
-   * 单条柱
+   * Single column
    */
   setSingleBar () {
     const {
-      // 数据
+      // data
       data = [],
-      // 属性字典
+      // Attribute dictionary
       keyMap = {
         xAxisKey: 'key',
         dataKey: 'value'
       },
-      // 图表标题
-      title = '单条柱状图'
+      // Chart title
+      title = 'Single bar histogram'
     } = this.settings
 
-    // x 轴对应属性名，数据值对应的属性名
+    // X axis corresponds to attribute name, data value corresponds to attribute name
     const { xAxisKey, dataKey } = keyMap
     checkKeyInModel(data[0], xAxisKey, dataKey)
 
@@ -89,27 +89,27 @@ export default class Bar extends Base {
   }
 
   /**
-   * 多条柱
+   * Multiple columns
    */
   setMultipleBars () {
     const {
-      // 数据
+      // data
       data = [],
-      // 属性字典
+      // Attribute dictionary
       keyMap = {
         xAxisKey: 'key',
         legendKey: 'typeName',
         dataKey: 'value'
       },
-      // 图表标题
-      title = '多条柱状图',
-      // 折柱混合时，指定的折线数据索引
+      // Chart title
+      title = 'Multiple histogram',
+      // The specified index of polyline data when the column is mixed
       lineTypes
     } = this.settings
 
-    // x 轴对应属性名，图例对应的属性名，数据值对应的属性名
+    // Attribute name corresponding to X axis, legend and data value
     const { xAxisKey, legendKey, dataKey } = keyMap
-    // 是否使用时间轴数据
+    // Use timeline data or not
     const timeline = Object.keys(data[0]).length === 4
     const timelineKey = keyMap.timelineKey || 'timeline'
     if (timeline) {
@@ -118,7 +118,7 @@ export default class Bar extends Base {
       checkKeyInModel(data[0], xAxisKey, legendKey, dataKey)
     }
 
-    // 规范折柱混合索引
+    // Standard mixed index of folded columns
     let lineTypeList = []
     if (lineTypes) {
       if (!Array.isArray(lineTypes)) {
@@ -128,7 +128,7 @@ export default class Bar extends Base {
       }
     }
 
-    // 时间轴默认配置
+    // Timeline default configuration
     const timelineOptions = {
       timeline: {
         axisType: 'category',
@@ -139,7 +139,7 @@ export default class Bar extends Base {
       options: []
     }
 
-    // 初始值
+    // Initial value
     const legendData = []
     const series = []
     const xAxis = {
@@ -151,24 +151,24 @@ export default class Bar extends Base {
       const xAxisItem = data[i][xAxisKey]
       const dataItem = data[i][dataKey]
 
-      // 图例
+      // Legend
       if (!legendData.includes(legendItem)) {
         legendData.push(legendItem)
       }
 
-      // x 轴
+      // x axis
       if (!xAxis.data.includes(xAxisItem)) {
         xAxis.data.push(xAxisItem)
       }
 
-      // 时间轴
+      // time axis
       if (timeline) {
         const timelineItem = data[i][timelineKey]
-        // 设置时间轴 label
+        // Set timeline label
         if (!timelineOptions.timeline.data.includes(timelineItem)) {
           timelineOptions.timeline.data.push(timelineItem)
         }
-        // 通用的系列配置
+        // Universal family configuration
         if (!series.some(s => s.name === legendItem)) {
           let seriesType = TYPE
           if (lineTypeList.length !== 0 && lineTypeList.includes(legendItem)) {
@@ -179,10 +179,10 @@ export default class Bar extends Base {
             type: seriesType
           })
         }
-        // 系列数据
+        // Series data
         let targetOptions = timelineOptions.options.find(o => o._helpName === timelineItem)
         if (!targetOptions) {
-          // 初始化 option
+          // Initialization option
           targetOptions = {
             _helpName: timelineItem,
             title: { text: title.replace('$timeline', timelineItem) },
@@ -192,7 +192,7 @@ export default class Bar extends Base {
         }
         let targetSeries = targetOptions.series.find(d => d._helpName === legendItem)
         if (!targetSeries) {
-          // 初始化系列数据
+          // Initialize series data
           targetSeries = {
             _helpName: legendItem,
             data: []
@@ -201,7 +201,7 @@ export default class Bar extends Base {
         }
         targetSeries.data.push(dataItem)
       } else {
-        // 非时间轴数据处理
+        // Non timeline data processing
         let targetSeries = series.find(s => s.name === legendItem)
         if (!targetSeries) {
           let seriesType = TYPE
@@ -226,28 +226,28 @@ export default class Bar extends Base {
   }
 
   /**
-   * 绘制图表
+   * Drawing charts
    */
   apply () {
     const { title, xAxis, series, legendData, timelineOptions } = this.options
     const {
-      // 是否为横向图
+      // Whether it is a horizontal drawing
       reverseAxis = false,
-      // 自定义 y 轴
+      // Custom Y axis
       yAxis,
-      // 是否为堆叠图
+      // Is it a stacking diagram
       stack = false,
-      // 注入配置到 series
+      // Injection configuration to series
       insertSeries
     } = this.settings
     const valueAxis = { type: 'value' }
     let yAxisModel = reverseAxis ? xAxis : valueAxis
     let xAxisModel = reverseAxis ? valueAxis : xAxis
-    // 使用自定义 y 轴覆盖
+    // Use custom Y-axis overlay
     if (yAxis) {
       yAxisModel = yAxis
     }
-    // 设置堆叠图
+    // Set up stack chart
     if (stack) {
       series.forEach(set => {
         set.stack = '总量'
@@ -265,7 +265,7 @@ export default class Bar extends Base {
       _series = this.injectDataIntoSeries(insertSeries, _series)
     }
 
-    // 时间轴
+    // time axis
     if (timelineOptions) {
       let opts = {
         baseOption: {
@@ -293,7 +293,7 @@ export default class Bar extends Base {
       this.echart.clear()
       this.echart.setOption(opts, true)
     } else {
-      // 简单图表标题为空时，图表垂直居中
+      // When the simple chart title is empty, the chart is vertically centered
       const top = !title && this.simple ? '3%' : 60
 
       let opts = {

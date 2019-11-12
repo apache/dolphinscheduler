@@ -20,27 +20,27 @@ import { checkKeyInModel, init } from '../../common'
 const TYPE = 'line'
 
 /**
- * 折线图
+ * Broken line diagram
  */
 export default class Line extends Base {
   /**
-   * 单独导出时调用的初始化方法
-   * @param {*} el 选择器或者 DOM 对象
-   * @param {*} data 数据源
-   * @param {*} options 可选项
+   * Initialization method called on separate export
+   * @param {*} el Selector or DOM object
+   * @param {*} data data source
+   * @param {*} options Optional
    */
   static init (el, data, options) {
     return init(Line, el, data, options)
   }
 
   /**
-   * 将用户配置转换为符合 ECharts API 格式的配置格式
+   * Convert user configuration to a configuration format that conforms to the format of echarts API
    */
   transform () {
     const { data = [] } = this.settings
 
     if (data.length === 0) {
-      throw new Error('数据源为空！')
+      throw new Error('Data source is empty!')
     }
 
     if (Object.keys(data[0]).length > 2) {
@@ -52,22 +52,22 @@ export default class Line extends Base {
   }
 
   /**
-   * 单条折线
+   * Single broken line
    */
   setSingleLine () {
     const {
-      // 数据
+      // data
       data = [],
-      // 属性字典
+      // Attribute dictionary
       keyMap = {
         xAxisKey: 'key',
         dataKey: 'value'
       },
-      // 图表标题
-      title = '单条折线图'
+      // Chart title
+      title = 'Single line chart'
     } = this.settings
 
-    // x 轴对应属性名，数据值对应的属性名
+    // X axis corresponds to attribute name, data value corresponds to attribute name
     const { xAxisKey, dataKey } = keyMap
     checkKeyInModel(data[0], xAxisKey, dataKey)
 
@@ -89,23 +89,23 @@ export default class Line extends Base {
   }
 
   /**
-   * 多条折线
+   * Multiple broken lines
    */
   setMultipleLines () {
     const {
-      // 数据
+      // data
       data = [],
-      // 属性字典
+      // Attribute dictionary
       keyMap = {
         xAxisKey: 'key',
         legendKey: 'typeName',
         dataKey: 'value'
       },
-      // 图表标题
-      title = '多条折线图'
+      // Chart title
+      title = 'Multiple line chart'
     } = this.settings
 
-    // x 轴对应属性名，图例对应的属性名，数据值对应的属性名
+    // Attribute name corresponding to X axis, legend and data value
     const { xAxisKey, legendKey, dataKey } = keyMap
     checkKeyInModel(data[0], xAxisKey, legendKey, dataKey)
 
@@ -121,17 +121,17 @@ export default class Line extends Base {
       const xAxisItem = data[i][xAxisKey]
       const dataItem = data[i][dataKey]
 
-      // 图例
+      // Legend
       if (!legendData.includes(legendItem)) {
         legendData.push(legendItem)
       }
 
-      // x 轴
+      // X axis
       if (!xAxis.data.includes(xAxisItem)) {
         xAxis.data.push(xAxisItem)
       }
 
-      // 系列
+      // series
       let targetSeries = series.find(s => s.name === legendItem)
       if (!targetSeries) {
         targetSeries = {
@@ -148,26 +148,26 @@ export default class Line extends Base {
   }
 
   /**
-   * 绘制图表
+   * Drawing charts
    */
   apply () {
     const { title, xAxis, series, legendData = [] } = this.options
     const {
-      // 是否为横向图
+      // Whether it is a horizontal drawing
       reverseAxis = false,
-      // 自定义 y 轴
+      // Custom Y axis
       yAxis,
-      // 注入配置到 series
+      // Injection configuration to series
       insertSeries
     } = this.settings
     const valueAxis = { type: 'value' }
     let yAxisModel = reverseAxis ? xAxis : valueAxis
     let xAxisModel = reverseAxis ? valueAxis : xAxis
-    // 使用自定义 y 轴覆盖
+    // Use custom Y-axis overlay
     if (yAxis) {
       yAxisModel = yAxis
     }
-    // 简单图表标题为空时，图表垂直居中
+    // When the simple chart title is empty, the chart is vertically centered
     const top = !title && this.simple ? '3%' : 60
 
     let _series = series

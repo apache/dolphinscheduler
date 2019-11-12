@@ -52,17 +52,17 @@
       return {
         // loading
         isLoading: true,
-        // 总条数
+        // total
         total: null,
-        // 数据
+        // data
         processInstanceList: [],
         // Parameter
         searchParams: {
-          // 搜索关键词
+          // Search keywords
           searchVal: '',
-          // 一页条数
+          // Number of pages
           pageSize: 10,
-          // 当前页
+          // Current page
           pageNo: 1,
           // host
           host: '',
@@ -87,7 +87,7 @@
         this._debounceGET()
       },
       /**
-       * 分页事件
+       * Paging event
        */
       _page (val) {
         this.searchParams.pageNo = val
@@ -95,7 +95,7 @@
         this._debounceGET()
       },
       /**
-       * 获取list数据
+       * get list data
        */
       _getProcessInstanceListP (flag) {
         this.isLoading = !flag
@@ -109,20 +109,20 @@
         })
       },
       /**
-       * 更新
+       * update
        */
       _onUpdate () {
         this._debounceGET()
       },
       /**
-       * 路由变动
+       * Routing changes
        */
       _routerView () {
         return this.$route.name === 'projects-instance-details'
       },
       /**
-       * 防抖请求接口
-       * @desc 防止函数多次被调用
+       * Anti shake request interface
+       * @desc Prevent functions from being called multiple times
        */
       _debounceGET: _.debounce(function (flag) {
         this._getProcessInstanceListP(flag)
@@ -132,7 +132,7 @@
       })
     },
     watch: {
-      // 路由变动
+      // Routing changes
       '$route' (a, b) {
         if (a.name === 'instance' && b.name === 'projects-instance-details') {
           this._debounceGET()
@@ -149,27 +149,27 @@
       }
     },
     created () {
-      // 删除流程定义id
+      // Delete process definition ID
       localStore.removeItem('subProcessId')
 
-      // 路由参数合并
+      // Route parameter merge
       if (!_.isEmpty(this.$route.query)) {
         this.searchParams = _.assign(this.searchParams, this.$route.query)
       }
 
-      // 根据路由判断请求数据
+      // Judge the request data according to the route
       if (!this._routerView()) {
         this._debounceGET()
       }
     },
     mounted () {
-      // 轮循获取状态
+      // Cycle acquisition status
       this.setIntervalP = setInterval(() => {
         this._debounceGET('false')
       }, 90000)
     },
     beforeDestroy () {
-      // 销毁轮循
+      // Destruction wheel
       clearInterval(this.setIntervalP)
     },
     components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
