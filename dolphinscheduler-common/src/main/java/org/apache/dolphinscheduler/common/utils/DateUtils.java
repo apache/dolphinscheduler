@@ -63,7 +63,7 @@ public class DateUtils {
     }
 
     /**
-     * @param format
+     * @param format format
      * @return get the date string in the specified format of the current time
      */
     public static String getCurrentTime(String format) {
@@ -72,7 +72,7 @@ public class DateUtils {
     }
 
     /**
-     * @param date
+     * @param date date
      * @param format e.g. yyyy-MM-dd HH:mm:ss
      * @return get the formatted date string
      */
@@ -82,7 +82,7 @@ public class DateUtils {
     }
 
     /**
-     * @param localDateTime
+     * @param localDateTime local data time
      * @param format        e.g. yyyy-MM-dd HH:mm:ss
      * @return get the formatted date string
      */
@@ -91,7 +91,7 @@ public class DateUtils {
     }
 
     /**
-     * @param date
+     * @param date date
      * @return convert time to yyyy-MM-dd HH:mm:ss format
      */
     public static String dateToString(Date date) {
@@ -100,7 +100,8 @@ public class DateUtils {
 
 
     /**
-     * @param date
+     * @param date date
+     * @param format  format
      * @return convert string to date and time
      */
     public static Date parse(String date, String format) {
@@ -117,8 +118,8 @@ public class DateUtils {
     /**
      * convert date str to yyyy-MM-dd HH:mm:ss format
      *
-     * @param str
-     * @return
+     * @param str date string
+     * @return yyyy-MM-dd HH:mm:ss format
      */
     public static Date stringToDate(String str) {
         return parse(str, Constants.YYYY_MM_DD_HH_MM_SS);
@@ -127,9 +128,9 @@ public class DateUtils {
     /**
      * get seconds between two dates
      *
-     * @param d1
-     * @param d2
-     * @return
+     * @param d1 date1
+     * @param d2 date2
+     * @return differ seconds
      */
     public static long differSec(Date d1, Date d2) {
         if(d1 == null || d2 == null){
@@ -141,9 +142,9 @@ public class DateUtils {
     /**
      * get ms between two dates
      *
-     * @param d1
-     * @param d2
-     * @return
+     * @param d1 date1
+     * @param d2 date2
+     * @return differ ms
      */
     public static long differMs(Date d1, Date d2) {
         return Math.abs(d1.getTime() - d2.getTime());
@@ -153,9 +154,9 @@ public class DateUtils {
     /**
      * get hours between two dates
      *
-     * @param d1
-     * @param d2
-     * @return
+     * @param d1 date1
+     * @param d2 date2
+     * @return differ hours
      */
     public static long diffHours(Date d1, Date d2) {
         return (long) Math.ceil(diffMin(d1, d2) / 60.0);
@@ -164,9 +165,9 @@ public class DateUtils {
     /**
      * get minutes between two dates
      *
-     * @param d1
-     * @param d2
-     * @return
+     * @param d1 date1
+     * @param d2 date2
+     * @return differ minutes
      */
     public static long diffMin(Date d1, Date d2) {
         return (long) Math.ceil(differSec(d1, d2) / 60.0);
@@ -176,9 +177,9 @@ public class DateUtils {
     /**
      * get the date of the specified date in the days before and after
      *
-     * @param date
-     * @param day
-     * @return
+     * @param date date
+     * @param day day
+     * @return the date of the specified date in the days before and after
      */
     public static Date getSomeDay(Date date, int day) {
         Calendar calendar = Calendar.getInstance();
@@ -190,9 +191,9 @@ public class DateUtils {
     /**
      * compare two dates
      *
-     * @param future
-     * @param old
-     * @return
+     * @param future future date
+     * @param old old date
+     * @return true if future time greater than old time
      */
     public static boolean compare(Date future, Date old) {
         return future.getTime() > old.getTime();
@@ -201,8 +202,8 @@ public class DateUtils {
     /**
      * convert schedule string to date
      *
-     * @param schedule
-     * @return
+     * @param schedule schedule
+     * @return convert schedule string to date
      */
     public static Date getScheduleDate(String schedule) {
         return stringToDate(schedule);
@@ -211,8 +212,8 @@ public class DateUtils {
     /**
      * format time to readable
      *
-     * @param ms
-     * @return
+     * @param ms ms
+     * @return format time
      */
     public static String format2Readable(long ms) {
 
@@ -228,7 +229,9 @@ public class DateUtils {
     /**
      * get monday
      * <p>
-     * note: Set the first day of the week to Monday, the default is Sunday
+     * note: Set the first day of the week to Monday, the default is Sunday</p>
+     * @param date date
+     * @return get monday
      */
     public static Date getMonday(Date date) {
         Calendar cal = Calendar.getInstance();
@@ -245,6 +248,8 @@ public class DateUtils {
      * get sunday
      * <p>
      * note: Set the first day of the week to Monday, the default is Sunday
+     * @param date date
+     * @return get sunday
      */
     public static Date getSunday(Date date) {
         Calendar cal = Calendar.getInstance();
@@ -258,7 +263,9 @@ public class DateUtils {
 
     /**
      * get first day of month
-     */
+     * @param date date
+     * @return first day of month
+     * */
     public static Date getFirstDayOfMonth(Date date) {
         Calendar cal = Calendar.getInstance();
 
@@ -269,8 +276,11 @@ public class DateUtils {
     }
 
     /**
-     * get first day of month
-     */
+     * get some hour of day
+     * @param date date
+     * @param hours hours
+     * @return some hour of day
+     * */
     public static Date getSomeHourOfDay(Date date, int hours) {
         Calendar cal = Calendar.getInstance();
 
@@ -284,6 +294,8 @@ public class DateUtils {
 
     /**
      * get last day of month
+     * @param  date date
+     * @return  get last day of month
      */
     public static Date getLastDayOfMonth(Date date) {
         Calendar cal = Calendar.getInstance();
@@ -300,8 +312,8 @@ public class DateUtils {
     /**
      * return YYYY-MM-DD 00:00:00
      *
-     * @param inputDay
-     * @return
+     * @param inputDay date
+     * @return start day
      */
     public static Date getStartOfDay(Date inputDay) {
         Calendar cal = Calendar.getInstance();
@@ -315,8 +327,8 @@ public class DateUtils {
     /**
      * return YYYY-MM-DD 23:59:59
      *
-     * @param inputDay
-     * @return
+     * @param inputDay day
+     * @return end of day
      */
     public static Date getEndOfDay(Date inputDay) {
         Calendar cal = Calendar.getInstance();
@@ -330,8 +342,8 @@ public class DateUtils {
     /**
      * return YYYY-MM-DD 00:00:00
      *
-     * @param inputDay
-     * @return
+     * @param inputDay day
+     * @return start of hour
      */
     public static Date getStartOfHour(Date inputDay) {
         Calendar cal = Calendar.getInstance();
@@ -344,8 +356,8 @@ public class DateUtils {
     /**
      * return YYYY-MM-DD 23:59:59
      *
-     * @param inputDay
-     * @return
+     * @param inputDay day
+     * @return end of hour
      */
     public static Date getEndOfHour(Date inputDay) {
         Calendar cal = Calendar.getInstance();

@@ -42,7 +42,7 @@ public class SchemaUtils {
 
 	/**
 	 * Gets upgradable schemas for all upgrade directories
-	 * @return
+	 * @return all schema list
 	 */
 	@SuppressWarnings("unchecked")
 	public static List<String> getAllSchemaList() {
@@ -86,9 +86,9 @@ public class SchemaUtils {
 	
 	/**
 	 * Determine whether schemaVersion is higher than version
-	 * @param schemaVersion
-	 * @param version
-	 * @return
+	 * @param schemaVersion schema version
+	 * @param version version
+	 * @return  Determine whether schemaVersion is higher than version
 	 */
 	public static boolean isAGreatVersion(String schemaVersion, String version) {
 		if(StringUtils.isEmpty(schemaVersion) || StringUtils.isEmpty(version)) {
@@ -112,7 +112,7 @@ public class SchemaUtils {
 	
 	/**
 	 * Gets the current software version number of the system
-	 * @return
+	 * @return current software version
 	 */
 	public static String getSoftVersion() {
 		String soft_version;
@@ -131,8 +131,8 @@ public class SchemaUtils {
 	
 	/**
 	 * Strips the string of space carriage returns and tabs
-	 * @param str
-	 * @return
+	 * @param str string
+	 * @return string removed blank
 	 */
 	public static String replaceBlank(String str) {
 		String dest = "";

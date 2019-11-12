@@ -48,7 +48,7 @@ public class TimePlaceholderUtils {
      *
      * @param value                 the value containing the placeholders to be replaced
      * @param date                  custom date
-     * @param ignoreUnresolvablePlaceholders
+     * @param ignoreUnresolvablePlaceholders ignore unresolvable placeholders
      * @return the supplied value with placeholders replaced inline
      */
     public static String replacePlaceholders(String value, Date date, boolean ignoreUnresolvablePlaceholders) {
@@ -72,8 +72,8 @@ public class TimePlaceholderUtils {
     /**
      * calculate expression's value
      *
-     * @param expression
-     * @return
+     * @param expression expression
+     * @return expression's value
      */
     public static Integer calculate(String expression) {
         expression = StringUtils.trim(expression);
@@ -320,8 +320,9 @@ public class TimePlaceholderUtils {
 
     /**
      * calculate time expresstion
-     *
-     * @return <date, date format>
+     * @param expression expresstion
+     * @param date  date
+     * @return  map with date, date format
      */
     public static Map.Entry<Date, String> calcTimeExpression(String expression, Date date) {
         Map.Entry<Date, String> resultEntry;
@@ -345,8 +346,9 @@ public class TimePlaceholderUtils {
 
     /**
      * get first day of month
-     *
-     * @return
+     * @param expression expresstion
+     * @param date  date
+     * @return first day of month
      */
     public static Map.Entry<Date, String> calcMonthBegin(String expression, Date date) {
         String addMonthExpr = expression.substring(Constants.MONTH_BEGIN.length() + 1, expression.length() - 1);
@@ -367,7 +369,9 @@ public class TimePlaceholderUtils {
 
     /**
      * get last day of month
-     *
+     * @param expression expresstion
+     * @param date  date
+     * @return last day of month
      */
     public static Map.Entry<Date, String> calcMonthEnd(String expression, Date date) {
         String addMonthExpr = expression.substring(Constants.MONTH_END.length() + 1, expression.length() - 1);
@@ -388,7 +392,8 @@ public class TimePlaceholderUtils {
 
     /**
      * get first day of week
-     *
+     * @param expression expresstion
+     * @param date  date
      * @return monday
      */
     public static Map.Entry<Date, String> calcWeekStart(String expression, Date date) {
@@ -409,7 +414,9 @@ public class TimePlaceholderUtils {
 
     /**
      * get last day of week
-     *
+     * @param expression expresstion
+     * @param date  date
+     * @return last day of week
      */
     public static Map.Entry<Date, String> calcWeekEnd(String expression, Date date) {
         String addMonthExpr = expression.substring(Constants.WEEK_END.length() + 1, expression.length() - 1);
@@ -430,8 +437,9 @@ public class TimePlaceholderUtils {
 
     /**
      * calc months expression
-     *
-     * @return <date, format>
+     * @param expression expresstion
+     * @param date  date
+     * @return calc months
      */
     public static Map.Entry<Date, String> calcMonths(String expression, Date date) {
         String addMonthExpr = expression.substring(Constants.ADD_MONTHS.length() + 1, expression.length() - 1);
@@ -452,8 +460,9 @@ public class TimePlaceholderUtils {
     /**
      * calculate time expression
      *
-     *
-     * @return <date, format>
+     * @param expression expresstion
+     * @param date  date
+     * @return calculate time expression with date,format
      */
     public static Map.Entry<Date, String> calcMinutes(String expression, Date date) {
         if (expression.contains("+")) {
@@ -490,8 +499,8 @@ public class TimePlaceholderUtils {
     /**
      * calculate need minutes
      *
-     * @param minuteExpression
-     * @return
+     * @param minuteExpression minute expression
+     * @return calculate need minutes
      */
     public static Integer calcMinutes(String minuteExpression) {
         int index = minuteExpression.indexOf("/");

@@ -41,7 +41,7 @@ public class CollectionUtils {
      * Returns a new {@link Collection} containing <i>a</i> minus a subset of
      * <i>b</i>.  Only the elements of <i>b</i> that satisfy the predicate
      * condition, <i>p</i> are subtracted from <i>a</i>.
-     * <p>
+     *
      * <p>The cardinality of each element <i>e</i> in the returned {@link Collection}
      * that satisfies the predicate condition will be the cardinality of <i>e</i> in <i>a</i>
      * minus the cardinality of <i>e</i> in <i>b</i>, or zero, whichever is greater.</p>
@@ -50,6 +50,7 @@ public class CollectionUtils {
      *
      * @param a the collection to subtract from, must not be null
      * @param b the collection to subtract, must not be null
+     * @param <T> T
      * @return a new collection with the results
      * @see Collection#removeAll
      */
@@ -70,7 +71,7 @@ public class CollectionUtils {
      *
      * @param str       string
      * @param separator separator
-     * @return
+     * @return string to map
      */
     public static Map<String, String> stringToMap(String str, String separator) {
         return stringToMap(str, separator, "");
@@ -82,7 +83,7 @@ public class CollectionUtils {
      * @param str       string
      * @param separator separator
      * @param keyPrefix prefix
-     * @return
+     * @return string to map
      */
     public static Map<String, String> stringToMap(String str, String separator, String keyPrefix) {
         if (null == str || "".equals(str)) {
@@ -245,7 +246,7 @@ public class CollectionUtils {
      * Only those elements present in the collection will appear as
      * keys in the map.
      *
-     * @param <O>  the type of object in the returned {@link Map}. This is a super type of <I>.
+     * @param <O>  the type of object in the returned {@link Map}. This is a super type of O
      * @param coll the collection to get the cardinality map for, must not be null
      * @return the populated cardinality map
      */
@@ -265,10 +266,10 @@ public class CollectionUtils {
 
     /**
      * Removes certain attributes of each object in the list
-     * @param originList
-     * @param exclusionSet
-     * @param <T>
-     * @return
+     * @param originList origin list
+     * @param exclusionSet exclusion set
+     * @param <T> T
+     * @return removes certain attributes of each object in the list
      */
     public static <T extends Object> List<Map<String, Object>> getListByExclusion(List<T> originList, Set<String> exclusionSet) {
         List<Map<String, Object>> instanceList = new ArrayList<>();

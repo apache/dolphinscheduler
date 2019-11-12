@@ -37,7 +37,7 @@ public class FileUtils {
     /**
      * get file suffix
      *
-     * @param filename
+     * @param filename file name
      * @return file suffix
      */
     public static String suffix(String filename) {
@@ -55,7 +55,7 @@ public class FileUtils {
     /**
      * get download file absolute path and name
      *
-     * @param filename
+     * @param filename file name
      * @return download file name
      */
     public static String getDownloadFilename(String filename) {
@@ -75,10 +75,10 @@ public class FileUtils {
 
     /**
      * directory of process execution
-     * @param projectId
-     * @param processDefineId
-     * @param processInstanceId
-     * @param taskInstanceId
+     * @param projectId project id
+     * @param processDefineId process definition id
+     * @param processInstanceId process instance id
+     * @param taskInstanceId task instance id
      * @return directory of process execution
      */
     public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId, int taskInstanceId) {
@@ -89,9 +89,9 @@ public class FileUtils {
 
     /**
      * directory of process instances
-     * @param projectId
-     * @param processDefineId
-     * @param processInstanceId
+     * @param projectId project id
+     * @param processDefineId process definition id
+     * @param processInstanceId process instance id
      * @return directory of process instances
      */
     public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId) {
@@ -108,10 +108,10 @@ public class FileUtils {
 
     /**
      * create directory and user
-     * @param execLocalPath
-     * @param userName
-     * @param logger
-     * @throws IOException
+     * @param execLocalPath execute local path
+     * @param userName user name
+     * @param logger logger
+     * @throws IOException errors
      */
     public static void createWorkDirAndUserIfAbsent(String execLocalPath, String userName, Logger logger) throws IOException{
         //if work dir exists, first delete
@@ -145,7 +145,7 @@ public class FileUtils {
      *
      * @param content       content
      * @param filePath      target file path
-     * @return
+     * @return true if write success
      */
     public static boolean writeContent2File(String content, String filePath) {
         boolean flag = true;
@@ -344,7 +344,8 @@ public class FileUtils {
 
     /**
      * deletes a directory recursively
-     * @param dir
+     * @param dir directory
+     * @throws IOException in case deletion is unsuccessful
      */
 
     public static void deleteDir(String dir) throws IOException {
@@ -361,7 +362,7 @@ public class FileUtils {
      *      (java.io.File methods returns a boolean)</li>
      * </ul>
      *
-     * @param filename
+     * @param filename file name
      * @throws IOException in case deletion is unsuccessful
      */
     public static void deleteFile(String filename) throws IOException {
@@ -370,8 +371,8 @@ public class FileUtils {
 
     /**
      * Gets all the parent subdirectories of the parentDir directory
-     * @param parentDir
-     * @return
+     * @param parentDir parent dir
+     * @return all dirs
      */
     public static File[] getAllDir(String parentDir){
         if(parentDir == null || "".equals(parentDir)) {
@@ -401,9 +402,9 @@ public class FileUtils {
 
     /**
      * Get Content
-     * @param inputStream
-     * @return
-     * @throws IOException
+     * @param inputStream input stream
+     * @return string of input stream
+     * @throws IOException errors
      */
     public static String readFile2Str(InputStream inputStream) throws IOException{
         String all_content=null;

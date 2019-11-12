@@ -43,9 +43,9 @@ public class ParameterUtils {
   /**
    * convert parameters place holders
    *
-   * @param parameterString
-   * @param parameterMap
-   * @return
+   * @param parameterString parameter
+   * @param parameterMap parameter map
+   * @return convert parameters place holders
    */
   public static String convertParameterPlaceholders(String parameterString, Map<String, String> parameterMap) {
     if (StringUtils.isEmpty(parameterString)) {
@@ -80,11 +80,11 @@ public class ParameterUtils {
 
   /**
    *  set in parameter
-   * @param index
-   * @param stmt
-   * @param dataType
-   * @param value
-   * @throws Exception
+   * @param index index
+   * @param stmt preparedstatement
+   * @param dataType data type
+   * @param value value
+   * @throws Exception errors
    */
   public static void setInParameter(int index, PreparedStatement stmt, DataType dataType, String value)throws Exception{
     if (dataType.equals(DataType.VARCHAR)){
@@ -111,7 +111,11 @@ public class ParameterUtils {
   /**
    * curing user define parameters
    *
-   * @return
+   * @param globalParamMap global param map
+   * @param globalParamList global param list
+   * @param commandType command type
+   * @param scheduleTime schedule time
+   * @return curing user define parameters
    */
   public static String curingGlobalParams(Map<String,String> globalParamMap, List<Property> globalParamList,
                                    CommandType commandType, Date scheduleTime){
@@ -120,7 +124,7 @@ public class ParameterUtils {
         globalMap.putAll(globalParamMap);
       }
     Map<String,String> allParamMap = new HashMap<>();
-    //如果是补数，需要传入一个补数时间，根据任务类型
+    //If it is a complement, a complement time needs to be passed in, according to the task type
     Map<String,String> timeParams = BusinessTimeUtils
             .getBusinessTime(commandType, scheduleTime);
 
@@ -163,8 +167,8 @@ public class ParameterUtils {
 
   /**
    * handle escapes
-   * @param inputString
-   * @return
+   * @param inputString input string
+   * @return string filter escapes
    */
   public static String handleEscapes(String inputString){
 

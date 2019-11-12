@@ -39,6 +39,7 @@ public class BusinessTimeUtils {
    *
    * @param commandType command type
    * @param runTime run time or schedule time
+   * @return business time
    */
   public static Map<String, String> getBusinessTime(CommandType commandType, Date runTime) {
     Date businessDate = runTime;

@@ -39,7 +39,7 @@ public class HttpUtils {
 
 	/**
 	 * get http request content
-	 * @param url
+	 * @param url url
 	 * @return http response
 	 */
 	public static String get(String url){

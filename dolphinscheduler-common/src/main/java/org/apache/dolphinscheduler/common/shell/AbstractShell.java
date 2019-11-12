@@ -113,6 +113,7 @@ public abstract class AbstractShell {
 
   /**
    * check to see if a command needs to be executed and execute if needed
+   * @throws IOException errors
    */
   protected void run() throws IOException {
     if (lastTime + interval > System.currentTimeMillis()) {
@@ -222,13 +223,16 @@ public abstract class AbstractShell {
   }
 
   /**
-   * return an array containing the command name & its parameters
-   * */
+   *
+   * @return an array containing the command name and its parameters
+   */
   protected abstract String[] getExecString();
   
   /**
    * Parse the execution result
-   * */
+   * @param lines lines
+   * @throws IOException errors
+   */
   protected abstract void parseExecResult(BufferedReader lines)
   throws IOException;
 

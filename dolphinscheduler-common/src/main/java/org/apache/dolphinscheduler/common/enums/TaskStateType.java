@@ -31,8 +31,8 @@ public enum TaskStateType {
 
     /**
      * convert task state to execute status integer array ;
-     * @param taskStateType
-     * @return
+     * @param taskStateType task state type
+     * @return result of execution status
      */
     public static int[] convert2ExecutStatusIntArray(TaskStateType taskStateType){
 

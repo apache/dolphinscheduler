@@ -29,7 +29,7 @@ import java.io.File;
 /**
  * common utils
  */
-public class CommonUtils {
+public class  CommonUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
 
@@ -64,7 +64,7 @@ public class CommonUtils {
 
   /**
    * if upload resource is HDFS and kerberos startup is true , else false
-   * @return
+   * @return true if upload resource is HDFS and kerberos startup
    */
   public static boolean getKerberosStartupState(){
     String resUploadStartupType = PropertyUtils.getString(Constants.RES_UPLOAD_STARTUP_TYPE);
@@ -75,7 +75,7 @@ public class CommonUtils {
 
   /**
    * load kerberos configuration
-   * @throws Exception
+   * @throws Exception errors
    */
   public static void loadKerberosConf()throws Exception{
     if (CommonUtils.getKerberosStartupState())  {

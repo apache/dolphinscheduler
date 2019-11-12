@@ -139,7 +139,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
    * whether this node is contained
    *
    * @param node node
-   * @return
+   * @return true if contains
    */
   public boolean containsNode(Node node) {
     lock.readLock().lock();
@@ -157,7 +157,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
    *
    * @param fromNode node of origin
    * @param toNode   node of destination
-   * @return
+   * @return true if contains
    */
   public boolean containsEdge(Node fromNode, Node toNode) {
     lock.readLock().lock();
@@ -178,7 +178,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
    * get node description
    *
    * @param node node
-   * @return
+   * @return node description
    */
   public NodeInfo getNode(Node node) {
     lock.readLock().lock();
@@ -194,7 +194,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
   /**
    * Get the number of nodes
    *
-   * @return
+   * @return the number of nodes
    */
   public int getNodesCount() {
     lock.readLock().lock();
@@ -209,7 +209,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
   /**
    * Get the number of edges
    *
-   * @return
+   * @return the number of edges
    */
   public int getEdgesCount() {
     lock.readLock().lock();
@@ -230,7 +230,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
   /**
    * get the start node of DAG
    *
-   * @return
+   * @return the start node of DAG
    */
   public Collection<Node> getBeginNode() {
     lock.readLock().lock();
@@ -247,7 +247,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
   /**
    * get the end node of DAG
    *
-   * @return
+   * @return the end node of DAG
    */
   public Collection<Node> getEndNode() {
 
@@ -266,7 +266,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
    * Gets all previous nodes of the node
    *
    * @param node node id to be calculated
-   * @return
+   * @return all previous nodes of the node
    */
   public Set<Node> getPreviousNodes(Node node) {
     lock.readLock().lock();
@@ -283,7 +283,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
    * Get all subsequent nodes of the node
    *
    * @param node node id to be calculated
-   * @return
+   * @return all subsequent nodes of the node
    */
   public Set<Node> getSubsequentNodes(Node node) {
     lock.readLock().lock();
@@ -300,7 +300,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
    * Gets the degree of entry of the node
    *
    * @param node node id
-   * @return
+   * @return the degree of entry of the node
    */
   public int getIndegree(Node node) {
     lock.readLock().lock();
@@ -331,7 +331,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
   /**
    * Only DAG has a topological sort
    * @return topologically sorted results, returns false if the DAG result is a ring result
-   * @throws Exception
+   * @throws Exception errors
    */
   public List<Node> topologicalSort() throws Exception {
     lock.readLock().lock();
@@ -385,7 +385,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
    * @param fromNode     node of origin
    * @param toNode       node of destination
    * @param createNode whether to create a node
-   * @return
+   * @return true if added
    */
   private boolean isLegalAddEdge(Node fromNode, Node toNode, boolean createNode) {
       if (fromNode.equals(toNode)) {
@@ -429,7 +429,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
    *
    * @param node   Node id to be calculated
    * @param edges neighbor edge information
-   * @return
+   * @return all neighbor nodes of the node
    */
   private Set<Node> getNeighborNodes(Node node, final Map<Node, Map<Node, EdgeInfo>> edges) {
     final Map<Node, EdgeInfo> neighborEdges = edges.get(node);
