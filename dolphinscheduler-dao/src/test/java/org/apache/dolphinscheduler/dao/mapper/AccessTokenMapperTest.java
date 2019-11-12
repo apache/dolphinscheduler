@@ -39,6 +39,10 @@ public class AccessTokenMapperTest {
     AccessTokenMapper accessTokenMapper;
 
 
+    /**
+     * insert
+     * @return AccessToken
+     */
     private AccessToken insertOne(){
         //insertOne
         AccessToken accessToken = new AccessToken();
@@ -51,6 +55,9 @@ public class AccessTokenMapperTest {
         return accessToken;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -62,6 +69,9 @@ public class AccessTokenMapperTest {
         Assert.assertEquals(update, 1);
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
 
@@ -70,6 +80,9 @@ public class AccessTokenMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery(){
 
@@ -80,8 +93,11 @@ public class AccessTokenMapperTest {
         accessTokenMapper.deleteById(accessToken.getId());
     }
 
+    /**
+     * test page
+     */
     @Test
-    public void selectAccessTokenPage() {
+    public void testSelectAccessTokenPage() {
         AccessToken accessToken = insertOne();
         Page page = new Page(1, 3);
         String userName = "";

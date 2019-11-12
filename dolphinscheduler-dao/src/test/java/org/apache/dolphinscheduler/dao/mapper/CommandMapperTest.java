@@ -41,6 +41,10 @@ public class CommandMapperTest {
     @Autowired
     ProcessDefinitionMapper processDefinitionMapper;
 
+    /**
+     * insert
+     * @return Command
+     */
     private Command insertOne(){
         //insertOne
         Command command = new Command();
@@ -56,6 +60,9 @@ public class CommandMapperTest {
         return command;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -67,6 +74,9 @@ public class CommandMapperTest {
         commandMapper.deleteById(command.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
 
@@ -75,6 +85,9 @@ public class CommandMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         Command command = insertOne();
@@ -83,6 +96,10 @@ public class CommandMapperTest {
         Assert.assertNotEquals(commands.size(), 0);
         commandMapper.deleteById(command.getId());
     }
+
+    /**
+     * test query all
+     */
     @Test
     public void testGetAll() {
         Command command = insertOne();
@@ -91,6 +108,9 @@ public class CommandMapperTest {
         commandMapper.deleteById(command.getId());
     }
 
+    /**
+     * test get on command to run
+     */
     @Test
     public void testGetOneToRun() {
         ProcessDefinition processDefinition = new ProcessDefinition();
@@ -117,6 +137,9 @@ public class CommandMapperTest {
         processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
+    /**
+     * test count command state
+     */
     @Test
     public void testCountCommandState() {
         Command command = insertOne();

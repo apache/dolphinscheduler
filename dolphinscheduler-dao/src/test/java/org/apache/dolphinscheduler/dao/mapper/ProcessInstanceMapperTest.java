@@ -48,6 +48,10 @@ public class ProcessInstanceMapperTest {
     ProjectMapper projectMapper;
 
 
+    /**
+     * insert
+     * @return ProcessInstance
+     */
     private ProcessInstance insertOne(){
         //insertOne
         ProcessInstance processInstance = new ProcessInstance();
@@ -61,6 +65,9 @@ public class ProcessInstanceMapperTest {
         return processInstance;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -71,6 +78,9 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.deleteById(processInstanceMap.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         ProcessInstance processInstanceMap = insertOne();
@@ -78,6 +88,9 @@ public class ProcessInstanceMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         ProcessInstance processInstance = insertOne();
@@ -87,6 +100,9 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
+    /**
+     * test query detail by id
+     */
     @Test
     public void testQueryDetailById() {
         ProcessInstance processInstance = insertOne();
@@ -97,8 +113,11 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
+    /**
+     * test query by host and states
+     */
     @Test
-    public void testQueryByHostAndStatus() {
+    public void testQueryByHostAndStates() {
         ProcessInstance processInstance = insertOne();
         processInstance.setHost("192.168.2.155");
         processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
@@ -114,6 +133,9 @@ public class ProcessInstanceMapperTest {
         Assert.assertNotEquals(processInstances.size(), 0);
     }
 
+    /**
+     * test query process instance page
+     */
     @Test
     public void testQueryProcessInstanceListPaging() {
 
@@ -154,6 +176,9 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
+    /**
+     * test set failover by host and state
+     */
     @Test
     public void testSetFailoverByHostAndStateArray() {
 
@@ -175,6 +200,9 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
+    /**
+     * test update process instance by state
+     */
     @Test
     public void testUpdateProcessInstanceByState() {
 
@@ -192,6 +220,9 @@ public class ProcessInstanceMapperTest {
 
     }
 
+    /**
+     * test count process instance state by user
+     */
     @Test
     public void testCountInstanceStateByUser() {
 
@@ -219,6 +250,9 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
+    /**
+     * test query process instance by process definition id
+     */
     @Test
     public void testQueryByProcessDefineId() {
         ProcessInstance processInstance = insertOne();
@@ -235,6 +269,9 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.deleteById(processInstance1.getId());
     }
 
+    /**
+     * test query last schedule process instance
+     */
     @Test
     public void testQueryLastSchedulerProcess() {
         ProcessInstance processInstance = insertOne();
@@ -246,6 +283,9 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
+    /**
+     * test query last running process instance
+     */
     @Test
     public void testQueryLastRunningProcess() {
         ProcessInstance processInstance = insertOne();
@@ -262,6 +302,9 @@ public class ProcessInstanceMapperTest {
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
+    /**
+     * test query last manual process instance
+     */
     @Test
     public void testQueryLastManualProcess() {
         ProcessInstance processInstance = insertOne();

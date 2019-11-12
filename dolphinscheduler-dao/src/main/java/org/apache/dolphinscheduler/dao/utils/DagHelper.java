@@ -41,12 +41,12 @@ public class DagHelper {
 
     private static final Logger logger = LoggerFactory.getLogger(DagHelper.class);
 
+
     /**
      * generate flow node relation list by task node list;
      * Edges that are not in the task Node List will not be added to the result
-     *
-     * @param taskNodeList
-     * @return
+     * @param taskNodeList taskNodeList
+     * @return task node relation list
      */
     public static List<TaskNodeRelation> generateRelationListByFlowNodes(List<TaskNode> taskNodeList) {
         List<TaskNodeRelation> nodeRelationList = new ArrayList<>();
@@ -66,10 +66,11 @@ public class DagHelper {
 
     /**
      * generate task nodes needed by dag
-     *
-     * @param taskNodeList
-     * @param taskDependType
-     * @return
+     * @param taskNodeList taskNodeList
+     * @param startNodeNameList startNodeNameList
+     * @param recoveryNodeNameList recoveryNodeNameList
+     * @param taskDependType taskDependType
+     * @return task node list
      */
     public static List<TaskNode> generateFlowNodeListByStartNode(List<TaskNode> taskNodeList, List<String> startNodeNameList,
                                                                  List<String> recoveryNodeNameList, TaskDependType taskDependType) {
@@ -88,10 +89,10 @@ public class DagHelper {
             startNodeList = recoveryNodeNameList;
         }
         if (startNodeList == null || startNodeList.size() == 0) {
-            // 没有特殊的指定start nodes
+            // no special designation start nodes
             tmpTaskNodeList = taskNodeList;
         } else {
-            // 指定了start nodes or 恢复执行
+            // specified start nodes or resume execution
             for (String startNodeName : startNodeList) {
                 TaskNode startNode = findNodeByName(taskNodeList, startNodeName);
                 List<TaskNode> childNodeList = new ArrayList<>();
@@ -117,10 +118,9 @@ public class DagHelper {
 
     /**
      * find all the nodes that depended on the start node
-     *
-     * @param startNode
-     * @param taskNodeList
-     * @return
+     * @param startNode startNode
+     * @param taskNodeList taskNodeList
+     * @return task node list
      */
     private static List<TaskNode> getFlowNodeListPost(TaskNode startNode, List<TaskNode> taskNodeList) {
         List<TaskNode> resultList = new ArrayList<>();
@@ -137,12 +137,13 @@ public class DagHelper {
         return resultList;
     }
 
+
     /**
      * find all nodes that start nodes depend on.
-     *
-     * @param startNode
-     * @param taskNodeList
-     * @return
+     * @param startNode startNode
+     * @param recoveryNodeNameList recoveryNodeNameList
+     * @param taskNodeList taskNodeList
+     * @return task node list
      */
     private static List<TaskNode> getFlowNodeListPre(TaskNode startNode, List<String> recoveryNodeNameList, List<TaskNode> taskNodeList) {
 
@@ -166,12 +167,12 @@ public class DagHelper {
 
     /**
      * generate dag by start nodes and recovery nodes
-     * @param processDefinitionJson
-     * @param startNodeNameList
-     * @param recoveryNodeNameList
-     * @param depNodeType
-     * @return
-     * @throws Exception
+     * @param processDefinitionJson processDefinitionJson
+     * @param startNodeNameList startNodeNameList
+     * @param recoveryNodeNameList recoveryNodeNameList
+     * @param depNodeType depNodeType
+     * @return process dag
+     * @throws Exception if error throws Exception
      */
     public static ProcessDag generateFlowDag(String processDefinitionJson,
                                              List<String> startNodeNameList,
@@ -193,8 +194,8 @@ public class DagHelper {
 
     /**
      * parse the forbidden task nodes in process definition.
-     * @param processDefinitionJson
-     * @return
+     * @param processDefinitionJson processDefinitionJson
+     * @return task node map
      */
     public static Map<String, TaskNode> getForbiddenTaskNodeMaps(String processDefinitionJson){
         Map<String, TaskNode> forbidTaskNodeMap = new ConcurrentHashMap<>();
@@ -212,10 +213,9 @@ public class DagHelper {
 
     /**
      * find node by node name
-     * @param nodeDetails
-     * @param nodeName
-     * @return
-     * @see TaskNode
+     * @param nodeDetails nodeDetails
+     * @param nodeName nodeName
+     * @return task node
      */
     public static TaskNode findNodeByName(List<TaskNode> nodeDetails, String nodeName) {
         for (TaskNode taskNode : nodeDetails) {
@@ -230,10 +230,10 @@ public class DagHelper {
     /**
      * get start vertex in one dag
      * it would find the post node if the start vertex is forbidden running
-     * @param parentNodeName the previous node
-     * @param dag
-     * @param completeTaskList
-     * @return
+     * @param parentNodeName previous node
+     * @param dag dag
+     * @param completeTaskList completeTaskList
+     * @return start Vertex list
      */
     public static Collection<String> getStartVertex(String parentNodeName, DAG<String, TaskNode, TaskNodeRelation> dag,
                                                     Map<String, TaskInstance> completeTaskList){
@@ -274,10 +274,10 @@ public class DagHelper {
 
     /**
      * the task can be submit when  all the depends nodes are forbidden or complete
-     * @param taskNode
-     * @param dag
-     * @param completeTaskList
-     * @return
+     * @param taskNode taskNode
+     * @param dag dag
+     * @param completeTaskList completeTaskList
+     * @return can submit
      */
     public static boolean taskNodeCanSubmit(TaskNode taskNode,
                                             DAG<String, TaskNode, TaskNodeRelation> dag,
@@ -299,9 +299,9 @@ public class DagHelper {
 
 
     /***
-     * generate dag graph
-     * @param processDag
-     * @return
+     * build dag graph
+     * @param processDag processDag
+     * @return dag
      */
     public static DAG<String, TaskNode, TaskNodeRelation> buildDagGraph(ProcessDag processDag) {
 

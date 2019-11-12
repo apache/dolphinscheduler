@@ -37,6 +37,10 @@ public class ResourceUserMapperTest {
     @Autowired
     ResourceUserMapper resourceUserMapper;
 
+    /**
+     * insert
+     * @return ResourcesUser
+     */
     private ResourcesUser insertOne(){
         //insertOne
         ResourcesUser queue = new ResourcesUser();
@@ -48,6 +52,9 @@ public class ResourceUserMapperTest {
         return queue;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -59,6 +66,9 @@ public class ResourceUserMapperTest {
         resourceUserMapper.deleteById(queue.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         ResourcesUser queue = insertOne();
@@ -66,6 +76,9 @@ public class ResourceUserMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         ResourcesUser queue = insertOne();
@@ -75,6 +88,9 @@ public class ResourceUserMapperTest {
         resourceUserMapper.deleteById(queue.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDeleteResourceUser() {
 

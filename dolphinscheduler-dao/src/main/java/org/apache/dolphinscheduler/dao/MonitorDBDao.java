@@ -56,6 +56,10 @@ public class MonitorDBDao {
         }
     }
 
+    /**
+     * get current db performance
+     * @return MonitorRecord
+     */
     public static MonitorRecord getCurrentDbPerformance(){
         MonitorRecord monitorRecord = null;
         Connection conn = null;
@@ -93,7 +97,7 @@ public class MonitorDBDao {
 
     /**
      * query database state
-     * @return
+     * @return MonitorRecord list
      */
     public static List<MonitorRecord> queryDatabaseState() {
         List<MonitorRecord> list = new ArrayList<>(1);

@@ -23,9 +23,16 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * alert mapper interface
+ */
 public interface AlertMapper extends BaseMapper<Alert> {
 
-
+    /**
+     * list alert by status
+     * @param alertStatus alertStatus
+     * @return alert list
+     */
     List<Alert> listAlertByStatus(@Param("alertStatus") AlertStatus alertStatus);
 
 }

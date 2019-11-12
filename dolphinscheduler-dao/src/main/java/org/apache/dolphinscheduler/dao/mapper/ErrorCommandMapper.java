@@ -24,8 +24,18 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * error command mapper interface
+ */
 public interface ErrorCommandMapper extends BaseMapper<ErrorCommand> {
 
+    /**
+     * count command state
+     * @param startTime startTime
+     * @param endTime endTime
+     * @param projectIdArray projectIdArray
+     * @return CommandCount list
+     */
     List<CommandCount> countCommandState(
             @Param("startTime") Date startTime,
             @Param("endTime") Date endTime,

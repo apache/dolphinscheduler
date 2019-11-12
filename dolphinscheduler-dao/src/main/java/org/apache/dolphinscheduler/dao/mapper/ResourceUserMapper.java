@@ -20,8 +20,17 @@ import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+/**
+ * resource user relation mapper interface
+ */
 public interface ResourceUserMapper extends BaseMapper<ResourcesUser> {
 
+    /**
+     * delete resource user relation
+     * @param userId userId
+     * @param resourceId resourceId
+     * @return delete result
+     */
     int deleteResourceUser(@Param("userId") int userId,
                            @Param("resourceId") int resourceId);
 

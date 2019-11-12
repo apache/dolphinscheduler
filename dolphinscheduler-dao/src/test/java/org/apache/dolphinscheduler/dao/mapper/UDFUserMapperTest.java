@@ -45,6 +45,10 @@ public class UDFUserMapperTest {
     @Autowired
     UdfFuncMapper udfFuncMapper;
 
+    /**
+     * insert
+     * @return UDFUser
+     */
     private UDFUser insertOne(){
         UDFUser udfUser = new UDFUser();
         udfUser.setUdfId(1);
@@ -55,6 +59,12 @@ public class UDFUserMapperTest {
         return udfUser;
     }
 
+    /**
+     * insert UDFUser
+     * @param user user
+     * @param udfFunc  udfFunc
+     * @return UDFUser
+     */
     private UDFUser insertOne(User user,UdfFunc udfFunc){
         UDFUser udfUser = new UDFUser();
         udfUser.setUdfId(udfFunc.getId());
@@ -68,7 +78,7 @@ public class UDFUserMapperTest {
 
     /**
      * insert one user
-     * @return
+     * @return User
      */
     private User insertOneUser(){
         User user = new User();
@@ -86,7 +96,7 @@ public class UDFUserMapperTest {
 
     /**
      * insert one udf
-     * @return
+     * @return UdfFunc
      */
     private UdfFunc insertOneUdfFunc(){
         UdfFunc udfFunc = new UdfFunc();
@@ -101,6 +111,9 @@ public class UDFUserMapperTest {
         return udfFunc;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOneUser
@@ -119,6 +132,9 @@ public class UDFUserMapperTest {
 
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         //insertOneUser
@@ -133,6 +149,9 @@ public class UDFUserMapperTest {
         udfFuncMapper.deleteById(udfFunc.getId());
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery(){
         //insertOne
@@ -143,6 +162,9 @@ public class UDFUserMapperTest {
         userMapper.deleteById(udfUser.getId());
     }
 
+    /**
+     * test delete by userId
+     */
     @Test
     public void testDeleteByUserId() {
         //insertOneUser
@@ -158,6 +180,9 @@ public class UDFUserMapperTest {
 
     }
 
+    /**
+     * test delete by udffuncId
+     */
     @Test
     public void testDeleteByUdfFuncId() {
         //insertOneUser

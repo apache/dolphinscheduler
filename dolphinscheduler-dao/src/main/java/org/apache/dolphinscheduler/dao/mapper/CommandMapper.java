@@ -27,11 +27,26 @@ import org.apache.ibatis.annotations.Select;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * command mapper interface
+ */
 public interface CommandMapper extends BaseMapper<Command> {
 
 
+    /**
+     * get one command
+     * @return command
+     */
     Command getOneToRun();
 
+    /**
+     * count command state
+     * @param userId userId
+     * @param startTime startTime
+     * @param endTime endTime
+     * @param projectIdArray projectIdArray
+     * @return CommandCount list
+     */
     List<CommandCount> countCommandState(
             @Param("userId") int userId,
             @Param("startTime") Date startTime,

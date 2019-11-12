@@ -32,12 +32,21 @@ public class CycleLinks extends AbstractCycle {
     super(cron);
   }
 
+  /**
+   * add cycle
+   * @param cycle cycle
+   * @return CycleLinks
+   */
   @Override
   public CycleLinks addCycle(AbstractCycle cycle) {
     cycleList.add(cycle);
     return this;
   }
 
+  /**
+   * get cycle
+   * @return CycleEnum
+   */
   @Override
   protected CycleEnum getCycle() {
     for (AbstractCycle abstractCycle : cycleList) {
@@ -50,6 +59,10 @@ public class CycleLinks extends AbstractCycle {
     return null;
   }
 
+  /**
+   * get mini cycle
+   * @return CycleEnum
+   */
   @Override
   protected CycleEnum getMiniCycle() {
     for (AbstractCycle cycleHelper : cycleList) {

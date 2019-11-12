@@ -36,6 +36,10 @@ public class DataSourceUserMapperTest {
     DataSourceUserMapper dataSourceUserMapper;
 
 
+    /**
+     * insert
+     * @return DatasourceUser
+     */
     private DatasourceUser insertOne(){
         //insertOne
         DatasourceUser dataSourceUser = new DatasourceUser();
@@ -48,6 +52,9 @@ public class DataSourceUserMapperTest {
         return dataSourceUser;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -59,6 +66,9 @@ public class DataSourceUserMapperTest {
         dataSourceUserMapper.deleteById(dataSourceUser.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
 
@@ -67,6 +77,9 @@ public class DataSourceUserMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         DatasourceUser dataSourceUser = insertOne();
@@ -76,6 +89,9 @@ public class DataSourceUserMapperTest {
         dataSourceUserMapper.deleteById(dataSourceUser.getId());
     }
 
+    /**
+     * test delete by userId
+     */
     @Test
     public void testDeleteByUserId() {
         DatasourceUser dataSourceUser = insertOne();
@@ -83,6 +99,9 @@ public class DataSourceUserMapperTest {
         Assert.assertNotEquals(delete, 0);
     }
 
+    /**
+     * test delete by datasource id
+     */
     @Test
     public void testDeleteByDatasourceId() {
         DatasourceUser dataSourceUser = insertOne();

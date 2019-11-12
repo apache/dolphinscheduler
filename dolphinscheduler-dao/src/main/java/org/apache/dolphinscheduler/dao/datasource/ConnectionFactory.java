@@ -40,8 +40,14 @@ import javax.sql.DataSource;
 public class ConnectionFactory {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
 
+    /**
+     * sql session factory
+     */
     private static SqlSessionFactory sqlSessionFactory;
 
+    /**
+     * sql session template
+     */
     private static SqlSessionTemplate sqlSessionTemplate;
 
     /**
@@ -60,6 +66,7 @@ public class ConnectionFactory {
 
     /**
      * get the data source
+     * @return druid dataSource
      */
     public static DruidDataSource getDataSource() {
 
@@ -94,6 +101,8 @@ public class ConnectionFactory {
 
     /**
      * get sql session factory
+     * @return sqlSessionFactory
+     * @throws Exception sqlSessionFactory exception
      */
     public static SqlSessionFactory getSqlSessionFactory() throws Exception {
         if (sqlSessionFactory == null) {
@@ -125,6 +134,7 @@ public class ConnectionFactory {
 
     /**
      * get sql session
+     * @return sqlSession
      */
     public static SqlSession getSqlSession() {
         if (sqlSessionTemplate == null) {
@@ -143,12 +153,18 @@ public class ConnectionFactory {
         return sqlSessionTemplate;
     }
 
+    /**
+     * get mapper
+     * @param type target class
+     * @param <T> generic
+     * @return target object
+     */
     public static <T> T getMapper(Class<T> type) {
         try {
             return getSqlSession().getMapper(type);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-            throw new RuntimeException("get mapper failed!");
+            throw new RuntimeException("get mapper failed");
         }
     }
 }

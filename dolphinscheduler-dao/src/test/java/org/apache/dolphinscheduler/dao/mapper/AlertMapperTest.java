@@ -39,6 +39,10 @@ public class AlertMapperTest {
     @Autowired
     AlertMapper alertMapper;
 
+    /**
+     * insert
+     * @return Alert
+     */
     private Alert insertOne(){
         //insertOne
         Alert alert = new Alert();
@@ -55,6 +59,9 @@ public class AlertMapperTest {
         return alert;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -66,6 +73,9 @@ public class AlertMapperTest {
         alertMapper.deleteById(alert.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
 
@@ -74,6 +84,9 @@ public class AlertMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         Alert alert = insertOne();
@@ -83,6 +96,9 @@ public class AlertMapperTest {
         alertMapper.deleteById(alert.getId());
     }
 
+    /**
+     * test list alert by status
+     */
     @Test
     public void testListAlertByStatus() {
         Alert alert = insertOne();

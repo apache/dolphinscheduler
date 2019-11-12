@@ -25,19 +25,31 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * mysql upgrade dao
+ */
 public class MysqlUpgradeDao extends UpgradeDao {
 
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
 
+    /**
+     * init
+     */
     @Override
     protected void init() {
 
     }
 
+    /**
+     * mysql upgrade dao holder
+     */
     private static class MysqlUpgradeDaoHolder {
         private static final MysqlUpgradeDao INSTANCE = new MysqlUpgradeDao();
     }
 
+    /**
+     * mysql upgrade dao constructor
+     */
     private MysqlUpgradeDao() {
     }
 
@@ -47,10 +59,11 @@ public class MysqlUpgradeDao extends UpgradeDao {
 
 
     /**
-     * Determines whether a table exists
-     * @param tableName
-     * @return
+     * determines whether a table exists
+     * @param tableName tableName
+     * @return if table exist return true，else return false
      */
+    @Override
     public boolean isExistsTable(String tableName) {
         ResultSet rs = null;
         Connection conn = null;
@@ -73,11 +86,12 @@ public class MysqlUpgradeDao extends UpgradeDao {
     }
 
     /**
-     * Determines whether a field exists in the specified table
-     * @param tableName
-     * @param columnName
-     * @return
+     * determines whether a field exists in the specified table
+     * @param tableName tableName
+     * @param columnName columnName
+     * @return  if column name exist return true，else return false
      */
+    @Override
     public boolean isExistsColumn(String tableName,String columnName) {
         Connection conn = null;
         try {

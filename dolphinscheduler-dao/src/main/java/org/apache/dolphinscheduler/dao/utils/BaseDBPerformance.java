@@ -21,14 +21,15 @@ import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import java.sql.Connection;
 
 /**
- *
+ * db performance abstract class
  */
 public abstract class BaseDBPerformance {
 
 
     /**
      * return the current database performance
-     * @return
+     * @param conn connection
+     * @return MonitorRecord
      */
     protected abstract MonitorRecord getMonitorRecord(Connection conn);
 

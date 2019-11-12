@@ -26,25 +26,50 @@ import com.cronutils.model.field.expression.QuestionMark;
  */
 public class CycleFactory {
 
-  public static AbstractCycle min(Cron cron) {
-    return new MinCycle(cron);
-  }
+    /**
+     * min
+     * @param cron cron
+     * @return AbstractCycle
+     */
+    public static AbstractCycle min(Cron cron) {
+      return new MinCycle(cron);
+    }
 
-  public static AbstractCycle hour(Cron cron) {
-    return new HourCycle(cron);
-  }
+    /**
+     * hour
+     * @param cron cron
+     * @return AbstractCycle
+     */
+    public static AbstractCycle hour(Cron cron) {
+      return new HourCycle(cron);
+    }
 
-  public static AbstractCycle day(Cron cron) {
-    return new DayCycle(cron);
-  }
+    /**
+     * day
+     * @param cron cron
+     * @return AbstractCycle
+     */
+    public static AbstractCycle day(Cron cron) {
+      return new DayCycle(cron);
+    }
 
-  public static AbstractCycle week(Cron cron) {
-    return new WeekCycle(cron);
-  }
+    /**
+     * week
+     * @param cron cron
+     * @return AbstractCycle
+     */
+    public static AbstractCycle week(Cron cron) {
+      return new WeekCycle(cron);
+    }
 
-  public static AbstractCycle month(Cron cron) {
-    return new MonthCycle(cron);
-  }
+    /**
+     * month
+     * @param cron cron
+     * @return AbstractCycle
+     */
+    public static AbstractCycle month(Cron cron) {
+      return new MonthCycle(cron);
+    }
 
   /**
    * day cycle
@@ -55,28 +80,36 @@ public class CycleFactory {
       super(cron);
     }
 
-    @Override
-    protected CycleEnum getCycle() {
+      /**
+       * get cycle
+       * @return CycleEnum
+       */
+        @Override
+        protected CycleEnum getCycle() {
 
-      if (minFiledIsSetAll()
-          && hourFiledIsSetAll()
-          && dayOfMonthFieldIsEvery()
-          && dayOfWeekField.getExpression() instanceof QuestionMark
-          && monthField.getExpression() instanceof Always) {
-        return CycleEnum.DAY;
-      }
+          if (minFiledIsSetAll()
+              && hourFiledIsSetAll()
+              && dayOfMonthFieldIsEvery()
+              && dayOfWeekField.getExpression() instanceof QuestionMark
+              && monthField.getExpression() instanceof Always) {
+            return CycleEnum.DAY;
+          }
 
-      return null;
-    }
+          return null;
+        }
 
-    @Override
-    protected CycleEnum getMiniCycle() {
-      if (dayOfMonthFieldIsEvery()) {
-        return CycleEnum.DAY;
-      }
+      /**
+       * get min cycle
+       * @return CycleEnum
+       */
+        @Override
+        protected CycleEnum getMiniCycle() {
+          if (dayOfMonthFieldIsEvery()) {
+            return CycleEnum.DAY;
+          }
 
-      return null;
-    }
+          return null;
+        }
   }
 
   /**
@@ -88,26 +121,34 @@ public class CycleFactory {
       super(cron);
     }
 
-    @Override
-    protected CycleEnum getCycle() {
-      if (minFiledIsSetAll()
-          && hourFiledIsEvery()
-          && dayOfMonthField.getExpression() instanceof Always
-          && dayOfWeekField.getExpression() instanceof QuestionMark
-          && monthField.getExpression() instanceof Always) {
-        return CycleEnum.HOUR;
-      }
+      /**
+       * get cycle
+       * @return CycleEnum
+       */
+        @Override
+        protected CycleEnum getCycle() {
+          if (minFiledIsSetAll()
+              && hourFiledIsEvery()
+              && dayOfMonthField.getExpression() instanceof Always
+              && dayOfWeekField.getExpression() instanceof QuestionMark
+              && monthField.getExpression() instanceof Always) {
+            return CycleEnum.HOUR;
+          }
 
-      return null;
-    }
+          return null;
+        }
 
-    @Override
-    protected CycleEnum getMiniCycle() {
-      if(hourFiledIsEvery()){
-        return CycleEnum.HOUR;
-      }
-      return null;
-    }
+      /**
+       * get mini cycle
+       * @return CycleEnum
+       */
+        @Override
+        protected CycleEnum getMiniCycle() {
+          if(hourFiledIsEvery()){
+            return CycleEnum.HOUR;
+          }
+          return null;
+        }
   }
 
   /**
@@ -119,6 +160,10 @@ public class CycleFactory {
           super(cron);
       }
 
+      /**
+       * get cycle
+       * @return CycleEnum
+       */
       @Override
       protected CycleEnum getCycle() {
           if (minFiledIsEvery()
@@ -131,6 +176,10 @@ public class CycleFactory {
           return null;
       }
 
+      /**
+       * get min cycle
+       * @return CycleEnum
+       */
       @Override
       protected CycleEnum getMiniCycle() {
           if(minFiledIsEvery()){
@@ -149,33 +198,41 @@ public class CycleFactory {
       super(cron);
     }
 
-    @Override
-    protected CycleEnum getCycle() {
-      boolean flag = (minFiledIsSetAll()
-              && hourFiledIsSetAll()
-              && dayOfMonthFieldIsSetAll()
-              && dayOfWeekField.getExpression() instanceof QuestionMark
-              && monthFieldIsEvery()) ||
-              (minFiledIsSetAll()
-                      && hourFiledIsSetAll()
-                      && dayOfMonthField.getExpression() instanceof QuestionMark
-                      && dayofWeekFieldIsSetAll()
-                      && monthFieldIsEvery());
-      if (flag) {
-        return CycleEnum.MONTH;
-      }
+      /**
+       * get cycle
+       * @return CycleEnum
+       */
+        @Override
+        protected CycleEnum getCycle() {
+          boolean flag = (minFiledIsSetAll()
+                  && hourFiledIsSetAll()
+                  && dayOfMonthFieldIsSetAll()
+                  && dayOfWeekField.getExpression() instanceof QuestionMark
+                  && monthFieldIsEvery()) ||
+                  (minFiledIsSetAll()
+                          && hourFiledIsSetAll()
+                          && dayOfMonthField.getExpression() instanceof QuestionMark
+                          && dayofWeekFieldIsSetAll()
+                          && monthFieldIsEvery());
+          if (flag) {
+            return CycleEnum.MONTH;
+          }
 
-      return null;
-    }
+          return null;
+        }
 
-    @Override
-    protected CycleEnum getMiniCycle() {
-      if (monthFieldIsEvery()) {
-        return CycleEnum.MONTH;
-      }
+      /**
+       * get mini cycle
+       * @return CycleEnum
+       */
+        @Override
+        protected CycleEnum getMiniCycle() {
+          if (monthFieldIsEvery()) {
+            return CycleEnum.MONTH;
+          }
 
-      return null;
-    }
+          return null;
+        }
   }
 
   /**
@@ -186,26 +243,34 @@ public class CycleFactory {
       super(cron);
     }
 
-    @Override
-    protected CycleEnum getCycle() {
-      if (minFiledIsSetAll()
-          && hourFiledIsSetAll()
-          && dayOfMonthField.getExpression() instanceof QuestionMark
-          && dayofWeekFieldIsEvery()
-          && monthField.getExpression() instanceof Always) {
-        return CycleEnum.WEEK;
-      }
+      /**
+       * get cycle
+       * @return CycleEnum
+       */
+        @Override
+        protected CycleEnum getCycle() {
+          if (minFiledIsSetAll()
+              && hourFiledIsSetAll()
+              && dayOfMonthField.getExpression() instanceof QuestionMark
+              && dayofWeekFieldIsEvery()
+              && monthField.getExpression() instanceof Always) {
+            return CycleEnum.WEEK;
+          }
 
-      return null;
-    }
+          return null;
+        }
 
-    @Override
-    protected CycleEnum getMiniCycle() {
-      if (dayofWeekFieldIsEvery()) {
-        return CycleEnum.WEEK;
-      }
+      /**
+       * get mini cycle
+       * @return CycleEnum
+       */
+        @Override
+        protected CycleEnum getMiniCycle() {
+          if (dayofWeekFieldIsEvery()) {
+            return CycleEnum.WEEK;
+          }
 
-      return null;
-    }
+          return null;
+        }
   }
 }

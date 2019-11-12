@@ -23,10 +23,23 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * user alertgroup relation mapper interface
+ */
 public interface UserAlertGroupMapper extends BaseMapper<UserAlertGroup> {
 
+    /**
+     * delete user alertgroup relation by alertgroupId
+     * @param alertgroupId alertgroupId
+     * @return delete result
+     */
     int deleteByAlertgroupId(@Param("alertgroupId") int alertgroupId);
 
+    /**
+     *  list user by alertgroupId
+     * @param alertgroupId alertgroupId
+     * @return user list
+     */
     List<User> listUserByAlertgroupId(@Param("alertgroupId") int alertgroupId);
 
 }

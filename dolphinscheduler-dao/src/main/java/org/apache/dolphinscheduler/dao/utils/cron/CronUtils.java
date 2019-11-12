@@ -45,64 +45,47 @@ public class CronUtils {
   private static final CronParser QUARTZ_CRON_PARSER = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
 
   /**
-   * Parse string with cron expression to Cron
-   *
-   * @param cronExpression
-   *            - cron expression, never null
+   * parse to cron
+   * @param cronExpression cron expression, never null
    * @return Cron instance, corresponding to cron expression received
-   * @throws java.lang.IllegalArgumentException
-   *             if expression does not match cron definition
    */
   public static Cron parse2Cron(String cronExpression) {
     return QUARTZ_CRON_PARSER.parse(cronExpression);
   }
 
+
   /**
-   * build a new <CODE>CronExpression</CODE> based on the string cronExpression.
-   *
-   * @param cronExpression String representation of the cron expression the
-   *                       new object should represent
-   * @throws java.text.ParseException
-   *         if the string expression cannot be parsed into a valid
-   *         <CODE>CronExpression</CODE>
+   * build a new CronExpression based on the string cronExpression
+   * @param cronExpression String representation of the cron expression the new object should represent
+   * @return CronExpression
+   * @throws ParseException if the string expression cannot be parsed into a valid
    */
   public static CronExpression parse2CronExpression(String cronExpression) throws ParseException {
     return new CronExpression(cronExpression);
   }
 
   /**
-   * get cycle enum
-   * @param cron
-   * @return
+   * get max cycle
+   * @param cron cron
+   * @return CycleEnum
    */
   public static CycleEnum getMaxCycle(Cron cron) {
     return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron)).getCycle();
   }
 
   /**
-   * get cycle enum
-   * @param cron
-   * @return
+   * get min cycle
+   * @param cron cron
+   * @return CycleEnum
    */
   public static CycleEnum getMiniCycle(Cron cron) {
     return min(cron).addCycle(hour(cron)).addCycle(day(cron)).addCycle(week(cron)).addCycle(month(cron)).getMiniCycle();
   }
 
   /**
-   * get mini level of cycle enum
-   *
-   * @param crontab
-   * @return
-   */
-  public static CycleEnum getMiniCycle(String crontab) {
-    return getMiniCycle(parse2Cron(crontab));
-  }
-
-  /**
-   * get cycle enum
-   *
-   * @param crontab
-   * @return
+   * get max cycle
+   * @param crontab crontab
+   * @return CycleEnum
    */
   public static CycleEnum getMaxCycle(String crontab) {
     return getMaxCycle(parse2Cron(crontab));
@@ -110,10 +93,10 @@ public class CronUtils {
 
   /**
    * gets all scheduled times for a period of time based on not self dependency
-   * @param startTime
-   * @param endTime
-   * @param cronExpression
-   * @return
+   * @param startTime startTime
+   * @param endTime endTime
+   * @param cronExpression cronExpression
+   * @return date list
    */
   public static List<Date> getFireDateList(Date startTime, Date endTime, CronExpression cronExpression) {
     List<Date> dateList = new ArrayList<>();
@@ -131,11 +114,11 @@ public class CronUtils {
 
   /**
    * gets expect scheduled times for a period of time based on self dependency
-   * @param startTime
-   * @param endTime
-   * @param cronExpression
-   * @param fireTimes
-   * @return
+   * @param startTime startTime
+   * @param endTime endTime
+   * @param cronExpression cronExpression
+   * @param fireTimes fireTimes
+   * @return date list
    */
   public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression,int fireTimes) {
     List<Date> dateList = new ArrayList<>();
@@ -154,10 +137,10 @@ public class CronUtils {
 
   /**
    * gets all scheduled times for a period of time based on self dependency
-   * @param startTime
-   * @param endTime
-   * @param cronExpression
-   * @return
+   * @param startTime startTime
+   * @param endTime endTime
+   * @param cronExpression cronExpression
+   * @return date list
    */
   public static List<Date> getSelfFireDateList(Date startTime, Date endTime, CronExpression cronExpression) {
     List<Date> dateList = new ArrayList<>();
@@ -176,9 +159,9 @@ public class CronUtils {
 
   /**
    * get expiration time
-   * @param startTime
-   * @param cycleEnum
-   * @return
+   * @param startTime startTime
+   * @param cycleEnum cycleEnum
+   * @return date
    */
   public static Date getExpirationTime(Date startTime, CycleEnum cycleEnum) {
     Date maxExpirationTime = null;
@@ -215,7 +198,7 @@ public class CronUtils {
   /**
    * get the end time of the day by value of date
    * @param date
-   * @return
+   * @return date
    */
   private static Date getEndTime(Date date) {
     Calendar end = new GregorianCalendar();

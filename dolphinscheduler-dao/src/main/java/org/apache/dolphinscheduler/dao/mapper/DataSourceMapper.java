@@ -23,21 +23,57 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * datasource mapper interface
+ */
 public interface DataSourceMapper extends BaseMapper<DataSource> {
 
+    /**
+     * query datasource by type
+     * @param userId userId
+     * @param type type
+     * @return datasource list
+     */
     List<DataSource> queryDataSourceByType(@Param("userId") int userId, @Param("type") Integer type);
 
+    /**
+     * datasource page
+     * @param page page
+     * @param userId userId
+     * @param name name
+     * @return datasource IPage
+     */
     IPage<DataSource> selectPaging(IPage<DataSource> page,
                                    @Param("userId") int userId,
                                    @Param("name") String name);
 
+    /**
+     * query datasource by name
+     * @param name name
+     * @return datasource list
+     */
     List<DataSource> queryDataSourceByName(@Param("name") String name);
 
 
+    /**
+     * query authed datasource
+     * @param userId userId
+     * @return datasource list
+     */
     List<DataSource> queryAuthedDatasource(@Param("userId") int userId);
 
+    /**
+     * query datasource except userId
+     * @param userId userId
+     * @return datasource list
+     */
     List<DataSource> queryDatasourceExceptUserId(@Param("userId") int userId);
 
+    /**
+     * list all datasource by type
+     * @param type datasource type
+     * @return datasource list
+     */
     List<DataSource> listAllDataSourceByType(@Param("type") Integer type);
 
 

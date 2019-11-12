@@ -21,11 +21,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * upgrade DolphinScheduler database
+ * upgrade DolphinScheduler
  */
 public class UpgradeDolphinScheduler {
 	private static final Logger logger = LoggerFactory.getLogger(UpgradeDolphinScheduler.class);
 
+	/**
+	 * upgrade dolphin scheduler db
+	 * @param args args
+	 */
 	public static void main(String[] args) {
 		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
 		try {

@@ -26,20 +26,32 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * postgresql upgrade dao
+ */
 public class PostgresqlUpgradeDao extends UpgradeDao {
 
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
     private static final String schema = getSchema();
 
+    /**
+     * init
+     */
     @Override
     protected void init() {
 
     }
 
+    /**
+     * postgresql upgrade dao holder
+     */
     private static class PostgresqlUpgradeDaoHolder {
         private static final PostgresqlUpgradeDao INSTANCE = new PostgresqlUpgradeDao();
     }
 
+    /**
+     * PostgresqlUpgradeDao Constructor
+     */
     private PostgresqlUpgradeDao() {
     }
 
@@ -48,11 +60,19 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
     }
 
 
+    /**
+     * init schema
+     * @param initSqlPath initSqlPath
+     */
     @Override
     public void initSchema(String initSqlPath) {
         super.initSchema(initSqlPath);
     }
 
+    /**
+     * getSchema
+     * @return schema
+     */
     public static String getSchema(){
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -75,11 +95,13 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
         return "";
     }
 
+
     /**
-     * Determines whether a table exists
-     * @param tableName
-     * @return
+     * determines whether a table exists
+     * @param tableName tableName
+     * @return if table exist return true，else return false
      */
+    @Override
     public boolean isExistsTable(String tableName) {
         Connection conn = null;
         ResultSet rs = null;
@@ -103,11 +125,12 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
     }
 
     /**
-     * Determines whether a field exists in the specified table
-     * @param tableName
-     * @param columnName
-     * @return
+     * determines whether a field exists in the specified table
+     * @param tableName tableName
+     * @param columnName columnName
+     * @return  if column name exist return true，else return false
      */
+    @Override
     public boolean isExistsColumn(String tableName,String columnName) {
         Connection conn = null;
         ResultSet rs = null;

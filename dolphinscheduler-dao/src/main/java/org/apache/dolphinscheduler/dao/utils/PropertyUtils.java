@@ -45,6 +45,9 @@ public class PropertyUtils {
         init();
     }
 
+    /**
+     * init
+     */
     private void init(){
         String[] propertyFiles = new String[]{Constants.DAO_PROPERTIES_PATH};
         for (String fileName : propertyFiles) {
@@ -65,25 +68,18 @@ public class PropertyUtils {
         }
     }
 
-/*
-    public static PropertyUtils getInstance(){
-        return propertyUtils;
-    }
-*/
-
     /**
      * get property value
-     *
      * @param key property name
-     * @return
+     * @return get string value
      */
     public static String getString(String key) {
         return properties.getProperty(key);
     }
 
+
     /**
      * get property value
-     *
      * @param key property name
      * @return  get property int value , if key == null, then return -1
      */
@@ -92,10 +88,10 @@ public class PropertyUtils {
     }
 
     /**
-     *
-     * @param key
-     * @param defaultValue
-     * @return
+     * get property value
+     * @param key key
+     * @param defaultValue defaultValue
+     * @return get property int value，if key == null ，then return  defaultValue
      */
     public static int getInt(String key, int defaultValue) {
         String value = getString(key);
@@ -109,87 +105,5 @@ public class PropertyUtils {
             logger.info(e.getMessage(),e);
         }
         return defaultValue;
-    }
-
-    /**
-     * get property value
-     *
-     * @param key property name
-     * @return
-     */
-    public static Boolean getBoolean(String key) {
-        String value = properties.getProperty(key.trim());
-        if(null != value){
-            return Boolean.parseBoolean(value);
-        }
-
-        return false;
-    }
-
-    /**
-     *
-     * @param key
-     * @return
-     */
-    public static long getLong(String key) {
-        return getLong(key,-1);
-    }
-
-    /**
-     *
-     * @param key
-     * @param defaultVal
-     * @return
-     */
-    public static long getLong(String key, long defaultVal) {
-        String val = getString(key);
-        return val == null ? defaultVal : Long.parseLong(val);
-    }
-
-
-    /**
-     *
-     * @param key
-     * @param defaultVal
-     * @return
-     */
-    public double getDouble(String key, double defaultVal) {
-        String val = getString(key);
-        return val == null ? defaultVal : Double.parseDouble(val);
-    }
-
-
-    /**
-     *  get array
-     * @param key       property name
-     * @param splitStr  separator
-     * @return
-     */
-    public static String[] getArray(String key, String splitStr) {
-        String value = getString(key);
-        if (value == null) {
-            return null;
-        }
-        try {
-            String[] propertyArray = value.split(splitStr);
-            return propertyArray;
-        } catch (NumberFormatException e) {
-            logger.info(e.getMessage(),e);
-        }
-        return null;
-    }
-
-    /**
-     *
-     * @param key
-     * @param type
-     * @param defaultValue
-     * @param <T>
-     * @return  get enum value
-     */
-    public <T extends Enum<T>> T getEnum(String key, Class<T> type,
-                                         T defaultValue) {
-        String val = getString(key);
-        return val == null ? defaultValue : Enum.valueOf(type, val);
     }
 }

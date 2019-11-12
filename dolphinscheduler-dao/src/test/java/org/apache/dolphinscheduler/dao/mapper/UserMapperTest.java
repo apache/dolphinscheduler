@@ -55,7 +55,7 @@ public class UserMapperTest {
 
     /**
      * insert one user
-     * @return
+     * @return User
      */
     private User insertOne(){
         User user = new User();
@@ -72,8 +72,8 @@ public class UserMapperTest {
 
     /**
      * insert one user
-     * @param tenant
-     * @return
+     * @param tenant tenant
+     * @return User
      */
     private User insertOne(Tenant tenant){
         User user = new User();
@@ -90,9 +90,9 @@ public class UserMapperTest {
 
     /**
      * insert one user
-     * @param queue
-     * @param tenant
-     * @return
+     * @param queue queue
+     * @param tenant tenant
+     * @return User
      */
     private User insertOne(Queue queue,Tenant tenant){
         User user = new User();
@@ -110,7 +110,7 @@ public class UserMapperTest {
 
     /**
      * insert one AlertGroup
-     * @return
+     * @return AlertGroup
      */
     private AlertGroup insertOneAlertGroup(){
         //insertOne
@@ -127,9 +127,9 @@ public class UserMapperTest {
 
     /**
      * insert one UserAlertGroup
-     * @param user
-     * @param alertGroup
-     * @return
+     * @param user user
+     * @param alertGroup alertGroup
+     * @return UserAlertGroup
      */
     private UserAlertGroup insertOneUserAlertGroup(User user,AlertGroup alertGroup){
         UserAlertGroup userAlertGroup = new UserAlertGroup();
@@ -144,8 +144,8 @@ public class UserMapperTest {
 
     /**
      * insert one AccessToken
-     * @param user
-     * @return
+     * @param user user
+     * @return AccessToken
      */
     private AccessToken insertOneAccessToken(User user){
         //insertOne
@@ -161,7 +161,7 @@ public class UserMapperTest {
 
     /**
      * insert one Tenant
-     * @return
+     * @return Tenant
      */
     private Tenant insertOneTenant(){
         Tenant tenant = new Tenant();
@@ -177,7 +177,7 @@ public class UserMapperTest {
 
     /**
      * insert one Queue
-     * @return
+     * @return Queue
      */
     private Queue insertOneQueue(){
         Queue queue = new Queue();
@@ -189,6 +189,9 @@ public class UserMapperTest {
         return queue;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -202,6 +205,9 @@ public class UserMapperTest {
         userMapper.deleteById(user.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         //insertOne
@@ -212,6 +218,9 @@ public class UserMapperTest {
         userMapper.deleteById(user.getId());
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         //insertOne
@@ -222,6 +231,9 @@ public class UserMapperTest {
         userMapper.deleteById(user.getId());
     }
 
+    /**
+     * test query all general user
+     */
     @Test
     public void testQueryAllGeneralUser() {
         //insertOne
@@ -232,6 +244,9 @@ public class UserMapperTest {
         userMapper.deleteById(user.getId());
     }
 
+    /**
+     * test query by username
+     */
     @Test
     public void testQueryByUserNameAccurately() {
         //insertOne
@@ -242,6 +257,9 @@ public class UserMapperTest {
         userMapper.deleteById(user.getId());
     }
 
+    /**
+     * test query by username and password
+     */
     @Test
     public void testQueryUserByNamePassword() {
         //insertOne
@@ -253,6 +271,9 @@ public class UserMapperTest {
         userMapper.deleteById(user.getId());
     }
 
+    /**
+     * test page
+     */
     @Test
     public void testQueryUserPaging() {
         //insertOneQueue
@@ -270,6 +291,9 @@ public class UserMapperTest {
         userMapper.deleteById(user.getId());
     }
 
+    /**
+     * test query detail by id
+     */
     @Test
     public void testQueryDetailsById() {
         //insertOne
@@ -280,6 +304,9 @@ public class UserMapperTest {
         userMapper.deleteById(user.getId());
     }
 
+    /**
+     * test query user list by alertgroupId
+     */
     @Test
     public void testQueryUserListByAlertGroupId() {
         //insertOne
@@ -297,6 +324,9 @@ public class UserMapperTest {
 
     }
 
+    /**
+     * test query tenant code by userId
+     */
     @Test
     public void testQueryTenantCodeByUserId() {
         //insertOneTenant
@@ -310,6 +340,9 @@ public class UserMapperTest {
         tenantMapper.deleteById(tenant.getId());
     }
 
+    /**
+     * test query user by token
+     */
     @Test
     public void testQueryUserByToken() {
         //insertOne

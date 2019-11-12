@@ -50,8 +50,8 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     }
 
     /**
-     * get db type
-     * @return
+     * get datasource
+     * @return DruidDataSource
      */
     public static DruidDataSource getDataSource(){
         DruidDataSource dataSource = ConnectionFactory.getDataSource();
@@ -64,14 +64,14 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     /**
      * get db type
-     * @return
+     * @return dbType
      */
     public static DbType getDbType(){
         return dbType;
     }
 
     /**
-     * get db type
+     * get current dbType
      * @return
      */
     private static DbType getCurrentDbType(){
@@ -88,6 +88,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         }
     }
 
+    /**
+     * init schema
+     */
     public void initSchema(){
         DbType dbType = getDbType();
         String initSqlPath = "";
@@ -109,6 +112,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     }
 
 
+    /**
+     * init scheam
+     * @param initSqlPath initSqlPath
+     */
     public void initSchema(String initSqlPath) {
 
         // Execute the dolphinscheduler DDL, it cannot be rolled back
@@ -119,6 +126,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     }
 
+    /**
+     * run DML
+     * @param initSqlPath initSqlPath
+     */
     private void runInitDML(String initSqlPath) {
         Connection conn = null;
         if (StringUtils.isEmpty(rootDir)) {
@@ -158,6 +169,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     }
 
+    /**
+     * run DDL
+     * @param initSqlPath initSqlPath
+     */
     private void runInitDDL(String initSqlPath) {
         Connection conn = null;
         if (StringUtils.isEmpty(rootDir)) {
@@ -188,21 +203,26 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     }
 
     /**
-     * Determines whether a table exists
-     * @param tableName
-     * @return
+     * determines whether a table exists
+     * @param tableName tableName
+     * @return if table exist return true，else return false
      */
     public abstract boolean isExistsTable(String tableName);
 
     /**
-     * Determines whether a field exists in the specified table
-     * @param tableName
-     * @param columnName
-     * @return
+     * determines whether a field exists in the specified table
+     * @param tableName tableName
+     * @param columnName columnName
+     * @return  if column name exist return true，else return false
      */
     public abstract boolean isExistsColumn(String tableName,String columnName);
 
 
+    /**
+     * get current version
+     * @param versionName versionName
+     * @return version
+     */
     public String getCurrentVersion(String versionName) {
         String sql = String.format("select version from %s",versionName);
         Connection conn = null;
@@ -229,6 +249,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     }
 
 
+    /**
+     * upgrade DolphinScheduler
+     * @param schemaDir schema dir
+     */
     public void upgradeDolphinScheduler(String schemaDir) {
 
         upgradeDolphinSchedulerDDL(schemaDir);
@@ -237,6 +261,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     }
 
+    /**
+     * upgradeDolphinScheduler DML
+     * @param schemaDir schemaDir
+     */
     private void upgradeDolphinSchedulerDML(String schemaDir) {
         String schemaVersion = schemaDir.split("_")[0];
         if (StringUtils.isEmpty(rootDir)) {
@@ -305,6 +333,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
     }
 
+    /**
+     * upgradeDolphinScheduler DDL
+     * @param schemaDir schemaDir
+     */
     private void upgradeDolphinSchedulerDDL(String schemaDir) {
         if (StringUtils.isEmpty(rootDir)) {
             throw new RuntimeException("Environment variable user.dir not found");
@@ -345,7 +377,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     }
 
 
-
+    /**
+     * update version
+     * @param version version
+     */
     public void updateVersion(String version) {
         // Change version in the version table to the new version
         String versionName = T_VERSION_NAME;

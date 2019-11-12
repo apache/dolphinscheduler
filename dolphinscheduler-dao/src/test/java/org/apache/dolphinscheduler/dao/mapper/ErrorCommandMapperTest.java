@@ -42,6 +42,10 @@ public class ErrorCommandMapperTest {
     ProcessDefinitionMapper processDefinitionMapper;
 
 
+    /**
+     * insert
+     * @return ErrorCommand
+     */
     private ErrorCommand insertOne(){
         //insertOne
         ErrorCommand errorCommand = new ErrorCommand();
@@ -53,6 +57,9 @@ public class ErrorCommandMapperTest {
         return errorCommand;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -64,6 +71,9 @@ public class ErrorCommandMapperTest {
         errorCommandMapper.deleteById(errorCommand.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
 
@@ -72,6 +82,9 @@ public class ErrorCommandMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         ErrorCommand errorCommand = insertOne();

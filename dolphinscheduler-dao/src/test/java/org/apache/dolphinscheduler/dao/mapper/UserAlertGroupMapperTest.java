@@ -47,9 +47,9 @@ public class UserAlertGroupMapperTest {
 
     /**
      * insert one UserAlertGroup
-     * @param user
-     * @param alertGroup
-     * @return
+     * @param user user
+     * @param alertGroup alertGroup
+     * @return UserAlertGroup
      */
     private UserAlertGroup insertOne(User user,AlertGroup alertGroup){
         UserAlertGroup userAlertGroup = new UserAlertGroup();
@@ -64,7 +64,7 @@ public class UserAlertGroupMapperTest {
 
     /**
      * insert one UserAlertGroup
-     * @return
+     * @return UserAlertGroup
      */
     private UserAlertGroup insertOne(){
         UserAlertGroup userAlertGroup = new UserAlertGroup();
@@ -79,7 +79,7 @@ public class UserAlertGroupMapperTest {
 
     /**
      * insert one user
-     * @return
+     * @return User
      */
     private User insertOneUser(){
         User user = new User();
@@ -97,7 +97,7 @@ public class UserAlertGroupMapperTest {
 
     /**
      * insert one AlertGroup
-     * @return
+     * @return AlertGroup
      */
     private AlertGroup insertOneAlertGroup(){
         //insertOne
@@ -112,6 +112,9 @@ public class UserAlertGroupMapperTest {
         return alertGroup;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOneUser
@@ -133,6 +136,9 @@ public class UserAlertGroupMapperTest {
         alertGroupMapper.deleteById(alertGroup.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         //insertOne
@@ -142,6 +148,9 @@ public class UserAlertGroupMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         //insertOne
@@ -152,6 +161,9 @@ public class UserAlertGroupMapperTest {
         userAlertGroupMapper.deleteById(userAlertGroup.getId());
     }
 
+    /**
+     * test delete by alertgroupId
+     */
     @Test
     public void testDeleteByAlertgroupId() {
         //insertOneUser
@@ -167,6 +179,9 @@ public class UserAlertGroupMapperTest {
         alertGroupMapper.deleteById(alertGroup.getId());
     }
 
+    /**
+     * test list user by alertgroupId
+     */
     @Test
     public void testListUserByAlertgroupId() {
         //insertOneUser

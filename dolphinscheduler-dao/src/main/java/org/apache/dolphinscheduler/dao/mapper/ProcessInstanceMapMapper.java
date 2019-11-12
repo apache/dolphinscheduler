@@ -22,17 +22,40 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * process instance map mapper interface
+ */
 public interface ProcessInstanceMapMapper extends BaseMapper<ProcessInstanceMap> {
 
+    /**
+     * query process instance by parentId
+     * @param parentProcessId parentProcessId
+     * @param parentTaskId parentTaskId
+     * @return process instance map
+     */
+    ProcessInstanceMap queryByParentId(@Param("parentProcessId") int parentProcessId,
+                                       @Param("parentTaskId") int parentTaskId);
 
 
-    ProcessInstanceMap queryByParentId(@Param("parentProcessId") int parentProcessId, @Param("parentTaskId") int parentTaskId);
-
-
+    /**
+     * query by sub process id
+     * @param subProcessId subProcessId
+     * @return process instance map
+     */
     ProcessInstanceMap queryBySubProcessId(@Param("subProcessId") Integer subProcessId);
 
+    /**
+     * delete by parent process id
+     * @param parentProcessId parentProcessId
+     * @return delete result
+     */
     int deleteByParentProcessId(@Param("parentProcessId") int parentProcessId);
 
+    /**
+     *  query sub process instance  ids by parent instance id
+     * @param parentInstanceId parentInstanceId
+     * @return sub process instance ids
+     */
     List<Integer> querySubIdListByParentId(@Param("parentInstanceId") int parentInstanceId);
 
 }

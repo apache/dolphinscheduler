@@ -28,6 +28,9 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * task instance mapper interface
+ */
 public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
 

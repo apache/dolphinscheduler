@@ -23,12 +23,30 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * worker group mapper interface
+ */
 public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
 
+    /**
+     * query all worker group
+     * @return worker group list
+     */
     List<WorkerGroup> queryAllWorkerGroup();
 
+    /**
+     * query worer grouop by name
+     * @param name name
+     * @return worker group list
+     */
     List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
 
+    /**
+     * worker group page
+     * @param page page
+     * @param searchVal searchVal
+     * @return worker group IPage
+     */
     IPage<WorkerGroup> queryListPaging(IPage<WorkerGroup> page,
                                        @Param("searchVal") String searchVal);
 

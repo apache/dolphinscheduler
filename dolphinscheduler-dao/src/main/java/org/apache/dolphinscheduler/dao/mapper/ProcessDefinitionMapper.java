@@ -24,26 +24,71 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * process definition mapper interface
+ */
 public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
 
+    /**
+     * query process definition by name
+     * @param projectId projectId
+     * @param name name
+     * @return process definition
+     */
     ProcessDefinition queryByDefineName(@Param("projectId") int projectId,
                                         @Param("processDefinitionName") String name);
 
+    /**
+     * query process definition by id
+     * @param processDefineId processDefineId
+     * @return process definition
+     */
     ProcessDefinition queryByDefineId(@Param("processDefineId") int processDefineId);
 
+    /**
+     * process definition page
+     * @param page page
+     * @param searchVal searchVal
+     * @param userId userId
+     * @param projectId projectId
+     * @param isAdmin isAdmin
+     * @return process definition IPage
+     */
     IPage<ProcessDefinition> queryDefineListPaging(IPage<ProcessDefinition> page,
                                                    @Param("searchVal") String searchVal,
                                                    @Param("userId") int userId,
                                                    @Param("projectId") int projectId,
                                                    @Param("isAdmin") boolean isAdmin);
 
+    /**
+     * query all process definition list
+     * @param projectId projectId
+     * @return process definition list
+     */
     List<ProcessDefinition> queryAllDefinitionList(@Param("projectId") int projectId);
 
+    /**
+     * query process definition by ids
+     * @param ids ids
+     * @return process definition list
+     */
     List<ProcessDefinition> queryDefinitionListByIdList(@Param("ids") Integer[] ids);
 
+    /**
+     * query process definition by tenant
+     * @param tenantId tenantId
+     * @return process definition list
+     */
     List<ProcessDefinition> queryDefinitionListByTenant(@Param("tenantId") int tenantId);
 
+    /**
+     *  count process definition group by user
+     * @param userId userId
+     * @param projectIds projectIds
+     * @param isAdmin isAdmin
+     * @return process definition list
+     */
     List<DefinitionGroupByUser> countDefinitionGroupByUser(
             @Param("userId") Integer userId,
             @Param("projectIds") Integer[] projectIds,

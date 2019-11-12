@@ -37,9 +37,9 @@ public class DaoFactory {
 
   /**
    * get dao instance
-   *
-   * @param clazz
-   * @return  dao instance
+   * @param clazz clazz
+   * @param <T> T
+   * @return T object
    */
   @SuppressWarnings("unchecked")
   public static <T extends AbstractBaseDao> T getDaoInstance(Class<T> clazz) {

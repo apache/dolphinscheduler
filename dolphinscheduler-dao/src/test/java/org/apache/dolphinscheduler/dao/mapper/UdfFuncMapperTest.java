@@ -49,7 +49,7 @@ public class UdfFuncMapperTest {
 
     /**
      * insert one udf
-     * @return
+     * @return UdfFunc
      */
     private UdfFunc insertOne(){
         UdfFunc udfFunc = new UdfFunc();
@@ -85,7 +85,7 @@ public class UdfFuncMapperTest {
 
     /**
      * insert one user
-     * @return
+     * @return User
      */
     private User insertOneUser(){
         User user = new User();
@@ -102,7 +102,7 @@ public class UdfFuncMapperTest {
 
     /**
      * insert one user
-     * @return
+     * @return User
      */
     private User insertOneUser(String userName){
         User user = new User();
@@ -117,6 +117,12 @@ public class UdfFuncMapperTest {
         return user;
     }
 
+    /**
+     * insert UDFUser
+     * @param user user
+     * @param udfFunc udf func
+     * @return UDFUser
+     */
     private UDFUser insertOneUDFUser(User user,UdfFunc udfFunc){
         UDFUser udfUser = new UDFUser();
         udfUser.setUdfId(udfFunc.getId());
@@ -127,6 +133,9 @@ public class UdfFuncMapperTest {
         return udfUser;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -142,6 +151,9 @@ public class UdfFuncMapperTest {
 
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         //insertOne
@@ -151,6 +163,9 @@ public class UdfFuncMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery(){
         //insertOne
@@ -161,6 +176,9 @@ public class UdfFuncMapperTest {
         udfFuncMapper.deleteById(udfFunc.getId());
     }
 
+    /**
+     * test query udf by ids
+     */
     @Test
     public void testQueryUdfByIdStr() {
         //insertOne
@@ -175,6 +193,9 @@ public class UdfFuncMapperTest {
         udfFuncMapper.deleteById(udfFunc1.getId());
     }
 
+    /**
+     * test page
+     */
     @Test
     public void testQueryUdfFuncPaging() {
         //insertOneUser
@@ -190,6 +211,9 @@ public class UdfFuncMapperTest {
 
     }
 
+    /**
+     * test get udffunc by type
+     */
     @Test
     public void testGetUdfFuncByType() {
         //insertOneUser
@@ -204,6 +228,9 @@ public class UdfFuncMapperTest {
 
     }
 
+    /**
+     * test query udffunc expect userId
+     */
     @Test
     public void testQueryUdfFuncExceptUserId() {
         //insertOneUser
@@ -221,6 +248,9 @@ public class UdfFuncMapperTest {
 
     }
 
+    /**
+     * test query authed udffunc
+     */
     @Test
     public void testQueryAuthedUdfFunc() {
         //insertOneUser
