@@ -214,8 +214,7 @@ public class JSONUtils {
   }
 
   /**
-   * 对象装json字符串 <p>
-   *
+   * object to json string
    * @return json string
    */
   public static String toJsonString(Object object) {

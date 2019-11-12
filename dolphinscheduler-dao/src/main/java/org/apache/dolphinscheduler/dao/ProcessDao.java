@@ -59,7 +59,6 @@ public class ProcessDao extends AbstractBaseDao {
     private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.RUNNING_EXEUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
-//            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
@@ -248,7 +247,7 @@ public class ProcessDao extends AbstractBaseDao {
             int processInstanceId = cmdParamObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING);
 
             List<Command> commands = commandMapper.selectList(null);
-            //遍历所有命令
+            // for all commands
             for (Command tmpCommand:commands){
                 if(cmdTypeMap.containsKey(tmpCommand.getCommandType())){
                     tempObj = (JSONObject) JSONObject.parse(tmpCommand.getCommandParam());
@@ -638,7 +637,7 @@ public class ProcessDao extends AbstractBaseDao {
                         ExecutionStatus.KILL);
                 suspendedNodeList.addAll(stopNodeList);
                 for(Integer taskId : suspendedNodeList){
-                    // 把暂停状态初始化
+                    // initialize the pause state
                     initTaskInstance(this.findTaskInstanceById(taskId));
                 }
                 cmdParam.put(Constants.CMDPARAM_RECOVERY_START_NODE_STRING, String.join(",", convertIntListToString(suspendedNodeList)));
@@ -1017,9 +1016,6 @@ public class ProcessDao extends AbstractBaseDao {
      * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_${task executed by ip1},${ip2}...
      *
      * The tasks with the highest priority are selected by comparing the priorities of the above four levels from high to low.
-     *
-     * 流程实例优先级_流程实例id_任务优先级_任务id_任务执行机器ip1，ip2...          high <- low
-     *
      * @param taskInstance
      * @return
      */
@@ -1167,7 +1163,6 @@ public class ProcessDao extends AbstractBaseDao {
             logger.error("save error, process instance is null!");
             return ;
         }
-        //创建流程实例
         if(workProcessInstance.getId() != 0){
             processInstanceMapper.updateById(workProcessInstance);
         }else{
@@ -1566,7 +1561,7 @@ public class ProcessDao extends AbstractBaseDao {
      *
      * @param masterId
      * @param processDefinitionId
-     * @param scheduledFireTime 任务调度预计触发的时间
+     * @param scheduledFireTime the time the task schedule is expected to trigger
      * @return
      * @throws Exception
      */
@@ -1581,7 +1576,7 @@ public class ProcessDao extends AbstractBaseDao {
      * get dependency cycle list by work process define id list and scheduler fire time
      * @param masterId
      * @param ids
-     * @param scheduledFireTime 任务调度预计触发的时间
+     * @param scheduledFireTime the time the task schedule is expected to trigger
      * @return
      * @throws Exception
      */
@@ -1602,7 +1597,7 @@ public class ProcessDao extends AbstractBaseDao {
         Cron depCron;
         List<Date> list;
         List<Schedule> schedules = this.selectAllByProcessDefineId(ids);
-        // 遍历所有的调度信息
+        // for all scheduling information
         for(Schedule depSchedule:schedules){
             strCrontab = depSchedule.getCrontab();
             depCronExpression = CronUtils.parse2CronExpression(strCrontab);
