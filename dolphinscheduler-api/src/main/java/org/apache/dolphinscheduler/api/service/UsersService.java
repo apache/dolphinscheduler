@@ -76,13 +76,15 @@ public class UsersService extends BaseService {
     /**
      * create user, only system admin have permission
      *
-     * @param loginUser
-     * @param userName
-     * @param userPassword
-     * @param email
-     * @param tenantId
-     * @param phone
-     * @return
+     * @param loginUser login user
+     * @param userName user name
+     * @param userPassword user password
+     * @param email email
+     * @param tenantId tenant id
+     * @param phone phone
+     * @param queue queue
+     * @return create result code
+     * @throws Exception exception
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createUser(User loginUser,
@@ -103,7 +105,7 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        if (checkTenant(tenantId)) {
+        if (!checkTenantExists(tenantId)) {
             putMsg(result, Status.TENANT_NOT_EXIST);
             return result;
         }
@@ -147,9 +149,9 @@ public class UsersService extends BaseService {
     /**
      * query user
      *
-     * @param name
-     * @param password
-     * @return
+     * @param name name
+     * @param password password
+     * @return user info
      */
     public User queryUser(String name, String password) {
         String md5 = EncryptionUtils.getMd5(password);
@@ -157,23 +159,13 @@ public class UsersService extends BaseService {
     }
 
     /**
-     * check general user or not
-     *
-     * @param user
-     * @return
-     */
-    public boolean isGeneral(User user) {
-        return user.getUserType() == UserType.GENERAL_USER;
-    }
-
-    /**
      * query user list
      *
-     * @param loginUser
-     * @param searchVal
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param pageNo page number
+     * @param searchVal search avlue
+     * @param pageSize page size
+     * @return user list page
      */
     public Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>(5);
@@ -198,13 +190,15 @@ public class UsersService extends BaseService {
     /**
      * updateProcessInstance user
      *
-     * @param userId
-     * @param userName
-     * @param userPassword
-     * @param email
-     * @param tenantId
-     * @param phone
-     * @return
+     * @param userId user id
+     * @param userName user name
+     * @param userPassword user password
+     * @param email email
+     * @param tenantId tennat id
+     * @param phone phone
+     * @param queue  queue
+     * @return update result code
+     * @throws Exception exception
      */
     public Map<String, Object> updateUser(int userId,
                                           String userName,
@@ -311,9 +305,10 @@ public class UsersService extends BaseService {
     /**
      * delete user
      *
-     * @param loginUser
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param id user id
+     * @return delete result code
+     * @throws Exception exception when operate hdfs
      */
     public Map<String, Object> deleteUserById(User loginUser, int id) throws Exception {
         Map<String, Object> result = new HashMap<>(5);
@@ -344,10 +339,10 @@ public class UsersService extends BaseService {
     /**
      * grant project
      *
-     * @param loginUser
-     * @param userId
-     * @param projectIds
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectIds project id array
+     * @return grant result code
      */
     public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
         Map<String, Object> result = new HashMap<>(5);
@@ -387,10 +382,10 @@ public class UsersService extends BaseService {
     /**
      * grant resource
      *
-     * @param loginUser
-     * @param userId
-     * @param resourceIds
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @param resourceIds resource id array
+     * @return grant result code
      */
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>(5);
@@ -432,10 +427,10 @@ public class UsersService extends BaseService {
     /**
      * grant udf function
      *
-     * @param loginUser
-     * @param userId
-     * @param udfIds
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @param udfIds udf id array
+     * @return grant result code
      */
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
         Map<String, Object> result = new HashMap<>(5);
@@ -473,10 +468,10 @@ public class UsersService extends BaseService {
     /**
      * grant datasource
      *
-     * @param loginUser
-     * @param userId
-     * @param datasourceIds
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @param datasourceIds  data source id array
+     * @return grant result code
      */
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
         Map<String, Object> result = new HashMap<>(5);
@@ -515,8 +510,8 @@ public class UsersService extends BaseService {
     /**
      * query user info
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return user info
      */
     public Map<String, Object> getUserInfo(User loginUser) {
 
@@ -550,8 +545,8 @@ public class UsersService extends BaseService {
     /**
      * query user list
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return user list
      */
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
         Map<String, Object> result = new HashMap<>(5);
@@ -571,8 +566,8 @@ public class UsersService extends BaseService {
     /**
      * query user list
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return user list
      */
     public Map<String, Object> queryUserList(User loginUser) {
         Map<String, Object> result = new HashMap<>(5);
@@ -591,8 +586,8 @@ public class UsersService extends BaseService {
     /**
      * verify user name exists
      *
-     * @param userName
-     * @return
+     * @param userName user name
+     * @return true if user name not exists, otherwise return false
      */
     public Result verifyUserName(String userName) {
 
@@ -613,9 +608,9 @@ public class UsersService extends BaseService {
     /**
      * unauthorized user
      *
-     * @param loginUser
-     * @param alertgroupId
-     * @return
+     * @param loginUser login user
+     * @param alertgroupId alert group id
+     * @return unauthorize result code
      */
     public Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId) {
 
@@ -650,9 +645,9 @@ public class UsersService extends BaseService {
     /**
      * authorized user
      *
-     * @param loginUser
-     * @param alertgroupId
-     * @return
+     * @param loginUser login user
+     * @param alertgroupId alert group id
+     * @return authorized result code
      */
     public Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId) {
         Map<String, Object> result = new HashMap<>(5);
@@ -670,10 +665,10 @@ public class UsersService extends BaseService {
     /**
      * check
      *
-     * @param result
-     * @param bool
-     * @param userNoOperationPerm
-     * @return
+     * @param result result
+     * @param bool bool
+     * @param userNoOperationPerm status
+     * @return check result
      */
     private boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
         //only admin can operate
@@ -686,10 +681,10 @@ public class UsersService extends BaseService {
     }
 
     /**
-     * @param tenantId
-     * @return
+     * @param tenantId tenant id
+     * @return true if tenant exists, otherwise return false
      */
-    private boolean checkTenant(int tenantId) {
-        return tenantMapper.queryById(tenantId) == null ? true : false;
+    private boolean checkTenantExists(int tenantId) {
+        return tenantMapper.queryById(tenantId) != null ? true : false;
     }
 }
