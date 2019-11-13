@@ -17,6 +17,9 @@
 package org.apache.dolphinscheduler.server.worker.task.http;
 
 
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.io.Charsets;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
 import org.apache.dolphinscheduler.common.enums.HttpParametersType;
@@ -27,15 +30,12 @@ import org.apache.dolphinscheduler.common.task.http.HttpParameters;
 import org.apache.dolphinscheduler.common.utils.Bytes;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
+import org.apache.dolphinscheduler.server.utils.SpringApplication;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.io.Charsets;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;
@@ -92,7 +92,7 @@ public class HttpTask extends AbstractTask {
      */
     public HttpTask(TaskProps props, Logger logger) {
         super(props, logger);
-        this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+        this.processDao = SpringApplication.getBean(ProcessDao.class);
     }
 
     @Override
