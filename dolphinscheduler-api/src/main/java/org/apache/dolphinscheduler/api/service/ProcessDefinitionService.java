@@ -102,14 +102,15 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * create process definition
      *
-     * @param loginUser
-     * @param projectName
-     * @param name
-     * @param processDefinitionJson
-     * @param desc
-     * @param locations
-     * @param connects
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param name process definition name
+     * @param processDefinitionJson process definition json
+     * @param desc description
+     * @param locations locations for nodes
+     * @param connects connects for nodes
+     * @return create result code
+     * @throws JsonProcessingException JsonProcessingException
      */
     public Map<String, Object> createProcessDefinition(User loginUser, String projectName, String name,
                                                        String processDefinitionJson, String desc, String locations, String connects) throws JsonProcessingException {
@@ -163,9 +164,9 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * query proccess definition list
      *
-     * @param loginUser
-     * @param projectName
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @return definition list
      */
     public Map<String, Object> queryProccessDefinitionList(User loginUser, String projectName) {
 
@@ -189,13 +190,13 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * query proccess definition list paging
      *
-     * @param loginUser
-     * @param projectName
-     * @param searchVal
-     * @param pageNo
-     * @param pageSize
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param userId user id
+     * @return process definition page
      */
     public Map<String, Object> queryProcessDefinitionListPaging(User loginUser, String projectName, String searchVal, Integer pageNo, Integer pageSize, Integer userId) {
 
@@ -224,10 +225,10 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * query datail of process definition
      *
-     * @param loginUser
-     * @param projectName
-     * @param processId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process definition id
+     * @return process definition detail
      */
     public Map<String, Object> queryProccessDefinitionById(User loginUser, String projectName, Integer processId) {
 
@@ -254,15 +255,15 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * update  process definition
      *
-     * @param loginUser
-     * @param projectName
-     * @param id
-     * @param name
-     * @param processDefinitionJson
-     * @param desc
-     * @param locations
-     * @param connects
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param name process definition name
+     * @param id process definition id
+     * @param processDefinitionJson process definition json
+     * @param desc description
+     * @param locations locations for nodes
+     * @param connects connects for nodes
+     * @return update result code
      */
     public Map<String, Object> updateProcessDefinition(User loginUser, String projectName, int id, String name,
                                                        String processDefinitionJson, String desc,
@@ -329,10 +330,10 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * verify process definition name unique
      *
-     * @param loginUser
-     * @param projectName
-     * @param name
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param name name
+     * @return true if process definition name not exists, otherwise false
      */
     public Map<String, Object> verifyProccessDefinitionName(User loginUser, String projectName, String name) {
 
@@ -356,10 +357,10 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * delete process definition by id
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @return delete result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId) {
@@ -421,10 +422,10 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * batch delete process definition by ids
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionIds
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionIds process definition id
+     * @return delete result code
      */
     public Map<String, Object> batchDeleteProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds) {
 
@@ -470,11 +471,11 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * release process definition: online / offline
      *
-     * @param loginUser
-     * @param projectName
-     * @param id
-     * @param releaseState
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param id process definition id
+     * @param releaseState release state
+     * @return release result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> releaseProcessDefinition(User loginUser, String projectName, int id, int releaseState) {
@@ -525,10 +526,10 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * export process definition by id
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @param response response
      */
     public void exportProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId, HttpServletResponse response) {
         Project project = projectMapper.queryByName(projectName);
@@ -812,9 +813,9 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * check the process definition node meets the specifications
      *
-     * @param processData
-     * @param processDefinitionJson
-     * @return
+     * @param processData process data
+     * @param processDefinitionJson process definition json
+     * @return check result code
      */
     public Map<String, Object> checkProcessNodeList(ProcessData processData, String processDefinitionJson) {
 
@@ -863,6 +864,10 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     /**
      * get task node details based on process definition
+     *
+     * @param defineId define id
+     * @return task node list
+     * @throws Exception exception
      */
     public Map<String, Object> getTaskNodeListByDefinitionId(Integer defineId) throws Exception {
         Map<String, Object> result = new HashMap<>();
@@ -890,6 +895,10 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     /**
      * get task node details based on process definition
+     *
+     * @param defineIdList define id list
+     * @return task node list
+     * @throws Exception exception
      */
     public Map<String, Object> getTaskNodeListByDefinitionIdList(String defineIdList) throws Exception {
         Map<String, Object> result = new HashMap<>();
@@ -927,8 +936,8 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * query proccess definition all by project id
      *
-     * @param projectId
-     * @return
+     * @param projectId project id
+     * @return process definitions in the project
      */
     public Map<String, Object> queryProccessDefinitionAllByProjectId(Integer projectId) {
 
@@ -944,9 +953,10 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * Encapsulates the TreeView structure
      *
-     * @param processId
-     * @param limit
-     * @return
+     * @param processId process definition id
+     * @param limit limit
+     * @return tree view json data
+     * @throws Exception exception
      */
     public Map<String, Object> viewTree(Integer processId, Integer limit) throws Exception {
         Map<String, Object> result = new HashMap<>();
@@ -1075,9 +1085,9 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * Generate the DAG Graph based on the process definition id
      *
-     * @param processDefinition
-     * @return
-     * @throws Exception
+     * @param processDefinition process definition
+     * @return dag graph
+     * @throws Exception if exception happens
      */
     private DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) throws Exception {
 

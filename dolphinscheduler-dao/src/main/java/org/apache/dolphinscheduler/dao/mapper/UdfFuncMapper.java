@@ -23,21 +23,53 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * udf function mapper interface
+ */
 public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
 
 
+    /**
+     * query udf function by ids and function name
+     * @param ids ids
+     * @param funcNames funcNames
+     * @return udf function list
+     */
     List<UdfFunc> queryUdfByIdStr(@Param("ids") int[] ids,
                                   @Param("funcNames") String funcNames);
 
+    /**
+     * udf function page
+     * @param page page
+     * @param userId userId
+     * @param searchVal searchVal
+     * @return udf function IPage
+     */
     IPage<UdfFunc> queryUdfFuncPaging(IPage<UdfFunc> page,
                                       @Param("userId") int userId,
                                       @Param("searchVal") String searchVal);
 
+    /**
+     * query udf function by type
+     * @param userId userId
+     * @param type type
+     * @return udf function list
+     */
     List<UdfFunc> getUdfFuncByType(@Param("userId") int userId,
                                    @Param("type") Integer type);
 
+    /**
+     * query udf function except userId
+     * @param userId userId
+     * @return udf function list
+     */
     List<UdfFunc> queryUdfFuncExceptUserId(@Param("userId") int userId);
 
+    /**
+     *  query authed udf function
+     * @param userId userId
+     * @return udf function list
+     */
     List<UdfFunc> queryAuthedUdfFunc(@Param("userId") int userId);
 
 

@@ -106,6 +106,7 @@ public class Bytes {
    * @param b1 The first byte array.
    * @param sep The separator to use.
    * @param b2 The second byte array.
+   * @return two byte arrays together using a separator.
    */
   public static String toString(final byte [] b1,
                                 String sep,
@@ -470,9 +471,9 @@ public class Bytes {
   }
 
   /**
-   * This method will get a sequence of bytes from pos -> limit,
+   * This method will get a sequence of bytes from pos to limit,
    * but will restore pos after.
-   * @param buf
+   * @param buf buffer
    * @return byte array
    */
   public static byte[] getBytes(ByteBuffer buf) {
@@ -506,7 +507,7 @@ public class Bytes {
   /**
    * Convert a BigDecimal value to a byte array
    *
-   * @param val
+   * @param val value
    * @return the byte array
    */
   public static byte[] toBytes(BigDecimal val) {
@@ -521,7 +522,7 @@ public class Bytes {
   /**
    * Converts a byte array to a BigDecimal
    *
-   * @param bytes
+   * @param bytes bytes array
    * @return the char value
    */
   public static BigDecimal toBigDecimal(byte[] bytes) {
@@ -531,9 +532,9 @@ public class Bytes {
   /**
    * Converts a byte array to a BigDecimal value
    *
-   * @param bytes
-   * @param offset
-   * @param length
+   * @param bytes bytes array
+   * @param offset  offset
+   * @param length length
    * @return the char value
    */
   public static BigDecimal toBigDecimal(byte[] bytes, int offset, final int length) {
@@ -652,6 +653,7 @@ public class Bytes {
    * @param bytes array to hash
    * @param offset offset to start from
    * @param length length to hash
+   * @return hash code
    * */
   public static int hashCode(byte[] bytes, int offset, int length) {
     int hash = 1;

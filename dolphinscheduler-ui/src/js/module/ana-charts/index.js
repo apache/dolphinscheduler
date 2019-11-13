@@ -34,15 +34,15 @@ const components = {
 }
 
 const Chart = {
-  // 默认配置
+  // Default configuration
   settings: {},
   /**
-   * 配置全局属性
-   * @param {Object} options 全局配置项
+   * Configure global properties
+   * @param {Object} options Global configuration item
    */
   config (options) {
     const { theme } = options
-    // 注册主题
+    // Registration theme
     if (theme) {
       checkKeyInModel(theme, 'name', 'data')
       echarts.registerTheme(theme.name, theme.data)
@@ -53,7 +53,7 @@ const Chart = {
   }
 }
 
-// 注入不同组件对应方法
+// Corresponding methods for injection of different components
 for (const key in components) {
   if (components.hasOwnProperty(key)) {
     Chart[key.toLowerCase()] = (el, data, options) => {

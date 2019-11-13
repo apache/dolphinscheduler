@@ -47,6 +47,10 @@ public class ResourceMapperTest {
     @Autowired
     UserMapper userMapper;
 
+    /**
+     * insert
+     * @return Resource
+     */
     private Resource insertOne(){
         //insertOne
         Resource resource = new Resource();
@@ -57,6 +61,9 @@ public class ResourceMapperTest {
         return resource;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -68,6 +75,9 @@ public class ResourceMapperTest {
         resourceMapper.deleteById(resource.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         Resource resourceMap = insertOne();
@@ -75,6 +85,9 @@ public class ResourceMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         Resource resource = insertOne();
@@ -84,6 +97,9 @@ public class ResourceMapperTest {
         resourceMapper.deleteById(resource.getId());
     }
 
+    /**
+     * test query resource list
+     */
     @Test
     public void testQueryResourceList() {
 
@@ -102,6 +118,9 @@ public class ResourceMapperTest {
         resourceMapper.deleteById(resource.getId());
     }
 
+    /**
+     * test page
+     */
     @Test
     public void testQueryResourcePaging() {
         Resource resource = insertOne();
@@ -131,6 +150,9 @@ public class ResourceMapperTest {
 
     }
 
+    /**
+     * test authed resource list
+     */
     @Test
     public void testQueryResourceListAuthored() {
         Resource resource = insertOne();
@@ -152,6 +174,9 @@ public class ResourceMapperTest {
 
     }
 
+    /**
+     * test authed resource list
+     */
     @Test
     public void testQueryAuthorizedResourceList() {
         Resource resource = insertOne();
@@ -162,6 +187,9 @@ public class ResourceMapperTest {
         Assert.assertEquals(resources.size(), 0);
     }
 
+    /**
+     * test query resource expect userId
+     */
     @Test
     public void testQueryResourceExceptUserId() {
         Resource resource = insertOne();
@@ -172,6 +200,9 @@ public class ResourceMapperTest {
         resourceMapper.deleteById(resource.getId());
     }
 
+    /**
+     * test query tenant code by resource name
+     */
     @Test
     public void testQueryTenantCodeByResourceName() {
 

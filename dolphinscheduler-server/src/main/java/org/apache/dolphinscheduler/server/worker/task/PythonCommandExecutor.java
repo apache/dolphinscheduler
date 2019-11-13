@@ -35,12 +35,29 @@ import java.util.function.Consumer;
  */
 public class PythonCommandExecutor extends AbstractCommandExecutor {
 
+    /**
+     * logger
+     */
     private static final Logger logger = LoggerFactory.getLogger(PythonCommandExecutor.class);
 
+    /**
+     * python
+     */
     public static final String PYTHON = "python";
 
 
-
+    /**
+     * constructor
+     * @param logHandler    log handler
+     * @param taskDir       task dir
+     * @param taskAppId     task app id
+     * @param taskInstId    task instance id
+     * @param tenantCode    tenant code
+     * @param envFile       env file
+     * @param startTime     start time
+     * @param timeout       timeout
+     * @param logger        logger
+     */
     public PythonCommandExecutor(Consumer<List<String>> logHandler,
                                  String taskDir,
                                  String taskAppId,
@@ -57,7 +74,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     /**
      * build command file path
      *
-     * @return
+     * @return command file path
      */
     @Override
     protected String buildCommandFilePath() {
@@ -66,9 +83,9 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * create command file if not exists
-     *
-     * @param commandFile
-     * @throws IOException
+     * @param execCommand   exec command
+     * @param commandFile   command file
+     * @throws IOException  io exception
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
@@ -91,6 +108,10 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         }
     }
 
+    /**
+     * get python home
+     * @return python home
+     */
     @Override
     protected String commandType() {
         String pythonHome = getPythonHome(envFile);
@@ -100,6 +121,11 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         return pythonHome;
     }
 
+    /**
+     * check find yarn application id
+     * @param line line
+     * @return boolean
+     */
     @Override
     protected boolean checkFindApp(String line) {
         return true;
@@ -117,8 +143,8 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      *  you must set PYTHON_HOME is /opt/python3.7/python under nder common.properties
      *  dolphinscheduler.env.path file.
      *
-     * @param envPath
-     * @return
+     * @param envPath env path
+     * @return python home
      */
     private static String getPythonHome(String envPath){
         BufferedReader br = null;

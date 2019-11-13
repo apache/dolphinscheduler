@@ -22,14 +22,18 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
+/**
+ * accesstoken mapper interface
+ */
 public interface AccessTokenMapper extends BaseMapper<AccessToken> {
 
+
     /**
-     *
-     * @param page
-     * @param userName
-     * @param userId
-     * @return
+     * access token page
+     * @param page page
+     * @param userName userName
+     * @param userId userId
+     * @return access token Ipage
      */
     IPage<AccessToken> selectAccessTokenPage(Page page,
                                              @Param("userName") String userName,

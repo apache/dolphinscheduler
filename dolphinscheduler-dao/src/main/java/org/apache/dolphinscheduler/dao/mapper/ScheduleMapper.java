@@ -23,17 +23,41 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * scheduler mapper interface
+ */
 public interface ScheduleMapper extends BaseMapper<Schedule> {
 
-
+    /**
+     * scheduler page
+     * @param page page
+     * @param processDefinitionId processDefinitionId
+     * @param searchVal searchVal
+     * @return scheduler IPage
+     */
     IPage<Schedule> queryByProcessDefineIdPaging(IPage<Schedule> page,
                                                  @Param("processDefinitionId") int processDefinitionId,
                                                  @Param("searchVal") String searchVal);
+
+    /**
+     * query schedule list by project name
+     * @param projectName projectName
+     * @return schedule list
+     */
     List<Schedule> querySchedulerListByProjectName(@Param("projectName") String projectName);
 
-
+    /**
+     * query schedule list by process definition ids
+     * @param processDefineIds processDefineIds
+     * @return schedule list
+     */
     List<Schedule> selectAllByProcessDefineArray(@Param("processDefineIds") int[] processDefineIds);
 
+    /**
+     * query schedule list by process definition id
+     * @param processDefinitionId processDefinitionId
+     * @return schedule list
+     */
     List<Schedule> queryByProcessDefinitionId(@Param("processDefinitionId") int processDefinitionId);
 
 }

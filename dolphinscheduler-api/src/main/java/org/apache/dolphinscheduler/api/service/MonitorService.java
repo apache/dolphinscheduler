@@ -41,7 +41,8 @@ public class MonitorService extends BaseService{
   /**
    * query database state
    *
-   * @return
+   * @param loginUser login user
+   * @return data base state
    */
   public Map<String,Object> queryDatabaseState(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
@@ -58,8 +59,8 @@ public class MonitorService extends BaseService{
   /**
    * query master list
    *
-   * @param loginUser
-   * @return
+   * @param loginUser login user
+   * @return master information list
    */
   public Map<String,Object> queryMaster(User loginUser) {
 
@@ -75,7 +76,8 @@ public class MonitorService extends BaseService{
   /**
    * query zookeeper state
    *
-   * @return
+   * @param loginUser login user
+   * @return zookeeper information list
    */
   public Map<String,Object> queryZookeeperState(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
@@ -91,10 +93,10 @@ public class MonitorService extends BaseService{
 
 
   /**
-   * query master list
+   * query worker list
    *
-   * @param loginUser
-   * @return
+   * @param loginUser login user
+   * @return worker information list
    */
   public Map<String,Object> queryWorker(User loginUser) {
 

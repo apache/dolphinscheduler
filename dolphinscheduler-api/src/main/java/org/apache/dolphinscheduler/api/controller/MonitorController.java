@@ -48,8 +48,8 @@ public class MonitorController extends BaseController{
 
     /**
      * master list
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return master list
      */
     @ApiOperation(value = "listMaster", notes= "MASTER_LIST_NOTES")
     @GetMapping(value = "/master/list")
@@ -69,8 +69,8 @@ public class MonitorController extends BaseController{
 
     /**
      * worker list
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return worker information list
      */
     @ApiOperation(value = "listWorker", notes= "WORKER_LIST_NOTES")
     @GetMapping(value = "/worker/list")
@@ -89,8 +89,8 @@ public class MonitorController extends BaseController{
 
     /**
      * query database state
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return data base state
      */
     @ApiOperation(value = "queryDatabaseState", notes= "QUERY_DATABASE_STATE_NOTES")
     @GetMapping(value = "/database")
@@ -110,8 +110,8 @@ public class MonitorController extends BaseController{
 
     /**
      * query zookeeper state
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return zookeeper information list
      */
     @ApiOperation(value = "queryZookeeperState", notes= "QUERY_ZOOKEEPER_STATE_NOTES")
     @GetMapping(value = "/zookeeper/list")

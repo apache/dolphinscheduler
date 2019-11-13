@@ -33,17 +33,21 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- *  logger server
+ * logger server
  */
 public class LoggerServer {
 
     private static  final Logger logger = LoggerFactory.getLogger(LoggerServer.class);
 
     /**
-     *  server
+     * server
      */
     private Server server;
 
+    /**
+     * server start
+     * @throws IOException io exception
+     */
     public void start() throws IOException {
 	    /* The port on which the server should run */
         int port = Constants.RPC_PORT;
@@ -63,6 +67,9 @@ public class LoggerServer {
         });
     }
 
+    /**
+     * stop
+     */
     private void stop() {
         if (server != null) {
             server.shutdown();
@@ -81,13 +88,22 @@ public class LoggerServer {
     /**
      * main launches the server from the command line.
      */
+
+    /**
+     * main launches the server from the command line.
+     * @param args arguments
+     * @throws IOException          io exception
+     * @throws InterruptedException interrupted exception
+     */
     public static void main(String[] args) throws IOException, InterruptedException {
         final LoggerServer server = new LoggerServer();
         server.start();
         server.blockUntilShutdown();
     }
 
-
+    /**
+     * Log View Service Grpc Implementation
+     */
     static class LogViewServiceGrpcImpl extends LogViewServiceGrpc.LogViewServiceImplBase {
         @Override
         public void rollViewLog(LogParameter request, StreamObserver<RetStrInfo> responseObserver) {
@@ -130,10 +146,11 @@ public class LoggerServer {
     }
 
     /**
-     *  get files bytes
-     * @param path
-     * @return
-     * @throws Exception
+     * get files bytes
+     *
+     * @param path path
+     * @return byte array of file
+     * @throws Exception exception
      */
     private static byte[] getFileBytes(String path){
         InputStream in = null;
@@ -169,7 +186,8 @@ public class LoggerServer {
     }
 
     /**
-     *  read file content
+     * read file content
+     *
      * @param path
      * @param skipLine
      * @param limit
@@ -186,9 +204,10 @@ public class LoggerServer {
 
     /**
      * read  file content
-     * @param path
-     * @return
-     * @throws Exception
+     *
+     * @param path path
+     * @return string of file content
+     * @throws Exception exception
      */
     private static String readFile(String path){
         BufferedReader br = null;

@@ -51,6 +51,10 @@ public class ProcessDefinitionMapperTest {
     @Autowired
     ProjectMapper projectMapper;
 
+    /**
+     * insert
+     * @return ProcessDefinition
+     */
     private ProcessDefinition insertOne(){
         //insertOne
         ProcessDefinition processDefinition = new ProcessDefinition();
@@ -63,6 +67,9 @@ public class ProcessDefinitionMapperTest {
         return processDefinition;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -74,6 +81,9 @@ public class ProcessDefinitionMapperTest {
         processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         ProcessDefinition processDefinition = insertOne();
@@ -81,6 +91,9 @@ public class ProcessDefinitionMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         ProcessDefinition processDefinition = insertOne();
@@ -90,6 +103,9 @@ public class ProcessDefinitionMapperTest {
         processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
+    /**
+     * test query by definition name
+     */
     @Test
     public void testQueryByDefineName() {
         Project project = new Project();
@@ -134,6 +150,9 @@ public class ProcessDefinitionMapperTest {
         userMapper.deleteById(user.getId());
     }
 
+    /**
+     * test page
+     */
     @Test
     public void testQueryDefineListPaging() {
         ProcessDefinition processDefinition = insertOne();
@@ -143,6 +162,9 @@ public class ProcessDefinitionMapperTest {
         processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
+    /**
+     * test query all process definition
+     */
     @Test
     public void testQueryAllDefinitionList() {
         ProcessDefinition processDefinition = insertOne();
@@ -151,6 +173,9 @@ public class ProcessDefinitionMapperTest {
         processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
+    /**
+     * test query process definition by ids
+     */
     @Test
     public void testQueryDefinitionListByIdList() {
 
@@ -168,6 +193,9 @@ public class ProcessDefinitionMapperTest {
 
     }
 
+    /**
+     * test count process definition group by user
+     */
     @Test
     public void testCountDefinitionGroupByUser() {
 
