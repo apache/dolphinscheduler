@@ -450,7 +450,6 @@ public class ProcessDefinitionController extends BaseController{
      * @param loginUser login user
      * @param projectName project name
      * @param processDefinitionId process definition id
-     * @return export json data
      */
     @ApiOperation(value = "exportProcessDefinitionById", notes= "EXPORT_PROCCESS_DEFINITION_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -476,8 +475,9 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * query proccess definition all by project id
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param projectId  project id
+     * @return process definition list
      */
     @ApiOperation(value = "queryProccessDefinitionAllByProjectId", notes= "QUERY_PROCCESS_DEFINITION_All_BY_PROJECT_ID_NOTES")
     @GetMapping(value="/queryProccessDefinitionAllByProjectId")

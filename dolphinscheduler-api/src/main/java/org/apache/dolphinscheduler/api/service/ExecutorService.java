@@ -82,8 +82,12 @@ public class ExecutorService extends BaseService{
      * @param warningGroupId         notify group id
      * @param receivers             receivers
      * @param receiversCc           receivers cc
+     * @param processInstancePriority process instance priority
+     * @param workerGroupId worker group id
+     * @param runMode run mode
      * @param timeout               timeout
      * @return execute process instance code
+     * @throws ParseException Parse Exception
      */
     public Map<String, Object> execProcessInstance(User loginUser, String projectName,
                                                    int processDefinitionId, String cronTime, CommandType commandType,

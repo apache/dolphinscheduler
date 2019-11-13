@@ -125,6 +125,7 @@ public class LoginController extends BaseController {
      * sign out
      *
      * @param loginUser login user
+     * @param request  request
      * @return sign out result
      */
     @ApiOperation(value = "signOut", notes = "SIGNOUT_NOTES")

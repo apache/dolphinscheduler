@@ -70,6 +70,7 @@ public class SchedulerController extends BaseController {
      * @param processInstancePriority process instance priority
      * @param receivers receivers
      * @param receiversCc receivers cc
+     * @param workerGroupId  worker group id
      * @return create result code
      */
     @ApiOperation(value = "createSchedule", notes= "CREATE_SCHEDULE_NOTES")
@@ -122,6 +123,10 @@ public class SchedulerController extends BaseController {
      * @param warningType warning type
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
+     * @param receivers receivers
+     * @param workerGroupId worker group id
+     * @param processInstancePriority process instance priority
+     * @param receiversCc receivers cc
      * @return update result code
      */
     @ApiOperation(value = "updateSchedule", notes= "UPDATE_SCHEDULE_NOTES")
@@ -171,7 +176,6 @@ public class SchedulerController extends BaseController {
      * @param projectName project name
      * @param id scheduler id
      * @return publish result code
-     * @throws Exception some exceptions when operation quartz
      */
     @ApiOperation(value = "online", notes= "ONLINE_SCHEDULE_NOTES")
     @ApiImplicitParams({

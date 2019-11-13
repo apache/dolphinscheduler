@@ -70,6 +70,7 @@ public class UdfFuncService extends BaseService{
      * @param database database
      * @param desc description
      * @param resourceId resource id
+     * @param className class name
      * @return create result code
      */
     public Result createUdfFunction(User loginUser,
@@ -144,6 +145,9 @@ public class UdfFuncService extends BaseService{
 
     /**
      * query udf function
+     *
+     * @param id  udf function id
+     * @return udf function detail
      */
     public Map<String, Object> queryUdfFuncDetail(int id) {
 
@@ -168,6 +172,7 @@ public class UdfFuncService extends BaseService{
      * @param database data base
      * @param desc description
      * @param resourceId resource id
+     * @param className class name
      * @return update result code
      */
     public Map<String, Object> updateUdfFunc(int udfFuncId,
@@ -236,6 +241,7 @@ public class UdfFuncService extends BaseService{
      * @param loginUser login user
      * @param pageNo page number
      * @param pageSize page size
+     * @param searchVal search value
      * @return udf function list page
      */
     public Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {

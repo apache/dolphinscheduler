@@ -51,6 +51,7 @@ public class TaskRecordService extends BaseService{
      * @param endDate end time
      * @param pageNo page numbere
      * @param pageSize page size
+     * @param isHistory is history
      * @return task record list
      */
     public Map<String,Object> queryTaskRecordListPaging(boolean isHistory, String taskName, String startDate,

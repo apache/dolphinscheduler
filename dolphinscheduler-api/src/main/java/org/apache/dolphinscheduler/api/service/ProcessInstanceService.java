@@ -472,11 +472,11 @@ public class ProcessInstanceService extends BaseDAGService {
 
     /**
      * delete process instance by id, at the same time，delete task instance and their mapping relation data
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceId
-     * @param tasksQueue
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceId process instance id
+     * @param tasksQueue task queue
+     * @return delete result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId,ITaskQueue tasksQueue) {
@@ -608,6 +608,7 @@ public class ProcessInstanceService extends BaseDAGService {
      *
      * @param processInstanceId process instance id
      * @return variables data
+     * @throws Exception exception
      */
     public Map<String, Object> viewVariables( Integer processInstanceId) throws Exception {
         Map<String, Object> result = new HashMap<>(5);

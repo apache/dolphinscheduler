@@ -92,7 +92,9 @@ public class SchedulerService extends BaseService {
      * @param processInstancePriority process instance priority
      * @param receivers receivers
      * @param receiversCc receivers cc
+     * @param workerGroupId worker group id
      * @return create result code
+     * @throws IOException ioexception
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName, Integer processDefineId, String schedule, WarningType warningType,
@@ -172,7 +174,13 @@ public class SchedulerService extends BaseService {
      * @param warningType warning type
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
+     * @param workerGroupId worker group id
+     * @param processInstancePriority process instance priority
+     * @param receiversCc receiver cc
+     * @param receivers receivers
+     * @param scheduleStatus schedule status
      * @return update result code
+     * @throws IOException ioexception
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> updateSchedule(User loginUser, String projectName, Integer id, String scheduleExpression, WarningType warningType,
@@ -267,7 +275,6 @@ public class SchedulerService extends BaseService {
      * @param id scheduler id
      * @param scheduleStatus  schedule status
      * @return publish result code
-     * @throws Exception some exceptions when operation quartz
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> setScheduleState(User loginUser, String projectName, Integer id, ReleaseState scheduleStatus) {
@@ -467,6 +474,10 @@ public class SchedulerService extends BaseService {
 
     /**
      * delete schedule
+     *
+     * @param projectId project id
+     * @param scheduleId schedule id
+     * @throws RuntimeException runtime exception
      */
     public static void deleteSchedule(int projectId, int scheduleId) throws RuntimeException{
         logger.info("delete schedules of project id:{}, schedule id:{}", projectId, scheduleId);

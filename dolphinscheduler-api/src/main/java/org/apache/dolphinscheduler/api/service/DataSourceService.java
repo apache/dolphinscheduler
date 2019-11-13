@@ -135,6 +135,7 @@ public class DataSourceService extends BaseService{
      * @param desc data source description
      * @param type data source type
      * @param parameter datasource parameters
+     * @param id data source id
      * @return update result code
      */
     public Map<String, Object> updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter) {
@@ -337,9 +338,9 @@ public class DataSourceService extends BaseService{
     /**
      * verify datasource exists
      *
-     * @param loginUser
-     * @param name
-     * @return
+     * @param loginUser login user
+     * @param name datasource name
+     * @return true if data datasource not exists, otherwise return false
      */
     public Result verifyDataSourceName(User loginUser, String name) {
         Result result = new Result();
@@ -463,6 +464,7 @@ public class DataSourceService extends BaseService{
      * @param userName user name
      * @param password password
      * @param other other parameters
+     * @param principal principal
      * @return datasource parameter
      */
     public String buildParameter(String name, String desc, DbType type, String host,

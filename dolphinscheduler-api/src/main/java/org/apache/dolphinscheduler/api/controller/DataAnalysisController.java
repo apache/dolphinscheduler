@@ -56,7 +56,7 @@ public class DataAnalysisController extends BaseController{
      * @param startDate count start date
      * @param endDate count end date
      * @param projectId project id
-     * @return
+     * @return task instance count data
      */
     @ApiOperation(value = "countTaskState", notes= "COUNT_TASK_STATE_NOTES")
     @ApiImplicitParams({

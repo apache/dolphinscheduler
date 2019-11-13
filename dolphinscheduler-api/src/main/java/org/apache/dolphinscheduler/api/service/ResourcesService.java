@@ -76,6 +76,7 @@ public class ResourcesService extends BaseService {
      * @param name alias
      * @param desc description
      * @param file file
+     * @param type type
      * @return create result code
      */
     @Transactional(rollbackFor = Exception.class)
@@ -389,6 +390,7 @@ public class ResourcesService extends BaseService {
      * @param loginUser login user
      * @param resourceId resource id
      * @return delete result code
+     * @throws Exception exception
      */
     @Transactional(rollbackFor = Exception.class)
     public Result delete(User loginUser, int resourceId) throws Exception {
@@ -469,24 +471,6 @@ public class ResourcesService extends BaseService {
     }
 
     /**
-     * verify resource by name and type
-     *
-     * @param name
-     * @return
-     */
-    public Result verifyResourceName(String name, ResourceType type) {
-        Result result = new Result();
-        if (checkResourceExists(name, 0, type.ordinal())) {
-            logger.error("resource type:{} name:{} has exist, can't create again.", type, name);
-            putMsg(result, Status.RESOURCE_EXIST);
-        } else {
-            putMsg(result, Status.SUCCESS);
-        }
-
-        return result;
-    }
-
-    /**
      * view resource file online
      *
      * @param resourceId resource id
@@ -557,7 +541,7 @@ public class ResourcesService extends BaseService {
      * @param type resource type
      * @param fileName file name
      * @param fileSuffix file suffix
-     * @param description description
+     * @param desc description
      * @param content content
      * @return create result code
      */
@@ -714,8 +698,9 @@ public class ResourcesService extends BaseService {
     /**
      * download file
      *
-     * @param resourceId
-     * @return
+     * @param resourceId resource id
+     * @return resource content
+     * @throws Exception exception
      */
     public org.springframework.core.io.Resource downloadResource(int resourceId) throws Exception {
         // if resource upload startup

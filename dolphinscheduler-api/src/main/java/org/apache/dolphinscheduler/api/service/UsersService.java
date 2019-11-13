@@ -82,7 +82,9 @@ public class UsersService extends BaseService {
      * @param email email
      * @param tenantId tenant id
      * @param phone phone
+     * @param queue queue
      * @return create result code
+     * @throws Exception exception
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createUser(User loginUser,
@@ -196,6 +198,7 @@ public class UsersService extends BaseService {
      * @param phone phone
      * @param queue  queue
      * @return update result code
+     * @throws Exception exception
      */
     public Map<String, Object> updateUser(int userId,
                                           String userName,

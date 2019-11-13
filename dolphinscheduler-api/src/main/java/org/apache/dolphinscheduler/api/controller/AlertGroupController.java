@@ -227,6 +227,7 @@ public class AlertGroupController extends  BaseController{
      *
      * @param loginUser login user
      * @param userIds user ids in the group
+     * @param alertgroupId alert group id
      * @return grant result code
      */
     @ApiOperation(value = "grantUser", notes= "GRANT_ALERT_GROUP_NOTES")

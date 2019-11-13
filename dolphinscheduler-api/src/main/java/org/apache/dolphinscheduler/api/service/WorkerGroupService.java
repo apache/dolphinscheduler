@@ -150,8 +150,8 @@ public class WorkerGroupService extends BaseService {
 
     /**
      * delete worker group by id
-     * @param id
-     * @return
+     * @param id worker group id
+     * @return delete result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> deleteWorkerGroupById(Integer id) {

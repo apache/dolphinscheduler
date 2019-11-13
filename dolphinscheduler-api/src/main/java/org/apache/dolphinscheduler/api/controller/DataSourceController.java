@@ -113,6 +113,13 @@ public class DataSourceController extends BaseController {
      * @param note description
      * @param type data source type
      * @param other other arguments
+     * @param id data source di
+     * @param host host
+     * @param port port
+     * @param database database
+     * @param principal principal
+     * @param userName user name
+     * @param password password
      * @return update result code
      */
     @ApiOperation(value = "updateDataSource", notes= "UPDATE_DATA_SOURCE_NOTES")
@@ -252,6 +259,12 @@ public class DataSourceController extends BaseController {
      * @param note data soruce description
      * @param type data source type
      * @param other other parameters
+     * @param host host
+     * @param port port
+     * @param database data base
+     * @param principal principal
+     * @param userName user name
+     * @param password password
      * @return connect result code
      */
     @ApiOperation(value = "connectDataSource", notes= "CONNECT_DATA_SOURCE_NOTES")
@@ -301,8 +314,9 @@ public class DataSourceController extends BaseController {
     /**
      * connection test
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param id  data source id
+     * @return connect result code
      */
     @ApiOperation(value = "connectionTest", notes= "CONNECT_DATA_SOURCE_TEST_NOTES")
     @ApiImplicitParams({

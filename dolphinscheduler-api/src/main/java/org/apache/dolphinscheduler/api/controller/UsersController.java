@@ -59,6 +59,7 @@ public class UsersController extends BaseController{
      * @param email email
      * @param tenantId tenant id
      * @param phone phone
+     * @param queue  queue
      * @return create result code
      */
     @ApiOperation(value = "createUser", notes= "CREATE_USER_NOTES")
@@ -139,6 +140,7 @@ public class UsersController extends BaseController{
      * @param email email
      * @param tenantId tennat id
      * @param phone phone
+     * @param queue queue
      * @return update result code
      */
     @ApiOperation(value = "updateUser", notes= "UPDATE_USER_NOTES")

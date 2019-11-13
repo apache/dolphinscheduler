@@ -190,7 +190,8 @@ public class BaseController {
      *
      * @param totalList success object list
      * @param currentPage current page
-     * @param total total page
+     * @param total total
+     * @param totalPage  total page
      * @return success result code
      */
     public Result success(Object totalList, Integer currentPage,
@@ -243,6 +244,7 @@ public class BaseController {
      *
      * @param result result
      * @param status status
+     * @param statusParams status parameters
      */
     protected void putMsg(Result result, Status status, Object... statusParams) {
         result.setCode(status.getCode());

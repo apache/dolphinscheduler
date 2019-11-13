@@ -78,6 +78,7 @@ public class TenantService extends BaseService{
    * @param queueId queue id
    * @param desc description
    * @return create result code
+   * @throws Exception exception
    */
   @Transactional(rollbackFor = Exception.class)
   public Map<String,Object> createTenant(User loginUser,
@@ -165,6 +166,7 @@ public class TenantService extends BaseService{
    * @param queueId queue id
    * @param desc description
    * @return update result code
+   * @throws Exception exception
    */
   public Map<String, Object>  updateTenant(User loginUser,int id,String tenantCode, String tenantName, int queueId, String desc) throws Exception {
 
@@ -230,6 +232,7 @@ public class TenantService extends BaseService{
    * @param loginUser login user
    * @param id tenant id
    * @return delete result code
+   * @throws Exception exception
    */
   @Transactional(rollbackFor = Exception.class)
   public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {

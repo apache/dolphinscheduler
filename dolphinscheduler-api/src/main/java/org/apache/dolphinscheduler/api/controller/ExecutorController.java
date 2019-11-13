@@ -132,6 +132,7 @@ public class ExecutorController extends BaseController {
      * @param loginUser login user
      * @param projectName project name
      * @param processInstanceId process instance id
+     * @param executeType execute type
      * @return execute result code
      */
     @ApiOperation(value = "execute", notes= "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")

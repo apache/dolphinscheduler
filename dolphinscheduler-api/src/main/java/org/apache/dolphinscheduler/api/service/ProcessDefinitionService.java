@@ -105,11 +105,12 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param loginUser login user
      * @param projectName project name
      * @param name process definition name
-     * @param json process definition json
-     * @param description description
+     * @param processDefinitionJson process definition json
+     * @param desc description
      * @param locations locations for nodes
      * @param connects connects for nodes
      * @return create result code
+     * @throws JsonProcessingException JsonProcessingException
      */
     public Map<String, Object> createProcessDefinition(User loginUser, String projectName, String name,
                                                        String processDefinitionJson, String desc, String locations, String connects) throws JsonProcessingException {
@@ -528,7 +529,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param loginUser login user
      * @param projectName project name
      * @param processDefinitionId process definition id
-     * @return export json data
+     * @param response response
      */
     public void exportProcessDefinitionById(User loginUser, String projectName, Integer processDefinitionId, HttpServletResponse response) {
         Project project = projectMapper.queryByName(projectName);
@@ -863,6 +864,10 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     /**
      * get task node details based on process definition
+     *
+     * @param defineId define id
+     * @return task node list
+     * @throws Exception exception
      */
     public Map<String, Object> getTaskNodeListByDefinitionId(Integer defineId) throws Exception {
         Map<String, Object> result = new HashMap<>();
@@ -890,6 +895,10 @@ public class ProcessDefinitionService extends BaseDAGService {
 
     /**
      * get task node details based on process definition
+     *
+     * @param defineIdList define id list
+     * @return task node list
+     * @throws Exception exception
      */
     public Map<String, Object> getTaskNodeListByDefinitionIdList(String defineIdList) throws Exception {
         Map<String, Object> result = new HashMap<>();
@@ -947,6 +956,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processId process definition id
      * @param limit limit
      * @return tree view json data
+     * @throws Exception exception
      */
     public Map<String, Object> viewTree(Integer processId, Integer limit) throws Exception {
         Map<String, Object> result = new HashMap<>();

@@ -66,6 +66,7 @@ public class ResourcesController extends BaseController{
      * @param loginUser login user
      * @param alias alias
      * @param description description
+     * @param type type
      * @param file file
      * @return create result code
      */
@@ -226,7 +227,7 @@ public class ResourcesController extends BaseController{
      * verify resource by alias and type
      *
      * @param loginUser login user
-     * @param name resource name
+     * @param alias resource name
      * @param type resource type
      * @return true if the resource name not exists, otherwise return false
      */
@@ -398,6 +399,7 @@ public class ResourcesController extends BaseController{
      * @param argTypes argument types
      * @param database database
      * @param description description
+     * @param className  class name
      * @param resourceId resource id
      * @return create result code
      */
@@ -472,6 +474,8 @@ public class ResourcesController extends BaseController{
      * @param database data base
      * @param description description
      * @param resourceId resource id
+     * @param className class name
+     * @param udfFuncId  udf function id
      * @return update result code
      */
     @ApiOperation(value = "updateUdfFunc", notes= "UPDATE_UDF_FUNCTION_NOTES")
