@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.dolphinscheduler</groupId>
 	<artifactId>dolphinscheduler</artifactId>
-	<version>1.2.1-release-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
@@ -89,7 +89,7 @@
 		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
 		<maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-		<maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>2.4</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
 		<jacoco.version>0.8.4</jacoco.version>
@@ -512,8 +512,6 @@
 					<version>${maven-source-plugin.version}</version>
 				</plugin>
 
-
-
 			</plugins>
 
 		</pluginManagement>
@@ -521,8 +519,6 @@
 
 
 		<plugins>
-
-
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -542,14 +538,22 @@
 			</plugin>
 
 			<plugin>
-				<!--引入javadoc插件 -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>${maven-javadoc-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
-					<show>package</show>
-					<!-- 禁用java 8 的DocLint新特性，以确保当javadoc有编译错误时，也能正常生成javadoc jar包-->
-					<doclint>none</doclint>
+					<aggregate>true</aggregate>
+					<charset>${project.build.sourceEncoding}</charset>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<docencoding>${project.build.sourceEncoding}</docencoding>
 				</configuration>
 			</plugin>
 			<plugin>
