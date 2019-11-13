@@ -58,7 +58,11 @@ public class PythonTask extends AbstractTask {
    */
   private ProcessDao processDao;
 
-
+  /**
+   * constructor
+   * @param taskProps task props
+   * @param logger    logger
+   */
   public PythonTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
 
@@ -105,9 +109,9 @@ public class PythonTask extends AbstractTask {
   }
 
   /**
-   *  build command
-   * @return
-   * @throws Exception
+   * build command
+   * @return raw python script
+   * @throws Exception exception
    */
   private String buildCommand() throws Exception {
     String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", "\n");

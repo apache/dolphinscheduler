@@ -42,10 +42,13 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- *  shell task
+ * shell task
  */
 public class ShellTask extends AbstractTask {
 
+  /**
+   * shell parameters
+   */
   private ShellParameters shellParameters;
 
   /**
@@ -53,6 +56,9 @@ public class ShellTask extends AbstractTask {
    */
   private String taskDir;
 
+  /**
+   * shell command executor
+   */
   private ShellCommandExecutor shellCommandExecutor;
 
   /**
@@ -60,7 +66,11 @@ public class ShellTask extends AbstractTask {
    */
   private ProcessDao processDao;
 
-
+  /**
+   * constructor
+   * @param taskProps task props
+   * @param logger    logger
+   */
   public ShellTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
 
@@ -106,9 +116,9 @@ public class ShellTask extends AbstractTask {
   }
 
   /**
-   *  create command
-   * @return
-   * @throws Exception
+   * create command
+   * @return file name
+   * @throws Exception exception
    */
   private String buildCommand() throws Exception {
     // generate scripts

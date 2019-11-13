@@ -65,6 +65,11 @@ public class ProcedureTask extends AbstractTask {
      */
     private BaseDataSource baseDataSource;
 
+    /**
+     * constructor
+     * @param taskProps task props
+     * @param logger    logger
+     */
     public ProcedureTask(TaskProps taskProps, Logger logger) {
         super(taskProps, logger);
 
@@ -276,11 +281,11 @@ public class ProcedureTask extends AbstractTask {
 
     /**
      * set out parameter
-     * @param index
-     * @param stmt
-     * @param dataType
-     * @param value
-     * @throws Exception
+     * @param index     index
+     * @param stmt      stmt
+     * @param dataType  dataType
+     * @param value     value
+     * @throws Exception exception
      */
     private void setOutParameter(int index,CallableStatement stmt,DataType dataType,String value)throws Exception{
         if (dataType.equals(VARCHAR)){
