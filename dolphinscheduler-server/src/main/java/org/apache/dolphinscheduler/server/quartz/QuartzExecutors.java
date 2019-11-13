@@ -40,29 +40,31 @@ import static org.quartz.TriggerBuilder.newTrigger;
  */
 public class QuartzExecutors {
 
+  /**
+   * logger of QuartzExecutors
+   */
   private static final Logger logger = LoggerFactory.getLogger(QuartzExecutors.class);
 
+  /**
+   * read write lock
+   */
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-
   /**
-   * <p>
-   * A <code>Scheduler</code> maintains a registry of <code>{@link org.quartz.JobDetail}</code>s
-   * and <code>{@link Trigger}</code>s. Once registered, the <code>Scheduler</code>
-   * is responsible for executing <code>Job</code> s when their associated
-   * <code>Trigger</code> s fire (when their scheduled time arrives).
-   * </p>
-   * {@link Scheduler}
+   * A Scheduler maintains a registry of org.quartz.JobDetail and Trigger.
    */
   private static Scheduler scheduler;
 
+  /**
+   * instance of QuartzExecutors
+   */
   private static volatile QuartzExecutors INSTANCE = null;
 
   private QuartzExecutors() {}
 
   /**
    * thread safe and performance promote
-   * @return
+   * @return instance of Quartz Executors
    */
   public static QuartzExecutors getInstance() {
     if (INSTANCE == null) {
@@ -82,9 +84,7 @@ public class QuartzExecutors {
   /**
    * init
    *
-   * <p>
-   * Returns a client-usable handle to a <code>Scheduler</code>.
-   * </p>
+   * Returns a client-usable handle to a Scheduler.
    */
   private void init() {
     try {
@@ -101,14 +101,7 @@ public class QuartzExecutors {
   /**
    * Whether the scheduler has been started.
    *
-   * <p>
-   * Note: This only reflects whether <code>{@link #start()}</code> has ever
-   * been called on this Scheduler, so it will return <code>true</code> even
-   * if the <code>Scheduler</code> is currently in standby mode or has been
-   * since shutdown.
-   * </p>
-   *
-   * @see  Scheduler#start()
+   * @throws SchedulerException scheduler exception
    */
   public void start() throws SchedulerException {
     if (!scheduler.isStarted()){
@@ -120,14 +113,11 @@ public class QuartzExecutors {
   /**
    * stop all scheduled tasks
    *
-   * Halts the <code>Scheduler</code>'s firing of <code>{@link Trigger}s</code>,
-   * and cleans up all resources associated with the Scheduler. Equivalent to
-   * <code>shutdown(false)</code>.
+   * Halts the Scheduler's firing of Triggers,
+   * and cleans up all resources associated with the Scheduler.
    *
-   * <p>
    * The scheduler cannot be re-started.
-   * </p>
-   *
+   * @throws SchedulerException scheduler exception
    */
   public void shutdown() throws SchedulerException {
     if (!scheduler.isShutdown()) {
@@ -148,7 +138,6 @@ public class QuartzExecutors {
    * @param endDate           job end date
    * @param cronExpression    cron expression
    * @param jobDataMap        job parameters data map
-   * @return
    */
   public void addJob(Class<? extends Job> clazz,String jobName,String jobGroupName,Date startDate, Date endDate,
                                  String cronExpression,
@@ -180,10 +169,10 @@ public class QuartzExecutors {
 
       TriggerKey triggerKey = new TriggerKey(jobName, jobGroupName);
       /**
-       * Instructs the <code>{@link Scheduler}</code> that upon a mis-fire
-       * situation, the <code>{@link CronTrigger}</code> wants to have it's
+       * Instructs the Scheduler that upon a mis-fire
+       * situation, the CronTrigger wants to have it's
        * next-fire-time updated to the next time in the schedule after the
-       * current time (taking into account any associated <code>{@link Calendar}</code>,
+       * current time (taking into account any associated Calendar),
        * but it does not want to be fired now.
        */
       CronTrigger cronTrigger = newTrigger().withIdentity(triggerKey).startAt(startDate).endAt(endDate)
@@ -219,8 +208,8 @@ public class QuartzExecutors {
   /**
    * delete job
    *
-   * @param jobName
-   * @param jobGroupName
+   * @param jobName      job name
+   * @param jobGroupName job group name
    * @return true if the Job was found and deleted.
    */
   public boolean deleteJob(String jobName, String jobGroupName) {
@@ -244,15 +233,8 @@ public class QuartzExecutors {
 
   /**
    * delete all jobs in job group
-   * <p>
-   *    Note that while this bulk operation is likely more efficient than
-   *    invoking <code>deleteJob(JobKey jobKey)</code> several
-   *    times, it may have the adverse affect of holding data locks for a
-   *    single long duration of time (rather than lots of small durations
-   *    of time).
-   * </p>
    *
-   * @param jobGroupName
+   * @param jobGroupName job group name
    *
    * @return true if all of the Jobs were found and deleted, false if
    *      one or more were not deleted.
@@ -275,6 +257,8 @@ public class QuartzExecutors {
 
   /**
    * build job name
+   * @param processId process id
+   * @return job name
    */
   public static String buildJobName(int processId) {
     StringBuilder sb = new StringBuilder(30);
@@ -284,6 +268,8 @@ public class QuartzExecutors {
 
   /**
    * build job group name
+   * @param projectId project id
+   * @return job group name
    */
   public static String buildJobGroupName(int projectId) {
     StringBuilder sb = new StringBuilder(30);
@@ -294,10 +280,10 @@ public class QuartzExecutors {
   /**
    * add params to map
    *
-   * @param projectId
-   * @param scheduleId
-   * @param schedule
-   * @return
+   * @param projectId   project id
+   * @param scheduleId  schedule id
+   * @param schedule    schedule
+   * @return data map
    */
   public static Map<String, Object> buildDataMap(int projectId, int scheduleId, Schedule schedule) {
     Map<String, Object> dataMap = new HashMap<>(3);

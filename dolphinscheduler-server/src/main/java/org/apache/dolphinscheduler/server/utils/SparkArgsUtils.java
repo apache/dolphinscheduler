@@ -32,9 +32,10 @@ import java.util.List;
 public class SparkArgsUtils {
 
     /**
-     *  build args
-     * @param param
-     * @return
+     * build args
+     *
+     * @param param param
+     * @return argument list
      */
     public static List<String> buildArgs(SparkParameters param) {
         List<String> args = new ArrayList<>();

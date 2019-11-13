@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  executive task
+ * executive task
  */
 public abstract class AbstractTask {
 
@@ -55,7 +55,7 @@ public abstract class AbstractTask {
 
 
     /**
-     *  cancel
+     * cancel
      */
     protected volatile boolean cancel = false;
 
@@ -65,8 +65,9 @@ public abstract class AbstractTask {
     protected volatile int exitStatusCode = -1;
 
     /**
-     * @param taskProps
-     * @param logger
+     * constructor
+     * @param taskProps task props
+     * @param logger    logger
      */
     protected AbstractTask(TaskProps taskProps, Logger logger) {
         this.taskProps = taskProps;
@@ -75,32 +76,39 @@ public abstract class AbstractTask {
 
     /**
      * init task
+     * @throws Exception exception
      */
     public void init() throws Exception {
     }
 
     /**
      * task handle
+     * @throws Exception exception
      */
     public abstract void handle() throws Exception;
 
 
-
+    /**
+     * cancel application
+     * @param status status
+     * @throws Exception exception
+     */
     public void cancelApplication(boolean status) throws Exception {
         this.cancel = status;
     }
 
     /**
-     *  log process
+     * log handle
+     * @param logs log list
      */
     public void logHandle(List<String> logs) {
         // note that the "new line" is added here to facilitate log parsing
         logger.info(" -> {}", String.join("\n\t", logs));
     }
 
-
     /**
-     *  exit code
+     * get exit status code
+     * @return  exit status code
      */
     public int getExitStatusCode() {
         return exitStatusCode;
@@ -112,6 +120,7 @@ public abstract class AbstractTask {
 
     /**
      * get task parameters
+     * @return AbstractParameters
      */
     public abstract AbstractParameters getParameters();
 
@@ -157,7 +166,7 @@ public abstract class AbstractTask {
 
     /**
      * get current task parameter class
-     * @return
+     * @return Task Params Class
      */
     private Class getCurTaskParamsClass(){
         Class paramsClass = null;
@@ -193,8 +202,8 @@ public abstract class AbstractTask {
     }
 
     /**
-     *  get exit status according to exitCode
-     * @return
+     * get exit status according to exitCode
+     * @return exit status
      */
     public ExecutionStatus getExitStatus(){
         ExecutionStatus status;

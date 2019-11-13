@@ -20,29 +20,29 @@ import { checkKeyInModel, init } from '../../common'
 const TYPE = 'radar'
 
 /**
- * 雷达图
+ * Radar chart
  */
 export default class Radar extends Base {
   /**
-   * 单独导出时调用的初始化方法
-   * @param {*} el 选择器或者 DOM 对象
-   * @param {*} data 数据源
-   * @param {*} options 可选项
+   * Initialization method called on separate export
+   * @param {*} el Selector or DOM object
+   * @param {*} data data source
+   * @param {*} options Optional
    */
   static init (el, data, options) {
     return init(Radar, el, data, options)
   }
 
   /**
-   * 将用户配置转换为符合 ECharts API 格式的配置格式
+   * Convert user configuration to a configuration format that conforms to the format of echarts API
    */
   transform () {
     const {
-      // 数据
+      // data
       data = [],
-      // 图表标题
-      title = '雷达图',
-      // 属性字典
+      // Chart title
+      title = 'Radar chart',
+      // Attribute dictionary
       keyMap = {
         textKey: 'key',
         legendKey: 'typeName',
@@ -51,10 +51,10 @@ export default class Radar extends Base {
     } = this.settings
 
     if (data.length === 0) {
-      throw new Error('数据源为空！')
+      throw new Error('Data source is empty!')
     }
 
-    // 文本对应属性名，图例对应的属性名，数据值对应的属性名
+    // Attribute name corresponding to text, attribute name corresponding to legend, attribute name corresponding to data value
     const { textKey, legendKey, dataKey } = keyMap
     checkKeyInModel(data[0], textKey, legendKey, dataKey)
 
@@ -62,18 +62,18 @@ export default class Radar extends Base {
     const seriesData = []
     const indicator = []
 
-    // 设置图例并初始化数据系列
+    // Set legend and initialize data series
     for (let i = 0; i < data.length; i++) {
       const legendItem = data[i][legendKey]
       const textItem = data[i][textKey]
       const dataItem = data[i][dataKey]
 
-      // 图例
+      // Legend
       if (!legendData.includes(legendItem)) {
         legendData.push(legendItem)
       }
 
-      // 系列
+      // series
       let targetSeries = seriesData.find(s => s.name === legendItem)
       if (!targetSeries) {
         targetSeries = {
@@ -86,7 +86,7 @@ export default class Radar extends Base {
       targetSeries.value.push(dataItem)
       targetSeries._raw.push(data[i])
 
-      // 指标
+      // index
       let targetIndicator = indicator.find(i => i.name === textItem)
       if (!targetIndicator) {
         indicator.push({ name: textItem })
@@ -97,7 +97,7 @@ export default class Radar extends Base {
   }
 
   /**
-   * 绘制图表
+   * Drawing charts
    */
   apply () {
     const { title, seriesData, legendData = [], indicator } = this.options

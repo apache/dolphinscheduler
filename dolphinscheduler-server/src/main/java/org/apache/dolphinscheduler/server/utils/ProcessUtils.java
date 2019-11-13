@@ -45,8 +45,10 @@ public class ProcessUtils {
   private final static Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
   /**
-   *  build command line characters
-   * @return
+   * build command line characters
+   * @param commandList command list
+   * @return command
+   * @throws IOException io exception
    */
   public static String buildCommandStr(List<String> commandList) throws IOException {
     String cmdstr;
@@ -98,6 +100,13 @@ public class ProcessUtils {
     return cmdstr;
   }
 
+  /**
+   * get executable path
+   *
+   * @param path path
+   * @return executable path
+   * @throws IOException io exception
+   */
   private static String getExecutablePath(String path) throws IOException {
     boolean pathIsQuoted = isQuoted(true, path, "Executable name has embedded quote, split the arguments");
 
@@ -105,17 +114,34 @@ public class ProcessUtils {
     return fileToRun.getPath();
   }
 
+  /**
+   * whether is shell file
+   *
+   * @param executablePath executable path
+   * @return true if endsWith .CMD or .BAT
+   */
   private static boolean isShellFile(String executablePath) {
     String upPath = executablePath.toUpperCase();
     return (upPath.endsWith(".CMD") || upPath.endsWith(".BAT"));
   }
 
+  /**
+   * quote string
+   *
+   * @param arg argument
+   * @return format arg
+   */
   private static String quoteString(String arg) {
     StringBuilder argbuf = new StringBuilder(arg.length() + 2);
     return argbuf.append('"').append(arg).append('"').toString();
   }
 
-
+  /**
+   * get tokens from command
+   *
+   * @param command command
+   * @return token string array
+   */
   private static String[] getTokensFromCommand(String command) {
     ArrayList<String> matchList = new ArrayList<>(8);
     Matcher regexMatcher = LazyPattern.PATTERN.matcher(command);
@@ -125,24 +151,49 @@ public class ProcessUtils {
     return matchList.toArray(new String[matchList.size()]);
   }
 
+  /**
+   * Lazy Pattern
+   */
   private static class LazyPattern {
     // Escape-support version:
     // "(\")((?:\\\\\\1|.)+?)\\1|([^\\s\"]+)";
     private static final Pattern PATTERN = Pattern.compile("[^\\s\"]+|\"[^\"]*\"");
   }
 
-    private static final int VERIFICATION_CMD_BAT = 0;
+  /**
+   * verification cmd bat
+   */
+  private static final int VERIFICATION_CMD_BAT = 0;
 
+  /**
+   * verification win32
+   */
   private static final int VERIFICATION_WIN32 = 1;
 
+  /**
+   * verification legacy
+   */
   private static final int VERIFICATION_LEGACY = 2;
 
+  /**
+   * escape verification
+   */
   private static final char[][] ESCAPE_VERIFICATION = {{' ', '\t', '<', '>', '&', '|', '^'},
 
           {' ', '\t', '<', '>'}, {' ', '\t'}};
 
+  /**
+   * matcher
+   */
   private static Matcher matcher;
 
+  /**
+   * create command line
+   * @param verificationType  verification type
+   * @param executablePath    executable path
+   * @param cmd               cmd
+   * @return command line
+   */
   private static String createCommandLine(int verificationType, final String executablePath, final String[] cmd) {
     StringBuilder cmdbuf = new StringBuilder(80);
 
@@ -165,6 +216,13 @@ public class ProcessUtils {
     return cmdbuf.toString();
   }
 
+  /**
+   * whether is quoted
+   * @param noQuotesInside
+   * @param arg
+   * @param errorMessage
+   * @return boolean
+   */
   private static boolean isQuoted(boolean noQuotesInside, String arg, String errorMessage) {
     int lastPos = arg.length() - 1;
     if (lastPos >= 1 && arg.charAt(0) == '"' && arg.charAt(lastPos) == '"') {
@@ -186,6 +244,13 @@ public class ProcessUtils {
     return false;
   }
 
+  /**
+   * whether needs escaping
+   *
+   * @param verificationType  verification type
+   * @param arg               arg
+   * @return boolean
+   */
   private static boolean needsEscaping(int verificationType, String arg) {
 
     boolean argIsQuoted = isQuoted((verificationType == VERIFICATION_CMD_BAT), arg, "Argument has embedded quote, use the explicit CMD.EXE call.");
@@ -201,13 +266,14 @@ public class ProcessUtils {
     return false;
   }
 
-
   /**
-   *  kill yarn application
-   * @param appIds
-   * @param logger
-   * @param tenantCode
-   * @throws IOException
+   * kill yarn application
+   *
+   * @param appIds      app id list
+   * @param logger      logger
+   * @param tenantCode  tenant code
+   * @param workDir     work dir
+   * @throws IOException io exception
    */
   public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode,String workDir)
           throws IOException {
@@ -248,8 +314,9 @@ public class ProcessUtils {
   }
 
   /**
-   *  kill tasks according to different task types
-   * @param taskInstance
+   * kill tasks according to different task types
+   *
+   * @param taskInstance  task instance
    */
   public static void kill(TaskInstance taskInstance) {
     try {
@@ -276,9 +343,10 @@ public class ProcessUtils {
 
   /**
    * get pids str
-   * @param processId
-   * @return
-   * @throws Exception
+   *
+   * @param processId process id
+   * @return pids
+   * @throws Exception exception
    */
   private static String getPidsStr(int processId)throws Exception{
     StringBuilder sb = new StringBuilder();
@@ -293,7 +361,8 @@ public class ProcessUtils {
 
   /**
    * find logs and kill yarn tasks
-   * @param taskInstance
+   *
+   * @param taskInstance  task instance
    */
   public static void killYarnJob(TaskInstance taskInstance) {
     try {

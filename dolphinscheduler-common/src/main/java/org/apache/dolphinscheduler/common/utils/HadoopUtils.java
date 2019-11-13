@@ -177,8 +177,8 @@ public class HadoopUtils implements Closeable {
     /**
      * get application url
      *
-     * @param applicationId
-     * @return
+     * @param applicationId application id
+     * @return url of application
      */
     public String getApplicationUrl(String applicationId) {
         return String.format(configuration.get(Constants.YARN_APPLICATION_STATUS_ADDRESS), applicationId);
@@ -188,7 +188,8 @@ public class HadoopUtils implements Closeable {
      * cat file on hdfs
      *
      * @param hdfsFilePath  hdfs file path
-     * @return byte[]
+     * @return byte[] byte array
+     * @throws IOException errors
      */
     public byte[] catFile(String hdfsFilePath) throws IOException {
 
@@ -209,7 +210,8 @@ public class HadoopUtils implements Closeable {
      * @param hdfsFilePath  hdfs file path
      * @param skipLineNums  skip line numbers
      * @param limit         read how many lines
-     * @return
+     * @return content of file
+     * @throws IOException errors
      */
     public List<String> catFile(String hdfsFilePath, int skipLineNums, int limit) throws IOException {
 
@@ -230,6 +232,8 @@ public class HadoopUtils implements Closeable {
      * Existence of the directory hierarchy is not an error.
      *
      * @param hdfsPath path to create
+     * @return mkdir result
+     * @throws IOException errors
      */
     public boolean mkdir(String hdfsPath) throws IOException {
         return fs.mkdirs(new Path(hdfsPath));
@@ -242,7 +246,8 @@ public class HadoopUtils implements Closeable {
      * @param dstPath      destination hdfs path
      * @param deleteSource whether to delete the src
      * @param overwrite    whether to overwrite an existing file
-     * @return 是否成功
+     * @return if success or not
+     * @throws IOException errors
      */
     public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
         return FileUtil.copy(fs, new Path(srcPath), fs, new Path(dstPath), deleteSource, overwrite, fs.getConf());
@@ -256,6 +261,8 @@ public class HadoopUtils implements Closeable {
      * @param dstHdfsPath   destination hdfs path
      * @param deleteSource  whether to delete the src
      * @param overwrite     whether to overwrite an existing file
+     * @return if success or not
+     * @throws IOException errors
      */
     public boolean copyLocalToHdfs(String srcFile, String dstHdfsPath, boolean deleteSource, boolean overwrite) throws IOException {
         Path srcPath = new Path(srcFile);
@@ -273,8 +280,8 @@ public class HadoopUtils implements Closeable {
      * @param dstFile           destination file
      * @param deleteSource      delete source
      * @param overwrite         overwrite
-     * @return
-     * @throws IOException
+     * @return result of copy hdfs file to local
+     * @throws IOException errors
      */
     public boolean copyHdfsToLocal(String srcHdfsFilePath, String dstFile, boolean deleteSource, boolean overwrite) throws IOException {
         Path srcPath = new Path(srcHdfsFilePath);
@@ -306,7 +313,7 @@ public class HadoopUtils implements Closeable {
      * true, the directory is deleted else throws an exception. In
      * case of a file the recursive can be set to either true or false.
      * @return  true if delete is successful else false.
-     * @throws IOException
+     * @throws IOException errors
      */
     public boolean delete(String hdfsFilePath, boolean recursive) throws IOException {
         return fs.delete(new Path(hdfsFilePath), recursive);
@@ -316,7 +323,8 @@ public class HadoopUtils implements Closeable {
      * check if exists
      *
      * @param hdfsFilePath source file path
-     * @return
+     * @return result of exists or not
+     * @throws IOException errors
      */
     public boolean exists(String hdfsFilePath) throws IOException {
         return fs.exists(new Path(hdfsFilePath));
@@ -325,8 +333,9 @@ public class HadoopUtils implements Closeable {
     /**
      * Gets a list of files in the directory
      *
-     * @param filePath
-     * @return {@link FileStatus}
+     * @param filePath file path
+     * @return {@link FileStatus} file status
+     * @throws Exception errors
      */
     public FileStatus[] listFileStatus(String filePath)throws Exception{
         Path path = new Path(filePath);
@@ -354,10 +363,9 @@ public class HadoopUtils implements Closeable {
     /**
      * get the state of an application
      *
-     * @param applicationId
+     * @param applicationId application id
      * @return the return may be null or there may be other parse exceptions
-     * @throws JSONException
-     * @throws IOException
+     * @throws JSONException json exception
      */
     public ExecutionStatus getApplicationStatus(String applicationId) throws JSONException {
         if (StringUtils.isEmpty(applicationId)) {
@@ -418,6 +426,7 @@ public class HadoopUtils implements Closeable {
      * hdfs user dir
      *
      * @param tenantCode tenant code
+     * @param userId user id
      * @return hdfs resource dir
      */
     public static String getHdfsUserDir(String tenantCode,int userId) {
@@ -457,6 +466,7 @@ public class HadoopUtils implements Closeable {
     }
 
     /**
+     * @param tenantCode tenant code
      * @return file directory of tenants on hdfs
      */
     public static String getHdfsTenantDir(String tenantCode) {
@@ -467,9 +477,9 @@ public class HadoopUtils implements Closeable {
     /**
      * getAppAddress
      *
-     * @param appAddress
-     * @param rmHa
-     * @return
+     * @param appAddress app address
+     * @param rmHa resource manager ha
+     * @return app address
      */
     public static String getAppAddress(String appAddress, String rmHa) {
 

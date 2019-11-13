@@ -42,8 +42,8 @@ public class TaskParametersUtils {
 
   /**
    * get task parameters
-   * @param taskType
-   * @param parameter
+   * @param taskType task type
+   * @param parameter parameter
    * @return task parameters
    */
   public static AbstractParameters getParameters(String taskType, String parameter) {

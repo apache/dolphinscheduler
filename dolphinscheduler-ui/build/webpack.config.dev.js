@@ -18,6 +18,7 @@ const webpack = require('webpack')
 const merge = require('webpack-merge')
 const { assetsDir, baseConfig } = require('./config')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const ProgressPlugin = require('progress-bar-webpack-plugin')
 const getEnv = require('env-parse').getEnv
 
 const config = merge.smart(baseConfig, {
@@ -113,6 +114,7 @@ const config = merge.smart(baseConfig, {
     clientLogLevel: 'none'
   },
   plugins: [
+    new ProgressPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new ExtractTextPlugin({ filename: 'css/[name].css', allChunks: true }),
     new webpack.optimize.CommonsChunkPlugin({ name: 'common', filename: 'js/[name].js' }),

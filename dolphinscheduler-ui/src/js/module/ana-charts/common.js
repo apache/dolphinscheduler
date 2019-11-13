@@ -1,9 +1,25 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /**
- * 根据参数找到容器并初始化图表，然后返回一个或者一组图表实例
- * @param {*} Target 图表组件类
- * @param {*} el 选择器或者 DOM 对象
- * @param {*} data 数据源
- * @param {*} options 可选项
+ * Find the container and initialize the chart according to the parameters, and then return one or a group of chart instances
+ * @param {*} Target Chart component class
+ * @param {*} el Selector or DOM object
+ * @param {*} data data source
+ * @param {*} options Optional
  */
 export const init = (Target, el, data, options) => {
   const list = getChartContainers(el)
@@ -15,11 +31,11 @@ export const init = (Target, el, data, options) => {
 }
 
 /**
- * 统一图表容器为 DOM 元素数组
- * @param {*} el 选择器或者 DOM 对象
+ * Unified chart container is an array of DOM elements
+ * @param {*} el Selector or DOM object
  */
 function getChartContainers (el) {
-  // 未传参数，直接返回
+  // Parameter not transmitted, return directly
   if (!el) {
     return
   }
@@ -33,7 +49,7 @@ function getChartContainers (el) {
     }
   }
   if (!el) {
-    throw new Error('找不到对应的dom对象！')
+    throw new Error('No corresponding DOM object found!')
   }
   let list
   if (HTMLElement.prototype.isPrototypeOf(el)) {
@@ -42,20 +58,20 @@ function getChartContainers (el) {
     list = Array.from(el)
   }
   if (!list) {
-    throw new Error('未找到对应的dom对象！')
+    throw new Error('No corresponding DOM object found!')
   }
   return list
 }
 
 /**
- * 检测在指定对象中是否存在指定的属性名
- * @param {Object} model 待检测模型
- * @param  {...any} params 待检测属性名
+ * Detects whether the specified property name exists in the specified object
+ * @param {Object} model Model to be tested
+ * @param  {...any} params Property name to be tested
  */
 export const checkKeyInModel = (model, ...params) => {
   for (const key of params) {
     if (!model.hasOwnProperty(key)) {
-      throw new Error('数据格式错误！未找到指定属性：' + key)
+      throw new Error('Data format error! The specified property was not found:' + key)
     }
   }
 }
