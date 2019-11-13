@@ -579,8 +579,8 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-annotation</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
+			<version>${mybatis-plus.version}</version>
+			<scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
