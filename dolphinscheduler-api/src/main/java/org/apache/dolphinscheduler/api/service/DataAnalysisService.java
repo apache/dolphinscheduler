@@ -74,11 +74,11 @@ public class DataAnalysisService extends BaseService{
     /**
      * statistical task instance status data
      *
-     * @param loginUser
-     * @param projectId
-     * @param startDate
-     * @param endDate
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @param startDate start date
+     * @param endDate end date
+     * @return task state count data
      */
     public Map<String,Object> countTaskStateByProject(User loginUser, int projectId, String startDate, String endDate) {
 
@@ -126,11 +126,11 @@ public class DataAnalysisService extends BaseService{
     /**
      * statistical process instance status data
      *
-     * @param loginUser
-     * @param projectId
-     * @param startDate
-     * @param endDate
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @param startDate start date
+     * @param endDate end date
+     * @return process instance state count data
      */
     public Map<String,Object> countProcessInstanceStateByProject(User loginUser, int projectId, String startDate, String endDate) {
 
@@ -169,9 +169,9 @@ public class DataAnalysisService extends BaseService{
     /**
      * statistics the process definition quantities of certain person
      *
-     * @param loginUser
-     * @param projectId
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @return definition count data
      */
     public Map<String,Object> countDefinitionByUser(User loginUser, int projectId) {
         Map<String, Object> result = new HashMap<>();
@@ -187,24 +187,15 @@ public class DataAnalysisService extends BaseService{
         return result;
     }
 
-    /**
-     *
-     * @param result
-     * @param status
-     */
-    private void putMsg(Map<String, Object> result, Status status) {
-        result.put(Constants.STATUS, status);
-        result.put(Constants.MSG, status.getMsg());
-    }
 
     /**
      * statistical command status data
      *
-     * @param loginUser
-     * @param projectId
-     * @param startDate
-     * @param endDate
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @param startDate start date
+     * @param endDate end date
+     * @return command state count data
      */
     public Map<String, Object> countCommandState(User loginUser, int projectId, String startDate, String endDate) {
 
@@ -315,9 +306,9 @@ public class DataAnalysisService extends BaseService{
 
     /**
      * count queue state
-     * @param loginUser
-     * @param projectId
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @return queue state count data
      */
     public Map<String, Object> countQueueState(User loginUser, int projectId) {
         Map<String, Object> result = new HashMap<>(5);
