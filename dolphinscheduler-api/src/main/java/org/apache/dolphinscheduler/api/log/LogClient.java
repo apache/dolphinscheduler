@@ -37,6 +37,9 @@ public class LogClient {
 
     /**
      * construct client connecting to HelloWorld server at {@code host:port}
+     *
+     * @param host host
+     * @param port port
      */
     public LogClient(String host, int port) {
         this(ManagedChannelBuilder.forAddress(host, port)
@@ -61,7 +64,7 @@ public class LogClient {
     /**
      * shutdown
      *
-     * @throws InterruptedException
+     * @throws InterruptedException InterruptedException
      */
     public void shutdown() throws InterruptedException {
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
@@ -70,10 +73,10 @@ public class LogClient {
     /**
      * roll view log
      *
-     * @param path
-     * @param skipLineNum
-     * @param limit
-     * @return
+     * @param path path
+     * @param skipLineNum skip line number
+     * @param limit limit
+     * @return log content
      */
     public String rollViewLog(String path,int skipLineNum,int limit) {
         logger.info("roll view log : path {},skipLineNum {} ,limit {}", path, skipLineNum, limit);
@@ -96,8 +99,8 @@ public class LogClient {
     /**
      * view log
      *
-     * @param path
-     * @return
+     * @param path path
+     * @return log content
      */
     public String viewLog(String path) {
         logger.info("view log path {}",path);
@@ -115,8 +118,8 @@ public class LogClient {
     /**
      * get log size
      *
-     * @param path
-     * @return
+     * @param path log path
+     * @return log content bytes
      */
     public byte[] getLogBytes(String path) {
         logger.info("log path {}",path);

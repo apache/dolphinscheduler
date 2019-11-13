@@ -42,7 +42,7 @@ public class FourLetterWordMain {
      * @param port the destination port
      * @param cmd the 4letterword
      * @return server response
-     * @throws java.io.IOException
+     * @throws java.io.IOException io exceptions
      */
     public static String send4LetterWord(String host, int port, String cmd)
             throws IOException
@@ -56,7 +56,7 @@ public class FourLetterWordMain {
      * @param cmd the 4letterword
      * @param timeout in milliseconds, maximum time to wait while connecting/reading data
      * @return server response
-     * @throws java.io.IOException
+     * @throws java.io.IOException io exceptions
      */
     public static String send4LetterWord(String host, int port, String cmd, int timeout)
             throws IOException

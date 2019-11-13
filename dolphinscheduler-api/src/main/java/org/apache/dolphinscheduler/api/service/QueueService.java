@@ -50,8 +50,8 @@ public class QueueService extends BaseService {
     /**
      * query queue list
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return queue list
      */
     public Map<String, Object> queryList(User loginUser) {
         Map<String, Object> result = new HashMap<>(5);
@@ -69,11 +69,11 @@ public class QueueService extends BaseService {
     /**
      * query queue list paging
      *
-     * @param loginUser
-     * @param searchVal
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param pageNo page number
+     * @param searchVal search value
+     * @param pageSize page size
+     * @return queue list
      */
     public Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>(5);
@@ -99,10 +99,10 @@ public class QueueService extends BaseService {
     /**
      * create queue
      *
-     * @param loginUser
-     * @param queue
-     * @param queueName
-     * @return
+     * @param loginUser login user
+     * @param queue queue
+     * @param queueName queue name
+     * @return create result
      */
     public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>(5);
@@ -147,11 +147,11 @@ public class QueueService extends BaseService {
     /**
      * update queue
      *
-     * @param loginUser
-     * @param id
-     * @param queue
-     * @param queueName
-     * @return
+     * @param loginUser login user
+     * @param queue queue
+     * @param id queue id
+     * @param queueName queue name
+     * @return update result code
      */
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>(5);
@@ -202,9 +202,9 @@ public class QueueService extends BaseService {
     /**
      * verify queue and queueName
      *
-     * @param queue
-     * @param queueName
-     * @return
+     * @param queue queue
+     * @param queueName queue name
+     * @return true if the queue name not exists, otherwise return false
      */
     public Result verifyQueue(String queue, String queueName) {
         Result result=new Result();
@@ -240,8 +240,8 @@ public class QueueService extends BaseService {
      * check queue exist
      * if exists return true，not exists return false
      * check queue exist
-     * @param queue
-     * @return
+     * @param queue queue
+     * @return true if the queue not exists, otherwise return false
      */
     private boolean checkQueueExist(String queue) {
         return queueMapper.queryAllQueueList(queue, null).size()>0 ? true : false;
@@ -250,8 +250,8 @@ public class QueueService extends BaseService {
     /**
      * check queue name exist
      * if exists return true，not exists return false
-     * @param queueName
-     * @return
+     * @param queueName queue name
+     * @return true if the queue name not exists, otherwise return false
      */
     private boolean checkQueueNameExist(String queueName) {
         return queueMapper.queryAllQueueList(null ,queueName).size() > 0 ? true : false;

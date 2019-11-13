@@ -49,13 +49,14 @@ public class DataAnalysisController extends BaseController{
     @Autowired
     DataAnalysisService dataAnalysisService;
 
-
     /**
      * statistical task instance status data
      *
-     * @param loginUser
-     * @param projectId
-     * @return
+     * @param loginUser login user
+     * @param startDate count start date
+     * @param endDate count end date
+     * @param projectId project id
+     * @return task instance count data
      */
     @ApiOperation(value = "countTaskState", notes= "COUNT_TASK_STATE_NOTES")
     @ApiImplicitParams({
@@ -83,9 +84,11 @@ public class DataAnalysisController extends BaseController{
     /**
      * statistical process instance status data
      *
-     * @param loginUser
-     * @param projectId
-     * @return
+     * @param loginUser login user
+     * @param startDate start date
+     * @param endDate end date
+     * @param projectId project id
+     * @return process instance data
      */
     @ApiOperation(value = "countProcessInstanceState", notes= "COUNT_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
@@ -113,9 +116,9 @@ public class DataAnalysisController extends BaseController{
     /**
      * statistics the process definition quantities of certain person
      *
-     * @param loginUser
-     * @param projectId
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @return definition count in project id
      */
     @ApiOperation(value = "countDefinitionByUser", notes= "COUNT_PROCESS_DEFINITION_BY_USER_NOTES")
     @ApiImplicitParams({
@@ -140,9 +143,11 @@ public class DataAnalysisController extends BaseController{
     /**
      * statistical command status data
      *
-     * @param loginUser
-     * @param projectId
-     * @return
+     * @param loginUser login user
+     * @param startDate start date
+     * @param endDate end date
+     * @param projectId project id
+     * @return command state in project id
      */
     @ApiOperation(value = "countCommandState", notes= "COUNT_COMMAND_STATE_NOTES")
     @ApiImplicitParams({
@@ -170,14 +175,12 @@ public class DataAnalysisController extends BaseController{
     /**
      * queue count
      *
-     * @param loginUser
-     * @param projectId
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @return queue state count
      */
     @ApiOperation(value = "countQueueState", notes= "COUNT_QUEUE_STATE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", dataType = "String"),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE",  dataType ="String"),
             @ApiImplicitParam(name = "projectId", value = "PROJECT_ID",  dataType ="Int", example = "100")
     })
     @GetMapping(value="/queue-count")

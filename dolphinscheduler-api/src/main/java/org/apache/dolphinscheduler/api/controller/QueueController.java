@@ -53,8 +53,8 @@ public class QueueController extends BaseController{
 
     /**
      * query queue list
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return queue list
      */
     @ApiOperation(value = "queryList", notes= "QUERY_QUEUE_LIST_NOTES")
     @GetMapping(value="/list")
@@ -72,8 +72,11 @@ public class QueueController extends BaseController{
 
     /**
      * query queue list paging
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param pageNo page number
+     * @param searchVal search value
+     * @param pageSize page size
+     * @return queue list
      */
     @ApiOperation(value = "queryQueueListPaging", notes= "QUERY_QUEUE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
@@ -106,10 +109,10 @@ public class QueueController extends BaseController{
     /**
      * create queue
      *
-     * @param loginUser
-     * @param queue
-     * @param queueName
-     * @return
+     * @param loginUser login user
+     * @param queue queue
+     * @param queueName queue name
+     * @return create result
      */
     @ApiOperation(value = "createQueue", notes= "CREATE_QUEUE_NOTES")
     @ApiImplicitParams({
@@ -136,10 +139,11 @@ public class QueueController extends BaseController{
     /**
      * update queue
      *
-     * @param loginUser
-     * @param queue
-     * @param queueName
-     * @return
+     * @param loginUser login user
+     * @param queue queue
+     * @param id queue id
+     * @param queueName queue name
+     * @return update result code
      */
     @ApiOperation(value = "updateQueue", notes= "UPDATE_QUEUE_NOTES")
     @ApiImplicitParams({
@@ -168,10 +172,10 @@ public class QueueController extends BaseController{
     /**
      * verify queue and queue name
      *
-     * @param loginUser
-     * @param queue
-     * @param queueName
-     * @return
+     * @param loginUser login user
+     * @param queue queue
+     * @param queueName queue name
+     * @return true if the queue name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyQueue", notes= "VERIFY_QUEUE_NOTES")
     @ApiImplicitParams({
