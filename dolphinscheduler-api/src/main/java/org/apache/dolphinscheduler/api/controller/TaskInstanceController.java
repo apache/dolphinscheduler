@@ -51,8 +51,18 @@ public class TaskInstanceController extends BaseController{
     /**
      * query task list paging
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceId process instance id
+     * @param searchVal search value
+     * @param taskName task name
+     * @param stateType state type
+     * @param host host
+     * @param startTime start time
+     * @param endTime end time
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return task list page
      */
     @ApiOperation(value = "queryTaskListPaging", notes= "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({

@@ -47,10 +47,19 @@ public class TaskRecordController extends BaseController{
     TaskRecordService taskRecordService;
 
     /**
-     * query task record list paging
+     * query task record list page
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param taskName task name
+     * @param state state
+     * @param sourceTable source table
+     * @param destTable destination table
+     * @param taskDate task date
+     * @param startTime start time
+     * @param endTime end time
+     * @param pageNo page numbere
+     * @param pageSize page size
+     * @return task record list
      */
     @GetMapping("/list-paging")
     @ResponseStatus(HttpStatus.OK)
@@ -81,8 +90,17 @@ public class TaskRecordController extends BaseController{
     /**
      * query history task record list paging
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param taskName task name
+     * @param state state
+     * @param sourceTable source table
+     * @param destTable destination table
+     * @param taskDate task date
+     * @param startTime start time
+     * @param endTime end time
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return history task record list
      */
     @GetMapping("/history-list-paging")
     @ResponseStatus(HttpStatus.OK)

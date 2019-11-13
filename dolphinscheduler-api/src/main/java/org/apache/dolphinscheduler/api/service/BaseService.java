@@ -37,8 +37,8 @@ public class BaseService {
     /**
      * check admin
      *
-     * @param user
-     * @return
+     * @param user input user
+     * @return ture if administrator, otherwise return false
      */
     protected boolean isAdmin(User user) {
         return user.getUserType() == UserType.ADMIN_USER;
@@ -47,9 +47,9 @@ public class BaseService {
     /**
      * check admin
      *
-     * @param loginUser
-     * @param result
-     * @return
+     * @param loginUser login user
+     * @param result result code
+     * @return true if administrator, otherwise false
      */
     protected boolean checkAdmin(User loginUser, Map<String, Object> result) {
         //only admin can operate
@@ -63,9 +63,9 @@ public class BaseService {
     /**
      * put message to map
      *
-     * @param result
-     * @param status
-     * @param statusParams
+     * @param result result code
+     * @param status status
+     * @param statusParams status message
      */
     protected void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
         result.put(Constants.STATUS, status);
@@ -79,8 +79,9 @@ public class BaseService {
     /**
      * put message to result object
      *
-     * @param result
-     * @param status
+     * @param result result code
+     * @param status status
+     * @param statusParams status message
      */
     protected void putMsg(Result result, Status status, Object... statusParams) {
         result.setCode(status.getCode());
@@ -95,8 +96,8 @@ public class BaseService {
 
     /**
      * get cookie info by name
-     * @param request
-     * @param name
+     * @param request request
+     * @param name 'sessionId'
      * @return get cookie info
      */
     public static Cookie getCookie(HttpServletRequest request, String name) {
@@ -114,8 +115,8 @@ public class BaseService {
 
     /**
      * create tenant dir if not exists
-     * @param tenantCode
-     * @throws Exception
+     * @param tenantCode tenant code
+     * @throws Exception if hdfs operation exception
      */
     protected void createTenantDirIfNotExists(String tenantCode)throws Exception{
 
