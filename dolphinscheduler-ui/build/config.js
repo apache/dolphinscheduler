@@ -65,7 +65,7 @@ const minifierConfig = isProduction ? {
 
 const getPageEntry = view => jsEntry[view] ? view : ''
 
-// 重新定向输出页面
+// Redirect output page
 const pageRewriter = {
   'view/home/index.*': 'index.html'
 }

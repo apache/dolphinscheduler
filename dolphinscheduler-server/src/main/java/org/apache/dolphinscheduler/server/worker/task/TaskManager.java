@@ -31,18 +31,18 @@ import org.apache.commons.lang3.EnumUtils;
 import org.slf4j.Logger;
 
 /**
- *  task manaster
+ * task manaster
  */
 public class TaskManager {
 
 
   /**
-   *  create new task
-   * @param taskType
-   * @param props
-   * @param logger
-   * @return
-   * @throws IllegalArgumentException
+   * create new task
+   * @param taskType  task type
+   * @param props     props
+   * @param logger    logger
+   * @return AbstractTask
+   * @throws IllegalArgumentException illegal argument exception
    */
   public static AbstractTask newTask(String taskType, TaskProps props, Logger logger)
       throws IllegalArgumentException {

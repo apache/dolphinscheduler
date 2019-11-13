@@ -23,20 +23,55 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * project mapper interface
+ */
 public interface ProjectMapper extends BaseMapper<Project> {
 
+    /**
+     * query project detail by id
+     * @param projectId projectId
+     * @return project
+     */
     Project queryDetailById(@Param("projectId") int projectId);
 
+    /**
+     * query project by name
+     * @param projectName projectName
+     * @return project
+     */
     Project queryByName(@Param("projectName") String projectName);
 
+    /**
+     * project page
+     * @param page page
+     * @param userId userId
+     * @param searchName searchName
+     * @return project Ipage
+     */
     IPage<Project> queryProjectListPaging(IPage<Project> page,
                                           @Param("userId") int userId,
                                           @Param("searchName") String searchName);
 
+    /**
+     *  query create project user
+     * @param userId userId
+     * @return project list
+     */
     List<Project> queryProjectCreatedByUser(@Param("userId") int userId);
 
+    /**
+     * query authed project list by userId
+     * @param userId userId
+     * @return project list
+     */
     List<Project> queryAuthedProjectListByUserId(@Param("userId") int userId);
 
+    /**
+     * query project except userId
+     * @param userId userId
+     * @return project list
+     */
     List<Project> queryProjectExceptUserId(@Param("userId") int userId);
 
 }

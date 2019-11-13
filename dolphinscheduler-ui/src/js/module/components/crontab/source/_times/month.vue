@@ -91,46 +91,46 @@
       event: 'monthValueEvent'
     },
     methods: {
-      // 间隔执行时间（1）
+      // Interval execution time（1）
       onIntervalPerform (val) {
         this.intervalPerformVal = val
         if (this.radioMonth === 'intervalMonth') {
           this.monthValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
         }
       },
-      // 间隔开始时间（2）
+      // Interval start time（2）
       onIntervalStart (val) {
         this.intervalStartVal = val
         if (this.radioMonth === 'intervalMonth') {
           this.monthValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
         }
       },
-      // 具体月
+      // Specific months
       onspecificlMonths (arr) {
       },
-      // 周期开始值
+      // Cycle start value
       onCycleStart (val) {
         this.cycleStartVal = val
         if (this.radioMonth === 'cycleMonth') {
           this.monthValue = `${this.cycleStartVal}-${this.cycleEndVal}`
         }
       },
-      // 周期结束值
+      // Cycle end value
       onCycleEnd (val) {
         this.cycleEndVal = val
         if (this.radioMonth === 'cycleMonth') {
           this.monthValue = `${this.cycleStartVal}-${this.cycleEndVal}`
         }
       },
-      // 重置每一月
+      // Reset every month
       everyReset () {
         this.monthValue = '*'
       },
-      // 重置间隔月
+      // Reset every month
       intervalReset () {
         this.monthValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
       },
-      // 重置具体月数
+      // Reset specific months
       specificReset () {
         if (this.specificMonthVal.length) {
           this.monthValue = this.specificMonthVal.join(',')
@@ -138,31 +138,31 @@
           this.monthValue = '*'
         }
       },
-      // 重置周期月数
+      // Months of reset cycle
       cycleReset () {
         this.monthValue = `${this.cycleStartVal}-${this.cycleEndVal}`
       },
       /**
-       * 解析参数值
+       * Parse parameter value
        */
       analyticalValue () {
         return new Promise((resolve, reject) => {
           let $monthVal = _.cloneDeep(this.value)
-          // 间隔月
+          // Interval month
           let $interval = isStr($monthVal, '/')
-          // 具体月
+          // Specific months
           let $specific = isStr($monthVal, ',')
-          // 周期月
+          // Cycle month
           let $cycle = isStr($monthVal, '-')
 
-          // 每一月
+          // Every month
           if ($monthVal === '*') {
             this.radioMonth = 'everyMonth'
             this.monthValue = '*'
             return
           }
 
-          // 正整数(月)
+          // Positive integer (month)
           if ($monthVal.length === 1 && _.isInteger(parseInt($monthVal)) ||
             $monthVal.length === 2 && _.isInteger(parseInt($monthVal))
           ) {
@@ -171,7 +171,7 @@
             return
           }
 
-          // 间隔月
+          // Interval month
           if ($interval) {
             this.radioMonth = 'intervalMonth'
             this.intervalStartVal = parseInt($interval[0])
@@ -180,14 +180,14 @@
             return
           }
 
-          // 具体月数
+          // Specific months
           if ($specific) {
             this.radioMonth = 'specificlMonth'
             this.specificMonthVal = $specific
             return
           }
 
-          // 周期月
+          // Cycle month
           if ($cycle) {
             this.radioMonth = 'cycleMonth'
             this.cycleStartVal = parseInt($cycle[0])
@@ -200,11 +200,11 @@
       }
     },
     watch: {
-      // 导出值
+      // Derived value
       monthValue (val) {
         this.$emit('monthValueEvent', val)
       },
-      // 选中类型
+      // Selected type
       radioMonth (val) {
         switch (val) {
           case 'everyMonth':
@@ -221,7 +221,7 @@
             break
         }
       },
-      // 具体月数
+      // Specific months
       specificMonthVal (arr) {
         this.monthValue = arr.join(',')
       }

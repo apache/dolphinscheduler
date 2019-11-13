@@ -166,7 +166,7 @@
       this._handlerEditor()
     },
     destroyed () {
-      editor.toTextArea() // 卸载
+      editor.toTextArea() // uninstall
       editor.off($('.code-create-mirror'), 'keypress', this.keypress)
     },
     computed: {},

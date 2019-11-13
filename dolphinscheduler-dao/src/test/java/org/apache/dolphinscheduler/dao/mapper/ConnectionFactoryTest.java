@@ -25,6 +25,10 @@ import java.sql.Connection;
 
 public class ConnectionFactoryTest {
 
+    /**
+     * test connection
+     * @throws Exception if error throws Exception
+     */
     @Test
     public void testConnection()throws Exception{
         Connection connection = ConnectionFactory.getDataSource().getPooledConnection().getConnection();

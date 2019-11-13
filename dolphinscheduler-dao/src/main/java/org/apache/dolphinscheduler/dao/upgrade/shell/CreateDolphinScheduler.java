@@ -21,16 +21,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * init DolphinScheduler
+ * create DolphinScheduler
  *
  */
 public class CreateDolphinScheduler {
 
 	private static final Logger logger = LoggerFactory.getLogger(CreateDolphinScheduler.class);
 
+	/**
+	 * create dolphin scheduler db
+	 * @param args args
+	 */
 	public static void main(String[] args) {
 		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-
 		try {
 			dolphinSchedulerManager.initDolphinScheduler();
 			logger.info("init DolphinScheduler finished");

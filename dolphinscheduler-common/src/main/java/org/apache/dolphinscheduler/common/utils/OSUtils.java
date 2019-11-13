@@ -106,7 +106,7 @@ public class OSUtils {
   /**
    * load average
    *
-   * @return
+   * @return load average
    */
   public static double loadAverage() {
     double loadAverage =  hal.getProcessor().getSystemLoadAverage();
@@ -120,7 +120,7 @@ public class OSUtils {
   /**
    * get cpu usage
    *
-   * @return
+   * @return cpu usage
    */
   public static double cpuUsage() {
     CentralProcessor processor = hal.getProcessor();
@@ -136,7 +136,7 @@ public class OSUtils {
   /**
    * get user list
    *
-   * @return
+   * @return user list
    */
   public static List<String> getUserList() {
     List<String> userList = new ArrayList<>();
@@ -169,8 +169,8 @@ public class OSUtils {
 
   /**
    * get system group information
-   * @return
-   * @throws IOException
+   * @return system group info
+   * @throws IOException errors
    */
   public static String getGroup() throws IOException {
     String result = exeCmd("groups");
@@ -186,9 +186,9 @@ public class OSUtils {
   /**
    * Execute the corresponding command of Linux or Windows
    *
-   * @param command
-   * @return
-   * @throws IOException
+   * @param command command
+   * @return result of execute command
+   * @throws IOException errors
    */
   public static String exeCmd(String command) throws IOException {
     BufferedReader br = null;
@@ -217,9 +217,9 @@ public class OSUtils {
 
   /**
    * Execute the shell
-   * @param command
-   * @return
-   * @throws IOException
+   * @param command command
+   * @return result of execute the shell
+   * @throws IOException errors
    */
   public static String exeShell(String command) throws IOException {
     return ShellExecutor.execCommand(command);
@@ -227,7 +227,7 @@ public class OSUtils {
 
   /**
    * get process id
-   * @return
+   * @return process id
    */
   public static int getProcessID() {
     RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
@@ -236,7 +236,7 @@ public class OSUtils {
 
   /**
    * get local host
-   * @return
+   * @return host
    */
   public static String getHost(){
     try {
@@ -250,6 +250,7 @@ public class OSUtils {
 
   /**
    * whether is macOS
+   * @return true if mac
    */
   public static boolean isMacOS() {
     String os = System.getProperty("os.name");
@@ -259,6 +260,7 @@ public class OSUtils {
 
   /**
    * whether is windows
+   * @return true if windows
    */
   public static boolean isWindows() {
     String os = System.getProperty("os.name");
@@ -268,8 +270,9 @@ public class OSUtils {
 
   /**
    * check memory and cpu usage
-   * @param conf
-   * @return
+   * @param conf conf
+   * @param isMaster is master
+   * @return check memory and cpu usage
    */
   public static Boolean checkResource(Configuration conf, Boolean isMaster){
     double systemCpuLoad;

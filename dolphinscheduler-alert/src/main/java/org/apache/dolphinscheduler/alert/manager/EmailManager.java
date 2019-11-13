@@ -28,12 +28,12 @@ import java.util.Map;
 public class EmailManager {
     /**
      * email send
-     * @param receviersList
-     * @param receviersCcList
-     * @param title
-     * @param content
-     * @param showType
-     * @return
+     * @param receviersList the receiver list
+     * @param receviersCcList the cc List
+     * @param title the title
+     * @param content the content
+     * @param showType the showType
+     * @return the send result
      */
     public Map<String,Object> send(List<String> receviersList,List<String> receviersCcList,String title,String content,ShowType showType){
 
@@ -42,11 +42,11 @@ public class EmailManager {
 
     /**
      * msg send
-     * @param receviersList
-     * @param title
-     * @param content
-     * @param showType
-     * @return
+     * @param receviersList the receiver list
+     * @param title the title
+     * @param content the content
+     * @param showType the showType
+     * @return the send result
      */
     public Map<String,Object> send(List<String> receviersList,String title,String content,ShowType showType){
 

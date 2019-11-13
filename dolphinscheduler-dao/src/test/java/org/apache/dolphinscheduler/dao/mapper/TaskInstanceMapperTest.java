@@ -51,6 +51,10 @@ public class TaskInstanceMapperTest {
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
 
+    /**
+     * insert
+     * @return TaskInstance
+     */
     private TaskInstance insertOne(){
         //insertOne
         TaskInstance taskInstance = new TaskInstance();
@@ -65,6 +69,9 @@ public class TaskInstanceMapperTest {
         return taskInstance;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -75,6 +82,9 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.deleteById(taskInstance.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         TaskInstance taskInstance = insertOne();
@@ -82,6 +92,9 @@ public class TaskInstanceMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         TaskInstance taskInstance = insertOne();
@@ -91,6 +104,9 @@ public class TaskInstanceMapperTest {
         Assert.assertNotEquals(taskInstances.size(), 0);
     }
 
+    /**
+     * test query task instance by process instance id and state
+     */
     @Test
     public void testQueryTaskByProcessIdAndState() {
         TaskInstance task = insertOne();
@@ -104,6 +120,9 @@ public class TaskInstanceMapperTest {
         Assert.assertNotEquals(taskInstances.size(), 0);
     }
 
+    /**
+     * test find vaild task list by process instance id
+     */
     @Test
     public void testFindValidTaskListByProcessId() {
         TaskInstance task = insertOne();
@@ -129,6 +148,9 @@ public class TaskInstanceMapperTest {
         Assert.assertNotEquals(taskInstances1.size(), 0 );
     }
 
+    /**
+     * test query by host and status
+     */
     @Test
     public void testQueryByHostAndStatus() {
         TaskInstance task = insertOne();
@@ -142,6 +164,9 @@ public class TaskInstanceMapperTest {
         Assert.assertNotEquals(taskInstances.size(), 0);
     }
 
+    /**
+     * test set failover by host and state array
+     */
     @Test
     public void testSetFailoverByHostAndStateArray() {
         TaskInstance task = insertOne();
@@ -157,6 +182,9 @@ public class TaskInstanceMapperTest {
         Assert.assertNotEquals(setResult, 0);
     }
 
+    /**
+     * test query by task instance id and name
+     */
     @Test
     public void testQueryByInstanceIdAndName() {
         TaskInstance task = insertOne();
@@ -171,6 +199,9 @@ public class TaskInstanceMapperTest {
         Assert.assertNotEquals(taskInstance, null);
     }
 
+    /**
+     * test count task instance
+     */
     @Test
     public void testCountTask() {
         TaskInstance task = insertOne();
@@ -197,6 +228,9 @@ public class TaskInstanceMapperTest {
 
     }
 
+    /**
+     * test count task instance state by user
+     */
     @Test
     public void testCountTaskInstanceStateByUser() {
 
@@ -217,6 +251,9 @@ public class TaskInstanceMapperTest {
         taskInstanceMapper.deleteById(task.getId());
     }
 
+    /**
+     * test page
+     */
     @Test
     public void testQueryTaskInstanceListPaging() {
         TaskInstance task = insertOne();

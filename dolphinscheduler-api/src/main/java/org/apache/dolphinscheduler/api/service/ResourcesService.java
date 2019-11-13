@@ -107,7 +107,6 @@ public class ResourcesService extends BaseService {
         if (!StringUtils.equals(fileSuffix, nameSuffix)) {
             /**
              * rename file suffix and original suffix must be consistent
-             * 重命名的后缀必须与原文件后缀一致
              */
             logger.error("rename file suffix and original suffix must be consistent: {}", file.getOriginalFilename());
             putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);

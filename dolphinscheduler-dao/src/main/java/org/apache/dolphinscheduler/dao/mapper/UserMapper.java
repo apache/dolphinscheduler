@@ -24,26 +24,75 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * user mapper interface
+ */
 public interface UserMapper extends BaseMapper<User> {
 
+    /**
+     * query all general user
+     * @return user list
+     */
     List<User> queryAllGeneralUser();
 
+    /**
+     * query user by name
+     * @param userName userName
+     * @return user
+     */
     User queryByUserNameAccurately(@Param("userName") String userName);
 
+    /**
+     * query user by userName and password
+     * @param userName userName
+     * @param password password
+     * @return user
+     */
     User queryUserByNamePassword(@Param("userName") String userName, @Param("password") String password);
 
 
+    /**
+     * user page
+     * @param page page
+     * @param userName userName
+     * @return user IPage
+     */
     IPage<User> queryUserPaging(Page page,
                                 @Param("userName") String userName);
 
+    /**
+     * query user detail by id
+     * @param userId userId
+     * @return user
+     */
     User queryDetailsById(@Param("userId") int userId);
 
+    /**
+     * query user list by alertgroupId
+     * @param alertgroupId alertgroupId
+     * @return user list
+     */
     List<User> queryUserListByAlertGroupId(@Param("alertgroupId") int alertgroupId);
 
+    /**
+     * query user list by tenantId
+     * @param tenantId tenantId
+     * @return user list
+     */
     List<User> queryUserListByTenant(@Param("tenantId") int tenantId);
 
+    /**
+     * query user by userId
+     * @param userId userId
+     * @return user
+     */
     User queryTenantCodeByUserId(@Param("userId") int userId);
 
+    /**
+     * query user by token
+     * @param token token
+     * @return user
+     */
     User queryUserByToken(@Param("token") String token);
 
 }

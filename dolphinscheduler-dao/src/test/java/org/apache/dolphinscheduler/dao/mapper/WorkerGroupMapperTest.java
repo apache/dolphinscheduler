@@ -36,6 +36,10 @@ public class WorkerGroupMapperTest {
     @Autowired
     WorkerGroupMapper workerGroupMapper;
 
+    /**
+     * insert
+     * @return WorkerGroup
+     */
     private WorkerGroup insertOne(){
         //insertOne
         WorkerGroup workerGroup = new WorkerGroup();
@@ -50,6 +54,9 @@ public class WorkerGroupMapperTest {
     }
 
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -61,6 +68,9 @@ public class WorkerGroupMapperTest {
         Assert.assertEquals(update, 1);
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         //insertOne
@@ -70,6 +80,9 @@ public class WorkerGroupMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         //insertOne
@@ -80,6 +93,9 @@ public class WorkerGroupMapperTest {
         workerGroupMapper.deleteById(workerGroup.getId());
     }
 
+    /**
+     * test query all worker group
+     */
     @Test
     public void testQueryAllWorkerGroup() {
         //insertOne
@@ -90,6 +106,9 @@ public class WorkerGroupMapperTest {
         workerGroupMapper.deleteById(workerGroup.getId());
     }
 
+    /**
+     * test query work group by name
+     */
     @Test
     public void testQueryWorkerGroupByName() {
         //insertOne
@@ -100,6 +119,9 @@ public class WorkerGroupMapperTest {
         workerGroupMapper.deleteById(workerGroup.getId());
     }
 
+    /**
+     * test page
+     */
     @Test
     public void testQueryListPaging() {
         //insertOne

@@ -37,23 +37,31 @@ import java.util.concurrent.ThreadFactory;
  */
 public class ZKWorkerClient extends AbstractZKClient {
 
+	/**
+	 * logger
+	 */
 	private static final Logger logger = LoggerFactory.getLogger(ZKWorkerClient.class);
 
-
+	/**
+	 * thread factory
+	 */
 	private static final ThreadFactory defaultThreadFactory = ThreadUtils.newGenericThreadFactory("Worker-Main-Thread");
 
 
 	/**
-	 *  worker znode
+	 * worker znode
 	 */
 	private String workerZNode = null;
 
 
 	/**
-	 *  zkWorkerClient
+	 * zookeeper worker client
 	 */
 	private static ZKWorkerClient zkWorkerClient = null;
 
+	/**
+	 * worker path children cache
+	 */
 	private PathChildrenCache workerPathChildrenCache;
 
 	private ZKWorkerClient(){
@@ -61,7 +69,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 	}
 
 	/**
-	 *  init
+	 * init
 	 */
 	private void init(){
 
@@ -75,6 +83,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 		this.registWorker();
 	}
 
+	@Override
 	public void close(){
 		try {
 			if(workerPathChildrenCache != null){
@@ -87,9 +96,9 @@ public class ZKWorkerClient extends AbstractZKClient {
 
 
 	/**
-	 * get zkWorkerClient
+	 * get zookeeper worker client
 	 *
-	 * @return
+	 * @return ZKWorkerClient
 	 */
 	public static synchronized ZKWorkerClient  getZKWorkerClient(){
 		if(zkWorkerClient == null){
@@ -152,15 +161,15 @@ public class ZKWorkerClient extends AbstractZKClient {
 
 	/**
 	 * get worker znode
-	 * @return
+	 * @return worker zookeeper node
 	 */
 	public String getWorkerZNode() {
 		return workerZNode;
 	}
 
 	/**
-	 *  get worker lock path
-	 * @return
+	 * get worker lock path
+	 * @return worker lock path
 	 */
 	public String getWorkerLockPath(){
 		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS);

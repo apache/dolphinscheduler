@@ -425,8 +425,8 @@ public class TaskInstance {
                 || (this.getState().typeIsFailure() && !taskCanRetry());
     }
     /**
-     * 判断是否可以重试
-     * @return
+     * determine if you can try again
+     * @return can try result
      */
     public boolean taskCanRetry() {
         if(this.isSubProcess()){

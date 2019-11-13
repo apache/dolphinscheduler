@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- *  task props
+ * task props
  */
 public class TaskProps {
 
@@ -38,44 +38,47 @@ public class TaskProps {
   private String nodeName;
 
   /**
-   *  task instance id
+   * task instance id
    **/
   private int taskInstId;
 
   /**
-   *  tenant code , execute task linux user
+   * tenant code , execute task linux user
    **/
   private String tenantCode;
 
+  /**
+   * task type
+   */
   private String taskType;
 
   /**
-   *  task parameters
+   * task parameters
    **/
   private String taskParams;
 
   /**
-   *  task dir
+   * task dir
    **/
   private String taskDir;
 
   /**
-   *  queue
+   * queue
    **/
   private String queue;
 
   /**
-   *  env file
+   * env file
    **/
   private String envFile;
 
   /**
-   *  defined params
+   * defined params
    **/
   private Map<String, String> definedParams;
 
   /**
-   *  task path
+   * task path
    */
   private String taskAppId;
 
@@ -85,12 +88,12 @@ public class TaskProps {
   private Date taskStartTime;
 
   /**
-   *  task timeout
+   * task timeout
    */
   private int taskTimeout;
 
   /**
-   *  task timeout strategy
+   * task timeout strategy
    */
   private TaskTimeoutStrategy taskTimeoutStrategy;
   /**
@@ -100,7 +103,6 @@ public class TaskProps {
 
   /**
    * schedule time
-   * @return
    */
   private Date scheduleTime;
 
@@ -109,8 +111,27 @@ public class TaskProps {
    */
   private CommandType cmdTypeIfComplement;
 
-
+  /**
+   * constructor
+   */
   public TaskProps(){}
+
+  /**
+   * constructor
+   * @param taskParams          task params
+   * @param taskDir             task dir
+   * @param scheduleTime        schedule time
+   * @param nodeName            node name
+   * @param taskType            task type
+   * @param taskInstId          task instance id
+   * @param envFile             env file
+   * @param tenantCode          tenant code
+   * @param queue               queue
+   * @param taskStartTime       task start time
+   * @param definedParams       defined params
+   * @param dependence          dependence
+   * @param cmdTypeIfComplement cmd type if complement
+   */
   public TaskProps(String taskParams,
                    String taskDir,
                    Date scheduleTime,
@@ -271,8 +292,8 @@ public class TaskProps {
   }
 
   /**
-   *  get parameters map
-   * @return
+   * get parameters map
+   * @return user defined params map
    */
   public Map<String,Property> getUserDefParamsMap() {
     if (definedParams != null) {

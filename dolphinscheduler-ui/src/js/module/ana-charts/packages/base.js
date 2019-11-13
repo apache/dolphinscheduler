@@ -24,23 +24,23 @@ export default class Base {
     if (options) {
       this.options = options
       if (settings.theme) {
-        // 使用已经注册的自定义主题
+        // Use a registered custom theme
         this.echart = echarts.init(element, settings.theme)
       } else if (Chart.settings.defaultTheme) {
-        // 使用全局配置的主题
+        // Topics using global configuration
         this.echart = echarts.init(element, Chart.settings.defaultTheme)
       } else {
         this.echart = echarts.init(element)
       }
-      // 响应窗口 resize 事件
+      // Response window resize event
       window.addEventListener('resize', () => this.echart.resize())
       this.apply()
     }
   }
 
   /**
-   * 刷新数据
-   * @param {*} data 图表数据
+   * refresh data
+   * @param {*} data Icon data
    */
   setData (data) {
     if (data && data.length !== 0) {

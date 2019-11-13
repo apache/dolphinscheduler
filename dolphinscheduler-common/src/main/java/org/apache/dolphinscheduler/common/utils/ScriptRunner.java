@@ -62,20 +62,13 @@ public class ScriptRunner {
 	private String delimiter = DEFAULT_DELIMITER;
 	private boolean fullLineDelimiter = false;
 
-	/**
-	 * Default constructor
-	 */
+
 	public ScriptRunner(Connection connection, boolean autoCommit, boolean stopOnError) {
 		this.connection = connection;
 		this.autoCommit = autoCommit;
 		this.stopOnError = stopOnError;
 	}
 
-	public static void main(String[] args) {
-		String dbName = "db_mmu";
-		String appKey = dbName.substring(dbName.lastIndexOf("_")+1, dbName.length());
-		System.out.println(appKey);
-	}
 
 	public void setDelimiter(String delimiter, boolean fullLineDelimiter) {
 		this.delimiter = delimiter;
@@ -87,6 +80,8 @@ public class ScriptRunner {
 	 *
 	 * @param reader
 	 *            - the source of the script
+	 * @throws IOException errors
+	 * @throws SQLException errors
 	 */
 	public void runScript(Reader reader) throws IOException, SQLException {
 		try {
@@ -167,9 +162,6 @@ public class ScriptRunner {
 					command.append(line.substring(0, line.lastIndexOf(getDelimiter())));
 					command.append(" ");
 					Statement statement = conn.createStatement();
-
-					// logger.info(command.toString());
-
 					boolean hasResults = false;
 					logger.info("sql:"+command.toString());
 					if (stopOnError) {
@@ -253,11 +245,9 @@ public class ScriptRunner {
 					command.append(" ");
 					Statement statement = conn.createStatement();
 
-					// logger.info(command.toString());
-
 					sql = command.toString().replaceAll("\\{\\{APPDB\\}\\}", dbName);
 					boolean hasResults = false;
-					logger.info("sql:"+sql);
+					logger.info("sql : " + sql);
 					if (stopOnError) {
 						hasResults = statement.execute(sql);
 					} else {

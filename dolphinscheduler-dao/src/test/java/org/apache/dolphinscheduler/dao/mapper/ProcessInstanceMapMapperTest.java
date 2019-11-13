@@ -36,6 +36,10 @@ public class ProcessInstanceMapMapperTest {
     ProcessInstanceMapMapper processInstanceMapMapper;
 
 
+    /**
+     * insert
+     * @return ProcessInstanceMap
+     */
     private ProcessInstanceMap insertOne(){
         //insertOne
         ProcessInstanceMap processInstanceMap = new ProcessInstanceMap();
@@ -46,6 +50,9 @@ public class ProcessInstanceMapMapperTest {
         return processInstanceMap;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -57,6 +64,9 @@ public class ProcessInstanceMapMapperTest {
         processInstanceMapMapper.deleteById(processInstanceMap.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         ProcessInstanceMap processInstanceMap = insertOne();
@@ -64,6 +74,9 @@ public class ProcessInstanceMapMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         ProcessInstanceMap processInstanceMap = insertOne();
@@ -73,6 +86,9 @@ public class ProcessInstanceMapMapperTest {
         processInstanceMapMapper.deleteById(processInstanceMap.getId());
     }
 
+    /**
+     * test query by process instance parentId
+     */
     @Test
     public void testQueryByParentId() {
         ProcessInstanceMap processInstanceMap = insertOne();
@@ -87,6 +103,9 @@ public class ProcessInstanceMapMapperTest {
         processInstanceMapMapper.deleteById(processInstanceMap.getId());
     }
 
+    /**
+     * test query by sub process instance id
+     */
     @Test
     public void testQueryBySubProcessId() {
         ProcessInstanceMap processInstanceMap = insertOne();
@@ -101,6 +120,9 @@ public class ProcessInstanceMapMapperTest {
         processInstanceMapMapper.deleteById(processInstanceMap.getId());
     }
 
+    /**
+     * test delete by parent process instance id
+     */
     @Test
     public void testDeleteByParentProcessId() {
         ProcessInstanceMap processInstanceMap = insertOne();
@@ -113,6 +135,9 @@ public class ProcessInstanceMapMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query sub ids by process instance parentId
+     */
     @Test
     public void querySubIdListByParentId() {
         ProcessInstanceMap processInstanceMap = insertOne();
