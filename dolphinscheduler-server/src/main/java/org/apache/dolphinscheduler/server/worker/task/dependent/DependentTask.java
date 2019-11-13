@@ -36,8 +36,14 @@ import java.util.*;
 
 import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
 
+/**
+ * Dependent Task
+ */
 public class DependentTask extends AbstractTask {
 
+    /**
+     * dependent task list
+     */
     private List<DependentExecute> dependentTaskList = new ArrayList<>();
 
     /**
@@ -46,12 +52,26 @@ public class DependentTask extends AbstractTask {
      */
     private Map<String, DependResult> dependResultMap = new HashMap<>();
 
+    /**
+     * dependent parameters
+     */
     private DependentParameters dependentParameters;
 
+    /**
+     * dependent date
+     */
     private Date dependentDate;
 
+    /**
+     * process dao
+     */
     private ProcessDao processDao;
 
+    /**
+     * constructor
+     * @param props     props
+     * @param logger    logger
+     */
     public DependentTask(TaskProps props, Logger logger) {
         super(props, logger);
     }
@@ -120,7 +140,7 @@ public class DependentTask extends AbstractTask {
 
     /**
      * get dependent result
-     * @return
+     * @return DependResult
      */
     private DependResult getTaskDependResult(){
         List<DependResult> dependResultList = new ArrayList<>();
@@ -136,7 +156,7 @@ public class DependentTask extends AbstractTask {
 
     /**
      * judge all dependent tasks finish
-     * @return
+     * @return whether all dependent tasks finish
      */
     private boolean allDependentTaskFinish(){
         boolean finish = true;
