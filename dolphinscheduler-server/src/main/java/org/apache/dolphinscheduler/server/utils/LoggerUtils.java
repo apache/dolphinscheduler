@@ -39,15 +39,19 @@ public class LoggerUtils {
      */
     public static final String TASK_LOGGER_INFO_PREFIX = "TASK";
 
+    /**
+     * Task Logger Thread's name
+     */
     public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
 
     /**
-     *  build job id
-     * @param affix
-     * @param processDefId
-     * @param processInstId
-     * @param taskId
-     * @return
+     * build job id
+     *
+     * @param affix         Task Logger's prefix
+     * @param processDefId  process define id
+     * @param processInstId process instance id
+     * @param taskId        task id
+     * @return task id format
      */
     public static String buildTaskId(String affix,
                                   int processDefId,
@@ -62,11 +66,11 @@ public class LoggerUtils {
 
 
     /**
-     *  processing log
-     *  get yarn application id list
-     * @param log
-     * @param logger
-     * @return
+     * processing log
+     * get yarn application id list
+     * @param log       log content
+     * @param logger    logger
+     * @return app id list
      */
     public static List<String> getAppIds(String log, Logger logger) {
 

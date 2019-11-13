@@ -42,15 +42,22 @@ import java.util.List;
  */
 public class AlertManager {
 
+    /**
+     * logger of AlertManager
+     */
     private static final Logger logger = LoggerFactory.getLogger(AlertManager.class);
 
+    /**
+     * alert dao
+     */
     private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 
 
     /**
-     *  command type convert chinese
-     * @param commandType
-     * @return
+     * command type convert chinese
+     *
+     * @param commandType command type
+     * @return command name
      */
     private String getCommandCnName(CommandType commandType) {
         switch (commandType) {
@@ -80,7 +87,7 @@ public class AlertManager {
     }
 
     /**
-     *  process instance format
+     * process instance format
      */
     private static final String PROCESS_INSTANCE_FORMAT =
             "\"Id:%d\"," +
@@ -94,9 +101,10 @@ public class AlertManager {
             "\"Host: %s\"" ;
 
     /**
-     *  get process instance content
-     * @param processInstance
-     * @return
+     * get process instance content
+     * @param processInstance   process instance
+     * @param taskInstances     task instance list
+     * @return process instance format content
      */
     public String getContentProcessInstance(ProcessInstance processInstance,
                                             List<TaskInstance> taskInstances){
@@ -142,10 +150,11 @@ public class AlertManager {
     }
 
     /**
-     *  getting worker fault tolerant content
-     * @param processInstance
-     * @param toleranceTaskList
-     * @return
+     * getting worker fault tolerant content
+     *
+     * @param processInstance   process instance
+     * @param toleranceTaskList tolerance task list
+     * @return worker tolerance content
      */
     private String getWorkerToleranceContent(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList){
 
@@ -164,8 +173,9 @@ public class AlertManager {
 
     /**
      * send worker alert fault tolerance
-     * @param processInstance
-     * @param toleranceTaskList
+     *
+     * @param processInstance   process instance
+     * @param toleranceTaskList tolerance task list
      */
     public void sendAlertWorkerToleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList){
         try{
@@ -190,7 +200,8 @@ public class AlertManager {
 
     /**
      * send process instance alert
-     * @param processInstance
+     * @param processInstance   process instance
+     * @param taskInstances     task instance list
      */
     public void sendAlertProcessInstance(ProcessInstance processInstance,
                                          List<TaskInstance> taskInstances){
@@ -238,6 +249,12 @@ public class AlertManager {
         logger.info("add alert to db , alert: {}", alert.toString());
     }
 
+    /**
+     * send process timeout alert
+     *
+     * @param processInstance   process instance
+     * @param processDefinition process definition
+     */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
         alertDao.sendProcessTimeoutAlert(processInstance, processDefinition);
     }

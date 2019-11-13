@@ -98,16 +98,29 @@ public class DruidConnectionProvider implements ConnectionProvider {
      */
     private DruidDataSource datasource;
 
+    /**
+     * get connection
+     * @return Connection
+     * @throws SQLException sql exception
+     */
     @Override
     public Connection getConnection() throws SQLException {
         return datasource.getConnection();
     }
 
+    /**
+     * shutdown data source
+     * @throws SQLException sql exception
+     */
     @Override
     public void shutdown() throws SQLException {
         datasource.close();
     }
 
+    /**
+     * data source initialize
+     * @throws SQLException sql exception
+     */
     @Override
     public void initialize() throws SQLException{
         if (this.URL == null) {

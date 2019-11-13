@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  mapreduce task
+ * mapreduce task
  */
 public class MapReduceTask extends AbstractYarnTask {
 
@@ -45,8 +45,9 @@ public class MapReduceTask extends AbstractYarnTask {
     private MapreduceParameters mapreduceParameters;
 
     /**
-     * @param props
-     * @param logger
+     * constructor
+     * @param props     task props
+     * @param logger    logger
      */
     public MapReduceTask(TaskProps props, Logger logger) {
         super(props, logger);
@@ -82,6 +83,11 @@ public class MapReduceTask extends AbstractYarnTask {
         }
     }
 
+    /**
+     * build command
+     * @return command
+     * @throws Exception exception
+     */
     @Override
     protected String buildCommand() throws Exception {
         List<String> parameterList = buildParameters(mapreduceParameters);
@@ -98,7 +104,11 @@ public class MapReduceTask extends AbstractYarnTask {
         return mapreduceParameters;
     }
 
-
+    /**
+     * build parameters
+     * @param mapreduceParameters mapreduce parameters
+     * @return parameter list
+     */
     private List<String> buildParameters(MapreduceParameters mapreduceParameters){
 
         List<String> result = new ArrayList<>();

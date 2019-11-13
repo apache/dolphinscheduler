@@ -27,12 +27,20 @@ import org.apache.dolphinscheduler.server.utils.LoggerUtils;
  */
 public class TaskLogFilter extends Filter<ILoggingEvent> {
 
+    /**
+     * level
+     */
     private Level level;
 
     public void setLevel(String level) {
         this.level = Level.toLevel(level);
     }
 
+    /**
+     * Accept or reject based on thread name
+     * @param event event
+     * @return FilterReply
+     */
     @Override
     public FilterReply decide(ILoggingEvent event) {
         if (event.getThreadName().startsWith(LoggerUtils.TASK_LOGGER_THREAD_NAME) || event.getLevel().isGreaterOrEqual(level)) {

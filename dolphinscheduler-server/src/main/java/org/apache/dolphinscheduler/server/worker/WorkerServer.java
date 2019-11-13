@@ -56,6 +56,9 @@ import java.util.concurrent.TimeUnit;
 @ComponentScan("org.apache.dolphinscheduler")
 public class WorkerServer extends AbstractServer {
 
+    /**
+     * logger
+     */
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
 
@@ -115,11 +118,11 @@ public class WorkerServer extends AbstractServer {
         this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
     }
 
-
     /**
      * master server startup
      *
      * master server not use web service
+     * @param args arguments
      */
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(WorkerServer.class);
@@ -143,7 +146,10 @@ public class WorkerServer extends AbstractServer {
         workerServer.awaitTermination();
     }
 
-
+    /**
+     * worker server run
+     * @param processDao process dao
+     */
     public void run(ProcessDao processDao){
 
         //  heartbeat interval
@@ -265,6 +271,7 @@ public class WorkerServer extends AbstractServer {
 
     /**
      * heartbeat thread implement
+     *
      * @return
      */
     private Runnable heartBeatThread(){
@@ -284,8 +291,9 @@ public class WorkerServer extends AbstractServer {
 
 
     /**
-     *  kill process thread implement
-     * @return
+     * kill process thread implement
+     *
+     * @return kill process thread
      */
     private Runnable getKillProcessThread(ProcessDao processDao){
         Runnable killProcessThread  = new Runnable() {
@@ -313,6 +321,12 @@ public class WorkerServer extends AbstractServer {
         return killProcessThread;
     }
 
+    /**
+     * kill task
+     *
+     * @param taskInfo  task info
+     * @param pd        process dao
+     */
     private void killTask(String taskInfo, ProcessDao pd) {
         logger.info("get one kill command from tasks kill queue: " + taskInfo);
         String[] taskInfoArray = taskInfo.split("-");
@@ -345,6 +359,12 @@ public class WorkerServer extends AbstractServer {
         }
     }
 
+    /**
+     * delete task from queue
+     *
+     * @param taskInstance
+     * @param pd process dao
+     */
     private void deleteTaskFromQueue(TaskInstance taskInstance, ProcessDao pd){
         // creating distributed locks, lock path /dolphinscheduler/lock/worker
         InterProcessMutex mutex = null;
@@ -365,6 +385,11 @@ public class WorkerServer extends AbstractServer {
         }
     }
 
+    /**
+     * remove Kill info from queue
+     *
+     * @param taskInfo task info
+     */
     private void removeKillInfoFromQueue(String taskInfo){
         taskQueue.srem(Constants.DOLPHINSCHEDULER_TASKS_KILL,taskInfo);
     }

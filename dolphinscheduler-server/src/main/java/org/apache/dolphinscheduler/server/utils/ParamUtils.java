@@ -27,16 +27,18 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- *  param utils
+ * param utils
  */
 public class ParamUtils {
 
     /**
-     *  parameter conversion
-     *
-     * @param globalParams
-     * @param localParams
-     * @return
+     * parameter conversion
+     * @param globalParams      global params
+     * @param globalParamsMap   global params map
+     * @param localParams       local params
+     * @param commandType       command type
+     * @param scheduleTime      schedule time
+     * @return global params
      */
     public static Map<String,Property> convert(Map<String,Property> globalParams,
                                                            Map<String,String> globalParamsMap,
@@ -86,9 +88,9 @@ public class ParamUtils {
     }
 
     /**
-     *  format convert
-     * @param paramsMap
-     * @return
+     * format convert
+     * @param paramsMap params map
+     * @return Map of converted
      */
     public static Map<String,String> convert(Map<String,Property> paramsMap){
         Map<String,String> map = new HashMap<>();

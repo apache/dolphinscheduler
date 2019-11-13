@@ -33,12 +33,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  spark task
+ * spark task
  */
 public class SparkTask extends AbstractYarnTask {
 
   /**
-   *  spark command
+   * spark command
    */
   private static final String SPARK_COMMAND = "spark-submit";
 
@@ -82,8 +82,8 @@ public class SparkTask extends AbstractYarnTask {
   }
 
   /**
-   *  create command
-   * @return
+   * create command
+   * @return command
    */
   @Override
   protected String buildCommand() {

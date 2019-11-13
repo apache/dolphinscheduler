@@ -37,15 +37,18 @@ import java.util.concurrent.Callable;
  */
 public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
+    /**
+     * logger of MasterBaseTaskExecThread
+     */
     private static final Logger logger = LoggerFactory.getLogger(MasterBaseTaskExecThread.class);
 
     /**
-     *  process dao
+     * process dao
      */
     protected ProcessDao processDao;
 
     /**
-     *  alert database access
+     * alert database access
      */
     protected AlertDao alertDao;
 
@@ -60,9 +63,13 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     protected TaskInstance taskInstance;
 
     /**
-     *  task queue
+     * task queue
      */
     protected ITaskQueue taskQueue;
+
+    /**
+     * whether need cancel
+     */
     protected boolean cancel;
 
     /**
@@ -79,6 +86,11 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         }
     }
 
+    /**
+     * constructor of MasterBaseTaskExecThread
+     * @param taskInstance      task instance
+     * @param processInstance   process instance
+     */
     public MasterBaseTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
         this.processDao = BeanContext.getBean(ProcessDao.class);
         this.alertDao = BeanContext.getBean(AlertDao.class);
@@ -88,14 +100,25 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         this.taskInstance = taskInstance;
     }
 
+    /**
+     * get task instance
+     * @return TaskInstance
+     */
     public TaskInstance getTaskInstance(){
         return this.taskInstance;
     }
 
+    /**
+     * kill master base task exec thread
+     */
     public void kill(){
         this.cancel = true;
     }
 
+    /**
+     * submit master base task exec thread
+     * @return TaskInstance
+     */
     protected TaskInstance submit(){
         Integer commitRetryTimes = conf.getInt(Constants.MASTER_COMMIT_RETRY_TIMES,
                 Constants.defaultMasterCommitRetryTimes);
@@ -120,10 +143,19 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         return null;
     }
 
+    /**
+     * submit wait complete
+     * @return true
+     */
     protected Boolean submitWaitComplete(){
         return true;
     }
 
+    /**
+     * call
+     * @return boolean
+     * @throws Exception exception
+     */
     @Override
     public Boolean call() throws Exception {
         return submitWaitComplete();

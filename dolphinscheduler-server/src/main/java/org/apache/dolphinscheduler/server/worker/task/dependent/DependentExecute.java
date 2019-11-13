@@ -37,27 +37,50 @@ import java.util.*;
  */
 public class DependentExecute {
     /**
-     *  process dao
+     * process dao
      */
     private static final ProcessDao processDao = DaoFactory.getDaoInstance(ProcessDao.class);
 
+    /**
+     * depend item list
+     */
     private List<DependentItem> dependItemList;
+
+    /**
+     * dependent relation
+     */
     private DependentRelation relation;
 
+    /**
+     * depend result
+     */
     private DependResult modelDependResult = DependResult.WAITING;
+
+    /**
+     * depend result map
+     */
     private Map<String, DependResult> dependResultMap = new HashMap<>();
 
+    /**
+     * logger
+     */
     private Logger logger =  LoggerFactory.getLogger(DependentExecute.class);
 
+    /**
+     * constructor
+     * @param itemList  item list
+     * @param relation  relation
+     */
     public DependentExecute(List<DependentItem> itemList, DependentRelation relation){
         this.dependItemList = itemList;
         this.relation = relation;
     }
 
     /**
-     *  get dependent item for one dependent item
-     * @param dependentItem
-     * @return
+     * get dependent item for one dependent item
+     * @param dependentItem dependent item
+     * @param currentTime   current time
+     * @return DependResult
      */
     public DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime){
         List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
@@ -66,9 +89,9 @@ public class DependentExecute {
 
     /**
      * calculate dependent result for one dependent item.
-     * @param dependentItem
-     * @param dateIntervals
-     * @return
+     * @param dependentItem dependent item
+     * @param dateIntervals date intervals
+     * @return dateIntervals
      */
     private DependResult calculateResultForTasks(DependentItem dependentItem,
                                                         List<DateInterval> dateIntervals) {
@@ -112,9 +135,9 @@ public class DependentExecute {
      * find the last one process instance that :
      * 1. manual run and finish between the interval
      * 2. schedule run and schedule time between the interval
-     * @param definitionId
-     * @param dateInterval
-     * @return
+     * @param definitionId  definition id
+     * @param dateInterval  date interval
+     * @return ProcessInstance
      */
     private ProcessInstance findLastProcessInterval(int definitionId, DateInterval dateInterval) {
 
@@ -144,8 +167,8 @@ public class DependentExecute {
 
     /**
      * get dependent result by task/process instance state
-     * @param state
-     * @return
+     * @param state state
+     * @return DependResult
      */
     private DependResult getDependResultByState(ExecutionStatus state) {
 
@@ -160,7 +183,8 @@ public class DependentExecute {
 
     /**
      * judge depend item finished
-     * @return
+     * @param currentTime current time
+     * @return boolean
      */
     public boolean finish(Date currentTime){
         if(modelDependResult == DependResult.WAITING){
@@ -172,7 +196,8 @@ public class DependentExecute {
 
     /**
      * get model depend result
-     * @return
+     * @param currentTime current time
+     * @return DependResult
      */
     public DependResult getModelDependResult(Date currentTime){
 
@@ -193,8 +218,9 @@ public class DependentExecute {
 
     /**
      * get dependent item result
-     * @param item
-     * @return
+     * @param item          item
+     * @param currentTime   current time
+     * @return DependResult
      */
     public DependResult getDependResultForItem(DependentItem item, Date currentTime){
         String key = item.getKey();

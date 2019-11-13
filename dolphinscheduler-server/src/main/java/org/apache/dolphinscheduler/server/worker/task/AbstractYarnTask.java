@@ -44,9 +44,9 @@ public abstract class AbstractYarnTask extends AbstractTask {
   protected ProcessDao processDao;
 
   /**
-   * @param taskProps
-   * @param logger
-   * @throws IOException
+   * Abstract Yarn Task
+   * @param taskProps task rops
+   * @param logger    logger
    */
   public AbstractYarnTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
@@ -73,6 +73,11 @@ public abstract class AbstractYarnTask extends AbstractTask {
     }
   }
 
+  /**
+   * cancel application
+   * @param status status
+   * @throws Exception exception
+   */
   @Override
   public void cancelApplication(boolean status) throws Exception {
     cancel = true;
@@ -85,7 +90,9 @@ public abstract class AbstractYarnTask extends AbstractTask {
   }
 
   /**
-   *  create command
+   * create command
+   * @return String
+   * @throws Exception exception
    */
   protected abstract String buildCommand() throws Exception;
 }

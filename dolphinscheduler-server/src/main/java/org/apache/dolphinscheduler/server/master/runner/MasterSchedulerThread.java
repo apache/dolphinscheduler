@@ -38,8 +38,14 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class MasterSchedulerThread implements Runnable {
 
+    /**
+     * logger of MasterSchedulerThread
+     */
     private static final Logger logger = LoggerFactory.getLogger(MasterSchedulerThread.class);
 
+    /**
+     * master exec service
+     */
     private final ExecutorService masterExecService;
 
     /**
@@ -47,13 +53,28 @@ public class MasterSchedulerThread implements Runnable {
      */
     private final ProcessDao processDao;
 
+    /**
+     * zookeeper master client
+     */
     private final ZKMasterClient zkMasterClient ;
 
+    /**
+     * master exec thread num
+     */
     private int masterExecThreadNum;
 
+    /**
+     * Configuration of MasterSchedulerThread
+     */
     private final Configuration conf;
 
-
+    /**
+     * constructor of MasterSchedulerThread
+     * @param zkClient              zookeeper master client
+     * @param processDao            process dao
+     * @param conf                  conf
+     * @param masterExecThreadNum   master exec thread num
+     */
     public MasterSchedulerThread(ZKMasterClient zkClient, ProcessDao processDao, Configuration conf, int masterExecThreadNum){
         this.processDao = processDao;
         this.zkMasterClient = zkClient;
@@ -62,7 +83,9 @@ public class MasterSchedulerThread implements Runnable {
         this.masterExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread",masterExecThreadNum);
     }
 
-
+    /**
+     * run of MasterSchedulerThread
+     */
     @Override
     public void run() {
         while (Stopper.isRunning()){

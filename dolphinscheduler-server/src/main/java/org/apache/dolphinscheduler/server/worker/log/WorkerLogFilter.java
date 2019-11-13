@@ -25,8 +25,16 @@ import ch.qos.logback.core.spi.FilterReply;
  *  worker log filter
  */
 public class WorkerLogFilter extends Filter<ILoggingEvent> {
+    /**
+     * level
+     */
     Level level;
 
+    /**
+     * Accept or reject based on thread name
+     * @param event event
+     * @return FilterReply
+     */
     @Override
     public FilterReply decide(ILoggingEvent event) {
         if (event.getThreadName().startsWith("Worker-")){

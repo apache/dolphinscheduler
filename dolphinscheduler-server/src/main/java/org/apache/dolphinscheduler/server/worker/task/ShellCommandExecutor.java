@@ -29,13 +29,27 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- *  shell command executor
+ * shell command executor
  */
 public class ShellCommandExecutor extends AbstractCommandExecutor {
 
+    /**
+     * sh
+     */
     public static final String SH = "sh";
 
-
+    /**
+     * constructor
+     * @param logHandler    log handler
+     * @param taskDir       task dir
+     * @param taskAppId     task app id
+     * @param taskInstId    task instance id
+     * @param tenantCode    tenant code
+     * @param envFile       env file
+     * @param startTime     start time
+     * @param timeout       timeout
+     * @param logger        logger
+     */
     public ShellCommandExecutor(Consumer<List<String>> logHandler,
                                 String taskDir,
                                 String taskAppId,
@@ -55,16 +69,31 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
         return String.format("%s/%s.command", taskDir, taskAppId);
     }
 
+    /**
+     * get command type
+     * @return command type
+     */
     @Override
     protected String commandType() {
         return SH;
     }
 
+    /**
+     * check find yarn application id
+     * @param line line
+     * @return true if line contains task app id
+     */
     @Override
     protected boolean checkFindApp(String line) {
         return line.contains(taskAppId);
     }
 
+    /**
+     * create command file if not exists
+     * @param execCommand   exec command
+     * @param commandFile   command file
+     * @throws IOException  io exception
+     */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
         logger.info("tenantCode user:{}, task dir:{}", tenantCode, taskAppId);

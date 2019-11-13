@@ -30,12 +30,27 @@ import java.util.concurrent.TimeUnit;
  */
 public class LogClient {
 
+    /**
+     * logger of LogClient
+     */
     private static  final Logger logger = LoggerFactory.getLogger(LogClient.class);
 
+    /**
+     * managed channel
+     */
     private final ManagedChannel channel;
+
+    /**
+     * blocking stub
+     */
     private final LogViewServiceGrpc.LogViewServiceBlockingStub blockingStub;
 
-    /** Construct client connecting to HelloWorld server at {@code host:port}. */
+    /**
+     * Construct client connecting to HelloWorld server at host:port.
+     *
+     * @param host host
+     * @param port port
+     */
     public LogClient(String host, int port) {
         this(ManagedChannelBuilder.forAddress(host, port)
                 // Channels are secure by default (via SSL/TLS). For the example we disable TLS to avoid
@@ -43,7 +58,11 @@ public class LogClient {
                 .usePlaintext(true));
     }
 
-    /** Construct client for accessing RouteGuide server using the existing channel. */
+    /**
+     * Construct client for accessing RouteGuide server using the existing channel.
+     *
+     * @param channelBuilder channel builder
+     */
     LogClient(ManagedChannelBuilder<?> channelBuilder) {
         /**
          *  set max message read size
@@ -53,16 +72,22 @@ public class LogClient {
         blockingStub = LogViewServiceGrpc.newBlockingStub(channel);
     }
 
+    /**
+     * shut down channel
+     *
+     * @throws InterruptedException interrupted exception
+     */
     public void shutdown() throws InterruptedException {
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }
 
     /**
-     *  roll view log
-     * @param path
-     * @param skipLineNum
-     * @param limit
-     * @return
+     * roll view log
+     *
+     * @param path          log path
+     * @param skipLineNum   skip line num
+     * @param limit         limit
+     * @return log content
      */
     public String rollViewLog(String path,int skipLineNum,int limit) {
         logger.info("roll view log , path : {},skipLineNum : {} ,limit :{}", path, skipLineNum, limit);
@@ -83,9 +108,10 @@ public class LogClient {
     }
 
     /**
-     *  view all log
-     * @param path
-     * @return
+     * view all log
+     *
+     * @param path log path
+     * @return log content
      */
     public String viewLog(String path) {
         logger.info("view log path : {}",path);
@@ -102,9 +128,10 @@ public class LogClient {
     }
 
     /**
-     *  get log bytes
-     * @param path
-     * @return
+     * get log bytes
+     *
+     * @param path log path
+     * @return log content
      */
     public byte[] getLogBytes(String path) {
         logger.info("get log bytes {}",path);

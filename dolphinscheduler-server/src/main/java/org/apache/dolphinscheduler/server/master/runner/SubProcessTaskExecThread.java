@@ -31,12 +31,21 @@ import java.util.Date;
  */
 public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
 
-
+    /**
+     * logger of SubProcessTaskExecThread
+     */
     private static final Logger logger = LoggerFactory.getLogger(SubProcessTaskExecThread.class);
 
-
+    /**
+     * sub process instance
+     */
     private ProcessInstance subProcessInstance;
 
+    /**
+     * sub process task exec thread
+     * @param taskInstance      task instance
+     * @param processInstance   process instance
+     */
     public SubProcessTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
         super(taskInstance, processInstance);
     }
@@ -111,7 +120,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
-     *  wait task quit
+     * wait task quit
      * @throws InterruptedException
      */
     private void waitTaskQuit() throws InterruptedException {
@@ -153,7 +162,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
-     *  stop subflow
+     * stop sub process
      */
     private void stopSubProcess() {
         if(subProcessInstance.getState() == ExecutionStatus.STOP ||
@@ -165,7 +174,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
-     * pause subflow
+     * pause sub process
      */
     private void pauseSubProcess() {
         if(subProcessInstance.getState() == ExecutionStatus.PAUSE ||

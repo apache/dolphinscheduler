@@ -34,28 +34,42 @@ import java.util.Date;
 import static org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_KILL;
 
 /**
- *  master task exec thread
+ * master task exec thread
  */
 public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
+    /**
+     * logger of MasterTaskExecThread
+     */
     private static final Logger logger = LoggerFactory.getLogger(MasterTaskExecThread.class);
 
-
+    /**
+     * constructor of MasterTaskExecThread
+     * @param taskInstance      task instance
+     * @param processInstance   process instance
+     */
     public MasterTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
         super(taskInstance, processInstance);
     }
 
     /**
-     *  get task instance
-     * @return
+     * get task instance
+     * @return TaskInstance
      */
     @Override
     public TaskInstance getTaskInstance(){
         return this.taskInstance;
     }
 
+    /**
+     * whether already Killed,default false
+     */
     private Boolean alreadyKilled = false;
 
+    /**
+     * submit task instance and wait complete
+     * @return true is task quit is true
+     */
     @Override
     public Boolean submitWaitComplete() {
         Boolean result = false;
@@ -70,7 +84,10 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         return result;
     }
 
-
+    /**
+     * wait task quit
+     * @return true if task quit success
+     */
     public Boolean waitTaskQuit(){
         // query new state
         taskInstance = processDao.findTaskInstanceById(taskInstance.getId());
@@ -147,7 +164,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      * get task timeout parameter
-     * @return
+     * @return TaskTimeoutParameter
      */
     private TaskTimeoutParameter getTaskTimeoutParameter(){
         String taskJson = taskInstance.getTaskJson();
@@ -159,7 +176,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * get remain time（s）
      *
-     * @return
+     * @return remain time
      */
     private long getRemaintime(long timeoutSeconds) {
         Date startTime = taskInstance.getStartTime();

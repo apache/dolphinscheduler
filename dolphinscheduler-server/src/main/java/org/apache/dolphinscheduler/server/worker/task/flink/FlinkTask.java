@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  flink task
+ * flink task
  */
 public class FlinkTask extends AbstractYarnTask {
 
@@ -90,8 +90,8 @@ public class FlinkTask extends AbstractYarnTask {
   }
 
   /**
-   *  create command
-   * @return
+   * create command
+   * @return command
    */
   @Override
   protected String buildCommand() {

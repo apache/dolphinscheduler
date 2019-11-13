@@ -123,9 +123,9 @@ public abstract class AbstractCommandExecutor {
     /**
      * task specific execution logic
      *
-     * @param execCommand
-     * @param processDao
-     * @return
+     * @param execCommand   exec command
+     * @param processDao    process dao
+     * @return exit status code
      */
     public int run(String execCommand, ProcessDao processDao) {
         int exitStatusCode;
@@ -196,8 +196,8 @@ public abstract class AbstractCommandExecutor {
     /**
      * build process
      *
-     * @param commandFile
-     * @throws IOException
+     * @param commandFile command file
+     * @throws IOException IO Exception
      */
     private void buildProcess(String commandFile) throws IOException {
         //init process builder
@@ -245,9 +245,9 @@ public abstract class AbstractCommandExecutor {
         return exitStatusCode;
     }
 
-
     /**
-     *  cancel python task
+     * cancel application
+     * @throws Exception exception
      */
     public void cancelApplication() throws Exception {
         if (process == null) {
@@ -276,10 +276,10 @@ public abstract class AbstractCommandExecutor {
     }
 
     /**
-     *  soft kill
-     * @param processId
-     * @return
-     * @throws InterruptedException
+     * soft kill
+     * @param processId process id
+     * @return process is alive
+     * @throws InterruptedException interrupted exception
      */
     private boolean softKill(int processId) {
 
@@ -383,8 +383,8 @@ public abstract class AbstractCommandExecutor {
     /**
      * check yarn state
      *
-     * @param appIds
-     * @return
+     * @param appIds application id list
+     * @return is success of yarn task state
      */
     public boolean isSuccessOfYarnState(List<String> appIds) {
 
@@ -415,8 +415,8 @@ public abstract class AbstractCommandExecutor {
 
     /**
      *  get app links
-     * @param fileName
-     * @return
+     * @param fileName file name
+     * @return app id list
      */
     private List<String> getAppLinks(String fileName) {
         List<String> logs = convertFile2List(fileName);
@@ -437,9 +437,9 @@ public abstract class AbstractCommandExecutor {
     }
 
     /**
-     *  convert file to list
-     * @param filename
-     * @return
+     * convert file to list
+     * @param filename file name
+     * @return line list
      */
     private List<String> convertFile2List(String filename) {
         List lineList = new ArrayList<String>(100);
@@ -472,8 +472,8 @@ public abstract class AbstractCommandExecutor {
     }
 
     /**
-     *  find app id
-     *
+     * find app id
+     * @param line line
      * @return appid
      */
     private String findAppId(String line) {
@@ -490,7 +490,7 @@ public abstract class AbstractCommandExecutor {
     /**
      * get remain time（s）
      *
-     * @return
+     * @return remain time
      */
     private long getRemaintime() {
         long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
@@ -506,8 +506,8 @@ public abstract class AbstractCommandExecutor {
     /**
      * get process id
      *
-     * @param process
-     * @return
+     * @param process process
+     * @return process id
      */
     private int getProcessId(Process process) {
         int processId = 0;
@@ -528,7 +528,7 @@ public abstract class AbstractCommandExecutor {
      * when log buffer siz or flush time reach condition , then flush
      *
      * @param lastFlushTime  last flush time
-     * @return
+     * @return last flush time
      */
     private long flush(long lastFlushTime) {
         long now = System.currentTimeMillis();
@@ -549,7 +549,7 @@ public abstract class AbstractCommandExecutor {
     /**
      * close buffer reader
      *
-     * @param inReader
+     * @param inReader in reader
      */
     private void close(BufferedReader inReader) {
         if (inReader != null) {

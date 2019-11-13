@@ -33,49 +33,37 @@ import java.util.Date;
 
 /**
  * process schedule job
- * <p>
- *  {@link Job}
- * </p>
  */
 public class ProcessScheduleJob implements Job {
 
+    /**
+     * logger of ProcessScheduleJob
+     */
     private static final Logger logger = LoggerFactory.getLogger(ProcessScheduleJob.class);
 
     /**
-     * {@link ProcessDao}
+     * process dao
      */
     private static ProcessDao processDao;
 
 
     /**
      * init
+     * @param processDao process dao
      */
     public static void init(ProcessDao processDao) {
         ProcessScheduleJob.processDao = processDao;
     }
 
     /**
-     * <p>
-     * Called by the <code>{@link Scheduler}</code> when a <code>{@link Trigger}</code>
-     * fires that is associated with the <code>Job</code>.
-     * </p>
+     * Called by the Scheduler when a Trigger fires that is associated with the Job
      *
-     * <p>
-     * The implementation may wish to set a
-     * {@link JobExecutionContext#setResult(Object) result} object on the
-     * {@link JobExecutionContext} before this method exits.  The result itself
-     * is meaningless to Quartz, but may be informative to
-     * <code>{@link JobListener}s</code> or
-     * <code>{@link TriggerListener}s</code> that are watching the job's
-     * execution.
-     * </p>
-     *
+     * @param context JobExecutionContext
      * @throws JobExecutionException if there is an exception while executing the job.
      */
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
 
-        //TODO...
         Assert.notNull(processDao, "please call init() method first");
 
         JobDataMap dataMap = context.getJobDetail().getJobDataMap();

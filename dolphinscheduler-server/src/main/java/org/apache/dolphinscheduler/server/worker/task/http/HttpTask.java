@@ -60,6 +60,9 @@ import java.util.Map;
  */
 public class HttpTask extends AbstractTask {
 
+    /**
+     * http parameters
+     */
     private HttpParameters httpParameters;
 
     /**
@@ -72,11 +75,21 @@ public class HttpTask extends AbstractTask {
      */
     protected static final int MAX_CONNECTION_MILLISECONDS = 60000;
 
+    /**
+     * application json
+     */
     protected static final String APPLICATION_JSON = "application/json";
 
+    /**
+     * output
+     */
     protected String output;
 
-
+    /**
+     * constructor
+     * @param props     props
+     * @param logger    logger
+     */
     public HttpTask(TaskProps props, Logger logger) {
         super(props, logger);
         this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
@@ -120,6 +133,12 @@ public class HttpTask extends AbstractTask {
         }
     }
 
+    /**
+     * send request
+     * @param client client
+     * @return CloseableHttpResponse
+     * @throws IOException io exception
+     */
     protected CloseableHttpResponse sendRequest(CloseableHttpClient client) throws IOException {
         RequestBuilder builder = createRequestBuilder();
         ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
@@ -145,6 +164,13 @@ public class HttpTask extends AbstractTask {
         return client.execute(request);
     }
 
+    /**
+     * get response body
+     * @param httpResponse http response
+     * @return response body
+     * @throws ParseException parse exception
+     * @throws IOException io exception
+     */
     protected String getResponseBody(CloseableHttpResponse httpResponse) throws ParseException, IOException {
         if (httpResponse == null) {
             return null;
@@ -157,11 +183,22 @@ public class HttpTask extends AbstractTask {
         return webPage;
     }
 
+    /**
+     * get status code
+     * @param httpResponse http response
+     * @return status code
+     */
     protected int getStatusCode(CloseableHttpResponse httpResponse) {
         int status = httpResponse.getStatusLine().getStatusCode();
         return status;
     }
 
+    /**
+     * valid response
+     * @param body          body
+     * @param statusCode    status code
+     * @return exit status code
+     */
     protected int validResponse(String body, String statusCode){
         int exitStatusCode = 0;
         switch (httpParameters.getHttpCheckCondition()) {
@@ -199,6 +236,10 @@ public class HttpTask extends AbstractTask {
         return output;
     }
 
+    /**
+     * append message
+     * @param message message
+     */
     protected void appendMessage(String message) {
         if (output == null) {
             output = "";
@@ -208,6 +249,11 @@ public class HttpTask extends AbstractTask {
         }
     }
 
+    /**
+     * add request params
+     * @param builder           buidler
+     * @param httpPropertyList  http property list
+     */
     protected void addRequestParams(RequestBuilder builder,List<HttpProperty> httpPropertyList) {
         if(httpPropertyList != null && httpPropertyList.size() > 0){
             JSONObject jsonParam = new JSONObject();
@@ -227,6 +273,11 @@ public class HttpTask extends AbstractTask {
         }
     }
 
+    /**
+     * set headers
+     * @param request           request
+     * @param httpPropertyList  http property list
+     */
     protected void setHeaders(HttpUriRequest request,List<HttpProperty> httpPropertyList) {
         if(httpPropertyList != null && httpPropertyList.size() > 0){
             for (HttpProperty property: httpPropertyList){
@@ -239,6 +290,10 @@ public class HttpTask extends AbstractTask {
         }
     }
 
+    /**
+     * create http client
+     * @return CloseableHttpClient
+     */
     protected CloseableHttpClient createHttpClient() {
         final RequestConfig requestConfig = requestConfig();
         HttpClientBuilder httpClientBuilder;
@@ -246,10 +301,18 @@ public class HttpTask extends AbstractTask {
         return httpClientBuilder.build();
     }
 
+    /**
+     * request config
+     * @return RequestConfig
+     */
     private RequestConfig requestConfig() {
         return RequestConfig.custom().setSocketTimeout(MAX_CONNECTION_MILLISECONDS).setConnectTimeout(MAX_CONNECTION_MILLISECONDS).build();
     }
 
+    /**
+     * create request builder
+     * @return RequestBuilder
+     */
     protected RequestBuilder createRequestBuilder() {
         if (httpParameters.getHttpMethod().equals(HttpMethod.GET)) {
             return RequestBuilder.get();
