@@ -20,6 +20,7 @@ const merge = require('webpack-merge')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const { baseConfig } = require('./config')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const ProgressPlugin = require('progress-bar-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 
@@ -96,6 +97,7 @@ const config = merge.smart(baseConfig, {
     ]
   },
   plugins: [
+    new ProgressPlugin(),
     new ExtractTextPlugin({ filename: 'css/[name].[contenthash:7].css', allChunks: true }),
     new webpack.optimize.CommonsChunkPlugin({ name: 'common', filename: 'js/[name].[hash:7].js' }),
     new webpack.optimize.OccurrenceOrderPlugin(),
