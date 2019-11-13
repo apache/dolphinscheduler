@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.dolphinscheduler</groupId>
 	<artifactId>dolphinscheduler</artifactId>
-	<version>1.2.1-release-SNAPSHOT</version>
+	<version>1.1.0-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
@@ -83,13 +83,13 @@
 		<jsp.version>6.1.14</jsp.version>
 		<spotbugs.version>3.1.12</spotbugs.version>
 		<apache.rat.version>0.13</apache.rat.version>
-		<zookeeper.version>3.5.6</zookeeper.version>
+		<zookeeper.version>3.4.14</zookeeper.version>
 
 		<frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
 		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
 		<maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
 		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-		<maven-javadoc-plugin.version>3.0.1</maven-javadoc-plugin.version>
+		<maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>2.4</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
 		<jacoco.version>0.8.4</jacoco.version>
@@ -512,8 +512,6 @@
 					<version>${maven-source-plugin.version}</version>
 				</plugin>
 
-
-
 			</plugins>
 
 		</pluginManagement>
@@ -521,8 +519,6 @@
 
 
 		<plugins>
-
-
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -543,6 +539,25 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven-javadoc-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<aggregate>true</aggregate>
+					<charset>${project.build.sourceEncoding}</charset>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<docencoding>${project.build.sourceEncoding}</docencoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
 				<version>${maven-release-plugin.version}</version>
 				<configuration>
@@ -559,6 +574,8 @@
 					</dependency>
 				</dependencies>
 			</plugin>
+
+
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

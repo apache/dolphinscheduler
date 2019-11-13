@@ -24,6 +24,6 @@ public interface IStoppable {
    * Stop this service.
    * @param cause why stopping
    */
-  public void stop(String cause);
+   void stop(String cause);
 
 }

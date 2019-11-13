@@ -72,12 +72,12 @@ public class ResourcesService extends BaseService {
     /**
      * create resource
      *
-     * @param loginUser
-     * @param type
-     * @param name
-     * @param desc
-     * @param file
-     * @return
+     * @param loginUser login user
+     * @param name alias
+     * @param desc description
+     * @param file file
+     * @param type type
+     * @return create result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Result createResource(User loginUser,
@@ -108,7 +108,6 @@ public class ResourcesService extends BaseService {
         if (!StringUtils.equals(fileSuffix, nameSuffix)) {
             /**
              * rename file suffix and original suffix must be consistent
-             * 重命名的后缀必须与原文件后缀一致
              */
             logger.error("rename file suffix and original suffix must be consistent: {}", file.getOriginalFilename());
             putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
@@ -181,11 +180,12 @@ public class ResourcesService extends BaseService {
     /**
      * update resource
      *
-     * @param loginUser
-     * @param type
-     * @param name
-     * @param desc
-     * @return
+     * @param loginUser login user
+     * @param name alias
+     * @param resourceId resource id
+     * @param type resource type
+     * @param desc description
+     * @return update result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Result updateResource(User loginUser,
@@ -291,12 +291,12 @@ public class ResourcesService extends BaseService {
     /**
      * query resources list paging
      *
-     * @param loginUser
-     * @param type
-     * @param searchVal
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param type resource type
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return resource list page
      */
     public Map<String, Object> queryResourceListPaging(User loginUser, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
@@ -365,9 +365,9 @@ public class ResourcesService extends BaseService {
     /**
      * query resource list
      *
-     * @param loginUser
-     * @param type
-     * @return
+     * @param loginUser login user
+     * @param type resource type
+     * @return resource list
      */
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
 
@@ -387,8 +387,10 @@ public class ResourcesService extends BaseService {
     /**
      * delete resource
      *
-     * @param loginUser
-     * @param resourceId
+     * @param loginUser login user
+     * @param resourceId resource id
+     * @return delete result code
+     * @throws Exception exception
      */
     @Transactional(rollbackFor = Exception.class)
     public Result delete(User loginUser, int resourceId) throws Exception {
@@ -431,10 +433,10 @@ public class ResourcesService extends BaseService {
 
     /**
      * verify resource by name and type
-     * @param name
-     * @param type
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param name resource alias
+     * @param type resource type
+     * @return true if the resource name not exists, otherwise return false
      */
     public Result verifyResourceName(String name, ResourceType type,User loginUser) {
         Result result = new Result();
@@ -469,28 +471,12 @@ public class ResourcesService extends BaseService {
     }
 
     /**
-     * verify resource by name and type
-     *
-     * @param name
-     * @return
-     */
-    public Result verifyResourceName(String name, ResourceType type) {
-        Result result = new Result();
-        if (checkResourceExists(name, 0, type.ordinal())) {
-            logger.error("resource type:{} name:{} has exist, can't create again.", type, name);
-            putMsg(result, Status.RESOURCE_EXIST);
-        } else {
-            putMsg(result, Status.SUCCESS);
-        }
-
-        return result;
-    }
-
-    /**
      * view resource file online
      *
-     * @param resourceId
-     * @return
+     * @param resourceId resource id
+     * @param skipLineNum skip line number
+     * @param limit limit
+     * @return resource content
      */
     public Result readResource(int resourceId, int skipLineNum, int limit) {
         Result result = new Result();
@@ -551,13 +537,13 @@ public class ResourcesService extends BaseService {
     /**
      * create resource file online
      *
-     * @param loginUser
-     * @param type
-     * @param fileName
-     * @param fileSuffix
-     * @param desc
-     * @param content
-     * @return
+     * @param loginUser login user
+     * @param type resource type
+     * @param fileName file name
+     * @param fileSuffix file suffix
+     * @param desc description
+     * @param content content
+     * @return create result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Result onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix, String desc, String content) {
@@ -616,8 +602,9 @@ public class ResourcesService extends BaseService {
     /**
      * updateProcessInstance resource
      *
-     * @param resourceId
-     * @return
+     * @param resourceId resource id
+     * @param content content
+     * @return update result cod
      */
     @Transactional(rollbackFor = Exception.class)
     public Result updateResourceContent(int resourceId, String content) {
@@ -711,8 +698,9 @@ public class ResourcesService extends BaseService {
     /**
      * download file
      *
-     * @param resourceId
-     * @return
+     * @param resourceId resource id
+     * @return resource content
+     * @throws Exception exception
      */
     public org.springframework.core.io.Resource downloadResource(int resourceId) throws Exception {
         // if resource upload startup
@@ -744,9 +732,9 @@ public class ResourcesService extends BaseService {
     /**
      * unauthorized file
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return unauthorized result code
      */
     public Map<String, Object> unauthorizedFile(User loginUser, Integer userId) {
 
@@ -777,9 +765,9 @@ public class ResourcesService extends BaseService {
     /**
      * unauthorized udf function
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return unauthorized result code
      */
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>(5);
@@ -810,9 +798,9 @@ public class ResourcesService extends BaseService {
     /**
      * authorized udf function
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return authorized result code
      */
     public Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
@@ -829,9 +817,9 @@ public class ResourcesService extends BaseService {
     /**
      * authorized file
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return authorized result
      */
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>(5);
@@ -848,10 +836,10 @@ public class ResourcesService extends BaseService {
     /**
      * get hdfs file name
      *
-     * @param resource
-     * @param tenantCode
-     * @param hdfsFileName
-     * @return
+     * @param resource resource
+     * @param tenantCode tenant code
+     * @param hdfsFileName hdfs file name
+     * @return hdfs file name
      */
     private String getHdfsFileName(Resource resource, String tenantCode, String hdfsFileName) {
         if (resource.getType().equals(ResourceType.FILE)) {
@@ -865,10 +853,10 @@ public class ResourcesService extends BaseService {
     /**
      * get hdfs file name
      *
-     * @param resourceType
-     * @param tenantCode
-     * @param hdfsFileName
-     * @return
+     * @param resourceType resource type
+     * @param tenantCode tenant code
+     * @param hdfsFileName hdfs file name
+     * @return hdfs file name
      */
     private String getHdfsFileName(ResourceType resourceType, String tenantCode, String hdfsFileName) {
         if (resourceType.equals(ResourceType.FILE)) {
@@ -882,8 +870,8 @@ public class ResourcesService extends BaseService {
     /**
      * get authorized resource list
      *
-     * @param resourceSet
-     * @param authedResourceList
+     * @param resourceSet resource set
+     * @param authedResourceList authorized resource list
      */
     private void getAuthorizedResourceList(Set<?> resourceSet, List<?> authedResourceList) {
         Set<?> authedResourceSet = null;

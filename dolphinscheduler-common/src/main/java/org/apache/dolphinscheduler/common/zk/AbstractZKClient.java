@@ -133,6 +133,7 @@ public abstract class AbstractZKClient {
     }
 
     public void close() {
+		zkClient.getZookeeperClient().close();
 		zkClient.close();
 		logger.info("zookeeper close ...");
     }
@@ -140,7 +141,8 @@ public abstract class AbstractZKClient {
 
 	/**
 	 *  heartbeat for zookeeper
-	 * @param znode
+	 * @param znode  zookeeper node
+	 * @param serverType server type
 	 */
 	public void heartBeatForZk(String znode, String serverType){
 		try {
@@ -175,11 +177,12 @@ public abstract class AbstractZKClient {
 	/**
 	 *	check dead server or not , if dead, stop self
 	 *
-	 * @param zNode   		  node path
-	 * @param serverType	  master or worker prefix
-	 * @throws Exception
+	 * @param zNode   	 node path
+	 * @param serverType master or worker prefix
+	 * @return  true if not exists
+	 * @throws Exception errors
 	 */
-	protected boolean checkIsDeadServer(String zNode, String serverType) throws Exception {
+	protected boolean checkIsDeadServer(String zNode, String serverType) throws Exception{
 		//ip_sequenceno
 		String[] zNodesPath = zNode.split("\\/");
 		String ipSeqNo = zNodesPath[zNodesPath.length - 1];
@@ -213,8 +216,8 @@ public abstract class AbstractZKClient {
 
 	/**
 	 * create zookeeper path according the zk node type.
-	 * @param zkNodeType
-	 * @return
+	 * @param zkNodeType zookeeper node type
+	 * @return  register zookeeper path
 	 * @throws Exception
 	 */
 	private String createZNodePath(ZKNodeType zkNodeType) throws Exception {
@@ -231,8 +234,9 @@ public abstract class AbstractZKClient {
 
 	/**
 	 * register server,  if server already exists, return null.
-	 * @param zkNodeType
+	 * @param zkNodeType zookeeper node type
 	 * @return register server path in zookeeper
+	 * @throws Exception errors
 	 */
 	public String registerServer(ZKNodeType zkNodeType) throws Exception {
 		String registerPath = null;
@@ -257,7 +261,7 @@ public abstract class AbstractZKClient {
 	 * @param zNode   		  node path
 	 * @param zkNodeType	  master or worker
 	 * @param opType		  delete or add
-	 * @throws Exception
+	 * @throws Exception errors
 	 */
 	public void handleDeadServer(String zNode, ZKNodeType zkNodeType, String opType) throws Exception {
 		//ip_sequenceno
@@ -291,7 +295,7 @@ public abstract class AbstractZKClient {
 
 	/**
 	 * for stop server
-	 * @param serverStoppable
+	 * @param serverStoppable server stoppable interface
 	 */
 	public void setStoppable(IStoppable serverStoppable){
 		this.stoppable = serverStoppable;
@@ -299,7 +303,7 @@ public abstract class AbstractZKClient {
 
 	/**
 	 * get active master num
-	 * @return
+	 * @return active master number
 	 */
 	public int getActiveMasterNum(){
 		List<String> childrenList = new ArrayList<>();
@@ -340,8 +344,8 @@ public abstract class AbstractZKClient {
 
 	/**
 	 * get server list.
-	 * @param zkNodeType
-	 * @return
+	 * @param zkNodeType zookeeper node type
+	 * @return server list
 	 */
 	public List<Server> getServersList(ZKNodeType zkNodeType){
 		Map<String, String> masterMap = getServerMaps(zkNodeType);
@@ -361,8 +365,8 @@ public abstract class AbstractZKClient {
 
 	/**
 	 * get master server list map.
-	 * result : {host : resource info}
-	 * @return
+	 * @param zkNodeType zookeeper node type
+	 * @return result : {host : resource info}
 	 */
 	public Map<String, String> getServerMaps(ZKNodeType zkNodeType){
 
@@ -383,10 +387,9 @@ public abstract class AbstractZKClient {
 
 	/**
 	 * check the zookeeper node already exists
-	 * @param host
-	 * @param zkNodeType
-	 * @return
-	 * @throws Exception
+	 * @param host host
+	 * @param zkNodeType zookeeper node type
+	 * @return true if exists
 	 */
 	public boolean checkZKNodeExists(String host, ZKNodeType zkNodeType) {
 		String path = getZNodeParentPath(zkNodeType);
@@ -406,36 +409,36 @@ public abstract class AbstractZKClient {
 
 	/**
 	 *  get zkclient
-	 * @return
+	 * @return zookeeper client
 	 */
 	public  CuratorFramework getZkClient() {
 		return zkClient;
 	}
 
 	/**
-	 * get worker node parent path
-	 * @return
+	 *
+	 * @return get worker node parent path
 	 */
 	protected String getWorkerZNodeParentPath(){return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS);};
 
 	/**
-	 * get master node parent path
-	 * @return
+	 *
+	 * @return get master node parent path
 	 */
 	protected String getMasterZNodeParentPath(){return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_MASTERS);}
 
 	/**
-	 *  get master lock path
-	 * @return
+	 *
+	 * @return get master lock path
 	 */
 	public String getMasterLockPath(){
 		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS);
 	}
 
 	/**
-	 * get zookeeper node parent path
-	 * @param zkNodeType
-	 * @return
+	 *
+	 * @param zkNodeType zookeeper node type
+	 * @return get zookeeper node parent path
 	 */
 	public String getZNodeParentPath(ZKNodeType zkNodeType) {
 		String path = "";
@@ -453,32 +456,32 @@ public abstract class AbstractZKClient {
 	}
 
 	/**
-	 * get dead server node parent path
-	 * @return
+	 *
+	 * @return get dead server node parent path
 	 */
 	protected String getDeadZNodeParentPath(){
 		return conf.getString(ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS);
 	}
 
 	/**
-	 *  get master start up lock path
-	 * @return
+	 *
+	 * @return get master start up lock path
 	 */
 	public String getMasterStartUpLockPath(){
 		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS);
 	}
 
 	/**
-	 *  get master failover lock path
-	 * @return
+	 *
+	 * @return get master failover lock path
 	 */
 	public String getMasterFailoverLockPath(){
 		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS);
 	}
 
 	/**
-	 * get worker failover lock path
-	 * @return
+	 *
+	 * @return get worker failover lock path
 	 */
 	public String getWorkerFailoverLockPath(){
 		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS);
@@ -486,7 +489,7 @@ public abstract class AbstractZKClient {
 
 	/**
 	 * release mutex
-	 * @param mutex
+	 * @param mutex mutex
 	 */
 	public static void releaseMutex(InterProcessMutex mutex) {
 		if (mutex != null){
@@ -519,8 +522,8 @@ public abstract class AbstractZKClient {
 
 	/**
 	 * create zookeeper node path if not exists
-	 * @param zNodeParentPath
-	 * @throws Exception
+	 * @param zNodeParentPath zookeeper parent path
+	 * @throws Exception errors
 	 */
 	private void createNodePath(String zNodeParentPath) throws Exception {
 	    if(null == zkClient.checkExists().forPath(zNodeParentPath)){
@@ -531,8 +534,9 @@ public abstract class AbstractZKClient {
 
 	/**
 	 * server self dead, stop all threads
-	 * @param serverHost
-	 * @param zkNodeType
+	 * @param serverHost server host
+	 * @param zkNodeType zookeeper node type
+	 * @return true if server dead and stop all threads
 	 */
 	protected boolean checkServerSelfDead(String serverHost, ZKNodeType zkNodeType) {
 		if (serverHost.equals(OSUtils.getHost())) {
@@ -547,8 +551,8 @@ public abstract class AbstractZKClient {
 
 	/**
 	 *  get host ip, string format: masterParentPath/ip_000001/value
-	 * @param path
-	 * @return
+	 * @param path path
+	 * @return host ip, string format: masterParentPath/ip_000001/value
 	 */
 	protected String getHostByEventDataPath(String path) {
 		int  startIndex = path.lastIndexOf("/")+1;
@@ -562,9 +566,10 @@ public abstract class AbstractZKClient {
 	}
 	/**
 	 * acquire zk lock
-	 * @param zkClient
-	 * @param zNodeLockPath
-	 * @throws Exception
+	 * @param zkClient zk client
+	 * @param zNodeLockPath zk lock path
+	 * @return zk lock
+	 * @throws Exception errors
 	 */
 	public InterProcessMutex acquireZkLock(CuratorFramework zkClient,String zNodeLockPath)throws Exception{
 		InterProcessMutex mutex = new InterProcessMutex(zkClient, zNodeLockPath);

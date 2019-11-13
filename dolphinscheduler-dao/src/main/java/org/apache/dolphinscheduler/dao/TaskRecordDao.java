@@ -43,7 +43,7 @@ public class TaskRecordDao {
     private static Logger logger = LoggerFactory.getLogger(TaskRecordDao.class.getName());
 
     /**
-     * 加载配置文件
+     * load conf
      */
     private static Configuration conf;
 
@@ -58,14 +58,14 @@ public class TaskRecordDao {
 
     /**
      *  get task record flag
-     * @return
+     * @return whether startup taskrecord
      */
     public static boolean getTaskRecordFlag(){
        return conf.getBoolean(Constants.TASK_RECORD_FLAG);
     }
     /**
      * create connection
-     * @return
+     * @return connection
      */
     private static Connection getConn() {
         if(!getTaskRecordFlag()){
@@ -77,7 +77,7 @@ public class TaskRecordDao {
         String password = conf.getString(Constants.TASK_RECORD_PWD);
         Connection conn = null;
         try {
-            //classLoader,加载对应驱动
+            //classLoader，load driver
             Class.forName(driver);
             conn = DriverManager.getConnection(url, username, password);
         } catch (ClassNotFoundException e) {
@@ -90,8 +90,8 @@ public class TaskRecordDao {
 
     /**
      * generate where sql string
-     * @param filterMap
-     * @return
+     * @param filterMap filterMap
+     * @return sql string
      */
     private static String getWhereString(Map<String, String> filterMap)
     {
@@ -140,8 +140,9 @@ public class TaskRecordDao {
 
     /**
      * count task record
-     * @param filterMap
-     * @return
+     * @param filterMap filterMap
+     * @param table table
+     * @return task record count
      */
     public static int countTaskRecord(Map<String, String> filterMap, String table){
 
@@ -180,8 +181,9 @@ public class TaskRecordDao {
 
     /**
      * query task record by filter map paging
-     * @param filterMap
-     * @return
+     * @param filterMap filterMap
+     * @param table table
+     * @return task record list
      */
     public static List<TaskRecord> queryAllTaskRecord(Map<String,String> filterMap , String table) {
 
@@ -203,9 +205,9 @@ public class TaskRecordDao {
 
     /**
      * convert result set to task record
-     * @param resultSet
-     * @return
-     * @throws SQLException
+     * @param resultSet resultSet
+     * @return task record
+     * @throws SQLException if error throws SQLException
      */
     private static TaskRecord convertToTaskRecord(ResultSet resultSet) throws SQLException {
 
@@ -231,8 +233,8 @@ public class TaskRecordDao {
 
     /**
      * query task list by select sql
-     * @param selectSql
-     * @return
+     * @param selectSql select sql
+     * @return task record list
      */
     private static List<TaskRecord> getQueryResult(String selectSql) {
         List<TaskRecord> recordList = new ArrayList<>();
@@ -269,9 +271,9 @@ public class TaskRecordDao {
 
     /**
      * according to procname and procdate query task record
-     * @param procName
-     * @param procDate
-     * @return
+     * @param procName procName
+     * @param procDate procDate
+     * @return task record status
      */
     public static TaskRecordStatus getTaskRecordState(String procName,String procDate){
         String sql = String.format("SELECT * FROM eamp_hive_log_hd WHERE PROC_NAME='%s' and PROC_DATE like '%s'"

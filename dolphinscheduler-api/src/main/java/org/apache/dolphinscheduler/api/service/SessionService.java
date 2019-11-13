@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -49,8 +50,8 @@ public class SessionService extends BaseService{
   /**
    * get user session from request
    *
-   * @param request
-   * @return
+   * @param request request
+   * @return session
    */
   public Session getSession(HttpServletRequest request)  {
     String sessionId = request.getHeader(Constants.SESSION_ID);
@@ -76,10 +77,11 @@ public class SessionService extends BaseService{
   /**
    * create session
    *
-   * @param user
-   * @param ip
-   * @return
+   * @param user user
+   * @param ip ip
+   * @return session string
    */
+  @Transactional(rollbackFor = Exception.class)
   public String createSession(User user, String ip) {
     Session session = null;
 
@@ -134,7 +136,7 @@ public class SessionService extends BaseService{
    * remove ip restrictions
    *
    * @param ip   no use
-   * @param loginUser
+   * @param loginUser login user
    */
   public void signOut(String ip, User loginUser) {
     try {

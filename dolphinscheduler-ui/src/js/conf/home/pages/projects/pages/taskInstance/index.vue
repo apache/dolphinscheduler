@@ -108,8 +108,8 @@
         })
       },
       /**
-       * 防抖请求接口
-       * @desc 防止函数多次被调用
+       * Anti shake request interface
+       * @desc Prevent functions from being called multiple times
        */
       _debounceGET: _.debounce(function (flag) {
         this._getList(flag)
@@ -131,13 +131,13 @@
     created () {
     },
     mounted () {
-      // 轮循获取状态
+      // Cycle acquisition status
       this.setIntervalP = setInterval(() => {
         this._debounceGET('false')
       }, 90000)
     },
     beforeDestroy () {
-      // 销毁轮循
+      // Destruction wheel
       clearInterval(this.setIntervalP)
     },
     components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }

@@ -67,7 +67,7 @@ public enum ExecutionStatus {
 
  /**
   * status is success
-  * @return
+  * @return status
   */
    public boolean typeIsSuccess(){
      return this == SUCCESS;
@@ -75,7 +75,7 @@ public enum ExecutionStatus {
 
  /**
   * status is failure
-  * @return
+  * @return status
   */
    public boolean typeIsFailure(){
      return this == FAILURE || this == NEED_FAULT_TOLERANCE;
@@ -83,7 +83,7 @@ public enum ExecutionStatus {
 
  /**
   * status is finished
-  * @return
+  * @return status
   */
    public boolean typeIsFinished(){
 
@@ -93,7 +93,7 @@ public enum ExecutionStatus {
 
     /**
      * status is waiting thread
-     * @return
+     * @return status
      */
    public boolean typeIsWaittingThread(){
        return this == WAITTING_THREAD;
@@ -101,7 +101,7 @@ public enum ExecutionStatus {
 
     /**
      * status is pause
-     * @return
+     * @return status
      */
    public boolean typeIsPause(){
        return this == PAUSE;
@@ -109,7 +109,7 @@ public enum ExecutionStatus {
 
     /**
      * status is running
-     * @return
+     * @return status
      */
    public boolean typeIsRunning(){
        return this == RUNNING_EXEUTION || this == WAITTING_DEPEND;
@@ -117,6 +117,7 @@ public enum ExecutionStatus {
 
     /**
      * status is cancel
+     * @return status
      */
     public boolean typeIsCancel(){ return this == KILL || this == STOP ;}
 

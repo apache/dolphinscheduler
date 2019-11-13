@@ -18,6 +18,7 @@ const webpack = require('webpack')
 const merge = require('webpack-merge')
 const { assetsDir, baseConfig } = require('./config')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const ProgressPlugin = require('progress-bar-webpack-plugin')
 const getEnv = require('env-parse').getEnv
 
 const config = merge.smart(baseConfig, {
@@ -31,7 +32,7 @@ const config = merge.smart(baseConfig, {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
-          hotReload: true // 开启热重载
+          hotReload: true // Open hot overload
         }
       },
       {
@@ -44,7 +45,13 @@ const config = merge.smart(baseConfig, {
               options: {
                 plugins: (loader) => [
                   require('autoprefixer')({
-                    'browsers': [ '> 1%', 'last 3 versions', 'ie >= 9' ]
+                    overrideBrowserslist: [
+                      "Android 4.1",
+                      "iOS 7.1",
+                      "Chrome > 31",
+                      "ff > 31",
+                      "ie >= 8"
+                    ]              
                   }),
                   require('cssnano')
                 ]
@@ -65,7 +72,13 @@ const config = merge.smart(baseConfig, {
               options: {
                 plugins: (loader) => [
                   require('autoprefixer')({
-                    'browsers': [ '> 1%', 'last 3 versions', 'ie >= 9' ]
+                    overrideBrowserslist: [
+                      "Android 4.1",
+                      "iOS 7.1",
+                      "Chrome > 31",
+                      "ff > 31",
+                      "ie >= 8"
+                    ] 
                   }),
                   require('cssnano')
                 ]
@@ -101,6 +114,7 @@ const config = merge.smart(baseConfig, {
     clientLogLevel: 'none'
   },
   plugins: [
+    new ProgressPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new ExtractTextPlugin({ filename: 'css/[name].css', allChunks: true }),
     new webpack.optimize.CommonsChunkPlugin({ name: 'common', filename: 'js/[name].js' }),

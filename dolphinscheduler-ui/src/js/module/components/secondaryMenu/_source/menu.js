@@ -211,30 +211,12 @@ let menu = {
           id: 1,
           disabled: true
         },
-        // {
-        //   name: 'Alert',
-        //   path: 'servers-alert',
-        //   id: 2,
-        //   disabled: true
-        // },
-        // {
-        //   name: 'RpcServer',
-        //   path: 'servers-rpcserver',
-        //   id: 3,
-        //   disabled: true
-        // },
         {
           name: 'Zookeeper',
           path: 'servers-zookeeper',
           id: 4,
           disabled: true
         },
-        // {
-        //   name: 'ApiServer',
-        //   path: 'servers-apiserver',
-        //   id: 5,
-        //   disabled: true
-        // },
         {
           name: 'DB',
           path: 'servers-db',

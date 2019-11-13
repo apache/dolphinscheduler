@@ -20,6 +20,7 @@ const merge = require('webpack-merge')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const { baseConfig } = require('./config')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const ProgressPlugin = require('progress-bar-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 
@@ -37,7 +38,7 @@ const config = merge.smart(baseConfig, {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
-          hotReload: false // 开启热重载
+          hotReload: false // Open hot overload
         }
       },
       {
@@ -50,7 +51,13 @@ const config = merge.smart(baseConfig, {
               options: {
                 plugins: (loader) => [
                   require('autoprefixer')({
-                    'browsers': [ '> 1%', 'last 3 versions', 'ie >= 9' ]
+                    overrideBrowserslist: [
+                      "Android 4.1",
+                      "iOS 7.1",
+                      "Chrome > 31",
+                      "ff > 31",
+                      "ie >= 8"
+                    ]      
                   }),
                   require('cssnano')
                 ]
@@ -71,7 +78,13 @@ const config = merge.smart(baseConfig, {
               options: {
                 plugins: (loader) => [
                   require('autoprefixer')({
-                    'browsers': [ '> 1%', 'last 3 versions', 'ie >= 9' ]
+                    overrideBrowserslist: [
+                      "Android 4.1",
+                      "iOS 7.1",
+                      "Chrome > 31",
+                      "ff > 31",
+                      "ie >= 8"
+                    ]
                   }),
                   require('cssnano')
                 ]
@@ -84,6 +97,7 @@ const config = merge.smart(baseConfig, {
     ]
   },
   plugins: [
+    new ProgressPlugin(),
     new ExtractTextPlugin({ filename: 'css/[name].[contenthash:7].css', allChunks: true }),
     new webpack.optimize.CommonsChunkPlugin({ name: 'common', filename: 'js/[name].[hash:7].js' }),
     new webpack.optimize.OccurrenceOrderPlugin(),
@@ -101,7 +115,7 @@ const config = merge.smart(baseConfig, {
           warnings: false,
           drop_debugger: true,
           drop_console: true,
-          pure_funcs: ['console.log']//移除console
+          pure_funcs: ['console.log']// remove console
         },
         comments: function (n, c) {
           /*! IMPORTANT: Please preserve 3rd-party library license info, inspired from @allex/amd-build-worker/config/jsplumb.js */

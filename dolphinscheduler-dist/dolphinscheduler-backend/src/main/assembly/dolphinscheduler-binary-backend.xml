@@ -8,8 +8,7 @@
 		<format>dir</format>
 	</formats>
 	<includeBaseDirectory>true</includeBaseDirectory>
-
-	<baseDirectory>dolphinscheduler-backend</baseDirectory>
+	<baseDirectory>${project.build.finalName}-dolphinscheduler-backend-bin</baseDirectory>
 
 	<fileSets>
 		<!--alert start-->
@@ -176,7 +175,6 @@
 			<outputDirectory>.</outputDirectory>
 		</fileSet>
 
-<!--
 		<fileSet>
 			<directory>${basedir}/../../dolphinscheduler-ui/dist</directory>
 			<includes>
@@ -192,7 +190,6 @@
 			</includes>
 			<outputDirectory>./ui</outputDirectory>
 		</fileSet>
--->
 
 		<fileSet>
 			<directory>${basedir}/../../sql</directory>

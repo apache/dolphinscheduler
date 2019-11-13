@@ -80,7 +80,7 @@ public class EnterpriseWeChatUtils {
     /**
      * get Enterprise WeChat token info
      * @return token string info
-     * @throws IOException
+     * @throws IOException the IOException
      */
     public static String getToken() throws IOException {
         String resp;
@@ -104,9 +104,9 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team single Enterprise WeChat message
-     * @param toParty
-     * @param agentId
-     * @param msg
+     * @param toParty the toParty
+     * @param agentId the agentId
+     * @param msg the msg
      * @return Enterprise WeChat send message
      */
     public static String makeTeamSendMsg(String toParty, String agentId, String msg) {
@@ -117,9 +117,9 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team multi Enterprise WeChat message
-     * @param toParty
-     * @param agentId
-     * @param msg
+     * @param toParty the toParty
+     * @param agentId the agentId
+     * @param msg the msg
      * @return Enterprise WeChat send message
      */
     public static String makeTeamSendMsg(Collection<String> toParty, String agentId, String msg) {
@@ -131,9 +131,9 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team single user message
-     * @param toUser
-     * @param agentId
-     * @param msg
+     * @param toUser the toUser
+     * @param agentId the agentId
+     * @param msg the msg
      * @return Enterprise WeChat send message
      */
     public static String makeUserSendMsg(String toUser, String agentId, String msg) {
@@ -144,9 +144,9 @@ public class EnterpriseWeChatUtils {
 
     /**
      * make team multi user message
-     * @param toUser
-     * @param agentId
-     * @param msg
+     * @param toUser the toUser
+     * @param agentId the agentId
+     * @param msg the msg
      * @return Enterprise WeChat send message
      */
     public static String makeUserSendMsg(Collection<String> toUser, String agentId, String msg) {
@@ -158,11 +158,11 @@ public class EnterpriseWeChatUtils {
 
     /**
      * send Enterprise WeChat
-     * @param charset
-     * @param data
-     * @param token
+     * @param charset the charset
+     * @param data the data
+     * @param token the token
      * @return Enterprise WeChat resp, demo: {"errcode":0,"errmsg":"ok","invaliduser":""}
-     * @throws IOException
+     * @throws IOException the IOException
      */
     public static String sendEnterpriseWeChat(String charset, String data, String token) throws IOException {
         String enterpriseWeChatPushUrlReplace = enterpriseWeChatPushUrl.replaceAll("\\$token", token);
@@ -185,9 +185,9 @@ public class EnterpriseWeChatUtils {
 
     /**
      * convert table to markdown style
-     * @param title
-     * @param content
-     * @return
+     * @param title the title
+     * @param content the content
+     * @return markdown table content
      */
     public static String markdownTable(String title,String content){
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
@@ -214,9 +214,9 @@ public class EnterpriseWeChatUtils {
 
     /**
      * convert text to markdown style
-     * @param title
-     * @param content
-     * @return
+     * @param title the title
+     * @param content the content
+     * @return markdown text
      */
     public static String markdownText(String title,String content){
         if (StringUtils.isNotEmpty(content)){
@@ -244,8 +244,8 @@ public class EnterpriseWeChatUtils {
 
     /**
      * Determine the mardown style based on the show type of the alert
-     * @param alert
-     * @return
+     * @param alert the alert
+     * @return the markdown alert table/text
      */
     public static String markdownByAlert(Alert alert){
         String result = "";

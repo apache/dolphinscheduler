@@ -20,31 +20,31 @@ import { checkKeyInModel, init } from '../../common'
 const TYPE = 'pie'
 
 /**
- * 饼图
+ * Pie chart
  */
 export default class Pie extends Base {
   /**
-   * 单独导出时调用的初始化方法
-   * @param {*} el 选择器或者 DOM 对象
-   * @param {*} data 数据源
-   * @param {*} options 可选项
+   * Initialization method called on separate export
+   * @param {*} el Selector or DOM object
+   * @param {*} data data source
+   * @param {*} options Optional
    */
   static init (el, data, options) {
     return init(Pie, el, data, options)
   }
 
   /**
-   * 将用户配置转换为符合 ECharts API 格式的配置格式
+   * Convert user configuration to a configuration format that conforms to the format of echarts API
    */
   transform () {
     const {
-      // 数据
+      // data
       data = [],
-      // 标题
-      title = '饼图',
-      // 是否环形图
+      // title
+      title = 'Pie chart',
+      // Ring chart or not
       ring = false,
-      // 属性字典
+      // Attribute dictionary
       keyMap = {
         textKey: 'key',
         dataKey: 'value'
@@ -55,7 +55,7 @@ export default class Pie extends Base {
       throw new Error('数据源为空！')
     }
 
-    // 文本对应属性名，数据值对应的属性名
+    // Attribute name corresponding to text and attribute name corresponding to data value
     const { textKey, dataKey } = keyMap
     checkKeyInModel(data[0], textKey, dataKey)
 
@@ -69,7 +69,7 @@ export default class Pie extends Base {
       data: []
     }]
 
-    // 填充数据
+    // Fill data
     for (let i = 0; i < data.length; i++) {
       const element = data[i]
       const { [dataKey]: value, [textKey]: name, ...other } = element
@@ -85,12 +85,12 @@ export default class Pie extends Base {
   }
 
   /**
-   * 绘制图表
+   * Drawing charts
    */
   apply () {
     let { title, series, legendData } = this.options
 
-    // 注入配置到series
+    // Injection configuration to series
     let { insertSeries } = this.settings
     let _series = series
     if (insertSeries && insertSeries.length && series.length) {

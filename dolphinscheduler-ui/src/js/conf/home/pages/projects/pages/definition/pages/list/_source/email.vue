@@ -98,7 +98,7 @@
        */
       _manualEmail () {
         if (this.email === '') {
-          return true
+          return
         }
         this.email = _.trim(this.email).replace(/(;$)|(；$)/g, "")
 
@@ -114,14 +114,11 @@
             this.activeList.push(email)
             this.email = ''
             this._handlerEmailWitch()
-            return true
           } else {
             this.$message.warning(`${i18n.$t('Mailbox already exists! Recipients and copyers cannot repeat')}`)
-            return false
           }
         } else {
           this.$message.warning(`${i18n.$t('Mailbox input is illegal')}`)
-          return false
         }
       },
       /**
@@ -146,7 +143,7 @@
        * Carriage return
        */
       _emailEnter () {
-        // 没有list 手填
+        // not list Hand filling
         if (!this.emailList.length) {
           this._manualEmail()
           return
@@ -157,7 +154,7 @@
        * delete email
        */
       _emailDelete () {
-        // 输入法中文情况下禁止删除
+        // Do not delete in case of input method in Chinese
         if (!this.isCn) {
           this.emailWidth = 0
           if (_.isInteger(this.activeIndex)) {
@@ -255,6 +252,11 @@
       _emailTab () {
         // Data processing
         this._emailEnter()
+        // Focus acquisition
+        setTimeout(() => {
+          // Focus position
+          this.$refs.emailInput.focus()
+        }, 100)
       }
     },
     watch: {

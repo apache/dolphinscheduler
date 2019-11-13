@@ -40,6 +40,10 @@ public abstract class AbstractCycle {
     return new CycleLinks(this.cron).addCycle(this).addCycle(cycle);
   }
 
+  /**
+   * cycle constructor
+   * @param cron cron
+   */
   public AbstractCycle(Cron cron) {
     if (cron == null) {
       throw new IllegalArgumentException("cron must not be null!");
@@ -55,8 +59,8 @@ public abstract class AbstractCycle {
   }
 
   /**
-   * Whether the minute field has a value
-   * @return
+   * whether the minute field has a value
+   * @return if minute field has a value return true，else return false
    */
   protected boolean minFiledIsSetAll(){
     FieldExpression minFieldExpression = minField.getExpression();
@@ -67,8 +71,8 @@ public abstract class AbstractCycle {
 
 
   /**
-   * Whether the minute field has a value of every or always
-   * @return
+   * whether the minute field has a value of every or always
+   * @return if minute field has a value of every or always return true，else return false
    */
   protected boolean minFiledIsEvery(){
     FieldExpression minFieldExpression = minField.getExpression();
@@ -76,8 +80,8 @@ public abstract class AbstractCycle {
   }
 
   /**
-   * Whether the hour field has a value
-   * @return
+   * whether the hour field has a value
+   * @return if hour field has a value return true，else return false
    */
   protected boolean hourFiledIsSetAll(){
     FieldExpression hourFieldExpression = hourField.getExpression();
@@ -87,8 +91,8 @@ public abstract class AbstractCycle {
   }
 
   /**
-   * Whether the hour field has a value of every or always
-   * @return
+   * whether the hour field has a value of every or always
+   * @return if hour field has a value of every or always return true，else return false
    */
   protected boolean hourFiledIsEvery(){
     FieldExpression hourFieldExpression = hourField.getExpression();
@@ -96,8 +100,8 @@ public abstract class AbstractCycle {
   }
 
   /**
-   * Whether the day Of month field has a value
-   * @return
+   * whether the day Of month field has a value
+   * @return if day Of month field has a value return true，else return false
    */
   protected boolean dayOfMonthFieldIsSetAll(){
     return (dayOfMonthField.getExpression() instanceof Every || dayOfMonthField.getExpression() instanceof Always
@@ -107,16 +111,16 @@ public abstract class AbstractCycle {
 
 
   /**
-   * Whether the day Of Month field has a value of every or always
-   * @return
+   * whether the day Of Month field has a value of every or always
+   * @return if day Of Month field has a value of every or always return true，else return false
    */
   protected boolean dayOfMonthFieldIsEvery(){
     return (dayOfMonthField.getExpression() instanceof Every || dayOfMonthField.getExpression() instanceof Always);
   }
 
   /**
-   * Whether month field has a value
-   * @return
+   * whether month field has a value
+   * @return if month field has a value return true，else return false
    */
   protected boolean monthFieldIsSetAll(){
     FieldExpression monthFieldExpression = monthField.getExpression();
@@ -126,8 +130,8 @@ public abstract class AbstractCycle {
   }
 
   /**
-   * Whether the month field has a value of every or always
-   * @return
+   * whether the month field has a value of every or always
+   * @return if  month field has a value of every or always return true，else return false
    */
   protected boolean monthFieldIsEvery(){
     FieldExpression monthFieldExpression = monthField.getExpression();
@@ -135,8 +139,8 @@ public abstract class AbstractCycle {
   }
 
   /**
-   * Whether the day Of week field has a value
-   * @return
+   * whether the day Of week field has a value
+   * @return if day Of week field has a value return true，else return false
    */
   protected boolean dayofWeekFieldIsSetAll(){
     FieldExpression dayOfWeekFieldExpression = dayOfWeekField.getExpression();
@@ -146,24 +150,23 @@ public abstract class AbstractCycle {
   }
 
   /**
-   * Whether the day Of week field has a value of every or always
-   * @return
+   * whether the day Of week field has a value of every or always
+   * @return if day Of week field has a value of every or always return true，else return false
    */
   protected boolean dayofWeekFieldIsEvery(){
     FieldExpression dayOfWeekFieldExpression = dayOfWeekField.getExpression();
     return (dayOfWeekFieldExpression instanceof Every || dayOfWeekFieldExpression instanceof Always);
   }
+
   /**
    * get cycle enum
-   *
-   * @return
+   * @return CycleEnum
    */
   protected abstract CycleEnum getCycle();
 
   /**
    * get mini level cycle enum
-   *
-   * @return
+   * @return CycleEnum
    */
   protected abstract CycleEnum getMiniCycle();
 }

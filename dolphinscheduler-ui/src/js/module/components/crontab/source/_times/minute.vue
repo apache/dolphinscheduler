@@ -91,7 +91,7 @@
       event: 'minuteValueEvent'
     },
     methods: {
-      // 间隔执行时间（1）
+      // Interval execution time（1）
       onIntervalPerform (val) {
         console.log(val)
         this.intervalPerformVal = val
@@ -99,39 +99,39 @@
           this.minuteValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
         }
       },
-      // 间隔开始时间（2）
+      // Interval start time（2）
       onIntervalStart (val) {
         this.intervalStartVal = val
         if (this.radioMinute === 'intervalMinute') {
           this.minuteValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
         }
       },
-      // 具体分
+      // Specific points
       onspecificMinutes (arr) {
       },
-      // 周期开始值
+      // Cycle start value
       onCycleStart (val) {
         this.cycleStartVal = val
         if (this.radioMinute === 'cycleMinute') {
           this.minuteValue = `${this.cycleStartVal}-${this.cycleEndVal}`
         }
       },
-      // 周期结束值
+      // Cycle end value
       onCycleEnd (val) {
         this.cycleEndVal = val
         if (this.radioMinute === 'cycleMinute') {
           this.minuteValue = `${this.cycleStartVal}-${this.cycleEndVal}`
         }
       },
-      // 重置每一分
+      // Reset every point
       everyReset () {
         this.minuteValue = '*'
       },
-      // 重置间隔分
+      // Reset interval minute
       intervalReset () {
         this.minuteValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
       },
-      // 重置具体分钟数
+      // Reset specific minutes
       specificReset () {
         if (this.specificMinutesVal.length) {
           this.minuteValue = this.specificMinutesVal.join(',')
@@ -139,31 +139,31 @@
           this.minuteValue = '*'
         }
       },
-      // 重置周期分分钟数
+      // Reset cycle minutes
       cycleReset () {
         this.minuteValue = `${this.cycleStartVal}-${this.cycleEndVal}`
       },
       /**
-       * 解析参数值
+       * Parse parameter value
        */
       analyticalValue () {
         return new Promise((resolve, reject) => {
           let $minuteVal = _.cloneDeep(this.value)
-          // 间隔分
+          // Interval score
           let $interval = isStr($minuteVal, '/')
-          // 具体分
+          // Specific points
           let $specific = isStr($minuteVal, ',')
-          // 周期分
+          // Periodic Division
           let $cycle = isStr($minuteVal, '-')
 
-          // 每一分
+          // Every point
           if ($minuteVal === '*') {
             this.radioMinute = 'everyMinute'
             this.minuteValue = '*'
             return
           }
 
-          // 正整数（分）
+          // Positive integer (min)
           if ($minuteVal.length === 1 && _.isInteger(parseInt($minuteVal)) ||
             $minuteVal.length === 2 && _.isInteger(parseInt($minuteVal))
           ) {
@@ -172,7 +172,7 @@
             return
           }
 
-          // 间隔分
+          // nterval score
           if ($interval) {
             this.radioMinute = 'intervalMinute'
             this.intervalStartVal = parseInt($interval[0])
@@ -181,14 +181,14 @@
             return
           }
 
-          // 具体分钟数
+          // Specific minutes
           if ($specific) {
             this.radioMinute = 'specificMinute'
             this.specificMinutesVal = $specific
             return
           }
 
-          // 周期分
+          // Periodic Division
           if ($cycle) {
             this.radioMinute = 'cycleMinute'
             this.cycleStartVal = parseInt($cycle[0])
@@ -201,11 +201,11 @@
       }
     },
     watch: {
-      // 导出值
+      // Derived value
       minuteValue (val) {
         this.$emit('minuteValueEvent', val)
       },
-      // 选中类型
+      // Selected type
       radioMinute (val) {
         switch (val) {
           case 'everyMinute':
@@ -222,7 +222,7 @@
             break
         }
       },
-      // 具体分钟数
+      // pecific minutes
       specificMinutesVal (arr) {
         this.minuteValue = arr.join(',')
       }

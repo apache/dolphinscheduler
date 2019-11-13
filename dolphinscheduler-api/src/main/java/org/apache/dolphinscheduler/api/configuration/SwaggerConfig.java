@@ -31,7 +31,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  *
- * swager2 config class <br/>
+ * swager2 config class
  *
  */
 @Configuration

@@ -100,10 +100,10 @@ public class ProcessInstanceService extends BaseDAGService {
     /**
      * query process instance by id
      *
-     * @param loginUser
-     * @param projectName
-     * @param processId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process instance id
+     * @return process instance detail
      */
     public Map<String, Object> queryProcessInstanceById(User loginUser, String projectName, Integer processId) {
         Map<String, Object> result = new HashMap<>(5);
@@ -136,20 +136,20 @@ public class ProcessInstanceService extends BaseDAGService {
         return result;
     }
 
-
     /**
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefineId
-     * @param startDate
-     * @param endDate
-     * @param searchVal
-     * @param stateType
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param processDefineId process definition id
+     * @param searchVal search value
+     * @param stateType state type
+     * @param host host
+     * @param startDate start time
+     * @param endDate end time
+     * @return process instance list
      */
     public Map<String, Object> queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
                                                         String startDate, String endDate,
@@ -216,10 +216,11 @@ public class ProcessInstanceService extends BaseDAGService {
     /**
      * query task list by process instance id
      *
-     * @param loginUser
-     * @param projectName
-     * @param processId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process instance id
+     * @return task list for the process instance
+     * @throws IOException io exception
      */
     public Map<String, Object> queryTaskListByProcessId(User loginUser, String projectName, Integer processId) throws IOException {
         Map<String, Object> result = new HashMap<>();
@@ -291,10 +292,10 @@ public class ProcessInstanceService extends BaseDAGService {
     /**
      * query sub process instance detail info by task id
      *
-     * @param loginUser
-     * @param projectName
-     * @param taskId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param taskId task id
+     * @return sub process instance detail
      */
     public Map<String, Object> querySubProcessInstanceByTaskId(User loginUser, String projectName, Integer taskId) {
         Map<String, Object> result = new HashMap<>();
@@ -332,16 +333,17 @@ public class ProcessInstanceService extends BaseDAGService {
     /**
      * update process instance
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceId
-     * @param processInstanceJson
-     * @param scheduleTime
-     * @param syncDefine
-     * @param flag
-     * @param locations
-     * @param connects
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceJson process instance json
+     * @param processInstanceId process instance id
+     * @param scheduleTime schedule time
+     * @param syncDefine sync define
+     * @param flag flag
+     * @param locations locations
+     * @param connects connects
+     * @return update result code
+     * @throws ParseException parse exception for json parse
      */
     public Map<String, Object> updateProcessInstance(User loginUser, String projectName, Integer processInstanceId,
                                                      String processInstanceJson, String scheduleTime, Boolean syncDefine,
@@ -431,10 +433,10 @@ public class ProcessInstanceService extends BaseDAGService {
     /**
      * query parent process instance detail info by sub process instance id
      *
-     * @param loginUser
-     * @param projectName
-     * @param subId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param subId sub process id
+     * @return parent instance detail
      */
     public Map<String, Object> queryParentInstanceBySubId(User loginUser, String projectName, Integer subId) {
         Map<String, Object> result = new HashMap<>();
@@ -470,11 +472,11 @@ public class ProcessInstanceService extends BaseDAGService {
 
     /**
      * delete process instance by id, at the same time，delete task instance and their mapping relation data
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceId
-     * @param tasksQueue
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceId process instance id
+     * @param tasksQueue task queue
+     * @return delete result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> deleteProcessInstanceById(User loginUser, String projectName, Integer processInstanceId,ITaskQueue tasksQueue) {
@@ -560,10 +562,10 @@ public class ProcessInstanceService extends BaseDAGService {
     /**
      * batch delete process instance by ids, at the same time，delete task instance and their mapping relation data
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceIds
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceIds process instance id
+     * @return delete result code
      */
     public Map<String, Object> batchDeleteProcessInstanceByIds(User loginUser, String projectName, String processInstanceIds) {
         // task queue
@@ -604,8 +606,9 @@ public class ProcessInstanceService extends BaseDAGService {
     /**
      * view process instance variables
      *
-     * @param processInstanceId
-     * @return
+     * @param processInstanceId process instance id
+     * @return variables data
+     * @throws Exception exception
      */
     public Map<String, Object> viewVariables( Integer processInstanceId) throws Exception {
         Map<String, Object> result = new HashMap<>(5);
@@ -677,9 +680,9 @@ public class ProcessInstanceService extends BaseDAGService {
     /**
      * encapsulation gantt structure
      *
-     * @param processInstanceId
-     * @return
-     * @throws Exception
+     * @param processInstanceId process instance id
+     * @return gantt tree data
+     * @throws Exception exception when json parse
      */
     public Map<String, Object> viewGantt(Integer processInstanceId) throws Exception {
         Map<String, Object> result = new HashMap<>();

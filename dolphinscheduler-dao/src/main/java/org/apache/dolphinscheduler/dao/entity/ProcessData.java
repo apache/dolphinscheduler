@@ -47,8 +47,8 @@ public class ProcessData {
 
   /**
    *
-   * @param tasks
-   * @param globalParams
+   * @param tasks tasks
+   * @param globalParams globalParams
    */
   public ProcessData(List<TaskNode> tasks, List<Property> globalParams) {
     this.tasks = tasks;

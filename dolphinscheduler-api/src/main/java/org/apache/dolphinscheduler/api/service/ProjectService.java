@@ -59,10 +59,10 @@ public class ProjectService extends BaseService{
     /**
      * create project
      *
-     * @param loginUser
-     * @param name
-     * @param desc
-     * @return
+     * @param loginUser login user
+     * @param name project name
+     * @param desc description
+     * @return returns an error if it exists
      */
     public Map<String, Object> createProject(User loginUser, String name, String desc) {
 
@@ -98,8 +98,8 @@ public class ProjectService extends BaseService{
     /**
      * query project details by id
      *
-     * @param projectId
-     * @return
+     * @param projectId project id
+     * @return project detail information
      */
     public Map<String, Object> queryById(Integer projectId) {
 
@@ -117,12 +117,11 @@ public class ProjectService extends BaseService{
 
     /**
      * check project and authorization
-     * 检查项目权限
      *
-     * @param loginUser
-     * @param project
-     * @param projectName
-     * @return
+     * @param loginUser login user
+     * @param project project
+     * @param projectName project name
+     * @return true if the login user havve permission to see the project
      */
     public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName) {
 
@@ -155,13 +154,12 @@ public class ProjectService extends BaseService{
 
     /**
      * admin can view all projects
-     * 如果是管理员,则所有项目都可见
      *
-     * @param loginUser
-     * @param pageSize
-     * @param pageNo
-     * @param searchVal
-     * @return
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageSize page size
+     * @param pageNo page number
+     * @return project list which the login user have permission to see
      */
     public Map<String, Object> queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
         Map<String, Object> result = new HashMap<>();
@@ -190,9 +188,9 @@ public class ProjectService extends BaseService{
     /**
      * delete project by id
      *
-     * @param loginUser
-     * @param projectId
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @return delete result code
      */
     public Map<String, Object> deleteProject(User loginUser, Integer projectId) {
         Map<String, Object> result = new HashMap<>(5);
@@ -224,9 +222,9 @@ public class ProjectService extends BaseService{
     /**
      * get check result
      *
-     * @param loginUser
-     * @param project
-     * @return
+     * @param loginUser login user
+     * @param project project
+     * @return check result
      */
     private Map<String, Object> getCheckResult(User loginUser, Project project) {
         Map<String, Object> checkResult = checkProjectAndAuth(loginUser, project, project.getName());
@@ -240,11 +238,11 @@ public class ProjectService extends BaseService{
     /**
      * updateProcessInstance project
      *
-     * @param loginUser
-     * @param projectId
-     * @param projectName
-     * @param desc
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @param projectName project name
+     * @param desc description
+     * @return update result code
      */
     public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc) {
         Map<String, Object> result = new HashMap<>(5);
@@ -276,9 +274,9 @@ public class ProjectService extends BaseService{
     /**
      * query unauthorized project
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return the projects which user have not permission to see
      */
     public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>(5);
@@ -306,9 +304,9 @@ public class ProjectService extends BaseService{
     /**
      * get unauthorized project
      *
-     * @param projectSet
-     * @param authedProjectList
-     * @return
+     * @param projectSet project set
+     * @param authedProjectList authed project list
+     * @return project list that authorization
      */
     private List<Project> getUnauthorizedProjects(Set<Project> projectSet, List<Project> authedProjectList) {
         List<Project> resultList;
@@ -326,9 +324,9 @@ public class ProjectService extends BaseService{
     /**
      * query authorized project
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return projects which the user have permission to see, Except for items created by this user
      */
     public Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
@@ -348,9 +346,9 @@ public class ProjectService extends BaseService{
     /**
      * check whether have read permission
      *
-     * @param user
-     * @param project
-     * @return
+     * @param user user
+     * @param project project
+     * @return true if the user have permission to see the project, otherwise return false
      */
     private boolean checkReadPermission(User user, Project project) {
         int permissionId = queryPermission(user, project);
@@ -360,9 +358,9 @@ public class ProjectService extends BaseService{
     /**
      * query permission id
      *
-     * @param user
-     * @param project
-     * @return
+     * @param user user
+     * @param project project
+     * @return permission
      */
     private int queryPermission(User user, Project project) {
         if (user.getUserType() == UserType.ADMIN_USER) {
@@ -385,7 +383,7 @@ public class ProjectService extends BaseService{
 
     /**
      * query all project list that have one or more process definitions.
-     * @return
+     * @return project list
      */
     public Map<String, Object> queryAllProjectList() {
         Map<String, Object> result = new HashMap<>();

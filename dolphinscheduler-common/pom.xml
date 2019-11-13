@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.apache.dolphinscheduler</groupId>
 		<artifactId>dolphinscheduler</artifactId>
-		<version>1.2.1-release-SNAPSHOT</version>
+		<version>1.1.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>dolphinscheduler-common</artifactId>
 	<name>dolphinscheduler-common</name>
@@ -46,7 +46,7 @@
 		<dependency>
 			<groupId>org.apache.curator</groupId>
 			<artifactId>curator-client</artifactId>
-			<version>2.12.0</version>
+			<version>${curator.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>log4j-1.2-api</groupId>
@@ -579,13 +579,13 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-annotation</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
+			<version>${mybatis-plus.version}</version>
+			<scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>RELEASE</version>
+            <version>${lombok.version}</version>
             <scope>compile</scope>
         </dependency>
 	</dependencies>

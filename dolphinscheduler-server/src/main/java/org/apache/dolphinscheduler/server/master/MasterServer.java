@@ -41,11 +41,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- *   master server
+ * master server
  */
 @ComponentScan("org.apache.dolphinscheduler")
 public class MasterServer extends AbstractServer {
 
+    /**
+     * logger of MasterServer
+     */
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
     /**
@@ -69,8 +72,15 @@ public class MasterServer extends AbstractServer {
      */
     private ExecutorService masterSchedulerService;
 
+    /**
+     * default constructor
+     */
     public MasterServer(){}
 
+    /**
+     * constructor of MasterServers
+     * @param processDao process dao
+     */
     public MasterServer(ProcessDao processDao){
         try {
             conf = new PropertiesConfiguration(Constants.MASTER_PROPERTIES_PATH);
@@ -82,11 +92,11 @@ public class MasterServer extends AbstractServer {
         this.masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
     }
 
-
     /**
      * master server startup
      *
      * master server not use web service
+     * @param args arguments
      */
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(MasterServer.class);
@@ -107,7 +117,10 @@ public class MasterServer extends AbstractServer {
         masterServer.awaitTermination();
     }
 
-
+    /**
+     * run master server
+     * @param processDao process dao
+     */
     public void run(ProcessDao processDao){
 
         // heartbeat interval

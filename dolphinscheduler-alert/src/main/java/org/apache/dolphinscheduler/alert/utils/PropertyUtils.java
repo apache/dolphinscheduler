@@ -66,17 +66,10 @@ public class PropertyUtils {
         }
     }
 
-/*
-    public static PropertyUtils getInstance(){
-        return propertyUtils;
-    }
-*/
-
     /**
      * get property value
-     *
      * @param key property name
-     * @return
+     * @return the value
      */
     public static String getString(String key) {
         return properties.getProperty(key);
@@ -93,10 +86,10 @@ public class PropertyUtils {
     }
 
     /**
-     *
-     * @param key
-     * @param defaultValue
-     * @return
+     * get int value
+     * @param key the key
+     * @param defaultValue the default value
+     * @return the value related the key or the default value if the key not existed
      */
     public static int getInt(String key, int defaultValue) {
         String value = getString(key);
@@ -114,9 +107,8 @@ public class PropertyUtils {
 
     /**
      * get property value
-     *
      * @param key property name
-     * @return
+     * @return  the boolean result value
      */
     public static Boolean getBoolean(String key) {
         String value = properties.getProperty(key.trim());
@@ -128,19 +120,19 @@ public class PropertyUtils {
     }
 
     /**
-     *
-     * @param key
-     * @return
+     * get long value
+     * @param key the key
+     * @return if the value not existed, return -1, or will return the related value
      */
     public static long getLong(String key) {
         return getLong(key,-1);
     }
 
     /**
-     *
-     * @param key
-     * @param defaultVal
-     * @return
+     * get long value
+     * @param key the key
+     * @param defaultVal the default value
+     * @return the value related the key or the default value if the key not existed
      */
     public static long getLong(String key, long defaultVal) {
         String val = getString(key);
@@ -149,10 +141,10 @@ public class PropertyUtils {
 
 
     /**
-     *
-     * @param key
-     * @param defaultVal
-     * @return
+     * get double value
+     * @param key the key
+     * @param defaultVal the default value
+     * @return the value related the key or the default value if the key not existed
      */
     public double getDouble(String key, double defaultVal) {
         String val = getString(key);
@@ -164,7 +156,7 @@ public class PropertyUtils {
      *  get array
      * @param key       property name
      * @param splitStr  separator
-     * @return
+     * @return the result array
      */
     public static String[] getArray(String key, String splitStr) {
         String value = getString(key);
@@ -181,11 +173,11 @@ public class PropertyUtils {
     }
 
     /**
-     *
-     * @param key
-     * @param type
-     * @param defaultValue
-     * @param <T>
+     * get enum
+     * @param key the key
+     * @param type the class type
+     * @param defaultValue the default value
+     * @param <T> the generic class type
      * @return  get enum value
      */
     public <T extends Enum<T>> T getEnum(String key, Class<T> type,

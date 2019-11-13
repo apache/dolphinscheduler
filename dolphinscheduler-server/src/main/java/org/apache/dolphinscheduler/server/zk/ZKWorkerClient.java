@@ -28,7 +28,6 @@ import org.apache.curator.utils.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.concurrent.ThreadFactory;
 
 
@@ -38,33 +37,39 @@ import java.util.concurrent.ThreadFactory;
  */
 public class ZKWorkerClient extends AbstractZKClient {
 
+	/**
+	 * logger
+	 */
 	private static final Logger logger = LoggerFactory.getLogger(ZKWorkerClient.class);
 
-
+	/**
+	 * thread factory
+	 */
 	private static final ThreadFactory defaultThreadFactory = ThreadUtils.newGenericThreadFactory("Worker-Main-Thread");
 
 
 	/**
-	 *  worker znode
+	 * worker znode
 	 */
 	private String workerZNode = null;
 
-	/**
-	 *  create time
-	 */
-	private Date createTime = null;
 
 	/**
-	 *  zkWorkerClient
+	 * zookeeper worker client
 	 */
 	private static ZKWorkerClient zkWorkerClient = null;
+
+	/**
+	 * worker path children cache
+	 */
+	private PathChildrenCache workerPathChildrenCache;
 
 	private ZKWorkerClient(){
 		init();
 	}
 
 	/**
-	 *  init
+	 * init
 	 */
 	private void init(){
 
@@ -78,11 +83,22 @@ public class ZKWorkerClient extends AbstractZKClient {
 		this.registWorker();
 	}
 
+	@Override
+	public void close(){
+		try {
+			if(workerPathChildrenCache != null){
+				workerPathChildrenCache.close();
+			}
+			super.close();
+		} catch (Exception ignore) {
+		}
+	}
+
 
 	/**
-	 * get zkWorkerClient
+	 * get zookeeper worker client
 	 *
-	 * @return
+	 * @return ZKWorkerClient
 	 */
 	public static synchronized ZKWorkerClient  getZKWorkerClient(){
 		if(zkWorkerClient == null){
@@ -112,13 +128,10 @@ public class ZKWorkerClient extends AbstractZKClient {
 	 *  monitor worker
 	 */
 	private void listenerWorker(){
-		PathChildrenCache workerPc = new PathChildrenCache(zkClient, getZNodeParentPath(ZKNodeType.WORKER), true, defaultThreadFactory);
+		workerPathChildrenCache = new PathChildrenCache(zkClient, getZNodeParentPath(ZKNodeType.WORKER), true, defaultThreadFactory);
 		try {
-
-			Date now = new Date();
-			createTime = now ;
-			workerPc.start();
-			workerPc.getListenable().addListener(new PathChildrenCacheListener() {
+			workerPathChildrenCache.start();
+			workerPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
 				@Override
 				public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
 					switch (event.getType()) {
@@ -148,15 +161,15 @@ public class ZKWorkerClient extends AbstractZKClient {
 
 	/**
 	 * get worker znode
-	 * @return
+	 * @return worker zookeeper node
 	 */
 	public String getWorkerZNode() {
 		return workerZNode;
 	}
 
 	/**
-	 *  get worker lock path
-	 * @return
+	 * get worker lock path
+	 * @return worker lock path
 	 */
 	public String getWorkerLockPath(){
 		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS);

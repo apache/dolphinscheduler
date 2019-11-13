@@ -37,11 +37,10 @@ public class BaseDAGService extends BaseService{
     /**
      * process instance to DAG
      *
-     * @param processInstance
-     * @return
-     * @throws Exception
+     * @param processInstance input process instance
+     * @return process instance dag.
      */
-    public static DAG<String, TaskNode, TaskNodeRelation> processInstance2DAG(ProcessInstance processInstance) throws Exception {
+    public static DAG<String, TaskNode, TaskNodeRelation> processInstance2DAG(ProcessInstance processInstance) {
 
         String processDefinitionJson = processInstance.getProcessInstanceJson();
 
