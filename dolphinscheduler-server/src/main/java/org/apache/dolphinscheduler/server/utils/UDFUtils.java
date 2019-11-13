@@ -40,9 +40,12 @@ public class UDFUtils {
      */
     private static final String CREATE_FUNCTION_FORMAT = "create temporary function {0} as ''{1}''";
 
-
     /**
      * create function list
+     * @param udfFuncs      udf functions
+     * @param tenantCode    tenant code
+     * @param logger        logger
+     * @return create function list
      */
     public static List<String> createFuncs(List<UdfFunc> udfFuncs, String tenantCode,Logger logger){
         // get  hive udf jar path
@@ -67,7 +70,10 @@ public class UDFUtils {
     }
 
     /**
-     *  build jar sql
+     * build jar sql
+     * @param sqls          sql list
+     * @param resources     resource set
+     * @param uploadPath    upload path
      */
     private static void buildJarSql(List<String> sqls, Set<String> resources, String uploadPath) {
         String defaultFS = HadoopUtils.getInstance().getConfiguration().get(Constants.FS_DEFAULTFS);
@@ -81,7 +87,9 @@ public class UDFUtils {
     }
 
     /**
-     *  build temp function sql
+     * build temp function sql
+     * @param sqls      sql list
+     * @param udfFuncs  udf function list
      */
     private static void buildTempFuncSql(List<String> sqls, List<UdfFunc> udfFuncs) {
         if (isNotEmpty(udfFuncs)) {
@@ -94,6 +102,8 @@ public class UDFUtils {
 
     /**
      * get the resource names of all functions
+     * @param udfFuncs udf function list
+     * @return
      */
     private static Set<String> getFuncResouces(List<UdfFunc> udfFuncs) {
         Set<String> resources = new HashSet<>();

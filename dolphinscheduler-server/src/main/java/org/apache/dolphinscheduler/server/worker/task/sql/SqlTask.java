@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 import static org.apache.dolphinscheduler.common.Constants.*;
 import static org.apache.dolphinscheduler.common.enums.DbType.HIVE;
 /**
- *  sql task
+ * sql task
  */
 public class SqlTask extends AbstractTask {
 
@@ -234,12 +234,12 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * execute sql
-     * @param mainSqlBinds
-     * @param preStatementsBinds
-     * @param postStatementsBinds
-     * @param createFuncs
-     * @return
+     * execute function and sql
+     * @param mainSqlBinds          main sql binds
+     * @param preStatementsBinds    pre statements binds
+     * @param postStatementsBinds   post statements binds
+     * @param createFuncs           create functions
+     * @return Connection
      */
     public Connection executeFuncAndSql(SqlBinds mainSqlBinds,
                                         List<SqlBinds> preStatementsBinds,
@@ -366,9 +366,9 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     *  send mail as an attachment
-     * @param title
-     * @param content
+     * send mail as an attachment
+     * @param title     title
+     * @param content   content
      */
     public void sendAttachment(String title,String content){
 
@@ -416,9 +416,11 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     *  regular expressions match the contents between two specified strings
-     * @param content
-     * @return
+     * regular expressions match the contents between two specified strings
+     * @param content           content
+     * @param rgex              rgex
+     * @param sqlParamsMap      sql params map
+     * @param paramsPropsMap    params props map
      */
     public void setSqlParamsMap(String content, String rgex, Map<Integer,Property> sqlParamsMap, Map<String,Property> paramsPropsMap){
         Pattern pattern = Pattern.compile(rgex);
@@ -435,11 +437,11 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     *  print replace sql
-     * @param content
-     * @param formatSql
-     * @param rgex
-     * @param sqlParamsMap
+     * print replace sql
+     * @param content       content
+     * @param formatSql     format sql
+     * @param rgex          rgex
+     * @param sqlParamsMap  sql params map
      */
     public void printReplacedSql(String content, String formatSql,String rgex, Map<Integer,Property> sqlParamsMap){
         //parameter print style
