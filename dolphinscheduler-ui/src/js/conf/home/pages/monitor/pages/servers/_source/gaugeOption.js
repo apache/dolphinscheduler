@@ -19,47 +19,47 @@ export default function (value) {
     series: [
       {
         type: 'gauge',
-        center: ['50%', '45%'], // 仪表位置
-        radius: '80%', // 仪表大小
-        startAngle: 200, // 开始角度
-        endAngle: -20, // 结束角度
+        center: ['50%', '45%'], // Instrument position
+        radius: '80%', // Instrument size
+        startAngle: 200, // Starting angle
+        endAngle: -20, // End angle
         axisLine: {
           show: false,
-          lineStyle: { // 属性lineStyle控制线条样式
+          lineStyle: { // Property linestyle controls line style
             color: [
               [ 0.5, new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ // eslint-disable-line
                 offset: 1,
-                color: '#E75F25' // 50% 处的颜色
+                color: '#E75F25' // 50% Color in place
               }, {
                 offset: 0.8,
-                color: '#D9452C' // 40% 处的颜色
-              }], false) ], // 100% 处的颜色
+                color: '#D9452C' // 40% Color in place
+              }], false) ], // 100% Color in place
               [ 0.7, new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ // eslint-disable-line
                 offset: 1,
-                color: '#FFC539' // 70% 处的颜色
+                color: '#FFC539' // 70% Color in place
               }, {
                 offset: 0.8,
-                color: '#FE951E' // 66% 处的颜色
+                color: '#FE951E' // 66% Color in place
               }, {
                 offset: 0,
-                color: '#E75F25' // 50% 处的颜色
+                color: '#E75F25' // 50% Color in place
               }], false) ],
               [ 0.9, new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ // eslint-disable-line
                 offset: 1,
-                color: '#C7DD6B' // 90% 处的颜色
+                color: '#C7DD6B' // 90% Color in place
               }, {
                 offset: 0.8,
-                color: '#FEEC49' // 86% 处的颜色
+                color: '#FEEC49' // 86% Color in place
               }, {
                 offset: 0,
-                color: '#FFC539' // 70% 处的颜色
+                color: '#FFC539' // 70% Color in place
               }], false) ],
               [1, new echarts.graphic.LinearGradient(0, 0, 0, 1, [ { // eslint-disable-line
                 offset: 0.2,
-                color: '#1CAD52' // 92% 处的颜色
+                color: '#1CAD52' // 92% Color in place
               }, {
                 offset: 0,
-                color: '#C7DD6B' // 90% 处的颜色
+                color: '#C7DD6B' // 90% Color in place
               }], false) ]
             ],
             width: 10
@@ -74,7 +74,7 @@ export default function (value) {
         axisLabel: {
           show: false
         },
-        pointer: { // 指针样式
+        pointer: { // Pointer style
           length: '45%'
         },
         detail: {
@@ -83,34 +83,34 @@ export default function (value) {
       },
       {
         type: 'gauge',
-        center: ['50%', '45%'], // 默认全局居中
+        center: ['50%', '45%'], // Default global center
         radius: '70%',
         startAngle: 200,
         endAngle: -20,
         axisLine: {
           show: true,
-          lineStyle: { // 属性lineStyle控制线条样式
-            color: [ // 表盘颜色
-              [ 0.5, '#DA462C' ], // 0-50%处的颜色
-              [ 0.7, '#FF9618' ], // 51%-70%处的颜色
-              [ 0.9, '#FFED44' ], // 70%-90%处的颜色
-              [ 1, '#20AE51' ]// 90%-100%处的颜色
+          lineStyle: { // Property linestyle controls line style
+            color: [ // Dial Color
+              [ 0.5, '#DA462C' ], // 0-50%Color in place
+              [ 0.7, '#FF9618' ], // 51%-70%Color in place
+              [ 0.9, '#FFED44' ], // 70%-90%Color in place
+              [ 1, '#20AE51' ]// 90%-100%Color in place
             ],
-            width: 30// 表盘宽度
+            width: 30// Dial width
           }
         },
-        splitLine: { // 分割线样式（及10、20等长线样式）
+        splitLine: { // Split line style (and 10, 20 equal length line style)
           length: 30,
-          lineStyle: { // 属性lineStyle控制线条样式
+          lineStyle: { // Property linestyle controls line style
             width: 2
           }
         },
-        axisTick: { // 刻度线样式（及短线样式）
+        axisTick: { // Tick mark style (and short line style)
           length: 20
         },
-        axisLabel: { // 文字样式（及“10”、“20”等文字样式）
+        axisLabel: { // Text style (and text styles such as "10", "20")
           color: 'black',
-          distance: 5 // 文字离表盘的距离
+          distance: 5 // Distance between text and dial
         },
         detail: {
           formatter: '{score|{value}%}',
@@ -120,7 +120,7 @@ export default function (value) {
           rich: {
             score: {
               color: 'white',
-              fontFamily: '微软雅黑',
+              fontFamily: 'Microsoft YaHei',
               fontSize: 32
             }
           }

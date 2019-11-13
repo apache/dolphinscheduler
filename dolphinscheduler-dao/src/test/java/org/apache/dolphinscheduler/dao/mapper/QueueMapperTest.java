@@ -40,6 +40,10 @@ public class QueueMapperTest {
     QueueMapper queueMapper;
 
 
+    /**
+     * insert
+     * @return Queue
+     */
     private Queue insertOne(){
         //insertOne
         Queue queue = new Queue();
@@ -51,6 +55,9 @@ public class QueueMapperTest {
         return queue;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -62,6 +69,9 @@ public class QueueMapperTest {
         queueMapper.deleteById(queue.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
         Queue queue = insertOne();
@@ -69,6 +79,9 @@ public class QueueMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         Queue queue = insertOne();
@@ -76,8 +89,11 @@ public class QueueMapperTest {
         List<Queue> queues = queueMapper.selectList(null);
         Assert.assertNotEquals(queues.size(), 0);
         queueMapper.deleteById(queue.getId());
-    } 
-    
+    }
+
+    /**
+     * test page
+     */
     @Test
     public void testQueryQueuePaging() {
 
@@ -94,6 +110,9 @@ public class QueueMapperTest {
         queueMapper.deleteById(queue.getId());
     }
 
+    /**
+     * test query all list
+     */
     @Test
     public void queryAllQueueList() {
         Queue queue = insertOne();

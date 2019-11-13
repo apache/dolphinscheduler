@@ -40,8 +40,11 @@ public class CronUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CronUtilsTest.class);
 
+    /**
+     * cron as string test
+     */
     @Test
-    public void cronAsStringTest() {
+    public void testCronAsString() {
         Cron cron = CronBuilder.cron(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))
                 .withYear(always())
                 .withDoW(questionMark())
@@ -55,13 +58,20 @@ public class CronUtilsTest {
         String cronAsString = cron.asString(); // 0 */5 * * * ? *  Every five minutes(once every 5 minutes)
 
         Assert.assertEquals(cronAsString, "0 */5 * * * ? *");
-
     }
 
 
+    /**
+     * cron parse test
+     * @throws ParseException if error throws ParseException
+     */
     @Test
-    public void testParse() throws ParseException {
+    public void testCronParse() throws ParseException {
         String strCrontab = "0 1 2 3 * ? *";
+        strCrontab = "0/50 0/59 * * * ? *";
+        strCrontab = "3/5 * 0/5 * * ? *";
+        strCrontab = "1/5 3/5 1/5 3/30 * ? *";
+
         Cron depCron = CronUtils.parse2Cron(strCrontab);
         Assert.assertEquals(depCron.retrieve(CronFieldName.SECOND).getExpression().asString(), "0");
         Assert.assertEquals(depCron.retrieve(CronFieldName.MINUTE).getExpression().asString(), "1");
@@ -71,18 +81,12 @@ public class CronUtilsTest {
         Assert.assertEquals(depCron.retrieve(CronFieldName.YEAR).getExpression().asString(), "*");
     }
 
+    /**
+     * schedule type test
+     * @throws ParseException if error throws ParseException
+     */
     @Test
-    public void testParse1() throws ParseException {
-        String strCrontab = "* * 0/1 * * ? *";
-        strCrontab = "0/50 0/59 * * * ? *";
-        strCrontab = "3/5 * 0/5 * * ? *";
-        strCrontab = "1/5 3/5 1/5 3/30 * ? *";
-        Cron depCron = CronUtils.parse2Cron(strCrontab);
-        logger.info(depCron.validate().asString());
-    }
-
-    @Test
-    public void scheduleTypeTest() throws ParseException {
+    public void testScheduleType() throws ParseException {
 
         CycleEnum cycleEnum = CronUtils.getMaxCycle("0 */1 * * * ? *");
         Assert.assertEquals(cycleEnum.name(), "MINUTE");
@@ -91,6 +95,9 @@ public class CronUtilsTest {
         Assert.assertEquals(cycleEnum2.name(), "MINUTE");
     }
 
+    /**
+     * test
+     */
     @Test
     public void test2(){
         Cron cron1 = CronBuilder.cron(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ))
@@ -172,8 +179,5 @@ public class CronUtilsTest {
                 logger.info("can't get scheduleType");
             }
         }
-
-
-
     }
 }

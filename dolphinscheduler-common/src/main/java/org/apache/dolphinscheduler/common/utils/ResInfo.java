@@ -79,7 +79,10 @@ public class ResInfo {
 
     /**
      * get CPU and memory usage
-     * @return
+     * @param cpuUsage cpu usage
+     * @param memoryUsage memory usage
+     * @param loadAverage load average
+     * @return cpu and memory usage
      */
     public static String getResInfoJson(double cpuUsage , double memoryUsage,double loadAverage){
         ResInfo resInfo = new ResInfo(cpuUsage,memoryUsage,loadAverage);
@@ -89,8 +92,8 @@ public class ResInfo {
 
     /**
      * get heart beat info
-     * @param now
-     * @return
+     * @param now now
+     * @return heart beat info
      */
     public static String getHeartBeatInfo(Date now){
         return buildHeartbeatForZKInfo(OSUtils.getHost(),
@@ -105,14 +108,14 @@ public class ResInfo {
 
     /**
      * build heartbeat info for zk
-     * @param host
-     * @param port
-     * @param cpuUsage
-     * @param memoryUsage
-     * @param loadAverage
-     * @param createTime
-     * @param lastHeartbeatTime
-     * @return
+     * @param host host
+     * @param port port
+     * @param cpuUsage cpu usage
+     * @param memoryUsage memory usage
+     * @param loadAverage load average
+     * @param createTime create time
+     * @param lastHeartbeatTime last heartbeat time
+     * @return  heartbeat info
      */
     public static String buildHeartbeatForZKInfo(String host , int port ,
                                          double cpuUsage , double memoryUsage,double loadAverage,
@@ -128,8 +131,8 @@ public class ResInfo {
 
     /**
      * parse heartbeat info for zk
-     * @param heartBeatInfo
-     * @return
+     * @param heartBeatInfo heartbeat info
+     * @return heartbeat info to Server
      */
     public static Server parseHeartbeatForZKInfo(String heartBeatInfo){
         Server masterServer =  null;

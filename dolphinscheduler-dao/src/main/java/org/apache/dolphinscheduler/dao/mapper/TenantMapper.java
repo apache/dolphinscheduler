@@ -23,12 +23,31 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+/**
+ * tenant mapper interface
+ */
 public interface TenantMapper extends BaseMapper<Tenant> {
 
+    /**
+     * query tenant by id
+     * @param tenantId tenantId
+     * @return tenant
+     */
     Tenant queryById(@Param("tenantId") int tenantId);
 
+    /**
+     * query tenant by code
+     * @param tenantCode tenantCode
+     * @return tenant list
+     */
     List<Tenant> queryByTenantCode(@Param("tenantCode") String tenantCode);
 
+    /**
+     * tenant page
+     * @param page page
+     * @param searchVal searchVal
+     * @return tenant IPage
+     */
     IPage<Tenant> queryTenantPaging(IPage<Tenant> page,
                                     @Param("searchVal") String searchVal);
 }
