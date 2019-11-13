@@ -9,7 +9,7 @@ CREATE PROCEDURE ac_escheduler_T_t_escheduler_queue_C_create_time()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME='create_time')
    THEN
-         ALTER TABLE t_escheduler_queue ADD COLUMN create_time datetime DEFAULT NULL COMMENT '创建时间' AFTER queue;
+         ALTER TABLE t_escheduler_queue ADD COLUMN create_time datetime DEFAULT NULL COMMENT 'create time' AFTER queue;
        END IF;
  END;
 
@@ -30,7 +30,7 @@ CREATE PROCEDURE ac_escheduler_T_t_escheduler_queue_C_update_time()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME='update_time')
    THEN
-         ALTER TABLE t_escheduler_queue ADD COLUMN update_time datetime DEFAULT NULL COMMENT '更新时间' AFTER create_time;
+         ALTER TABLE t_escheduler_queue ADD COLUMN update_time datetime DEFAULT NULL COMMENT 'update time' AFTER create_time;
        END IF;
  END;
 

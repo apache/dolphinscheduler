@@ -42,6 +42,10 @@ public class DataSourceMapperTest {
     @Autowired
     DataSourceUserMapper dataSourceUserMapper;
 
+    /**
+     * insert
+     * @return DataSource
+     */
     private DataSource insertOne(){
         //insertOne
         DataSource dataSource = new DataSource();
@@ -56,6 +60,9 @@ public class DataSourceMapperTest {
         return dataSource;
     }
 
+    /**
+     * test update
+     */
     @Test
     public void testUpdate(){
         //insertOne
@@ -67,6 +74,9 @@ public class DataSourceMapperTest {
         dataSourceMapper.deleteById(dataSource.getId());
     }
 
+    /**
+     * test delete
+     */
     @Test
     public void testDelete(){
 
@@ -75,6 +85,9 @@ public class DataSourceMapperTest {
         Assert.assertEquals(delete, 1);
     }
 
+    /**
+     * test query
+     */
     @Test
     public void testQuery() {
         DataSource dataSource = insertOne();
@@ -84,6 +97,9 @@ public class DataSourceMapperTest {
         dataSourceMapper.deleteById(dataSource.getId());
     }
 
+    /**
+     * test query datasource by type
+     */
     @Test
     public void testQueryDataSourceByType() {
         DataSource dataSource = insertOne();
@@ -95,6 +111,9 @@ public class DataSourceMapperTest {
         dataSourceMapper.deleteById(dataSource.getId());
     }
 
+    /**
+     * test page
+     */
     @Test
     public void testSelectPaging() {
         DataSource dataSource = insertOne();
@@ -105,6 +124,9 @@ public class DataSourceMapperTest {
         dataSourceMapper.deleteById(dataSource.getId());
     }
 
+    /**
+     * test query datasource by name
+     */
     @Test
     public void testQueryDataSourceByName() {
         DataSource dataSource = insertOne();
@@ -113,6 +135,9 @@ public class DataSourceMapperTest {
         dataSourceMapper.deleteById(dataSource.getId());
     }
 
+    /**
+     * test query authed datasource
+     */
     @Test
     public void testQueryAuthedDatasource() {
 
@@ -128,6 +153,9 @@ public class DataSourceMapperTest {
         dataSourceUserMapper.deleteById(datasourceUser.getId());
     }
 
+    /**
+     * test query datasource except userId
+     */
     @Test
     public void testQueryDatasourceExceptUserId() {
         DataSource dataSource = insertOne();
@@ -136,6 +164,9 @@ public class DataSourceMapperTest {
         dataSourceMapper.deleteById(dataSource.getId());
     }
 
+    /**
+     * test list all datasource by type
+     */
     @Test
     public void testListAllDataSourceByType() {
 

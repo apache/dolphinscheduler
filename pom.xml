@@ -61,7 +61,7 @@
 		<jsp.version>6.1.14</jsp.version>
 		<spotbugs.version>3.1.12</spotbugs.version>
 		<apache.rat.version>0.13</apache.rat.version>
-		<zookeeper.version>3.5.6</zookeeper.version>
+		<zookeeper.version>3.4.14</zookeeper.version>
 
 		<frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
 		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
@@ -447,15 +447,15 @@
 	</dependencyManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/lgcareer/EasyScheduler.git</connection>
-		<developerConnection>scm:git:https://github.com/lgcareer/EasyScheduler.git</developerConnection>
-		<url>https://github.com/lgcareer/EasyScheduler.git</url>
+		<connection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</connection>
+		<developerConnection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</developerConnection>
+		<url>https://github.com/apache/incubator-dolphinscheduler</url>
 		<tag>HEAD</tag>
 	</scm>
 
 	<build>
 
-		<finalName>apache-dolphinscheduler-incubating-${project.artifactId}-${project.version}</finalName>
+		<finalName>apache-dolphinscheduler-incubating-${project.version}-${project.name}</finalName>
 
 		<!--<resources>-->
 			<!--<resource>-->
@@ -675,7 +675,7 @@
 	</build>
 
 	<modules>
-		<!--<module>dolphinscheduler-ui</module>-->
+		<module>dolphinscheduler-ui</module>
 		<module>dolphinscheduler-server</module>
 		<module>dolphinscheduler-common</module>
 		<module>dolphinscheduler-api</module>

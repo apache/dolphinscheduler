@@ -54,7 +54,7 @@ public class JSONUtils {
 
   /**
    * json representation of object
-   * @param object
+   * @param object object
    * @return object to json string
    */
   public static String toJson(Object object) {
@@ -79,6 +79,7 @@ public class JSONUtils {
    *
    * @param json the string from which the object is to be deserialized
    * @param clazz the class of T
+   * @param <T> T
    * @return an object of type T from the string
    * classOfT
    */
@@ -99,10 +100,10 @@ public class JSONUtils {
   /**
    * json to list
    *
-   * @param json
-   * @param clazz c
-   * @param <T>
-   * @return
+   * @param json json string
+   * @param clazz class
+   * @param <T> T
+   * @return list
    */
   public static <T> List<T> toList(String json, Class<T> clazz) {
     if (StringUtils.isEmpty(json)) {
@@ -122,8 +123,8 @@ public class JSONUtils {
   /**
    * check json object valid
    *
-   * @param json
-   * @return
+   * @param json json
+   * @return true if valid
    */
   public static boolean checkJsonVaild(String json) {
 
@@ -147,6 +148,7 @@ public class JSONUtils {
    * node or its child nodes, and returning value it has.
    * If no matching field is found in this node or its descendants, returns null.
    *
+   * @param jsonNode json node
    * @param fieldName Name of field to look for
    *
    * @return Value of first matching node found, if any; null if none
@@ -167,8 +169,8 @@ public class JSONUtils {
    *
    * {@link #toMap(String, Class, Class)}
    *
-   * @param json
-   * @return
+   * @param json json
+   * @return json to map
    */
   public static Map<String, String> toMap(String json) {
     if (StringUtils.isEmpty(json)) {
@@ -188,16 +190,12 @@ public class JSONUtils {
    *
    * json to map
    *
-   * <pre>
-   *         String jsonStr = "{\"id\":\"1001\",\"name\":\"Jobs\"}";
-   *         Map<String,String> models = JSONUtils.toMap(jsonStr, String.class,String.class);
-   * </pre>
-   * @param json
-   * @param classK
-   * @param classV
-   * @param <K>
-   * @param <V>
-   * @return
+   * @param json json
+   * @param classK classK
+   * @param classV classV
+   * @param <K> K
+   * @param <V> V
+   * @return to map
    */
   public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
     if (StringUtils.isEmpty(json)) {
@@ -214,8 +212,8 @@ public class JSONUtils {
   }
 
   /**
-   * 对象装json字符串 <p>
-   *
+   * object to json string
+   * @param object object
    * @return json string
    */
   public static String toJsonString(Object object) {

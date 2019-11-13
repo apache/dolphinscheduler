@@ -59,7 +59,6 @@ public class ProcessDao extends AbstractBaseDao {
     private final int[] stateArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal(),
             ExecutionStatus.RUNNING_EXEUTION.ordinal(),
             ExecutionStatus.READY_PAUSE.ordinal(),
-//            ExecutionStatus.NEED_FAULT_TOLERANCE.ordinal(),
             ExecutionStatus.READY_STOP.ordinal()};
 
     @Autowired
@@ -114,7 +113,7 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     * initialize
+     * init
      */
     @Override
     protected void init() {
@@ -139,10 +138,10 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find one command from command queue, construct process instance
-     * @param logger
-     * @param host
-     * @param validThreadNum
-     * @return
+     * @param logger logger
+     * @param host host
+     * @param validThreadNum validThreadNum
+     * @return process instance
      */
     @Transactional(rollbackFor = Exception.class)
     public ProcessInstance scanCommand(Logger logger, String host, int validThreadNum){
@@ -181,6 +180,11 @@ public class ProcessDao extends AbstractBaseDao {
         return null;
     }
 
+    /**
+     * save error command
+     * @param command command
+     * @param message message
+     */
     private void saveErrorCommand(Command command, String message) {
 
         ErrorCommand errorCommand = new ErrorCommand(command, message);
@@ -189,9 +193,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * set process waiting thread
-     * @param command
-     * @param processInstance
-     * @return
+     * @param command command
+     * @param processInstance processInstance
+     * @return process instance
      */
     private ProcessInstance setWaitingThreadProcess(Command command, ProcessInstance processInstance) {
         processInstance.setState(ExecutionStatus.WAITTING_THREAD);
@@ -204,6 +208,12 @@ public class ProcessDao extends AbstractBaseDao {
         return null;
     }
 
+    /**
+     * check thread num
+     * @param command command
+     * @param validThreadNum validThreadNum
+     * @return if thread is enough
+     */
     private boolean checkThreadNum(Command command, int validThreadNum) {
         int commandThreadCount = this.workProcessThreadNumCount(command.getProcessDefinitionId());
         return validThreadNum >= commandThreadCount;
@@ -211,6 +221,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * insert one command
+     * @param command command
+     * @return create result
      */
     public int createCommand(Command command) {
         int result = 0;
@@ -221,9 +233,8 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     *
      * find one command from queue list
-     * @return
+     * @return command
      */
     public Command findOneCommand(){
         return commandMapper.getOneToRun();
@@ -231,8 +242,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * check the input command exists in queue list
-     * @param command
-     * @return
+     * @param command command
+     * @return create command result
      */
     public Boolean verifyIsNeedCreateCommand(Command command){
         Boolean isNeedCreate = true;
@@ -248,7 +259,7 @@ public class ProcessDao extends AbstractBaseDao {
             int processInstanceId = cmdParamObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING);
 
             List<Command> commands = commandMapper.selectList(null);
-            //遍历所有命令
+            // for all commands
             for (Command tmpCommand:commands){
                 if(cmdTypeMap.containsKey(tmpCommand.getCommandType())){
                     tempObj = (JSONObject) JSONObject.parse(tmpCommand.getCommandParam());
@@ -264,8 +275,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find process instance detail by id
-     * @param processId
-     * @return
+     * @param processId processId
+     * @return process instance
      */
     public ProcessInstance findProcessInstanceDetailById(int processId){
         return processInstanceMapper.queryDetailById(processId);
@@ -273,18 +284,17 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find process instance by id
-     * @param processId
-     * @return
+     * @param processId processId
+     * @return process instance
      */
     public ProcessInstance findProcessInstanceById(int processId){
-
         return processInstanceMapper.selectById(processId);
     }
 
     /**
      * find process define by id.
-     * @param processDefinitionId
-     * @return
+     * @param processDefinitionId processDefinitionId
+     * @return process definition
      */
     public ProcessDefinition findProcessDefineById(int processDefinitionId) {
         return processDefineMapper.selectById(processDefinitionId);
@@ -292,17 +302,17 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * delete work process instance by id
-     * @param processInstanceId
-     * @return
+     * @param processInstanceId processInstanceId
+     * @return delete process instance result
      */
     public int deleteWorkProcessInstanceById(int processInstanceId){
         return processInstanceMapper.deleteById(processInstanceId);
     }
 
     /**
-     *
      * delete all sub process by parent instance id
-     * @return
+     * @param processInstanceId processInstanceId
+     * @return delete all sub process instance result
      */
     public int deleteAllSubWorkProcessByParentId(int processInstanceId){
 
@@ -316,24 +326,11 @@ public class ProcessDao extends AbstractBaseDao {
         return 1;
     }
 
-    /**
-     * create process define
-     * @param processDefinition
-     * @return
-     */
-    public int createProcessDefine(ProcessDefinition processDefinition){
-        int count = 0;
-        if(processDefinition != null){
-            count = this.processDefineMapper.insert(processDefinition);
-        }
-        return count;
-    }
-
 
     /**
      * calculate sub process number in the process define.
-     * @param processDefinitionId
-     * @return
+     * @param processDefinitionId processDefinitionId
+     * @return process thread num count
      */
     private Integer workProcessThreadNumCount(Integer processDefinitionId){
         List<Integer> ids = new ArrayList<>();
@@ -343,8 +340,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * recursive query sub process definition id by parent id.
-     * @param parentId
-     * @param ids
+     * @param parentId parentId
+     * @param ids ids
      */
     public void recurseFindSubProcessId(int parentId, List<Integer> ids){
         ProcessDefinition processDefinition = processDefineMapper.selectById(parentId);
@@ -372,8 +369,8 @@ public class ProcessDao extends AbstractBaseDao {
      * sub work process instance need not to create recovery command.
      * create recovery waiting thread  command and delete origin command at the same time.
      * if the recovery command is exists, only update the field update_time
-     * @param originCommand
-     * @param processInstance
+     * @param originCommand originCommand
+     * @param processInstance processInstance
      */
     public void createRecoveryWaitingThreadCommand(Command originCommand, ProcessInstance processInstance) {
 
@@ -422,9 +419,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * get schedule time from command
-     * @param command
-     * @param cmdParam
-     * @return
+     * @param command command
+     * @param cmdParam cmdParam map
+     * @return date
      */
     private Date getScheduleTime(Command command, Map<String, String> cmdParam){
         Date scheduleTime = command.getScheduleTime();
@@ -438,10 +435,10 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * generate a new work process instance from command.
-     * @param processDefinition
-     * @param command
-     * @param cmdParam
-     * @return
+     * @param processDefinition processDefinition
+     * @param command command
+     * @param cmdParam cmdParam map
+     * @return process instance
      */
     private ProcessInstance generateNewProcessInstance(ProcessDefinition processDefinition,
                                                        Command command,
@@ -495,9 +492,9 @@ public class ProcessDao extends AbstractBaseDao {
      * there is tenant id in definition, use the tenant of the definition.
      * if there is not tenant id in the definiton or the tenant not exist
      * use definition creator's tenant.
-     * @param tenantId
-     * @param userId
-     * @return
+     * @param tenantId tenantId
+     * @param userId userId
+     * @return tenant
      */
     public Tenant getTenantForProcess(int tenantId, int userId){
         Tenant tenant = null;
@@ -513,9 +510,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * check command parameters is valid
-     * @param command
-     * @param cmdParam
-     * @return
+     * @param command command
+     * @param cmdParam cmdParam map
+     * @return whether command param is valid
      */
     private Boolean checkCmdParam(Command command, Map<String, String> cmdParam){
         if(command.getTaskDependType() == TaskDependType.TASK_ONLY || command.getTaskDependType()== TaskDependType.TASK_PRE){
@@ -531,9 +528,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * construct process instance according to one command.
-     * @param command
-     * @param host
-     * @return
+     * @param command command
+     * @param host host
+     * @return process instance
      */
     private ProcessInstance constructProcessInstance(Command command, String host){
 
@@ -638,7 +635,7 @@ public class ProcessDao extends AbstractBaseDao {
                         ExecutionStatus.KILL);
                 suspendedNodeList.addAll(stopNodeList);
                 for(Integer taskId : suspendedNodeList){
-                    // 把暂停状态初始化
+                    // initialize the pause state
                     initTaskInstance(this.findTaskInstanceById(taskId));
                 }
                 cmdParam.put(Constants.CMDPARAM_RECOVERY_START_NODE_STRING, String.join(",", convertIntListToString(suspendedNodeList)));
@@ -686,6 +683,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * return complement data if the process start with complement data
+     * @param processInstance processInstance
+     * @param command command
+     * @return command type
      */
     private CommandType getCommandTypeIfComplement(ProcessInstance processInstance, Command command){
         if(CommandType.COMPLEMENT_DATA == processInstance.getCmdTypeIfComplement()){
@@ -697,11 +697,13 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * initialize complement data parameters
-     * @param processDefinition
-     * @param processInstance
-     * @param cmdParam
+     * @param processDefinition processDefinition
+     * @param processInstance processInstance
+     * @param cmdParam cmdParam
      */
-    private void initComplementDataParam(ProcessDefinition processDefinition, ProcessInstance processInstance, Map<String, String> cmdParam) {
+    private void initComplementDataParam(ProcessDefinition processDefinition,
+                                         ProcessInstance processInstance,
+                                         Map<String, String> cmdParam) {
         if(!processInstance.isComplementData()){
             return;
         }
@@ -716,10 +718,13 @@ public class ProcessDao extends AbstractBaseDao {
 
     }
 
+
     /**
      * set sub work process parameters.
      * handle sub work process instance, update relation table and command parameters
-     * set sub work process flag, extends parent work process command parameters.
+     * set sub work process flag, extends parent work process command parameters
+     * @param subProcessInstance subProcessInstance
+     * @return process instance
      */
     public ProcessInstance setSubProcessParam(ProcessInstance subProcessInstance){
         String cmdParam = subProcessInstance.getCommandParam();
@@ -761,10 +766,10 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * join parent global params into sub process.
-     *  only the keys doesn't in sub process global would be joined.
-     * @param parentGlobalParams
-     * @param subGlobalParams
-     * @return
+     * only the keys doesn't in sub process global would be joined.
+     * @param parentGlobalParams parentGlobalParams
+     * @param subGlobalParams subGlobalParams
+     * @return global params join
      */
     private String joinGlobalParams(String parentGlobalParams, String subGlobalParams){
         List<Property> parentPropertyList = JSONUtils.toList(parentGlobalParams, Property.class);
@@ -781,7 +786,7 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * initialize task instance
-     * @param taskInstance
+     * @param taskInstance taskInstance
      */
     private void initTaskInstance(TaskInstance taskInstance){
 
@@ -797,10 +802,11 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     *  submit task to mysql and task queue
-     *  submit sub process to command
-     * @param taskInstance
-     * @return
+     * submit task to mysql and task queue
+     * submit sub process to command
+     * @param taskInstance taskInstance
+     * @param processInstance processInstance
+     * @return task instance
      */
     @Transactional(rollbackFor = Exception.class)
     public TaskInstance submitTask(TaskInstance taskInstance, ProcessInstance processInstance){
@@ -828,9 +834,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * set work process instance map
-     * @param parentInstance
-     * @param parentTask
-     * @return
+     * @param parentInstance parentInstance
+     * @param parentTask parentTask
+     * @return process instance map
      */
     private ProcessInstanceMap setProcessInstanceMap(ProcessInstance parentInstance, TaskInstance parentTask){
         ProcessInstanceMap processMap = findWorkProcessMapByParent(parentInstance.getId(), parentTask.getId());
@@ -857,9 +863,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find previous task work process map.
-     * @param parentProcessInstance
-     * @param parentTask
-     * @return
+     * @param parentProcessInstance parentProcessInstance
+     * @param parentTask parentTask
+     * @return process instance map
      */
     private ProcessInstanceMap findPreviousTaskProcessMap(ProcessInstance parentProcessInstance,
                                                           TaskInstance parentTask) {
@@ -882,10 +888,10 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * create sub work process command
-     * @param parentProcessInstance
-     * @param instanceMap
-     * @param childDefineId
-     * @param task
+     * @param parentProcessInstance parentProcessInstance
+     * @param instanceMap instanceMap
+     * @param childDefineId instanceMap
+     * @param task task
      */
     private void createSubWorkProcessCommand(ProcessInstance parentProcessInstance,
                                              ProcessInstanceMap instanceMap,
@@ -938,6 +944,11 @@ public class ProcessDao extends AbstractBaseDao {
         logger.info("sub process command created: {} ", command.toString());
     }
 
+    /**
+     * update sub process definition
+     * @param parentProcessInstance parentProcessInstance
+     * @param childDefinitionId childDefinitionId
+     */
     private void updateSubProcessDefinitionByParent(ProcessInstance parentProcessInstance, int childDefinitionId) {
         ProcessDefinition fatherDefinition = this.findProcessDefineById(parentProcessInstance.getProcessDefinitionId());
         ProcessDefinition childDefinition = this.findProcessDefineById(childDefinitionId);
@@ -950,8 +961,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * submit task to mysql
-     * @param taskInstance
-     * @return
+     * @param taskInstance taskInstance
+     * @param processInstance processInstance
+     * @return task instance
      */
     public TaskInstance submitTaskInstanceToMysql(TaskInstance taskInstance, ProcessInstance processInstance){
         ExecutionStatus processInstanceState = processInstance.getState();
@@ -986,28 +998,29 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     *  submit task to queue
-     * @param task
+     * submit task to queue
+     * @param taskInstance taskInstance
+     * @return whether submit task to queue success
      */
-    public Boolean submitTaskToQueue(TaskInstance task) {
+    public Boolean submitTaskToQueue(TaskInstance taskInstance) {
 
         try{
             // task cannot submit when running
-            if(task.getState() == ExecutionStatus.RUNNING_EXEUTION){
-                logger.info(String.format("submit to task queue, but task [%s] state already be running. ", task.getName()));
+            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
+                logger.info(String.format("submit to task queue, but task [%s] state already be running. ", taskInstance.getName()));
                 return true;
             }
-            if(checkTaskExistsInTaskQueue(task)){
-                logger.info(String.format("submit to task queue, but task [%s] already exists in the queue.", task.getName()));
+            if(checkTaskExistsInTaskQueue(taskInstance)){
+                logger.info(String.format("submit to task queue, but task [%s] already exists in the queue.", taskInstance.getName()));
                 return true;
             }
-            logger.info("task ready to queue: {}" , task);
-            taskQueue.add(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo(task));
-            logger.info(String.format("master insert into queue success, task : %s", task.getName()) );
+            logger.info("task ready to queue: {}" , taskInstance);
+            taskQueue.add(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo(taskInstance));
+            logger.info(String.format("master insert into queue success, task : %s", taskInstance.getName()) );
             return true;
         }catch (Exception e){
             logger.error("submit task to queue Exception: ", e);
-            logger.error("task queue error : %s", JSONUtils.toJson(task));
+            logger.error("task queue error : %s", JSONUtils.toJson(taskInstance));
             return false;
 
         }
@@ -1015,13 +1028,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_${task executed by ip1},${ip2}...
-     *
      * The tasks with the highest priority are selected by comparing the priorities of the above four levels from high to low.
-     *
-     * 流程实例优先级_流程实例id_任务优先级_任务id_任务执行机器ip1，ip2...          high <- low
-     *
-     * @param taskInstance
-     * @return
+     * @param taskInstance taskInstance
+     * @return task zk queue str
      */
     public String taskZkInfo(TaskInstance taskInstance) {
 
@@ -1087,9 +1096,9 @@ public class ProcessDao extends AbstractBaseDao {
      * return stop if work process state is ready stop
      * if all of above are not satisfied, return submit success
      *
-     * @param taskInstance
-     * @param processInstanceState
-     * @return
+     * @param taskInstance taskInstance
+     * @param processInstanceState processInstanceState
+     * @return process instance state
      */
     public ExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ExecutionStatus processInstanceState){
         ExecutionStatus state = taskInstance.getState();
@@ -1116,6 +1125,11 @@ public class ProcessDao extends AbstractBaseDao {
         return state;
     }
 
+    /**
+     *  check process instance strategy
+     * @param taskInstance taskInstance
+     * @return check strategy result
+     */
     private boolean checkProcessStrategy(TaskInstance taskInstance){
         ProcessInstance processInstance = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
         FailureStrategy failureStrategy = processInstance.getFailureStrategy();
@@ -1134,21 +1148,22 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * check the task instance existing in queue
-     * @return
+     * @param taskInstance taskInstance
+     * @return whether taskinstance exists queue
      */
-    public boolean checkTaskExistsInTaskQueue(TaskInstance task){
-        if(task.isSubProcess()){
+    public boolean checkTaskExistsInTaskQueue(TaskInstance taskInstance){
+        if(taskInstance.isSubProcess()){
             return false;
         }
 
-        String taskZkInfo = taskZkInfo(task);
+        String taskZkInfo = taskZkInfo(taskInstance);
 
         return taskQueue.checkTaskExists(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo);
     }
 
     /**
      * create a new process instance
-     * @param processInstance
+     * @param processInstance processInstance
      */
     public void createProcessInstance(ProcessInstance processInstance){
 
@@ -1159,26 +1174,25 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * insert or update work process instance to data base
-     * @param workProcessInstance
+     * @param processInstance processInstance
      */
-    public void saveProcessInstance(ProcessInstance workProcessInstance){
+    public void saveProcessInstance(ProcessInstance processInstance){
 
-        if (workProcessInstance == null){
+        if (processInstance == null){
             logger.error("save error, process instance is null!");
             return ;
         }
-        //创建流程实例
-        if(workProcessInstance.getId() != 0){
-            processInstanceMapper.updateById(workProcessInstance);
+        if(processInstance.getId() != 0){
+            processInstanceMapper.updateById(processInstance);
         }else{
-            createProcessInstance(workProcessInstance);
+            createProcessInstance(processInstance);
         }
     }
 
     /**
      * insert or update command
-     * @param command
-     * @return
+     * @param command command
+     * @return save command result
      */
     public int saveCommand(Command command){
         if(command.getId() != 0){
@@ -1190,8 +1204,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      *  insert or update task instance
-     * @param taskInstance
-     * @return
+     * @param taskInstance taskInstance
+     * @return save task instance result
      */
     public boolean saveTaskInstance(TaskInstance taskInstance){
         if(taskInstance.getId() != 0){
@@ -1203,8 +1217,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * insert task instance
-     * @param taskInstance
-     * @return
+     * @param taskInstance taskInstance
+     * @return create task instance result
      */
     public boolean createTaskInstance(TaskInstance taskInstance) {
         int count = taskInstanceMapper.insert(taskInstance);
@@ -1213,8 +1227,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * update task instance
-     * @param taskInstance
-     * @return
+     * @param taskInstance taskInstance
+     * @return update task instance result
      */
     public boolean updateTaskInstance(TaskInstance taskInstance){
         int count = taskInstanceMapper.updateById(taskInstance);
@@ -1222,12 +1236,17 @@ public class ProcessDao extends AbstractBaseDao {
     }
     /**
      * delete a command by id
-     * @param id
+     * @param id  id
      */
     public void delCommandByid(int id) {
         commandMapper.deleteById(id);
     }
 
+    /**
+     * find task instance by id
+     * @param taskId task id
+     * @return task intance
+     */
     public TaskInstance findTaskInstanceById(Integer taskId){
         return taskInstanceMapper.selectById(taskId);
     }
@@ -1235,8 +1254,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * package task instance，associate processInstance and processDefine
-     * @param taskInstId
-     * @return
+     * @param taskInstId taskInstId
+     * @return task instance
      */
     public TaskInstance getTaskInstanceDetailByTaskId(int taskInstId){
         // get task instance
@@ -1257,19 +1276,18 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * get id list by task state
-     * @param instanceId
-     * @param state
-     * @return
+     * @param instanceId instanceId
+     * @param state state
+     * @return task instance states
      */
     public List<Integer> findTaskIdByInstanceState(int instanceId, ExecutionStatus state){
         return taskInstanceMapper.queryTaskByProcessIdAndState(instanceId, state.ordinal());
     }
 
     /**
-     *
      * find valid task list by process definition id
-     * @param processInstanceId
-     * @return
+     * @param processInstanceId processInstanceId
+     * @return task instance list
      */
     public List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId){
          return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES);
@@ -1277,17 +1295,17 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find previous task list by work process id
-     * @param workProcessInstanceId
-     * @return
+     * @param processInstanceId processInstanceId
+     * @return task instance list
      */
-    public List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer workProcessInstanceId){
-        return taskInstanceMapper.findValidTaskListByProcessId(workProcessInstanceId, Flag.NO);
+    public List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId){
+        return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO);
     }
 
     /**
      * update work process instance map
-     * @param processInstanceMap
-     * @return
+     * @param processInstanceMap processInstanceMap
+     * @return update process instance result
      */
     public int updateWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap){
         return processInstanceMapMapper.updateById(processInstanceMap);
@@ -1296,8 +1314,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * create work process instance map
-     * @param processInstanceMap
-     * @return
+     * @param processInstanceMap processInstanceMap
+     * @return create process instance result
      */
     public int createWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap){
         Integer count = 0;
@@ -1309,9 +1327,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find work process map by parent process id and parent task id.
-     * @param parentWorkProcessId
-     * @param parentTaskId
-     * @return
+     * @param parentWorkProcessId parentWorkProcessId
+     * @param parentTaskId parentTaskId
+     * @return process instance map
      */
     public ProcessInstanceMap findWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId){
         return processInstanceMapMapper.queryByParentId(parentWorkProcessId, parentTaskId);
@@ -1319,14 +1337,20 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * delete work process map by parent process id
-     * @param parentWorkProcessId
-     * @return
+     * @param parentWorkProcessId parentWorkProcessId
+     * @return delete process map result
      */
     public int deleteWorkProcessMapByParentId(int parentWorkProcessId){
         return processInstanceMapMapper.deleteByParentProcessId(parentWorkProcessId);
 
     }
 
+    /**
+     * find sub process instance
+     * @param parentProcessId parentProcessId
+     * @param parentTaskId parentTaskId
+     * @return process instance
+     */
     public ProcessInstance findSubProcessInstance(Integer parentProcessId, Integer parentTaskId){
         ProcessInstance processInstance = null;
         ProcessInstanceMap processInstanceMap = processInstanceMapMapper.queryByParentId(parentProcessId, parentTaskId);
@@ -1336,6 +1360,12 @@ public class ProcessDao extends AbstractBaseDao {
         processInstance = findProcessInstanceById(processInstanceMap.getProcessInstanceId());
         return processInstance;
     }
+
+    /**
+     * find parent process instance
+     * @param subProcessId subProcessId
+     * @return process instance
+     */
     public ProcessInstance findParentProcessInstance(Integer subProcessId) {
         ProcessInstance processInstance = null;
         ProcessInstanceMap processInstanceMap = processInstanceMapMapper.queryBySubProcessId(subProcessId);
@@ -1347,13 +1377,14 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
 
-
     /**
      * change task state
-     * @param state
-     * @param startTime
-     * @param host
-     * @param executePath
+     * @param state state
+     * @param startTime startTime
+     * @param host host
+     * @param executePath executePath
+     * @param logPath logPath
+     * @param taskInstId taskInstId
      */
     public void changeTaskState(ExecutionStatus state, Date startTime, String host,
                                 String executePath,
@@ -1370,24 +1401,23 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * update process instance
-     * @param instance
-     * @return
+     * @param processInstance processInstance
+     * @return update process instance result
      */
-    public int updateProcessInstance(ProcessInstance instance){
-
-        return processInstanceMapper.updateById(instance);
+    public int updateProcessInstance(ProcessInstance processInstance){
+        return processInstanceMapper.updateById(processInstance);
     }
 
     /**
      * update the process instance
-     * @param  processInstanceId
-     * @param processJson
-     * @param globalParams
-     * @param scheduleTime
-     * @param flag
-     * @param locations
-     * @param connects
-     * @return
+     * @param processInstanceId processInstanceId
+     * @param processJson processJson
+     * @param globalParams globalParams
+     * @param scheduleTime scheduleTime
+     * @param flag flag
+     * @param locations locations
+     * @param connects connects
+     * @return update process instance result
      */
     public int updateProcessInstance(Integer processInstanceId, String processJson,
                                      String globalParams, Date scheduleTime, Flag flag,
@@ -1406,8 +1436,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * change task state
-     * @param state
-     * @param endTime
+     * @param state state
+     * @param endTime endTime
+     * @param taskInstId taskInstId
      */
     public void changeTaskState(ExecutionStatus state,
                                 Date endTime,
@@ -1420,8 +1451,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * convert integer list to string list
-     * @param intList
-     * @return
+     * @param intList intList
+     * @return string list
      */
     public List<String> convertIntListToString(List<Integer> intList){
         if(intList == null){
@@ -1436,8 +1467,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * update pid and app links field by task instance id
-     * @param taskInstId
-     * @param pid
+     * @param taskInstId taskInstId
+     * @param pid pid
+     * @param appLinks appLinks
      */
     public void updatePidByTaskInstId(int taskInstId, int pid,String appLinks) {
 
@@ -1448,30 +1480,30 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     * query Schedule <p>
-     *
-     * @see Schedule
+     * query schedule by id
+     * @param id id
+     * @return schedule
      */
     public Schedule querySchedule(int id) {
         return scheduleMapper.selectById(id);
     }
 
+    /**
+     * query need failover process instance
+     * @param host host
+     * @return process instance list
+     */
     public List<ProcessInstance> queryNeedFailoverProcessInstances(String host){
 
         return processInstanceMapper.queryByHostAndStatus(host, stateArray);
     }
 
-
-
-
     /**
      * process need failover process instance
-     * @param processInstance
+     * @param processInstance processInstance
      */
     @Transactional(rollbackFor = Exception.class)
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance){
-
-
         //1 update processInstance host is null
         processInstance.setHost("null");
         processInstanceMapper.updateById(processInstance);
@@ -1483,13 +1515,12 @@ public class ProcessDao extends AbstractBaseDao {
         cmd.setExecutorId(processInstance.getExecutorId());
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
         createCommand(cmd);
-
     }
 
     /**
      * query all need failover task instances by host
-     * @param host
-     * @return
+     * @param host host
+     * @return task instance list
      */
     public List<TaskInstance> queryNeedFailoverTaskInstances(String host){
         return taskInstanceMapper.queryByHostAndStatus(host,
@@ -1498,8 +1529,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find data source by id
-     * @param id
-     * @return
+     * @param id id
+     * @return datasource
      */
     public DataSource findDataSourceById(int id){
         return dataSourceMapper.selectById(id);
@@ -1508,9 +1539,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * update process instance state by id
-     * @param processInstanceId
-     * @param executionStatus
-     * @return
+     * @param processInstanceId processInstanceId
+     * @param executionStatus executionStatus
+     * @return update process result
      */
     public int updateProcessInstanceState(Integer processInstanceId, ExecutionStatus executionStatus) {
         ProcessInstance instance = processInstanceMapper.selectById(processInstanceId);
@@ -1521,8 +1552,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find process instance by the task id
-     * @param taskId
-     * @return
+     * @param taskId taskId
+     * @return process instance
      */
     public ProcessInstance findProcessInstanceByTaskId(int taskId){
         TaskInstance taskInstance = taskInstanceMapper.selectById(taskId);
@@ -1534,8 +1565,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find udf function list by id list string
-     * @param ids
-     * @return
+     * @param ids ids
+     * @return udf function list
      */
     public List<UdfFunc> queryUdfFunListByids(int[] ids){
 
@@ -1544,8 +1575,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find tenant code by resource name
-     * @param resName
-     * @return
+     * @param resName resource name
+     * @return tenant code
      */
     public String queryTenantCodeByResName(String resName){
         return resourceMapper.queryTenantCodeByResourceName(resName);
@@ -1553,8 +1584,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find schedule list by process define id.
-     * @param ids
-     * @return
+     * @param ids ids
+     * @return schedule list
      */
     public List<Schedule> selectAllByProcessDefineId(int[] ids){
         return scheduleMapper.selectAllByProcessDefineArray(
@@ -1563,12 +1594,11 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * get dependency cycle by work process define id and scheduler fire time
-     *
-     * @param masterId
-     * @param processDefinitionId
-     * @param scheduledFireTime 任务调度预计触发的时间
-     * @return
-     * @throws Exception
+     * @param masterId masterId
+     * @param processDefinitionId processDefinitionId
+     * @param scheduledFireTime the time the task schedule is expected to trigger
+     * @return CycleDependency
+     * @throws Exception if error throws Exception
      */
     public CycleDependency getCycleDependency(int masterId, int processDefinitionId, Date scheduledFireTime) throws Exception {
         List<CycleDependency> list = getCycleDependencies(masterId,new int[]{processDefinitionId},scheduledFireTime);
@@ -1577,13 +1607,12 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     *
      * get dependency cycle list by work process define id list and scheduler fire time
-     * @param masterId
-     * @param ids
-     * @param scheduledFireTime 任务调度预计触发的时间
-     * @return
-     * @throws Exception
+     * @param masterId masterId
+     * @param ids ids
+     * @param scheduledFireTime the time the task schedule is expected to trigger
+     * @return CycleDependency list
+     * @throws Exception if error throws Exception
      */
     public List<CycleDependency> getCycleDependencies(int masterId,int[] ids,Date scheduledFireTime) throws Exception {
         List<CycleDependency> cycleDependencyList =  new ArrayList<CycleDependency>();
@@ -1602,7 +1631,7 @@ public class ProcessDao extends AbstractBaseDao {
         Cron depCron;
         List<Date> list;
         List<Schedule> schedules = this.selectAllByProcessDefineId(ids);
-        // 遍历所有的调度信息
+        // for all scheduling information
         for(Schedule depSchedule:schedules){
             strCrontab = depSchedule.getCrontab();
             depCronExpression = CronUtils.parse2CronExpression(strCrontab);
@@ -1651,9 +1680,9 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * find last scheduler process instance in the date interval
-     * @param definitionId
-     * @param dateInterval
-     * @return
+     * @param definitionId definitionId
+     * @param dateInterval dateInterval
+     * @return process instance
      */
     public ProcessInstance findLastSchedulerProcessInterval(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastSchedulerProcess(definitionId,
@@ -1661,12 +1690,24 @@ public class ProcessDao extends AbstractBaseDao {
                 DateUtils.dateToString(dateInterval.getEndTime()));
     }
 
+    /**
+     * find last manual process instance interval
+     * @param definitionId process definition id
+     * @param dateInterval dateInterval
+     * @return process instance
+     */
     public ProcessInstance findLastManualProcessInterval(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastManualProcess(definitionId,
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime());
     }
 
+    /**
+     * find last running process instance
+     * @param definitionId  process definition id
+     * @param dateInterval dateInterval
+     * @return process instance
+     */
     public ProcessInstance findLastRunningProcess(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastRunningProcess(definitionId,
                 DateUtils.dateToString(dateInterval.getStartTime()),
@@ -1675,9 +1716,9 @@ public class ProcessDao extends AbstractBaseDao {
     }
 
     /**
-     *  query user queue by process instance id
-     * @param processInstanceId
-     * @return
+     * query user queue by process instance id
+     * @param processInstanceId processInstanceId
+     * @return queue
      */
     public String queryUserQueueByProcessInstanceId(int processInstanceId){
 
@@ -1695,8 +1736,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * query worker group by id
-     * @param workerGroupId
-     * @return
+     * @param workerGroupId workerGroupId
+     * @return WorkerGroup
      */
     public WorkerGroup queryWorkerGroupById(int workerGroupId){
 
@@ -1705,9 +1746,8 @@ public class ProcessDao extends AbstractBaseDao {
 
     /**
      * get task worker group id
-     *
-     * @param taskInstance
-     * @return
+     * @param taskInstance taskInstance
+     * @return workerGroupId
      */
     public int getTaskWorkerGroupId(TaskInstance taskInstance) {
         int taskWorkerGroupId = taskInstance.getWorkerGroupId();
@@ -1725,6 +1765,11 @@ public class ProcessDao extends AbstractBaseDao {
         return Constants.DEFAULT_WORKER_ID;
     }
 
+    /**
+     * get have perm project list
+     * @param userId userId
+     * @return project list
+     */
     public List<Project> getProjectListHavePerm(int userId){
         List<Project> createProjects = projectMapper.queryProjectCreatedByUser(userId);
         List<Project> authedProjects = projectMapper.queryAuthedProjectListByUserId(userId);
@@ -1739,6 +1784,11 @@ public class ProcessDao extends AbstractBaseDao {
         return createProjects;
     }
 
+    /**
+     * get have perm project ids
+     * @param userId userId
+     * @return project ids
+     */
     public List<Integer> getProjectIdListHavePerm(int userId){
 
         List<Integer> projectIdList = new ArrayList<>();

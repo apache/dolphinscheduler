@@ -33,13 +33,15 @@ import java.util.List;
 public class FlinkArgsUtils {
 
     /**
-     * build args
-     *
-     * @param param
-     * @return
+     * logger of FlinkArgsUtils
      */
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(FlinkArgsUtils.class);
 
+    /**
+     * build args
+     * @param param flink parameters
+     * @return argument list
+     */
     public static List<String> buildArgs(FlinkParameters param) {
         List<String> args = new ArrayList<>();
         String deployMode = "cluster";
@@ -115,7 +117,6 @@ public class FlinkArgsUtils {
             args.add(param.getQueue());
 
         }
-
 
         return args;
     }

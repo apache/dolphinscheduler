@@ -21,10 +21,19 @@ import ch.qos.logback.core.sift.AbstractDiscriminator;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.server.utils.LoggerUtils;
 
+/**
+ * Task Log Discriminator
+ */
 public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
 
+    /**
+     * key
+     */
     private String key;
 
+    /**
+     * log base
+     */
     private String logBase;
 
     /**

@@ -29,7 +29,7 @@ public enum CommandType {
      * command types
      * 0 start a new process
      * 1 start a new process from current nodes
-     * 2  recover tolerance fault work flow
+     * 2 recover tolerance fault work flow
      * 3 start process from paused task nodes
      * 4 start process from failure task nodes
      * 5 complement data

@@ -33,13 +33,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * dag helper test
+ */
 public class DagHelperTest {
 
-
+    /**
+     * test task node can submit
+     * @throws JsonProcessingException if error throws JsonProcessingException
+     */
     @Test
     public void testTaskNodeCanSubmit() throws JsonProcessingException {
-
-
         //1->2->3->5
         //4->3
         DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
@@ -74,8 +78,8 @@ public class DagHelperTest {
     /**
      * 1->2->3->5
      * 4->3
-     * @return
-     * @throws JsonProcessingException
+     * @return dag
+     * @throws JsonProcessingException if error throws JsonProcessingException
      */
     private DAG<String, TaskNode, TaskNodeRelation> generateDag() throws JsonProcessingException {
         List<TaskNode> taskNodeList = new ArrayList<>();
@@ -96,7 +100,6 @@ public class DagHelperTest {
         TaskNode node4 = new TaskNode();
         node4.setId("4");
         node4.setName("4");
-//        node4.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         taskNodeList.add(node4);
 
         TaskNode node3 = new TaskNode();

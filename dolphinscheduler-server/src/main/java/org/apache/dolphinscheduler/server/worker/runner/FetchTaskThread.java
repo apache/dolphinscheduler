@@ -242,13 +242,19 @@ public class FetchTaskThread implements Runnable{
         }
     }
 
+    /**
+     * remove node from task queue
+     *
+     * @param taskQueueStr task queue
+     */
     private void removeNodeFromTaskQueue(String taskQueueStr){
         taskQueue.removeNode(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, taskQueueStr);
     }
 
     /**
      * verify task instance is null
-     * @return
+     * @param taskInstance
+     * @return true if task instance is null
      */
     private boolean verifyTaskInstanceIsNull(TaskInstance taskInstance) {
         if (taskInstance == null ) {
@@ -259,9 +265,10 @@ public class FetchTaskThread implements Runnable{
     }
 
     /**
-     *  verify tenant is null
-     * @param tenant
-     * @return
+     * verify tenant is null
+     *
+     * @param tenant tenant
+     * @return true if tenant is null
      */
     private boolean verifyTenantIsNull(Tenant tenant) {
         if(tenant == null){
@@ -276,7 +283,8 @@ public class FetchTaskThread implements Runnable{
 
     /**
      * get execute local path
-     * @return
+     *
+     * @return execute local path
      */
     private String getExecLocalPath(){
         return FileUtils.getProcessExecDir(taskInstance.getProcessDefine().getProjectId(),
@@ -286,9 +294,10 @@ public class FetchTaskThread implements Runnable{
     }
 
     /**
-     *  check
-     * @param poolExecutor
-     * @return
+     * check thread count
+     *
+     * @param poolExecutor pool executor
+     * @return true if active count < worker exec nums
      */
     private boolean checkThreadCount(ThreadPoolExecutor poolExecutor) {
         int activeCount = poolExecutor.getActiveCount();
@@ -304,8 +313,9 @@ public class FetchTaskThread implements Runnable{
     }
 
     /**
-     *  wait for task instance exists, because of db action would be delayed.
-     * @throws Exception
+     * wait for task instance exists, because of db action would be delayed.
+     *
+     * @throws Exception exception
      */
     private void waitForTaskInstance()throws Exception{
         int retryTimes = 30;
@@ -319,8 +329,8 @@ public class FetchTaskThread implements Runnable{
     /**
      * get task instance id
      *
-     * @param taskQueueStr
-     * @return
+     * @param taskQueueStr task queue
+     * @return task instance id
      */
     private int getTaskInstanceId(String taskQueueStr){
         return Integer.parseInt(taskQueueStr.split(Constants.UNDERLINE)[3]);

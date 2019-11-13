@@ -36,10 +36,10 @@ public class DaoFactory {
   }
 
   /**
-   * 获取 Dao 实例
-   *
-   * @param clazz
-   * @return Dao实例
+   * get dao instance
+   * @param clazz clazz
+   * @param <T> T
+   * @return T object
    */
   @SuppressWarnings("unchecked")
   public static <T extends AbstractBaseDao> T getDaoInstance(Class<T> clazz) {
@@ -47,9 +47,8 @@ public class DaoFactory {
     synchronized (daoMap) {
       if (!daoMap.containsKey(className)) {
         try {
-//          T t = BeanContext.getBean(clazz);
           T t = clazz.getConstructor().newInstance();
-          // 实例初始化
+          // init
           t.init();
           daoMap.put(className, t);
         } catch (Exception e) {

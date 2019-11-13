@@ -91,7 +91,7 @@
       event: 'yearValueEvent'
     },
     methods: {
-      // 间隔执行时间（1）
+      // Interval execution time（1）
       onIntervalPerform (val) {
         console.log(val)
         this.intervalPerformVal = val
@@ -99,39 +99,39 @@
           this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
         }
       },
-      // 间隔开始时间（2）
+      // Interval start time（2）
       onIntervalStart (val) {
         this.intervalStartVal = val
         if (this.radioYear === 'intervalYear') {
           this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
         }
       },
-      // 具体年
+      // Specific year
       onspecificYears (arr) {
       },
-      // 周期开始值
+      // Cycle start value
       onCycleStart (val) {
         this.cycleStartVal = val
         if (this.radioYear === 'cycleYear') {
           this.yearValue = `${this.cycleStartVal}-${this.cycleEndVal}`
         }
       },
-      // 周期结束值
+      // Cycle end value
       onCycleEnd (val) {
         this.cycleEndVal = val
         if (this.radioYear === 'cycleYear') {
           this.yearValue = `${this.cycleStartVal}-${this.cycleEndVal}`
         }
       },
-      // 重置每一年
+      // Reset every year
       everyReset () {
         this.yearValue = '*'
       },
-      // 重置间隔年
+      // Reset every other year
       intervalReset () {
         this.yearValue = `${this.intervalStartVal}/${this.intervalPerformVal}`
       },
-      // 重置具体年数
+      // Reset specific years
       specificReset () {
         if (this.specificYearVal.length) {
           this.yearValue = this.specificYearVal.join(',')
@@ -139,38 +139,38 @@
           this.yearValue = '*'
         }
       },
-      // 重置周期年数
+      // Reset cycle years
       cycleReset () {
         this.yearValue = `${this.cycleStartVal}-${this.cycleEndVal}`
       },
       /**
-       * 解析参数值
+       * Parse parameter value
        */
       analyticalValue () {
         return new Promise((resolve, reject) => {
           let $yearVal = _.cloneDeep(this.value)
-          // 间隔年
+          // Interval year
           let $interval = isStr($yearVal, '/')
-          // 具体年
+          // Specific year
           let $specific = isStr($yearVal, ',')
-          // 周期年
+          // Cycle year
           let $cycle = isStr($yearVal, '-')
 
-          // 每一年
+          // Every year
           if ($yearVal === '*') {
             this.radioYear = 'everyYear'
             this.yearValue = '*'
             return
           }
 
-          // 正整数(年)
+          // Positive integer (year)
           if ($yearVal.length === 4 && _.isInteger(parseInt($yearVal))) {
             this.radioYear = 'specificYear'
             this.specificYearVal = [$yearVal]
             return
           }
 
-          // 间隔年
+          // Interval year
           if ($interval) {
             this.radioYear = 'intervalYear'
             this.intervalStartVal = parseInt($interval[0])
@@ -179,14 +179,14 @@
             return
           }
 
-          // 具体年数
+          // Specific years
           if ($specific) {
             this.radioYear = 'specificYear'
             this.specificYearVal = $specific
             return
           }
 
-          // 周期年
+          // Cycle year
           if ($cycle) {
             this.radioYear = 'cycleYear'
             this.cycleStartVal = parseInt($cycle[0])
@@ -199,11 +199,11 @@
       }
     },
     watch: {
-      // 导出值
+      // Derived value
       yearValue (val) {
         this.$emit('yearValueEvent', val)
       },
-      // 选中类型
+      // Selected type
       radioYear (val) {
         switch (val) {
           case 'everyYear':
@@ -220,7 +220,7 @@
             break
         }
       },
-      // 具体年数
+      // Specific years
       specificYearVal (arr) {
         this.yearValue = arr.join(',')
       }
@@ -229,7 +229,7 @@
     },
     created () {
       this.analyticalValue().then(() => {
-        console.log('数据结构解析成功！')
+        console.log('Data structure parsing succeeded!')
       })
     },
     beforeMount () {

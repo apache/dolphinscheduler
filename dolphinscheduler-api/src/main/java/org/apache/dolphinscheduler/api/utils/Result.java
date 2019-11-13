@@ -19,18 +19,16 @@ package org.apache.dolphinscheduler.api.utils;
 /**
  * result
  *
- * @param <T>
+ * @param <T> T
  */
 public class Result<T> {
     /**
      * status
-     * 状态码
      */
     private Integer code;
 
     /**
      * message
-     * 消息
      */
     private String msg;
 

@@ -29,10 +29,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 
+/**
+ * postgresql performance
+ */
 public class PostgrePerformance extends BaseDBPerformance {
 
     private static Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
 
+    /**
+     * get monitor record
+     * @param conn connection
+     * @return MonitorRecord
+     */
     @Override
     public MonitorRecord getMonitorRecord(Connection conn) {
         MonitorRecord monitorRecord = new MonitorRecord();

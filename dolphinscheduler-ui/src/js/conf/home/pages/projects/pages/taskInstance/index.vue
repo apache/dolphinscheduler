@@ -106,7 +106,17 @@
         }).catch(e => {
           this.isLoading = false
         })
-      }
+      },
+      /**
+       * Anti shake request interface
+       * @desc Prevent functions from being called multiple times
+       */
+      _debounceGET: _.debounce(function (flag) {
+        this._getList(flag)
+      }, 100, {
+        'leading': false,
+        'trailing': true
+      })
     },
     watch: {
       // router
@@ -121,6 +131,14 @@
     created () {
     },
     mounted () {
+      // Cycle acquisition status
+      this.setIntervalP = setInterval(() => {
+        this._debounceGET('false')
+      }, 90000)
+    },
+    beforeDestroy () {
+      // Destruction wheel
+      clearInterval(this.setIntervalP)
     },
     components: { mList, mInstanceConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }

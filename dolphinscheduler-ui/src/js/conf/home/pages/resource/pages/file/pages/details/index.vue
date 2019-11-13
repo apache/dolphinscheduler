@@ -195,7 +195,7 @@
     },
     mounted () {
       if (this.isNoType) {
-        // 获取数据
+        // get data
         this._getViewResources()
       }
     },

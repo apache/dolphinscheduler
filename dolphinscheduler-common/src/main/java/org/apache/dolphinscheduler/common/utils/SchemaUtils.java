@@ -41,9 +41,8 @@ public class SchemaUtils {
 	private static Pattern p = Pattern.compile("\\s*|\t|\r|\n");
 
 	/**
-	 * 获取所有upgrade目录下的可升级的schema
 	 * Gets upgradable schemas for all upgrade directories
-	 * @return
+	 * @return all schema list
 	 */
 	@SuppressWarnings("unchecked")
 	public static List<String> getAllSchemaList() {
@@ -86,11 +85,10 @@ public class SchemaUtils {
 	}
 	
 	/**
-	 * 判断schemaVersion是否比version版本高
 	 * Determine whether schemaVersion is higher than version
-	 * @param schemaVersion
-	 * @param version
-	 * @return
+	 * @param schemaVersion schema version
+	 * @param version version
+	 * @return  Determine whether schemaVersion is higher than version
 	 */
 	public static boolean isAGreatVersion(String schemaVersion, String version) {
 		if(StringUtils.isEmpty(schemaVersion) || StringUtils.isEmpty(version)) {
@@ -108,14 +106,13 @@ public class SchemaUtils {
 			}
 		}
 		
-		// 说明直到第arrLength-1个元素，两个版本号都一样，此时谁的arrLength大，谁的版本号就大
 		// If the version and schema version is the same from 0 up to the arrlength-1 element,whoever has a larger arrLength has a larger version number
 		return schemaVersionArr.length > versionArr.length;
 	}
 	
 	/**
 	 * Gets the current software version number of the system
-	 * @return
+	 * @return current software version
 	 */
 	public static String getSoftVersion() {
 		String soft_version;
@@ -133,10 +130,9 @@ public class SchemaUtils {
 	}
 	
 	/**
-	 * 去掉字符串中的空格回车换行和制表符
 	 * Strips the string of space carriage returns and tabs
-	 * @param str
-	 * @return
+	 * @param str string
+	 * @return string removed blank
 	 */
 	public static String replaceBlank(String str) {
 		String dest = "";
