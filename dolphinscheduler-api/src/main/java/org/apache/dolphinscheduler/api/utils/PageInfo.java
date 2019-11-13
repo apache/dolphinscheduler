@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * page info
  *
- * @param <T>
+ * @param <T> model
  */
 public class PageInfo<T> {
 

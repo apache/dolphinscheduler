@@ -54,12 +54,12 @@ public class TenantController extends BaseController{
     /**
      * create tenant
      *
-     * @param loginUser
-     * @param tenantCode
-     * @param tenantName
-     * @param queueId
-     * @param description
-     * @return
+     * @param loginUser login user
+     * @param tenantCode tenant code
+     * @param tenantName tenant name
+     * @param queueId queue id
+     * @param description description
+     * @return create result code
      */
     @ApiOperation(value = "createTenant", notes= "CREATE_TENANT_NOTES")
     @ApiImplicitParams({
@@ -92,11 +92,11 @@ public class TenantController extends BaseController{
     /**
      * query tenant list paging
      *
-     * @param loginUser
-     * @param pageNo
-     * @param searchVal
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return tenant list page
      */
     @ApiOperation(value = "queryTenantlistPaging", notes= "QUERY_TENANT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
@@ -130,8 +130,8 @@ public class TenantController extends BaseController{
     /**
      * tenant list
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return tenant list
      */
     @ApiOperation(value = "queryTenantlist", notes= "QUERY_TENANT_LIST_NOTES")
     @GetMapping(value="/list")
@@ -152,12 +152,13 @@ public class TenantController extends BaseController{
     /**
      * udpate tenant
      *
-     * @param loginUser
-     * @param tenantCode
-     * @param tenantName
-     * @param queueId
-     * @param description
-     * @return
+     * @param loginUser login user
+     * @param id tennat id
+     * @param tenantCode tennat code
+     * @param tenantName tennat name
+     * @param queueId queue id
+     * @param description description
+     * @return update result code
      */
     @ApiOperation(value = "updateTenant", notes= "UPDATE_TENANT_NOTES")
     @ApiImplicitParams({
@@ -190,9 +191,9 @@ public class TenantController extends BaseController{
     /**
      * delete tenant by id
      *
-     * @param loginUser
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param id tenant id
+     * @return delete result code
      */
     @ApiOperation(value = "deleteTenantById", notes= "DELETE_TENANT_NOTES")
     @ApiImplicitParams({
@@ -217,9 +218,9 @@ public class TenantController extends BaseController{
     /**
      * verify tenant code
      *
-     * @param loginUser
-     * @param tenantCode
-     * @return
+     * @param loginUser login user
+     * @param tenantCode tenant code
+     * @return true if tenant code can user, otherwise return false
      */
     @ApiOperation(value = "verifyTenantCode", notes= "VERIFY_TENANT_CODE_NOTES")
     @ApiImplicitParams({

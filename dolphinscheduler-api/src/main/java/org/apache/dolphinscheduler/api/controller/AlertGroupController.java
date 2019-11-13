@@ -53,11 +53,11 @@ public class AlertGroupController extends  BaseController{
 
     /**
      * create alert group
-     * @param loginUser
-     * @param groupName
-     * @param groupType
-     * @param description
-     * @return
+     * @param loginUser login user
+     * @param groupName group name
+     * @param groupType group type
+     * @param description description
+     * @return create result code
      */
     @ApiOperation(value = "createAlertgroup", notes= "CREATE_ALERT_GROUP_NOTES")
     @ApiImplicitParams({
@@ -84,8 +84,8 @@ public class AlertGroupController extends  BaseController{
 
     /**
      * alert group list
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return alert group list
      */
     @ApiOperation(value = "list", notes= "QUERY_ALERT_GROUP_LIST_NOTES")
     @GetMapping(value = "/list")
@@ -105,13 +105,13 @@ public class AlertGroupController extends  BaseController{
     /**
      * paging query alarm group list
      *
-     * @param loginUser
-     * @param pageNo
-     * @param searchVal
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param pageNo page number
+     * @param searchVal search value
+     * @param pageSize page size
+     * @return alert group list page
      */
-    @ApiOperation(value = "queryTaskListPaging", notes= "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
+    @ApiOperation(value = "queryAlertGroupListPaging", notes= "QUERY_ALERT_GROUP_LIST_PAGING_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type ="String"),
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
@@ -142,12 +142,12 @@ public class AlertGroupController extends  BaseController{
 
     /**
      * updateProcessInstance alert group
-     * @param loginUser
-     * @param id
-     * @param groupName
-     * @param groupType
-     * @param description
-     * @return
+     * @param loginUser login user
+     * @param id alert group id
+     * @param groupName group name
+     * @param groupType group type
+     * @param description description
+     * @return update result code
      */
     @ApiOperation(value = "updateAlertgroup", notes= "UPDATE_ALERT_GROUP_NOTES")
     @ApiImplicitParams({
@@ -177,9 +177,9 @@ public class AlertGroupController extends  BaseController{
 
     /**
      * delete alert group by id
-     * @param loginUser
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param id alert group id
+     * @return delete result code
      */
     @ApiOperation(value = "delAlertgroupById", notes= "DELETE_ALERT_GROUP_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -203,9 +203,9 @@ public class AlertGroupController extends  BaseController{
 
     /**
      * check alert group exist
-     * @param loginUser
-     * @param groupName
-     * @return
+     * @param loginUser login user
+     * @param groupName group name
+     * @return check result code
      */
     @ApiOperation(value = "verifyGroupName", notes= "VERIFY_ALERT_GROUP_NAME_NOTES")
     @ApiImplicitParams({
@@ -225,9 +225,10 @@ public class AlertGroupController extends  BaseController{
     /**
      * grant user
      *
-     * @param loginUser
-     * @param userIds
-     * @return
+     * @param loginUser login user
+     * @param userIds user ids in the group
+     * @param alertgroupId alert group id
+     * @return grant result code
      */
     @ApiOperation(value = "grantUser", notes= "GRANT_ALERT_GROUP_NOTES")
     @ApiImplicitParams({

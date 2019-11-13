@@ -65,17 +65,18 @@ public class TaskInstanceService extends BaseService {
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceId
-     * @param taskName
-     * @param startDate
-     * @param endDate
-     * @param searchVal
-     * @param stateType
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceId process instance id
+     * @param searchVal search value
+     * @param taskName task name
+     * @param stateType state type
+     * @param host host
+     * @param startDate start time
+     * @param endDate end time
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return task list page
      */
     public Map<String,Object> queryTaskListPaging(User loginUser, String projectName,
                                                   Integer processInstanceId, String taskName, String startDate, String endDate,

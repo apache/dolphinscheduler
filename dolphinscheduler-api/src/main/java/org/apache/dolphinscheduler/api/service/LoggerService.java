@@ -42,10 +42,10 @@ public class LoggerService {
   /**
    * view log
    *
-   * @param taskInstId
-   * @param skipLineNum
-   * @param limit
-   * @return
+   * @param taskInstId task instance id
+   * @param skipLineNum skip line number
+   * @param limit limit
+   * @return log string data
    */
   public Result queryLog(int taskInstId, int skipLineNum, int limit) {
 
@@ -76,8 +76,8 @@ public class LoggerService {
   /**
    * get log size
    *
-   * @param taskInstId
-   * @return
+   * @param taskInstId task instance id
+   * @return log byte array
    */
   public byte[] getLogBytes(int taskInstId) {
     TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);

@@ -63,14 +63,15 @@ public class UdfFuncService extends BaseService{
     /**
      * create udf function
      *
-     * @param loginUser
-     * @param funcName
-     * @param argTypes
-     * @param database
-     * @param desc
-     * @param type
-     * @param resourceId
-     * @return
+     * @param loginUser login user
+     * @param type udf type
+     * @param funcName function name
+     * @param argTypes argument types
+     * @param database database
+     * @param desc description
+     * @param resourceId resource id
+     * @param className class name
+     * @return create result code
      */
     public Result createUdfFunction(User loginUser,
                                     String funcName,
@@ -130,8 +131,8 @@ public class UdfFuncService extends BaseService{
 
     /**
      *
-     * @param name
-     * @return
+     * @param name name
+     * @return check result code
      */
     private boolean checkUdfFuncNameExists(String name){
         List<UdfFunc> resource = udfFuncMapper.queryUdfByIdStr(null, name);
@@ -144,6 +145,9 @@ public class UdfFuncService extends BaseService{
 
     /**
      * query udf function
+     *
+     * @param id  udf function id
+     * @return udf function detail
      */
     public Map<String, Object> queryUdfFuncDetail(int id) {
 
@@ -161,13 +165,15 @@ public class UdfFuncService extends BaseService{
     /**
      * updateProcessInstance udf function
      *
-     * @param funcName
-     * @param argTypes
-     * @param database
-     * @param desc
-     * @param type
-     * @param resourceId
-     * @return
+     * @param udfFuncId udf function id
+     * @param type  resource type
+     * @param funcName function name
+     * @param argTypes argument types
+     * @param database data base
+     * @param desc description
+     * @param resourceId resource id
+     * @param className class name
+     * @return update result code
      */
     public Map<String, Object> updateUdfFunc(int udfFuncId,
                                              String funcName,
@@ -232,11 +238,11 @@ public class UdfFuncService extends BaseService{
     /**
      * query udf function list paging
      *
-     * @param loginUser
-     * @param searchVal
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param searchVal search value
+     * @return udf function list page
      */
     public Map<String, Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>(5);
@@ -254,11 +260,11 @@ public class UdfFuncService extends BaseService{
     /**
      * get udf functions
      *
-     * @param loginUser
-     * @param searchVal
-     * @param pageSize
-     * @param pageNo
-     * @return
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageSize page size
+     * @param pageNo page number
+     * @return udf function list page
      */
     private IPage<UdfFunc> getUdfFuncsPage(User loginUser, String searchVal, Integer pageSize, int pageNo) {
 
@@ -273,9 +279,9 @@ public class UdfFuncService extends BaseService{
     /**
      * query data resource by type
      *
-     * @param loginUser
-     * @param type
-     * @return
+     * @param loginUser login user
+     * @param type  resource type
+     * @return resource list
      */
     public Map<String, Object> queryResourceList(User loginUser, Integer type) {
         Map<String, Object> result = new HashMap<>(5);
@@ -289,7 +295,8 @@ public class UdfFuncService extends BaseService{
     /**
      * delete udf function
      *
-     * @param id
+     * @param id udf function id
+     * @return delete result code
      */
     @Transactional(value = "transactionManager",rollbackFor = Exception.class)
     public Result delete(int id) {
@@ -304,8 +311,8 @@ public class UdfFuncService extends BaseService{
     /**
      * verify udf function by name
      *
-     * @param name
-     * @return
+     * @param name name
+     * @return true if the name can user, otherwise return false
      */
     public Result verifyUdfFuncByName(String name) {
         Result result = new Result();

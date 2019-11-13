@@ -50,8 +50,8 @@ public class SessionService extends BaseService{
   /**
    * get user session from request
    *
-   * @param request
-   * @return
+   * @param request request
+   * @return session
    */
   public Session getSession(HttpServletRequest request)  {
     String sessionId = request.getHeader(Constants.SESSION_ID);
@@ -77,9 +77,9 @@ public class SessionService extends BaseService{
   /**
    * create session
    *
-   * @param user
-   * @param ip
-   * @return
+   * @param user user
+   * @param ip ip
+   * @return session string
    */
   @Transactional(rollbackFor = Exception.class)
   public String createSession(User user, String ip) {
@@ -136,7 +136,7 @@ public class SessionService extends BaseService{
    * remove ip restrictions
    *
    * @param ip   no use
-   * @param loginUser
+   * @param loginUser login user
    */
   public void signOut(String ip, User loginUser) {
     try {

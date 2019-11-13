@@ -59,9 +59,9 @@ public class ProjectController extends BaseController {
     /**
      * create project
      *
-     * @param loginUser
-     * @param projectName
-     * @param description
+     * @param loginUser login user
+     * @param projectName project name
+     * @param description description
      * @return returns an error if it exists
      */
     @ApiOperation(value = "createProject", notes= "CREATE_PROJECT_NOTES")
@@ -88,11 +88,11 @@ public class ProjectController extends BaseController {
     /**
      * updateProcessInstance project
      *
-     * @param loginUser
-     * @param projectId
-     * @param projectName
-     * @param description
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @param projectName project name
+     * @param description description
+     * @return update result code
      */
     @ApiOperation(value = "updateProject", notes= "UPDATE_PROJECT_NOTES")
     @ApiImplicitParams({
@@ -119,9 +119,9 @@ public class ProjectController extends BaseController {
     /**
      * query project details by id
      *
-     * @param loginUser
-     * @param projectId
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @return project detail information
      */
     @ApiOperation(value = "queryProjectById", notes= "QUERY_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -145,11 +145,11 @@ public class ProjectController extends BaseController {
     /**
      * query project list paging
      *
-     * @param loginUser
-     * @param searchVal
-     * @param pageSize
-     * @param pageNo
-     * @return
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageSize page size
+     * @param pageNo page number
+     * @return project list which the login user have permission to see
      */
     @ApiOperation(value = "queryProjectListPaging", notes= "QUERY_PROJECT_LIST_PAGING_NOTES")
     @ApiImplicitParams({
@@ -179,9 +179,9 @@ public class ProjectController extends BaseController {
     /**
      * delete project by id
      *
-     * @param loginUser
-     * @param projectId
-     * @return
+     * @param loginUser login user
+     * @param projectId project id
+     * @return delete result code
      */
     @ApiOperation(value = "deleteProjectById", notes= "DELETE_PROJECT_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -206,9 +206,9 @@ public class ProjectController extends BaseController {
     /**
      * query unauthorized project
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return the projects which user have not permission to see
      */
     @ApiOperation(value = "queryUnauthorizedProject", notes= "QUERY_UNAUTHORIZED_PROJECT_NOTES")
     @ApiImplicitParams({
@@ -232,9 +232,9 @@ public class ProjectController extends BaseController {
     /**
      * query authorized project
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return projects which the user have permission to see, Except for items created by this user
      */
     @ApiOperation(value = "queryAuthorizedProject", notes= "QUERY_AUTHORIZED_PROJECT_NOTES")
     @ApiImplicitParams({
@@ -257,9 +257,9 @@ public class ProjectController extends BaseController {
     /**
      * import process definition
      *
-     * @param loginUser
-     * @param file
-     * @return
+     * @param loginUser login user
+     * @param file resource file
+     * @return import result code
      */
     @ApiOperation(value = "importProcessDefinition", notes= "EXPORT_PROCCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
@@ -281,8 +281,8 @@ public class ProjectController extends BaseController {
 
     /**
      * query all project list
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return all project list
      */
     @ApiOperation(value = "queryAllProjectList", notes= "QUERY_ALL_PROJECT_LIST_NOTES")
     @GetMapping(value = "/queryAllProjectList")

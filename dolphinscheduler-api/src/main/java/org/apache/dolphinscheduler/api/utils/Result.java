@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.utils;
 /**
  * result
  *
- * @param <T>
+ * @param <T> T
  */
 public class Result<T> {
     /**

@@ -58,7 +58,7 @@ public class AlertGroupService extends BaseService{
     /**
      * query alert group list
      *
-     * @return
+     * @return alert group list
      */
     public HashMap<String, Object> queryAlertgroup() {
 
@@ -73,11 +73,11 @@ public class AlertGroupService extends BaseService{
     /**
      * paging query alarm group list
      *
-     * @param loginUser
-     * @param searchVal
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return alert group list page
      */
     public Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
@@ -101,11 +101,11 @@ public class AlertGroupService extends BaseService{
     /**
      * create alert group
      *
-     * @param loginUser
-     * @param groupName
-     * @param groupType
-     * @param desc
-     * @return
+     * @param loginUser login user
+     * @param groupName group name
+     * @param groupType group type
+     * @param desc description
+     * @return create result code
      */
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, AlertType groupType, String desc) {
         Map<String, Object> result = new HashMap<>(5);
@@ -135,24 +135,14 @@ public class AlertGroupService extends BaseService{
     }
 
     /**
-     * check user is admin or not
-     *
-     * @param user
-     * @return
-     */
-    public boolean isAdmin(User user) {
-        return user.getUserType() == UserType.ADMIN_USER;
-    }
-
-    /**
      * updateProcessInstance alert group
      *
-     * @param loginUser
-     * @param id
-     * @param groupName
-     * @param groupType
-     * @param desc
-     * @return
+     * @param loginUser login user
+     * @param id alert group id
+     * @param groupName group name
+     * @param groupType group type
+     * @param desc description
+     * @return update result code
      */
     public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, AlertType groupType, String desc) {
         Map<String, Object> result = new HashMap<>(5);
@@ -190,9 +180,9 @@ public class AlertGroupService extends BaseService{
     /**
      * delete alert group by id
      *
-     * @param loginUser
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param id alert group id
+     * @return delete result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> delAlertgroupById(User loginUser, int id) {
@@ -214,10 +204,10 @@ public class AlertGroupService extends BaseService{
     /**
      * grant user
      *
-     * @param loginUser
-     * @param alertgroupId
-     * @param userIds
-     * @return
+     * @param loginUser login user
+     * @param alertgroupId alert group id
+     * @param userIds user id list
+     * @return grant result code
      */
     public Map<String, Object> grantUser(User loginUser, int alertgroupId, String userIds) {
         Map<String, Object> result = new HashMap<>(5);
@@ -253,9 +243,9 @@ public class AlertGroupService extends BaseService{
     /**
      * verify group name exists
      *
-     * @param loginUser
-     * @param groupName
-     * @return
+     * @param loginUser login user
+     * @param groupName group name
+     * @return check result code
      */
     public Result verifyGroupName(User loginUser, String groupName) {
         Result result = new Result();

@@ -39,7 +39,8 @@ public class CheckUtils {
   /**
    * check username
    *
-   * @param userName
+   * @param userName user name
+   * @return true if user name regex valid,otherwise return false
    */
   public static boolean checkUserName(String userName) {
     return regexChecks(userName, Constants.REGEX_USER_NAME);
@@ -48,7 +49,8 @@ public class CheckUtils {
   /**
    * check email
    *
-   * @param email
+   * @param email email
+   * @return true if email regex valid, otherwise return false
    */
   public static boolean checkEmail(String email) {
     return email.length() > 5 && email.length() <= 40 && regexChecks(email, Constants.REGEX_MAIL_NAME) ;
@@ -57,7 +59,8 @@ public class CheckUtils {
   /**
    * check project description
    *
-   * @param desc
+   * @param desc desc
+   * @return true if description regex valid, otherwise return false
    */
   public static Map<String, Object> checkDesc(String desc) {
     Map<String, Object> result = new HashMap<>();
@@ -73,7 +76,8 @@ public class CheckUtils {
   /**
    * check extra info
    *
-   * @param otherParams
+   * @param otherParams other parames
+   * @return true if other parameters are valid, otherwise return false
    */
   public static boolean checkOtherParams(String otherParams) {
     return StringUtils.isNotEmpty(otherParams) && !JSONUtils.checkJsonVaild(otherParams);
@@ -82,7 +86,8 @@ public class CheckUtils {
   /**
    * check password
    *
-   * @param password
+   * @param password password
+   * @return true if password regex valid, otherwise return false
    */
   public static boolean checkPassword(String password) {
     return StringUtils.isNotEmpty(password) && password.length() >= 2 && password.length() <= 20;
@@ -91,7 +96,8 @@ public class CheckUtils {
   /**
    * check phone
    * phone can be empty.
-   * @param phone
+   * @param phone phone
+   * @return true if phone regex valid, otherwise return false
    */
   public static boolean checkPhone(String phone) {
     return StringUtils.isEmpty(phone) || phone.length() <= 11;
@@ -101,9 +107,9 @@ public class CheckUtils {
   /**
    * check task node parameter
    *
-   * @param parameter
-   * @param taskType
-   * @return
+   * @param parameter parameter
+   * @param taskType task type
+   * @return true if taks node parameters are valid, otherwise return false
    */
   public static boolean checkTaskNodeParameters(String parameter, String taskType) {
     AbstractParameters abstractParameters = TaskParametersUtils.getParameters(taskType, parameter);
@@ -117,11 +123,11 @@ public class CheckUtils {
 
   /**
    * check params
-   * @param userName
-   * @param password
-   * @param email
-   * @param phone
-   * @return
+   * @param userName user name
+   * @param password password
+   * @param email email
+   * @param phone phone
+   * @return true if user parameters are valid, other return false
    */
   public static boolean checkUserParams(String userName, String password, String email, String phone){
     return CheckUtils.checkUserName(userName) &&
@@ -131,11 +137,11 @@ public class CheckUtils {
   }
 
   /**
-   * 正则匹配
+   * regex check
    *
-   * @param str
-   * @param pattern
-   * @return
+   * @param str input string
+   * @param pattern regex pattern
+   * @return true if regex pattern is right, otherwise return false
    */
   private static boolean regexChecks(String str, Pattern pattern) {
     if (org.apache.commons.lang3.StringUtils.isEmpty(str)) {

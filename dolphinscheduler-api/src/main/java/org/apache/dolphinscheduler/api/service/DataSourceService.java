@@ -79,12 +79,12 @@ public class DataSourceService extends BaseService{
     /**
      * create data source
      *
-     * @param loginUser
-     * @param name
-     * @param desc
-     * @param type
-     * @param parameter
-     * @return
+     * @param loginUser login user
+     * @param name data source name
+     * @param desc data source description
+     * @param type data source type
+     * @param parameter datasource parameters
+     * @return create result code
      */
     public Map<String, Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter) {
 
@@ -130,12 +130,13 @@ public class DataSourceService extends BaseService{
     /**
      * updateProcessInstance datasource
      *
-     * @param loginUser
-     * @param name
-     * @param desc
-     * @param type
-     * @param parameter
-     * @return
+     * @param loginUser login user
+     * @param name data source name
+     * @param desc data source description
+     * @param type data source type
+     * @param parameter datasource parameters
+     * @param id data source id
+     * @return update result code
      */
     public Map<String, Object> updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter) {
 
@@ -188,6 +189,8 @@ public class DataSourceService extends BaseService{
 
     /**
      * updateProcessInstance datasource
+     * @param id datasource id
+     * @return data source detail
      */
     public Map<String, Object> queryDataSource(int id) {
 
@@ -264,11 +267,11 @@ public class DataSourceService extends BaseService{
     /**
      * query datasource list by keyword
      *
-     * @param loginUser
-     * @param searchVal
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return data source list page
      */
     public Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>();
@@ -293,31 +296,6 @@ public class DataSourceService extends BaseService{
     }
 
     /**
-     * get list paging
-     *
-     * @param loginUser
-     * @param searchVal
-     * @param pageSize
-     * @param pageInfo
-     * @return
-     */
-    private List<DataSource> getDataSources(User loginUser, String searchVal, Integer pageSize, PageInfo pageInfo) {
-        IPage<DataSource> dataSourceList = null;
-        Page<DataSource> dataSourcePage = new Page(pageInfo.getStart(), pageSize);
-
-        if (isAdmin(loginUser)) {
-            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, 0, searchVal);
-        }else{
-            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, loginUser.getId(), searchVal);
-        }
-        List<DataSource> dataSources = dataSourceList.getRecords();
-
-        handlePasswd(dataSources);
-        return dataSources;
-    }
-
-
-    /**
      * handle datasource connection password for safety
      * @param dataSourceList
      */
@@ -336,9 +314,9 @@ public class DataSourceService extends BaseService{
     /**
      * query data resource list
      *
-     * @param loginUser
-     * @param type
-     * @return
+     * @param loginUser login user
+     * @param type data source type
+     * @return data source list page
      */
     public Map<String, Object> queryDataSourceList(User loginUser, Integer type) {
         Map<String, Object> result = new HashMap<>(5);
@@ -360,9 +338,9 @@ public class DataSourceService extends BaseService{
     /**
      * verify datasource exists
      *
-     * @param loginUser
-     * @param name
-     * @return
+     * @param loginUser login user
+     * @param name datasource name
+     * @return true if data datasource not exists, otherwise return false
      */
     public Result verifyDataSourceName(User loginUser, String name) {
         Result result = new Result();
@@ -380,9 +358,9 @@ public class DataSourceService extends BaseService{
     /**
      * get connection
      *
-     * @param dbType
-     * @param parameter
-     * @return
+     * @param dbType datasource type
+     * @param parameter parameter
+     * @return connection for datasource
      */
     private Connection getConnection(DbType dbType, String parameter) {
         Connection connection = null;
@@ -443,9 +421,9 @@ public class DataSourceService extends BaseService{
     /**
      * check connection
      *
-     * @param type
-     * @param parameter
-     * @return
+     * @param type data source type
+     * @param parameter data source parameters
+     * @return true if connect successfully, otherwise false
      */
     public boolean checkConnection(DbType type, String parameter) {
         Boolean isConnection = false;
@@ -465,9 +443,9 @@ public class DataSourceService extends BaseService{
     /**
      * test connection
      *
-     * @param loginUser
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param id datasource id
+     * @return connect result code
      */
     public boolean connectionTest(User loginUser, int id) {
         DataSource dataSource = dataSourceMapper.selectById(id);
@@ -477,16 +455,17 @@ public class DataSourceService extends BaseService{
     /**
      * build paramters
      *
-     * @param name
-     * @param desc
-     * @param type
-     * @param host
-     * @param port
-     * @param database
-     * @param userName
-     * @param password
-     * @param other
-     * @return
+     * @param name data source name
+     * @param desc data source description
+     * @param type data source  type
+     * @param host data source  host
+     * @param port data source port
+     * @param database data source database name
+     * @param userName user name
+     * @param password password
+     * @param other other parameters
+     * @param principal principal
+     * @return datasource parameter
      */
     public String buildParameter(String name, String desc, DbType type, String host,
                                  String port, String database,String principal,String userName,
@@ -578,9 +557,9 @@ public class DataSourceService extends BaseService{
     /**
      * delete datasource
      *
-     * @param loginUser
-     * @param datasourceId
-     * @return
+     * @param loginUser login user
+     * @param datasourceId data source id
+     * @return delete result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Result delete(User loginUser, int datasourceId) {
@@ -610,9 +589,9 @@ public class DataSourceService extends BaseService{
     /**
      * unauthorized datasource
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return unauthed data source result code
      */
     public Map<String, Object> unauthDatasource(User loginUser, Integer userId) {
 
@@ -651,9 +630,9 @@ public class DataSourceService extends BaseService{
     /**
      * authorized datasource
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return authorized result code
      */
     public Map<String, Object> authedDatasource(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>(5);
@@ -674,17 +653,17 @@ public class DataSourceService extends BaseService{
      * get host and port by address
      *
      * @param address
-     * @return
+     * @return sting array: [host,port]
      */
     private String[] getHostsAndPort(String address) {
         String[] result = new String[2];
-        String[] tmpArray = address.split(org.apache.dolphinscheduler.common.Constants.DOUBLE_SLASH);
+        String[] tmpArray = address.split(Constants.DOUBLE_SLASH);
         String hostsAndPorts = tmpArray[tmpArray.length - 1];
         StringBuilder hosts = new StringBuilder();
-        String[] hostPortArray = hostsAndPorts.split(org.apache.dolphinscheduler.common.Constants.COMMA);
-        String port = hostPortArray[0].split(org.apache.dolphinscheduler.common.Constants.COLON)[1];
+        String[] hostPortArray = hostsAndPorts.split(Constants.COMMA);
+        String port = hostPortArray[0].split(Constants.COLON)[1];
         for (String hostPort : hostPortArray) {
-            hosts.append(hostPort.split(org.apache.dolphinscheduler.common.Constants.COLON)[0]).append(org.apache.dolphinscheduler.common.Constants.COMMA);
+            hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA);
         }
         hosts.deleteCharAt(hosts.length() - 1);
         result[0] = hosts.toString();

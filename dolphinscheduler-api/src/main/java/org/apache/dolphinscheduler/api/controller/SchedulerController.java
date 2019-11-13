@@ -60,14 +60,18 @@ public class SchedulerController extends BaseController {
     /**
      * create schedule
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionId
-     * @param schedule
-     * @param warningType
-     * @param warningGroupId
-     * @param failureStrategy
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @param schedule scheduler
+     * @param warningType  warning type
+     * @param warningGroupId warning group id
+     * @param failureStrategy failure strategy
+     * @param processInstancePriority process instance priority
+     * @param receivers receivers
+     * @param receiversCc receivers cc
+     * @param workerGroupId  worker group id
+     * @return create result code
      */
     @ApiOperation(value = "createSchedule", notes= "CREATE_SCHEDULE_NOTES")
     @ApiImplicitParams({
@@ -112,14 +116,18 @@ public class SchedulerController extends BaseController {
     /**
      * updateProcessInstance schedule
      *
-     * @param loginUser
-     * @param projectName
-     * @param id
-     * @param schedule
-     * @param warningType
-     * @param warningGroupId
-     * @param failureStrategy
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param id scheduler id
+     * @param schedule scheduler
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param failureStrategy failure strategy
+     * @param receivers receivers
+     * @param workerGroupId worker group id
+     * @param processInstancePriority process instance priority
+     * @param receiversCc receivers cc
+     * @return update result code
      */
     @ApiOperation(value = "updateSchedule", notes= "UPDATE_SCHEDULE_NOTES")
     @ApiImplicitParams({
@@ -164,11 +172,10 @@ public class SchedulerController extends BaseController {
     /**
      * publish schedule setScheduleState
      *
-     * @param loginUser
-     * @param projectName
-     * @param id
-     * @return
-     * @throws Exception
+     * @param loginUser login user
+     * @param projectName project name
+     * @param id scheduler id
+     * @return publish result code
      */
     @ApiOperation(value = "online", notes= "ONLINE_SCHEDULE_NOTES")
     @ApiImplicitParams({
@@ -193,10 +200,10 @@ public class SchedulerController extends BaseController {
     /**
      * offline schedule
      *
-     * @param loginUser
-     * @param projectName
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param id schedule id
+     * @return operation result code
      */
     @ApiOperation(value = "offline", notes= "OFFLINE_SCHEDULE_NOTES")
     @ApiImplicitParams({
@@ -222,10 +229,13 @@ public class SchedulerController extends BaseController {
     /**
      * query schedule list paging
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @param pageNo page number
+     * @param pageSize  page size
+     * @param searchVal search value
+     * @return schedule list page
      */
     @ApiOperation(value = "queryScheduleListPaging", notes= "QUERY_SCHEDULE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
@@ -258,10 +268,10 @@ public class SchedulerController extends BaseController {
     /**
      * delete schedule by id
      *
-     * @param loginUser
-     * @param projectName
-     * @param scheduleId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param scheduleId scheule id
+     * @return delete result code
      */
     @ApiOperation(value = "deleteScheduleById", notes= "OFFLINE_SCHEDULE_NOTES")
     @ApiImplicitParams({
@@ -286,9 +296,9 @@ public class SchedulerController extends BaseController {
     /**
      * query schedule list
      *
-     * @param loginUser
-     * @param projectName
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @return schedule list
      */
     @ApiOperation(value = "queryScheduleList", notes= "QUERY_SCHEDULE_LIST_NOTES")
     @PostMapping("/list")
@@ -308,10 +318,10 @@ public class SchedulerController extends BaseController {
     /**
      * preview schedule
      *
-     * @param loginUser
-     * @param projectName
-     * @param schedule
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param schedule schedule expression
+     * @return the next five fire time
      */
     @ApiOperation(value = "previewSchedule", notes= "PREVIEW_SCHEDULE_NOTES")
     @ApiImplicitParams({

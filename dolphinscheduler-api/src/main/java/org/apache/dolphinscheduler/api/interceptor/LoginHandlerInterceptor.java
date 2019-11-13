@@ -60,7 +60,6 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
    * @return {@code true} if the execution chain should proceed with the
    * next interceptor or the handler itself. Else, DispatcherServlet assumes
    * that this interceptor has already dealt with the response itself.
-   * @throws Exception in case of errors
    */
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {

@@ -61,11 +61,11 @@ public class LoginController extends BaseController {
     /**
      * login
      *
-     * @param userName
-     * @param userPassword
-     * @param request
-     * @param response
-     * @return
+     * @param userName user name
+     * @param userPassword user password
+     * @param request request
+     * @param response  response
+     * @return login result
      */
     @ApiOperation(value = "login", notes= "LOGIN_NOTES")
     @ApiImplicitParams({
@@ -124,8 +124,9 @@ public class LoginController extends BaseController {
     /**
      * sign out
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param request  request
+     * @return sign out result
      */
     @ApiOperation(value = "signOut", notes = "SIGNOUT_NOTES")
     @PostMapping(value = "/signOut")

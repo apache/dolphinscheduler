@@ -55,11 +55,17 @@ public class ProcessInstanceController extends BaseController{
     /**
      * query process instance list paging
      * 
-     * @param loginUser
-     * @param projectName
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param processDefinitionId process definition id
+     * @param searchVal search value
+     * @param stateType state type
+     * @param host host
+     * @param startTime start time
+     * @param endTime end time
+     * @return process instance list
      */
     @ApiOperation(value = "queryProcessInstanceList", notes= "QUERY_PROCESS_INSTANCE_LIST_NOTES")
     @ApiImplicitParams({
@@ -102,10 +108,10 @@ public class ProcessInstanceController extends BaseController{
     /**
      * query task list by process instance id
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceId process instance id
+     * @return task list for the process instance
      */
     @ApiOperation(value = "queryTaskListByProcessId", notes= "QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_NOTES")
     @ApiImplicitParams({
@@ -131,14 +137,16 @@ public class ProcessInstanceController extends BaseController{
     /**
      * update process instance
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceJson
-     * @param processInstanceId
-     * @param scheduleTime
-     * @param syncDefine
-     * @param flag
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceJson process instance json
+     * @param processInstanceId process instance id
+     * @param scheduleTime schedule time
+     * @param syncDefine sync define
+     * @param flag flag
+     * @param locations locations
+     * @param connects connects
+     * @return update result code
      */
     @ApiOperation(value = "updateProcessInstance", notes= "UPDATE_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
@@ -179,10 +187,10 @@ public class ProcessInstanceController extends BaseController{
     /**
      * query process instance by id
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceId process instance id
+     * @return process instance detail
      */
     @ApiOperation(value = "queryProcessInstanceById", notes= "QUERY_PROCESS_INSTANCE_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -209,10 +217,10 @@ public class ProcessInstanceController extends BaseController{
      * delete process instance by id, at the same time,
      * delete task instance and their mapping relation data
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceId process instance id
+     * @return delete result code
      */
     @ApiOperation(value = "deleteProcessInstanceById", notes= "DELETE_PROCESS_INSTANCE_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -240,10 +248,10 @@ public class ProcessInstanceController extends BaseController{
     /**
      * query sub process instance detail info by task id
      *
-     * @param loginUser
-     * @param projectName
-     * @param taskId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param taskId task id
+     * @return sub process instance detail
      */
     @ApiOperation(value = "querySubProcessInstanceByTaskId", notes= "QUERY_SUBPROCESS_INSTANCE_BY_TASK_ID_NOTES")
     @ApiImplicitParams({
@@ -266,10 +274,10 @@ public class ProcessInstanceController extends BaseController{
     /**
      * query parent process instance detail info by sub process instance id
      *
-     * @param loginUser
-     * @param projectName
-     * @param subId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param subId sub process id
+     * @return parent instance detail
      */
     @ApiOperation(value = "queryParentInstanceBySubId", notes= "QUERY_PARENT_PROCESS_INSTANCE_BY_SUB_PROCESS_INSTANCE_ID_NOTES")
     @ApiImplicitParams({
@@ -292,9 +300,9 @@ public class ProcessInstanceController extends BaseController{
     /**
      * query process instance global variables and local variables
      *
-     * @param loginUser
-     * @param processInstanceId
-     * @return
+     * @param loginUser login user
+     * @param processInstanceId process instance id
+     * @return variables data
      */
     @ApiOperation(value = "viewVariables", notes= "QUERY_PROCESS_INSTANCE_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
     @ApiImplicitParams({
@@ -316,10 +324,10 @@ public class ProcessInstanceController extends BaseController{
     /**
      * encapsulation gantt structure
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceId process instance id
+     * @return gantt tree data
      */
     @ApiOperation(value = "vieGanttTree", notes= "VIEW_GANTT_NOTES")
     @ApiImplicitParams({
@@ -343,10 +351,10 @@ public class ProcessInstanceController extends BaseController{
      * batch delete process instance by ids, at the same time,
      * delete task instance and their mapping relation data
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceIds
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceIds process instance id
+     * @return delete result code
      */
     @GetMapping(value="/batch-delete")
     @ResponseStatus(HttpStatus.OK)

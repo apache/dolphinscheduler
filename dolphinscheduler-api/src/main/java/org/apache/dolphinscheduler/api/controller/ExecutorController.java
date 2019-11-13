@@ -50,6 +50,23 @@ public class ExecutorController extends BaseController {
 
     /**
      * execute process instance
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @param scheduleTime schedule time
+     * @param failureStrategy failure strategy
+     * @param startNodeList start nodes list
+     * @param taskDependType task depend type
+     * @param execType execute type
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param receivers receivers
+     * @param receiversCc receivers cc
+     * @param runMode run mode
+     * @param processInstancePriority process instance priority
+     * @param workerGroupId worker group id
+     * @param timeout timeout
+     * @return start process result code
      */
     @ApiOperation(value = "startProcessInstance", notes= "RUN_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
@@ -112,10 +129,11 @@ public class ExecutorController extends BaseController {
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceId process instance id
+     * @param executeType execute type
+     * @return execute result code
      */
     @ApiOperation(value = "execute", notes= "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
     @ApiImplicitParams({
@@ -126,8 +144,8 @@ public class ExecutorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Result execute(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                                  @RequestParam("processInstanceId") Integer processInstanceId,
-                                                  @RequestParam("executeType") ExecuteType executeType
+                          @RequestParam("processInstanceId") Integer processInstanceId,
+                          @RequestParam("executeType") ExecuteType executeType
     ) {
         try {
             logger.info("execute command, login user: {}, project:{}, process instance id:{}, execute type:{}",
@@ -143,9 +161,9 @@ public class ExecutorController extends BaseController {
     /**
      * check process definition and all of the son process definitions is on line.
      *
-     * @param loginUser
-     * @param processDefinitionId
-     * @return
+     * @param loginUser login user
+     * @param processDefinitionId process definition id
+     * @return check result code
      */
     @ApiOperation(value = "startCheckProcessDefinition", notes= "START_CHECK_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
@@ -169,9 +187,10 @@ public class ExecutorController extends BaseController {
     /**
      * query recipients and copyers by process definition ID
      *
-     * @param loginUser
-     * @param processDefinitionId
-     * @return
+     * @param loginUser login user
+     * @param processDefinitionId process definition id
+     * @param processInstanceId process instance id
+     * @return receivers cc list
      */
     @ApiIgnore
     @ApiOperation(value = "getReceiverCc", notes= "GET_RECEIVER_CC_NOTES")

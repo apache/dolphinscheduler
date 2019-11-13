@@ -48,6 +48,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 
   /**
    * Cookie
+   * @return local resolver
    */
   @Bean(name = "localeResolver")
   public LocaleResolver localeResolver() {
@@ -102,7 +103,7 @@ public class AppConfiguration implements WebMvcConfigurer {
   /**
    * Turn off suffix-based content negotiation
    *
-   * @param configurer
+   * @param configurer configurer
    */
   @Override
   public void configureContentNegotiation(final ContentNegotiationConfigurer configurer) {

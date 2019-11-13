@@ -63,10 +63,12 @@ public class ResourcesController extends BaseController{
     /**
      * create resource
      *
-     * @param loginUser
-     * @param alias
-     * @param description
-     * @param file
+     * @param loginUser login user
+     * @param alias alias
+     * @param description description
+     * @param type type
+     * @param file file
+     * @return create result code
      */
     @ApiOperation(value = "createResource", notes= "CREATE_RESOURCE_NOTES")
     @ApiImplicitParams({
@@ -94,11 +96,14 @@ public class ResourcesController extends BaseController{
     /**
      * update resource
      *
-     * @param loginUser
-     * @param alias
-     * @param description
+     * @param loginUser login user
+     * @param alias alias
+     * @param resourceId resource id
+     * @param type resource type
+     * @param description description
+     * @return update result code
      */
-    @ApiOperation(value = "createResource", notes= "CREATE_RESOURCE_NOTES")
+    @ApiOperation(value = "updateResource", notes= "UPDATE_RESOURCE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType ="Int", example = "100"),
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
@@ -125,8 +130,9 @@ public class ResourcesController extends BaseController{
     /**
      * query resources list
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param type resource type
+     * @return resource list
      */
     @ApiOperation(value = "querytResourceList", notes= "QUERY_RESOURCE_LIST_NOTES")
     @ApiImplicitParams({
@@ -150,10 +156,12 @@ public class ResourcesController extends BaseController{
     /**
      * query resources list paging
      *
-     * @param loginUser
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param type resource type
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return resource list page
      */
     @ApiOperation(value = "querytResourceListPaging", notes= "QUERY_RESOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
@@ -191,8 +199,9 @@ public class ResourcesController extends BaseController{
     /**
      * delete resource
      *
-     * @param loginUser
-     * @param resourceId
+     * @param loginUser login user
+     * @param resourceId resource id
+     * @return delete result code
      */
     @ApiOperation(value = "deleteResource", notes= "DELETE_RESOURCE_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -217,10 +226,10 @@ public class ResourcesController extends BaseController{
     /**
      * verify resource by alias and type
      *
-     * @param loginUser
-     * @param alias
-     * @param type
-     * @return
+     * @param loginUser login user
+     * @param alias resource name
+     * @param type resource type
+     * @return true if the resource name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyResourceName", notes= "VERIFY_RESOURCE_NAME_NOTES")
     @ApiImplicitParams({
@@ -247,8 +256,11 @@ public class ResourcesController extends BaseController{
     /**
      * view resource file online
      *
-     * @param loginUser
-     * @param resourceId
+     * @param loginUser login user
+     * @param resourceId resource id
+     * @param skipLineNum skip line number
+     * @param limit limit
+     * @return resource content
      */
     @ApiOperation(value = "viewResource", notes= "VIEW_RESOURCE_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -276,13 +288,13 @@ public class ResourcesController extends BaseController{
     /**
      * create resource file online
      *
-     * @param loginUser
-     * @param type
-     * @param fileName
-     * @param fileSuffix
-     * @param description
-     * @param content
-     * @return
+     * @param loginUser login user
+     * @param type resource type
+     * @param fileName file name
+     * @param fileSuffix file suffix
+     * @param description description
+     * @param content content
+     * @return create result code
      */
     @ApiOperation(value = "onlineCreateResource", notes= "ONLINE_CREATE_RESOURCE_NOTES")
     @ApiImplicitParams({
@@ -317,8 +329,10 @@ public class ResourcesController extends BaseController{
     /**
      * edit resource file online
      *
-     * @param loginUser
-     * @param resourceId
+     * @param loginUser login user
+     * @param resourceId resource id
+     * @param content content
+     * @return update result code
      */
     @ApiOperation(value = "updateResourceContent", notes= "UPDATE_RESOURCE_NOTES")
     @ApiImplicitParams({
@@ -347,8 +361,9 @@ public class ResourcesController extends BaseController{
     /**
      * download resource file
      *
-     * @param loginUser
-     * @param resourceId
+     * @param loginUser login user
+     * @param resourceId resource id
+     * @return resource content
      */
     @ApiOperation(value = "downloadResource", notes= "DOWNLOAD_RESOURCE_NOTES")
     @ApiImplicitParams({
@@ -378,14 +393,15 @@ public class ResourcesController extends BaseController{
 
     /**
      * create udf function
-     * @param loginUser
-     * @param type
-     * @param funcName
-     * @param argTypes
-     * @param database
-     * @param description
-     * @param resourceId
-     * @return
+     * @param loginUser login user
+     * @param type udf type
+     * @param funcName function name
+     * @param argTypes argument types
+     * @param database database
+     * @param description description
+     * @param className  class name
+     * @param resourceId resource id
+     * @return create result code
      */
     @ApiOperation(value = "createUdfFunc", notes= "CREATE_UDF_FUNCTION_NOTES")
     @ApiImplicitParams({
@@ -423,9 +439,9 @@ public class ResourcesController extends BaseController{
     /**
      * view udf function
      *
-     * @param loginUser
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param id resource id
+     * @return udf function detail
      */
     @ApiOperation(value = "viewUIUdfFunction", notes= "VIEW_UDF_FUNCTION_NOTES")
     @ApiImplicitParams({
@@ -437,7 +453,6 @@ public class ResourcesController extends BaseController{
     public Result viewUIUdfFunction(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam("id") int id)
     {
-        Result result = new Result();
         logger.info("login user {}, query udf{}",
                 loginUser.getUserName(), id);
         try {
@@ -450,16 +465,18 @@ public class ResourcesController extends BaseController{
     }
 
     /**
-     * updateProcessInstance udf function
+     * update udf function
      *
-     * @param loginUser
-     * @param type
-     * @param funcName
-     * @param argTypes
-     * @param database
-     * @param description
-     * @param resourceId
-     * @return
+     * @param loginUser login user
+     * @param type  resource type
+     * @param funcName function name
+     * @param argTypes argument types
+     * @param database data base
+     * @param description description
+     * @param resourceId resource id
+     * @param className class name
+     * @param udfFuncId  udf function id
+     * @return update result code
      */
     @ApiOperation(value = "updateUdfFunc", notes= "UPDATE_UDF_FUNCTION_NOTES")
     @ApiImplicitParams({
@@ -496,10 +513,11 @@ public class ResourcesController extends BaseController{
     /**
      * query udf function list paging
      *
-     * @param loginUser
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return udf function list page
      */
     @ApiOperation(value = "queryUdfFuncListPaging", notes= "QUERY_UDF_FUNCTION_LIST_PAGING_NOTES")
     @ApiImplicitParams({
@@ -533,8 +551,9 @@ public class ResourcesController extends BaseController{
     /**
      * query resource list by type
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param type  resource type
+     * @return resource list
      */
     @ApiOperation(value = "queryResourceList", notes= "QUERY_RESOURCE_LIST_NOTES")
     @ApiImplicitParams({
@@ -557,9 +576,9 @@ public class ResourcesController extends BaseController{
     /**
      * verify udf function name can use or not
      *
-     * @param loginUser
-     * @param name
-     * @return
+     * @param loginUser login user
+     * @param name name
+     * @return true if the name can user, otherwise return false
      */
     @ApiOperation(value = "verifyUdfFuncName", notes= "VERIFY_UDF_FUNCTION_NAME_NOTES")
     @ApiImplicitParams({
@@ -586,8 +605,9 @@ public class ResourcesController extends BaseController{
     /**
      * delete udf function
      *
-     * @param loginUser
-     * @param udfFuncId
+     * @param loginUser login user
+     * @param udfFuncId udf function id
+     * @return delete result code
      */
     @ApiOperation(value = "deleteUdfFunc", notes= "DELETE_UDF_FUNCTION_NOTES")
     @ApiImplicitParams({
@@ -611,9 +631,9 @@ public class ResourcesController extends BaseController{
     /**
      * authorized file resource list
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return authorized result
      */
     @ApiOperation(value = "authorizedFile", notes= "AUTHORIZED_FILE_NOTES")
     @ApiImplicitParams({
@@ -637,9 +657,9 @@ public class ResourcesController extends BaseController{
     /**
      * unauthorized file resource list
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return unauthorized result code
      */
     @ApiOperation(value = "unauthorizedFile", notes= "UNAUTHORIZED_FILE_NOTES")
     @ApiImplicitParams({
@@ -663,9 +683,9 @@ public class ResourcesController extends BaseController{
     /**
      * unauthorized udf function
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return unauthorized result code
      */
     @ApiOperation(value = "unauthUDFFunc", notes= "UNAUTHORIZED_UDF_FUNC_NOTES")
     @ApiImplicitParams({
@@ -690,9 +710,9 @@ public class ResourcesController extends BaseController{
     /**
      * authorized udf function
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return authorized result code
      */
     @ApiOperation(value = "authUDFFunc", notes= "AUTHORIZED_UDF_FUNC_NOTES")
     @ApiImplicitParams({

@@ -52,10 +52,12 @@ public class WorkerGroupService extends BaseService {
 
     /**
      * create or update a worker group
-     * @param id
-     * @param name
-     * @param ipList
-     * @return
+     *
+     * @param loginUser login user
+     * @param id worker group id
+     * @param name worker group name
+     * @param ipList ip list
+     * @return create or update result code
      */
     public Map<String, Object> saveWorkerGroup(User loginUser,int id, String name, String ipList){
 
@@ -121,11 +123,12 @@ public class WorkerGroupService extends BaseService {
 
     /**
      * query worker group paging
-     * @param loginUser
-     * @param pageNo
-     * @param pageSize
-     * @param searchVal
-     * @return
+     *
+     * @param loginUser login user
+     * @param pageNo page number
+     * @param searchVal search value
+     * @param pageSize page size
+     * @return worker group list page
      */
     public Map<String,Object> queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
 
@@ -147,8 +150,8 @@ public class WorkerGroupService extends BaseService {
 
     /**
      * delete worker group by id
-     * @param id
-     * @return
+     * @param id worker group id
+     * @return delete result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String,Object> deleteWorkerGroupById(Integer id) {
@@ -168,7 +171,8 @@ public class WorkerGroupService extends BaseService {
 
     /**
      * query all worker group
-     * @return
+     *
+     * @return all worker group list
      */
     public Map<String,Object> queryAllGroup() {
         Map<String, Object> result = new HashMap<>(5);

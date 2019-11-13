@@ -53,7 +53,7 @@ public class ZookeeperMonitor extends AbstractZKClient{
 
 	/**
 	 * get master servers
-	 * @return
+	 * @return master server information
 	 */
 	public List<Server> getMasterServers(){
 	    return getServersList(ZKNodeType.MASTER);
@@ -61,7 +61,7 @@ public class ZookeeperMonitor extends AbstractZKClient{
 
 	/**
 	 * master construct is the same with worker, use the master instead
-	 * @return
+	 * @return worker server informations
 	 */
 	public List<Server> getWorkerServers(){
 	    return getServersList(ZKNodeType.WORKER);

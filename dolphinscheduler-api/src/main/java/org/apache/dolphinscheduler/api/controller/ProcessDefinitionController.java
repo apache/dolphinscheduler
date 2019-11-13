@@ -50,12 +50,14 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * create process definition
      * 
-     * @param loginUser
-     * @param projectName
-     * @param name
+     * @param loginUser login user
+     * @param projectName project name
+     * @param name process definition name
      * @param json process definition json
-     * @param description
-     * @return
+     * @param description description
+     * @param locations locations for nodes
+     * @param connects connects for nodes
+     * @return create result code
      */
     @ApiOperation(value = "save", notes= "CREATE_PROCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
@@ -91,10 +93,10 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * verify process definition name unique
      * 
-     * @param loginUser
-     * @param projectName
-     * @param name
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param name name
+     * @return true if process definition name not exists, otherwise false
      */
     @ApiOperation(value = "verify-name", notes = "VERIFY_PROCCESS_DEFINITION_NAME_NOTES")
     @ApiImplicitParams({
@@ -119,13 +121,15 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * update process definition
      *
-     * @param loginUser
-     * @param projectName
-     * @param name
-     * @param id
-     * @param processDefinitionJson
-     * @param description
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param name process definition name
+     * @param id process definition id
+     * @param processDefinitionJson process definition json
+     * @param description description
+     * @param locations locations for nodes
+     * @param connects connects for nodes
+     * @return update result code
      */
     @ApiOperation(value = "updateProccessDefinition", notes= "UPDATE_PROCCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
@@ -163,11 +167,11 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * release process definition
      *
-     * @param loginUser
-     * @param projectName
-     * @param processId
-     * @param releaseState
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process definition id
+     * @param releaseState release state
+     * @return release result code
      */
     @ApiOperation(value = "releaseProccessDefinition", notes= "RELEASE_PROCCESS_DEFINITION_NOTES")
     @ApiImplicitParams({
@@ -197,10 +201,10 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * query datail of process definition
      *
-     * @param loginUser
-     * @param projectName
-     * @param processId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processId process definition id
+     * @return process definition detail
      */
     @ApiOperation(value = "queryProccessDefinitionById", notes= "QUERY_PROCCESS_DEFINITION_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -227,9 +231,9 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * query proccess definition list
      *
-     * @param loginUser
-     * @param projectName
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @return process definition list
      */
     @ApiOperation(value = "queryProccessDefinitionList", notes= "QUERY_PROCCESS_DEFINITION_LIST_NOTES")
     @GetMapping(value="/list")
@@ -250,11 +254,13 @@ public class ProcessDefinitionController extends BaseController{
 
     /**
      * query proccess definition list paging
-     * @param loginUser
-     * @param projectName
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param userId user id
+     * @return process definition page
      */
     @ApiOperation(value = "queryProcessDefinitionListPaging", notes= "QUERY_PROCCESS_DEFINITION_LIST_PAGING_NOTES")
     @ApiImplicitParams({
@@ -290,10 +296,11 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * encapsulation treeview structure
      *
-     * @param loginUser
-     * @param projectName
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param id process definition id
+     * @param limit limit
+     * @return tree view json data
      */
     @ApiOperation(value = "viewTree", notes= "VIEW_TREE_NOTES")
     @ApiImplicitParams({
@@ -321,10 +328,10 @@ public class ProcessDefinitionController extends BaseController{
      * get tasks list by process definition id
      *  
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @return task list
      */
     @ApiOperation(value = "getNodeListByDefinitionId", notes= "GET_NODE_LIST_BY_DEFINITION_ID_NOTES")
     @ApiImplicitParams({
@@ -352,10 +359,10 @@ public class ProcessDefinitionController extends BaseController{
      * get tasks list by process definition id
      *
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionIdList
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionIdList process definition id list
+     * @return node list data
      */
     @ApiOperation(value = "getNodeListByDefinitionIdList", notes= "GET_NODE_LIST_BY_DEFINITION_ID_NOTES")
     @ApiImplicitParams({
@@ -382,10 +389,10 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * delete process definition by id
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @return delete result code
      */
     @ApiOperation(value = "deleteProcessDefinitionById", notes= "DELETE_PROCESS_DEFINITION_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -411,10 +418,10 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * batch delete process definition by ids
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionIds
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionIds process definition id list
+     * @return delete result code
      */
     @ApiOperation(value = "batchDeleteProcessDefinitionByIds", notes= "BATCH_DELETE_PROCESS_DEFINITION_BY_IDS_NOTES")
     @ApiImplicitParams({
@@ -440,10 +447,10 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * export process definition by id
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefinitionId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefinitionId process definition id
+     * @param response response
      */
     @ApiOperation(value = "exportProcessDefinitionById", notes= "EXPORT_PROCCESS_DEFINITION_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -469,8 +476,9 @@ public class ProcessDefinitionController extends BaseController{
     /**
      * query proccess definition all by project id
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param projectId  project id
+     * @return process definition list
      */
     @ApiOperation(value = "queryProccessDefinitionAllByProjectId", notes= "QUERY_PROCCESS_DEFINITION_All_BY_PROJECT_ID_NOTES")
     @GetMapping(value="/queryProccessDefinitionAllByProjectId")

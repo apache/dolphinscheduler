@@ -71,12 +71,14 @@ public class TenantService extends BaseService{
   /**
    * create tenant
    *
-   * @param loginUser
-   * @param tenantCode
-   * @param tenantName
-   * @param queueId
-   * @param desc
-   * @return
+   *
+   * @param loginUser login user
+   * @param tenantCode tenant code
+   * @param tenantName tenant name
+   * @param queueId queue id
+   * @param desc description
+   * @return create result code
+   * @throws Exception exception
    */
   @Transactional(rollbackFor = Exception.class)
   public Map<String,Object> createTenant(User loginUser,
@@ -129,11 +131,11 @@ public class TenantService extends BaseService{
   /**
    * query tenant list paging
    *
-   * @param loginUser
-   * @param searchVal
-   * @param pageNo
-   * @param pageSize
-   * @return
+   * @param loginUser login user
+   * @param searchVal search value
+   * @param pageNo page number
+   * @param pageSize page size
+   * @return tenant list page
    */
   public Map<String,Object> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
 
@@ -157,12 +159,14 @@ public class TenantService extends BaseService{
   /**
    * updateProcessInstance tenant
    *
-   * @param loginUser
-   * @param tenantCode
-   * @param tenantName
-   * @param queueId
-   * @param desc
-   * @return
+   * @param loginUser login user
+   * @param id tennat id
+   * @param tenantCode tennat code
+   * @param tenantName tennat name
+   * @param queueId queue id
+   * @param desc description
+   * @return update result code
+   * @throws Exception exception
    */
   public Map<String, Object>  updateTenant(User loginUser,int id,String tenantCode, String tenantName, int queueId, String desc) throws Exception {
 
@@ -224,10 +228,11 @@ public class TenantService extends BaseService{
 
   /**
    * delete tenant 
-   * 
-   * @param loginUser
-   * @param id
-   * @return
+   *
+   * @param loginUser login user
+   * @param id tenant id
+   * @return delete result code
+   * @throws Exception exception
    */
   @Transactional(rollbackFor = Exception.class)
   public Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception {
@@ -282,9 +287,9 @@ public class TenantService extends BaseService{
 
   /**
    * query tenant list
-   * 
-   * @param loginUser
-   * @return
+   *
+   * @param loginUser login user
+   * @return tenant list
    */
   public Map<String, Object> queryTenantList(User loginUser) {
 
@@ -299,9 +304,9 @@ public class TenantService extends BaseService{
 
   /**
    * verify tenant code
-   * 
-   * @param tenantCode
-   * @return
+   *
+   * @param tenantCode tenant code
+   * @return true if tenant code can user, otherwise return false
    */
   public Result verifyTenantCode(String tenantCode) {
     Result result=new Result();
@@ -318,8 +323,8 @@ public class TenantService extends BaseService{
   /**
    * check tenant exists
    *
-   * @param tenantCode
-   * @return
+   * @param tenantCode tenant code
+   * @return ture if the tenant code exists, otherwise return false
    */
   private boolean checkTenantExists(String tenantCode) {
       List<Tenant> tenants = tenantMapper.queryByTenantCode(tenantCode);

@@ -38,9 +38,9 @@ public class BaseController {
     /**
      * check params
      *
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return check result code
      */
     public Map<String, Object> checkPageParams(int pageNo, int pageSize) {
         Map<String, Object> result = new HashMap<>(2);
@@ -61,7 +61,7 @@ public class BaseController {
     /**
      * get ip address in the http request
      *
-     * @param request
+     * @param request http servlet request
      * @return client ip address
      */
     public static String getClientIpAddress(HttpServletRequest request) {
@@ -87,8 +87,8 @@ public class BaseController {
     /**
      * return data list
      *
-     * @param result
-     * @return
+     * @param result result code
+     * @return result code
      */
     public Result returnDataList(Map<String, Object> result) {
         Status status = (Status) result.get(Constants.STATUS);
@@ -105,8 +105,8 @@ public class BaseController {
 
     /**
      * return data list with paging
-     * @param result
-     * @return
+     * @param result result code
+     * @return result code
      */
     public Result returnDataListPaging(Map<String, Object> result) {
         Status status = (Status) result.get(Constants.STATUS);
@@ -125,7 +125,7 @@ public class BaseController {
     /**
      * success
      *
-     * @return
+     * @return success result code
      */
     public Result success() {
         Result result = new Result();
@@ -138,8 +138,8 @@ public class BaseController {
     /**
      * success does not need to return data
      *
-     * @param msg
-     * @return
+     * @param msg success message
+     * @return success result code
      */
     public Result success(String msg) {
         Result result = new Result();
@@ -152,9 +152,9 @@ public class BaseController {
     /**
      * return data no paging
      *
-     * @param msg
-     * @param list
-     * @return
+     * @param msg success message
+     * @param list data list
+     * @return success result code
      */
     public Result success(String msg, Object list) {
         Result result = getResult(msg, list);
@@ -164,8 +164,8 @@ public class BaseController {
     /**
      * return data no paging
      *
-     * @param list
-     * @return
+     * @param list success
+     * @return success result code
      */
     public Result success(Object list) {
         Result result = getResult(Status.SUCCESS.getMsg(), list);
@@ -176,9 +176,9 @@ public class BaseController {
      * return the data use Map format, for example, passing the value of key, value, passing a value
      * eg. "/user/add"  then return user name: zhangsan
      *
-     * @param msg
-     * @param object
-     * @return
+     * @param msg message
+     * @param object success object data
+     * @return success result code
      */
     public Result success(String msg, Map<String, Object> object) {
         Result result = getResult(msg, object);
@@ -188,10 +188,11 @@ public class BaseController {
     /**
      * return data with paging
      *
-     * @param totalList
-     * @param currentPage
-     * @param total
-     * @return
+     * @param totalList success object list
+     * @param currentPage current page
+     * @param total total
+     * @param totalPage  total page
+     * @return success result code
      */
     public Result success(Object totalList, Integer currentPage,
                                                   Integer total, Integer totalPage) {
@@ -211,9 +212,9 @@ public class BaseController {
     /**
      * error handle
      *
-     * @param code
-     * @param msg
-     * @return
+     * @param code result code
+     * @param msg result message
+     * @return error result code
      */
     public Result error(Integer code, String msg) {
         Result result = new Result();
@@ -225,9 +226,9 @@ public class BaseController {
     /**
      * put message to map
      *
-     * @param result
-     * @param status
-     * @param statusParams
+     * @param result result
+     * @param status status
+     * @param statusParams object messages
      */
     protected void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
         result.put(Constants.STATUS, status);
@@ -241,8 +242,9 @@ public class BaseController {
     /**
      * put message to result object
      *
-     * @param result
-     * @param status
+     * @param result result
+     * @param status status
+     * @param statusParams status parameters
      */
     protected void putMsg(Result result, Status status, Object... statusParams) {
         result.setCode(status.getCode());
@@ -257,9 +259,9 @@ public class BaseController {
 
     /**
      * get result
-     * @param msg
-     * @param list
-     * @return
+     * @param msg message
+     * @param list object list
+     * @return result code
      */
     private Result getResult(String msg, Object list) {
         Result result = new Result();
