@@ -438,37 +438,11 @@
 	</dependencyManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/lgcareer/EasyScheduler.git</connection>
-		<developerConnection>scm:git:https://github.com/lgcareer/EasyScheduler.git</developerConnection>
-		<url>https://github.com/lgcareer/EasyScheduler.git</url>
+		<connection>scm:git:https://github.com/analysys/EasyScheduler.git</connection>
+		<developerConnection>scm:git:https://github.com/analysys/EasyScheduler.git</developerConnection>
+		<url>https://github.com/analysys/EasyScheduler.git</url>
 		<tag>HEAD</tag>
 	</scm>
-
-	<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.6</version>
-						<configuration>
-							<descriptors>
-								<descriptor>package.xml</descriptor>
-							</descriptors>
-							<appendAssemblyId>false</appendAssemblyId>
-						</configuration>
-						<executions>
-							<execution>
-								<id>make-assembly</id>
-								<phase>package</phase>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 	<build>
 		<!--<resources>-->
