@@ -52,6 +52,11 @@ public class LoggerController extends BaseController {
 
     /**
      * query task log
+     * @param loginUser login user
+     * @param taskInstanceId task instance id
+     * @param skipNum skip number
+     * @param limit limit
+     * @return
      */
     @ApiOperation(value = "queryLog", notes= "QUERY_TASK_INSTANCE_LOG_NOTES")
     @ApiImplicitParams({

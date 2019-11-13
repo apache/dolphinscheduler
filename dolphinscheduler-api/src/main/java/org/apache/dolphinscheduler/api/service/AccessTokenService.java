@@ -49,11 +49,11 @@ public class AccessTokenService extends BaseService {
     /**
      * query access token list
      *
-     * @param loginUser
-     * @param searchVal
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return token list for page number and page size
      */
     public Map<String, Object> queryAccessTokenList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>(5);
@@ -74,32 +74,11 @@ public class AccessTokenService extends BaseService {
     }
 
     /**
-     * check
-     *
-     * @param result
-     * @param bool
-     * @param userNoOperationPerm
-     * @param status
-     * @return
-     */
-    private boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm, String status) {
-        //only admin can operate
-        if (bool) {
-            result.put(Constants.STATUS, userNoOperationPerm);
-            result.put(status, userNoOperationPerm.getMsg());
-            return true;
-        }
-        return false;
-    }
-
-
-    /**
      * create token
-     *
-     * @param userId
-     * @param expireTime
-     * @param token
-     * @return
+     * @param userId token for user
+     * @param expireTime token expire time
+     * @param token token string
+     * @return create result code
      */
     public Map<String, Object> createToken(int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>(5);
@@ -125,9 +104,9 @@ public class AccessTokenService extends BaseService {
 
     /**
      * generate token
-     * @param userId
-     * @param expireTime
-     * @return
+     * @param userId token for user
+     * @param expireTime token expire time
+     * @return token string
      */
     public Map<String, Object> generateToken(int userId, String expireTime) {
         Map<String, Object> result = new HashMap<>(5);
@@ -139,9 +118,9 @@ public class AccessTokenService extends BaseService {
 
     /**
      *  delete access token
-     * @param loginUser
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param id token id
+     * @return delete result code
      */
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>(5);
@@ -167,11 +146,11 @@ public class AccessTokenService extends BaseService {
 
     /**
      * update token by id
-     * @param id
-     * @param userId
-     * @param expireTime
-     * @param token
-     * @return
+     * @param id token id
+     * @param userId token for user
+     * @param expireTime token expire time
+     * @param token token string
+     * @return update result code
      */
     public Map<String, Object> updateToken(int id,int userId, String expireTime, String token) {
         Map<String, Object> result = new HashMap<>(5);

@@ -53,13 +53,13 @@ public class UsersController extends BaseController{
     /**
      * create user
      * 
-     * @param loginUser
-     * @param userName
-     * @param userPassword
-     * @param email
-     * @param tenantId
-     * @param phone
-     * @return
+     * @param loginUser login user
+     * @param userName user name
+     * @param userPassword user password
+     * @param email email
+     * @param tenantId tenant id
+     * @param phone phone
+     * @return create result code
      */
     @ApiOperation(value = "createUser", notes= "CREATE_USER_NOTES")
     @ApiImplicitParams({
@@ -94,11 +94,11 @@ public class UsersController extends BaseController{
     /**
      * query user list paging
      *
-     * @param loginUser
-     * @param pageNo
-     * @param searchVal
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param pageNo page number
+     * @param searchVal search avlue
+     * @param pageSize page size
+     * @return user list page
      */
     @ApiOperation(value = "queryUserList", notes= "QUERY_USER_LIST_NOTES")
     @ApiImplicitParams({
@@ -132,14 +132,14 @@ public class UsersController extends BaseController{
     /**
      * update user
      *
-     * @param loginUser
-     * @param id
-     * @param userName
-     * @param userPassword
-     * @param email
-     * @param tenantId
-     * @param phone
-     * @return
+     * @param loginUser login user
+     * @param id user id
+     * @param userName user name
+     * @param userPassword user password
+     * @param email email
+     * @param tenantId tennat id
+     * @param phone phone
+     * @return update result code
      */
     @ApiOperation(value = "updateUser", notes= "UPDATE_USER_NOTES")
     @ApiImplicitParams({
@@ -174,9 +174,9 @@ public class UsersController extends BaseController{
 
     /**
      * delete user by id
-     * @param loginUser
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param id user id
+     * @return delete result code
      */
     @ApiOperation(value = "delUserById", notes= "DELETE_USER_BY_ID_NOTES")
     @ApiImplicitParams({
@@ -199,9 +199,10 @@ public class UsersController extends BaseController{
     /**
      * grant project
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectIds project id array
+     * @return grant result code
      */
     @ApiOperation(value = "grantProject", notes= "GRANT_PROJECT_NOTES")
     @ApiImplicitParams({
@@ -226,9 +227,10 @@ public class UsersController extends BaseController{
     /**
      * grant resource
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @param resourceIds resource id array
+     * @return grant result code
      */
     @ApiOperation(value = "grantResource", notes= "GRANT_RESOURCE_NOTES")
     @ApiImplicitParams({
@@ -254,9 +256,10 @@ public class UsersController extends BaseController{
     /**
      * grant udf function
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @param udfIds udf id array
+     * @return grant result code
      */
     @ApiOperation(value = "grantUDFFunc", notes= "GRANT_UDF_FUNC_NOTES")
     @ApiImplicitParams({
@@ -283,9 +286,10 @@ public class UsersController extends BaseController{
     /**
      * grant datasource
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @param datasourceIds  data source id array
+     * @return grant result code
      */
     @ApiOperation(value = "grantDataSource", notes= "GRANT_DATASOURCE_NOTES")
     @ApiImplicitParams({
@@ -311,8 +315,8 @@ public class UsersController extends BaseController{
     /**
      * get user info
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return user info
      */
     @ApiOperation(value = "getUserInfo", notes= "GET_USER_INFO_NOTES")
     @GetMapping(value="/get-user-info")
@@ -331,8 +335,8 @@ public class UsersController extends BaseController{
     /**
      * user list no paging
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return user list
      */
     @ApiOperation(value = "listUser", notes= "LIST_USER_NOTES")
     @GetMapping(value="/list")
@@ -352,8 +356,8 @@ public class UsersController extends BaseController{
     /**
      * user list no paging
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return user list
      */
     @GetMapping(value="/list-all")
     @ResponseStatus(HttpStatus.OK)
@@ -372,9 +376,9 @@ public class UsersController extends BaseController{
     /**
      * verify username
      *
-     * @param loginUser
-     * @param userName
-     * @return
+     * @param loginUser login user
+     * @param userName user name
+     * @return true if user name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyUserName", notes= "VERIFY_USER_NAME_NOTES")
     @ApiImplicitParams({
@@ -400,9 +404,9 @@ public class UsersController extends BaseController{
     /**
      * unauthorized user
      *
-     * @param loginUser
-     * @param alertgroupId
-     * @return
+     * @param loginUser login user
+     * @param alertgroupId alert group id
+     * @return unauthorize result code
      */
     @ApiOperation(value = "unauthorizedUser", notes= "UNAUTHORIZED_USER_NOTES")
     @ApiImplicitParams({
@@ -427,9 +431,9 @@ public class UsersController extends BaseController{
     /**
      * authorized user
      *
-     * @param loginUser
-     * @param alertgroupId
-     * @return
+     * @param loginUser login user
+     * @param alertgroupId alert group id
+     * @return authorized result code
      */
     @ApiOperation(value = "authorizedUser", notes= "AUTHORIZED_USER_NOTES")
     @ApiImplicitParams({

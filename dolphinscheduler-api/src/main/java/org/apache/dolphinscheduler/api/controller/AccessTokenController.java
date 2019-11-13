@@ -54,8 +54,11 @@ public class AccessTokenController extends BaseController{
 
     /**
      * create token
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param userId token for user id
+     * @param expireTime expire time for the token
+     * @param token token
+     * @return create result state code
      */
     @ApiIgnore
     @PostMapping(value = "/create")
@@ -77,9 +80,11 @@ public class AccessTokenController extends BaseController{
     }
 
     /**
-     * create token
-     * @param loginUser
-     * @return
+     * generate token string
+     * @param loginUser login user
+     * @param userId token for user
+     * @param expireTime expire time
+     * @return token string
      */
     @ApiIgnore
     @PostMapping(value = "/generate")
@@ -100,11 +105,11 @@ public class AccessTokenController extends BaseController{
     /**
      * query access token list paging
      *
-     * @param loginUser
-     * @param pageNo
-     * @param searchVal
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param pageNo page number
+     * @param searchVal search value
+     * @param pageSize page size
+     * @return token list of page number and page size
      */
     @ApiOperation(value = "queryAccessTokenList", notes= "QUERY_ACCESS_TOKEN_LIST_NOTES")
     @ApiImplicitParams({
@@ -136,9 +141,9 @@ public class AccessTokenController extends BaseController{
 
     /**
      * delete access token by id
-     * @param loginUser
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param id token id
+     * @return delete result code
      */
     @ApiIgnore
     @PostMapping(value = "/delete")
@@ -158,8 +163,12 @@ public class AccessTokenController extends BaseController{
 
     /**
      * update token
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param id token id
+     * @param userId token for user
+     * @param expireTime token expire time
+     * @param token token string
+     * @return update result code
      */
     @ApiIgnore
     @PostMapping(value = "/update")

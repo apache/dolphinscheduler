@@ -83,7 +83,7 @@ public class ExecutorService extends BaseService{
      * @param receivers             receivers
      * @param receiversCc           receivers cc
      * @param timeout               timeout
-     * @return
+     * @return execute process instance code
      */
     public Map<String, Object> execProcessInstance(User loginUser, String projectName,
                                                    int processDefinitionId, String cronTime, CommandType commandType,
@@ -142,9 +142,9 @@ public class ExecutorService extends BaseService{
     /**
      * check whether the process definition can be executed
      *
-     * @param processDefinition
-     * @param processDefineId
-     * @return
+     * @param processDefinition process definition
+     * @param processDefineId process definition id
+     * @return check result code
      */
     public Map<String, Object> checkProcessDefinitionValid(ProcessDefinition processDefinition, int processDefineId){
         Map<String, Object> result = new HashMap<>(5);
@@ -165,11 +165,11 @@ public class ExecutorService extends BaseService{
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop
      *
-     * @param loginUser
-     * @param projectName
-     * @param processInstanceId
-     * @param executeType
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processInstanceId process instance id
+     * @param executeType execute type
+     * @return execute result code
      */
     public Map<String, Object> execute(User loginUser, String projectName, Integer processInstanceId, ExecuteType executeType) {
         Map<String, Object> result = new HashMap<>(5);
@@ -246,8 +246,8 @@ public class ExecutorService extends BaseService{
 
     /**
      * check tenant suitable
-     * @param processDefinition
-     * @return
+     * @param processDefinition process definition
+     * @return true if tenant suitable, otherwise return false
      */
     private boolean checkTenantSuitable(ProcessDefinition processDefinition) {
         // checkTenantExists();
@@ -262,9 +262,9 @@ public class ExecutorService extends BaseService{
     /**
      * Check the state of process instance and the type of operation match
      *
-     * @param processInstance
-     * @param executeType
-     * @return
+     * @param processInstance process instance
+     * @param executeType execute type
+     * @return check result code
      */
     private Map<String, Object> checkExecuteType(ProcessInstance processInstance, ExecuteType executeType) {
 
@@ -306,9 +306,9 @@ public class ExecutorService extends BaseService{
     /**
      * update process instance state
      *
-     * @param processInstanceId
-     * @param executionStatus
-     * @return
+     * @param processInstanceId process instance id
+     * @param executionStatus execute status
+     * @return update result
      */
     private Map<String, Object> updateProcessInstanceState(Integer processInstanceId, ExecutionStatus executionStatus) {
         Map<String, Object> result = new HashMap<>(5);
@@ -326,11 +326,11 @@ public class ExecutorService extends BaseService{
     /**
      * insert command, used in the implementation of the page, re run, recovery (pause / failure) execution
      *
-     * @param loginUser
-     * @param instanceId
-     * @param processDefinitionId
-     * @param commandType
-     * @return
+     * @param loginUser login user
+     * @param instanceId instance id
+     * @param processDefinitionId process definition id
+     * @param commandType command type
+     * @return insert result code
      */
     private Map<String, Object> insertCommand(User loginUser, Integer instanceId, Integer processDefinitionId, CommandType commandType) {
         Map<String, Object> result = new HashMap<>(5);
@@ -358,9 +358,9 @@ public class ExecutorService extends BaseService{
     }
 
     /**
-     * check if subprocesses are offline before starting process definition
-     * @param processDefineId
-     * @return
+     * check if sub processes are offline before starting process definition
+     * @param processDefineId process definition id
+     * @return check result code
      */
     public Map<String, Object> startCheckByProcessDefinedId(int processDefineId) {
         Map<String, Object> result = new HashMap<String, Object>();
@@ -396,8 +396,9 @@ public class ExecutorService extends BaseService{
     /**
      * query recipients and copyers by process definition id or processInstanceId
      *
-     * @param processDefineId
-     * @return
+     * @param processDefineId process definition id
+     * @param processInstanceId process instance id
+     * @return receivers cc list
      */
     public Map<String, Object> getReceiverCc(Integer processDefineId,Integer processInstanceId) {
         Map<String, Object> result = new HashMap<>();

@@ -38,8 +38,8 @@ public class FileUtils {
     /**
      * copy source file to target file
      *
-     * @param file
-     * @param destFilename
+     * @param file file
+     * @param destFilename destination file name
      */
 
     public static void copyFile(MultipartFile file, String destFilename) {
@@ -61,8 +61,9 @@ public class FileUtils {
     /**
      * file to resource
      *
-     * @param filename
-     * @return
+     * @param filename file name
+     * @return resource
+     * @throws MalformedURLException io exceptions
      */
     public static Resource file2Resource(String filename) throws MalformedURLException {
         Path file = Paths.get(filename);

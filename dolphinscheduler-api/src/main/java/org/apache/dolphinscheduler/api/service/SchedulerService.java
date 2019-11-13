@@ -82,14 +82,17 @@ public class SchedulerService extends BaseService {
     /**
      * save schedule
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefineId
-     * @param schedule
-     * @param warningType
-     * @param warningGroupId
-     * @param failureStrategy
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefineId process definition id
+     * @param schedule scheduler
+     * @param warningType  warning type
+     * @param warningGroupId warning group id
+     * @param failureStrategy failure strategy
+     * @param processInstancePriority process instance priority
+     * @param receivers receivers
+     * @param receiversCc receivers cc
+     * @return create result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> insertSchedule(User loginUser, String projectName, Integer processDefineId, String schedule, WarningType warningType,
@@ -162,16 +165,14 @@ public class SchedulerService extends BaseService {
     /**
      * updateProcessInstance schedule
      *
-     * @param loginUser
-     * @param projectName
-     * @param id
-     * @param scheduleExpression
-     * @param warningType
-     * @param warningGroupId
-     * @param failureStrategy
-     * @param scheduleStatus
-     * @param workerGroupId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param id scheduler id
+     * @param scheduleExpression scheduler
+     * @param warningType warning type
+     * @param warningGroupId warning group id
+     * @param failureStrategy failure strategy
+     * @return update result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> updateSchedule(User loginUser, String projectName, Integer id, String scheduleExpression, WarningType warningType,
@@ -261,11 +262,12 @@ public class SchedulerService extends BaseService {
     /**
      * set schedule online or offline
      *
-     * @param loginUser
-     * @param projectName
-     * @param id
-     * @param scheduleStatus
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param id scheduler id
+     * @param scheduleStatus  schedule status
+     * @return publish result code
+     * @throws Exception some exceptions when operation quartz
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> setScheduleState(User loginUser, String projectName, Integer id, ReleaseState scheduleStatus) {
@@ -375,10 +377,13 @@ public class SchedulerService extends BaseService {
     /**
      * query schedule
      *
-     * @param loginUser
-     * @param projectName
-     * @param processDefineId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param processDefineId process definition id
+     * @param pageNo page number
+     * @param pageSize  page size
+     * @param searchVal search value
+     * @return schedule list page
      */
     public Map<String, Object> querySchedule(User loginUser, String projectName, Integer processDefineId, String searchVal, Integer pageNo, Integer pageSize) {
 
@@ -415,9 +420,9 @@ public class SchedulerService extends BaseService {
     /**
      * query schedule list
      *
-     * @param loginUser
-     * @param projectName
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @return schedule list
      */
     public Map<String, Object> queryScheduleList(User loginUser, String projectName) {
         Map<String, Object> result = new HashMap<>(5);
@@ -437,11 +442,6 @@ public class SchedulerService extends BaseService {
         return result;
     }
 
-    /**
-     * set schedule
-     *
-     * @see
-     */
     public void setSchedule(int projectId, int scheduleId) throws RuntimeException{
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, scheduleId);
 
@@ -484,10 +484,10 @@ public class SchedulerService extends BaseService {
     /**
      * check valid
      *
-     * @param result
-     * @param bool
-     * @param status
-     * @return
+     * @param result result
+     * @param bool bool
+     * @param status status
+     * @return check result code
      */
     private boolean checkValid(Map<String, Object> result, boolean bool, Status status) {
         // timeout is valid
@@ -501,10 +501,10 @@ public class SchedulerService extends BaseService {
     /**
      * delete schedule by id
      *
-     * @param loginUser
-     * @param projectName
-     * @param scheduleId
-     * @return
+     * @param loginUser login user
+     * @param projectName project name
+     * @param scheduleId scheule id
+     * @return delete result code
      */
     public Map<String, Object> deleteScheduleById(User loginUser, String projectName, Integer scheduleId) {
 
@@ -550,10 +550,11 @@ public class SchedulerService extends BaseService {
 
     /**
      * preview schedule
-     * @param loginUser
-     * @param projectName
-     * @param schedule
-     * @return
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @param schedule schedule expression
+     * @return the next five fire time
      */
     public Map<String,Object> previewSchedule(User loginUser, String projectName, String schedule) {
         Map<String, Object> result = new HashMap<>(5);

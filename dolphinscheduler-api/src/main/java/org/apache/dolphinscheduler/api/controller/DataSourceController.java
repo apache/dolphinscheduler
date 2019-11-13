@@ -53,18 +53,18 @@ public class DataSourceController extends BaseController {
 
     /**
      * create data source
-     * @param loginUser
-     * @param name
-     * @param note
-     * @param type
-     * @param host
-     * @param port
-     * @param database
-     * @param principal
-     * @param userName
-     * @param password
-     * @param other
-     * @return
+     * @param loginUser login user
+     * @param name data source name
+     * @param note  data source description
+     * @param type data source type
+     * @param host host
+     * @param port port
+     * @param database data base
+     * @param principal principal
+     * @param userName user name
+     * @param password password
+     * @param other other arguments
+     * @return create result code
      */
     @ApiOperation(value = "createDataSource", notes= "CREATE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
@@ -108,12 +108,12 @@ public class DataSourceController extends BaseController {
     /**
      * updateProcessInstance data source
      *
-     * @param loginUser
-     * @param name
-     * @param note
-     * @param type
-     * @param other
-     * @return
+     * @param loginUser login user
+     * @param name data source name
+     * @param note description
+     * @param type data source type
+     * @param other other arguments
+     * @return update result code
      */
     @ApiOperation(value = "updateDataSource", notes= "UPDATE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
@@ -157,11 +157,11 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * query data source
+     * query data source detail
      *
-     * @param loginUser
-     * @param id
-     * @return
+     * @param loginUser login user
+     * @param id datasource id
+     * @return data source detail
      */
     @ApiOperation(value = "queryDataSource", notes= "QUERY_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
@@ -188,8 +188,9 @@ public class DataSourceController extends BaseController {
     /**
      * query datasouce by type
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @param type data source type
+     * @return data source list page
      */
     @ApiOperation(value = "queryDataSourceList", notes= "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
     @ApiImplicitParams({
@@ -211,11 +212,11 @@ public class DataSourceController extends BaseController {
     /**
      * query datasource with paging
      *
-     * @param loginUser
-     * @param searchVal
-     * @param pageNo
-     * @param pageSize
-     * @return
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return data source list page
      */
     @ApiOperation(value = "queryDataSourceListPaging", notes= "QUERY_DATA_SOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
@@ -244,14 +245,14 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * connec datasource
+     * connect datasource
      *
-     * @param loginUser
-     * @param name
-     * @param note
-     * @param type
-     * @param other
-     * @return
+     * @param loginUser login user
+     * @param name data source name
+     * @param note data soruce description
+     * @param type data source type
+     * @param other other parameters
+     * @return connect result code
      */
     @ApiOperation(value = "connectDataSource", notes= "CONNECT_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
@@ -333,9 +334,9 @@ public class DataSourceController extends BaseController {
     /**
      * delete datasource by id
      *
-     * @param loginUser
+     * @param loginUser login user
      * @param id datasource id
-     * @return
+     * @return delete result
      */
     @ApiOperation(value = "delete", notes= "DELETE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
@@ -357,9 +358,9 @@ public class DataSourceController extends BaseController {
     /**
      * verify datasource name
      *
-     * @param loginUser
-     * @param name
-     * @return
+     * @param loginUser login user
+     * @param name data source name
+     * @return true if data source name not exists.otherwise return false
      */
     @ApiOperation(value = "verifyDataSourceName", notes= "VERIFY_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
@@ -386,9 +387,9 @@ public class DataSourceController extends BaseController {
     /**
      * unauthorized datasource
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return unauthed data source result code
      */
     @ApiOperation(value = "unauthDatasource", notes= "UNAUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
@@ -413,9 +414,9 @@ public class DataSourceController extends BaseController {
     /**
      * authorized datasource
      *
-     * @param loginUser
-     * @param userId
-     * @return
+     * @param loginUser login user
+     * @param userId user id
+     * @return authorized result code
      */
     @ApiOperation(value = "authedDatasource", notes= "AUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
@@ -439,8 +440,8 @@ public class DataSourceController extends BaseController {
     /**
      * get user info
      *
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return user info data
      */
     @ApiOperation(value = "getKerberosStartupState", notes= "GET_USER_INFO_NOTES")
     @GetMapping(value="/kerberos-startup-state")
