@@ -12,8 +12,8 @@
   <name>${project.artifactId}</name>
 
   <properties>
-    <node.version>v10.15.1</node.version>
-    <npm.version>6.4.1</npm.version>
+    <node.version>v12.12.0</node.version>
+    <npm.version>6.11.3</npm.version>
   </properties>
 
   <build>
@@ -51,16 +51,6 @@
             <phase>generate-resources</phase>
             <configuration>
               <arguments>install</arguments>
-            </configuration>
-          </execution>
-          <execution>
-            <id>npm run unit</id>
-            <phase>test</phase>
-            <goals>
-              <goal>npm</goal>
-            </goals>
-            <configuration>
-              <arguments>run unit</arguments>
             </configuration>
           </execution>
           <execution>
