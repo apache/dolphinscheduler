@@ -3,7 +3,7 @@
     <parent>
         <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <version>1.2.1-SNAPSHOT</version>
+        <version>1.2.0-release-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -14,6 +14,7 @@
     </properties>-->
     <modules>
         <module>dolphinscheduler-backend</module>
+        <module>dolphinscheduler-front</module>
         <module>dolphinscheduler-src</module>
     </modules>
 

@@ -176,22 +176,6 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-ui/dist</directory>
-			<includes>
-				<include>**/*.*</include>
-			</includes>
-			<outputDirectory>./ui/dist</outputDirectory>
-		</fileSet>
-
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-ui</directory>
-			<includes>
-				<include>install-dolphinscheduler-ui.sh</include>
-			</includes>
-			<outputDirectory>./ui</outputDirectory>
-		</fileSet>
-
-		<fileSet>
 			<directory>${basedir}/../../sql</directory>
 			<includes>
 				<include>**/*</include>
