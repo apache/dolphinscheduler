@@ -16,17 +16,17 @@
  */
 package org.apache.dolphinscheduler.server.worker.shell;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.LoggerUtils;
+import org.apache.dolphinscheduler.server.utils.SpringApplication;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import com.alibaba.fastjson.JSONObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class ShellCommandExecutorTest {
 
     @Before
     public void before(){
-        processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+        processDao = SpringApplication.getBean(ProcessDao.class);
     }
 
     @Test
