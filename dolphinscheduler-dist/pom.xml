@@ -9,9 +9,10 @@
 
     <artifactId>dolphinscheduler-dist</artifactId>
     <packaging>pom</packaging>
-    <!--<properties>
+    <name>${project.artifactId}</name>
+    <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>-->
+    </properties>
     <modules>
         <module>dolphinscheduler-backend</module>
         <module>dolphinscheduler-front</module>
