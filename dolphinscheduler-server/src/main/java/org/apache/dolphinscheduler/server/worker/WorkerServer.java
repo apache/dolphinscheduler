@@ -121,7 +121,7 @@ public class WorkerServer extends AbstractServer {
      * @param args arguments
      */
     public static void main(String[] args) {
-        SpringApplication.run(WorkerServer.class);
+        SpringApplication.run(WorkerServer.class,args);
     }
 
 

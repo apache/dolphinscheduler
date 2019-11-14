@@ -81,7 +81,7 @@ public class MasterServer extends AbstractServer {
      * @param args arguments
      */
     public static void main(String[] args) {
-        SpringApplication.run(MasterServer.class);
+        SpringApplication.run(MasterServer.class, args);
 
     }
 
