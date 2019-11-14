@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.LoggerUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplication;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -47,7 +47,7 @@ public class ShellCommandExecutorTest {
 
     @Before
     public void before(){
-        processDao = SpringApplication.getBean(ProcessDao.class);
+        processDao = SpringApplicationContext.getBean(ProcessDao.class);
     }
 
     @Test

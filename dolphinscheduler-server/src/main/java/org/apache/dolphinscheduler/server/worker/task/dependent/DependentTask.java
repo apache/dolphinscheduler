@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.SpringApplication;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.slf4j.Logger;
@@ -88,7 +88,7 @@ public class DependentTask extends AbstractTask {
                             taskModel.getDependItemList(), taskModel.getRelation()));
         }
 
-        this.processDao = SpringApplication.getBean(ProcessDao.class);
+        this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
 
         if(taskProps.getScheduleTime() != null){
             this.dependentDate = taskProps.getScheduleTime();
