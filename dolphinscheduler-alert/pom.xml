@@ -7,6 +7,7 @@
         <version>1.2.0-release-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-alert</artifactId>
+    <name>${project.artifactId}</name>
     <packaging>jar</packaging>
 
     <properties>
@@ -120,7 +121,7 @@
                     </execution>
                 </executions>
             </plugin>-->
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -128,7 +129,7 @@
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 

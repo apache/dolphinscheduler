@@ -4,7 +4,6 @@
 	<groupId>org.apache.dolphinscheduler</groupId>
 	<artifactId>dolphinscheduler</artifactId>
 	<version>1.2.0-release-SNAPSHOT</version>
-
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
 	<url>http://dolphinscheduler.apache.org</url>
