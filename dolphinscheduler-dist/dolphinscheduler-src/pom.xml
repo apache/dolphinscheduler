@@ -8,6 +8,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-src</artifactId>
+    <name>${project.artifactId}</name>
 
     <profiles>
         <profile>
