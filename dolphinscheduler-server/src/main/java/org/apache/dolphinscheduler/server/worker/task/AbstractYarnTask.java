@@ -16,13 +16,11 @@
  */
 package org.apache.dolphinscheduler.server.worker.task;
 
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
+import org.apache.dolphinscheduler.server.utils.SpringApplication;
 import org.slf4j.Logger;
-
-import java.io.IOException;
 
 /**
  *  abstract yarn task
@@ -50,7 +48,7 @@ public abstract class AbstractYarnTask extends AbstractTask {
    */
   public AbstractYarnTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
-    this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+    this.processDao = SpringApplication.getBean(ProcessDao.class);
     this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
             taskProps.getTaskDir(),
             taskProps.getTaskAppId(),

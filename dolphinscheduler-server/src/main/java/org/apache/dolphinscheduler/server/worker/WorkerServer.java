@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.AbstractServer;
@@ -76,7 +75,8 @@ public class WorkerServer extends AbstractServer {
     /**
      *  alert database access
      */
-    private final AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);;
+    @Autowired
+    private AlertDao alertDao;
 
     /**
      * heartbeat thread pool
