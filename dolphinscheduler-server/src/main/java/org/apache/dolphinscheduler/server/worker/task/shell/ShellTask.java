@@ -23,9 +23,9 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
+import org.apache.dolphinscheduler.server.utils.SpringApplication;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -84,7 +84,7 @@ public class ShellTask extends AbstractTask {
             taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(),
             logger);
-    this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+    this.processDao = SpringApplication.getBean(ProcessDao.class);
   }
 
   @Override

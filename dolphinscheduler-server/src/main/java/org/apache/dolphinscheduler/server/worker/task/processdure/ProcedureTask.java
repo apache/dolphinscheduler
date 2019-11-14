@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.processdure;
 
+import com.alibaba.fastjson.JSONObject;
+import com.cronutils.utils.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
@@ -27,14 +29,12 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
+import org.apache.dolphinscheduler.server.utils.SpringApplication;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import com.alibaba.fastjson.JSONObject;
-import com.cronutils.utils.StringUtils;
 import org.slf4j.Logger;
 
 import java.sql.*;
@@ -82,7 +82,7 @@ public class ProcedureTask extends AbstractTask {
             throw new RuntimeException("procedure task params is not valid");
         }
 
-        this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+        this.processDao = SpringApplication.getBean(ProcessDao.class);
     }
 
     @Override

@@ -23,10 +23,10 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.utils.SpringApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class DependentExecute {
     /**
      * process dao
      */
-    private static final ProcessDao processDao = DaoFactory.getDaoInstance(ProcessDao.class);
+    private static final ProcessDao processDao = SpringApplication.getBean(ProcessDao.class);
 
     /**
      * depend item list
