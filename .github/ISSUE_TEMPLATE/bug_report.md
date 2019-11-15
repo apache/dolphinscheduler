@@ -26,7 +26,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 
-**Which version of Easy Scheduler:**
+**Which version of Dolphin Scheduler:**
  -[1.1.0-preview]
 
 **Additional context**
