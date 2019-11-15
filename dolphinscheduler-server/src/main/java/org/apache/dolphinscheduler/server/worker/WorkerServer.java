@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.AbstractServer;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.runner.FetchTaskThread;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
 import org.slf4j.Logger;
@@ -44,7 +45,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.ComponentScan;
 
+import javax.annotation.PostConstruct;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +67,8 @@ public class WorkerServer extends AbstractServer {
     /**
      *  zk worker client
      */
-    private static ZKWorkerClient zkWorkerClient = null;
+    private ZKWorkerClient zkWorkerClient = null;
+
 
     /**
      *  process database access
@@ -81,7 +85,7 @@ public class WorkerServer extends AbstractServer {
     /**
      * heartbeat thread pool
      */
-    private ScheduledExecutorService heartbeatWorerService;
+    private ScheduledExecutorService heartbeatWorkerService;
 
     /**
      * task queue impl
@@ -98,10 +102,35 @@ public class WorkerServer extends AbstractServer {
      */
     private ExecutorService fetchTaskExecutorService;
 
-    public WorkerServer(){
+    /**
+     *  spring application context
+     *  only use it for initialization
+     */
+    @Autowired
+    private SpringApplicationContext springApplicationContext;
+
+    /**
+     * CountDownLatch latch
+     */
+    private CountDownLatch latch;
+
+    /**
+     * master server startup
+     *
+     * master server not use web service
+     * @param args arguments
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(WorkerServer.class,args);
     }
 
-    public WorkerServer(ProcessDao processDao){
+
+    /**
+     * worker server run
+     */
+    @PostConstruct
+    public void run(){
+
         try {
             conf = new PropertiesConfiguration(Constants.WORKER_PROPERTIES_PATH);
         }catch (ConfigurationException e){
@@ -116,47 +145,12 @@ public class WorkerServer extends AbstractServer {
         this.killExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Kill-Thread-Executor");
 
         this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
-    }
-
-    /**
-     * master server startup
-     *
-     * master server not use web service
-     * @param args arguments
-     */
-    public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(WorkerServer.class);
-
-        app.run(args);
-    }
-
-
-    @Override
-    public void run(String... args) throws Exception {
-        // set the name of the current thread
-        Thread.currentThread().setName("Worker-Main-Thread");
-
-        WorkerServer workerServer = new WorkerServer(processDao);
-
-        workerServer.run(processDao);
-
-        logger.info("worker server started");
-
-        // blocking
-        workerServer.awaitTermination();
-    }
-
-    /**
-     * worker server run
-     * @param processDao process dao
-     */
-    public void run(ProcessDao processDao){
 
         //  heartbeat interval
         heartBeatInterval = conf.getInt(Constants.WORKER_HEARTBEAT_INTERVAL,
                 Constants.defaultWorkerHeartbeatInterval);
 
-        heartbeatWorerService = ThreadUtils.newDaemonThreadScheduledExecutor("Worker-Heartbeat-Thread-Executor", Constants.defaulWorkerHeartbeatThreadNum);
+        heartbeatWorkerService = ThreadUtils.newDaemonThreadScheduledExecutor("Worker-Heartbeat-Thread-Executor", Constants.defaulWorkerHeartbeatThreadNum);
 
         // heartbeat thread implement
         Runnable heartBeatThread = heartBeatThread();
@@ -165,14 +159,24 @@ public class WorkerServer extends AbstractServer {
 
         // regular heartbeat
         // delay 5 seconds, send heartbeat every 30 seconds
-        heartbeatWorerService.
-                scheduleAtFixedRate(heartBeatThread, 5, heartBeatInterval, TimeUnit.SECONDS);
+        heartbeatWorkerService.scheduleAtFixedRate(heartBeatThread, 5, heartBeatInterval, TimeUnit.SECONDS);
 
         // kill process thread implement
-        Runnable killProcessThread = getKillProcessThread(processDao);
+        Runnable killProcessThread = getKillProcessThread();
 
         // submit kill process thread
         killExecutorService.execute(killProcessThread);
+
+
+
+        // get worker number of concurrent tasks
+        int taskNum = conf.getInt(Constants.WORKER_FETCH_TASK_NUM,Constants.defaultWorkerFetchTaskNum);
+
+        // new fetch task thread
+        FetchTaskThread fetchTaskThread = new FetchTaskThread(taskNum,zkWorkerClient, processDao,conf, taskQueue);
+
+        // submit fetch task thread
+        fetchTaskExecutorService.execute(fetchTaskThread);
 
         /**
          * register hooks, which are called before the process exits
@@ -190,14 +194,12 @@ public class WorkerServer extends AbstractServer {
             }
         }));
 
-        // get worker number of concurrent tasks
-        int taskNum = conf.getInt(Constants.WORKER_FETCH_TASK_NUM,Constants.defaultWorkerFetchTaskNum);
-
-        // new fetch task thread
-        FetchTaskThread fetchTaskThread = new FetchTaskThread(taskNum,zkWorkerClient, processDao,conf, taskQueue);
-
-        // submit fetch task thread
-        fetchTaskExecutorService.execute(fetchTaskThread);
+        //let the main thread await
+        latch = new CountDownLatch(1);
+        try {
+            latch.await();
+        } catch (InterruptedException ignore) {
+        }
     }
 
     @Override
@@ -222,7 +224,7 @@ public class WorkerServer extends AbstractServer {
             }
 
             try {
-                heartbeatWorerService.shutdownNow();
+                heartbeatWorkerService.shutdownNow();
             }catch (Exception e){
                 logger.warn("heartbeat service stopped exception");
             }
@@ -255,13 +257,9 @@ public class WorkerServer extends AbstractServer {
             }catch (Exception e){
                 logger.warn("zookeeper service stopped exception:{}",e.getMessage());
             }
+            latch.countDown();
             logger.info("zookeeper service stopped");
 
-            //notify
-            synchronized (lock) {
-                terminated = true;
-                lock.notifyAll();
-            }
         } catch (Exception e) {
             logger.error("worker server stop exception : " + e.getMessage(), e);
             System.exit(-1);
@@ -295,7 +293,7 @@ public class WorkerServer extends AbstractServer {
      *
      * @return kill process thread
      */
-    private Runnable getKillProcessThread(ProcessDao processDao){
+    private Runnable getKillProcessThread(){
         Runnable killProcessThread  = new Runnable() {
             @Override
             public void run() {
