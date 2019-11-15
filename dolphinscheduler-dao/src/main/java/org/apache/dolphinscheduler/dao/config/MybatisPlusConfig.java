@@ -33,7 +33,7 @@ public class MybatisPlusConfig {
      * @return pagination interceptor
      */
     @Bean
-    public PaginationInterceptor paginationInterceptor() {
+    public static PaginationInterceptor paginationInterceptor() {
         return new PaginationInterceptor();
     }
 

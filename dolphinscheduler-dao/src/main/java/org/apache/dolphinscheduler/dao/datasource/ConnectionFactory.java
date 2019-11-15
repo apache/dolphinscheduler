@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.dao.config.MybatisPlusConfig;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -122,6 +123,7 @@ public class ConnectionFactory {
                     configuration.setEnvironment(environment);
                     configuration.setLazyLoadingEnabled(true);
                     configuration.addMappers("org.apache.dolphinscheduler.dao.mapper");
+                    configuration.addInterceptor(MybatisPlusConfig.paginationInterceptor());
 
                     MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
                     sqlSessionFactoryBean.setConfiguration(configuration);
