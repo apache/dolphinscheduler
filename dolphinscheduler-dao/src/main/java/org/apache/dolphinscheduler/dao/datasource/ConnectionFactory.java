@@ -30,6 +30,8 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 
@@ -37,6 +39,7 @@ import javax.sql.DataSource;
 /**
  * data source connection factory
  */
+@Service
 public class ConnectionFactory {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
 
@@ -68,6 +71,7 @@ public class ConnectionFactory {
      * get the data source
      * @return druid dataSource
      */
+    @Bean
     public static DruidDataSource getDataSource() {
 
         DruidDataSource druidDataSource = new DruidDataSource();
@@ -104,6 +108,7 @@ public class ConnectionFactory {
      * @return sqlSessionFactory
      * @throws Exception sqlSessionFactory exception
      */
+    @Bean
     public static SqlSessionFactory getSqlSessionFactory() throws Exception {
         if (sqlSessionFactory == null) {
             synchronized (ConnectionFactory.class) {
@@ -136,6 +141,7 @@ public class ConnectionFactory {
      * get sql session
      * @return sqlSession
      */
+    @Bean
     public static SqlSession getSqlSession() {
         if (sqlSessionTemplate == null) {
             synchronized (ConnectionFactory.class) {
