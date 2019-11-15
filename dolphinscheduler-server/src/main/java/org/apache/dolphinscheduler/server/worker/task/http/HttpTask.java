@@ -33,7 +33,7 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplication;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.http.HttpEntity;
@@ -92,7 +92,7 @@ public class HttpTask extends AbstractTask {
      */
     public HttpTask(TaskProps props, Logger logger) {
         super(props, logger);
-        this.processDao = SpringApplication.getBean(ProcessDao.class);
+        this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
     }
 
     @Override

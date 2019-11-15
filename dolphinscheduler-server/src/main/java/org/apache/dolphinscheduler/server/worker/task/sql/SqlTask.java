@@ -43,7 +43,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplication;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -97,8 +97,8 @@ public class SqlTask extends AbstractTask {
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
         }
-        this.processDao = SpringApplication.getBean(ProcessDao.class);
-        this.alertDao = SpringApplication.getBean(AlertDao.class);
+        this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
+        this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
     }
 
     @Override

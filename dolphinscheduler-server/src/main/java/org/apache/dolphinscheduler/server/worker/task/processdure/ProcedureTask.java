@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplication;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public class ProcedureTask extends AbstractTask {
             throw new RuntimeException("procedure task params is not valid");
         }
 
-        this.processDao = SpringApplication.getBean(ProcessDao.class);
+        this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
     }
 
     @Override

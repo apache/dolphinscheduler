@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplication;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.PythonCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -76,7 +76,7 @@ public class PythonTask extends AbstractTask {
             taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(),
             logger);
-    this.processDao = SpringApplication.getBean(ProcessDao.class);
+    this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
   }
 
   @Override

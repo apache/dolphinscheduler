@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.ComponentScan;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -54,7 +55,7 @@ public class MasterServer extends AbstractServer {
     /**
      *  zk master client
      */
-    private static ZKMasterClient zkMasterClient = null;
+    private ZKMasterClient zkMasterClient = null;
 
     /**
      *  heartbeat thread pool
@@ -72,25 +73,6 @@ public class MasterServer extends AbstractServer {
      */
     private ExecutorService masterSchedulerService;
 
-    /**
-     * default constructor
-     */
-    public MasterServer(){}
-
-    /**
-     * constructor of MasterServers
-     * @param processDao process dao
-     */
-    public MasterServer(ProcessDao processDao){
-        try {
-            conf = new PropertiesConfiguration(Constants.MASTER_PROPERTIES_PATH);
-        }catch (ConfigurationException e){
-            logger.error("load configuration failed : " + e.getMessage(),e);
-            System.exit(1);
-        }
-        zkMasterClient = ZKMasterClient.getZKMasterClient(processDao);
-        this.masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
-    }
 
     /**
      * master server startup
@@ -99,29 +81,26 @@ public class MasterServer extends AbstractServer {
      * @param args arguments
      */
     public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(MasterServer.class);
+        SpringApplication.run(MasterServer.class, args);
 
-        app.run(args);
-    }
-
-
-    @Override
-    public void run(String... strings) throws Exception {
-
-        MasterServer masterServer = new MasterServer(processDao);
-
-        masterServer.run(processDao);
-
-        logger.info("master server started");
-        // blocking
-        masterServer.awaitTermination();
     }
 
     /**
      * run master server
-     * @param processDao process dao
      */
-    public void run(ProcessDao processDao){
+    @PostConstruct
+    public void run(){
+
+        try {
+            conf = new PropertiesConfiguration(Constants.MASTER_PROPERTIES_PATH);
+        }catch (ConfigurationException e){
+            logger.error("load configuration failed : " + e.getMessage(),e);
+            System.exit(1);
+        }
+
+        masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
+
+        zkMasterClient = ZKMasterClient.getZKMasterClient(processDao);
 
         // heartbeat interval
         heartBeatInterval = conf.getInt(Constants.MASTER_HEARTBEAT_INTERVAL,
@@ -251,10 +230,6 @@ public class MasterServer extends AbstractServer {
 
             logger.info("zookeeper service stopped");
 
-            synchronized (lock) {
-                terminated = true;
-                lock.notifyAll();
-            }
 
         } catch (Exception e) {
             logger.error("master server stop exception : " + e.getMessage(), e);
