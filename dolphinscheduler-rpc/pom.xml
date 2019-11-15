@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler</artifactId>
-        <version>1.2.1-release-SNAPSHOT</version>
+        <version>1.2.1-release</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
