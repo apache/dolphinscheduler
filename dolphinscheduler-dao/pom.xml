@@ -4,10 +4,10 @@
 	<parent>
 		<groupId>org.apache.dolphinscheduler</groupId>
 		<artifactId>dolphinscheduler</artifactId>
-		<version>1.1.0-SNAPSHOT</version>
+		<version>1.2.1-release-SNAPSHOT</version>
 	</parent>
 	<artifactId>dolphinscheduler-dao</artifactId>
-	<name>dolphinscheduler-dao</name>
+	<name>${project.artifactId}</name>
 	<url>http://maven.apache.org</url>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -175,7 +175,7 @@
 				<!--<filtering>false</filtering>-->
 			<!--</resource>-->
 		<!--</resources>-->
-		<plugins>
+		<!--<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -185,6 +185,6 @@
 					<encoding>${project.build.sourceEncoding}</encoding>
 				</configuration>
 			</plugin>
-		</plugins>
+		</plugins>-->
 	</build>
 </project>

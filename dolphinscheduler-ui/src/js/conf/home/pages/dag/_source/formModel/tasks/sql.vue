@@ -58,13 +58,13 @@
       <m-list-box>
         <div slot="text">{{$t('Recipient')}}</div>
         <div slot="content">
-          <m-email ref="refEmail" v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
+          <m-email v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
         </div>
       </m-list-box>
       <m-list-box>
         <div slot="text">{{$t('Cc')}}</div>
         <div slot="content">
-          <m-email ref="refCc" v-model="receiversCc" :disabled="isDetails" :repeat-data="receivers"></m-email>
+          <m-email v-model="receiversCc" :disabled="isDetails" :repeat-data="receivers"></m-email>
         </div>
       </m-list-box>
     </template>
@@ -240,14 +240,7 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
-        // receivers Subcomponent verification
-        if (!this.$refs.refEmail._manualEmail()) {
-          return false
-        }
-        // receiversCc Subcomponent verification
-        if (!this.$refs.refCc._manualEmail()) {
-          return false
-        }
+
         // udfs Subcomponent verification Verification only if the data type is HIVE
         if (this.type === 'HIVE') {
           if (!this.$refs.refUdfs._verifUdfs()) {

@@ -106,8 +106,6 @@ public class ProcessDao {
      * task queue impl
      */
     protected ITaskQueue taskQueue = TaskQueueFactory.getTaskQueueInstance();
-
-
     /**
      * find one command from command queue, construct process instance
      * @param logger logger
