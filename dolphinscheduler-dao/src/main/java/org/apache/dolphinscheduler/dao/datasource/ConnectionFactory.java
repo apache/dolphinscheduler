@@ -93,7 +93,6 @@ public class ConnectionFactory extends SpringConnectionFactory{
      * @return sqlSessionFactory
      * @throws Exception sqlSessionFactory exception
      */
-    @Bean
     public static SqlSessionFactory getSqlSessionFactory() throws Exception {
         if (sqlSessionFactory == null) {
             synchronized (ConnectionFactory.class) {
