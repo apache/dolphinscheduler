@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.commons.configuration.Configuration;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
@@ -63,24 +65,21 @@ public class MasterSchedulerThread implements Runnable {
      */
     private int masterExecThreadNum;
 
-    /**
-     * Configuration of MasterSchedulerThread
-     */
-    private final Configuration conf;
+    private MasterConfig masterConfig;
+
 
     /**
      * constructor of MasterSchedulerThread
      * @param zkClient              zookeeper master client
      * @param processDao            process dao
-     * @param conf                  conf
      * @param masterExecThreadNum   master exec thread num
      */
-    public MasterSchedulerThread(ZKMasterClient zkClient, ProcessDao processDao, Configuration conf, int masterExecThreadNum){
+    public MasterSchedulerThread(ZKMasterClient zkClient, ProcessDao processDao, int masterExecThreadNum){
         this.processDao = processDao;
         this.zkMasterClient = zkClient;
-        this.conf = conf;
         this.masterExecThreadNum = masterExecThreadNum;
         this.masterExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread",masterExecThreadNum);
+        this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
     }
 
     /**
@@ -96,7 +95,7 @@ public class MasterSchedulerThread implements Runnable {
             InterProcessMutex mutex = null;
             try {
 
-                if(OSUtils.checkResource(conf, true)){
+                if(OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory())){
                     if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
 
                         // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
