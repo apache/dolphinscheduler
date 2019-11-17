@@ -39,7 +39,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
@@ -415,55 +414,6 @@ public class ProcessDefinitionService extends BaseDAGService {
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.DELETE_PROCESS_DEFINE_BY_ID_ERROR);
-        }
-        return result;
-    }
-
-    /**
-     * batch delete process definition by ids
-     *
-     * @param loginUser login user
-     * @param projectName project name
-     * @param processDefinitionIds process definition id
-     * @return delete result code
-     */
-    public Map<String, Object> batchDeleteProcessDefinitionByIds(User loginUser, String projectName, String processDefinitionIds) {
-
-        Map<String, Object> result = new HashMap<>(5);
-
-        Map<String, Object> deleteReuslt = new HashMap<>(5);
-
-        List<Integer> deleteFailedIdList = new ArrayList<Integer>();
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
-            return checkResult;
-        }
-
-
-        if(StringUtils.isNotEmpty(processDefinitionIds)){
-            String[] processInstanceIdArray = processDefinitionIds.split(",");
-
-            for (String strProcessInstanceId:processInstanceIdArray) {
-                int processInstanceId = Integer.parseInt(strProcessInstanceId);
-                try {
-                    deleteReuslt = deleteProcessDefinitionById(loginUser, projectName, processInstanceId);
-                    if(!Status.SUCCESS.equals(deleteReuslt.get(Constants.STATUS))){
-                        deleteFailedIdList.add(processInstanceId);
-                        logger.error((String)deleteReuslt.get(Constants.MSG));
-                    }
-                } catch (Exception e) {
-                    deleteFailedIdList.add(processInstanceId);
-                }
-            }
-        }
-
-        if(deleteFailedIdList.size() > 0){
-            putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
-        }else{
-            putMsg(result, Status.SUCCESS);
         }
         return result;
     }
