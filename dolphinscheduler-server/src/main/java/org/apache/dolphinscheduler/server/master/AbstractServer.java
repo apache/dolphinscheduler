@@ -30,11 +30,6 @@ public abstract class AbstractServer implements IStoppable {
 
 
     /**
-     * abstract server onfiguration
-     */
-    protected static Configuration conf;
-
-    /**
      *  heartbeat interval, unit second
      */
     protected int heartBeatInterval;
