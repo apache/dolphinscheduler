@@ -219,6 +219,14 @@
 			<outputDirectory>.</outputDirectory>
 		</fileSet>
 
+		<fileSet>
+			<directory>${basedir}/../release-docs</directory>
+			<includes>
+				<include>**/*</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+		</fileSet>
+
 	</fileSets>
 
 	<dependencySets>
