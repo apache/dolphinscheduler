@@ -24,21 +24,19 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @ServletComponentScan
 @ComponentScan("org.apache.dolphinscheduler")
+@Import({MasterServer.class, WorkerServer.class})
 @EnableSwagger2
 public class CombinedApplicationServer extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws Exception {
 
         ApiApplicationServer.main(args);
-
-        MasterServer.main(args);
-
-        WorkerServer.main(args);
 
         LoggerServer server = new LoggerServer();
         server.start();
