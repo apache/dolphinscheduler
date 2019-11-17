@@ -16,6 +16,10 @@
  */
 package org.apache.dolphinscheduler.dao;
 
+import com.alibaba.fastjson.JSONObject;
+import com.cronutils.model.Cron;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.DateInterval;
@@ -28,13 +32,9 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
-import com.alibaba.fastjson.JSONObject;
-import com.cronutils.model.Cron;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +46,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
-import static org.apache.dolphinscheduler.dao.datasource.ConnectionFactory.getMapper;
 
 /**
  * process relative dao that some mappers in this.
  */
 @Component
-public class ProcessDao extends AbstractBaseDao {
+public class ProcessDao {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -106,36 +105,7 @@ public class ProcessDao extends AbstractBaseDao {
     /**
      * task queue impl
      */
-    protected ITaskQueue taskQueue;
-
-    public ProcessDao(){
-        init();
-    }
-
-    /**
-     * init
-     */
-    @Override
-    protected void init() {
-        taskQueue = TaskQueueFactory.getTaskQueueInstance();
-
-
-        userMapper = getMapper(UserMapper.class);
-        processDefineMapper = getMapper(ProcessDefinitionMapper.class);
-        processInstanceMapper = getMapper(ProcessInstanceMapper.class);
-        dataSourceMapper = getMapper(DataSourceMapper.class);
-        processInstanceMapMapper = getMapper(ProcessInstanceMapMapper.class);
-        taskInstanceMapper = getMapper(TaskInstanceMapper.class);
-        commandMapper = getMapper(CommandMapper.class);
-        scheduleMapper = getMapper(ScheduleMapper.class);
-        udfFuncMapper = getMapper(UdfFuncMapper.class);
-        resourceMapper = getMapper(ResourceMapper.class);
-        workerGroupMapper = getMapper(WorkerGroupMapper.class);
-        taskQueue = TaskQueueFactory.getTaskQueueInstance();
-        tenantMapper = getMapper(TenantMapper.class);
-    }
-
-
+    protected ITaskQueue taskQueue = TaskQueueFactory.getTaskQueueInstance();
     /**
      * find one command from command queue, construct process instance
      * @param logger logger
