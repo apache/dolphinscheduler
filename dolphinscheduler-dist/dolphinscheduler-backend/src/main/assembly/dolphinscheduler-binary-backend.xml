@@ -2,7 +2,7 @@
 		xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
-	<id>dolphinscheduler-binary-backend</id>
+	<id>dolphinscheduler-backend-bin</id>
 	<formats>
 		<format>tar.gz</format>
 		<format>dir</format>
@@ -122,15 +122,7 @@
 			</includes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
-		<!--<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-api/src/main/resources</directory>
-			<includes>
-				<include>**/*.properties</include>
-				<include>**/*.xml</include>
-				<include>**/*.json</include>
-			</includes>
-			<outputDirectory>conf</outputDirectory>
-		</fileSet>-->
+
 		<fileSet>
 			<directory>${basedir}/../../dolphinscheduler-server/target/</directory>
 			<includes>
@@ -147,9 +139,6 @@
 			</includes>
 			<outputDirectory>lib</outputDirectory>
 		</fileSet>
-
-
-
 
 		<fileSet>
 			<directory>${basedir}/../../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
@@ -221,9 +210,13 @@
 
 		<fileSet>
 			<directory>${basedir}/../release-docs</directory>
+			<useDefaultExcludes>true</useDefaultExcludes>
 			<includes>
 				<include>**/*</include>
 			</includes>
+			<excludes>
+				<exclude>**/licenses/ui-licenses/**</exclude>
+			</excludes>
 			<outputDirectory>.</outputDirectory>
 		</fileSet>
 
