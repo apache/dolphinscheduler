@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
@@ -97,7 +95,6 @@ public class MasterServer implements IStoppable {
      * @param args arguments
      */
     public static void main(String[] args) {
-        System.setProperty("spring.profiles.active","master");
         SpringApplication.run(MasterServer.class, args);
 
     }

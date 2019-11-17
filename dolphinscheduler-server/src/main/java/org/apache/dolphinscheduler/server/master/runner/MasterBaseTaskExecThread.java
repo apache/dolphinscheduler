@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
 import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -24,9 +23,8 @@ import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.BeanContext;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,18 +71,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     protected boolean cancel;
 
     /**
-     * load configuration file
+     * master config
      */
-    private static Configuration conf;
-
-    static {
-        try {
-            conf = new PropertiesConfiguration(Constants.MASTER_PROPERTIES_PATH);
-        } catch (ConfigurationException e) {
-            logger.error(e.getMessage(), e);
-            System.exit(1);
-        }
-    }
+    private MasterConfig masterConfig;
 
     /**
      * constructor of MasterBaseTaskExecThread
@@ -98,6 +87,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
         this.cancel = false;
         this.taskInstance = taskInstance;
+        this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
     }
 
     /**
@@ -120,10 +110,8 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * @return TaskInstance
      */
     protected TaskInstance submit(){
-        Integer commitRetryTimes = conf.getInt(Constants.MASTER_COMMIT_RETRY_TIMES,
-                Constants.defaultMasterCommitRetryTimes);
-        Integer commitRetryInterval = conf.getInt(Constants.MASTER_COMMIT_RETRY_INTERVAL,
-                Constants.defaultMasterCommitRetryInterval);
+        Integer commitRetryTimes = masterConfig.getMasterTaskCommitRetryTimes();
+        Integer commitRetryInterval = masterConfig.getMasterTaskCommitInterval();
 
         int retryTimes = 1;
 
