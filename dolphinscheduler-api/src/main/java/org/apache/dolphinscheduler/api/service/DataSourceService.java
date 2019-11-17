@@ -580,8 +580,8 @@ public class DataSourceService extends BaseService{
             datasourceUserMapper.deleteByDatasourceId(datasourceId);
             putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
-            logger.error("delete datasource fail",e);
-            throw new RuntimeException("delete datasource fail");
+            logger.error("delete datasource error",e);
+            throw new RuntimeException("delete datasource error");
         }
         return result;
     }

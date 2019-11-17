@@ -153,8 +153,7 @@ public class ResourcesService extends BaseService {
             result.setData(resultMap);
         } catch (Exception e) {
             logger.error("resource already exists, can't recreate ", e);
-            putMsg(result, Status.CREATE_RESOURCE_ERROR);
-            return result;
+            throw new RuntimeException("resource already exists, can't recreate");
         }
 
         // fail upload
@@ -248,8 +247,7 @@ public class ResourcesService extends BaseService {
             result.setData(resultMap);
         } catch (Exception e) {
             logger.error(Status.UPDATE_RESOURCE_ERROR.getMsg(), e);
-            putMsg(result, Status.UPDATE_RESOURCE_ERROR);
-            return result;
+            throw new RuntimeException(Status.UPDATE_RESOURCE_ERROR.getMsg());
         }
         // if name unchanged, return directly without moving on HDFS
         if (originResourceName.equals(name)) {
