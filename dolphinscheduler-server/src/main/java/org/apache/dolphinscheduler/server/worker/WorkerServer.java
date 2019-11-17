@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.annotation.ComponentScan;
 
@@ -113,6 +114,12 @@ public class WorkerServer extends AbstractServer {
      * CountDownLatch latch
      */
     private CountDownLatch latch;
+
+    /**
+     * If inside combined server, WorkerServer no need to await on CountDownLatch
+     */
+    @Value("${server.is-combined-server:false}")
+    private Boolean isCombinedServer;
 
     /**
      * master server startup
@@ -196,9 +203,11 @@ public class WorkerServer extends AbstractServer {
 
         //let the main thread await
         latch = new CountDownLatch(1);
-        try {
-            latch.await();
-        } catch (InterruptedException ignore) {
+        if (!isCombinedServer) {
+            try {
+                latch.await();
+            } catch (InterruptedException ignore) {
+            }
         }
     }
 
