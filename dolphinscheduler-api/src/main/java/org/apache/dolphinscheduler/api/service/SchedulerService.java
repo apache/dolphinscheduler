@@ -97,9 +97,16 @@ public class SchedulerService extends BaseService {
      * @throws IOException ioexception
      */
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> insertSchedule(User loginUser, String projectName, Integer processDefineId, String schedule, WarningType warningType,
-                                              int warningGroupId, FailureStrategy failureStrategy,
-                                              String receivers, String receiversCc, Priority processInstancePriority, int workerGroupId) throws IOException {
+    public Map<String, Object> insertSchedule(User loginUser, String projectName,
+                                              Integer processDefineId,
+                                              String schedule,
+                                              WarningType warningType,
+                                              int warningGroupId,
+                                              FailureStrategy failureStrategy,
+                                              String receivers,
+                                              String receiversCc,
+                                              Priority processInstancePriority,
+                                              int workerGroupId) throws IOException {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
 
@@ -183,10 +190,18 @@ public class SchedulerService extends BaseService {
      * @throws IOException ioexception
      */
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> updateSchedule(User loginUser, String projectName, Integer id, String scheduleExpression, WarningType warningType,
-                                              int warningGroupId, FailureStrategy failureStrategy,
-                                              String receivers, String receiversCc, ReleaseState scheduleStatus,
-                                              Priority processInstancePriority, int workerGroupId) throws IOException {
+    public Map<String, Object> updateSchedule(User loginUser,
+                                              String projectName,
+                                              Integer id,
+                                              String scheduleExpression,
+                                              WarningType warningType,
+                                              int warningGroupId,
+                                              FailureStrategy failureStrategy,
+                                              String receivers,
+                                              String receiversCc,
+                                              ReleaseState scheduleStatus,
+                                              Priority processInstancePriority,
+                                              int workerGroupId) throws IOException {
         Map<String, Object> result = new HashMap<String, Object>(5);
 
         Project project = projectMapper.queryByName(projectName);
@@ -277,7 +292,10 @@ public class SchedulerService extends BaseService {
      * @return publish result code
      */
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> setScheduleState(User loginUser, String projectName, Integer id, ReleaseState scheduleStatus) {
+    public Map<String, Object> setScheduleState(User loginUser,
+                                                String projectName,
+                                                Integer id,
+                                                ReleaseState scheduleStatus) {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
 
