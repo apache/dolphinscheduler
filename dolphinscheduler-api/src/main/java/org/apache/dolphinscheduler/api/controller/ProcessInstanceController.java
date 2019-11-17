@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -34,6 +35,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.apache.dolphinscheduler.api.enums.Status.*;
@@ -365,7 +369,32 @@ public class ProcessInstanceController extends BaseController{
         try{
             logger.info("delete process instance by ids, login user:{}, project name:{}, process instance ids :{}",
                     loginUser.getUserName(), projectName, processInstanceIds);
-            Map<String, Object> result = processInstanceService.batchDeleteProcessInstanceByIds(loginUser, projectName, processInstanceIds);
+            // task queue
+            ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
+            Map<String, Object> result = new HashMap<>(5);
+            List<Integer> deleteFailedIdList = new ArrayList<Integer>();
+            if(StringUtils.isNotEmpty(processInstanceIds)){
+                String[] processInstanceIdArray = processInstanceIds.split(",");
+
+                for (String strProcessInstanceId:processInstanceIdArray) {
+                    int processInstanceId = Integer.parseInt(strProcessInstanceId);
+                    try {
+                        Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
+                        if(!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))){
+                            deleteFailedIdList.add(processInstanceId);
+                            logger.error((String)deleteResult.get(Constants.MSG));
+                        }
+                    } catch (Exception e) {
+                        deleteFailedIdList.add(processInstanceId);
+                    }
+                }
+            }
+            if(deleteFailedIdList.size() > 0){
+                putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
+            }else{
+                putMsg(result, Status.SUCCESS);
+            }
+
             return returnDataList(result);
         }catch (Exception e){
             logger.error(BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR.getMsg(),e);
