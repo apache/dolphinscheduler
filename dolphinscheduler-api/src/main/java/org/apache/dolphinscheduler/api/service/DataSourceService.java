@@ -564,25 +564,21 @@ public class DataSourceService extends BaseService{
     @Transactional(rollbackFor = Exception.class)
     public Result delete(User loginUser, int datasourceId) {
         Result result = new Result();
-        try {
-            //query datasource by id
-            DataSource dataSource = dataSourceMapper.selectById(datasourceId);
-            if(dataSource == null){
-                logger.error("resource id {} not exist", datasourceId);
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                return result;
-            }
-            if(!hasPerm(loginUser, dataSource.getUserId())){
-                putMsg(result, Status.USER_NO_OPERATION_PERM);
-                return result;
-            }
-            dataSourceMapper.deleteById(datasourceId);
-            datasourceUserMapper.deleteByDatasourceId(datasourceId);
-            putMsg(result, Status.SUCCESS);
-        } catch (Exception e) {
-            logger.error("delete datasource fail",e);
-            throw new RuntimeException("delete datasource fail");
+        //query datasource by id
+        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+        if(dataSource == null){
+            logger.error("resource id {} not exist", datasourceId);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
         }
+        if(!hasPerm(loginUser, dataSource.getUserId())){
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+        dataSourceMapper.deleteById(datasourceId);
+        datasourceUserMapper.deleteByDatasourceId(datasourceId);
+        putMsg(result, Status.SUCCESS);
+
         return result;
     }
 

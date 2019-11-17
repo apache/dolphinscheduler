@@ -536,12 +536,9 @@ public class ProcessInstanceService extends BaseDAGService {
                     nodeValueSb.append(ipSb);
                 }
 
-                try {
-                    logger.info("delete task queue node : {}",nodeValueSb.toString());
-                    tasksQueue.removeNode(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE, nodeValueSb.toString());
-                }catch (Exception e){
-                    logger.error("delete task queue node : {}", nodeValueSb.toString());
-                }
+                logger.info("delete task queue node : {}",nodeValueSb.toString());
+                tasksQueue.removeNode(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE, nodeValueSb.toString());
+
             }
         }
 
