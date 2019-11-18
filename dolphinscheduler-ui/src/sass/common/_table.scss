@@ -22,6 +22,16 @@
       background-color: #ccc;
     }
   }
+  .ans-checkbox {
+    .ans-checkbox-inner {
+      border: 1px solid #ccc;
+    }
+  }
+  .ans-checkbox-checked {
+    .ans-checkbox-inner {
+      border: 1px solid #1489e2;
+    }
+  }
   .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;

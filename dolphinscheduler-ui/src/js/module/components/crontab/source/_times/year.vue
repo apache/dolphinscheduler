@@ -252,8 +252,11 @@
 
 <style lang="scss" rel="stylesheet/scss">
   .year-model {
-
+    .ans-radio-group-vertical {
+      .ans-radio-wrapper {
+        margin: 5px 0;
+        display: inline-block
+      }
+    }
   }
-
-
 </style>
