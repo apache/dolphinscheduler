@@ -23,44 +23,55 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.transaction.TransactionFactory;
-import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Service;
-
-import javax.sql.DataSource;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 
 /**
- *  not spring manager connection, only use for init db, and alert module for non-spring application
  * data source connection factory
  */
-public class ConnectionFactory extends SpringConnectionFactory{
+@Configuration
+@MapperScan("org.apache.dolphinscheduler.*.mapper")
+public class SpringConnectionFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
-
-
-    /**
-     * sql session factory
-     */
-    private static SqlSessionFactory sqlSessionFactory;
+    private static final Logger logger = LoggerFactory.getLogger(SpringConnectionFactory.class);
 
     /**
-     * sql session template
+     * Load configuration file
      */
-    private static SqlSessionTemplate sqlSessionTemplate;
+    protected static org.apache.commons.configuration.Configuration conf;
+
+    static {
+        try {
+            conf = new PropertiesConfiguration(Constants.APPLICATION_PROPERTIES);
+        } catch (ConfigurationException e) {
+            logger.error("load configuration exception", e);
+            System.exit(1);
+        }
+    }
+
+    /**
+     *  pagination interceptor
+     * @return pagination interceptor
+     */
+    @Bean
+    public PaginationInterceptor paginationInterceptor() {
+        return new PaginationInterceptor();
+    }
 
     /**
      * get the data source
      * @return druid dataSource
      */
-    public static DruidDataSource getDataSource() {
+    @Bean
+    public DruidDataSource dataSource() {
 
         DruidDataSource druidDataSource = new DruidDataSource();
 
@@ -92,73 +103,40 @@ public class ConnectionFactory extends SpringConnectionFactory{
     }
 
     /**
+     * * get transaction manager
+     * @return DataSourceTransactionManager
+     */
+    @Bean
+    public DataSourceTransactionManager transactionManager() {
+        return new DataSourceTransactionManager(dataSource());
+    }
+
+    /**
      * * get sql session factory
      * @return sqlSessionFactory
      * @throws Exception sqlSessionFactory exception
      */
-    public static SqlSessionFactory getSqlSessionFactory() throws Exception {
-        if (sqlSessionFactory == null) {
-            synchronized (ConnectionFactory.class) {
-                if (sqlSessionFactory == null) {
-                    DataSource dataSource = getDataSource();
-                    TransactionFactory transactionFactory = new JdbcTransactionFactory();
+    @Bean
+    public SqlSessionFactory sqlSessionFactory() throws Exception {
+        MybatisConfiguration configuration = new MybatisConfiguration();
+        configuration.addMappers("org.apache.dolphinscheduler.dao.mapper");
+        configuration.addInterceptor(paginationInterceptor());
 
-                    Environment environment = new Environment("development", transactionFactory, dataSource);
+        MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
+        sqlSessionFactoryBean.setConfiguration(configuration);
+        sqlSessionFactoryBean.setDataSource(dataSource());
 
-                    MybatisConfiguration configuration = new MybatisConfiguration();
-                    configuration.setEnvironment(environment);
-                    configuration.setLazyLoadingEnabled(true);
-                    configuration.addMappers("org.apache.dolphinscheduler.dao.mapper");
-                    configuration.addInterceptor(new PaginationInterceptor());
-
-                    MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
-                    sqlSessionFactoryBean.setConfiguration(configuration);
-                    sqlSessionFactoryBean.setDataSource(dataSource);
-
-                    sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
-                    sqlSessionFactory = sqlSessionFactoryBean.getObject();
-                    return sqlSessionFactory;
-                }
-            }
-        }
-
-        return sqlSessionFactory;
+        sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
+        return sqlSessionFactoryBean.getObject();
     }
 
     /**
      * get sql session
      * @return sqlSession
      */
-    public static SqlSession getSqlSession() {
-        if (sqlSessionTemplate == null) {
-            synchronized (ConnectionFactory.class) {
-                if (sqlSessionTemplate == null) {
-                    try {
-                        sqlSessionTemplate = new SqlSessionTemplate(getSqlSessionFactory());
-                        return sqlSessionTemplate;
-                    } catch (Exception e) {
-                        logger.error("getSqlSession error", e);
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        }
-        return sqlSessionTemplate;
-    }
-
-    /**
-     * get mapper
-     * @param type target class
-     * @param <T> generic
-     * @return target object
-     */
-    public static <T> T getMapper(Class<T> type) {
-        try {
-            return getSqlSession().getMapper(type);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException("get mapper failed");
-        }
+    @Bean
+    public SqlSession sqlSession() throws Exception{
+        return new SqlSessionTemplate(sqlSessionFactory());
     }
 
 }
