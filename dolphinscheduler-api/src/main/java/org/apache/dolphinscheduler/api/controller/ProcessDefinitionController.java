@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -31,6 +32,9 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -436,7 +440,32 @@ public class ProcessDefinitionController extends BaseController{
         try{
             logger.info("delete process definition by ids, login user:{}, project name:{}, process definition ids:{}",
                     loginUser.getUserName(), projectName, processDefinitionIds);
-            Map<String, Object> result = processDefinitionService.batchDeleteProcessDefinitionByIds(loginUser, projectName, processDefinitionIds);
+
+            Map<String, Object> result = new HashMap<>(5);
+            List<Integer> deleteFailedIdList = new ArrayList<Integer>();
+            if(StringUtils.isNotEmpty(processDefinitionIds)){
+                String[] processDefinitionIdArray = processDefinitionIds.split(",");
+
+                for (String strProcessDefinitionId:processDefinitionIdArray) {
+                    int processDefinitionId = Integer.parseInt(strProcessDefinitionId);
+                    try {
+                        Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
+                        if(!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))){
+                            deleteFailedIdList.add(processDefinitionId);
+                            logger.error((String)deleteResult.get(Constants.MSG));
+                        }
+                    } catch (Exception e) {
+                        deleteFailedIdList.add(processDefinitionId);
+                    }
+                }
+            }
+
+            if(deleteFailedIdList.size() > 0){
+                putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
+            }else{
+                putMsg(result, Status.SUCCESS);
+            }
+
             return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(),e);

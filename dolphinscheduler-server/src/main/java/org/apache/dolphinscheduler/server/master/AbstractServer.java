@@ -26,13 +26,8 @@ import org.springframework.context.annotation.ComponentScan;
 /**
  *   master server
  */
-@ComponentScan("org.apache.dolphinscheduler")
-public abstract class AbstractServer implements CommandLineRunner, IStoppable {
+public abstract class AbstractServer implements IStoppable {
 
-    /**
-     * logger of AbstractServer
-     */
-    private static final Logger logger = LoggerFactory.getLogger(AbstractServer.class);
 
     /**
      * abstract server onfiguration
@@ -40,39 +35,9 @@ public abstract class AbstractServer implements CommandLineRunner, IStoppable {
     protected static Configuration conf;
 
     /**
-     *  object lock
-     */
-    protected final Object lock = new Object();
-
-    /**
-     * whether or not to close the state
-     */
-    protected boolean terminated = false;
-
-    /**
      *  heartbeat interval, unit second
      */
     protected int heartBeatInterval;
-
-    /**
-     * blocking implement
-     * @throws InterruptedException reasonInter
-     */
-    public void awaitTermination() throws InterruptedException {
-        synchronized (lock) {
-            while (!terminated) {
-                lock.wait();
-            }
-        }
-    }
-
-    /**
-     * Callback used to run the bean.
-     * @param args incoming main method arguments
-     * @throws Exception on error
-     */
-    @Override
-    public abstract void run(String... args) throws Exception;
 
     /**
      * gracefully stop

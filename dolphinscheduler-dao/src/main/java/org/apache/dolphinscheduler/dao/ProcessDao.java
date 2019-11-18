@@ -107,58 +107,44 @@ public class ProcessDao {
      */
     protected ITaskQueue taskQueue = TaskQueueFactory.getTaskQueueInstance();
     /**
-     * find one command from command queue, construct process instance
+     * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      * @param logger logger
      * @param host host
      * @param validThreadNum validThreadNum
+     * @param command found command
      * @return process instance
      */
     @Transactional(rollbackFor = Exception.class)
-    public ProcessInstance scanCommand(Logger logger, String host, int validThreadNum){
-
-        ProcessInstance processInstance = null;
-        Command command = findOneCommand();
-        if (command == null) {
+    public ProcessInstance handleCommand(Logger logger, String host, int validThreadNum, Command command) {
+        ProcessInstance processInstance = constructProcessInstance(command, host);
+        //cannot construct process instance, return null;
+        if(processInstance == null){
+            logger.error("scan command, command parameter is error: %s", command.toString());
+            moveToErrorCommand(command, "process instance is null");
             return null;
         }
-        logger.info(String.format("find one command: id: %d, type: %s", command.getId(),command.getCommandType().toString()));
-
-        try{
-            processInstance = constructProcessInstance(command, host);
-            //cannot construct process instance, return null;
-            if(processInstance == null){
-                logger.error("scan command, command parameter is error: %s", command.toString());
-                delCommandByid(command.getId());
-                saveErrorCommand(command, "process instance is null");
-                return null;
-            }
-            if(!checkThreadNum(command, validThreadNum)){
-                logger.info("there is not enough thread for this command: {}",command.toString() );
-                return setWaitingThreadProcess(command, processInstance);
-            }
-            processInstance.setCommandType(command.getCommandType());
-            processInstance.addHistoryCmd(command.getCommandType());
-            saveProcessInstance(processInstance);
-            this.setSubProcessParam(processInstance);
-            delCommandByid(command.getId());
-            return processInstance;
-        }catch (Exception e){
-            logger.error("scan command error ", e);
-            saveErrorCommand(command, e.toString());
-            delCommandByid(command.getId());
+        if(!checkThreadNum(command, validThreadNum)){
+            logger.info("there is not enough thread for this command: {}",command.toString() );
+            return setWaitingThreadProcess(command, processInstance);
         }
-        return null;
+        processInstance.setCommandType(command.getCommandType());
+        processInstance.addHistoryCmd(command.getCommandType());
+        saveProcessInstance(processInstance);
+        this.setSubProcessParam(processInstance);
+        delCommandByid(command.getId());
+        return processInstance;
     }
 
     /**
-     * save error command
+     * save error command, and delete original command
      * @param command command
      * @param message message
      */
-    private void saveErrorCommand(Command command, String message) {
-
+    @Transactional(rollbackFor = Exception.class)
+    public void moveToErrorCommand(Command command, String message) {
         ErrorCommand errorCommand = new ErrorCommand(command, message);
         this.errorCommandMapper.insert(errorCommand);
+        delCommandByid(command.getId());
     }
 
     /**
