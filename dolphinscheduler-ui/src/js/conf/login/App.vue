@@ -26,7 +26,7 @@
           <x-input
                   size="large"
                   type="text"
-                  v-model="userName"
+                  v-model.trim="userName"
                   :placeholder="$t('Please enter user name')"
                   maxlength="60"
                   @on-enterkey="_ok">
