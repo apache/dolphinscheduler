@@ -27,11 +27,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@SpringBootApplication
-@ServletComponentScan
-@ComponentScan("org.apache.dolphinscheduler")
-@Import({MasterServer.class, WorkerServer.class})
-@EnableSwagger2
+//@SpringBootApplication
+//@ServletComponentScan
+//@ComponentScan("org.apache.dolphinscheduler")
+//@Import({MasterServer.class, WorkerServer.class})
+//@EnableSwagger2
 public class CombinedApplicationServer extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws Exception {
