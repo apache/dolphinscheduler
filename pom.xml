@@ -250,6 +250,10 @@
 						<artifactId>netty</artifactId>
 						<groupId>io.netty</groupId>
 					</exclusion>
+					<exclusion>
+						<groupId>com.github.spotbugs</groupId>
+						<artifactId>spotbugs-annotations</artifactId>
+					</exclusion>
 				</exclusions>
 				<version>${zookeeper.version}</version>
 			</dependency>

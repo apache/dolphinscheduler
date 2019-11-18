@@ -17,36 +17,26 @@
 package org.apache.dolphinscheduler.api;
 
 import org.apache.dolphinscheduler.alert.AlertServer;
-import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.rpc.LoggerServer;
 import org.apache.dolphinscheduler.server.worker.WorkerServer;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@SpringBootApplication
-@ServletComponentScan
-@ComponentScan("org.apache.dolphinscheduler")
-@EnableSwagger2
+//@SpringBootApplication
+//@ServletComponentScan
+//@ComponentScan("org.apache.dolphinscheduler")
+//@Import({MasterServer.class, WorkerServer.class})
+//@EnableSwagger2
 public class CombinedApplicationServer extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws Exception {
 
-        ConfigurableApplicationContext context = SpringApplication.run(ApiApplicationServer.class, args);
-        ProcessDao processDao = context.getBean(ProcessDao.class);
-        AlertDao alertDao = context.getBean(AlertDao.class);
-
-        MasterServer master = new MasterServer(processDao);
-        master.run(processDao);
-
-        WorkerServer workerServer = new WorkerServer(processDao);
-        workerServer.run(processDao);
+        ApiApplicationServer.main(args);
 
         LoggerServer server = new LoggerServer();
         server.start();
