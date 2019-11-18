@@ -14,36 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master;
+package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.commons.configuration.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.ComponentScan;
-
-/**
- *   master server
- */
-public abstract class AbstractServer implements IStoppable {
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 
-    /**
-     * abstract server onfiguration
-     */
-    protected static Configuration conf;
+@Component
+public class SpringApplicationContext implements ApplicationContextAware {
 
-    /**
-     *  heartbeat interval, unit second
-     */
-    protected int heartBeatInterval;
+    private static ApplicationContext applicationContext;
 
-    /**
-     * gracefully stop
-     * @param cause why stopping
-     */
     @Override
-    public abstract void stop(String cause);
-}
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        SpringApplicationContext.applicationContext = applicationContext;
+    }
 
+    public static <T> T getBean(Class<T> requiredType){
+        return applicationContext.getBean(requiredType);
+    }
+
+
+}
