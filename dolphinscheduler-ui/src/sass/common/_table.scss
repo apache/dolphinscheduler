@@ -17,6 +17,11 @@
 
 .table-box {
   border-top: 1px solid #ecf3ff;
+  .ans-checkbox-wrapper-disabled {
+    .ans-checkbox-inner {
+      background-color: #ccc;
+    }
+  }
   .ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
