@@ -21,17 +21,19 @@ import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.rpc.LoggerServer;
 import org.apache.dolphinscheduler.server.worker.WorkerServer;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-//@SpringBootApplication
-//@ServletComponentScan
-//@ComponentScan("org.apache.dolphinscheduler")
-//@Import({MasterServer.class, WorkerServer.class})
-//@EnableSwagger2
+@SpringBootApplication
+@ConditionalOnProperty(prefix = "server", name = "is-combined-server", havingValue = "true")
+@ServletComponentScan
+@ComponentScan("org.apache.dolphinscheduler")
+@Import({MasterServer.class, WorkerServer.class})
+@EnableSwagger2
 public class CombinedApplicationServer extends SpringBootServletInitializer {
 
     public static void main(String[] args) throws Exception {
