@@ -126,7 +126,7 @@
         where 1 = 1
         and t.is_sub_process = 0
         <if test="startTime != null and endTime != null">
-            and  t.start_time >= #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
+            and  t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         <if test="projectIds != null and projectIds.length != 0">
             and p.id in
@@ -147,7 +147,7 @@
         from t_ds_process_instance
         where process_definition_id=#{processDefinitionId}
         <if test="startTime!=null and endTime != null ">
-            and schedule_time between #{startTime} and #{endTime}
+            and schedule_time <![CDATA[ >= ]]> #{startTime} and  schedule_time <![CDATA[ <= ]]> #{endTime}
         </if>
         order by end_time desc limit 1
     </select>
@@ -163,7 +163,8 @@
         </if>
         <if test="startTime!=null and endTime != null ">
             and process_definition_id=#{processDefinitionId}
-            and (schedule_time between #{startTime} and #{endTime} or start_time between #{startTime} and #{endTime})
+            and (schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime}
+                  or start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime})
         </if>
         order by start_time desc limit 1
     </select>
@@ -173,7 +174,7 @@
         where process_definition_id=#{processDefinitionId}
         and schedule_time is null
         <if test="startTime!=null and endTime != null ">
-            and start_time between #{startTime} and #{endTime}
+            and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         order by end_time desc limit 1
     </select>

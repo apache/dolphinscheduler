@@ -375,7 +375,7 @@ public class ResourcesService extends BaseService {
         if(isAdmin(loginUser)){
             userId = 0;
         }
-        resourceList = resourcesMapper.queryResourceList(null, userId, type.ordinal());
+        resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
         result.put(Constants.DATA_LIST, resourceList);
         putMsg(result,Status.SUCCESS);
 
