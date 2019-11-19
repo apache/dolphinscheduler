@@ -1,4 +1,20 @@
 #!/bin/sh
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
@@ -34,20 +50,20 @@ fi
 source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
-# for example mysql or postgresql ...
-dbtype="mysql"
+# for example postgresql or mysql ...
+dbtype="postgresql"
 
 # db config
 # db address and port
 dbhost="192.168.xx.xx:3306"
 
-# mysql database
+# db name
 dbname="dolphinscheduler"
 
-# mysql username
+# db username
 username="xx"
 
-# mysql passwprd
+# db passwprd
 # Note: if there are special characters, please use the \ transfer character to transfer
 passowrd="xx"
 
@@ -301,10 +317,10 @@ apiMaxHttpPostSize="5000000"
 # 1,replace file
 echo "1,replace file"
 if [ $dbtype == "mysql" ];then
-    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application.properties
-    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application.properties
-    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application.properties
-    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=com.mysql.jdbc.Driver#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=com.mysql.jdbc.Driver#g" conf/application-dao.properties
 
 
     sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
@@ -314,10 +330,10 @@ if [ $dbtype == "mysql" ];then
 fi
 
 if [ $dbtype == "postgresql" ];then
-    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application.properties
-    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application.properties
-    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application.properties
-    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=org.postgresql.Driver#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=org.postgresql.Driver#g" conf/application-dao.properties
 
     sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
     sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties

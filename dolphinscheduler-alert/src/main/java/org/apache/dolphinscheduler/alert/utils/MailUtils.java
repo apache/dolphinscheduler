@@ -188,17 +188,17 @@ public class MailUtils {
             String title = "";
             for (LinkedHashMap mapItems : mapItemsList){
 
-                Set<Map.Entry<String, String>> entries = mapItems.entrySet();
+                Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
 
-                Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+                Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
 
                 StringBuilder t = new StringBuilder(Constants.TR);
                 StringBuilder cs = new StringBuilder(Constants.TR);
                 while (iterator.hasNext()){
 
-                    Map.Entry<String, String> entry = iterator.next();
+                    Map.Entry<String, Object> entry = iterator.next();
                     t.append(Constants.TH).append(entry.getKey()).append(Constants.TH_END);
-                    cs.append(Constants.TD).append(entry.getValue()).append(Constants.TD_END);
+                    cs.append(Constants.TD).append(String.valueOf(entry.getValue())).append(Constants.TD_END);
 
                 }
                 t.append(Constants.TR_END);

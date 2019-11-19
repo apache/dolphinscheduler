@@ -16,6 +16,10 @@
  */
 package org.apache.dolphinscheduler.dao;
 
+import com.alibaba.fastjson.JSONObject;
+import com.cronutils.model.Cron;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.DateInterval;
@@ -28,13 +32,9 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
-import com.alibaba.fastjson.JSONObject;
-import com.cronutils.model.Cron;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +46,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
-import static org.apache.dolphinscheduler.dao.datasource.ConnectionFactory.getMapper;
 
 /**
  * process relative dao that some mappers in this.
  */
 @Component
-public class ProcessDao extends AbstractBaseDao {
+public class ProcessDao {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -106,89 +105,46 @@ public class ProcessDao extends AbstractBaseDao {
     /**
      * task queue impl
      */
-    protected ITaskQueue taskQueue;
-
-    public ProcessDao(){
-        init();
-    }
-
+    protected ITaskQueue taskQueue = TaskQueueFactory.getTaskQueueInstance();
     /**
-     * init
-     */
-    @Override
-    protected void init() {
-        taskQueue = TaskQueueFactory.getTaskQueueInstance();
-
-
-        userMapper = getMapper(UserMapper.class);
-        processDefineMapper = getMapper(ProcessDefinitionMapper.class);
-        processInstanceMapper = getMapper(ProcessInstanceMapper.class);
-        dataSourceMapper = getMapper(DataSourceMapper.class);
-        processInstanceMapMapper = getMapper(ProcessInstanceMapMapper.class);
-        taskInstanceMapper = getMapper(TaskInstanceMapper.class);
-        commandMapper = getMapper(CommandMapper.class);
-        scheduleMapper = getMapper(ScheduleMapper.class);
-        udfFuncMapper = getMapper(UdfFuncMapper.class);
-        resourceMapper = getMapper(ResourceMapper.class);
-        workerGroupMapper = getMapper(WorkerGroupMapper.class);
-        taskQueue = TaskQueueFactory.getTaskQueueInstance();
-        tenantMapper = getMapper(TenantMapper.class);
-    }
-
-
-    /**
-     * find one command from command queue, construct process instance
+     * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      * @param logger logger
      * @param host host
      * @param validThreadNum validThreadNum
+     * @param command found command
      * @return process instance
      */
     @Transactional(rollbackFor = Exception.class)
-    public ProcessInstance scanCommand(Logger logger, String host, int validThreadNum){
-
-        ProcessInstance processInstance = null;
-        Command command = findOneCommand();
-        if (command == null) {
+    public ProcessInstance handleCommand(Logger logger, String host, int validThreadNum, Command command) {
+        ProcessInstance processInstance = constructProcessInstance(command, host);
+        //cannot construct process instance, return null;
+        if(processInstance == null){
+            logger.error("scan command, command parameter is error: %s", command.toString());
+            moveToErrorCommand(command, "process instance is null");
             return null;
         }
-        logger.info(String.format("find one command: id: %d, type: %s", command.getId(),command.getCommandType().toString()));
-
-        try{
-            processInstance = constructProcessInstance(command, host);
-            //cannot construct process instance, return null;
-            if(processInstance == null){
-                logger.error("scan command, command parameter is error: %s", command.toString());
-                delCommandByid(command.getId());
-                saveErrorCommand(command, "process instance is null");
-                return null;
-            }
-            if(!checkThreadNum(command, validThreadNum)){
-                logger.info("there is not enough thread for this command: {}",command.toString() );
-                return setWaitingThreadProcess(command, processInstance);
-            }
-            processInstance.setCommandType(command.getCommandType());
-            processInstance.addHistoryCmd(command.getCommandType());
-            saveProcessInstance(processInstance);
-            this.setSubProcessParam(processInstance);
-            delCommandByid(command.getId());
-            return processInstance;
-        }catch (Exception e){
-            logger.error("scan command error ", e);
-            saveErrorCommand(command, e.toString());
-            delCommandByid(command.getId());
+        if(!checkThreadNum(command, validThreadNum)){
+            logger.info("there is not enough thread for this command: {}",command.toString() );
+            return setWaitingThreadProcess(command, processInstance);
         }
-        return null;
+        processInstance.setCommandType(command.getCommandType());
+        processInstance.addHistoryCmd(command.getCommandType());
+        saveProcessInstance(processInstance);
+        this.setSubProcessParam(processInstance);
+        delCommandByid(command.getId());
+        return processInstance;
     }
 
     /**
-     * save error command
+     * save error command, and delete original command
      * @param command command
      * @param message message
      */
-    private void saveErrorCommand(Command command, String message) {
-
+    @Transactional(rollbackFor = Exception.class)
+    public void moveToErrorCommand(Command command, String message) {
         ErrorCommand errorCommand = new ErrorCommand(command, message);
         this.errorCommandMapper.insert(errorCommand);
+        delCommandByid(command.getId());
     }
 
     /**

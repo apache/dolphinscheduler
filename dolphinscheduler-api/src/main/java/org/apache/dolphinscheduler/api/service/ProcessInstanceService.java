@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
-import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
@@ -536,12 +535,9 @@ public class ProcessInstanceService extends BaseDAGService {
                     nodeValueSb.append(ipSb);
                 }
 
-                try {
-                    logger.info("delete task queue node : {}",nodeValueSb.toString());
-                    tasksQueue.removeNode(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE, nodeValueSb.toString());
-                }catch (Exception e){
-                    logger.error("delete task queue node : {}", nodeValueSb.toString());
-                }
+                logger.info("delete task queue node : {}",nodeValueSb.toString());
+                tasksQueue.removeNode(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE, nodeValueSb.toString());
+
             }
         }
 
@@ -554,50 +550,6 @@ public class ProcessInstanceService extends BaseDAGService {
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR);
-        }
-
-        return result;
-    }
-
-    /**
-     * batch delete process instance by ids, at the same time，delete task instance and their mapping relation data
-     *
-     * @param loginUser login user
-     * @param projectName project name
-     * @param processInstanceIds process instance id
-     * @return delete result code
-     */
-    public Map<String, Object> batchDeleteProcessInstanceByIds(User loginUser, String projectName, String processInstanceIds) {
-        // task queue
-        ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-
-        Map<String, Object> result = new HashMap<>(5);
-        List<Integer> deleteFailedIdList = new ArrayList<Integer>();
-
-        Project project = projectMapper.queryByName(projectName);
-
-        Map<String, Object> checkResult = projectService.checkProjectAndAuth(loginUser, project, projectName);
-        Status resultEnum = (Status) checkResult.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
-            return checkResult;
-        }
-
-        if(StringUtils.isNotEmpty(processInstanceIds)){
-            String[] processInstanceIdArray = processInstanceIds.split(",");
-
-            for (String strProcessInstanceId:processInstanceIdArray) {
-                int processInstanceId = Integer.parseInt(strProcessInstanceId);
-                try {
-                    deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
-                } catch (Exception e) {
-                    deleteFailedIdList.add(processInstanceId);
-                }
-            }
-        }
-        if(deleteFailedIdList.size() > 0){
-            putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
-        }else{
-            putMsg(result, Status.SUCCESS);
         }
 
         return result;
