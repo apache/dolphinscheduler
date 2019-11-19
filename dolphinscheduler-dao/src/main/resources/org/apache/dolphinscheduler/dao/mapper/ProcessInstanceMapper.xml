@@ -126,7 +126,7 @@
         where 1 = 1
         and t.is_sub_process = 0
         <if test="startTime != null and endTime != null">
-            and  t.start_time <![CDATA[ >= ]] #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
+            and  t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         <if test="projectIds != null and projectIds.length != 0">
             and p.id in
