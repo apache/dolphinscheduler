@@ -1,3 +1,4 @@
+## 1.2.0
 
 ### New Feature	
 1. Support postgre sql
