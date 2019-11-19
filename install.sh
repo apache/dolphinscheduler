@@ -50,20 +50,20 @@ fi
 source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
-# for example mysql or postgresql ...
-dbtype="mysql"
+# for example postgresql or mysql ...
+dbtype="postgresql"
 
 # db config
 # db address and port
 dbhost="192.168.xx.xx:3306"
 
-# mysql database
+# db name
 dbname="dolphinscheduler"
 
-# mysql username
+# db username
 username="xx"
 
-# mysql passwprd
+# db passwprd
 # Note: if there are special characters, please use the \ transfer character to transfer
 passowrd="xx"
 
