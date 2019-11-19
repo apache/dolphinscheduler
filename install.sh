@@ -50,7 +50,7 @@ fi
 source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
-# for example mysql or postgresql ...
+# for example postgresql or mysql ...
 dbtype="postgresql"
 
 # db config
