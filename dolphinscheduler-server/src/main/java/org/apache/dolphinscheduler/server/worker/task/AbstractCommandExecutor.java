@@ -226,7 +226,7 @@ public abstract class AbstractCommandExecutor {
      */
     private int updateState(ProcessDao processDao, int exitStatusCode, int pid, int taskInstId) {
         //get yarn state by log
-        if (exitStatusCode != 0) {
+        if (exitStatusCode == 0) {
             TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
             logger.info("process id is {}", pid);
 
