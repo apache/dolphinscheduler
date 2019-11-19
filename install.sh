@@ -55,7 +55,7 @@ dbtype="postgresql"
 
 # db config
 # db address and port
-dbhost="192.168.xx.xx:3306"
+dbhost="192.168.xx.xx:5432"
 
 # db name
 dbname="dolphinscheduler"
