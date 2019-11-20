@@ -53,8 +53,9 @@ SELECT setval('t_ds_relation_user_alertgroup_id_sequence', (SELECT MAX(id) FROM 
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO "t_ds_queue" VALUES ('1', 'default', 'default');
-INSERT INTO "t_ds_version" VALUES ('1', '1.2.0');
+SELECT setval('t_ds_queue_id_sequence', (SELECT MAX(id) FROM "t_ds_queue")+1);
 
--- Records of t_ds_queue,default queue name : default
-INSERT INTO "t_ds_queue" VALUES ('1', 'default', 'default');
 INSERT INTO "t_ds_version" VALUES ('1', '1.2.0');
+SELECT setval('t_ds_version_id_sequence', (SELECT MAX(id) FROM "t_ds_version")+1);
+
+
