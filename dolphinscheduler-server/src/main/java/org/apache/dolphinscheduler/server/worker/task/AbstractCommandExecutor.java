@@ -218,11 +218,11 @@ public abstract class AbstractCommandExecutor {
     /**
      * update process state to db
      *
-     * @param processDao
-     * @param exitStatusCode
-     * @param pid
-     * @param taskInstId
-     * @return
+     * @param processDao        process dao
+     * @param exitStatusCode    exit status code
+     * @param pid               process id
+     * @param taskInstId        task instance id
+     * @return exit status code
      */
     private int updateState(ProcessDao processDao, int exitStatusCode, int pid, int taskInstId) {
         //get yarn state by log
@@ -300,8 +300,8 @@ public abstract class AbstractCommandExecutor {
     }
 
     /**
-     *  hard kill
-     * @param processId
+     * hard kill
+     * @param processId process id
      */
     private void hardKill(int processId) {
         if (processId != 0 && process.isAlive()) {
@@ -318,8 +318,8 @@ public abstract class AbstractCommandExecutor {
     }
 
     /**
-     *  print command
-     * @param processBuilder
+     * print command
+     * @param processBuilder process builder
      */
     private void printCommand(ProcessBuilder processBuilder) {
         String cmdStr;
@@ -333,7 +333,7 @@ public abstract class AbstractCommandExecutor {
     }
 
     /**
-     *  clear
+     * clear
      */
     private void clear() {
         if (!logBuffer.isEmpty()) {
@@ -346,6 +346,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * get the standard output of the process
+     * @param process process
      */
     private void parseProcessOutput(Process process) {
         String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskAppId);
@@ -414,7 +415,7 @@ public abstract class AbstractCommandExecutor {
     }
 
     /**
-     *  get app links
+     * get app links
      * @param fileName file name
      * @return app id list
      */

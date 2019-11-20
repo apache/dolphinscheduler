@@ -536,27 +536,7 @@
 
 		</pluginManagement>
 
-
-
 		<plugins>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.5</version>
-				<configuration>
-					<target>
-						<echo message="hello ant, from Maven!" />
-						<echo>${project.basedir}</echo>
-						<echo>${project.build.directory}</echo>
-						<echo>${project.build.finalName}</echo>
-						<echo>${basedir}</echo>
-						<echo>${basedir}/../../target/${project.name}</echo>
-						<echo>${project.artifactId}</echo>
-					</target>
-				</configuration>
-			</plugin>
-                        
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
