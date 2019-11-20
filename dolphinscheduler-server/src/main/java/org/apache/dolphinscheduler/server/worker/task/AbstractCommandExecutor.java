@@ -427,7 +427,6 @@ public abstract class AbstractCommandExecutor {
          * analysis log，get submited yarn application id
          */
         for (String log : logs) {
-
             String appId = findAppId(log);
             if (StringUtils.isNotEmpty(appId) && !appIds.contains(appId)) {
                 logger.info("find app id: {}", appId);
@@ -479,11 +478,9 @@ public abstract class AbstractCommandExecutor {
      */
     private String findAppId(String line) {
         Matcher matcher = APPLICATION_REGEX.matcher(line);
-
-        if (matcher.find() && checkFindApp(line)) {
+        if (matcher.find()) {
             return matcher.group();
         }
-
         return null;
     }
 
