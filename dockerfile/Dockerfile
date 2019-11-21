@@ -99,7 +99,7 @@ ADD . /opt/dolphinscheduler_source
 
 #9,backend compilation
 RUN cd /opt/dolphinscheduler_source && \
-    mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+    mvn clean package -Prelease -Dmaven.test.skip=true
 
 #10,frontend compilation
 RUN chmod -R 777 /opt/dolphinscheduler_source/dolphinscheduler-ui && \
@@ -111,9 +111,10 @@ RUN chmod -R 777 /opt/dolphinscheduler_source/dolphinscheduler-ui && \
 
 #11,modify dolphinscheduler configuration file
 #backend configuration
-RUN mkdir -p /opt/dolphinscheduler && \
-    tar -zxvf /opt/dolphinscheduler_source/target/dolphinscheduler-${tar_version}.tar.gz -C /opt/dolphinscheduler && \
+RUN tar -zxvf /opt/dolphinscheduler_source/dolphinscheduler-dist/dolphinscheduler-backend/target/apache-dolphinscheduler-incubating-${tar_version}-dolphinscheduler-backend-bin.tar.gz -C /opt && \
+    mv /opt/apache-dolphinscheduler-incubating-${tar_version}-dolphinscheduler-backend-bin /opt/dolphinscheduler && \
     rm -rf /opt/dolphinscheduler/conf
+
 ADD ./dockerfile/conf/dolphinscheduler/conf /opt/dolphinscheduler/conf
 #frontend nginx configuration
 ADD ./dockerfile/conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
