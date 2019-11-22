@@ -757,18 +757,15 @@ CREATE SEQUENCE  t_ds_worker_server_id_sequence;
 ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
 
 
--- Records of t_ds_user,user : admin , password : dolphinscheduler123
-INSERT INTO "t_ds_user" VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', 'xx', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
-SELECT setval('t_ds_user_id_sequence', (SELECT MAX(id) FROM "t_ds_user")+1);
+-- Records of t_ds_user，user : admin , password : dolphinscheduler123
+INSERT INTO t_ds_user(user_name,user_password,user_type,email,phone,tenant_id,create_time,update_time) VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', 'xx', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
-INSERT INTO "t_ds_alertgroup" VALUES (1, 'dolphinscheduler warning group', '0', 'dolphinscheduler warning group','2018-11-29 10:20:39', '2018-11-29 10:20:39');
-SELECT setval('t_ds_alertgroup_id_sequence', (SELECT MAX(id) FROM "t_ds_alertgroup")+1);
-
-INSERT INTO "t_ds_relation_user_alertgroup" VALUES ('1', '1', '1', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
-SELECT setval('t_ds_relation_user_alertgroup_id_sequence', (SELECT MAX(id) FROM "t_ds_relation_user_alertgroup")+1);
+-- Records of t_ds_alertgroup，dolphinscheduler warning group
+INSERT INTO t_ds_alertgroup(group_name,group_type,description,create_time,update_time)  VALUES ('dolphinscheduler warning group', '0', 'dolphinscheduler warning group','2018-11-29 10:20:39', '2018-11-29 10:20:39');
+INSERT INTO t_ds_relation_user_alertgroup(alertgroup_id,user_id,create_time,update_time) VALUES ( '1', '1', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO "t_ds_queue" VALUES ('1', 'default', 'default');
-SELECT setval('t_ds_queue_id_sequence', (SELECT MAX(id) FROM "t_ds_queue")+1);
+INSERT INTO t_ds_queue(queue_name,queue,create_time,update_time) VALUES ('default', 'default','2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
-INSERT INTO "t_ds_version" VALUES ('1', '1.2.0');
+-- Records of t_ds_queue,default queue name : default
+INSERT INTO t_ds_version(version) VALUES ('1.2.0');
