@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -24,22 +27,16 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.dao.DaoFactory;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.common.utils.*;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
@@ -131,9 +128,9 @@ public class MasterExecThread implements Runnable {
     private ProcessDao processDao;
 
     /**
-     * load configuration file
+     * master config
      */
-    private static Configuration conf;
+    private MasterConfig masterConfig;
 
     /**
      * constructor of MasterExecThread
@@ -144,22 +141,12 @@ public class MasterExecThread implements Runnable {
         this.processDao = processDao;
 
         this.processInstance = processInstance;
-
-        int masterTaskExecNum = conf.getInt(Constants.MASTER_EXEC_TASK_THREADS,
-                Constants.defaultMasterTaskExecNum);
+        this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        int masterTaskExecNum = masterConfig.getMasterExecTaskNum();
         this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
                 masterTaskExecNum);
     }
 
-
-    static {
-        try {
-            conf = new PropertiesConfiguration(Constants.MASTER_PROPERTIES_PATH);
-        }catch (ConfigurationException e){
-            logger.error("load configuration failed : " + e.getMessage(),e);
-            System.exit(1);
-        }
-    }
 
     @Override
     public void run() {
@@ -927,7 +914,7 @@ public class MasterExecThread implements Runnable {
      * @return boolean
      */
     private boolean canSubmitTaskToQueue() {
-        return OSUtils.checkResource(conf, true);
+        return OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory());
     }
 
 
