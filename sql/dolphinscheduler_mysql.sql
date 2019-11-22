@@ -445,7 +445,7 @@ CREATE TABLE `t_ds_queue` (
 -- Records of t_ds_queue
 -- ----------------------------
 BEGIN;
-INSERT INTO `t_ds_queue` VALUES (1, 'default', 'default', NULL, NULL);
+INSERT INTO `t_ds_queue` VALUES (1, 'default', 'default','2018-11-29 10:22:33', '2018-11-29 10:22:33');
 COMMIT;
 
 -- ----------------------------
