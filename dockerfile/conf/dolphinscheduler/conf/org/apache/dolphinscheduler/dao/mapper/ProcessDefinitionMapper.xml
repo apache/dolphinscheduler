@@ -34,9 +34,6 @@
         left join (select process_definition_id,release_state as schedule_release_state from t_ds_schedules group by process_definition_id,release_state) sc on sc.process_definition_id = td.id
         left join t_ds_user tu on  td.user_id = tu.id
         where td.project_id = #{projectId}
-        <if test=" isAdmin == false ">
-            and tu.user_type=1
-        </if>
         <if test=" searchVal != null and searchVal != ''">
             and td.name like concat('%', #{searchVal}, '%')
         </if>
@@ -70,9 +67,6 @@
         FROM t_ds_process_definition td
         JOIN t_ds_user tu on tu.id=td.user_id
         where 1 = 1
-        <if test=" isAdmin == false ">
-            and tu.user_type=1
-        </if>
         <if test="projectIds != null and projectIds.length != 0">
             and td.project_id in
             <foreach collection="projectIds" index="index" item="i" open="(" separator="," close=")">

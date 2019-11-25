@@ -63,6 +63,19 @@ DolphinScheduler的工作计划：<a href="https://github.com/apache/incubator-d
 非常欢迎大家来参与贡献代码，提交代码流程请参考：
 [[How to contribute code](https://github.com/apache/incubator-dolphinscheduler/issues/310)]
 
+### How to Build
+
+```bash
+mvn clean install -Prelease
+```
+
+Artifact:
+
+```
+dolphinscheduler-dist/dolphinscheduler-backend/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-backend-bin.tar.gz: Binary package of DolphinScheduler-Backend
+dolphinscheduler-dist/dolphinscheduler-front/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-front-bin.tar.gz: Binary package of DolphinScheduler-UI
+dolphinscheduler-dist/dolphinscheduler-src/target/apache-dolphinscheduler-incubating-${latest.release.version}-src.zip: Source code package of DolphinScheduler
+```
 
 ### 感谢
 

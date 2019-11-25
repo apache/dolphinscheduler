@@ -74,6 +74,20 @@ Work plan of Dolphin Scheduler: [R&D plan](https://github.com/apache/incubator-d
 Welcome to participate in contributing code, please refer to the process of submitting the code:
 [[How to contribute code](https://github.com/apache/incubator-dolphinscheduler/issues/310)]
 
+### How to Build
+
+```bash
+mvn clean install -Prelease
+```
+
+Artifact:
+
+```
+dolphinscheduler-dist/dolphinscheduler-backend/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-backend-bin.tar.gz: Binary package of DolphinScheduler-Backend
+dolphinscheduler-dist/dolphinscheduler-front/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-front-bin.tar.gz: Binary package of DolphinScheduler-UI
+dolphinscheduler-dist/dolphinscheduler-src/target/apache-dolphinscheduler-incubating-${latest.release.version}-src.zip: Source code package of DolphinScheduler
+```
+
 ### Thanks
 
 Dolphin Scheduler uses a lot of excellent open source projects, such as google guava, guice, grpc, netty, ali bonecp, quartz, and many open source projects of apache, etc.
