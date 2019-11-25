@@ -220,8 +220,9 @@ public class UdfFuncService extends BaseService{
         Date now = new Date();
         udf.setFuncName(funcName);
         udf.setClassName(className);
-        udf.setArgTypes(argTypes);
-        udf.setDatabase(database);
+        if (StringUtils.isNotEmpty(database)) {
+            udf.setDatabase(database);
+        }
         udf.setDescription(desc);
         udf.setResourceId(resourceId);
         udf.setResourceName(resource.getAlias());
