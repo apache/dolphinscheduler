@@ -165,6 +165,14 @@ public class ResourcesService extends BaseService {
         return result;
     }
 
+    /**
+     * check resource is exists
+     *
+     * @param alias     alias
+     * @param userId    user id
+     * @param type      type
+     * @return true if resource exists
+     */
     private boolean checkResourceExists(String alias, int userId, int type ){
 
         List<Resource> resources = resourcesMapper.queryResourceList(alias, userId, type);
