@@ -148,7 +148,7 @@ export default {
   'Click to view': 'Click to view',
   'Delete?': 'Delete?',
   'Confirm': 'Confirm',
-  'Task status statistics': 'Task status statistics',
+  'Task status statistics': 'Task Status Statistics',
   'Number': 'Number',
   'State': 'State',
   'Process Status Statistics': 'Process Status Statistics',
