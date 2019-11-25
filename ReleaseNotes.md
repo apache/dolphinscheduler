@@ -52,3 +52,4 @@
 17. Resole verify udf name error and delete udf error 
 18. Fix bug: task cannot submit when recovery failover
 19. Fix bug: the administrator authorizes the project to ordinary users,but ordinary users cannot see the process definition created by the administrator
+20. Fix bug: create dolphinscheduler sql failed
