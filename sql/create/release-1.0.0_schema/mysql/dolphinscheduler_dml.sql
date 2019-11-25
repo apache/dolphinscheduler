@@ -21,4 +21,4 @@ INSERT INTO `t_escheduler_alertgroup` VALUES (1, 'default admin warning group', 
 INSERT INTO `t_escheduler_relation_user_alertgroup` VALUES ('1', '1', '1', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_escheduler_queue,default queue name : default
-INSERT INTO `t_escheduler_queue` VALUES ('1', 'default', 'default','2018-11-29 10:22:33', '2018-11-29 10:22:33');
+INSERT INTO `t_escheduler_queue` VALUES ('1', 'default', 'default');
