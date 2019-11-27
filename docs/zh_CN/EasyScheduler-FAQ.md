@@ -73,9 +73,9 @@ A：单独安装 **npm install node-sass --unsafe-perm**，之后再 **npm insta
 A： 1，如果是node启动的查看escheduler-ui下的.env API_BASE配置是否是Api Server服务地址
 
     2，如果是nginx启动的并且是通过 **install-escheduler-ui.sh** 安装的，查看             											**/etc/nginx/conf.d/escheduler.conf** 中的proxy_pass配置是否是Api Server服务地址
-
+    
     3，如果以上配置都是正确的，那么请查看Api Server服务是否是正常的，curl http://192.168.xx.xx:12345/escheduler/users/get-user-info，查看Api Server日志，如果提示 cn.escheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null，则证明Api Server服务是正常的
-
+    
     4，如果以上都没有问题，需要查看一下 **application.properties** 中的 **server.context-path 和 server.port 配置**是否正确
 
 ---
@@ -246,7 +246,7 @@ A ： EasyScheduler 中的队列可以在用户或者租户上指定队列，**�
 ## Q : Master 或者 Worker报如下告警
 
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/master_worker_lack_res.png" width="60%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs_cn/images/master_worker_lack_res.png"><img src="https://analysys.github.io/easyscheduler_docs_cn/images/master_worker_lack_res.png" width="60%" /></a>
  </p>
 
 
@@ -260,7 +260,7 @@ worker.properties **worker.reserved.memory** 的值为更小的值，比如说0.
 ## Q : hive版本是1.1.0+cdh5.15.0，SQL hive任务连接报错
 
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs_cn/images/cdh_hive_error.png" width="60%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs_cn/images/cdh_hive_error.png"><img src="https://analysys.github.io/easyscheduler_docs_cn/images/cdh_hive_error.png" width="60%" /></a>
  </p>
 
 

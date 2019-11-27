@@ -7,7 +7,7 @@
   - Click "Project - > Create Project", enter project name,  description, and click "Submit" to create a new project.
   - Click on the project name to enter the project home page.
 <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61776719-2ee50380-ae2e-11e9-9d11-41de8907efb5.png" width="60%" />
+      <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61776719-2ee50380-ae2e-11e9-9d11-41de8907efb5.png"><img src="https://user-images.githubusercontent.com/53217792/61776719-2ee50380-ae2e-11e9-9d11-41de8907efb5.png" width="60%" /></a>
  </p>
 
 > Project Home Page contains task status statistics, process status statistics.
@@ -26,23 +26,23 @@
   - Timeout alarm. Fill in "Overtime Time". When the task execution time exceeds the overtime, it can alarm and fail over time.
   - Fill in "Custom Parameters" and refer to [Custom Parameters](#Custom Parameters)
     <p align="center">
-    <img src="https://user-images.githubusercontent.com/53217792/61778402-42459e00-ae31-11e9-96c6-8fd7fed8fed2.png" width="60%" />
+    <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61778402-42459e00-ae31-11e9-96c6-8fd7fed8fed2.png"><img src="https://user-images.githubusercontent.com/53217792/61778402-42459e00-ae31-11e9-96c6-8fd7fed8fed2.png" width="60%" /></a>
       </p>
   - Increase the order of execution between nodes: click "line connection". As shown, task 1 and task 3 are executed in parallel. When task 1 is executed, task 2 and task 3 are executed simultaneously.
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61778247-f98de500-ae30-11e9-8f11-cce0530c3ff2.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61778247-f98de500-ae30-11e9-8f11-cce0530c3ff2.png"><img src="https://user-images.githubusercontent.com/53217792/61778247-f98de500-ae30-11e9-8f11-cce0530c3ff2.png" width="60%" /></a>
  </p>
 
   - Delete dependencies: Click on the arrow icon to "drag nodes and select items", select the connection line, click on the delete icon to delete dependencies between nodes.
 <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61778800-052ddb80-ae32-11e9-8ac0-4f13466d3515.png" width="60%" />
+      <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61778800-052ddb80-ae32-11e9-8ac0-4f13466d3515.png"><img src="https://user-images.githubusercontent.com/53217792/61778800-052ddb80-ae32-11e9-8ac0-4f13466d3515.png" width="60%" /></a>
  </p>
 
   - Click "Save", enter the name of the process definition, the description of the process definition, and set the global parameters.
 
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/save-definition.png" width="60%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/save-definition.png"><img src="https://analysys.github.io/easyscheduler_docs/images/save-definition.png" width="60%" /></a>
  </p>
 
   - For other types of nodes, refer to [task node types and parameter settings](#task node types and parameter settings)
@@ -63,13 +63,13 @@
     * Cc: Enter the mailbox and press Enter key to save. When the process is over and fault-tolerant occurs, alarm messages are copied to the copier list.
     
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/start-process.png" width="60%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/start-process.png"><img src="https://analysys.github.io/easyscheduler_docs/images/start-process.png" width="60%" /></a>
  </p>
 
   * Complement: To implement the workflow definition of a specified date, you can select the time range of the complement (currently only support for continuous days), such as the data from May 1 to May 10, as shown in the figure:
-  
+
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/complement.png" width="60%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/complement.png"><img src="https://analysys.github.io/easyscheduler_docs/images/complement.png" width="60%" /></a>
  </p>
 
 > Complement execution mode includes serial execution and parallel execution. In serial mode, the complement will be executed sequentially from May 1 to May 10. In parallel mode, the tasks from May 1 to May 10 will be executed simultaneously.
@@ -77,14 +77,14 @@
 ### Timing Process Definition
   - Create Timing: "Process Definition - > Timing"
   - Choose start-stop time, in the start-stop time range, regular normal work, beyond the scope, will not continue to produce timed workflow instances.
-  
+
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/timing.png" width="60%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/timing.png"><img src="https://analysys.github.io/easyscheduler_docs/images/timing.png" width="60%" /></a>
  </p>
 
   - Add a timer to be executed once a day at 5:00 a.m. as shown below:
 <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61781968-d9adef80-ae37-11e9-9e90-3d9f0b3eb998.png" width="60%" />
+      <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61781968-d9adef80-ae37-11e9-9e90-3d9f0b3eb998.png"><img src="https://user-images.githubusercontent.com/53217792/61781968-d9adef80-ae37-11e9-9e90-3d9f0b3eb998.png" width="60%" /></a>
  </p>
 
   - Timely online，**the newly created timer is offline. You need to click "Timing Management - >online" to work properly.**
@@ -95,26 +95,26 @@
   > Click on the process name to see the status of task execution.
 
   <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61855837-6ff31b80-aef3-11e9-8464-2fb5773709df.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61855837-6ff31b80-aef3-11e9-8464-2fb5773709df.png"><img src="https://user-images.githubusercontent.com/53217792/61855837-6ff31b80-aef3-11e9-8464-2fb5773709df.png" width="60%" /></a>
  </p>
 
   > Click on the task node, click "View Log" to view the task execution log.
 
   <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61783070-bdab4d80-ae39-11e9-9ada-355614fbb7f7.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61783070-bdab4d80-ae39-11e9-9ada-355614fbb7f7.png"><img src="https://user-images.githubusercontent.com/53217792/61783070-bdab4d80-ae39-11e9-9ada-355614fbb7f7.png" width="60%" /></a>
  </p>
 
  > Click on the task instance node, click **View History** to view the list of task instances that the process instance runs.
 
  <p align="center">
-    <img src="https://user-images.githubusercontent.com/53217792/61783240-05ca7000-ae3a-11e9-8c10-591a7635834a.png" width="60%" />
+    <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61783240-05ca7000-ae3a-11e9-8c10-591a7635834a.png"><img src="https://user-images.githubusercontent.com/53217792/61783240-05ca7000-ae3a-11e9-8c10-591a7635834a.png" width="60%" /></a>
   </p>
 
 
   > Operations on workflow instances:
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61783291-21357b00-ae3a-11e9-837c-fc3d85404410.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61783291-21357b00-ae3a-11e9-837c-fc3d85404410.png"><img src="https://user-images.githubusercontent.com/53217792/61783291-21357b00-ae3a-11e9-837c-fc3d85404410.png" width="60%" /></a>
 </p>
 
   * Editor: You can edit the terminated process. When you save it after editing, you can choose whether to update the process definition or not.
@@ -126,7 +126,7 @@
   * Delete: Delete process instances and task instances under process instances
   * Gantt diagram: The vertical axis of Gantt diagram is the topological ordering of task instances under a process instance, and the horizontal axis is the running time of task instances, as shown in the figure:
 <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61783596-aa4cb200-ae3a-11e9-9798-e795f80dae96.png" width="60%" />
+      <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61783596-aa4cb200-ae3a-11e9-9798-e795f80dae96.png"><img src="https://user-images.githubusercontent.com/53217792/61783596-aa4cb200-ae3a-11e9-9798-e795f80dae96.png" width="60%" /></a>
 </p>
 
 ### View task instances
@@ -135,13 +135,13 @@
   >
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61783544-91dc9780-ae3a-11e9-9dca-dfd901f1fe83.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61783544-91dc9780-ae3a-11e9-9dca-dfd901f1fe83.png"><img src="https://user-images.githubusercontent.com/53217792/61783544-91dc9780-ae3a-11e9-9dca-dfd901f1fe83.png" width="60%" /></a>
 </p>
 
   > Click "View Log" in the action column to view the log of task execution.
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61783441-60fc6280-ae3a-11e9-8631-963dcf78467b.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61783441-60fc6280-ae3a-11e9-8631-963dcf78467b.png"><img src="https://user-images.githubusercontent.com/53217792/61783441-60fc6280-ae3a-11e9-8631-963dcf78467b.png" width="60%" /></a>
 </p>
 
 ### Create data source
@@ -161,7 +161,7 @@
 - Jdbc connection parameters: parameter settings for MySQL connections, filled in as JSON
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61783812-129b9380-ae3b-11e9-9b9c-77870371c5f3.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61783812-129b9380-ae3b-11e9-9b9c-77870371c5f3.png"><img src="https://user-images.githubusercontent.com/53217792/61783812-129b9380-ae3b-11e9-9b9c-77870371c5f3.png" width="60%" /></a>
  </p>
 
   > Click "Test Connect" to test whether the data source can be successfully connected.
@@ -181,7 +181,7 @@
 - Jdbc connection parameters: parameter settings for POSTGRESQL connections, filled in as JSON
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61783968-60180080-ae3b-11e9-91b7-36d49246a205.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61783968-60180080-ae3b-11e9-91b7-36d49246a205.png"><img src="https://user-images.githubusercontent.com/53217792/61783968-60180080-ae3b-11e9-91b7-36d49246a205.png" width="60%" /></a>
  </p>
 
 #### Create and edit HIVE data source
@@ -189,7 +189,7 @@
 1.Connect with HiveServer 2
 
  <p align="center">
-    <img src="https://user-images.githubusercontent.com/53217792/61784129-b9802f80-ae3b-11e9-8a27-7be23e0953be.png" width="60%" />
+    <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61784129-b9802f80-ae3b-11e9-8a27-7be23e0953be.png"><img src="https://user-images.githubusercontent.com/53217792/61784129-b9802f80-ae3b-11e9-8a27-7be23e0953be.png" width="60%" /></a>
   </p>
 
   - Datasource: Select HIVE
@@ -205,13 +205,13 @@
 2.Connect using Hive Server 2 HA Zookeeper mode
 
  <p align="center">
-    <img src="https://user-images.githubusercontent.com/53217792/61784420-3dd2b280-ae3c-11e9-894a-5b896863d37a.png" width="60%" />
+    <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61784420-3dd2b280-ae3c-11e9-894a-5b896863d37a.png"><img src="https://user-images.githubusercontent.com/53217792/61784420-3dd2b280-ae3c-11e9-894a-5b896863d37a.png" width="60%" /></a>
   </p>
 
 
 Note: If **kerberos** is turned on, you need to fill in **Principal**
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/53217792/61784847-0adcee80-ae3d-11e9-8ac7-ba8a13aef90c.png" width="60%" />
+    <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61784847-0adcee80-ae3d-11e9-8ac7-ba8a13aef90c.png"><img src="https://user-images.githubusercontent.com/53217792/61784847-0adcee80-ae3d-11e9-8ac7-ba8a13aef90c.png" width="60%" /></a>
   </p>
 
 
@@ -220,7 +220,7 @@ Note: If **kerberos** is turned on, you need to fill in **Principal**
 #### Create and Edit Datasource
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/48329107/61853431-7af77d00-aeee-11e9-8e2e-95ba6cea43c8.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/48329107/61853431-7af77d00-aeee-11e9-8e2e-95ba6cea43c8.png"><img src="https://user-images.githubusercontent.com/48329107/61853431-7af77d00-aeee-11e9-8e2e-95ba6cea43c8.png" width="60%" /></a>
  </p>
 
 - Datasource: Select Spark
@@ -238,7 +238,7 @@ Note: If **kerberos** is turned on, you need to fill in **Principal**
 Note: If **kerberos** If Kerberos is turned on, you need to fill in  **Principal**
 
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/48329107/61853668-0709a480-aeef-11e9-8960-92107dd1a9ca.png" width="60%" />
+    <a target="_blank" href="https://user-images.githubusercontent.com/48329107/61853668-0709a480-aeef-11e9-8960-92107dd1a9ca.png"><img src="https://user-images.githubusercontent.com/48329107/61853668-0709a480-aeef-11e9-8960-92107dd1a9ca.png" width="60%" /></a>
   </p>
 
 ### Upload Resources
@@ -259,14 +259,14 @@ conf/common/hadoop.properties
   >
   >
   > <p align="center">
-  >  <img src="https://user-images.githubusercontent.com/53217792/61785274-ed5c5480-ae3d-11e9-8461-2178f49b228d.png" width="60%" />
+  >  <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61785274-ed5c5480-ae3d-11e9-8461-2178f49b228d.png"><img src="https://user-images.githubusercontent.com/53217792/61785274-ed5c5480-ae3d-11e9-8461-2178f49b228d.png" width="60%" /></a>
   > </p>
 
   * Create file
  > File formats support the following types：txt、log、sh、conf、cfg、py、java、sql、xml、hql
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61841049-f133b980-aec5-11e9-8ac8-db97cdccc599.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61841049-f133b980-aec5-11e9-8ac8-db97cdccc599.png"><img src="https://user-images.githubusercontent.com/53217792/61841049-f133b980-aec5-11e9-8ac8-db97cdccc599.png" width="60%" /></a>
  </p>
 
   * Upload Files
@@ -274,7 +274,7 @@ conf/common/hadoop.properties
 > Upload Files: Click the Upload button to upload, drag the file to the upload area, and the file name will automatically complete the uploaded file name.
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61841179-73bc7900-aec6-11e9-8780-28756e684754.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61841179-73bc7900-aec6-11e9-8780-28756e684754.png"><img src="https://user-images.githubusercontent.com/53217792/61841179-73bc7900-aec6-11e9-8780-28756e684754.png" width="60%" /></a>
  </p>
 
 
@@ -283,7 +283,7 @@ conf/common/hadoop.properties
 > For viewable file types, click on the file name to view file details
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61841247-9cdd0980-aec6-11e9-9f6f-0a7dd145f865.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61841247-9cdd0980-aec6-11e9-9f6f-0a7dd145f865.png"><img src="https://user-images.githubusercontent.com/53217792/61841247-9cdd0980-aec6-11e9-9f6f-0a7dd145f865.png" width="60%" /></a>
  </p>
 
   * Download files
@@ -293,7 +293,7 @@ conf/common/hadoop.properties
   * File rename
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61841322-f47b7500-aec6-11e9-93b1-b00328e7b69e.png" width="60%" />
+  <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61841322-f47b7500-aec6-11e9-93b1-b00328e7b69e.png"> <img src="https://user-images.githubusercontent.com/53217792/61841322-f47b7500-aec6-11e9-93b1-b00328e7b69e.png" width="60%" /></a>
  </p>
 
 #### Delete
@@ -325,7 +325,7 @@ conf/common/hadoop.properties
   > 
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61841562-c6e2fb80-aec7-11e9-9481-4202d63dab6f.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61841562-c6e2fb80-aec7-11e9-9481-4202d63dab6f.png"><img src="https://user-images.githubusercontent.com/53217792/61841562-c6e2fb80-aec7-11e9-9481-4202d63dab6f.png" width="60%" /></a>
  </p>
 
 ## Security
@@ -342,7 +342,7 @@ conf/common/hadoop.properties
   - Queues are used to execute spark, mapreduce and other programs, which require the use of "queue" parameters.
 - "Security" - > "Queue Manage" - > "Create Queue" 
      <p align="center">
-    <img src="https://user-images.githubusercontent.com/53217792/61841945-078f4480-aec9-11e9-92fb-05b6f42f07d6.png" width="60%" />
+    <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61841945-078f4480-aec9-11e9-92fb-05b6f42f07d6.png"><img src="https://user-images.githubusercontent.com/53217792/61841945-078f4480-aec9-11e9-92fb-05b6f42f07d6.png" width="60%" /></a>
   </p>
 
 
@@ -351,7 +351,7 @@ conf/common/hadoop.properties
   - Tenant Code：**the tenant code is the only account on Linux that can't be duplicated.**
 
  <p align="center">
-    <img src="https://user-images.githubusercontent.com/53217792/61842372-8042d080-aeca-11e9-8c54-e3dee583eeff.png" width="60%" />
+    <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61842372-8042d080-aeca-11e9-8c54-e3dee583eeff.png"><img src="https://user-images.githubusercontent.com/53217792/61842372-8042d080-aeca-11e9-8c54-e3dee583eeff.png" width="60%" /></a>
   </p>
 
 ### Create Ordinary Users
@@ -360,14 +360,14 @@ conf/common/hadoop.properties
     * Ordinary users can **create projects and create, edit, and execute process definitions**.
     * Note: **If the user switches the tenant, all resources under the tenant will be copied to the switched new tenant.**
 <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61842461-da439600-aeca-11e9-98e3-f8327dbafa60.png" width="60%" />
+      <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61842461-da439600-aeca-11e9-98e3-f8327dbafa60.png"><img src="https://user-images.githubusercontent.com/53217792/61842461-da439600-aeca-11e9-98e3-f8327dbafa60.png" width="60%" /></a>
  </p>
 
 ### Create alarm group
   * The alarm group is a parameter set at start-up. After the process is finished, the status of the process and other information will be sent to the alarm group by mail.
   * New and Editorial Warning Group
     <p align="center">
-    <img src="https://user-images.githubusercontent.com/53217792/61842553-34445b80-aecb-11e9-84a8-3cc66b6c6135.png" width="60%" />
+    <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61842553-34445b80-aecb-11e9-84a8-3cc66b6c6135.png"><img src="https://user-images.githubusercontent.com/53217792/61842553-34445b80-aecb-11e9-84a8-3cc66b6c6135.png" width="60%" /></a>
     </p>
 
 ### Create Worker Group
@@ -375,7 +375,7 @@ conf/common/hadoop.properties
 - Multiple IP addresses within a worker group (**aliases can not be written**), separated by **commas in English**
 
   <p align="center">
-    <img src="https://user-images.githubusercontent.com/53217792/61842630-6b1a7180-aecb-11e9-8988-b4444de16b36.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61842630-6b1a7180-aecb-11e9-8988-b4444de16b36.png"> <img src="https://user-images.githubusercontent.com/53217792/61842630-6b1a7180-aecb-11e9-8988-b4444de16b36.png" width="60%" /></a>
   </p>
 
 ### Token manage
@@ -425,13 +425,13 @@ conf/common/hadoop.properties
 
   - 1.Click on the authorization button of the designated person as follows:
     <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61843204-71a9e880-aecd-11e9-83ad-365d7bf99375.png" width="60%" />
+      <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61843204-71a9e880-aecd-11e9-83ad-365d7bf99375.png"><img src="https://user-images.githubusercontent.com/53217792/61843204-71a9e880-aecd-11e9-83ad-365d7bf99375.png" width="60%" /></a>
  </p>
 
 - 2.Select the project button to authorize the project
 
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/auth-project.png" width="60%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/auth-project.png"><img src="https://analysys.github.io/easyscheduler_docs/images/auth-project.png" width="60%" /></a>
  </p>
 
 ### Monitor center
@@ -440,28 +440,28 @@ conf/common/hadoop.properties
 #### Master monitor
   - Mainly related information about master.
 <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61843245-8edeb700-aecd-11e9-9916-ea50080e7d08.png" width="60%" />
+      <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61843245-8edeb700-aecd-11e9-9916-ea50080e7d08.png"><img src="https://user-images.githubusercontent.com/53217792/61843245-8edeb700-aecd-11e9-9916-ea50080e7d08.png" width="60%" /></a>
  </p>
 
 #### Worker monitor
   - Mainly related information of worker.
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61843277-ae75df80-aecd-11e9-9667-b9f1615b6f3b.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61843277-ae75df80-aecd-11e9-9667-b9f1615b6f3b.png"><img src="https://user-images.githubusercontent.com/53217792/61843277-ae75df80-aecd-11e9-9667-b9f1615b6f3b.png" width="60%" /></a>
  </p>
 
 #### Zookeeper monitor
   - Mainly the configuration information of each worker and master in zookpeeper.
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61843323-c64d6380-aecd-11e9-8392-1ca9b84cd794.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61843323-c64d6380-aecd-11e9-8392-1ca9b84cd794.png"><img src="https://user-images.githubusercontent.com/53217792/61843323-c64d6380-aecd-11e9-8392-1ca9b84cd794.png" width="60%" /></a>
  </p>
 
 #### Mysql monitor
   - Mainly the health status of mysql
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61843358-e11fd800-aecd-11e9-86d1-9490e48dc955.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61843358-e11fd800-aecd-11e9-86d1-9490e48dc955.png"><img src="https://user-images.githubusercontent.com/53217792/61843358-e11fd800-aecd-11e9-86d1-9490e48dc955.png" width="60%" /></a>
  </p>
 
 ## Task Node Type and Parameter Setting
@@ -472,7 +472,7 @@ conf/common/hadoop.properties
 > Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_SHELL.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61843728-6788e980-aecf-11e9-8006-241a7ec5024b.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61843728-6788e980-aecf-11e9-8006-241a7ec5024b.png"><img src="https://user-images.githubusercontent.com/53217792/61843728-6788e980-aecf-11e9-8006-241a7ec5024b.png" width="60%" /></a>
  </p>`
 
 - Node name: The node name in a process definition is unique
@@ -489,7 +489,7 @@ conf/common/hadoop.properties
 > Drag the ![PNG](https://analysys.github.io/easyscheduler_docs_cn/images/toolbar_SUB_PROCESS.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61843799-adde4880-aecf-11e9-846e-f1696107029f.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61843799-adde4880-aecf-11e9-846e-f1696107029f.png"><img src="https://user-images.githubusercontent.com/53217792/61843799-adde4880-aecf-11e9-846e-f1696107029f.png" width="60%" /></a>
  </p>
 
 - Node name: The node name in a process definition is unique
@@ -504,25 +504,25 @@ conf/common/hadoop.properties
 > Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_DEPENDENT.png) ask node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61844369-be8fbe00-aed1-11e9-965d-ddb9aeeba9db.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61844369-be8fbe00-aed1-11e9-965d-ddb9aeeba9db.png"><img src="https://user-images.githubusercontent.com/53217792/61844369-be8fbe00-aed1-11e9-965d-ddb9aeeba9db.png" width="60%" /></a>
  </p>
 
   > Dependent nodes provide logical judgment functions, such as checking whether yesterday's B process was successful or whether the C process was successfully executed.
 
   <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/depend-b-and-c.png" width="80%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/depend-b-and-c.png"><img src="https://analysys.github.io/easyscheduler_docs/images/depend-b-and-c.png" width="80%" /></a>
  </p>
 
   > For example, process A is a weekly task and process B and C are daily tasks. Task A requires that task B and C be successfully executed every day of the last week, as shown in the figure:
 
  <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/depend-week.png" width="80%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/depend-week.png"><img src="https://analysys.github.io/easyscheduler_docs/images/depend-week.png" width="80%" /></a>
  </p>
 
   > If weekly A also needs to be implemented successfully on Tuesday:
 
  <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/depend-last-tuesday.png" width="80%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/depend-last-tuesday.png"><img src="https://analysys.github.io/easyscheduler_docs/images/depend-last-tuesday.png" width="80%" /></a>
  </p>
 
 ###  PROCEDURE
@@ -530,7 +530,7 @@ conf/common/hadoop.properties
 > Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_PROCEDURE.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61844464-1af2dd80-aed2-11e9-9486-6cf1b8585aa5.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61844464-1af2dd80-aed2-11e9-9486-6cf1b8585aa5.png"><img src="https://user-images.githubusercontent.com/53217792/61844464-1af2dd80-aed2-11e9-9486-6cf1b8585aa5.png" width="60%" /></a>
  </p>
 
 - Datasource: The data source type of stored procedure supports MySQL and POSTGRESQL, and chooses the corresponding data source.
@@ -540,14 +540,14 @@ conf/common/hadoop.properties
 ### SQL
   - Execute non-query SQL functionality
     <p align="center">
-      <img src="https://user-images.githubusercontent.com/53217792/61850397-d7569e80-aee6-11e9-9da0-c4d96deaa8a1.png" width="60%" />
+      <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61850397-d7569e80-aee6-11e9-9da0-c4d96deaa8a1.png"><img src="https://user-images.githubusercontent.com/53217792/61850397-d7569e80-aee6-11e9-9da0-c4d96deaa8a1.png" width="60%" /></a>
  </p>
 
   - Executing the query SQL function, you can choose to send mail in the form of tables and attachments to the designated recipients.
 > Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_SQL.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61850594-4d5b0580-aee7-11e9-9c9e-1934c91962b9.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61850594-4d5b0580-aee7-11e9-9c9e-1934c91962b9.png"><img src="https://user-images.githubusercontent.com/53217792/61850594-4d5b0580-aee7-11e9-9c9e-1934c91962b9.png" width="60%" /></a>
  </p>
 
 - Datasource: Select the corresponding datasource
@@ -568,7 +568,7 @@ conf/common/hadoop.properties
 > 
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/48329107/61852935-3d462480-aeed-11e9-8241-415314bfc2e5.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/48329107/61852935-3d462480-aeed-11e9-8241-415314bfc2e5.png"><img src="https://user-images.githubusercontent.com/48329107/61852935-3d462480-aeed-11e9-8241-415314bfc2e5.png" width="60%" /></a>
  </p>
 
 - Program Type: Support JAVA, Scala and Python
@@ -593,7 +593,7 @@ Note: JAVA and Scala are just used for identification, no difference. If it's a 
  1. JAVA program
 
  <p align="center">
-    <img src="https://user-images.githubusercontent.com/53217792/61851102-91023f00-aee8-11e9-9ac0-dbe588d860c2.png" width="60%" />
+    <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61851102-91023f00-aee8-11e9-9ac0-dbe588d860c2.png"><img src="https://user-images.githubusercontent.com/53217792/61851102-91023f00-aee8-11e9-9ac0-dbe588d860c2.png" width="60%" /></a>
   </p>
 
 - Class of the main function: The full path of the MR program's entry Main Class
@@ -607,7 +607,7 @@ Note: JAVA and Scala are just used for identification, no difference. If it's a 
 2. Python program
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61851224-f3f3d600-aee8-11e9-8862-435220bbda93.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61851224-f3f3d600-aee8-11e9-8862-435220bbda93.png"><img src="https://user-images.githubusercontent.com/53217792/61851224-f3f3d600-aee8-11e9-8862-435220bbda93.png" width="60%" /></a>
  </p>
 
 - Program Type: Select Python Language
@@ -627,7 +627,7 @@ Note: JAVA and Scala are just used for identification, no difference. If it's a 
 > Drag the ![PNG](https://analysys.github.io/easyscheduler_docs/images/toolbar_PYTHON.png) task node in the toolbar onto the palette and double-click the task node as follows:
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61851959-daec2480-aeea-11e9-83fd-3e00a030cb84.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61851959-daec2480-aeea-11e9-83fd-3e00a030cb84.png"><img src="https://user-images.githubusercontent.com/53217792/61851959-daec2480-aeea-11e9-83fd-3e00a030cb84.png" width="60%" /></a>
  </p>
 
 - Script: User-developed Python program
@@ -684,13 +684,13 @@ Note: JAVA and Scala are just used for identification, no difference. If it's a 
 
 > For example:
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/save-global-parameters.png" width="60%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/save-global-parameters.png"><img src="https://analysys.github.io/easyscheduler_docs/images/save-global-parameters.png" width="60%" /></a>
  </p>
 
 > global_bizdate is a global parameter, referring to system parameters.
 
 <p align="center">
-   <img src="https://user-images.githubusercontent.com/53217792/61857313-78992100-aef6-11e9-9ba3-521c6ca33ce3.png" width="60%" />
+   <a target="_blank" href="https://user-images.githubusercontent.com/53217792/61857313-78992100-aef6-11e9-9ba3-521c6ca33ce3.png"><img src="https://user-images.githubusercontent.com/53217792/61857313-78992100-aef6-11e9-9ba3-521c6ca33ce3.png" width="60%" /></a>
  </p>
 
 > In tasks, local_param_bizdate refers to global parameters by  ${global_bizdate} for scripts, the value of variable local_param_bizdate can be referenced by${local_param_bizdate}, or the value of local_param_bizdate can be set directly by JDBC.

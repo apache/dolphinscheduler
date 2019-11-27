@@ -248,7 +248,7 @@ If it is a Spark task --queue mode specifies the queue
 ## Q : Master or Worker reports the following alarm
 
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/master_worker_lack_res.png" width="60%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/master_worker_lack_res.png"><img src="https://analysys.github.io/easyscheduler_docs/images/master_worker_lack_res.png" width="60%" /></a>
  </p>
 
 
@@ -258,7 +258,7 @@ A ： Change the value of master.properties **master.reserved.memory** under con
 ## Q: The hive version is 1.1.0+cdh5.15.0, and the SQL hive task connection is reported incorrectly.
 
 <p align="center">
-   <img src="https://analysys.github.io/easyscheduler_docs/images/cdh_hive_error.png" width="60%" />
+   <a target="_blank" href="https://analysys.github.io/easyscheduler_docs/images/cdh_hive_error.png"><img src="https://analysys.github.io/easyscheduler_docs/images/cdh_hive_error.png" width="60%" /></a>
  </p>
 
 
