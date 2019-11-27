@@ -43,9 +43,9 @@
         </div>
       </div>
     </m-list-box>
-    <template v-if="!sqlType && showType.length">
+    <template v-if="!sqlType">
       <m-list-box>
-        <div slot="text">{{$t('Title')}}</div>
+        <div slot="text"><b class='requiredIcon'>*</b>{{$t('Title')}}</div>
         <div slot="content">
           <x-input
             type="input"
@@ -56,7 +56,7 @@
         </div>
       </m-list-box>
       <m-list-box>
-        <div slot="text">{{$t('Recipient')}}</div>
+        <div slot="text"><b class='requiredIcon'>*</b>{{$t('Recipient')}}</div>
         <div slot="content">
           <m-email ref="refEmail" v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
         </div>
@@ -195,6 +195,9 @@
        */
       _onSqlType (a) {
         this.sqlType = a
+        if(a==0) {
+          this.showType = ['TABLE']
+        }
       },
       /**
        * return udfs
@@ -240,12 +243,24 @@
         if (!this.$refs.refDs._verifDatasource()) {
           return false
         }
+        if (this.sqlType==0 && !this.showType.length) {
+          this.$message.warning(`${i18n.$t('One form or attachment must be selected')}`)
+          return false
+        }
+        if (this.sqlType==0 && !this.title) {
+          this.$message.warning(`${i18n.$t('Mail subject required')}`)
+          return false
+        }
+        if (this.sqlType==0 && !this.receivers.length) {
+          this.$message.warning(`${i18n.$t('Recipient required')}`)
+          return false
+        }
         // receivers Subcomponent verification
-        if (!this.$refs.refEmail._manualEmail()) {
+        if (!this.sqlType && !this.$refs.refEmail._manualEmail()) {
           return false
         }
         // receiversCc Subcomponent verification
-        if (!this.$refs.refCc._manualEmail()) {
+        if (!this.sqlType && !this.$refs.refCc._manualEmail()) {
           return false
         }
         // udfs Subcomponent verification Verification only if the data type is HIVE
@@ -356,14 +371,6 @@
           this.connParams = ''
         }
       },
-      //
-      showType (val) {
-        if (!val.length) {
-          this.title = ''
-          this.receivers = []
-          this.receiversCc = []
-        }
-      }
     },
     created () {
       let o = this.backfillItem
@@ -412,3 +419,10 @@
     components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
   }
 </script>
+<style lang="scss" rel="stylesheet/scss">
+  .requiredIcon {
+    color: #ff0000;
+    padding-right: 4px;
+  }
+</style>
+

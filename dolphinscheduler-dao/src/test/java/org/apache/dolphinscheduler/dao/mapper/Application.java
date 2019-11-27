@@ -14,27 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.config;
+package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
+@SpringBootApplication
+@ComponentScan("org.apache.dolphinscheduler.dao")
+public class Application {
 
-/**
- * mybatis plus config
- */
-@Configuration
-@MapperScan("org.apache.dolphinscheduler.*.mapper")
-public class MybatisPlusConfig {
-    /**
-     *  pagination interceptor
-     * @return pagination interceptor
-     */
-    @Bean
-    public PaginationInterceptor paginationInterceptor() {
-        return new PaginationInterceptor();
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class);
+
     }
-
 }
