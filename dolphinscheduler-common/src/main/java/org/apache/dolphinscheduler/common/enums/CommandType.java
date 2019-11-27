@@ -29,27 +29,27 @@ public enum CommandType {
      * command types
      * 0 start a new process
      * 1 start a new process from current nodes
-     * 2 recover tolerance fault work flow
-     * 3 start process from paused task nodes
+     * 2 recover tolerance fault process
+     * 3 recover suspended process
      * 4 start process from failure task nodes
      * 5 complement data
      * 6 start a new process from scheduler
-     * 7 repeat running a work flow
+     * 7 repeat running a process
      * 8 pause a process
      * 9 stop a process
      * 10 recover waiting thread
      */
     START_PROCESS(0, "start a new process"),
     START_CURRENT_TASK_PROCESS(1, "start a new process from current nodes"),
-    RECOVER_TOLERANCE_FAULT_PROCESS(2, "recover tolerance fault work flow"),
-    RECOVER_SUSPENDED_PROCESS(3, "start process from paused task nodes"),
-    START_FAILURE_TASK_PROCESS(4, "start a new process"),
+    RECOVER_TOLERANCE_FAULT_PROCESS(2, "recover tolerance fault process"),
+    RECOVER_SUSPENDED_PROCESS(3, "recover suspended process"),
+    START_FAILURE_TASK_PROCESS(4, "start process from failure task nodes"),
     COMPLEMENT_DATA(5, "complement data"),
     SCHEDULER(6, "start a new process from scheduler"),
-    REPEAT_RUNNING(7, "start a new process"),
-    PAUSE(8, "start a new process"),
-    STOP(9, "start a new process"),
-    RECOVER_WAITTING_THREAD(10, "start a new process");
+    REPEAT_RUNNING(7, "repeat running a process"),
+    PAUSE(8, "pause a process"),
+    STOP(9, "stop a process"),
+    RECOVER_WAITTING_THREAD(10, "recover waitting thread");
 
     CommandType(int code, String descp){
         this.code = code;
