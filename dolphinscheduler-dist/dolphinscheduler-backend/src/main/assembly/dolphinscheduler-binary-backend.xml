@@ -226,14 +226,11 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../release-docs</directory>
+			<directory>${basedir}/release-docs</directory>
 			<useDefaultExcludes>true</useDefaultExcludes>
 			<includes>
 				<include>**/*</include>
 			</includes>
-			<excludes>
-				<exclude>**/licenses/ui-licenses/**</exclude>
-			</excludes>
 			<outputDirectory>.</outputDirectory>
 		</fileSet>
 
