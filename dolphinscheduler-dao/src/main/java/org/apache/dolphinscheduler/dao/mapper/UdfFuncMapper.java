@@ -28,6 +28,12 @@ import java.util.List;
  */
 public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
 
+    /**
+     * select udf by id
+     * @param id udf id
+     * @return UdfFunc
+     */
+    UdfFunc selectUdfById(@Param("id") int id);
 
     /**
      * query udf function by ids and function name

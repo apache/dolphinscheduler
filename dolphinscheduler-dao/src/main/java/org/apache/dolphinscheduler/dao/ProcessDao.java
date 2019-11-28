@@ -106,8 +106,6 @@ public class ProcessDao {
      * task queue impl
      */
     protected ITaskQueue taskQueue = TaskQueueFactory.getTaskQueueInstance();
-
-
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      * @param logger logger
@@ -1644,8 +1642,8 @@ public class ProcessDao {
      */
     public ProcessInstance findLastSchedulerProcessInterval(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastSchedulerProcess(definitionId,
-                DateUtils.dateToString(dateInterval.getStartTime()),
-                DateUtils.dateToString(dateInterval.getEndTime()));
+                dateInterval.getStartTime(),
+                dateInterval.getEndTime());
     }
 
     /**
@@ -1668,8 +1666,8 @@ public class ProcessDao {
      */
     public ProcessInstance findLastRunningProcess(int definitionId, DateInterval dateInterval) {
         return processInstanceMapper.queryLastRunningProcess(definitionId,
-                DateUtils.dateToString(dateInterval.getStartTime()),
-                DateUtils.dateToString(dateInterval.getEndTime()),
+                dateInterval.getStartTime(),
+                dateInterval.getEndTime(),
                 stateArray);
     }
 

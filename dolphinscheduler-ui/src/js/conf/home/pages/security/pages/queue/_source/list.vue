@@ -26,7 +26,7 @@
             <span>{{$t('Name')}}</span>
           </th>
           <th>
-            <span>队列值</span>
+            <span>{{$t('Queue value')}}</span>
           </th>
           <th>
             <span>{{$t('Create Time')}}</span>
