@@ -396,16 +396,16 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     spring-plugin-core 1.2.0.RELEASE: https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-core/1.2.0.RELEASE, Apache 2.0
     spring-plugin-metadata 1.2.0.RELEASE: https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-metadata/1.2.0.RELEASE, Apache 2.0
     spring-tx 5.1.5.RELEASE: https://mvnrepository.com/artifact/org.springframework/spring-tx/5.1.5.RELEASE, Apache 2.0
-    spring-web 5.1.5.RELEASE: https://mvnrepository.com/artifact/org.springframework/spring-web, Apache 2.0
-    spring-webmvc 5.1.5.RELEASE: https://mvnrepository.com/artifact/org.springframework/spring-webmvc, Apache 2.0
-    swagger-annotations 1.5.20: https://mvnrepository.com/artifact/io.swagger/swagger-annotations, Apache 2.0
-    swagger-bootstrap-ui 1.9.3: https://github.com/xiaoymin/swagger-bootstrap-ui, Apache 2.0
-    swagger-models 1.5.20: https://mvnrepository.com/artifact/io.swagger/swagger-models, Apache 2.0
+    spring-web 5.1.5.RELEASE: https://mvnrepository.com/artifact/org.springframework/spring-web/5.1.5.RELEASE, Apache 2.0
+    spring-webmvc 5.1.5.RELEASE: https://mvnrepository.com/artifact/org.springframework/spring-webmvc/5.1.5.RELEASE, Apache 2.0
+    swagger-annotations 1.5.20: https://mvnrepository.com/artifact/io.swagger/swagger-annotations/1.5.20, Apache 2.0
+    swagger-bootstrap-ui 1.9.3: https://mvnrepository.com/artifact/com.github.xiaoymin/swagger-bootstrap-ui/1.9.3, Apache 2.0
+    swagger-models 1.5.20: https://mvnrepository.com/artifact/io.swagger/swagger-models/1.5.20, Apache 2.0
     tephra-api 0.6.0: https://mvnrepository.com/artifact/co.cask.tephra/tephra-api/0.6.0, Apache 2.0
-    validation-api 2.0.1.Final: https://mvnrepository.com/artifact/javax.validation/validation-api, Apache 2.0
-    xercesImpl 2.9.1: https://mvnrepository.com/artifact/xerces/xercesImpl, Apache 2.0
-    xml-apis 1.4.01: https://mvnrepository.com/artifact/xml-apis/xml-apis, Apache 2.0 and W3C
-    zookeeper 3.4.8: https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper, Apache 2.0
+    validation-api 2.0.1.Final: https://mvnrepository.com/artifact/javax.validation/validation-api/2.0.1.Final, Apache 2.0
+    xercesImpl 2.9.1: https://mvnrepository.com/artifact/xerces/xercesImpl/2.9.1, Apache 2.0
+    xml-apis 1.4.01: https://mvnrepository.com/artifact/xml-apis/xml-apis/1.4.01, Apache 2.0 and W3C
+    zookeeper 3.4.14: https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper/3.4.14, Apache 2.0
 
 
 ========================================================================
@@ -416,15 +416,17 @@ The following components are provided under a BSD license. See project link for 
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     asm 3.1: https://github.com/jdf/javalin/tree/master/lib/asm-3.1, BSD
+    javolution 5.5.1: https://mvnrepository.com/artifact/javolution/javolution/5.5.1, BSD
     jline 0.9.94: https://github.com/jline/jline3, BSD
-    jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch, BSD
-    jsr305 3.0.2: https://github.com/amaembo/jsr-305/blob/master/ri/LICENSE, BSD-3-Clause
+    jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
     leveldbjni-all 1.8: https://github.com/fusesource/leveldbjni, BSD-3-Clause
     postgresql 42.1.4: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.1.4, BSD 2-clause
     protobuf-java 3.5.1: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/3.5.1, BSD 3-clause
     protobuf-java-util 3.5.1: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util, BSD 3-clause
-    paranamer 2.3: https://github.com/paul-hammant/paranamer/blob/paranamer-2.3/LICENSE.txt, BSD
-    threetenbp 1.3.6: https://mvnrepository.com/artifact/org.threeten/threetenbp,  BSD 3-clause
+    paranamer 2.3: https://mvnrepository.com/artifact/com.thoughtworks.paranamer/paranamer/2.3, BSD
+    threetenbp 1.3.6: https://mvnrepository.com/artifact/org.threeten/threetenbp/1.3.6,  BSD 3-clause
+    xmlenc 0.52: https://mvnrepository.com/artifact/xmlenc/xmlenc/0.52, BSD
+    hamcrest-core 1.3: https://mvnrepository.com/artifact/org.hamcrest/hamcrest-core/1.3, BSD 2-Clause
 
 
 ========================================================================
@@ -434,16 +436,20 @@ CDDL licenses
 The following components are provided under the CDDL License. See project link for details.
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
+    activation 1.1: https://mvnrepository.com/artifact/javax.activation/activation/1.1 CDDL 1.0
     javax.activation-api 1.2.0: https://mvnrepository.com/artifact/javax.activation/javax.activation-api/1.2.0, CDDL and LGPL 2.0
-    jaxb-api 2.3.1: https://github.com/eclipse-ee4j/jaxb-api, CDDL 1.1
-    jaxb-impl 2.2.3-1: https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl, CDDL and GPL 1.1
-    jersey-client 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-client, CDDL 1.1 and GPL 1.1
-    jersey-core 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-core, CDDL 1.1 and GPL 1.1
-    jersey-guice 1.9: https://mvnrepository.com/artifact/com.sun.jersey.contribs/jersey-guice, CDDL 1.1 and GPL 1.1
-    jersey-json 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-json, CDDL 1.1 and GPL 1.1
-    jersey-server 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-server, CDDL 1.1 and GPL 1.1
+    javax.annotation-api 1.3.2: https://mvnrepository.com/artifact/javax.annotation/javax.annotation-api/1.3.2, CDDL + GPLv2
+    javax.mail 1.6.2: https://mvnrepository.com/artifact/com.sun.mail/javax.mail/1.6.2, CDDL/GPLv2
+    javax.servlet-api 3.1.0: https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api/3.1.0, CDDL + GPLv2
+    jaxb-api 2.3.1: https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api/2.3.1, CDDL 1.1
+    jaxb-impl 2.2.3-1: https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl/2.2.3-1, CDDL and GPL 1.1
+    jersey-client 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-client/1.9, CDDL 1.1 and GPL 1.1
+    jersey-core 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-core/1.9, CDDL 1.1 and GPL 1.1
+    jersey-guice 1.9: https://mvnrepository.com/artifact/com.sun.jersey.contribs/jersey-guice/1.9, CDDL 1.1 and GPL 1.1
+    jersey-json 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-json/1.9, CDDL 1.1 and GPL 1.1
+    jersey-server 1.9: https://mvnrepository.com/artifact/com.sun.jersey/jersey-server/1.9, CDDL 1.1 and GPL 1.1
     jsp-2.1 6.1.14: https://mvnrepository.com/artifact/org.mortbay.jetty/jsp-2.1/6.1.14, CDDL 1.0
-    jta 1.1: https://mvnrepository.com/artifact/javax.transaction/jta, CDDL 1.0
+    jta 1.1: https://mvnrepository.com/artifact/javax.transaction/jta/1.1, CDDL 1.0
     transaction-api 1.1: https://mvnrepository.com/artifact/javax.transaction/transaction-api/1.1, CDDL 1.0
 
 ========================================================================
@@ -453,10 +459,11 @@ EPL licenses
 The following components are provided under the EPL License. See project link for details.
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
-    aspectjweaver 1.9.2: https://mvnrepository.com/artifact/org.aspectj/aspectjweaver, EPL 1.0 and Apache 2.0
-    logback-classic 1.2.3: https://github.com/qos-ch/logback, EPL 1.0 or LGPL 2.1
-    logback-core 1.2.3: https://github.com/qos-ch/logback, EPL 1.0 or LGPL 2.1
+    aspectjweaver 1.9.2:https://mvnrepository.com/artifact/org.aspectj/aspectjweaver/1.9.2, EPL 1.0
+    logback-classic 1.2.3: https://mvnrepository.com/artifact/ch.qos.logback/logback-classic/1.2.3, EPL 1.0 and LGPL 2.1
+    logback-core 1.2.3: https://mvnrepository.com/artifact/ch.qos.logback/logback-core/1.2.3, EPL 1.0 and LGPL 2.1
     oshi-core 3.5.0: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/3.5.0, EPL 1.0
+    junit 4.12: https://mvnrepository.com/artifact/junit/junit/4.12, EPL 1.0
 
 
 ========================================================================
@@ -466,8 +473,24 @@ MIT licenses
 The following components are provided under a MIT 2.0 license. See project link for details.
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
-    jul-to-slf4j 1.7.25: https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j, MIT
-    lombok 1.18.6: https://mvnrepository.com/artifact/org.projectlombok/lombok, MIT
-    mssql-jdbc 6.1.0.jre8: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc, MIT
-    slf4j-api 1.7.5: https://mvnrepository.com/artifact/org.slf4j/slf4j-api, MIT
+    jul-to-slf4j 1.7.25: https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j/1.7.25, MIT
+    lombok 1.18.6: https://mvnrepository.com/artifact/org.projectlombok/lombok/1.18.6, MIT
+    mssql-jdbc 6.1.0.jre8: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc/6.1.0.jre8, MIT
+    slf4j-api 1.7.5: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.5, MIT
+
+========================================================================
+MPL 1.1 licenses
+========================================================================
+The following components are provided under a MPL 1.1 license. See project link for details.
+The text of each license is also included at licenses/LICENSE-[project].txt.
+
+jamon-runtime 2.3.1: https://mvnrepository.com/artifact/org.jamon/jamon-runtime/2.3.1, MPL-1.1
+
+
+========================================================================
+Public Domain licenses
+========================================================================
+
+    xz 1.0: https://mvnrepository.com/artifact/org.tukaani/xz/1.0, Public Domain
+    aopalliance 1.0: https://mvnrepository.com/artifact/aopalliance/aopalliance/1.0, Public Domain
 
