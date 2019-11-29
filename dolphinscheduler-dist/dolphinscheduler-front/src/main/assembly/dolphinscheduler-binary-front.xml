@@ -44,9 +44,9 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/release-docs</directory>
+            <directory>${basedir}/src/main/release-docs</directory>
             <includes>
-                <include>./*</include>
+                <include>**/*</include>
             </includes>
             <outputDirectory>.</outputDirectory>
         </fileSet>
