@@ -273,7 +273,10 @@ public class ResourcesService extends BaseService {
             }
         } catch (Exception e) {
             logger.error(MessageFormat.format("hdfs copy {0} -> {1} fail", originHdfsFileName, destHdfsFileName), e);
-            putMsg(result,Status.HDFS_COPY_FAIL);
+            // fill params
+            putMsg(result,Status.HDFS_COPY_FAIL, originHdfsFileName, destHdfsFileName);
+            //roll back
+            throw new RuntimeException(result.getMsg());
         }
 
         return result;
