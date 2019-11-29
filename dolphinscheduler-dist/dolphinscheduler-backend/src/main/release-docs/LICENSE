@@ -478,12 +478,19 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     mssql-jdbc 6.1.0.jre8: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc/6.1.0.jre8, MIT
     slf4j-api 1.7.5: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.5, MIT
 
+========================================================================
+MPL 1.1 licenses
+========================================================================
+The following components are provided under a MPL 1.1 license. See project link for details.
+The text of each license is also included at licenses/LICENSE-[project].txt.
+
+jamon-runtime 2.3.1: https://mvnrepository.com/artifact/org.jamon/jamon-runtime/2.3.1, MPL-1.1
+
 
 ========================================================================
 Public Domain licenses
 ========================================================================
 
-appalliance 1.0: http://appalliance.sourceorge.net Public Domain
-
     xz 1.0: https://mvnrepository.com/artifact/org.tukaani/xz/1.0, Public Domain
     aopalliance 1.0: https://mvnrepository.com/artifact/aopalliance/aopalliance/1.0, Public Domain
+
