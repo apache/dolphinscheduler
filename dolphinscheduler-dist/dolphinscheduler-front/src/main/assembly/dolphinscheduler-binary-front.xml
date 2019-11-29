@@ -44,19 +44,11 @@
         </fileSet>
 
         <fileSet>
-            <directory>${basedir}/../release-docs</directory>
+            <directory>${basedir}/release-docs</directory>
             <includes>
                 <include>./*</include>
             </includes>
             <outputDirectory>.</outputDirectory>
-        </fileSet>
-
-        <fileSet>
-            <directory>${basedir}/../release-docs/licenses/ui-licenses</directory>
-            <includes>
-                <include>**/*</include>
-            </includes>
-            <outputDirectory>./licenses</outputDirectory>
         </fileSet>
 
         <fileSet>
