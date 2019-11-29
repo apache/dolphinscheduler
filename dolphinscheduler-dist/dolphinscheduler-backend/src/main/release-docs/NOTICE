@@ -828,7 +828,7 @@ The Apache Software Foundation (http://www.apache.org/).
 ========================================================================
 
 
-Apache Commons Math NOTICE
+Apache Commons Math3 NOTICE
 
 ========================================================================
 Apache Commons Math
@@ -1477,7 +1477,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =========================================================================
 
-Apache Directory Server
+Apache Directory Server NOTICE
 
 =========================================================================
 ApacheDS
@@ -1568,3 +1568,66 @@ Licensed under the Apache License, Version 2.0 (the "License");
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
+=========================================================================
+
+
+ Apache EL NOTICE
+
+=========================================================================
+ Apache Tomcat
+ Copyright 1999-2018 The Apache Software Foundation
+
+ This product includes software developed at
+ The Apache Software Foundation (http://www.apache.org/).
+=========================================================================
+
+
+ Apache Commons Net NOTICE
+
+=========================================================================
+Apache Commons Net
+Copyright 2001-2012 The Apache Software Foundation
+
+This product includes software developed by
+The Apache Software Foundation (http://www.apache.org/).
+=========================================================================
+
+
+Apache Logging Log4j2 NOTICE
+
+=========================================================================
+Apache Log4j
+Copyright 1999-2017 Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+ResolverUtil.java
+Copyright 2005-2006 Tim Fennell
+
+Dumbster SMTP test server
+Copyright 2004 Jason Paul Kitchen
+
+TypeUtil.java
+Copyright 2002-2012 Ramnivas Laddad, Juergen Hoeller, Chris Beams
+
+picocli (http://picocli.info)
+Copyright 2017 Remko Popma
+=========================================================================
+
+Snappy Java NOTICE
+
+=========================================================================
+This product includes software developed by Google
+ Snappy: http://code.google.com/p/snappy/ (New BSD License)
+
+
+This library containd statically linked libstdc++. This inclusion is allowed by
+"GCC RUntime Library Exception"
+http://gcc.gnu.org/onlinedocs/libstdc++/manual/license.html
+
+== Contributors ==
+  * Tatu Saloranta
+    * Providing benchmark suite
+  * Alec Wysoker
+    * Performance and memory usage improvement
