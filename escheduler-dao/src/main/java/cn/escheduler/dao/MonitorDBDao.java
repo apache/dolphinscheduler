@@ -36,10 +36,24 @@ import java.util.List;
 public class MonitorDBDao {
 
     private static Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
+
     public static final String VARIABLE_NAME = "variable_name";
 
+    public static final String SHOW_GLOBAL_VARIABLES = "show global variables";
+
+    public static final String SHOW_GLOBAL_STATUS = "show global status";
+
+    public static final String MAX_CONNECTIONS = "MAX_CONNECTIONS";
+
+    public static final String MAX_USED_CONNECTIONS = "MAX_USED_CONNECTIONS";
+
+    public static final String THREADS_CONNECTED = "THREADS_CONNECTED";
+
+    public static final String THREADS_RUNNING = "THREADS_RUNNING";
+
+    public static final String VALUE = "value";
     /**
-     * 加载配置文件
+     * Load configuration file
      */
     private static Configuration conf;
 
@@ -99,21 +113,21 @@ public class MonitorDBDao {
 
             Statement pstmt = conn.createStatement();
 
-            ResultSet rs1 = pstmt.executeQuery("show global variables");
+            ResultSet rs1 = pstmt.executeQuery(SHOW_GLOBAL_VARIABLES);
             while(rs1.next()){
-                if(rs1.getString(VARIABLE_NAME).toUpperCase().equals("MAX_CONNECTIONS")){
-                    maxConnections= Long.parseLong(rs1.getString("value"));
+                if(MAX_CONNECTIONS.equals(rs1.getString(VARIABLE_NAME).toUpperCase())){
+                    maxConnections= Long.parseLong(rs1.getString(VALUE));
                 }
             }
 
-            ResultSet rs2 = pstmt.executeQuery("show global status");
+            ResultSet rs2 = pstmt.executeQuery(SHOW_GLOBAL_STATUS);
             while(rs2.next()){
-                if(rs2.getString(VARIABLE_NAME).toUpperCase().equals("MAX_USED_CONNECTIONS")){
-                    maxUsedConnections = Long.parseLong(rs2.getString("value"));
-                }else if(rs2.getString(VARIABLE_NAME).toUpperCase().equals("THREADS_CONNECTED")){
-                    threadsConnections = Long.parseLong(rs2.getString("value"));
-                }else if(rs2.getString(VARIABLE_NAME).toUpperCase().equals("THREADS_RUNNING")){
-                    threadsRunningConnections= Long.parseLong(rs2.getString("value"));
+                if(MAX_USED_CONNECTIONS.equals(rs2.getString(VARIABLE_NAME).toUpperCase())){
+                    maxUsedConnections = Long.parseLong(rs2.getString(VALUE));
+                }else if(THREADS_CONNECTED.equals(rs2.getString(VARIABLE_NAME).toUpperCase())){
+                        threadsConnections = Long.parseLong(rs2.getString(VALUE));
+                    }else if(THREADS_RUNNING.equals(rs2.getString(VARIABLE_NAME).toUpperCase())){
+                        threadsRunningConnections= Long.parseLong(rs2.getString(VALUE));
                 }
             }
 
