@@ -15,7 +15,7 @@
 
 *(Please pick either of the following options)*
 
-This pull request is a trivial rework / code cleanup without any test coverage.
+This pull request is code cleanup without any test coverage.
 
 *(or)*
 
