@@ -60,6 +60,7 @@
 		<mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
 		<jsp.version>6.1.14</jsp.version>
 		<spotbugs.version>3.1.12</spotbugs.version>
+		<checkstyle.version>3.0.0</checkstyle.version>
 		<apache.rat.version>0.13</apache.rat.version>
 		<zookeeper.version>3.4.14</zookeeper.version>
 	</properties>
@@ -588,6 +589,40 @@
 						<version>4.0.0-beta4</version>
 					</dependency>
 				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>8.18</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<consoleOutput>true</consoleOutput>
+					<encoding>UTF-8</encoding>
+					<configLocation>style/checkstyle.xml</configLocation>
+					<suppressionsLocation>style/checkstyle-suppressions.xml</suppressionsLocation>
+					<suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+					<failOnViolation>true</failOnViolation>
+					<violationSeverity>warning</violationSeverity>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+					<sourceDirectories>
+						<sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+					</sourceDirectories>
+					<excludes>**\/generated-sources\/</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 
