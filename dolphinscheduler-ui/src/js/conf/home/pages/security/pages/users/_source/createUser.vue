@@ -50,7 +50,7 @@
               <x-option
                       v-for="city in tenantList"
                       :key="city.id"
-                      :value="city"
+                      :value="city.id"
                       :label="city.code">
               </x-option>
             </x-select>
@@ -60,14 +60,14 @@
           <template slot="name">{{$t('Queue')}}</template>
           <template slot="content">
             <x-select v-model="queueName">
-              <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="queueName = {}">
-                <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="queueName.id"></i>
-                <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!queueName.id"></i>
+              <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="queueName = ''">
+                <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></i>
+                <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></i>
               </x-input>
               <x-option
                       v-for="city in queueList"
                       :key="city.id"
-                      :value="city"
+                      :value="city.id"
                       :label="city.code">
               </x-option>
             </x-select>
@@ -114,10 +114,8 @@
         queueList: [],
         userName: '',
         userPassword: '',
-        tenantId: {},
-        queueName: {
-          id:''
-        },
+        tenantId: '',
+        queueName: '',
         email: '',
         phone: '',
         tenantList: [],
@@ -193,7 +191,7 @@
               }
             })
             this.$nextTick(() => {
-              this.queueName = this.queueList[0]
+              this.queueName = this.queueList[0].id
             })
             resolve()
           })
@@ -212,7 +210,7 @@
               }
             })
             this.$nextTick(() => {
-              this.tenantId = this.tenantList[0]
+              this.tenantId = this.tenantList[0].id
             })
             resolve()
           })
@@ -223,9 +221,9 @@
         let param = {
           userName: this.userName,
           userPassword: this.userPassword,
-          tenantId: this.tenantId.id,
+          tenantId: this.tenantId,
           email: this.email,
-          queue: this.queueName.code,
+          queue: this.queueList[this.queueName].code,
           phone: this.phone
         }
 
@@ -255,9 +253,9 @@
             this.userPassword = ''
             this.email = this.item.email
             this.phone = this.item.phone
-            this.tenantId = _.find(this.tenantList, ['id', this.item.tenantId])
+            this.tenantId = this.item.tenantId
             this.$nextTick(() => {
-              this.queueName = _.find(this.queueList, ['code', this.item.queue])||{id:''}
+              this.queueName = _.find(this.queueList, ['code', this.item.queue]).id||''
             })
           }
         })
@@ -267,8 +265,8 @@
           this.userPassword = ''
           this.email = this.item.email
           this.phone = this.item.phone
-          this.tenantId.id = this.item.tenantId
-          this.queueName = { queue: this.item.queue}
+          this.tenantId = this.item.tenantId
+          this.queueName = _.find(this.queueList, ['code', this.item.queue]).id
         }
       }
     },

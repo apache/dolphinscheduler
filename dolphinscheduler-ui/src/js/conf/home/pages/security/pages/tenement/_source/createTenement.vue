@@ -51,7 +51,7 @@
               <x-option
                       v-for="city in queueList"
                       :key="city.id"
-                      :value="city"
+                      :value="city.id"
                       :label="city.code">
               </x-option>
             </x-select>
@@ -85,10 +85,10 @@
       return {
         store,
         queueList: [],
-        queueId: {},
+        queueId: '',
         tenantCode: '',
         tenantName: '',
-        description: ''
+        description: '',
       }
     },
     props: {
@@ -151,7 +151,7 @@
         let param = {
           tenantCode: this.tenantCode,
           tenantName: this.tenantName,
-          queueId: this.queueId.id,
+          queueId: this.queueId,
           description: this.description
         }
         if (this.item) {
@@ -177,7 +177,7 @@
       this._getQueueList().then(res => {
         if (this.item) {
           this.$nextTick(() => {
-            this.queueId = _.find(this.queueList, ['id', this.item.queueId])
+            this.queueId = this.item.queueId
           })
           this.tenantCode = this.item.tenantCode
           this.tenantName = this.item.tenantName

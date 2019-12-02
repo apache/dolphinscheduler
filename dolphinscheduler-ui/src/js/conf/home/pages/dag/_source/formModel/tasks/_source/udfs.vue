@@ -23,7 +23,7 @@
       <x-option
               v-for="city in udfsList"
               :key="city.id"
-              :value="city"
+              :value="city.id"
               :label="city.code">
       </x-option>
     </x-select>

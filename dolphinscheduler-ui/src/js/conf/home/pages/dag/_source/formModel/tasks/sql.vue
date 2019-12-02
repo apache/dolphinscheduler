@@ -35,7 +35,7 @@
                   :sql-type="sqlType">
           </m-sql-type>
         </div>
-        <div v-if="!sqlType" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
+        <div v-if="sqlType==0" style="display: inline-block;padding-left: 10px;margin-top: 2px;">
           <x-checkbox-group v-model="showType">
             <x-checkbox :label="'TABLE'" :disabled="isDetails">{{$t('Table')}}</x-checkbox>
             <x-checkbox :label="'ATTACHMENT'" :disabled="isDetails">{{$t('Attachment')}}</x-checkbox>
@@ -43,7 +43,7 @@
         </div>
       </div>
     </m-list-box>
-    <template v-if="!sqlType">
+    <template v-if="sqlType==0">
       <m-list-box>
         <div slot="text"><b class='requiredIcon'>*</b>{{$t('Title')}}</div>
         <div slot="content">
@@ -167,7 +167,7 @@
         // UDF function
         udfs: '',
         // Sql type
-        sqlType: 0,
+        sqlType: '0',
         // Email title
         title: '',
         // Form/attachment
@@ -256,11 +256,11 @@
           return false
         }
         // receivers Subcomponent verification
-        if (!this.sqlType && !this.$refs.refEmail._manualEmail()) {
+        if (this.sqlType==0 && !this.$refs.refEmail._manualEmail()) {
           return false
         }
         // receiversCc Subcomponent verification
-        if (!this.sqlType && !this.$refs.refCc._manualEmail()) {
+        if (this.sqlType==0 && !this.$refs.refCc._manualEmail()) {
           return false
         }
         // udfs Subcomponent verification Verification only if the data type is HIVE
@@ -356,10 +356,10 @@
     watch: {
       // Listening to sqlType
       sqlType (val) {
-        if (val) {
+        if (val==0) {
           this.showType = []
         }
-        if (val !== 0) {
+        if (val != 0) {
           this.title = ''
           this.receivers = []
           this.receiversCc = []
