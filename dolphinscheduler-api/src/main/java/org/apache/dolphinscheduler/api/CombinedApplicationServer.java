@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.rpc.LoggerServer;
 import org.apache.dolphinscheduler.server.worker.WorkerServer;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
