@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -38,6 +39,9 @@ import java.util.Map;
 @Service
 public class MonitorService extends BaseService{
 
+
+  @Autowired
+  private MonitorDBDao monitorDBDao;
   /**
    * query database state
    *
@@ -47,7 +51,7 @@ public class MonitorService extends BaseService{
   public Map<String,Object> queryDatabaseState(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
 
-    List<MonitorRecord> monitorRecordList = MonitorDBDao.queryDatabaseState();
+    List<MonitorRecord> monitorRecordList = monitorDBDao.queryDatabaseState();
 
     result.put(Constants.DATA_LIST, monitorRecordList);
     putMsg(result, Status.SUCCESS);
