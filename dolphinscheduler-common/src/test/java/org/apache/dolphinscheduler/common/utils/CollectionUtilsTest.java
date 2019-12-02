@@ -30,34 +30,30 @@ public class CollectionUtilsTest {
     @Test
     public void equalLists() {
         List<Integer> a = new ArrayList<Integer>();
-
         a.add(1);
         a.add(2);
         a.add(3);
-
         List<Integer> b = new ArrayList<Integer>();
         b.add(3);
         b.add(2);
         b.add(1);
-
         Assert.assertTrue(CollectionUtils.equalLists(a,b));
-
+        Assert.assertTrue(CollectionUtils.equalLists(null,null));
+        List<Integer> c = new ArrayList<Integer>();
+        Assert.assertFalse(CollectionUtils.equalLists(c,null));
+        Assert.assertFalse(CollectionUtils.equalLists(c,a));
     }
 
     @Test
     public void subtract() {
         Set<Integer> a = new HashSet<Integer>();
-
         a.add(1);
         a.add(2);
         a.add(3);
-
         Set<Integer> b = new HashSet<Integer>();
         b.add(0);
         b.add(2);
         b.add(4);
-
-
         Assert.assertArrayEquals(new Integer[]{1,3},CollectionUtils.subtract(a,b).toArray());
     }
 }
