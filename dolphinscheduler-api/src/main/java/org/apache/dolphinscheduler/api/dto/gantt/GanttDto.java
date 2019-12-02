@@ -55,7 +55,7 @@ public class GanttDto {
         this();
         this.height = height;
         this.tasks = tasks;
-        this.taskNames = taskNames;;
+        this.taskNames = taskNames;
     }
     public GanttDto(int height, List<Task> tasks, List<String> taskNames, Map<String, String> taskStatus) {
         this.height = height;

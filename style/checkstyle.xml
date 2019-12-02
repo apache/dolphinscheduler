@@ -229,7 +229,9 @@
             <property name="illegalClasses" value="java.util.Optional, com.google.common.base.Optional"/>
         </module>
 
-        <module name="EmptyStatement"/>
+        <module name="EmptyStatement">
+            <property name="severity" value="error"/>
+        </module>
 
         <module name="JavadocStyle"/>
 
