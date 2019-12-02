@@ -59,4 +59,4 @@ public enum CommandType {
     @EnumValue
     private final int code;
     private final String descp;
-}
+ }
