@@ -77,8 +77,11 @@ class ZkClient:
         master_list = list(map(lambda item : self.get_ip_by_hostname(item),master_list))
 
         worker_list = config_dict.get('workers').split(',')
-	print worker_list
+	    print worker_list
         worker_list = list(map(lambda item: self.get_ip_by_hostname(item), worker_list))
+
+        ssh_port = config_dict.get("sshPort")
+        print ssh_port
 
         if (self.zk.exists(masters_zk_path)):
             zk_master_list = []
@@ -89,7 +92,7 @@ class ZkClient:
             if (len(restart_master_list) != 0):
                 for master in restart_master_list:
                     print("master " + self.get_ip_by_hostname(master) + " server has down")
-                    os.system('ssh ' + self.get_ip_by_hostname(master) + ' sh ' + install_path + '/bin/dolphinscheduler-daemon.sh start master-server')
+                    os.system('ssh -p ' + ssh_port + ' ' + self.get_ip_by_hostname(master) + ' sh ' + install_path + '/bin/dolphinscheduler-daemon.sh start master-server')
 
         if (self.zk.exists(workers_zk_path)):
             zk_worker_list = []
@@ -100,7 +103,7 @@ class ZkClient:
             if (len(restart_worker_list) != 0):
                 for worker in restart_worker_list:
                     print("worker " + self.get_ip_by_hostname(worker) + " server has down")
-                    os.system('ssh  ' + self.get_ip_by_hostname(worker) + ' sh ' + install_path + '/bin/dolphinscheduler-daemon.sh start worker-server')
+                    os.system('ssh -p ' + ssh_port + ' ' + self.get_ip_by_hostname(worker) + ' sh ' + install_path + '/bin/dolphinscheduler-daemon.sh start worker-server')
 
         print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         schedule.enter(inc, 0, self.restart_server, (inc,))
