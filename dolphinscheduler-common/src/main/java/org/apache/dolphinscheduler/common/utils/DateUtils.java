@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -35,20 +36,20 @@ public class DateUtils {
     private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
 
     /**
-     * <code>java.util.Date</code> to <code>java.time.LocalDateTime</code>
-     * use default zone
-     * @param date
-     * @return
+     * date to local datetime
+     *
+     * @param date date
+     * @return local datetime
      */
     private static LocalDateTime date2LocalDateTime(Date date) {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
     /**
-     * <code>java.time.LocalDateTime</code> to <code>java.util.Date</code>
-     * use default zone
-     * @param localDateTime
-     * @return
+     * local datetime to date
+     *
+     * @param localDateTime local datetime
+     * @return date
      */
     private static Date localDateTime2Date(LocalDateTime localDateTime) {
         Instant instant = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
@@ -56,43 +57,51 @@ public class DateUtils {
     }
 
     /**
-     * @return get the formatted date string for the current time
+     * get current date str
+     *
+     * @return date string
      */
     public static String getCurrentTime() {
         return getCurrentTime(Constants.YYYY_MM_DD_HH_MM_SS);
     }
 
     /**
-     * @param format format
-     * @return get the date string in the specified format of the current time
+     * get the date string in the specified format of the current time
+     *
+     * @param format date format
+     * @return date string
      */
     public static String getCurrentTime(String format) {
-//        return new SimpleDateFormat(format).format(new Date());
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern(format));
     }
 
     /**
+     * get the formatted date string
+     *
      * @param date date
      * @param format e.g. yyyy-MM-dd HH:mm:ss
-     * @return get the formatted date string
+     * @return date string
      */
     public static String format(Date date, String format) {
-//        return new SimpleDateFormat(format).format(date);
         return format(date2LocalDateTime(date), format);
     }
 
     /**
+     * get the formatted date string
+     *
      * @param localDateTime local data time
-     * @param format        e.g. yyyy-MM-dd HH:mm:ss
-     * @return get the formatted date string
+     * @param format        yyyy-MM-dd HH:mm:ss
+     * @return date string
      */
     public static String format(LocalDateTime localDateTime, String format) {
         return localDateTime.format(DateTimeFormatter.ofPattern(format));
     }
 
     /**
+     * convert time to yyyy-MM-dd HH:mm:ss format
+     *
      * @param date date
-     * @return convert time to yyyy-MM-dd HH:mm:ss format
+     * @return date string
      */
     public static String dateToString(Date date) {
         return format(date, Constants.YYYY_MM_DD_HH_MM_SS);
@@ -100,13 +109,14 @@ public class DateUtils {
 
 
     /**
+     * convert string to date and time
+     *
      * @param date date
      * @param format  format
-     * @return convert string to date and time
+     * @return date
      */
     public static Date parse(String date, String format) {
         try {
-            //     return new SimpleDateFormat(format).parse(date);
             LocalDateTime ldt = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(format));
             return localDateTime2Date(ldt);
         } catch (Exception e) {
@@ -114,6 +124,7 @@ public class DateUtils {
         }
         return null;
     }
+
 
     /**
      * convert date str to yyyy-MM-dd HH:mm:ss format
@@ -228,8 +239,8 @@ public class DateUtils {
 
     /**
      * get monday
-     * <p>
-     * note: Set the first day of the week to Monday, the default is Sunday</p>
+     *
+     * note: Set the first day of the week to Monday, the default is Sunday
      * @param date date
      * @return get monday
      */
@@ -246,7 +257,7 @@ public class DateUtils {
 
     /**
      * get sunday
-     * <p>
+     *
      * note: Set the first day of the week to Monday, the default is Sunday
      * @param date date
      * @return get sunday
@@ -263,6 +274,7 @@ public class DateUtils {
 
     /**
      * get first day of month
+     *
      * @param date date
      * @return first day of month
      * */
@@ -277,6 +289,7 @@ public class DateUtils {
 
     /**
      * get some hour of day
+     *
      * @param date date
      * @param hours hours
      * @return some hour of day
@@ -295,6 +308,7 @@ public class DateUtils {
 
     /**
      * get last day of month
+     *
      * @param  date date
      * @return  get last day of month
      */
@@ -372,5 +386,12 @@ public class DateUtils {
         return cal.getTime();
     }
 
-
+    /**
+     * get current date
+     * @return current date
+     */
+    public static Date getCurrentDate() {
+        return DateUtils.parse(DateUtils.getCurrentTime(),
+                Constants.YYYY_MM_DD_HH_MM_SS);
+    }
 }
