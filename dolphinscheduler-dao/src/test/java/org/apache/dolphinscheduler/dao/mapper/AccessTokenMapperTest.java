@@ -16,95 +16,211 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
+/**
+ * AccessToken mapper test
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class AccessTokenMapperTest {
 
-
-    @Resource
+    @Autowired
     AccessTokenMapper accessTokenMapper;
 
+    @Autowired
+    UserMapper userMapper;
 
     /**
-     * insert
-     * @return AccessToken
-     */
-    private AccessToken insertOne(){
-        //insertOne
-        AccessToken accessToken = new AccessToken();
-        accessToken.setUserId(4);
-        accessToken.setToken("hello, access token");
-        accessToken.setCreateTime(new Date());
-        accessToken.setUpdateTime(new Date());
-        accessToken.setExpireTime(new Date());
-        accessTokenMapper.insert(accessToken);
-        return accessToken;
-    }
-
-    /**
-     * test update
+     * test insert
+     * @throws Exception
      */
     @Test
-    public void testUpdate(){
-        //insertOne
-        AccessToken accessToken = insertOne();
-        //update
-        accessToken.setToken("hello, token");
-        int update = accessTokenMapper.updateById(accessToken);
-        accessTokenMapper.deleteById(accessToken.getId());
-        Assert.assertEquals(update, 1);
+    public void testInsert() throws Exception{
+        Integer userId = 1;
+
+        AccessToken accessToken = createAccessToken(userId);
+        assertNotNull(accessToken.getId());
+        assertThat(accessToken.getId(), greaterThan(0));
     }
 
-    /**
-     * test delete
-     */
-    @Test
-    public void testDelete(){
-
-        AccessToken accessToken = insertOne();
-        int delete = accessTokenMapper.deleteById(accessToken.getId());
-        Assert.assertEquals(delete, 1);
-    }
 
     /**
-     * test query
+     * test select by id
+     * @throws Exception
      */
     @Test
-    public void testQuery(){
+    public void testSelectById() throws Exception{
+        Integer userId = 1;
 
-        AccessToken accessToken = insertOne();
-        //query
-        List<AccessToken> token = accessTokenMapper.selectList(null);
-        Assert.assertNotEquals(token.size(), 0);
-        accessTokenMapper.deleteById(accessToken.getId());
+        AccessToken accessToken = createAccessToken(userId);
+
+        AccessToken resultAccessToken
+                = accessTokenMapper.selectById(accessToken.getId());
+
+        assertEquals(accessToken, resultAccessToken);
+
     }
 
     /**
      * test page
      */
     @Test
-    public void testSelectAccessTokenPage() {
-        AccessToken accessToken = insertOne();
-        Page page = new Page(1, 3);
-        String userName = "";
-        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 4);
-        Assert.assertNotEquals(accessTokenPage.getTotal(), 0);
-        accessTokenMapper.deleteById(accessToken.getId());
+    public void testSelectAccessTokenPage() throws Exception{
+        Integer count = 4;
+        String userName = "zhangsan";
+
+        Integer offset = 2;
+        Integer size = 2;
+
+
+        Map<Integer, AccessToken> accessTokenMap = createAccessTokens(count, userName);
+
+        Page page = new Page(offset, size);
+        IPage<AccessToken> accessTokenPage = accessTokenMapper.selectAccessTokenPage(page, userName, 0);
+
+        assertEquals(Integer.valueOf(accessTokenPage.getRecords().size()),size);
+
+
+        for (AccessToken accessToken : accessTokenPage.getRecords()){
+            AccessToken resultAccessToken = accessTokenMap.get(accessToken.getId());
+            assertEquals(accessToken,resultAccessToken);
+        }
     }
 
+
+    /**
+     * test update
+     */
+    @Test
+    public void testUpdate() throws Exception{
+        Integer userId = 1;
+
+        AccessToken accessToken = createAccessToken(userId);
+        //update
+        accessToken.setToken("56789");
+        accessToken.setExpireTime(DateUtils.getCurrentDate());
+        accessToken.setUpdateTime(DateUtils.getCurrentDate());
+
+        accessTokenMapper.updateById(accessToken);
+
+        AccessToken resultAccessToken = accessTokenMapper.selectById(accessToken.getId());
+        assertEquals(accessToken, resultAccessToken);
+    }
+
+    /**
+     * test delete
+     */
+    @Test
+    public void testDelete() throws Exception{
+        Integer userId = 1;
+
+        AccessToken accessToken = createAccessToken(userId);
+        accessTokenMapper.deleteById(accessToken.getId());
+
+        AccessToken resultAccessToken =
+                accessTokenMapper.selectById(accessToken.getId());
+        assertNull(resultAccessToken);
+    }
+
+
+    /**
+     * create accessTokens
+     * @param count
+     * @param userName
+     * @return
+     * @throws Exception
+     */
+    private Map<Integer,AccessToken> createAccessTokens(
+            Integer count,String userName) throws Exception{
+
+        User user = createUser(userName);
+
+        Map<Integer,AccessToken> accessTokenMap = new HashMap<>();
+        for (int i = 1 ; i<= count ; i++){
+            AccessToken accessToken = createAccessToken(user.getId(),userName);
+
+            accessTokenMap.put(accessToken.getId(),accessToken);
+        }
+        return accessTokenMap;
+    }
+
+    /**
+     * create user
+     * @param userName
+     * @return
+     * @throws Exception
+     */
+    private User createUser(String userName) throws Exception{
+        User user = new User();
+        user.setUserName(userName);
+        user.setUserPassword("123");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setEmail("test@qq.com");
+        user.setPhone("13102557272");
+        user.setTenantId(1);
+        user.setCreateTime(DateUtils.getCurrentDate());
+        user.setUpdateTime(DateUtils.getCurrentDate());
+        user.setQueue("default");
+
+        userMapper.insert(user);
+
+        return user;
+    }
+
+    /**
+     *  create access token
+     *
+     * @return AccessToken
+     */
+    private AccessToken createAccessToken(Integer userId,String userName)throws Exception{
+        Random random = new Random();
+        //insertOne
+        AccessToken accessToken = new AccessToken();
+        accessToken.setUserName(userName);
+        accessToken.setUserId(userId);
+        accessToken.setToken(String.valueOf(random.nextLong()));
+        accessToken.setCreateTime(DateUtils.getCurrentDate());
+        accessToken.setUpdateTime(DateUtils.getCurrentDate());
+        accessToken.setExpireTime(DateUtils.getCurrentDate());
+
+        accessTokenMapper.insert(accessToken);
+
+        return accessToken;
+    }
+
+    /**
+     *  create access token
+     *
+     * @return AccessToken
+     */
+    private AccessToken createAccessToken(Integer userId)throws Exception{
+        return createAccessToken(userId,null);
+    }
 
 }
