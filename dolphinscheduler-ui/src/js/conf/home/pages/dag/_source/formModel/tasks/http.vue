@@ -60,7 +60,7 @@
       <div slot="text">{{$t('Http Check Condition')}}</div>
       <div slot="content">
         <x-select
-          style="width: 150px;"
+          style="width: 230px;"
           v-model="httpCheckCondition"
           :disabled="isDetails">
           <x-option
@@ -101,6 +101,7 @@
 <script>
   import _ from 'lodash'
   import i18n from '@/module/i18n'
+  import cookie from '@/module/util/cookie'
   import mLocalParams from './_source/localParams'
   import mHttpParams from './_source/httpParams'
   import mListBox from './_source/listBox'
@@ -116,7 +117,7 @@
         httpMethod: 'GET',
         httpMethodList: [{ code: 'GET' }, { code: 'POST' }, { code: 'HEAD' }, { code: 'PUT' }, { code: 'DELETE' }],
         httpCheckCondition: 'STATUS_CODE_DEFAULT',
-        httpCheckConditionList: [{ code: 'STATUS_CODE_DEFAULT',value:'默认响应码200' }, { code: 'STATUS_CODE_CUSTOM',value:'自定义响应码' }, { code: 'BODY_CONTAINS',value:'内容包含' }, { code: 'BODY_NOT_CONTAINS',value:'内容不包含' }]
+        httpCheckConditionList: cookie.get('language') == 'en_US'? [{ code: 'STATUS_CODE_DEFAULT',value:'Default response code 200' }, { code: 'STATUS_CODE_CUSTOM',value:'Custom response code' }, { code: 'BODY_CONTAINS',value:'Content includes' }, { code: 'BODY_NOT_CONTAINS',value:'Content does not contain' }]:[{ code: 'STATUS_CODE_DEFAULT',value:'默认响应码200' }, { code: 'STATUS_CODE_CUSTOM',value:'自定义响应码' }, { code: 'BODY_CONTAINS',value:'内容包含' }, { code: 'BODY_NOT_CONTAINS',value:'内容不包含' }]
       }
     },
     props: {

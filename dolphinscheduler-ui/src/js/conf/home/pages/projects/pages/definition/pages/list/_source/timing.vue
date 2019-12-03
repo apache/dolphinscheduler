@@ -128,7 +128,7 @@
           <x-option
                   v-for="city in notifyGroupList"
                   :key="city.id"
-                  :value="city"
+                  :value="city.id"
                   :label="city.code">
           </x-option>
         </x-select>
@@ -177,7 +177,7 @@
         warningTypeList: warningTypeList,
         warningType: 'NONE',
         notifyGroupList: [],
-        warningGroupId: {},
+        warningGroupId: '',
         spinnerLoading: false,
         scheduleTime: '',
         crontab: '0 0 * * * ? *',
@@ -229,7 +229,7 @@
             failureStrategy: this.failureStrategy,
             warningType: this.warningType,
             processInstancePriority: this.processInstancePriority,
-            warningGroupId: _.isEmpty(this.warningGroupId) ? 0 : this.warningGroupId.id,
+            warningGroupId: this.warningGroupId =='' ? 0 : this.warningGroupId,
             receivers: this.receivers.join(',') || '',
             receiversCc: this.receiversCc.join(',') || '',
             workerGroupId: this.workerGroupId
@@ -331,16 +331,16 @@
         this.workerGroupId = item.workerGroupId || -1
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
-            let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
-            this.warningGroupId = list.length && list[0] || { id: 0 }
+            // let list = _.filter(this.notifyGroupList, v => v.id === item.warningGroupId)
+            this.warningGroupId = item.warningGroupId
           })
-        }).catch(() => this.warningGroupId = { id: 0 })
+        }).catch(() => this.warningGroupId = '')
       } else {
         this._getNotifyGroupList().then(() => {
           this.$nextTick(() => {
-            this.warningGroupId = { id: 0 }
+            this.warningGroupId = ''
           })
-        }).catch(() => this.warningGroupId = { id: 0 })
+        }).catch(() => this.warningGroupId = '')
       }
     },
     components: { vCrontab, mEmail, mPriority, mWorkerGroups }

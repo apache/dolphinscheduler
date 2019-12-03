@@ -24,7 +24,7 @@
       <x-option
               v-for="city in sqlTypeList"
               :key="city.id"
-              :value="city"
+              :value="city.id"
               :label="city.code">
       </x-option>
     </x-select>
@@ -41,29 +41,30 @@
         // sql(List)
         sqlTypeList: sqlTypeList,
         // sql
-        sqlTypeId: {}
+        sqlTypeId: '0'
       }
     },
     mixins: [disabledState],
     props: {
-      sqlType: Number
+      sqlType: String
     },
     methods: {
       /**
        * return sqlType
        */
       _handleSqlTypeChanged (val) {
-        this.$emit('on-sqlType', val.value.id)
+        this.$emit('on-sqlType', val.value)
       }
     },
     watch: {
     },
     created () {
       this.$nextTick(() => {
-        if (this.sqlType !== null) {
-          this.sqlTypeId = _.filter(this.sqlTypeList, v => v.id === this.sqlType)[0]
+        console.log(this.sqlType)
+        if (this.sqlType != 0) {
+          this.sqlTypeId = this.sqlType
         } else {
-          this.sqlTypeId = this.sqlTypeList[0]
+          this.sqlTypeId = this.sqlTypeList[0].id
         }
       })
     },

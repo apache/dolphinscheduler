@@ -209,11 +209,11 @@ const typeList = [
  */
 const sqlTypeList = [
   {
-    id: 0,
+    id: '0',
     code: `${i18n.$t('Query')}`
   },
   {
-    id: 1,
+    id: '1',
     code: `${i18n.$t('Non Query')}`
   }
 ]
