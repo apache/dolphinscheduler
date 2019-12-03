@@ -1,3 +1,20 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 FROM ubuntu:18.04
 
 ENV LANG=C.UTF-8
@@ -82,7 +99,7 @@ ADD . /opt/dolphinscheduler_source
 
 #9,backend compilation
 RUN cd /opt/dolphinscheduler_source && \
-    mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+    mvn clean package -Prelease -Dmaven.test.skip=true
 
 #10,frontend compilation
 RUN chmod -R 777 /opt/dolphinscheduler_source/dolphinscheduler-ui && \
@@ -94,9 +111,10 @@ RUN chmod -R 777 /opt/dolphinscheduler_source/dolphinscheduler-ui && \
 
 #11,modify dolphinscheduler configuration file
 #backend configuration
-RUN mkdir -p /opt/dolphinscheduler && \
-    tar -zxvf /opt/dolphinscheduler_source/target/dolphinscheduler-${tar_version}.tar.gz -C /opt/dolphinscheduler && \
+RUN tar -zxvf /opt/dolphinscheduler_source/dolphinscheduler-dist/dolphinscheduler-backend/target/apache-dolphinscheduler-incubating-${tar_version}-dolphinscheduler-backend-bin.tar.gz -C /opt && \
+    mv /opt/apache-dolphinscheduler-incubating-${tar_version}-dolphinscheduler-backend-bin /opt/dolphinscheduler && \
     rm -rf /opt/dolphinscheduler/conf
+
 ADD ./dockerfile/conf/dolphinscheduler/conf /opt/dolphinscheduler/conf
 #frontend nginx configuration
 ADD ./dockerfile/conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d

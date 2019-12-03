@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper">
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
@@ -109,7 +126,7 @@
         where 1 = 1
         and t.is_sub_process = 0
         <if test="startTime != null and endTime != null">
-            and  t.start_time >= #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
+            and  t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         <if test="projectIds != null and projectIds.length != 0">
             and p.id in
@@ -130,7 +147,7 @@
         from t_ds_process_instance
         where process_definition_id=#{processDefinitionId}
         <if test="startTime!=null and endTime != null ">
-            and schedule_time between #{startTime} and #{endTime}
+            and schedule_time <![CDATA[ >= ]]> #{startTime} and  schedule_time <![CDATA[ <= ]]> #{endTime}
         </if>
         order by end_time desc limit 1
     </select>
@@ -146,7 +163,8 @@
         </if>
         <if test="startTime!=null and endTime != null ">
             and process_definition_id=#{processDefinitionId}
-            and (schedule_time between #{startTime} and #{endTime} or start_time between #{startTime} and #{endTime})
+            and (schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime}
+                  or start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime})
         </if>
         order by start_time desc limit 1
     </select>
@@ -156,7 +174,7 @@
         where process_definition_id=#{processDefinitionId}
         and schedule_time is null
         <if test="startTime!=null and endTime != null ">
-            and start_time between #{startTime} and #{endTime}
+            and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         order by end_time desc limit 1
     </select>
