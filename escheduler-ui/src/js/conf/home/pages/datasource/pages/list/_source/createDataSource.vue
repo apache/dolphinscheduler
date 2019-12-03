@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 <template>
   <div class="datasource-popup-model">
     <div class="top-p">
@@ -97,7 +113,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Database Name')}}</template>
+          <template slot="name"><b :class="{hidden:showdDatabase}">*</b>{{$t('Database Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -165,6 +181,7 @@
         // btn test loading
         testLoading: false,
         showPrincipal: true,
+        showdDatabase: false,
         isShowPrincipal:true
       }
     },
@@ -264,7 +281,7 @@
           return false
         }
 
-        if (!this.database) {
+        if (!this.database && this.showdDatabase == false) {
           this.$message.warning(`${i18n.$t('Please enter database name')}`)
           return false
         }
@@ -322,6 +339,11 @@
           this.showPrincipal = false
         }else{
           this.showPrincipal = true
+        }
+        if(value == 'POSTGRESQL') {
+          this.showdDatabase = true;
+        } else {
+          this.showdDatabase = false;
         }
       }
     },
