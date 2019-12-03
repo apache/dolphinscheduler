@@ -1,3 +1,19 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 <template>
   <div class="timing-process-model">
     <div class="title-box">
@@ -48,7 +64,7 @@
     <div class="clearfix list">
       <div style = "padding-left: 150px;">{{$t('Next five execution times')}}</div>
       <ul style = "padding-left: 150px;">
-          <li v-for="time in previewTimes">{{time}}</li>
+        <li v-for="(time,i) in previewTimes" :key='i'>{{time}}</li>
       </ul>
     </div>
 
@@ -144,10 +160,9 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mEmail from './email.vue'
-  import '~/@vue/crontab/dist/index.css'
   import store from '@/conf/home/store'
   import { warningTypeList } from './util'
-  import { vCrontab } from '~/@vue/crontab/dist'
+  import { vCrontab } from '@/module/components/crontab/index'
   import { formatDate } from '@/module/filter/filter'
   import mPriority from '@/module/components/priority/priority'
   import mWorkerGroups from '@/conf/home/pages/dag/_source/formModel/_source/workerGroups'
@@ -253,7 +268,12 @@
                 let msg = ''
 
                 this.store.dispatch(api, searchParams).then(res => {
-                  this.previewTimes = res
+                  if (res.length) {
+                    this.previewTimes = res
+                  } else {
+                    this.$message.warning('该时间段无数据')
+                    this.$message.warning(`${i18n.$t('There is no data for this period of time')}`)
+                  }
                 })
               }
             },
@@ -286,9 +306,11 @@
         this._preview()
       }
     },
-    watch: {
-    },
+    watch: {},
     created () {
+      if(this.item.crontab !== null){
+        this.crontab = this.item.crontab
+      }
       this.receivers = _.cloneDeep(this.receiversD)
       this.receiversCc = _.cloneDeep(this.receiversCcD)
     },

@@ -37,7 +37,9 @@ public class LoggerUtils {
     /**
      * Task Logger's prefix
      */
-    public static final String TASK_LOGGER_INFO_PREFIX = "TaskLogInfo";
+    public static final String TASK_LOGGER_INFO_PREFIX = "TASK";
+
+    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
 
     /**
      *  build job id
@@ -51,7 +53,8 @@ public class LoggerUtils {
                                   int processDefId,
                                   int processInstId,
                                   int taskId){
-        return String.format("%s-%s/%s/%s",affix,
+        // - [taskAppId=TASK_79_4084_15210]
+        return String.format(" - [taskAppId=%s-%s-%s-%s]",affix,
                 processDefId,
                 processInstId,
                 taskId);

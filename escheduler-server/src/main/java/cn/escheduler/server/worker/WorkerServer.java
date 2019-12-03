@@ -17,7 +17,6 @@
 package cn.escheduler.server.worker;
 
 import cn.escheduler.common.Constants;
-import cn.escheduler.common.IStoppable;
 import cn.escheduler.common.enums.ExecutionStatus;
 import cn.escheduler.common.enums.TaskType;
 import cn.escheduler.common.queue.ITaskQueue;
@@ -28,20 +27,22 @@ import cn.escheduler.common.thread.ThreadUtils;
 import cn.escheduler.common.utils.CollectionUtils;
 import cn.escheduler.common.utils.OSUtils;
 import cn.escheduler.dao.AlertDao;
-import cn.escheduler.dao.DaoFactory;
 import cn.escheduler.dao.ProcessDao;
-import cn.escheduler.dao.ServerDao;
-import cn.escheduler.dao.model.ProcessInstance;
 import cn.escheduler.dao.model.TaskInstance;
+import cn.escheduler.server.master.AbstractServer;
 import cn.escheduler.server.utils.ProcessUtils;
 import cn.escheduler.server.worker.runner.FetchTaskThread;
 import cn.escheduler.server.zk.ZKWorkerClient;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -51,24 +52,11 @@ import java.util.concurrent.TimeUnit;
 /**
  *  worker server
  */
-public class WorkerServer implements IStoppable {
+@ComponentScan("cn.escheduler")
+public class WorkerServer extends AbstractServer {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
-    /**
-     * conf
-     */
-    private static Configuration conf;
-
-    /**
-     * object lock
-     */
-    private final Object lock = new Object();
-
-    /**
-     * whether or not to close the state
-     */
-    private boolean terminated = false;
 
     /**
      *  zk worker client
@@ -76,29 +64,21 @@ public class WorkerServer implements IStoppable {
     private static ZKWorkerClient zkWorkerClient = null;
 
     /**
-     *  worker dao database access
-     */
-    private ServerDao serverDao = null;
-
-    /**
      *  process database access
      */
-    private final ProcessDao processDao;
+    @Autowired
+    private ProcessDao processDao;
 
     /**
      *  alert database access
      */
-    private final AlertDao alertDao;
+    @Autowired
+    private AlertDao alertDao;
 
     /**
      * heartbeat thread pool
      */
     private ScheduledExecutorService heartbeatWorerService;
-
-    /**
-     * heartbeat interval, unit second
-     */
-    private int heartBeatInterval;
 
     /**
      * task queue impl
@@ -115,29 +95,56 @@ public class WorkerServer implements IStoppable {
      */
     private ExecutorService fetchTaskExecutorService;
 
-    static {
+    public WorkerServer(){}
+
+    public WorkerServer(ProcessDao processDao, AlertDao alertDao){
         try {
             conf = new PropertiesConfiguration(Constants.WORKER_PROPERTIES_PATH);
         }catch (ConfigurationException e){
             logger.error("load configuration failed",e);
             System.exit(1);
         }
-    }
 
-    public WorkerServer(){
         zkWorkerClient = ZKWorkerClient.getZKWorkerClient();
-        this.serverDao = zkWorkerClient.getServerDao();
-        this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-        this.processDao = DaoFactory.getDaoInstance(ProcessDao.class);
-        taskQueue = TaskQueueFactory.getTaskQueueInstance();
 
-        killExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Kill-Thread-Executor");
+        this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
 
-        fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
+        this.killExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Kill-Thread-Executor");
 
+        this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
     }
 
-    public void run(){
+
+    /**
+     * master server startup
+     *
+     * master server not use web service
+     */
+    public static void main(String[] args) {
+
+        SpringApplication app = new SpringApplication(WorkerServer.class);
+
+        app.run(args);
+    }
+
+
+    @Override
+    public void run(String... args) throws Exception {
+        // set the name of the current thread
+        Thread.currentThread().setName("Worker-Main-Thread");
+
+        WorkerServer workerServer = new WorkerServer(processDao,alertDao);
+
+        workerServer.run(processDao,alertDao);
+
+        logger.info("worker server started");
+
+        // blocking
+        workerServer.awaitTermination();
+    }
+
+
+    public void run(ProcessDao processDao, AlertDao alertDao){
 
         //  heartbeat interval
         heartBeatInterval = conf.getInt(Constants.WORKER_HEARTBEAT_INTERVAL,
@@ -187,106 +194,7 @@ public class WorkerServer implements IStoppable {
 
         // submit fetch task thread
         fetchTaskExecutorService.execute(fetchTaskThread);
-
-
     }
-
-    public static void main(String[] args)throws Exception{
-
-        // set the name of the current thread
-        Thread.currentThread().setName("Worker-Main-Thread");
-
-        WorkerServer workerServer = new WorkerServer();
-
-        workerServer.run();
-
-        logger.info("worker server started");
-
-        // blocking
-        workerServer.awaitTermination();
-
-
-    }
-
-
-    /**
-     * blocking implement
-     * @throws InterruptedException
-     */
-    public void awaitTermination() throws InterruptedException {
-        synchronized (lock) {
-            while (!terminated) {
-                lock.wait();
-            }
-        }
-    }
-
-    /**
-     * heartbeat thread implement
-     * @return
-     */
-    public Runnable heartBeatThread(){
-        Runnable heartBeatThread  = new Runnable() {
-            @Override
-            public void run() {
-                // send heartbeat to zk
-                if (StringUtils.isEmpty(zkWorkerClient.getWorkerZNode())){
-                    logger.error("worker send heartbeat to zk failed");
-                }
-
-                zkWorkerClient.heartBeatForZk(zkWorkerClient.getWorkerZNode() , Constants.WORKER_PREFIX);
-            }
-        };
-        return heartBeatThread;
-    }
-
-    /**
-     *  kill process thread implement
-     * @return
-     */
-    public Runnable getKillProcessThread(){
-        Runnable killProcessThread  = new Runnable() {
-            @Override
-            public void run() {
-                Set<String> taskInfoSet = taskQueue.smembers(Constants.SCHEDULER_TASKS_KILL);
-                while (Stopper.isRunning()){
-                    try {
-                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                    } catch (InterruptedException e) {
-                        logger.error("interrupted exception",e);
-                    }
-                    // if set is null , return
-                    if (CollectionUtils.isNotEmpty(taskInfoSet)){
-                        for (String taskInfo : taskInfoSet){
-                            // task info start with current host
-                            if (taskInfo.startsWith(OSUtils.getHost())){
-                                String[] taskInfoArr = taskInfo.split("-");
-                                if (taskInfoArr.length != 2){
-                                    continue;
-                                }else {
-                                    int taskInstId=Integer.parseInt(taskInfoArr[1]);
-                                    TaskInstance taskInstance = processDao.getTaskInstanceRelationByTaskId(taskInstId);
-
-                                    if(taskInstance.getTaskType().equals(TaskType.DEPENDENT.toString())){
-                                        taskInstance.setState(ExecutionStatus.KILL);
-                                        processDao.saveTaskInstance(taskInstance);
-                                    }else{
-                                        ProcessUtils.kill(taskInstance);
-                                    }
-                                    taskQueue.srem(Constants.SCHEDULER_TASKS_KILL,taskInfo);
-                                }
-                            }
-                        }
-                    }
-
-                    taskInfoSet = taskQueue.smembers(Constants.SCHEDULER_TASKS_KILL);
-                }
-            }
-        };
-        return killProcessThread;
-    }
-
-
 
     @Override
     public synchronized void stop(String cause) {
@@ -355,5 +263,73 @@ public class WorkerServer implements IStoppable {
             System.exit(-1);
         }
     }
+
+
+    /**
+     * heartbeat thread implement
+     * @return
+     */
+    private Runnable heartBeatThread(){
+        Runnable heartBeatThread  = new Runnable() {
+            @Override
+            public void run() {
+                // send heartbeat to zk
+                if (StringUtils.isEmpty(zkWorkerClient.getWorkerZNode())){
+                    logger.error("worker send heartbeat to zk failed");
+                }
+
+                zkWorkerClient.heartBeatForZk(zkWorkerClient.getWorkerZNode() , Constants.WORKER_PREFIX);
+            }
+        };
+        return heartBeatThread;
+    }
+
+
+    /**
+     *  kill process thread implement
+     * @return
+     */
+    private Runnable getKillProcessThread(){
+        Runnable killProcessThread  = new Runnable() {
+            @Override
+            public void run() {
+                Set<String> taskInfoSet = taskQueue.smembers(Constants.SCHEDULER_TASKS_KILL);
+                while (Stopper.isRunning()){
+                    try {
+                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    } catch (InterruptedException e) {
+                        logger.error("interrupted exception",e);
+                    }
+                    // if set is null , return
+                    if (CollectionUtils.isNotEmpty(taskInfoSet)){
+                        for (String taskInfo : taskInfoSet){
+                            // task info start with current host
+                            if (taskInfo.startsWith(OSUtils.getHost())){
+                                String[] taskInfoArr = taskInfo.split("-");
+                                if (taskInfoArr.length != 2){
+                                    continue;
+                                }else {
+                                    int taskInstId=Integer.parseInt(taskInfoArr[1]);
+                                    TaskInstance taskInstance = processDao.getTaskInstanceRelationByTaskId(taskInstId);
+
+                                    if(taskInstance.getTaskType().equals(TaskType.DEPENDENT.toString())){
+                                        taskInstance.setState(ExecutionStatus.KILL);
+                                        processDao.saveTaskInstance(taskInstance);
+                                    }else{
+                                        ProcessUtils.kill(taskInstance);
+                                    }
+                                    taskQueue.srem(Constants.SCHEDULER_TASKS_KILL,taskInfo);
+                                }
+                            }
+                        }
+                    }
+
+                    taskInfoSet = taskQueue.smembers(Constants.SCHEDULER_TASKS_KILL);
+                }
+            }
+        };
+        return killProcessThread;
+    }
+
 }
 
