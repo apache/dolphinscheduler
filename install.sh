@@ -1,4 +1,20 @@
 #!/bin/sh
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
@@ -34,20 +50,20 @@ fi
 source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
-# for example mysql or postgresql ...
-dbtype="mysql"
+# for example postgresql or mysql ...
+dbtype="postgresql"
 
 # db config
 # db address and port
-dbhost="192.168.xx.xx:3306"
+dbhost="192.168.xx.xx:5432"
 
-# mysql database
+# db name
 dbname="dolphinscheduler"
 
-# mysql username
+# db username
 username="xx"
 
-# mysql passwprd
+# db passwprd
 # Note: if there are special characters, please use the \ transfer character to transfer
 passowrd="xx"
 
@@ -311,6 +327,7 @@ if [ $dbtype == "mysql" ];then
     sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties
     sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${passowrd}#g" conf/quartz.properties
     sed -i ${txt} "s#org.quartz.dataSource.myDs.driver.*#org.quartz.dataSource.myDs.driver=com.mysql.jdbc.Driver#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.jobStore.driverDelegateClass.*#org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.StdJDBCDelegate#g" conf/quartz.properties
 fi
 
 if [ $dbtype == "postgresql" ];then

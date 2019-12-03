@@ -49,7 +49,7 @@
             </x-input>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
+        <!-- <m-list-box-f>
           <template slot="name">{{$t('Parameter')}}</template>
           <template slot="content">
             <x-input
@@ -68,7 +68,7 @@
                     :placeholder="$t('Please enter database name')">
             </x-input>
           </template>
-        </m-list-box-f>
+        </m-list-box-f> -->
         <m-list-box-f>
           <template slot="name"><b>*</b>{{$t('UDF Resources')}}</template>
           <template slot="content">

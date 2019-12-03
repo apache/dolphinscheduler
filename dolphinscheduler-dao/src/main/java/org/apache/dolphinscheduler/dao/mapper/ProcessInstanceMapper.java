@@ -152,8 +152,8 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @return process instance
      */
     ProcessInstance queryLastSchedulerProcess(@Param("processDefinitionId") int definitionId,
-                                              @Param("startTime") String startTime,
-                                              @Param("endTime") String endTime);
+                                              @Param("startTime") Date startTime,
+                                              @Param("endTime") Date endTime);
 
     /**
      * query last running process instance
@@ -164,8 +164,8 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @return process instance
      */
     ProcessInstance queryLastRunningProcess(@Param("processDefinitionId") int definitionId,
-                                            @Param("startTime") String startTime,
-                                            @Param("endTime") String endTime,
+                                            @Param("startTime") Date startTime,
+                                            @Param("endTime") Date endTime,
                                             @Param("states") int[] stateArray);
 
     /**

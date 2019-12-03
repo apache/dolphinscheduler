@@ -185,7 +185,7 @@ public class UdfFuncService extends BaseService{
                                              int resourceId) {
         Map<String, Object> result = new HashMap<>();
         // verify udfFunc is exist
-        UdfFunc udf = udfFuncMapper.selectById(udfFuncId);
+        UdfFunc udf = udfFuncMapper.selectUdfById(udfFuncId);
 
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()){
@@ -221,7 +221,9 @@ public class UdfFuncService extends BaseService{
         udf.setFuncName(funcName);
         udf.setClassName(className);
         udf.setArgTypes(argTypes);
-        udf.setDatabase(database);
+        if (StringUtils.isNotEmpty(database)) {
+            udf.setDatabase(database);
+        }
         udf.setDescription(desc);
         udf.setResourceId(resourceId);
         udf.setResourceName(resource.getAlias());

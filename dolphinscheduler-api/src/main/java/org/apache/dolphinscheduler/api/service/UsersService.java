@@ -97,7 +97,7 @@ public class UsersService extends BaseService {
 
         Map<String, Object> result = new HashMap<>(5);
         if (!CheckUtils.checkUserParams(userName, userPassword, email, phone)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,userName);
             return result;
         }
         if (!isAdmin(loginUser)) {

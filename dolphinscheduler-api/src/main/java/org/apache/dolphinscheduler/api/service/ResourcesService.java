@@ -165,6 +165,14 @@ public class ResourcesService extends BaseService {
         return result;
     }
 
+    /**
+     * check resource is exists
+     *
+     * @param alias     alias
+     * @param userId    user id
+     * @param type      type
+     * @return true if resource exists
+     */
     private boolean checkResourceExists(String alias, int userId, int type ){
 
         List<Resource> resources = resourcesMapper.queryResourceList(alias, userId, type);
@@ -375,7 +383,7 @@ public class ResourcesService extends BaseService {
         if(isAdmin(loginUser)){
             userId = 0;
         }
-        resourceList = resourcesMapper.queryResourceList(null, userId, type.ordinal());
+        resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
         result.put(Constants.DATA_LIST, resourceList);
         putMsg(result,Status.SUCCESS);
 
