@@ -28,8 +28,6 @@ import java.sql.SQLException;
 public class MysqlUpgradeDao extends UpgradeDao {
 
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
-    private static final String T_VERSION_NAME = "t_escheduler_version";
-    private static final String rootDir = System.getProperty("user.dir");
 
     @Override
     protected void init() {
@@ -54,10 +52,11 @@ public class MysqlUpgradeDao extends UpgradeDao {
      * @return
      */
     public boolean isExistsTable(String tableName) {
+        ResultSet rs = null;
         Connection conn = null;
         try {
             conn = ConnectionFactory.getDataSource().getConnection();
-            ResultSet rs = conn.getMetaData().getTables(null, null, tableName, null);
+            rs = conn.getMetaData().getTables(null, null, tableName, null);
             if (rs.next()) {
                 return true;
             } else {
@@ -68,8 +67,7 @@ public class MysqlUpgradeDao extends UpgradeDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, null, conn);
-
+            ConnectionUtils.releaseResource(rs, null, conn);
         }
 
     }
@@ -96,7 +94,6 @@ public class MysqlUpgradeDao extends UpgradeDao {
             throw new RuntimeException(e.getMessage(),e);
         } finally {
             ConnectionUtils.releaseResource(null, null, conn);
-
         }
 
     }

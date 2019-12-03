@@ -100,8 +100,10 @@ const config = merge.smart(baseConfig, {
       sourceMap: true,
       uglifyOptions: {
         compress: {
+          warnings: false,
+          drop_debugger: true,
           drop_console: true,
-          drop_debugger: true
+          pure_funcs: ['console.log']//移除console
         },
         comments: function (n, c) {
           /*! IMPORTANT: Please preserve 3rd-party library license info, inspired from @allex/amd-build-worker/config/jsplumb.js */

@@ -1,6 +1,22 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 <template>
   <div class="dep-list-model">
-    <div v-for="(el,$index) in dependItemList" class="list" @click="itemIndex = $index">
+    <div v-for="(el,$index) in dependItemList" :key='$index' class="list" @click="itemIndex = $index">
       <x-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.projectId" @on-change="_onChangeProjectId">
         <x-option v-for="item in projectList" :key="item.value" :value="item.value" :label="item.label">
         </x-option>
@@ -58,7 +74,8 @@
     mixins: [disabledState],
     props: {
       dependItemList: Array,
-      index: Number
+      index: Number,
+      dependTaskList:Array
     },
     model: {
       prop: 'dependItemList',
@@ -77,9 +94,10 @@
         let value = noArr[0] && noArr[0].value || null
         let val = value || this.definitionList[0].value
         // add task list
+        let projectId = this.projectList[0].value
         this._getDependItemList(val).then(depTasksList => {
           this.$nextTick(() => {
-            this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(val, depTasksList)))
+            this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(val, depTasksList,projectId)))
           })
         })
         // remove tooltip
@@ -89,10 +107,9 @@
        * remove task
        */
       _remove (i) {
-        this.dependItemList.splice(i, 1)
+        this.dependTaskList[this.index].dependItemList.splice(i,1)
         this._removeTip()
-
-        if (!this.dependItemList.length) {
+        if (!this.dependItemList.length || this.dependItemList.length === 0) {
           this.$emit('on-delete-all', {
             index: this.index
           })

@@ -266,7 +266,7 @@ In the early scheduling design, if there is no priority design and fair scheduli
  /**
   * task log appender
   */
- Public class TaskLogAppender extends FileAppender<ILoggingEvent {
+ Public class TaskLogAppender extends FileAppender<ILoggingEvent> {
  
      ...
 
@@ -297,7 +297,7 @@ Generate a log in the form of /process definition id/process instance id/task in
  /**
  * task log filter
  */
-Public class TaskLogFilter extends Filter<ILoggingEvent {
+Public class TaskLogFilter extends Filter<ILoggingEvent> {
 
     @Override
     Public FilterReply decide(ILoggingEvent event) {

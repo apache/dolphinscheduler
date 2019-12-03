@@ -260,6 +260,10 @@ let tasksType = {
     desc: 'SPARK',
     color: '#E46F13'
   },
+  'FLINK': {
+    desc: 'FLINK',
+    color: '#E46F13'
+  },
   'MR': {
     desc: 'MapReduce',
     color: '#A0A5CC'
@@ -271,6 +275,10 @@ let tasksType = {
   'DEPENDENT': {
     desc: 'DEPENDENT',
     color: '#2FBFD8'
+  },
+  'HTTP': {
+    desc: 'HTTP',
+    color: '#E46F13'
   }
 }
 
