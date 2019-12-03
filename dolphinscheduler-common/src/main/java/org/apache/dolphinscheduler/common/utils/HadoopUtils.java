@@ -293,7 +293,7 @@ public class HadoopUtils implements Closeable {
                     dstPath.delete();
                 }
             } else {
-                logger.error("destination file must be a file");
+                throw new IOException("destination file must be a file!");
             }
         }
 

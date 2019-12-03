@@ -32,7 +32,7 @@
           <template slot="content">
             <x-input
                     type="input"
-                    maxlength="40"
+                    maxlength="100"
                     v-model="funcName"
                     :placeholder="$t('Please enter a function name')">
             </x-input>

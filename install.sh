@@ -191,7 +191,7 @@ execPath="/tmp/dolphinscheduler/exec"
 shellEnvPath="$installPath/conf/env/.dolphinscheduler_env.sh"
 
 # suffix of the resource file
-resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
+resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties"
 
 # development status, if true, for the SHELL script, you can view the encapsulated SHELL script in the execPath directory. 
 # If it is false, execute the direct delete
