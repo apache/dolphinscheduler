@@ -84,10 +84,6 @@
 					<artifactId>servlet-api</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.apache.curator</groupId>
 					<artifactId>curator-client</artifactId>
 				</exclusion>
@@ -519,6 +515,10 @@
 					<artifactId>log4j-web</artifactId>
 					<groupId>org.apache.logging.log4j</groupId>
 				</exclusion>
+				<exclusion>
+					<artifactId>log4j-1.2-api</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 
@@ -572,6 +572,12 @@
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jsp-2.1</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.mortbay.jetty</groupId>
+					<artifactId>servlet-api-2.5</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 

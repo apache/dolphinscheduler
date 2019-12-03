@@ -22,6 +22,7 @@ import cn.escheduler.common.enums.TaskRecordStatus;
 import cn.escheduler.common.enums.TaskType;
 import cn.escheduler.common.process.Property;
 import cn.escheduler.common.task.AbstractParameters;
+import cn.escheduler.common.task.flink.FlinkParameters;
 import cn.escheduler.common.task.mr.MapreduceParameters;
 import cn.escheduler.common.task.procedure.ProcedureParameters;
 import cn.escheduler.common.task.python.PythonParameters;
@@ -178,6 +179,8 @@ public abstract class AbstractTask {
             case SPARK:
                 paramsClass = SparkParameters.class;
                 break;
+            case FLINK:
+                paramsClass = FlinkParameters.class;
             case PYTHON:
                 paramsClass = PythonParameters.class;
                 break;

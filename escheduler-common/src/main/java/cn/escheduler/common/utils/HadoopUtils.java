@@ -288,9 +288,11 @@ public class HadoopUtils implements Closeable {
             if (dstPath.isFile()) {
                 if (overwrite) {
                     dstPath.delete();
+                }else{
+                    throw new IOException("destination file already exists!");
                 }
             } else {
-                logger.error("destination file must be a file");
+                throw new IOException("destination file must be a file!");
             }
         }
 
