@@ -93,8 +93,7 @@ public class TaskRecordDao {
      * @param filterMap filterMap
      * @return sql string
      */
-    private static String getWhereString(Map<String, String> filterMap)
-    {
+    private static String getWhereString(Map<String, String> filterMap) {
         if(filterMap.size() ==0){
             return "";
         }

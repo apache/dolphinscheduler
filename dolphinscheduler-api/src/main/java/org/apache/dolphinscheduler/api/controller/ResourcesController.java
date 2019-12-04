@@ -451,8 +451,7 @@ public class ResourcesController extends BaseController{
     @GetMapping(value = "/udf-func/update-ui")
     @ResponseStatus(HttpStatus.OK)
     public Result viewUIUdfFunction(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam("id") int id)
-    {
+                                      @RequestParam("id") int id) {
         logger.info("login user {}, query udf{}",
                 loginUser.getUserName(), id);
         try {

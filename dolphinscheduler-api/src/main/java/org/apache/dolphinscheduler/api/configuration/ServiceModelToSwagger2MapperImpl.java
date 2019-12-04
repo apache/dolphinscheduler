@@ -156,8 +156,7 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
             List<String> list = new ArrayList<String>(tagsSet.size());
 
             Iterator<String> it = from.getTags().iterator();
-            while(it.hasNext())
-            {
+            while(it.hasNext()){
                String tag = it.next();
                list.add(StringUtils.isNotBlank(tag) ? messageSource.getMessage(tag, null, tag, locale) : " ");
             }

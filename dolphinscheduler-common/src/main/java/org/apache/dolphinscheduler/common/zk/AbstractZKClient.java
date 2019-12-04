@@ -419,13 +419,17 @@ public abstract class AbstractZKClient {
 	 *
 	 * @return get worker node parent path
 	 */
-	protected String getWorkerZNodeParentPath(){return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS);};
+	protected String getWorkerZNodeParentPath(){
+		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS);
+	}
 
 	/**
 	 *
 	 * @return get master node parent path
 	 */
-	protected String getMasterZNodeParentPath(){return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_MASTERS);}
+	protected String getMasterZNodeParentPath(){
+		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_MASTERS);
+	}
 
 	/**
 	 *

@@ -37,16 +37,25 @@
     </module>
 
     <module name="TreeWalker">
+        <module name="OuterTypeFilename">
+            <property name="severity" value="error"/>
+        </module>
 
-        <module name="OuterTypeFilename"/>
+        <module name="OneTopLevelClass">
+            <property name="severity" value="error"/>
+        </module>
 
-        <module name="OneTopLevelClass"/>
+        <module name="NoLineWrap">
+            <property name="severity" value="error"/>
+        </module>
 
-        <module name="NoLineWrap"/>
+        <module name="NeedBraces">
+            <property name="severity" value="error"/>
+        </module>
 
-        <module name="NeedBraces"/>
-
-        <module name="LeftCurly"/>
+        <module name="LeftCurly">
+            <property name="severity" value="error"/>
+        </module>
 
         <module name="AvoidNestedBlocks">
             <property name="allowInSwitchCase" value="true"/>

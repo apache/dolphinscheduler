@@ -94,8 +94,7 @@ public class TaskQueueImplTest extends StandaloneZKServerForTest {
     public void extremeTest(){
         int total = 30 * 10000;
 
-        for(int i = 0; i < total; i++)
-        {
+        for(int i = 0; i < total; i++) {
             for(int j = 0; j < total; j++) {
                 //${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
                 //format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}

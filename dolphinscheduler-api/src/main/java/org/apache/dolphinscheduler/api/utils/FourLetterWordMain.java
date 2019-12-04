@@ -45,8 +45,7 @@ public class FourLetterWordMain {
      * @throws java.io.IOException io exceptions
      */
     public static String send4LetterWord(String host, int port, String cmd)
-            throws IOException
-    {
+            throws IOException {
         return send4LetterWord(host, port, cmd, DEFAULT_SOCKET_TIMEOUT);
     }
     /**
@@ -59,8 +58,7 @@ public class FourLetterWordMain {
      * @throws java.io.IOException io exceptions
      */
     public static String send4LetterWord(String host, int port, String cmd, int timeout)
-            throws IOException
-    {
+            throws IOException {
         LOG.info("connecting to " + host + " " + port);
         Socket sock = new Socket();
         InetSocketAddress hostaddress= host != null ? new InetSocketAddress(host, port) :
