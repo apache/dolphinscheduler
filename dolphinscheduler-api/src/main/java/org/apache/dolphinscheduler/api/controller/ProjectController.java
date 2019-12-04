@@ -265,7 +265,7 @@ public class ProjectController extends BaseController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
     })
-    @PostMapping(value="/importProcessDefinition")
+    @PostMapping(value="/import-definition")
     public Result importProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam("file") MultipartFile file){
         try{
@@ -285,7 +285,7 @@ public class ProjectController extends BaseController {
      * @return all project list
      */
     @ApiOperation(value = "queryAllProjectList", notes= "QUERY_ALL_PROJECT_LIST_NOTES")
-    @GetMapping(value = "/queryAllProjectList")
+    @GetMapping(value = "/query-project-list")
     @ResponseStatus(HttpStatus.OK)
     public Result queryAllProjectList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
