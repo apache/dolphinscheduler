@@ -27,21 +27,21 @@ import org.slf4j.LoggerFactory;
  * HttpClient utils test
  */
 public class HttpUtilsTest {
-	
-	
-	public static final Logger logger = LoggerFactory.getLogger(HttpUtilsTest.class);
 
 
-	@Ignore
-	@Test
-	public void getTest(){
-
-		String result = HttpUtils.get("http://192.168.xx.xx:8088/ws/v1/cluster/info");
-		logger.info(result);
+    public static final Logger logger = LoggerFactory.getLogger(HttpUtilsTest.class);
 
 
-		JSONObject jsonObject = JSON.parseObject(result);
-		String string = jsonObject.getJSONObject("clusterInfo").getString("haState");
-		logger.info(string);
-	}
+    @Ignore
+    @Test
+    public void getTest(){
+
+        String result = HttpUtils.get("http://192.168.xx.xx:8088/ws/v1/cluster/info");
+        logger.info(result);
+
+
+        JSONObject jsonObject = JSON.parseObject(result);
+        String string = jsonObject.getJSONObject("clusterInfo").getString("haState");
+        logger.info(string);
+    }
 }

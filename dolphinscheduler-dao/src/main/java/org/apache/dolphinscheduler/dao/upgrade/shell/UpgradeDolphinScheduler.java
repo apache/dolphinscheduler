@@ -24,24 +24,24 @@ import org.slf4j.LoggerFactory;
  * upgrade DolphinScheduler
  */
 public class UpgradeDolphinScheduler {
-	private static final Logger logger = LoggerFactory.getLogger(UpgradeDolphinScheduler.class);
+    private static final Logger logger = LoggerFactory.getLogger(UpgradeDolphinScheduler.class);
 
-	/**
-	 * upgrade dolphin scheduler db
-	 * @param args args
-	 */
-	public static void main(String[] args) {
-		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-		try {
-			dolphinSchedulerManager.upgradeDolphinScheduler();
-			logger.info("upgrade DolphinScheduler success");
-		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
-			logger.info("Upgrade DolphinScheduler failed");
-			throw new RuntimeException(e);
-		}
-	}
-	
-	
-	
+    /**
+     * upgrade dolphin scheduler db
+     * @param args args
+     */
+    public static void main(String[] args) {
+        DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
+        try {
+            dolphinSchedulerManager.upgradeDolphinScheduler();
+            logger.info("upgrade DolphinScheduler success");
+        } catch (Exception e) {
+            logger.error(e.getMessage(),e);
+            logger.info("Upgrade DolphinScheduler failed");
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
 }

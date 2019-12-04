@@ -28,6 +28,7 @@
     <property name="fileExtensions" value="java, properties, xml"/>
 
     <module name="FileTabCharacter">
+        <property name="severity" value="error"/>
         <property name="eachLine" value="true"/>
     </module>
 

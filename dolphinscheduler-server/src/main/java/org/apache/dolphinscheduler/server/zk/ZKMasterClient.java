@@ -49,441 +49,441 @@ import java.util.concurrent.ThreadFactory;
  */
 public class ZKMasterClient extends AbstractZKClient {
 
-	/**
-	 * logger
-	 */
-	private static final Logger logger = LoggerFactory.getLogger(ZKMasterClient.class);
+    /**
+     * logger
+     */
+    private static final Logger logger = LoggerFactory.getLogger(ZKMasterClient.class);
 
-	/**
-	 * thread factory
-	 */
-	private static final ThreadFactory defaultThreadFactory = ThreadUtils.newGenericThreadFactory("Master-Main-Thread");
+    /**
+     * thread factory
+     */
+    private static final ThreadFactory defaultThreadFactory = ThreadUtils.newGenericThreadFactory("Master-Main-Thread");
 
-	/**
-	 *  master znode
-	 */
-	private String masterZNode = null;
+    /**
+     *  master znode
+     */
+    private String masterZNode = null;
 
-	/**
-	 *  alert database access
-	 */
-	private AlertDao alertDao = null;
-	/**
-	 *  flow database access
-	 */
-	private ProcessDao processDao;
+    /**
+     *  alert database access
+     */
+    private AlertDao alertDao = null;
+    /**
+     *  flow database access
+     */
+    private ProcessDao processDao;
 
-	/**
-	 *  zkMasterClient
-	 */
-	private static ZKMasterClient zkMasterClient = null;
+    /**
+     *  zkMasterClient
+     */
+    private static ZKMasterClient zkMasterClient = null;
 
-	/**
-	 * master path children cache
-	 */
-	private PathChildrenCache masterPathChildrenCache;
+    /**
+     * master path children cache
+     */
+    private PathChildrenCache masterPathChildrenCache;
 
-	/**
-	 * worker path children cache
-	 */
-	private PathChildrenCache workerPathChildrenCache;
+    /**
+     * worker path children cache
+     */
+    private PathChildrenCache workerPathChildrenCache;
 
-	/**
-	 * constructor
-	 *
-	 * @param processDao process dao
-	 */
-	private ZKMasterClient(ProcessDao processDao){
-		this.processDao = processDao;
-		init();
-	}
+    /**
+     * constructor
+     *
+     * @param processDao process dao
+     */
+    private ZKMasterClient(ProcessDao processDao){
+        this.processDao = processDao;
+        init();
+    }
 
-	/**
-	 * default constructor
-	 */
-	private ZKMasterClient(){}
+    /**
+     * default constructor
+     */
+    private ZKMasterClient(){}
 
-	/**
-	 * get zkMasterClient
-	 *
-	 * @param processDao process dao
-	 * @return ZKMasterClient zookeeper master client
-	 */
-	public static synchronized ZKMasterClient getZKMasterClient(ProcessDao processDao){
-		if(zkMasterClient == null){
-			zkMasterClient = new ZKMasterClient(processDao);
-		}
-		zkMasterClient.processDao = processDao;
+    /**
+     * get zkMasterClient
+     *
+     * @param processDao process dao
+     * @return ZKMasterClient zookeeper master client
+     */
+    public static synchronized ZKMasterClient getZKMasterClient(ProcessDao processDao){
+        if(zkMasterClient == null){
+            zkMasterClient = new ZKMasterClient(processDao);
+        }
+        zkMasterClient.processDao = processDao;
 
-		return zkMasterClient;
-	}
+        return zkMasterClient;
+    }
 
-	/**
-	 * init
-	 */
-	public void init(){
-		// init dao
-		this.initDao();
+    /**
+     * init
+     */
+    public void init(){
+        // init dao
+        this.initDao();
 
-		InterProcessMutex mutex = null;
-		try {
-			// create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
-			String znodeLock = getMasterStartUpLockPath();
-			mutex = new InterProcessMutex(zkClient, znodeLock);
-			mutex.acquire();
+        InterProcessMutex mutex = null;
+        try {
+            // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
+            String znodeLock = getMasterStartUpLockPath();
+            mutex = new InterProcessMutex(zkClient, znodeLock);
+            mutex.acquire();
 
-			// init system znode
-			this.initSystemZNode();
+            // init system znode
+            this.initSystemZNode();
 
-			// monitor master
-			this.listenerMaster();
+            // monitor master
+            this.listenerMaster();
 
-			// monitor worker
-			this.listenerWorker();
+            // monitor worker
+            this.listenerWorker();
 
-			// register master
-			this.registerMaster();
+            // register master
+            this.registerMaster();
 
-			// check if fault tolerance is required，failure and tolerance
-			if (getActiveMasterNum() == 1) {
-				failoverWorker(null, true);
-				failoverMaster(null);
-			}
+            // check if fault tolerance is required，failure and tolerance
+            if (getActiveMasterNum() == 1) {
+                failoverWorker(null, true);
+                failoverMaster(null);
+            }
 
-		}catch (Exception e){
-			logger.error("master start up  exception : " + e.getMessage(),e);
-		}finally {
-			releaseMutex(mutex);
-		}
-	}
+        }catch (Exception e){
+            logger.error("master start up  exception : " + e.getMessage(),e);
+        }finally {
+            releaseMutex(mutex);
+        }
+    }
 
-	@Override
-	public void close(){
-		try {
-			if(masterPathChildrenCache != null){
-				masterPathChildrenCache.close();
-			}
-			if(workerPathChildrenCache != null){
-				workerPathChildrenCache.close();
-			}
-			super.close();
-		} catch (Exception ignore) {
-		}
-	}
-
-
-
-
-	/**
-	 *  init dao
-	 */
-	public void initDao(){
-		this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-	}
-	/**
-	 * get alert dao
-	 *
-	 * @return AlertDao
-	 */
-	public AlertDao getAlertDao() {
-		return alertDao;
-	}
+    @Override
+    public void close(){
+        try {
+            if(masterPathChildrenCache != null){
+                masterPathChildrenCache.close();
+            }
+            if(workerPathChildrenCache != null){
+                workerPathChildrenCache.close();
+            }
+            super.close();
+        } catch (Exception ignore) {
+        }
+    }
 
 
 
 
-	/**
-	 *  register master znode
-	 */
-	public void registerMaster(){
-		try {
-		    String serverPath = registerServer(ZKNodeType.MASTER);
-		    if(StringUtils.isEmpty(serverPath)){
-		    	System.exit(-1);
-			}
-			masterZNode = serverPath;
-		} catch (Exception e) {
-			logger.error("register master failure : "  + e.getMessage(),e);
-			System.exit(-1);
-		}
-	}
+    /**
+     *  init dao
+     */
+    public void initDao(){
+        this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+    }
+    /**
+     * get alert dao
+     *
+     * @return AlertDao
+     */
+    public AlertDao getAlertDao() {
+        return alertDao;
+    }
 
 
 
-	/**
-	 *  monitor master
-	 */
-	public void listenerMaster(){
-		masterPathChildrenCache = new PathChildrenCache(zkClient,
-				getZNodeParentPath(ZKNodeType.MASTER), true ,defaultThreadFactory);
 
-		try {
-			masterPathChildrenCache.start();
-			masterPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
-				@Override
-				public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-					switch (event.getType()) {
-						case CHILD_ADDED:
-							logger.info("master node added : {}",event.getData().getPath());
-							break;
-						case CHILD_REMOVED:
-							String path = event.getData().getPath();
-							String serverHost = getHostByEventDataPath(path);
-							if(checkServerSelfDead(serverHost, ZKNodeType.MASTER)){
-								return;
-							}
-							removeZKNodePath(path, ZKNodeType.MASTER, true);
-							break;
-						case CHILD_UPDATED:
-							break;
-						default:
-							break;
-					}
-				}
-			});
-		}catch (Exception e){
-			logger.error("monitor master failed : " + e.getMessage(),e);
-		}
+    /**
+     *  register master znode
+     */
+    public void registerMaster(){
+        try {
+            String serverPath = registerServer(ZKNodeType.MASTER);
+            if(StringUtils.isEmpty(serverPath)){
+                System.exit(-1);
+            }
+            masterZNode = serverPath;
+        } catch (Exception e) {
+            logger.error("register master failure : "  + e.getMessage(),e);
+            System.exit(-1);
+        }
+    }
+
+
+
+    /**
+     *  monitor master
+     */
+    public void listenerMaster(){
+        masterPathChildrenCache = new PathChildrenCache(zkClient,
+                getZNodeParentPath(ZKNodeType.MASTER), true ,defaultThreadFactory);
+
+        try {
+            masterPathChildrenCache.start();
+            masterPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
+                @Override
+                public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
+                    switch (event.getType()) {
+                        case CHILD_ADDED:
+                            logger.info("master node added : {}",event.getData().getPath());
+                            break;
+                        case CHILD_REMOVED:
+                            String path = event.getData().getPath();
+                            String serverHost = getHostByEventDataPath(path);
+                            if(checkServerSelfDead(serverHost, ZKNodeType.MASTER)){
+                                return;
+                            }
+                            removeZKNodePath(path, ZKNodeType.MASTER, true);
+                            break;
+                        case CHILD_UPDATED:
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+        }catch (Exception e){
+            logger.error("monitor master failed : " + e.getMessage(),e);
+        }
 }
 
-	/**
-	 * remove zookeeper node path
-	 *
-	 * @param path			zookeeper node path
-	 * @param zkNodeType	zookeeper node type
-	 * @param failover		is failover
-	 */
-	private void removeZKNodePath(String path, ZKNodeType zkNodeType, boolean failover) {
-		logger.info("{} node deleted : {}", zkNodeType.toString(), path);
-		InterProcessMutex mutex = null;
-		try {
-			String failoverPath = getFailoverLockPath(zkNodeType);
-			// create a distributed lock
-			mutex = new InterProcessMutex(getZkClient(), failoverPath);
-			mutex.acquire();
-
-			String serverHost = getHostByEventDataPath(path);
-			// handle dead server
-			handleDeadServer(path, zkNodeType, Constants.ADD_ZK_OP);
-			//alert server down.
-			alertServerDown(serverHost, zkNodeType);
-			//failover server
-			if(failover){
-				failoverServerWhenDown(serverHost, zkNodeType);
-			}
-		}catch (Exception e){
-			logger.error("{} server failover failed.", zkNodeType.toString());
-			logger.error("failover exception : " + e.getMessage(),e);
-		}
-		finally {
-			releaseMutex(mutex);
-		}
-	}
-
-	/**
-	 * failover server when server down
-	 *
-	 * @param serverHost	server host
-	 * @param zkNodeType	zookeeper node type
-	 * @throws Exception	exception
-	 */
-	private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-	    if(StringUtils.isEmpty(serverHost)){
-	    	return ;
-		}
-		switch (zkNodeType){
-			case MASTER:
-				failoverMaster(serverHost);
-				break;
-			case WORKER:
-				failoverWorker(serverHost, true);
-			default:
-				break;
-		}
-	}
-
-	/**
-	 * get failover lock path
-	 *
-	 * @param zkNodeType zookeeper node type
-	 * @return fail over lock path
-	 */
-	private String getFailoverLockPath(ZKNodeType zkNodeType){
-
-		switch (zkNodeType){
-			case MASTER:
-				return getMasterFailoverLockPath();
-			case WORKER:
-				return getWorkerFailoverLockPath();
-			default:
-				return "";
-		}
-	}
-
-	/**
-	 * send alert when server down
-	 *
-	 * @param serverHost	server host
-	 * @param zkNodeType	zookeeper node type
-	 */
-	private void alertServerDown(String serverHost, ZKNodeType zkNodeType) {
-
-	    String serverType = zkNodeType.toString();
-		for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
-			alertDao.sendServerStopedAlert(1, serverHost, serverType);
-		}
-	}
-
-	/**
-	 * monitor worker
-	 */
-	public void listenerWorker(){
-		workerPathChildrenCache = new PathChildrenCache(zkClient,
-				getZNodeParentPath(ZKNodeType.WORKER),true ,defaultThreadFactory);
-		try {
-			workerPathChildrenCache.start();
-			workerPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
-				@Override
-				public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) {
-					switch (event.getType()) {
-						case CHILD_ADDED:
-							logger.info("node added : {}" ,event.getData().getPath());
-							break;
-						case CHILD_REMOVED:
-							String path = event.getData().getPath();
-							logger.info("node deleted : {}",event.getData().getPath());
-							removeZKNodePath(path, ZKNodeType.WORKER, true);
-							break;
-						default:
-							break;
-					}
-				}
-			});
-		}catch (Exception e){
-			logger.error("listener worker failed : " + e.getMessage(),e);
-		}
-	}
-
-
-	/**
-	 * get master znode
-	 *
-	 * @return master zookeeper node
-	 */
-	public String getMasterZNode() {
-		return masterZNode;
-	}
-
-	/**
-	 * task needs failover if task start before worker starts
+    /**
+     * remove zookeeper node path
      *
-	 * @param taskInstance task instance
-	 * @return true if task instance need fail over
-	 */
-	private boolean checkTaskInstanceNeedFailover(TaskInstance taskInstance) throws Exception {
+     * @param path            zookeeper node path
+     * @param zkNodeType    zookeeper node type
+     * @param failover        is failover
+     */
+    private void removeZKNodePath(String path, ZKNodeType zkNodeType, boolean failover) {
+        logger.info("{} node deleted : {}", zkNodeType.toString(), path);
+        InterProcessMutex mutex = null;
+        try {
+            String failoverPath = getFailoverLockPath(zkNodeType);
+            // create a distributed lock
+            mutex = new InterProcessMutex(getZkClient(), failoverPath);
+            mutex.acquire();
 
-		boolean taskNeedFailover = true;
+            String serverHost = getHostByEventDataPath(path);
+            // handle dead server
+            handleDeadServer(path, zkNodeType, Constants.ADD_ZK_OP);
+            //alert server down.
+            alertServerDown(serverHost, zkNodeType);
+            //failover server
+            if(failover){
+                failoverServerWhenDown(serverHost, zkNodeType);
+            }
+        }catch (Exception e){
+            logger.error("{} server failover failed.", zkNodeType.toString());
+            logger.error("failover exception : " + e.getMessage(),e);
+        }
+        finally {
+            releaseMutex(mutex);
+        }
+    }
 
-		//now no host will execute this task instance,so no need to failover the task
-		if(taskInstance.getHost() == null){
-			return false;
-		}
+    /**
+     * failover server when server down
+     *
+     * @param serverHost    server host
+     * @param zkNodeType    zookeeper node type
+     * @throws Exception    exception
+     */
+    private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
+        if(StringUtils.isEmpty(serverHost)){
+            return ;
+        }
+        switch (zkNodeType){
+            case MASTER:
+                failoverMaster(serverHost);
+                break;
+            case WORKER:
+                failoverWorker(serverHost, true);
+            default:
+                break;
+        }
+    }
 
-		// if the worker node exists in zookeeper, we must check the task starts after the worker
-	    if(checkZKNodeExists(taskInstance.getHost(), ZKNodeType.WORKER)){
-	        //if task start after worker starts, there is no need to failover the task.
-         	if(checkTaskAfterWorkerStart(taskInstance)){
-         	    taskNeedFailover = false;
-			}
-		}
-		return taskNeedFailover;
-	}
+    /**
+     * get failover lock path
+     *
+     * @param zkNodeType zookeeper node type
+     * @return fail over lock path
+     */
+    private String getFailoverLockPath(ZKNodeType zkNodeType){
 
-	/**
-	 * check task start after the worker server starts.
-	 *
-	 * @param taskInstance task instance
-	 * @return true if task instance start time after worker server start date
-	 */
-	private boolean checkTaskAfterWorkerStart(TaskInstance taskInstance) {
-	    if(StringUtils.isEmpty(taskInstance.getHost())){
-	    	return false;
-		}
-	    Date workerServerStartDate = null;
-	    List<Server> workerServers = getServersList(ZKNodeType.WORKER);
-	    for(Server workerServer : workerServers){
-	    	if(workerServer.getHost().equals(taskInstance.getHost())){
-	    	    workerServerStartDate = workerServer.getCreateTime();
-	    	    break;
-			}
-		}
+        switch (zkNodeType){
+            case MASTER:
+                return getMasterFailoverLockPath();
+            case WORKER:
+                return getWorkerFailoverLockPath();
+            default:
+                return "";
+        }
+    }
 
-		if(workerServerStartDate != null){
-			return taskInstance.getStartTime().after(workerServerStartDate);
-		}else{
-			return false;
-		}
-	}
+    /**
+     * send alert when server down
+     *
+     * @param serverHost    server host
+     * @param zkNodeType    zookeeper node type
+     */
+    private void alertServerDown(String serverHost, ZKNodeType zkNodeType) {
 
-	/**
-	 * failover worker tasks
-	 *
-	 * 1. kill yarn job if there are yarn jobs in tasks.
-	 * 2. change task state from running to need failover.
-     * 3. failover all tasks when workerHost is null
-	 * @param workerHost worker host
-	 */
+        String serverType = zkNodeType.toString();
+        for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
+            alertDao.sendServerStopedAlert(1, serverHost, serverType);
+        }
+    }
 
-	/**
-	 * failover worker tasks
-	 *
-	 * 1. kill yarn job if there are yarn jobs in tasks.
-	 * 2. change task state from running to need failover.
-	 * 3. failover all tasks when workerHost is null
-	 * @param workerHost			worker host
-	 * @param needCheckWorkerAlive	need check worker alive
-	 * @throws Exception			exception
-	 */
-	private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
-		logger.info("start worker[{}] failover ...", workerHost);
-
-		List<TaskInstance> needFailoverTaskInstanceList = processDao.queryNeedFailoverTaskInstances(workerHost);
-		for(TaskInstance taskInstance : needFailoverTaskInstanceList){
-			if(needCheckWorkerAlive){
-				if(!checkTaskInstanceNeedFailover(taskInstance)){
-					continue;
+    /**
+     * monitor worker
+     */
+    public void listenerWorker(){
+        workerPathChildrenCache = new PathChildrenCache(zkClient,
+                getZNodeParentPath(ZKNodeType.WORKER),true ,defaultThreadFactory);
+        try {
+            workerPathChildrenCache.start();
+            workerPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
+                @Override
+                public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) {
+                    switch (event.getType()) {
+                        case CHILD_ADDED:
+                            logger.info("node added : {}" ,event.getData().getPath());
+                            break;
+                        case CHILD_REMOVED:
+                            String path = event.getData().getPath();
+                            logger.info("node deleted : {}",event.getData().getPath());
+                            removeZKNodePath(path, ZKNodeType.WORKER, true);
+                            break;
+                        default:
+                            break;
+                    }
                 }
-			}
+            });
+        }catch (Exception e){
+            logger.error("listener worker failed : " + e.getMessage(),e);
+        }
+    }
 
-			ProcessInstance instance = processDao.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
-			if(instance!=null){
-				taskInstance.setProcessInstance(instance);
-			}
-			// only kill yarn job if exists , the local thread has exited
-			ProcessUtils.killYarnJob(taskInstance);
 
-			taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
-			processDao.saveTaskInstance(taskInstance);
-		}
-		logger.info("end worker[{}] failover ...", workerHost);
-	}
+    /**
+     * get master znode
+     *
+     * @return master zookeeper node
+     */
+    public String getMasterZNode() {
+        return masterZNode;
+    }
 
-	/**
-	 * failover master tasks
-	 *
-	 * @param masterHost master host
-	 */
-	private void failoverMaster(String masterHost) {
-		logger.info("start master failover ...");
+    /**
+     * task needs failover if task start before worker starts
+     *
+     * @param taskInstance task instance
+     * @return true if task instance need fail over
+     */
+    private boolean checkTaskInstanceNeedFailover(TaskInstance taskInstance) throws Exception {
 
-		List<ProcessInstance> needFailoverProcessInstanceList = processDao.queryNeedFailoverProcessInstances(masterHost);
+        boolean taskNeedFailover = true;
 
-		//updateProcessInstance host is null and insert into command
-		for(ProcessInstance processInstance : needFailoverProcessInstanceList){
-			processDao.processNeedFailoverProcessInstances(processInstance);
-		}
+        //now no host will execute this task instance,so no need to failover the task
+        if(taskInstance.getHost() == null){
+            return false;
+        }
 
-		logger.info("master failover end");
-	}
+        // if the worker node exists in zookeeper, we must check the task starts after the worker
+        if(checkZKNodeExists(taskInstance.getHost(), ZKNodeType.WORKER)){
+            //if task start after worker starts, there is no need to failover the task.
+             if(checkTaskAfterWorkerStart(taskInstance)){
+                 taskNeedFailover = false;
+            }
+        }
+        return taskNeedFailover;
+    }
+
+    /**
+     * check task start after the worker server starts.
+     *
+     * @param taskInstance task instance
+     * @return true if task instance start time after worker server start date
+     */
+    private boolean checkTaskAfterWorkerStart(TaskInstance taskInstance) {
+        if(StringUtils.isEmpty(taskInstance.getHost())){
+            return false;
+        }
+        Date workerServerStartDate = null;
+        List<Server> workerServers = getServersList(ZKNodeType.WORKER);
+        for(Server workerServer : workerServers){
+            if(workerServer.getHost().equals(taskInstance.getHost())){
+                workerServerStartDate = workerServer.getCreateTime();
+                break;
+            }
+        }
+
+        if(workerServerStartDate != null){
+            return taskInstance.getStartTime().after(workerServerStartDate);
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * failover worker tasks
+     *
+     * 1. kill yarn job if there are yarn jobs in tasks.
+     * 2. change task state from running to need failover.
+     * 3. failover all tasks when workerHost is null
+     * @param workerHost worker host
+     */
+
+    /**
+     * failover worker tasks
+     *
+     * 1. kill yarn job if there are yarn jobs in tasks.
+     * 2. change task state from running to need failover.
+     * 3. failover all tasks when workerHost is null
+     * @param workerHost            worker host
+     * @param needCheckWorkerAlive    need check worker alive
+     * @throws Exception            exception
+     */
+    private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
+        logger.info("start worker[{}] failover ...", workerHost);
+
+        List<TaskInstance> needFailoverTaskInstanceList = processDao.queryNeedFailoverTaskInstances(workerHost);
+        for(TaskInstance taskInstance : needFailoverTaskInstanceList){
+            if(needCheckWorkerAlive){
+                if(!checkTaskInstanceNeedFailover(taskInstance)){
+                    continue;
+                }
+            }
+
+            ProcessInstance instance = processDao.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
+            if(instance!=null){
+                taskInstance.setProcessInstance(instance);
+            }
+            // only kill yarn job if exists , the local thread has exited
+            ProcessUtils.killYarnJob(taskInstance);
+
+            taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
+            processDao.saveTaskInstance(taskInstance);
+        }
+        logger.info("end worker[{}] failover ...", workerHost);
+    }
+
+    /**
+     * failover master tasks
+     *
+     * @param masterHost master host
+     */
+    private void failoverMaster(String masterHost) {
+        logger.info("start master failover ...");
+
+        List<ProcessInstance> needFailoverProcessInstanceList = processDao.queryNeedFailoverProcessInstances(masterHost);
+
+        //updateProcessInstance host is null and insert into command
+        for(ProcessInstance processInstance : needFailoverProcessInstanceList){
+            processDao.processNeedFailoverProcessInstances(processInstance);
+        }
+
+        logger.info("master failover end");
+    }
 
 }

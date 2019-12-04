@@ -26,17 +26,17 @@ import org.slf4j.LoggerFactory;
  */
 public class InitDolphinScheduler {
 
-	private static final Logger logger = LoggerFactory.getLogger(InitDolphinScheduler.class);
+    private static final Logger logger = LoggerFactory.getLogger(InitDolphinScheduler.class);
 
-	/**
-	 * init dolphin scheduler db
-	 * @param args args
-	 */
-	public static void main(String[] args) {
-		Thread.currentThread().setName("manager-InitDolphinScheduler");
-		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-		dolphinSchedulerManager.initDolphinScheduler();
-		logger.info("init DolphinScheduler finished");
-		
-	}
+    /**
+     * init dolphin scheduler db
+     * @param args args
+     */
+    public static void main(String[] args) {
+        Thread.currentThread().setName("manager-InitDolphinScheduler");
+        DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
+        dolphinSchedulerManager.initDolphinScheduler();
+        logger.info("init DolphinScheduler finished");
+
+    }
 }

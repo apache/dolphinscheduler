@@ -30,76 +30,76 @@ import java.util.List;
 
 
 /**
- *	monitor zookeeper info
+ *    monitor zookeeper info
  */
 public class ZookeeperMonitor extends AbstractZKClient{
 
-	private static final Logger LOG = LoggerFactory.getLogger(ZookeeperMonitor.class);
-	private static final String zookeeperList = AbstractZKClient.getZookeeperQuorum();
+    private static final Logger LOG = LoggerFactory.getLogger(ZookeeperMonitor.class);
+    private static final String zookeeperList = AbstractZKClient.getZookeeperQuorum();
 
-	/**
-	 *
-	 * @return zookeeper info list
-	 */
-	public static List<ZookeeperRecord> zookeeperInfoList(){
-		String zookeeperServers = zookeeperList.replaceAll("[\\t\\n\\x0B\\f\\r]", "");
-		try{
-			return zookeeperInfoList(zookeeperServers);
-		}catch(Exception e){
-			LOG.error(e.getMessage(),e);
-		}
-		return null;
-	}
+    /**
+     *
+     * @return zookeeper info list
+     */
+    public static List<ZookeeperRecord> zookeeperInfoList(){
+        String zookeeperServers = zookeeperList.replaceAll("[\\t\\n\\x0B\\f\\r]", "");
+        try{
+            return zookeeperInfoList(zookeeperServers);
+        }catch(Exception e){
+            LOG.error(e.getMessage(),e);
+        }
+        return null;
+    }
 
-	/**
-	 * get master servers
-	 * @return master server information
-	 */
-	public List<Server> getMasterServers(){
-	    return getServersList(ZKNodeType.MASTER);
-	}
+    /**
+     * get master servers
+     * @return master server information
+     */
+    public List<Server> getMasterServers(){
+        return getServersList(ZKNodeType.MASTER);
+    }
 
-	/**
-	 * master construct is the same with worker, use the master instead
-	 * @return worker server informations
-	 */
-	public List<Server> getWorkerServers(){
-	    return getServersList(ZKNodeType.WORKER);
-	}
+    /**
+     * master construct is the same with worker, use the master instead
+     * @return worker server informations
+     */
+    public List<Server> getWorkerServers(){
+        return getServersList(ZKNodeType.WORKER);
+    }
 
-	private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {
+    private static List<ZookeeperRecord> zookeeperInfoList(String zookeeperServers) {
 
-		List<ZookeeperRecord> list = new ArrayList<>(5);
+        List<ZookeeperRecord> list = new ArrayList<>(5);
 
-		if(StringUtils.isNotBlank(zookeeperServers)){
-			String[] zookeeperServersArray = zookeeperServers.split(",");
-			
-			for (String zookeeperServer : zookeeperServersArray) {
-				ZooKeeperState state = new ZooKeeperState(zookeeperServer);
-				boolean ok = state.ruok();
-				if(ok){
-					state.getZookeeperInfo();
-				}
-				
-				String hostName = zookeeperServer;
-				int connections = state.getConnections();
-				int watches = state.getWatches();
-				long sent = state.getSent();
-				long received = state.getReceived();
-				String mode =  state.getMode();
-				int minLatency =  state.getMinLatency();
-				int avgLatency = state.getAvgLatency();
-				int maxLatency = state.getMaxLatency();
-				int nodeCount = state.getNodeCount();
-				int status = ok ? 1 : 0;
-				Date date = new Date();
+        if(StringUtils.isNotBlank(zookeeperServers)){
+            String[] zookeeperServersArray = zookeeperServers.split(",");
 
-				ZookeeperRecord zookeeperRecord = new ZookeeperRecord(hostName,connections,watches,sent,received,mode,minLatency,avgLatency,maxLatency,nodeCount,status,date);
-				list.add(zookeeperRecord);
+            for (String zookeeperServer : zookeeperServersArray) {
+                ZooKeeperState state = new ZooKeeperState(zookeeperServer);
+                boolean ok = state.ruok();
+                if(ok){
+                    state.getZookeeperInfo();
+                }
 
-			}
-		}
+                String hostName = zookeeperServer;
+                int connections = state.getConnections();
+                int watches = state.getWatches();
+                long sent = state.getSent();
+                long received = state.getReceived();
+                String mode =  state.getMode();
+                int minLatency =  state.getMinLatency();
+                int avgLatency = state.getAvgLatency();
+                int maxLatency = state.getMaxLatency();
+                int nodeCount = state.getNodeCount();
+                int status = ok ? 1 : 0;
+                Date date = new Date();
 
-		return list;
-	}
+                ZookeeperRecord zookeeperRecord = new ZookeeperRecord(hostName,connections,watches,sent,received,mode,minLatency,avgLatency,maxLatency,nodeCount,status,date);
+                list.add(zookeeperRecord);
+
+            }
+        }
+
+        return list;
+    }
 }

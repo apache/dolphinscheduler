@@ -26,23 +26,23 @@ import org.slf4j.LoggerFactory;
  */
 public class CreateDolphinScheduler {
 
-	private static final Logger logger = LoggerFactory.getLogger(CreateDolphinScheduler.class);
+    private static final Logger logger = LoggerFactory.getLogger(CreateDolphinScheduler.class);
 
-	/**
-	 * create dolphin scheduler db
-	 * @param args args
-	 */
-	public static void main(String[] args) {
-		DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
-		try {
-			dolphinSchedulerManager.initDolphinScheduler();
-			logger.info("init DolphinScheduler finished");
-			dolphinSchedulerManager.upgradeDolphinScheduler();
-			logger.info("upgrade DolphinScheduler finished");
-			logger.info("create DolphinScheduler success");
-		} catch (Exception e) {
-			logger.error("create DolphinScheduler failed",e);
-		}
+    /**
+     * create dolphin scheduler db
+     * @param args args
+     */
+    public static void main(String[] args) {
+        DolphinSchedulerManager dolphinSchedulerManager = new DolphinSchedulerManager();
+        try {
+            dolphinSchedulerManager.initDolphinScheduler();
+            logger.info("init DolphinScheduler finished");
+            dolphinSchedulerManager.upgradeDolphinScheduler();
+            logger.info("upgrade DolphinScheduler finished");
+            logger.info("create DolphinScheduler success");
+        } catch (Exception e) {
+            logger.error("create DolphinScheduler failed",e);
+        }
 
-	}
+    }
 }

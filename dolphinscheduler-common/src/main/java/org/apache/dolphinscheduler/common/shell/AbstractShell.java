@@ -310,36 +310,36 @@ public abstract class AbstractShell {
    *
    */
   public static class ProcessContainer extends ConcurrentHashMap<Integer, Process>{
-	  private static final ProcessContainer container = new ProcessContainer();
-	  private ProcessContainer(){
-		  super();
-	  }
-	  public static final ProcessContainer getInstance(){
-		return container;
-	  }
-	  
-	  public static void putProcess(Process process){
-		  getInstance().put(process.hashCode(), process);
-	  }
-	  public static int processSize(){
-		  return getInstance().size();
-	  }
-	  
-	  public static void removeProcess(Process process){
-		  getInstance().remove(process.hashCode());
-	  }
-	  
-	  public static void destroyAllProcess(){
-		  Set<Entry<Integer, Process>> set = getInstance().entrySet();
-		  for (Entry<Integer, Process> entry : set) {
-			try{  
-			  entry.getValue().destroy();
-		  	} catch (Exception e) {
-		  		e.printStackTrace();
-		  	}
-		  }
-		  
-		  logger.info("close " + set.size() + " executing process tasks");
-	  }
-  }	  
+      private static final ProcessContainer container = new ProcessContainer();
+      private ProcessContainer(){
+          super();
+      }
+      public static final ProcessContainer getInstance(){
+        return container;
+      }
+
+      public static void putProcess(Process process){
+          getInstance().put(process.hashCode(), process);
+      }
+      public static int processSize(){
+          return getInstance().size();
+      }
+
+      public static void removeProcess(Process process){
+          getInstance().remove(process.hashCode());
+      }
+
+      public static void destroyAllProcess(){
+          Set<Entry<Integer, Process>> set = getInstance().entrySet();
+          for (Entry<Integer, Process> entry : set) {
+            try{
+              entry.getValue().destroy();
+              } catch (Exception e) {
+                  e.printStackTrace();
+              }
+          }
+
+          logger.info("close " + set.size() + " executing process tasks");
+      }
+  }
 }
