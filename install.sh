@@ -82,6 +82,10 @@ zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
 # Note: install the scheduled hostname list. If it is pseudo-distributed, just write a pseudo-distributed hostname
 ips="ark0,ark1,ark2,ark3,ark4"
 
+# ssh port, default 22
+# Note: if ssh port is not default, modify here
+sshPort=22
+
 # conf/config/run_config.conf config
 # run master machine
 # Note: list of hosts hostname for deploying master
@@ -426,12 +430,14 @@ sed -i ${txt} "s#enterprise.wechat.users.*#enterprise.wechat.users=${enterpriseW
 sed -i ${txt} "s#installPath.*#installPath=${installPath}#g" conf/config/install_config.conf
 sed -i ${txt} "s#deployUser.*#deployUser=${deployUser}#g" conf/config/install_config.conf
 sed -i ${txt} "s#ips.*#ips=${ips}#g" conf/config/install_config.conf
+sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/install_config.conf
 
 
 sed -i ${txt} "s#masters.*#masters=${masters}#g" conf/config/run_config.conf
 sed -i ${txt} "s#workers.*#workers=${workers}#g" conf/config/run_config.conf
 sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/run_config.conf
 sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/run_config.conf
+sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/run_config.conf
 
 
 # 2,create directory
@@ -447,23 +453,23 @@ for host in ${hostsArr[@]}
 do
 
 # create if programPath does not exist
-if ! ssh $host test -e $programPath; then
-  ssh $host "sudo mkdir -p $programPath;sudo chown -R $deployUser:$deployUser $programPath"
+if ! ssh -p $sshPort $host test -e $programPath; then
+  ssh -p $sshPort $host "sudo mkdir -p $programPath;sudo chown -R $deployUser:$deployUser $programPath"
 fi
 
 # create if downloadPath does not exist
-if ! ssh $host test -e $downloadPath; then
-  ssh $host "sudo mkdir -p $downloadPath;sudo chown -R $deployUser:$deployUser $downloadPath"
+if ! ssh -p $sshPort $host test -e $downloadPath; then
+  ssh -p $sshPort $host "sudo mkdir -p $downloadPath;sudo chown -R $deployUser:$deployUser $downloadPath"
 fi
 
 # create if execPath does not exist
-if ! ssh $host test -e $execPath; then
-  ssh $host "sudo mkdir -p $execPath; sudo chown -R $deployUser:$deployUser $execPath"
+if ! ssh -p $sshPort $host test -e $execPath; then
+  ssh -p $sshPort $host "sudo mkdir -p $execPath; sudo chown -R $deployUser:$deployUser $execPath"
 fi
 
 # create if xlsFilePath does not exist
-if ! ssh $host test -e $xlsFilePath; then
-  ssh $host "sudo mkdir -p $xlsFilePath; sudo chown -R $deployUser:$deployUser $xlsFilePath"
+if ! ssh -p $sshPort $host test -e $xlsFilePath; then
+  ssh -p $sshPort $host "sudo mkdir -p $xlsFilePath; sudo chown -R $deployUser:$deployUser $xlsFilePath"
 fi
 
 done

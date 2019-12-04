@@ -25,15 +25,15 @@ hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
 do
 
-    if ! ssh $host test -e $installPath; then
-      ssh $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
+    if ! ssh -p $sshPort $host test -e $installPath; then
+      ssh -p $sshPort $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
     fi
 
-	ssh $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/"
-	scp -r $workDir/../bin  $host:$installPath
-	scp -r $workDir/../conf  $host:$installPath
-	scp -r $workDir/../lib   $host:$installPath
-	scp -r $workDir/../script  $host:$installPath
-	scp -r $workDir/../sql  $host:$installPath
-	scp  $workDir/../install.sh  $host:$installPath
+	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/"
+	scp -P $sshPort -r $workDir/../bin  $host:$installPath
+	scp -P $sshPort -r $workDir/../conf  $host:$installPath
+	scp -P $sshPort -r $workDir/../lib   $host:$installPath
+	scp -P $sshPort -r $workDir/../script  $host:$installPath
+	scp -P $sshPort -r $workDir/../sql  $host:$installPath
+	scp -P $sshPort  $workDir/../install.sh  $host:$installPath
 done
