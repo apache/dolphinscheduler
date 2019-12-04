@@ -107,4 +107,42 @@ public class AlertGroup {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        AlertGroup that = (AlertGroup) o;
+
+        if (id != that.id) {
+            return false;
+        }
+        if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null) {
+            return false;
+        }
+        if (groupType != that.groupType) {
+            return false;
+        }
+        if (description != null ? !description.equals(that.description) : that.description != null) {
+            return false;
+        }
+        return !(createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) && !(updateTime != null ? !updateTime.equals(that.updateTime) : that.updateTime != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (groupName != null ? groupName.hashCode() : 0);
+        result = 31 * result + (groupType != null ? groupType.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        return result;
+    }
 }

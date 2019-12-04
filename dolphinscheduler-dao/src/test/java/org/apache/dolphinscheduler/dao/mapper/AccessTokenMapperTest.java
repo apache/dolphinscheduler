@@ -151,9 +151,9 @@ public class AccessTokenMapperTest {
 
     /**
      * create accessTokens
-     * @param count
-     * @param userName
-     * @return
+     * @param count create accessToken count
+     * @param userName username
+     * @return accessToken map
      * @throws Exception
      */
     private Map<Integer,AccessToken> createAccessTokens(
@@ -167,13 +167,14 @@ public class AccessTokenMapperTest {
 
             accessTokenMap.put(accessToken.getId(),accessToken);
         }
+
         return accessTokenMap;
     }
 
     /**
      * create user
-     * @param userName
-     * @return
+     * @param userName userName
+     * @return user
      * @throws Exception
      */
     private User createUser(String userName) throws Exception{
@@ -194,9 +195,11 @@ public class AccessTokenMapperTest {
     }
 
     /**
-     *  create access token
-     *
-     * @return AccessToken
+     * create access token
+     * @param userId userId
+     * @param userName userName
+     * @return accessToken
+     * @throws Exception
      */
     private AccessToken createAccessToken(Integer userId,String userName)throws Exception{
         Random random = new Random();
@@ -215,9 +218,10 @@ public class AccessTokenMapperTest {
     }
 
     /**
-     *  create access token
-     *
-     * @return AccessToken
+     * create access token
+     * @param userId userId
+     * @return accessToken
+     * @throws Exception
      */
     private AccessToken createAccessToken(Integer userId)throws Exception{
         return createAccessToken(userId,null);
