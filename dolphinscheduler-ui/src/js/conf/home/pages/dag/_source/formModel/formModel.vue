@@ -369,7 +369,6 @@
         }
 
         $(`#${this.id}`).find('span').text(this.name)
-
         // Store the corresponding node data structure
         this.$emit('addTaskInfo', {
           item: {
@@ -455,7 +454,23 @@
           this.description = o.description
           this.maxRetryTimes = o.maxRetryTimes
           this.retryInterval = o.retryInterval
-          this.workerGroupId = o.workerGroupId
+
+          // If the workergroup has been deleted, set the default workergroup
+          var hasMatch = false;
+          for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
+            var workerGroupId = this.store.state.security.workerGroupsListAll[i].id
+            if (o.workerGroupId == workerGroupId) {
+              hasMatch = true;
+              break;
+            }
+          }
+
+          if(!hasMatch){
+            this.workerGroupId = -1
+          }else{
+            this.workerGroupId = o.workerGroupId
+          }
+
         }
       }
       this.isContentBox = true
