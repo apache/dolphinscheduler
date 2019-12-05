@@ -14,7 +14,7 @@
     "build:combined": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.combined.js"
   },
   "dependencies": {
-    "ans-ui": "1.1.3",
+    "ans-ui": "1.1.4",
     "axios": "^0.16.2",
     "jquery": "1.12.4",
     "vue": "^2.5.17",

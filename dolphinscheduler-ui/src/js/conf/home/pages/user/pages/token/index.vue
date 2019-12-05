@@ -133,6 +133,7 @@
     created () {
     },
     mounted () {
+      this.$modal.destroy()
     },
     components: { mSecondaryMenu, mList, mListConstruction, mConditions, mSpin, mNoData }
   }

@@ -270,7 +270,7 @@ export default {
       resolve()
       return
     }
-    io.get(`projects/query-project-list`, payload, res => {
+    io.get(`projects/queryAllProjectList`, payload, res => {
       state.projectListS = res.data
       resolve(res.data)
   }).catch(res => {

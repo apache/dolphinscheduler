@@ -282,7 +282,7 @@
        * Click external to close the current component
        */
       _handleClose () {
-        this.close()
+        // this.close()
       },
       /**
        * Jump to task instance
