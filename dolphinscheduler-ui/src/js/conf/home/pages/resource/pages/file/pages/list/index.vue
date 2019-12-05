@@ -111,6 +111,7 @@
     created () {
     },
     mounted () {
+      this.$modal.destroy()
     },
     components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }
