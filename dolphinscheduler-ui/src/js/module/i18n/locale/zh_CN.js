@@ -504,5 +504,11 @@ export default {
   'There is no data for this period of time': '该时间段无数据',
   'IP address cannot be empty': 'IP地址不能为空',
   'Please enter the correct IP': '请输入正确的IP',
-  'Please generate token': '请生成Token'
+  'Please generate token': '请生成Token',
+  'Measure Parameters':'测量参数',
+  'Measure Parameters Field(required)':'字段(必填)',
+  'Measure Parameters BasicType': '基本类型',
+  'Measure Parameters Position': '操作符',
+  'Measure Parameters MatchRate(required)': '匹配率(必填：1-100)',
+  'Measure Parameters FailState': '是否失败'
 }

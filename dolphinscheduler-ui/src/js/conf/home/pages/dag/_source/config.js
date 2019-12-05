@@ -279,6 +279,10 @@ let tasksType = {
   'HTTP': {
     desc: 'HTTP',
     color: '#E46F13'
+  },
+  'MEASURE': {
+    desc: 'MEASURE',
+    color: '#E46F13'
   }
 }
 

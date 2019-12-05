@@ -148,9 +148,6 @@
         if (!this.$refs.refHttpParams._verifProp()) {
           return false
         }
-        if (!this.$refs.refHttpParams._verifValue()) {
-          return false
-        }
         // storage
         this.$emit('on-params', {
           localParams: this.localParams,

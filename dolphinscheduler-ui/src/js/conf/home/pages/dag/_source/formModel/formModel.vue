@@ -187,7 +187,12 @@
           ref="HTTP"
           :backfill-item="backfillItem">
         </m-http>
-
+        <m-measure
+          v-if="taskType === 'MEASURE'"
+          @on-params="_onParams"
+          ref="MEASURE"
+          :backfill-item="backfillItem">
+        </m-measure>
       </div>
     </div>
     <div class="bottom-box">
@@ -212,6 +217,7 @@
   import mProcedure from './tasks/procedure'
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
+  import mMeasure from './tasks/measure'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
@@ -489,6 +495,7 @@
       mPython,
       mDependent,
       mHttp,
+      mMeasure,
       mSelectInput,
       mTimeoutAlarm,
       mPriority,

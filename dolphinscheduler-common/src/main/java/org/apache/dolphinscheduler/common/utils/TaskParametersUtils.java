@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
+import org.apache.dolphinscheduler.common.task.measure.MeasureParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
@@ -69,6 +70,8 @@ public class TaskParametersUtils {
           return JSONUtils.parseObject(parameter, FlinkParameters.class);
         case HTTP:
           return JSONUtils.parseObject(parameter, HttpParameters.class);
+        case MEASURE:
+          return JSONUtils.parseObject(parameter, MeasureParameters.class);
         default:
           return null;
       }

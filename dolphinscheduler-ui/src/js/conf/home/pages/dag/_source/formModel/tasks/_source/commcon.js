@@ -232,6 +232,96 @@ const positionList = [
     code: "Headers"
   }
 ]
+const basicTypeList = [
+  {
+    id: 'INT',
+    code: "int"
+  },
+  {
+    id: 'VARCHAR',
+    code: "varchar"
+  },
+  {
+    id: 'INTEGER',
+    code: "integer"
+  },
+  {
+    id: 'BIGINT',
+    code: "bigint"
+  },
+  {
+    id: 'LONG',
+    code: "long"
+  },
+  {
+    id: 'DOUBLE',
+    code: "double"
+  },
+  {
+    id: 'FLOAT',
+    code: "float"
+  },
+  {
+    id: 'CHAR',
+    code: "char"
+  },
+  {
+    id: 'DECIMAL',
+    code: "decimal"
+  },
+  {
+    id: 'TIMESTAMP',
+    code: "timestamp"
+  },
+  {
+    id: 'DATETIME',
+    code: "datetime"
+  }
+]
+const operationList = [
+  {
+    id: 'EQUAL',
+    code: "="
+  },
+  {
+    id: 'NOTEQUAL',
+    code: "!="
+  },
+  {
+    id: 'MORE',
+    code: ">"
+  },
+  {
+    id: 'MOREEQUAL',
+    code: ">="
+  },
+  {
+    id: 'LESS',
+    code: "<"
+  },
+  {
+    id: 'LESSEQUAL',
+    code: "<="
+  },
+  {
+    id: 'CONTAIN',
+    code: "contain"
+  },
+  {
+    id: 'NOTCONTAIN',
+    code: "notContain"
+  }
+]
+const failStateList = [
+  {
+    id: 'FALSE',
+    code: "false"
+  },
+  {
+    id: 'TRUE',
+    code: "true"
+  }
+]
 
 export {
   cycleList,
@@ -239,5 +329,8 @@ export {
   typeList,
   directList,
   sqlTypeList,
-  positionList
+  positionList,
+  basicTypeList,
+  operationList,
+  failStateList
 }
