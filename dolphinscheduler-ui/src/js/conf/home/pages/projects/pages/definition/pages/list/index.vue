@@ -123,7 +123,8 @@
     created () {
       localStore.removeItem('subProcessId')
     },
-    mounted () {
+    mounted() {
+      this.$modal.destroy()
     },
     components: { mList, mConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }
