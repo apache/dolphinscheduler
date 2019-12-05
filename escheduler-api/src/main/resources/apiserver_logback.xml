@@ -1,0 +1,42 @@
+<!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
+<configuration scan="true" scanPeriod="120 seconds">
+	<logger name="org.apache.zookeeper" level="WARN"/>
+ 	<logger name="org.apache.hbase" level="WARN"/>
+ 	<logger name="org.apache.hadoop" level="WARN"/>
+
+	<property name="log.base" value="logs" />
+
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>
+				[%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %msg%n
+			</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<appender name="APISERVERLOGFILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- Log level filter -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>INFO</level>
+		</filter>
+        <file>${log.base}/escheduler-api-server.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${log.base}/escheduler-api-server.%d{yyyy-MM-dd_HH}.%i.log</fileNamePattern>
+			<maxHistory>168</maxHistory>
+			<maxFileSize>64MB</maxFileSize>
+		</rollingPolicy>
+
+		<encoder>
+			<pattern>
+				[%level] %date{yyyy-MM-dd HH:mm:ss.SSS} %logger{96}:[%line] - %msg%n
+			</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="APISERVERLOGFILE" />
+	</root>
+</configuration>
