@@ -314,7 +314,7 @@ public class ResourcesController extends BaseController{
     ) {
         try{
             logger.info("login user {}, online create resource! fileName : {}, type : {}, suffix : {},desc : {},content : {}",
-                    loginUser.getUserName(),type,fileName,fileSuffix,description,content);
+                    loginUser.getUserName(),fileName,type,fileSuffix,description,content);
             if(StringUtils.isEmpty(content)){
                 logger.error("resource file contents are not allowed to be empty");
                 return error(Status.RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
