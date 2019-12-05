@@ -54,7 +54,7 @@
         <fileSet>
             <directory>${basedir}/../.././</directory>
             <includes>
-                <include>DISCLAIMER</include>
+                <include>DISCLAIMER-WIP</include>
             </includes>
             <outputDirectory>.</outputDirectory>
         </fileSet>
