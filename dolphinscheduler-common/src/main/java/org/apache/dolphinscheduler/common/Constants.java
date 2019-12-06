@@ -652,6 +652,13 @@ public final class Constants {
      */
     public static final String JDBC_SQLSERVER_CLASS_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
+
+    /**
+     * DB2
+     */
+    public static final String JDBC_DB2_CLASS_NAME = "com.ibm.db2.jcc.DB2Driver";
+
+
     /**
      * spark params constant
      */
@@ -1003,6 +1010,7 @@ public final class Constants {
     public static final String COM_CLICKHOUSE_JDBC_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
     public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
 
     /**
      * database type
@@ -1014,6 +1022,7 @@ public final class Constants {
     public static final String CLICKHOUSE = "CLICKHOUSE";
     public static final String ORACLE = "ORACLE";
     public static final String SQLSERVER = "SQLSERVER";
+    public static final String DB2 = "DB2";
 
     /**
      * jdbc url
@@ -1024,6 +1033,7 @@ public final class Constants {
     public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
     public static final String JDBC_ORACLE = "jdbc:oracle:thin:@//";
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
+    public static final String JDBC_DB2 = "jdbc:db2://";
 
 
     public static final String ADDRESS = "address";
