@@ -24,7 +24,7 @@
         <m-list :process-instance-list="processInstanceList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page"></x-page>
+          <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
       <template v-if="!processInstanceList.length">
@@ -91,6 +91,11 @@
        */
       _page (val) {
         this.searchParams.pageNo = val
+        setUrlParams(this.searchParams)
+        this._debounceGET()
+      },
+      _pageSize(val) {
+        this.searchParams.pageSize = val
         setUrlParams(this.searchParams)
         this._debounceGET()
       },
@@ -163,6 +168,7 @@
       }
     },
     mounted () {
+      this.$modal.destroy()
       // Cycle acquisition status
       this.setIntervalP = setInterval(() => {
         this._debounceGET('false')

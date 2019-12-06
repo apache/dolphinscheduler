@@ -134,13 +134,13 @@ public class ResourcesController extends BaseController{
      * @param type resource type
      * @return resource list
      */
-    @ApiOperation(value = "querytResourceList", notes= "QUERY_RESOURCE_LIST_NOTES")
+    @ApiOperation(value = "queryResourceList", notes= "QUERY_RESOURCE_LIST_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType")
     })
     @GetMapping(value="/list")
     @ResponseStatus(HttpStatus.OK)
-    public Result querytResourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryResourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value ="type") ResourceType type
     ){
         try{
@@ -163,7 +163,7 @@ public class ResourcesController extends BaseController{
      * @param pageSize page size
      * @return resource list page
      */
-    @ApiOperation(value = "querytResourceListPaging", notes= "QUERY_RESOURCE_LIST_PAGING_NOTES")
+    @ApiOperation(value = "queryResourceListPaging", notes= "QUERY_RESOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType ="String"),
@@ -172,7 +172,7 @@ public class ResourcesController extends BaseController{
     })
     @GetMapping(value="/list-paging")
     @ResponseStatus(HttpStatus.OK)
-    public Result querytResourceListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result queryResourceListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value ="type") ResourceType type,
                                      @RequestParam("pageNo") Integer pageNo,
                                      @RequestParam(value = "searchVal", required = false) String searchVal,
@@ -314,7 +314,7 @@ public class ResourcesController extends BaseController{
     ) {
         try{
             logger.info("login user {}, online create resource! fileName : {}, type : {}, suffix : {},desc : {},content : {}",
-                    loginUser.getUserName(),type,fileName,fileSuffix,description,content);
+                    loginUser.getUserName(),fileName,type,fileSuffix,description,content);
             if(StringUtils.isEmpty(content)){
                 logger.error("resource file contents are not allowed to be empty");
                 return error(Status.RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
@@ -451,8 +451,7 @@ public class ResourcesController extends BaseController{
     @GetMapping(value = "/udf-func/update-ui")
     @ResponseStatus(HttpStatus.OK)
     public Result viewUIUdfFunction(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam("id") int id)
-    {
+                                      @RequestParam("id") int id) {
         logger.info("login user {}, query udf{}",
                 loginUser.getUserName(), id);
         try {
