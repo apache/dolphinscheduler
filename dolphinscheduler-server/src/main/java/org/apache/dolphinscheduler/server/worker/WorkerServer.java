@@ -117,6 +117,8 @@ public class WorkerServer implements IStoppable {
     @Value("${server.is-combined-server:false}")
     private Boolean isCombinedServer;
 
+    @Autowired
+    private WorkerConfig workerConfig;
 
     /**
      * master server startup
