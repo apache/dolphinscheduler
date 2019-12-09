@@ -119,7 +119,9 @@ public enum ExecutionStatus {
      * status is cancel
      * @return status
      */
-    public boolean typeIsCancel(){ return this == KILL || this == STOP ;}
+    public boolean typeIsCancel(){
+        return this == KILL || this == STOP ;
+    }
 
 
 }

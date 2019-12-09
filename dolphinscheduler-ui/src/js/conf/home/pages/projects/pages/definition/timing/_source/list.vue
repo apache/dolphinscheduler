@@ -140,7 +140,7 @@
           </table>
         </div>
         <div class="page-box">
-          <x-page :current="pageNo" :total="total" show-elevator @on-change="_page"></x-page>
+          <x-page :current="pageNo" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
       <template v-if="!list.length">
@@ -205,6 +205,10 @@
        */
       _page (val) {
         this.pageNo = val
+        this._getScheduleList()
+      },
+      _pageSize (val) {
+        this.pageSize = val
         this._getScheduleList()
       },
       /**

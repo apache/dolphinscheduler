@@ -28,9 +28,9 @@ v-ps<template>
           <th>
             <span>{{$t('Class Name')}}</span>
           </th>
-          <th>
+          <!-- <th>
             <span>{{$t('Parameter')}}</span>
-          </th>
+          </th> -->
           <th width="80">
             <span>{{$t('type')}}</span>
           </th>
@@ -40,9 +40,9 @@ v-ps<template>
           <th>
             <span>{{$t('Jar Package')}}</span>
           </th>
-          <th>
+          <!-- <th>
             <span>{{$t('Library Name')}}</span>
-          </th>
+          </th> -->
           <th width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
@@ -60,9 +60,9 @@ v-ps<template>
             </span>
           </td>
           <td><span class="ellipsis">{{item.className || '-'}}</span></td>
-          <td>
+          <!-- <td>
             <span>{{item.argTypes || '-'}}</span>
-          </td>
+          </td> -->
           <td>
             <span>{{item.type}}</span>
           </td>
@@ -73,9 +73,9 @@ v-ps<template>
           <td>
             <span>{{item.resourceName}}</span>
           </td>
-          <td>
+          <!-- <td>
             <span>{{item.database || '-'}}</span>
-          </td>
+          </td> -->
           <td>
             <span v-if="item.updateTime">{{item.updateTime | formatDate}}</span>
             <span v-else>-</span>

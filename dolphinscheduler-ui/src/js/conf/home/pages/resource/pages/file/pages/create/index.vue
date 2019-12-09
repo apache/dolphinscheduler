@@ -163,6 +163,7 @@
     created () {
     },
     mounted () {
+      this.$modal.destroy()
       this._handlerEditor()
     },
     destroyed () {
