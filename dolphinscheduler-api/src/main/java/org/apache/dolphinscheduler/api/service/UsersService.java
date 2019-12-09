@@ -96,8 +96,12 @@ public class UsersService extends BaseService {
                                           String queue) throws Exception {
 
         Map<String, Object> result = new HashMap<>(5);
-        if (!CheckUtils.checkUserParams(userName, userPassword, email, phone)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,userName);
+
+        //check all user params
+        String msg = this.checkUserParams(userName, userPassword, email, phone);
+
+        if (!StringUtils.isEmpty(msg)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,msg);
             return result;
         }
         if (!isAdmin(loginUser)) {
@@ -686,5 +690,33 @@ public class UsersService extends BaseService {
      */
     private boolean checkTenantExists(int tenantId) {
         return tenantMapper.queryById(tenantId) != null ? true : false;
+    }
+
+    /**
+     *
+     * @param userName
+     * @param password
+     * @param email
+     * @param phone
+     * @return if check failed return the field, otherwise return null
+     */
+    private String checkUserParams(String userName, String password, String email, String phone) {
+
+        String msg = null;
+        if (!CheckUtils.checkUserName(userName)) {
+
+            msg = userName;
+        } else if (!CheckUtils.checkPassword(password)) {
+
+            msg = password;
+        } else if (!CheckUtils.checkEmail(email)) {
+
+            msg = email;
+        } else if (!CheckUtils.checkPhone(phone)) {
+
+            msg = phone;
+        }
+
+        return msg;
     }
 }
