@@ -267,6 +267,23 @@ public class OSUtils {
     return os.startsWith("Windows");
   }
 
+  /**
+   * check memory and cpu usage
+   * @return check memory and cpu usage
+   */
+  public static Boolean checkResource(double systemCpuLoad, double systemReservedMemory){
+    // judging usage
+    double loadAverage = OSUtils.loadAverage();
+    //
+    double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
+
+    if(loadAverage > systemCpuLoad || availablePhysicalMemorySize < systemReservedMemory){
+      logger.warn("load or availablePhysicalMemorySize(G) is too high, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize , loadAverage);
+      return false;
+    }else{
+      return true;
+    }
+  }
 
   /**
    * check memory and cpu usage

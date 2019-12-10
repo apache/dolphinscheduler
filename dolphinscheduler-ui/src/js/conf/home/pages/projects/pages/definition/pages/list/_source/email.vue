@@ -17,7 +17,7 @@
 <template>
   <div class="ans-input email-model">
     <div class="clearfix input-element" :class="disabled ? 'disabled' : ''">
-      <span class="tag-wrapper" v-for="(item,$index) in activeList" :class="activeIndex === $index ? 'active' : ''">
+      <span class="tag-wrapper" v-for="(item,$index) in activeList" :key="$index" :class="activeIndex === $index ? 'active' : ''">
         <span class="tag-text">{{item}}</span>
         <i class="remove-tag ans-icon-close" @click.stop="_del($index)" v-if="!disabled"></i>
       </span>
@@ -31,7 +31,7 @@
           <div class="ans-scroller" style=" max-height: 300px;">
             <div class="scroll-area-wrapper scroll-transition">
               <ul class="dropdown-container">
-                <li class="ans-option" v-for="(item,$index) in emailList" @click.stop="_selectEmail($index + 1)">
+                <li class="ans-option" v-for="(item,$index) in emailList" @click.stop="_selectEmail($index + 1)" :key="$index">
                   <span class="default-option-class" :class="index === ($index + 1) ? 'active' : ''">{{item}}</span>
                 </li>
               </ul>
