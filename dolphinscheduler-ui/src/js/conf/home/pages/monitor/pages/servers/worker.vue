@@ -97,7 +97,8 @@
       this.getWorkerData().then(res => {
         this.workerList = _.map(res, (v, i) => {
           return _.assign(v, {
-            resInfo: JSON.parse(v.resInfo)
+            resInfo: JSON.parse(v.resInfo),
+            id: i
           })
         })
         this.isLoading = false
