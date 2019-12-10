@@ -16,11 +16,10 @@
  */
 package org.apache.dolphinscheduler.server.worker;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
@@ -34,9 +33,9 @@ import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.AbstractServer;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.FetchTaskThread;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
 import org.slf4j.Logger;
@@ -57,7 +56,7 @@ import java.util.concurrent.TimeUnit;
  *  worker server
  */
 @ComponentScan("org.apache.dolphinscheduler")
-public class WorkerServer extends AbstractServer {
+public class WorkerServer implements IStoppable {
 
     /**
      * logger
@@ -115,11 +114,11 @@ public class WorkerServer extends AbstractServer {
      */
     private CountDownLatch latch;
 
-    /**
-     * If inside combined server, WorkerServer no need to await on CountDownLatch
-     */
     @Value("${server.is-combined-server:false}")
     private Boolean isCombinedServer;
+
+    @Autowired
+    private WorkerConfig workerConfig;
 
     /**
      * master server startup
@@ -138,13 +137,6 @@ public class WorkerServer extends AbstractServer {
     @PostConstruct
     public void run(){
 
-        try {
-            conf = new PropertiesConfiguration(Constants.WORKER_PROPERTIES_PATH);
-        }catch (ConfigurationException e){
-            logger.error("load configuration failed",e);
-            System.exit(1);
-        }
-
         zkWorkerClient = ZKWorkerClient.getZKWorkerClient();
 
         this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
@@ -152,10 +144,6 @@ public class WorkerServer extends AbstractServer {
         this.killExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Kill-Thread-Executor");
 
         this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
-
-        //  heartbeat interval
-        heartBeatInterval = conf.getInt(Constants.WORKER_HEARTBEAT_INTERVAL,
-                Constants.defaultWorkerHeartbeatInterval);
 
         heartbeatWorkerService = ThreadUtils.newDaemonThreadScheduledExecutor("Worker-Heartbeat-Thread-Executor", Constants.defaulWorkerHeartbeatThreadNum);
 
@@ -166,7 +154,7 @@ public class WorkerServer extends AbstractServer {
 
         // regular heartbeat
         // delay 5 seconds, send heartbeat every 30 seconds
-        heartbeatWorkerService.scheduleAtFixedRate(heartBeatThread, 5, heartBeatInterval, TimeUnit.SECONDS);
+        heartbeatWorkerService.scheduleAtFixedRate(heartBeatThread, 5, workerConfig.getWorkerHeartbeatInterval(), TimeUnit.SECONDS);
 
         // kill process thread implement
         Runnable killProcessThread = getKillProcessThread();
@@ -174,13 +162,8 @@ public class WorkerServer extends AbstractServer {
         // submit kill process thread
         killExecutorService.execute(killProcessThread);
 
-
-
-        // get worker number of concurrent tasks
-        int taskNum = conf.getInt(Constants.WORKER_FETCH_TASK_NUM,Constants.defaultWorkerFetchTaskNum);
-
         // new fetch task thread
-        FetchTaskThread fetchTaskThread = new FetchTaskThread(taskNum,zkWorkerClient, processDao,conf, taskQueue);
+        FetchTaskThread fetchTaskThread = new FetchTaskThread(zkWorkerClient, processDao, taskQueue);
 
         // submit fetch task thread
         fetchTaskExecutorService.execute(fetchTaskThread);

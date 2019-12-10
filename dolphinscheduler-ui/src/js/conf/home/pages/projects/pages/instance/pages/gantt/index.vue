@@ -23,7 +23,7 @@
             <a href="javascript:">
               <span>{{$t('Task Status')}}</span>
             </a>
-            <a href="javascript:" v-for="(item) in tasksState">
+            <a href="javascript:" v-for="(item) in tasksState" :key="item.id">
               <i class="fa fa-square" :style="{color:item.color}"></i>
               <span>{{item.desc}}</span>
             </a>

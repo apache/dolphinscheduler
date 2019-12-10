@@ -109,6 +109,7 @@
 		<maven-source-plugin.version>2.4</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
 		<jacoco.version>0.8.4</jacoco.version>
+		<jcip.version>1.0</jcip.version>
 		<maven.deploy.skip>false</maven.deploy.skip>
 	</properties>
 
@@ -517,6 +518,7 @@
 				</plugin>
 
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
 					<version>${maven-assembly-plugin.version}</version>
 				</plugin>

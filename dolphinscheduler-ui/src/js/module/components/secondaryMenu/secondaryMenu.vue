@@ -44,7 +44,7 @@
         </template>
         <ul v-if="item.isOpen && item.children.length">
           <template v-for="(el,index) in item.children">
-            <router-link :to="{ name: el.path}" tag="li" active-class="active" v-if="el.disabled">
+            <router-link :to="{ name: el.path}" tag="li" active-class="active" v-if="el.disabled" :key="index">
               <span>{{el.name}}</span>
             </router-link>
           </template>

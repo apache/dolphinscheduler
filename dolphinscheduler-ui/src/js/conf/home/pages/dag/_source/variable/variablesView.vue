@@ -25,6 +25,7 @@
                     size="xsmall"
                     type="ghost"
                     @click="_copy('gbudp-' + $index)"
+                    :key="$index"
                     :data-clipboard-text="item.prop + ' = ' +item.value"
                     :class="'gbudp-' + $index">
               <b style="color: #2A455B;">{{item.prop}}</b> = {{item.value}}
@@ -38,12 +39,12 @@
           &nbsp;
         </div>
       </div>
-      <div class="list list-t" v-for="(item,key,$index) in list.localParams">
+      <div class="list list-t" v-for="(item,key,$index) in list.localParams" :key="$index">
         <div class="task-name">Task({{$index}})：{{key}}</div>
         <div class="var-cont" v-if="item.localParamsList.length">
           <template v-for="(el,index) in item.localParamsList">
-            <x-button size="xsmall" type="ghost" @click="_copy('copy-part-' + index)" :data-clipboard-text="_rtClipboard(el,item.taskType)" :class="'copy-part-' + index">
-              <span v-for="(e,k,i) in el">
+            <x-button size="xsmall" type="ghost" :key="index" @click="_copy('copy-part-' + index)" :data-clipboard-text="_rtClipboard(el,item.taskType)" :class="'copy-part-' + index">
+              <span v-for="(e,k,i) in el" :key="i">
                 <template v-if="item.taskType === 'SQL' || item.taskType === 'PROCEDURE'">
                   <template v-if="(k !== 'direct' && k !== 'type')">
                     <b style="color: #2A455B;">{{k}}</b> = {{e}}

@@ -405,9 +405,14 @@ public class DataSourceService extends BaseService{
                     datasource = JSONObject.parseObject(parameter, SQLServerDataSource.class);
                     Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
                     break;
+                case DB2:
+                    datasource = JSONObject.parseObject(parameter, DB2ServerDataSource.class);
+                    Class.forName(Constants.COM_DB2_JDBC_DRIVER);
+                    break;
                 default:
                     break;
             }
+
             if(datasource != null){
                 connection = DriverManager.getConnection(datasource.getJdbcUrl(), datasource.getUser(), datasource.getPassword());
             }
@@ -487,6 +492,7 @@ public class DataSourceService extends BaseService{
             separator = "&";
         } else if (Constants.HIVE.equals(type.name())
                 || Constants.SPARK.equals(type.name())
+                || Constants.DB2.equals(type.name())
                 || Constants.SQLSERVER.equals(type.name())) {
             separator = ";";
         }
@@ -509,7 +515,9 @@ public class DataSourceService extends BaseService{
                 for (Map.Entry<String, String> entry: map.entrySet()) {
                     otherSb.append(String.format("%s=%s%s", entry.getKey(), entry.getValue(), separator));
                 }
-                otherSb.deleteCharAt(otherSb.length() - 1);
+                if (!Constants.DB2.equals(type.name())) {
+                    otherSb.deleteCharAt(otherSb.length() - 1);
+                }
                 parameterMap.put(Constants.OTHER, otherSb);
             }
 
@@ -548,6 +556,9 @@ public class DataSourceService extends BaseService{
             sb.append(host).append(":").append(port);
         } else if (Constants.SQLSERVER.equals(type.name())) {
             sb.append(Constants.JDBC_SQLSERVER);
+            sb.append(host).append(":").append(port);
+        }else if (Constants.DB2.equals(type.name())) {
+            sb.append(Constants.JDBC_DB2);
             sb.append(host).append(":").append(port);
         }
 
