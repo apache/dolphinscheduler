@@ -605,51 +605,6 @@ public final class Constants {
 
 
     /**
-     * jdbc class name
-     */
-    /**
-     * mysql
-     */
-    public static final String JDBC_MYSQL_CLASS_NAME = "com.mysql.jdbc.Driver";
-
-    /**
-     * postgresql
-     */
-    public static final String JDBC_POSTGRESQL_CLASS_NAME = "org.postgresql.Driver";
-
-    /**
-     * hive
-     */
-    public static final String JDBC_HIVE_CLASS_NAME = "org.apache.hive.jdbc.HiveDriver";
-
-    /**
-     * spark
-     */
-    public static final String JDBC_SPARK_CLASS_NAME = "org.apache.hive.jdbc.HiveDriver";
-
-    /**
-     * ClickHouse
-     */
-    public static final String JDBC_CLICKHOUSE_CLASS_NAME = "ru.yandex.clickhouse.ClickHouseDriver";
-
-    /**
-     * Oracle
-     */
-    public static final String JDBC_ORACLE_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
-
-    /**
-     * Oracle
-     */
-    public static final String JDBC_SQLSERVER_CLASS_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-
-
-    /**
-     * DB2
-     */
-    public static final String JDBC_DB2_CLASS_NAME = "com.ibm.db2.jcc.DB2Driver";
-
-
-    /**
      * spark params constant
      */
     public static final String MASTER = "--master";

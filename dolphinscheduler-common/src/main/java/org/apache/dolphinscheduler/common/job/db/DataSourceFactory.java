@@ -65,28 +65,28 @@ public class DataSourceFactory {
   public static void loadClass(DbType dbType) throws Exception{
     switch (dbType){
       case MYSQL :
-        Class.forName(Constants.JDBC_MYSQL_CLASS_NAME);
+        Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
         break;
       case POSTGRESQL :
-        Class.forName(Constants.JDBC_POSTGRESQL_CLASS_NAME);
+        Class.forName(Constants.ORG_POSTGRESQL_DRIVER);
         break;
       case HIVE :
-        Class.forName(Constants.JDBC_HIVE_CLASS_NAME);
+        Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
         break;
       case SPARK :
-        Class.forName(Constants.JDBC_SPARK_CLASS_NAME);
+        Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
         break;
       case CLICKHOUSE :
-        Class.forName(Constants.JDBC_CLICKHOUSE_CLASS_NAME);
+        Class.forName(Constants.COM_CLICKHOUSE_JDBC_DRIVER);
         break;
       case ORACLE :
-        Class.forName(Constants.JDBC_ORACLE_CLASS_NAME);
+        Class.forName(Constants.COM_ORACLE_JDBC_DRIVER);
         break;
       case SQLSERVER:
-        Class.forName(Constants.JDBC_SQLSERVER_CLASS_NAME);
+        Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
         break;
       case DB2:
-        Class.forName(Constants.JDBC_DB2_CLASS_NAME);
+        Class.forName(Constants.COM_DB2_JDBC_DRIVER);
         break;
       default:
         logger.error("not support sql type: {},can't load class", dbType);
