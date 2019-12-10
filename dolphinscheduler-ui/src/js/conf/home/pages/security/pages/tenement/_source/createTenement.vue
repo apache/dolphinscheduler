@@ -123,7 +123,7 @@
               }
             })
             this.$nextTick(() => {
-              this.queueId = this.queueList[0]
+              this.queueId = this.queueList[0].id
             })
             resolve()
           })
