@@ -18,7 +18,7 @@
   <m-list-construction :title="'Master ' + $t('Manage')">
     <template slot="content">
       <div class="servers-wrapper" v-show="masterList.length">
-        <div class="row-box" v-for="(item,$index) in masterList">
+        <div class="row-box" v-for="(item,$index) in masterList" :key="$index">
           <div class="row-title">
             <div class="left">
               <span class="sp">IP: {{item.host}}</span>
