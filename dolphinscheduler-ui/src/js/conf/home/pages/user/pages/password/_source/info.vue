@@ -104,33 +104,17 @@
        * verification
        */
       _verification () {
-        let regCn = new RegExp('[\\u4E00-\\u9FFF]+', 'g')
+        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
 
         // password
-        if (regCn.test(this.userPassword)) {
-          this.$message.warning(`${i18n.$t('Password cannot be in Chinese')}`)
-          return false
-        }
-        if (!this.userPassword) {
-          this.$message.warning(`${i18n.$t('Please enter a password (6-22) character password')}`)
-          return false
-        }
-        if (this.userPassword.length < 6 || this.userPassword.length > 22) {
-          this.$message.warning(`${i18n.$t('Please enter a password (6-22) character password')}`)
+        if (!regPassword.test(this.userPassword)) {
+          this.$message.warning(`${i18n.$t('The password is a combination of 6 to 22 digits, English, and at least two characters')}`)
           return false
         }
 
         // confirm password
-        if (regCn.test(this.oldUserPassword)) {
-          this.$message.warning(`${i18n.$t('Confirmation password cannot be in Chinese')}`)
-          return false
-        }
-        if (!this.oldUserPassword) {
-          this.$message.warning(`${i18n.$t('Please enter a confirmation password (6-22) character password')}`)
-          return false
-        }
-        if (this.oldUserPassword.length < 6 || this.oldUserPassword.length > 22) {
-          this.$message.warning(`${i18n.$t('Please enter a confirmation password (6-22) character password')}`)
+        if (!regPassword.test(this.oldUserPassword)) {
+          this.$message.warning(`${i18n.$t('The password is a combination of 6 to 22 digits, English, and at least two characters')}`)
           return false
         }
         if (this.userPassword !== this.oldUserPassword) {
