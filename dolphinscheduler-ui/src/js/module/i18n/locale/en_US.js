@@ -81,7 +81,6 @@ export default {
   'Please enter a positive integer': 'Please enter a positive integer',
   'Program Type': 'Program Type',
   'Main class': 'Main class',
-  'Please enter main class': 'Please enter main class',
   'Main jar package': 'Main jar package',
   'Please enter main jar package': 'Please enter main jar package',
   'Command-line parameters': 'Command-line parameters',
@@ -505,5 +504,6 @@ export default {
   'There is no data for this period of time': 'There is no data for this period of time',
   'IP address cannot be empty': 'IP address cannot be empty',
   'Please enter the correct IP': 'Please enter the correct IP',
-  'Please generate token': 'Please generate token'
+  'Please generate token': 'Please generate token',
+  'Spark Version': 'Spark Version'
 }
