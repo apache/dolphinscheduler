@@ -38,6 +38,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -132,18 +134,32 @@ public class OSUtils {
     return Double.parseDouble(df.format(cpuUsage));
   }
 
+  public static List<String> getUserList() {
+    try {
+      if (isMacOS()) {
+        return getUserListFromMac();
+      } else if (isWindows()) {
+        // do something
+      } else {
+        return getUserListFromLinux();
+      }
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
+
+    return Collections.emptyList();
+  }
 
   /**
-   * get user list
+   * get user list from linux
    *
    * @return user list
    */
-  public static List<String> getUserList() {
+  private static List<String> getUserListFromLinux() throws IOException {
     List<String> userList = new ArrayList<>();
-    BufferedReader bufferedReader = null;
 
-    try {
-      bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("/etc/passwd")));
+    try (BufferedReader bufferedReader = new BufferedReader(
+            new InputStreamReader(new FileInputStream("/etc/passwd")))) {
       String line;
 
       while ((line = bufferedReader.readLine()) != null) {
@@ -152,19 +168,80 @@ public class OSUtils {
           userList.add(userInfo[0]);
         }
       }
-    } catch (Exception e) {
-      logger.error(e.getMessage(), e);
-    } finally {
-      try {
-        if (bufferedReader != null) {
-          bufferedReader.close();
-        }
-      } catch (IOException e) {
-        logger.error(e.getMessage(), e);
-      }
     }
 
     return userList;
+  }
+
+  /**
+   * get user list from mac
+   * @return user list
+   */
+  private static List<String> getUserListFromMac() throws IOException {
+    String result = exeCmd("dscl . list /users");
+    if (StringUtils.isNotEmpty(result)) {
+      return Arrays.asList(StringUtils.split(result, "\n"));
+    }
+
+    return Collections.emptyList();
+  }
+
+  /**
+   * create user
+   * @param userName user name
+   * @return true if creation was successful, otherwise false
+   */
+  public static boolean createUser(String userName) {
+    try {
+      String userGroup = OSUtils.getGroup();
+      if (StringUtils.isEmpty(userGroup)) {
+        logger.error("{} group does not exist for this operating system.", userGroup);
+        return false;
+      }
+      if (isMacOS()) {
+        createMacUser(userName, userGroup);
+      } else if (isWindows()) {
+        // do something
+      } else {
+        createLinuxUser(userName, userGroup);
+      }
+      return true;
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
+
+    return false;
+  }
+
+  /**
+   * create linux user
+   * @param userName user name
+   * @param userGroup user group
+   * @throws IOException in case of an I/O error
+   */
+  private static void createLinuxUser(String userName, String userGroup) throws IOException {
+    logger.info("create linux os user : {}", userName);
+    String cmd = String.format("sudo useradd -g %s %s", userGroup, userName);
+
+    logger.info("execute cmd : {}", cmd);
+    OSUtils.exeCmd(cmd);
+  }
+
+  /**
+   * create mac user (Supports Mac OSX 10.10+)
+   * @param userName user name
+   * @param userGroup user group
+   * @throws IOException in case of an I/O error
+   */
+  private static void createMacUser(String userName, String userGroup) throws IOException {
+    logger.info("create mac os user : {}", userName);
+    String userCreateCmd = String.format("sudo sysadminctl -addUser %s -password %s", userName, userName);
+    String appendGroupCmd = String.format("sudo dseditgroup -o edit -a %s -t user %s", userName, userGroup);
+
+    logger.info("create user command : {}", userCreateCmd);
+    OSUtils.exeCmd(userCreateCmd);
+    logger.info("append user to group : {}", appendGroupCmd);
+    OSUtils.exeCmd(appendGroupCmd);
   }
 
   /**
