@@ -1,0 +1,6 @@
+This license requires a copy of the license 
+text and all copyright 
+notices to be included in the source file(s). 
+This obligation can also mean that a license 
+or notice text file must be present in the 
+same directory as the associated code.

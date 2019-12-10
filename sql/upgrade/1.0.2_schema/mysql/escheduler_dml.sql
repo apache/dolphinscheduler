@@ -1,1 +1,0 @@
-INSERT INTO `t_escheduler_version` (`version`) VALUES ('1.0.2');
