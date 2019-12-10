@@ -32,16 +32,6 @@ public final class Constants {
     public static final String ZOOKEEPER_PROPERTIES_PATH = "zookeeper.properties";
 
     /**
-     * worker properties path
-     */
-    public static final String WORKER_PROPERTIES_PATH = "worker.properties";
-
-    /**
-     * master properties path
-     */
-    public static final String MASTER_PROPERTIES_PATH = "master.properties";
-
-    /**
      * hadoop properties path
      */
     public static final String HADOOP_PROPERTIES_PATH = "/common/hadoop/hadoop.properties";
