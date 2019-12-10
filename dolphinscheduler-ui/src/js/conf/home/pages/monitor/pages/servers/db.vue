@@ -17,7 +17,7 @@
 <template>
   <div>
     <div class="servers-wrapper mysql-model content-wrap" v-show="mysqlList.length">
-      <div class="row" v-for="(item,$index) in mysqlList">
+      <div class="row" v-for="(item,$index) in mysqlList" :key="$index">
         <div class="col-md-12">
           <div class="db-title">
             <span>{{item.dbType+$t('Manage')}}</span>

@@ -18,7 +18,7 @@
   <m-list-construction :title="'Worker ' + $t('Manage')">
     <template slot="content">
       <div class="servers-wrapper" v-show="workerList.length">
-        <div class="row-box" v-for="(item,$index) in workerList">
+        <div class="row-box" v-for="(item,$index) in workerList" :key="$index">
           <div class="row-title">
             <div class="left">
               <span class="sp">IP: {{item.host}}</span>
