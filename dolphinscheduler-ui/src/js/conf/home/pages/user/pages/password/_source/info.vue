@@ -108,15 +108,11 @@
 
         // password
         if (!regPassword.test(this.userPassword)) {
-          this.$message.warning(`${i18n.$t('The password is a combination of 6 to 22 digits, English, and at least two characters')}`)
+          this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
           return false
         }
 
         // confirm password
-        if (!regPassword.test(this.oldUserPassword)) {
-          this.$message.warning(`${i18n.$t('The password is a combination of 6 to 22 digits, English, and at least two characters')}`)
-          return false
-        }
         if (this.userPassword !== this.oldUserPassword) {
           this.$message.warning(`${i18n.$t('The password is inconsistent with the confirmation password')}`)
           return false

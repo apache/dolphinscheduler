@@ -20,7 +20,7 @@ export default {
   'Please enter user name': '请输入用户名',
   'Password': '密码',
   'Please enter your password': '请输入密码',
-  'The password is a combination of 6 to 22 digits, English, and at least two characters': '密码为6~22位数字、英文、符号至少两种组合的字符',
+  'Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22': '密码至少包含数字，字母和字符的两种组合，长度在6-22之间',
   'Login': '登录',
   'Home': '首页',
   'Failed to create node to save': '未创建节点保存失败',

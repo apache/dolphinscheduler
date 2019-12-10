@@ -155,18 +155,18 @@
 
         // user name
         if (!this.userName.replace(/\s*/g,"")) {
-          this.$message.warning(`${i18n.$t('The password is a combination of 6 to 22 digits, English, and at least two characters')}`)
+          this.$message.warning(`${i18n.$t('Please enter user name')}`)
           return false
         }
         // password
         if (this.userPassword!='' && this.item) {
           if(!regPassword.test(this.userPassword)) {
-            this.$message.warning(`${i18n.$t('The password is a combination of 6 to 22 digits, English, and at least two characters')}`)
+            this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
             return false
           }
         } else if(!this.item){
           if(!regPassword.test(this.userPassword)) {
-            this.$message.warning(`${i18n.$t('The password is a combination of 6 to 22 digits, English, and at least two characters')}`)
+            this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
             return false
           }
         }

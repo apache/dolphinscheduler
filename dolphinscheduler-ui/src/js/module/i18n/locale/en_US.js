@@ -20,7 +20,7 @@ export default {
   'Please enter user name': 'Please enter user name',
   'Password': 'Password',
   'Please enter your password': 'Please enter your password',
-  'The password is a combination of 6 to 22 digits, English, and at least two characters': 'PThe password is a combination of 6 to 22 digits, English, and at least two characters',
+  'Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22': 'Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22',
   'Login': 'Login',
   'Home': 'Home',
   'Failed to create node to save': 'Failed to create node to save',
