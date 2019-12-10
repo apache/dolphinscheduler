@@ -16,18 +16,19 @@
  */
 package org.apache.dolphinscheduler.server.master;
 
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
 import org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.server.quartz.QuartzExecutors;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ import java.util.concurrent.TimeUnit;
  * master server
  */
 @ComponentScan("org.apache.dolphinscheduler")
-public class MasterServer extends AbstractServer {
+public class MasterServer implements IStoppable {
 
     /**
      * logger of MasterServer
@@ -73,6 +74,19 @@ public class MasterServer extends AbstractServer {
      */
     private ExecutorService masterSchedulerService;
 
+    /**
+     *  spring application context
+     *  only use it for initialization
+     */
+    @Autowired
+    private SpringApplicationContext springApplicationContext;
+
+    /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
+
 
     /**
      * master server startup
@@ -91,25 +105,9 @@ public class MasterServer extends AbstractServer {
     @PostConstruct
     public void run(){
 
-        try {
-            conf = new PropertiesConfiguration(Constants.MASTER_PROPERTIES_PATH);
-        }catch (ConfigurationException e){
-            logger.error("load configuration failed : " + e.getMessage(),e);
-            System.exit(1);
-        }
-
         masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
 
         zkMasterClient = ZKMasterClient.getZKMasterClient(processDao);
-
-        // heartbeat interval
-        heartBeatInterval = conf.getInt(Constants.MASTER_HEARTBEAT_INTERVAL,
-                Constants.defaultMasterHeartbeatInterval);
-
-        // master exec thread pool num
-        int masterExecThreadNum = conf.getInt(Constants.MASTER_EXEC_THREADS,
-                Constants.defaultMasterExecThreadNum);
-
 
         heartbeatMasterService = ThreadUtils.newDaemonThreadScheduledExecutor("Master-Main-Thread",Constants.defaulMasterHeartbeatThreadNum);
 
@@ -121,13 +119,13 @@ public class MasterServer extends AbstractServer {
         // regular heartbeat
         // delay 5 seconds, send heartbeat every 30 seconds
         heartbeatMasterService.
-                scheduleAtFixedRate(heartBeatThread, 5, heartBeatInterval, TimeUnit.SECONDS);
+                scheduleAtFixedRate(heartBeatThread, 5, masterConfig.getMasterHeartbeatInterval(), TimeUnit.SECONDS);
 
         // master scheduler thread
         MasterSchedulerThread masterSchedulerThread = new MasterSchedulerThread(
                 zkMasterClient,
-                processDao,conf,
-                masterExecThreadNum);
+                processDao,
+                masterConfig.getMasterExecThreads());
 
         // submit master scheduler thread
         masterSchedulerService.execute(masterSchedulerThread);
