@@ -38,13 +38,13 @@
 			</includes>
 			<outputDirectory>./conf</outputDirectory>
 		</fileSet>
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-alert/target/</directory>
-			<includes>
-				<include>dolphinscheduler-alert-${project.version}.jar</include>
-			</includes>
-			<outputDirectory>lib</outputDirectory>
-		</fileSet>
+		<!--<fileSet>-->
+			<!--<directory>${basedir}/../../dolphinscheduler-alert/target/</directory>-->
+			<!--<includes>-->
+				<!--<include>dolphinscheduler-alert-${project.version}.jar</include>-->
+			<!--</includes>-->
+			<!--<outputDirectory>lib</outputDirectory>-->
+		<!--</fileSet>-->
 		<!--alert end-->
 
 		<!--api start-->
