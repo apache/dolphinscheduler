@@ -72,7 +72,7 @@
                 style="width: 80px"
                 trigger="click">
         <div class="lrns-list">
-          <a href="javascript:" @click="_toggleLanguage(item.code)" v-for="(item,$index) in localeList"><span>{{item.name}}</span></a>
+          <a href="javascript:" @click="_toggleLanguage(item.code)" v-for="(item,$index) in localeList" :key="$index"><span>{{item.name}}</span></a>
         </div>
         <div class="login-model" slot="reference">
           <span>{{activeLocale.name}}</span>

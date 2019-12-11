@@ -150,6 +150,8 @@
 
         // Mobile phone number regular
         let regPhone = /^1(3|4|5|6|7|8)\d{9}$/; // eslint-disable-line
+        
+        let regPassword = /^(?![0-9]+$)(?![a-z]+$)(?![A-Z]+$)(?![`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、]+$)[`~!@#$%^&*()_\-+=<>?:"{}|,.\/;'\\[\]·~！@#￥%……&*（）——\-+={}|《》？：“”【】、；‘’，。、0-9A-Za-z]{6,22}$/;
 
         // user name
         if (!this.userName.replace(/\s*/g,"")) {
@@ -157,10 +159,18 @@
           return false
         }
         // password
-        if (!this.userPassword && !this.item) {
-          this.$message.warning(`${i18n.$t('Please enter your password')}`)
-          return false
+        if (this.userPassword!='' && this.item) {
+          if(!regPassword.test(this.userPassword)) {
+            this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
+            return false
+          }
+        } else if(!this.item){
+          if(!regPassword.test(this.userPassword)) {
+            this.$message.warning(`${i18n.$t('Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22')}`)
+            return false
+          }
         }
+
         // email
         if (!this.email) {
           this.$message.warning(`${i18n.$t('Please enter email')}`)
@@ -184,6 +194,7 @@
       _getQueueList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('security/getQueueList').then(res => {
+          
             this.queueList = _.map(res, v => {
               return {
                 id: v.id,
@@ -223,7 +234,7 @@
           userPassword: this.userPassword,
           tenantId: this.tenantId,
           email: this.email,
-          queue: this.queueList[this.queueName].code,
+          queue: this.queueList.length>0? _.find(this.queueList, ['id', this.queueName]).code : '',
           phone: this.phone
         }
 
@@ -266,7 +277,11 @@
           this.email = this.item.email
           this.phone = this.item.phone
           this.tenantId = this.item.tenantId
-          this.queueName = _.find(this.queueList, ['code', this.item.queue]).id
+          if(this.queueList.length>0) {
+            this.queueName = _.find(this.queueList, ['code', this.item.queue]).id
+          } else {
+            this.queueName = ''
+          }
         }
       }
     },
