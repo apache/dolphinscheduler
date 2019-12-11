@@ -19,10 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 public class CollectionUtilsTest {
@@ -55,5 +52,11 @@ public class CollectionUtilsTest {
         b.add(2);
         b.add(4);
         Assert.assertArrayEquals(new Integer[]{1,3},CollectionUtils.subtract(a,b).toArray());
+    }
+
+    @Test
+    public void stringToMap() {
+        Map<String, String> a = CollectionUtils.stringToMap("a=b;c=d", ";", "");
+        Assert.assertNotNull(a);
     }
 }
