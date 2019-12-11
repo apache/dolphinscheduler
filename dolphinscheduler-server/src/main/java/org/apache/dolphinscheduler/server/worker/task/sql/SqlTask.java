@@ -211,7 +211,7 @@ public class SqlTask extends AbstractTask {
         if (StringUtils.isNotEmpty(sqlParameters.getTitle())){
             String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(),
                     ParamUtils.convert(paramsMap));
-            logger.info("SQL tile : {}",title);
+            logger.info("SQL title : {}",title);
             sqlParameters.setTitle(title);
         }
 
