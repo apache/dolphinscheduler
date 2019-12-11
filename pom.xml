@@ -491,6 +491,14 @@
 		<pluginManagement>
 			<plugins>
 
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>rpm-maven-plugin</artifactId>
+					<version>2.2.0</version>
+					<inherited>false</inherited>
+				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>

@@ -38,13 +38,13 @@
 			</includes>
 			<outputDirectory>./conf</outputDirectory>
 		</fileSet>
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-alert/target/</directory>
-			<includes>
-				<include>dolphinscheduler-alert-${project.version}.jar</include>
-			</includes>
-			<outputDirectory>lib</outputDirectory>
-		</fileSet>
+		<!--<fileSet>-->
+			<!--<directory>${basedir}/../../dolphinscheduler-alert/target/</directory>-->
+			<!--<includes>-->
+				<!--<include>dolphinscheduler-alert-${project.version}.jar</include>-->
+			<!--</includes>-->
+			<!--<outputDirectory>lib</outputDirectory>-->
+		<!--</fileSet>-->
 		<!--alert end-->
 
 		<!--api start-->
@@ -119,14 +119,6 @@
 				<include>**/*.json</include>
 			</includes>
 			<outputDirectory>conf</outputDirectory>
-		</fileSet>
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-common/src/main/resources/bin</directory>
-			<includes>
-				<include>*.*</include>
-			</includes>
-			<directoryMode>755</directoryMode>
-			<outputDirectory>bin</outputDirectory>
 		</fileSet>
 		<fileSet>
 			<directory>${basedir}/../../dolphinscheduler-dao/src/main/resources</directory>
