@@ -9,6 +9,7 @@
 .idea/*
 .target
 .target/
+**/**/target/**
 target/*
 */target
 */target/*
@@ -40,6 +41,8 @@ dolphinscheduler-alert/logs/
 dolphinscheduler-alert/src/main/resources/alert.properties_bak
 dolphinscheduler-alert/src/main/resources/logback.xml
 dolphinscheduler-server/src/main/resources/logback.xml
+dolphinscheduler-ui/dist
+dolphinscheduler-ui/node
 dolphinscheduler-ui/dist/css/common.16ac5d9.css
 dolphinscheduler-ui/dist/css/home/index.b444b91.css
 dolphinscheduler-ui/dist/css/login/index.5866c64.css
@@ -144,3 +147,4 @@ dolphinscheduler-ui/dist/js/login/index.291b8e3.js.map
 dolphinscheduler-ui/dist/lib/external/
 dolphinscheduler-ui/src/js/conf/home/pages/projects/pages/taskInstance/index.vue
 /dolphinscheduler-dao/src/main/resources/dao/data_source.properties
+
