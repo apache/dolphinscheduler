@@ -36,9 +36,9 @@ jobs:
 
       - name: Codecov
         uses: codecov/codecov-action@v1
-          with:
-            token: ff304763-c6f2-4b38-a5d1-a82a57e5ec57 #required
-            file: ./target/site/cobertura/coverage.xml
-            flags: unittests #optional
-            name: codecov-umbrella #optional
-            fail_ci_if_error: true #optional (default = false)
+        with:
+          token: ff304763-c6f2-4b38-a5d1-a82a57e5ec57
+          file: ./target/site/cobertura/coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
