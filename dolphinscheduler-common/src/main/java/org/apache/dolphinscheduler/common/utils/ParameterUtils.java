@@ -98,11 +98,11 @@ public class ParameterUtils {
     }else if (dataType.equals(DataType.DOUBLE)){
       stmt.setDouble(index, Double.parseDouble(value));
     }else if (dataType.equals(DataType.DATE)){
-      stmt.setString(index, value);
+      stmt.setDate(index, java.sql.Date.valueOf(value));
     }else if (dataType.equals(DataType.TIME)){
       stmt.setString(index, value);
     }else if (dataType.equals(DataType.TIMESTAMP)){
-      stmt.setString(index, value);
+      stmt.setTimestamp(index, java.sql.Timestamp.valueOf(value));
     }else if (dataType.equals(DataType.BOOLEAN)){
       stmt.setBoolean(index,Boolean.parseBoolean(value));
     }
