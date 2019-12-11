@@ -603,7 +603,7 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<encoding>${project.build.sourceEncoding}</encoding>
-					<skip>true</skip><!--not skip compile test classes-->
+					<skip>false</skip><!--not skip compile test classes-->
 				</configuration>
 			</plugin>
 			<plugin>
