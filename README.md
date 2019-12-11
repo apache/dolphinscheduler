@@ -1,17 +1,17 @@
-Easy Scheduler
+Dolphin Scheduler
 ============
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![Total Lines](https://tokei.rs/b1/github/analysys/EasyScheduler?category=lines)](https://github.com/analysys/EasyScheduler)
+[![Total Lines](https://tokei.rs/b1/github/apache/Incubator-DolphinScheduler?category=lines)](https://github.com/apache/Incubator-DolphinScheduler)
 
-> Easy Scheduler for Big Data
+> Dolphin Scheduler for Big Data
 
-[![Stargazers over time](https://starchart.cc/analysys/EasyScheduler.svg)](https://starchart.cc/analysys/EasyScheduler)
+[![Stargazers over time](https://starchart.cc/apache/incubator-dolphinscheduler.svg)](https://starchart.cc/apache/incubator-dolphinscheduler)
 
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 
 
-### Design features: 
+### Design features:
 
 A distributed and easy-to-expand visual DAG workflow scheduling system. Dedicated to solving the complex dependencies in data processing, making the scheduling system `out of the box` for data processing.
 Its main objectives are as follows:
@@ -32,12 +32,12 @@ Its main objectives are as follows:
  - There are more waiting partners to explore
 
 
-### What's in Easy Scheduler
+### What's in Dolphin Scheduler
 
  Stability | Easy to use | Features | Scalability |
  -- | -- | -- | --
-Decentralized multi-master and multi-worker | Visualization process defines key information such as task status, task type, retry times, task running machine, visual variables and so on at a glance.  |  Support pause, recover operation | support custom task types 
-HA is supported by itself | All process definition operations are visualized, dragging tasks to draw DAGs, configuring data sources and resources. At the same time, for third-party systems, the api mode operation is provided. | Users on easyscheduler can achieve many-to-one or one-to-one mapping relationship through tenants and Hadoop users, which is very important for scheduling large data jobs. " | The scheduler uses distributed scheduling, and the overall scheduling capability will increase linearly with the scale of the cluster. Master and Worker support dynamic online and offline. 
+Decentralized multi-master and multi-worker | Visualization process defines key information such as task status, task type, retry times, task running machine, visual variables and so on at a glance.  |  Support pause, recover operation | support custom task types
+HA is supported by itself | All process definition operations are visualized, dragging tasks to draw DAGs, configuring data sources and resources. At the same time, for third-party systems, the api mode operation is provided. | Users on DolphinScheduler can achieve many-to-one or one-to-one mapping relationship through tenants and Hadoop users, which is very important for scheduling large data jobs. " | The scheduler uses distributed scheduling, and the overall scheduling capability will increase linearly with the scale of the cluster. Master and Worker support dynamic online and offline.
 Overload processing: Task queue mechanism, the number of schedulable tasks on a single machine can be flexibly configured, when too many tasks will be cached in the task queue, will not cause machine jam. | One-click deployment | Supports traditional shell tasks, and also support big data platform task scheduling: MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Procedure, Sub_Process |  |
 
 
@@ -54,38 +54,54 @@ Overload processing: Task queue mechanism, the number of schedulable tasks on a 
 
 ### Document
 
-- <a href="https://analysys.github.io/easyscheduler_docs_cn/后端部署文档.html" target="_blank">Backend deployment documentation</a>
+- <a href="https://dolphinscheduler.apache.org/en-us/docs/user_doc/backend-deployment.html" target="_blank">Backend deployment documentation</a>
 
-- <a href="https://analysys.github.io/easyscheduler_docs_cn/前端部署文档.html" target="_blank">Front-end deployment documentation</a>
+- <a href="https://dolphinscheduler.apache.org/en-us/docs/user_doc/frontend-deployment.html" target="_blank">Front-end deployment documentation</a>
 
-- [**User manual**](https://analysys.github.io/easyscheduler_docs_cn/系统使用手册.html?_blank "User manual") 
+- [**User manual**](https://dolphinscheduler.apache.org/en-us/docs/user_doc/system-manual.html?_blank "System manual")
 
-- [**Upgrade document**](https://analysys.github.io/easyscheduler_docs_cn/升级文档.html?_blank "Upgrade document") 
+- [**Upgrade document**](https://dolphinscheduler.apache.org/en-us/docs/release/upgrade.html?_blank "Upgrade document")
 
-- <a href="http://106.75.43.194:8888" target="_blank">Online Demo</a> 
+- <a href="http://106.75.43.194:8888" target="_blank">Online Demo</a>
 
-More documentation please refer to <a href="https://analysys.github.io/easyscheduler_docs_cn/" target="_blank">[EasyScheduler online documentation]</a>
+More documentation please refer to <a href="https://dolphinscheduler.apache.org/en-us/docs/user_doc/quick-start.html" target="_blank">[DolphinScheduler online documentation]</a>
 
 ### Recent R&D plan
-Work plan of Easy Scheduler: [R&D plan](https://github.com/analysys/EasyScheduler/projects/1), where `In Develop` card is the features of 1.1.0 version , TODO card is to be done (including feature ideas)
+Work plan of Dolphin Scheduler: [R&D plan](https://github.com/apache/incubator-dolphinscheduler/projects/1), Under the `In Develop` card is what is currently being developed, TODO card is to be done (including feature ideas)
 
 ### How to contribute code
 
 Welcome to participate in contributing code, please refer to the process of submitting the code:
-[[How to contribute code](https://github.com/analysys/EasyScheduler/issues/310)]
+[[How to contribute code](https://github.com/apache/incubator-dolphinscheduler/issues/310)]
+
+### How to Build
+
+```bash
+mvn clean install -Prelease
+```
+
+Artifact:
+
+```
+dolphinscheduler-dist/dolphinscheduler-backend/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-backend-bin.tar.gz: Binary package of DolphinScheduler-Backend
+dolphinscheduler-dist/dolphinscheduler-front/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-front-bin.tar.gz: Binary package of DolphinScheduler-UI
+dolphinscheduler-dist/dolphinscheduler-src/target/apache-dolphinscheduler-incubating-${latest.release.version}-src.zip: Source code package of DolphinScheduler
+```
 
 ### Thanks
 
-Easy Scheduler uses a lot of excellent open source projects, such as google guava, guice, grpc, netty, ali bonecp, quartz, and many open source projects of apache, etc.
-It is because of the shoulders of these open source projects that the birth of the Easy Scheduler is possible. We are very grateful for all the open source software used! We also hope that we will not only be the beneficiaries of open source, but also be open source contributors, so we decided to contribute to easy scheduling and promised long-term updates. We also hope that partners who have the same passion and conviction for open source will join in and contribute to open source!
+Dolphin Scheduler uses a lot of excellent open source projects, such as google guava, guice, grpc, netty, ali bonecp, quartz, and many open source projects of apache, etc.
+It is because of the shoulders of these open source projects that the birth of the Dolphin Scheduler is possible. We are very grateful for all the open source software used! We also hope that we will not only be the beneficiaries of open source, but also be open source contributors. We also hope that partners who have the same passion and conviction for open source will join in and contribute to open source!
 
 ### Get Help
-The fastest way to get response from our developers is to submit issues,  or add our wechat : 510570367
+1. Submit an issue
+1. Mail list: dev@dolphinscheduler.apache.org. Mail to dev-subscribe@dolphinscheduler.apache.org, follow the reply to subscribe the mail list.
+1. Contact WeChat group manager, ID 510570367. This is for Mandarin(CN) discussion.
 
 ### License
-Please refer to [LICENSE](https://github.com/analysys/EasyScheduler/blob/dev/LICENSE) file.
- 
- 
+Please refer to [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) file.
+
+
 
 
 
