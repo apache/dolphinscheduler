@@ -152,9 +152,15 @@ public final class Constants {
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS = "zookeeper.dolphinscheduler.dead.servers";
 
     /**
+     * AlertServer lock directory registered in zookeeper
+     */
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_ALERT = "zookeeper.dolphinscheduler.lock.alert";
+
+    /**
      * MasterServer lock directory registered in zookeeper
      */
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "zookeeper.dolphinscheduler.lock.masters";
+
 
     /**
      * WorkerServer lock directory registered in zookeeper

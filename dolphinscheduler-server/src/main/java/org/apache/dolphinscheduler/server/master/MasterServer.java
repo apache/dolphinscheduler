@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
+import org.apache.dolphinscheduler.server.alert.AlertServer;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
 import org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob;
@@ -88,6 +89,9 @@ public class MasterServer implements IStoppable {
     private MasterConfig masterConfig;
 
 
+    @Autowired
+    private AlertServer alertServer;
+
     /**
      * master server startup
      *
@@ -129,6 +133,8 @@ public class MasterServer implements IStoppable {
 
         // submit master scheduler thread
         masterSchedulerService.execute(masterSchedulerThread);
+
+        alertServer.start();
 
         // start QuartzExecutors
         // what system should do if exception
@@ -219,6 +225,8 @@ public class MasterServer implements IStoppable {
             }
 
             logger.info("master scheduler service stopped");
+
+            alertServer.close();
 
             try {
                 zkMasterClient.close();

@@ -441,6 +441,14 @@ public abstract class AbstractZKClient {
 
 	/**
 	 *
+	 * @return get alert lock path
+	 */
+	public String getAlertLockPath(){
+		return conf.getString(ZOOKEEPER_DOLPHINSCHEDULER_LOCK_ALERT);
+	}
+
+	/**
+	 *
 	 * @param zkNodeType zookeeper node type
 	 * @return get zookeeper node parent path
 	 */
