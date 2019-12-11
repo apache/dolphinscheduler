@@ -20,7 +20,7 @@
       <a href="javascript:" class="tog-close" @click="_toggleMenu" v-if="!isTogHide"></a>
       <a href="javascript:" class="tog-open" @click="_toggleMenu" v-if="isTogHide"></a>
     </div>
-    <div class="leven-1" v-for="(item,$index) in menuList">
+    <div class="leven-1" v-for="(item,$index) in menuList" :key="$index">
       <div v-if="item.disabled">
         <template v-if="item.path">
           <router-link :to="{ name: item.path}">

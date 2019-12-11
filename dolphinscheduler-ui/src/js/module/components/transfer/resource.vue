@@ -42,7 +42,7 @@
           </div>-->
           <div class="scrollbar tf-content">
             <ul>
-              <li v-for="(item,$index) in sourceList" :key="item.id" @click="_ckSource(item)">
+              <li v-for="(item,$index) in sourceList" :key="$index" @click="_ckSource(item)">
                 <span :title="item.name">{{item.name}}</span>
                 <a href="javascript:"></a>
               </li>
@@ -68,7 +68,7 @@
           </div>-->
           <div class="scrollbar tf-content">
             <ul>
-              <li v-for="(item,$index) in targetList" :key="item.id" @click="_ckTarget(item)"><span :title="item.name">{{item.name}}</span></li>
+              <li v-for="(item,$index) in targetList" :key="$index" @click="_ckTarget(item)"><span :title="item.name">{{item.name}}</span></li>
             </ul>
           </div>
         </div>
