@@ -101,7 +101,7 @@ public class MasterSchedulerThread implements Runnable {
                 if(OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory())){
                     if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
 
-                        // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
+                        // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/masters
                         String znodeLock = zkMasterClient.getMasterLockPath();
 
                         mutex = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
