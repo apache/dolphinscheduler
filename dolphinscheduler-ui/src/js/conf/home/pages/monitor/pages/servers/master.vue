@@ -96,8 +96,7 @@
       this.getMasterData().then(res => {
         this.masterList = _.map(res, (v, i) => {
           return _.assign(v, {
-            resInfo: JSON.parse(v.resInfo),
-            id: i
+            resInfo: JSON.parse(v.resInfo)
           })
         })
         this.isLoading = false
