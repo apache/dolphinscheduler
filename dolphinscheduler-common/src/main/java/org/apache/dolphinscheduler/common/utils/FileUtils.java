@@ -127,14 +127,7 @@ public class FileUtils {
 
         //if not exists this user,then create
         if (!OSUtils.getUserList().contains(userName)){
-            String userGroup = OSUtils.getGroup();
-            if (org.apache.commons.lang3.StringUtils.isNotEmpty(userGroup)){
-                logger.info("create os user : {}",userName);
-                String cmd = String.format("sudo useradd -g %s %s",userGroup,userName);
-
-                logger.info("execute cmd : {}",cmd);
-                OSUtils.exeCmd(cmd);
-            }
+            OSUtils.createUser(userName);
         }
 
     }
