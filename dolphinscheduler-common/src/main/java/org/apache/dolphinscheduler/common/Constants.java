@@ -315,7 +315,7 @@ public final class Constants {
     /**
      * user name regex
      */
-    public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9_-]{3,20}$");
+    public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,20}$");
 
     /**
      * email regex
