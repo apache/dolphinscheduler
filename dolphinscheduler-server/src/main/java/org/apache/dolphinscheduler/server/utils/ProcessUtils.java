@@ -348,13 +348,20 @@ public class ProcessUtils {
    * @return pids
    * @throws Exception exception
    */
-  private static String getPidsStr(int processId)throws Exception{
+  public static String getPidsStr(int processId)throws Exception{
     StringBuilder sb = new StringBuilder();
-    // pstree -p pid get sub pids
-    String pids = OSUtils.exeCmd("pstree -p " +processId+ "");
-    Matcher mat = Pattern.compile("(\\d+)").matcher(pids);
+    Matcher mat;
+    // pstree pid get sub pids
+    if (OSUtils.isMacOS()) {
+      String pids = OSUtils.exeCmd("pstree -sp " + processId);
+      mat = Pattern.compile("-[+|-]-\\s(\\d+)").matcher(pids);
+    } else {
+      String pids = OSUtils.exeCmd("pstree -p " + processId);
+      mat = Pattern.compile("(\\d+)").matcher(pids);
+    }
+
     while (mat.find()){
-      sb.append(mat.group()+" ");
+      sb.append(mat.group(1)).append(" ");
     }
     return sb.toString().trim();
   }

@@ -222,7 +222,7 @@ public class FetchTaskThread implements Runnable{
                             new Date(),
                             execLocalPath);
 
-                    // check and create Linux users
+                    // check and create users
                     FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
                             tenant.getTenantCode(), logger);
 
