@@ -156,4 +156,8 @@ public class Constants {
     public static final String ENTERPRISE_WECHAT_AGENT_ID = "enterprise.wechat.agent.id";
 
     public static final String ENTERPRISE_WECHAT_USERS = "enterprise.wechat.users";
+    
+    public static final String DINGTALK_WEBHOOK = "dingtalk.webhook";
+
+    public static final String DINGTALK_KEYWORD = "dingtalk.keyword";
 }
