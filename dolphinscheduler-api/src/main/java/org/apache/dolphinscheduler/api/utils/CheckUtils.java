@@ -53,6 +53,10 @@ public class CheckUtils {
    * @return true if email regex valid, otherwise return false
    */
   public static boolean checkEmail(String email) {
+    if (StringUtils.isEmpty(email)){
+      return false;
+    }
+
     return email.length() > 5 && email.length() <= 40 && regexChecks(email, Constants.REGEX_MAIL_NAME) ;
   }
 
