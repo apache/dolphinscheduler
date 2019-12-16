@@ -769,21 +769,13 @@ public class ProcessDao {
         logger.info("start submit task : {}, instance id:{}, state: {}, ",
                 taskInstance.getName(), processInstance.getId(), processInstance.getState() );
         processInstance = this.findProcessInstanceDetailById(processInstance.getId());
-        //submit to mysql
-        TaskInstance task= submitTaskInstanceToMysql(taskInstance, processInstance);
-        if(task.isSubProcess() && !task.getState().typeIsFinished()){
-            ProcessInstanceMap processInstanceMap = setProcessInstanceMap(processInstance, task);
-
-            TaskNode taskNode = JSONUtils.parseObject(task.getTaskJson(), TaskNode.class);
-            Map<String, String> subProcessParam = JSONUtils.toMap(taskNode.getParams());
-            Integer defineId = Integer.parseInt(subProcessParam.get(Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID));
-            createSubWorkProcessCommand(processInstance, processInstanceMap, defineId, task);
-        }else if(!task.getState().typeIsFinished()){
-            //submit to task queue
-            task.setProcessInstancePriority(processInstance.getProcessInstancePriority());
-            submitTaskToQueue(task);
+        //submit to db
+        TaskInstance task= submitTaskInstanceToDB(taskInstance, processInstance);
+        if(!task.getState().typeIsFinished()){
+            createSubWorkProcessCommand(processInstance, task);
         }
-        logger.info("submit task :{} state:{} complete, instance id:{} state: {}  ",
+
+        logger.info("end submit task to db:{} state:{} complete, instance id:{} state: {}  ",
                 taskInstance.getName(), task.getState(), processInstance.getId(), processInstance.getState());
         return task;
     }
@@ -845,13 +837,18 @@ public class ProcessDao {
     /**
      * create sub work process command
      * @param parentProcessInstance parentProcessInstance
-     * @param instanceMap instanceMap
-     * @param childDefineId instanceMap
      * @param task task
      */
     private void createSubWorkProcessCommand(ProcessInstance parentProcessInstance,
-                                             ProcessInstanceMap instanceMap,
-                                             Integer childDefineId, TaskInstance task){
+                                             TaskInstance task){
+        if(!task.isSubProcess()){
+            return;
+        }
+        ProcessInstanceMap instanceMap = setProcessInstanceMap(parentProcessInstance, task);
+        TaskNode taskNode = JSONUtils.parseObject(task.getTaskJson(), TaskNode.class);
+        Map<String, String> subProcessParam = JSONUtils.toMap(taskNode.getParams());
+        Integer childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID));
+
         ProcessInstance childInstance = findSubProcessInstance(parentProcessInstance.getId(), task.getId());
 
         CommandType fatherType = parentProcessInstance.getCommandType();
@@ -921,7 +918,7 @@ public class ProcessDao {
      * @param processInstance processInstance
      * @return task instance
      */
-    public TaskInstance submitTaskInstanceToMysql(TaskInstance taskInstance, ProcessInstance processInstance){
+    public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance){
         ExecutionStatus processInstanceState = processInstance.getState();
 
         if(taskInstance.getState().typeIsFailure()){

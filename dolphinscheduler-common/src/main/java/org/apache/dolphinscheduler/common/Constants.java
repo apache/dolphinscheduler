@@ -449,7 +449,7 @@ public final class Constants {
     /**
      * default master commit retry interval
      */
-    public static final int defaultMasterCommitRetryInterval = 100;
+    public static final int defaultMasterCommitRetryInterval = 3000;
 
     /**
      * time unit secong to minutes
