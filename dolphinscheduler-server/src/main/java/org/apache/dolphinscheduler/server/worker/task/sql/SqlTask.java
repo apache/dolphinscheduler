@@ -258,9 +258,7 @@ public class SqlTask extends AbstractTask {
                 Map<String, String> connParamMap = CollectionUtils.stringToMap(sqlParameters.getConnParams(),
                         SEMICOLON,
                         HIVE_CONF);
-                if(connParamMap != null){
-                    paramProp.putAll(connParamMap);
-                }
+                paramProp.putAll(connParamMap);
 
                 connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
                         paramProp);

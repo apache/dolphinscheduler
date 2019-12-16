@@ -613,6 +613,7 @@
 				<configuration>
 					<includes>
 						<include>**/*CollectionUtilsTest.java</include><!--run test classes-->
+						<include>**/*DateUtilsTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
