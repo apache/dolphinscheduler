@@ -758,7 +758,7 @@ public class ProcessDao {
     }
 
     /**
-     * submit task to mysql and task queue
+     * submit task to db
      * submit sub process to command
      * @param taskInstance taskInstance
      * @param processInstance processInstance
@@ -769,21 +769,18 @@ public class ProcessDao {
         logger.info("start submit task : {}, instance id:{}, state: {}, ",
                 taskInstance.getName(), processInstance.getId(), processInstance.getState() );
         processInstance = this.findProcessInstanceDetailById(processInstance.getId());
-        //submit to mysql
-        TaskInstance task= submitTaskInstanceToMysql(taskInstance, processInstance);
-        if(task.isSubProcess() && !task.getState().typeIsFinished()){
-            ProcessInstanceMap processInstanceMap = setProcessInstanceMap(processInstance, task);
-
-            TaskNode taskNode = JSONUtils.parseObject(task.getTaskJson(), TaskNode.class);
-            Map<String, String> subProcessParam = JSONUtils.toMap(taskNode.getParams());
-            Integer defineId = Integer.parseInt(subProcessParam.get(Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID));
-            createSubWorkProcessCommand(processInstance, processInstanceMap, defineId, task);
-        }else if(!task.getState().typeIsFinished()){
-            //submit to task queue
-            task.setProcessInstancePriority(processInstance.getProcessInstancePriority());
-            submitTaskToQueue(task);
+        //submit to db
+        TaskInstance task = submitTaskInstanceToDB(taskInstance, processInstance);
+        if(task == null){
+            logger.error("end submit task to db error, task name:{}, process id:{} state: {} ",
+                    taskInstance.getName(), taskInstance.getProcessInstance(), processInstance.getState());
+            return task;
         }
-        logger.info("submit task :{} state:{} complete, instance id:{} state: {}  ",
+        if(!task.getState().typeIsFinished()){
+            createSubWorkProcessCommand(processInstance, task);
+        }
+
+        logger.info("end submit task to db successfully:{} state:{} complete, instance id:{} state: {}  ",
                 taskInstance.getName(), task.getState(), processInstance.getId(), processInstance.getState());
         return task;
     }
@@ -845,13 +842,18 @@ public class ProcessDao {
     /**
      * create sub work process command
      * @param parentProcessInstance parentProcessInstance
-     * @param instanceMap instanceMap
-     * @param childDefineId instanceMap
      * @param task task
      */
     private void createSubWorkProcessCommand(ProcessInstance parentProcessInstance,
-                                             ProcessInstanceMap instanceMap,
-                                             Integer childDefineId, TaskInstance task){
+                                             TaskInstance task){
+        if(!task.isSubProcess()){
+            return;
+        }
+        ProcessInstanceMap instanceMap = setProcessInstanceMap(parentProcessInstance, task);
+        TaskNode taskNode = JSONUtils.parseObject(task.getTaskJson(), TaskNode.class);
+        Map<String, String> subProcessParam = JSONUtils.toMap(taskNode.getParams());
+        Integer childDefineId = Integer.parseInt(subProcessParam.get(Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID));
+
         ProcessInstance childInstance = findSubProcessInstance(parentProcessInstance.getId(), task.getId());
 
         CommandType fatherType = parentProcessInstance.getCommandType();
@@ -921,7 +923,7 @@ public class ProcessDao {
      * @param processInstance processInstance
      * @return task instance
      */
-    public TaskInstance submitTaskInstanceToMysql(TaskInstance taskInstance, ProcessInstance processInstance){
+    public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance){
         ExecutionStatus processInstanceState = processInstance.getState();
 
         if(taskInstance.getState().typeIsFailure()){
@@ -949,7 +951,10 @@ public class ProcessDao {
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstanceState));
         taskInstance.setSubmitTime(new Date());
-        saveTaskInstance(taskInstance);
+        boolean saveResult = saveTaskInstance(taskInstance);
+        if(!saveResult){
+            return null;
+        }
         return taskInstance;
     }
 
@@ -961,6 +966,10 @@ public class ProcessDao {
     public Boolean submitTaskToQueue(TaskInstance taskInstance) {
 
         try{
+            if(taskInstance.getState().typeIsFinished()){
+                logger.info(String.format("submit to task queue, but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
+                return true;
+            }
             // task cannot submit when running
             if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
                 logger.info(String.format("submit to task queue, but task [%s] state already be running. ", taskInstance.getName()));
@@ -978,7 +987,6 @@ public class ProcessDao {
             logger.error("submit task to queue Exception: ", e);
             logger.error("task queue error : %s", JSONUtils.toJson(taskInstance));
             return false;
-
         }
     }
 
