@@ -189,31 +189,6 @@
                                     <sources>
                                         <source>
                                             <location>
-                                                ${basedir}/../../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}
-                                            </location>
-                                            <includes>
-                                                <include>**/*.*</include>
-                                            </includes>
-                                        </source>
-                                        <source>
-                                            <location>
-                                                ${basedir}/../../dolphinscheduler-api/target/dolphinscheduler-api-${project.version}
-                                            </location>
-                                            <includes>
-                                                <include>**/*.*</include>
-                                            </includes>
-                                        </source>
-                                        <source>
-                                            <location>
-                                                ${basedir}/../../dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}
-                                            </location>
-                                            <includes>
-                                                <include>**/*.*</include>
-                                            </includes>
-                                        </source>
-
-                                        <source>
-                                            <location>
                                                 ${basedir}/../.././
                                             </location>
                                             <includes>

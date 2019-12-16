@@ -121,32 +121,6 @@
 
 		<!--server end-->
 
-
-
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
-			<includes>
-				<include>**/*.*</include>
-			</includes>
-			<outputDirectory>.</outputDirectory>
-		</fileSet>
-
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
-			<includes>
-				<include>**/*.*</include>
-			</includes>
-			<outputDirectory>.</outputDirectory>
-		</fileSet>
-
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
-			<includes>
-				<include>**/*.*</include>
-			</includes>
-			<outputDirectory>.</outputDirectory>
-		</fileSet>
-
 		<fileSet>
 			<directory>${basedir}/../../sql</directory>
 			<includes>
