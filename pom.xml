@@ -612,6 +612,8 @@
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<includes>
+						<include>**/api/utils/CheckUtilsTest.java</include>
+						<include>**/common/graph/*.java</include>
 						<include>**/*CollectionUtilsTest.java</include><!--run test classes-->
 					</includes>
 					<!-- <skip>true</skip> -->
