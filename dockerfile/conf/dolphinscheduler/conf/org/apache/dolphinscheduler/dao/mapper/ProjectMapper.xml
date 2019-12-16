@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProjectMapper">
+    <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select p.*,u.user_name as user_name
+        from t_ds_project p
+        join t_ds_user u on p.user_id = u.id
+        where p.id = #{projectId}
+    </select>
+    <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select p.*,u.user_name as user_name
+        from t_ds_project p
+        join t_ds_user u on p.user_id = u.id
+        where p.name = #{projectName}
+        limit 1
+    </select>
+    <select id="queryProjectListPaging" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select p.*,u.user_name as user_name,
+        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_id = p.id) AS def_count,
+        (SELECT COUNT(*) FROM t_ds_process_definition def, t_ds_process_instance inst WHERE def.id = inst.process_definition_id AND def.project_id = p.id AND inst.state=1 ) as inst_running_count
+        from t_ds_project p
+        join t_ds_user u on u.id=p.user_id
+        where 1=1
+        <if test="userId != 0">
+            and p.id in
+            (select project_id from t_ds_relation_project_user  where user_id=#{userId}
+            union select id as project_id  from t_ds_project where user_id=#{userId}
+            )
+        </if>
+        <if test="searchName!=null and searchName != ''">
+            and p.name like concat('%', #{searchName}, '%')
+        </if>
+        order by p.create_time desc
+    </select>
+    <select id="queryAuthedProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select p.*
+        from t_ds_project p,t_ds_relation_project_user rel
+        where p.id = rel.project_id and rel.user_id= #{userId}
+    </select>
+    <select id="queryProjectExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select *
+        from t_ds_project
+        where user_id <![CDATA[ <> ]]> #{userId}
+    </select>
+    <select id="queryProjectCreatedByUser" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select *
+        from t_ds_project
+        where user_id = #{userId}
+    </select>
+
+</mapper>

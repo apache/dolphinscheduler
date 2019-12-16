@@ -1,13 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>cn.analysys</groupId>
-	<artifactId>escheduler</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<groupId>org.apache.dolphinscheduler</groupId>
+	<artifactId>dolphinscheduler</artifactId>
+	<version>1.2.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>escheduler</name>
-	<url>http://maven.apache.org</url>
-
+	<name>${project.artifactId}</name>
+	<url>http://dolphinscheduler.apache.org</url>
+	<description>Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.</description>
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</connection>
+		<developerConnection>scm:git:https://github.com/apache/incubator-dolphinscheduler.git</developerConnection>
+		<url>https://github.com/apache/incubator-dolphinscheduler</url>
+		<tag>HEAD</tag>
+	</scm>
+	<mailingLists>
+		<mailingList>
+			<name>DolphinScheduler Developer List</name>
+			<post>dev@dolphinscheduler.incubator.apache.org</post>
+			<subscribe>dev-subscribe@dolphinscheduler.incubator.apache.org</subscribe>
+			<unsubscribe>dev-unsubscribe@dolphinscheduler.incubator.apache.org</unsubscribe>
+		</mailingList>
+	</mailingLists>
+	<parent>
+		<groupId>org.apache</groupId>
+		<artifactId>apache</artifactId>
+		<version>21</version>
+	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,8 +62,9 @@
 		<logback.version>1.2.3</logback.version>
 		<hadoop.version>2.7.3</hadoop.version>
 		<quartz.version>2.2.3</quartz.version>
-		<jackson.version>2.10.1</jackson.version>
-		<mybatis.version>3.5.1</mybatis.version>
+		<jackson.version>2.9.8</jackson.version>
+		<mybatis-plus.version>3.2.0</mybatis-plus.version>
+		<lombok.version>1.18.4</lombok.version>
 		<mybatis.spring.version>2.0.1</mybatis.spring.version>
 		<cron.utils.version>5.0.5</cron.utils.version>
 		<fastjson.version>1.2.61</fastjson.version>
@@ -53,32 +97,35 @@
 		<clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
 		<mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
 		<jsp.version>6.1.14</jsp.version>
+		<spotbugs.version>3.1.12</spotbugs.version>
+		<checkstyle.version>3.0.0</checkstyle.version>
+		<apache.rat.version>0.13</apache.rat.version>
+		<zookeeper.version>3.4.14</zookeeper.version>
+		<frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
+		<maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
+		<maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
+		<maven-release-plugin.version>2.5.3</maven-release-plugin.version>
+		<maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
+		<maven-source-plugin.version>2.4</maven-source-plugin.version>
+		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+		<jacoco.version>0.8.4</jacoco.version>
+		<jcip.version>1.0</jcip.version>
+		<maven.deploy.skip>false</maven.deploy.skip>
+		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
-
 			<dependency>
-				<groupId>org.mybatis</groupId>
-				<artifactId>mybatis</artifactId>
-				<version>${mybatis.version}</version>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus-boot-starter</artifactId>
+				<version>${mybatis-plus.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.mybatis</groupId>
-				<artifactId>mybatis-spring</artifactId>
-				<version>${mybatis.spring.version}</version>
+				<groupId>com.baomidou</groupId>
+				<artifactId>mybatis-plus</artifactId>
+				<version>${mybatis-plus.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.mybatis.spring.boot</groupId>
-				<artifactId>mybatis-spring-boot-autoconfigure</artifactId>
-				<version>${mybatis.spring.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mybatis.spring.boot</groupId>
-				<artifactId>mybatis-spring-boot-starter</artifactId>
-				<version>${mybatis.spring.version}</version>
-			</dependency>
-
 			<!-- quartz-->
 			<dependency>
 				<groupId>org.quartz-scheduler</groupId>
@@ -154,33 +201,33 @@
 			</dependency>
 
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-server</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-server</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-common</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-common</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-dao</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-dao</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-api</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-api</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-rpc</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-rpc</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>cn.analysys</groupId>
-				<artifactId>escheduler-alert</artifactId>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-alert</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -193,6 +240,25 @@
 				<groupId>org.apache.curator</groupId>
 				<artifactId>curator-recipes</artifactId>
 				<version>${curator.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.zookeeper</groupId>
+				<artifactId>zookeeper</artifactId>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-log4j12</artifactId>
+					</exclusion>
+					<exclusion>
+						<artifactId>netty</artifactId>
+						<groupId>io.netty</groupId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.github.spotbugs</groupId>
+						<artifactId>spotbugs-annotations</artifactId>
+					</exclusion>
+				</exclusions>
+				<version>${zookeeper.version}</version>
 			</dependency>
 
 			<dependency>
@@ -240,6 +306,7 @@
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
 				<version>${mysql.connector.version}</version>
+				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -410,32 +477,112 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>jsp-2.1</artifactId>
-				<version>${jsp.version}</version>
+				<groupId>net.jcip</groupId>
+				<artifactId>jcip-annotations</artifactId>
+				<version>${jcip.version}</version>
+				<optional>true</optional>
 			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
 
-	<scm>
-		<connection>scm:git:https://github.com/analysys/EasyScheduler.git</connection>
-		<developerConnection>scm:git:https://github.com/analysys/EasyScheduler.git</developerConnection>
-		<url>https://github.com/analysys/EasyScheduler.git</url>
-		<tag>HEAD</tag>
-	</scm>
-
 	<build>
+
+		<finalName>apache-dolphinscheduler-incubating-${project.version}</finalName>
+
+		<pluginManagement>
+			<plugins>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+						<testSource>${java.version}</testSource>
+						<testTarget>${java.version}</testTarget>
+					</configuration>
+					<version>${maven-compiler-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-release-plugin</artifactId>
+					<version>${maven-release-plugin.version}</version>
+					<configuration>
+						<tagNameFormat>@{project.version}</tagNameFormat>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>${maven-assembly-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>${maven-javadoc-plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>${maven-source-plugin.version}</version>
+				</plugin>
+
+			</plugins>
+
+		</pluginManagement>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven-javadoc-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<aggregate>true</aggregate>
+					<charset>${project.build.sourceEncoding}</charset>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<docencoding>${project.build.sourceEncoding}</docencoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.2</version>
+				<version>${maven-release-plugin.version}</version>
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<tagNameFormat>@{project.version}</tagNameFormat>
 					<tagBase>${project.version}</tagBase>
-					<goals>-f pom.xml deploy</goals>
+					<!--<goals>-f pom.xml deploy</goals>-->
 				</configuration>
 				<dependencies>
 					<dependency>
@@ -445,26 +592,13 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<descriptors>
-						<descriptor>package.xml</descriptor>
-					</descriptors>
-					<appendAssemblyId>false</appendAssemblyId>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-					</execution>
-				</executions>
-			</plugin>
+
+
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>
@@ -475,10 +609,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19.1</version>
+				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<includes>
-						<include>**/*Test*.java</include><!--run test classes-->
+						<include>**/api/utils/CheckUtilsTest.java</include>
+						<include>**/common/graph/*.java</include>
+						<include>**/*CollectionUtilsTest.java</include><!--run test classes-->
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
@@ -488,7 +624,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.4</version>
+				<version>${jacoco.version}</version>
 				<configuration>
 					<destFile>target/jacoco.exec</destFile>
 					<dataFile>target/jacoco.exec</dataFile>
@@ -512,29 +648,105 @@
 			<plugin>
 				<groupId>org.apache.rat</groupId>
 				<artifactId>apache-rat-plugin</artifactId>
+				<version>${apache.rat.version}</version>
 				<configuration>
 					<includes>
 						<include>**/*.java</include>
-						<include>**/escheduler-ui/src/**.scss</include>
-						<include>**/escheduler-ui/src/**.css</include>
-						<include>**/escheduler-ui/src/**.vue</include>
-						<include>**/escheduler-ui/src/**.js</include>
+						<include>**/dolphinscheduler-ui/src/**/*.scss</include>
+						<include>**/dolphinscheduler-ui/src/**/*.css</include>
+						<include>**/dolphinscheduler-ui/src/**/*.vue</include>
+						<include>**/dolphinscheduler-ui/src/**/*.js</include>
+						<include>**/dolphinscheduler-ui/src/**/*.html</include>
 					</includes>
 					<excludes>
-						<exclude>**/escheduler-ui/src/lib/**</exclude>
-						<exclude>**/escheduler-ui/src/js/module/util/cookie.js</exclude>
-						<exclude>**/escheduler-ui/src/font/awesome/font-awesome.css</exclude>
-						<exclude>**/escheduler-ui/src/sass/common/_animation.scss</exclude>
-						<exclude>**/escheduler-ui/src/sass/common/_normalize.scss</exclude>
-						<exclude>**/escheduler-ui/src/combo/1.0.0/es5.js</exclude>
-						<exclude>**/escheduler-ui/src/combo/1.0.0/base.css</exclude>
-						<exclude>**/escheduler-ui/src/view/home/index.html</exclude>
-						<exclude>**/escheduler-ui/src/view/common/outro.inc</exclude>
-						<exclude>**/escheduler-ui/src/view/common/meta.inc</exclude>
-						<exclude>**/escheduler-ui/src/view/login/index.html</exclude>
-						<exclude>**/escheduler-ui/src/font/demo_index.html</exclude>
+						<exclude>**/dolphinscheduler-ui/src/lib/**</exclude>
+						<exclude>**/dolphinscheduler-ui/src/js/module/util/cookie.js</exclude>
+						<exclude>**/dolphinscheduler-ui/src/font/awesome/font-awesome.css</exclude>
+						<exclude>**/dolphinscheduler-ui/src/sass/common/_animation.scss</exclude>
+						<exclude>**/dolphinscheduler-ui/src/sass/common/_normalize.scss</exclude>
+						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/es5.js</exclude>
+						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/base.css</exclude>
+						<exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
+						<exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
+						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
+						<exclude>**/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java</exclude>
 					</excludes>
 					<consoleOutput>true</consoleOutput>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${spotbugs.version}</version>
+				<configuration>
+					<xmlOutput>true</xmlOutput>
+					<threshold>medium</threshold>
+					<effort>default</effort>
+					<excludeFilterFile>dev-config/spotbugs-exclude.xml</excludeFilterFile>
+					<failOnError>true</failOnError>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.github.spotbugs</groupId>
+						<artifactId>spotbugs</artifactId>
+						<version>4.0.0-beta4</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${checkstyle.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>8.18</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<consoleOutput>true</consoleOutput>
+					<encoding>UTF-8</encoding>
+					<configLocation>style/checkstyle.xml</configLocation>
+					<suppressionsLocation>style/checkstyle-suppressions.xml</suppressionsLocation>
+					<suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+					<failOnViolation>true</failOnViolation>
+					<violationSeverity>warning</violationSeverity>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+					<sourceDirectories>
+						<sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+					</sourceDirectories>
+					<excludes>**\/generated-sources\/</excludes>
+					<skip>true</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>${cobertura-maven-plugin.version}</version>
+				<configuration>
+					<check>
+					</check>
+					<aggregate>true</aggregate>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<quiet>true</quiet>
+					<format>xml</format>
+					<instrumentation>
+						<ignoreTrivial>true</ignoreTrivial>
+						<ignoreMethodAnnotations>
+							<ignoreMethodAnnotation>lombok.Generated</ignoreMethodAnnotation>
+						</ignoreMethodAnnotations>
+						<excludes>
+						</excludes>
+					</instrumentation>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -542,12 +754,14 @@
 	</build>
 
 	<modules>
-		<module>escheduler-server</module>
-		<module>escheduler-common</module>
-		<module>escheduler-api</module>
-		<module>escheduler-dao</module>
-		<module>escheduler-alert</module>
-		<module>escheduler-rpc</module>
+		<module>dolphinscheduler-ui</module>
+		<module>dolphinscheduler-server</module>
+		<module>dolphinscheduler-common</module>
+		<module>dolphinscheduler-api</module>
+		<module>dolphinscheduler-dao</module>
+		<module>dolphinscheduler-alert</module>
+		<module>dolphinscheduler-rpc</module>
+		<module>dolphinscheduler-dist</module>
 	</modules>
 
 </project>
