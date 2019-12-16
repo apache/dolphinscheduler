@@ -36,6 +36,12 @@ public final class Constants {
      */
     public static final String HADOOP_PROPERTIES_PATH = "/common/hadoop/hadoop.properties";
 
+
+    /**
+     * run config
+     */
+    public static final String RUN_CONFIG = "/config/run_config.conf";
+
     /**
      * common properties path
      */
