@@ -92,13 +92,7 @@
 			</includes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-api/target/</directory>
-			<includes>
-				<include>dolphinscheduler-api-${project.version}.jar</include>
-			</includes>
-			<outputDirectory>lib</outputDirectory>
-		</fileSet>
+
 		<!--api end-->
 
 		<!--server start-->
@@ -131,22 +125,10 @@
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
 
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-server/target/</directory>
-			<includes>
-				<include>dolphinscheduler-server-${project.version}.jar</include>
-			</includes>
-			<outputDirectory>lib</outputDirectory>
-		</fileSet>
+
 		<!--server end-->
 
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-rpc/target/</directory>
-			<includes>
-				<include>dolphinscheduler-rpc-${project.version}.jar</include>
-			</includes>
-			<outputDirectory>lib</outputDirectory>
-		</fileSet>
+
 
 		<fileSet>
 			<directory>${basedir}/../../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
