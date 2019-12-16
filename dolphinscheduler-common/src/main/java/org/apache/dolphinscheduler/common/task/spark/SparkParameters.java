@@ -215,7 +215,7 @@ public class SparkParameters extends AbstractParameters {
 
   @Override
   public boolean checkParameters() {
-    return mainJar != null && programType != null;
+    return mainJar != null && programType != null && sparkVersion != null;
   }
 
 
@@ -224,7 +224,7 @@ public class SparkParameters extends AbstractParameters {
     if(resourceList !=null ) {
       this.resourceList.add(mainJar);
       return resourceList.stream()
-              .map(p -> p.getRes()).collect(Collectors.toList());
+              .map(ResourceInfo::getRes).collect(Collectors.toList());
     }
     return null;
   }
