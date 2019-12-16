@@ -117,7 +117,7 @@
 
                             <defineStatements>
                                 <!-- disable compile python when rpm build -->
-                                <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
+                                <defineStatement>__os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')</defineStatement>
                             </defineStatements>
                             <mappings>
                                 <mapping>

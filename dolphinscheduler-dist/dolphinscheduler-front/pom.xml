@@ -64,7 +64,6 @@
                         <extensions>true</extensions>
                         <executions>
                             <execution>
-                                <!-- unbinds rpm creation from maven lifecycle -->
                                 <phase>package</phase>
                                 <goals>
                                     <goal>attached-rpm</goal>
@@ -79,7 +78,10 @@
                             <packager>dolphinscheduler</packager>
                             <!-- <version>${project.version}</version> -->
                             <prefix>/opt/soft</prefix>
-
+                            <defineStatements>
+                                <!-- disable compile python when rpm build -->
+                                <defineStatement>__os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-python-bytecompile[[:space:]].*$!!g')</defineStatement>
+                            </defineStatements>
 
                             <mappings>
                                 <mapping>
@@ -101,12 +103,12 @@
                                                 ${basedir}/../release-docs
                                             </location>
                                             <includes>
-                                                <include>./*</include>
+                                                <include>**/*.*</include>
                                             </includes>
                                         </source>
                                         <source>
                                             <location>
-                                                ${basedir}/../.././
+                                                ${basedir}/../../
                                             </location>
                                             <includes>
                                                 <include>DISCLAIMER</include>
