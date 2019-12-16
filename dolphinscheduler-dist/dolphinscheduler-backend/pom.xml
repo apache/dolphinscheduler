@@ -107,15 +107,7 @@
                         </executions>
                         <defineStatements>
                             <!-- disable compile python -->
-                            <defineStatement>__os_install_post
-                                /usr/lib/rpm/redhat/brp-compress
-                                %{!?__debug_package:
-                                /usr/lib/rpm/redhat/brp-strip %{__strip}
-                                /usr/lib/rpm/redhat/brp-strip-comment-note %{__strip} %{__objdump}
-                                }
-                                /usr/lib/rpm/redhat/brp-strip-static-archive %{__strip}
-                                /usr/lib/rpm/redhat/brp-python-hardlink
-                            </defineStatement>
+                            <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
                         </defineStatements>
                         <configuration>
                             <name>apache-dolphinscheduler-incubating-backend</name>
