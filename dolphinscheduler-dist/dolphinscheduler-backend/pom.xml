@@ -168,14 +168,6 @@
                                     <username>root</username>
                                     <groupname>root</groupname>
                                     <sources>
-                                        <source>
-                                            <location>
-                                                ${basedir}/../../dolphinscheduler-common/src/main/resources/bin
-                                            </location>
-                                            <includes>
-                                                <include>*.*</include>
-                                            </includes>
-                                        </source>
 
                                         <source>
                                             <location>
