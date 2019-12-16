@@ -612,8 +612,7 @@
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<includes>
-						<include>**/*CollectionUtilsTest.java</include><!--run test classes-->
-						<include>**/*DateUtilsTest.java</include>
+						<include>**/common/utils/*.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
