@@ -958,6 +958,10 @@ public class ProcessDao {
     public Boolean submitTaskToQueue(TaskInstance taskInstance) {
 
         try{
+            if(taskInstance.getState().typeIsFinished()){
+                logger.info(String.format("submit to task queue, but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
+                return true;
+            }
             // task cannot submit when running
             if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
                 logger.info(String.format("submit to task queue, but task [%s] state already be running. ", taskInstance.getName()));
