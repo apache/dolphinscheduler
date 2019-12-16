@@ -66,14 +66,7 @@
 			</includes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-common/src/main/resources/bin</directory>
-			<includes>
-				<include>*.*</include>
-			</includes>
-			<directoryMode>755</directoryMode>
-			<outputDirectory>bin</outputDirectory>
-		</fileSet>
+
 		<fileSet>
 			<directory>${basedir}/../../dolphinscheduler-dao/src/main/resources</directory>
 			<includes>
