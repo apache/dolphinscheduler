@@ -80,4 +80,74 @@ public class DateUtilsTest {
         Assert.assertEquals(DateUtils.dateToString(curr), "2019-02-01 00:00:00");
         Assert.assertEquals(DateUtils.dateToString(DateUtils.getSomeDay(d1, -31)), "2018-12-31 00:00:00");
     }
+
+    @Test
+    public void getFirstDayOfMonth() {
+        Date d1 = DateUtils.stringToDate("2019-01-31 00:00:00");
+        Date curr = DateUtils.getFirstDayOfMonth(d1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-01 00:00:00");
+
+        d1 = DateUtils.stringToDate("2019-01-31 01:59:00");
+        curr = DateUtils.getFirstDayOfMonth(d1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-01 01:59:00");
+    }
+
+    @Test
+    public void getSomeHourOfDay() {
+        Date d1 = DateUtils.stringToDate("2019-01-31 11:59:59");
+        Date curr = DateUtils.getSomeHourOfDay(d1, -1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 10:00:00");
+        curr = DateUtils.getSomeHourOfDay(d1, 0);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 11:00:00");
+        curr = DateUtils.getSomeHourOfDay(d1, 2);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 13:00:00");
+        curr = DateUtils.getSomeHourOfDay(d1, 24);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-02-01 11:00:00");
+    }
+
+    @Test
+    public void getLastDayOfMonth() {
+        Date d1 = DateUtils.stringToDate("2019-01-31 11:59:59");
+        Date curr = DateUtils.getLastDayOfMonth(d1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 11:59:59");
+        d1 = DateUtils.stringToDate("2019-01-02 11:59:59");
+        curr = DateUtils.getLastDayOfMonth(d1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 11:59:59");
+
+        d1 = DateUtils.stringToDate("2019-02-02 11:59:59");
+        curr = DateUtils.getLastDayOfMonth(d1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-02-28 11:59:59");
+
+        d1 = DateUtils.stringToDate("2020-02-02 11:59:59");
+        curr = DateUtils.getLastDayOfMonth(d1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2020-02-29 11:59:59");
+    }
+
+    @Test
+    public void getStartOfDay() {
+        Date d1 = DateUtils.stringToDate("2019-01-31 11:59:59");
+        Date curr = DateUtils.getStartOfDay(d1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 00:00:00");
+    }
+
+    @Test
+    public void getEndOfDay() {
+        Date d1 = DateUtils.stringToDate("2019-01-31 11:00:59");
+        Date curr = DateUtils.getEndOfDay(d1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 23:59:59");
+    }
+
+    @Test
+    public void getStartOfHour() {
+        Date d1 = DateUtils.stringToDate("2019-01-31 11:00:59");
+        Date curr = DateUtils.getStartOfHour(d1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 11:00:00");
+    }
+
+    @Test
+    public void getEndOfHour() {
+        Date d1 = DateUtils.stringToDate("2019-01-31 11:00:59");
+        Date curr = DateUtils.getEndOfHour(d1);
+        Assert.assertEquals(DateUtils.dateToString(curr), "2019-01-31 11:59:59");
+    }
 }
