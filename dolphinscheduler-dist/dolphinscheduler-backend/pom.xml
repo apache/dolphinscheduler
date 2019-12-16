@@ -154,7 +154,7 @@
                                     <sources>
                                         <source>
                                             <location>
-                                                ${basedir}/../../../lib/
+                                                ${basedir}/../../dolphinscheduler-dist/dolphinscheduler-backend/target/lib
                                             </location>
                                             <includes>
                                                 <include>*.*</include>
