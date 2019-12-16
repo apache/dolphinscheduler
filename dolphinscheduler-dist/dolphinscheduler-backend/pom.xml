@@ -105,10 +105,7 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <defineStatements>
-                            <!-- disable compile python -->
-                            <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
-                        </defineStatements>
+
                         <configuration>
                             <name>apache-dolphinscheduler-incubating-backend</name>
                             <release>1</release>
@@ -118,7 +115,18 @@
                             <!-- <version>${project.version}</version> -->
                             <prefix>/opt/soft</prefix>
 
-
+                            <defineStatements>
+                                <!-- disable compile python when rpm build -->
+                                <defineStatement>__os_install_post
+                                    /usr/lib/rpm/redhat/brp-compress
+                                    %{!?__debug_package:
+                                    /usr/lib/rpm/redhat/brp-strip %{__strip}
+                                    /usr/lib/rpm/redhat/brp-strip-comment-note %{__strip} %{__objdump}
+                                    }
+                                    /usr/lib/rpm/redhat/brp-strip-static-archive %{__strip}
+                                    /usr/lib/rpm/redhat/brp-python-hardlink
+                                </defineStatement>
+                            </defineStatements>
                             <mappings>
                                 <mapping>
                                     <directory>/opt/soft/${project.build.finalName}-dolphinscheduler-backend-bin/conf</directory>
