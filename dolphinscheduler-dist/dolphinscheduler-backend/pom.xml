@@ -154,7 +154,7 @@
                                     <sources>
                                         <source>
                                             <location>
-                                                ${basedir}/lib/
+                                                ${basedir}/../../../lib/
                                             </location>
                                             <includes>
                                                 <include>*.*</include>
