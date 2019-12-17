@@ -273,7 +273,7 @@
                             </mappings>
 
                             <postremoveScriptlet>
-                                <script>rm -rf /opt/soft/${project.artifactId}-${project.version}</script>
+                                <script>rm -rf /opt/soft/apache-dolphinscheduler-incubating-${project.version}</script>
                             </postremoveScriptlet>
                         </configuration>
                     </plugin>
