@@ -68,6 +68,7 @@ public abstract class AbstractYarnTask extends AbstractTask {
     } catch (Exception e) {
       logger.error("yarn process failure", e);
       exitStatusCode = -1;
+      throw e;
     }
   }
 
