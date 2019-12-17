@@ -134,7 +134,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                     return task;
                 }
                 if(!taskDBFlag){
-                    logger.error("task commit to mysql failed , task has already retry {} times, please check the database", retryTimes);
+                    logger.error("task commit to db failed , task has already retry {} times, please check the database", retryTimes);
                 }else if(!taskQueueFlag){
                     logger.error("task commit to queue failed , task has already retry {} times, please check the database", retryTimes);
 
