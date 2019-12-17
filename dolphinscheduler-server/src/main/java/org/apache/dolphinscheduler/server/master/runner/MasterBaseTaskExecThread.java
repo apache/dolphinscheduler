@@ -116,9 +116,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         int retryTimes = 1;
         boolean taskDBFlag = false;
         boolean taskQueueFlag = false;
+        TaskInstance task = null;
         while (true){
             try {
-                TaskInstance task = null;
                 if(!taskDBFlag){
                     // submit task to db
                     task = processDao.submitTask(taskInstance, processInstance);
