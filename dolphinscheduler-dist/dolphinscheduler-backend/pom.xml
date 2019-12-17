@@ -107,9 +107,9 @@
                         </executions>
 
                         <configuration>
-                            <name>apache-dolphinscheduler-incubating-backend</name>
+                            <name>apache-dolphinscheduler-incubating</name>
                             <release>1</release>
-                            <distribution>apache dolphinscheduler incubating backend rpm</distribution>
+                            <distribution>apache dolphinscheduler incubating rpm</distribution>
                             <group>apache</group>
                             <packager>dolphinscheduler</packager>
                             <!-- <version>${project.version}</version> -->
