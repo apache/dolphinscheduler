@@ -41,12 +41,9 @@ public class ExcelUtils {
      */
     public static void genExcelFile(String content,String title,String xlsFilePath){
         List<LinkedHashMap> itemsList;
-        try {
-            itemsList = JSONUtils.toList(content, LinkedHashMap.class);
-        }catch (Exception e){
-            logger.error(String.format("json format incorrect : %s",content),e);
-            throw new RuntimeException("json format incorrect",e);
-        }
+
+        //The JSONUtils.toList has been try catch ex
+        itemsList = JSONUtils.toList(content, LinkedHashMap.class);
 
         if (itemsList == null || itemsList.size() == 0){
             logger.error("itemsList is null");
