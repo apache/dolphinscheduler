@@ -29,7 +29,7 @@ public class DependentTaskTest {
 
 
     @Test
-    public void testDependInit(){
+    public void testDependInit() throws Exception{
 
         TaskProps taskProps = new TaskProps();
 

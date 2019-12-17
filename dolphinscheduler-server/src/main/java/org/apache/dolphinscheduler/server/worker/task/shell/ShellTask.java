@@ -106,6 +106,7 @@ public class ShellTask extends AbstractTask {
     } catch (Exception e) {
       logger.error("shell task failure", e);
       exitStatusCode = -1;
+      throw e;
     }
   }
 
