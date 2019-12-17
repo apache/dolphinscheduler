@@ -615,6 +615,7 @@
 						<include>**/common/utils/*.java</include>
 						<include>**/common/graph/*.java</include>
 						<include>**/api/utils/CheckUtilsTest.java</include>
+						<include>**/api/utils/FileUtilsTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
