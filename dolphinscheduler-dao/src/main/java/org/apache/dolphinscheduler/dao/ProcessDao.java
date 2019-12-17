@@ -980,9 +980,9 @@ public class ProcessDao {
                 return true;
             }
             logger.info("task ready to queue: {}" , taskInstance);
-            taskQueue.add(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo(taskInstance));
+            boolean insertQueueResult = taskQueue.add(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo(taskInstance));
             logger.info(String.format("master insert into queue success, task : %s", taskInstance.getName()) );
-            return true;
+            return insertQueueResult;
         }catch (Exception e){
             logger.error("submit task to queue Exception: ", e);
             logger.error("task queue error : %s", JSONUtils.toJson(taskInstance));
