@@ -114,6 +114,7 @@
 		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
 		<mockito.version>2.21.0</mockito.version>
 		<powermock.version>2.0.2</powermock.version>
+		<jjwt.version>0.9.1</jjwt.version>
 	</properties>
 
 	<dependencyManagement>
@@ -513,6 +514,12 @@
 				<artifactId>jcip-annotations</artifactId>
 				<version>${jcip.version}</version>
 				<optional>true</optional>
+			</dependency>
+
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt</artifactId>
+				<version>${jjwt.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

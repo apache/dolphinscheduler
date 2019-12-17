@@ -303,6 +303,25 @@ public class TenantService extends BaseService{
   }
 
   /**
+   * query tenant list via tenant code
+   * @param tenantCode tenant code
+   * @return tenant list
+   */
+  public Map<String, Object> queryTenantList(String tenantCode) {
+    Map<String, Object> result = new HashMap<>(5);
+
+    List<Tenant> resourceList = tenantMapper.queryByTenantCode(tenantCode);
+    if (resourceList != null && resourceList.size() > 0) {
+      result.put(Constants.DATA_LIST, resourceList);
+      putMsg(result, Status.SUCCESS);
+    } else {
+      putMsg(result, Status.TENANT_NAME_EXIST);
+    }
+
+    return result;
+  }
+
+  /**
    * verify tenant code
    *
    * @param tenantCode tenant code

@@ -114,6 +114,31 @@ public class UsersService extends BaseService {
             return result;
         }
 
+        User user = createUser(userName, userPassword, email, tenantId, phone, queue);
+
+        Tenant tenant = tenantMapper.queryById(tenantId);
+        // resource upload startup
+        if (PropertyUtils.getResUploadStartupState()){
+            // if tenant not exists
+            if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))){
+                createTenantDirIfNotExists(tenant.getTenantCode());
+            }
+            String userPath = HadoopUtils.getHdfsUserDir(tenant.getTenantCode(),user.getId());
+            HadoopUtils.getInstance().mkdir(userPath);
+        }
+
+        putMsg(result, Status.SUCCESS);
+        return result;
+
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public User createUser(String userName,
+                                          String userPassword,
+                                          String email,
+                                          int tenantId,
+                                          String phone,
+                                          String queue) throws Exception {
         User user = new User();
         Date now = new Date();
 
@@ -133,21 +158,16 @@ public class UsersService extends BaseService {
 
         // save user
         userMapper.insert(user);
+        return user;
+    }
 
-        Tenant tenant = tenantMapper.queryById(tenantId);
-        // resource upload startup
-        if (PropertyUtils.getResUploadStartupState()){
-            // if tenant not exists
-            if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))){
-                createTenantDirIfNotExists(tenant.getTenantCode());
-            }
-            String userPath = HadoopUtils.getHdfsUserDir(tenant.getTenantCode(),user.getId());
-            HadoopUtils.getInstance().mkdir(userPath);
-        }
-
-        putMsg(result, Status.SUCCESS);
-        return result;
-
+    /**
+     * query user
+     * @param name name
+     * @return user info
+     */
+    public User queryUser(String name) {
+        return userMapper.queryByUserNameAccurately(name);
     }
 
     /**

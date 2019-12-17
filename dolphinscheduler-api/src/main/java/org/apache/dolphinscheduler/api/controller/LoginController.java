@@ -18,8 +18,8 @@ package org.apache.dolphinscheduler.api.controller;
 
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
-import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -55,7 +55,7 @@ public class LoginController extends BaseController {
     private SessionService sessionService;
 
     @Autowired
-    private UsersService userService;
+    private Authenticator authenticator;
 
 
     /**
@@ -94,7 +94,7 @@ public class LoginController extends BaseController {
             }
 
             // verify username and password
-            User user = userService.queryUser(userName, userPassword);
+            User user = authenticator.authenticate(userName, userPassword);
 
             if (user == null) {
                 return error(Status.USER_NAME_PASSWD_ERROR.getCode(),Status.USER_NAME_PASSWD_ERROR.getMsg()
