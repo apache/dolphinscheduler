@@ -34,7 +34,7 @@ public class DependentDateUtils {
     public static List<DateInterval> getLastHoursInterval(Date businessDate, int hourNumber){
         List<DateInterval> dateIntervals = new ArrayList<>();
         for(int index = hourNumber; index > 0; index--){
-            Date lastHour = DateUtils.getSomeHourOfDay(businessDate, index);
+            Date lastHour = DateUtils.getSomeHourOfDay(businessDate, -index);
             Date beginTime = DateUtils.getStartOfHour(lastHour);
             Date endTime = DateUtils.getEndOfHour(lastHour);
             dateIntervals.add(new DateInterval(beginTime, endTime));
