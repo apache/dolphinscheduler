@@ -174,6 +174,9 @@ public class SqlTask extends AbstractTask {
 
             // execute sql task
             con = executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
         } finally {
             if (con != null) {
                 try {

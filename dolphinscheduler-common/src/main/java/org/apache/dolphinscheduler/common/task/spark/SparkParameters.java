@@ -95,6 +95,11 @@ public class SparkParameters extends AbstractParameters {
    */
   private ProgramType programType;
 
+  /**
+   * spark version
+   */
+  private String sparkVersion;
+
   public ResourceInfo getMainJar() {
     return mainJar;
   }
@@ -200,9 +205,17 @@ public class SparkParameters extends AbstractParameters {
     this.programType = programType;
   }
 
+  public String getSparkVersion() {
+    return sparkVersion;
+  }
+
+  public void setSparkVersion(String sparkVersion) {
+    this.sparkVersion = sparkVersion;
+  }
+
   @Override
   public boolean checkParameters() {
-    return mainJar != null && programType != null;
+    return mainJar != null && programType != null && sparkVersion != null;
   }
 
 
@@ -211,7 +224,7 @@ public class SparkParameters extends AbstractParameters {
     if(resourceList !=null ) {
       this.resourceList.add(mainJar);
       return resourceList.stream()
-              .map(p -> p.getRes()).collect(Collectors.toList());
+              .map(ResourceInfo::getRes).collect(Collectors.toList());
     }
     return null;
   }
