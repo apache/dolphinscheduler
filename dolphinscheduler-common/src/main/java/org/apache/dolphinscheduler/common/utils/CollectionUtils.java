@@ -86,21 +86,20 @@ public class CollectionUtils {
      * @return string to map
      */
     public static Map<String, String> stringToMap(String str, String separator, String keyPrefix) {
-        if (null == str || "".equals(str)) {
-            return null;
+        Map<String, String> emptyMap = new HashMap<>(0);
+        if (StringUtils.isEmpty(str)) {
+            return emptyMap;
         }
-        if (null == separator || "".equals(separator)) {
-            return null;
+        if (StringUtils.isEmpty(separator)) {
+            return emptyMap;
         }
         String[] strings = str.split(separator);
-        int mapLength = strings.length;
-        if ((strings.length % 2) != 0) {
-            mapLength = mapLength + 1;
-        }
-
-        Map<String, String> map = new HashMap<>(mapLength);
+        Map<String, String> map = new HashMap<>(strings.length);
         for (int i = 0; i < strings.length; i++) {
             String[] strArray = strings[i].split("=");
+            if (strArray.length != 2) {
+                return emptyMap;
+            }
             //strArray[0] KEY  strArray[1] VALUE
             if (StringUtils.isEmpty(keyPrefix)) {
                 map.put(strArray[0], strArray[1]);
@@ -146,7 +145,7 @@ public class CollectionUtils {
          * @param obj the object
          * @return the maximum frequency of the object
          */
-        public final int max(final Object obj) {
+        private int max(final Object obj) {
             return Math.max(freqA(obj), freqB(obj));
         }
 
@@ -156,7 +155,7 @@ public class CollectionUtils {
          * @param obj the object
          * @return the minimum frequency of the object
          */
-        public final int min(final Object obj) {
+        private int min(final Object obj) {
             return Math.min(freqA(obj), freqB(obj));
         }
 
@@ -180,10 +179,10 @@ public class CollectionUtils {
             return getFreq(obj, cardinalityB);
         }
 
-        private final int getFreq(final Object obj, final Map<?, Integer> freqMap) {
+        private int getFreq(final Object obj, final Map<?, Integer> freqMap) {
             final Integer count = freqMap.get(obj);
             if (count != null) {
-                return count.intValue();
+                return count;
             }
             return 0;
         }
@@ -203,7 +202,7 @@ public class CollectionUtils {
             return true;
         }
 
-        if ((a == null && b != null) || a != null && b == null) {
+        if (a == null || b == null) {
             return false;
         }
 
@@ -253,12 +252,7 @@ public class CollectionUtils {
     public static <O> Map<O, Integer> getCardinalityMap(final Iterable<? extends O> coll) {
         final Map<O, Integer> count = new HashMap<O, Integer>();
         for (final O obj : coll) {
-            final Integer c = count.get(obj);
-            if (c == null) {
-                count.put(obj, Integer.valueOf(1));
-            } else {
-                count.put(obj, Integer.valueOf(c.intValue() + 1));
-            }
+            count.put(obj, count.getOrDefault(obj, 0) + 1);
         }
         return count;
     }
@@ -273,6 +267,12 @@ public class CollectionUtils {
      */
     public static <T extends Object> List<Map<String, Object>> getListByExclusion(List<T> originList, Set<String> exclusionSet) {
         List<Map<String, Object>> instanceList = new ArrayList<>();
+        if (exclusionSet == null) {
+            exclusionSet = new HashSet<>();
+        }
+        if (originList == null) {
+            return instanceList;
+        }
         Map<String, Object> instanceMap;
         for (T instance : originList) {
             Map<String, Object> dataMap = new BeanMap(instance);
