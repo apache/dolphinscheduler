@@ -612,6 +612,7 @@
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<includes>
+						<include>**/alert/utils/ExcelUtilsTest.java</include>
 						<include>**/api/utils/CheckUtilsTest.java</include>
 						<include>**/api/utils/FileUtilsTest.java</include>
 						<include>**/common/graph/*.java</include>
