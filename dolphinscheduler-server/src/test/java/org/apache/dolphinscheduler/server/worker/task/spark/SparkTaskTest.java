@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.SparkArgsUtils;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,6 +134,8 @@ public class SparkTaskTest {
         String sparkArgs = String.join(" ", args);
 
         logger.info("spark task command : {}", sparkArgs);
+
+        Assert.assertEquals(sparkArgs.split(" ")[0], SPARK2_COMMAND );
 
     }
 }
