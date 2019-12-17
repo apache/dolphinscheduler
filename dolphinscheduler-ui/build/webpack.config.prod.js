@@ -128,10 +128,6 @@ const config = merge.smart(baseConfig, {
     }),
     new CopyWebpackPlugin([
       {
-        from: resolve('src/combo'),
-        to: resolve('dist/combo')
-      },
-      {
         from: resolve('src/lib'),
         to: resolve('dist/lib')
       },

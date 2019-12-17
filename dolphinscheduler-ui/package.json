@@ -4,17 +4,16 @@
   "description": "dolphinscheduler",
   "author": "gongzijian <gongzijian@analysys.com.cn>",
   "scripts": {
-    "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./build/webpack.config.prod.js",
+    "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./build/webpack.config.prod.js && cp -rf src/3rdcss dist && cp -rf src/3rdjs dist",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.config.dev.js",
     "clean": "rimraf dist",
     "lint": "standard \"**/*.{js,vue}\"",
     "lint:fix": "standard \"**/*.{js,vue}\" --fix",
     "start": "npm run dev",
-    "combo": "node ./build/combo.js",
     "build:combined": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.combined.js"
   },
   "dependencies": {
-    "ans-ui": "1.1.4",
+    "ans-ui": "1.1.5",
     "axios": "^0.16.2",
     "jquery": "1.12.4",
     "vue": "^2.5.17",
@@ -37,7 +36,6 @@
     "ignore": [
       "src/~/**",
       "src/font/*",
-      "src/combo/**",
       "dist/**",
       "src/lib/**",
       "build/**"
