@@ -1,8 +1,26 @@
-<!--<script src="https://s1.analysys.cn/libs/??vue/2.5.2/vue.js,vue-router/2.7.0/vue-router.min.js,vuex/3.0.0/vuex.min.js,jquery/3.3.1/jquery.min.js,lodash.js/4.17.5/lodash.min.js"></script> -->
-<!--<script src="https://s1.analysys.cn/libs/??jqueryui/1.12.1/jquery-ui.min.js,twitter-bootstrap/3.3.7/js/bootstrap.min.js,jsPlumb/2.8.5/js/jsplumb.min.js"></script> -->
-<!--<script src="https://s1.analysys.cn/libs/??highlight.js/9.13.1/highlight.min.js,element-ui/2.4.9/index.js,clipboard.js/2.0.1/clipboard.min.js,d3/3.3.6/d3.min.js,dayjs/1.7.8/dayjs.min.js"></script> -->
-
-<script src="${locals.PUBLIC_PATH}/combo/1.0.0/3rd.js?v1.0.0.1" type="text/javascript"></script>
-
-
-
+<base href="/">
+<script src="${locals.PUBLIC_PATH}/3rdjs/canvg.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/clipboard.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/codemirror.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/d3.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/dayjs.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/echarts.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/es5-sham.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/es5-shim.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/html2canvas.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/jquery.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/jquery-ui.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/jsplumb.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/lodash.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/python.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/shell.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/show-hint.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/sql-hint.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/sql.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/textile.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/vue-router.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/vue.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/vuex.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/xml-hint.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/xml.min.js" type="text/javascript"></script>
+<script src="${locals.PUBLIC_PATH}/3rdjs/bootstrap.min.js" type="text/javascript"></script>
