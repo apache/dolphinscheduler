@@ -613,10 +613,14 @@
 				<configuration>
 					<includes>
 						<include>**/common/utils/*.java</include>
+						<include>**/api/utils/CheckUtilsTest.java</include>
+						<include>**/api/utils/FileUtilsTest.java</include>
+
 						<include>**/common/graph/*.java</include>
 						<include>**/common/queue/*.java</include>
 						<include>**/api/utils/CheckUtilsTest.java</include>
 						<include>**/api/utils/FileUtilsTest.java</include>
+            <include>**/alert/utils/ExcelUtilsTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
