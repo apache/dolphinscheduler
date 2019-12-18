@@ -272,7 +272,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
     }
 
     @Override
-    public void removeNode(String key, String nodeValue){
+    public boolean removeNode(String key, String nodeValue){
 
         CuratorFramework zk = getZkClient();
         String tasksQueuePath = getTasksPath(key) + Constants.SINGLE_SLASH;
@@ -283,8 +283,10 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
             if(stat != null){
                 zk.delete().forPath(taskIdPath);
             }
+            return true;
         }catch(Exception e){
             logger.error(String.format("delete task:%s from zookeeper fail, exception:" ,nodeValue) ,e);
+            return false;
         }
 
     }
@@ -297,9 +299,10 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      * To be compatible with the redis implementation, add an element to the set
      * @param key   The key is the kill/cancel queue path name
      * @param value host-taskId  The name of the zookeeper node
+     * @return
      */
     @Override
-    public void sadd(String key,String value) {
+    public boolean sadd(String key, String value) {
         try {
 
             if(value != null && value.trim().length() > 0){
@@ -317,9 +320,11 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
             }else{
                 logger.warn("add host-taskId:{} to tasks set is empty ",value);
             }
+            return true;
 
         } catch (Exception e) {
             logger.error("add task to tasks set exception",e);
+            return false;
         }
     }
 
@@ -328,9 +333,10 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      * delete the value corresponding to the key in the set
      * @param key   The key is the kill/cancel queue path name
      * @param value host-taskId-taskType The name of the zookeeper node
+     * @return
      */
     @Override
-    public void srem(String key, String value) {
+    public boolean srem(String key, String value) {
         try{
             String path = getTasksPath(key) + Constants.SINGLE_SLASH;
             CuratorFramework zk = getZkClient();
@@ -342,9 +348,10 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
             }else{
                 logger.info("delete task:{} from tasks set fail, there is no this task",value);
             }
-
+            return true;
         }catch(Exception e){
             logger.error(String.format("delete task:" + value + " exception"),e);
+            return false;
         }
     }
 
@@ -401,9 +408,10 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
 
     /**
      * Clear the task queue of zookeeper node
+     * @return
      */
     @Override
-    public void delete(){
+    public boolean delete(){
         try {
             String tasksQueuePath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
             String tasksCancelPath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_KILL);
@@ -421,9 +429,10 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
 
                 }
             }
-
+            return true;
         } catch (Exception e) {
             logger.error("delete all tasks in tasks queue failure",e);
+            return false;
         }
     }
 

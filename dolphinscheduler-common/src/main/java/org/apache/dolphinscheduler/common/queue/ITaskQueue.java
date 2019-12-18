@@ -60,24 +60,25 @@ public interface ITaskQueue {
      * remove a element from queue
      * @param key
      * @param value
+     * @return
      */
-    void removeNode(String key, String value);
+    boolean removeNode(String key, String value);
 
     /**
      * add an element to the set
-     *
-     * @param key
+     *  @param key
      * @param value
+     * @return
      */
-    void sadd(String key, String value);
+    boolean sadd(String key, String value);
 
     /**
      * delete the value corresponding to the key in the set
-     *
-     * @param key
+     *  @param key
      * @param value
+     * @return
      */
-    void srem(String key, String value);
+    boolean srem(String key, String value);
 
     /**
      * gets all the elements of the set based on the key
@@ -90,6 +91,7 @@ public interface ITaskQueue {
 
     /**
      * clear the task queue for use by junit tests only
+     * @return
      */
-    void delete();
+    boolean delete();
 }
