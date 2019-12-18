@@ -99,7 +99,7 @@ public class DependentTask extends AbstractTask {
     }
 
     @Override
-    public void handle(){
+    public void handle() throws Exception {
         // set the name of the current thread
         String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
@@ -135,6 +135,7 @@ public class DependentTask extends AbstractTask {
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             exitStatusCode = -1;
+            throw e;
         }
     }
 
