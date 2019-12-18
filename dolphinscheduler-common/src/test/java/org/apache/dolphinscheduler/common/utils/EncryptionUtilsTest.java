@@ -16,20 +16,20 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.util.List;
 
-public class OSUtilsTest {
-    private static final Logger logger = LoggerFactory.getLogger(OSUtilsTest.class);
+/**
+ * encryption utils
+ */
+public class EncryptionUtilsTest {
 
 
     @Test
-    public void getUserList() {
-        List<String> userList = OSUtils.getUserList();
-        Assert.assertNotEquals("System user list should not be empty", userList.size(), 0);
-        logger.info("OS user list : {}", userList.toString());
+    public void getMd5() {
+        Assert.assertEquals(EncryptionUtils.getMd5(null), EncryptionUtils.getMd5(""));
     }
+
 }
