@@ -147,7 +147,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
     public List<String> poll(String key, int tasksNum) {
         try{
             CuratorFramework zk = getZkClient();
-            String tasksQueuePath = getTasksPath(key) + Constants.SINGLE_SLASH;
             List<String> list = zk.getChildren().forPath(getTasksPath(key));
 
             if(list != null && list.size() > 0){
@@ -156,7 +155,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                 String workerIpLongStr = String.valueOf(IpUtils.ipToLong(workerIp));
 
                 int size = list.size();
-
 
                 Set<String> taskTreeSet = new TreeSet<>(new Comparator<String>() {
                     @Override
@@ -185,7 +183,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                     String taskDetail = list.get(i);
                     String[] taskDetailArrs = taskDetail.split(Constants.UNDERLINE);
 
-                    //forward compatibility 向前版本兼容
+                    //forward compatibility
                     if(taskDetailArrs.length >= 4){
 
                         //format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
@@ -203,9 +201,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                             formatTask += Constants.UNDERLINE + taskDetailArrs[4];
                         }
                         taskTreeSet.add(formatTask);
-
                     }
-
                 }
 
                 List<String> taskslist = getTasksListFromTreeSet(tasksNum, taskTreeSet);
