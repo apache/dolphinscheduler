@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,9 @@ public class QueueService extends BaseService {
 
     @Autowired
     private QueueMapper queueMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * query queue list
@@ -70,9 +74,9 @@ public class QueueService extends BaseService {
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return queue list
      */
     public Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
@@ -86,7 +90,7 @@ public class QueueService extends BaseService {
 
         IPage<Queue> queueList = queueMapper.queryQueuePaging(page, searchVal);
 
-        Integer count = (int)queueList.getTotal();
+        Integer count = (int) queueList.getTotal();
         PageInfo<Queue> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotalCount(count);
         pageInfo.setLists(queueList.getRecords());
@@ -100,7 +104,7 @@ public class QueueService extends BaseService {
      * create queue
      *
      * @param loginUser login user
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return create result
      */
@@ -110,12 +114,12 @@ public class QueueService extends BaseService {
             return result;
         }
 
-        if(StringUtils.isEmpty(queue)){
+        if (StringUtils.isEmpty(queue)) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
             return result;
         }
 
-        if(StringUtils.isEmpty(queueName)){
+        if (StringUtils.isEmpty(queueName)) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queueName);
             return result;
         }
@@ -148,8 +152,8 @@ public class QueueService extends BaseService {
      * update queue
      *
      * @param loginUser login user
-     * @param queue queue
-     * @param id queue id
+     * @param queue     queue
+     * @param id        queue id
      * @param queueName queue name
      * @return update result code
      */
@@ -173,7 +177,7 @@ public class QueueService extends BaseService {
 
         // check queue name is exist
         if (!queueName.equals(queueObj.getQueueName())) {
-            if(checkQueueNameExist(queueName)){
+            if (checkQueueNameExist(queueName)) {
                 putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
                 return result;
             }
@@ -181,10 +185,17 @@ public class QueueService extends BaseService {
 
         // check queue value is exist
         if (!queue.equals(queueObj.getQueue())) {
-            if(checkQueueExist(queue)){
+            if (checkQueueExist(queue)) {
                 putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
                 return result;
             }
+        }
+
+        // check old queue using by any user
+        if (checkUserRelatedQueue(queueObj.getQueueName(), queueName)) {
+            //update user related old queue
+            Integer relatedUserNums = userMapper.updateUserQueue(queueObj.getQueueName(), queueName);
+            logger.info("old queue have related {} user, exec update user success.", relatedUserNums);
         }
 
         // update queue
@@ -194,6 +205,7 @@ public class QueueService extends BaseService {
         queueObj.setUpdateTime(now);
 
         queueMapper.updateById(queueObj);
+
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -202,12 +214,12 @@ public class QueueService extends BaseService {
     /**
      * verify queue and queueName
      *
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
     public Result verifyQueue(String queue, String queueName) {
-        Result result=new Result();
+        Result result = new Result();
 
         if (StringUtils.isEmpty(queue)) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
@@ -220,13 +232,13 @@ public class QueueService extends BaseService {
         }
 
 
-        if(checkQueueNameExist(queueName)){
+        if (checkQueueNameExist(queueName)) {
             logger.error("queue name {} has exist, can't create again.", queueName);
             putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
             return result;
         }
 
-        if(checkQueueExist(queue)){
+        if (checkQueueExist(queue)) {
             logger.error("queue value {} has exist, can't create again.", queue);
             putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
             return result;
@@ -240,21 +252,35 @@ public class QueueService extends BaseService {
      * check queue exist
      * if exists return true，not exists return false
      * check queue exist
+     *
      * @param queue queue
      * @return true if the queue not exists, otherwise return false
      */
     private boolean checkQueueExist(String queue) {
-        return queueMapper.queryAllQueueList(queue, null).size()>0 ? true : false;
+        return queueMapper.queryAllQueueList(queue, null).size() > 0;
     }
 
     /**
      * check queue name exist
      * if exists return true，not exists return false
+     *
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
     private boolean checkQueueNameExist(String queueName) {
-        return queueMapper.queryAllQueueList(null ,queueName).size() > 0 ? true : false;
+        return queueMapper.queryAllQueueList(null, queueName).size() > 0;
+    }
+
+    /**
+     * check old queue name using by any user
+     * if need to update user
+     *
+     * @param queueOld old queue name
+     * @param queueNew new queue name
+     * @return true if need to update user
+     */
+    private boolean checkUserRelatedQueue(String queueOld, String queueNew) {
+        return !queueOld.equals(queueNew) && userMapper.queryUserListByQueue(queueOld).size() > 0;
     }
 
 }

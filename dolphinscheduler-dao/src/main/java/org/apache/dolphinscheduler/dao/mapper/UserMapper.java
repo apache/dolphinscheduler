@@ -95,4 +95,18 @@ public interface UserMapper extends BaseMapper<User> {
      */
     User queryUserByToken(@Param("token") String token);
 
+    /**
+     * query user by queue name
+     * @param queueName queue name
+     * @return user list
+     */
+    List<User> queryUserListByQueue(@Param("queueName") String queueName);
+
+    /**
+     * update user with old queue
+     * @param queueOld old queue name
+     * @param queueNew new queue name
+     * @return update rows
+     */
+    Integer updateUserQueue(@Param("queueOld") String queueOld, @Param("queueNew") String queueNew);
 }
