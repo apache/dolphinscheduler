@@ -24,7 +24,7 @@ import java.util.List;
 
 public class OSUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(OSUtilsTest.class);
-    
+
     @Test
     public void getUserList() {
         List<String> userList = OSUtils.getUserList();

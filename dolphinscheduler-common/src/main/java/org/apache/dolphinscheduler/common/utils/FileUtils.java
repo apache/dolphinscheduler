@@ -110,7 +110,6 @@ public class FileUtils {
      * create directory and user
      * @param execLocalPath execute local path
      * @param userName user name
-     * @param logger logger
      * @throws IOException errors
      */
     public static void createWorkDirAndUserIfAbsent(String execLocalPath, String userName) throws IOException{
