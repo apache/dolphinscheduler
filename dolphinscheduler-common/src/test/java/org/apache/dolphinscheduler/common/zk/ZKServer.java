@@ -39,7 +39,7 @@ public class ZKServer {
 
     private static volatile PublicZooKeeperServerMain zkServer = null;
 
-    public static final int DEFAULT_ZK_TEST_PORT = 22181;
+    public static final int DEFAULT_ZK_TEST_PORT = 2181;
 
     public static final String DEFAULT_ZK_STR = "localhost:" + DEFAULT_ZK_TEST_PORT;
 
