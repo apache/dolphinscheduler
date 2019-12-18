@@ -28,7 +28,7 @@
 
 	<fileSets>
 		<fileSet>
-			<directory>${basedir}/../../</directory>
+			<directory>${basedir}/../</directory>
 			<useDefaultExcludes>true</useDefaultExcludes>
 			<includes>
 				<include>**/*</include>
