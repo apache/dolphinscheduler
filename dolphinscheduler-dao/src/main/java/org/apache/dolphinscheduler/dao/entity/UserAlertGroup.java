@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 
@@ -28,114 +29,18 @@ import java.util.Date;
  * user alert group
  */
 @Data
+@ToString
 @TableName("t_ds_relation_user_alertgroup")
 public class UserAlertGroup {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    /**
-     * id
-     */
     @TableField("alertgroup_id")
     private int alertgroupId;
-
-    /**
-     * alert group name
-     */
     @TableField(exist = false)
     private String alertgroupName;
-
-    /**
-     * user id
-     */
     private int userId;
-
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
-
-    /**
-     * create time
-     */
     private Date createTime;
-
-    /**
-     * update time
-     */
     private Date updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getAlertgroupId() {
-        return alertgroupId;
-    }
-
-    public void setAlertgroupId(int alertgroupId) {
-        this.alertgroupId = alertgroupId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getAlertgroupName() {
-        return alertgroupName;
-    }
-
-    public void setAlertgroupName(String alertgroupName) {
-        this.alertgroupName = alertgroupName;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    @Override
-    public String toString() {
-        return "UserAlertGroup{" +
-                "id=" + id +
-                ", alertgroupId=" + alertgroupId +
-                ", alertgroupName='" + alertgroupName + '\'' +
-                ", userId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
 }

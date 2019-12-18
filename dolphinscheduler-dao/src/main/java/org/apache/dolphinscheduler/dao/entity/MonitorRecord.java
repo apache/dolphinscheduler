@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import lombok.Data;
+import lombok.ToString;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 
@@ -24,106 +26,14 @@ import java.util.Date;
 /**
  * monitor record for database
  */
+@Data
+@ToString
 public class MonitorRecord {
-
     private DbType dbType;
-
-    /**
-     * is normal or not , 1: normal
-     */
     private Flag state;
-
-    /**
-     * max connections
-     */
     private long maxConnections;
-
-    /**
-     * max used connections
-     */
     private long maxUsedConnections;
-
-    /**
-     * threads connections
-     */
     private long threadsConnections;
-
-    /**
-     * threads running connections
-     */
     private long threadsRunningConnections;
-
-    /**
-     * start date
-     */
     private Date date;
-
-    public Flag getState() {
-        return state;
-    }
-
-    public void setState(Flag state) {
-        this.state = state;
-    }
-
-    public long getMaxConnections() {
-        return maxConnections;
-    }
-
-    public void setMaxConnections(long maxConnections) {
-        this.maxConnections = maxConnections;
-    }
-
-    public long getMaxUsedConnections() {
-        return maxUsedConnections;
-    }
-
-    public void setMaxUsedConnections(long maxUsedConnections) {
-        this.maxUsedConnections = maxUsedConnections;
-    }
-
-    public long getThreadsConnections() {
-        return threadsConnections;
-    }
-
-    public void setThreadsConnections(long threadsConnections) {
-        this.threadsConnections = threadsConnections;
-    }
-
-    public long getThreadsRunningConnections() {
-        return threadsRunningConnections;
-    }
-
-    public void setThreadsRunningConnections(long threadsRunningConnections) {
-        this.threadsRunningConnections = threadsRunningConnections;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    @Override
-    public String toString() {
-        return "MonitorRecord{" +
-                "state=" + state +
-                ", dbType=" + dbType +
-                ", maxConnections=" + maxConnections +
-                ", maxUsedConnections=" + maxUsedConnections +
-                ", threadsConnections=" + threadsConnections +
-                ", threadsRunningConnections=" + threadsRunningConnections +
-                ", date=" + date +
-                '}';
-    }
-
-    public DbType getDbType() {
-        return dbType;
-    }
-
-    public void setDbType(DbType dbType) {
-        this.dbType = dbType;
-    }
 }

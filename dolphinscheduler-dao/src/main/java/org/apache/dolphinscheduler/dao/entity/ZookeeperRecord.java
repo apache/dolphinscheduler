@@ -16,202 +16,34 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.util.Date;
 
 /**
  * monitor record for zookeeper
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class ZookeeperRecord {
-
-    /**
-     * hostname
-     */
     private String hostname;
-
-    /**
-     * connections
-     */
     private int connections;
-
-    /**
-     * max connections
-     */
     private int watches;
-
-    /**
-     * sent
-     */
     private long sent;
-
-    /**
-     * received
-     */
     private long received;
-
-    /**
-     * mode: leader or follower
-     */
     private String mode;
-
-    /**
-     * min Latency
-     */
     private int minLatency;
-
-    /**
-     * avg Latency
-     */
     private int avgLatency;
-
-    /**
-     * max Latency
-     */
     private int maxLatency;
-
-    /**
-     * node count
-     */
     private int nodeCount;
-
-    /**
-     * date
-     */
     private Date date;
-
-
     /**
      * is normal or not, 1:normal
      */
     private int state;
-
-
-    public ZookeeperRecord(String hostname,int connections, int watches, long sent, long received, String mode, int minLatency, int avgLatency, int maxLatency, int nodeCount, int state,Date date) {
-        this.hostname = hostname;
-        this.connections = connections;
-        this.watches = watches;
-        this.sent = sent;
-        this.received = received;
-        this.mode = mode;
-        this.minLatency = minLatency;
-        this.avgLatency = avgLatency;
-        this.maxLatency = maxLatency;
-        this.nodeCount = nodeCount;
-        this.state = state;
-        this.date = date;
-    }
-
-
-    public String getHostname() {
-        return hostname;
-    }
-
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
-    }
-
-    public int getConnections() {
-        return connections;
-    }
-
-    public void setConnections(int connections) {
-        this.connections = connections;
-    }
-
-    public int getWatches() {
-        return watches;
-    }
-
-    public void setWatches(int watches) {
-        this.watches = watches;
-    }
-
-    public long getSent() {
-        return sent;
-    }
-
-    public void setSent(long sent) {
-        this.sent = sent;
-    }
-
-    public long getReceived() {
-        return received;
-    }
-
-    public void setReceived(long received) {
-        this.received = received;
-    }
-
-    public String getMode() {
-        return mode;
-    }
-
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-
-    public int getMinLatency() {
-        return minLatency;
-    }
-
-    public void setMinLatency(int minLatency) {
-        this.minLatency = minLatency;
-    }
-
-    public int getAvgLatency() {
-        return avgLatency;
-    }
-
-    public void setAvgLatency(int avgLatency) {
-        this.avgLatency = avgLatency;
-    }
-
-    public int getMaxLatency() {
-        return maxLatency;
-    }
-
-    public void setMaxLatency(int maxLatency) {
-        this.maxLatency = maxLatency;
-    }
-
-    public int getNodeCount() {
-        return nodeCount;
-    }
-
-    public void setNodeCount(int nodeCount) {
-        this.nodeCount = nodeCount;
-    }
-
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    @Override
-    public String toString() {
-        return "ZookeeperRecord{" +
-                "hostname='" + hostname + '\'' +
-                ", connections=" + connections +
-                ", watches=" + watches +
-                ", sent=" + sent +
-                ", received=" + received +
-                ", mode='" + mode + '\'' +
-                ", minLatency=" + minLatency +
-                ", avgLatency=" + avgLatency +
-                ", maxLatency=" + maxLatency +
-                ", nodeCount=" + nodeCount +
-                ", date=" + date +
-                ", state=" + state +
-                '}';
-    }
 }

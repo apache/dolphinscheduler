@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.dolphinscheduler.common.enums.*;
 
 import java.util.Date;
@@ -26,88 +29,29 @@ import java.util.Date;
 /**
  * command
  */
+@Data
+@NoArgsConstructor
+@ToString
 @TableName("t_ds_error_command")
 public class ErrorCommand {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private int id;
-
-    /**
-     * command type
-     */
     private CommandType commandType;
-
-    /**
-     * process definition id
-     */
     private int processDefinitionId;
-
-    /**
-     * executor id
-     */
     private int executorId;
-
-    /**
-     * command parameter, format json
-     */
     private String commandParam;
-
-    /**
-     * task depend type
-     */
     private TaskDependType taskDependType;
-
-    /**
-     * failure strategy
-     */
     private FailureStrategy failureStrategy;
-
-    /**
-     *  warning type
-     */
     private WarningType warningType;
-
-    /**
-     * warning group id
-     */
     private Integer warningGroupId;
-
-    /**
-     * schedule time
-     */
     private Date scheduleTime;
-
-    /**
-     * start time
-     */
     private Date startTime;
-
-    /**
-     * process instance priority
-     */
     private Priority processInstancePriority;
-
-    /**
-     * update time
-     */
     private Date updateTime;
-
-    /**
-     * 执行信息
-     */
     private String message;
-
-    /**
-     * worker group id
-     */
     private int workerGroupId;
 
-    public ErrorCommand(){}
-
-    public ErrorCommand(Command command, String message){
+    public ErrorCommand(Command command, String message) {
         this.id = command.getId();
         this.commandType = command.getCommandType();
         this.executorId = command.getExecutorId();
@@ -123,175 +67,4 @@ public class ErrorCommand {
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
     }
-
-    public ErrorCommand(
-            CommandType commandType,
-            TaskDependType taskDependType,
-            FailureStrategy failureStrategy,
-            int executorId,
-            int processDefinitionId,
-            String commandParam,
-            WarningType warningType,
-            int warningGroupId,
-            Date scheduleTime,
-            Priority processInstancePriority,
-            String message){
-        this.commandType = commandType;
-        this.executorId = executorId;
-        this.processDefinitionId = processDefinitionId;
-        this.commandParam = commandParam;
-        this.warningType = warningType;
-        this.warningGroupId = warningGroupId;
-        this.scheduleTime = scheduleTime;
-        this.taskDependType = taskDependType;
-        this.failureStrategy = failureStrategy;
-        this.startTime = new Date();
-        this.updateTime = new Date();
-        this.processInstancePriority = processInstancePriority;
-        this.message = message;
-    }
-
-
-    public TaskDependType getTaskDependType() {
-        return taskDependType;
-    }
-
-    public void setTaskDependType(TaskDependType taskDependType) {
-        this.taskDependType = taskDependType;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public CommandType getCommandType() {
-        return commandType;
-    }
-
-    public void setCommandType(CommandType commandType) {
-        this.commandType = commandType;
-    }
-
-    public int getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(int processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
-    }
-
-
-    public FailureStrategy getFailureStrategy() {
-        return failureStrategy;
-    }
-
-    public void setFailureStrategy(FailureStrategy failureStrategy) {
-        this.failureStrategy = failureStrategy;
-    }
-
-    public void setCommandParam(String commandParam) {
-        this.commandParam = commandParam;
-    }
-
-    public String getCommandParam() {
-        return commandParam;
-    }
-
-    public WarningType getWarningType() {
-        return warningType;
-    }
-
-    public void setWarningType(WarningType warningType) {
-        this.warningType = warningType;
-    }
-
-    public Integer getWarningGroupId() {
-        return warningGroupId;
-    }
-
-    public void setWarningGroupId(Integer warningGroupId) {
-        this.warningGroupId = warningGroupId;
-    }
-
-    public Date getScheduleTime() {
-        return scheduleTime;
-    }
-
-    public void setScheduleTime(Date scheduleTime) {
-        this.scheduleTime = scheduleTime;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public int getExecutorId() {
-        return executorId;
-    }
-
-    public void setExecutorId(int executorId) {
-        this.executorId = executorId;
-    }
-
-    public Priority getProcessInstancePriority() {
-        return processInstancePriority;
-    }
-
-    public void setProcessInstancePriority(Priority processInstancePriority) {
-        this.processInstancePriority = processInstancePriority;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public int getWorkerGroupId() {
-        return workerGroupId;
-    }
-
-    public void setWorkerGroupId(int workerGroupId) {
-        this.workerGroupId = workerGroupId;
-    }
-
-    @Override
-    public String toString() {
-        return "Command{" +
-                "id=" + id +
-                ", commandType=" + commandType +
-                ", processDefinitionId=" + processDefinitionId +
-                ", executorId=" + executorId +
-                ", commandParam='" + commandParam + '\'' +
-                ", taskDependType=" + taskDependType +
-                ", failureStrategy=" + failureStrategy +
-                ", warningType=" + warningType +
-                ", warningGroupId=" + warningGroupId +
-                ", scheduleTime=" + scheduleTime +
-                ", startTime=" + startTime +
-                ", processInstancePriority=" + processInstancePriority +
-                ", updateTime=" + updateTime +
-                ", message=" + message +
-                '}';
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-
 }

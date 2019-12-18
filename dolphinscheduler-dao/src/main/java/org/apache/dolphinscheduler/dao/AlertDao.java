@@ -56,21 +56,23 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * insert alert
+     *
      * @param alert alert
      * @return add alert result
      */
-    public int addAlert(Alert alert){
+    public int addAlert(Alert alert) {
         return alertMapper.insert(alert);
     }
 
     /**
      * update alert
+     *
      * @param alertStatus alertStatus
-     * @param log log
-     * @param id id
+     * @param log         log
+     * @param id          id
      * @return update alert result
      */
-    public int updateAlert(AlertStatus alertStatus,String log,int id){
+    public int updateAlert(AlertStatus alertStatus, String log, int id) {
         Alert alert = alertMapper.selectById(id);
         alert.setAlertStatus(alertStatus);
         alert.setUpdateTime(new Date());
@@ -80,21 +82,23 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * query user list by alert group id
-     * @param alerGroupId alerGroupId
+     *
+     * @param alertGroupId alertGroupId
      * @return user list
      */
-    public List<User> queryUserByAlertGroupId(int alerGroupId){
+    public List<User> queryUserByAlertGroupId(int alertGroupId) {
 
-        return userAlertGroupMapper.listUserByAlertgroupId(alerGroupId);
+        return userAlertGroupMapper.listUserByAlertgroupId(alertGroupId);
     }
 
     /**
      * MasterServer or WorkerServer stoped
-     * @param alertgroupId alertgroupId
-     * @param host host
-     * @param serverType serverType
+     *
+     * @param alertGroupId alertgroupId
+     * @param host         host
+     * @param serverType   serverType
      */
-    public void sendServerStopedAlert(int alertgroupId,String host,String serverType){
+    public void sendServerStopedAlert(int alertGroupId, String host, String serverType) {
         Alert alert = new Alert();
         String content = String.format("[{'type':'%s','host':'%s','event':'server down','warning level':'serious'}]",
                 serverType, host);
@@ -102,7 +106,7 @@ public class AlertDao extends AbstractBaseDao {
         alert.setShowType(ShowType.TABLE);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
-        alert.setAlertGroupId(alertgroupId);
+        alert.setAlertGroupId(alertGroupId);
         alert.setCreateTime(new Date());
         alert.setUpdateTime(new Date());
         alertMapper.insert(alert);
@@ -110,43 +114,39 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * process time out alert
-     * @param processInstance processInstance
+     *
+     * @param processInstance   processInstance
      * @param processDefinition processDefinition
      */
-    public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition){
-        int alertgroupId = processInstance.getWarningGroupId();
-        String receivers = processDefinition.getReceivers();
-        String receiversCc = processDefinition.getReceiversCc();
-        Alert alert = new Alert();
-        String content = String.format("[{'id':'%d','name':'%s','event':'timeout','warnLevel':'middle'}]",
-                processInstance.getId(), processInstance.getName());
-        alert.setTitle("Process Timeout Warn");
-        alert.setShowType(ShowType.TABLE);
-        alert.setContent(content);
-        alert.setAlertType(AlertType.EMAIL);
-        alert.setAlertGroupId(alertgroupId);
-        if (StringUtils.isNotEmpty(receivers)) {
-            alert.setReceivers(receivers);
-        }
-        if (StringUtils.isNotEmpty(receiversCc)) {
-            alert.setReceiversCc(receiversCc);
-        }
-        alert.setCreateTime(new Date());
-        alert.setUpdateTime(new Date());
+    public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProcessDefinition processDefinition) {
+        Alert alert = Alert
+                .builder()
+                .showType(ShowType.TABLE)
+                .content(String.format("[{'id':'%d','name':'%s','event':'timeout','warnLevel':'middle'}]",
+                        processInstance.getId(), processInstance.getName()))
+                .alertType(AlertType.EMAIL)
+                .alertGroupId(processInstance.getWarningGroupId())
+                .receivers(processDefinition.getReceivers())
+                .receiversCc(processDefinition.getReceiversCc())
+                .title("Process Timeout Warn")
+                .createTime(new Date())
+                .updateTime(new Date())
+                .build();
         alertMapper.insert(alert);
     }
 
     /**
      * task timeout warn
+     *
      * @param alertgroupId alertgroupId
-     * @param receivers receivers
-     * @param receiversCc receiversCc
-     * @param taskId taskId
-     * @param taskName taskName
+     * @param receivers    receivers
+     * @param receiversCc  receiversCc
+     * @param taskId       taskId
+     * @param taskName     taskName
      */
-    public void sendTaskTimeoutAlert(int alertgroupId,String receivers,String receiversCc,int taskId,String taskName){
+    public void sendTaskTimeoutAlert(int alertgroupId, String receivers, String receiversCc, int taskId, String taskName) {
         Alert alert = new Alert();
-        String content = String.format("[{'id':'%d','name':'%s','event':'timeout','warnLevel':'middle'}]",taskId,taskName);
+        String content = String.format("[{'id':'%d','name':'%s','event':'timeout','warnLevel':'middle'}]", taskId, taskName);
         alert.setTitle("Task Timeout Warn");
         alert.setShowType(ShowType.TABLE);
         alert.setContent(content);
@@ -165,18 +165,20 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * list the alert information of waiting to be executed
+     *
      * @return alert list
      */
-    public List<Alert> listWaitExecutionAlert(){
+    public List<Alert> listWaitExecutionAlert() {
         return alertMapper.listAlertByStatus(AlertStatus.WAIT_EXECUTION);
     }
 
     /**
      * list user information by alert group id
+     *
      * @param alertgroupId alertgroupId
      * @return user list
      */
-    public List<User> listUserByAlertgroupId(int alertgroupId){
+    public List<User> listUserByAlertgroupId(int alertgroupId) {
         return userAlertGroupMapper.listUserByAlertgroupId(alertgroupId);
     }
 

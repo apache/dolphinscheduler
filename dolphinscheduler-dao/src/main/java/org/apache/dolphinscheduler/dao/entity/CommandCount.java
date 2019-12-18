@@ -17,42 +17,13 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 
+import lombok.Data;
+import lombok.ToString;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 
+@Data
+@ToString
 public class CommandCount {
-
-
-    /**
-     * execution state
-     */
     private CommandType commandType;
-
-    /**
-     * count for state
-     */
     private int count;
-
-
-    @Override
-    public String toString(){
-        return "command count:" +
-                " commandType: "+ commandType.toString() +
-                " count: "+ count;
-    }
-
-    public CommandType getCommandType() {
-        return commandType;
-    }
-
-    public void setCommandType(CommandType commandType) {
-        this.commandType = commandType;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
 }

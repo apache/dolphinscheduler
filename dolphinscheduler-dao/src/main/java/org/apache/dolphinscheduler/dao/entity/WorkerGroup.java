@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 
@@ -27,70 +28,13 @@ import java.util.Date;
  * worker group for task running
  */
 @Data
+@ToString
 @TableName("t_ds_worker_group")
 public class WorkerGroup {
-
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
     private String name;
-
     private String ipList;
-
     private Date createTime;
-
     private Date updateTime;
-
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getIpList() {
-        return ipList;
-    }
-
-    public void setIpList(String ipList) {
-        this.ipList = ipList;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Worker group model{" +
-                "id= " + id +
-                ",name= " + name +
-                ",ipList= " + ipList +
-                ",createTime= " + createTime +
-                ",updateTime= " + updateTime +
-
-                "}";
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

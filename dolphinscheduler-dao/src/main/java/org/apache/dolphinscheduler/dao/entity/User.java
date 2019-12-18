@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 
+import lombok.ToString;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -32,199 +33,31 @@ import java.util.Date;
  * user
  */
 @Data
+@ToString
 @TableName("t_ds_user")
 @ApiModel(description = "UserModelDesc")
-public class  User {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+public class User {
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    /**
-     * user name
-     */
-    @ApiModelProperty(name = "userName", notes = "USER_NAME",dataType = "String",required = true)
+    @ApiModelProperty(name = "userName", notes = "USER_NAME", dataType = "String", required = true)
     private String userName;
-
-    /**
-     * user password
-     */
-    @ApiModelProperty(name = "userPassword", notes = "USER_PASSWORD",dataType = "String",required = true)
+    @ApiModelProperty(name = "userPassword", notes = "USER_PASSWORD", dataType = "String", required = true)
     private String userPassword;
-
-    /**
-     * mail
-     */
     private String email;
-
-    /**
-     * phone
-     */
     private String phone;
-
-    /**
-     * user type
-     */
     private UserType userType;
-
-    /**
-     *  tenant id
-     */
     private int tenantId;
-
-    /**
-     * tenant code
-     */
     @TableField(exist = false)
     private String tenantCode;
-
-    /**
-     * tenant name
-     */
     @TableField(exist = false)
     private String tenantName;
-
-    /**
-     * queue name
-     */
     @TableField(exist = false)
     private String queueName;
-
-    /**
-     * alert group
-     */
     @TableField(exist = false)
     private String alertGroup;
-
-    /**
-     * user specified queue
-     */
     private String queue;
-
-    /**
-     * create time
-     */
     private Date createTime;
-
-    /**
-     * update time
-     */
     private Date updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getUserPassword() {
-        return userPassword;
-    }
-
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public UserType getUserType() {
-        return userType;
-    }
-
-    public void setUserType(UserType userType) {
-        this.userType = userType;
-    }
-
-    public int getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(int tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getQueueName() {
-        return queueName;
-    }
-
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
-    }
-
-    public String getAlertGroup() {
-        return alertGroup;
-    }
-
-    public void setAlertGroup(String alertGroup) {
-        this.alertGroup = alertGroup;
-    }
-
-    public String getTenantName() {
-        return tenantName;
-    }
-
-    public void setTenantName(String tenantName) {
-        this.tenantName = tenantName;
-    }
-
-    public String getTenantCode() {
-        return tenantCode;
-    }
-
-    public void setTenantCode(String tenantCode) {
-        this.tenantCode = tenantCode;
-    }
-
-    public String getQueue() {
-        return queue;
-    }
-
-    public void setQueue(String queue) {
-        this.queue = queue;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -249,25 +82,5 @@ public class  User {
         int result = id;
         result = 31 * result + userName.hashCode();
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", userName='" + userName + '\'' +
-                ", userPassword='" + userPassword + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", userType=" + userType +
-                ", tenantId=" + tenantId +
-                ", tenantCode='" + tenantCode + '\'' +
-                ", tenantName='" + tenantName + '\'' +
-                ", queueName='" + queueName + '\'' +
-                ", alertGroup='" + alertGroup + '\'' +
-                ", queue='" + queue + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
     }
 }
