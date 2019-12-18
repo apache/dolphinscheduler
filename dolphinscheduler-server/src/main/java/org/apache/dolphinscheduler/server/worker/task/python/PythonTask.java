@@ -98,6 +98,7 @@ public class PythonTask extends AbstractTask {
     } catch (Exception e) {
       logger.error("python task failure", e);
       exitStatusCode = -1;
+      throw e;
     }
   }
 

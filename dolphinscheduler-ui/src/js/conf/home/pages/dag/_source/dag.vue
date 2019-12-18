@@ -22,6 +22,7 @@
         <div class="bar-box roundedRect jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected"
              :class="v === dagBarId ? 'active' : ''"
              :id="v"
+             :key="v"
              v-for="(item,v) in tasksTypeList"
              @mousedown="_getDagId(v)">
           <div data-toggle="tooltip" :title="item.description">
@@ -65,10 +66,12 @@
                v-for="(item,$index) in toolOperList"
                :class="_operationClass(item)"
                :id="item.code"
+               :key="$index"
                @click="_ckOperation(item,$event)">
               <i class="iconfont" v-html="item.icon" data-toggle="tooltip" :title="item.description" ></i>
             </a>
           </div>
+          <x-button type="text" icon="fa fa-play" @click="dagAutomaticLayout"></x-button>
           <x-button
                   data-toggle="tooltip"
                   :title="$t('Refresh DAG status')"
@@ -142,7 +145,8 @@
         isRtTasks: false,
         isRefresh: false,
         isLoading: false,
-        taskId: null
+        taskId: null,
+        arg: false,
       }
     },
     mixins: [disabledState],
@@ -153,9 +157,44 @@
     methods: {
       ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState']),
       ...mapMutations('dag', ['addTasks', 'resetParams', 'setIsEditDag', 'setName']),
-      init () {
+      
+      // DAG automatic layout
+      dagAutomaticLayout() {
+        $('#canvas').html('')
+
+      // Destroy round robin
+        Dag.init({
+        dag: this,
+        instance: jsPlumb.getInstance({
+          Endpoint: [
+            'Dot', { radius: 1, cssClass: 'dot-style' }
+          ],
+          Connector: 'Straight',
+          PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+          ConnectionOverlays: [
+            [
+              'Arrow',
+              {
+                location: 1,
+                id: 'arrow',
+                length: 12,
+                foldback: 0.8
+              }
+            ]
+          ],
+          Container: 'canvas'
+        })
+      })
         if (this.tasks.length) {
-          Dag.backfill()
+          Dag.backfill(true)
+        } else {
+          Dag.create()
+        }
+      },
+
+      init (args) {
+        if (this.tasks.length) {
+          Dag.backfill(args)
           // Process instances can view status
           if (this.type === 'instance') {
             this._getTaskState(false).then(res => {})
@@ -513,7 +552,7 @@
       })
     },
     mounted () {
-      this.init()
+      this.init(this.arg)
     },
     beforeDestroy () {
       this.resetParams()

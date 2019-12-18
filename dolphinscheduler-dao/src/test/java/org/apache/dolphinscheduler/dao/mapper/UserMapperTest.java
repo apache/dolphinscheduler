@@ -154,7 +154,7 @@ public class UserMapperTest {
         accessToken.setToken("secrettoken");
         accessToken.setCreateTime(new Date());
         accessToken.setUpdateTime(new Date());
-        accessToken.setExpireTime(DateUtils.getSomeHourOfDay(new Date(),-1));
+        accessToken.setExpireTime(DateUtils.getSomeHourOfDay(new Date(),1));
         accessTokenMapper.insert(accessToken);
         return accessToken;
     }

@@ -118,14 +118,16 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      * @param value    ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_host1,host2,...
      */
     @Override
-    public void add(String key, String value) {
+    public boolean add(String key, String value){
         try {
             String taskIdPath = getTasksPath(key) + Constants.SINGLE_SLASH + value;
             String result = getZkClient().create().withMode(CreateMode.PERSISTENT).forPath(taskIdPath, Bytes.toBytes(value));
 
             logger.info("add task : {} to tasks queue , result success",result);
+            return true;
         } catch (Exception e) {
             logger.error("add task to tasks queue exception",e);
+            return false;
         }
 
     }
