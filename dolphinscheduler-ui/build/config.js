@@ -18,8 +18,9 @@
 const path = require('path')
 const glob = require('globby')
 const webpack = require('webpack')
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const HtmlWebpackExtPlugin = require('html-webpack-ext-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const isProduction = process.env.NODE_ENV !== 'development'
 
 const resolve = dir => path.join(__dirname, '..', dir)
@@ -106,7 +107,7 @@ const pages = glob.sync(['*/!(_*).html'], { cwd: viewDir }).map(p => {
   }
   return new HtmlWebpackPlugin({
     filename: newPagePath || path.join('view', p),
-    template: `html-loader?min=false!${path.join(viewDir, p)}`,
+    template: `${path.join('src/view', p)}`,
     cache: true,
     inject: true,
     chunks: chunks,
@@ -121,14 +122,15 @@ const baseConfig = {
     publicPath: '/',
     filename: 'js/[name].[chunkhash:7].js'
   },
-  devServer: {
-    historyApiFallback: true,
-    hot: true,
-    inline: true,
-    progress: true
-  },
   module: {
     rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {
+          hotReload: !isProduction
+        }
+      },
       {
         test: /\.js$/,
         exclude: /(node_modules|bower_components)/,
@@ -143,9 +145,40 @@ const baseConfig = {
         ]
       },
       {
+        test: /\.(sa|sc|c)ss$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              hmr: !isProduction,
+            },
+          },
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: (loader) => [
+                require('autoprefixer')({
+                  overrideBrowserslist: [
+                    "Android 4.1",
+                    "iOS 7.1",
+                    "Chrome > 31",
+                    "ff > 31",
+                    "ie >= 8"
+                  ]
+                }),
+                require('cssnano')
+              ]
+            }
+          },
+          'sass-loader'
+        ]
+      },
+      {
         test: /\.(png|jpe?g|gif|svg|cur)(\?.*)?$/,
         loader: 'file-loader',
         options: {
+          esModule: false,
           name: 'images/[name].[ext]?[hash]'
         }
       },
@@ -153,6 +186,7 @@ const baseConfig = {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader',
         options: {
+          esModule: false,
           limit: 10000,
           // publicPath: distDir,
           name: 'font/[name].[hash:7].[ext]'
@@ -188,17 +222,10 @@ const baseConfig = {
     './codemirror': 'CodeMirror'
   },
   plugins: [
+    new VueLoaderPlugin(),
     new webpack.ProvidePlugin({ vue: 'Vue', _: 'lodash' }),
     new webpack.DefinePlugin({
       PUBLIC_PATH: JSON.stringify(process.env.PUBLIC_PATH ? process.env.PUBLIC_PATH : '')
-    }),
-    new HtmlWebpackExtPlugin({
-      cache: true,
-      delimiter: '$',
-      locals: {
-        NODE_ENV:isProduction,
-        PUBLIC_PATH: process.env.PUBLIC_PATH ? process.env.PUBLIC_PATH : ''
-      }
     }),
     ...pages
   ]

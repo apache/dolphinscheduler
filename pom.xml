@@ -109,7 +109,9 @@
 		<maven-source-plugin.version>2.4</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
 		<jacoco.version>0.8.4</jacoco.version>
+		<jcip.version>1.0</jcip.version>
 		<maven.deploy.skip>false</maven.deploy.skip>
+		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
@@ -517,6 +519,7 @@
 				</plugin>
 
 				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
 					<version>${maven-assembly-plugin.version}</version>
 				</plugin>
@@ -600,7 +603,7 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<encoding>${project.build.sourceEncoding}</encoding>
-					<skip>true</skip><!--not skip compile test classes-->
+					<skip>false</skip><!--not skip compile test classes-->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -609,7 +612,15 @@
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<includes>
-						<include>**/*Test*.java</include><!--run test classes-->
+						<include>**/common/utils/*.java</include>
+						<include>**/api/utils/CheckUtilsTest.java</include>
+						<include>**/api/utils/FileUtilsTest.java</include>
+
+						<include>**/common/graph/*.java</include>
+						<include>**/common/queue/*.java</include>
+						<include>**/api/utils/CheckUtilsTest.java</include>
+						<include>**/api/utils/FileUtilsTest.java</include>
+            <include>**/alert/utils/ExcelUtilsTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
@@ -712,6 +723,7 @@
 						<sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
 					</sourceDirectories>
 					<excludes>**\/generated-sources\/</excludes>
+					<skip>true</skip>
 				</configuration>
 				<executions>
 					<execution>
@@ -721,6 +733,27 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>${cobertura-maven-plugin.version}</version>
+				<configuration>
+					<check>
+					</check>
+					<aggregate>true</aggregate>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<quiet>true</quiet>
+					<format>xml</format>
+					<instrumentation>
+						<ignoreTrivial>true</ignoreTrivial>
+						<ignoreMethodAnnotations>
+							<ignoreMethodAnnotation>lombok.Generated</ignoreMethodAnnotation>
+						</ignoreMethodAnnotations>
+						<excludes>
+						</excludes>
+					</instrumentation>
+				</configuration>
 			</plugin>
 		</plugins>
 

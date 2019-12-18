@@ -32,6 +32,7 @@ public enum DbType {
    * 4 clickhouse
    * 5 oracle
    * 6 sqlserver
+   * 7 db2
    */
   MYSQL(0, "mysql"),
   POSTGRESQL(1, "postgresql"),
@@ -39,7 +40,8 @@ public enum DbType {
   SPARK(3, "spark"),
   CLICKHOUSE(4, "clickhouse"),
   ORACLE(5, "oracle"),
-  SQLSERVER(6, "sqlserver");
+  SQLSERVER(6, "sqlserver"),
+  DB2(7, "db2");
 
   DbType(int code, String descp){
     this.code = code;

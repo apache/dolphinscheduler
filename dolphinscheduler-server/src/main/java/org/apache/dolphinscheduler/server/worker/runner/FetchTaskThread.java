@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
 import org.apache.dolphinscheduler.common.thread.Stopper;
@@ -28,10 +30,9 @@ import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,11 +79,6 @@ public class FetchTaskThread implements Runnable{
     private int workerExecNums;
 
     /**
-     * conf
-     */
-    private Configuration conf;
-
-    /**
      *  task instance
      */
     private TaskInstance taskInstance;
@@ -92,18 +88,22 @@ public class FetchTaskThread implements Runnable{
      */
     Integer taskInstId;
 
-    public FetchTaskThread(int taskNum, ZKWorkerClient zkWorkerClient,
-                           ProcessDao processDao, Configuration conf,
+    /**
+     * worker config
+     */
+    private WorkerConfig workerConfig;
+
+    public FetchTaskThread(ZKWorkerClient zkWorkerClient,
+                           ProcessDao processDao,
                            ITaskQueue taskQueue){
-        this.taskNum = taskNum;
         this.zkWorkerClient = zkWorkerClient;
         this.processDao = processDao;
-        this.workerExecNums = conf.getInt(Constants.WORKER_EXEC_THREADS,
-                Constants.defaultWorkerExecThreadNum);
-        // worker thread pool executor
-        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Fetch-Task-Thread",workerExecNums);
-        this.conf = conf;
         this.taskQueue = taskQueue;
+        this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
+        this.taskNum = workerConfig.getWorkerFetchTaskNum();
+        this.workerExecNums = workerConfig.getWorkerExecThreads();
+        // worker thread pool executor
+        this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Fetch-Task-Thread", workerExecNums);
         this.taskInstance = null;
     }
 
@@ -145,7 +145,7 @@ public class FetchTaskThread implements Runnable{
             try {
                 ThreadPoolExecutor poolExecutor = (ThreadPoolExecutor) workerExecService;
                 //check memory and cpu usage and threads
-                boolean runCheckFlag = OSUtils.checkResource(this.conf, false) && checkThreadCount(poolExecutor);
+                boolean runCheckFlag = OSUtils.checkResource(workerConfig.getWorkerMaxCpuloadAvg(), workerConfig.getWorkerReservedMemory()) && checkThreadCount(poolExecutor);
 
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
 
@@ -222,7 +222,7 @@ public class FetchTaskThread implements Runnable{
                             new Date(),
                             execLocalPath);
 
-                    // check and create Linux users
+                    // check and create users
                     FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
                             tenant.getTenantCode(), logger);
 

@@ -235,9 +235,18 @@ public class ResourcesService extends BaseService {
             }
         }
 
-        // updateProcessInstance data
+        //get the file suffix
+        String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
+
+        //if the name without suffix then add it ,else use the origin name
+        String nameWithSuffix = name;
+        if(!name.endsWith(suffix)){
+            nameWithSuffix = nameWithSuffix + suffix;
+        }
+
+        // updateResource data
         Date now = new Date();
-        resource.setAlias(name);
+        resource.setAlias(nameWithSuffix);
         resource.setDescription(desc);
         resource.setUpdateTime(now);
 
