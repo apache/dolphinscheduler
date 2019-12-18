@@ -76,7 +76,7 @@
     </select>
     <update id="updateUserQueue" parameterType="java.lang.String">
         update t_ds_user
-        set queue = #{queueNew}
-        where queue = #{queueOld}
+        set queue = #{newQueue}
+        where queue = #{oldQueue}
     </update>
 </mapper>

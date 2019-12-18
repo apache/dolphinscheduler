@@ -192,7 +192,7 @@ public class QueueService extends BaseService {
         }
 
         // check old queue using by any user
-        if (checkUserRelatedQueue(queueObj.getQueueName(), queueName)) {
+        if (checkIfQueueIsInUsing(queueObj.getQueueName(), queueName)) {
             //update user related old queue
             Integer relatedUserNums = userMapper.updateUserQueue(queueObj.getQueueName(), queueName);
             logger.info("old queue have related {} user, exec update user success.", relatedUserNums);
@@ -275,12 +275,12 @@ public class QueueService extends BaseService {
      * check old queue name using by any user
      * if need to update user
      *
-     * @param queueOld old queue name
-     * @param queueNew new queue name
+     * @param oldQueue old queue name
+     * @param newQueue new queue name
      * @return true if need to update user
      */
-    private boolean checkUserRelatedQueue(String queueOld, String queueNew) {
-        return !queueOld.equals(queueNew) && userMapper.queryUserListByQueue(queueOld).size() > 0;
+    private boolean checkIfQueueIsInUsing (String oldQueue, String newQueue) {
+        return !oldQueue.equals(newQueue) && userMapper.queryUserListByQueue(oldQueue).size() > 0;
     }
 
 }

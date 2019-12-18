@@ -104,9 +104,9 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * update user with old queue
-     * @param queueOld old queue name
-     * @param queueNew new queue name
+     * @param oldQueue old queue name
+     * @param newQueue new queue name
      * @return update rows
      */
-    Integer updateUserQueue(@Param("queueOld") String queueOld, @Param("queueNew") String queueNew);
+    Integer updateUserQueue(@Param("oldQueue") String oldQueue, @Param("newQueue") String newQueue);
 }
