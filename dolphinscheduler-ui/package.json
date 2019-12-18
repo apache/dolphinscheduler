@@ -11,7 +11,7 @@
     "lint:fix": "standard \"**/*.{js,vue}\" --fix",
     "start": "npm run dev",
     "combo": "node ./build/combo.js",
-    "build:combined": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.combined.js"
+    "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.release.js"
   },
   "dependencies": {
     "ans-ui": "1.1.4",
