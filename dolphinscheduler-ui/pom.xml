@@ -71,12 +71,12 @@
             </configuration>
           </execution>
           <execution>
-            <id>npm run build</id>
+            <id>npm run build:release</id>
             <goals>
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run build</arguments>
+              <arguments>run build:release</arguments>
             </configuration>
           </execution>
         </executions>

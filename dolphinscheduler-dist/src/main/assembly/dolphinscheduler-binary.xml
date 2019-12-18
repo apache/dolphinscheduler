@@ -19,17 +19,17 @@
 		xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
-	<id>dolphinscheduler-backend-bin</id>
+	<id>dolphinscheduler-bin</id>
 	<formats>
 		<format>tar.gz</format>
 	</formats>
 	<includeBaseDirectory>true</includeBaseDirectory>
-	<baseDirectory>${project.build.finalName}-dolphinscheduler-backend-bin</baseDirectory>
+	<baseDirectory>${project.build.finalName}-dolphinscheduler-bin</baseDirectory>
 
 	<fileSets>
 		<!--alert start-->
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-alert/src/main/resources</directory>
+			<directory>${basedir}/../dolphinscheduler-alert/src/main/resources</directory>
 			<includes>
 				<include>**/*.properties</include>
 				<include>**/*.xml</include>
@@ -37,13 +37,6 @@
 				<include>**/*.ftl</include>
 			</includes>
 			<outputDirectory>./conf</outputDirectory>
-		</fileSet>
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-alert/target/</directory>
-			<includes>
-				<include>dolphinscheduler-alert-${project.version}.jar</include>
-			</includes>
-			<outputDirectory>lib</outputDirectory>
 		</fileSet>
 		<!--alert end-->
 
@@ -58,7 +51,7 @@
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-common/src/main/resources</directory>
+			<directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
 			<includes>
 				<include>**/*.properties</include>
 				<include>**/*.xml</include>
@@ -67,7 +60,7 @@
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-common/src/main/resources/bin</directory>
+			<directory>${basedir}/../dolphinscheduler-common/src/main/resources/bin</directory>
 			<includes>
 				<include>*.*</include>
 			</includes>
@@ -75,7 +68,7 @@
 			<outputDirectory>bin</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-dao/src/main/resources</directory>
+			<directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
 			<includes>
 				<include>**/*.properties</include>
 				<include>**/*.xml</include>
@@ -84,26 +77,19 @@
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-api/src/main/resources</directory>
+			<directory>${basedir}/../dolphinscheduler-api/src/main/resources</directory>
 			<includes>
 				<include>**/*.properties</include>
 				<include>**/*.xml</include>
 				<include>**/*.json</include>
 			</includes>
 			<outputDirectory>conf</outputDirectory>
-		</fileSet>
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-api/target/</directory>
-			<includes>
-				<include>dolphinscheduler-api-${project.version}.jar</include>
-			</includes>
-			<outputDirectory>lib</outputDirectory>
 		</fileSet>
 		<!--api end-->
 
 		<!--server start-->
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-server/src/main/resources</directory>
+			<directory>${basedir}/../dolphinscheduler-server/src/main/resources</directory>
 			<includes>
 				<include>**/*.properties</include>
 				<include>**/*.xml</include>
@@ -112,7 +98,7 @@
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-common/src/main/resources</directory>
+			<directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
 			<includes>
 				<include>**/*.properties</include>
 				<include>**/*.xml</include>
@@ -121,7 +107,7 @@
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-common/src/main/resources/bin</directory>
+			<directory>${basedir}/../dolphinscheduler-common/src/main/resources/bin</directory>
 			<includes>
 				<include>*.*</include>
 			</includes>
@@ -129,7 +115,7 @@
 			<outputDirectory>bin</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-dao/src/main/resources</directory>
+			<directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
 			<includes>
 				<include>**/*.properties</include>
 				<include>**/*.xml</include>
@@ -138,26 +124,10 @@
 			</includes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
-
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-server/target/</directory>
-			<includes>
-				<include>dolphinscheduler-server-${project.version}.jar</include>
-			</includes>
-			<outputDirectory>lib</outputDirectory>
-		</fileSet>
 		<!--server end-->
 
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-rpc/target/</directory>
-			<includes>
-				<include>dolphinscheduler-rpc-${project.version}.jar</include>
-			</includes>
-			<outputDirectory>lib</outputDirectory>
-		</fileSet>
-
-		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
+			<directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -165,7 +135,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
+			<directory>${basedir}/../dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -173,7 +143,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
+			<directory>${basedir}/../dolphinscheduler-alert/target/dolphinscheduler-alert-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
@@ -181,7 +151,15 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../sql</directory>
+			<directory>${basedir}/../dolphinscheduler-ui/dist</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>./ui</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../sql</directory>
 			<includes>
 				<include>**/*</include>
 			</includes>
@@ -189,7 +167,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../script</directory>
+			<directory>${basedir}/../script</directory>
 			<includes>
 				<include>*.*</include>
 			</includes>
@@ -197,7 +175,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../script</directory>
+			<directory>${basedir}/../script</directory>
 			<includes>
 				<include>config/*.*</include>
 				<include>env/*.*</include>
@@ -206,7 +184,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../../script</directory>
+			<directory>${basedir}/../script</directory>
 			<includes>
 				<include>start-all.sh</include>
 				<include>stop-all.sh</include>
@@ -216,7 +194,7 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../.././</directory>
+			<directory>${basedir}/.././</directory>
 			<includes>
 				<include>*.sh</include>
 				<include>*.py</include>
@@ -226,14 +204,11 @@
 		</fileSet>
 
 		<fileSet>
-			<directory>${basedir}/../release-docs</directory>
+			<directory>${basedir}/release-docs</directory>
 			<useDefaultExcludes>true</useDefaultExcludes>
 			<includes>
 				<include>**/*</include>
 			</includes>
-			<excludes>
-				<exclude>**/licenses/ui-licenses/**</exclude>
-			</excludes>
 			<outputDirectory>.</outputDirectory>
 		</fileSet>
 
@@ -247,7 +222,6 @@
 				<exclude>javax.servlet:servlet-api</exclude>
 				<exclude>org.eclipse.jetty.aggregate:jetty-all</exclude>
 				<exclude>org.slf4j:slf4j-log4j12</exclude>
-				<exclude>org.apache.dolphinscheduler:dolphinscheduler-backend</exclude>
 			</excludes>
 		</dependencySet>
 	</dependencySets>
