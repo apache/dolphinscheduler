@@ -171,6 +171,7 @@ public enum Status {
     QUERY_WORKER_GROUP_FAIL(100146,"query worker group fail "),
     DELETE_WORKER_GROUP_FAIL(100147,"delete worker group fail "),
 
+    GET_USER_TOKEN_ERROR(100148,"get user token error"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists"),

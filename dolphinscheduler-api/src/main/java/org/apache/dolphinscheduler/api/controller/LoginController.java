@@ -36,6 +36,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.Map;
+
 import static org.apache.dolphinscheduler.api.enums.Status.*;
 
 /**
@@ -94,27 +96,20 @@ public class LoginController extends BaseController {
             }
 
             // verify username and password
-            User user = authenticator.authenticate(userName, userPassword);
-
-            if (user == null) {
-                return error(Status.USER_NAME_PASSWD_ERROR.getCode(),Status.USER_NAME_PASSWD_ERROR.getMsg()
-                );
-            }
-
-            // create session
-            String sessionId = sessionService.createSession(user, ip);
-
-            if (sessionId == null) {
-                return error(Status.LOGIN_SESSION_FAILED.getCode(),
-                        Status.LOGIN_SESSION_FAILED.getMsg()
-                );
+            Result<Map<String, String>> result = authenticator.authenticate(userName, userPassword, ip);
+            if (result.getCode() != Status.SUCCESS.getCode()) {
+                return result;
             }
 
             response.setStatus(HttpStatus.SC_OK);
-            response.addCookie(new Cookie(Constants.SESSION_ID, sessionId));
+            Map<String, String> cookieMap = result.getData();
+            for (Map.Entry<String, String> cookieEntry : cookieMap.entrySet()) {
+                Cookie cookie = new Cookie(cookieEntry.getKey(), cookieEntry.getValue());
+                cookie.setHttpOnly(true);
+                response.addCookie(cookie);
+            }
 
-            logger.info("sessionId : {}" , sessionId);
-            return success(LOGIN_SUCCESS.getMsg(), sessionId);
+            return result;
         } catch (Exception e) {
             logger.error(USER_LOGIN_FAILURE.getMsg(),e);
             return error(USER_LOGIN_FAILURE.getCode(), USER_LOGIN_FAILURE.getMsg());

@@ -16,18 +16,64 @@
  */
 package org.apache.dolphinscheduler.api.security;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
+import java.util.Map;
 
 public class PasswordAuthenticator implements Authenticator {
+    private static final Logger logger = LoggerFactory.getLogger(PasswordAuthenticator.class);
 
     @Autowired
     private UsersService userService;
+    @Autowired
+    private SessionService sessionService;
+    @Autowired
+    private UserMapper userMapper;
 
     @Override
-    public User authenticate(String username, String password) {
+    public Result<Map<String, String>> authenticate(String username, String password, String extra) {
+        Result<Map<String, String>> result = new Result<>();
         // verify username and password
-        return userService.queryUser(username, password);
+        User user = userService.queryUser(username, password);
+        if (user == null) {
+            result.setCode(Status.USER_NAME_PASSWD_ERROR.getCode());
+            result.setMsg(Status.USER_NAME_PASSWD_ERROR.getMsg());
+            return result;
+        }
+
+        // create session
+        String sessionId = sessionService.createSession(user, extra);
+        if (sessionId == null) {
+            result.setCode(Status.LOGIN_SESSION_FAILED.getCode());
+            result.setMsg(Status.LOGIN_SESSION_FAILED.getMsg());
+            return result;
+        }
+        logger.info("sessionId : {}" , sessionId);
+        result.setData(Collections.singletonMap(Constants.SESSION_ID, sessionId));
+        result.setCode(Status.SUCCESS.getCode());
+        result.setMsg(Status.LOGIN_SUCCESS.getMsg());
+        return result;
+    }
+
+    @Override
+    public User getAuthUser(HttpServletRequest request) {
+        Session session = sessionService.getSession(request);
+        if (session == null) {
+            logger.info("session info is null ");
+            return null;
+        }
+        //get user object from session
+        return userMapper.selectById(session.getUserId());
     }
 }

@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -37,9 +38,18 @@ import java.security.spec.InvalidKeySpecException;
 public class JsonWebTokenAuthenticatorTest {
     private static Logger logger = LoggerFactory.getLogger(JsonWebTokenAuthenticatorTest.class);
 
+    @Before
+    public void setUp() throws Exception {
+        writePemToTempDir();
+    }
+
+    @Test
+    public void getAuthUser() {
+
+    }
+
     @Test
     public void getPublicKey() throws NoSuchAlgorithmException, IOException, InvalidKeySpecException {
-        writePemToTempDir();
         JsonWebTokenAuthenticator authenticator = new JsonWebTokenAuthenticator();
         PublicKey publicKey = authenticator.getPublicKey("/tmp/test_rsa_public_key.pem");
         Assert.assertNotNull(publicKey);

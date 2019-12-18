@@ -84,8 +84,10 @@
           this._gLogin().then(res => {
             setTimeout(() => {
               this.spinnerLoading = false
-              sessionStorage.setItem("sessionId", res.data)
-              cookie.set('sessionId', res.data,{ path: '/' })
+              if (res.data.hasOwnProperty("sessionId")) {
+                sessionStorage.setItem("sessionId", res.data)
+                cookie.set('sessionId', res.data,{ path: '/' })
+              }
               if (this.userName === 'admin') {
                 window.location.href = `${PUBLIC_PATH}/#/security/tenant`
               } else {

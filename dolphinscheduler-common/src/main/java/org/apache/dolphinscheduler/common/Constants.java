@@ -947,6 +947,11 @@ public final class Constants {
     public static final String PASSWORD_DEFAULT = "******";
 
     /**
+     * user auth
+     */
+    public static final String USER_AUTH = "auth";
+
+    /**
      * driver
      */
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";

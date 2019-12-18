@@ -14,27 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.common.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Map;
 
-public interface Authenticator {
-    /**
-     * Verifying legality via username and password
-     * @param username user name
-     * @param password user password
-     * @param extra extra info
-     * @return result object
-     */
-    Result<Map<String, String>> authenticate(String username, String password, String extra);
+/**
+ * jwt service
+ */
+@Service
+public class JsonWebTokenService  extends BaseService {
+    private static final Logger logger = LoggerFactory.getLogger(JsonWebTokenService.class);
 
     /**
-     * Get authenticated user
-     * @param request http servlet request
-     * @return user
+     * Get token from cookie
+     * @param request request
+     * @return token
      */
-    User getAuthUser(HttpServletRequest request);
+    public String getToken(HttpServletRequest request) {
+        Cookie cookie = getCookie(request, Constants.USER_AUTH);
+        if (cookie == null) {
+            logger.info("user auth cookie is empty");
+            return null;
+        }
+        return cookie.getValue();
+    }
 }
