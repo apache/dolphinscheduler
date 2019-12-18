@@ -39,7 +39,7 @@ public class ZKServer {
 
     private static volatile PublicZooKeeperServerMain zkServer = null;
 
-    public static final int DEFAULT_ZK_TEST_PORT = 22181;
+    public static final int DEFAULT_ZK_TEST_PORT = 2181;
 
     public static final String DEFAULT_ZK_STR = "localhost:" + DEFAULT_ZK_TEST_PORT;
 
@@ -80,6 +80,7 @@ public class ZKServer {
      */
     public static void startLocalZkServer(final int port) {
         startLocalZkServer(port, org.apache.commons.io.FileUtils.getTempDirectoryPath() + File.separator + "test-" + System.currentTimeMillis());
+        startLocalZkServer(port, org.apache.commons.io.FileUtils.getTempDirectoryPath() + "test-" + System.currentTimeMillis());
     }
 
     /**
@@ -137,6 +138,8 @@ public class ZKServer {
     public static void stop() {
         try {
             stopLocalZkServer(true);
+            logger.info("zk server stopped");
+
         } catch (Exception e) {
             logger.error("Failed to stop ZK ",e);
         }

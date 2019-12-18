@@ -8,7 +8,7 @@
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.config.dev.js",
     "clean": "rimraf dist",
     "start": "npm run dev",
-    "build:combined": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.combined.js && cp -rf src/3rdcss dist && cp -rf src/3rdjs dist"
+    "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.combined.js && cp -rf src/3rdcss dist && cp -rf src/3rdjs dist"
   },
   "dependencies": {
     "ans-ui": "1.1.5",
