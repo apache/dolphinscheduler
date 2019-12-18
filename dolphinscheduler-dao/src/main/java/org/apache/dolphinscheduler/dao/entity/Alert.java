@@ -57,9 +57,4 @@ public class Alert {
     private Date updateTime;
     @TableField(exist = false)
     private Map<String, Object> info = new HashMap<>();
-
-    public Alert(int id, String title) {
-        this.id = id;
-        this.title = title;
-    }
 }
