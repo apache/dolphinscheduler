@@ -45,7 +45,7 @@ public interface ITaskQueue {
      * @param key  queue name
      * @param value
      */
-    void add(String key, String value);
+    boolean add(String key, String value);
 
     /**
      * an element pops out of the queue
