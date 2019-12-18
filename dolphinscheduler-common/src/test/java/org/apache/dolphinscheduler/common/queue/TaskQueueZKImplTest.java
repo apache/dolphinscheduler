@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.common.queue;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-
-import org.apache.dolphinscheduler.common.zk.ZKServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -34,16 +32,14 @@ import static org.junit.Assert.*;
 /**
  * task queue test
  */
-public class TaskQueueZKImplTest  {
+public class TaskQueueZKImplTest extends BaseTaskQueueTest  {
 
 
-    private ITaskQueue tasksQueue = null;
+
 
     @Before
     public void before(){
 
-        ZKServer.start();
-        tasksQueue = TaskQueueFactory.getTaskQueueInstance();
         //clear all data
         tasksQueue.delete();
     }
@@ -52,9 +48,7 @@ public class TaskQueueZKImplTest  {
     public void after(){
         //clear all data
         tasksQueue.delete();
-        ZKServer.stop();
     }
-
 
     /**
      * test take out all the elements
