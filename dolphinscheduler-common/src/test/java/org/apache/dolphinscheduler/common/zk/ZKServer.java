@@ -79,7 +79,7 @@ public class ZKServer {
      * @param port The port to listen on
      */
     public static void startLocalZkServer(final int port) {
-        startLocalZkServer(port, org.apache.commons.io.FileUtils.getTempDirectoryPath() + File.separator + "test-" + System.currentTimeMillis());
+        startLocalZkServer(port, org.apache.commons.io.FileUtils.getTempDirectoryPath() + "test-" + System.currentTimeMillis());
     }
 
     /**
@@ -137,6 +137,7 @@ public class ZKServer {
     public static void stop() {
         try {
             stopLocalZkServer(true);
+            logger.info("zk server stopped");
         } catch (Exception e) {
             logger.error("Failed to stop ZK ",e);
         }
