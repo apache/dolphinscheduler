@@ -76,7 +76,7 @@
         </div>
         <div class="login-model" slot="reference">
           <span>{{activeLocale.name}}</span>
-          <i class="iconfont">&#xe61b;</i>
+          <i class="ans-icon-arrow-down"></i>
         </div>
       </x-poptip>
       </span>
@@ -87,18 +87,18 @@
               placement="bottom-end">
         <div class="lrns-list">
           <a href="javascript:" @click="_goAccount">
-            <i class="iconfont">&#xe629;</i>
+            <i class="ans-icon-user-empty"></i>
             <span>{{$t('User Information')}}</span>
           </a>
           <a href="javascript:" @click="_signOut">
-            <i class="iconfont">&#xe60c;</i>
+            <i class="ans-icon-off"></i>
             <span>{{$t('Logout')}}</span>
           </a>
         </div>
         <div class="login-model" slot="reference">
-          <i class="iconfont">&#xe638;</i>
+          <i class="ans-icon-user-solid"></i>
           <span>{{userInfo.userName}}</span>
-          <i class="iconfont">&#xe61b;</i>
+          <i class="ans-icon-arrow-down"></i>
         </div>
       </x-poptip>
     </div>
@@ -285,7 +285,7 @@
     created () {
       let language = cookie.get('language')
       this.activeLocale = language ? findLocale(language) : '中文'
-      this.docLink = NODE_ENV === 'true' ? 'docs' : `/view/docs/${this.activeLocale.code}/_book` // eslint-disable-line
+      this.docLink = process.env.NODE_ENV === 'true' ? 'docs' : `/view/docs/${this.activeLocale.code}/_book` // eslint-disable-line
     },
     computed: {
       ...mapState('user', ['userInfo'])

@@ -12,12 +12,18 @@
 <meta name="msapplication-navbutton-color" content="#4a8dee">
 <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1,minimum-scale=1">
 <link rel="shortcut icon" href="${locals.PUBLIC_PATH}/images/favicon.ico"/>
-<link href="${locals.PUBLIC_PATH}/combo/1.0.0/base.css?v1.0.0.1" rel="stylesheet">
-<link href="${locals.PUBLIC_PATH}/combo/1.0.0/3rd.css?v1.0.0.1" rel="stylesheet">
 
-<!--[if lt IE 9]>
-<script src="${locals.PUBLIC_PATH}/combo/1.0.0/es5.js"></script>
-<![endif]-->
+<base href="/">
+<link href="${locals.PUBLIC_PATH}/3rdcss/animate.css" rel="stylesheet">
+<link href="${locals.PUBLIC_PATH}/3rdcss/bootstrap.min.css" rel="stylesheet">
+<link href="${locals.PUBLIC_PATH}/3rdcss/codemirror.min.css" rel="stylesheet">
+<link href="${locals.PUBLIC_PATH}/3rdcss/jsplumbtoolkit-defaults.min.css" rel="stylesheet">
+<link href="${locals.PUBLIC_PATH}/3rdcss/mdn-like.min.css" rel="stylesheet">
+<link href="${locals.PUBLIC_PATH}/3rdcss/normalize.min.css" rel="stylesheet">
+<link href="${locals.PUBLIC_PATH}/3rdcss/reset.css" rel="stylesheet">
+<link href="${locals.PUBLIC_PATH}/3rdcss/show-hint.min.css" rel="stylesheet">
+<link href="${locals.PUBLIC_PATH}/3rdcss/vs.min.css" rel="stylesheet">
+
 
 <script>
   let NODE_ENV = '${locals.NODE_ENV}'
