@@ -34,7 +34,7 @@ public class HttpUtilsTest {
 
 
 	@Test
-	public void getTest(){
+	public void testGetTest(){
 		//success
 		String result = HttpUtils.get("https://github.com/manifest.json");
 		Assert.assertNotNull(result);
