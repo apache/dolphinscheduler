@@ -612,10 +612,16 @@
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<includes>
+						<include>**/common/utils/*.java</include>
+
+						<include>**/common/graph/*.java</include>
+						<include>**/common/queue/*.java</include>
 						<include>**/api/utils/CheckUtilsTest.java</include>
 						<include>**/api/utils/FileUtilsTest.java</include>
-						<include>**/common/graph/*.java</include>
-						<include>**/*CollectionUtilsTest.java</include><!--run test classes-->
+
+						<include>**/alert/utils/ExcelUtilsTest.java</include>
+						<include>**/alert/utils/FuncUtilsTest.java</include>
+						<include>**/alert/utils/JSONUtilsTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
