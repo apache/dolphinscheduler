@@ -91,6 +91,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     public Boolean waitTaskQuit(){
         // query new state
         taskInstance = processDao.findTaskInstanceById(taskInstance.getId());
+        logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
+                this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
         // task time out
         Boolean checkTimeout = false;
         TaskTimeoutParameter taskTimeoutParameter = getTaskTimeoutParameter();

@@ -174,6 +174,9 @@ public class SqlTask extends AbstractTask {
 
             // execute sql task
             con = executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
         } finally {
             if (con != null) {
                 try {
@@ -258,9 +261,7 @@ public class SqlTask extends AbstractTask {
                 Map<String, String> connParamMap = CollectionUtils.stringToMap(sqlParameters.getConnParams(),
                         SEMICOLON,
                         HIVE_CONF);
-                if(connParamMap != null){
-                    paramProp.putAll(connParamMap);
-                }
+                paramProp.putAll(connParamMap);
 
                 connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
                         paramProp);

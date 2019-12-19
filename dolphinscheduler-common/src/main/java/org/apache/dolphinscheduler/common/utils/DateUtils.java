@@ -291,14 +291,14 @@ public class DateUtils {
      * get some hour of day
      *
      * @param date date
-     * @param hours hours
+     * @param offsetHour hours
      * @return some hour of day
      * */
-    public static Date getSomeHourOfDay(Date date, int hours) {
+    public static Date getSomeHourOfDay(Date date, int offsetHour) {
         Calendar cal = Calendar.getInstance();
 
         cal.setTime(date);
-        cal.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY) - hours);
+        cal.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY) + offsetHour);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
