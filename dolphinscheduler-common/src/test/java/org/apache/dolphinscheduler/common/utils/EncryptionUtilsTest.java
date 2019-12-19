@@ -16,32 +16,20 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * HttpClient utils test
+ * encryption utils
  */
-public class HttpUtilsTest {
+public class EncryptionUtilsTest {
 
 
-	public static final Logger logger = LoggerFactory.getLogger(HttpUtilsTest.class);
+    @Test
+    public void testGetMd5() {
+        Assert.assertEquals(EncryptionUtils.getMd5(null), EncryptionUtils.getMd5(""));
+    }
 
-
-	@Test
-	public void testGetTest(){
-		//success
-		String result = HttpUtils.get("https://github.com/manifest.json");
-		Assert.assertNotNull(result);
-		JSONObject jsonObject = JSON.parseObject(result);
-		Assert.assertEquals(jsonObject.getString("name"), "GitHub");
-
-		result = HttpUtils.get("https://123.333.111.33/ccc");
-		Assert.assertNull(result);
-	}
 }
