@@ -315,7 +315,7 @@ public class TenantService extends BaseService{
       result.put(Constants.DATA_LIST, resourceList);
       putMsg(result, Status.SUCCESS);
     } else {
-      putMsg(result, Status.TENANT_NAME_EXIST);
+      putMsg(result, Status.TENANT_NOT_EXIST);
     }
 
     return result;

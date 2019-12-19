@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
 public class SecurityConfig {
     private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-    @Value("${security.authentication.type}")
+    @Value("${security.authentication.type:PASSWORD}")
     private String type;
 
     private AutowireCapableBeanFactory beanFactory;
@@ -58,8 +58,11 @@ public class SecurityConfig {
             case PASSWORD:
                 authenticator = new PasswordAuthenticator();
                 break;
-            case JWT:
-                authenticator = new JsonWebTokenAuthenticator();
+            case JWT_KEY:
+                authenticator = new JsonWebTokenSecretKeyAuthenticator();
+                break;
+            case JWT_RSA:
+                authenticator = new JsonWebTokenRSAAuthenticator();
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + authenticationType);

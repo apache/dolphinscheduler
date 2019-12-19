@@ -114,7 +114,7 @@
 		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
 		<mockito.version>2.21.0</mockito.version>
 		<powermock.version>2.0.2</powermock.version>
-		<jjwt.version>0.9.1</jjwt.version>
+		<jjwt.version>0.10.7</jjwt.version>
 	</properties>
 
 	<dependencyManagement>
@@ -516,10 +516,23 @@
 				<optional>true</optional>
 			</dependency>
 
+			<!--for jwt-->
 			<dependency>
 				<groupId>io.jsonwebtoken</groupId>
-				<artifactId>jjwt</artifactId>
+				<artifactId>jjwt-api</artifactId>
 				<version>${jjwt.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt-impl</artifactId>
+				<version>${jjwt.version}</version>
+				<scope>runtime</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.jsonwebtoken</groupId>
+				<artifactId>jjwt-jackson</artifactId>
+				<version>${jjwt.version}</version>
+				<scope>runtime</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

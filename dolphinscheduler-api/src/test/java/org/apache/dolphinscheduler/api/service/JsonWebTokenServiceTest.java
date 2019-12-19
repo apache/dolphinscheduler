@@ -14,30 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.security;
+package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.junit.Assert;
+import org.apache.dolphinscheduler.common.Constants;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
-@TestPropertySource(properties = {
-        "security.authentication.type=PASSWORD",
-})
-public class SecurityConfigTest {
-
+public class JsonWebTokenServiceTest {
     @Autowired
-    private SecurityConfig securityConfig;
+    JsonWebTokenService jsonWebTokenService;
 
     @Test
-    public void authenticator() {
-        Authenticator authenticator = securityConfig.authenticator();
-        Assert.assertNotNull(authenticator);
+    public void getToken() {
+        Cookie[] cookies = new Cookie[] {new Cookie(Constants.USER_AUTH, "123456")};
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        when(request.getCookies()).thenReturn(cookies);
+        String token = jsonWebTokenService.getToken(request);
+        assertEquals("123456", token);
     }
 }
