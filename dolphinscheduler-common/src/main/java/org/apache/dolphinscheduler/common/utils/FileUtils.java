@@ -122,13 +122,14 @@ public class FileUtils {
 
         //create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
+        logger.info("create dir success {}" , execLocalPath);
 
 
         //if not exists this user,then create
         if (!OSUtils.getUserList().contains(userName)){
             OSUtils.createUser(userName);
         }
-
+        logger.info("create user name success {}", userName);
     }
 
 
