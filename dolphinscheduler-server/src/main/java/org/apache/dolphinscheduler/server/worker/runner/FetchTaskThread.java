@@ -147,9 +147,8 @@ public class FetchTaskThread implements Runnable{
                 //check memory and cpu usage and threads
                 boolean runCheckFlag = OSUtils.checkResource(workerConfig.getWorkerMaxCpuloadAvg(), workerConfig.getWorkerReservedMemory()) && checkThreadCount(poolExecutor);
 
-                Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-
                 if(!runCheckFlag) {
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
 
