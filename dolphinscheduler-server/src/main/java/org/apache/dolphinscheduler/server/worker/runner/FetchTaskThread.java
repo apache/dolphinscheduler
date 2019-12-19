@@ -223,7 +223,7 @@ public class FetchTaskThread implements Runnable{
 
                     // check and create users
                     FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
-                            tenant.getTenantCode(), logger);
+                            tenant.getTenantCode());
 
                     logger.info("task : {} ready to submit to task scheduler thread",taskInstId);
                     // submit task
