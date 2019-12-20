@@ -28,7 +28,7 @@
               <a href="javascript:">
                 <i class="fa icon" :class="item.icon"></i>
                 <span>{{item.name}}</span>
-                <i class="fa angle" :class="item.isOpen ? 'fa-angle-down' : 'fa-angle-right'" v-if="item.children.length"></i>
+                <i class="fa angle" :class="item.isOpen ? 'ans-icon-arrow-down' : 'ans-icon-arrow-right'" v-if="item.children.length"></i>
               </a>
             </div>
           </router-link>
@@ -38,7 +38,7 @@
             <a href="javascript:">
               <i class="fa icon" :class="item.icon"></i>
               <span>{{item.name}}</span>
-              <i class="fa angle" :class="item.isOpen ? 'fa-angle-down' : 'fa-angle-right'" v-if="item.children.length"></i>
+              <i class="fa angle" :class="item.isOpen ? 'ans-icon-arrow-down' : 'ans-icon-arrow-right'" v-if="item.children.length"></i>
             </a>
           </div>
         </template>
@@ -150,7 +150,7 @@
           >.angle {
             position: absolute;
             right: 12px;
-            top: 14px;
+            top: 3px;
           }
 
         }

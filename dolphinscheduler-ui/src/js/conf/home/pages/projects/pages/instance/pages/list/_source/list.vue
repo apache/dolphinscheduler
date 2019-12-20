@@ -99,7 +99,7 @@
                         data-toggle="tooltip"
                         :title="$t('Edit')"
                         @click="_reEdit(item)"
-                        icon="iconfont icon-bianjixiugai"
+                        icon="ans-icon-edit"
                         :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
               <x-button type="info"
                         shape="circle"
@@ -107,7 +107,7 @@
                         data-toggle="tooltip"
                         :title="$t('Rerun')"
                         @click="_reRun(item,$index)"
-                        icon="iconfont icon-shuaxin"
+                        icon="ans-icon-refresh"
                         :disabled="item.state !== 'SUCCESS' && item.state !== 'PAUSE' && item.state !== 'FAILURE' && item.state !== 'STOP'"></x-button>
               <x-button type="success"
                         shape="circle"
@@ -115,7 +115,7 @@
                         data-toggle="tooltip"
                         :title="$t('Recovery Failed')"
                         @click="_restore(item,$index)"
-                        icon="iconfont icon-cuowuguanbishibai"
+                        icon="ans-icon-fail-empty"
                         :disabled="item.state !== 'FAILURE'"></x-button>
               <x-button type="error"
                         shape="circle"
@@ -123,7 +123,7 @@
                         data-toggle="tooltip"
                         :title="item.state === 'STOP' ? $t('Recovery Suspend') : $t('Stop')"
                         @click="_stop(item,$index)"
-                        :icon="item.state === 'STOP' ? 'iconfont icon-ai06' : 'iconfont icon-zanting'"
+                        :icon="item.state === 'STOP' ? 'ans-icon-pause-solid' : 'ans-icon-stop'"
                         :disabled="item.state !== 'RUNNING_EXEUTION' && item.state != 'STOP'"></x-button>
               <x-button type="warning"
                         shape="circle"
@@ -131,7 +131,7 @@
                         data-toggle="tooltip"
                         :title="item.state === 'PAUSE' ? $t('Recovery Suspend') : $t('Pause')"
                         @click="_suspend(item,$index)"
-                        :icon="item.state === 'PAUSE' ? 'iconfont icon-ai06' : 'iconfont icon-zanting1'"
+                        :icon="item.state === 'PAUSE' ? 'ans-icon-pause-solid' : 'ans-icon-pause'"
                         :disabled="item.state !== 'RUNNING_EXEUTION' && item.state !== 'PAUSE'"></x-button>
               <x-poptip
                       :ref="'poptip-delete-' + $index"
@@ -144,7 +144,7 @@
                 </div>
                 <template slot="reference">
                   <x-button
-                          icon="iconfont icon-shanchu"
+                          icon="ans-icon-trash"
                           type="error"
                           shape="circle"
                           size="xsmall"
@@ -161,7 +161,7 @@
                         data-toggle="tooltip"
                         :title="$t('Gantt')"
                         @click="_gantt(item)"
-                        icon="iconfont icon-gantt">
+                        icon="ans-icon-gantt">
               </x-button>
 
             </div>
@@ -171,7 +171,7 @@
                       type="info"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-bianjixiugai"
+                      icon="ans-icon-edit"
                       disabled="true">
               </x-button>
 
@@ -189,7 +189,7 @@
                       type="info"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-shuaxin"
+                      icon="ans-icon-refresh"
                       disabled="true">
               </x-button>
 
@@ -207,7 +207,7 @@
                       type="success"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-cuowuguanbishibai"
+                      icon="ans-icon-fail-empty"
                       disabled="true">
               </x-button>
 
@@ -216,7 +216,7 @@
                       <!--type="error"-->
                       <!--shape="circle"-->
                       <!--size="xsmall"-->
-                      <!--icon="iconfont icon-zanting1"-->
+                      <!--icon="ans-icon-pause"-->
                       <!--disabled="true">-->
               <!--</x-button>-->
 
@@ -235,7 +235,7 @@
                       type="warning"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-ai06"
+                      icon="ans-icon-pause-solid"
                       disabled="true">
               </x-button>
               <!--Pause-->
@@ -244,7 +244,7 @@
                       type="warning"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-zanting1"
+                      icon="ans-icon-stop"
                       disabled="true">
               </x-button>
             <!--Stop-->
@@ -253,7 +253,7 @@
                       type="warning"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-zanting"
+                      icon="ans-icon-pause"
                       disabled="true">
               </x-button>
 
@@ -262,7 +262,7 @@
                       type="error"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-shanchu"
+                      icon="ans-icon-trash"
                       :disabled="true">
               </x-button>
 
@@ -271,7 +271,7 @@
                       type="info"
                       shape="circle"
                       size="xsmall"
-                      icon="iconfont icon-gantt"
+                      icon="ans-icon-gantt"
                       disabled="true">
               </x-button>
             </div>
@@ -330,7 +330,7 @@
        */
       _rtState (code) {
         let o = tasksState[code]
-        return `<em class="iconfont ${o.isSpin ? 'fa fa-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}">${o.icoUnicode}</em>`
+        return `<em class="ansfont ${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
       /**
        * Close the delete layer

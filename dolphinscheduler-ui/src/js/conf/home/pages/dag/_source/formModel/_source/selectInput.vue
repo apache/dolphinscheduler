@@ -32,7 +32,7 @@
               :value="selectedModel === null ? '0' : selectedModel.value"
               style="width: 100%;"
               @on-click-icon.stop="_ckIcon">
-        <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="!isIconState"></i>
+        <i slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="!isIconState"></i>
         <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="isIconState"></i>
       </x-input>
     <x-option

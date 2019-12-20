@@ -110,10 +110,9 @@ public class FileUtils {
      * create directory and user
      * @param execLocalPath execute local path
      * @param userName user name
-     * @param logger logger
      * @throws IOException errors
      */
-    public static void createWorkDirAndUserIfAbsent(String execLocalPath, String userName, Logger logger) throws IOException{
+    public static void createWorkDirAndUserIfAbsent(String execLocalPath, String userName) throws IOException{
         //if work dir exists, first delete
         File execLocalPathFile = new File(execLocalPath);
 
@@ -123,13 +122,14 @@ public class FileUtils {
 
         //create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
+        logger.info("create dir success {}" , execLocalPath);
 
 
         //if not exists this user,then create
         if (!OSUtils.getUserList().contains(userName)){
             OSUtils.createUser(userName);
         }
-
+        logger.info("create user name success {}", userName);
     }
 
 

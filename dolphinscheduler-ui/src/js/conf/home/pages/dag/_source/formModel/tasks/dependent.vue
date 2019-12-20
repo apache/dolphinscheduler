@@ -23,12 +23,8 @@
           <a href="javascript:"
              @click="!isDetails && _addDep()"
              class="add-dep">
-            <i v-if="!isLoading" class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">
-              &#xe636;
-            </i>
-            <i v-if="isLoading" class="iconfont fa fa-spin" data-toggle="tooltip" :title="$t('Add')">
-              &#xe6af;
-            </i>
+            <i v-if="!isLoading" class="ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></i>
+            <i v-if="isLoading" class="ans-icon-spinner2 as as-spin" data-toggle="tooltip" :title="$t('Add')"></i>
           </a>
         </div>
         <div class="dep-box">
@@ -44,13 +40,12 @@
                   @click="!isDetails && _setRelation($index)">
               {{el.relation === 'AND' ? $t('and') : $t('or')}}
             </span>
-            <i class="iconfont dep-delete"
+            <i class="ans-icon-trash dep-delete"
                data-toggle="tooltip"
                data-container="body"
                :class="_isDetails"
                @click="!isDetails && _deleteDep($index)"
                :title="$t('delete')" >
-              &#xe611;
             </i>
             <m-depend-item-list
               :dependTaskList='dependTaskList'

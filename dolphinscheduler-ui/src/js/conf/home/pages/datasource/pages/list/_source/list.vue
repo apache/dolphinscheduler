@@ -82,7 +82,7 @@
                     size="xsmall"
                     data-toggle="tooltip"
                     :title="$t('Edit')"
-                    icon="iconfont icon-bianjixiugai"
+                    icon="ans-icon-edit"
                     @click="_edit(item)">
             </x-button>
             <x-poptip
@@ -99,7 +99,7 @@
                         type="error"
                         shape="circle"
                         size="xsmall"
-                        icon="iconfont icon-shanchu"
+                        icon="ans-icon-trash"
                         data-toggle="tooltip"
                         :title="$t('delete')">
                 </x-button>
