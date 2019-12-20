@@ -18,7 +18,7 @@
   <m-conditions>
     <template slot="search-group">
       <div class="list">
-        <x-button type="ghost" size="small" @click="_ckQuery" icon="fa fa-search"></x-button>
+        <x-button type="ghost" size="small" @click="_ckQuery" icon="ans-icon-search"></x-button>
       </div>
       <div class="list">
         <x-datepicker

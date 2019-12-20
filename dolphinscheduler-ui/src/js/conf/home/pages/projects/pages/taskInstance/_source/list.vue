@@ -88,7 +88,7 @@
                     size="xsmall"
                     data-toggle="tooltip"
                     :title="$t('View log')"
-                    icon="iconfont icon-xitongcaozuorizhi"
+                    icon="ans-icon-log"
                     @click="_refreshLog(item)">
             </x-button>
           </td>
@@ -119,7 +119,7 @@
     methods: {
       _rtState (code) {
         let o = tasksState[code]
-        return `<em class="iconfont ${o.isSpin ? 'fa fa-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}">${o.icoUnicode}</em>`
+        return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
       _refreshLog (item) {
         let self = this
