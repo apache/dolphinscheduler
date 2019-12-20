@@ -150,7 +150,7 @@
           >.angle {
             position: absolute;
             right: 12px;
-            top: 14px;
+            top: 3px;
           }
 
         }
