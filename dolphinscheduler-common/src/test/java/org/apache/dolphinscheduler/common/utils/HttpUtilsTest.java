@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -27,21 +28,20 @@ import org.slf4j.LoggerFactory;
  * HttpClient utils test
  */
 public class HttpUtilsTest {
-	
-	
+
+
 	public static final Logger logger = LoggerFactory.getLogger(HttpUtilsTest.class);
 
 
-	@Ignore
 	@Test
-	public void getTest(){
-
-		String result = HttpUtils.get("http://192.168.xx.xx:8088/ws/v1/cluster/info");
-		logger.info(result);
-
-
+	public void testGetTest(){
+		//success
+		String result = HttpUtils.get("https://github.com/manifest.json");
+		Assert.assertNotNull(result);
 		JSONObject jsonObject = JSON.parseObject(result);
-		String string = jsonObject.getJSONObject("clusterInfo").getString("haState");
-		logger.info(string);
+		Assert.assertEquals(jsonObject.getString("name"), "GitHub");
+
+		result = HttpUtils.get("https://123.333.111.33/ccc");
+		Assert.assertNull(result);
 	}
 }
