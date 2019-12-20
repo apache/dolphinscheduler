@@ -74,6 +74,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     public Boolean submitWaitComplete() {
         Boolean result = false;
         this.taskInstance = submit();
+        if(this.taskInstance == null){
+            return result;
+        }
         if(!this.taskInstance.getState().typeIsFinished()) {
             result = waitTaskQuit();
         }
