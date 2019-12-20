@@ -91,11 +91,11 @@
                 <a href="javascript:" @click="_authUdfFunc(item,$index)">{{$t('UDF Function')}}</a>
               </div>
               <template slot="reference">
-                <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Authorize')" icon="iconfont icon-yonghu1" :disabled="item.userType === 'ADMIN_USER'"></x-button>
+                <x-button type="warning" shape="circle" size="xsmall" data-toggle="tooltip" :title="$t('Authorize')" icon="ans-icon-user-empty" :disabled="item.userType === 'ADMIN_USER'"></x-button>
               </template>
             </x-poptip>
 
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-bianjixiugai" :title="$t('Edit')" @click="_edit(item)">
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="ans-icon-edit" :title="$t('Edit')" @click="_edit(item)">
             </x-button>
             <x-poptip
                     :ref="'poptip-delete-' + $index"
@@ -114,7 +114,7 @@
                         data-toggle="tooltip"
                         :title="$t('delete')"
                         :disabled="item.userType === 'ADMIN_USER'"
-                        icon="iconfont icon-shanchu">
+                        icon="ans-icon-trash">
                 </x-button>
               </template>
             </x-poptip>
