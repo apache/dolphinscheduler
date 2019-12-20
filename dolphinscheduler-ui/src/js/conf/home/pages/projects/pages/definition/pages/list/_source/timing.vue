@@ -122,7 +122,7 @@
                 :disabled="!notifyGroupList.length"
                 v-model="warningGroupId">
           <x-input slot="trigger" readonly slot-scope="{ selectedModel }" :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
-            <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></i>
+            <i slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></i>
             <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId.id"></i>
           </x-input>
           <x-option

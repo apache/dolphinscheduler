@@ -61,7 +61,7 @@
           <template slot="content">
             <x-select v-model="queueName">
               <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="queueName = ''">
-                <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></i>
+                <i slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></i>
                 <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></i>
               </x-input>
               <x-option

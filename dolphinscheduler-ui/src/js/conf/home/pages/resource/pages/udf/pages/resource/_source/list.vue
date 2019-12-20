@@ -74,7 +74,7 @@
                     type="info"
                     shape="circle"
                     size="xsmall"
-                    icon="iconfont icon-wendangxiugai"
+                    icon="ans-icon-play"
                     data-toggle="tooltip"
                     :title="$t('Rename')"
                     @click="_rename(item,$index)">
@@ -85,7 +85,7 @@
                     size="xsmall"
                     data-toggle="tooltip"
                     :title="$t('Download')"
-                    icon="iconfont icon-download"
+                    icon="ans-icon-download"
                     @click="_downloadFile(item)">
             </x-button>
             <x-poptip
@@ -104,7 +104,7 @@
                         size="xsmall"
                         data-toggle="tooltip"
                         :title="$t('delete')"
-                        icon="iconfont icon-shanchu">
+                        icon="ans-icon-trash">
                 </x-button>
               </template>
             </x-poptip>

@@ -68,7 +68,7 @@
                     data-toggle="tooltip"
                     :title="$t('Edit')"
                     @click="_edit(item)"
-                    icon="iconfont icon-bianjixiugai">
+                    icon="ans-icon-edit">
             </x-button>
             <!--<x-poptip
                     :ref="'poptip-' + $index"
