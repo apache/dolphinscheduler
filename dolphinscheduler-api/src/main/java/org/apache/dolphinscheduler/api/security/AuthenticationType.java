@@ -23,9 +23,9 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  */
 public enum AuthenticationType {
 
-    PASSWORD(0, "verifying via user name and password"),
-    JWT_KEY(1,"verifying jwt via secret key"),
-    JWT_RSA(2, "verifying jwt via rsa key, support local key or remote url")
+    PASSWORD(0, "verify via user name and password"),
+    JWT_KEY(1,"verify jwt via secret key"),
+    JWT_RSA(2, "verify jwt via rsa key, support local key or remote url")
     ;
 
     AuthenticationType(int code, String desc) {

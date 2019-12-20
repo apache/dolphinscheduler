@@ -169,7 +169,6 @@ public class JsonWebTokenRSAAuthenticator implements Authenticator, Initializing
             result.setMsg(Status.LOGIN_SUCCESS.getMsg());
         } catch (Exception e) {
             logger.error(e.toString());
-            e.printStackTrace();
             result.setCode(Status.USER_LOGIN_FAILURE.getCode());
             result.setMsg(Status.USER_LOGIN_FAILURE.getMsg());
         }
@@ -203,6 +202,11 @@ public class JsonWebTokenRSAAuthenticator implements Authenticator, Initializing
                 .setId(UUID.randomUUID().toString())
                 .signWith(privateKey)
                 .compact();
+        if (StringUtils.isBlank(token)) {
+            result.setCode(Status.GET_USER_TOKEN_ERROR.getCode());
+            result.setMsg(Status.GET_USER_TOKEN_ERROR.getMsg());
+            return result;
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("token = {}", token);
         }
