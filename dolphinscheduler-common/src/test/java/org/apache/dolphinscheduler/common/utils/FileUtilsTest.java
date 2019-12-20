@@ -18,11 +18,50 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(DateUtils.class)
 public class FileUtilsTest {
 
     @Test
     public void suffix() {
         Assert.assertEquals(FileUtils.suffix("ninfor.java"),"java");
+    }
+
+    @Test
+    public void testGetDownloadFilename() {
+        PowerMockito.mockStatic(DateUtils.class);
+        PowerMockito.when(DateUtils.getCurrentTime(YYYYMMDDHHMMSS)).thenReturn("20190101101059");
+        Assert.assertEquals(FileUtils.getDownloadFilename("test"),
+                "/tmp/dolphinscheduler/download/20190101101059/test");
+    }
+
+    @Test
+    public void testGetUploadFilename() {
+        Assert.assertEquals(FileUtils.getUploadFilename("aaa","bbb"),
+                "/tmp/dolphinscheduler/aaa/resources/bbb");
+    }
+
+    @Test
+    public void testGetProcessExecDir() {
+        String dir = FileUtils.getProcessExecDir(1,2,3, 4);
+        Assert.assertEquals(dir, "/tmp/dolphinscheduler/exec/process/1/2/3/4");
+        dir = FileUtils.getProcessExecDir(1,2,3);
+        Assert.assertEquals(dir, "/tmp/dolphinscheduler/exec/process/1/2/3");
+    }
+
+    @Test
+    public void testCreateWorkDirAndUserIfAbsent() {
+        try {
+            FileUtils.createWorkDirAndUserIfAbsent("/tmp/createWorkDirAndUserIfAbsent", "test123");
+            Assert.assertTrue(true);
+        } catch (Exception e) {
+            Assert.assertTrue(false);
+        }
     }
 }

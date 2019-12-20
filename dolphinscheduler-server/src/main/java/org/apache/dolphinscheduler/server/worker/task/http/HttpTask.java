@@ -113,23 +113,20 @@ public class HttpTask extends AbstractTask {
         long startTime = System.currentTimeMillis();
         String statusCode = null;
         String body = null;
-        try(CloseableHttpClient client = createHttpClient()) {
-            try(CloseableHttpResponse response = sendRequest(client)) {
-                statusCode = String.valueOf(getStatusCode(response));
-                body = getResponseBody(response);
-                exitStatusCode = validResponse(body, statusCode);
-                long costTime = System.currentTimeMillis() - startTime;
-                logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {}Millisecond, statusCode : {}, body : {}, log : {}",
-                        DateUtils.format2Readable(startTime), httpParameters.getUrl(),httpParameters.getHttpMethod(), costTime, statusCode, body, output);
-            }catch (Exception e) {
-                appendMessage(e.toString());
-                exitStatusCode = -1;
-                logger.error("httpUrl[" + httpParameters.getUrl() + "] connection failed："+output, e);
-            }
-        } catch (Exception e) {
+
+        try(CloseableHttpClient client = createHttpClient();
+            CloseableHttpResponse response = sendRequest(client)) {
+            statusCode = String.valueOf(getStatusCode(response));
+            body = getResponseBody(response);
+            exitStatusCode = validResponse(body, statusCode);
+            long costTime = System.currentTimeMillis() - startTime;
+            logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {}Millisecond, statusCode : {}, body : {}, log : {}",
+                    DateUtils.format2Readable(startTime), httpParameters.getUrl(),httpParameters.getHttpMethod(), costTime, statusCode, body, output);
+        }catch (Exception e){
             appendMessage(e.toString());
             exitStatusCode = -1;
             logger.error("httpUrl[" + httpParameters.getUrl() + "] connection failed："+output, e);
+            throw e;
         }
     }
 
