@@ -652,6 +652,7 @@
 						<include>**/alert/utils/ExcelUtilsTest.java</include>
 						<include>**/alert/utils/FuncUtilsTest.java</include>
 						<include>**/alert/utils/JSONUtilsTest.java</include>
+						<include>**/alert/utils/PropertyUtilsTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
