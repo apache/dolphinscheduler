@@ -128,6 +128,9 @@ public class MasterSchedulerThread implements Runnable {
                             logger.error("scan command error ", e);
                             processDao.moveToErrorCommand(command, e.toString());
                         }
+                    } else{
+                        //indicate that no command ,sleep for 1s
+                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
                 }
             }catch (Exception e){
