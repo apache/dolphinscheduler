@@ -29,7 +29,7 @@
              @dragleave.prevent="dragOver = false"
              id="file-update-model">
           <div class="tooltip-info">
-            <i class="fa fa-info-circle"></i>
+            <i class="fa ans-icon-notice-solid"></i>
             <span>{{$t('Drag the file into the current upload window')}}</span>
           </div>
           <!--<div class="hide-archive" v-if="progress !== 0" @click="_ckArchive">
@@ -37,7 +37,7 @@
           </div>-->
           <div class="update-popup" v-if="dragOver">
             <div class="icon-box">
-              <i class="fa fa-cloud-upload"></i>
+              <i class="ans ans-icon-upload"></i>
             </div>
             <p class="p1">
               <span>{{$t('Drag area upload')}}</span>

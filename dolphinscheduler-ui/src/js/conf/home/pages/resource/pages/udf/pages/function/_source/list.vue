@@ -88,7 +88,7 @@ v-ps<template>
                     data-toggle="tooltip"
                     :title="$t('Edit')"
                     @click="_edit(item)"
-                    icon="iconfont icon-bianjixiugai">
+                    icon="ans-icon-edit">
             </x-button>
             <x-poptip
                     :ref="'poptip-' + $index"
@@ -104,7 +104,7 @@ v-ps<template>
                         type="error"
                         shape="circle"
                         size="xsmall"
-                        icon="iconfont icon-shanchu"
+                        icon="ans-icon-trash"
                         data-toggle="tooltip"
                         :title="$t('delete')">
                 </x-button>

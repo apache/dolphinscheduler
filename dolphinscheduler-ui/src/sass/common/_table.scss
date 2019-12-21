@@ -14,7 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+ .ansfont {
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+ .as {
+  display: inline-block;
+  font-size: 14px;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+ .as-spin {
+    -webkit-animation: as-spin 2s infinite linear;
+    animation: as-spin 2s infinite linear;
+  }
+  @-webkit-keyframes as-spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg);
+    }
+  }
+  @keyframes as-spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg);
+    }
+  }
 .table-box {
   border-top: 1px solid #ecf3ff;
   .ans-checkbox-wrapper-disabled {
@@ -41,6 +77,9 @@
   button {
     .iconfont {
       font-size: 16px;
+    }
+    .ans-icon {
+      font-size: 14px;
     }
   }
   table {
