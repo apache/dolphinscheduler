@@ -43,7 +43,7 @@
                   size="xsmall"
                   :disabled="$route.name !== 'projects-instance-details'"
                   @click="_toggleView"
-                  icon="fa fa-code">
+                  icon="ans-icon-code">
           </x-button>
           <x-button
             style="vertical-align: middle;"
@@ -54,11 +54,11 @@
             size="xsmall"
             :disabled="$route.name !== 'projects-instance-details'"
             @click="_toggleParam"
-            icon="fa fa-chevron-circle-right">
+            icon="ans-icon-arrow-circle-right">
           </x-button>
           <span class="name">{{name}}</span>
           &nbsp;
-          <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><i class="iconfont" data-container="body"  data-toggle="tooltip" title="复制名称" >&#xe61e;</i></span>
+          <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><i class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></i></span>
         </div>
         <div class="save-btn">
           <div class="operation" style="vertical-align: middle;">
@@ -68,16 +68,16 @@
                :id="item.code"
                :key="$index"
                @click="_ckOperation(item,$event)">
-              <i class="iconfont" v-html="item.icon" data-toggle="tooltip" :title="item.description" ></i>
+              <i :class="item.icon" data-toggle="tooltip" :title="item.description" ></i>
             </a>
           </div>
-          <x-button type="text" icon="fa fa-play" @click="dagAutomaticLayout"></x-button>
+          <x-button type="text" icon="ans-icon-triangle-solid-right" @click="dagAutomaticLayout"></x-button>
           <x-button
                   data-toggle="tooltip"
                   :title="$t('Refresh DAG status')"
                   data-container="body"
                   style="vertical-align: middle;"
-                  icon="fa fa-refresh"
+                  icon="ans-icon-refresh"
                   type="primary"
                   :loading="isRefresh"
                   v-if="type === 'instance'"
@@ -89,7 +89,7 @@
                   style="vertical-align: middle;"
                   type="primary"
                   size="xsmall"
-                  icon="fa fa-reply"
+                  icon="ans-icon-play"
                   @click="_rtNodesDag" >
             {{$t('Return_1')}}
           </x-button>
@@ -99,7 +99,7 @@
                   size="xsmall"
                   :loading="spinnerLoading"
                   @click="_saveChart"
-                  icon="fa fa-save"
+                  icon="ans-icon-save"
                   >
             {{spinnerLoading ? 'Loading...' : $t('Save')}}
           </x-button>
@@ -250,7 +250,7 @@
                   let state = dom.find('.state-p')
                   dom.attr('data-state-id', v1.stateId)
                   dom.attr('data-dependent-result', v1.dependentResult || '')
-                  state.append(`<b class="iconfont ${v1.isSpin ? 'fa fa-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body">${v1.icoUnicode}</b>`)
+                  state.append(`<b class="${v1.icoUnicode} ${v1.isSpin ? 'as as-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body"></b>`)
                   state.find('b').attr('title', titleTpl(v2, v1.desc))
                 }
               })

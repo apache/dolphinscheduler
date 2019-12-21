@@ -32,18 +32,18 @@
       </x-input>
       <span class="lt-add">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeStatement($index)" >
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" >&#xe611;</i>
+          <i class="ans-icon-trash" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></i>
         </a>
       </span>
       <span class="add" v-if="$index === (localStatementList.length - 1)">
         <a href="javascript:" @click="!isDetails && _addStatement()" >
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
+          <i class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></i>
         </a>
       </span>
     </div>
     <span class="add" v-if="!localStatementList.length">
       <a href="javascript:" @click="!isDetails && _addStatement()" >
-        <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
+        <i class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></i>
       </a>
     </span>
   </div>
@@ -149,10 +149,10 @@
     .add {
       a {
         .iconfont {
-          font-size: 18px;
+          font-size: 16px;
           vertical-align: middle;
           display: inline-block;
-          margin-top: 1px;
+          margin-top: -5px;
         }
       }
     }
