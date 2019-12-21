@@ -22,7 +22,7 @@ import static org.junit.Assert.*;
 public class ExecuteTypeTest {
 
     @Test
-    public void getEnum() {
+    public void testGetEnum() {
         assertEquals(ExecuteType.REPEAT_RUNNING, ExecuteType.getEnum(1));
         assertEquals(ExecuteType.RECOVER_SUSPENDED_PROCESS, ExecuteType.getEnum(2));
         assertEquals(ExecuteType.START_FAILURE_TASK_PROCESS, ExecuteType.getEnum(3));

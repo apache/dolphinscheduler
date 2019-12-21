@@ -22,13 +22,13 @@ import static org.junit.Assert.*;
 public class StatusTest {
 
     @Test
-    public void getCode() {
+    public void testGetCode() {
         assertEquals(Status.SUCCESS.getCode(), 0);
         assertNotEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 0);
     }
 
     @Test
-    public void getMsg() {
+    public void testGetMsg() {
         assertEquals("success", Status.SUCCESS.getMsg());
     }
 }
