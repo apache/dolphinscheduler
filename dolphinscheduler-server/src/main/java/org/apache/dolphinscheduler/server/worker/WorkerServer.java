@@ -67,6 +67,7 @@ public class WorkerServer implements IStoppable {
     /**
      *  zk worker client
      */
+    @Autowired
     private ZKWorkerClient zkWorkerClient = null;
 
 
@@ -136,8 +137,7 @@ public class WorkerServer implements IStoppable {
      */
     @PostConstruct
     public void run(){
-
-        zkWorkerClient = ZKWorkerClient.getZKWorkerClient();
+        zkWorkerClient.init();
 
         this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
 
