@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +37,6 @@ public class PasswordAuthenticator implements Authenticator {
     private UsersService userService;
     @Autowired
     private SessionService sessionService;
-    @Autowired
-    private UserMapper userMapper;
 
     @Override
     public Result<Map<String, String>> authenticate(String username, String password, String extra) {
@@ -74,6 +71,6 @@ public class PasswordAuthenticator implements Authenticator {
             return null;
         }
         //get user object from session
-        return userMapper.selectById(session.getUserId());
+        return userService.queryUser(session.getUserId());
     }
 }

@@ -20,6 +20,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import javax.crypto.SecretKey;
@@ -43,7 +45,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.UUID;
-
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -57,6 +58,10 @@ public class JsonWebTokenSecretKeyAuthenticatorTest {
 
     @Autowired
     private AutowireCapableBeanFactory beanFactory;
+    @MockBean
+    private UsersService userService;
+
+    private User mockUser;
 
     private JsonWebTokenSecretKeyAuthenticator authenticator;
 
@@ -65,11 +70,18 @@ public class JsonWebTokenSecretKeyAuthenticatorTest {
         authenticator = new JsonWebTokenSecretKeyAuthenticator();
         beanFactory.autowireBean(authenticator);
         authenticator.afterPropertiesSet();
+
+        mockUser = new User();
+        mockUser.setUserName("test");
+        mockUser.setEmail("test@test.com");
+        mockUser.setUserPassword("test");
+        mockUser.setId(1);
     }
 
     @Test
     public void authenticate() {
-        Result result = authenticator.authenticate("admin", "dolphinscheduler123", "127.0.0.1");
+        when(userService.queryUser("test", "test")).thenReturn(mockUser);
+        Result result = authenticator.authenticate("test", "test", "127.0.0.1");
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
     }
@@ -83,14 +95,14 @@ public class JsonWebTokenSecretKeyAuthenticatorTest {
         String token = Jwts.builder()
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plus(5, ChronoUnit.MINUTES)))
-                .setIssuer("admin")
-                .setSubject("admin")
+                .setIssuer("test")
+                .setSubject("test")
                 .setId(UUID.randomUUID().toString())
                 .signWith(secretKey)
                 .compact();
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         when(request.getCookies()).thenReturn(new Cookie[]{new Cookie(Constants.USER_AUTH, token)});
-
+        when(userService.queryUser("test")).thenReturn(mockUser);
         // get auth user
         User user = authenticator.getAuthUser(request);
         Assert.assertNotNull(user);

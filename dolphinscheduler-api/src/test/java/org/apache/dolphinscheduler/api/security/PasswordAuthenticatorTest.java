@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.api.security;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,9 +34,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
@@ -45,33 +47,48 @@ public class PasswordAuthenticatorTest {
 
     @Autowired
     private AutowireCapableBeanFactory beanFactory;
-    @Autowired
+    @MockBean
     private SessionService sessionService;
+    @MockBean
+    private UsersService usersService;
+
     private PasswordAuthenticator authenticator;
+
+    private User mockUser;
+    private Session mockSession;
 
     @Before
     public void setUp() throws Exception {
         authenticator = new PasswordAuthenticator();
         beanFactory.autowireBean(authenticator);
+
+        mockUser = new User();
+        mockUser.setUserName("test");
+        mockUser.setEmail("test@test.com");
+        mockUser.setUserPassword("test");
+        mockUser.setId(1);
+
+        mockSession = new Session();
+        mockSession.setId(UUID.randomUUID().toString());
+        mockSession.setIp("127.0.0.1");
+        mockSession.setUserId(1);
+        mockSession.setLastLoginTime(new Date());
     }
 
     @Test
     public void authenticate() {
-        Result result = authenticator.authenticate("admin", "dolphinscheduler123", "127.0.0.1");
+        when(usersService.queryUser("test", "test")).thenReturn(mockUser);
+        when(sessionService.createSession(mockUser, "127.0.0.1")).thenReturn(mockSession.getId());
+        Result result = authenticator.authenticate("test", "test", "127.0.0.1");
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
     }
 
     @Test
     public void getAuthUser() {
-        User loginUser = new User();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        String session = sessionService.createSession(loginUser, "127.0.0.1");
-
-        Cookie[] cookies = new Cookie[] {new Cookie(Constants.SESSION_ID, session)};
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        when(request.getCookies()).thenReturn(cookies);
+        when(usersService.queryUser(mockUser.getId())).thenReturn(mockUser);
+        when(sessionService.getSession(request)).thenReturn(mockSession);
 
         User user = authenticator.getAuthUser(request);
         Assert.assertNotNull(user);

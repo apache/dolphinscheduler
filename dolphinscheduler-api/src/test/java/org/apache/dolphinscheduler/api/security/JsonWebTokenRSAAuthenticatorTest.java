@@ -19,10 +19,9 @@ package org.apache.dolphinscheduler.api.security;
 import io.jsonwebtoken.Jwts;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.TenantService;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,8 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import javax.servlet.http.Cookie;
@@ -50,7 +48,6 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,7 +57,6 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 @TestPropertySource(properties = {
-        "spring.main.allow-bean-definition-overriding=true",
         "security.authentication.jwt.public-key-file=/tmp/rsa_public_key.pem",
         "security.authentication.jwt.private-key-file=/tmp/rsa_private_key.pem",
         "security.authentication.jwt.generate-token-mode=local",
@@ -69,6 +65,10 @@ public class JsonWebTokenRSAAuthenticatorTest {
     private static Logger logger = LoggerFactory.getLogger(JsonWebTokenRSAAuthenticatorTest.class);
     @Autowired
     private AutowireCapableBeanFactory beanFactory;
+    @MockBean
+    private UsersService userService;
+
+    private User mockUser;
 
     private JsonWebTokenRSAAuthenticator authenticator;
 
@@ -109,20 +109,6 @@ public class JsonWebTokenRSAAuthenticatorTest {
             "YOw8+MCDq/pjrF3if4bmo7tQ+ad+HrYyPxoeyENorME57HjA1Rvn9w==\n" +
             "-----END RSA PRIVATE KEY-----";
 
-    @Bean
-    public TenantService tenantService() {
-        Tenant tenant = new Tenant();
-        tenant.setId(0);
-        tenant.setTenantName("default");
-        tenant.setTenantCode("default");
-        Map<String, Object> tenantMap = new HashMap<>();
-        tenantMap.put(Constants.STATUS, Status.SUCCESS);
-        tenantMap.put(Constants.DATA_LIST, Collections.singletonList(tenant));
-        TenantService tenantService = Mockito.mock(TenantService.class);
-        when(tenantService.queryTenantList("default")).thenReturn(tenantMap);
-        return tenantService;
-    }
-
     @Before
     public void setUp() throws Exception {
         writeKeyToTempDir("/tmp/rsa_public_key.pem", PUBLIC_KEY);
@@ -131,11 +117,19 @@ public class JsonWebTokenRSAAuthenticatorTest {
         authenticator = new JsonWebTokenRSAAuthenticator();
         beanFactory.autowireBean(authenticator);
         authenticator.afterPropertiesSet();
+
+        mockUser = new User();
+        mockUser.setUserName("test");
+        mockUser.setEmail("test@test.com");
+        mockUser.setUserPassword("test");
+        mockUser.setId(1);
     }
 
     @Test
     public void authenticate() {
-        Result result = authenticator.authenticate("admin", "dolphinscheduler123", "127.0.0.1");
+        when(userService.queryUser("test", "test")).thenReturn(mockUser);
+        when(userService.queryUser("test")).thenReturn(mockUser);
+        Result result = authenticator.authenticate("test", "test", "127.0.0.1");
         Assert.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
     }
@@ -146,6 +140,7 @@ public class JsonWebTokenRSAAuthenticatorTest {
 
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         when(request.getCookies()).thenReturn(new Cookie[]{new Cookie(Constants.USER_AUTH, token)});
+        when(userService.queryUser("test")).thenReturn(mockUser);
 
         // get auth user
         User user = authenticator.getAuthUser(request);
@@ -172,8 +167,8 @@ public class JsonWebTokenRSAAuthenticatorTest {
         PrivateKey privateKey = authenticator.getPrivateKey(PRIVATE_KEY);
         Instant now = Instant.now();
         Map<String, Object> claims = new HashMap<>();
-        claims.put("name", "admin");
-        claims.put("email", "test@xxx.com");
+        claims.put("name", "test");
+        claims.put("email", "test@test.com");
         return Jwts.builder()
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(now.plus(5, ChronoUnit.MINUTES)))

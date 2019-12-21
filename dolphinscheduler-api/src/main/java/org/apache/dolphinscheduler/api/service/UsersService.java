@@ -162,6 +162,15 @@ public class UsersService extends BaseService {
     }
 
     /**
+     * query user by id
+     * @param id id
+     * @return user info
+     */
+    public User queryUser(int id) {
+        return userMapper.selectById(id);
+    }
+
+    /**
      * query user
      * @param name name
      * @return user info
