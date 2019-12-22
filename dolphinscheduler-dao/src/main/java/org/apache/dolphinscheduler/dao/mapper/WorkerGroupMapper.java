@@ -35,7 +35,7 @@ public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
     List<WorkerGroup> queryAllWorkerGroup();
 
     /**
-     * query worer grouop by name
+     * query worker group by name
      * @param name name
      * @return worker group list
      */
