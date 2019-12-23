@@ -37,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -230,11 +231,8 @@ public class TenantServiceTest {
      */
     private void remove(){
 
-        List<Tenant> tenantList = tenantMapper.queryByTenantCode(tenantCode);
-        if (CollectionUtils.isNotEmpty(tenantList)){
-            for (Tenant tenant : tenantList) {
-                tenantMapper.deleteById(tenant.getId());
-            }
-        }
+        Map<String,Object> map = new HashMap<>(1);
+        map.put("tenant_name",tenantName);
+        tenantMapper.deleteByMap(map);
     }
 }
