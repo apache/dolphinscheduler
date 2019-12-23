@@ -21,6 +21,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
@@ -30,209 +32,27 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *  alert
+ * alert
  */
 @Data
+@NoArgsConstructor
+@ToString
 @TableName("t_ds_alert")
 public class Alert {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    /**
-     * title
-     */
     private String title;
-
-    /**
-     * show type
-     */
     private ShowType showType;
-    /**
-     * content
-     */
     private String content;
-
-    /**
-     * alert type
-     */
     private AlertType alertType;
-
-
-
-    /**
-     * alert status
-     */
     private AlertStatus alertStatus;
-
-    /**
-     * log
-     */
     private String log;
-
-    /**
-     * alert group id
-     */
     @TableField("alertgroup_id")
     private int alertGroupId;
-
-
-    /**
-     * receivers
-     */
     private String receivers;
-
-    /**
-     * receivers cc
-     */
     private String receiversCc;
-
-    /**
-     * create time
-     */
     private Date createTime;
-
-    /**
-     * update time
-     */
     private Date updateTime;
-
-
     @TableField(exist = false)
-    private Map<String,Object> info = new HashMap<>();
-
-    public Map<String, Object> getInfo() {
-        return info;
-    }
-
-    public void setInfo(Map<String, Object> info) {
-        this.info = info;
-    }
-
-    public Alert() {
-    }
-
-    public Alert(int id, String title) {
-        this.id = id;
-        this.title = title;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public ShowType getShowType() {
-        return showType;
-    }
-
-    public void setShowType(ShowType showType) {
-        this.showType = showType;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public AlertType getAlertType() {
-        return alertType;
-    }
-
-    public void setAlertType(AlertType alertType) {
-        this.alertType = alertType;
-    }
-
-
-    public AlertStatus getAlertStatus() {
-        return alertStatus;
-    }
-
-    public void setAlertStatus(AlertStatus alertStatus) {
-        this.alertStatus = alertStatus;
-    }
-
-    public String getLog() {
-        return log;
-    }
-
-    public void setLog(String log) {
-        this.log = log;
-    }
-
-    public int getAlertGroupId() {
-        return alertGroupId;
-    }
-
-    public void setAlertGroupId(int alertGroupId) {
-        this.alertGroupId = alertGroupId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public String getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(String receivers) {
-        this.receivers = receivers;
-    }
-
-    public String getReceiversCc() {
-        return receiversCc;
-    }
-
-    public void setReceiversCc(String receiversCc) {
-        this.receiversCc = receiversCc;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Alert{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", showType=" + showType +
-                ", content='" + content + '\'' +
-                ", alertType=" + alertType +
-                ", alertStatus=" + alertStatus +
-                ", log='" + log + '\'' +
-                ", alertGroupId=" + alertGroupId +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", receivers='" + receivers + '\'' +
-                ", receiversCc='" + receiversCc + '\'' +
-                ", info=" + info +
-                '}';
-    }
+    private Map<String, Object> info = new HashMap<>();
 }
