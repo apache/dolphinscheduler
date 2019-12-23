@@ -14,7 +14,7 @@ jdk:
 
 script:
   # JaCoCo is used to have code coverage, "-Pcoverage" activates the maven profile in the pom.xml
-  - mvn clean install
+  - mvn clean install -q
 
 
 cache:
