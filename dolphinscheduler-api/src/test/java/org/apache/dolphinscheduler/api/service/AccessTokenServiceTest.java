@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -24,43 +26,53 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import static org.mockito.Mockito.*;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
+//@RunWith(SpringRunner.class)
+//@SpringBootTest(classes = ApiApplicationServer.class)
 public class AccessTokenServiceTest {
 
 
     private static final Logger logger = LoggerFactory.getLogger(AccessTokenServiceTest.class);
 
-    @Autowired
-    private AccessTokenService accessTokenService;
-    @Autowired
-    private AccessTokenMapper accessTokenMapper;
+
+    private AccessTokenService accessTokenService = new AccessTokenService();
+
     @Before
     public void setUp() {
-        remove();
+
+        AccessTokenMapper accessTokenMapper1 = mock(AccessTokenMapper.class);
+        AccessToken accessToken = new AccessToken();
+        accessToken.setId(1);
+        accessToken.setToken("AccessTokenServiceTest");
+        Date date = DateUtils.addDays(new Date(),30);
+        accessToken.setExpireTime(date);
+        when(accessTokenMapper1.insert(accessToken)).thenReturn(1);
+        when(accessTokenMapper1.selectById(1)).thenReturn(accessToken);
+        when(accessTokenMapper1.deleteById(1)).thenReturn(0);
+
+        Page<AccessToken> page = new Page(1, 10);
+        Page<AccessToken> accessTokenList = new Page();
+        accessTokenList.setRecords(new ArrayList<>());
+        when(accessTokenMapper1.selectAccessTokenPage(page,"test",0)).thenReturn(accessTokenList);
+
+        accessTokenService.setAccessTokenMapper(accessTokenMapper1);
+
     }
 
 
     @After
     public void after(){
 
-        remove();
     }
 
 
@@ -68,11 +80,14 @@ public class AccessTokenServiceTest {
     @Test
     public  void testQueryAccessTokenList(){
 
+        User user =new User();
+        Map<String, Object> result = accessTokenService.queryAccessTokenList(user,"test",1,10);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
     }
 
     @Test
     public  void testCreateToken(){
-
 
         Map<String, Object> result = accessTokenService.createToken(Integer.MAX_VALUE,getDate(),"AccessTokenServiceTest");
         logger.info(result.toString());
@@ -93,22 +108,7 @@ public class AccessTokenServiceTest {
 
 
         User userLogin = new User();
-        // not exist
-        Map<String, Object> result = accessTokenService.delAccessTokenById(userLogin,Integer.MAX_VALUE);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST,result.get(Constants.STATUS));
-
-        // add AccessToken
-        add();
-        AccessToken accessToken = get();
-        //no operation
-        result = accessTokenService.delAccessTokenById(userLogin,accessToken.getId());
-        logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM,result.get(Constants.STATUS));
-
-        // correct
-        userLogin.setId(Integer.MAX_VALUE);
-        result = accessTokenService.delAccessTokenById(userLogin,accessToken.getId());
+        Map<String, Object> result = accessTokenService.delAccessTokenById(userLogin,1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
 
@@ -117,49 +117,12 @@ public class AccessTokenServiceTest {
     @Test
     public  void testUpdateToken(){
 
-        add();
-        AccessToken accessToken = get();
-        Map<String, Object> result = accessTokenService.updateToken(accessToken.getId(),Integer.MAX_VALUE,getDate(),"token");
+        Map<String, Object> result = accessTokenService.updateToken(1,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-        accessToken = get();
-        //check update
-        Assert.assertEquals("token",accessToken.getToken());
-
 
     }
 
-    /**
-     * remove AccessToken
-     */
-    private void remove(){
-        Map<String,Object> map = new HashMap<>(1);
-        map.put("user_id",Integer.MAX_VALUE);
-        accessTokenMapper.deleteByMap(map);
-    }
-
-    /**
-     * get AccessToken
-     * @return
-     */
-    private AccessToken get(){
-
-        Map<String,Object> map = new HashMap<>(1);
-        map.put("user_id",Integer.MAX_VALUE);
-        List<AccessToken> accessTokens = accessTokenMapper.selectByMap(map);
-        if (CollectionUtils.isNotEmpty(accessTokens)){
-            return accessTokens.get(0);
-        }
-        return  new AccessToken();
-    }
-
-    /**
-     * add AccessToken
-     * @return
-     */
-    private void add(){
-        accessTokenService.createToken(Integer.MAX_VALUE,getDate(),"AccessTokenServiceTest");
-    }
 
     private String getDate(){
         Date date = DateUtils.addDays(new Date(),30);
