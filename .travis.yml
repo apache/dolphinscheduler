@@ -1,0 +1,16 @@
+language: java
+sudo: false
+install: true
+
+addons:
+  sonarcloud:
+    organization: "Jave-Chen"
+    token:
+      secure: "8k4b4yu8zj93gjyq"
+
+jdk:
+  - oraclejdk8
+
+script:
+  # JaCoCo is used to have code coverage, "-Pcoverage" activates the maven profile in the pom.xml
+  - mvn clean verify sonar:sonar -Pcoverage 
