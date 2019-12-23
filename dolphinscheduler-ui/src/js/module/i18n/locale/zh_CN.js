@@ -309,6 +309,7 @@ export default {
   'Waiting for dependence': '等待依赖',
   'Start': '运行',
   'Copy': '复制节点',
+  'Copy name': '复制名称',
   'Delete': '删除',
   'Please enter keyword': '请输入关键词',
   'File Upload': '文件上传',

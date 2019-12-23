@@ -11,7 +11,7 @@
     "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.release.js && cp -rf src/3rdcss dist && cp -rf src/3rdjs dist"
   },
   "dependencies": {
-    "ans-ui": "1.1.5",
+    "ans-ui": "1.1.7",
     "axios": "^0.16.2",
     "bootstrap": "3.3.7",
     "canvg": "1.5.1",
