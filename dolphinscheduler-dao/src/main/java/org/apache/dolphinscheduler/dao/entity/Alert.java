@@ -20,10 +20,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
@@ -40,6 +37,7 @@ import java.util.Map;
 @TableName("t_ds_alert")
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 public class Alert {
     @TableId(value = "id", type = IdType.AUTO)
     private int id;

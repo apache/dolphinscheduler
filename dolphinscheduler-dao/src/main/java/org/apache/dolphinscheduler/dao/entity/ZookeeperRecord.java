@@ -41,9 +41,9 @@ public class ZookeeperRecord {
     private int avgLatency;
     private int maxLatency;
     private int nodeCount;
-    private Date date;
     /**
      * is normal or not, 1:normal
      */
     private int state;
+    private Date date;
 }

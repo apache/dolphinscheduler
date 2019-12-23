@@ -27,6 +27,6 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 @Data
 @ToString
 public class ExecuteStatusCount {
-    private ExecutionStatus state;
+    private ExecutionStatus executionStatus;
     private int count;
 }
