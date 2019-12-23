@@ -7,7 +7,7 @@ addons:
   sonarcloud:
     organization: "8k4b4yu8zj93gjyq"
     token:
-      secure: "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAqo6E1ncpK1qWiEOP7A1O\nNzhHANJfMAP1dwqBTQcY0ByyzWzRQ5ZKEpz12MzCdTyqbWve/4TBw5RiRG9JwDOa\n2pWz2bAVEeQiURu7U3WiBfxrWzj1nH2zILVqwG5U7LD08ZgEM8g06FnRLdzukksl\nQIV2kY/6Th6cHXovov2LJuootSmuvlCG0tNSj768vNbcEwkRUjJX7j2GGfkCui92\nShZdclVCmF9JOqNNlixHTkBPLqfB4xA3QTA8AT9WKLlYuYkYufEDtYh77EQZ6VDy\nk392dJm9rn2fKxTcU0augCa209XtOvhDuMohXXMZTfzbgXsS1mgn1sC9p1cc+ov6\nV3REbr+CwjJ2XPEgdrfnZzZRmKHiABEYKrjMD2GgDl3EqBz1T1C/3tfgx6mOX/gY\nJ+cuOExvVooWd7EiSaK5T1Ay0kYu1nhBXy5mlAp+firFnoxkmvQNHpl0VPjZKezu\nQCtpgj62RGRI1OG8mOWmAnmTgQK6H5IyIv/dOPgyZef3g4Q4RBVRQaBcXwrhg0Vb\neEwZYiUg7nv26zcuNj5X0cwu0PHQDfgaifuo9AIW7iblfw0MVN5IkATHp4uvCp+o\ngXxeg125WIigNR8nOGaQre6byJ/6nrRpDVSLef9rUF1GicwcVQinWZDTJv6nON/P\nkoEt98172+KaxNtGVcUwyAUCAwEAAQ=="
+      secure: "YthaLCPP7YHHGVsioaVrUss0obVRN5Yxp3+eZTQ/bIvaGt9YUV93UjDOtqOEX9vnmXfcgw1UauZQXV/RvkOU3QBmgGzeTGn91nNtaNLnFHMMPobmYtEuf2al65qGGg907LF7JxkUIA/B+p8kMOjstHLcO69BcZ3BsIz955cwLlXulyz5dkzbLD3f3KKTuXSHUY3HTiFKq7OVXpQi9J5jTZYCg+RsaX1FJ3iStA6EIL8vO7DSTMsUCyIbGSRjSGa1HKPf6P4CvyapB+rLMKYqXamY11K6TC5Nr3sGqwr3NRNph05VymbWf68r2Z1WKXhZnhiXjy0T+KN+hWQg0ACyKAWfJkLuEKGEM0/zHXtwoOdTQ7pElwGYBzkwnrWeygPg+d8/5ING+DSX2Q+l3SkOaxmMtU50DWr05AowENn8NVy2KecCbFuBov/YI1aa/aA6nMKBETa7/h36GU3Uuw/RMaGSynPf73sbXI3PXk/cErCvJLE6JuRB91nWTRSudSCauVpA9BDKAqMIvuWvvIDzMrEx9HFUEWIP1ltvNEM4NO+NjCqdHqrYGj+fBECqtjNCa0dp1CkqT8LSTkkJ6nT+UgdtL+W55eaY4CYdl1qLx5qOJhd5iK6XWA3JCc+azrAvCXmnBFyiZaOIj8h+YlW7boxxbPEZRu0VFQIDTK3MVII="
 
 jdk:
   - oraclejdk8
@@ -15,7 +15,7 @@ jdk:
 script:
   # JaCoCo is used to have code coverage, "-Pcoverage" activates the maven profile in the pom.xml
   - mvn clean install -q
-  - mvn clean verify sonar:sonar -Pcoverage
+  - mvn clean verify sonar:sonar -Pcoverage -q
 
 cache:
   directories:
