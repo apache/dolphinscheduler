@@ -9,7 +9,7 @@ addons:
       secure: "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAqo6E1ncpK1qWiEOP7A1O\nNzhHANJfMAP1dwqBTQcY0ByyzWzRQ5ZKEpz12MzCdTyqbWve/4TBw5RiRG9JwDOa\n2pWz2bAVEeQiURu7U3WiBfxrWzj1nH2zILVqwG5U7LD08ZgEM8g06FnRLdzukksl\nQIV2kY/6Th6cHXovov2LJuootSmuvlCG0tNSj768vNbcEwkRUjJX7j2GGfkCui92\nShZdclVCmF9JOqNNlixHTkBPLqfB4xA3QTA8AT9WKLlYuYkYufEDtYh77EQZ6VDy\nk392dJm9rn2fKxTcU0augCa209XtOvhDuMohXXMZTfzbgXsS1mgn1sC9p1cc+ov6\nV3REbr+CwjJ2XPEgdrfnZzZRmKHiABEYKrjMD2GgDl3EqBz1T1C/3tfgx6mOX/gY\nJ+cuOExvVooWd7EiSaK5T1Ay0kYu1nhBXy5mlAp+firFnoxkmvQNHpl0VPjZKezu\nQCtpgj62RGRI1OG8mOWmAnmTgQK6H5IyIv/dOPgyZef3g4Q4RBVRQaBcXwrhg0Vb\neEwZYiUg7nv26zcuNj5X0cwu0PHQDfgaifuo9AIW7iblfw0MVN5IkATHp4uvCp+o\ngXxeg125WIigNR8nOGaQre6byJ/6nrRpDVSLef9rUF1GicwcVQinWZDTJv6nON/P\nkoEt98172+KaxNtGVcUwyAUCAwEAAQ=="
 
 jdk:
-  - oraclejdk8
+  - oraclejdk11
 
 script:
   # JaCoCo is used to have code coverage, "-Pcoverage" activates the maven profile in the pom.xml
