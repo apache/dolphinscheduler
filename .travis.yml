@@ -4,7 +4,7 @@ install: true
 
 addons:
   sonarcloud:
-    organization: "Jave-Chen"
+    organization: "8k4b4yu8zj93gjyq"
     token:
       secure: "Jave-Chen_incubator-dolphinscheduler"
 
