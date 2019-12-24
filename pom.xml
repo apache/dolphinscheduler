@@ -649,9 +649,12 @@
 						<include>**/common/queue/*.java</include>
 						<include>**/api/utils/CheckUtilsTest.java</include>
 						<include>**/api/utils/FileUtilsTest.java</include>
+						<include>**/api/enums/*.java</include>
 						<include>**/alert/utils/ExcelUtilsTest.java</include>
 						<include>**/alert/utils/FuncUtilsTest.java</include>
 						<include>**/alert/utils/JSONUtilsTest.java</include>
+						<include>**/alert/utils/PropertyUtilsTest.java</include>
+						<include>**/server/utils/SparkArgsUtilsTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
