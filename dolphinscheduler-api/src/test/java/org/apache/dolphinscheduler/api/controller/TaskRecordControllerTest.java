@@ -18,6 +18,9 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,25 +31,56 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * login controller test
- */
-public class LoginControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
+public class TaskRecordControllerTest extends AbstractControllerTest {
+    private static final Logger logger = LoggerFactory.getLogger(TaskInstanceController.class);
+
+    @Test
+    public void testQueryTaskRecordListPaging() throws Exception {
+            MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+            paramsMap.add("taskName","taskName");
+            paramsMap.add("state","state");
+            paramsMap.add("sourceTable","");
+            paramsMap.add("destTable","");
+            paramsMap.add("taskDate","");
+            paramsMap.add("startDate","2019-12-16 00:00:00");
+            paramsMap.add("endDate","2019-12-17 00:00:00");
+            paramsMap.add("pageNo","1");
+            paramsMap.add("pageSize","30");
+
+            MvcResult mvcResult = mockMvc.perform(get("/projects/task-record/list-paging")
+                    .header(SESSION_ID, sessionId)
+                    .params(paramsMap))
+                    .andExpect(status().isOk())
+                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                    .andReturn();
+
+            Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+            Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+            logger.info(mvcResult.getResponse().getContentAsString());
+        }
 
 
     @Test
-    public void testLogin() throws Exception {
+    public void testQueryHistoryTaskRecordListPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userName","cxc");
-        paramsMap.add("userPassword","123456");
+        paramsMap.add("taskName","taskName");
+        paramsMap.add("state","state");
+        paramsMap.add("sourceTable","");
+        paramsMap.add("destTable","");
+        paramsMap.add("taskDate","");
+        paramsMap.add("startDate","2019-12-16 00:00:00");
+        paramsMap.add("endDate","2019-12-17 00:00:00");
+        paramsMap.add("pageNo","1");
+        paramsMap.add("pageSize","30");
 
-        MvcResult mvcResult = mockMvc.perform(post("/login")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/task-record/history-list-paging")
+                .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -55,22 +89,6 @@ public class LoginControllerTest extends AbstractControllerTest{
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
-    }
 
-
-    @Test
-    public void testSignOut() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-
-        MvcResult mvcResult = mockMvc.perform(post("/signOut")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

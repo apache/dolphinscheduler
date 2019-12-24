@@ -16,14 +16,10 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,35 +33,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * executor controller test
- */
-public class ExecutorControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(ExecutorControllerTest.class);
 
-    @Ignore
+
+public class AccessTokenControllerTest extends AbstractControllerTest{
+    private static Logger logger = LoggerFactory.getLogger(AccessTokenControllerTest.class);
+
+
     @Test
-    public void testStartProcessInstance() throws Exception {
+    public void testCreateToken() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionId","40");
-        paramsMap.add("scheduleTime","");
-        paramsMap.add("failureStrategy", String.valueOf(FailureStrategy.CONTINUE));
-        paramsMap.add("startNodeList","");
-        paramsMap.add("taskDependType","");
-        paramsMap.add("execType","");
-        paramsMap.add("warningType", String.valueOf(WarningType.NONE));
-        paramsMap.add("warningGroupId","");
-        paramsMap.add("receivers","");
-        paramsMap.add("receiversCc","");
-        paramsMap.add("runMode","");
-        paramsMap.add("processInstancePriority","");
-        paramsMap.add("workerGroupId","");
-        paramsMap.add("timeout","");
-
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/start-process-instance","cxc_1113")
+        paramsMap.add("userId","4");
+        paramsMap.add("expireTime","2019-12-18 00:00:00");
+        paramsMap.add("token","607f5aeaaa2093dbdff5d5522ce00510");
+        MvcResult mvcResult = mockMvc.perform(post("/access-token/create")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -73,15 +56,30 @@ public class ExecutorControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    @Ignore
     @Test
-    public void testExecute() throws Exception {
+    public void testGenerateToken() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processInstanceId","40");
-        paramsMap.add("executeType",String.valueOf(ExecuteType.NONE));
+        paramsMap.add("userId","4");
+        paramsMap.add("expireTime","2019-12-28 00:00:00");
+        MvcResult mvcResult = mockMvc.perform(post("/access-token/generate")
+                .header("sessionId", "5925a115-1691-47e0-9c46-4c7da03f6bbd")
+                .params(paramsMap))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/execute","cxc_1113")
-                .header("sessionId", sessionId)
+    @Test
+    public void testQueryAccessTokenList() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("pageNo","1");
+        paramsMap.add("pageSize","20");
+        paramsMap.add("searchVal","");
+        MvcResult mvcResult = mockMvc.perform(get("/access-token/list-paging")
+                .header("sessionId", "5925a115-1691-47e0-9c46-4c7da03f6bbd")
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -91,27 +89,12 @@ public class ExecutorControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
     @Test
-    public void testStartCheckProcessDefinition() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/executors/start-check","cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processDefinitionId","40"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testGetReceiverCc() throws Exception {
+    public void testDelAccessTokenById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processInstanceId","13");
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/executors/get-receiver-cc","cxc_1113")
-                .header(SESSION_ID, sessionId)
+        paramsMap.add("id","13");
+        MvcResult mvcResult = mockMvc.perform(post("/access-token/delete")
+                .header("sessionId", "5925a115-1691-47e0-9c46-4c7da03f6bbd")
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -120,4 +103,23 @@ public class ExecutorControllerTest extends AbstractControllerTest{
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
+
+    @Test
+    public void testUpdateToken() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("id","12");
+        paramsMap.add("userId","4");
+        paramsMap.add("expireTime","2019-12-20 00:00:00");
+        paramsMap.add("token","cxctoken123update");
+        MvcResult mvcResult = mockMvc.perform(post("/access-token/update")
+                .header("sessionId", "5925a115-1691-47e0-9c46-4c7da03f6bbd")
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
 }

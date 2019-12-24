@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,133 +35,71 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * process instance controller test
- */
-public class ProcessInstanceControllerTest extends AbstractControllerTest {
-    private static Logger logger = LoggerFactory.getLogger(ProcessInstanceControllerTest.class);
+public class AlertGroupControllerTest extends AbstractControllerTest{
+    private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
 
     @Test
-    public void testQueryProcessInstanceList() throws Exception {
+    public void testCreateAlertgroup() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionId", "91");
-        paramsMap.add("searchVal", "cxc");
-        paramsMap.add("stateType", String.valueOf(ExecutionStatus.SUCCESS));
-        paramsMap.add("host", "192.168.1.13");
-        paramsMap.add("startDate", "2019-12-15 00:00:00");
-        paramsMap.add("endDate", "2019-12-16 00:00:00");
-        paramsMap.add("pageNo", "2");
-        paramsMap.add("pageSize", "2");
+        paramsMap.add("groupName","cxc test group name");
+        paramsMap.add("groupType", AlertType.EMAIL.toString());
+        paramsMap.add("description","cxc junit 测试告警描述");
+        MvcResult mvcResult = mockMvc.perform(post("/alert-group/create")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/list-paging","cxc_1113")
+    @Test
+    public void testList() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        MvcResult mvcResult = mockMvc.perform(get("/alert-group/list")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
+
     }
 
     @Test
-    public void testQueryTaskListByProcessId() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/task-list-by-process-id","cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId","1203"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT,result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testUpdateProcessInstance() throws Exception {
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
-        String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
-
+    public void testListPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processInstanceJson", json);
-        paramsMap.add("processInstanceId", "91");
-        paramsMap.add("scheduleTime", "2019-12-15 00:00:00");
-        paramsMap.add("syncDefine", "false");
-        paramsMap.add("locations", locations);
-        paramsMap.add("connects", "[]");
-//        paramsMap.add("flag", "2");
-
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/instance/update","cxc_1113")
+        paramsMap.add("pageNo","1");
+        paramsMap.add("searchVal", AlertType.EMAIL.toString());
+        paramsMap.add("pageSize","1");
+        MvcResult mvcResult = mockMvc.perform(get("/alert-group/list-paging")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testQueryProcessInstanceById() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-by-id","cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId","1203"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
-
     @Test
-    public void testQuerySubProcessInstanceByTaskId() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-sub-process","cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("taskId","1203"))
+    public void testUpdateAlertgroup() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("id","22");
+        paramsMap.add("groupName", "hd test group name");
+        paramsMap.add("groupType",AlertType.EMAIL.toString());
+        paramsMap.add("description","update alter group");
+        MvcResult mvcResult = mockMvc.perform(post("/alert-group/update")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testQueryParentInstanceBySubId() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-parent-process","cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("subId","1204"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-
-    @Test
-    public void testViewVariables() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/view-variables","cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId","1204"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andReturn();
-
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -168,32 +107,64 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
 
     @Test
-    public void testDeleteProcessInstanceById() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/delete","cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId","1204"))
+    public void testVerifyGroupName() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("groupName","hd test group name");
+        MvcResult mvcResult = mockMvc.perform(get("/alert-group/verify-group-name")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.ALERT_GROUP_EXIST.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
 
+    @Test
+    public void testVerifyGroupNameNotExit() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("groupName","cxc test group name");
+        MvcResult mvcResult = mockMvc.perform(get("/alert-group/verify-group-name")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
-    public void testBatchDeleteProcessInstanceByIds() throws Exception {
+    public void testGrantUser() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("alertgroupId","2");
+        paramsMap.add("userIds","2");
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/batch-delete","cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceIds","1205，1206"))
+        MvcResult mvcResult = mockMvc.perform(post("/alert-group/grant-user")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
-
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getCode(),result.getCode().intValue());
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testDelAlertgroupById() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("id","22");
+        MvcResult mvcResult = mockMvc.perform(post("/alert-group/delete")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

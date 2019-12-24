@@ -25,8 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,11 +37,93 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * tenant controller test
  */
 public class TenantControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
+    private static Logger logger = LoggerFactory.getLogger(TenantControllerTest.class);
+
+    @Test
+    public void testCreateTenant() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("tenantCode","tenantCode");
+        paramsMap.add("tenantName","tenantName");
+        paramsMap.add("queueId","1");
+        paramsMap.add("description","tenant description");
+
+        MvcResult mvcResult = mockMvc.perform(post("/tenant/create")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+
+    }
+
+    @Test
+    public void testQueryTenantlistPaging() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("pageNo","1");
+        paramsMap.add("searchVal","tenant");
+        paramsMap.add("pageSize","30");
+
+        MvcResult mvcResult = mockMvc.perform(get("/tenant/list-paging")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testUpdateTenant() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("id","9");
+        paramsMap.add("tenantCode","cxc_te");
+        paramsMap.add("tenantName","tenant_update_2");
+        paramsMap.add("queueId","1");
+        paramsMap.add("description","tenant description");
+
+        MvcResult mvcResult = mockMvc.perform(post("/tenant/update")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+
+    }
 
 
     @Test
-    public void countTaskState() throws Exception {
+    public void testVerifyTenantCode() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("tenantCode","cxc_test");
+
+        MvcResult mvcResult = mockMvc.perform(get("/tenant/verify-tenant-code")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+
+    }
+
+
+
+    @Test
+    public void testQueryTenantlist() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(get("/tenant/list")
                 .header(SESSION_ID, sessionId))
@@ -46,7 +131,23 @@ public class TenantControllerTest extends AbstractControllerTest{
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andReturn();
 
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
 
+    @Test
+    public void testDeleteTenantById() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("id","64");
+
+        MvcResult mvcResult = mockMvc.perform(post("/tenant/delete")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
