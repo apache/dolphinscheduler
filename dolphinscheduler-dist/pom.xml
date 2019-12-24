@@ -219,7 +219,7 @@
 
                                         <source>
                                             <location>
-                                                ${basedir}/script
+                                                ${basedir}/../script
                                             </location>
                                             <includes>
                                                 <include>config/*.*</include>
