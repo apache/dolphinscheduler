@@ -997,4 +997,9 @@ public final class Constants {
     public static final String CLASS = "class";
     public static final String RECEIVERS = "receivers";
     public static final String RECEIVERS_CC = "receiversCc";
+
+    /**
+     * dataSource sensitive param
+     */
+    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
 }
