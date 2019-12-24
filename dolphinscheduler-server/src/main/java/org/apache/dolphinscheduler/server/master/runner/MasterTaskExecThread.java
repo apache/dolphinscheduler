@@ -75,6 +75,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         Boolean result = false;
         this.taskInstance = submit();
         if(this.taskInstance == null){
+            logger.error("submit task instance to mysql and queue failed , please check and fix it");
             return result;
         }
         if(!this.taskInstance.getState().typeIsFinished()) {
