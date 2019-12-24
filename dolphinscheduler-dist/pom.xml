@@ -228,7 +228,7 @@
                                         </source>
                                         <source>
                                             <location>
-                                                ./src/main/resources
+                                                ${basedir}/src/main/resources
                                             </location>
                                             <includes>
                                                 <include>**/*.properties</include>
