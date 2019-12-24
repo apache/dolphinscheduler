@@ -76,6 +76,13 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-dependency-plugin</artifactId>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <excludeScope>provided</excludeScope>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>copy-dependencies</id>
@@ -83,13 +90,7 @@
                                 <goals>
                                     <goal>copy-dependencies</goal>
                                 </goals>
-                                <configuration>
-                                    <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                                    <overWriteReleases>false</overWriteReleases>
-                                    <overWriteSnapshots>false</overWriteSnapshots>
-                                    <overWriteIfNewer>true</overWriteIfNewer>
-                                    <excludeArtifactIds>javax.servlet:servlet-api:2.5,org.eclipse.jetty.aggregate:jetty-all,org.slf4j:slf4j-log4j12:1.7.5,org.apache.dolphinscheduler:dolphinscheduler-backend</excludeArtifactIds>
-                                </configuration>
+
                             </execution>
                         </executions>
                     </plugin>
@@ -162,6 +163,10 @@
                                             <includes>
                                                 <include>*.*</include>
                                             </includes>
+                                            <excludes>
+                                                <exclude>servlet-api-*.jar</exclude>
+                                                <exclude>slf4j-log4j12-${slf4j.log4j12.version}.jar</exclude>
+                                            </excludes>
                                         </source>
                                     </sources>
                                 </mapping>
