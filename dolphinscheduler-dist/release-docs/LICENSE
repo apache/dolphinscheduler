@@ -505,21 +505,22 @@ The text of each license is also included at licenses/ui-licenses/LICENSE-[proje
 ========================================
 MIT licenses
 ========================================
-    vue	2.5.17:	https://github.com/vuejs/vue	MIT
-    jquery 1.12.4: https://github.com/jquery/jquery MIT
-    vue-router 2.7.0: https://github.com/vuejs/vue-router MIT
-    vuex 3.0.0: https://github.com/vuejs/vuex MIT
+    ans-UI 1.1.7: https://github.com/analysys/ans-ui MIT
+    axios 0.16.2: https://github.com/axios/axios MIT
     bootstrap 3.3.7: https://github.com/twbs/bootstrap MIT
     canvg 1.5.1: https://github.com/canvg/canvg MIT
     clipboard 2.0.1: https://github.com/zenorocha/clipboard.js MIT
     codemirror 5.43.0: https://github.com/codemirror/CodeMirror MIT
     dayjs 1.7.8: https://github.com/iamkun/dayjs MIT
     html2canvas 0.5.0-beta4: https://github.com/niklasvh/html2canvas MIT
-    lodash 4.17.11: https://github.com/lodash/lodash MIT
-    vuex-router-sync 4.1.2: https://github.com/vuejs/vuex-router-sync MIT
-    ans-UI 0.0.22: https://github.com/analysys/ans-ui MIT
-    axios 0.16.2: https://github.com/axios/axios MIT
+    jquery 3.3.1: https://github.com/jquery/jquery MIT
+    jquery-ui 1.12.1: https://github.com/jquery/jquery-ui MIT
     jsplumb 2.8.6: https://github.com/jsplumb/jsplumb MIT and GPLv2
+    lodash 4.17.11: https://github.com/lodash/lodash MIT
+    vue	2.5.17:	https://github.com/vuejs/vue	MIT
+    vue-router 2.7.0: https://github.com/vuejs/vue-router MIT
+    vuex 3.0.0: https://github.com/vuejs/vuex MIT
+    vuex-router-sync 4.1.2: https://github.com/vuejs/vuex-router-sync MIT
 
 ========================================
 Apache 2.0 licenses
