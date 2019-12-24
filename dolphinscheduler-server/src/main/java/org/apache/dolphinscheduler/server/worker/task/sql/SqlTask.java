@@ -174,6 +174,9 @@ public class SqlTask extends AbstractTask {
 
             // execute sql task
             con = executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
         } finally {
             if (con != null) {
                 try {
@@ -211,7 +214,7 @@ public class SqlTask extends AbstractTask {
         if (StringUtils.isNotEmpty(sqlParameters.getTitle())){
             String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(),
                     ParamUtils.convert(paramsMap));
-            logger.info("SQL tile : {}",title);
+            logger.info("SQL title : {}",title);
             sqlParameters.setTitle(title);
         }
 
@@ -258,9 +261,7 @@ public class SqlTask extends AbstractTask {
                 Map<String, String> connParamMap = CollectionUtils.stringToMap(sqlParameters.getConnParams(),
                         SEMICOLON,
                         HIVE_CONF);
-                if(connParamMap != null){
-                    paramProp.putAll(connParamMap);
-                }
+                paramProp.putAll(connParamMap);
 
                 connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
                         paramProp);

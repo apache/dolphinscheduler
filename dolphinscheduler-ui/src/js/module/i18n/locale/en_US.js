@@ -20,6 +20,7 @@ export default {
   'Please enter user name': 'Please enter user name',
   'Password': 'Password',
   'Please enter your password': 'Please enter your password',
+  'Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22': 'Password consists of at least two combinations of numbers, letters, and characters, and the length is between 6-22',
   'Login': 'Login',
   'Home': 'Home',
   'Failed to create node to save': 'Failed to create node to save',
@@ -81,7 +82,6 @@ export default {
   'Please enter a positive integer': 'Please enter a positive integer',
   'Program Type': 'Program Type',
   'Main class': 'Main class',
-  'Please enter main class': 'Please enter main class',
   'Main jar package': 'Main jar package',
   'Please enter main jar package': 'Please enter main jar package',
   'Command-line parameters': 'Command-line parameters',
@@ -314,6 +314,7 @@ export default {
   'Waiting for dependence': 'Waiting for dependence',
   'Start': 'Start',
   'Copy': 'Copy',
+  'Copy name': 'Copy name',
   'Delete': 'Delete',
   'Please enter keyword': 'Please enter keyword',
   'File Upload': 'File Upload',
@@ -481,8 +482,8 @@ export default {
   'failure command number': 'failure command number',
   'tasks number of waiting running': 'tasks number of waiting running',
   'task number of ready to kill': 'task number of ready to kill',
-  'Statistics manage': 'Statistics manage',
-  'statistics': 'statistics',
+  'Statistics manage': 'Statistics Manage',
+  'statistics': 'Statistics',
   'select tenant':'select tenant',
   'Please enter Principal':'Please enter Principal',
   'The start time must not be the same as the end': 'The start time must not be the same as the end',
@@ -505,5 +506,6 @@ export default {
   'There is no data for this period of time': 'There is no data for this period of time',
   'IP address cannot be empty': 'IP address cannot be empty',
   'Please enter the correct IP': 'Please enter the correct IP',
-  'Please generate token': 'Please generate token'
+  'Please generate token': 'Please generate token',
+  'Spark Version': 'Spark Version'
 }

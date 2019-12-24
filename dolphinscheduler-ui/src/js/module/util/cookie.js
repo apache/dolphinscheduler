@@ -1,19 +1,18 @@
-/**
- * Cookies utils with setter and getter apis.
- * Inspired by <https://github.com/carhartl/jquery-cookie/>
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * ```js
- * let cookie = require('lib/core/1.0.0/cookie');
- * cookie.set('foo', 'foo_value');
- * cookie.set('foo2', 'foo_value2', {expires: 7}); // expires 7 days
- * let value = cookie.get('foo');
- * cookie.set('foo', null) // clear cookie
- * console.log(value); // foo
- * console.log(cookie.get('foo')); // null
- * ```
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * @author Allex Wang (allex.wxn@gmail.com)
- * MIT Licensed
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 let document = window.document
 let trim = function (s) {

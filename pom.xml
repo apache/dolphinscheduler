@@ -113,6 +113,9 @@
 		<jacoco.version>0.8.4</jacoco.version>
 		<jcip.version>1.0</jcip.version>
 		<maven.deploy.skip>false</maven.deploy.skip>
+		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
+		<mockito.version>2.21.0</mockito.version>
+		<powermock.version>2.0.2</powermock.version>
 	</properties>
 
 	<dependencyManagement>
@@ -303,6 +306,36 @@
 				<artifactId>junit</artifactId>
 				<version>${junit.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.version}</version>
+				<type>jar</type>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-module-junit4</artifactId>
+				<version>${powermock.version}</version>
+				<type>jar</type>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-api-mockito2</artifactId>
+				<version>${powermock.version}</version>
+				<type>jar</type>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.mockito</groupId>
+						<artifactId>mockito-core</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
 			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
@@ -618,7 +651,7 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<encoding>${project.build.sourceEncoding}</encoding>
-					<skip>true</skip><!--not skip compile test classes-->
+					<skip>false</skip><!--not skip compile test classes-->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -627,7 +660,16 @@
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<includes>
-						<include>**/*Test*.java</include><!--run test classes-->
+						<include>**/common/utils/*.java</include>
+						<include>**/common/graph/*.java</include>
+						<include>**/common/queue/*.java</include>
+						<include>**/api/utils/CheckUtilsTest.java</include>
+						<include>**/api/utils/FileUtilsTest.java</include>
+						<include>**/alert/utils/ExcelUtilsTest.java</include>
+						<include>**/alert/utils/FuncUtilsTest.java</include>
+						<include>**/alert/utils/JSONUtilsTest.java</include>
+						<include>**/alert/utils/PropertyUtilsTest.java</include>
+						<include>**/server/utils/SparkArgsUtilsTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
@@ -730,6 +772,7 @@
 						<sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
 					</sourceDirectories>
 					<excludes>**\/generated-sources\/</excludes>
+					<skip>true</skip>
 				</configuration>
 				<executions>
 					<execution>
@@ -739,6 +782,27 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>${cobertura-maven-plugin.version}</version>
+				<configuration>
+					<check>
+					</check>
+					<aggregate>true</aggregate>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<quiet>true</quiet>
+					<format>xml</format>
+					<instrumentation>
+						<ignoreTrivial>true</ignoreTrivial>
+						<ignoreMethodAnnotations>
+							<ignoreMethodAnnotation>lombok.Generated</ignoreMethodAnnotation>
+						</ignoreMethodAnnotations>
+						<excludes>
+						</excludes>
+					</instrumentation>
+				</configuration>
 			</plugin>
 		</plugins>
 
