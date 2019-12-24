@@ -1,8 +1,8 @@
 {
-  "name": "dolphinscheduler",
+  "name": "dolphinscheduler-ui-frontend",
   "version": "1.0.0",
-  "description": "dolphinscheduler",
-  "author": "gongzijian <gongzijian@analysys.com.cn>",
+  "description": "A vue.js project",
+  "author": "DolphinScheduler",
   "scripts": {
     "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./build/webpack.config.prod.js",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.config.dev.js",
