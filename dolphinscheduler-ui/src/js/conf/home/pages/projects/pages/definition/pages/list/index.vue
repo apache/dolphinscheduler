@@ -29,7 +29,7 @@
       <template v-if="processListP.length">
         <m-list :process-list="processListP" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page"></x-page>
+          <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
       <template v-if="!processListP.length">
@@ -84,6 +84,9 @@
       _page (val) {
         this.searchParams.pageNo = val
       },
+      _pageSize (val) {
+        this.searchParams.pageSize = val
+      },
       /**
        * conditions
        */
@@ -123,7 +126,8 @@
     created () {
       localStore.removeItem('subProcessId')
     },
-    mounted () {
+    mounted() {
+      this.$modal.destroy()
     },
     components: { mList, mConditions, mSpin, mListConstruction, mSecondaryMenu, mNoData }
   }

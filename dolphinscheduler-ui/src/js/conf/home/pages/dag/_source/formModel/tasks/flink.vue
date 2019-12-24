@@ -98,7 +98,7 @@
         </span>
       </div>
       <div class="clearfix list">
-        <span class="sp1">{{$t('jobManagerMemory')}}</span>
+        <span class="sp1" style="word-break:break-all">{{$t('jobManagerMemory')}}</span>
         <span class="sp2">
           <x-input
                   :disabled="isDetails"

@@ -51,7 +51,7 @@
           <x-option
                   v-for="city in warningTypeList"
                   :key="city.id"
-                  :value="city"
+                  :value="city.id"
                   :label="city.code">
           </x-option>
         </x-select>
@@ -82,14 +82,14 @@
                 style="width: 200px;"
                 v-model="warningGroupId"
                 :disabled="!notifyGroupList.length">
-          <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
-            <i slot="suffix" class="fa fa-times-circle" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></i>
-            <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId.id"></i>
+          <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = ''">
+            <i slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId"></i>
+            <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId"></i>
           </x-input>
           <x-option
                   v-for="city in notifyGroupList"
                   :key="city.id"
-                  :value="city"
+                  :value="city.id"
                   :label="city.code">
           </x-option>
         </x-select>
@@ -174,9 +174,9 @@
         processDefinitionId: 0,
         failureStrategy: 'CONTINUE',
         warningTypeList: warningTypeList,
-        warningType: {},
+        warningType: '',
         notifyGroupList: [],
-        warningGroupId: {},
+        warningGroupId: '',
         scheduleTime: '',
         spinnerLoading: false,
         execType: false,
@@ -206,8 +206,8 @@
           processDefinitionId: this.item.id,
           scheduleTime: this.scheduleTime.length && this.scheduleTime.join(',') || '',
           failureStrategy: this.failureStrategy,
-          warningType: this.warningType.id,
-          warningGroupId: _.isEmpty(this.warningGroupId) ? 0 : this.warningGroupId.id,
+          warningType: this.warningType,
+          warningGroupId: this.warningGroupId=='' ? 0 : this.warningGroupId,
           execType: this.execType ? 'COMPLEMENT_DATA' : null,
           startNodeList: this.startNodeList,
           taskDependType: this.taskDependType,
@@ -266,14 +266,14 @@
       }
     },
     created () {
-      this.warningType = this.warningTypeList[0]
+      this.warningType = this.warningTypeList[0].id
 
       this._getReceiver()
     },
     mounted () {
       this._getNotifyGroupList().then(() => {
         this.$nextTick(() => {
-          this.warningGroupId = { id: 0 }
+          this.warningGroupId = ''
         })
       })
     },

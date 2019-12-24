@@ -91,7 +91,7 @@
                         data-toggle="tooltip"
                         :title="$t('Edit')"
                         @click="_editTiming(item)"
-                        icon="iconfont icon-bianji"
+                        icon="ans-icon-edit"
                         :disabled="item.releaseState === 'ONLINE'" >
                 </x-button>
                 <x-button
@@ -101,7 +101,7 @@
                         data-toggle="tooltip"
                         :title="$t('online')"
                         @click="_online(item)"
-                        icon="iconfont icon-erji-xiaxianjilu-copy"
+                        icon="ans-icon-upward"
                         v-if="item.releaseState === 'OFFLINE'">
                 </x-button>
                 <x-button
@@ -110,7 +110,7 @@
                         size="xsmall"
                         data-toggle="tooltip"
                         :title="$t('offline')"
-                        icon="iconfont icon-erji-xiaxianjilu"
+                        icon="ans-icon-downward"
                         @click="_offline(item)"
                         v-if="item.releaseState === 'ONLINE'">
                 </x-button>
@@ -125,7 +125,7 @@
                   </div>
                   <template slot="reference">
                     <x-button
-                            icon="iconfont icon-shanchu"
+                            icon="ans-icon-trash"
                             type="error"
                             shape="circle"
                             size="xsmall"
@@ -140,7 +140,7 @@
           </table>
         </div>
         <div class="page-box">
-          <x-page :current="pageNo" :total="total" show-elevator @on-change="_page"></x-page>
+          <x-page :current="pageNo" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
       <template v-if="!list.length">
@@ -205,6 +205,10 @@
        */
       _page (val) {
         this.pageNo = val
+        this._getScheduleList()
+      },
+      _pageSize (val) {
+        this.pageSize = val
         this._getScheduleList()
       },
       /**

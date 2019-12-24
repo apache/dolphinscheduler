@@ -27,7 +27,7 @@
       <template v-if="projectsList.length">
         <m-list :projects-list="projectsList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
         <div class="page-box">
-          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page"></x-page>
+          <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
       <template v-if="!projectsList.length">
@@ -78,6 +78,9 @@
       _page (val) {
         this.searchParams.pageNo = val
       },
+      _pageSize (val) {
+        this.searchParams.pageSize = val
+      },
       _create (item) {
         let self = this
         let modal = this.$modal.dialog({
@@ -126,6 +129,7 @@
     created () {
     },
     mounted () {
+      this.$modal.destroy()
     },
     components: { mListConstruction, mSpin, mConditions, mList, mCreateProject, mNoData }
   }
