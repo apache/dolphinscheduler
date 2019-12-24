@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import echarts from 'echarts'
 export default function (value) {
   return {
     series: [
@@ -36,23 +37,23 @@ export default function (value) {
               }], false) ], // 100% Color in place
               [ 0.7, new echarts.graphic.LinearGradient(0, 0, 1, 0, [{ // eslint-disable-line
                 offset: 1,
-                color:  '#C7DD6B'// 70% Color in place
+                color:  '#FFC539'// 70% Color in place
               }, {
                 offset: 0.8,
                 color:  '#FEEC49'// 66% Color in place
               }, {
                 offset: 0,
-                color:  '#FFC539'// 50% Color in place
+                color:  '#C7DD6B'// 50% Color in place
               }], false) ],
               [ 0.9, new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ // eslint-disable-line
                 offset: 1,
-                color: '#FFC539' // 90% Color in place
+                color: '#E75F25' // 90% Color in place
               }, {
                 offset: 0.8,
                 color: '#FE951E' // 86% Color in place
               }, {
                 offset: 0,
-                color: '#E75F25' // 70% Color in place
+                color: '#FFC539' // 70% Color in place
               }], false) ],
               [1, new echarts.graphic.LinearGradient(0, 0, 0, 1, [ { // eslint-disable-line
                 offset: 0.2,
