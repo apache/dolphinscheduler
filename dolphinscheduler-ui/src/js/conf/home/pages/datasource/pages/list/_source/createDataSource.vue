@@ -32,6 +32,7 @@
               <x-radio :label="'CLICKHOUSE'">CLICKHOUSE</x-radio>
               <x-radio :label="'ORACLE'">ORACLE</x-radio>
               <x-radio :label="'SQLSERVER'">SQLSERVER</x-radio>
+              <x-radio :label="'DB2'" class="radio-label-last" >DB2</x-radio>
             </x-radio-group>
           </template>
         </m-list-box-f>
@@ -182,7 +183,8 @@
         testLoading: false,
         showPrincipal: true,
         showdDatabase: false,
-        isShowPrincipal:true
+        isShowPrincipal:true,
+        prePortMapper:{}
       }
     },
     props: {
@@ -220,7 +222,7 @@
           host: this.host,
           port: this.port,
           database: this.database,
-          principal:this.principal,
+          principal: this.principal,
           userName: this.userName,
           password: this.password,
           other: this.other
@@ -316,13 +318,19 @@
       /**
        * Get modified data
        */
-      _getEditDatasource () {
-        this.store.dispatch('datasource/getEditDatasource', { id: this.item.id }).then(res => {
+      _getEditDatasource() {
+        this.store.dispatch('datasource/getEditDatasource', {id: this.item.id}).then(res => {
           this.type = res.type
           this.name = res.name
           this.note = res.note
           this.host = res.host
-          this.port = res.port
+
+          //When in Editpage, Prevent default value overwrite backfill value
+          let that = this;
+          setTimeout(() => {
+            this.port = res.port
+          },0)
+
           this.principal = res.principal
           this.database = res.database
           this.userName = res.userName
@@ -331,13 +339,68 @@
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
-      }
+      },
+      /**
+       * Set default port for each type.
+       */
+      _setDefaultValues(value) {
+
+        //Default type is MYSQL
+        let type = this.type || 'MYSQL'
+
+        let defaultPort = this._getDefaultPort(type)
+
+        //Backfill the previous input from memcache
+        let mapperPort = this.prePortMapper[type]
+
+        this.port = mapperPort || defaultPort
+
+      },
+
+      /**
+       * Get default port by type
+       */
+      _getDefaultPort(type) {
+        var defaultPort = ''
+        switch (type) {
+          case 'MYSQL':
+            defaultPort = '3306'
+            break
+          case 'POSTGRESQL':
+            defaultPort = '5432'
+            break
+          case 'HIVE':
+            defaultPort = '10000'
+            break
+          case 'SPARK':
+            defaultPort = '10015'
+            break
+          case 'CLICKHOUSE':
+            defaultPort = '8123'
+            break
+          case 'ORACLE':
+            defaultPort = '1521'
+            break
+          case 'SQLSERVER':
+            defaultPort = '1433'
+            break
+          case 'DB2':
+            defaultPort = '50000'
+            break
+          default:
+            break
+
+        }
+        return defaultPort
+      },
     },
     created () {
       // Backfill
       if (this.item.id) {
         this._getEditDatasource()
       }
+
+      this._setDefaultValues()
 
     },
     watch: {
@@ -347,6 +410,10 @@
         } else {
           this.showdDatabase = false;
         }
+
+        //Set default port for each type datasource
+        this._setDefaultValues(value)
+
         return new Promise((resolve, reject) => {
           this.store.dispatch('datasource/getKerberosStartupState').then(res => {
             this.isShowPrincipal=res
@@ -360,9 +427,16 @@
             reject(e)
           })
         })
+      },
+      /**
+       * Cache the previous input port for each type datasource
+       * @param value
+       */
+      port(value){
+        this.prePortMapper[this.type] = value
       }
     },
-    
+
     mounted () {
     },
     components: { mPopup, mListBoxF }
@@ -402,5 +476,10 @@
         }
       }
     }
+    .radio-label-last {
+      margin-left: 0px !important;
+    }
   }
+
+
 </style>

@@ -25,7 +25,7 @@
               type="text"
               v-model="localParamsList[$index].prop"
               :placeholder="$t('prop(required)')"
-              maxlength="64"
+              maxlength="256"
               @on-blur="_verifProp()"
               :style="inputStyle">
       </x-input>
@@ -60,24 +60,24 @@
               type="text"
               v-model="localParamsList[$index].value"
               :placeholder="$t('value(optional)')"
-              maxlength="64"
+              maxlength="256"
               @on-blur="_handleValue()"
               :style="inputStyle">
       </x-input>
       <span class="lt-add">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" >&#xe611;</i>
+          <i class="ans-icon-trash" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></i>
         </a>
       </span>
       <span class="add" v-if="$index === (localParamsList.length - 1)">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
+          <i class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></i>
         </a>
       </span>
     </div>
     <span class="add-dp" v-if="!localParamsList.length">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
-        <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
+        <i class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></i>
       </a>
     </span>
   </div>
@@ -222,10 +222,10 @@
       a {
         color: #000;
         .iconfont {
-          font-size: 18px;
+          font-size: 16px;
           vertical-align: middle;
           display: inline-block;
-          margin-top: 1px;
+          margin-top: -5px;
         }
       }
     }

@@ -29,7 +29,7 @@
                 <th>{{$t('Number')}}</th>
                 <th>{{$t('State')}}</th>
               </tr>
-              <tr v-for="(item,$index) in taskCtatusList">
+              <tr v-for="(item,$index) in taskCtatusList" :key="$index">
                 <td><span>{{$index+1}}</span></td>
                 <td>
                   <span>

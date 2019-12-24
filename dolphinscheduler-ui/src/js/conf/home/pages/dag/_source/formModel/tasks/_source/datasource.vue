@@ -35,7 +35,7 @@
         <x-option
                 v-for="city in datasourceList"
                 :key="city.id"
-                :value="city"
+                :value="city.id"
                 :label="city.code">
         </x-option>
       </x-select>
@@ -56,7 +56,7 @@
         // Data source type(List)
         typeList: [],
         // data source
-        datasource: {},
+        datasource: '',
         // data source(List)
         datasourceList: []
       }
@@ -77,7 +77,7 @@
         }
         this.$emit('on-dsData', {
           type: this.type,
-          datasource: this.datasource.id
+          datasource: this.datasource
         })
         return true
       },
@@ -104,10 +104,10 @@
       _handleTypeChanged ({ value }) {
         this.type = value
         this._getDatasourceData().then(res => {
-          this.datasource = this.datasourceList.length && this.datasourceList[0] || {}
+          this.datasource = this.datasourceList.length && this.datasourceList[0].id || ''
           this.$emit('on-dsData', {
             type: this.type,
-            datasource: this.datasource.id
+            datasource: this.datasource
           })
         })
       }
@@ -129,11 +129,11 @@
       this._getDatasourceData().then(res => {
         if (_.isEmpty(this.data)) {
           this.$nextTick(() => {
-            this.datasource = this.datasourceList[0]
+            this.datasource = this.datasourceList[0].id
           })
         } else {
           this.$nextTick(() => {
-            this.datasource = _.filter(this.datasourceList, v => v.id === this.data.datasource)[0]
+            this.datasource = this.data.datasource
           })
         }
         this.$emit('on-dsData', {

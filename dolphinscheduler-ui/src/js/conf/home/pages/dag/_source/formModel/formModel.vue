@@ -16,15 +16,15 @@
  */
 <template>
   <div class="form-model-model" v-clickoutside="_handleClose">
-    <div class="title-box">
+    <div class="title-box"> 
       <span class="name">{{$t('Current node settings')}}</span>
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
         <m-log :item="backfillItem">
-          <template slot="history"><a href="javascript:" @click="_seeHistory" ><i class="iconfont">&#xe6ee;</i><em>{{$t('View history')}}</em></a></template>
-          <template slot="log"><a href="javascript:"><i class="iconfont">&#xe691;</i><em>{{$t('View log')}}</em></a></template>
+          <template slot="history"><a href="javascript:" @click="_seeHistory" ><i class="ansicon ans-icon-timer"></i><em>{{$t('View history')}}</em></a></template>
+          <template slot="log"><a href="javascript:"><i class="ansicon ans-icon-log"></i><em>{{$t('View log')}}</em></a></template>
         </m-log>
-        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><i class="iconfont">&#xe600;</i><em>{{$t('Enter this child node')}}</em></a>
+        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><i class="ansicon ans-icon-node"></i><em>{{$t('Enter this child node')}}</em></a>
       </span>
     </div>
     <div class="content-box" v-if="isContentBox">
@@ -282,7 +282,7 @@
        * Click external to close the current component
        */
       _handleClose () {
-        this.close()
+        // this.close()
       },
       /**
        * Jump to task instance
@@ -369,7 +369,6 @@
         }
 
         $(`#${this.id}`).find('span').text(this.name)
-
         // Store the corresponding node data structure
         this.$emit('addTaskInfo', {
           item: {
@@ -455,7 +454,23 @@
           this.description = o.description
           this.maxRetryTimes = o.maxRetryTimes
           this.retryInterval = o.retryInterval
-          this.workerGroupId = o.workerGroupId
+
+          // If the workergroup has been deleted, set the default workergroup
+          var hasMatch = false;
+          for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
+            var workerGroupId = this.store.state.security.workerGroupsListAll[i].id
+            if (o.workerGroupId == workerGroupId) {
+              hasMatch = true;
+              break;
+            }
+          }
+
+          if(!hasMatch){
+            this.workerGroupId = -1
+          }else{
+            this.workerGroupId = o.workerGroupId
+          }
+
         }
       }
       this.isContentBox = true

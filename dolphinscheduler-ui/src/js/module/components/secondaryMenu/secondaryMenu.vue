@@ -20,7 +20,7 @@
       <a href="javascript:" class="tog-close" @click="_toggleMenu" v-if="!isTogHide"></a>
       <a href="javascript:" class="tog-open" @click="_toggleMenu" v-if="isTogHide"></a>
     </div>
-    <div class="leven-1" v-for="(item,$index) in menuList">
+    <div class="leven-1" v-for="(item,$index) in menuList" :key="$index">
       <div v-if="item.disabled">
         <template v-if="item.path">
           <router-link :to="{ name: item.path}">
@@ -28,7 +28,7 @@
               <a href="javascript:">
                 <i class="fa icon" :class="item.icon"></i>
                 <span>{{item.name}}</span>
-                <i class="fa angle" :class="item.isOpen ? 'fa-angle-down' : 'fa-angle-right'" v-if="item.children.length"></i>
+                <i class="fa angle" :class="item.isOpen ? 'ans-icon-arrow-down' : 'ans-icon-arrow-right'" v-if="item.children.length"></i>
               </a>
             </div>
           </router-link>
@@ -38,13 +38,13 @@
             <a href="javascript:">
               <i class="fa icon" :class="item.icon"></i>
               <span>{{item.name}}</span>
-              <i class="fa angle" :class="item.isOpen ? 'fa-angle-down' : 'fa-angle-right'" v-if="item.children.length"></i>
+              <i class="fa angle" :class="item.isOpen ? 'ans-icon-arrow-down' : 'ans-icon-arrow-right'" v-if="item.children.length"></i>
             </a>
           </div>
         </template>
         <ul v-if="item.isOpen && item.children.length">
           <template v-for="(el,index) in item.children">
-            <router-link :to="{ name: el.path}" tag="li" active-class="active" v-if="el.disabled">
+            <router-link :to="{ name: el.path}" tag="li" active-class="active" v-if="el.disabled" :key="index">
               <span>{{el.name}}</span>
             </router-link>
           </template>
@@ -150,7 +150,7 @@
           >.angle {
             position: absolute;
             right: 12px;
-            top: 14px;
+            top: 3px;
           }
 
         }

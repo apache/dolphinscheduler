@@ -43,7 +43,7 @@
           <template slot="content">
             <x-input
                     type="input"
-                    maxlength="40"
+                    maxlength="100"
                     v-model="className"
                     :placeholder="$t('Please enter a Package name')">
             </x-input>
@@ -80,7 +80,7 @@
               <x-option
                       v-for="city in udfResourceList"
                       :key="city.id"
-                      :value="city"
+                      :value="city.id"
                       :label="city.alias">
               </x-option>
             </x-select>
@@ -129,7 +129,7 @@
         argTypes: '',
         database: '',
         description: '',
-        resourceId: {},
+        resourceId: '',
         udfResourceList: [],
         isUpdate: false,
         upDisabled: false
@@ -165,7 +165,7 @@
             argTypes: this.argTypes, // Can not pass this parameter
             database: this.database, // Can not pass this parameter
             description: this.description,
-            resourceId: this.resourceId.id
+            resourceId: this.resourceId
           }
 
           let id = this.item && this.item.id || null
@@ -210,7 +210,7 @@
         this.udfResourceList.push(o)
         this.isUpdate = false
         this.$nextTick(() => {
-          this.resourceId = _.filter(this.udfResourceList, v => v.id === o.id)[0]
+          this.resourceId = o.id
         })
         this.$refs.popup.apDisabled = false
       },
@@ -268,9 +268,9 @@
           this.argTypes = this.item.argTypes || ''
           this.database = this.item.database || ''
           this.description = this.item.description || ''
-          this.resourceId = _.filter(this.udfResourceList, v => v.id === this.item.resourceId)[0]
+          this.resourceId = this.item.resourceId
         } else {
-          this.resourceId = this.udfResourceList.length && this.udfResourceList[0] || []
+          this.resourceId = this.udfResourceList.length && this.udfResourceList[0].id || ''
         }
       })
     },
