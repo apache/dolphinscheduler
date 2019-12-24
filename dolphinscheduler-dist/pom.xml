@@ -226,16 +226,7 @@
                                                 <include>env/*.*</include>
                                             </includes>
                                         </source>
-                                        <source>
-                                            <location>
-                                                ${basedir}/src/main/resources
-                                            </location>
-                                            <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
-                                            </includes>
-                                        </source>
+
 
                                     </sources>
                                 </mapping>
