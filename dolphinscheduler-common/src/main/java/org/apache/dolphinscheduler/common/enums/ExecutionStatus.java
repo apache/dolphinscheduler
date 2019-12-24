@@ -21,7 +21,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
 /**
- * runing status for workflow and task nodes
+ * running status for workflow and task nodes
  *
  */
 @Getter
