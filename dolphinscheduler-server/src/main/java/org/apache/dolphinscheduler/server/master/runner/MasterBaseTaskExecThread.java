@@ -134,9 +134,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                     return task;
                 }
                 if(!submitDB){
-                    logger.error("task commit to db failed , task has already retry {} times, please check the database", retryTimes);
+                    logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
                 }else if(!submitQueue){
-                    logger.error("task commit to queue failed , task has already retry {} times, please check the database", retryTimes);
+                    logger.error("task commit to queue failed , taskId {} has already retry {} times, please check the queue", taskInstance.getId(), retryTimes);
                 }
                 Thread.sleep(commitRetryInterval);
             } catch (Exception e) {
