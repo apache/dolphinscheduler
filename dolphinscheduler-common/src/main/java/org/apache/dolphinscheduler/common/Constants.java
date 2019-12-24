@@ -32,16 +32,6 @@ public final class Constants {
     public static final String ZOOKEEPER_PROPERTIES_PATH = "zookeeper.properties";
 
     /**
-     * worker properties path
-     */
-    public static final String WORKER_PROPERTIES_PATH = "worker.properties";
-
-    /**
-     * master properties path
-     */
-    public static final String MASTER_PROPERTIES_PATH = "master.properties";
-
-    /**
      * hadoop properties path
      */
     public static final String HADOOP_PROPERTIES_PATH = "/common/hadoop/hadoop.properties";
@@ -325,12 +315,12 @@ public final class Constants {
     /**
      * user name regex
      */
-    public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9_-]{3,20}$");
+    public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,20}$");
 
     /**
      * email regex
      */
-    public static final Pattern REGEX_MAIL_NAME = Pattern.compile("^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
+    public static final Pattern REGEX_MAIL_NAME = Pattern.compile("^([a-z0-9A-Z]+[_|\\-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$");
 
     /**
      * read permission
@@ -449,7 +439,7 @@ public final class Constants {
     /**
      * default master commit retry interval
      */
-    public static final int defaultMasterCommitRetryInterval = 100;
+    public static final int defaultMasterCommitRetryInterval = 3000;
 
     /**
      * time unit secong to minutes
@@ -613,44 +603,6 @@ public final class Constants {
      */
     public static final String MR_QUEUE = "mapreduce.job.queuename";
 
-
-    /**
-     * jdbc class name
-     */
-    /**
-     * mysql
-     */
-    public static final String JDBC_MYSQL_CLASS_NAME = "com.mysql.jdbc.Driver";
-
-    /**
-     * postgresql
-     */
-    public static final String JDBC_POSTGRESQL_CLASS_NAME = "org.postgresql.Driver";
-
-    /**
-     * hive
-     */
-    public static final String JDBC_HIVE_CLASS_NAME = "org.apache.hive.jdbc.HiveDriver";
-
-    /**
-     * spark
-     */
-    public static final String JDBC_SPARK_CLASS_NAME = "org.apache.hive.jdbc.HiveDriver";
-
-    /**
-     * ClickHouse
-     */
-    public static final String JDBC_CLICKHOUSE_CLASS_NAME = "ru.yandex.clickhouse.ClickHouseDriver";
-
-    /**
-     * Oracle
-     */
-    public static final String JDBC_ORACLE_CLASS_NAME = "oracle.jdbc.driver.OracleDriver";
-
-    /**
-     * Oracle
-     */
-    public static final String JDBC_SQLSERVER_CLASS_NAME = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 
     /**
      * spark params constant
@@ -1003,6 +955,7 @@ public final class Constants {
     public static final String COM_CLICKHOUSE_JDBC_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
     public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
 
     /**
      * database type
@@ -1014,6 +967,7 @@ public final class Constants {
     public static final String CLICKHOUSE = "CLICKHOUSE";
     public static final String ORACLE = "ORACLE";
     public static final String SQLSERVER = "SQLSERVER";
+    public static final String DB2 = "DB2";
 
     /**
      * jdbc url
@@ -1024,6 +978,7 @@ public final class Constants {
     public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
     public static final String JDBC_ORACLE = "jdbc:oracle:thin:@//";
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
+    public static final String JDBC_DB2 = "jdbc:db2://";
 
 
     public static final String ADDRESS = "address";

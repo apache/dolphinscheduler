@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.apache.curator.framework.imps.CuratorFrameworkState;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -24,10 +26,9 @@ import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
-import org.apache.commons.configuration.Configuration;
-import org.apache.curator.framework.imps.CuratorFrameworkState;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,23 +66,23 @@ public class MasterSchedulerThread implements Runnable {
     private int masterExecThreadNum;
 
     /**
-     * Configuration of MasterSchedulerThread
+     * master config
      */
-    private final Configuration conf;
+    private MasterConfig masterConfig;
+
 
     /**
      * constructor of MasterSchedulerThread
      * @param zkClient              zookeeper master client
      * @param processDao            process dao
-     * @param conf                  conf
      * @param masterExecThreadNum   master exec thread num
      */
-    public MasterSchedulerThread(ZKMasterClient zkClient, ProcessDao processDao, Configuration conf, int masterExecThreadNum){
+    public MasterSchedulerThread(ZKMasterClient zkClient, ProcessDao processDao, int masterExecThreadNum){
         this.processDao = processDao;
         this.zkMasterClient = zkClient;
-        this.conf = conf;
         this.masterExecThreadNum = masterExecThreadNum;
         this.masterExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread",masterExecThreadNum);
+        this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
     }
 
     /**
@@ -97,39 +98,41 @@ public class MasterSchedulerThread implements Runnable {
             InterProcessMutex mutex = null;
             try {
 
-                if(OSUtils.checkResource(conf, true)){
-                    if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
+                boolean runCheckFlag = OSUtils.checkResource(masterConfig.getMasterMaxCpuloadAvg(), masterConfig.getMasterReservedMemory());
+                if(!runCheckFlag) {
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    continue;
+                }
+                if (zkMasterClient.getZkClient().getState() == CuratorFrameworkState.STARTED) {
 
-                        // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
-                        String znodeLock = zkMasterClient.getMasterLockPath();
+                    // create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/masters
+                    String znodeLock = zkMasterClient.getMasterLockPath();
 
-                        mutex = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
-                        mutex.acquire();
+                    mutex = new InterProcessMutex(zkMasterClient.getZkClient(), znodeLock);
+                    mutex.acquire();
 
-                        ThreadPoolExecutor poolExecutor = (ThreadPoolExecutor) masterExecService;
-                        int activeCount = poolExecutor.getActiveCount();
-                        // make sure to scan and delete command  table in one transaction
-                        Command command = processDao.findOneCommand();
-                        if (command != null) {
-                            logger.info(String.format("find one command: id: %d, type: %s", command.getId(),command.getCommandType().toString()));
+                    ThreadPoolExecutor poolExecutor = (ThreadPoolExecutor) masterExecService;
+                    int activeCount = poolExecutor.getActiveCount();
+                    // make sure to scan and delete command  table in one transaction
+                    Command command = processDao.findOneCommand();
+                    if (command != null) {
+                        logger.info(String.format("find one command: id: %d, type: %s", command.getId(),command.getCommandType().toString()));
 
-                            try{
-                                processInstance = processDao.handleCommand(logger, OSUtils.getHost(), this.masterExecThreadNum - activeCount, command);
-                                if (processInstance != null) {
-                                    logger.info("start master exec thread , split DAG ...");
-                                    masterExecService.execute(new MasterExecThread(processInstance,processDao));
-                                }
-                            }catch (Exception e){
-                                logger.error("scan command error ", e);
-                                processDao.moveToErrorCommand(command, e.toString());
+                        try{
+                            processInstance = processDao.handleCommand(logger, OSUtils.getHost(), this.masterExecThreadNum - activeCount, command);
+                            if (processInstance != null) {
+                                logger.info("start master exec thread , split DAG ...");
+                                masterExecService.execute(new MasterExecThread(processInstance,processDao));
                             }
+                        }catch (Exception e){
+                            logger.error("scan command error ", e);
+                            processDao.moveToErrorCommand(command, e.toString());
                         }
+                    } else{
+                        //indicate that no command ,sleep for 1s
+                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
                 }
-
-                // accessing the command table every SLEEP_TIME_MILLIS milliseconds
-                Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-
             }catch (Exception e){
                 logger.error("master scheduler thread exception : " + e.getMessage(),e);
             }finally{

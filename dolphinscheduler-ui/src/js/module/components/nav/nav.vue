@@ -23,42 +23,42 @@
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/home'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe61d;</i>{{$t('Home')}}</span><b></b>
+            <span><i class="ansiconfont ans-icon-home-empty"></i>{{$t('Home')}}</span><b></b>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/projects'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe635;</i>{{$t('Project Manage')}}</span><b></b>
+            <span><i class="ansiconfont ans-icon-setting"></i>{{$t('Project Manage')}}</span><b></b>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/resource'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe768;</i>{{$t('Resources manage')}}</span><b></b>
+            <span><i class="ansiconfont ans-icon-folder-empty"></i>{{$t('Resources manage')}}</span><b></b>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/datasource'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xeef4;</i>{{$t('Datasource manage')}}</span><b></b>
+            <span><i class="ansiconfont ans-icon-database"></i>{{$t('Datasource manage')}}</span><b></b>
           </router-link>
         </div>
       </div>
       <div class="clearfix list">
         <div class="nav-links">
           <router-link :to="{ path: '/monitor'}" tag="a" active-class="active">
-            <span><i class="iconfont">&#xe65f;</i>{{$t('Monitor')}}</span><b></b>
+            <span><i class="ansiconfont ans-icon-monitor"></i>{{$t('Monitor')}}</span><b></b>
           </router-link>
         </div>
       </div>
       <div class="clearfix list" >
         <div class="nav-links">
           <router-link :to="{ path: '/security'}" tag="a" active-class="active" v-ps="['ADMIN_USER']">
-            <span><i class="iconfont">&#xe671;</i>{{$t('Security')}}</span><b></b>
+            <span><i class="ansiconfont ans-icon-shield"></i>{{$t('Security')}}</span><b></b>
           </router-link>
         </div>
       </div>
@@ -72,11 +72,11 @@
                 style="width: 80px"
                 trigger="click">
         <div class="lrns-list">
-          <a href="javascript:" @click="_toggleLanguage(item.code)" v-for="(item,$index) in localeList"><span>{{item.name}}</span></a>
+          <a href="javascript:" @click="_toggleLanguage(item.code)" v-for="(item,$index) in localeList" :key="$index"><span>{{item.name}}</span></a>
         </div>
         <div class="login-model" slot="reference">
           <span>{{activeLocale.name}}</span>
-          <i class="iconfont">&#xe61b;</i>
+          <i class="ans-icon-arrow-down"></i>
         </div>
       </x-poptip>
       </span>
@@ -87,24 +87,24 @@
               placement="bottom-end">
         <div class="lrns-list">
           <a href="javascript:" @click="_goAccount">
-            <i class="iconfont">&#xe629;</i>
+            <i class="ans-icon-user-empty"></i>
             <span>{{$t('User Information')}}</span>
           </a>
           <a href="javascript:" @click="_signOut">
-            <i class="iconfont">&#xe60c;</i>
+            <i class="ans-icon-off"></i>
             <span>{{$t('Logout')}}</span>
           </a>
         </div>
         <div class="login-model" slot="reference">
-          <i class="iconfont">&#xe638;</i>
+          <i class="ans-icon-user-solid"></i>
           <span>{{userInfo.userName}}</span>
-          <i class="iconfont">&#xe61b;</i>
+          <i class="ans-icon-arrow-down"></i>
         </div>
       </x-poptip>
     </div>
     <div class="file-update-model" @click="_toggleArchive" v-if="isUpdate">
       <div class="icon-cloud">
-        <i class="fa fa-cloud-upload"></i>
+        <i class="ans ans-icon-upload"></i>
       </div>
       <div class="progress-box">
         <m-progress-bar :value="progress" text-placement="bottom"></m-progress-bar>
@@ -112,35 +112,35 @@
     </div>
     <div class="adaptive-m-nav">
       <div class="m-nav-box ">
-        <a href="javascript:" @click="mIsNav = !mIsNav"><i class="iconfont">&#xe609;</i></a>
+        <a href="javascript:" @click="mIsNav = !mIsNav"><i class="ans-icon-database"></i></a>
       </div>
       <div class="m-title-box">
         <div class="logo-m"></div>
       </div>
       <div class="m-user-box">
-        <a href="javascript:" @click="_goAccount"><i class="iconfont">&#xe64a;</i></a>
+        <a href="javascript:" @click="_goAccount"><i class="ans-icon-user-empty"></i></a>
       </div>
       <transition name="slide-fade">
         <div class="m-nav-list" v-if="mIsNav">
           <ul @click="mIsNav = false">
             <router-link :to="{ path: '/home'}" tag="li" active-class="active">
-              <i class="iconfont">&#xe61d;</i>
+              <i class="ans-icon-home-empty"></i>
               <span>{{$t('Home')}}</span>
             </router-link>
             <router-link :to="{ path: '/projects'}" tag="li" active-class="active">
-              <i class="iconfont">&#xe635;</i>
+              <i class="ans-icon-setting"></i>
               <span>{{$t('Project manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/resource'}" tag="li" active-class="active">
-              <i class="iconfont">&#xe768;</i>
+              <i class="ans-icon-folder-empty"></i>
               <span>{{$t('Resources manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/datasource'}" tag="li" active-class="active">
-              <i class="iconfont">&#xeef4;</i>
+              <i class="ans-icon-database"></i>
               <span>{{$t('Datasource manage')}}</span>
             </router-link>
             <router-link :to="{ path: '/security'}" tag="li" active-class="active" v-ps="['ADMIN_USER']">
-              <i class="iconfont">&#xe671;</i>
+              <i class="ans-icon-shield"></i>
               <span>{{$t('Security')}}</span>
             </router-link>
           </ul>
@@ -285,7 +285,7 @@
     created () {
       let language = cookie.get('language')
       this.activeLocale = language ? findLocale(language) : '中文'
-      this.docLink = NODE_ENV === 'true' ? 'docs' : `/view/docs/${this.activeLocale.code}/_book` // eslint-disable-line
+      this.docLink = process.env.NODE_ENV === 'true' ? 'docs' : `/view/docs/${this.activeLocale.code}/_book` // eslint-disable-line
     },
     computed: {
       ...mapState('user', ['userInfo'])
@@ -349,7 +349,7 @@
               display: block;
               width: 106px;
               color: #fff;
-              .iconfont {
+              .ansiconfont {
                 vertical-align: -2px;
                 font-size: 22px;
                 margin-right: 4px;
