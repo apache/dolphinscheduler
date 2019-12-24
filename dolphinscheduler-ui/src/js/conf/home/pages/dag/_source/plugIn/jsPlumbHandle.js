@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import 'jquery-ui/ui/widgets/draggable'
+import 'jquery-ui/ui/widgets/droppable'
+import 'jquery-ui/ui/widgets/resizable'
 import Vue from 'vue'
-import $ from 'jquery'
 import _ from 'lodash'
 import i18n from '@/module/i18n'
 import { jsPlumb } from 'jsplumb'
@@ -25,6 +26,7 @@ import store from '@/conf/home/store'
 import router from '@/conf/home/router'
 import Permissions from '@/module/permissions'
 import { uuid, findComponentDownward } from '@/module/util/'
+
 import {
   tasksAll,
   rtTasksTpl,
