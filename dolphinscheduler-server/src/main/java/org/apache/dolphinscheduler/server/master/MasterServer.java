@@ -173,7 +173,7 @@ public class MasterServer implements IStoppable {
 
         try {
             //execute only once
-            if(Stopper.isStoped()){
+            if(Stopper.isStopped()){
                 return;
             }
 
@@ -183,7 +183,7 @@ public class MasterServer implements IStoppable {
             Stopper.stop();
 
             try {
-                //thread sleep 3 seconds for thread quitely stop
+                //thread sleep 3 seconds for thread stop quietly
                 Thread.sleep(3000L);
             }catch (Exception e){
                 logger.warn("thread sleep exception:" + e.getMessage(), e);

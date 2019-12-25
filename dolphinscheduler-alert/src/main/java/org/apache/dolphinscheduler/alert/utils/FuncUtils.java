@@ -20,7 +20,15 @@ import org.apache.commons.lang.StringUtils;
 
 public class FuncUtils {
 
-    static public String mkString(Iterable<String> list, String split) {
+    /**
+     * make a string from given list with given split
+     * and the split is not in beginning of the first item.
+     *
+     * @param list such as {"hello","world", "java"}
+     * @param split such as "+"
+     * @return such as "hello+world+java"
+     */
+    public static String mkString(Iterable<String> list, String split) {
 
         if (null == list || StringUtils.isEmpty(split)){
             return null;

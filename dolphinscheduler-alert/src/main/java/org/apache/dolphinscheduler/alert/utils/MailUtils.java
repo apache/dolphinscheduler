@@ -35,8 +35,6 @@ import javax.mail.internet.*;
 import java.io.*;
 import java.util.*;
 
-import static org.apache.dolphinscheduler.alert.utils.PropertyUtils.getInt;
-
 
 /**
  * mail utils

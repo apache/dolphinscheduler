@@ -28,7 +28,10 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * alert of start
+ * alert server
+ * the alert server starts an alert sender to execute alert strategies and
+ * alert sender runs in every #Constants.ALERT_SCAN_INTERVAL# milliseconds
+ *
  */
 public class AlertServer {
     private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
@@ -60,7 +63,7 @@ public class AlertServer {
         logger.info("alert server ready start ");
         while (Stopper.isRunning()){
             try {
-                Thread.sleep(Constants.ALERT_SCAN_INTERVEL);
+                Thread.sleep(Constants.ALERT_SCAN_INTERVAL);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(),e);
             }
@@ -68,12 +71,9 @@ public class AlertServer {
             alertSender = new AlertSender(alerts, alertDao);
             alertSender.run();
         }
+
+        logger.info("alert server stopped ");
     }
 
-
-    public static void main(String[] args){
-        AlertServer alertServer = AlertServer.getInstance();
-        alertServer.start();
-    }
 
 }
