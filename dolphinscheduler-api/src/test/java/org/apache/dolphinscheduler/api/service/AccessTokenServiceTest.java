@@ -20,7 +20,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
@@ -35,11 +37,14 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -58,16 +63,6 @@ public class AccessTokenServiceTest {
     @Before
     public void setUp() {
 
-        AccessToken accessToken = new AccessToken();
-        accessToken.setId(1);
-        accessToken.setToken("AccessTokenServiceTest");
-        Date date = DateUtils.addDays(new Date(),30);
-        accessToken.setExpireTime(date);
-        // select
-        when(accessTokenMapper.selectById(1)).thenReturn(accessToken);
-       //selectAccessTokenPage
-        IPage<AccessToken> accessTokenList = new Page<>();
-        when(accessTokenMapper.selectAccessTokenPage(any(Page.class),eq("zhangsan"),eq(0))).thenReturn(accessTokenList);
     }
 
 
@@ -81,18 +76,27 @@ public class AccessTokenServiceTest {
     @Test
     public  void testQueryAccessTokenList(){
 
+        IPage<AccessToken> tokenPage = new Page<>();
+        tokenPage.setRecords(getList());
+        tokenPage.setTotal(1L);
+        when(accessTokenMapper.selectAccessTokenPage(any(Page.class),eq("zhangsan"),eq(0))).thenReturn(tokenPage);
+
         User user =new User();
         Map<String, Object> result = accessTokenService.queryAccessTokenList(user,"zhangsan",1,10);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        PageInfo<AccessToken> pageInfo = (PageInfo<AccessToken>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(pageInfo.getTotalCount()>0);
     }
 
     @Test
     public  void testCreateToken(){
 
-        Map<String, Object> result = accessTokenService.createToken(Integer.MAX_VALUE,getDate(),"AccessTokenServiceTest");
+
+       when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(2);
+        Map<String, Object> result = accessTokenService.createToken(1,getDate(),"AccessTokenServiceTest");
         logger.info(result.toString());
-       // Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
     }
 
     @Test
@@ -101,27 +105,70 @@ public class AccessTokenServiceTest {
         Map<String, Object> result = accessTokenService.generateToken(Integer.MAX_VALUE,getDate());
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-
+        String token = (String) result.get(Constants.DATA_LIST);
+        Assert.assertNotNull(token);
     }
 
     @Test
     public  void testDelAccessTokenById(){
 
+        when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
         User userLogin = new User();
-        Map<String, Object> result = accessTokenService.delAccessTokenById(userLogin,1);
+        // not exist
+        Map<String, Object> result = accessTokenService.delAccessTokenById(userLogin,0);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST,result.get(Constants.STATUS));
+        // no operate
+        result = accessTokenService.delAccessTokenById(userLogin,1);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM,result.get(Constants.STATUS));
+        //success
+        userLogin.setId(1);
+        userLogin.setUserType(UserType.ADMIN_USER);
+        result = accessTokenService.delAccessTokenById(userLogin,1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-
     }
 
     @Test
     public  void testUpdateToken(){
 
+        when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
         Map<String, Object> result = accessTokenService.updateToken(1,Integer.MAX_VALUE,getDate(),"token");
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        // not exist
+        result = accessTokenService.updateToken(2,Integer.MAX_VALUE,getDate(),"token");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST,result.get(Constants.STATUS));
 
     }
+
+    /**
+     * create entity
+     * @return
+     */
+    private AccessToken getEntity(){
+        AccessToken accessToken = new AccessToken();
+        accessToken.setId(1);
+        accessToken.setUserId(1);
+        accessToken.setToken("AccessTokenServiceTest");
+        Date date = DateUtils.addDays(new Date(),30);
+        accessToken.setExpireTime(date);
+        return accessToken;
+    }
+
+    /**
+     * entity list
+     * @return
+     */
+    private List<AccessToken> getList(){
+
+        List<AccessToken> list = new ArrayList<>();
+        list.add(getEntity());
+        return list;
+    }
+
 
 
     /**
