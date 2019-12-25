@@ -1,222 +1,175 @@
-DROP TABLE IF EXISTS QRTZ_BLOB_TRIGGERS;
-CREATE TABLE QRTZ_BLOB_TRIGGERS (
-  SCHED_NAME varchar(120) NOT NULL,
-  TRIGGER_NAME varchar(200) NOT NULL,
-  TRIGGER_GROUP varchar(200) NOT NULL,
-  BLOB_DATA bytea NULL,
-  PRIMARY KEY (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
-);
-
---
--- Table structure for table QRTZ_CALENDARS
---
-
-DROP TABLE IF EXISTS QRTZ_CALENDARS;
-CREATE TABLE QRTZ_CALENDARS (
-  SCHED_NAME varchar(120) NOT NULL,
-  CALENDAR_NAME varchar(200) NOT NULL,
-  CALENDAR bytea NOT NULL,
-  PRIMARY KEY (SCHED_NAME,CALENDAR_NAME)
-);
---
--- Table structure for table QRTZ_CRON_TRIGGERS
---
-
-DROP TABLE IF EXISTS QRTZ_CRON_TRIGGERS;
-CREATE TABLE QRTZ_CRON_TRIGGERS (
-  SCHED_NAME varchar(120) NOT NULL,
-  TRIGGER_NAME varchar(200) NOT NULL,
-  TRIGGER_GROUP varchar(200) NOT NULL,
-  CRON_EXPRESSION varchar(120) NOT NULL,
-  TIME_ZONE_ID varchar(80) DEFAULT NULL,
-  PRIMARY KEY (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
-);
-
---
--- Table structure for table QRTZ_FIRED_TRIGGERS
---
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
 
 DROP TABLE IF EXISTS QRTZ_FIRED_TRIGGERS;
-CREATE TABLE QRTZ_FIRED_TRIGGERS (
-  SCHED_NAME varchar(120) NOT NULL,
-  ENTRY_ID varchar(95) NOT NULL,
-  TRIGGER_NAME varchar(200) NOT NULL,
-  TRIGGER_GROUP varchar(200) NOT NULL,
-  INSTANCE_NAME varchar(200) NOT NULL,
-  FIRED_TIME bigint NOT NULL,
-  SCHED_TIME bigint NOT NULL,
-  PRIORITY int NOT NULL,
-  STATE varchar(16) NOT NULL,
-  JOB_NAME varchar(200) DEFAULT NULL,
-  JOB_GROUP varchar(200) DEFAULT NULL,
-  IS_NONCONCURRENT varchar(1) DEFAULT NULL,
-  REQUESTS_RECOVERY varchar(1) DEFAULT NULL,
-  PRIMARY KEY (SCHED_NAME,ENTRY_ID)
-) ;
-  create index IDX_QRTZ_FT_TRIG_INST_NAME on QRTZ_FIRED_TRIGGERS (SCHED_NAME,INSTANCE_NAME);
-  create index IDX_QRTZ_FT_INST_JOB_REQ_RCVRY on QRTZ_FIRED_TRIGGERS(SCHED_NAME,INSTANCE_NAME,REQUESTS_RECOVERY);
-  create index IDX_QRTZ_FT_J_G on QRTZ_FIRED_TRIGGERS(SCHED_NAME,JOB_NAME,JOB_GROUP);
-  create index IDX_QRTZ_FT_JG on QRTZ_FIRED_TRIGGERS (SCHED_NAME,JOB_GROUP);
-  create index IDX_QRTZ_FT_T_G on QRTZ_FIRED_TRIGGERS (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
-  create index IDX_QRTZ_FT_TG on QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_GROUP);
-
---
--- Table structure for table QRTZ_LOCKS
---
-
-DROP TABLE IF EXISTS QRTZ_LOCKS;
-CREATE TABLE QRTZ_LOCKS (
-  SCHED_NAME varchar(120) NOT NULL,
-  LOCK_NAME varchar(40) NOT NULL,
-  PRIMARY KEY (SCHED_NAME,LOCK_NAME)
-) ;
-
---
--- Table structure for table QRTZ_PAUSED_TRIGGER_GRPS
---
-
 DROP TABLE IF EXISTS QRTZ_PAUSED_TRIGGER_GRPS;
-CREATE TABLE QRTZ_PAUSED_TRIGGER_GRPS (
-  SCHED_NAME varchar(120) NOT NULL,
-  TRIGGER_GROUP varchar(200) NOT NULL,
-  PRIMARY KEY (SCHED_NAME,TRIGGER_GROUP)
-) ;
-
---
--- Table structure for table QRTZ_SCHEDULER_STATE
---
-
 DROP TABLE IF EXISTS QRTZ_SCHEDULER_STATE;
-CREATE TABLE QRTZ_SCHEDULER_STATE (
-  SCHED_NAME varchar(120) NOT NULL,
-  INSTANCE_NAME varchar(200) NOT NULL,
-  LAST_CHECKIN_TIME bigint NOT NULL,
-  CHECKIN_INTERVAL bigint NOT NULL,
-  PRIMARY KEY (SCHED_NAME,INSTANCE_NAME)
-) ;
-
---
--- Table structure for table QRTZ_SIMPLE_TRIGGERS
---
-
+DROP TABLE IF EXISTS QRTZ_LOCKS;
 DROP TABLE IF EXISTS QRTZ_SIMPLE_TRIGGERS;
-CREATE TABLE QRTZ_SIMPLE_TRIGGERS (
-  SCHED_NAME varchar(120) NOT NULL,
-  TRIGGER_NAME varchar(200) NOT NULL,
-  TRIGGER_GROUP varchar(200) NOT NULL,
-  REPEAT_COUNT bigint NOT NULL,
-  REPEAT_INTERVAL bigint NOT NULL,
-  TIMES_TRIGGERED bigint NOT NULL,
-  PRIMARY KEY (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
-
-) ;
-
---
--- Table structure for table QRTZ_SIMPROP_TRIGGERS
---
-
 DROP TABLE IF EXISTS QRTZ_SIMPROP_TRIGGERS;
-CREATE TABLE QRTZ_SIMPROP_TRIGGERS (
-  SCHED_NAME varchar(120) NOT NULL,
-  TRIGGER_NAME varchar(200) NOT NULL,
-  TRIGGER_GROUP varchar(200) NOT NULL,
-  STR_PROP_1 varchar(512) DEFAULT NULL,
-  STR_PROP_2 varchar(512) DEFAULT NULL,
-  STR_PROP_3 varchar(512) DEFAULT NULL,
-  INT_PROP_1 int DEFAULT NULL,
-  INT_PROP_2 int DEFAULT NULL,
-  LONG_PROP_1 bigint DEFAULT NULL,
-  LONG_PROP_2 bigint DEFAULT NULL,
-  DEC_PROP_1 decimal(13,4) DEFAULT NULL,
-  DEC_PROP_2 decimal(13,4) DEFAULT NULL,
-  BOOL_PROP_1 varchar(1) DEFAULT NULL,
-  BOOL_PROP_2 varchar(1) DEFAULT NULL,
-  PRIMARY KEY (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
-) ;
-
---
--- Table structure for table QRTZ_TRIGGERS
---
-
+DROP TABLE IF EXISTS QRTZ_CRON_TRIGGERS;
+DROP TABLE IF EXISTS QRTZ_BLOB_TRIGGERS;
 DROP TABLE IF EXISTS QRTZ_TRIGGERS;
-CREATE TABLE QRTZ_TRIGGERS (
-  SCHED_NAME varchar(120) NOT NULL,
-  TRIGGER_NAME varchar(200) NOT NULL,
-  TRIGGER_GROUP varchar(200) NOT NULL,
-  JOB_NAME varchar(200) NOT NULL,
-  JOB_GROUP varchar(200) NOT NULL,
-  DESCRIPTION varchar(250) DEFAULT NULL,
-  NEXT_FIRE_TIME bigint DEFAULT NULL,
-  PREV_FIRE_TIME bigint DEFAULT NULL,
-  PRIORITY int DEFAULT NULL,
-  TRIGGER_STATE varchar(16) NOT NULL,
-  TRIGGER_TYPE varchar(8) NOT NULL,
-  START_TIME bigint NOT NULL,
-  END_TIME bigint DEFAULT NULL,
-  CALENDAR_NAME varchar(200) DEFAULT NULL,
-  MISFIRE_INSTR smallint DEFAULT NULL,
-  JOB_DATA bytea,
-  PRIMARY KEY (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP)
-) ;
-
-  create index IDX_QRTZ_T_J on QRTZ_TRIGGERS (SCHED_NAME,JOB_NAME,JOB_GROUP);
-  create index IDX_QRTZ_T_JG  on QRTZ_TRIGGERS (SCHED_NAME,JOB_GROUP);
-  create index IDX_QRTZ_T_C  on QRTZ_TRIGGERS (SCHED_NAME,CALENDAR_NAME);
-  create index IDX_QRTZ_T_G on QRTZ_TRIGGERS  (SCHED_NAME,TRIGGER_GROUP);
-  create index IDX_QRTZ_T_STATE on QRTZ_TRIGGERS  (SCHED_NAME,TRIGGER_STATE);
-  create index IDX_QRTZ_T_N_STATE on QRTZ_TRIGGERS  (SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP,TRIGGER_STATE);
-  create index IDX_QRTZ_T_N_G_STATE on QRTZ_TRIGGERS  (SCHED_NAME,TRIGGER_GROUP,TRIGGER_STATE);
-  create index IDX_QRTZ_T_NEXT_FIRE_TIME on QRTZ_TRIGGERS  (SCHED_NAME,NEXT_FIRE_TIME);
-  create index IDX_QRTZ_T_NFT_ST on QRTZ_TRIGGERS  (SCHED_NAME,TRIGGER_STATE,NEXT_FIRE_TIME);
-  create index IDX_QRTZ_T_NFT_MISFIRE on QRTZ_TRIGGERS  (SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME);
-  create index IDX_QRTZ_T_NFT_ST_MISFIRE on QRTZ_TRIGGERS  (SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_STATE);
-  create index IDX_QRTZ_T_NFT_ST_MISFIRE_GRP on QRTZ_TRIGGERS  (SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_GROUP,TRIGGER_STATE);
-
-
---
--- Table structure for table QRTZ_JOB_DETAILS
---
-
 DROP TABLE IF EXISTS QRTZ_JOB_DETAILS;
-CREATE TABLE QRTZ_JOB_DETAILS (
-  SCHED_NAME varchar(120) NOT NULL,
-  JOB_NAME varchar(200) NOT NULL,
-  JOB_GROUP varchar(200) NOT NULL,
-  DESCRIPTION varchar(250) DEFAULT NULL,
-  JOB_CLASS_NAME varchar(250) NOT NULL,
-  IS_DURABLE varchar(1) NOT NULL,
-  IS_NONCONCURRENT varchar(1) NOT NULL,
-  IS_UPDATE_DATA varchar(1) NOT NULL,
-  REQUESTS_RECOVERY varchar(1) NOT NULL,
-  JOB_DATA bytea,
-  PRIMARY KEY (SCHED_NAME,JOB_NAME,JOB_GROUP)
-) ;
-  create index  IDX_QRTZ_J_REQ_RECOVERY on QRTZ_JOB_DETAILS (SCHED_NAME,REQUESTS_RECOVERY);
-  create index  IDX_QRTZ_J_GRP on QRTZ_JOB_DETAILS (SCHED_NAME,JOB_GROUP);
+DROP TABLE IF EXISTS QRTZ_CALENDARS;
 
-alter table QRTZ_BLOB_TRIGGERS drop CONSTRAINT if EXISTS QRTZ_BLOB_TRIGGERS_ibfk_1;
-alter table QRTZ_BLOB_TRIGGERS add CONSTRAINT QRTZ_BLOB_TRIGGERS_ibfk_1 FOREIGN KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP) REFERENCES QRTZ_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+CREATE TABLE QRTZ_JOB_DETAILS(
+SCHED_NAME character varying(120) NOT NULL,
+JOB_NAME character varying(200) NOT NULL,
+JOB_GROUP character varying(200) NOT NULL,
+DESCRIPTION character varying(250) NULL,
+JOB_CLASS_NAME character varying(250) NOT NULL,
+IS_DURABLE boolean NOT NULL,
+IS_NONCONCURRENT boolean NOT NULL,
+IS_UPDATE_DATA boolean NOT NULL,
+REQUESTS_RECOVERY boolean NOT NULL,
+JOB_DATA bytea NULL);
+alter table QRTZ_JOB_DETAILS add primary key(SCHED_NAME,JOB_NAME,JOB_GROUP);
 
-alter table QRTZ_CRON_TRIGGERS drop CONSTRAINT if EXISTS QRTZ_CRON_TRIGGERS_ibfk_1;
-alter table QRTZ_CRON_TRIGGERS add CONSTRAINT QRTZ_CRON_TRIGGERS_ibfk_1 FOREIGN KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP) REFERENCES QRTZ_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+CREATE TABLE QRTZ_TRIGGERS (
+SCHED_NAME character varying(120) NOT NULL,
+TRIGGER_NAME character varying(200) NOT NULL,
+TRIGGER_GROUP character varying(200) NOT NULL,
+JOB_NAME character varying(200) NOT NULL,
+JOB_GROUP character varying(200) NOT NULL,
+DESCRIPTION character varying(250) NULL,
+NEXT_FIRE_TIME BIGINT NULL,
+PREV_FIRE_TIME BIGINT NULL,
+PRIORITY INTEGER NULL,
+TRIGGER_STATE character varying(16) NOT NULL,
+TRIGGER_TYPE character varying(8) NOT NULL,
+START_TIME BIGINT NOT NULL,
+END_TIME BIGINT NULL,
+CALENDAR_NAME character varying(200) NULL,
+MISFIRE_INSTR SMALLINT NULL,
+JOB_DATA bytea NULL)  ;
+alter table QRTZ_TRIGGERS add primary key(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 
-alter table QRTZ_SIMPLE_TRIGGERS drop CONSTRAINT if EXISTS QRTZ_SIMPLE_TRIGGERS_ibfk_1;
-alter table QRTZ_SIMPLE_TRIGGERS add CONSTRAINT QRTZ_SIMPLE_TRIGGERS_ibfk_1 FOREIGN KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP) REFERENCES QRTZ_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+CREATE TABLE QRTZ_SIMPLE_TRIGGERS (
+SCHED_NAME character varying(120) NOT NULL,
+TRIGGER_NAME character varying(200) NOT NULL,
+TRIGGER_GROUP character varying(200) NOT NULL,
+REPEAT_COUNT BIGINT NOT NULL,
+REPEAT_INTERVAL BIGINT NOT NULL,
+TIMES_TRIGGERED BIGINT NOT NULL)  ;
+alter table QRTZ_SIMPLE_TRIGGERS add primary key(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 
-alter table QRTZ_SIMPROP_TRIGGERS drop CONSTRAINT if EXISTS QRTZ_SIMPROP_TRIGGERS_ibfk_1;
-alter table QRTZ_SIMPROP_TRIGGERS add CONSTRAINT QRTZ_SIMPROP_TRIGGERS_ibfk_1 FOREIGN KEY (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP) REFERENCES QRTZ_TRIGGERS (SCHED_NAME, TRIGGER_NAME, TRIGGER_GROUP);
+CREATE TABLE QRTZ_CRON_TRIGGERS (
+SCHED_NAME character varying(120) NOT NULL,
+TRIGGER_NAME character varying(200) NOT NULL,
+TRIGGER_GROUP character varying(200) NOT NULL,
+CRON_EXPRESSION character varying(120) NOT NULL,
+TIME_ZONE_ID character varying(80))  ;
+alter table QRTZ_CRON_TRIGGERS add primary key(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 
-alter table QRTZ_TRIGGERS drop CONSTRAINT if EXISTS QRTZ_TRIGGERS_ibfk_1;
-alter table QRTZ_TRIGGERS add CONSTRAINT QRTZ_TRIGGERS_ibfk_1 FOREIGN KEY (SCHED_NAME, JOB_NAME, JOB_GROUP) REFERENCES QRTZ_JOB_DETAILS (SCHED_NAME, JOB_NAME, JOB_GROUP);
+CREATE TABLE QRTZ_SIMPROP_TRIGGERS
+  (
+    SCHED_NAME character varying(120) NOT NULL,
+    TRIGGER_NAME character varying(200) NOT NULL,
+    TRIGGER_GROUP character varying(200) NOT NULL,
+    STR_PROP_1 character varying(512) NULL,
+    STR_PROP_2 character varying(512) NULL,
+    STR_PROP_3 character varying(512) NULL,
+    INT_PROP_1 INT NULL,
+    INT_PROP_2 INT NULL,
+    LONG_PROP_1 BIGINT NULL,
+    LONG_PROP_2 BIGINT NULL,
+    DEC_PROP_1 NUMERIC(13,4) NULL,
+    DEC_PROP_2 NUMERIC(13,4) NULL,
+    BOOL_PROP_1 boolean NULL,
+    BOOL_PROP_2 boolean NULL) ;
+alter table QRTZ_SIMPROP_TRIGGERS add primary key(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 
+CREATE TABLE QRTZ_BLOB_TRIGGERS (
+SCHED_NAME character varying(120) NOT NULL,
+TRIGGER_NAME character varying(200) NOT NULL,
+TRIGGER_GROUP character varying(200) NOT NULL,
+BLOB_DATA bytea NULL) ;
+alter table QRTZ_BLOB_TRIGGERS add primary key(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
+
+CREATE TABLE QRTZ_CALENDARS (
+SCHED_NAME character varying(120) NOT NULL,
+CALENDAR_NAME character varying(200) NOT NULL,
+CALENDAR bytea NOT NULL)  ;
+alter table QRTZ_CALENDARS add primary key(SCHED_NAME,CALENDAR_NAME);
+
+CREATE TABLE QRTZ_PAUSED_TRIGGER_GRPS (
+SCHED_NAME character varying(120) NOT NULL,
+TRIGGER_GROUP character varying(200) NOT NULL)  ;
+alter table QRTZ_PAUSED_TRIGGER_GRPS add primary key(SCHED_NAME,TRIGGER_GROUP);
+
+CREATE TABLE QRTZ_FIRED_TRIGGERS (
+SCHED_NAME character varying(120) NOT NULL,
+ENTRY_ID character varying(95) NOT NULL,
+TRIGGER_NAME character varying(200) NOT NULL,
+TRIGGER_GROUP character varying(200) NOT NULL,
+INSTANCE_NAME character varying(200) NOT NULL,
+FIRED_TIME BIGINT NOT NULL,
+SCHED_TIME BIGINT NOT NULL,
+PRIORITY INTEGER NOT NULL,
+STATE character varying(16) NOT NULL,
+JOB_NAME character varying(200) NULL,
+JOB_GROUP character varying(200) NULL,
+IS_NONCONCURRENT boolean NULL,
+REQUESTS_RECOVERY boolean NULL)  ;
+alter table QRTZ_FIRED_TRIGGERS add primary key(SCHED_NAME,ENTRY_ID);
+
+CREATE TABLE QRTZ_SCHEDULER_STATE (
+SCHED_NAME character varying(120) NOT NULL,
+INSTANCE_NAME character varying(200) NOT NULL,
+LAST_CHECKIN_TIME BIGINT NOT NULL,
+CHECKIN_INTERVAL BIGINT NOT NULL)  ;
+alter table QRTZ_SCHEDULER_STATE add primary key(SCHED_NAME,INSTANCE_NAME);
+
+CREATE TABLE QRTZ_LOCKS (
+SCHED_NAME character varying(120) NOT NULL,
+LOCK_NAME character varying(40) NOT NULL)  ;
+alter table QRTZ_LOCKS add primary key(SCHED_NAME,LOCK_NAME);
+
+CREATE INDEX IDX_QRTZ_J_REQ_RECOVERY ON QRTZ_JOB_DETAILS(SCHED_NAME,REQUESTS_RECOVERY);
+CREATE INDEX IDX_QRTZ_J_GRP ON QRTZ_JOB_DETAILS(SCHED_NAME,JOB_GROUP);
+
+CREATE INDEX IDX_QRTZ_T_J ON QRTZ_TRIGGERS(SCHED_NAME,JOB_NAME,JOB_GROUP);
+CREATE INDEX IDX_QRTZ_T_JG ON QRTZ_TRIGGERS(SCHED_NAME,JOB_GROUP);
+CREATE INDEX IDX_QRTZ_T_C ON QRTZ_TRIGGERS(SCHED_NAME,CALENDAR_NAME);
+CREATE INDEX IDX_QRTZ_T_G ON QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_GROUP);
+CREATE INDEX IDX_QRTZ_T_STATE ON QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_STATE);
+CREATE INDEX IDX_QRTZ_T_N_STATE ON QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP,TRIGGER_STATE);
+CREATE INDEX IDX_QRTZ_T_N_G_STATE ON QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_GROUP,TRIGGER_STATE);
+CREATE INDEX IDX_QRTZ_T_NEXT_FIRE_TIME ON QRTZ_TRIGGERS(SCHED_NAME,NEXT_FIRE_TIME);
+CREATE INDEX IDX_QRTZ_T_NFT_ST ON QRTZ_TRIGGERS(SCHED_NAME,TRIGGER_STATE,NEXT_FIRE_TIME);
+CREATE INDEX IDX_QRTZ_T_NFT_MISFIRE ON QRTZ_TRIGGERS(SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME);
+CREATE INDEX IDX_QRTZ_T_NFT_ST_MISFIRE ON QRTZ_TRIGGERS(SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_STATE);
+CREATE INDEX IDX_QRTZ_T_NFT_ST_MISFIRE_GRP ON QRTZ_TRIGGERS(SCHED_NAME,MISFIRE_INSTR,NEXT_FIRE_TIME,TRIGGER_GROUP,TRIGGER_STATE);
+
+CREATE INDEX IDX_QRTZ_FT_TRIG_INST_NAME ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,INSTANCE_NAME);
+CREATE INDEX IDX_QRTZ_FT_INST_JOB_REQ_RCVRY ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,INSTANCE_NAME,REQUESTS_RECOVERY);
+CREATE INDEX IDX_QRTZ_FT_J_G ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,JOB_NAME,JOB_GROUP);
+CREATE INDEX IDX_QRTZ_FT_JG ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,JOB_GROUP);
+CREATE INDEX IDX_QRTZ_FT_T_G ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
+CREATE INDEX IDX_QRTZ_FT_TG ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_GROUP);
 
 
 --
--- Table structure for table t_escheduler_access_token
+-- Table structure for table t_ds_access_token
 --
 
-DROP TABLE IF EXISTS t_escheduler_access_token;
-CREATE TABLE t_escheduler_access_token (
+DROP TABLE IF EXISTS t_ds_access_token;
+CREATE TABLE t_ds_access_token (
   id int NOT NULL  ,
   user_id int DEFAULT NULL ,
   token varchar(64) DEFAULT NULL ,
@@ -227,11 +180,11 @@ CREATE TABLE t_escheduler_access_token (
 ) ;
 
 --
--- Table structure for table t_escheduler_alert
+-- Table structure for table t_ds_alert
 --
 
-DROP TABLE IF EXISTS t_escheduler_alert;
-CREATE TABLE t_escheduler_alert (
+DROP TABLE IF EXISTS t_ds_alert;
+CREATE TABLE t_ds_alert (
   id int NOT NULL  ,
   title varchar(64) DEFAULT NULL ,
   show_type int DEFAULT NULL ,
@@ -247,26 +200,26 @@ CREATE TABLE t_escheduler_alert (
   PRIMARY KEY (id)
 ) ;
 --
--- Table structure for table t_escheduler_alertgroup
+-- Table structure for table t_ds_alertgroup
 --
 
-DROP TABLE IF EXISTS t_escheduler_alertgroup;
-CREATE TABLE t_escheduler_alertgroup (
+DROP TABLE IF EXISTS t_ds_alertgroup;
+CREATE TABLE t_ds_alertgroup (
   id int NOT NULL  ,
   group_name varchar(255) DEFAULT NULL ,
   group_type int DEFAULT NULL ,
-  "desc" varchar(255) DEFAULT NULL ,
+  description varchar(255) DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
 --
--- Table structure for table t_escheduler_command
+-- Table structure for table t_ds_command
 --
 
-DROP TABLE IF EXISTS t_escheduler_command;
-CREATE TABLE t_escheduler_command (
+DROP TABLE IF EXISTS t_ds_command;
+CREATE TABLE t_ds_command (
   id int NOT NULL  ,
   command_type int DEFAULT NULL ,
   process_definition_id int DEFAULT NULL ,
@@ -286,11 +239,11 @@ CREATE TABLE t_escheduler_command (
 ) ;
 
 --
--- Table structure for table t_escheduler_datasource
+-- Table structure for table t_ds_datasource
 --
 
-DROP TABLE IF EXISTS t_escheduler_datasource;
-CREATE TABLE t_escheduler_datasource (
+DROP TABLE IF EXISTS t_ds_datasource;
+CREATE TABLE t_ds_datasource (
   id int NOT NULL  ,
   name varchar(64) NOT NULL ,
   note varchar(256) DEFAULT NULL ,
@@ -303,11 +256,11 @@ CREATE TABLE t_escheduler_datasource (
 ) ;
 
 --
--- Table structure for table t_escheduler_error_command
+-- Table structure for table t_ds_error_command
 --
 
-DROP TABLE IF EXISTS t_escheduler_error_command;
-CREATE TABLE t_escheduler_error_command (
+DROP TABLE IF EXISTS t_ds_error_command;
+CREATE TABLE t_ds_error_command (
   id int NOT NULL ,
   command_type int DEFAULT NULL ,
   executor_id int DEFAULT NULL ,
@@ -327,11 +280,11 @@ CREATE TABLE t_escheduler_error_command (
   PRIMARY KEY (id)
 );
 --
--- Table structure for table t_escheduler_master_server
+-- Table structure for table t_ds_master_server
 --
 
-DROP TABLE IF EXISTS t_escheduler_master_server;
-CREATE TABLE t_escheduler_master_server (
+DROP TABLE IF EXISTS t_ds_master_server;
+CREATE TABLE t_ds_master_server (
   id int NOT NULL  ,
   host varchar(45) DEFAULT NULL ,
   port int DEFAULT NULL ,
@@ -343,11 +296,11 @@ CREATE TABLE t_escheduler_master_server (
 ) ;
 
 --
--- Table structure for table t_escheduler_process_definition
+-- Table structure for table t_ds_process_definition
 --
 
-DROP TABLE IF EXISTS t_escheduler_process_definition;
-CREATE TABLE t_escheduler_process_definition (
+DROP TABLE IF EXISTS t_ds_process_definition;
+CREATE TABLE t_ds_process_definition (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
   version int DEFAULT NULL ,
@@ -355,7 +308,7 @@ CREATE TABLE t_escheduler_process_definition (
   project_id int DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   process_definition_json text ,
-  "desc" text ,
+  description text ,
   global_params text ,
   flag int DEFAULT NULL ,
   locations text ,
@@ -369,14 +322,14 @@ CREATE TABLE t_escheduler_process_definition (
   PRIMARY KEY (id)
 ) ;
 
-create index process_definition_index on t_escheduler_process_definition (project_id,id);
+create index process_definition_index on t_ds_process_definition (project_id,id);
 
 --
--- Table structure for table t_escheduler_process_instance
+-- Table structure for table t_ds_process_instance
 --
 
-DROP TABLE IF EXISTS t_escheduler_process_instance;
-CREATE TABLE t_escheduler_process_instance (
+DROP TABLE IF EXISTS t_ds_process_instance;
+CREATE TABLE t_ds_process_instance (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
   process_definition_id int DEFAULT NULL ,
@@ -411,32 +364,32 @@ CREATE TABLE t_escheduler_process_instance (
   tenant_id int NOT NULL DEFAULT '-1' ,
   PRIMARY KEY (id)
 ) ;
-  create index process_instance_index on t_escheduler_process_instance (process_definition_id,id);
-  create index start_time_index on t_escheduler_process_instance (start_time);
+  create index process_instance_index on t_ds_process_instance (process_definition_id,id);
+  create index start_time_index on t_ds_process_instance (start_time);
 
 --
--- Table structure for table t_escheduler_project
+-- Table structure for table t_ds_project
 --
 
-DROP TABLE IF EXISTS t_escheduler_project;
-CREATE TABLE t_escheduler_project (
+DROP TABLE IF EXISTS t_ds_project;
+CREATE TABLE t_ds_project (
   id int NOT NULL  ,
   name varchar(100) DEFAULT NULL ,
-  ”desc“ varchar(200) DEFAULT NULL ,
+  description varchar(200) DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   flag int DEFAULT '1' ,
   create_time timestamp DEFAULT CURRENT_TIMESTAMP ,
   update_time timestamp DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (id)
 ) ;
-  create index user_id_index on t_escheduler_project (user_id);
+  create index user_id_index on t_ds_project (user_id);
 
 --
--- Table structure for table t_escheduler_queue
+-- Table structure for table t_ds_queue
 --
 
-DROP TABLE IF EXISTS t_escheduler_queue;
-CREATE TABLE t_escheduler_queue (
+DROP TABLE IF EXISTS t_ds_queue;
+CREATE TABLE t_ds_queue (
   id int NOT NULL  ,
   queue_name varchar(64) DEFAULT NULL ,
   queue varchar(64) DEFAULT NULL ,
@@ -447,11 +400,11 @@ CREATE TABLE t_escheduler_queue (
 
 
 --
--- Table structure for table t_escheduler_relation_datasource_user
+-- Table structure for table t_ds_relation_datasource_user
 --
 
-DROP TABLE IF EXISTS t_escheduler_relation_datasource_user;
-CREATE TABLE t_escheduler_relation_datasource_user (
+DROP TABLE IF EXISTS t_ds_relation_datasource_user;
+CREATE TABLE t_ds_relation_datasource_user (
   id int NOT NULL  ,
   user_id int NOT NULL ,
   datasource_id int DEFAULT NULL ,
@@ -463,11 +416,11 @@ CREATE TABLE t_escheduler_relation_datasource_user (
 ;
 
 --
--- Table structure for table t_escheduler_relation_process_instance
+-- Table structure for table t_ds_relation_process_instance
 --
 
-DROP TABLE IF EXISTS t_escheduler_relation_process_instance;
-CREATE TABLE t_escheduler_relation_process_instance (
+DROP TABLE IF EXISTS t_ds_relation_process_instance;
+CREATE TABLE t_ds_relation_process_instance (
   id int NOT NULL  ,
   parent_process_instance_id int DEFAULT NULL ,
   parent_task_instance_id int DEFAULT NULL ,
@@ -477,11 +430,11 @@ CREATE TABLE t_escheduler_relation_process_instance (
 
 
 --
--- Table structure for table t_escheduler_relation_project_user
+-- Table structure for table t_ds_relation_project_user
 --
 
-DROP TABLE IF EXISTS t_escheduler_relation_project_user;
-CREATE TABLE t_escheduler_relation_project_user (
+DROP TABLE IF EXISTS t_ds_relation_project_user;
+CREATE TABLE t_ds_relation_project_user (
   id int NOT NULL  ,
   user_id int NOT NULL ,
   project_id int DEFAULT NULL ,
@@ -490,14 +443,14 @@ CREATE TABLE t_escheduler_relation_project_user (
   update_time timestamp DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
-create index relation_project_user_id_index on t_escheduler_relation_project_user (user_id);
+create index relation_project_user_id_index on t_ds_relation_project_user (user_id);
 
 --
--- Table structure for table t_escheduler_relation_resources_user
+-- Table structure for table t_ds_relation_resources_user
 --
 
-DROP TABLE IF EXISTS t_escheduler_relation_resources_user;
-CREATE TABLE t_escheduler_relation_resources_user (
+DROP TABLE IF EXISTS t_ds_relation_resources_user;
+CREATE TABLE t_ds_relation_resources_user (
   id int NOT NULL ,
   user_id int NOT NULL ,
   resources_id int DEFAULT NULL ,
@@ -508,11 +461,11 @@ CREATE TABLE t_escheduler_relation_resources_user (
 ) ;
 
 --
--- Table structure for table t_escheduler_relation_udfs_user
+-- Table structure for table t_ds_relation_udfs_user
 --
 
-DROP TABLE IF EXISTS t_escheduler_relation_udfs_user;
-CREATE TABLE t_escheduler_relation_udfs_user (
+DROP TABLE IF EXISTS t_ds_relation_udfs_user;
+CREATE TABLE t_ds_relation_udfs_user (
   id int NOT NULL  ,
   user_id int NOT NULL ,
   udf_id int DEFAULT NULL ,
@@ -524,11 +477,11 @@ CREATE TABLE t_escheduler_relation_udfs_user (
 ;
 
 --
--- Table structure for table t_escheduler_relation_user_alertgroup
+-- Table structure for table t_ds_relation_user_alertgroup
 --
 
-DROP TABLE IF EXISTS t_escheduler_relation_user_alertgroup;
-CREATE TABLE t_escheduler_relation_user_alertgroup (
+DROP TABLE IF EXISTS t_ds_relation_user_alertgroup;
+CREATE TABLE t_ds_relation_user_alertgroup (
   id int NOT NULL,
   alertgroup_id int DEFAULT NULL,
   user_id int DEFAULT NULL,
@@ -538,15 +491,15 @@ CREATE TABLE t_escheduler_relation_user_alertgroup (
 );
 
 --
--- Table structure for table t_escheduler_resources
+-- Table structure for table t_ds_resources
 --
 
-DROP TABLE IF EXISTS t_escheduler_resources;
-CREATE TABLE t_escheduler_resources (
+DROP TABLE IF EXISTS t_ds_resources;
+CREATE TABLE t_ds_resources (
   id int NOT NULL  ,
   alias varchar(64) DEFAULT NULL ,
   file_name varchar(64) DEFAULT NULL ,
-  "desc" varchar(256) DEFAULT NULL ,
+  description varchar(256) DEFAULT NULL ,
   user_id int DEFAULT NULL ,
   type int DEFAULT NULL ,
   size bigint DEFAULT NULL ,
@@ -557,11 +510,11 @@ CREATE TABLE t_escheduler_resources (
 ;
 
 --
--- Table structure for table t_escheduler_schedules
+-- Table structure for table t_ds_schedules
 --
 
-DROP TABLE IF EXISTS t_escheduler_schedules;
-CREATE TABLE t_escheduler_schedules (
+DROP TABLE IF EXISTS t_ds_schedules;
+CREATE TABLE t_ds_schedules (
   id int NOT NULL  ,
   process_definition_id int NOT NULL ,
   start_time timestamp NOT NULL ,
@@ -580,11 +533,11 @@ CREATE TABLE t_escheduler_schedules (
 );
 
 --
--- Table structure for table t_escheduler_session
+-- Table structure for table t_ds_session
 --
 
-DROP TABLE IF EXISTS t_escheduler_session;
-CREATE TABLE t_escheduler_session (
+DROP TABLE IF EXISTS t_ds_session;
+CREATE TABLE t_ds_session (
   id varchar(64) NOT NULL ,
   user_id int DEFAULT NULL ,
   ip varchar(45) DEFAULT NULL ,
@@ -593,11 +546,11 @@ CREATE TABLE t_escheduler_session (
 );
 
 --
--- Table structure for table t_escheduler_task_instance
+-- Table structure for table t_ds_task_instance
 --
 
-DROP TABLE IF EXISTS t_escheduler_task_instance;
-CREATE TABLE t_escheduler_task_instance (
+DROP TABLE IF EXISTS t_ds_task_instance;
+CREATE TABLE t_ds_task_instance (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
   task_type varchar(64) DEFAULT NULL ,
@@ -624,15 +577,15 @@ CREATE TABLE t_escheduler_task_instance (
 ) ;
 
 --
--- Table structure for table t_escheduler_tenant
+-- Table structure for table t_ds_tenant
 --
 
-DROP TABLE IF EXISTS t_escheduler_tenant;
-CREATE TABLE t_escheduler_tenant (
+DROP TABLE IF EXISTS t_ds_tenant;
+CREATE TABLE t_ds_tenant (
   id int NOT NULL  ,
   tenant_code varchar(64) DEFAULT NULL ,
   tenant_name varchar(64) DEFAULT NULL ,
-  "desc" varchar(256) DEFAULT NULL ,
+  description varchar(256) DEFAULT NULL ,
   queue_id int DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
@@ -640,11 +593,11 @@ CREATE TABLE t_escheduler_tenant (
 ) ;
 
 --
--- Table structure for table t_escheduler_udfs
+-- Table structure for table t_ds_udfs
 --
 
-DROP TABLE IF EXISTS t_escheduler_udfs;
-CREATE TABLE t_escheduler_udfs (
+DROP TABLE IF EXISTS t_ds_udfs;
+CREATE TABLE t_ds_udfs (
   id int NOT NULL  ,
   user_id int NOT NULL ,
   func_name varchar(100) NOT NULL ,
@@ -652,7 +605,7 @@ CREATE TABLE t_escheduler_udfs (
   type int NOT NULL ,
   arg_types varchar(255) DEFAULT NULL ,
   database varchar(255) DEFAULT NULL ,
-  "desc" varchar(255) DEFAULT NULL ,
+  description varchar(255) DEFAULT NULL ,
   resource_id int NOT NULL ,
   resource_name varchar(255) NOT NULL ,
   create_time timestamp NOT NULL ,
@@ -661,11 +614,11 @@ CREATE TABLE t_escheduler_udfs (
 ) ;
 
 --
--- Table structure for table t_escheduler_user
+-- Table structure for table t_ds_user
 --
 
-DROP TABLE IF EXISTS t_escheduler_user;
-CREATE TABLE t_escheduler_user (
+DROP TABLE IF EXISTS t_ds_user;
+CREATE TABLE t_ds_user (
   id int NOT NULL  ,
   user_name varchar(64) DEFAULT NULL ,
   user_password varchar(64) DEFAULT NULL ,
@@ -680,23 +633,23 @@ CREATE TABLE t_escheduler_user (
 );
 
 --
--- Table structure for table t_escheduler_version
+-- Table structure for table t_ds_version
 --
 
-DROP TABLE IF EXISTS t_escheduler_version;
-CREATE TABLE t_escheduler_version (
+DROP TABLE IF EXISTS t_ds_version;
+CREATE TABLE t_ds_version (
   id int NOT NULL ,
   version varchar(200) NOT NULL,
   PRIMARY KEY (id)
 ) ;
-create index version_index on t_escheduler_version(version);
+create index version_index on t_ds_version(version);
 
 --
--- Table structure for table t_escheduler_worker_group
+-- Table structure for table t_ds_worker_group
 --
 
-DROP TABLE IF EXISTS t_escheduler_worker_group;
-CREATE TABLE t_escheduler_worker_group (
+DROP TABLE IF EXISTS t_ds_worker_group;
+CREATE TABLE t_ds_worker_group (
   id bigint NOT NULL  ,
   name varchar(256) DEFAULT NULL ,
   ip_list varchar(256) DEFAULT NULL ,
@@ -706,11 +659,11 @@ CREATE TABLE t_escheduler_worker_group (
 ) ;
 
 --
--- Table structure for table t_escheduler_worker_server
+-- Table structure for table t_ds_worker_server
 --
 
-DROP TABLE IF EXISTS t_escheduler_worker_server;
-CREATE TABLE t_escheduler_worker_server (
+DROP TABLE IF EXISTS t_ds_worker_server;
+CREATE TABLE t_ds_worker_server (
   id int NOT NULL  ,
   host varchar(45) DEFAULT NULL ,
   port int DEFAULT NULL ,
@@ -722,83 +675,83 @@ CREATE TABLE t_escheduler_worker_server (
 ) ;
 
 
-DROP SEQUENCE IF EXISTS t_escheduler_access_token_id_sequence;
-CREATE SEQUENCE  t_escheduler_access_token_id_sequence;
-ALTER TABLE t_escheduler_access_token ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_access_token_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_alert_id_sequence;
-CREATE SEQUENCE  t_escheduler_alert_id_sequence;
-ALTER TABLE t_escheduler_alert ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_alert_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_alertgroup_id_sequence;
-CREATE SEQUENCE  t_escheduler_alertgroup_id_sequence;
-ALTER TABLE t_escheduler_alertgroup ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_alertgroup_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_access_token_id_sequence;
+CREATE SEQUENCE  t_ds_access_token_id_sequence;
+ALTER TABLE t_ds_access_token ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_access_token_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_alert_id_sequence;
+CREATE SEQUENCE  t_ds_alert_id_sequence;
+ALTER TABLE t_ds_alert ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_alert_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_alertgroup_id_sequence;
+CREATE SEQUENCE  t_ds_alertgroup_id_sequence;
+ALTER TABLE t_ds_alertgroup ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_alertgroup_id_sequence');
 
-DROP SEQUENCE IF EXISTS t_escheduler_command_id_sequence;
-CREATE SEQUENCE  t_escheduler_command_id_sequence;
-ALTER TABLE t_escheduler_command ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_command_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_datasource_id_sequence;
-CREATE SEQUENCE  t_escheduler_datasource_id_sequence;
-ALTER TABLE t_escheduler_datasource ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_datasource_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_master_server_id_sequence;
-CREATE SEQUENCE  t_escheduler_master_server_id_sequence;
-ALTER TABLE t_escheduler_master_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_master_server_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_process_definition_id_sequence;
-CREATE SEQUENCE  t_escheduler_process_definition_id_sequence;
-ALTER TABLE t_escheduler_process_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_process_definition_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_process_instance_id_sequence;
-CREATE SEQUENCE  t_escheduler_process_instance_id_sequence;
-ALTER TABLE t_escheduler_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_process_instance_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_project_id_sequence;
-CREATE SEQUENCE  t_escheduler_project_id_sequence;
-ALTER TABLE t_escheduler_project ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_project_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_queue_id_sequence;
-CREATE SEQUENCE  t_escheduler_queue_id_sequence;
-ALTER TABLE t_escheduler_queue ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_queue_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_command_id_sequence;
+CREATE SEQUENCE  t_ds_command_id_sequence;
+ALTER TABLE t_ds_command ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_command_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_datasource_id_sequence;
+CREATE SEQUENCE  t_ds_datasource_id_sequence;
+ALTER TABLE t_ds_datasource ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_datasource_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_master_server_id_sequence;
+CREATE SEQUENCE  t_ds_master_server_id_sequence;
+ALTER TABLE t_ds_master_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_master_server_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_process_definition_id_sequence;
+CREATE SEQUENCE  t_ds_process_definition_id_sequence;
+ALTER TABLE t_ds_process_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_process_instance_id_sequence;
+CREATE SEQUENCE  t_ds_process_instance_id_sequence;
+ALTER TABLE t_ds_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_instance_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_project_id_sequence;
+CREATE SEQUENCE  t_ds_project_id_sequence;
+ALTER TABLE t_ds_project ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_project_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_queue_id_sequence;
+CREATE SEQUENCE  t_ds_queue_id_sequence;
+ALTER TABLE t_ds_queue ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_queue_id_sequence');
 
-DROP SEQUENCE IF EXISTS t_escheduler_relation_datasource_user_id_sequence;
-CREATE SEQUENCE  t_escheduler_relation_datasource_user_id_sequence;
-ALTER TABLE t_escheduler_relation_datasource_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_relation_datasource_user_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_relation_process_instance_id_sequence;
-CREATE SEQUENCE  t_escheduler_relation_process_instance_id_sequence;
-ALTER TABLE t_escheduler_relation_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_relation_process_instance_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_relation_project_user_id_sequence;
-CREATE SEQUENCE  t_escheduler_relation_project_user_id_sequence;
-ALTER TABLE t_escheduler_relation_project_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_relation_project_user_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_relation_resources_user_id_sequence;
-CREATE SEQUENCE  t_escheduler_relation_resources_user_id_sequence;
-ALTER TABLE t_escheduler_relation_resources_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_relation_resources_user_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_relation_udfs_user_id_sequence;
-CREATE SEQUENCE  t_escheduler_relation_udfs_user_id_sequence;
-ALTER TABLE t_escheduler_relation_udfs_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_relation_udfs_user_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_relation_user_alertgroup_id_sequence;
-CREATE SEQUENCE  t_escheduler_relation_user_alertgroup_id_sequence;
-ALTER TABLE t_escheduler_relation_user_alertgroup ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_relation_user_alertgroup_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_relation_datasource_user_id_sequence;
+CREATE SEQUENCE  t_ds_relation_datasource_user_id_sequence;
+ALTER TABLE t_ds_relation_datasource_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_datasource_user_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_relation_process_instance_id_sequence;
+CREATE SEQUENCE  t_ds_relation_process_instance_id_sequence;
+ALTER TABLE t_ds_relation_process_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_process_instance_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_relation_project_user_id_sequence;
+CREATE SEQUENCE  t_ds_relation_project_user_id_sequence;
+ALTER TABLE t_ds_relation_project_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_project_user_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_relation_resources_user_id_sequence;
+CREATE SEQUENCE  t_ds_relation_resources_user_id_sequence;
+ALTER TABLE t_ds_relation_resources_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_resources_user_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_relation_udfs_user_id_sequence;
+CREATE SEQUENCE  t_ds_relation_udfs_user_id_sequence;
+ALTER TABLE t_ds_relation_udfs_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_udfs_user_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_relation_user_alertgroup_id_sequence;
+CREATE SEQUENCE  t_ds_relation_user_alertgroup_id_sequence;
+ALTER TABLE t_ds_relation_user_alertgroup ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_user_alertgroup_id_sequence');
 
-DROP SEQUENCE IF EXISTS t_escheduler_resources_id_sequence;
-CREATE SEQUENCE  t_escheduler_resources_id_sequence;
-ALTER TABLE t_escheduler_resources ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_resources_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_schedules_id_sequence;
-CREATE SEQUENCE  t_escheduler_schedules_id_sequence;
-ALTER TABLE t_escheduler_schedules ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_schedules_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_task_instance_id_sequence;
-CREATE SEQUENCE  t_escheduler_task_instance_id_sequence;
-ALTER TABLE t_escheduler_task_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_task_instance_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_tenant_id_sequence;
-CREATE SEQUENCE  t_escheduler_tenant_id_sequence;
-ALTER TABLE t_escheduler_tenant ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_tenant_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_udfs_id_sequence;
-CREATE SEQUENCE  t_escheduler_udfs_id_sequence;
-ALTER TABLE t_escheduler_udfs ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_udfs_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_user_id_sequence;
-CREATE SEQUENCE  t_escheduler_user_id_sequence;
-ALTER TABLE t_escheduler_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_user_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_resources_id_sequence;
+CREATE SEQUENCE  t_ds_resources_id_sequence;
+ALTER TABLE t_ds_resources ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_resources_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_schedules_id_sequence;
+CREATE SEQUENCE  t_ds_schedules_id_sequence;
+ALTER TABLE t_ds_schedules ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_schedules_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_task_instance_id_sequence;
+CREATE SEQUENCE  t_ds_task_instance_id_sequence;
+ALTER TABLE t_ds_task_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_task_instance_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_tenant_id_sequence;
+CREATE SEQUENCE  t_ds_tenant_id_sequence;
+ALTER TABLE t_ds_tenant ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_tenant_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_udfs_id_sequence;
+CREATE SEQUENCE  t_ds_udfs_id_sequence;
+ALTER TABLE t_ds_udfs ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_udfs_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_user_id_sequence;
+CREATE SEQUENCE  t_ds_user_id_sequence;
+ALTER TABLE t_ds_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_user_id_sequence');
 
-DROP SEQUENCE IF EXISTS t_escheduler_version_id_sequence;
-CREATE SEQUENCE  t_escheduler_version_id_sequence;
-ALTER TABLE t_escheduler_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_version_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_version_id_sequence;
+CREATE SEQUENCE  t_ds_version_id_sequence;
+ALTER TABLE t_ds_version ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_version_id_sequence');
 
-DROP SEQUENCE IF EXISTS t_escheduler_worker_group_id_sequence;
-CREATE SEQUENCE  t_escheduler_worker_group_id_sequence;
-ALTER TABLE t_escheduler_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_worker_group_id_sequence');
-DROP SEQUENCE IF EXISTS t_escheduler_worker_server_id_sequence;
-CREATE SEQUENCE  t_escheduler_worker_server_id_sequence;
-ALTER TABLE t_escheduler_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_escheduler_worker_server_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_worker_group_id_sequence;
+CREATE SEQUENCE  t_ds_worker_group_id_sequence;
+ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_group_id_sequence');
+DROP SEQUENCE IF EXISTS t_ds_worker_server_id_sequence;
+CREATE SEQUENCE  t_ds_worker_server_id_sequence;
+ALTER TABLE t_ds_worker_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_server_id_sequence');
