@@ -358,6 +358,9 @@
                                 </mapping>
                             </mappings>
 
+                            <preinstallScriptlet>
+                                <script>mkdir -p /opt/soft</script>
+                            </preinstallScriptlet>
                             <postremoveScriptlet>
                                 <script>rm -rf /opt/soft/apache-dolphinscheduler-incubating-${project.version}</script>
                             </postremoveScriptlet>
