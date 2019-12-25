@@ -19,19 +19,12 @@ package org.apache.dolphinscheduler.server.zk;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
-import org.apache.dolphinscheduler.common.zk.AbstractListener;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
-import org.apache.curator.utils.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ThreadFactory;
 
 
 /**
@@ -89,7 +82,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 	 */
 	@Override
 	protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
-		if(path.equals(getZNodeParentPath(ZKNodeType.WORKER))){
+		if(path.startsWith(getZNodeParentPath(ZKNodeType.WORKER)+Constants.SINGLE_SLASH)){
 			handleWorkerEvent(event,path);
 		}
 	}
