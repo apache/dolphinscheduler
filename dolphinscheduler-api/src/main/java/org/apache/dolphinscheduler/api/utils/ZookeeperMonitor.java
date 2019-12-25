@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.ZookeeperRecord;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,17 +33,17 @@ import java.util.List;
 /**
  *	monitor zookeeper info
  */
+@Component
 public class ZookeeperMonitor extends AbstractZKClient{
 
 	private static final Logger LOG = LoggerFactory.getLogger(ZookeeperMonitor.class);
-	private static final String zookeeperList = AbstractZKClient.getZookeeperQuorum();
 
 	/**
 	 *
 	 * @return zookeeper info list
 	 */
-	public static List<ZookeeperRecord> zookeeperInfoList(){
-		String zookeeperServers = zookeeperList.replaceAll("[\\t\\n\\x0B\\f\\r]", "");
+	public List<ZookeeperRecord> zookeeperInfoList(){
+		String zookeeperServers = getZookeeperQuorum().replaceAll("[\\t\\n\\x0B\\f\\r]", "");
 		try{
 			return zookeeperInfoList(zookeeperServers);
 		}catch(Exception e){

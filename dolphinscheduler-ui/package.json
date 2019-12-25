@@ -23,12 +23,13 @@
     "html2canvas": "^0.5.0-beta4",
     "jquery": "3.3.1",
     "jquery-ui": "^1.12.1",
+    "js-cookie": "^2.2.1",
     "jsplumb": "^2.8.6",
     "lodash": "^4.17.11",
     "vue": "^2.5.17",
     "vue-router": "2.7.0",
     "vuex": "^3.0.0",
-    "vuex-router-sync": "^4.1.2"
+    "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^9.1.0",
