@@ -231,7 +231,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     api-util 1.0.0-M20: https://mvnrepository.com/artifact/org.apache.directory.api/api-util/1.0.0-M20, Apache 2.0
     audience-annotations 0.5.0: https://mvnrepository.com/artifact/org.apache.yetus/audience-annotations/0.5.0, Apache 2.0
     avro 1.7.4: https://github.com/apache/avro, Apache 2.0
-    aws-sdk-java 1.7.4: https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk/1.7.4, Apache 2.0
+    aws-java-sdk 1.7.4: https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk/1.7.4, Apache 2.0
     bonecp 0.8.0.RELEASE: https://github.com/wwadge/bonecp, Apache 2.0
     byte-buddy 1.9.10: https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy/1.9.10, Apache 2.0
     classmate 1.4.0: https://mvnrepository.com/artifact/com.fasterxml/classmate/1.4.0, Apache 2.0
@@ -251,7 +251,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     commons-lang3 3.5: https://mvnrepository.com/artifact/org.apache.commons/commons-lang3/3.5, Apache 2.0
     commons-logging 1.1.1: https://github.com/apache/commons-logging, Apache 2.0
     commons-math3 3.1.1: https://github.com/apache/commons-math, Apache 2.0
-    commans-net 3.1: https://github.com/apache/commons-net, Apache 2.0
+    commons-net 3.1: https://github.com/apache/commons-net, Apache 2.0
     commons-pool 1.6: https://github.com/apache/commons-pool, Apache 2.0
     cron-utils 5.0.5: https://mvnrepository.com/artifact/com.cronutils/cron-utils/5.0.5, Apache 2.0
     curator-client 2.12.0: https://mvnrepository.com/artifact/org.apache.curator/curator-client/2.12.0, Apache 2.0
@@ -363,7 +363,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     netty-codec-http 4.1.33.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-http/4.1.33.Final, Apache 2.0
     netty-codec-socks 4.1.33.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-socks/4.1.33.Final, Apache 2.0
     netty-common 4.1.33.Final: https://mvnrepository.com/artifact/io.netty/netty-common/4.1.33.Final, Apache 2.0
-    netty-handler 4.1.33: https://mvnrepository.com/artifact/io.netty/netty-handler/4.1.33.Final, Apache 2.0
+    netty-handler 4.1.33.Final: https://mvnrepository.com/artifact/io.netty/netty-handler/4.1.33.Final, Apache 2.0
     netty-handler-proxy 4.1.33.Final: https://mvnrepository.com/artifact/io.netty/netty-handler-proxy/4.1.33.Final, Apache 2.0
     netty-resolver 4.1.33.Final: https://mvnrepository.com/artifact/io.netty/netty-resolver/4.1.33.Final, Apache 2.0
     netty-transport 4.1.33.Final: https://mvnrepository.com/artifact/io.netty/netty-transport/4.1.33.Final, Apache 2.0
