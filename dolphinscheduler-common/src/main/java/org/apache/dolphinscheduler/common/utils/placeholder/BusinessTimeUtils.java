@@ -68,6 +68,7 @@ public class BusinessTimeUtils {
     result.put(Constants.PARAMETER_CURRENT_DATE, format(businessCurrentDate, PARAMETER_FORMAT_DATE));
     result.put(Constants.PARAMETER_BUSINESS_DATE, format(businessDate, PARAMETER_FORMAT_DATE));
     result.put(Constants.PARAMETER_DATETIME, format(businessCurrentDate, PARAMETER_FORMAT_TIME));
+    result.put(Constants.REPEAT_RUNNING,commandType == CommandType.REPEAT_RUNNING ? "1":"0");
     return result;
   }
 }

@@ -1011,4 +1011,6 @@ public final class Constants {
     public static final String CLASS = "class";
     public static final String RECEIVERS = "receivers";
     public static final String RECEIVERS_CC = "receiversCc";
+
+    public static final String REPEAT_RUNNING = "repeat.running";
 }
