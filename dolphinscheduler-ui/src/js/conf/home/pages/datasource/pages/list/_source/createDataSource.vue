@@ -32,7 +32,6 @@
               <x-radio :label="'CLICKHOUSE'">CLICKHOUSE</x-radio>
               <x-radio :label="'ORACLE'">ORACLE</x-radio>
               <x-radio :label="'SQLSERVER'">SQLSERVER</x-radio>
-              <x-radio :label="'DB2'" class="radio-label-last" >DB2</x-radio>
             </x-radio-group>
           </template>
         </m-list-box-f>
@@ -383,9 +382,6 @@
             break
           case 'SQLSERVER':
             defaultPort = '1433'
-            break
-          case 'DB2':
-            defaultPort = '50000'
             break
           default:
             break

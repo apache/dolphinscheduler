@@ -144,8 +144,7 @@
         isRtTasks: false,
         isRefresh: false,
         isLoading: false,
-        taskId: null,
-        arg: false,
+        taskId: null
       }
     },
     mixins: [disabledState],
@@ -157,43 +156,9 @@
       ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState']),
       ...mapMutations('dag', ['addTasks', 'resetParams', 'setIsEditDag', 'setName']),
       
-      // DAG automatic layout
-      dagAutomaticLayout() {
-        $('#canvas').html('')
-
-      // Destroy round robin
-        Dag.init({
-        dag: this,
-        instance: jsPlumb.getInstance({
-          Endpoint: [
-            'Dot', { radius: 1, cssClass: 'dot-style' }
-          ],
-          Connector: 'Straight',
-          PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
-          ConnectionOverlays: [
-            [
-              'Arrow',
-              {
-                location: 1,
-                id: 'arrow',
-                length: 12,
-                foldback: 0.8
-              }
-            ]
-          ],
-          Container: 'canvas'
-        })
-      })
+      init () {
         if (this.tasks.length) {
-          Dag.backfill(true)
-        } else {
-          Dag.create()
-        }
-      },
-
-      init (args) {
-        if (this.tasks.length) {
-          Dag.backfill(args)
+          Dag.backfill()
           // Process instances can view status
           if (this.type === 'instance') {
             this._getTaskState(false).then(res => {})
@@ -551,7 +516,7 @@
       })
     },
     mounted () {
-      this.init(this.arg)
+      this.init()
     },
     beforeDestroy () {
       this.resetParams()

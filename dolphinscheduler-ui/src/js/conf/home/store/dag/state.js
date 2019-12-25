@@ -87,11 +87,6 @@ export default {
       id: 6,
       code: 'SQLSERVER',
       disabled: false
-    },
-    {
-      id: 7,
-      code: 'DB2',
-      disabled: false
     }
   ],
   // Alarm interface
