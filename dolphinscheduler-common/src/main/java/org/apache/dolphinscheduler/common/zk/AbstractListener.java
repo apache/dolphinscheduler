@@ -14,23 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api;
+package org.apache.dolphinscheduler.common.zk;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 
-@SpringBootApplication
-@ServletComponentScan
-@ComponentScan("org.apache.dolphinscheduler")
-public class ApiApplicationServer extends SpringBootServletInitializer {
+public abstract class AbstractListener implements TreeCacheListener {
 
-  public static void main(String[] args) {
-    SpringApplication.run(ApiApplicationServer.class, args);
-  }
+    @Override
+    public final void childEvent(final CuratorFramework client, final TreeCacheEvent event) throws Exception {
+        String path = null == event.getData() ? "" : event.getData().getPath();
+        if (path.isEmpty()) {
+            return;
+        }
+        dataChanged(client, event, path);
+    }
 
-
+    protected abstract void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path);
 }

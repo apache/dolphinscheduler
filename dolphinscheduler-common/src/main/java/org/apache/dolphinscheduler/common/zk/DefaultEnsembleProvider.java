@@ -14,23 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api;
+package org.apache.dolphinscheduler.common.zk;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import org.apache.curator.ensemble.EnsembleProvider;
 
-@SpringBootApplication
-@ServletComponentScan
-@ComponentScan("org.apache.dolphinscheduler")
-public class ApiApplicationServer extends SpringBootServletInitializer {
+import java.io.IOException;
 
-  public static void main(String[] args) {
-    SpringApplication.run(ApiApplicationServer.class, args);
-  }
+/**
+ * default conf provider
+ */
+public class DefaultEnsembleProvider implements EnsembleProvider {
 
+    private final String serverList;
 
+    public DefaultEnsembleProvider(String serverList){
+        this.serverList = serverList;
+    }
+
+    @Override
+    public void start() throws Exception {
+        //NOP
+    }
+
+    @Override
+    public String getConnectionString() {
+        return serverList;
+    }
+
+    @Override
+    public void close() throws IOException {
+        //NOP
+    }
 }
