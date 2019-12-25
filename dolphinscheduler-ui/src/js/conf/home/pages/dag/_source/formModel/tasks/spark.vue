@@ -32,22 +32,6 @@
         </x-select>
       </div>
     </m-list-box>
-    <m-list-box>
-      <div slot="text">{{$t('Spark Version')}}</div>
-      <div slot="content">
-        <x-select
-                style="width: 130px;"
-                v-model="sparkVersion"
-                :disabled="isDetails">
-          <x-option
-                  v-for="city in sparkVersionList"
-                  :key="city.code"
-                  :value="city.code"
-                  :label="city.code">
-          </x-option>
-        </x-select>
-      </div>
-    </m-list-box>
     <m-list-box v-if="programType !== 'PYTHON'">
       <div slot="text">{{$t('Main class')}}</div>
       <div slot="content">
@@ -240,11 +224,7 @@
         // Program type
         programType: 'SCALA',
         // Program type(List)
-        programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }],
-        // Spark version
-        sparkVersion: 'SPARK2',
-        // Spark version(LIst)
-        sparkVersionList: [{ code: 'SPARK2' }, { code: 'SPARK1' }]
+        programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }]
       }
     },
     props: {
@@ -338,8 +318,7 @@
           executorCores: this.executorCores,
           mainArgs: this.mainArgs,
           others: this.others,
-          programType: this.programType,
-          sparkVersion: this.sparkVersion
+          programType: this.programType
         })
         return true
       },
@@ -387,7 +366,6 @@
           this.mainArgs = o.params.mainArgs || ''
           this.others = o.params.others
           this.programType = o.params.programType || 'SCALA'
-          this.sparkVersion = o.params.sparkVersion || 'SPARK2'
 
           // backfill resourceList
           let resourceList = o.params.resourceList || []
