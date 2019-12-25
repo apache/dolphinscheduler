@@ -32,6 +32,12 @@ public class SensitiveDataConverterTest {
     private final Logger logger = LoggerFactory.getLogger(SensitiveDataConverterTest.class);
 
     /**
+     * password pattern
+     */
+    private final Pattern pwdPattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
+
+
+    /**
      * mask sensitive logMsg - sql task datasource password
      */
     @Test
@@ -51,10 +57,10 @@ public class SensitiveDataConverterTest {
 
 
         logger.info("parameter : {}", logMsg);
-        logger.info("parameter : {}", passwordHandler(logMsg));
+        logger.info("parameter : {}", passwordHandler(pwdPattern, logMsg));
 
-        Assert.assertNotEquals(logMsg, passwordHandler(logMsg));
-        Assert.assertEquals(maskLogMsg, passwordHandler(logMsg));
+        Assert.assertNotEquals(logMsg, passwordHandler(pwdPattern, logMsg));
+        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
 
     }
 
@@ -63,13 +69,11 @@ public class SensitiveDataConverterTest {
      *
      * @param logMsg original log
      */
-    private static String passwordHandler(String logMsg) {
-
-        Pattern pattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
+    private static String passwordHandler(Pattern pattern, String logMsg) {
 
         Matcher matcher = pattern.matcher(logMsg);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(logMsg.length());
 
         while (matcher.find()) {
 

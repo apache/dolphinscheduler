@@ -33,6 +33,11 @@ import java.util.regex.Pattern;
 @Slf4j
 public class SensitiveDataConverter extends MessageConverter {
 
+    /**
+     * password pattern
+     */
+    private final Pattern pwdPattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
+
 
     @Override
     public String convert(ILoggingEvent event) {
@@ -54,7 +59,7 @@ public class SensitiveDataConverter extends MessageConverter {
         String tempLogMsg = oriLogMsg;
 
         if (StringUtils.isNotEmpty(tempLogMsg)) {
-            tempLogMsg = passwordHandler(tempLogMsg);
+            tempLogMsg = passwordHandler(pwdPattern, tempLogMsg);
         }
         return tempLogMsg;
     }
@@ -64,13 +69,11 @@ public class SensitiveDataConverter extends MessageConverter {
      *
      * @param logMsg original log
      */
-    private String passwordHandler(String logMsg) {
+    private String passwordHandler(Pattern pwdPattern, String logMsg) {
 
-        Pattern pattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
+        Matcher matcher = pwdPattern.matcher(logMsg);
 
-        Matcher matcher = pattern.matcher(logMsg);
-
-        StringBuffer sb = new StringBuffer();
+        StringBuffer sb = new StringBuffer(logMsg.length());
 
         while (matcher.find()) {
 
