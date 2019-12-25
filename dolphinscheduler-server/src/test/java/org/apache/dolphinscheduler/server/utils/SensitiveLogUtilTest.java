@@ -25,13 +25,13 @@ import org.junit.Test;
 public class SensitiveLogUtilTest {
 
     @Test
-    public void maskDataSourcePassword() {
+    public void testMaskDataSourcePwd() {
 
         String password = "123456";
         String emptyPassword = "";
 
-        Assert.assertEquals(Constants.PASSWORD_DEFAULT, SensitiveLogUtil.maskDataSourcePassword(password));
-        Assert.assertEquals("", SensitiveLogUtil.maskDataSourcePassword(emptyPassword));
+        Assert.assertEquals(Constants.PASSWORD_DEFAULT, SensitiveLogUtil.maskDataSourcePwd(password));
+        Assert.assertEquals("", SensitiveLogUtil.maskDataSourcePwd(emptyPassword));
 
     }
 }

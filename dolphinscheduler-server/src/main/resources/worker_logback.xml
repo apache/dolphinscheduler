@@ -33,7 +33,7 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
-        <filter class="org.apache.dolphinscheduler.server.worker.log.TaskLogFilter"></filter>
+        <filter class="org.apache.dolphinscheduler.server.worker.log.TaskLogFilter"/>
         <Discriminator class="org.apache.dolphinscheduler.server.worker.log.TaskLogDiscriminator">
             <key>taskAppId</key>
             <logBase>${log.base}</logBase>

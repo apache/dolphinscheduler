@@ -76,7 +76,7 @@ public class SensitiveDataConverter extends MessageConverter {
 
             String password = matcher.group();
 
-            String maskPassword = SensitiveLogUtil.maskDataSourcePassword(password);
+            String maskPassword = SensitiveLogUtil.maskDataSourcePwd(password);
 
             matcher.appendReplacement(sb, maskPassword);
         }

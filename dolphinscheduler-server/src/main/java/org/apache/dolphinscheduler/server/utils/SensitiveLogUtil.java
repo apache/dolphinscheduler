@@ -25,15 +25,15 @@ import org.apache.dolphinscheduler.common.Constants;
 public class SensitiveLogUtil {
 
     /**
-     * @param dataSourcePassword data source password
+     * @param dataSourcePwd data source password
      * @return String
      */
-    public static String maskDataSourcePassword(String dataSourcePassword){
+    public static String maskDataSourcePwd(String dataSourcePwd){
 
-        if (!StringUtils.isBlank(dataSourcePassword)) {
-            dataSourcePassword = Constants.PASSWORD_DEFAULT;
+        if (StringUtils.isNotEmpty(dataSourcePwd)) {
+            dataSourcePwd = Constants.PASSWORD_DEFAULT;
         }
-        return dataSourcePassword;
+        return dataSourcePwd;
     }
 
 }

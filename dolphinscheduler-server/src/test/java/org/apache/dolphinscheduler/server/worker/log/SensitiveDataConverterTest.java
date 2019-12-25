@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.log;
 
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.server.utils.SensitiveLogUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,16 +29,13 @@ import java.util.regex.Pattern;
 
 public class SensitiveDataConverterTest {
 
-    /**
-     * logger
-     */
     private final Logger logger = LoggerFactory.getLogger(SensitiveDataConverterTest.class);
 
     /**
      * mask sensitive logMsg - sql task datasource password
      */
     @Test
-    public void maskDataSourcePassword() {
+    public void testPwdLogMsgConverter() {
 
         String logMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\"," +
                 "\"database\":\"carbond\"," +
@@ -61,13 +59,13 @@ public class SensitiveDataConverterTest {
     }
 
     /**
-     * password regex
+     * password regex test
      *
      * @param logMsg original log
      */
-    private String passwordHandler(String logMsg) {
+    private static String passwordHandler(String logMsg) {
 
-        Pattern pattern = Pattern.compile("(?<=(\"password\":\")).*?(?=(\"))");
+        Pattern pattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
 
         Matcher matcher = pattern.matcher(logMsg);
 
@@ -77,7 +75,7 @@ public class SensitiveDataConverterTest {
 
             String password = matcher.group();
 
-            String maskPassword = SensitiveLogUtil.maskDataSourcePassword(password);
+            String maskPassword = SensitiveLogUtil.maskDataSourcePwd(password);
 
             matcher.appendReplacement(sb, maskPassword);
         }
