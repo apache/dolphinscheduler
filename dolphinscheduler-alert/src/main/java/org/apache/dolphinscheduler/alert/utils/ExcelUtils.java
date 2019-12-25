@@ -70,6 +70,8 @@ public class ExcelUtils {
                HSSFRow row = sheet.createRow(0);
                //set the height of the first line
                row.setHeight((short)500);
+
+
                //setting excel headers
                for (int i = 0; i < headerList.size(); i++) {
                    HSSFCell cell = row.createCell(i);
