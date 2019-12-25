@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
  * zookeeper conf
  */
 @Component
-@PropertySource("classpath:run_config.conf")
+@PropertySource("classpath:config/run_config.conf")
 public class RunConfig {
 
     //zk connect config
