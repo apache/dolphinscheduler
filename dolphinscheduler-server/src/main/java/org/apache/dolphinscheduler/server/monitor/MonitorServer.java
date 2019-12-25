@@ -40,10 +40,11 @@ public class MonitorServer implements CommandLineRunner {
     @Autowired
     private Monitor monitor;
 
+
+
     public static void main(String[] args) throws Exception{
 
         new SpringApplicationBuilder(MonitorServer.class).web(WebApplicationType.NONE).run(args);
-
     }
 
     @Override

@@ -36,6 +36,7 @@ public class ZKMmonitorImpl extends AbstractMonitor {
     @Autowired
     private ZookeeperOperator zookeeperOperator;
 
+
     /**
      * get active nodes map by path
      * @param path path

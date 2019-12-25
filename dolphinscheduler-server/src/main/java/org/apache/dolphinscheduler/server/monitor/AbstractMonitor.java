@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -33,6 +34,10 @@ import java.util.Set;
 public abstract class AbstractMonitor implements Monitor {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractMonitor.class);
+
+
+    @Autowired
+    private RunConfig runConfig;
 
     /**
      * monitor server and restart
@@ -49,16 +54,21 @@ public abstract class AbstractMonitor implements Monitor {
 
     private void restartServer(String path,Integer port,String installPath) throws Exception{
 
-        Map<String, String> activeNodeMap = getActiveNodesByPath(path);
         String type = path.split("/")[2];
-        Set<String> needRestartServer = getNeedRestartServer(getRunConfigByType(type),
-                activeNodeMap.keySet());
         String serverName = null;
+        String nodes = null;
         if ("masters".equals(type)){
             serverName = "master-server";
+            nodes = runConfig.getMasters();
         }else if ("workers".equals(type)){
             serverName = "worker-server";
+            nodes = runConfig.getWorkers();
         }
+
+        Map<String, String> activeNodeMap = getActiveNodesByPath(path);
+
+        Set<String> needRestartServer = getNeedRestartServer(getRunConfigServer(nodes),
+                activeNodeMap.keySet());
 
         for (String node : needRestartServer){
             // os.system('ssh -p ' + ssh_port + ' ' + self.get_ip_by_hostname(master) + ' sh ' + install_path + '/bin/dolphinscheduler-daemon.sh start master-server')
@@ -90,19 +100,18 @@ public abstract class AbstractMonitor implements Monitor {
      * run config masters/workers
      * @return master set/worker set
      */
-    private Set<String> getRunConfigByType(String type){
+    private Set<String> getRunConfigServer(String nodes){
         Set<String> nodeSet = new HashSet();
 
-        String nodes = "";
 
         if (StringUtils.isEmpty(nodes)){
             return null;
         }
 
-        String[] masterArr = nodes.split(",");
+        String[] nodeArr = nodes.split(",");
 
-        for (String master : masterArr){
-            nodeSet.add(master);
+        for (String node : nodeArr){
+            nodeSet.add(node);
         }
 
         return nodeSet;
