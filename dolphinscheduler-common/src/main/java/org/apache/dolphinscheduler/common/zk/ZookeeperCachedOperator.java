@@ -16,8 +16,10 @@
  */
 package org.apache.dolphinscheduler.common.zk;
 
+import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,30 +36,37 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
 
     private final Logger logger = LoggerFactory.getLogger(ZookeeperCachedOperator.class);
 
-    //kay is zk path, value is TreeCache
-    private ConcurrentHashMap<String, TreeCache> allCaches = new ConcurrentHashMap<>();
 
+    TreeCache treeCache;
     /**
-     * @param cachePath zk path
-     * @param listener  operator
+     * register a unified listener of /${dsRoot},
      */
-    public void registerListener(final String cachePath, final TreeCacheListener listener) {
-        TreeCache newCache = new TreeCache(zkClient, cachePath);
-        logger.info("add listener to zk path: {}", cachePath);
+    @Override
+    protected void registerListener() {
+        treeCache = new TreeCache(zkClient, getZookeeperConfig().getDsRoot());
+        logger.info("add listener to zk path: {}", getZookeeperConfig().getDsRoot());
         try {
-            newCache.start();
+            treeCache.start();
         } catch (Exception e) {
-            logger.error("add listener to zk path: {} failed", cachePath);
+            logger.error("add listener to zk path: {} failed", getZookeeperConfig().getDsRoot());
             throw new RuntimeException(e);
         }
 
-        newCache.getListenable().addListener(listener);
+        treeCache.getListenable().addListener((client, event) -> {
+            String path = null == event.getData() ? "" : event.getData().getPath();
+            if (path.isEmpty()) {
+                return;
+            }
+            dataChanged(client, event, path);
+        });
 
-        allCaches.put(cachePath, newCache);
     }
 
+    //for sub class
+    protected void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path){}
+
     public String getFromCache(final String cachePath, final String key) {
-        ChildData resultInCache = allCaches.get(checkNotNull(cachePath)).getCurrentData(key);
+        ChildData resultInCache = treeCache.getCurrentData(key);
         if (null != resultInCache) {
             return null == resultInCache.getData() ? null : new String(resultInCache.getData(), StandardCharsets.UTF_8);
         }
@@ -65,18 +74,15 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
     }
 
     public TreeCache getTreeCache(final String cachePath) {
-        return allCaches.get(checkNotNull(cachePath));
+        return treeCache;
     }
 
     public void close() {
-
-        allCaches.forEach((path, cache) -> {
-            cache.close();
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException ignore) {
-            }
-        });
+        treeCache.close();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ignore) {
+        }
         super.close();
     }
 }
