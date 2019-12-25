@@ -58,6 +58,7 @@ public class MasterServer implements IStoppable {
     /**
      *  zk master client
      */
+    @Autowired
     private ZKMasterClient zkMasterClient = null;
 
     /**
@@ -105,10 +106,9 @@ public class MasterServer implements IStoppable {
      */
     @PostConstruct
     public void run(){
+        zkMasterClient.init();
 
         masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
-
-        zkMasterClient = ZKMasterClient.getZKMasterClient(processDao);
 
         heartbeatMasterService = ThreadUtils.newDaemonThreadScheduledExecutor("Master-Main-Thread",Constants.defaulMasterHeartbeatThreadNum);
 
