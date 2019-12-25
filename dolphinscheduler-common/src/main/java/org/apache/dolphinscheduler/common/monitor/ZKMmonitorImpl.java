@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.common.zk.monitor;
+package org.apache.dolphinscheduler.common.monitor;
 
 import org.apache.dolphinscheduler.common.zk.operation.NodeOperation;
 import org.apache.dolphinscheduler.common.zk.operation.ZKNodeOperationImpl;
@@ -10,11 +10,11 @@ import java.util.Map;
 /**
  * zk monitor server impl
  */
-public class ZKMmonitorServerImpl extends AbstractMonitorServer {
+public class ZKMmonitorImpl extends AbstractMonitor {
 
     private NodeOperation nodeOperation;
 
-    public ZKMmonitorServerImpl(NodeOperation nodeOperation){
+    public ZKMmonitorImpl(NodeOperation nodeOperation){
         this.nodeOperation = nodeOperation;
     }
 
@@ -31,7 +31,7 @@ public class ZKMmonitorServerImpl extends AbstractMonitorServer {
         List<String> childrenList = nodeOperation.listNodesByPath(path);
 
         if (childrenList == null){
-            return null;
+            return maps;
         }
 
         for (String child : childrenList){
@@ -39,20 +39,5 @@ public class ZKMmonitorServerImpl extends AbstractMonitorServer {
         }
 
         return maps;
-    }
-
-    public static void main(String[] args) throws Exception{
-        String masterPath = args[0];
-        String workerPath = args[1];
-        Integer port = Integer.parseInt(args[2]);
-        String installPath = args[3];
-
-        MonitorServer monitorServer = new ZKMmonitorServerImpl(new ZKNodeOperationImpl());
-        while (true){
-            monitorServer.monitor(masterPath,workerPath,port,installPath);
-
-            // per five minutes to monitor
-            Thread.sleep(1000 * 60 * 5);
-        }
     }
 }

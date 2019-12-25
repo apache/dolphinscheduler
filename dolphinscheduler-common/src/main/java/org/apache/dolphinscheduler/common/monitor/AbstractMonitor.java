@@ -1,6 +1,7 @@
-package org.apache.dolphinscheduler.common.zk.monitor;
+package org.apache.dolphinscheduler.common.monitor;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.RunConfigUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +13,9 @@ import java.util.Set;
 /**
  * abstract server monitor and auto restart server
  */
-public abstract class AbstractMonitorServer implements MonitorServer {
+public abstract class AbstractMonitor implements Monitor {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractMonitorServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractMonitor.class);
 
     /**
      * monitor server and restart
@@ -32,7 +33,7 @@ public abstract class AbstractMonitorServer implements MonitorServer {
     private void restartServer(String path,Integer port,String installPath) throws Exception{
 
         Map<String, String> activeNodeMap = getActiveNodesByPath(path);
-        String type = path.split("/")[1];
+        String type = path.split("/")[2];
         Set<String> needRestartServer = getNeedRestartServer(getRunConfigByType(type),
                 activeNodeMap.keySet());
         String serverName = null;
@@ -44,7 +45,7 @@ public abstract class AbstractMonitorServer implements MonitorServer {
 
         for (String node : needRestartServer){
             // os.system('ssh -p ' + ssh_port + ' ' + self.get_ip_by_hostname(master) + ' sh ' + install_path + '/bin/dolphinscheduler-daemon.sh start master-server')
-            String runCmd = "ssh -p " + port + " " +  node + " sh "  + installPath + " /bin/dolphinscheduler-daemon.sh start " + serverName;
+            String runCmd = "ssh -p " + port + " " +  node + " sh "  + installPath + "/bin/dolphinscheduler-daemon.sh start " + serverName;
             Runtime.getRuntime().exec(runCmd);
         }
     }
@@ -56,6 +57,10 @@ public abstract class AbstractMonitorServer implements MonitorServer {
      * @return need restart server
      */
     private Set<String> getNeedRestartServer(Set<String> deployedNodes,Set<String> activeNodes){
+        if (CollectionUtils.isEmpty(activeNodes)){
+            return deployedNodes;
+        }
+
         Set<String> result = new HashSet<>();
 
         result.addAll(deployedNodes);
