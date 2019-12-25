@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import Vue from 'vue'
 import Vuex from 'vuex'
 import dag from './dag'
 import projects from './projects'
@@ -23,7 +23,7 @@ import security from './security'
 import datasource from './datasource'
 import user from './user'
 import monitor from './monitor'
-
+Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
     dag,

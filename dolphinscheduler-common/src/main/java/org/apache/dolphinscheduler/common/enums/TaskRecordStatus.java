@@ -25,7 +25,7 @@ public enum TaskRecordStatus {
 
     /**
      * status：
-     * 0 sucess
+     * 0 success
      * 1 failure
      * 2 exception
      */

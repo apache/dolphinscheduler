@@ -25,6 +25,7 @@
   </div>
 </template>
 <script>
+  import echarts from 'echarts'
   import gaugeOption from './gaugeOption'
 
   export default {

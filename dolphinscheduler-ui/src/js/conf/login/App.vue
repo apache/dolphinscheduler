@@ -61,7 +61,7 @@
 <script>
   import i18n from '@/module/i18n'
   import io from '@/module/io'
-  import cookie from '@/module/util/cookie'
+  import cookies from 'js-cookie'
 
   export default {
     name: 'login-model',
@@ -85,7 +85,7 @@
             setTimeout(() => {
               this.spinnerLoading = false
               sessionStorage.setItem("sessionId", res.data)
-              cookie.set('sessionId', res.data,{ path: '/' })
+              cookies.set('sessionId', res.data,{ path: '/' })
               if (this.userName === 'admin') {
                 window.location.href = `${PUBLIC_PATH}/#/security/tenant`
               } else {

@@ -14,4 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.api.enums;
 
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class StatusTest {
+
+    @Test
+    public void testGetCode() {
+        assertEquals(Status.SUCCESS.getCode(), 0);
+        assertNotEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 0);
+    }
+
+    @Test
+    public void testGetMsg() {
+        assertEquals("success", Status.SUCCESS.getMsg());
+    }
+}
