@@ -23,6 +23,7 @@
     "html2canvas": "^0.5.0-beta4",
     "jquery": "3.3.1",
     "jquery-ui": "^1.12.1",
+    "js-cookie": "^2.2.1",
     "jsplumb": "^2.8.6",
     "lodash": "^4.17.11",
     "vue": "^2.5.17",
