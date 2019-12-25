@@ -16,11 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.zk;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.apache.commons.configuration.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
@@ -29,10 +24,6 @@ import org.springframework.stereotype.Component;
  * zookeeper conf
  */
 @Component
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @PropertySource("classpath:zookeeper.properties")
 public class ZookeeperConfig {
 
@@ -58,14 +49,70 @@ public class ZookeeperConfig {
     @Value("${zookeeper.connection.digest: }")
     private String digest;
 
-    //ds scheduler install config
     @Value("${zookeeper.dolphinscheduler.root:/dolphinscheduler}")
     private String dsRoot;
 
-    public static ZookeeperConfig getFromConf(Configuration conf){
-        return ZookeeperConfig.builder().serverList(conf.getString("zookeeper.quorum")).baseSleepTimeMs(conf.getInt("zookeeper.retry.base.sleep"))
-                .maxSleepMs(conf.getInt("zookeeper.retry.max.sleep")).maxRetries(conf.getInt("zookeeper.retry.maxtime"))
-                .sessionTimeoutMs(conf.getInt("zookeeper.session.timeout")).connectionTimeoutMs(conf.getInt("zookeeper.connection.timeout"))
-                .dsRoot(conf.getString("zookeeper.dolphinscheduler.root")).build();
+    public String getServerList() {
+        return serverList;
+    }
+
+    public void setServerList(String serverList) {
+        this.serverList = serverList;
+    }
+
+    public int getBaseSleepTimeMs() {
+        return baseSleepTimeMs;
+    }
+
+    public void setBaseSleepTimeMs(int baseSleepTimeMs) {
+        this.baseSleepTimeMs = baseSleepTimeMs;
+    }
+
+    public int getMaxSleepMs() {
+        return maxSleepMs;
+    }
+
+    public void setMaxSleepMs(int maxSleepMs) {
+        this.maxSleepMs = maxSleepMs;
+    }
+
+    public int getMaxRetries() {
+        return maxRetries;
+    }
+
+    public void setMaxRetries(int maxRetries) {
+        this.maxRetries = maxRetries;
+    }
+
+    public int getSessionTimeoutMs() {
+        return sessionTimeoutMs;
+    }
+
+    public void setSessionTimeoutMs(int sessionTimeoutMs) {
+        this.sessionTimeoutMs = sessionTimeoutMs;
+    }
+
+    public int getConnectionTimeoutMs() {
+        return connectionTimeoutMs;
+    }
+
+    public void setConnectionTimeoutMs(int connectionTimeoutMs) {
+        this.connectionTimeoutMs = connectionTimeoutMs;
+    }
+
+    public String getDigest() {
+        return digest;
+    }
+
+    public void setDigest(String digest) {
+        this.digest = digest;
+    }
+
+    public String getDsRoot() {
+        return dsRoot;
+    }
+
+    public void setDsRoot(String dsRoot) {
+        this.dsRoot = dsRoot;
     }
 }
