@@ -12,7 +12,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Build with Maven
-      run: mvn clean install
+      run: mvn clean verify sonar:sonar -Pcoverage
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
       env:
