@@ -1,15 +1,20 @@
-package org.apache.dolphinscheduler.common.zk.operation;
+package org.apache.dolphinscheduler.server.utils.operation;
 
-import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
+import org.apache.dolphinscheduler.common.zk.ZookeeperOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.util.List;
 
 /**
  * zk  node operation
  */
-public class ZKNodeOperationImpl extends AbstractZKClient implements NodeOperation {
+@ComponentScan("org.apache.dolphinscheduler")
+public class ZKNodeOperationImpl extends ZookeeperOperator implements NodeOperation,CommandLineRunner {
 
     private static Integer ARGS_LENGTH = 1;
 
@@ -74,12 +79,17 @@ public class ZKNodeOperationImpl extends AbstractZKClient implements NodeOperati
 
     public static void main(String[] args) {
 
+        new SpringApplicationBuilder(ZKNodeOperationImpl.class).web(WebApplicationType.NONE).run(args);
+    }
+
+
+    @Override
+    public void run(String... args) throws Exception {
         if (args.length != ARGS_LENGTH){
             logger.error("Usage: <rootNode>");
             return;
         }
 
-        NodeOperation nodeOperation = new ZKNodeOperationImpl();
-        nodeOperation.removeNode(args[0]);
+        removeNode(args[0]);
     }
 }
