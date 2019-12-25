@@ -61,9 +61,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 		// init system znode
 		this.initSystemZNode();
 
-		// monitor worker
-		this.listenerWorker();
-
 		// register worker
 		this.registWorker();
 	}
@@ -83,31 +80,38 @@ public class ZKWorkerClient extends AbstractZKClient {
 			System.exit(-1);
 		}
 	}
-	
-	/**
-	 *  monitor worker
-	 */
-	private void listenerWorker(){
-		registerListener(getZNodeParentPath(ZKNodeType.WORKER), new AbstractListener() {
-			@Override
-			protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
-				switch (event.getType()) {
-					case NODE_ADDED:
-						logger.info("worker node added : {}", path);
-						break;
-					case NODE_REMOVED:
-						//find myself dead
-						String serverHost = getHostByEventDataPath(path);
-						if(checkServerSelfDead(serverHost, ZKNodeType.WORKER)){
-							return;
-						}
-						break;
-					default:
-						break;
-				}
-			}
-		});
 
+	/**
+	 * handle path events that this class cares about
+	 * @param client   zkClient
+	 * @param event	   path event
+	 * @param path     zk path
+	 */
+	@Override
+	protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
+		if(path.equals(getZNodeParentPath(ZKNodeType.WORKER))){
+			handleWorkerEvent(event,path);
+		}
+	}
+
+	/**
+	 * monitor worker
+	 */
+	public void handleWorkerEvent(TreeCacheEvent event, String path){
+		switch (event.getType()) {
+			case NODE_ADDED:
+				logger.info("worker node added : {}", path);
+				break;
+			case NODE_REMOVED:
+				//find myself dead
+				String serverHost = getHostByEventDataPath(path);
+				if(checkServerSelfDead(serverHost, ZKNodeType.WORKER)){
+					return;
+				}
+				break;
+			default:
+				break;
+		}
 	}
 
 	/**
