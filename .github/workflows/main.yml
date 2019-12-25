@@ -18,7 +18,7 @@ jobs:
           ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-sonarqube
           ${{ runner.os }}-maven-
     - name: Maven clean
-      run: mv clean
+      run: mvn clean
     - name: Run SonarCloud analyse
       run: >
           mvn --batch-mode
