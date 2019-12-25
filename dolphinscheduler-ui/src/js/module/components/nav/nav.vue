@@ -151,7 +151,7 @@
 </template>
 <script>
   import _ from 'lodash'
-  import cookie from '@/module/util/cookie'
+  import cookies from 'js-cookie'
   import { mapState, mapActions } from 'vuex'
   import { findComponentDownward } from '@/module/util/'
   import mFileUpdate from '@/module/components/fileUpdate/fileUpdate'
@@ -276,14 +276,14 @@
        * Language switching
        */
       _toggleLanguage (language) {
-        cookie.set('language', language, { path: '/' })
+        cookies.set('language', language, { path: '/' })
         setTimeout(() => {
           window.location.reload()
         }, 100)
       }
     },
     created () {
-      let language = cookie.get('language')
+      let language = cookies.get('language')
       this.activeLocale = language ? findLocale(language) : '中文'
       this.docLink = process.env.NODE_ENV === 'true' ? 'docs' : `/view/docs/${this.activeLocale.code}/_book` // eslint-disable-line
     },
