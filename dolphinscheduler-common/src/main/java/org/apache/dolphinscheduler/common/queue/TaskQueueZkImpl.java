@@ -17,26 +17,16 @@
 package org.apache.dolphinscheduler.common.queue;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.Bytes;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.dolphinscheduler.common.zk.DefaultEnsembleProvider;
 import org.apache.dolphinscheduler.common.zk.ZookeeperConfig;
 import org.apache.zookeeper.CreateMode;
@@ -44,7 +34,7 @@ import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.dolphinscheduler.common.utils.Preconditions.checkNotNull;
+import java.util.*;
 
 /**
  * A singleton of a task queue implemented with zookeeper
@@ -421,12 +411,11 @@ public class TaskQueueZkImpl implements ITaskQueue {
             logger.error("load zookeeper properties file failed, system exit");
             System.exit(-1);
         }
-        zookeeperConfig = ZookeeperConfig.getFromConf(conf);
 
-        zkClient = CuratorFrameworkFactory.builder().ensembleProvider(new DefaultEnsembleProvider(checkNotNull(zookeeperConfig.getServerList(), "zookeeper quorum can't be null")))
-                .retryPolicy(new ExponentialBackoffRetry(zookeeperConfig.getBaseSleepTimeMs(), zookeeperConfig.getMaxRetries(), zookeeperConfig.getMaxSleepMs()))
-                .sessionTimeoutMs(zookeeperConfig.getSessionTimeoutMs())
-                .connectionTimeoutMs(zookeeperConfig.getConnectionTimeoutMs())
+        zkClient = CuratorFrameworkFactory.builder().ensembleProvider(new DefaultEnsembleProvider(conf.getString("zookeeper.quorum")))
+                .retryPolicy(new ExponentialBackoffRetry(conf.getInt("zookeeper.retry.base.sleep"), conf.getInt("zookeeper.retry.maxtime"), conf.getInt("zookeeper.retry.max.sleep")))
+                .sessionTimeoutMs(conf.getInt("zookeeper.session.timeout"))
+                .connectionTimeoutMs(conf.getInt("zookeeper.connection.timeout"))
                 .build();
 
         zkClient.start();
@@ -472,8 +461,7 @@ public class TaskQueueZkImpl implements ITaskQueue {
      * @return
      */
     public String getTasksPath(String key){
-        return zookeeperConfig.getDsRoot() + Constants.SINGLE_SLASH + key;
+        return "/dolphinscheduler" + Constants.SINGLE_SLASH + key;
     }
-
 
 }
