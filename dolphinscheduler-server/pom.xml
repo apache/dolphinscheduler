@@ -21,7 +21,7 @@
 	<parent>
 		<groupId>org.apache.dolphinscheduler</groupId>
 		<artifactId>dolphinscheduler</artifactId>
-		<version>1.2.1-SNAPSHOT</version>
+		<version>1.2.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>dolphinscheduler-server</artifactId>
 	<name>dolphinscheduler-server</name>
