@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.zk.AbstractListener;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
@@ -31,9 +30,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.utils.ThreadUtils;
 import org.slf4j.Logger;
@@ -160,12 +156,10 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	@Override
 	protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
-		if(path.equals(getZNodeParentPath(ZKNodeType.MASTER))){  //monitor master
-			logger.info("master path event touch down");
+		if(path.startsWith(getZNodeParentPath(ZKNodeType.MASTER)+Constants.SINGLE_SLASH)){  //monitor master
 			handleMasterEvent(event,path);
 
-		}else if(path.equals(getZNodeParentPath(ZKNodeType.WORKER))){  //monitor worker
-			logger.info("worker path event touch down");
+		}else if(path.startsWith(getZNodeParentPath(ZKNodeType.WORKER)+Constants.SINGLE_SLASH)){  //monitor worker
 			handleWorkerEvent(event,path);
 		}
 		//other path event, ignore
