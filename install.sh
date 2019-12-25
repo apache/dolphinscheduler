@@ -1,4 +1,20 @@
 #!/bin/sh
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
@@ -13,14 +29,14 @@ elif [[ "$OSTYPE" == "linux-gnu" ]]; then
     txt=""
 elif [[ "$OSTYPE" == "cygwin" ]]; then
     # POSIX compatibility layer and Linux environment emulation for Windows
-    echo "Easy Scheduler not support Windows operating system"
+    echo "DolphinScheduler not support Windows operating system"
     exit 1
 elif [[ "$OSTYPE" == "msys" ]]; then
     # Lightweight shell and GNU utilities compiled for Windows (part of MinGW)
-    echo "Easy Scheduler not support Windows operating system"
+    echo "DolphinScheduler not support Windows operating system"
     exit 1
 elif [[ "$OSTYPE" == "win32" ]]; then
-    echo "Easy Scheduler not support Windows operating system"
+    echo "DolphinScheduler not support Windows operating system"
     exit 1
 elif [[ "$OSTYPE" == "freebsd"* ]]; then
     # ...
@@ -34,27 +50,30 @@ fi
 source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
-# mysql config
-# mysql address and port
-mysqlHost="192.168.xx.xx:3306"
+# for example postgresql or mysql ...
+dbtype="postgresql"
 
-# mysql database
-mysqlDb="escheduler"
+# db config
+# db address and port
+dbhost="192.168.xx.xx:5432"
 
-# mysql username
-mysqlUserName="xx"
+# db name
+dbname="dolphinscheduler"
 
-# mysql passwprd
+# db username
+username="xx"
+
+# db passwprd
 # Note: if there are special characters, please use the \ transfer character to transfer
-mysqlPassword="xx"
+passowrd="xx"
 
 # conf/config/install_config.conf config
 # Note: the installation path is not the same as the current path (pwd)
-installPath="/data1_1T/escheduler"
+installPath="/data1_1T/dolphinscheduler"
 
 # deployment user
 # Note: the deployment user needs to have sudo privileges and permissions to operate hdfs. If hdfs is enabled, the root directory needs to be created by itself
-deployUser="escheduler"
+deployUser="dolphinscheduler"
 
 # zk cluster
 zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
@@ -62,6 +81,10 @@ zkQuorum="192.168.xx.xx:2181,192.168.xx.xx:2181,192.168.xx.xx:2181"
 # install hosts
 # Note: install the scheduled hostname list. If it is pseudo-distributed, just write a pseudo-distributed hostname
 ips="ark0,ark1,ark2,ark3,ark4"
+
+# ssh port, default 22
+# Note: if ssh port is not default, modify here
+sshPort=22
 
 # conf/config/run_config.conf config
 # run master machine
@@ -93,11 +116,16 @@ mailServerPort="25"
 # sender
 mailSender="xxxxxxxxxx"
 
+# user
+mailUser="xxxxxxxxxx"
+
 # sender password
 mailPassword="xxxxxxxxxx"
 
 # TLS mail protocol support
 starttlsEnable="false"
+
+sslTrust="xxxxxxxxxx"
 
 # SSL mail protocol support
 # note: The SSL protocol is enabled by default. 
@@ -119,6 +147,9 @@ enterpriseWechatAgentId="xxxxxxxxxx"
 # Enterprise WeChat user configuration, multiple users to , split
 enterpriseWechatUsers="xxxxx,xxxxx"
 
+# alert port
+alertPort=7789
+
 
 # whether to start monitoring self-starting scripts
 monitorServerState="false"
@@ -127,8 +158,8 @@ monitorServerState="false"
 resUploadStartupType="NONE"
 
 # if resUploadStartupType is HDFS，defaultFS write namenode address，HA you need to put core-site.xml and hdfs-site.xml in the conf directory.
-# if S3，write S3 address，HA，for example ：s3a://escheduler，
-# Note，s3 be sure to create the root directory /escheduler
+# if S3，write S3 address，HA，for example ：s3a://dolphinscheduler，
+# Note，s3 be sure to create the root directory /dolphinscheduler
 defaultFS="hdfs://mycluster:8020"
 
 # if S3 is configured, the following configuration is required.
@@ -144,7 +175,7 @@ singleYarnIp="ark1"
 
 # hdfs root path, the owner of the root path must be the deployment user. 
 # versions prior to 1.1.0 do not automatically create the hdfs root directory, you need to create it yourself.
-hdfsPath="/escheduler"
+hdfsPath="/dolphinscheduler"
 
 # have users who create directory permissions under hdfs root path /
 # Note: if kerberos is enabled, hdfsRootUser="" can be used directly.
@@ -152,16 +183,16 @@ hdfsRootUser="hdfs"
 
 # common config
 # Program root path
-programPath="/tmp/escheduler"
+programPath="/tmp/dolphinscheduler"
 
 # download path
-downloadPath="/tmp/escheduler/download"
+downloadPath="/tmp/dolphinscheduler/download"
 
 # task execute path
-execPath="/tmp/escheduler/exec"
+execPath="/tmp/dolphinscheduler/exec"
 
 # SHELL environmental variable path
-shellEnvPath="$installPath/conf/env/.escheduler_env.sh"
+shellEnvPath="$installPath/conf/env/.dolphinscheduler_env.sh"
 
 # suffix of the resource file
 resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
@@ -185,10 +216,10 @@ keytabPath="$installPath/conf/hdfs.headless.keytab"
 
 # zk config
 # zk root directory
-zkRoot="/escheduler"
+zkRoot="/dolphinscheduler"
 
 # used to record the zk directory of the hanging machine
-zkDeadServers="/escheduler/dead-servers"
+zkDeadServers="$zkRoot/dead-servers"
 
 # masters directory
 zkMasters="$zkRoot/masters"
@@ -246,6 +277,9 @@ masterMaxCpuLoadAvg="10"
 # master reserve memory to determine if the master has execution capability
 masterReservedMemory="1"
 
+# master port
+masterPort=5566
+
 
 # worker config 
 # worker execution thread
@@ -257,12 +291,12 @@ workerHeartbeatInterval="10"
 # worker number of fetch tasks
 workerFetchTaskNum="3"
 
-# workerThe maximum cpu average load, used to determine whether the worker still has the ability to execute, 
-# keep the system default, the default is twice the number of cpu cores, when the load reaches 2 times
-#workerMaxCupLoadAvg="10"
-
 # worker reserve memory to determine if the master has execution capability
 workerReservedMemory="1"
+
+# master port
+workerPort=7788
+
 
 # api config
 # api server port
@@ -272,7 +306,7 @@ apiServerPort="12345"
 apiServerSessionTimeout="7200"
 
 # api server context path
-apiServerContextPath="/escheduler/"
+apiServerContextPath="/dolphinscheduler/"
 
 # spring max file size
 springMaxFileSize="1024MB"
@@ -283,15 +317,36 @@ springMaxRequestSize="1024MB"
 # api max http post size
 apiMaxHttpPostSize="5000000"
 
+
 # 1,replace file
 echo "1,replace file"
-sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${mysqlHost}/${mysqlDb}?characterEncoding=UTF-8#g" conf/dao/data_source.properties
-sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${mysqlUserName}#g" conf/dao/data_source.properties
-sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${mysqlPassword}#g" conf/dao/data_source.properties
+if [ $dbtype == "mysql" ];then
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=com.mysql.jdbc.Driver#g" conf/application-dao.properties
 
-sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${mysqlHost}/${mysqlDb}?characterEncoding=UTF-8#g" conf/quartz.properties
-sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${mysqlUserName}#g" conf/quartz.properties
-sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${mysqlPassword}#g" conf/quartz.properties
+
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${passowrd}#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.driver.*#org.quartz.dataSource.myDs.driver=com.mysql.jdbc.Driver#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.jobStore.driverDelegateClass.*#org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.StdJDBCDelegate#g" conf/quartz.properties
+fi
+
+if [ $dbtype == "postgresql" ];then
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=org.postgresql.Driver#g" conf/application-dao.properties
+
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.password.*#org.quartz.dataSource.myDs.password=${passowrd}#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.dataSource.myDs.driver.*#org.quartz.dataSource.myDs.driver=org.postgresql.Driver#g" conf/quartz.properties
+    sed -i ${txt} "s#org.quartz.jobStore.driverDelegateClass.*#org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.PostgreSQLDelegate#g" conf/quartz.properties
+fi
+
 
 
 sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common/hadoop/hadoop.properties
@@ -308,7 +363,7 @@ sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" co
 sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common/common.properties
 sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
 sed -i ${txt} "s#res.upload.startup.type.*#res.upload.startup.type=${resUploadStartupType}#g" conf/common/common.properties
-sed -i ${txt} "s#escheduler.env.path.*#escheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
+sed -i ${txt} "s#dolphinscheduler.env.path.*#dolphinscheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
 sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
 sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
 sed -i ${txt} "s#hadoop.security.authentication.startup.state.*#hadoop.security.authentication.startup.state=${kerberosStartUp}#g" conf/common/common.properties
@@ -317,50 +372,40 @@ sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keyta
 sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common/common.properties
 
 sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.root.*#zookeeper.escheduler.root=${zkRoot}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.dead.servers.*#zookeeper.escheduler.dead.servers=${zkDeadServers}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.masters.*#zookeeper.escheduler.masters=${zkMasters}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.workers.*#zookeeper.escheduler.workers=${zkWorkers}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.lock.masters.*#zookeeper.escheduler.lock.masters=${mastersLock}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.lock.workers.*#zookeeper.escheduler.lock.workers=${workersLock}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.lock.failover.masters.*#zookeeper.escheduler.lock.failover.masters=${mastersFailover}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.lock.failover.workers.*#zookeeper.escheduler.lock.failover.workers=${workersFailover}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.escheduler.lock.failover.startup.masters.*#zookeeper.escheduler.lock.failover.startup.masters=${mastersStartupFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.root.*#zookeeper.dolphinscheduler.root=${zkRoot}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.dead.servers.*#zookeeper.dolphinscheduler.dead.servers=${zkDeadServers}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.masters.*#zookeeper.dolphinscheduler.masters=${zkMasters}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.workers.*#zookeeper.dolphinscheduler.workers=${zkWorkers}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.masters.*#zookeeper.dolphinscheduler.lock.masters=${mastersLock}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.workers.*#zookeeper.dolphinscheduler.lock.workers=${workersLock}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.failover.masters.*#zookeeper.dolphinscheduler.lock.failover.masters=${mastersFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.failover.workers.*#zookeeper.dolphinscheduler.lock.failover.workers=${workersFailover}#g" conf/zookeeper.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.failover.startup.masters.*#zookeeper.dolphinscheduler.lock.failover.startup.masters=${mastersStartupFailover}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/zookeeper.properties
 sed -i ${txt} "s#zookeeper.retry.maxtime.*#zookeeper.retry.maxtime=${zkRetryMaxtime}#g" conf/zookeeper.properties
 
-sed -i ${txt} "s#master.exec.threads.*#master.exec.threads=${masterExecThreads}#g" conf/master.properties
-sed -i ${txt} "s#master.exec.task.number.*#master.exec.task.number=${masterExecTaskNum}#g" conf/master.properties
-sed -i ${txt} "s#master.heartbeat.interval.*#master.heartbeat.interval=${masterHeartbeatInterval}#g" conf/master.properties
-sed -i ${txt} "s#master.task.commit.retryTimes.*#master.task.commit.retryTimes=${masterTaskCommitRetryTimes}#g" conf/master.properties
-sed -i ${txt} "s#master.task.commit.interval.*#master.task.commit.interval=${masterTaskCommitInterval}#g" conf/master.properties
-#sed -i ${txt} "s#master.max.cpuload.avg.*#master.max.cpuload.avg=${masterMaxCpuLoadAvg}#g" conf/master.properties
-sed -i ${txt} "s#master.reserved.memory.*#master.reserved.memory=${masterReservedMemory}#g" conf/master.properties
+sed -i ${txt} "s#server.port.*#server.port=${masterPort}#g" conf/application-master.properties
+sed -i ${txt} "s#server.port.*#server.port=${workerPort}#g" conf/application-worker.properties
 
 
-sed -i ${txt} "s#worker.exec.threads.*#worker.exec.threads=${workerExecThreads}#g" conf/worker.properties
-sed -i ${txt} "s#worker.heartbeat.interval.*#worker.heartbeat.interval=${workerHeartbeatInterval}#g" conf/worker.properties
-sed -i ${txt} "s#worker.fetch.task.num.*#worker.fetch.task.num=${workerFetchTaskNum}#g" conf/worker.properties
-#sed -i ${txt} "s#worker.max.cpuload.avg.*#worker.max.cpuload.avg=${workerMaxCupLoadAvg}#g" conf/worker.properties
-sed -i ${txt} "s#worker.reserved.memory.*#worker.reserved.memory=${workerReservedMemory}#g" conf/worker.properties
-
-
-sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application.properties
-sed -i ${txt} "s#server.servlet.session.timeout.*#server.servlet.session.timeout=${apiServerSessionTimeout}#g" conf/application.properties
-sed -i ${txt} "s#server.servlet.context-path.*#server.servlet.context-path=${apiServerContextPath}#g" conf/application.properties
-sed -i ${txt} "s#spring.servlet.multipart.max-file-size.*#spring.servlet.multipart.max-file-size=${springMaxFileSize}#g" conf/application.properties
-sed -i ${txt} "s#spring.servlet.multipart.max-request-size.*#spring.servlet.multipart.max-request-size=${springMaxRequestSize}#g" conf/application.properties
-sed -i ${txt} "s#server.jetty.max-http-post-size.*#server.jetty.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application.properties
+sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
+sed -i ${txt} "s#server.servlet.session.timeout.*#server.servlet.session.timeout=${apiServerSessionTimeout}#g" conf/application-api.properties
+sed -i ${txt} "s#server.servlet.context-path.*#server.servlet.context-path=${apiServerContextPath}#g" conf/application-api.properties
+sed -i ${txt} "s#spring.servlet.multipart.max-file-size.*#spring.servlet.multipart.max-file-size=${springMaxFileSize}#g" conf/application-api.properties
+sed -i ${txt} "s#spring.servlet.multipart.max-request-size.*#spring.servlet.multipart.max-request-size=${springMaxRequestSize}#g" conf/application-api.properties
+sed -i ${txt} "s#server.jetty.max-http-post-size.*#server.jetty.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application-api.properties
 
 
 sed -i ${txt} "s#mail.protocol.*#mail.protocol=${mailProtocol}#g" conf/alert.properties
 sed -i ${txt} "s#mail.server.host.*#mail.server.host=${mailServerHost}#g" conf/alert.properties
 sed -i ${txt} "s#mail.server.port.*#mail.server.port=${mailServerPort}#g" conf/alert.properties
 sed -i ${txt} "s#mail.sender.*#mail.sender=${mailSender}#g" conf/alert.properties
+sed -i ${txt} "s#mail.user.*#mail.user=${mailUser}#g" conf/alert.properties
 sed -i ${txt} "s#mail.passwd.*#mail.passwd=${mailPassword}#g" conf/alert.properties
 sed -i ${txt} "s#mail.smtp.starttls.enable.*#mail.smtp.starttls.enable=${starttlsEnable}#g" conf/alert.properties
+sed -i ${txt} "s#mail.smtp.ssl.trust.*#mail.smtp.ssl.trust=${sslTrust}#g" conf/alert.properties
 sed -i ${txt} "s#mail.smtp.ssl.enable.*#mail.smtp.ssl.enable=${sslEnable}#g" conf/alert.properties
 sed -i ${txt} "s#xls.file.path.*#xls.file.path=${xlsFilePath}#g" conf/alert.properties
 sed -i ${txt} "s#enterprise.wechat.corp.id.*#enterprise.wechat.corp.id=${enterpriseWechatCorpId}#g" conf/alert.properties
@@ -369,15 +414,18 @@ sed -i ${txt} "s#enterprise.wechat.agent.id.*#enterprise.wechat.agent.id=${enter
 sed -i ${txt} "s#enterprise.wechat.users.*#enterprise.wechat.users=${enterpriseWechatUsers}#g" conf/alert.properties
 
 
+
 sed -i ${txt} "s#installPath.*#installPath=${installPath}#g" conf/config/install_config.conf
 sed -i ${txt} "s#deployUser.*#deployUser=${deployUser}#g" conf/config/install_config.conf
 sed -i ${txt} "s#ips.*#ips=${ips}#g" conf/config/install_config.conf
+sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/install_config.conf
 
 
 sed -i ${txt} "s#masters.*#masters=${masters}#g" conf/config/run_config.conf
 sed -i ${txt} "s#workers.*#workers=${workers}#g" conf/config/run_config.conf
 sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/run_config.conf
 sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/run_config.conf
+sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/run_config.conf
 
 
 # 2,create directory
@@ -393,23 +441,23 @@ for host in ${hostsArr[@]}
 do
 
 # create if programPath does not exist
-if ! ssh $host test -e $programPath; then
-  ssh $host "sudo mkdir -p $programPath;sudo chown -R $deployUser:$deployUser $programPath"
+if ! ssh -p $sshPort $host test -e $programPath; then
+  ssh -p $sshPort $host "sudo mkdir -p $programPath;sudo chown -R $deployUser:$deployUser $programPath"
 fi
 
 # create if downloadPath does not exist
-if ! ssh $host test -e $downloadPath; then
-  ssh $host "sudo mkdir -p $downloadPath;sudo chown -R $deployUser:$deployUser $downloadPath"
+if ! ssh -p $sshPort $host test -e $downloadPath; then
+  ssh -p $sshPort $host "sudo mkdir -p $downloadPath;sudo chown -R $deployUser:$deployUser $downloadPath"
 fi
 
 # create if execPath does not exist
-if ! ssh $host test -e $execPath; then
-  ssh $host "sudo mkdir -p $execPath; sudo chown -R $deployUser:$deployUser $execPath"
+if ! ssh -p $sshPort $host test -e $execPath; then
+  ssh -p $sshPort $host "sudo mkdir -p $execPath; sudo chown -R $deployUser:$deployUser $execPath"
 fi
 
 # create if xlsFilePath does not exist
-if ! ssh $host test -e $xlsFilePath; then
-  ssh $host "sudo mkdir -p $xlsFilePath; sudo chown -R $deployUser:$deployUser $xlsFilePath"
+if ! ssh -p $sshPort $host test -e $xlsFilePath; then
+  ssh -p $sshPort $host "sudo mkdir -p $xlsFilePath; sudo chown -R $deployUser:$deployUser $xlsFilePath"
 fi
 
 done
@@ -431,7 +479,7 @@ if [ $? -eq 0 ]
 then
 	echo 'scp copy completed'
 else
-	echo 'sc copy failed to exit'
+	echo 'scp copy failed to exit'
 	exit -1
 fi
 
