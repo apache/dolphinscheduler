@@ -18,9 +18,9 @@ package org.apache.dolphinscheduler.server.monitor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.RunConfigUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -29,6 +29,7 @@ import java.util.Set;
 /**
  * abstract server monitor and auto restart server
  */
+@Component
 public abstract class AbstractMonitor implements Monitor {
 
     private static final Logger logger = LoggerFactory.getLogger(AbstractMonitor.class);
@@ -92,7 +93,7 @@ public abstract class AbstractMonitor implements Monitor {
     private Set<String> getRunConfigByType(String type){
         Set<String> nodeSet = new HashSet();
 
-        String nodes = RunConfigUtils.getString(type);
+        String nodes = "";
 
         if (StringUtils.isEmpty(nodes)){
             return null;
