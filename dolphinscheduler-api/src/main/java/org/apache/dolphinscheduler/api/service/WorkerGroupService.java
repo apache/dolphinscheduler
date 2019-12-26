@@ -76,6 +76,11 @@ public class WorkerGroupService extends BaseService {
         WorkerGroup workerGroup = null;
         if(id != 0){
             workerGroup = workerGroupMapper.selectById(id);
+            //check exist
+            if (workerGroup == null){
+                putMsg(result, Status.WORKER_GROUP_NOT_EXIST);
+                return result;
+            }
         }else{
             workerGroup = new WorkerGroup();
             workerGroup.setCreateTime(now);
@@ -157,6 +162,12 @@ public class WorkerGroupService extends BaseService {
     public Map<String,Object> deleteWorkerGroupById(Integer id) {
 
         Map<String, Object> result = new HashMap<>(5);
+
+        WorkerGroup workerGroup = workerGroupMapper.selectById(id);
+        if (workerGroup == null) {
+            putMsg(result, Status.WORKER_GROUP_NOT_EXIST);
+            return result;
+        }
 
         List<ProcessInstance> processInstances = processInstanceMapper.queryByWorkerGroupIdAndStatus(id, Constants.NOT_TERMINATED_STATES);
         if(CollectionUtils.isNotEmpty(processInstances)){
