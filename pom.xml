@@ -655,6 +655,7 @@
 						<include>**/alert/utils/JSONUtilsTest.java</include>
 						<include>**/alert/utils/PropertyUtilsTest.java</include>
 						<include>**/server/utils/SparkArgsUtilsTest.java</include>
+						<include>**/server/utils/FlinkArgsUtilsTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
