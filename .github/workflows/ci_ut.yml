@@ -42,7 +42,7 @@ jobs:
         run: |
           cd ${DOCKER_DIR}
           mkdir -p ./postgres/data
-          docker-compose up db -d
+          docker-compose up -d db
           sed -i 's@host all all all md5@host all all 0.0.0.0/0 md5@g' postgres/data/pg_hba.conf
           docker-compose restart db
       - name: Set up JDK 1.8
