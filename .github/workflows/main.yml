@@ -21,13 +21,11 @@ jobs:
       run: mvn clean
     - name: Run SonarCloud analyse
       run: >
-          mvn  -U -B -T 1C -Prelease -Dmaven.compile.fork=true -Dmaven.test.skip=true --batch-mode
+          mvn --batch-mode
           org.jacoco:jacoco-maven-plugin:prepare-agent
           verify
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
           -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.inclusions=dolphinscheduler-ui/src/**
-          -Dsonar.inclusions=dolphinscheduler-ui/build/**
           -Dsonar.organization=8k4b4yu8zj93gjyq
           -Dsonar.projectKey=dolphinscheduler
           -q
