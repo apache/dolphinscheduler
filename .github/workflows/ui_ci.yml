@@ -1,0 +1,24 @@
+name: ui_ci
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/cache@v1
+      with:
+        path: ~/.sonar/cache
+    - name: npm build
+      run: |
+        cd ./dolphinscheduler-ui
+        mvn --batch-mode \
+          org.jacoco:jacoco-maven-plugin:prepare-agent \
+          verify \
+          org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.organization=8k4b4yu8zj93gjyq \
+          -Dsonar.projectKey=dolphinscheduler 
