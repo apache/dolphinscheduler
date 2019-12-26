@@ -121,7 +121,7 @@ public class ProjectService extends BaseService{
      * @param loginUser login user
      * @param project project
      * @param projectName project name
-     * @return true if the login user havve permission to see the project
+     * @return true if the login user have permission to see the project
      */
     public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName) {
 
