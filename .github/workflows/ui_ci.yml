@@ -32,7 +32,7 @@ jobs:
         -Dsonar.organization=8k4b4yu8zj93gjyq 
         -Dsonar.projectKey=dolphinscheduler
         -Dsonar.sources=.
-        -Dsonar.inclusions=**/dolphinscheduler-ui/**,**src/**
+        -Dsonar.inclusions=**/dolphinscheduler-ui/**,**src/**/*.js
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
