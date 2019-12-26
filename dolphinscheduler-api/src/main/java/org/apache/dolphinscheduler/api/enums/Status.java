@@ -170,6 +170,7 @@ public enum Status {
 
     QUERY_WORKER_GROUP_FAIL(100146,"query worker group fail "),
     DELETE_WORKER_GROUP_FAIL(100147,"delete worker group fail "),
+    WORKER_GROUP_NOT_EXIST(100148," worker group not exist"),
 
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found"),
