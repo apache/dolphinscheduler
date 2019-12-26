@@ -22,8 +22,10 @@ jobs:
         ls -al
     - name: npm install 
       run: >
-        mvn -f ./dolphinscheduler-ui/pom.xml -P --batch-mode 
-        verify 
+        mvn -f ./dolphinscheduler-ui/pom.xml --batch-mode 
+        install
+        -Dmaven.compile.fork=true 
+        -Dmaven.test.skip=true 
         org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
         -Dsonar.host.url=https://sonarcloud.io 
         -Dsonar.organization=8k4b4yu8zj93gjyq 
