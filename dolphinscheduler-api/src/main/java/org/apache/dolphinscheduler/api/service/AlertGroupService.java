@@ -194,6 +194,12 @@ public class AlertGroupService extends BaseService{
             return result;
         }
 
+        AlertGroup alertGroup = alertGroupMapper.selectById(id);
+        if (alertGroup == null) {
+            putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
+            return result;
+        }
+
         userAlertGroupMapper.deleteByAlertgroupId(id);
         alertGroupMapper.deleteById(id);
         putMsg(result, Status.SUCCESS);
