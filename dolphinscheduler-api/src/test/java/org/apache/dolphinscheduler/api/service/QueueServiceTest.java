@@ -16,7 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -26,49 +27,49 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
+@RunWith(MockitoJUnitRunner.class)
 public class QueueServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(QueueServiceTest.class);
 
-    @Autowired
+    @InjectMocks
     private QueueService queueService;
-    @Autowired
+    @Mock
     private QueueMapper queueMapper;
-
+    @Mock
+    private UserMapper userMapper;
     private String queueName = "QueueServiceTest";
 
     @Before
     public void setUp() {
-        remove();
     }
 
 
     @After
     public void after(){
-        remove();
     }
 
     @Test
     public void testQueryList(){
 
-        add();
+        Mockito.when(queueMapper.selectList(null)).thenReturn(getQueueList());
         Map<String, Object> result = queueService.queryList(getLoginUser());
         logger.info(result.toString());
         List<Queue> queueList  = (List<Queue>) result.get(Constants.DATA_LIST);
@@ -78,7 +79,10 @@ public class QueueServiceTest {
     @Test
     public void testQueryListPage(){
 
-        add();
+        IPage<Queue> page = new Page<>(1,10);
+        page.setTotal(1L);
+        page.setRecords(getQueueList());
+        Mockito.when(queueMapper.queryQueuePaging(Mockito.any(Page.class), Mockito.eq(queueName))).thenReturn(page);
         Map<String, Object> result = queueService.queryList(getLoginUser(),queueName,1,10);
         logger.info(result.toString());
         PageInfo<Queue>  pageInfo = (PageInfo<Queue>) result.get(Constants.DATA_LIST);
@@ -103,26 +107,65 @@ public class QueueServiceTest {
     }
     @Test
     public void testUpdateQueue(){
-        add();
-        Queue queue = getQueue();
-        Map<String, Object> result = queueService.updateQueue(getLoginUser(),queue.getId(),"queue",queueName);
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-        //get update queue ,check update
-        queue =queueMapper.selectById(queue.getId());
-        Assert.assertEquals("queue",queue.getQueue());
+
+        Mockito.when(queueMapper.selectById(1)).thenReturn(getQueue());
+        Mockito.when(queueMapper.queryAllQueueList("test", null)).thenReturn(getQueueList());
+        Mockito.when(queueMapper.queryAllQueueList(null, "test")).thenReturn(getQueueList());
+        Mockito.when(userMapper.queryUserListByQueue(queueName)).thenReturn(getUserList());
+
+        // not exist
+        Map<String, Object> result = queueService.updateQueue(getLoginUser(),0,"queue",queueName);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.QUEUE_NOT_EXIST.getCode(),((Status)result.get(Constants.STATUS)).getCode());
+        //no need update
+        result = queueService.updateQueue(getLoginUser(),1,queueName,queueName);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.NEED_NOT_UPDATE_QUEUE.getCode(),((Status)result.get(Constants.STATUS)).getCode());
+        //queue exist
+        result = queueService.updateQueue(getLoginUser(),1,"test",queueName);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.QUEUE_VALUE_EXIST.getCode(),((Status)result.get(Constants.STATUS)).getCode());
+        // queueName exist
+        result = queueService.updateQueue(getLoginUser(),1,"test1","test");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.QUEUE_NAME_EXIST.getCode(),((Status)result.get(Constants.STATUS)).getCode());
+        //success
+        result = queueService.updateQueue(getLoginUser(),1,"test1","test1");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS.getCode(),((Status)result.get(Constants.STATUS)).getCode());
+
     }
     @Test
     public void testVerifyQueue(){
-        //not exist
-        Result result = queueService.verifyQueue(queueName,queueName);
-        logger.info(result.toString());
-        Assert.assertEquals(result.getCode().intValue(), Status.SUCCESS.getCode());
 
-        add();
-        //exist queue
+        Mockito.when(queueMapper.queryAllQueueList(queueName, null)).thenReturn(getQueueList());
+        Mockito.when(queueMapper.queryAllQueueList(null, queueName)).thenReturn(getQueueList());
+
+        //queue null
+        Result result = queueService.verifyQueue(null,queueName);
+        logger.info(result.toString());
+        Assert.assertEquals(result.getCode().intValue(), Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
+
+        //queueName null
+        result = queueService.verifyQueue(queueName,null);
+        logger.info(result.toString());
+        Assert.assertEquals(result.getCode().intValue(), Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
+
+        //exist queueName
         result = queueService.verifyQueue(queueName,queueName);
         logger.info(result.toString());
         Assert.assertEquals(result.getCode().intValue(), Status.QUEUE_NAME_EXIST.getCode());
+
+        //exist queue
+        result = queueService.verifyQueue(queueName,"test");
+        logger.info(result.toString());
+        Assert.assertEquals(result.getCode().intValue(), Status.QUEUE_VALUE_EXIST.getCode());
+
+        // success
+        result = queueService.verifyQueue("test","test");
+        logger.info(result.toString());
+        Assert.assertEquals(result.getCode().intValue(), Status.SUCCESS.getCode());
+
 
     }
     /**
@@ -137,33 +180,29 @@ public class QueueServiceTest {
         return loginUser;
     }
 
-    /**
-     * remove queue
-     */
-    private void remove(){
-        Map<String,Object> map = new HashMap<>(1);
-        map.put("queue_name",queueName);
-        queueMapper.deleteByMap(map);
+    private List<User> getUserList(){
+        List<User> list = new ArrayList<>();
+        list.add(getLoginUser());
+        return list;
     }
+
 
     /**
      * get queue
      * @return
      */
     private Queue getQueue(){
-        List<Queue> queueList = queueMapper.queryAllQueueList(queueName, queueName);
-        if (CollectionUtils.isNotEmpty(queueList)){
-            return queueList.get(0);
-        }
-        return new Queue();
+        Queue queue = new Queue();
+        queue.setId(1);
+        queue.setQueue(queueName);
+        queue.setQueueName(queueName);
+        return queue;
     }
 
-    /**
-     * create queue
-     */
-    private void add(){
-        queueService.createQueue(getLoginUser(),queueName,queueName);
+    private List<Queue> getQueueList(){
+        List<Queue> queueList = new ArrayList<>();
+        queueList.add(getQueue());
+        return queueList;
     }
-
 
 }
