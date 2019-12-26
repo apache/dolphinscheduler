@@ -187,16 +187,16 @@ public class UdfFuncService extends BaseService{
         // verify udfFunc is exist
         UdfFunc udf = udfFuncMapper.selectUdfById(udfFuncId);
 
+        if (udf == null) {
+            result.put(Constants.STATUS, Status.UDF_FUNCTION_NOT_EXIST);
+            result.put(Constants.MSG, Status.UDF_FUNCTION_NOT_EXIST.getMsg());
+            return result;
+        }
+
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()){
             logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
-            return result;
-        }
-
-        if (udf == null) {
-            result.put(Constants.STATUS, Status.UDF_FUNCTION_NOT_EXIST);
-            result.put(Constants.MSG, Status.UDF_FUNCTION_NOT_EXIST.getMsg());
             return result;
         }
 
