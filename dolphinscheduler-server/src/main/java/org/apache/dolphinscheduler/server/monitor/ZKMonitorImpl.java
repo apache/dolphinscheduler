@@ -28,7 +28,7 @@ import java.util.Map;
  * zk monitor server impl
  */
 @Component
-public class ZKMmonitorImpl extends AbstractMonitor {
+public class ZKMonitorImpl extends AbstractMonitor {
 
     /**
      * zookeeper operator

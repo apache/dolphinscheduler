@@ -38,11 +38,6 @@ public final class Constants {
 
 
     /**
-     * run config
-     */
-    public static final String RUN_CONFIG = "/config/run_config.conf";
-
-    /**
      * common properties path
      */
     public static final String COMMON_PROPERTIES_PATH = "/common/common.properties";
@@ -1012,5 +1007,4 @@ public final class Constants {
     public static final String RECEIVERS = "receivers";
     public static final String RECEIVERS_CC = "receiversCc";
 
-    public static final String REPEAT_RUNNING = "repeat.running";
 }
