@@ -16,41 +16,43 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
+@RunWith(MockitoJUnitRunner.class)
 public class WorkerGroupServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerGroupServiceTest.class);
 
-    @Autowired
+    @InjectMocks
     private WorkerGroupService workerGroupService;
-    @Autowired
+    @Mock
     private WorkerGroupMapper workerGroupMapper;
+    @Mock
+    private ProcessInstanceMapper processInstanceMapper;
 
 
     private String groupName="groupName000001";
@@ -65,7 +67,6 @@ public class WorkerGroupServiceTest {
 
     @After
     public void after(){
-        remove();
     }
 
     /**
@@ -87,6 +88,8 @@ public class WorkerGroupServiceTest {
         logger.info(result.toString());
         Assert.assertEquals((String) result.get(Constants.MSG), Status.SUCCESS.getMsg());
         // group name exist
+        Mockito.when(workerGroupMapper.selectById(1)).thenReturn(getWorkerGroup());
+        Mockito.when(workerGroupMapper.queryWorkerGroupByName(groupName)).thenReturn(getList());
         result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
         logger.info(result.toString());
         Assert.assertEquals(result.get(Constants.STATUS), Status.NAME_EXIST);
@@ -99,20 +102,23 @@ public class WorkerGroupServiceTest {
     @Test
     public  void testQueryAllGroupPaging(){
 
-        add();
         User user = new User();
         // general user add
         user.setUserType(UserType.GENERAL_USER);
         Map<String, Object> result = workerGroupService.queryAllGroupPaging(user, 1, 10, groupName);
         logger.info(result.toString());
         Assert.assertEquals((String) result.get(Constants.MSG), Status.USER_NO_OPERATION_PERM.getMsg());
-        //admin add
+        //success
         user.setUserType(UserType.ADMIN_USER);
+        Page<WorkerGroup> page = new Page<>(1,10);
+        page.setRecords(getList());
+        page.setSize(1L);
+        Mockito.when(workerGroupMapper.queryListPaging(Mockito.any(Page.class), Mockito.eq(groupName))).thenReturn(page);
         result = workerGroupService.queryAllGroupPaging(user, 1, 10, groupName);
         logger.info(result.toString());
         Assert.assertEquals((String) result.get(Constants.MSG), Status.SUCCESS.getMsg());
-        PageInfo<Resource>  pageInfo = (PageInfo<Resource>) result.get(Constants.DATA_LIST);
-        Assert.assertEquals(pageInfo.getLists().size(),1);
+        PageInfo<WorkerGroup>  pageInfo = (PageInfo<WorkerGroup>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
     }
 
     /**
@@ -120,54 +126,38 @@ public class WorkerGroupServiceTest {
      */
     @Test
     public  void testDeleteWorkerGroupById(){
-        add();
-        WorkerGroup workerGroup =get();
-        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(workerGroup.getId());
+
+        Mockito.when(workerGroupMapper.selectById(1)).thenReturn(getWorkerGroup());
+        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(1);
         logger.info(result.toString());
         Assert.assertEquals( (String) result.get(Constants.MSG), Status.SUCCESS.getMsg());
     }
 
     @Test
     public void testQueryAllGroup(){
-        add();
+        Mockito.when(workerGroupMapper.queryAllWorkerGroup()).thenReturn(getList());
         Map<String, Object> result = workerGroupService.queryAllGroup();
         logger.info(result.toString());
         Assert.assertEquals((String)result.get(Constants.MSG), Status.SUCCESS.getMsg());
         List<WorkerGroup> workerGroupList = (List<WorkerGroup>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(workerGroupList.size()>0);
     }
-
-
-    /**
-     * add group
-     */
-    private void add(){
-
-        User user = new User();
-        user.setUserType(UserType.ADMIN_USER);
-        workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
-    }
+    
 
     /**
      * get Group
      * @return
      */
-    private WorkerGroup get(){
-
-        List<WorkerGroup> workerGroupList = workerGroupMapper.queryWorkerGroupByName(groupName);
-        if (CollectionUtils.isNotEmpty(workerGroupList)){
-            return workerGroupList.get(0);
-        }
-        return new WorkerGroup();
+    private WorkerGroup getWorkerGroup(){
+        WorkerGroup workerGroup = new WorkerGroup();
+        workerGroup.setId(1);
+        return workerGroup;
     }
 
-    /**
-     * remove group
-     */
-    private void remove(){
-        Map<String,Object> map = new HashMap<>(1);
-        map.put("name",groupName);
-        workerGroupMapper.deleteByMap(map);
-    }
+   private List<WorkerGroup> getList(){
+        List<WorkerGroup> list = new ArrayList<>();
+        list.add(getWorkerGroup());
+        return list;
+   }
 
 }
