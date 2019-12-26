@@ -36,6 +36,7 @@ public final class Constants {
      */
     public static final String HADOOP_PROPERTIES_PATH = "/common/hadoop/hadoop.properties";
 
+
     /**
      * common properties path
      */
@@ -1005,4 +1006,5 @@ public final class Constants {
     public static final String CLASS = "class";
     public static final String RECEIVERS = "receivers";
     public static final String RECEIVERS_CC = "receiversCc";
+
 }
