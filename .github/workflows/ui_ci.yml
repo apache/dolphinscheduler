@@ -9,12 +9,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: npm build
+    - name: pwd
       run: |
         pwd
         ls -al
-        cd ./dolphinscheduler-ui && \
-        mvn --batch-mode \
+    - name: npm install 
+      run: |
+        mvn -f ./dolphinscheduler-ui/pom.xml --batch-mode \
           verify \
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.host.url=https://sonarcloud.io \
