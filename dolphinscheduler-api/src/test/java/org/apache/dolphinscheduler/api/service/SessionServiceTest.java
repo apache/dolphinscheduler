@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Session;
@@ -28,36 +28,40 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockCookie;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+
+@RunWith(MockitoJUnitRunner.class)
 public class SessionServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionServiceTest.class);
 
-    @Autowired
+    @InjectMocks
     private SessionService sessionService;
 
-    @Autowired
+    @Mock
     private SessionMapper sessionMapper;
+
+    private String sessionId ="aaaaaaaaaaaaaaaaaa";
 
     @Before
     public void setUp() {
-        removeSession();
     }
 
 
     @After
     public void after(){
-
-        removeSession();
     }
 
     /**
@@ -66,8 +70,8 @@ public class SessionServiceTest {
     @Test
     public void testGetSession(){
 
-        //add session
-        String sessionId = getSessionId();
+
+        Mockito.when(sessionMapper.selectById(sessionId)).thenReturn(getSession());
         // get sessionId from  header
         MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
         mockHttpServletRequest.addHeader(Constants.SESSION_ID,sessionId);
@@ -100,7 +104,8 @@ public class SessionServiceTest {
         String ip = "127.0.0.1";
         User user = new User();
         user.setUserType(UserType.GENERAL_USER);
-        user.setId(88888888);
+        user.setId(1);
+        Mockito.when(sessionMapper.queryByUserId(1)).thenReturn(getSessions());
         String sessionId = sessionService.createSession(user, ip);
         logger.info("createSessionId is "+sessionId);
         Assert.assertTrue(StringUtils.isNotEmpty(sessionId));
@@ -114,35 +119,27 @@ public class SessionServiceTest {
 
         int userId = 88888888;
         String ip = "127.0.0.1";
-        //create session
-        getSessionId();
         User user = new User();
         user.setId(userId);
-        //signOut
         sessionService.signOut(ip ,user);
-        //check exist
-        Session session = sessionMapper.queryByUserIdAndIp(userId, ip);
-        Assert.assertNull(session);
+
+    }
+
+    private Session getSession(){
+
+        Session session = new Session();
+        session.setId(sessionId);
+        session.setIp("127.0.0.1");
+        session.setLastLoginTime(DateUtils.addDays(new Date(),40));
+        session.setUserId(1);
+        return session;
+    }
+
+    private List<Session> getSessions(){
+        List<Session> sessionList = new ArrayList<>();
+       sessionList.add(getSession());
+        return sessionList;
     }
 
 
-
-    private String getSessionId(){
-
-        String ip = "127.0.0.1";
-        User user = new User();
-        user.setId(88888888);
-        return sessionService.createSession(user, ip);
-    }
-
-    /**
-     * remove  session
-     */
-    private void removeSession(){
-
-        String ip = "127.0.0.1";
-        User user = new User();
-        user.setId(88888888);
-        sessionService.signOut( ip,user);
-    }
 }
