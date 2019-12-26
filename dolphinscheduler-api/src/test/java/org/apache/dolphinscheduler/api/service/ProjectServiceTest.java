@@ -16,15 +16,18 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
@@ -33,31 +36,34 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ProjectServiceTest {
 
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceTest.class);
 
-    @Autowired
+    @InjectMocks
     private ProjectService projectService;
-    @Autowired
+    @Mock
     private ProjectMapper projectMapper;
-    @Autowired
+    @Mock
     private UserMapper userMapper;
-    @Autowired
+    @Mock
     private ProjectUserMapper projectUserMapper;
+    @Mock
+    private ProcessDefinitionMapper processDefinitionMapper;
 
 
 
@@ -67,69 +73,83 @@ public class ProjectServiceTest {
 
     @Before
     public void setUp() {
-        remove();
-        removeUser();
+
     }
 
 
     @After
     public void after(){
-        remove();
-        removeUser();
+
     }
 
     @Test
     public void testCreateProject(){
 
         User loginUser  = getLoginUser();
-        Map<String, Object> result = projectService.createProject(loginUser, projectName, projectName);
+        loginUser.setId(1);
+        Map<String, Object> result = projectService.createProject(loginUser, projectName, getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assert.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR,result.get(Constants.STATUS));
 
         //project name exist
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject());
         result = projectService.createProject(loginUser, projectName, projectName);
         logger.info(result.toString());
         Assert.assertEquals(Status.PROJECT_ALREADY_EXISTS,result.get(Constants.STATUS));
+
+        //success
+        Mockito.when(projectMapper.insert(Mockito.any(Project.class))).thenReturn(1);
+        result = projectService.createProject(loginUser, "test", "test");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+
 
     }
     @Test
     public void testQueryById(){
 
-        // id not exist
+        //not exist
         Map<String, Object> result = projectService.queryById(Integer.MAX_VALUE);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT,result.get(Constants.STATUS));
-        User user = getLoginUser();
-        //add
-        add(user);
-        //get
-        Project project = getProject();
-        result = projectService.queryById(project.getId());
+        logger.info(result.toString());
+
+        //success
+        Mockito.when(projectMapper.selectById(1)).thenReturn(getProject());
+        result = projectService.queryById(1);
+        logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
 
     }
     @Test
     public void testCheckProjectAndAuth(){
 
+        Mockito.when(projectUserMapper.queryProjectRelation(1, 1)).thenReturn(getProjectUser());
         User loginUser = getLoginUser();
-        Project project = null;
-        // project null
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser,project,projectName);
+
+        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser,null,projectName);
         logger.info(result.toString());
         Status status = (Status)result.get(Constants.STATUS);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(),status.getCode());
-        //add
-        add(loginUser);
-        project =getProject();
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT,result.get(Constants.STATUS));
+
+        Project project = getProject();
+        //USER_NO_OPERATION_PROJECT_PERM
+        result = projectService.checkProjectAndAuth(loginUser,project,projectName);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM,result.get(Constants.STATUS));
+
+        //success
+        project.setUserId(1);
         result = projectService.checkProjectAndAuth(loginUser,project,projectName);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
 
     }
+
     @Test
     public void testHasProjectAndPerm(){
 
+        Mockito.when(projectUserMapper.queryProjectRelation(1, 1)).thenReturn(getProjectUser());
         User loginUser = getLoginUser();
-        add(loginUser);
         Project project = getProject();
         Map<String, Object> result = new HashMap<>();
         // not exist user
@@ -138,26 +158,66 @@ public class ProjectServiceTest {
         boolean checkResult = projectService.hasProjectAndPerm(tempUser,project,result);
         logger.info(result.toString());
         Assert.assertFalse(checkResult);
+
+        //success
+        result = new HashMap<>();
+        project.setUserId(1);
         checkResult = projectService.hasProjectAndPerm(loginUser,project,result);
+        logger.info(result.toString());
         Assert.assertTrue(checkResult);
     }
     @Test
     public void testQueryProjectListPaging(){
+
+        IPage<Project> page = new  Page<>(1,10);
+        page.setRecords(getList());
+        page.setTotal(1L);
+        Mockito.when(projectMapper.queryProjectListPaging(Mockito.any(Page.class), Mockito.eq(1), Mockito.eq(projectName))).thenReturn(page);
         User loginUser = getLoginUser();
-        add(loginUser);
+
+        // project owner
         Map<String, Object> result  =  projectService.queryProjectListPaging(loginUser,10,1,projectName);
         logger.info(result.toString());
         PageInfo<Project> pageInfo = (PageInfo<Project>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(pageInfo.getTotalCount()>0);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
+
+        //admin
+        Mockito.when(projectMapper.queryProjectListPaging(Mockito.any(Page.class), Mockito.eq(0), Mockito.eq(projectName))).thenReturn(page);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        result  =  projectService.queryProjectListPaging(loginUser,10,1,projectName);
+        logger.info(result.toString());
+        pageInfo = (PageInfo<Project>) result.get(Constants.DATA_LIST);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
     }
     @Test
     public void testDeleteProject(){
+
+        Mockito.when(projectMapper.selectById(1)).thenReturn(getProject());
         User loginUser = getLoginUser();
-        add(loginUser);
-        Project project = getProject();
-        Map<String, Object> result= projectService.deleteProject(loginUser,project.getId());
+        //PROJECT_NOT_FOUNT
+        Map<String, Object> result= projectService.deleteProject(loginUser,12);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT,result.get(Constants.STATUS));
+
+        //USER_NO_OPERATION_PROJECT_PERM
+        result= projectService.deleteProject(loginUser,1);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM,result.get(Constants.STATUS));
+
+        //DELETE_PROJECT_ERROR_DEFINES_NOT_NULL
+        Mockito.when(processDefinitionMapper.queryAllDefinitionList(1)).thenReturn(getProcessDefinitions());
+        loginUser.setUserType(UserType.ADMIN_USER);
+        result= projectService.deleteProject(loginUser,1);
+        logger.info(result.toString());
+        Assert.assertEquals(Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL,result.get(Constants.STATUS));
+
+        //success
+        Mockito.when(projectMapper.deleteById(1)).thenReturn(1);
+        Mockito.when(processDefinitionMapper.queryAllDefinitionList(1)).thenReturn(new ArrayList<>());
+        result= projectService.deleteProject(loginUser,1);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+
 
     }
 
@@ -165,76 +225,86 @@ public class ProjectServiceTest {
     public void testUpdate(){
 
         User loginUser = getLoginUser();
-        add(loginUser);
         Project project = getProject();
-        // update desc
-        Map<String, Object> result = projectService.update(loginUser,project.getId(),projectName,"desc");
+        project.setId(2);
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
+        Mockito.when( projectMapper.selectById(1)).thenReturn(getProject());
+        // PROJECT_NOT_FOUNT
+        Map<String, Object> result = projectService.update(loginUser,12,projectName,"desc");
         logger.info(result.toString());
-        //check update desc field
-        project = getProject();
-        Assert.assertEquals("desc",project.getDescription());
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT,result.get(Constants.STATUS));
+
+        //PROJECT_ALREADY_EXISTS
+        result = projectService.update(loginUser,1,projectName,"desc");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.PROJECT_ALREADY_EXISTS,result.get(Constants.STATUS));
+
+        //success
+        project.setUserId(1);
+        Mockito.when(projectMapper.updateById(Mockito.any(Project.class))).thenReturn(1);
+        result = projectService.update(loginUser,1,"test","desc");
+        logger.info(result.toString());
+        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+
     }
     @Test
     public void testQueryAuthorizedProject(){
-        //admin
-        User loginUser = new User();
-        loginUser.setUserType(UserType.ADMIN_USER);
-        // creater
-        User createUser = getLoginUser();
-        add(createUser);
-        // not exist user
-        Map<String, Object> result = projectService.queryAuthorizedProject(loginUser,Integer.MAX_VALUE);
-        List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isEmpty(projects));
-        //add projectuser
-        addProjectUser(getProject().getId(),createUser.getId());
-        result = projectService.queryAuthorizedProject(loginUser,createUser.getId());
+
+        User loginUser = getLoginUser();
+
+        Mockito.when(projectMapper.queryAuthedProjectListByUserId(1)).thenReturn(getList());
+        //USER_NO_OPERATION_PERM
+        Map<String, Object> result = projectService.queryAuthorizedProject(loginUser,3);
         logger.info(result.toString());
-        projects = (List<Project>) result.get(Constants.DATA_LIST);
+        Assert.assertEquals(Status.USER_NO_OPERATION_PERM,result.get(Constants.STATUS));
+
+        //success
+        loginUser.setUserType(UserType.ADMIN_USER);
+        result = projectService.queryAuthorizedProject(loginUser,1);
+        logger.info(result.toString());
+        List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
-        //remove projectUser
-        removeProjectUser(getProject().getId(),createUser.getId());
+
     }
     @Test
     public void testQueryAllProjectList(){
 
-        User loginUser = getLoginUser();
-        add(loginUser);
+        Mockito.when(projectMapper.selectList(null)).thenReturn(getList());
+        Mockito.when(processDefinitionMapper.selectList(null)).thenReturn(getProcessDefinitions());
 
         Map<String, Object> result = projectService.queryAllProjectList();
         logger.info(result.toString());
         List<Project> projects  = (List<Project>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isEmpty(projects));
+        Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
 
     }
     @Test
     public void testQueryUnauthorizedProject(){
-        //admin
+        Mockito.when(projectMapper.queryAuthedProjectListByUserId(1)).thenReturn(getList());
+        Mockito.when(projectMapper.queryProjectExceptUserId(2)).thenReturn(getList());
+
         User loginUser = new User();
         loginUser.setUserType(UserType.ADMIN_USER);
-        // creater
-        User createUser = getLoginUser();
-        add(createUser);
 
-        Map<String, Object> result = projectService.queryUnauthorizedProject(loginUser,Integer.MAX_VALUE);
+        Map<String, Object> result = projectService.queryUnauthorizedProject(loginUser,2);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(projects));
     }
 
 
-    /**
-     * add project
-     * @param user
-     */
-    private void add(User user){
-
-        projectService.createProject(user, projectName, projectName);
+    private Project getProject(){
+        Project project = new Project();
+        project.setId(1);
+        project.setName(projectName);
+        project.setUserId(1);
+        return  project;
     }
 
-    private Project getProject(){
-
-        return  projectMapper.queryByName(projectName);
+    private List<Project> getList(){
+        List<Project> list = new ArrayList<>();
+        list.add(getProject());
+        return list;
     }
 
 
@@ -247,51 +317,39 @@ public class ProjectServiceTest {
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
         loginUser.setUserName(userName);
-        userMapper.insert(loginUser);
-
-      return  userMapper.queryByUserNameAccurately(userName);
+        loginUser.setId(1);
+      return  loginUser;
 
     }
 
     /**
-     * remove users
-     */
-    private void removeUser(){
-        Map<String,Object> map = new HashMap<>(1);
-        map.put("user_name",userName);
-        userMapper.deleteByMap(map);
-    }
+     * get project user
 
-    /**
-     * remove project
      */
-    private void remove(){
-        Map<String,Object> map = new HashMap<>(1);
-        map.put("name",projectName);
-        projectMapper.deleteByMap(map);
-    }
-
-    /**
-     * add project user
-     * @param projectId
-     * @param userId
-     */
-    private void addProjectUser(int projectId , int userId){
+    private ProjectUser getProjectUser(){
         ProjectUser projectUser = new ProjectUser();
-        projectUser.setProjectId(projectId);
-        projectUser.setUserId(userId);
-        projectUserMapper.insert(projectUser);
+        projectUser.setProjectId(1);
+        projectUser.setUserId(1);
+       return projectUser;
     }
 
-    /**
-     * remove project user
-     * @param projectId
-     * @param userId
-     */
-    private void removeProjectUser(int projectId , int userId){
-        projectUserMapper.deleteProjectRelation(projectId,userId);
+    private  List<ProcessDefinition> getProcessDefinitions(){
+        List<ProcessDefinition> list = new ArrayList<>();
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setProjectId(1);
+        list.add(processDefinition);
+        return list;
     }
 
+
+
+
+    private String getDesc(){
+        return "projectUserMapper.deleteProjectRelation(projectId,userId)projectUserMappe" +
+                ".deleteProjectRelation(projectId,userId)projectUserMappe" +
+                "r.deleteProjectRelation(projectId,userId)projectUserMapper" +
+                ".deleteProjectRelation(projectId,userId)projectUserMapper.deleteProjectRelation(projectId,userId)";
+    }
 
 
 }
