@@ -389,9 +389,13 @@ public class MailUtils {
         }
 
         // send
-        email.send();
-
-        retMap.put(Constants.STATUS, true);
+        try {
+            // the send method may throw an EmailException
+            email.send();
+            retMap.put(Constants.STATUS, true);
+        } catch (EmailException e) {
+            logger.error("exception in send html email", e);
+        }
 
         return retMap;
     }
