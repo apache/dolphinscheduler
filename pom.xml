@@ -797,5 +797,11 @@
 			</plugins>
 		    </build>
 		</profile>
-	    </profiles>
+		<profile>
+			<id>linux</id>
+			<properties>
+			  <npm>npm</npm>
+    		</properties>
+ 		</profile>
+	</profiles>
 </project>
