@@ -21,7 +21,7 @@ jobs:
       run: mvn clean
     - name: Run SonarCloud analyse
       run: >
-          mvn --batch-mode
+          mvn  -U -B -T 1C -Prelease -Dmaven.compile.fork=true -Dmaven.test.skip=true --batch-mode
           org.jacoco:jacoco-maven-plugin:prepare-agent
           verify
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
