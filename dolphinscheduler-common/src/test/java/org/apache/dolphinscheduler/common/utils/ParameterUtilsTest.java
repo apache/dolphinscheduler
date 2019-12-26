@@ -1,6 +1,5 @@
 package org.apache.dolphinscheduler.common.utils;
 
-import ch.qos.logback.core.db.DataSourceConnectionSource;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -13,8 +12,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.*;
 
 import static org.apache.dolphinscheduler.common.Constants.PARAMETER_FORMAT_TIME;
@@ -58,13 +55,6 @@ public class ParameterUtilsTest {
 
     }
 
-    /**
-     * Test setInParameter
-     */
-    @Test
-    public void testSetInParameter() throws Exception {
-
-    }
 
 
     /**
