@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -82,17 +83,17 @@ public class WorkerGroupServiceTest {
         logger.info(result.toString());
         Assert.assertEquals((String) result.get(Constants.MSG), Status.USER_NO_OPERATION_PERM.getMsg());
 
-        //admin add
+        //success
         user.setUserType(UserType.ADMIN_USER);
         result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
         logger.info(result.toString());
         Assert.assertEquals((String) result.get(Constants.MSG), Status.SUCCESS.getMsg());
         // group name exist
-        Mockito.when(workerGroupMapper.selectById(1)).thenReturn(getWorkerGroup());
+        Mockito.when(workerGroupMapper.selectById(2)).thenReturn(getWorkerGroup(2));
         Mockito.when(workerGroupMapper.queryWorkerGroupByName(groupName)).thenReturn(getList());
-        result = workerGroupService.saveWorkerGroup(user, 0, groupName, "127.0.0.1");
+        result = workerGroupService.saveWorkerGroup(user, 2, groupName, "127.0.0.1");
         logger.info(result.toString());
-        Assert.assertEquals(result.get(Constants.STATUS), Status.NAME_EXIST);
+        Assert.assertEquals(Status.NAME_EXIST,result.get(Constants.STATUS));
 
     }
 
@@ -142,16 +143,27 @@ public class WorkerGroupServiceTest {
         List<WorkerGroup> workerGroupList = (List<WorkerGroup>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(workerGroupList.size()>0);
     }
-    
 
+
+    private IPage<WorkerGroup> getPage(){
+        IPage<WorkerGroup> page = new Page<>(1,10);
+        page.setTotal(1L);
+        page.setRecords(getList());
+        return page;
+    }
     /**
      * get Group
      * @return
      */
-    private WorkerGroup getWorkerGroup(){
+    private WorkerGroup getWorkerGroup(int id){
         WorkerGroup workerGroup = new WorkerGroup();
-        workerGroup.setId(1);
+        workerGroup.setName(groupName);
+        workerGroup.setId(id);
         return workerGroup;
+    }
+    private WorkerGroup getWorkerGroup(){
+
+        return getWorkerGroup(1);
     }
 
    private List<WorkerGroup> getList(){

@@ -16,76 +16,75 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.junit.After;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
+@RunWith(MockitoJUnitRunner.class)
 public class TenantServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(TenantServiceTest.class);
 
-    @Autowired
+    @InjectMocks
     private TenantService tenantService;
-    @Autowired
+    @Mock
     private TenantMapper tenantMapper;
+    @Mock
+    private ProcessDefinitionMapper processDefinitionMapper;
+    @Mock
+    private ProcessInstanceMapper processInstanceMapper;
+    @Mock
+    private UserMapper userMapper;
 
     private String tenantCode ="TenantServiceTest";
     private String tenantName ="TenantServiceTest";
 
 
-
-    @Before
-    public void setUp() {
-        remove();
-    }
-
-    @After
-    public void after(){
-        remove();
-    }
-
     @Test
     public void testCreateTenant(){
 
         User loginUser = getLoginUser();
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getList());
         try {
             //check tenantCode
             Map<String, Object> result = tenantService.createTenant(getLoginUser(), "%!1111", tenantName, 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(result.get(Constants.STATUS),Status.VERIFY_TENANT_CODE_ERROR);
 
-            // check add
-            result = tenantService.createTenant(loginUser, tenantCode, tenantName, 1, "TenantServiceTest");
-            logger.info(result.toString());
-            Assert.assertEquals(result.get(Constants.STATUS),Status.SUCCESS);
-
             //check exist
             result = tenantService.createTenant(loginUser, tenantCode, tenantName, 1, "TenantServiceTest");
             logger.info(result.toString());
             Assert.assertEquals(result.get(Constants.STATUS),Status.REQUEST_PARAMS_NOT_VALID_ERROR);
 
+            // success
+            result = tenantService.createTenant(loginUser, "test", "test", 1, "TenantServiceTest");
+            logger.info(result.toString());
+            Assert.assertEquals(result.get(Constants.STATUS),Status.SUCCESS);
         } catch (Exception e) {
           logger.error("create tenant error",e);
           Assert.assertTrue(false);
@@ -95,31 +94,30 @@ public class TenantServiceTest {
     @Test
     public void testQueryTenantListPage(){
 
-        add();
+        IPage<Tenant> page = new Page<>(1,10);
+        page.setRecords(getList());
+        page.setTotal(1L);
+        Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.eq("TenantServiceTest"))).thenReturn(page);
         Map<String, Object> result = tenantService.queryTenantList(getLoginUser(), "TenantServiceTest", 1, 10);
         logger.info(result.toString());
         PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(pageInfo.getLists().size()>0);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
 
     }
 
     @Test
     public void testUpdateTenant(){
+
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         try {
             // id not exist
             Map<String, Object> result = tenantService.updateTenant(getLoginUser(), 912222, tenantCode, tenantName, 1, "desc");
             logger.info(result.toString());
-            // add
-            add();
+            // success
             Assert.assertEquals(result.get(Constants.STATUS),Status.TENANT_NOT_EXIST);
-            result = tenantService.updateTenant(getLoginUser(), getTenantId(), tenantCode, "TenantServiceTest001", 1, "desc");
+            result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, "TenantServiceTest001", 1, "desc");
             logger.info(result.toString());
             Assert.assertEquals(result.get(Constants.STATUS),Status.SUCCESS);
-            // get update tenant
-            Tenant tenant = getTenant();
-            //check update field
-            Assert.assertEquals(tenant.getTenantName(),"TenantServiceTest001");
-
         } catch (Exception e) {
             logger.error("update tenant error",e);
             Assert.assertTrue(false);
@@ -130,21 +128,39 @@ public class TenantServiceTest {
     @Test
     public void testDeleteTenantById(){
 
+        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
+        Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1, Constants.NOT_TERMINATED_STATES)).thenReturn(getInstanceList());
+        Mockito.when(processDefinitionMapper.queryDefinitionListByTenant(2)).thenReturn(getDefinitionsList());
+        Mockito.when( userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
+
         try {
-            Map<String, Object> result = tenantService.deleteTenantById(getLoginUser(), Integer.MAX_VALUE);
+            //TENANT_NOT_EXIST
+            Map<String, Object> result = tenantService.deleteTenantById(getLoginUser(),12);
             logger.info(result.toString());
             Assert.assertEquals(result.get(Constants.STATUS),Status.TENANT_NOT_EXIST);
-            // add
-            add();
-            result = tenantService.deleteTenantById(getLoginUser(), getTenantId());
+
+            //DELETE_TENANT_BY_ID_FAIL
+            result = tenantService.deleteTenantById(getLoginUser(),1);
+            logger.info(result.toString());
+            Assert.assertEquals(result.get(Constants.STATUS),Status.DELETE_TENANT_BY_ID_FAIL);
+
+            //DELETE_TENANT_BY_ID_FAIL_DEFINES
+            Mockito.when(tenantMapper.queryById(2)).thenReturn(getTenant(2));
+            result = tenantService.deleteTenantById(getLoginUser(),2);
+            logger.info(result.toString());
+            Assert.assertEquals(result.get(Constants.STATUS),Status.DELETE_TENANT_BY_ID_FAIL_DEFINES);
+
+            //DELETE_TENANT_BY_ID_FAIL_USERS
+            Mockito.when(tenantMapper.queryById(3)).thenReturn(getTenant(3));
+            result = tenantService.deleteTenantById(getLoginUser(),3);
+            logger.info(result.toString());
+            Assert.assertEquals(result.get(Constants.STATUS),Status.DELETE_TENANT_BY_ID_FAIL_USERS);
+
+            // success
+            Mockito.when(tenantMapper.queryById(4)).thenReturn(getTenant(4));
+            result = tenantService.deleteTenantById(getLoginUser(),4);
             logger.info(result.toString());
             Assert.assertEquals(result.get(Constants.STATUS),Status.SUCCESS);
-
-            // get add tenant
-            Tenant tenant = getTenant();
-            //check exist
-            Assert.assertNull(tenant);
-
         } catch (Exception e) {
             logger.error("delete tenant error",e);
             Assert.assertTrue(false);
@@ -153,41 +169,28 @@ public class TenantServiceTest {
 
     @Test
     public void testQueryTenantList(){
-        add();
+
+        Mockito.when( tenantMapper.selectList(null)).thenReturn(getList());
         Map<String, Object> result = tenantService.queryTenantList(getLoginUser());
         logger.info(result.toString());
         List<Tenant> tenantList = (List<Tenant>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(tenantList.size()>0);
+        Assert.assertTrue(CollectionUtils.isNotEmpty(tenantList));
     }
 
     @Test
     public void testVerifyTenantCode(){
 
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getList());
         // tenantCode not exist
         Result result = tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf");
         logger.info(result.toString());
         Assert.assertEquals(result.getMsg(),Status.SUCCESS.getMsg());
-        //add
-        add();
         // tenantCode  exist
         result = tenantService.verifyTenantCode(getTenant().getTenantCode());
         logger.info(result.toString());
         Assert.assertEquals(result.getMsg(),Status.TENANT_NAME_EXIST.getMsg());
     }
 
-
-    /**
-     * add tenant
-     */
-    private void add(){
-
-        try {
-            tenantService.createTenant(getLoginUser(), tenantCode, tenantName, 1, "TenantServiceTest");
-        } catch (Exception e) {
-            logger.error("create tenant error",e);
-        }
-
-    }
 
     /**
      * get user
@@ -201,38 +204,53 @@ public class TenantServiceTest {
     }
 
     /**
-     * get  add tenant
+     * get  list
+     * @return
+     */
+    private List<Tenant> getList(){
+        List<Tenant> tenantList = new ArrayList<>();
+        tenantList.add(getTenant());
+        return tenantList;
+    }
+
+    /**
+     * get   tenant
      * @return
      */
     private Tenant getTenant(){
-
-        List<Tenant> tenantList = tenantMapper.queryByTenantCode(tenantCode);
-        if (CollectionUtils.isNotEmpty(tenantList)){
-           return tenantList.get(0);
-        }
-        return null;
+        return getTenant(1);
     }
-
     /**
-     * get  add tenant id
+     * get   tenant
      * @return
      */
-    private int getTenantId(){
-
-        Tenant tenant = getTenant();
-        if (tenant != null){
-            return tenant.getId();
-        }
-        return 0;
+    private Tenant getTenant(int id){
+        Tenant tenant = new Tenant();
+        tenant.setId(id);
+        tenant.setTenantCode(tenantCode);
+        tenant.setTenantName(tenantName);
+        return tenant;
     }
 
-    /**
-     * remove add tenant
-     */
-    private void remove(){
-
-        Map<String,Object> map = new HashMap<>(1);
-        map.put("tenant_name",tenantName);
-        tenantMapper.deleteByMap(map);
+    private List<User> getUserList(){
+        List<User> userList = new ArrayList<>();
+        userList.add(getLoginUser());
+        return userList;
     }
+
+    private List<ProcessInstance> getInstanceList(){
+        List<ProcessInstance> processInstances = new ArrayList<>();
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstances.add(processInstance);
+        return processInstances;
+    }
+
+    private List<ProcessDefinition>  getDefinitionsList(){
+        List<ProcessDefinition> processDefinitions = new ArrayList<>();
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinitions.add(processDefinition);
+        return processDefinitions;
+    }
+
+
 }
