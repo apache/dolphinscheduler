@@ -28,95 +28,36 @@ import java.util.Date;
 /**
  * command
  */
-@Data
 @TableName("t_ds_command")
 public class Command {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    /**
-     * command type
-     */
     @TableField("command_type")
     private CommandType commandType;
-
-    /**
-     * process definition id
-     */
     @TableField("process_definition_id")
     private int processDefinitionId;
-
-    /**
-     * executor id
-     */
     @TableField("executor_id")
     private int executorId;
-
-    /**
-     * command parameter, format json
-     */
     @TableField("command_param")
     private String commandParam;
-
-    /**
-     * task depend type
-     */
     @TableField("task_depend_type")
     private TaskDependType taskDependType;
-
-    /**
-     * failure strategy
-     */
     @TableField("failure_strategy")
     private FailureStrategy failureStrategy;
-
-    /**
-     * warning type
-     */
     @TableField("warning_type")
     private WarningType warningType;
-
-    /**
-     * warning group id
-     */
     @TableField("warning_group_id")
     private Integer warningGroupId;
-
-    /**
-     * schedule time
-     */
     @TableField("schedule_time")
     private Date scheduleTime;
-
-    /**
-     * start time
-     */
     @TableField("start_time")
     private Date startTime;
-
-    /**
-     * process instance priority
-     */
     @TableField("process_instance_priority")
     private Priority processInstancePriority;
-
-    /**
-     * update time
-     */
     @TableField("update_time")
     private Date updateTime;
-
-
-    /**
-     *
-     */
     @TableField("worker_group_id")
     private int workerGroupId;
-
 
     public Command() {
         this.taskDependType = TaskDependType.TASK_POST;
@@ -182,7 +123,6 @@ public class Command {
     public void setProcessDefinitionId(int processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
-
 
     public FailureStrategy getFailureStrategy() {
         return failureStrategy;
@@ -255,7 +195,6 @@ public class Command {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
-
 
     public int getWorkerGroupId() {
         return workerGroupId;
