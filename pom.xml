@@ -755,6 +755,45 @@
 				    <source>8</source>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+
+				  <execution>
+					<id>exec-npm-install</id>
+					<phase>prepare-package</phase>
+					<goals>
+					  <goal>exec</goal>
+					</goals>
+					<configuration>
+					  <executable>${npm}</executable>
+					  <arguments>
+						<argument>install</argument>
+					  </arguments>
+					  <workingDirectory>${basedir}/dolphinscheduler-ui</workingDirectory>
+					</configuration>
+				  </execution>
+
+				  <execution>
+					<id>exec-npm-run-build</id>
+					<phase>prepare-package</phase>
+					<goals>
+					  <goal>exec</goal>
+					</goals>
+					<configuration>
+					  <executable>${npm}</executable>
+					  <arguments>
+						<argument>run</argument>
+						<argument>build</argument>
+					  </arguments>
+					  <workingDirectory>${basedir}/dolphinscheduler-ui</workingDirectory>
+					</configuration>
+				  </execution>
+
+				</executions>
+			  </plugin>
 		</plugins>
 
 	</build>
