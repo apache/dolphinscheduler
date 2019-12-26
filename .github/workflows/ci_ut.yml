@@ -39,13 +39,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Bootstrap database
-        run: |
-          cd ${DOCKER_DIR}
-          mkdir -p ./postgres/data
-          docker-compose up -d db
-          chmod -R 777 postgres/data/pg_hba.conf
-          sed -i 's@host all all all md5@host all all 0.0.0.0/0 md5@g' postgres/data/pg_hba.conf
-          docker-compose restart db
+        run: cd ${DOCKER_DIR} && docker-compose up -d db
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
