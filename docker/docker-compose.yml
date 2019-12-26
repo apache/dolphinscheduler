@@ -1,0 +1,24 @@
+version: '2'
+services:
+  zookeeper:
+    image: zookeeper
+    restart: always
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+  db:
+    image: postgres
+    container_name: postgres
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=dolphinscheduler
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres/docker-entrypoint-initdb:/docker-entrypoint-initdb.d
+volumes:
+  pgdata:
