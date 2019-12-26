@@ -14,24 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Vue from 'vue'
-import Vuex from 'vuex'
-import dag from './dag'
-import projects from './projects'
-import resource from './resource'
-import security from './security'
-import datasource from './datasource'
-import user from './user'
-import monitor from './monitor'
-Vue.use(Vuex)
-export default new Vuex.Store({
-  modules: {
-    dag,
-    projects,
-    resource,
-    security,
-    datasource,
-    user,
-    monitor
-  }
-})
+package org.apache.dolphinscheduler.common.zk;
+
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+
+public abstract class AbstractListener implements TreeCacheListener {
+
+    @Override
+    public final void childEvent(final CuratorFramework client, final TreeCacheEvent event) throws Exception {
+        String path = null == event.getData() ? "" : event.getData().getPath();
+        if (path.isEmpty()) {
+            return;
+        }
+        dataChanged(client, event, path);
+    }
+
+    protected abstract void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path);
+}

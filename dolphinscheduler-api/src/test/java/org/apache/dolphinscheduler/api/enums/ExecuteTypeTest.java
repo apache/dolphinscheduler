@@ -14,24 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Vue from 'vue'
-import Vuex from 'vuex'
-import dag from './dag'
-import projects from './projects'
-import resource from './resource'
-import security from './security'
-import datasource from './datasource'
-import user from './user'
-import monitor from './monitor'
-Vue.use(Vuex)
-export default new Vuex.Store({
-  modules: {
-    dag,
-    projects,
-    resource,
-    security,
-    datasource,
-    user,
-    monitor
-  }
-})
+package org.apache.dolphinscheduler.api.enums;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class ExecuteTypeTest {
+
+    @Test
+    public void testGetEnum() {
+        assertEquals(ExecuteType.REPEAT_RUNNING, ExecuteType.getEnum(1));
+        assertEquals(ExecuteType.RECOVER_SUSPENDED_PROCESS, ExecuteType.getEnum(2));
+        assertEquals(ExecuteType.START_FAILURE_TASK_PROCESS, ExecuteType.getEnum(3));
+        assertEquals(ExecuteType.STOP, ExecuteType.getEnum(4));
+        assertEquals(ExecuteType.PAUSE, ExecuteType.getEnum(5));
+    }
+}

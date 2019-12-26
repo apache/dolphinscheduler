@@ -14,24 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import Vue from 'vue'
-import Vuex from 'vuex'
-import dag from './dag'
-import projects from './projects'
-import resource from './resource'
-import security from './security'
-import datasource from './datasource'
-import user from './user'
-import monitor from './monitor'
-Vue.use(Vuex)
-export default new Vuex.Store({
-  modules: {
-    dag,
-    projects,
-    resource,
-    security,
-    datasource,
-    user,
-    monitor
-  }
-})
+package org.apache.dolphinscheduler.common.zk;
+
+import org.apache.curator.ensemble.EnsembleProvider;
+
+import java.io.IOException;
+
+/**
+ * default conf provider
+ */
+public class DefaultEnsembleProvider implements EnsembleProvider {
+
+    private final String serverList;
+
+    public DefaultEnsembleProvider(String serverList){
+        this.serverList = serverList;
+    }
+
+    @Override
+    public void start() throws Exception {
+        //NOP
+    }
+
+    @Override
+    public String getConnectionString() {
+        return serverList;
+    }
+
+    @Override
+    public void close() throws IOException {
+        //NOP
+    }
+}
