@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -27,8 +29,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,7 +143,7 @@ public class ProjectService extends BaseService{
     public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result) {
         boolean checkResult = false;
         if (project == null) {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, project.getName());
+            putMsg(result, Status.PROJECT_NOT_FOUNT, "");
         } else if (!checkReadPermission(loginUser, project)) {
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
         } else {
@@ -199,12 +199,13 @@ public class ProjectService extends BaseService{
         if (checkResult != null) {
             return checkResult;
         }
-        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(projectId);
 
         if (!hasPerm(loginUser, project.getUserId())) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
+
+        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(projectId);
 
         if(processDefinitionList.size() > 0){
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
@@ -227,7 +228,8 @@ public class ProjectService extends BaseService{
      * @return check result
      */
     private Map<String, Object> getCheckResult(User loginUser, Project project) {
-        Map<String, Object> checkResult = checkProjectAndAuth(loginUser, project, project.getName());
+        String projectName = project == null ? null:project.getName();
+        Map<String, Object> checkResult = checkProjectAndAuth(loginUser, project, projectName);
         Status status = (Status) checkResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
             return checkResult;
@@ -246,6 +248,11 @@ public class ProjectService extends BaseService{
      */
     public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc) {
         Map<String, Object> result = new HashMap<>(5);
+
+        Map<String, Object> descCheck = checkDesc(desc);
+        if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
+            return descCheck;
+        }
 
         Project project = projectMapper.selectById(projectId);
         boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result);
