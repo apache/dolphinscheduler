@@ -772,7 +772,7 @@
 					  <arguments>
 						<argument>install</argument>
 					  </arguments>
-					  <workingDirectory>./dolphinscheduler-ui</workingDirectory>
+					  <workingDirectory>../dolphinscheduler-ui</workingDirectory>
 					</configuration>
 				  </execution>
 
@@ -788,7 +788,7 @@
 						<argument>run</argument>
 						<argument>build</argument>
 					  </arguments>
-					  <workingDirectory>./dolphinscheduler-ui</workingDirectory>
+					  <workingDirectory>../dolphinscheduler-ui</workingDirectory>
 					</configuration>
 				  </execution>
 
