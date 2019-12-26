@@ -569,7 +569,6 @@
 					    <phase>generate-resources</phase>
 					    <configuration>
 					      <arguments>install</arguments>
-					      <workingDirectory>${maven.multiModuleProjectDirectory}/dolphinscheduler-ui</workingDirectory>
 					    </configuration>
 					  </execution>
 					  <execution>
@@ -579,7 +578,6 @@
 					    </goals>
 					    <configuration>
 					      <arguments>run build</arguments>
-					      <workingDirectory>${maven.multiModuleProjectDirectory}/dolphinscheduler-ui</workingDirectory>
 					    </configuration>
 					  </execution>
 					</executions>
