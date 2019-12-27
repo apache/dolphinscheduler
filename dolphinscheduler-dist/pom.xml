@@ -110,7 +110,7 @@
                         <artifactId>maven-assembly-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>dolphinscheduler-bin</id>
+                                <id>dolphinscheduler-nginx</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>single</goal>
@@ -118,7 +118,7 @@
 
                                 <configuration>
                                     <descriptors>
-                                        <descriptor>src/main/assembly/dolphinscheduler-binary.xml</descriptor>
+                                        <descriptor>src/main/assembly/dolphinscheduler-nginx.xml</descriptor>
                                     </descriptors>
                                     <appendAssemblyId>true</appendAssemblyId>
                                 </configuration>
