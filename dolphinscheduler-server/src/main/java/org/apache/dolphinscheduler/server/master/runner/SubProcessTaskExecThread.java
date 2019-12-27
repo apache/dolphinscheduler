@@ -72,7 +72,6 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
                     this.taskInstance.setState(ExecutionStatus.KILL);
                 }else{
                     this.taskInstance.setState(subProcessInstance.getState());
-                    result = true;
                 }
             }
             taskInstance.setEndTime(new Date());
