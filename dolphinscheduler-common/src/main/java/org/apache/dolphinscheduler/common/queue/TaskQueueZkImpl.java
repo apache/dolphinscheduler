@@ -17,35 +17,42 @@
 package org.apache.dolphinscheduler.common.queue;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.Bytes;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
-import org.apache.curator.framework.CuratorFramework;
+import org.apache.dolphinscheduler.common.zk.DefaultEnsembleProvider;
+import org.apache.dolphinscheduler.common.zk.ZookeeperConfig;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.*;
+
 /**
  * A singleton of a task queue implemented with zookeeper
  * tasks queue implemention
  */
-public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
+public class TaskQueueZkImpl implements ITaskQueue {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskQueueZkImpl.class);
 
     private static volatile TaskQueueZkImpl instance;
+
+    private CuratorFramework zkClient;
+
+    private ZookeeperConfig zookeeperConfig;
+
+    private CuratorFramework getZkClient() {
+        return zkClient;
+    }
 
     private TaskQueueZkImpl(){
         init();
@@ -376,6 +383,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      * Init the task queue of zookeeper node
      */
     private void init(){
+        initZkClient();
         try {
             String tasksQueuePath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
             String tasksCancelPath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_KILL);
@@ -391,6 +399,30 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
 
         } catch (Exception e) {
             logger.error("create zk node failure",e);
+        }
+    }
+
+    private void initZkClient() {
+
+        Configuration conf = null;
+        try {
+            conf = new PropertiesConfiguration(Constants.ZOOKEEPER_PROPERTIES_PATH);
+        } catch (ConfigurationException ex) {
+            logger.error("load zookeeper properties file failed, system exit");
+            System.exit(-1);
+        }
+
+        zkClient = CuratorFrameworkFactory.builder().ensembleProvider(new DefaultEnsembleProvider(conf.getString("zookeeper.quorum")))
+                .retryPolicy(new ExponentialBackoffRetry(conf.getInt("zookeeper.retry.base.sleep"), conf.getInt("zookeeper.retry.maxtime"), conf.getInt("zookeeper.retry.max.sleep")))
+                .sessionTimeoutMs(conf.getInt("zookeeper.session.timeout"))
+                .connectionTimeoutMs(conf.getInt("zookeeper.connection.timeout"))
+                .build();
+
+        zkClient.start();
+        try {
+            zkClient.blockUntilConnected();
+        } catch (final Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 
@@ -429,8 +461,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      * @return
      */
     public String getTasksPath(String key){
-        return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_ROOT) + Constants.SINGLE_SLASH + key;
+        return "/dolphinscheduler" + Constants.SINGLE_SLASH + key;
     }
-
 
 }
