@@ -19,7 +19,7 @@
 		xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
-	<id>dolphinscheduler-bin</id>
+	<id>dolphinscheduler-nginx</id>
 	<formats>
 		<format>tar.gz</format>
 	</formats>
@@ -98,8 +98,23 @@
 			</includes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
-
-
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+			</includes>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-common/src/main/resources/bin</directory>
+			<includes>
+				<include>*.*</include>
+			</includes>
+			<directoryMode>755</directoryMode>
+			<outputDirectory>bin</outputDirectory>
+		</fileSet>
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
 			<includes>
@@ -140,6 +155,14 @@
 			<directory>${basedir}/../dolphinscheduler-ui/dist</directory>
 			<includes>
 				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>./ui/dist</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-ui</directory>
+			<includes>
+				<include>install-dolphinscheduler-ui.sh</include>
 			</includes>
 			<outputDirectory>./ui</outputDirectory>
 		</fileSet>

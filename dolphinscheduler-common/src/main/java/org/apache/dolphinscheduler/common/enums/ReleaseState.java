@@ -17,12 +17,10 @@
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
 /**
  * process define release state
  */
-@Getter
 public enum ReleaseState {
 
     /**
@@ -49,5 +47,13 @@ public enum ReleaseState {
         }
         //For values out of enum scope
         return null;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
     }
 }
