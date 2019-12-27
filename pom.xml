@@ -108,6 +108,8 @@
 		<maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>2.4</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+		<maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+		<rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
 		<jacoco.version>0.8.4</jacoco.version>
 		<jcip.version>1.0</jcip.version>
 		<maven.deploy.skip>false</maven.deploy.skip>
@@ -524,6 +526,14 @@
 		<pluginManagement>
 			<plugins>
 
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>rpm-maven-plugin</artifactId>
+					<version>${rpm-maven-plugion.version}</version>
+					<inherited>false</inherited>
+				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -568,6 +578,12 @@
 					<version>${maven-source-plugin.version}</version>
 				</plugin>
 
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>${maven-dependency-plugin.version}</version>
+
+				</plugin>
 			</plugins>
 
 		</pluginManagement>
