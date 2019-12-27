@@ -18,6 +18,8 @@
 
 <!-- Logback configuration. See http://logback.qos.ch/manual/index.html -->
 <configuration scan="true" scanPeriod="120 seconds">
+    <conversionRule conversionWord="msg"
+                    converterClass="org.apache.dolphinscheduler.server.worker.log.SensitiveDataConverter"/>
     <property name="log.base" value="logs"/>
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -31,7 +33,7 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
-        <filter class="org.apache.dolphinscheduler.server.worker.log.TaskLogFilter"></filter>
+        <filter class="org.apache.dolphinscheduler.server.worker.log.TaskLogFilter"/>
         <Discriminator class="org.apache.dolphinscheduler.server.worker.log.TaskLogDiscriminator">
             <key>taskAppId</key>
             <logBase>${log.base}</logBase>
