@@ -306,7 +306,7 @@ public class UdfFuncService extends BaseService{
         //check exist
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, Status.UDF_FUNCTION_NOT_EXIST);
             return result;
         }
         udfFuncMapper.deleteById(id);
