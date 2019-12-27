@@ -129,9 +129,6 @@ public class ZookeeperOperator implements InitializingBean {
         List<String> values;
         try {
             values = zkClient.getChildren().forPath(key);
-            if (CollectionUtils.isEmpty(values)) {
-                logger.warn("getChildrenKeys key : {} is empty", key);
-            }
             return values;
         } catch (InterruptedException ex) {
             logger.error("getChildrenKeys key : {} InterruptedException", key);
