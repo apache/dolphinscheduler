@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.common.queue;
 
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public class TaskQueueFactory {
     String queueImplValue = CommonUtils.getQueueImplValue();
     if (StringUtils.isNotBlank(queueImplValue)) {
         logger.info("task queue impl use zookeeper ");
-        return TaskQueueZkImpl.getInstance();
+        return SpringApplicationContext.getBean(TaskQueueZkImpl.class);
     }else{
       logger.error("property dolphinscheduler.queue.impl can't be blank, system will exit ");
       System.exit(-1);
