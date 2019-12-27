@@ -129,6 +129,7 @@
     created () {
     },
     mounted () {
+      this.$modal.destroy()
     },
     components: { mListConstruction, mSpin, mConditions, mList, mCreateProject, mNoData }
   }

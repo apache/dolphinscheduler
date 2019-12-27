@@ -141,7 +141,7 @@
           let self = this
           let formData = new FormData()
           formData.append('file', this.file)
-          io.post(`projects/import-definition`, res => {
+          io.post(`projects/importProcessDefinition`, res => {
             this.$message.success(res.msg)
             resolve()
             self.$emit('onUpdate')

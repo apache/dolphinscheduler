@@ -41,32 +41,21 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Ignore
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class DataAnalysisControllerTest {
+
+public class DataAnalysisControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
 
-    private MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @Before
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
 
     @Test
-    public void countTaskState() throws Exception {
+    public void testCountTaskState() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("startDate","2019-02-01 00:00:00");
-        paramsMap.add("endDate","2019-02-28 00:00:00");
-        paramsMap.add("projectId","21");
+        paramsMap.add("startDate","2019-12-01 00:00:00");
+        paramsMap.add("endDate","2019-12-28 00:00:00");
+        paramsMap.add("projectId","16");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/task-state-count")
-                .header("sessionId", "08fae8bf-fe2d-4fc0-8129-23c37fbfac82")
+                .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
@@ -77,15 +66,66 @@ public class DataAnalysisControllerTest {
     }
 
     @Test
-    public void countProcessInstanceState() throws Exception {
+    public void testCountProcessInstanceState() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("startDate","2019-02-01 00:00:00");
-        paramsMap.add("endDate","2019-02-28 00:00:00");
-        paramsMap.add("projectId","21");
+        paramsMap.add("startDate","2019-12-01 00:00:00");
+        paramsMap.add("endDate","2019-12-28 00:00:00");
+        paramsMap.add("projectId","16");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/process-state-count")
-                .header("sessionId", "08fae8bf-fe2d-4fc0-8129-23c37fbfac82")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCountDefinitionByUser() throws Exception {
+
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("projectId","16");
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/define-user-count")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testCountCommandState() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("startDate","2019-12-01");
+        paramsMap.add("endDate","2019-12-15");
+        paramsMap.add("projectId","16");
+        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/command-state-count")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+
+    @Test
+    public void testCountQueueState() throws Exception {
+
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("projectId","16");
+        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/queue-count")
+                .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))

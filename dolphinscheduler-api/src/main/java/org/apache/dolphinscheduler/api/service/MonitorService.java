@@ -39,6 +39,8 @@ import java.util.Map;
 @Service
 public class MonitorService extends BaseService{
 
+  @Autowired
+  private ZookeeperMonitor zookeeperMonitor;
 
   @Autowired
   private MonitorDBDao monitorDBDao;
@@ -86,7 +88,7 @@ public class MonitorService extends BaseService{
   public Map<String,Object> queryZookeeperState(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
 
-    List<ZookeeperRecord> zookeeperRecordList = ZookeeperMonitor.zookeeperInfoList();
+    List<ZookeeperRecord> zookeeperRecordList = zookeeperMonitor.zookeeperInfoList();
 
     result.put(Constants.DATA_LIST, zookeeperRecordList);
     putMsg(result, Status.SUCCESS);

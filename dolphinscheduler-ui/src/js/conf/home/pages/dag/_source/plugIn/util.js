@@ -16,7 +16,6 @@
  */
 
 import _ from 'lodash'
-import $ from 'jquery'
 import i18n from '@/module/i18n'
 import store from '@/conf/home/store'
 

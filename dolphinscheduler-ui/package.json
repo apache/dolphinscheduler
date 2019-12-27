@@ -1,14 +1,14 @@
 {
-  "name": "dolphinscheduler",
+  "name": "dolphinscheduler-ui-frontend",
   "version": "1.0.0",
-  "description": "dolphinscheduler",
-  "author": "gongzijian <gongzijian@analysys.com.cn>",
+  "description": "A vue.js project",
+  "author": "DolphinScheduler",
   "scripts": {
-    "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./build/webpack.config.prod.js && cp -rf src/3rdcss dist && cp -rf src/3rdjs dist",
+    "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./build/webpack.config.prod.js",
     "dev": "cross-env NODE_ENV=development webpack-dev-server --config ./build/webpack.config.dev.js",
     "clean": "rimraf dist",
     "start": "npm run dev",
-    "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.release.js && cp -rf src/3rdcss dist && cp -rf src/3rdjs dist"
+    "build:release": "npm run clean && cross-env NODE_ENV=production PUBLIC_PATH=/dolphinscheduler/ui webpack --config ./build/webpack.config.release.js"
   },
   "dependencies": {
     "ans-ui": "1.1.7",
@@ -19,15 +19,17 @@
     "codemirror": "^5.43.0",
     "d3": "^3.5.17",
     "dayjs": "^1.7.8",
-    "echarts": "^4.1.0",
+    "echarts": "4.1.0",
     "html2canvas": "^0.5.0-beta4",
-    "jquery": "1.12.4",
+    "jquery": "3.3.1",
+    "jquery-ui": "^1.12.1",
+    "js-cookie": "^2.2.1",
     "jsplumb": "^2.8.6",
     "lodash": "^4.17.11",
     "vue": "^2.5.17",
     "vue-router": "2.7.0",
     "vuex": "^3.0.0",
-    "vuex-router-sync": "^4.1.2"
+    "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
     "autoprefixer": "^9.1.0",

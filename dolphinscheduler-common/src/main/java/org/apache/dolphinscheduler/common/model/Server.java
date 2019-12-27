@@ -40,7 +40,7 @@ public class Server {
     private int port;
 
     /**
-     * master direcotry in zookeeper
+     * master directory in zookeeper
      */
     private String zkDirectory;
 
