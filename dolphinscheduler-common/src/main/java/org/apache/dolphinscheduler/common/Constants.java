@@ -27,24 +27,9 @@ import java.util.regex.Pattern;
 public final class Constants {
 
     /**
-     * zookeeper properties path
-     */
-    public static final String ZOOKEEPER_PROPERTIES_PATH = "zookeeper.properties";
-
-    /**
-     * hadoop properties path
-     */
-    public static final String HADOOP_PROPERTIES_PATH = "/common/hadoop/hadoop.properties";
-
-    /**
      * common properties path
      */
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
-
-    /**
-     * dao properties path
-     */
-    public static final String DAO_PROPERTIES_PATH = "application.properties";
 
     /**
      * fs.defaultFS
@@ -227,6 +212,8 @@ public final class Constants {
     public static final String ZOOKEEPER_CONNECTION_TIMEOUT = "zookeeper.connection.timeout";
 
     public static final String ZOOKEEPER_RETRY_SLEEP = "zookeeper.retry.sleep";
+    public static final String ZOOKEEPER_RETRY_BASE_SLEEP = "zookeeper.retry.base.sleep";
+    public static final String ZOOKEEPER_RETRY_MAX_SLEEP = "zookeeper.retry.max.sleep";
 
     public static final String ZOOKEEPER_RETRY_MAXTIME = "zookeeper.retry.maxtime";
 
@@ -469,7 +456,7 @@ public final class Constants {
     /**
      * task record configuration path
      */
-    public static final String APPLICATION_PROPERTIES = "application-dao.properties";
+    public static final String APPLICATION_PROPERTIES = "application.properties";
 
     public static final String TASK_RECORD_URL = "task.record.datasource.url";
 

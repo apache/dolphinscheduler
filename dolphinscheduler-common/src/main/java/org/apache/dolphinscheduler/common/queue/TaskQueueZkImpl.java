@@ -16,10 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.queue;
 
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
@@ -27,6 +23,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.Bytes;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.zk.DefaultEnsembleProvider;
 import org.apache.dolphinscheduler.common.zk.ZookeeperConfig;
 import org.apache.zookeeper.CreateMode;
@@ -404,18 +401,13 @@ public class TaskQueueZkImpl implements ITaskQueue {
 
     private void initZkClient() {
 
-        Configuration conf = null;
-        try {
-            conf = new PropertiesConfiguration(Constants.ZOOKEEPER_PROPERTIES_PATH);
-        } catch (ConfigurationException ex) {
-            logger.error("load zookeeper properties file failed, system exit");
-            System.exit(-1);
-        }
-
-        zkClient = CuratorFrameworkFactory.builder().ensembleProvider(new DefaultEnsembleProvider(conf.getString("zookeeper.quorum")))
-                .retryPolicy(new ExponentialBackoffRetry(conf.getInt("zookeeper.retry.base.sleep"), conf.getInt("zookeeper.retry.maxtime"), conf.getInt("zookeeper.retry.max.sleep")))
-                .sessionTimeoutMs(conf.getInt("zookeeper.session.timeout"))
-                .connectionTimeoutMs(conf.getInt("zookeeper.connection.timeout"))
+        zkClient = CuratorFrameworkFactory.builder().ensembleProvider(
+                new DefaultEnsembleProvider(PropertyUtils.getString(Constants.ZOOKEEPER_QUORUM)))
+                .retryPolicy(new ExponentialBackoffRetry(PropertyUtils.getInt(Constants.ZOOKEEPER_RETRY_BASE_SLEEP),
+                                                         PropertyUtils.getInt(Constants.ZOOKEEPER_RETRY_MAXTIME),
+                                                         PropertyUtils.getInt(Constants.ZOOKEEPER_RETRY_MAX_SLEEP)))
+                .sessionTimeoutMs(PropertyUtils.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT))
+                .connectionTimeoutMs(PropertyUtils.getInt(Constants.ZOOKEEPER_CONNECTION_TIMEOUT))
                 .build();
 
         zkClient.start();
