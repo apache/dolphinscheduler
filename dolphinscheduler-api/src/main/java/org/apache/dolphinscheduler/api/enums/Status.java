@@ -249,8 +249,8 @@ public enum Status {
     KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error"),
     ;
 
-    private int code;
-    private String msg;
+    private final int code;
+    private final String msg;
 
     private Status(int code, String msg) {
         this.code = code;
@@ -261,15 +261,7 @@ public enum Status {
         return this.code;
     }
 
-    public void setCode(int code) {
-        this.code = code;
-    }
-
     public String getMsg() {
         return this.msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
     }
 }
