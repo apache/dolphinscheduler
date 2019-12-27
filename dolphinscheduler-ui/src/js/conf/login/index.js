@@ -17,7 +17,7 @@
 
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import $ from 'jquery'
+// import $ from 'jquery'
 import Vue from 'vue'
 import App from './App'
 import i18n from '@/module/i18n'
@@ -25,6 +25,7 @@ import 'ans-ui/lib/ans-ui.min.css'
 import ans from 'ans-ui/lib/ans-ui.min'
 
 import 'sass/conf/login/index.scss'
+import'bootstrap/dist/js/bootstrap.min.js'
 
 Vue.use(ans)
 

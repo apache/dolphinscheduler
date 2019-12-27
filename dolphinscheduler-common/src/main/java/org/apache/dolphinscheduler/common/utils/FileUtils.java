@@ -152,7 +152,7 @@ public class FileUtils {
             }
             bufferedReader = new BufferedReader(new StringReader(content));
             bufferedWriter = new BufferedWriter(new FileWriter(distFile));
-            char buf[] = new char[1024];
+            char[] buf = new char[1024];
             int len;
             while ((len = bufferedReader.read(buf)) != -1) {
                 bufferedWriter.write(buf, 0, len);
@@ -320,7 +320,7 @@ public class FileUtils {
             if (file.isDirectory()) {
                 throw new IOException("File '" + file + "' exists but is a directory");
             }
-            if (file.canWrite() == false) {
+            if (!file.canWrite()) {
                 throw new IOException("File '" + file + "' cannot be written to");
             }
         } else {
@@ -377,41 +377,24 @@ public class FileUtils {
             throw new RuntimeException("parentDir not exist, or is not a directory:"+parentDir);
         }
 
-        File[] schemaDirs = file.listFiles(new FileFilter() {
-
-            @Override
-            public boolean accept(File pathname) {
-                if (pathname.isDirectory()) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-        });
-
-        return schemaDirs;
+        return file.listFiles(File::isDirectory);
     }
 
     /**
      * Get Content
      * @param inputStream input stream
      * @return string of input stream
-     * @throws IOException errors
      */
-    public static String readFile2Str(InputStream inputStream) throws IOException{
-        String all_content=null;
+    public static String readFile2Str(InputStream inputStream) {
+
         try {
-            all_content = new String();
-            InputStream ins = inputStream;
-            ByteArrayOutputStream outputstream = new ByteArrayOutputStream();
-            byte[] str_b = new byte[1024];
-            int i = -1;
-            while ((i=ins.read(str_b)) > 0) {
-                outputstream.write(str_b,0,i);
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length= inputStream.read(buffer)) != -1) {
+                output.write(buffer,0,length);
             }
-            all_content = outputstream.toString();
-            return all_content;
+            return output.toString();
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e);

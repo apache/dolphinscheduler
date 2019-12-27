@@ -18,13 +18,13 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
 import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
+import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.BeanContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,30 +114,29 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         Integer commitRetryInterval = masterConfig.getMasterTaskCommitInterval();
 
         int retryTimes = 1;
-        boolean taskDBFlag = false;
-        boolean taskQueueFlag = false;
+        boolean submitDB = false;
+        boolean submitQueue = false;
         TaskInstance task = null;
-        while (true){
+        while (retryTimes <= commitRetryTimes){
             try {
-                if(!taskDBFlag){
+                if(!submitDB){
                     // submit task to db
                     task = processDao.submitTask(taskInstance, processInstance);
                     if(task != null && task.getId() != 0){
-                        taskDBFlag = true;
+                        submitDB = true;
                     }
                 }
-                if(taskDBFlag && !taskQueueFlag){
+                if(submitDB && !submitQueue){
                     // submit task to queue
-                    taskQueueFlag = processDao.submitTaskToQueue(task);
+                    submitQueue = processDao.submitTaskToQueue(task);
                 }
-                if(taskDBFlag && taskQueueFlag){
+                if(submitDB && submitQueue){
                     return task;
                 }
-                if(!taskDBFlag){
-                    logger.error("task commit to db failed , task has already retry {} times, please check the database", retryTimes);
-                }else if(!taskQueueFlag){
-                    logger.error("task commit to queue failed , task has already retry {} times, please check the database", retryTimes);
-
+                if(!submitDB){
+                    logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
+                }else if(!submitQueue){
+                    logger.error("task commit to queue failed , taskId {} has already retry {} times, please check the queue", taskInstance.getId(), retryTimes);
                 }
                 Thread.sleep(commitRetryInterval);
             } catch (Exception e) {
@@ -145,6 +144,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
             }
             retryTimes += 1;
         }
+        return task;
     }
 
     /**
