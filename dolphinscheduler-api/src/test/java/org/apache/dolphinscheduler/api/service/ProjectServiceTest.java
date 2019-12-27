@@ -133,6 +133,7 @@ public class ProjectServiceTest {
 
         Project project = getProject();
         //USER_NO_OPERATION_PROJECT_PERM
+        project.setUserId(2);
         result = projectService.checkProjectAndAuth(loginUser,project,projectName);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM,result.get(Constants.STATUS));
@@ -148,7 +149,7 @@ public class ProjectServiceTest {
     @Test
     public void testHasProjectAndPerm(){
 
-        Mockito.when(projectUserMapper.queryProjectRelation(1, 1)).thenReturn(getProjectUser());
+       // Mockito.when(projectUserMapper.queryProjectRelation(1, 1)).thenReturn(getProjectUser());
         User loginUser = getLoginUser();
         Project project = getProject();
         Map<String, Object> result = new HashMap<>();
@@ -198,7 +199,7 @@ public class ProjectServiceTest {
         Map<String, Object> result= projectService.deleteProject(loginUser,12);
         logger.info(result.toString());
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT,result.get(Constants.STATUS));
-
+        loginUser.setId(2);
         //USER_NO_OPERATION_PROJECT_PERM
         result= projectService.deleteProject(loginUser,1);
         logger.info(result.toString());
@@ -280,7 +281,7 @@ public class ProjectServiceTest {
     }
     @Test
     public void testQueryUnauthorizedProject(){
-        Mockito.when(projectMapper.queryAuthedProjectListByUserId(1)).thenReturn(getList());
+       // Mockito.when(projectMapper.queryAuthedProjectListByUserId(1)).thenReturn(getList());
         Mockito.when(projectMapper.queryProjectExceptUserId(2)).thenReturn(getList());
 
         User loginUser = new User();
