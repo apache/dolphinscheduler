@@ -20,6 +20,7 @@ jobs:
       run: |
         pwd
         ls -al
+        mvn clean install
     - name: Setup sonarqube
       uses: warchant/setup-sonar-scanner@v1
     - name: Run sonarqube
