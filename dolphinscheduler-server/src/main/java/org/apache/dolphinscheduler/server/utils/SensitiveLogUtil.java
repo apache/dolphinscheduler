@@ -14,40 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.server.utils;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
 
 /**
- * types for whether to send warning when process ending;
+ *  sensitive log Util
  */
-public enum WarningType {
-  /**
-   * 0 do not send warning;
-   * 1 send if process success;
-   * 2 send if process failed;
-   * 3 send if process ending;
-   */
-  NONE(0, "none"),
-  SUCCESS(1, "success"),
-  FAILURE(2, "failure"),
-  ALL(3, "all");
+public class SensitiveLogUtil {
 
+    /**
+     * @param dataSourcePwd data source password
+     * @return String
+     */
+    public static String maskDataSourcePwd(String dataSourcePwd){
 
-  WarningType(int code, String descp){
-    this.code = code;
-    this.descp = descp;
-  }
+        if (StringUtils.isNotEmpty(dataSourcePwd)) {
+            dataSourcePwd = Constants.PASSWORD_DEFAULT;
+        }
+        return dataSourcePwd;
+    }
 
-  @EnumValue
-  private final int code;
-  private final String descp;
-
-  public int getCode() {
-    return code;
-  }
-
-  public String getDescp() {
-    return descp;
-  }
 }

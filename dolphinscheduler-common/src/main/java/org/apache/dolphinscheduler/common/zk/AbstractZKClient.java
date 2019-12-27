@@ -461,7 +461,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		if (serverHost.equals(OSUtils.getHost())) {
 			logger.error("{} server({}) of myself dead , stopping...",
 					zkNodeType.toString(), serverHost);
-			stoppable.stop(String.format(" {} server {} of myself dead , stopping...",
+			stoppable.stop(String.format(" %s server %s of myself dead , stopping...",
 					zkNodeType.toString(), serverHost));
 			return true;
 		}
