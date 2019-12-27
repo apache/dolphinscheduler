@@ -94,6 +94,7 @@
 				<include>**/*.properties</include>
 				<include>**/*.xml</include>
 				<include>**/*.json</include>
+				<include>config/*.*</include>
 			</includes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
@@ -162,7 +163,6 @@
 		<fileSet>
 			<directory>${basedir}/../script</directory>
 			<includes>
-				<include>config/*.*</include>
 				<include>env/*.*</include>
 			</includes>
 			<outputDirectory>./conf</outputDirectory>
