@@ -582,7 +582,7 @@ public class ProcessDefinitionService extends BaseDAGService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file) {
+    public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
         Map<String, Object> result = new HashMap<>(5);
 
         JSONObject json = null;
@@ -642,6 +642,8 @@ public class ProcessDefinitionService extends BaseDAGService {
                 }
 
                 Project project = projectMapper.queryByName(projectName);
+
+                //use currentProjectName to query
                 if(project != null){
                     processDefinitionName = recursionProcessDefinitionName(project.getId(), processDefinitionName, 1);
                 }
@@ -684,7 +686,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                 }
                 jsonObject.put("tasks", jsonArray);
 
-                Map<String, Object> createProcessDefinitionResult = createProcessDefinition(loginUser,projectName,processDefinitionName,jsonObject.toString(),processDefinitionDesc,processDefinitionLocations,processDefinitionConnects);
+                Map<String, Object> createProcessDefinitionResult = createProcessDefinition(loginUser,currentProjectName,processDefinitionName,jsonObject.toString(),processDefinitionDesc,processDefinitionLocations,processDefinitionConnects);
                 Integer processDefinitionId = null;
                 if (ObjectUtils.allNotNull(createProcessDefinitionResult.get("processDefinitionId"))) {
                     processDefinitionId = Integer.parseInt(createProcessDefinitionResult.get("processDefinitionId").toString());
