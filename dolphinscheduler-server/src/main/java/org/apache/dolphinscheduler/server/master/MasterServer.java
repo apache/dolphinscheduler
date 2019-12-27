@@ -23,18 +23,19 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
 import org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.server.quartz.QuartzExecutors;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.PostConstruct;
@@ -56,6 +57,7 @@ public class MasterServer implements IStoppable {
     /**
      *  zk master client
      */
+    @Autowired
     private ZKMasterClient zkMasterClient = null;
 
     /**
@@ -95,8 +97,7 @@ public class MasterServer implements IStoppable {
      * @param args arguments
      */
     public static void main(String[] args) {
-        SpringApplication.run(MasterServer.class, args);
-
+        new SpringApplicationBuilder(MasterServer.class).web(WebApplicationType.NONE).run(args);
     }
 
     /**
@@ -104,10 +105,9 @@ public class MasterServer implements IStoppable {
      */
     @PostConstruct
     public void run(){
+        zkMasterClient.init();
 
         masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
-
-        zkMasterClient = ZKMasterClient.getZKMasterClient(processDao);
 
         heartbeatMasterService = ThreadUtils.newDaemonThreadScheduledExecutor("Master-Main-Thread",Constants.defaulMasterHeartbeatThreadNum);
 

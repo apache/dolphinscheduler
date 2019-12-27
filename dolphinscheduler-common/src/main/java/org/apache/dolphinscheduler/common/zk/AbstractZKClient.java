@@ -47,97 +47,14 @@ import static org.apache.dolphinscheduler.common.Constants.*;
 /**
  * abstract zookeeper client
  */
-public abstract class AbstractZKClient {
+public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractZKClient.class);
-
-	/**
-	 *  load configuration file
-	 */
-	protected static Configuration conf;
-
-	protected  CuratorFramework zkClient = null;
 
 	/**
 	 * server stop or not
 	 */
 	protected IStoppable stoppable = null;
-
-
-	static {
-		try {
-			conf = new PropertiesConfiguration(Constants.ZOOKEEPER_PROPERTIES_PATH);
-		}catch (ConfigurationException e){
-			logger.error("load configuration failed : " + e.getMessage(),e);
-			System.exit(1);
-		}
-	}
-
-
-	public AbstractZKClient() {
-
-		// retry strategy
-		RetryPolicy retryPolicy = new ExponentialBackoffRetry(
-				conf.getInt(Constants.ZOOKEEPER_RETRY_SLEEP),
-				conf.getInt(Constants.ZOOKEEPER_RETRY_MAXTIME));
-
-		try{
-			// crate zookeeper client
-			zkClient = CuratorFrameworkFactory.builder()
-						.connectString(getZookeeperQuorum())
-						.retryPolicy(retryPolicy)
-						.sessionTimeoutMs(1000 * conf.getInt(Constants.ZOOKEEPER_SESSION_TIMEOUT))
-						.connectionTimeoutMs(1000 * conf.getInt(Constants.ZOOKEEPER_CONNECTION_TIMEOUT))
-						.build();
-
-			zkClient.start();
-			initStateLister();
-
-		}catch(Exception e){
-			logger.error("create zookeeper connect failed : " + e.getMessage(),e);
-			System.exit(-1);
-		}
-    }
-
-	/**
-	 *
-	 *  register status monitoring events for zookeeper clients
-	 */
-	public void initStateLister(){
-		if(zkClient == null) {
-			return;
-		}
-		// add ConnectionStateListener monitoring zookeeper  connection state
-		ConnectionStateListener csLister = new ConnectionStateListener() {
-
-			@Override
-			public void stateChanged(CuratorFramework client, ConnectionState newState) {
-				logger.info("state changed , current state : " + newState.name());
-				/**
-				 * probably session expired
-				 */
-				if(newState == ConnectionState.LOST){
-					// if lost , then exit
-					logger.info("current zookeepr connection state : connection lost ");
-				}
-			}
-		};
-
-		zkClient.getConnectionStateListenable().addListener(csLister);
-	}
-
-
-    public void start() {
-    	zkClient.start();
-		logger.info("zookeeper start ...");
-    }
-
-    public void close() {
-		zkClient.getZookeeperClient().close();
-		zkClient.close();
-		logger.info("zookeeper close ...");
-    }
-
 
 	/**
 	 *  heartbeat for zookeeper
@@ -328,18 +245,8 @@ public abstract class AbstractZKClient {
 	 *
 	 * @return zookeeper quorum
 	 */
-	public static String getZookeeperQuorum(){
-		StringBuilder sb = new StringBuilder();
-		String[] zookeeperParamslist = conf.getStringArray(Constants.ZOOKEEPER_QUORUM);
-		for (String param : zookeeperParamslist) {
-			sb.append(param).append(Constants.COMMA);
-		}
-
-		if(sb.length() > 0){
-			sb.deleteCharAt(sb.length() - 1);
-		}
-
-		return sb.toString();
+	public String getZookeeperQuorum(){
+		return getZookeeperConfig().getServerList();
 	}
 
 	/**
@@ -420,7 +327,7 @@ public abstract class AbstractZKClient {
 	 * @return get worker node parent path
 	 */
 	protected String getWorkerZNodeParentPath(){
-		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS);
+		return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_WORKERS;
 	}
 
 	/**
@@ -428,7 +335,7 @@ public abstract class AbstractZKClient {
 	 * @return get master node parent path
 	 */
 	protected String getMasterZNodeParentPath(){
-		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_MASTERS);
+		return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_MASTERS;
 	}
 
 	/**
@@ -436,7 +343,15 @@ public abstract class AbstractZKClient {
 	 * @return get master lock path
 	 */
 	public String getMasterLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS);
+		return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS;
+	}
+
+	/**
+	 *
+	 * @return get master lock path
+	 */
+	public String getWorkerLockPath(){
+		return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS;
 	}
 
 	/**
@@ -464,7 +379,7 @@ public abstract class AbstractZKClient {
 	 * @return get dead server node parent path
 	 */
 	protected String getDeadZNodeParentPath(){
-		return conf.getString(ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS);
+		return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS;
 	}
 
 	/**
@@ -472,7 +387,7 @@ public abstract class AbstractZKClient {
 	 * @return get master start up lock path
 	 */
 	public String getMasterStartUpLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS);
+		return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS;
 	}
 
 	/**
@@ -480,7 +395,7 @@ public abstract class AbstractZKClient {
 	 * @return get master failover lock path
 	 */
 	public String getMasterFailoverLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS);
+		return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS;
 	}
 
 	/**
@@ -488,7 +403,7 @@ public abstract class AbstractZKClient {
 	 * @return get worker failover lock path
 	 */
 	public String getWorkerFailoverLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS);
+		return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS;
 	}
 
 	/**
@@ -546,7 +461,7 @@ public abstract class AbstractZKClient {
 		if (serverHost.equals(OSUtils.getHost())) {
 			logger.error("{} server({}) of myself dead , stopping...",
 					zkNodeType.toString(), serverHost);
-			stoppable.stop(String.format(" {} server {} of myself dead , stopping...",
+			stoppable.stop(String.format(" %s server %s of myself dead , stopping...",
 					zkNodeType.toString(), serverHost));
 			return true;
 		}
