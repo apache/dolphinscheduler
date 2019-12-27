@@ -32,10 +32,8 @@ import static org.junit.Assert.*;
 /**
  * task queue test
  */
+@Ignore
 public class TaskQueueZKImplTest extends BaseTaskQueueTest  {
-
-
-
 
     @Before
     public void before(){
