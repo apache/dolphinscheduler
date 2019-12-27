@@ -19,19 +19,12 @@ package org.apache.dolphinscheduler.server.zk;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
-import org.apache.dolphinscheduler.common.zk.AbstractListener;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
-import org.apache.curator.utils.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ThreadFactory;
 
 
 /**
@@ -61,9 +54,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 		// init system znode
 		this.initSystemZNode();
 
-		// monitor worker
-		this.listenerWorker();
-
 		// register worker
 		this.registWorker();
 	}
@@ -83,31 +73,38 @@ public class ZKWorkerClient extends AbstractZKClient {
 			System.exit(-1);
 		}
 	}
-	
-	/**
-	 *  monitor worker
-	 */
-	private void listenerWorker(){
-		registerListener(getZNodeParentPath(ZKNodeType.WORKER), new AbstractListener() {
-			@Override
-			protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
-				switch (event.getType()) {
-					case NODE_ADDED:
-						logger.info("worker node added : {}", path);
-						break;
-					case NODE_REMOVED:
-						//find myself dead
-						String serverHost = getHostByEventDataPath(path);
-						if(checkServerSelfDead(serverHost, ZKNodeType.WORKER)){
-							return;
-						}
-						break;
-					default:
-						break;
-				}
-			}
-		});
 
+	/**
+	 * handle path events that this class cares about
+	 * @param client   zkClient
+	 * @param event	   path event
+	 * @param path     zk path
+	 */
+	@Override
+	protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
+		if(path.startsWith(getZNodeParentPath(ZKNodeType.WORKER)+Constants.SINGLE_SLASH)){
+			handleWorkerEvent(event,path);
+		}
+	}
+
+	/**
+	 * monitor worker
+	 */
+	public void handleWorkerEvent(TreeCacheEvent event, String path){
+		switch (event.getType()) {
+			case NODE_ADDED:
+				logger.info("worker node added : {}", path);
+				break;
+			case NODE_REMOVED:
+				//find myself dead
+				String serverHost = getHostByEventDataPath(path);
+				if(checkServerSelfDead(serverHost, ZKNodeType.WORKER)){
+					return;
+				}
+				break;
+			default:
+				break;
+		}
 	}
 
 	/**
