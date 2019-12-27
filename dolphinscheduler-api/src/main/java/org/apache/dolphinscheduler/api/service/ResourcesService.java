@@ -210,7 +210,6 @@ public class ResourcesService extends BaseService {
         }
 
         Resource resource = resourcesMapper.selectById(resourceId);
-        String originResourceName = resource.getAlias();
         if (resource == null) {
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
@@ -236,6 +235,7 @@ public class ResourcesService extends BaseService {
         }
 
         //get the file suffix
+        String originResourceName = resource.getAlias();
         String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
 
         //if the name without suffix then add it ,else use the origin name
