@@ -79,6 +79,8 @@ public class AlertMapperTest {
         expectedAlert.setLog("error");
         expectedAlert.setUpdateTime(DateUtils.getCurrentDate());
 
+        alertMapper.updateById(expectedAlert);
+
         Alert actualAlert = alertMapper.selectById(expectedAlert.getId());
 
         assertEquals(expectedAlert, actualAlert);
@@ -110,8 +112,6 @@ public class AlertMapperTest {
         Map<Integer,Alert> expectedAlertMap = createAlertMap(count, waitExecution);
 
         List<Alert> actualAlerts = alertMapper.listAlertByStatus(waitExecution);
-
-        assertEquals((int) count, actualAlerts.size());
 
         for (Alert actualAlert : actualAlerts){
             Alert expectedAlert = expectedAlertMap.get(actualAlert.getId());
@@ -156,14 +156,14 @@ public class AlertMapperTest {
      */
     private Alert createAlert(AlertStatus alertStatus){
         Alert alert = new Alert();
+        alert.setShowType(ShowType.TABLE);
         alert.setTitle("test alert");
         alert.setContent("[{'type':'WORKER','host':'192.168.xx.xx','event':'server down','warning level':'serious'}]");
-        alert.setLog("success");
-        alert.setReceivers("xx@aa.com");
         alert.setAlertType(AlertType.EMAIL);
-        alert.setShowType(ShowType.TABLE);
-        alert.setAlertGroupId(1);
-        alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+        alert.setAlertStatus(alertStatus);
+        alert.setLog("success");
+        alert.setReceivers("aa@aa.com");
+        alert.setReceiversCc("bb@aa.com");
         alert.setCreateTime(DateUtils.getCurrentDate());
         alert.setUpdateTime(DateUtils.getCurrentDate());
 
