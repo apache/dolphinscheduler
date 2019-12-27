@@ -19,7 +19,7 @@
 import Vue from 'vue'
 import { findLocale } from './config'
 import { template } from '@/module/util'
-import cookie from '@/module/util/cookie'
+import cookies from 'js-cookie'
 
 const globalScope = typeof window !== 'undefined' && window.document ? window : global
 
@@ -44,12 +44,12 @@ const $t = (str, data) => {
 const locale = (lang) => {
   // global
   globalScope.LOCALE = lang
-  // cookie
-  cookie.set('language', lang,{ path: '/' })
+  // cookies
+  cookies.set('language', lang,{ path: '/' })
 }
 
 const init = () => {
-  let language = cookie.get('language')
+  let language = cookies.get('language')
   if (language) {
     locale(language)
   }else{

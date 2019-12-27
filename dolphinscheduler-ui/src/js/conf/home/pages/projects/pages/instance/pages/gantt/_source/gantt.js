@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 import _ from 'lodash'
-import $ from 'jquery'
 import * as d3 from 'd3'
 import { formatDate } from '@/module/filter/filter'
 import { tasksState } from '@/conf/home/pages/dag/_source/config'
