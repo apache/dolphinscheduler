@@ -9,15 +9,27 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-sonarqube
+        restore-keys: |
+          ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-sonarqube
+          ${{ runner.os }}-maven-
     - name: pwd
       run: |
         pwd
         ls -al
-        cd ./dolphinscheduler-ui
-    - uses: actions/checkout@master
-    - name: SonarCloud Scan
-      uses: sonarsource/sonarcloud-github-action@master
+    - name: npm install 
+      run: >
+        mvn -X --batch-mode 
+        verify
+        org.sonarsource.scanner.maven:sonar-maven-plugin:sonar 
+        -Dsonar.host.url=https://sonarcloud.io 
+        -Dsonar.organization=8k4b4yu8zj93gjyq 
+        -Dsonar.projectKey=dolphinscheduler
+        -Dsonar.source=./dolphinscheduler-ui
+        -Dsonar.inclusions=**/*.vue
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
