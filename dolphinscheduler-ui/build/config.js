@@ -25,7 +25,7 @@ const isProduction = process.env.NODE_ENV !== 'development'
 const resolve = dir => path.join(__dirname, '..', dir)
 
 const assetsDir = resolve('src')
-const distDir = resolve('target')
+const distDir = resolve('dist')
 const viewDir = resolve('src/view')
 
 
