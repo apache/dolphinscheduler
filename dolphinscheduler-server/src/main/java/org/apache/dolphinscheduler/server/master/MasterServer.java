@@ -152,10 +152,8 @@ public class MasterServer implements IStoppable {
             @Override
             public void run() {
                 if (zkMasterClient.getActiveMasterNum() <= 1) {
-                    for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
-                        zkMasterClient.getAlertDao().sendServerStopedAlert(
-                                1, OSUtils.getHost(), "Master-Server");
-                    }
+                    zkMasterClient.getAlertDao().sendServerStopedAlert(
+                        1, OSUtils.getHost(), "Master-Server");
                 }
                 stop("shutdownhook");
             }
