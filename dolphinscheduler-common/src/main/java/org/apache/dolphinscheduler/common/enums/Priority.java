@@ -17,12 +17,10 @@
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
 /**
  *  define process and task priority
  */
-@Getter
 public enum Priority {
     /**
      * 0 highest priority
@@ -46,4 +44,11 @@ public enum Priority {
     private final int code;
     private final String descp;
 
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
 }
