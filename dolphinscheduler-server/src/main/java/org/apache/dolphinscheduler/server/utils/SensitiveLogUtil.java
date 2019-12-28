@@ -14,35 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.server.utils;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.Constants;
 
 /**
- * resource type
+ *  sensitive log Util
  */
-public enum  ResourceType {
+public class SensitiveLogUtil {
+
     /**
-     * 0 file, 1 udf
+     * @param dataSourcePwd data source password
+     * @return String
      */
-    FILE(0, "file"),
-    UDF(1, "udf");
+    public static String maskDataSourcePwd(String dataSourcePwd){
 
-
-    ResourceType(int code, String descp){
-        this.code = code;
-        this.descp = descp;
+        if (StringUtils.isNotEmpty(dataSourcePwd)) {
+            dataSourcePwd = Constants.PASSWORD_DEFAULT;
+        }
+        return dataSourcePwd;
     }
 
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 }
