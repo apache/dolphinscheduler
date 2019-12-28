@@ -535,6 +535,7 @@
 					<artifactId>maven-source-plugin</artifactId>
 					<version>${maven-source-plugin.version}</version>
 				</plugin>
+
 			</plugins>
 
 		</pluginManagement>
@@ -746,14 +747,6 @@
 					</instrumentation>
 				</configuration>
 			</plugin>
-			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-				    <source>8</source>
-				</configuration>
-			</plugin>
 		</plugins>
 
 	</build>
@@ -769,38 +762,4 @@
 		<module>dolphinscheduler-dist</module>
 	</modules>
 
-	<profiles>
-		<profile>
-		    <id>coverage</id>
-		    <build>
-			<plugins>
-			    <plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.3</version>
-				<executions>
-				    <execution>
-					<id>prepare-agent</id>
-					<goals>
-					    <goal>prepare-agent</goal>
-					</goals>
-				    </execution>
-				    <execution>
-					<id>report</id>
-					<goals>
-					    <goal>report</goal>
-					</goals>
-				    </execution>
-				</executions>
-			    </plugin>
-			</plugins>
-		    </build>
-		</profile>
-		<profile>
-			<id>linux</id>
-			<properties>
-			  <npm>npm</npm>
-    		</properties>
- 		</profile>
-	</profiles>
 </project>
