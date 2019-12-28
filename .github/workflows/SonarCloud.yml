@@ -1,5 +1,5 @@
 name: SonarCloud
-on: [push]
+on: [push, pull_request]
 jobs:
   sonarCloudTrigger:
     name: SonarCloud Trigger
