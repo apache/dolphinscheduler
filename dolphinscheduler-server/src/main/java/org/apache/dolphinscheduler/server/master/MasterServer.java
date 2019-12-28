@@ -117,7 +117,7 @@ public class MasterServer implements IStoppable {
         zkMasterClient.setStoppable(this);
 
         // regular heartbeat
-        // delay 5 seconds, send heartbeat every 30 seconds
+        // delay 5 seconds, send heartbeat every 10 seconds
         heartbeatMasterService.
                 scheduleAtFixedRate(heartBeatThread, 5, masterConfig.getMasterHeartbeatInterval(), TimeUnit.SECONDS);
 
