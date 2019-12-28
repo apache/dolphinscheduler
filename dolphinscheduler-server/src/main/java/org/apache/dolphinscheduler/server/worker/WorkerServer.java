@@ -290,22 +290,20 @@ public class WorkerServer implements IStoppable {
         Runnable killProcessThread  = new Runnable() {
             @Override
             public void run() {
-                Set<String> taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                 while (Stopper.isRunning()){
-                    try {
-                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                    } catch (InterruptedException e) {
-                        logger.error("interrupted exception",e);
-                    }
-                    // if set is null , return
+                    Set<String> taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                     if (CollectionUtils.isNotEmpty(taskInfoSet)){
                         for (String taskInfo : taskInfoSet){
                             killTask(taskInfo, processDao);
                             removeKillInfoFromQueue(taskInfo);
                         }
                     }
-
-                    taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
+                    try {
+                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    } catch (InterruptedException e) {
+                        logger.error("interrupted exception",e);
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         };
