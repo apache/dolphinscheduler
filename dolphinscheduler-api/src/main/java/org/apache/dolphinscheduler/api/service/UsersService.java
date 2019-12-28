@@ -221,8 +221,6 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        Date now = new Date();
-
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)){
@@ -259,9 +257,10 @@ public class UsersService extends BaseService {
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,phone);
                 return result;
             }
+            user.setPhone(phone);
         }
-        user.setPhone(phone);
         user.setQueue(queue);
+        Date now = new Date();
         user.setUpdateTime(now);
 
         //if user switches the tenant, the user's resources need to be copied to the new tenant
