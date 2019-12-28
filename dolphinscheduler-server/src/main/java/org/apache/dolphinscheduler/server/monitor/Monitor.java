@@ -14,22 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.zk;
+package org.apache.dolphinscheduler.server.monitor;
 
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
-import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+/**
+ * server monitor and auto restart server
+ */
+public interface Monitor {
 
-public abstract class AbstractListener implements TreeCacheListener {
-
-    @Override
-    public final void childEvent(final CuratorFramework client, final TreeCacheEvent event) throws Exception {
-        String path = null == event.getData() ? "" : event.getData().getPath();
-        if (path.isEmpty()) {
-            return;
-        }
-        dataChanged(client, event, path);
-    }
-
-    protected abstract void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path);
+    /**
+     * monitor server and restart
+     */
+    void monitor(String masterPath, String workerPath, Integer port, String installPath);
 }

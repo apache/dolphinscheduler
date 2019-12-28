@@ -18,13 +18,11 @@ package org.apache.dolphinscheduler.common.enums;
 
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
 /**
  * running status for workflow and task nodes
  *
  */
-@Getter
 public enum ExecutionStatus {
 
     /**
@@ -123,5 +121,11 @@ public enum ExecutionStatus {
         return this == KILL || this == STOP ;
     }
 
+    public int getCode() {
+        return code;
+    }
 
+    public String getDescp() {
+        return descp;
+    }
 }

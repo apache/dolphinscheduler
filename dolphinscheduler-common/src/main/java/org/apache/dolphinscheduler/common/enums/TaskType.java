@@ -17,12 +17,10 @@
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
 /**
  * task node type
  */
-@Getter
 public enum TaskType {
     /**
      * 0 SHELL
@@ -61,4 +59,11 @@ public enum TaskType {
         return !(taskType == TaskType.SUB_PROCESS || taskType == TaskType.DEPENDENT);
     }
 
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
 }

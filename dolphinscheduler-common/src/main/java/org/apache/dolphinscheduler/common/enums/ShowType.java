@@ -17,12 +17,10 @@
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
 /**
  * show type for email
  */
-@Getter
 public enum ShowType {
     /**
      * 0 TABLE;
@@ -44,4 +42,12 @@ public enum ShowType {
     @EnumValue
     private final int code;
     private final String descp;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
 }

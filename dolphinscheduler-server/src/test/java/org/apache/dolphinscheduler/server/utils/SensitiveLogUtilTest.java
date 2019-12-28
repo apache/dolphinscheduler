@@ -16,25 +16,22 @@
  */
 package org.apache.dolphinscheduler.server.utils;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
+
+import org.apache.dolphinscheduler.common.Constants;
+import org.junit.Assert;
+import org.junit.Test;
 
 
-@Component
-public class SpringApplicationContext implements ApplicationContextAware {
+public class SensitiveLogUtilTest {
 
-    private static ApplicationContext applicationContext;
+    @Test
+    public void testMaskDataSourcePwd() {
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        SpringApplicationContext.applicationContext = applicationContext;
+        String password = "123456";
+        String emptyPassword = "";
+
+        Assert.assertEquals(Constants.PASSWORD_DEFAULT, SensitiveLogUtil.maskDataSourcePwd(password));
+        Assert.assertEquals("", SensitiveLogUtil.maskDataSourcePwd(emptyPassword));
+
     }
-
-    public static <T> T getBean(Class<T> requiredType){
-        return applicationContext.getBean(requiredType);
-    }
-
-
 }

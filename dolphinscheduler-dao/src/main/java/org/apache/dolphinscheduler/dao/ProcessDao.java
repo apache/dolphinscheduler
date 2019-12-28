@@ -105,7 +105,8 @@ public class ProcessDao {
     /**
      * task queue impl
      */
-    protected ITaskQueue taskQueue = TaskQueueFactory.getTaskQueueInstance();
+    @Autowired
+    private ITaskQueue taskQueue;
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      * @param logger logger

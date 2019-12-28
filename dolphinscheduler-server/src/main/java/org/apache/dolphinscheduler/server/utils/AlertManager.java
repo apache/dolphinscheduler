@@ -90,15 +90,15 @@ public class AlertManager {
      * process instance format
      */
     private static final String PROCESS_INSTANCE_FORMAT =
-            "\"Id:%d\"," +
-            "\"Name:%s\"," +
-            "\"Job type: %s\"," +
-            "\"State: %s\"," +
-            "\"Recovery:%s\"," +
-            "\"Run time: %d\"," +
-            "\"Start time: %s\"," +
-            "\"End time: %s\"," +
-            "\"Host: %s\"" ;
+            "\"id:%d\"," +
+            "\"name:%s\"," +
+            "\"job type: %s\"," +
+            "\"state: %s\"," +
+            "\"recovery:%s\"," +
+            "\"run time: %d\"," +
+            "\"start time: %s\"," +
+            "\"end time: %s\"," +
+            "\"host: %s\"" ;
 
     /**
      * get process instance content
@@ -234,7 +234,7 @@ public class AlertManager {
 
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().typeIsSuccess() ? "success" :"failed";
-        alert.setTitle(cmdName + success);
+        alert.setTitle(cmdName + " " + success);
         ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
         alert.setShowType(showType);
         String content = getContentProcessInstance(processInstance, taskInstances);

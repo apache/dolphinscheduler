@@ -29,12 +29,12 @@ import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.FetchTaskThread;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
@@ -290,22 +290,20 @@ public class WorkerServer implements IStoppable {
         Runnable killProcessThread  = new Runnable() {
             @Override
             public void run() {
-                Set<String> taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                 while (Stopper.isRunning()){
-                    try {
-                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                    } catch (InterruptedException e) {
-                        logger.error("interrupted exception",e);
-                    }
-                    // if set is null , return
+                    Set<String> taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                     if (CollectionUtils.isNotEmpty(taskInfoSet)){
                         for (String taskInfo : taskInfoSet){
                             killTask(taskInfo, processDao);
                             removeKillInfoFromQueue(taskInfo);
                         }
                     }
-
-                    taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
+                    try {
+                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    } catch (InterruptedException e) {
+                        logger.error("interrupted exception",e);
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         };
