@@ -57,11 +57,13 @@ public class ZookeeperOperator implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         this.zkClient = buildClient();
         initStateLister();
-        //init();
+        registerListener();
     }
 
-    //for subclass
-    //protected void init(){}
+    /**
+     * this method is for sub class,
+     */
+    protected void registerListener(){}
 
     public void initStateLister() {
         checkNotNull(zkClient);
