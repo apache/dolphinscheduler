@@ -221,9 +221,13 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        Date now = new Date();
-
         if (StringUtils.isNotEmpty(userName)) {
+
+            if (!CheckUtils.checkUserName(userName)){
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,userName);
+                return result;
+            }
+
             User tempUser = userMapper.queryByUserNameAccurately(userName);
             if (tempUser != null && tempUser.getId() != userId) {
                 putMsg(result, Status.USER_NAME_EXIST);
@@ -233,14 +237,30 @@ public class UsersService extends BaseService {
         }
 
         if (StringUtils.isNotEmpty(userPassword)) {
+            if (!CheckUtils.checkPassword(userPassword)){
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,userPassword);
+                return result;
+            }
             user.setUserPassword(EncryptionUtils.getMd5(userPassword));
         }
 
         if (StringUtils.isNotEmpty(email)) {
+            if (!CheckUtils.checkEmail(email)){
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,email);
+                return result;
+            }
             user.setEmail(email);
         }
+
+        if (StringUtils.isNotEmpty(phone)) {
+            if (!CheckUtils.checkPhone(phone)){
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,phone);
+                return result;
+            }
+            user.setPhone(phone);
+        }
         user.setQueue(queue);
-        user.setPhone(phone);
+        Date now = new Date();
         user.setUpdateTime(now);
 
         //if user switches the tenant, the user's resources need to be copied to the new tenant
@@ -318,10 +338,15 @@ public class UsersService extends BaseService {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM, id);
+            return result;
+        }
+        //check exist
+        User tempUser = userMapper.selectById(id);
+        if (tempUser == null) {
             putMsg(result, Status.USER_NOT_EXIST, id);
             return result;
         }
-
         // delete user
         User user = userMapper.queryTenantCodeByUserId(id);
 
@@ -357,6 +382,12 @@ public class UsersService extends BaseService {
             return result;
         }
 
+        //check exist
+        User tempUser = userMapper.selectById(userId);
+        if (tempUser == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
         //if the selected projectIds are empty, delete all items associated with the user
         projectUserMapper.deleteProjectRelation(0, userId);
 
@@ -443,6 +474,11 @@ public class UsersService extends BaseService {
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
+        User user = userMapper.selectById(userId);
+        if(user == null){
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
 
         udfUserMapper.deleteByUserId(userId);
 
@@ -483,6 +519,11 @@ public class UsersService extends BaseService {
 
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
+        User user = userMapper.selectById(userId);
+        if(user == null){
+            putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
 

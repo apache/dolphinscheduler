@@ -257,8 +257,8 @@
       _rtParam () {
         return {
           taskInstId: this.stateId || this.logId,
-          skipLineNum: parseInt(`${this.loadingIndex ? this.loadingIndex + '0000' : 0}`),
-          limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 1 : 1}0000`)
+          skipLineNum: parseInt(`${this.loadingIndex ? this.loadingIndex + '000' : 0}`),
+          limit: parseInt(`${this.loadingIndex ? this.loadingIndex + 1 : 1}000`)
         }
       }
     },
@@ -316,7 +316,7 @@
           }
           .refresh-log {
             >i {
-              font-size: 24px;
+              font-size: 20px;
               vertical-align: middle;
               transform: scale(1);
             }
@@ -353,7 +353,7 @@
             font-weight: bold;
             resize:none;
             line-height: 1.6;
-            padding: 6px;
+            padding: 0px;
           }
         }
       }

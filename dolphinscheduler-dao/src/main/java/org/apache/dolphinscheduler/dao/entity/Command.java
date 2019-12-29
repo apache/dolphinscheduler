@@ -28,7 +28,6 @@ import java.util.Date;
 /**
  * command
  */
-@Data
 @TableName("t_ds_command")
 public class Command {
 
@@ -263,6 +262,79 @@ public class Command {
 
     public void setWorkerGroupId(int workerGroupId) {
         this.workerGroupId = workerGroupId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Command command = (Command) o;
+
+        if (id != command.id) {
+            return false;
+        }
+        if (processDefinitionId != command.processDefinitionId) {
+            return false;
+        }
+        if (executorId != command.executorId) {
+            return false;
+        }
+        if (workerGroupId != command.workerGroupId) {
+            return false;
+        }
+        if (commandType != command.commandType) {
+            return false;
+        }
+        if (commandParam != null ? !commandParam.equals(command.commandParam) : command.commandParam != null) {
+            return false;
+        }
+        if (taskDependType != command.taskDependType) {
+            return false;
+        }
+        if (failureStrategy != command.failureStrategy) {
+            return false;
+        }
+        if (warningType != command.warningType) {
+            return false;
+        }
+        if (warningGroupId != null ? !warningGroupId.equals(command.warningGroupId) : command.warningGroupId != null) {
+            return false;
+        }
+        if (scheduleTime != null ? !scheduleTime.equals(command.scheduleTime) : command.scheduleTime != null) {
+            return false;
+        }
+        if (startTime != null ? !startTime.equals(command.startTime) : command.startTime != null) {
+            return false;
+        }
+        if (processInstancePriority != command.processInstancePriority) {
+            return false;
+        }
+        return !(updateTime != null ? !updateTime.equals(command.updateTime) : command.updateTime != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + (commandType != null ? commandType.hashCode() : 0);
+        result = 31 * result + processDefinitionId;
+        result = 31 * result + executorId;
+        result = 31 * result + (commandParam != null ? commandParam.hashCode() : 0);
+        result = 31 * result + (taskDependType != null ? taskDependType.hashCode() : 0);
+        result = 31 * result + (failureStrategy != null ? failureStrategy.hashCode() : 0);
+        result = 31 * result + (warningType != null ? warningType.hashCode() : 0);
+        result = 31 * result + (warningGroupId != null ? warningGroupId.hashCode() : 0);
+        result = 31 * result + (scheduleTime != null ? scheduleTime.hashCode() : 0);
+        result = 31 * result + (startTime != null ? startTime.hashCode() : 0);
+        result = 31 * result + (processInstancePriority != null ? processInstancePriority.hashCode() : 0);
+        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        result = 31 * result + workerGroupId;
+        return result;
     }
 
     @Override
