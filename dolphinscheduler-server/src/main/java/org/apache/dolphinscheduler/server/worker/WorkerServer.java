@@ -177,9 +177,7 @@ public class WorkerServer implements IStoppable {
             public void run() {
                 // worker server exit alert
                 if (zkWorkerClient.getActiveMasterNum() <= 1) {
-                    for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
-                        alertDao.sendServerStopedAlert(1, OSUtils.getHost(), "Worker-Server");
-                    }
+                    alertDao.sendServerStopedAlert(1, OSUtils.getHost(), "Worker-Server");
                 }
                 stop("shutdownhook");
             }
