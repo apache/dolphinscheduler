@@ -469,8 +469,8 @@ sh ${workDir}/script/stop-all.sh
 
 # 4,delete zk node
 echo "4,delete zk node"
-sleep 1
-python ${workDir}/script/del-zk-node.py $zkQuorum $zkRoot
+
+sh ${workDir}/script/remove-zk-node.sh $zkRoot
 
 # 5,scp resources
 echo "5,scp resources"
@@ -486,28 +486,3 @@ fi
 # 6,startup
 echo "6,startup"
 sh ${workDir}/script/start-all.sh
-
-# 7,start monitoring self-starting script
-monitor_pid=${workDir}/monitor_server.pid
-if [ "true" = $monitorServerState ];then
-        if [ -f $monitor_pid ]; then
-                TARGET_PID=`cat $monitor_pid`
-                if kill -0 $TARGET_PID > /dev/null 2>&1; then
-                        echo "monitor server running as process ${TARGET_PID}.Stopping"
-                        kill $TARGET_PID
-                        sleep 5
-                        if kill -0 $TARGET_PID > /dev/null 2>&1; then
-                                echo "monitor server did not stop gracefully after 5 seconds: killing with kill -9"
-                                kill -9 $TARGET_PID
-                        fi
-                else
-                        echo "no monitor server to stop"
-                fi
-                echo "monitor server running as process ${TARGET_PID}.Stopped success"
-                rm -f $monitor_pid
-        fi
-        nohup python -u ${workDir}/script/monitor-server.py $installPath $zkQuorum $zkMasters $zkWorkers > ${workDir}/monitor-server.log 2>&1 &
-        echo $! > $monitor_pid
-        echo "start monitor server success as process `cat $monitor_pid`"
-
-fi
