@@ -24,6 +24,7 @@ jobs:
           org.jacoco:jacoco-maven-plugin:prepare-agent
           verify
           org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dmaven.test.skip=true
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.organization=apache
           -Dsonar.projectKey=apache-dolphinscheduler
