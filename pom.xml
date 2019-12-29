@@ -676,6 +676,7 @@
 						<include>**/dao/mapper/AlertGroupMapperTest.java</include>
 						<include>**/dao/mapper/AlertMapperTest.java</include>
 						<include>**/dao/mapper/CommandMapperTest.java</include>
+						<include>**/dao/mapper/ConnectionFactoryTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
