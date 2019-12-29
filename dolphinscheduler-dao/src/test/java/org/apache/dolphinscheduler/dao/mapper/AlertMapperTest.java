@@ -35,6 +35,9 @@ import java.util.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+/**
+ *  alert mapper test
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
