@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-import $ from 'jquery'
 import * as d3 from 'd3'
 import { rtInstancesTooltip, rtCountMethod } from './util'
 import { tasksType, tasksState } from '@/conf/home/pages/dag/_source/config'
