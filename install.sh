@@ -218,30 +218,6 @@ keytabPath="$installPath/conf/hdfs.headless.keytab"
 # zk root directory
 zkRoot="/dolphinscheduler"
 
-# used to record the zk directory of the hanging machine
-zkDeadServers="$zkRoot/dead-servers"
-
-# masters directory
-zkMasters="$zkRoot/masters"
-
-# workers directory
-zkWorkers="$zkRoot/workers"
-
-# zk master distributed lock
-mastersLock="$zkRoot/lock/masters"
-
-# zk worker distributed lock
-workersLock="$zkRoot/lock/workers"
-
-# zk master fault-tolerant distributed lock
-mastersFailover="$zkRoot/lock/failover/masters"
-
-# zk worker fault-tolerant distributed lock
-workersFailover="$zkRoot/lock/failover/workers"
-
-# zk master start fault tolerant distributed lock
-mastersStartupFailover="$zkRoot/lock/failover/startup-masters"
-
 # zk session timeout
 zkSessionTimeout="300"
 
@@ -321,11 +297,10 @@ apiMaxHttpPostSize="5000000"
 # 1,replace file
 echo "1,replace file"
 if [ $dbtype == "mysql" ];then
-    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application-dao.properties
-    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application-dao.properties
-    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application-dao.properties
-    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=com.mysql.jdbc.Driver#g" conf/application-dao.properties
-
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=com.mysql.jdbc.Driver#g" conf/application.properties
 
     sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:mysql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
     sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties
@@ -335,10 +310,10 @@ if [ $dbtype == "mysql" ];then
 fi
 
 if [ $dbtype == "postgresql" ];then
-    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application-dao.properties
-    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application-dao.properties
-    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application-dao.properties
-    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=org.postgresql.Driver#g" conf/application-dao.properties
+    sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/application.properties
+    sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=org.postgresql.Driver#g" conf/application.properties
 
     sed -i ${txt} "s#org.quartz.dataSource.myDs.URL.*#org.quartz.dataSource.myDs.URL=jdbc:postgresql://${dbhost}/${dbname}?characterEncoding=UTF-8#g" conf/quartz.properties
     sed -i ${txt} "s#org.quartz.dataSource.myDs.user.*#org.quartz.dataSource.myDs.user=${username}#g" conf/quartz.properties
@@ -349,46 +324,34 @@ fi
 
 
 
-sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common/hadoop/hadoop.properties
-sed -i ${txt} "s#fs.s3a.endpoint.*#fs.s3a.endpoint=${s3Endpoint}#g" conf/common/hadoop/hadoop.properties
-sed -i ${txt} "s#fs.s3a.access.key.*#fs.s3a.access.key=${s3AccessKey}#g" conf/common/hadoop/hadoop.properties
-sed -i ${txt} "s#fs.s3a.secret.key.*#fs.s3a.secret.key=${s3SecretKey}#g" conf/common/hadoop/hadoop.properties
-sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common/hadoop/hadoop.properties
-sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common/hadoop/hadoop.properties
+sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common.properties
+sed -i ${txt} "s#fs.s3a.endpoint.*#fs.s3a.endpoint=${s3Endpoint}#g" conf/common.properties
+sed -i ${txt} "s#fs.s3a.access.key.*#fs.s3a.access.key=${s3AccessKey}#g" conf/common.properties
+sed -i ${txt} "s#fs.s3a.secret.key.*#fs.s3a.secret.key=${s3SecretKey}#g" conf/common.properties
+sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common.properties
+sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common.properties
 
 
-sed -i ${txt} "s#data.basedir.path.*#data.basedir.path=${programPath}#g" conf/common/common.properties
-sed -i ${txt} "s#data.download.basedir.path.*#data.download.basedir.path=${downloadPath}#g" conf/common/common.properties
-sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" conf/common/common.properties
-sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common/common.properties
-sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common/common.properties
-sed -i ${txt} "s#res.upload.startup.type.*#res.upload.startup.type=${resUploadStartupType}#g" conf/common/common.properties
-sed -i ${txt} "s#dolphinscheduler.env.path.*#dolphinscheduler.env.path=${shellEnvPath}#g" conf/common/common.properties
-sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common/common.properties
-sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common/common.properties
-sed -i ${txt} "s#hadoop.security.authentication.startup.state.*#hadoop.security.authentication.startup.state=${kerberosStartUp}#g" conf/common/common.properties
-sed -i ${txt} "s#java.security.krb5.conf.path.*#java.security.krb5.conf.path=${krb5ConfPath}#g" conf/common/common.properties
-sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keytabUserName}#g" conf/common/common.properties
-sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common/common.properties
+sed -i ${txt} "s#data.basedir.path.*#data.basedir.path=${programPath}#g" conf/common.properties
+sed -i ${txt} "s#data.download.basedir.path.*#data.download.basedir.path=${downloadPath}#g" conf/common.properties
+sed -i ${txt} "s#process.exec.basepath.*#process.exec.basepath=${execPath}#g" conf/common.properties
+sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common.properties
+sed -i ${txt} "s#data.store2hdfs.basepath.*#data.store2hdfs.basepath=${hdfsPath}#g" conf/common.properties
+sed -i ${txt} "s#res.upload.startup.type.*#res.upload.startup.type=${resUploadStartupType}#g" conf/common.properties
+sed -i ${txt} "s#dolphinscheduler.env.path.*#dolphinscheduler.env.path=${shellEnvPath}#g" conf/common.properties
+sed -i ${txt} "s#resource.view.suffixs.*#resource.view.suffixs=${resSuffixs}#g" conf/common.properties
+sed -i ${txt} "s#development.state.*#development.state=${devState}#g" conf/common.properties
+sed -i ${txt} "s#hadoop.security.authentication.startup.state.*#hadoop.security.authentication.startup.state=${kerberosStartUp}#g" conf/common.properties
+sed -i ${txt} "s#java.security.krb5.conf.path.*#java.security.krb5.conf.path=${krb5ConfPath}#g" conf/common.properties
+sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keytabUserName}#g" conf/common.properties
+sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common.properties
 
-sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.dolphinscheduler.root.*#zookeeper.dolphinscheduler.root=${zkRoot}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.dolphinscheduler.dead.servers.*#zookeeper.dolphinscheduler.dead.servers=${zkDeadServers}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.dolphinscheduler.masters.*#zookeeper.dolphinscheduler.masters=${zkMasters}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.dolphinscheduler.workers.*#zookeeper.dolphinscheduler.workers=${zkWorkers}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.masters.*#zookeeper.dolphinscheduler.lock.masters=${mastersLock}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.workers.*#zookeeper.dolphinscheduler.lock.workers=${workersLock}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.failover.masters.*#zookeeper.dolphinscheduler.lock.failover.masters=${mastersFailover}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.failover.workers.*#zookeeper.dolphinscheduler.lock.failover.workers=${workersFailover}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.dolphinscheduler.lock.failover.startup.masters.*#zookeeper.dolphinscheduler.lock.failover.startup.masters=${mastersStartupFailover}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/zookeeper.properties
-sed -i ${txt} "s#zookeeper.retry.maxtime.*#zookeeper.retry.maxtime=${zkRetryMaxtime}#g" conf/zookeeper.properties
-
-sed -i ${txt} "s#server.port.*#server.port=${masterPort}#g" conf/application-master.properties
-sed -i ${txt} "s#server.port.*#server.port=${workerPort}#g" conf/application-worker.properties
-
+sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/common.properties
+sed -i ${txt} "s#zookeeper.dolphinscheduler.root.*#zookeeper.dolphinscheduler.root=${zkRoot}#g" conf/common.properties
+sed -i ${txt} "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/common.properties
+sed -i ${txt} "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/common.properties
+sed -i ${txt} "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/common.properties
+sed -i ${txt} "s#zookeeper.retry.maxtime.*#zookeeper.retry.maxtime=${zkRetryMaxtime}#g" conf/common.properties
 
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
 sed -i ${txt} "s#server.servlet.session.timeout.*#server.servlet.session.timeout=${apiServerSessionTimeout}#g" conf/application-api.properties
