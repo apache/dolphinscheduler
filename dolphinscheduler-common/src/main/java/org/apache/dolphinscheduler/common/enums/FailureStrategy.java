@@ -17,12 +17,10 @@
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
 /**
  * failure policy when some task node failed.
  */
-@Getter
 public enum FailureStrategy {
 
   /**
@@ -40,4 +38,12 @@ public enum FailureStrategy {
   @EnumValue
   private final int code;
   private final String descp;
+
+  public int getCode() {
+    return code;
+  }
+
+  public String getDescp() {
+    return descp;
+  }
 }

@@ -57,11 +57,13 @@ public class ZookeeperOperator implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         this.zkClient = buildClient();
         initStateLister();
-        //init();
+        registerListener();
     }
 
-    //for subclass
-    //protected void init(){}
+    /**
+     * this method is for sub class,
+     */
+    protected void registerListener(){}
 
     public void initStateLister() {
         checkNotNull(zkClient);
@@ -127,9 +129,6 @@ public class ZookeeperOperator implements InitializingBean {
         List<String> values;
         try {
             values = zkClient.getChildren().forPath(key);
-            if (CollectionUtils.isEmpty(values)) {
-                logger.warn("getChildrenKeys key : {} is empty", key);
-            }
             return values;
         } catch (InterruptedException ex) {
             logger.error("getChildrenKeys key : {} InterruptedException", key);

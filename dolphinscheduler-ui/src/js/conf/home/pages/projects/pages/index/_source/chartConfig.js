@@ -27,7 +27,7 @@ let pie = {
       avoidLabelOverlap: true, // Whether to prevent the label overlap policy
       hoverAnimation: true, // Whether to enable hover to enlarge the animation on the sector.
       radius: ['30%', '60%'],
-      center: ['50%', '50%'],
+      center: ['53%', '60%'],
       label: {
         align: 'left',
         normal: {
