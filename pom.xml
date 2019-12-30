@@ -675,6 +675,7 @@
 						<include>**/api/service/WorkerGroupServiceTest.java</include>
 						<include>**/api/service/AlertGroupServiceTest.java</include>
 						<include>**/api/service/ProjectServiceTest.java</include>
+						<include>**/api/service/UdfFuncServiceTest.java</include>
 						<include>**/alert/utils/ExcelUtilsTest.java</include>
 						<include>**/alert/utils/FuncUtilsTest.java</include>
 						<include>**/alert/utils/JSONUtilsTest.java</include>
