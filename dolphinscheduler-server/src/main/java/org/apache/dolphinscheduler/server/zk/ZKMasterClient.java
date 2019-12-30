@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.zk.AbstractListener;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
@@ -31,9 +30,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.utils.ThreadUtils;
 import org.slf4j.Logger;
@@ -101,12 +97,6 @@ public class ZKMasterClient extends AbstractZKClient {
 			// init system znode
 			this.initSystemZNode();
 
-			// monitor master
-			this.listenerMaster();
-
-			// monitor worker
-			this.listenerWorker();
-
 			// register master
 			this.registerMaster();
 
@@ -158,31 +148,22 @@ public class ZKMasterClient extends AbstractZKClient {
 		}
 	}
 
-
 	/**
-	 *  monitor master
+	 * handle path events that this class cares about
+	 * @param client   zkClient
+	 * @param event	   path event
+	 * @param path     zk path
 	 */
-	public void listenerMaster(){
-		registerListener(getZNodeParentPath(ZKNodeType.MASTER), new AbstractListener() {
-			@Override
-			protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
-				switch (event.getType()) {
-					case NODE_ADDED:
-						logger.info("master node added : {}", path);
-						break;
-					case NODE_REMOVED:
-						String serverHost = getHostByEventDataPath(path);
-						if (checkServerSelfDead(serverHost, ZKNodeType.MASTER)) {
-							return;
-						}
-						removeZKNodePath(path, ZKNodeType.MASTER, true);
-						break;
-					default:
-						break;
-				}
-			}
-		});
-}
+	@Override
+	protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
+		if(path.startsWith(getZNodeParentPath(ZKNodeType.MASTER)+Constants.SINGLE_SLASH)){  //monitor master
+			handleMasterEvent(event,path);
+
+		}else if(path.startsWith(getZNodeParentPath(ZKNodeType.WORKER)+Constants.SINGLE_SLASH)){  //monitor worker
+			handleWorkerEvent(event,path);
+		}
+		//other path event, ignore
+	}
 
 	/**
 	 * remove zookeeper node path
@@ -266,32 +247,45 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	private void alertServerDown(String serverHost, ZKNodeType zkNodeType) {
 
-	    String serverType = zkNodeType.toString();
-		for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
-			alertDao.sendServerStopedAlert(1, serverHost, serverType);
+		String serverType = zkNodeType.toString();
+		alertDao.sendServerStopedAlert(1, serverHost, serverType);
+	}
+
+	/**
+	 * monitor master
+	 */
+	public void handleMasterEvent(TreeCacheEvent event, String path){
+		switch (event.getType()) {
+			case NODE_ADDED:
+				logger.info("master node added : {}", path);
+				break;
+			case NODE_REMOVED:
+				String serverHost = getHostByEventDataPath(path);
+				if (checkServerSelfDead(serverHost, ZKNodeType.MASTER)) {
+					return;
+				}
+				removeZKNodePath(path, ZKNodeType.MASTER, true);
+				break;
+			default:
+				break;
 		}
 	}
 
 	/**
 	 * monitor worker
 	 */
-	public void listenerWorker(){
-		registerListener(getZNodeParentPath(ZKNodeType.WORKER), new AbstractListener() {
-			@Override
-			protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
-				switch (event.getType()) {
-					case NODE_ADDED:
-						logger.info("worker node added : {}", path);
-						break;
-					case NODE_REMOVED:
-						logger.info("worker node deleted : {}", path);
-						removeZKNodePath(path, ZKNodeType.WORKER, true);
-						break;
-					default:
-						break;
-				}
-			}
-		});
+	public void handleWorkerEvent(TreeCacheEvent event, String path){
+		switch (event.getType()) {
+			case NODE_ADDED:
+				logger.info("worker node added : {}", path);
+				break;
+			case NODE_REMOVED:
+				logger.info("worker node deleted : {}", path);
+				removeZKNodePath(path, ZKNodeType.WORKER, true);
+				break;
+			default:
+				break;
+		}
 	}
 
 
