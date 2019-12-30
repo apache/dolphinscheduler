@@ -41,13 +41,43 @@ public class SchemaUtils {
 	private static Pattern p = Pattern.compile("\\s*|\t|\r|\n");
 
 	/**
+	 * get current create schema
+	 * @return current create schema
+	 */
+	public static String getCurrentCreateSchema() {
+		// Gets a list of all creates
+		List<String> schemaList = SchemaUtils.getAllCreateSchemaList();
+		if(CollectionUtils.isEmpty(schemaList)){
+			return null;
+		}
+		return schemaList.get(schemaList.size()-1);
+	}
+
+	/**
+	 * Gets creatable schemas for all create directories
+	 * @return all create schema list
+	 */
+	public static List<String> getAllCreateSchemaList() {
+		return getAllSchemaList("sql/create");
+	}
+
+	/**
 	 * Gets upgradable schemas for all upgrade directories
+	 * @return all upgrade schema list
+	 */
+	public static List<String> getAllUpgradeSchemaList() {
+		return getAllSchemaList("sql/upgrade");
+	}
+
+	/**
+	 * Gets all schemas for all directories
+	 * @param parentDir parent dir
 	 * @return all schema list
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<String> getAllSchemaList() {
+	public static List<String> getAllSchemaList(String parentDir) {
 		List<String> schemaDirList = new ArrayList<>();
-		File[] schemaDirArr = FileUtils.getAllDir("sql/upgrade");
+		File[] schemaDirArr = FileUtils.getAllDir(parentDir);
 		if(schemaDirArr == null || schemaDirArr.length == 0) {
 			return null;
 		}

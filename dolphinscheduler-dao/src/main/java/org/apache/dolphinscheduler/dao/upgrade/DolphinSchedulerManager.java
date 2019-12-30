@@ -88,7 +88,7 @@ public class DolphinSchedulerManager {
     public void upgradeDolphinScheduler() throws Exception{
 
         // Gets a list of all upgrades
-        List<String> schemaList = SchemaUtils.getAllSchemaList();
+        List<String> schemaList = SchemaUtils.getAllUpgradeSchemaList();
         if(schemaList == null || schemaList.size() == 0) {
             logger.info("There is no schema to upgrade!");
         }else {

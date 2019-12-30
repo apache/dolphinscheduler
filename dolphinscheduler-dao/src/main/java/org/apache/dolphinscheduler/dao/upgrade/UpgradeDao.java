@@ -17,14 +17,13 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
 import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,11 +96,11 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         if (dbType != null) {
             switch (dbType) {
                 case MYSQL:
-                    initSqlPath = "/sql/create/release-1.0.0_schema/mysql/";
+                    initSqlPath = MessageFormat.format("/sql/create/{0}/mysql/",SchemaUtils.getCurrentCreateSchema());
                     initSchema(initSqlPath);
                     break;
                 case POSTGRESQL:
-                    initSqlPath = "/sql/create/release-1.2.0_schema/postgresql/";
+                    initSqlPath = MessageFormat.format("/sql/create/{0}/postgresql/",SchemaUtils.getCurrentCreateSchema());
                     initSchema(initSqlPath);
                     break;
                 default:
