@@ -86,20 +86,24 @@ public class EnterpriseWeChatUtils {
         String resp;
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(enterpriseWeChatTokenUrlReplace);
-        CloseableHttpResponse response = httpClient.execute(httpGet);
         try {
-            HttpEntity entity = response.getEntity();
-            resp = EntityUtils.toString(entity, Constants.UTF_8);
-            EntityUtils.consume(entity);
-        } finally {
-            response.close();
-        }
+            HttpGet httpGet = new HttpGet(enterpriseWeChatTokenUrlReplace);
+            CloseableHttpResponse response = httpClient.execute(httpGet);
+            try {
+                HttpEntity entity = response.getEntity();
+                resp = EntityUtils.toString(entity, Constants.UTF_8);
+                EntityUtils.consume(entity);
+            } finally {
+                response.close();
+            }
 
-        Map<String, Object> map = JSON.parseObject(resp,
-                new TypeToken<Map<String, Object>>() {
-                }.getType());
-        return map.get("access_token").toString();
+            Map<String, Object> map = JSON.parseObject(resp,
+                    new TypeToken<Map<String, Object>>() {
+                    }.getType());
+            return map.get("access_token").toString();
+        } finally {
+            httpClient.close();
+        }
     }
 
     /**
@@ -167,20 +171,25 @@ public class EnterpriseWeChatUtils {
     public static String sendEnterpriseWeChat(String charset, String data, String token) throws IOException {
         String enterpriseWeChatPushUrlReplace = enterpriseWeChatPushUrl.replaceAll("\\$token", token);
 
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(enterpriseWeChatPushUrlReplace);
-        httpPost.setEntity(new StringEntity(data, charset));
-        CloseableHttpResponse response = httpclient.execute(httpPost);
-        String resp;
+        CloseableHttpClient httpClient = HttpClients.createDefault();
         try {
-            HttpEntity entity = response.getEntity();
-            resp = EntityUtils.toString(entity, charset);
-            EntityUtils.consume(entity);
+            HttpPost httpPost = new HttpPost(enterpriseWeChatPushUrlReplace);
+            httpPost.setEntity(new StringEntity(data, charset));
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String resp;
+            try {
+                HttpEntity entity = response.getEntity();
+                resp = EntityUtils.toString(entity, charset);
+                EntityUtils.consume(entity);
+            } finally {
+                response.close();
+            }
+            logger.info("Enterprise WeChat send [{}], param:{}, resp:{}", 
+                enterpriseWeChatPushUrl, data, resp);
+            return resp;
         } finally {
-            response.close();
+            httpClient.close();
         }
-        logger.info("Enterprise WeChat send [{}], param:{}, resp:{}", enterpriseWeChatPushUrl, data, resp);
-        return resp;
     }
 
     /**
