@@ -57,13 +57,13 @@ pid=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command.pid
 cd $DOLPHINSCHEDULER_HOME
 
 if [ "$command" = "api-server" ]; then
-  LOG_FILE="-Dspring.profiles.active=api"
+  LOG_FILE="-Dlogging.config=classpath:apiserver_logback.xml -Dspring.profiles.active=api"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
 elif [ "$command" = "master-server" ]; then
-  LOG_FILE="-Dspring.profiles.active=master -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogging.config=classpath:master_logback.xml -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
 elif [ "$command" = "worker-server" ]; then
-  LOG_FILE="-Dspring.profiles.active=worker -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dlogging.config=classpath:worker_logback.xml -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
 elif [ "$command" = "alert-server" ]; then
   LOG_FILE="-Dlogback.configurationFile=conf/alert_logback.xml"
@@ -71,7 +71,7 @@ elif [ "$command" = "alert-server" ]; then
 elif [ "$command" = "logger-server" ]; then
   CLASS=org.apache.dolphinscheduler.server.rpc.LoggerServer
 elif [ "$command" = "combined-server" ]; then
-  LOG_FILE="-Dspring.profiles.active=combined"
+  LOG_FILE="-Dlogging.config=classpath:combined_logback.xml -Dspring.profiles.active=api -Dserver.is-combined-server=true"
   CLASS=org.apache.dolphinscheduler.api.CombinedApplicationServer
 else
   echo "Error: No command named \`$command' was found."

@@ -666,6 +666,15 @@
 						<include>**/api/utils/CheckUtilsTest.java</include>
 						<include>**/api/utils/FileUtilsTest.java</include>
 						<include>**/api/enums/*.java</include>
+						<include>**/api/service/AccessTokenServiceTest.java</include>
+						<include>**/api/service/QueueServiceTest.java</include>
+						<include>**/api/service/MonitorServiceTest.java</include>
+						<include>**/api/service/SessionServiceTest.java</include>
+						<include>**/api/service/UsersServiceTest.java</include>
+						<include>**/api/service/TenantServiceTest.java</include>
+						<include>**/api/service/WorkerGroupServiceTest.java</include>
+						<include>**/api/service/AlertGroupServiceTest.java</include>
+						<include>**/api/service/ProjectServiceTest.java</include>
 						<include>**/alert/utils/ExcelUtilsTest.java</include>
 						<include>**/alert/utils/FuncUtilsTest.java</include>
 						<include>**/alert/utils/JSONUtilsTest.java</include>
@@ -674,6 +683,8 @@
 						<include>**/server/utils/FlinkArgsUtilsTest.java</include>
 						<include>**/dao/mapper/AccessTokenMapperTest.java</include>
 						<include>**/dao/mapper/AlertGroupMapperTest.java</include>
+						<include>**/dao/mapper/AlertMapperTest.java</include>
+						<include>**/dao/mapper/CommandMapperTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>

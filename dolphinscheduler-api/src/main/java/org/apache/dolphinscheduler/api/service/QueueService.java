@@ -115,12 +115,12 @@ public class QueueService extends BaseService {
         }
 
         if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queue");
             return result;
         }
 
         if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queueName);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queueName");
             return result;
         }
 
@@ -160,6 +160,16 @@ public class QueueService extends BaseService {
     public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
         Map<String, Object> result = new HashMap<>(5);
         if (checkAdmin(loginUser, result)) {
+            return result;
+        }
+
+        if (StringUtils.isEmpty(queue)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queue");
+            return result;
+        }
+
+        if (StringUtils.isEmpty(queueName)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queueName");
             return result;
         }
 
@@ -222,12 +232,12 @@ public class QueueService extends BaseService {
         Result result = new Result();
 
         if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queue);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queue");
             return result;
         }
 
         if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, queueName);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "queueName");
             return result;
         }
 
