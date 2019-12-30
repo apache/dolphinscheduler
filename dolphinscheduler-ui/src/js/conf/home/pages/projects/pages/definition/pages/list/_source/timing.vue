@@ -313,7 +313,23 @@
         this.crontab = this.item.crontab
       }
       if(this.type == 'timing') {
+        let date = new Date()
+        let year = date.getFullYear()
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+        if (month < 10) {
+            month = "0" + month;
+        }
+        if (day < 10) {
+            day = "0" + day;
+        }
+        let startDate = year + "-" + month + "-" + day + ' ' + '00:00:00'
+        let endDate = (year+100) + "-" + month + "-" + day + ' ' + '00:00:00'
+        let times = []
+        times[0] = startDate
+        times[1] = endDate
         this.crontab = '0 0 * * * ? *'
+        this.scheduleTime = times
       }
       this.receivers = _.cloneDeep(this.receiversD)
       this.receiversCc = _.cloneDeep(this.receiversCcD)
