@@ -76,6 +76,11 @@ public class WorkerGroupService extends BaseService {
         WorkerGroup workerGroup = null;
         if(id != 0){
             workerGroup = workerGroupMapper.selectById(id);
+            //check exist
+            if (workerGroup == null){
+                workerGroup = new WorkerGroup();
+                workerGroup.setCreateTime(now);
+            }
         }else{
             workerGroup = new WorkerGroup();
             workerGroup.setCreateTime(now);
