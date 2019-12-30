@@ -181,7 +181,7 @@ public class MasterServer implements IStoppable {
 
             try {
                 //thread sleep 3 seconds for thread quitely stop
-                Thread.sleep(3000L);
+                this.wait(3000L);
             }catch (Exception e){
                 logger.warn("thread sleep exception:" + e.getMessage(), e);
             }
