@@ -176,14 +176,12 @@ public class MasterServer implements IStoppable {
 
             logger.info("master server is stopping ..., cause : {}", cause);
 
-            // set stop signal is true
-            Stopper.stop();
+            while (!Stopper.isStoped()) {
+                // set stop signal is true
+                Stopper.stop();
 
-            try {
                 //thread sleep 3 seconds for thread quitely stop
                 this.wait(3000L);
-            }catch (Exception e){
-                logger.warn("thread sleep exception:" + e.getMessage(), e);
             }
             try {
                 heartbeatMasterService.shutdownNow();
