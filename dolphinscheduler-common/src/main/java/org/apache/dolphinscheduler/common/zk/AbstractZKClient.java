@@ -144,7 +144,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		String parentPath = getZNodeParentPath(zkNodeType);
 		String serverPathPrefix = parentPath + "/" + OSUtils.getHost();
 		String registerPath = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(
-				serverPathPrefix + "_", heartbeatZKInfo.getBytes());
+				serverPathPrefix + UNDERLINE, heartbeatZKInfo.getBytes());
 		logger.info("register {} node {} success" , zkNodeType.toString(), registerPath);
 		return registerPath;
 	}
@@ -307,7 +307,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		}
 		Map<String, String> serverMaps = getServerMaps(zkNodeType);
 		for(String hostKey : serverMaps.keySet()){
-			if(hostKey.startsWith(host)){
+			if(hostKey.startsWith(host + UNDERLINE)){
 				return true;
 			}
 		}
