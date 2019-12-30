@@ -49,7 +49,7 @@ public class PropertyUtils {
      * init
      */
     private void init(){
-        String[] propertyFiles = new String[]{Constants.DAO_PROPERTIES_PATH};
+        String[] propertyFiles = new String[]{Constants.APPLICATION_PROPERTIES};
         for (String fileName : propertyFiles) {
             InputStream fis = null;
             try {
