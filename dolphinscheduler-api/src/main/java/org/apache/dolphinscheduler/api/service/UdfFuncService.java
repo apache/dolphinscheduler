@@ -303,12 +303,7 @@ public class UdfFuncService extends BaseService{
     @Transactional(rollbackFor = Exception.class)
     public Result delete(int id) {
         Result result = new Result();
-        //check exist
-        UdfFunc udfFunc = udfFuncMapper.selectById(id);
-        if (udfFunc == null) {
-            putMsg(result, Status.UDF_FUNCTION_NOT_EXIST);
-            return result;
-        }
+        
         udfFuncMapper.deleteById(id);
         udfUserMapper.deleteByUdfFuncId(id);
         putMsg(result, Status.SUCCESS);
