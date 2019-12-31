@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -59,6 +60,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_SUB_PROCESS_DEFINE_ID;
 
@@ -576,11 +578,11 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject taskNode = jsonArray.getJSONObject(i);
-            if (taskNode.get("type") != null && taskNode.get("type") != "") {
+            if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
                 String taskType = taskNode.getString("type");
 
                 if(checkTaskHasDataSource(taskType)){
-
+                    // add sqlParameters
                     JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
                     DataSource dataSource = dataSourceMapper.selectById((Integer) sqlParameters.get("datasource"));
                     if (null != dataSource) {
@@ -588,6 +590,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                     }
                     taskNode.put("params", sqlParameters);
                 }else if(checkTaskHasDependent(taskType)){
+                    // add dependent param
                     JSONObject dependentParameters =  JSONUtils.parseObject(taskNode.getString("dependence"));
 
                     if(null != dependentParameters){
@@ -632,6 +635,22 @@ public class ProcessDefinitionService extends BaseDAGService {
         return taskType.equals(TaskType.SQL.name())  || taskType.equals(TaskType.PROCEDURE.name());
     }
 
+    /**
+     * check task if has sub process
+     * @param taskType task type
+     * @return if task has sub process return true else false
+     */
+    private boolean checkTaskHasSubProcess(String taskType) {
+        return taskType.equals(TaskType.SUB_PROCESS.name());
+    }
+
+    /**
+     * import process definition
+     * @param loginUser login user
+     * @param file process metadata json file
+     * @param currentProjectName current project name
+     * @return
+     */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
         Map<String, Object> result = new HashMap<>(5);
@@ -746,6 +765,18 @@ public class ProcessDefinitionService extends BaseDAGService {
                             }
                         }
                     }
+
+                    //recursive sub-process parameter correction map key for old process id value for new process id
+                    Map<Integer, Integer> subProcessIdMap = new HashMap<>(20);
+
+                    List<Object> subProcessList = jsonArray.stream()
+                            .filter(elem -> checkTaskHasSubProcess(JSONUtils.parseObject(elem.toString()).getString("type")))
+                            .collect(Collectors.toList());
+
+                    if (!subProcessList.isEmpty()) {
+                        importSubProcess(loginUser, targetProject, jsonArray, subProcessIdMap);
+                    }
+
                     jsonObject.put("tasks", jsonArray);
 
                     Map<String, Object> createProcessDefinitionResult = createProcessDefinition(loginUser,currentProjectName,processDefinitionName,jsonObject.toString(),processDefinitionDesc,processDefinitionLocations,processDefinitionConnects);
@@ -825,6 +856,82 @@ public class ProcessDefinitionService extends BaseDAGService {
         return result;
     }
 
+    /**
+     * check import process has sub process
+     * recursion create sub process
+     * @param loginUser login user
+     * @param targetProject target project
+     */
+    private void importSubProcess(User loginUser, Project targetProject, JSONArray jsonArray, Map<Integer, Integer> subProcessIdMap) {
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JSONObject taskNode = jsonArray.getJSONObject(i);
+            String taskType = taskNode.getString("type");
+
+            if (checkTaskHasSubProcess(taskType)) {
+                //get sub process info
+                JSONObject subParams = JSONUtils.parseObject(taskNode.getString("params"));
+                Integer subProcessId = subParams.getInteger("processDefinitionId");
+                ProcessDefinition subProcess = processDefineMapper.queryByDefineId(subProcessId);
+                String subProcessJson = subProcess.getProcessDefinitionJson();
+                //check current project has sub process
+                ProcessDefinition currentProjectSubProcess = processDefineMapper.queryByDefineName(targetProject.getId(), subProcess.getName());
+
+                if (null == currentProjectSubProcess) {
+                    JSONArray subJsonArray = (JSONArray) JSONUtils.parseObject(subProcess.getProcessDefinitionJson()).get("tasks");
+
+                    List<Object> subProcessList = subJsonArray.stream()
+                            .filter(item -> checkTaskHasSubProcess(JSONUtils.parseObject(item.toString()).getString("type")))
+                            .collect(Collectors.toList());
+
+                    if (!subProcessList.isEmpty()) {
+                        importSubProcess(loginUser, targetProject, subJsonArray, subProcessIdMap);
+                        //sub process processId correct
+                        if (!subProcessIdMap.isEmpty()) {
+
+                            for (Map.Entry<Integer, Integer> entry : subProcessIdMap.entrySet()) {
+                                String oldSubProcessId = "\"processDefinitionId\":" + entry.getKey();
+                                String newSubProcessId = "\"processDefinitionId\":" + entry.getValue();
+                                subProcessJson = subProcessJson.replaceAll(oldSubProcessId, newSubProcessId);
+                            }
+
+                            subProcessIdMap.clear();
+                        }
+                    }
+
+                    //if sub-process recursion
+                    Date now = new Date();
+                    //create sub process in target project
+                    ProcessDefinition processDefine = new ProcessDefinition();
+                    processDefine.setName(subProcess.getName());
+                    processDefine.setVersion(subProcess.getVersion());
+                    processDefine.setReleaseState(subProcess.getReleaseState());
+                    processDefine.setProjectId(targetProject.getId());
+                    processDefine.setUserId(loginUser.getId());
+                    processDefine.setProcessDefinitionJson(subProcessJson);
+                    processDefine.setDescription(subProcess.getDescription());
+                    processDefine.setLocations(subProcess.getLocations());
+                    processDefine.setConnects(subProcess.getConnects());
+                    processDefine.setTimeout(subProcess.getTimeout());
+                    processDefine.setTenantId(subProcess.getTenantId());
+                    processDefine.setGlobalParams(subProcess.getGlobalParams());
+                    processDefine.setCreateTime(now);
+                    processDefine.setUpdateTime(now);
+                    processDefine.setFlag(subProcess.getFlag());
+                    processDefine.setReceivers(subProcess.getReceivers());
+                    processDefine.setReceiversCc(subProcess.getReceiversCc());
+                    processDefineMapper.insert(processDefine);
+
+                    logger.info("create sub process, project: {}, process name: {}", targetProject.getName(), processDefine.getName());
+
+                    //modify task node
+                    ProcessDefinition newSubProcessDefine = processDefineMapper.queryByDefineName(processDefine.getProjectId(),processDefine.getName());
+                    subProcessIdMap.put(subProcessId, newSubProcessDefine.getId());
+                    subParams.put("processDefinitionId", newSubProcessDefine.getId());
+                    taskNode.put("params", subParams);
+                }
+            }
+        }
+    }
 
 
     /**
