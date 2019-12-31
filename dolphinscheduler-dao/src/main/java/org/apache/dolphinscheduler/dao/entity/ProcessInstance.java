@@ -21,216 +21,97 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import lombok.Data;
 import org.apache.dolphinscheduler.common.enums.*;
 
 import java.util.Date;
 
-/**
- * process instance
- */
-@Data
 @TableName("t_ds_process_instance")
 public class ProcessInstance {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-    /**
-     * process definition id
-     */
+    @TableField(value = "process_definition_id")
     private int processDefinitionId;
-    /**
-     * process state
-     */
+    @TableField(value = "state")
     private ExecutionStatus state;
-    /**
-     * recovery flag for failover
-     */
+    @TableField(value = "recovery")
     private Flag recovery;
-    /**
-     * start time
-     */
+    @TableField(value = "start_time")
     private Date startTime;
-
-    /**
-     * end time
-     */
+    @TableField(value = "end_time")
     private Date endTime;
-
-    /**
-     * run time
-     */
+    @TableField(value = "run_times")
     private int runTimes;
-
-    /**
-     * name
-     */
+    @TableField(value = "name")
     private String name;
-
-    /**
-     * host
-     */
+    @TableField(value = "host")
     private String host;
-
-    /**
-     * process definition structure
-     */
     @TableField(exist = false)
     private ProcessDefinition processDefinition;
-    /**
-     * process command type
-     */
+    @TableField(value = "command_type")
     private CommandType commandType;
-
-    /**
-     * command parameters
-     */
+    @TableField(value = "command_param")
     private String commandParam;
-
-    /**
-     * node depend type
-     */
+    @TableField(value = "task_depend_type")
     private TaskDependType taskDependType;
-
-    /**
-     * task max try times
-     */
+    @TableField(value = "max_try_times")
     private int maxTryTimes;
-
-    /**
-     * failure strategy when task failed.
-     */
+    @TableField(value = "failure_strategy")
     private FailureStrategy failureStrategy;
-
-    /**
-     *  warning type
-     */
+    @TableField(value = "warning_type")
     private WarningType warningType;
-
-    /**
-     * warning group
-     */
+    @TableField(value = "warning_group_id")
     private Integer warningGroupId;
-
-    /**
-     * schedule time
-     */
+    @TableField(value = "schedule_time")
     private Date scheduleTime;
-
-    /**
-     * command start time
-     */
+    @TableField(value = "command_start_time")
     private Date commandStartTime;
-
-    /**
-     * user define parameters string
-     */
+    @TableField(value = "global_params")
     private String globalParams;
-
-    /**
-     * process instance json
-     */
+    @TableField(value = "process_instance_json")
     private String processInstanceJson;
-
-    /**
-     * executor id
-     */
+    @TableField(value = "executor_id")
     private int executorId;
-
-    /**
-     * tenant code
-     */
     @TableField(exist = false)
     private String tenantCode;
-
-    /**
-     * queue
-     */
     @TableField(exist = false)
     private String queue;
-
-    /**
-     * process is sub process
-     */
+    @TableField(value = "is_sub_process")
     private Flag isSubProcess;
-
-    /**
-     * task locations for web
-     */
+    @TableField(value = "locations")
     private String locations;
-
-    /**
-     * task connects for web
-     */
+    @TableField(value = "connects")
     private String connects;
-
-    /**
-     * history command
-     */
+    @TableField(value = "history_cmd")
     private String historyCmd;
-
-    /**
-     * depend processes schedule time
-     */
+    @TableField(value = "dependence_schedule_times")
     private String dependenceScheduleTimes;
-
-    /**
-     * process duration
-     * @return
-     */
     @TableField(exist = false)
     private Long duration;
-
-    /**
-     * process instance priority
-     */
+    @TableField(value = "process_instance_priority")
     private Priority processInstancePriority;
-
-    /**
-     * worker group id
-     */
+    @TableField(value = "worker_group_id")
     private int workerGroupId;
-
-    /**
-     * process timeout for warning
-     */
+    @TableField(value = "timeout")
     private int timeout;
-
-    /**
-     * tenant id
-     */
+    @TableField(value = "tenant_id")
     private int tenantId;
-
-    /**
-     * worker group name. for api.
-     */
     @TableField(exist = false)
     private String workerGroupName;
-
-    /**
-     * receivers for api
-     */
     @TableField(exist = false)
     private String receivers;
-
-    /**
-     * receivers cc for api
-     */
     @TableField(exist = false)
     private String receiversCc;
 
-    public ProcessInstance(){
+    public ProcessInstance() {
 
     }
 
     /**
      * set the process name with process define version and timestamp
+     *
      * @param processDefinition processDefinition
      */
-    public ProcessInstance(ProcessDefinition processDefinition){
+    public ProcessInstance(ProcessDefinition processDefinition) {
         this.processDefinition = processDefinition;
         this.name = processDefinition.getName() + "-" +
                 processDefinition.getVersion() + "-" +
@@ -361,7 +242,7 @@ public class ProcessInstance {
     }
 
 
-    public boolean IsProcessInstanceStop(){
+    public boolean IsProcessInstanceStop() {
         return this.state.typeIsFinished();
     }
 
@@ -437,7 +318,6 @@ public class ProcessInstance {
         this.executorId = executorId;
     }
 
-
     public Flag getIsSubProcess() {
         return isSubProcess;
     }
@@ -453,6 +333,7 @@ public class ProcessInstance {
     public void setProcessInstancePriority(Priority processInstancePriority) {
         this.processInstancePriority = processInstancePriority;
     }
+
     public String getLocations() {
         return locations;
     }
@@ -479,22 +360,24 @@ public class ProcessInstance {
 
     /**
      * add command to history
+     *
      * @param cmd cmd
      */
-    public void addHistoryCmd(CommandType cmd){
-        if(StringUtils.isNotEmpty(this.historyCmd)){
+    public void addHistoryCmd(CommandType cmd) {
+        if (StringUtils.isNotEmpty(this.historyCmd)) {
             this.historyCmd = String.format("%s,%s", this.historyCmd, cmd.toString());
-        }else{
+        } else {
             this.historyCmd = cmd.toString();
         }
     }
 
     /**
      * check this process is start complement data
+     *
      * @return whether complement data
      */
-    public Boolean isComplementData(){
-        if(!StringUtils.isNotEmpty(this.historyCmd)){
+    public Boolean isComplementData() {
+        if (!StringUtils.isNotEmpty(this.historyCmd)) {
             return false;
         }
         return historyCmd.startsWith(CommandType.COMPLEMENT_DATA.toString());
@@ -503,10 +386,11 @@ public class ProcessInstance {
     /**
      * get current command type,
      * if start with complement data,return complement
+     *
      * @return CommandType
      */
-    public CommandType getCmdTypeIfComplement(){
-        if(isComplementData()){
+    public CommandType getCmdTypeIfComplement() {
+        if (isComplementData()) {
             return CommandType.COMPLEMENT_DATA;
         }
         return commandType;
@@ -550,7 +434,7 @@ public class ProcessInstance {
     }
 
     public int getTenantId() {
-        return this.tenantId ;
+        return this.tenantId;
     }
 
     public String getWorkerGroupName() {

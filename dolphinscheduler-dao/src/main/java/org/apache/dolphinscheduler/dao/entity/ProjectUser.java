@@ -20,46 +20,26 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-@Data
 @TableName("t_ds_relation_project_user")
 public class ProjectUser {
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    @TableField("user_id")
+    @TableField(value = "user_id")
     private int userId;
-
-    @TableField("project_id")
+    @TableField(value = "project_id")
     private int projectId;
-
-    /**
-     * project name
-     */
     @TableField(exist = false)
     private String projectName;
-
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
-
-    /**
-     * permission
-     */
+    @TableField(value = "perm")
     private int perm;
-
-    @TableField("create_time")
+    @TableField(value = "create_time")
     private Date createTime;
-
-    @TableField("update_time")
+    @TableField(value = "update_time")
     private Date updateTime;
 
     public int getId() {
@@ -125,6 +105,7 @@ public class ProjectUser {
     public void setPerm(int perm) {
         this.perm = perm;
     }
+
     @Override
     public String toString() {
         return "ProjectUser{" +

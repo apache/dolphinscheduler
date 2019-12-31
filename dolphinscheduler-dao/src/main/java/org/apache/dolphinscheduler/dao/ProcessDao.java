@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
-import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
@@ -105,7 +104,8 @@ public class ProcessDao {
     /**
      * task queue impl
      */
-    protected ITaskQueue taskQueue = TaskQueueFactory.getTaskQueueInstance();
+    @Autowired
+    private ITaskQueue taskQueue;
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      * @param logger logger

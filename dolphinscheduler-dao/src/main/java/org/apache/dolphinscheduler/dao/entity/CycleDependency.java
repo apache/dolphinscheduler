@@ -20,28 +20,12 @@ import org.apache.dolphinscheduler.common.enums.CycleEnum;
 
 import java.util.Date;
 
-/**
- * cycle dependency
- */
 public class CycleDependency {
-    /**
-     * process define id
-     */
     private int processDefineId;
-    /**
-     * last schedule time
-     */
     private Date lastScheduleTime;
-    /**
-     * expiration time
-     */
     private Date expirationTime;
-    /**
-     * cycle enum
-     */
     private CycleEnum cycleEnum;
-
-
+    
     public CycleDependency(int processDefineId, Date lastScheduleTime, Date expirationTime, CycleEnum cycleEnum) {
         this.processDefineId = processDefineId;
         this.lastScheduleTime = lastScheduleTime;

@@ -17,30 +17,24 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-/**
- * worker group for task running
- */
-@Data
 @TableName("t_ds_worker_group")
 public class WorkerGroup {
-
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
+    @TableField(value = "name")
     private String name;
-
+    @TableField(value = "ip_list")
     private String ipList;
-
+    @TableField(value = "create_time")
     private Date createTime;
-
+    @TableField(value = "update_time")
     private Date updateTime;
-
 
     public int getId() {
         return id;
@@ -74,6 +68,14 @@ public class WorkerGroup {
         this.updateTime = updateTime;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
         return "Worker group model{" +
@@ -84,13 +86,5 @@ public class WorkerGroup {
                 ",updateTime= " + updateTime +
 
                 "}";
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

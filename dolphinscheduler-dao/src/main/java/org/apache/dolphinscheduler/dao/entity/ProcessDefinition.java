@@ -25,7 +25,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
@@ -33,133 +32,54 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-/**
- * process definition
- */
-@Data
 @TableName("t_ds_process_definition")
 public class ProcessDefinition {
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    /**
-     * name
-     */
+    @TableField(value = "name")
     private String name;
-
-    /**
-     * version
-     */
+    @TableField(value = "version")
     private int version;
-
-    /**
-     * release state : online/offline
-     */
+    @TableField(value = "release_state")
     private ReleaseState releaseState;
-
-    /**
-     * project id
-     */
+    @TableField(value = "project_id")
     private int projectId;
-
-    /**
-     * definition json string
-     */
+    @TableField(value = "process_definition_json")
     private String processDefinitionJson;
-
-    /**
-     * description
-     */
+    @TableField(value = "description")
     private String description;
-
-    /**
-     * user defined parameters
-     */
+    @TableField(value = "global_params")
     private String globalParams;
-
-    /**
-     * user defined parameter list
-     */
-    @TableField(exist=false)
+    @TableField(exist = false)
     private List<Property> globalParamList;
-
-    /**
-     * user define parameter map
-     */
-    @TableField(exist=false)
-    private Map<String,String> globalParamMap;
-
-    /**
-     * create time
-     */
+    @TableField(exist = false)
+    private Map<String, String> globalParamMap;
+    @TableField(value = "create_time")
     private Date createTime;
-
-    /**
-     * update time
-     */
+    @TableField(value = "update_time")
     private Date updateTime;
-
-    /**
-     * process is valid: yes/no
-     */
+    @TableField(value = "flag")
     private Flag flag;
-
-    /**
-     * process user id
-     */
+    @TableField(value = "user_id")
     private int userId;
-
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
-
-    /**
-     * project name
-     */
     @TableField(exist = false)
     private String projectName;
-
-    /**
-     * locations array for web
-     */
+    @TableField(value = "locations")
     private String locations;
-
-    /**
-     * connects array for web
-     */
+    @TableField(value = "connects")
     private String connects;
-
-    /**
-     * receivers
-     */
+    @TableField(value = "receivers")
     private String receivers;
-
-    /**
-     * receivers cc
-     */
+    @TableField(value = "receivers_cc")
     private String receiversCc;
-
-    /**
-     * schedule release state : online/offline
-     */
-    @TableField(exist=false)
+    @TableField(exist = false)
     private ReleaseState scheduleReleaseState;
-
-    /**
-     * process warning time out. unit: minute
-     */
+    @TableField(value = "timeout")
     private int timeout;
-
-    /**
-     * tenant id
-     */
+    @TableField(value = "tenant_id")
     private int tenantId;
-
 
     public String getName() {
         return name;
@@ -339,6 +259,22 @@ public class ProcessDefinition {
         this.timeout = timeout;
     }
 
+    public int getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(int tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "ProcessDefinition{" +
@@ -365,21 +301,5 @@ public class ProcessDefinition {
                 ", timeout=" + timeout +
                 ", tenantId=" + tenantId +
                 '}';
-    }
-
-    public int getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(int tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

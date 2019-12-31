@@ -26,186 +26,75 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-/**
- * task instance
- */
-@Data
 @TableName("t_ds_task_instance")
 public class TaskInstance {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    /**
-     * task name
-     */
+    @TableField(value = "name")
     private String name;
-
-    /**
-     * task type
-     */
+    @TableField(value = "task_type")
     private String taskType;
-
-    /**
-     * process definition id
-     */
+    @TableField(value = "process_definition_id")
     private int processDefinitionId;
-
-    /**
-     * process instance id
-     */
+    @TableField(value = "process_instance_id")
     private int processInstanceId;
-
-    /**
-     * process instance name
-     */
     @TableField(exist = false)
     private String processInstanceName;
-
-    /**
-     * task json
-     */
+    @TableField(value = "task_json")
     private String taskJson;
-
-    /**
-     * state
-     */
+    @TableField(value = "state")
     private ExecutionStatus state;
-
-    /**
-     * task submit time
-     */
+    @TableField(value = "submit_time")
     private Date submitTime;
-
-    /**
-     * task start time
-     */
+    @TableField(value = "start_time")
     private Date startTime;
-
-    /**
-     * task end time
-     */
+    @TableField(value = "end_time")
     private Date endTime;
-
-    /**
-     * task host
-     */
+    @TableField(value = "host")
     private String host;
-
-    /**
-     * task shell execute path and the resource down from hdfs
-     * default path: $base_run_dir/processInstanceId/taskInstanceId/retryTimes
-     */
+    @TableField(value = "execute_path")
     private String executePath;
-
-    /**
-     * task log path
-     * default path: $base_run_dir/processInstanceId/taskInstanceId/retryTimes
-     */
+    @TableField(value = "log_path")
     private String logPath;
-
-    /**
-     * retry times
-     */
+    @TableField(value = "retry_times")
     private int retryTimes;
-
-    /**
-     * alert flag
-     */
+    @TableField(value = "alert_flag")
     private Flag alertFlag;
-
-    /**
-     * process instance
-     */
     @TableField(exist = false)
     private ProcessInstance processInstance;
-
-    /**
-     * process definition
-     */
     @TableField(exist = false)
     private ProcessDefinition processDefine;
-
-    /**
-     * process id
-     */
+    @TableField(value = "pid")
     private int pid;
-
-    /**
-     * appLink
-     */
+    @TableField(value = "app_link")
     private String appLink;
-
-    /**
-     * flag
-     */
+    @TableField("flag")
     private Flag flag;
-
-    /**
-     * dependency
-     */
     @TableField(exist = false)
     private String dependency;
-
-    /**
-     * duration
-     * @return
-     */
     @TableField(exist = false)
     private Long duration;
-
-    /**
-     * max retry times
-     * @return
-     */
+    @TableField(value = "max_retry_times")
     private int maxRetryTimes;
-
-    /**
-     * task retry interval, unit: minute
-     * @return
-     */
+    @TableField(value = "retry_interval")
     private int retryInterval;
-
-    /**
-     * task intance priority
-     */
+    @TableField(value = "task_instance_priority")
     private Priority taskInstancePriority;
-
-    /**
-     * process intance priority
-     */
     @TableField(exist = false)
     private Priority processInstancePriority;
-
-    /**
-     * dependent state
-     * @return
-     */
     @TableField(exist = false)
     private String dependentResult;
-
-
-    /**
-     * worker group id
-     * @return
-     */
+    @TableField(value = "worker_group_id")
     private int workerGroupId;
 
-
-
-    public void  init(String host,Date startTime,String executePath){
+    public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
         this.executePath = executePath;
     }
-
 
     public ProcessInstance getProcessInstance() {
         return processInstance;
@@ -343,7 +232,7 @@ public class TaskInstance {
         this.retryTimes = retryTimes;
     }
 
-    public Boolean isTaskSuccess(){
+    public Boolean isTaskSuccess() {
         return this.state == ExecutionStatus.SUCCESS;
     }
 
@@ -364,13 +253,13 @@ public class TaskInstance {
     }
 
 
-    public Boolean isSubProcess(){
+    public Boolean isSubProcess() {
         return TaskType.SUB_PROCESS.toString().equals(this.taskType.toUpperCase());
     }
 
-    public String getDependency(){
+    public String getDependency() {
 
-        if(this.dependency != null){
+        if (this.dependency != null) {
             return this.dependency;
         }
         TaskNode taskNode = JSONUtils.parseObject(taskJson, TaskNode.class);
@@ -385,6 +274,7 @@ public class TaskInstance {
     public void setFlag(Flag flag) {
         this.flag = flag;
     }
+
     public String getProcessInstanceName() {
         return processInstanceName;
     }
@@ -424,19 +314,21 @@ public class TaskInstance {
                 || this.getState().typeIsCancel()
                 || (this.getState().typeIsFailure() && !taskCanRetry());
     }
+
     /**
      * determine if you can try again
+     *
      * @return can try result
      */
     public boolean taskCanRetry() {
-        if(this.isSubProcess()){
+        if (this.isSubProcess()) {
             return false;
         }
-        if(this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE){
+        if (this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
             return true;
-        }else {
+        } else {
             return (this.getState().typeIsFailure()
-                && this.getRetryTimes() < this.getMaxRetryTimes());
+                    && this.getRetryTimes() < this.getMaxRetryTimes());
         }
     }
 
@@ -466,6 +358,14 @@ public class TaskInstance {
 
     public void setWorkerGroupId(int workerGroupId) {
         this.workerGroupId = workerGroupId;
+    }
+
+    public String getDependentResult() {
+        return dependentResult;
+    }
+
+    public void setDependentResult(String dependentResult) {
+        this.dependentResult = dependentResult;
     }
 
     @Override
@@ -501,13 +401,5 @@ public class TaskInstance {
                 ", processInstancePriority=" + processInstancePriority +
                 ", workGroupId=" + workerGroupId +
                 '}';
-    }
-
-    public String getDependentResult() {
-        return dependentResult;
-    }
-
-    public void setDependentResult(String dependentResult) {
-        this.dependentResult = dependentResult;
     }
 }

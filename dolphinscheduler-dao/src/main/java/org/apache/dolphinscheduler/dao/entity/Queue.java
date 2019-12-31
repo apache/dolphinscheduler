@@ -17,40 +17,26 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
 /**
  * queue
  */
-@Data
 @TableName("t_ds_queue")
 public class Queue {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-    /**
-     * queue name
-     */
+    @TableField(value = "queue_name")
     private String queueName;
-    /**
-     * yarn queue name
-     */
+    @TableField(value = "queue")
     private String queue;
-
-    /**
-     * create time
-     */
+    @TableField(value = "create_time")
     private Date createTime;
-    /**
-     * update time
-     */
+    @TableField(value = "update_time")
     private Date updateTime;
 
     public int getId() {

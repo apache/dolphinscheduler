@@ -21,41 +21,13 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 
 import java.util.Date;
 
-/**
- * monitor record for database
- */
 public class MonitorRecord {
-
     private DbType dbType;
-
-    /**
-     * is normal or not , 1: normal
-     */
     private Flag state;
-
-    /**
-     * max connections
-     */
     private long maxConnections;
-
-    /**
-     * max used connections
-     */
     private long maxUsedConnections;
-
-    /**
-     * threads connections
-     */
     private long threadsConnections;
-
-    /**
-     * threads running connections
-     */
     private long threadsRunningConnections;
-
-    /**
-     * start date
-     */
     private Date date;
 
     public Flag getState() {
@@ -98,6 +70,14 @@ public class MonitorRecord {
         this.threadsRunningConnections = threadsRunningConnections;
     }
 
+    public DbType getDbType() {
+        return dbType;
+    }
+
+    public void setDbType(DbType dbType) {
+        this.dbType = dbType;
+    }
+
     public Date getDate() {
         return date;
     }
@@ -117,13 +97,5 @@ public class MonitorRecord {
                 ", threadsRunningConnections=" + threadsRunningConnections +
                 ", date=" + date +
                 '}';
-    }
-
-    public DbType getDbType() {
-        return dbType;
-    }
-
-    public void setDbType(DbType dbType) {
-        this.dbType = dbType;
     }
 }

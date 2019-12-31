@@ -19,20 +19,8 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 
-/**
- * count execute state
- *
- */
 public class ExecuteStatusCount {
-
-    /**
-     * execution state
-     */
     private ExecutionStatus state;
-
-    /**
-     * count for state
-     */
     private int count;
 
     public ExecutionStatus getExecutionStatus() {

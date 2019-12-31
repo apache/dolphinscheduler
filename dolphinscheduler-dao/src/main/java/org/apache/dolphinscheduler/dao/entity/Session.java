@@ -17,38 +17,21 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-/**
- * session
- */
-@Data
 @TableName("t_ds_session")
 public class Session {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private String id;
-
-    /**
-     * user id
-     */
+    @TableField(value = "user_id")
     private int userId;
-
-    /**
-     * last login time
-     */
+    @TableField(value = "t_ds_session")
     private Date lastLoginTime;
-
-    /**
-     * user login ip
-     */
+    @TableField(value = "ip")
     private String ip;
 
     public String getId() {

@@ -17,12 +17,10 @@
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
 /**
  * types for whether to send warning when process ending;
  */
-@Getter
 public enum WarningType {
   /**
    * 0 do not send warning;
@@ -44,4 +42,12 @@ public enum WarningType {
   @EnumValue
   private final int code;
   private final String descp;
+
+  public int getCode() {
+    return code;
+  }
+
+  public String getDescp() {
+    return descp;
+  }
 }

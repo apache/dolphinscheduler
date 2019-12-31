@@ -21,74 +21,34 @@ import org.apache.dolphinscheduler.common.enums.UdfType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-/**
- * udf function
- */
-@Data
 @TableName("t_ds_udfs")
 public class UdfFunc {
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-    /**
-     * user id
-     */
+    @TableField(value = "user_id")
     private int userId;
-
-    /**
-     * udf function name
-     */
+    @TableField(value = "func_name")
     private String funcName;
-
-    /**
-     * udf class name
-     */
+    @TableField(value = "class_name")
     private String className;
-
-    /**
-     * udf argument types
-     */
+    @TableField(value = "arg_types")
     private String argTypes;
-
-    /**
-     * udf data base
-     */
+    @TableField(value = "database")
     private String database;
-
-    /**
-     * udf description
-     */
+    @TableField(value = "description")
     private String description;
-
-    /**
-     * resource id
-     */
+    @TableField(value = "resource_id")
     private int resourceId;
-
-    /**
-     * resource name
-     */
+    @TableField(value = "resource_name")
     private String resourceName;
-
-    /**
-     * udf function type: hive / spark
-     */
+    @TableField(value = "type")
     private UdfType type;
-
-    /**
-     * create time
-     */
+    @TableField(value = "create_time")
     private Date createTime;
-
-    /**
-     * update time
-     */
+    @TableField(value = "update_time")
     private Date updateTime;
 
     public int getId() {

@@ -20,54 +20,24 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-/**
- * user alert group
- */
-@Data
 @TableName("t_ds_relation_user_alertgroup")
 public class UserAlertGroup {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    /**
-     * id
-     */
-    @TableField("alertgroup_id")
+    @TableField(value = "alertgroup_id")
     private int alertgroupId;
-
-    /**
-     * alert group name
-     */
     @TableField(exist = false)
     private String alertgroupName;
-
-    /**
-     * user id
-     */
+    @TableField(value = "user_id")
     private int userId;
-
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
-
-    /**
-     * create time
-     */
+    @TableField(value = "create_time")
     private Date createTime;
-
-    /**
-     * update time
-     */
+    @TableField(value = "update_time")
     private Date updateTime;
 
     public int getId() {

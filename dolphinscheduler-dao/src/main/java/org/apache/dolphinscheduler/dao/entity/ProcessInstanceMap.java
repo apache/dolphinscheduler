@@ -17,36 +17,19 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
-/**
- * process instance map
- */
-@Data
 @TableName("t_ds_relation_process_instance")
 public class ProcessInstanceMap {
-
-    /**
-     * id
-     */
     @TableId(value="id", type=IdType.AUTO)
     private int id;
-
-    /**
-     * parent process instance id
-     */
+    @TableField(value = "parent_process_instance_id")
     private int parentProcessInstanceId;
-
-    /**
-     * parent task instance id
-     */
+    @TableField(value = "parent_task_instance_id")
     private int parentTaskInstanceId;
-
-    /**
-     * process instance id
-     */
+    @TableField(value = "process_instance_id")
     private int processInstanceId;
 
     public int getId() {

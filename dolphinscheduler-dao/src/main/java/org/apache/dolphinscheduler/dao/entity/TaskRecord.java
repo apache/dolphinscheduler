@@ -18,90 +18,22 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
-/**
- * task record for qianfan
- */
 public class TaskRecord {
-
-    /**
-     * id
-     */
     private int id;
-
-    /**
-     * process id
-     */
     private int procId;
-
-    /**
-     * procedure name
-     */
     private String procName;
-
-    /**
-     * procedure date
-     */
     private String procDate;
-
-    /**
-     * start date
-     */
     private Date startTime;
-
-    /**
-     * end date
-     */
     private Date endTime;
-
-    /**
-     * result
-     */
     private String result;
-
-    /**
-     * duration unit: second
-     */
     private int duration;
-
-    /**
-     * note
-     */
     private String note;
-
-    /**
-     * schema
-     */
     private String schema;
-
-    /**
-     * job id
-     */
     private String jobId;
-
-
-    /**
-     * source tab
-     */
     private String sourceTab;
-
-    /**
-     * source row count
-     */
     private Long sourceRowCount;
-
-    /**
-     * target tab
-     */
     private String targetTab;
-
-    /**
-     * target row count
-     */
     private Long targetRowCount;
-
-    /**
-     * error code
-     */
     private String errorCode;
 
     public int getId() {
@@ -252,5 +184,4 @@ public class TaskRecord {
                 + " error code: " + errorCode
                 ;
     }
-
 }

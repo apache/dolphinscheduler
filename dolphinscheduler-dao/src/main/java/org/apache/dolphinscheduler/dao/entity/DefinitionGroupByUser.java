@@ -16,24 +16,9 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
-/**
- * count definition number group by user
- */
 public class DefinitionGroupByUser {
-
-    /**
-     * user name
-     */
     private String userName;
-
-    /**
-     * user id
-     */
     private Integer userId;
-
-    /**
-     * count number
-     */
     private int count;
 
     public String getUserName() {

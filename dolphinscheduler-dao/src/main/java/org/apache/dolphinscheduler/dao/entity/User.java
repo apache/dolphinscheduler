@@ -22,95 +22,38 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
 import java.util.Date;
 
-/**
- * user
- */
-@Data
 @TableName("t_ds_user")
-@ApiModel(description = "UserModelDesc")
-public class  User {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+public class User {
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    /**
-     * user name
-     */
-    @ApiModelProperty(name = "userName", notes = "USER_NAME",dataType = "String",required = true)
+    @TableField(value = "user_name")
     private String userName;
-
-    /**
-     * user password
-     */
-    @ApiModelProperty(name = "userPassword", notes = "USER_PASSWORD",dataType = "String",required = true)
+    @TableField(value = "user_password")
     private String userPassword;
-
-    /**
-     * mail
-     */
+    @TableField(value = "email")
     private String email;
-
-    /**
-     * phone
-     */
+    @TableField(value = "phone")
     private String phone;
-
-    /**
-     * user type
-     */
+    @TableField(value = "user_type")
     private UserType userType;
-
-    /**
-     *  tenant id
-     */
+    @TableField(value = "tenant_id")
     private int tenantId;
-
-    /**
-     * tenant code
-     */
     @TableField(exist = false)
     private String tenantCode;
-
-    /**
-     * tenant name
-     */
     @TableField(exist = false)
     private String tenantName;
-
-    /**
-     * queue name
-     */
     @TableField(exist = false)
     private String queueName;
-
-    /**
-     * alert group
-     */
     @TableField(exist = false)
     private String alertGroup;
-
-    /**
-     * user specified queue
-     */
+    @TableField(value = "queue")
     private String queue;
-
-    /**
-     * create time
-     */
+    @TableField(value = "create_time")
     private Date createTime;
-
-    /**
-     * update time
-     */
+    @TableField(value = "update_time")
     private Date updateTime;
 
     public int getId() {
@@ -176,7 +119,6 @@ public class  User {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
-
 
     public String getPhone() {
         return phone;

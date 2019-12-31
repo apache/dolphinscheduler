@@ -17,107 +17,84 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-/**
- * resource user relation
- */
-@Data
 @TableName("t_ds_relation_resources_user")
 public class ResourcesUser {
+    @TableId(value = "id", type = IdType.AUTO)
+    private int id;
+    @TableField(value = "user_id")
+    private int userId;
+    @TableField(value = "resources_id")
+    private int resourcesId;
+    @TableField(value = "perm")
+    private int perm;
+    @TableField(value = "create_time")
+    private Date createTime;
+    @TableField(value = "update_time")
+    private Date updateTime;
 
-  /**
-   * id
-   */
-  @TableId(value="id", type=IdType.AUTO)
-  private int id;
+    public int getId() {
+        return id;
+    }
 
-  /**
-   * user id
-   */
-  private int userId;
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  /**
-   * resource id
-   */
-  private int resourcesId;
+    public int getUserId() {
+        return userId;
+    }
 
-  /**
-   * permission
-   */
-  private int perm;
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-  /**
-   * create time
-   */
-  private Date createTime;
+    public int getResourcesId() {
+        return resourcesId;
+    }
 
-  /**
-   * update time
-   */
-  private Date updateTime;
+    public void setResourcesId(int resourcesId) {
+        this.resourcesId = resourcesId;
+    }
 
-  public int getId() {
-    return id;
-  }
+    public int getPerm() {
+        return perm;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public void setPerm(int perm) {
+        this.perm = perm;
+    }
 
-  public int getUserId() {
-    return userId;
-  }
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-  public void setUserId(int userId) {
-    this.userId = userId;
-  }
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-  public int getResourcesId() {
-    return resourcesId;
-  }
+    public Date getUpdateTime() {
+        return updateTime;
+    }
 
-  public void setResourcesId(int resourcesId) {
-    this.resourcesId = resourcesId;
-  }
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 
-  public int getPerm() {
-    return perm;
-  }
-
-  public void setPerm(int perm) {
-    this.perm = perm;
-  }
-
-  public Date getCreateTime() {
-    return createTime;
-  }
-
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
-
-  public Date getUpdateTime() {
-    return updateTime;
-  }
-
-  public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
-  }
-
-  @Override
-  public String toString() {
-    return "ResourcesUser{" +
-            "id=" + id +
-            ", userId=" + userId +
-            ", resourcesId=" + resourcesId +
-            ", perm=" + perm +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            '}';
-  }
+    @Override
+    public String toString() {
+        return "ResourcesUser{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", resourcesId=" + resourcesId +
+                ", perm=" + perm +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
+    }
 }

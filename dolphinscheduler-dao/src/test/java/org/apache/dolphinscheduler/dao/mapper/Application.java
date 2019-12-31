@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan("org.apache.dolphinscheduler.dao")
+@ComponentScan("org.apache.dolphinscheduler")
 public class Application {
 
     public static void main(String[] args) {

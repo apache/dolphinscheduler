@@ -18,74 +18,21 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
-/**
- * monitor record for zookeeper
- */
 public class ZookeeperRecord {
-
-    /**
-     * hostname
-     */
     private String hostname;
-
-    /**
-     * connections
-     */
     private int connections;
-
-    /**
-     * max connections
-     */
     private int watches;
-
-    /**
-     * sent
-     */
     private long sent;
-
-    /**
-     * received
-     */
     private long received;
-
-    /**
-     * mode: leader or follower
-     */
     private String mode;
-
-    /**
-     * min Latency
-     */
     private int minLatency;
-
-    /**
-     * avg Latency
-     */
     private int avgLatency;
-
-    /**
-     * max Latency
-     */
     private int maxLatency;
-
-    /**
-     * node count
-     */
     private int nodeCount;
-
-    /**
-     * date
-     */
     private Date date;
-
-
-    /**
-     * is normal or not, 1:normal
-     */
     private int state;
 
-
-    public ZookeeperRecord(String hostname,int connections, int watches, long sent, long received, String mode, int minLatency, int avgLatency, int maxLatency, int nodeCount, int state,Date date) {
+    public ZookeeperRecord(String hostname, int connections, int watches, long sent, long received, String mode, int minLatency, int avgLatency, int maxLatency, int nodeCount, int state, Date date) {
         this.hostname = hostname;
         this.connections = connections;
         this.watches = watches;
@@ -99,7 +46,6 @@ public class ZookeeperRecord {
         this.state = state;
         this.date = date;
     }
-
 
     public String getHostname() {
         return hostname;

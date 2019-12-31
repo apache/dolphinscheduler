@@ -20,64 +20,29 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-/**
- * tenant
- */
-@Data
 @TableName("t_ds_tenant")
 public class Tenant {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    /**
-     * tenant code
-     */
+    @TableField(value = "tenant_code")
     private String tenantCode;
-
-    /**
-     * tenant name
-     */
+    @TableField(value = "tenant_name")
     private String tenantName;
-
-    /**
-     * description
-     */
+    @TableField(value = "description")
     private String description;
-
-    /**
-     * queue id
-     */
+    @TableField(value = "queue_id")
     private int queueId;
-
-    /**
-     * queue name
-     */
     @TableField(exist = false)
     private String queueName;
-
-    /**
-     * queue
-     */
     @TableField(exist = false)
     private String queue;
-
-    /**
-     * create time
-     */
+    @TableField(value = "create_time")
     private Date createTime;
-    /**
-     * update time
-     */
+    @TableField(value = "update_time")
     private Date updateTime;
-
 
     public int getId() {
         return id;
@@ -143,6 +108,14 @@ public class Tenant {
         this.queue = queue;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Override
     public String toString() {
         return "Tenant{" +
@@ -155,13 +128,5 @@ public class Tenant {
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 '}';
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

@@ -22,84 +22,66 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
 import java.util.List;
 
-/**
- * definition json data structure
- */
 public class ProcessData {
-  /**
-   * task list
-   */
-  private List<TaskNode> tasks;
+    private List<TaskNode> tasks;
+    private List<Property> globalParams;
+    private int timeout;
+    private int tenantId;
 
-  /**
-   * global parameters
-   */
-  private List<Property> globalParams;
-
-
-  private int timeout;
-
-  private int tenantId;
-
-
-  public ProcessData() {
-  }
-
-  /**
-   *
-   * @param tasks tasks
-   * @param globalParams globalParams
-   */
-  public ProcessData(List<TaskNode> tasks, List<Property> globalParams) {
-    this.tasks = tasks;
-    this.globalParams = globalParams;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
+    /**
+     * @param tasks        tasks
+     * @param globalParams globalParams
+     */
+    public ProcessData(List<TaskNode> tasks, List<Property> globalParams) {
+        this.tasks = tasks;
+        this.globalParams = globalParams;
     }
 
-    if (o == null || getClass() != o.getClass()) {
-      return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ProcessData that = (ProcessData) o;
+
+        return CollectionUtils.equalLists(tasks, that.tasks) &&
+                CollectionUtils.equalLists(globalParams, that.globalParams);
     }
 
-    ProcessData that = (ProcessData) o;
+    public List<TaskNode> getTasks() {
+        return tasks;
+    }
 
-    return CollectionUtils.equalLists(tasks, that.tasks) &&
-        CollectionUtils.equalLists(globalParams, that.globalParams);
-  }
+    public void setTasks(List<TaskNode> tasks) {
+        this.tasks = tasks;
+    }
 
-  public List<TaskNode> getTasks() {
-    return tasks;
-  }
+    public List<Property> getGlobalParams() {
+        return globalParams;
+    }
 
-  public void setTasks(List<TaskNode> tasks) {
-    this.tasks = tasks;
-  }
+    public void setGlobalParams(List<Property> globalParams) {
+        this.globalParams = globalParams;
+    }
 
-  public List<Property> getGlobalParams() {
-    return globalParams;
-  }
+    public int getTimeout() {
+        return timeout;
+    }
 
-  public void setGlobalParams(List<Property> globalParams) {
-    this.globalParams = globalParams;
-  }
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
 
-  public int getTimeout() {
-    return timeout;
-  }
+    public int getTenantId() {
+        return tenantId;
+    }
 
-  public void setTimeout(int timeout) {
-    this.timeout = timeout;
-  }
-
-  public int getTenantId() {
-    return tenantId;
-  }
-
-  public void setTenantId(int tenantId) {
-    this.tenantId = tenantId;
-  }
+    public void setTenantId(int tenantId) {
+        this.tenantId = tenantId;
+    }
 }

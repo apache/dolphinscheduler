@@ -17,97 +17,50 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import org.apache.dolphinscheduler.common.enums.*;
 
 import java.util.Date;
 
-/**
- * command
- */
 @TableName("t_ds_error_command")
 public class ErrorCommand {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.INPUT)
     private int id;
-
-    /**
-     * command type
-     */
+    @TableField(value = "command_type")
     private CommandType commandType;
-
-    /**
-     * process definition id
-     */
+    @TableField(value = "process_definition_id")
     private int processDefinitionId;
-
-    /**
-     * executor id
-     */
+    @TableField(value = "executor_id")
     private int executorId;
-
-    /**
-     * command parameter, format json
-     */
+    @TableField("command_param")
     private String commandParam;
-
-    /**
-     * task depend type
-     */
+    @TableField(value = "task_depend_type")
     private TaskDependType taskDependType;
-
-    /**
-     * failure strategy
-     */
+    @TableField(value = "failure_strategy")
     private FailureStrategy failureStrategy;
-
-    /**
-     *  warning type
-     */
+    @TableField(value = "warning_type")
     private WarningType warningType;
-
-    /**
-     * warning group id
-     */
+    @TableField(value = "warning_group_id")
     private Integer warningGroupId;
-
-    /**
-     * schedule time
-     */
+    @TableField(value = "schedule_time")
     private Date scheduleTime;
-
-    /**
-     * start time
-     */
+    @TableField(value = "start_time")
     private Date startTime;
-
-    /**
-     * process instance priority
-     */
+    @TableField(value = "process_instance_priority")
     private Priority processInstancePriority;
-
-    /**
-     * update time
-     */
+    @TableField(value = "update_time")
     private Date updateTime;
-
-    /**
-     * 执行信息
-     */
+    @TableField(value = "message")
     private String message;
-
-    /**
-     * worker group id
-     */
+    @TableField(value = "worker_group_id")
     private int workerGroupId;
 
-    public ErrorCommand(){}
+    public ErrorCommand() {
+    }
 
-    public ErrorCommand(Command command, String message){
+    public ErrorCommand(Command command, String message) {
         this.id = command.getId();
         this.commandType = command.getCommandType();
         this.executorId = command.getExecutorId();
@@ -122,42 +75,6 @@ public class ErrorCommand {
         this.updateTime = command.getUpdateTime();
         this.processInstancePriority = command.getProcessInstancePriority();
         this.message = message;
-    }
-
-    public ErrorCommand(
-            CommandType commandType,
-            TaskDependType taskDependType,
-            FailureStrategy failureStrategy,
-            int executorId,
-            int processDefinitionId,
-            String commandParam,
-            WarningType warningType,
-            int warningGroupId,
-            Date scheduleTime,
-            Priority processInstancePriority,
-            String message){
-        this.commandType = commandType;
-        this.executorId = executorId;
-        this.processDefinitionId = processDefinitionId;
-        this.commandParam = commandParam;
-        this.warningType = warningType;
-        this.warningGroupId = warningGroupId;
-        this.scheduleTime = scheduleTime;
-        this.taskDependType = taskDependType;
-        this.failureStrategy = failureStrategy;
-        this.startTime = new Date();
-        this.updateTime = new Date();
-        this.processInstancePriority = processInstancePriority;
-        this.message = message;
-    }
-
-
-    public TaskDependType getTaskDependType() {
-        return taskDependType;
-    }
-
-    public void setTaskDependType(TaskDependType taskDependType) {
-        this.taskDependType = taskDependType;
     }
 
     public int getId() {
@@ -184,21 +101,12 @@ public class ErrorCommand {
         this.processDefinitionId = processDefinitionId;
     }
 
-
     public FailureStrategy getFailureStrategy() {
         return failureStrategy;
     }
 
     public void setFailureStrategy(FailureStrategy failureStrategy) {
         this.failureStrategy = failureStrategy;
-    }
-
-    public void setCommandParam(String commandParam) {
-        this.commandParam = commandParam;
-    }
-
-    public String getCommandParam() {
-        return commandParam;
     }
 
     public WarningType getWarningType() {
@@ -233,14 +141,6 @@ public class ErrorCommand {
         this.startTime = startTime;
     }
 
-    public int getExecutorId() {
-        return executorId;
-    }
-
-    public void setExecutorId(int executorId) {
-        this.executorId = executorId;
-    }
-
     public Priority getProcessInstancePriority() {
         return processInstancePriority;
     }
@@ -265,6 +165,14 @@ public class ErrorCommand {
         this.workerGroupId = workerGroupId;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     @Override
     public String toString() {
         return "Command{" +
@@ -284,14 +192,4 @@ public class ErrorCommand {
                 ", message=" + message +
                 '}';
     }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-
 }

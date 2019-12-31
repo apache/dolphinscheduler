@@ -20,71 +20,30 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-/**
- * project
- */
-@Data
 @TableName("t_ds_project")
 public class Project {
-
-    /**
-     * id
-     */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-    /**
-     * user id
-     */
-    @TableField("user_id")
+    @TableField(value = "user_id")
     private int userId;
-
-    /**
-     * user name
-     */
-    @TableField(exist=false)
+    @TableField(exist = false)
     private String userName;
-
-    /**
-     * project name
-     */
+    @TableField(value = "name")
     private String name;
-
-    /**
-     * project description
-     */
+    @TableField(value = "description")
     private String description;
-
-    /**
-     * create time
-     */
+    @TableField(value = "create_time")
     private Date createTime;
-
-    /**
-     * update time
-     */
+    @TableField(value = "update_time")
     private Date updateTime;
-
-    /**
-     * permission
-     */
-    @TableField(exist=false)
+    @TableField(exist = false)
     private int perm;
-
-    /**
-     * process define count
-     */
-    @TableField(exist=false)
+    @TableField(exist = false)
     private int defCount;
-
-    /**
-     * process instance running count
-     */
-    @TableField(exist=false)
+    @TableField(exist = false)
     private int instRunningCount;
 
     public int getDefCount() {
@@ -138,6 +97,7 @@ public class Project {
     public void setDescription(String description) {
         this.description = description;
     }
+
     public String getDescription() {
         return description;
     }
@@ -165,6 +125,7 @@ public class Project {
     public void setPerm(int perm) {
         this.perm = perm;
     }
+
     @Override
     public String toString() {
         return "Project{" +

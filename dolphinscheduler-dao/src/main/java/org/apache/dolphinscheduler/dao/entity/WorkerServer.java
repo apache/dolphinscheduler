@@ -19,41 +19,12 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Date;
 
 public class WorkerServer {
-
-    /**
-     * id
-     */
     private int id;
-
-    /**
-     * host
-     */
     private String host;
-
-    /**
-     * port
-     */
     private int port;
-
-
-    /**
-     * zookeeper directory
-     */
     private String zkDirectory;
-
-    /**
-     * resource info
-     */
     private String resInfo;
-
-    /**
-     * create time
-     */
     private Date createTime;
-
-    /**
-     * last heart beat time
-     */
     private Date lastHeartbeatTime;
 
     public int getId() {
