@@ -20,35 +20,25 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-@Data
 @TableName("t_ds_access_token")
 public class AccessToken {
-
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-
-    @TableField("user_id")
+    @TableField(value = "user_id")
     private int userId;
-
-    @TableField("token")
+    @TableField(value = "token")
     private String token;
-
+    @TableField(value = "expire_time")
+    private Date expireTime;
+    @TableField(value = "create_time")
+    private Date createTime;
+    @TableField(value = "update_time")
+    private Date updateTime;
     @TableField(exist = false)
     private String userName;
-
-    @TableField("expire_time")
-    private Date expireTime;
-
-    @TableField("create_time")
-    private Date createTime;
-
-    @TableField("update_time")
-    private Date updateTime;
 
     public int getId() {
         return id;
