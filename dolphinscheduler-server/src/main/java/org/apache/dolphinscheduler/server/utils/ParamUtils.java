@@ -93,6 +93,10 @@ public class ParamUtils {
      * @return Map of converted
      */
     public static Map<String,String> convert(Map<String,Property> paramsMap){
+        if(paramsMap == null){
+            return null;
+        }
+
         Map<String,String> map = new HashMap<>();
         Iterator<Map.Entry<String, Property>> iter = paramsMap.entrySet().iterator();
         while (iter.hasNext()){
