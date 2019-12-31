@@ -119,8 +119,9 @@ public class MonitorService extends BaseService{
 
   public List<Server> getServerListFromZK(boolean isMaster){
 
+    checkNotNull(zookeeperMonitor);
     ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
-    return checkNotNull(zookeeperMonitor).getServersList(zkNodeType);
+    return zookeeperMonitor.getServersList(zkNodeType);
   }
 
 }
