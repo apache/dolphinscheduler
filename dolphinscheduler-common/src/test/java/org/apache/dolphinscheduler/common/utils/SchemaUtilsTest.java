@@ -37,13 +37,13 @@ public class SchemaUtilsTest {
 
     @Test
     public void testReplaceBlank() {
-        Assert.assertEquals(SchemaUtils.replaceBlank(" abc"), "abc");
-        Assert.assertEquals(SchemaUtils.replaceBlank("abc "), "abc");
-        Assert.assertEquals(SchemaUtils.replaceBlank("a b c"), "abc");
-        Assert.assertEquals(SchemaUtils.replaceBlank("a b   c"), "abc");
-        Assert.assertEquals(SchemaUtils.replaceBlank("  "), "");
-        Assert.assertEquals(SchemaUtils.replaceBlank(null), "");
-        Assert.assertEquals(SchemaUtils.replaceBlank("我怕的   你"), "我怕的你");
+        Assert.assertEquals("abc", SchemaUtils.replaceBlank(" abc"));
+        Assert.assertEquals("abc", SchemaUtils.replaceBlank("abc "));
+        Assert.assertEquals("abc", SchemaUtils.replaceBlank("a b c"));
+        Assert.assertEquals("abc", SchemaUtils.replaceBlank("a b   c"));
+        Assert.assertEquals("", SchemaUtils.replaceBlank("  "));
+        Assert.assertEquals("", SchemaUtils.replaceBlank(null));
+        Assert.assertEquals("我怕的你", SchemaUtils.replaceBlank("我怕的   你"));
     }
 
     @Test
@@ -52,13 +52,13 @@ public class SchemaUtilsTest {
         try {
             SchemaUtils.getSoftVersion();
         } catch (RuntimeException e) {
-            Assert.assertEquals(e.getMessage(),
-                    "Failed to get the product version description file. The file could not be found");
+            Assert.assertEquals("Failed to get the product version description file. The file could not be found",
+                    e.getMessage());
         }
 
         // file exists, fmt is invalid
         FileUtils.writeContent2File("32432423", "sql/soft_version");
-        Assert.assertEquals(SchemaUtils.getSoftVersion(), "32432423");
+        Assert.assertEquals("32432423", SchemaUtils.getSoftVersion());
     }
 
     @Test
@@ -67,14 +67,14 @@ public class SchemaUtilsTest {
         try {
             SchemaUtils.isAGreatVersion(null, null);
         } catch (RuntimeException e) {
-            Assert.assertEquals(e.getMessage(), "schemaVersion or version is empty");
+            Assert.assertEquals("schemaVersion or version is empty", e.getMessage());
         }
 
         // param is ""
         try {
             SchemaUtils.isAGreatVersion("", "");
         } catch (RuntimeException e) {
-            Assert.assertEquals(e.getMessage(), "schemaVersion or version is empty");
+            Assert.assertEquals("schemaVersion or version is empty", e.getMessage());
         }
         Assert.assertFalse(SchemaUtils.isAGreatVersion("1", "1"));
         Assert.assertTrue(SchemaUtils.isAGreatVersion("2", "1"));
