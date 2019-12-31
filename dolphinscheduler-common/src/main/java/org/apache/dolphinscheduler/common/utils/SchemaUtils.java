@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  *
  */
 public class SchemaUtils {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
 	private static Pattern p = Pattern.compile("\\s*|\t|\r|\n");
 
@@ -51,11 +51,11 @@ public class SchemaUtils {
 		if(schemaDirArr == null || schemaDirArr.length == 0) {
 			return null;
 		}
-		
+
 		for(File file : schemaDirArr) {
 			schemaDirList.add(file.getName());
 		}
-		
+
 		Collections.sort(schemaDirList , new Comparator() {
 			@Override
 			public int compare(Object o1 , Object o2){
@@ -67,23 +67,23 @@ public class SchemaUtils {
 					if(version1.equals(version2)) {
 						return 0;
 					}
-					
+
 					if(SchemaUtils.isAGreatVersion(version1, version2)) {
 						return 1;
 					}
-					
+
 					return -1;
-					
+
 				} catch (Exception e) {
 					logger.error(e.getMessage(),e);
 					throw new RuntimeException(e);
 				}
 			}
 		});
-		
+
 		return schemaDirList;
 	}
-	
+
 	/**
 	 * Determine whether schemaVersion is higher than version
 	 * @param schemaVersion schema version
@@ -94,7 +94,7 @@ public class SchemaUtils {
 		if(StringUtils.isEmpty(schemaVersion) || StringUtils.isEmpty(version)) {
 			throw new RuntimeException("schemaVersion or version is empty");
 		}
-		
+
 		String[] schemaVersionArr = schemaVersion.split("\\.");
 		String[] versionArr = version.split("\\.");
 		int arrLength = schemaVersionArr.length < versionArr.length ? schemaVersionArr.length : versionArr.length;
@@ -105,11 +105,11 @@ public class SchemaUtils {
 				return false;
 			}
 		}
-		
+
 		// If the version and schema version is the same from 0 up to the arrlength-1 element,whoever has a larger arrLength has a larger version number
 		return schemaVersionArr.length > versionArr.length;
 	}
-	
+
 	/**
 	 * Gets the current software version number of the system
 	 * @return current software version
@@ -122,13 +122,13 @@ public class SchemaUtils {
 		} catch (FileNotFoundException e) {
 			logger.error(e.getMessage(),e);
 			throw new RuntimeException("Failed to get the product version description file. The file could not be found", e);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			throw new RuntimeException("Failed to get product version number description file, failed to read the file", e);
 		}
 		return soft_version;
 	}
-	
+
 	/**
 	 * Strips the string of space carriage returns and tabs
 	 * @param str string
