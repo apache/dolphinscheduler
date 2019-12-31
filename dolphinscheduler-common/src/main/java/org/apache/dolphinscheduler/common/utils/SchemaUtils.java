@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -120,9 +121,9 @@ public class SchemaUtils {
 		} catch (FileNotFoundException e) {
 			logger.error(e.getMessage(),e);
 			throw new RuntimeException("Failed to get the product version description file. The file could not be found", e);
-		} catch (Exception e) {
-			logger.error("Failed to get product version number description file, failed to read the file", e);
-			throw new RuntimeException(e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(),e);
+			throw new RuntimeException("Failed to get product version number description file, failed to read the file", e);
 		}
 		return soft_version;
 	}
