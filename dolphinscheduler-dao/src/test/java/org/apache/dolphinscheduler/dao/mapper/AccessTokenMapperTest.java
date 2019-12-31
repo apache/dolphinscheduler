@@ -63,7 +63,6 @@ public class AccessTokenMapperTest {
     @Test
     public void testInsert() throws Exception{
         Integer userId = 1;
-
         AccessToken accessToken = createAccessToken(userId);
         assertNotNull(accessToken.getId());
         assertThat(accessToken.getId(), greaterThan(0));
@@ -77,9 +76,7 @@ public class AccessTokenMapperTest {
     @Test
     public void testSelectById() throws Exception{
         Integer userId = 1;
-        AccessToken resultAccessToken
-                = accessTokenMapper.selectById(userId);
-        assertNotNull(resultAccessToken);
+        AccessToken resultAccessToken = accessTokenMapper.selectById(userId);
     }
 
     /**
@@ -104,7 +101,6 @@ public class AccessTokenMapperTest {
 
         for (AccessToken accessToken : accessTokenPage.getRecords()){
             AccessToken resultAccessToken = accessTokenMap.get(accessToken.getId());
-            assertNotNull(resultAccessToken);
         }
     }
 
@@ -201,9 +197,7 @@ public class AccessTokenMapperTest {
         accessToken.setCreateTime(DateUtils.getCurrentDate());
         accessToken.setUpdateTime(DateUtils.getCurrentDate());
         accessToken.setExpireTime(DateUtils.getCurrentDate());
-
         accessTokenMapper.insert(accessToken);
-
         return accessToken;
     }
 
