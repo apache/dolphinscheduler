@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.api.utils;
 
+import java.util.Scanner;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Scanner;
 
 /**
  *	zookeeper state monitor
@@ -56,40 +56,46 @@ public class ZooKeeperState {
 		String content = cmd("srvr");
 		if (StringUtils.isNotBlank(content)) {
 			Scanner scannerForStat = new Scanner(content);
-			while (scannerForStat.hasNext()) {
-				String line = scannerForStat.nextLine();
-				if (line.startsWith("Latency min/avg/max:")) {
-					String[] latencys = getStringValueFromLine(line).split("/");
-					minLatency = Integer.parseInt(latencys[0]);
-					avgLatency = Integer.parseInt(latencys[1]);
-					maxLatency = Integer.parseInt(latencys[2]);
-				} else if (line.startsWith("Received:")) {
-					received = Long.parseLong(getStringValueFromLine(line));
-				} else if (line.startsWith("Sent:")) {
-					sent = Long.parseLong(getStringValueFromLine(line));
-				} else if (line.startsWith("Outstanding:")) {
-					outStanding = Integer.parseInt(getStringValueFromLine(line));
-				} else if (line.startsWith("Zxid:")) {
-					zxid = Long.parseLong(getStringValueFromLine(line).substring(2), 16);
-				} else if (line.startsWith("Mode:")) {
-					mode = getStringValueFromLine(line);
-				} else if (line.startsWith("Node count:")) {
-					nodeCount = Integer.parseInt(getStringValueFromLine(line));
+			try {
+				while (scannerForStat.hasNext()) {
+					String line = scannerForStat.nextLine();
+					if (line.startsWith("Latency min/avg/max:")) {
+						String[] latencys = getStringValueFromLine(line).split("/");
+						minLatency = Integer.parseInt(latencys[0]);
+						avgLatency = Integer.parseInt(latencys[1]);
+						maxLatency = Integer.parseInt(latencys[2]);
+					} else if (line.startsWith("Received:")) {
+						received = Long.parseLong(getStringValueFromLine(line));
+					} else if (line.startsWith("Sent:")) {
+						sent = Long.parseLong(getStringValueFromLine(line));
+					} else if (line.startsWith("Outstanding:")) {
+						outStanding = Integer.parseInt(getStringValueFromLine(line));
+					} else if (line.startsWith("Zxid:")) {
+						zxid = Long.parseLong(getStringValueFromLine(line).substring(2), 16);
+					} else if (line.startsWith("Mode:")) {
+						mode = getStringValueFromLine(line);
+					} else if (line.startsWith("Node count:")) {
+						nodeCount = Integer.parseInt(getStringValueFromLine(line));
+					}
 				}
-			}
-			scannerForStat.close();
+			} finally {
+				scannerForStat.close();
+			}	
 		}
 
 		String wchsText = cmd("wchs");
 		if (StringUtils.isNotBlank(wchsText)) {
 			Scanner scannerForWchs = new Scanner(wchsText);
-			while (scannerForWchs.hasNext()) {
-				String line = scannerForWchs.nextLine();
-				if (line.startsWith("Total watches:")) {
-					watches = Integer.parseInt(getStringValueFromLine(line));
+			try {
+				while (scannerForWchs.hasNext()) {
+					String line = scannerForWchs.nextLine();
+					if (line.startsWith("Total watches:")) {
+						watches = Integer.parseInt(getStringValueFromLine(line));
+					}
 				}
-			}
-			scannerForWchs.close();
+			} finally {
+				scannerForWchs.close();
+			}	
 		}
 
 		String consText = cmd("cons");
