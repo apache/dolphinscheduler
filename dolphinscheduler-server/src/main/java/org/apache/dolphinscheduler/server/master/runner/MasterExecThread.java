@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -30,10 +31,12 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
+import org.apache.dolphinscheduler.server.utils.ScheduleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,66 +209,141 @@ public class MasterExecThread implements Runnable {
         processDao.saveProcessInstance(processInstance);
         Date scheduleDate = processInstance.getScheduleTime();
 
-        if(scheduleDate == null){
-            scheduleDate = startDate;
+        // First get schedule, if there is a scheduled task, it will be triggered according to the rules of the scheduled task
+        int id = processInstance.getProcessDefinitionId();
+        List<Schedule> schedules = processDao.queryScheduleByProcessDefinitionId(id);
+        List<Date> listDate = Lists.newLinkedList();
+        if(!CollectionUtils.isEmpty(schedules)){
+            for (Schedule schedule : schedules) {
+                if(schedule.getReleaseState() == ReleaseState.ONLINE){
+                    List<Date> list = ScheduleUtils.getRecentTriggerTime(schedule.getCrontab(), startDate, endDate);
+                    listDate.addAll(list);
+                }
+            }
         }
+        if(!CollectionUtils.isEmpty(listDate)){
+            // loop schedule date
+            Iterator<Date> iterator = listDate.iterator();
+            boolean next = iterator.hasNext();
+            if(next){
+                scheduleDate = iterator.next();
+                processInstance.setScheduleTime(scheduleDate);
+            }
+            while(Stopper.isRunning() && next){
+                // prepare dag and other info
+                prepareProcess();
 
-        while(Stopper.isRunning()){
-            // prepare dag and other info
-            prepareProcess();
+                if(dag == null){
+                    logger.error("process {} dag is null, please check out parameters",
+                            processInstance.getId());
+                    processInstance.setState(ExecutionStatus.SUCCESS);
+                    processDao.updateProcessInstance(processInstance);
+                    return;
+                }
 
-            if(dag == null){
-                logger.error("process {} dag is null, please check out parameters",
-                        processInstance.getId());
-                processInstance.setState(ExecutionStatus.SUCCESS);
-                processDao.updateProcessInstance(processInstance);
-                return;
+                // execute process ,waiting for end
+                runProcess();
+
+                // process instace failure ，no more complements
+                if(!processInstance.getState().typeIsSuccess()){
+                    logger.info("process {} state {}, complement not completely!",
+                            processInstance.getId(), processInstance.getState());
+                    break;
+                }
+
+                //  current process instance sucess ，next execute
+                if(iterator.hasNext()){
+                    scheduleDate = iterator.next();
+                }else{
+                    next = false;
+                    // all success
+                    logger.info("process {} complement completely!", processInstance.getId());
+                    break;
+                }
+
+                logger.info("process {} start to complement {} data",
+                        processInstance.getId(), DateUtils.dateToString(scheduleDate));
+                // execute next process instance complement data
+                processInstance.setScheduleTime(scheduleDate);
+                if(cmdParam.containsKey(Constants.CMDPARAM_RECOVERY_START_NODE_STRING)){
+                    cmdParam.remove(Constants.CMDPARAM_RECOVERY_START_NODE_STRING);
+                    processInstance.setCommandParam(JSONUtils.toJson(cmdParam));
+                }
+
+                List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstance.getId());
+                for(TaskInstance taskInstance : taskInstanceList){
+                    taskInstance.setFlag(Flag.NO);
+                    processDao.updateTaskInstance(taskInstance);
+                }
+                processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+                processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+                        processInstance.getProcessDefinition().getGlobalParamMap(),
+                        processInstance.getProcessDefinition().getGlobalParamList(),
+                        CommandType.COMPLEMENT_DATA,processInstance.getScheduleTime()));
+
+                processDao.saveProcessInstance(processInstance);
+            }
+        }else{
+            // loop day
+            if(scheduleDate == null){
+                scheduleDate = startDate;
             }
 
-            // execute process ,waiting for end
-            runProcess();
+            while(Stopper.isRunning()){
+                // prepare dag and other info
+                prepareProcess();
 
-            // process instace failure ，no more complements
-            if(!processInstance.getState().typeIsSuccess()){
-                logger.info("process {} state {}, complement not completely!",
-                        processInstance.getId(), processInstance.getState());
-                break;
+                if(dag == null){
+                    logger.error("process {} dag is null, please check out parameters",
+                            processInstance.getId());
+                    processInstance.setState(ExecutionStatus.SUCCESS);
+                    processDao.updateProcessInstance(processInstance);
+                    return;
+                }
+
+                // execute process ,waiting for end
+                runProcess();
+
+                // process instace failure ，no more complements
+                if(!processInstance.getState().typeIsSuccess()){
+                    logger.info("process {} state {}, complement not completely!",
+                            processInstance.getId(), processInstance.getState());
+                    break;
+                }
+
+                //  current process instance sucess ，next execute
+                scheduleDate = DateUtils.getSomeDay(scheduleDate, 1);
+                if(scheduleDate.after(endDate)){
+                    // all success
+                    logger.info("process {} complement completely!", processInstance.getId());
+                    break;
+                }
+
+                logger.info("process {} start to complement {} data",
+                        processInstance.getId(), DateUtils.dateToString(scheduleDate));
+                // execute next process instance complement data
+                processInstance.setScheduleTime(scheduleDate);
+                if(cmdParam.containsKey(Constants.CMDPARAM_RECOVERY_START_NODE_STRING)){
+                    cmdParam.remove(Constants.CMDPARAM_RECOVERY_START_NODE_STRING);
+                    processInstance.setCommandParam(JSONUtils.toJson(cmdParam));
+                }
+
+                List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstance.getId());
+                for(TaskInstance taskInstance : taskInstanceList){
+                    taskInstance.setFlag(Flag.NO);
+                    processDao.updateTaskInstance(taskInstance);
+                }
+                processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
+                processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
+                        processInstance.getProcessDefinition().getGlobalParamMap(),
+                        processInstance.getProcessDefinition().getGlobalParamList(),
+                        CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
+
+                processDao.saveProcessInstance(processInstance);
             }
-
-            //  current process instance sucess ，next execute
-            scheduleDate = DateUtils.getSomeDay(scheduleDate, 1);
-            if(scheduleDate.after(endDate)){
-                // all success
-                logger.info("process {} complement completely!", processInstance.getId());
-                break;
-            }
-
-            logger.info("process {} start to complement {} data",
-                    processInstance.getId(), DateUtils.dateToString(scheduleDate));
-            // execute next process instance complement data
-            processInstance.setScheduleTime(scheduleDate);
-            if(cmdParam.containsKey(Constants.CMDPARAM_RECOVERY_START_NODE_STRING)){
-                cmdParam.remove(Constants.CMDPARAM_RECOVERY_START_NODE_STRING);
-                processInstance.setCommandParam(JSONUtils.toJson(cmdParam));
-            }
-
-            List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstance.getId());
-            for(TaskInstance taskInstance : taskInstanceList){
-                taskInstance.setFlag(Flag.NO);
-                processDao.updateTaskInstance(taskInstance);
-            }
-            processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
-            processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
-                    processInstance.getProcessDefinition().getGlobalParamMap(),
-                    processInstance.getProcessDefinition().getGlobalParamList(),
-                    CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
-
-            processDao.saveProcessInstance(processInstance);
         }
-
         // flow end
         endProcess();
-
     }
 
 

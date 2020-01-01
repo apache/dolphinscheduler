@@ -1454,6 +1454,15 @@ public class ProcessDao {
     }
 
     /**
+     * query Schedule by processDefinitionId
+     * @param processDefinitionId processDefinitionId
+     * @see Schedule
+     */
+    public List<Schedule> queryScheduleByProcessDefinitionId(int processDefinitionId) {
+        return scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
+    }
+
+    /**
      * query need failover process instance
      * @param host host
      * @return process instance list
