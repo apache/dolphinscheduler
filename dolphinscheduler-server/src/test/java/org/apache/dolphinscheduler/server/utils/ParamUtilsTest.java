@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,8 +85,13 @@ public class ParamUtilsTest {
         //The expected value when globalParams is null but localParams is not null
         String expected1 = "{\"local_param\":{\"direct\":\"IN\",\"prop\":\"local_param\",\"type\":\"VARCHAR\",\"value\":\"20191229\"}}";
 
+        //Define expected date , the month is 0-base
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2019,11,30);
+        Date date = calendar.getTime();
+
         //Invoke convert
-        Map<String, Property> paramsMap = ParamUtils.convert(globalParams, globalParamsMap, localParams, CommandType.START_PROCESS, new Date());
+        Map<String, Property> paramsMap = ParamUtils.convert(globalParams, globalParamsMap, localParams, CommandType.START_PROCESS, date);
         String result = JSON.toJSONString(paramsMap);
         assertEquals(expected, result);
 
@@ -97,12 +103,12 @@ public class ParamUtilsTest {
         }
 
         //Invoke convert with null globalParams
-        Map<String, Property> paramsMap1 = ParamUtils.convert(null, globalParamsMap, localParams, CommandType.START_PROCESS, new Date());
+        Map<String, Property> paramsMap1 = ParamUtils.convert(null, globalParamsMap, localParams, CommandType.START_PROCESS, date);
         String result1 = JSON.toJSONString(paramsMap1);
         assertEquals(expected1, result1);
 
         //Null check, invoke convert with null globalParams and null localParams
-        Map<String, Property> paramsMap2 = ParamUtils.convert(null, globalParamsMap, null, CommandType.START_PROCESS, new Date());
+        Map<String, Property> paramsMap2 = ParamUtils.convert(null, globalParamsMap, null, CommandType.START_PROCESS, date);
         assertNull(paramsMap2);
     }
 
