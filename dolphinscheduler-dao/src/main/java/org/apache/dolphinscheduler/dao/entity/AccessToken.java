@@ -135,12 +135,11 @@ public class AccessToken {
     public int hashCode() {
         int result = id;
         result = 31 * result + userId;
-        result = 31 * result + userName != null ? userName.hashCode() : 0;
-        result = 31 * result + token != null ? token.hashCode() : 0;
+        result = 31 * result + (userName != null ? userName.hashCode() : 0);
+        result = 31 * result + (token != null ? token.hashCode() : 0);
         result = 31 * result + (expireTime != null ? expireTime.hashCode() : 0);
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
-        result = 31 * result + userName != null ? userName.hashCode() : 0;
         return result;
     }
 }
