@@ -26,14 +26,12 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
 /**
  * task instance
  */
-@Data
 @TableName("t_ds_task_instance")
 public class TaskInstance {
 
