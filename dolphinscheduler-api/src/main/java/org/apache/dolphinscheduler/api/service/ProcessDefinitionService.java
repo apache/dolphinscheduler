@@ -862,7 +862,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param loginUser login user
      * @param targetProject target project
      */
-    private void importSubProcess(User loginUser, Project targetProject, JSONArray jsonArray, Map<Integer, Integer> subProcessIdMap) {
+    public void importSubProcess(User loginUser, Project targetProject, JSONArray jsonArray, Map<Integer, Integer> subProcessIdMap) {
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject taskNode = jsonArray.getJSONObject(i);
             String taskType = taskNode.getString("type");
