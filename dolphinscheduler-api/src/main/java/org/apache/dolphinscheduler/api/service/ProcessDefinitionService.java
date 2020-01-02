@@ -925,9 +925,13 @@ public class ProcessDefinitionService extends BaseDAGService {
 
                     //modify task node
                     ProcessDefinition newSubProcessDefine = processDefineMapper.queryByDefineName(processDefine.getProjectId(),processDefine.getName());
-                    subProcessIdMap.put(subProcessId, newSubProcessDefine.getId());
-                    subParams.put("processDefinitionId", newSubProcessDefine.getId());
-                    taskNode.put("params", subParams);
+
+                    if (null != newSubProcessDefine) {
+                        subProcessIdMap.put(subProcessId, newSubProcessDefine.getId());
+                        subParams.put("processDefinitionId", newSubProcessDefine.getId());
+                        taskNode.put("params", subParams);
+                    }
+
                 }
             }
         }

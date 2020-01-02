@@ -48,7 +48,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class ProcessDefinitionServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionServiceTest.class);
@@ -138,6 +138,7 @@ public class ProcessDefinitionServiceTest {
     public void testAddTaskNodeSpecialParam() throws JSONException {
 
         Mockito.when(dataSourceMapper.selectById(1)).thenReturn(getDataSource());
+        Mockito.when(processDefineMapper.queryByDefineId(2)).thenReturn(getProcessDefinition());
 
 
         String sqlDependentJson = "{\"globalParams\":[]," +
@@ -216,18 +217,22 @@ public class ProcessDefinitionServiceTest {
 
         ProcessDefinition shellDefinition1 = new ProcessDefinition();
         shellDefinition1.setId(39);
-        shellDefinition1.setName("testProject");
+        shellDefinition1.setName("shell-4");
         shellDefinition1.setProjectId(2);
         shellDefinition1.setProcessDefinitionJson(sub1ProcessJson);
 
         ProcessDefinition shellDefinition2 = new ProcessDefinition();
         shellDefinition2.setId(46);
-        shellDefinition2.setName("testProject");
+        shellDefinition2.setName("shell-5");
         shellDefinition2.setProjectId(2);
         shellDefinition2.setProcessDefinitionJson(sub2ProcessJson);
 
         Mockito.when(processDefineMapper.queryByDefineId(39)).thenReturn(shellDefinition1);
+        Mockito.when(processDefineMapper.queryByDefineId(46)).thenReturn(shellDefinition2);
+        Mockito.when(processDefineMapper.queryByDefineName(testProject.getId(), "shell-5")).thenReturn(null);
+        Mockito.when(processDefineMapper.queryByDefineName(testProject.getId(), "shell-4")).thenReturn(null);
         Mockito.when(processDefineMapper.queryByDefineName(testProject.getId(), "testProject")).thenReturn(shellDefinition2);
+
         processDefinitionService.importSubProcess(loginUser,testProject,jsonArray,subProcessIdMap);
 
         String correctSubJson = jsonArray.toString();
