@@ -33,26 +33,6 @@ public class ScheduleUtils {
     private static final Logger logger = LoggerFactory.getLogger(ScheduleUtils.class);
 
     /**
-     *
-     * @param cron
-     * @return
-     */
-    public static List<Date> getRecentTriggerTime(String cron, int size) {
-        return getRecentTriggerTime(cron, size, new Date(), null);
-    }
-
-    /**
-     *
-     * @param cron
-     * @param size
-     * @param from
-     * @return
-     */
-    public static List<Date> getRecentTriggerTime(String cron, int size, Date from) {
-        return getRecentTriggerTime(cron, size, from, null);
-    }
-
-    /**
      * Get the execution time of the time interval
      * @param cron
      * @param size
@@ -87,7 +67,7 @@ public class ScheduleUtils {
                 }
             }
         } catch (ParseException e) {
-            logger.error("cron:{} error:{}", e.getMessage());
+            logger.error("cron:{} error:{}", cron, e.getMessage());
         }
         return java.util.Collections.unmodifiableList(list);
     }
@@ -126,7 +106,7 @@ public class ScheduleUtils {
                 }
             }
         } catch (ParseException e) {
-            logger.error("cron:{} error:{}", e.getMessage());
+            logger.error("cron:{} error:{}", cron, e.getMessage());
         }
         return java.util.Collections.unmodifiableList(list);
     }
