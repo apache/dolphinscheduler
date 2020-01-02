@@ -234,6 +234,12 @@ public class ResourcesService extends BaseService {
             }
         }
 
+        // query tenant by user id
+        String tenantCode = getTenantCode(resource.getUserId(),result);
+        if (StringUtils.isEmpty(tenantCode)){
+            return result;
+        }
+
         //get the file suffix
         String originResourceName = resource.getAlias();
         String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
@@ -271,10 +277,6 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        // hdfs move
-        // query tenant by user id
-        User user = userMapper.queryDetailsById(resource.getUserId());
-        String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
         // get file hdfs path
         // delete hdfs file by type
         String originHdfsFileName = "";
@@ -430,10 +432,15 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
+        Tenant tenant = tenantMapper.queryById(loginUser.getTenantId());
+        if (tenant == null){
+            putMsg(result, Status.TENANT_NOT_EXIST);
+            return result;
+        }
         String hdfsFilename = "";
 
         // delete hdfs file by type
+        String tenantCode = tenant.getTenantCode();
         hdfsFilename = getHdfsFileName(resource, tenantCode, hdfsFilename);
 
         //delete data in database
@@ -522,8 +529,11 @@ public class ResourcesService extends BaseService {
             }
         }
 
-        User user = userMapper.queryDetailsById(resource.getUserId());
-        String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
+        String tenantCode = getTenantCode(resource.getUserId(),result);
+        if (StringUtils.isEmpty(tenantCode)){
+            return  result;
+        }
+
         // hdfs path
         String hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resource.getAlias());
         logger.info("resource hdfs path is {} ", hdfsFileName);
@@ -644,18 +654,20 @@ public class ResourcesService extends BaseService {
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
             if (!strList.contains(nameSuffix)) {
-                logger.error("resouce suffix {} not support updateProcessInstance,  resource id {}", nameSuffix, resourceId);
+                logger.error("resource suffix {} not support updateProcessInstance,  resource id {}", nameSuffix, resourceId);
                 putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
         }
 
+        String tenantCode = getTenantCode(resource.getUserId(),result);
+        if (StringUtils.isEmpty(tenantCode)){
+            return  result;
+        }
         resource.setSize(content.getBytes().length);
         resource.setUpdateTime(new Date());
         resourcesMapper.updateById(resource);
 
-        User user = userMapper.queryDetailsById(resource.getUserId());
-        String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
 
         result = uploadContentToHdfs(resource.getAlias(), tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -895,6 +907,29 @@ public class ResourcesService extends BaseService {
             resourceSet.removeAll(authedResourceSet);
 
         }
+    }
+
+    /**
+     * get tenantCode by UserId
+     *
+     * @param userId user id
+     * @param result return result
+     * @return
+     */
+    private String getTenantCode(int userId,Result result){
+
+        User user = userMapper.queryDetailsById(userId);
+        if(user == null){
+            putMsg(result, Status.USER_NOT_EXIST,userId);
+            return null;
+        }
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null){
+            putMsg(result, Status.TENANT_NOT_EXIST);
+            return null;
+        }
+        return tenant.getTenantCode();
     }
 
 }
