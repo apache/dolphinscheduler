@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.http.entity.ContentType;
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +45,12 @@ import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -238,6 +245,72 @@ public class ProcessDefinitionServiceTest {
         String correctSubJson = jsonArray.toString();
 
         Assert.assertEquals(originSubJson, correctSubJson);
+
+    }
+
+    @Test
+    public void testImportProcessDefinitionById() throws IOException {
+
+        String processJson = "{\"projectName\":\"testProject\",\"processDefinitionName\":\"shell-4\"," +
+                "\"processDefinitionJson\":\"{\\\"tenantId\\\":1,\\\"globalParams\\\":[]," +
+                "\\\"tasks\\\":[{\\\"workerGroupId\\\":-1,\\\"description\\\":\\\"\\\",\\\"runFlag\\\":\\\"NORMAL\\\"," +
+                "\\\"type\\\":\\\"SHELL\\\",\\\"params\\\":{\\\"rawScript\\\":\\\"#!/bin/bash\\\\necho \\\\\\\"shell-4\\\\\\\"\\\"," +
+                "\\\"localParams\\\":[],\\\"resourceList\\\":[]},\\\"timeout\\\":{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}," +
+                "\\\"maxRetryTimes\\\":\\\"0\\\",\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-4\\\"," +
+                "\\\"dependence\\\":{},\\\"retryInterval\\\":\\\"1\\\",\\\"preTasks\\\":[],\\\"id\\\":\\\"tasks-84090\\\"}," +
+                "{\\\"taskInstancePriority\\\":\\\"MEDIUM\\\",\\\"name\\\":\\\"shell-5\\\",\\\"workerGroupId\\\":-1," +
+                "\\\"description\\\":\\\"\\\",\\\"dependence\\\":{},\\\"preTasks\\\":[\\\"shell-4\\\"],\\\"id\\\":\\\"tasks-87364\\\"," +
+                "\\\"runFlag\\\":\\\"NORMAL\\\",\\\"type\\\":\\\"SUB_PROCESS\\\",\\\"params\\\":{\\\"processDefinitionId\\\":46}," +
+                "\\\"timeout\\\":{\\\"enable\\\":false,\\\"strategy\\\":\\\"\\\"}}],\\\"timeout\\\":0}\"," +
+                "\"processDefinitionDescription\":\"\",\"processDefinitionLocations\":\"{\\\"tasks-84090\\\":{\\\"name\\\":\\\"shell-4\\\"," +
+                "\\\"targetarr\\\":\\\"\\\",\\\"x\\\":128,\\\"y\\\":114},\\\"tasks-87364\\\":{\\\"name\\\":\\\"shell-5\\\"," +
+                "\\\"targetarr\\\":\\\"tasks-84090\\\",\\\"x\\\":266,\\\"y\\\":115}}\"," +
+                "\"processDefinitionConnects\":\"[{\\\"endPointSourceId\\\":\\\"tasks-84090\\\"," +
+                "\\\"endPointTargetId\\\":\\\"tasks-87364\\\"}]\"}";
+
+        String subProcessJson = "{\"globalParams\":[]," +
+                "\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-52423\",\"name\":\"shell-5\"," +
+                "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo \\\"shell-5\\\"\"},\"description\":\"\"," +
+                "\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
+                "\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
+                "\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
+
+        FileUtils.writeStringToFile(new File("/tmp/task.json"),processJson);
+
+        File file = new File("/tmp/task.json");
+
+        FileInputStream fileInputStream = new FileInputStream("/tmp/task.json");
+
+        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(),
+                ContentType.APPLICATION_OCTET_STREAM.toString(), fileInputStream);
+
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+
+        String currentProjectName = "testProject";
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.SUCCESS, currentProjectName);
+
+        ProcessDefinition shellDefinition2 = new ProcessDefinition();
+        shellDefinition2.setId(46);
+        shellDefinition2.setName("shell-5");
+        shellDefinition2.setProjectId(2);
+        shellDefinition2.setProcessDefinitionJson(subProcessJson);
+
+        Mockito.when(projectMapper.queryByName(currentProjectName)).thenReturn(getProject(currentProjectName));
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, getProject(currentProjectName), currentProjectName)).thenReturn(result);
+        Mockito.when(processDefineMapper.queryByDefineId(46)).thenReturn(shellDefinition2);
+
+        //import process
+        Map<String, Object> importProcessResult = processDefinitionService.importProcessDefinition(loginUser, multipartFile, currentProjectName);
+
+        Assert.assertEquals(Status.SUCCESS, importProcessResult.get(Constants.STATUS));
+
+        boolean delete = file.delete();
+
+        Assert.assertTrue(delete);
+
 
     }
 
