@@ -21,6 +21,12 @@
     </div>
     <div class="clearfix list">
       <div class="text">
+        {{$t('Process Name')}}
+      </div>
+      <div style="line-height: 32px;">{{workflowName}}</div>
+    </div>
+    <div class="clearfix list">
+      <div class="text">
         {{$t('Failure Strategy')}}
       </div>
       <div class="cont">
@@ -174,6 +180,7 @@
         processDefinitionId: 0,
         failureStrategy: 'CONTINUE',
         warningTypeList: warningTypeList,
+        workflowName: '',
         warningType: '',
         notifyGroupList: [],
         warningGroupId: '',
@@ -276,6 +283,7 @@
           this.warningGroupId = ''
         })
       })
+      this.workflowName = this.item.name
     },
     computed: {},
     components: { mEmail, mPriority, mWorkerGroups }
