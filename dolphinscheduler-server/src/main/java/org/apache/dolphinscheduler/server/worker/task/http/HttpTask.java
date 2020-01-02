@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.common.process.HttpProperty;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
-import org.apache.dolphinscheduler.common.utils.Bytes;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
@@ -50,6 +49,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -176,7 +176,7 @@ public class HttpTask extends AbstractTask {
         if (entity == null) {
             return null;
         }
-        String webPage = EntityUtils.toString(entity, Bytes.UTF8_ENCODING);
+        String webPage = EntityUtils.toString(entity, StandardCharsets.UTF_8.name());
         return webPage;
     }
 
@@ -264,7 +264,7 @@ public class HttpTask extends AbstractTask {
                 }
             }
             StringEntity postingString = new StringEntity(jsonParam.toString(), Charsets.UTF_8);
-            postingString.setContentEncoding(Bytes.UTF8_ENCODING);
+            postingString.setContentEncoding(StandardCharsets.UTF_8.name());
             postingString.setContentType(APPLICATION_JSON);
             builder.setEntity(postingString);
         }
