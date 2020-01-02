@@ -141,6 +141,7 @@
           let self = this
           let formData = new FormData()
           formData.append('file', this.file)
+          formData.append('projectName',this.store.state.dag.projectName)
           io.post(`projects/import-definition`, res => {
             this.$message.success(res.msg)
             resolve()
