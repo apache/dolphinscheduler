@@ -63,6 +63,7 @@ public class AccessTokenMapperTest {
     @Test
     public void testInsert() throws Exception{
         Integer userId = 1;
+
         AccessToken accessToken = createAccessToken(userId);
         assertNotNull(accessToken.getId());
         assertThat(accessToken.getId(), greaterThan(0));
@@ -76,7 +77,9 @@ public class AccessTokenMapperTest {
     @Test
     public void testSelectById() throws Exception{
         Integer userId = 1;
-        AccessToken resultAccessToken = accessTokenMapper.selectById(userId);
+        AccessToken accessToken = createAccessToken(userId);
+        AccessToken resultAccessToken = accessTokenMapper.selectById(accessToken.getId());
+        assertEquals(accessToken, resultAccessToken);
     }
 
     /**
@@ -90,7 +93,6 @@ public class AccessTokenMapperTest {
         Integer offset = 2;
         Integer size = 2;
 
-
         Map<Integer, AccessToken> accessTokenMap = createAccessTokens(count, userName);
 
         Page page = new Page(offset, size);
@@ -98,9 +100,9 @@ public class AccessTokenMapperTest {
 
         assertEquals(Integer.valueOf(accessTokenPage.getRecords().size()),size);
 
-
         for (AccessToken accessToken : accessTokenPage.getRecords()){
             AccessToken resultAccessToken = accessTokenMap.get(accessToken.getId());
+            assertEquals(accessToken,resultAccessToken);
         }
     }
 
@@ -111,12 +113,17 @@ public class AccessTokenMapperTest {
     @Test
     public void testUpdate() throws Exception{
         Integer userId = 1;
+
         AccessToken accessToken = createAccessToken(userId);
         //update
         accessToken.setToken("56789");
         accessToken.setExpireTime(DateUtils.getCurrentDate());
         accessToken.setUpdateTime(DateUtils.getCurrentDate());
+
         accessTokenMapper.updateById(accessToken);
+
+        AccessToken resultAccessToken = accessTokenMapper.selectById(accessToken.getId());
+        assertEquals(accessToken, resultAccessToken);
     }
 
     /**
@@ -197,7 +204,9 @@ public class AccessTokenMapperTest {
         accessToken.setCreateTime(DateUtils.getCurrentDate());
         accessToken.setUpdateTime(DateUtils.getCurrentDate());
         accessToken.setExpireTime(DateUtils.getCurrentDate());
+
         accessTokenMapper.insert(accessToken);
+
         return accessToken;
     }
 

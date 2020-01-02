@@ -95,4 +95,52 @@ public class AccessToken {
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AccessToken that = (AccessToken) o;
+
+        if (id != that.id) {
+            return false;
+        }
+        if (userId != that.userId) {
+            return false;
+        }
+        if (!userName.equals(that.userName)) {
+            return false;
+        }
+        if (!token.equals(that.token)) {
+            return false;
+        }
+        if (!expireTime.equals(that.expireTime)) {
+            return false;
+        }
+        if (!createTime.equals(that.createTime)) {
+            return false;
+        }
+        if (!updateTime.equals(that.updateTime)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + userId;
+        result = 31 * result + userName.hashCode();
+        result = 31 * result + token.hashCode();
+        result = 31 * result + expireTime.hashCode();
+        result = 31 * result + createTime.hashCode();
+        result = 31 * result + updateTime.hashCode();
+        result = 31 * result + userName.hashCode();
+        return result;
+    }
 }
