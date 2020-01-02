@@ -37,9 +37,7 @@ import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
  * AccessToken mapper test
@@ -83,6 +81,31 @@ public class AccessTokenMapperTest {
     }
 
     /**
+     * test hashCode method
+     * @throws Exception
+     */
+    @Test
+    public void testHashCodeMethod() throws Exception {
+        Integer userId = 1;
+        AccessToken accessToken = createAccessToken(userId);
+        AccessToken resultAccessToken = accessTokenMapper.selectById(accessToken.getId());
+        boolean flag = accessToken.equals(resultAccessToken);
+        assertTrue(flag);
+    }
+
+    /**
+     * test equals method
+     * @throws Exception
+     */
+    @Test
+    public void testEqualsMethod() throws Exception {
+        Integer userId = 1;
+        AccessToken accessToken = createAccessToken(userId);
+        int result = accessToken.hashCode();
+        assertNotNull(result);
+    }
+
+    /**
      * test page
      */
     @Test
@@ -113,15 +136,12 @@ public class AccessTokenMapperTest {
     @Test
     public void testUpdate() throws Exception{
         Integer userId = 1;
-
         AccessToken accessToken = createAccessToken(userId);
         //update
         accessToken.setToken("56789");
         accessToken.setExpireTime(DateUtils.getCurrentDate());
         accessToken.setUpdateTime(DateUtils.getCurrentDate());
-
         accessTokenMapper.updateById(accessToken);
-
         AccessToken resultAccessToken = accessTokenMapper.selectById(accessToken.getId());
         assertEquals(accessToken, resultAccessToken);
     }
