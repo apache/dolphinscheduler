@@ -53,6 +53,7 @@ public class TaskNodeRelation {
   }
 
 
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof TaskNodeRelation)) {
       return false;
@@ -67,5 +68,12 @@ public class TaskNodeRelation {
             "startNode='" + startNode + '\'' +
             ", endNode='" + endNode + '\'' +
             '}';
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getStartNode() != null ? getStartNode().hashCode() : 0;
+    result = 31 * result + (getEndNode() != null ? getEndNode().hashCode() : 0);
+    return result;
   }
 }

@@ -59,4 +59,11 @@ public class DateInterval {
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
+
+    @Override
+    public int hashCode() {
+        int result = getStartTime() != null ? getStartTime().hashCode() : 0;
+        result = 31 * result + (getEndTime() != null ? getEndTime().hashCode() : 0);
+        return result;
+    }
 }
