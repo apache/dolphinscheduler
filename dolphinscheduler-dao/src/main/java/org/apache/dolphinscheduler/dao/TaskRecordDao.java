@@ -16,22 +16,26 @@
  */
 package org.apache.dolphinscheduler.dao;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskRecord;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -80,10 +84,8 @@ public class TaskRecordDao {
             //classLoader，load driver
             Class.forName(driver);
             conn = DriverManager.getConnection(url, username, password);
-        } catch (ClassNotFoundException e) {
-            logger.error("Exception ", e);
-        } catch (SQLException e) {
-            logger.error("Exception ", e);
+        } catch (ClassNotFoundException | SQLException e) {
+            logger.error("Exception when get connection", e);
         }
         return conn;
     }
@@ -156,13 +158,15 @@ public class TaskRecordDao {
             String sql = String.format("select count(1) as count from %s", table);
             sql += getWhereString(filterMap);
             pstmt = conn.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
-            while(rs.next()){
-                count = rs.getInt("count");
-                break;
-            }
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while(rs.next()){
+                    count = rs.getInt("count");
+                    break;
+                }
+            }            
         } catch (SQLException e) {
-            logger.error("Exception ", e);
+            logger.error("Exception when count task ", e);
         }finally {
             try {
                 if(pstmt != null) {
@@ -172,7 +176,7 @@ public class TaskRecordDao {
                     conn.close();
                 }
             } catch (SQLException e) {
-                logger.error("Exception ", e);
+                logger.error("Exception when close connection ", e);
             }
         }
         return count;
@@ -197,7 +201,7 @@ public class TaskRecordDao {
         try{
             recordList = getQueryResult(sql);
         }catch (Exception e){
-            logger.error("Exception ", e);
+            logger.error("Exception when query result ", e);
         }
         return recordList;
     }
@@ -245,11 +249,12 @@ public class TaskRecordDao {
                 return recordList;
             }
             pstmt = conn.prepareStatement(selectSql);
-            ResultSet rs = pstmt.executeQuery();
 
-            while(rs.next()){
-                TaskRecord taskRecord = convertToTaskRecord(rs);
-                recordList.add(taskRecord);
+            try (ResultSet rs = pstmt.executeQuery();) {
+                while(rs.next()){
+                    TaskRecord taskRecord = convertToTaskRecord(rs);
+                    recordList.add(taskRecord);
+                }
             }
         } catch (SQLException e) {
             logger.error("Exception ", e);
@@ -262,7 +267,7 @@ public class TaskRecordDao {
                     conn.close();
                 }
             } catch (SQLException e) {
-                logger.error("Exception ", e);
+                logger.error("Exception when close connection", e);
             }
         }
         return recordList;

@@ -16,18 +16,18 @@
  */
 package org.apache.dolphinscheduler.dao.utils;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Date;
+
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Date;
 
 /**
  * postgresql performance
@@ -50,26 +50,30 @@ public class PostgrePerformance extends BaseDBPerformance {
         Statement pstmt= null;
         try{
             pstmt = conn.createStatement();
-            ResultSet rs1 = pstmt.executeQuery("select count(*) from pg_stat_activity;");
-            while(rs1.next()){
-                monitorRecord.setThreadsConnections(rs1.getInt("count"));
-                break;
+            
+            try (ResultSet rs1 = pstmt.executeQuery("select count(*) from pg_stat_activity;")) {
+                while(rs1.next()){
+                    monitorRecord.setThreadsConnections(rs1.getInt("count"));
+                    break;
+                }
             }
 
-            ResultSet rs2 = pstmt.executeQuery("show max_connections");
-            while(rs2.next()){
-                monitorRecord.setMaxConnections( rs2.getInt("max_connections"));
-                break;
+            try (ResultSet rs2 = pstmt.executeQuery("show max_connections")) {
+                while(rs2.next()){
+                    monitorRecord.setMaxConnections( rs2.getInt("max_connections"));
+                    break;
+                }
             }
 
-            ResultSet rs3 = pstmt.executeQuery("select count(*) from pg_stat_activity pg where pg.state = 'active';");
-            while(rs3.next()){
-                monitorRecord.setThreadsRunningConnections(rs3.getInt("count"));
-                break;
+            try (ResultSet rs3 = pstmt.executeQuery("select count(*) from pg_stat_activity pg where pg.state = 'active';")) {
+                while(rs3.next()){
+                    monitorRecord.setThreadsRunningConnections(rs3.getInt("count"));
+                    break;
+                }
             }
         }catch (Exception e) {
             monitorRecord.setState(Flag.NO);
-            logger.error("SQLException " + e);
+            logger.error("SQLException ", e);
         }finally {
             try {
                 if (pstmt != null) {
