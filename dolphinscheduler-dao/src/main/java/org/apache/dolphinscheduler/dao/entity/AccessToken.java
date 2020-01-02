@@ -113,19 +113,19 @@ public class AccessToken {
         if (userId != that.userId) {
             return false;
         }
-        if (!userName.equals(that.userName)) {
+        if (userName != null && !userName.equals(that.userName)) {
             return false;
         }
-        if (!token.equals(that.token)) {
+        if (token != null && !token.equals(that.token)) {
             return false;
         }
-        if (!expireTime.equals(that.expireTime)) {
+        if (expireTime != null && !expireTime.equals(that.expireTime)) {
             return false;
         }
-        if (!createTime.equals(that.createTime)) {
+        if (createTime != null && !createTime.equals(that.createTime)) {
             return false;
         }
-        if (!updateTime.equals(that.updateTime)) {
+        if (updateTime != null && !updateTime.equals(that.updateTime)) {
             return false;
         }
         return true;
@@ -135,12 +135,12 @@ public class AccessToken {
     public int hashCode() {
         int result = id;
         result = 31 * result + userId;
-        result = 31 * result + userName.hashCode();
-        result = 31 * result + token.hashCode();
-        result = 31 * result + expireTime.hashCode();
-        result = 31 * result + createTime.hashCode();
-        result = 31 * result + updateTime.hashCode();
-        result = 31 * result + userName.hashCode();
+        result = 31 * result + userName != null ? userName.hashCode() : 0;
+        result = 31 * result + token != null ? token.hashCode() : 0;
+        result = 31 * result + (expireTime != null ? expireTime.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        result = 31 * result + userName != null ? userName.hashCode() : 0;
         return result;
     }
 }
