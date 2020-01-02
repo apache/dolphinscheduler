@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-.dag-model {
+ .dag-model {
   background: url("../img/dag_bg.png");
   height: calc(100vh - 100px);
   ::selection {
@@ -309,13 +309,13 @@ svg path:hover {
   //min-width: calc(100% - 220px);
   width: 8000px;
   height: 5000px;
-  position: relative;
   svg:not(:root){
     z-index: 11;
   }
 }
 
 .jtk-demo-canvas {
+  position: relative;
   height: 100%;
 }
 
@@ -552,5 +552,3 @@ svg path:hover {
   width: 628px;
   left: auto;
 }
-
-
