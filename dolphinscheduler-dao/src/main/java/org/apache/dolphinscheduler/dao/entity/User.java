@@ -22,18 +22,13 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
 
 import java.util.Date;
 
 /**
  * user
  */
-@Data
 @TableName("t_ds_user")
-@ApiModel(description = "UserModelDesc")
 public class  User {
 
     /**
@@ -45,13 +40,11 @@ public class  User {
     /**
      * user name
      */
-    @ApiModelProperty(name = "userName", notes = "USER_NAME",dataType = "String",required = true)
     private String userName;
 
     /**
      * user password
      */
-    @ApiModelProperty(name = "userPassword", notes = "USER_PASSWORD",dataType = "String",required = true)
     private String userPassword;
 
     /**
