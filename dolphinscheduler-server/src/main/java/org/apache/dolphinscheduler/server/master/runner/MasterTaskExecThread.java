@@ -74,6 +74,10 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     public Boolean submitWaitComplete() {
         Boolean result = false;
         this.taskInstance = submit();
+        if(this.taskInstance == null){
+            logger.error("submit task instance to mysql and queue failed , please check and fix it");
+            return result;
+        }
         if(!this.taskInstance.getState().typeIsFinished()) {
             result = waitTaskQuit();
         }
@@ -91,6 +95,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     public Boolean waitTaskQuit(){
         // query new state
         taskInstance = processDao.findTaskInstanceById(taskInstance.getId());
+        logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
+                this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
         // task time out
         Boolean checkTimeout = false;
         TaskTimeoutParameter taskTimeoutParameter = getTaskTimeoutParameter();

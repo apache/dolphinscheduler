@@ -71,13 +71,13 @@
                     :title="$t('Edit')"
                     :disabled="_rtDisb(item)"
                     @click="_edit(item,$index)"
-                    icon="iconfont icon-bianjixiugai">
+                    icon="ans-icon-edit">
             </x-button>
             <x-button
                     type="info"
                     shape="circle"
                     size="xsmall"
-                    icon="iconfont icon-wendangxiugai"
+                    icon="ans-icon-play"
                     data-toggle="tooltip"
                     :title="$t('Rename')"
                     @click="_rename(item,$index)">
@@ -90,7 +90,7 @@
                     data-toggle="tooltip"
                     :title="$t('Download')"
                     @click="_downloadFile(item)"
-                    icon="iconfont icon-download">
+                    icon="ans-icon-download">
             </x-button>
 
             <x-poptip
@@ -104,7 +104,7 @@
               </div>
               <template slot="reference">
                 <x-button
-                        icon="iconfont icon-shanchu"
+                        icon="ans-icon-trash"
                         type="error"
                         shape="circle"
                         size="xsmall"

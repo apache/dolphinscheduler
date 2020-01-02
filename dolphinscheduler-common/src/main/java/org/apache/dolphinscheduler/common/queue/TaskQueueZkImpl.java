@@ -17,51 +17,28 @@
 package org.apache.dolphinscheduler.common.queue;
 
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.Bytes;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.data.Stat;
+import org.apache.dolphinscheduler.common.zk.ZookeeperOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 /**
  * A singleton of a task queue implemented with zookeeper
  * tasks queue implemention
  */
-public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
+@Service
+public class TaskQueueZkImpl implements ITaskQueue {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskQueueZkImpl.class);
 
-    private static volatile TaskQueueZkImpl instance;
-
-    private TaskQueueZkImpl(){
-        init();
-    }
-
-    public static TaskQueueZkImpl getInstance(){
-        if (null == instance) {
-            synchronized (TaskQueueZkImpl.class) {
-                if(null == instance) {
-                    instance = new TaskQueueZkImpl();
-                }
-            }
-        }
-        return instance;
-    }
-
+    @Autowired
+    private ZookeeperOperator zookeeperOperator;
 
     /**
      * get all tasks from tasks queue
@@ -71,14 +48,12 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
     @Override
     public List<String> getAllTasks(String key) {
         try {
-            List<String> list = getZkClient().getChildren().forPath(getTasksPath(key));
-
+            List<String> list = zookeeperOperator.getChildrenKeys(getTasksPath(key));
             return list;
         } catch (Exception e) {
             logger.error("get all tasks from tasks queue exception",e);
         }
-
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     /**
@@ -92,22 +67,8 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
     public boolean checkTaskExists(String key, String task) {
         String taskPath = getTasksPath(key) + Constants.SINGLE_SLASH + task;
 
-        try {
-            Stat stat = zkClient.checkExists().forPath(taskPath);
+        return zookeeperOperator.isExisted(taskPath);
 
-            if(null == stat){
-                logger.info("check task:{} not exist in task queue",task);
-                return false;
-            }else{
-                logger.info("check task {} exists in task queue ",task);
-                return true;
-            }
-
-        } catch (Exception e) {
-            logger.info(String.format("task {} check exists in task queue exception ", task), e);
-        }
-
-        return false;
     }
 
 
@@ -118,14 +79,14 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      * @param value    ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}_host1,host2,...
      */
     @Override
-    public void add(String key, String value) {
+    public boolean add(String key, String value){
         try {
             String taskIdPath = getTasksPath(key) + Constants.SINGLE_SLASH + value;
-            String result = getZkClient().create().withMode(CreateMode.PERSISTENT).forPath(taskIdPath, Bytes.toBytes(value));
-
-            logger.info("add task : {} to tasks queue , result success",result);
+            zookeeperOperator.persist(taskIdPath, value);
+            return true;
         } catch (Exception e) {
             logger.error("add task to tasks queue exception",e);
+            return false;
         }
 
     }
@@ -144,9 +105,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
     @Override
     public List<String> poll(String key, int tasksNum) {
         try{
-            CuratorFramework zk = getZkClient();
-            String tasksQueuePath = getTasksPath(key) + Constants.SINGLE_SLASH;
-            List<String> list = zk.getChildren().forPath(getTasksPath(key));
+            List<String> list = zookeeperOperator.getChildrenKeys(getTasksPath(key));
 
             if(list != null && list.size() > 0){
 
@@ -154,7 +113,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                 String workerIpLongStr = String.valueOf(IpUtils.ipToLong(workerIp));
 
                 int size = list.size();
-
 
                 Set<String> taskTreeSet = new TreeSet<>(new Comparator<String>() {
                     @Override
@@ -183,7 +141,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                     String taskDetail = list.get(i);
                     String[] taskDetailArrs = taskDetail.split(Constants.UNDERLINE);
 
-                    //forward compatibility 向前版本兼容
+                    //forward compatibility
                     if(taskDetailArrs.length >= 4){
 
                         //format ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskId}
@@ -201,9 +159,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
                             formatTask += Constants.UNDERLINE + taskDetailArrs[4];
                         }
                         taskTreeSet.add(formatTask);
-
                     }
-
                 }
 
                 List<String> taskslist = getTasksListFromTreeSet(tasksNum, taskTreeSet);
@@ -272,15 +228,12 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
     @Override
     public void removeNode(String key, String nodeValue){
 
-        CuratorFramework zk = getZkClient();
         String tasksQueuePath = getTasksPath(key) + Constants.SINGLE_SLASH;
         String taskIdPath = tasksQueuePath + nodeValue;
-        logger.info("consume task {}", taskIdPath);
+        logger.info("removeNode task {}", taskIdPath);
         try{
-            Stat stat = zk.checkExists().forPath(taskIdPath);
-            if(stat != null){
-                zk.delete().forPath(taskIdPath);
-            }
+            zookeeperOperator.remove(taskIdPath);
+
         }catch(Exception e){
             logger.error(String.format("delete task:%s from zookeeper fail, exception:" ,nodeValue) ,e);
         }
@@ -302,13 +255,10 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
 
             if(value != null && value.trim().length() > 0){
                 String path = getTasksPath(key) + Constants.SINGLE_SLASH;
-                CuratorFramework zk = getZkClient();
-                Stat stat = zk.checkExists().forPath(path + value);
-
-                if(null == stat){
-                    String result = zk.create().withMode(CreateMode.PERSISTENT).forPath(path + value,Bytes.toBytes(value));
-                    logger.info("add task:{} to tasks set result:{} ",value,result);
-                }else{
+                if(!zookeeperOperator.isExisted(path + value)){
+                    zookeeperOperator.persist(path + value,value);
+                    logger.info("add task:{} to tasks set ",value);
+                } else{
                     logger.info("task {} exists in tasks set ",value);
                 }
 
@@ -331,15 +281,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
     public void srem(String key, String value) {
         try{
             String path = getTasksPath(key) + Constants.SINGLE_SLASH;
-            CuratorFramework zk = getZkClient();
-            Stat stat = zk.checkExists().forPath(path + value);
-
-            if(null != stat){
-                zk.delete().forPath(path + value);
-                logger.info("delete task:{} from tasks set ",value);
-            }else{
-                logger.info("delete task:{} from tasks set fail, there is no this task",value);
-            }
+            zookeeperOperator.remove(path + value);
 
         }catch(Exception e){
             logger.error(String.format("delete task:" + value + " exception"),e);
@@ -358,7 +300,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         Set<String> tasksSet = new HashSet<>();
 
         try {
-            List<String> list = getZkClient().getChildren().forPath(getTasksPath(key));
+            List<String> list = zookeeperOperator.getChildrenKeys(getTasksPath(key));
 
             for (String task : list) {
                 tasksSet.add(task);
@@ -372,31 +314,6 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
         return tasksSet;
     }
 
-
-
-    /**
-     * Init the task queue of zookeeper node
-     */
-    private void init(){
-        try {
-            String tasksQueuePath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
-            String tasksCancelPath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_KILL);
-
-            for(String taskQueuePath : new String[]{tasksQueuePath,tasksCancelPath}){
-                if(zkClient.checkExists().forPath(taskQueuePath) == null){
-                    // create a persistent parent node
-                    zkClient.create().creatingParentContainersIfNeeded()
-                            .withMode(CreateMode.PERSISTENT).forPath(taskQueuePath);
-                    logger.info("create tasks queue parent node success : {} ",taskQueuePath);
-                }
-            }
-
-        } catch (Exception e) {
-            logger.error("create zk node failure",e);
-        }
-    }
-
-
     /**
      * Clear the task queue of zookeeper node
      */
@@ -407,16 +324,12 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
             String tasksCancelPath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_KILL);
 
             for(String taskQueuePath : new String[]{tasksQueuePath,tasksCancelPath}){
-                if(zkClient.checkExists().forPath(taskQueuePath) != null){
-
-                    List<String> list = zkClient.getChildren().forPath(taskQueuePath);
-
+                if(zookeeperOperator.isExisted(taskQueuePath)){
+                    List<String> list = zookeeperOperator.getChildrenKeys(taskQueuePath);
                     for (String task : list) {
-                        zkClient.delete().forPath(taskQueuePath + Constants.SINGLE_SLASH + task);
+                        zookeeperOperator.remove(taskQueuePath + Constants.SINGLE_SLASH + task);
                         logger.info("delete task from tasks queue : {}/{} ",taskQueuePath,task);
-
                     }
-
                 }
             }
 
@@ -431,8 +344,7 @@ public class TaskQueueZkImpl extends AbstractZKClient implements ITaskQueue {
      * @return
      */
     public String getTasksPath(String key){
-        return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_ROOT) + Constants.SINGLE_SLASH + key;
+        return "/dolphinscheduler" + Constants.SINGLE_SLASH + key;
     }
-
 
 }

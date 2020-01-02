@@ -512,7 +512,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                                     for (int k = 0; k < dependItemList.size(); k++) {
                                         JSONObject dependentItem = dependItemList.getJSONObject(k);
                                         int definitionId = dependentItem.getInteger("definitionId");
-                                        ProcessDefinition definition = processDefineMapper.selectById(definitionId);
+                                        ProcessDefinition definition = processDefineMapper.queryByDefineId(definitionId);
                                         if(definition != null){
                                             dependentItem.put("projectName",definition.getProjectName());
                                             dependentItem.put("definitionName",definition.getName());

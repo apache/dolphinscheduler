@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.PythonCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -98,6 +98,7 @@ public class PythonTask extends AbstractTask {
     } catch (Exception e) {
       logger.error("python task failure", e);
       exitStatusCode = -1;
+      throw e;
     }
   }
 

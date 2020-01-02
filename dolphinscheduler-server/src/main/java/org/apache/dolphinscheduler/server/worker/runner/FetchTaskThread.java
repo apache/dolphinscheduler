@@ -25,12 +25,12 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
 import org.slf4j.Logger;
@@ -147,15 +147,15 @@ public class FetchTaskThread implements Runnable{
                 //check memory and cpu usage and threads
                 boolean runCheckFlag = OSUtils.checkResource(workerConfig.getWorkerMaxCpuloadAvg(), workerConfig.getWorkerReservedMemory()) && checkThreadCount(poolExecutor);
 
-                Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-
                 if(!runCheckFlag) {
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
 
                 //whether have tasks, if no tasks , no need lock  //get all tasks
                 List<String> tasksQueueList = taskQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
                 if (CollectionUtils.isEmpty(tasksQueueList)){
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
                 // creating distributed locks, lock path /dolphinscheduler/lock/worker
@@ -224,7 +224,7 @@ public class FetchTaskThread implements Runnable{
 
                     // check and create users
                     FileUtils.createWorkDirAndUserIfAbsent(execLocalPath,
-                            tenant.getTenantCode(), logger);
+                            tenant.getTenantCode());
 
                     logger.info("task : {} ready to submit to task scheduler thread",taskInstId);
                     // submit task

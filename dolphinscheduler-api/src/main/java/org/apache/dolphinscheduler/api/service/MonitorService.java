@@ -33,12 +33,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.dolphinscheduler.common.utils.Preconditions.*;
+
 /**
  * monitor service
  */
 @Service
 public class MonitorService extends BaseService{
 
+  @Autowired
+  private ZookeeperMonitor zookeeperMonitor;
 
   @Autowired
   private MonitorDBDao monitorDBDao;
@@ -86,7 +90,7 @@ public class MonitorService extends BaseService{
   public Map<String,Object> queryZookeeperState(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
 
-    List<ZookeeperRecord> zookeeperRecordList = ZookeeperMonitor.zookeeperInfoList();
+    List<ZookeeperRecord> zookeeperRecordList = zookeeperMonitor.zookeeperInfoList();
 
     result.put(Constants.DATA_LIST, zookeeperRecordList);
     putMsg(result, Status.SUCCESS);
@@ -114,20 +118,10 @@ public class MonitorService extends BaseService{
   }
 
   public List<Server> getServerListFromZK(boolean isMaster){
-    List<Server> servers = new ArrayList<>();
-    ZookeeperMonitor zookeeperMonitor = null;
-    try{
-      zookeeperMonitor = new ZookeeperMonitor();
-      ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
-      servers = zookeeperMonitor.getServersList(zkNodeType);
-    }catch (Exception e){
-      throw e;
-    }finally {
-      if(zookeeperMonitor != null){
-        zookeeperMonitor.close();
-      }
-    }
-    return servers;
+
+    checkNotNull(zookeeperMonitor);
+    ZKNodeType zkNodeType = isMaster ? ZKNodeType.MASTER : ZKNodeType.WORKER;
+    return zookeeperMonitor.getServersList(zkNodeType);
   }
 
 }

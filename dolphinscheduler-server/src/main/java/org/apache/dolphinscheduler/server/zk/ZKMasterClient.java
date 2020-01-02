@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.zk;
 
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
@@ -29,13 +30,12 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.utils.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
@@ -47,6 +47,7 @@ import java.util.concurrent.ThreadFactory;
  *
  *  single instance
  */
+@Component
 public class ZKMasterClient extends AbstractZKClient {
 
 	/**
@@ -71,52 +72,13 @@ public class ZKMasterClient extends AbstractZKClient {
 	/**
 	 *  flow database access
 	 */
+	@Autowired
 	private ProcessDao processDao;
-
-	/**
-	 *  zkMasterClient
-	 */
-	private static ZKMasterClient zkMasterClient = null;
-
-	/**
-	 * master path children cache
-	 */
-	private PathChildrenCache masterPathChildrenCache;
-
-	/**
-	 * worker path children cache
-	 */
-	private PathChildrenCache workerPathChildrenCache;
-
-	/**
-	 * constructor
-	 *
-	 * @param processDao process dao
-	 */
-	private ZKMasterClient(ProcessDao processDao){
-		this.processDao = processDao;
-		init();
-	}
 
 	/**
 	 * default constructor
 	 */
 	private ZKMasterClient(){}
-
-	/**
-	 * get zkMasterClient
-	 *
-	 * @param processDao process dao
-	 * @return ZKMasterClient zookeeper master client
-	 */
-	public static synchronized ZKMasterClient getZKMasterClient(ProcessDao processDao){
-		if(zkMasterClient == null){
-			zkMasterClient = new ZKMasterClient(processDao);
-		}
-		zkMasterClient.processDao = processDao;
-
-		return zkMasterClient;
-	}
 
 	/**
 	 * init
@@ -135,12 +97,6 @@ public class ZKMasterClient extends AbstractZKClient {
 			// init system znode
 			this.initSystemZNode();
 
-			// monitor master
-			this.listenerMaster();
-
-			// monitor worker
-			this.listenerWorker();
-
 			// register master
 			this.registerMaster();
 
@@ -156,22 +112,6 @@ public class ZKMasterClient extends AbstractZKClient {
 			releaseMutex(mutex);
 		}
 	}
-
-	@Override
-	public void close(){
-		try {
-			if(masterPathChildrenCache != null){
-				masterPathChildrenCache.close();
-			}
-			if(workerPathChildrenCache != null){
-				workerPathChildrenCache.close();
-			}
-			super.close();
-		} catch (Exception ignore) {
-		}
-	}
-
-
 
 
 	/**
@@ -208,43 +148,22 @@ public class ZKMasterClient extends AbstractZKClient {
 		}
 	}
 
-
-
 	/**
-	 *  monitor master
+	 * handle path events that this class cares about
+	 * @param client   zkClient
+	 * @param event	   path event
+	 * @param path     zk path
 	 */
-	public void listenerMaster(){
-		masterPathChildrenCache = new PathChildrenCache(zkClient,
-				getZNodeParentPath(ZKNodeType.MASTER), true ,defaultThreadFactory);
+	@Override
+	protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
+		if(path.startsWith(getZNodeParentPath(ZKNodeType.MASTER)+Constants.SINGLE_SLASH)){  //monitor master
+			handleMasterEvent(event,path);
 
-		try {
-			masterPathChildrenCache.start();
-			masterPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
-				@Override
-				public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-					switch (event.getType()) {
-						case CHILD_ADDED:
-							logger.info("master node added : {}",event.getData().getPath());
-							break;
-						case CHILD_REMOVED:
-							String path = event.getData().getPath();
-							String serverHost = getHostByEventDataPath(path);
-							if(checkServerSelfDead(serverHost, ZKNodeType.MASTER)){
-								return;
-							}
-							removeZKNodePath(path, ZKNodeType.MASTER, true);
-							break;
-						case CHILD_UPDATED:
-							break;
-						default:
-							break;
-					}
-				}
-			});
-		}catch (Exception e){
-			logger.error("monitor master failed : " + e.getMessage(),e);
+		}else if(path.startsWith(getZNodeParentPath(ZKNodeType.WORKER)+Constants.SINGLE_SLASH)){  //monitor worker
+			handleWorkerEvent(event,path);
 		}
-}
+		//other path event, ignore
+	}
 
 	/**
 	 * remove zookeeper node path
@@ -328,39 +247,44 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	private void alertServerDown(String serverHost, ZKNodeType zkNodeType) {
 
-	    String serverType = zkNodeType.toString();
-		for (int i = 0; i < Constants.DOLPHINSCHEDULER_WARN_TIMES_FAILOVER; i++) {
-			alertDao.sendServerStopedAlert(1, serverHost, serverType);
+		String serverType = zkNodeType.toString();
+		alertDao.sendServerStopedAlert(1, serverHost, serverType);
+	}
+
+	/**
+	 * monitor master
+	 */
+	public void handleMasterEvent(TreeCacheEvent event, String path){
+		switch (event.getType()) {
+			case NODE_ADDED:
+				logger.info("master node added : {}", path);
+				break;
+			case NODE_REMOVED:
+				String serverHost = getHostByEventDataPath(path);
+				if (checkServerSelfDead(serverHost, ZKNodeType.MASTER)) {
+					return;
+				}
+				removeZKNodePath(path, ZKNodeType.MASTER, true);
+				break;
+			default:
+				break;
 		}
 	}
 
 	/**
 	 * monitor worker
 	 */
-	public void listenerWorker(){
-		workerPathChildrenCache = new PathChildrenCache(zkClient,
-				getZNodeParentPath(ZKNodeType.WORKER),true ,defaultThreadFactory);
-		try {
-			workerPathChildrenCache.start();
-			workerPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
-				@Override
-				public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) {
-					switch (event.getType()) {
-						case CHILD_ADDED:
-							logger.info("node added : {}" ,event.getData().getPath());
-							break;
-						case CHILD_REMOVED:
-							String path = event.getData().getPath();
-							logger.info("node deleted : {}",event.getData().getPath());
-							removeZKNodePath(path, ZKNodeType.WORKER, true);
-							break;
-						default:
-							break;
-					}
-				}
-			});
-		}catch (Exception e){
-			logger.error("listener worker failed : " + e.getMessage(),e);
+	public void handleWorkerEvent(TreeCacheEvent event, String path){
+		switch (event.getType()) {
+			case NODE_ADDED:
+				logger.info("worker node added : {}", path);
+				break;
+			case NODE_REMOVED:
+				logger.info("worker node deleted : {}", path);
+				removeZKNodePath(path, ZKNodeType.WORKER, true);
+				break;
+			default:
+				break;
 		}
 	}
 

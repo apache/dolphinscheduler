@@ -108,10 +108,14 @@
 		<maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
 		<maven-source-plugin.version>2.4</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+		<maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+		<rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
 		<jacoco.version>0.8.4</jacoco.version>
 		<jcip.version>1.0</jcip.version>
 		<maven.deploy.skip>false</maven.deploy.skip>
 		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
+		<mockito.version>2.21.0</mockito.version>
+		<powermock.version>2.0.2</powermock.version>
 	</properties>
 
 	<dependencyManagement>
@@ -303,6 +307,36 @@
 				<version>${junit.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.version}</version>
+				<type>jar</type>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-module-junit4</artifactId>
+				<version>${powermock.version}</version>
+				<type>jar</type>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.powermock</groupId>
+				<artifactId>powermock-api-mockito2</artifactId>
+				<version>${powermock.version}</version>
+				<type>jar</type>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<groupId>org.mockito</groupId>
+						<artifactId>mockito-core</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
 				<version>${mysql.connector.version}</version>
@@ -492,6 +526,14 @@
 		<pluginManagement>
 			<plugins>
 
+
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>rpm-maven-plugin</artifactId>
+					<version>${rpm-maven-plugion.version}</version>
+					<inherited>false</inherited>
+				</plugin>
+
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
@@ -536,6 +578,12 @@
 					<version>${maven-source-plugin.version}</version>
 				</plugin>
 
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>${maven-dependency-plugin.version}</version>
+
+				</plugin>
 			</plugins>
 
 		</pluginManagement>
@@ -612,9 +660,34 @@
 				<version>${maven-surefire-plugin.version}</version>
 				<configuration>
 					<includes>
-						<include>**/api/utils/CheckUtilsTest.java</include>
+						<include>**/common/utils/*.java</include>
+						<include>**/common/threadutils/*.java</include>
 						<include>**/common/graph/*.java</include>
-						<include>**/*CollectionUtilsTest.java</include><!--run test classes-->
+						<include>**/common/queue/*.java</include>
+						<include>**/api/utils/CheckUtilsTest.java</include>
+						<include>**/api/utils/FileUtilsTest.java</include>
+						<include>**/api/enums/*.java</include>
+						<include>**/api/service/AccessTokenServiceTest.java</include>
+						<include>**/api/service/QueueServiceTest.java</include>
+						<include>**/api/service/MonitorServiceTest.java</include>
+						<include>**/api/service/SessionServiceTest.java</include>
+						<include>**/api/service/UsersServiceTest.java</include>
+						<include>**/api/service/TenantServiceTest.java</include>
+						<include>**/api/service/WorkerGroupServiceTest.java</include>
+						<include>**/api/service/AlertGroupServiceTest.java</include>
+						<include>**/api/service/ProjectServiceTest.java</include>
+						<include>**/api/service/UdfFuncServiceTest.java</include>
+						<include>**/alert/utils/ExcelUtilsTest.java</include>
+						<include>**/alert/utils/FuncUtilsTest.java</include>
+						<include>**/alert/utils/JSONUtilsTest.java</include>
+						<include>**/alert/utils/PropertyUtilsTest.java</include>
+						<include>**/server/utils/SparkArgsUtilsTest.java</include>
+						<include>**/server/utils/FlinkArgsUtilsTest.java</include>
+						<include>**/server/utils/ParamUtilsTest.java</include>
+						<include>**/dao/mapper/AccessTokenMapperTest.java</include>
+						<include>**/dao/mapper/AlertGroupMapperTest.java</include>
+						<include>**/dao/mapper/AlertMapperTest.java</include>
+						<include>**/dao/mapper/CommandMapperTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>

@@ -309,6 +309,7 @@ export default {
   'Waiting for dependence': '等待依赖',
   'Start': '运行',
   'Copy': '复制节点',
+  'Copy name': '复制名称',
   'Delete': '删除',
   'Please enter keyword': '请输入关键词',
   'File Upload': '文件上传',
@@ -505,5 +506,6 @@ export default {
   'There is no data for this period of time': '该时间段无数据',
   'IP address cannot be empty': 'IP地址不能为空',
   'Please enter the correct IP': '请输入正确的IP',
-  'Please generate token': '请生成Token'
+  'Please generate token': '请生成Token',
+  'Spark Version': 'Spark版本'
 }

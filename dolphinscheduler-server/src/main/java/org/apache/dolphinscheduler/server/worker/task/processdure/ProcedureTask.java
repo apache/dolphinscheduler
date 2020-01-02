@@ -29,10 +29,10 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.slf4j.Logger;
@@ -97,14 +97,13 @@ public class ProcedureTask extends AbstractTask {
                 procedureParameters.getMethod(),
                 procedureParameters.getLocalParams());
 
-        // determine whether there is a data source
-        if (procedureParameters.getDatasource() == 0){
-            logger.error("datasource id not exists");
+        DataSource dataSource = processDao.findDataSourceById(procedureParameters.getDatasource());
+        if (dataSource == null){
+            logger.error("datasource not exists");
             exitStatusCode = -1;
-            return;
+            throw new IllegalArgumentException("datasource not found");
         }
 
-        DataSource dataSource = processDao.findDataSourceById(procedureParameters.getDatasource());
         logger.info("datasource name : {} , type : {} , desc : {} ,  user_id : {} , parameter : {}",
                 dataSource.getName(),
                 dataSource.getType(),
@@ -112,11 +111,6 @@ public class ProcedureTask extends AbstractTask {
                 dataSource.getUserId(),
                 dataSource.getConnectionParams());
 
-        if (dataSource == null){
-            logger.error("datasource not exists");
-            exitStatusCode = -1;
-            return;
-        }
         Connection connection = null;
         CallableStatement stmt = null;
         try {

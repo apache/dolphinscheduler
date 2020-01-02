@@ -1,0 +1,142 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-size: 90%;
+  background-color: #fff;
+  font-family: tahoma, verdana, arial, sans-serif;
+  color: #3f3f3f;
+}
+
+div.content {
+  padding: 0.2em 0.3em 0.2em 0.4em;
+  width: 99%;
+}
+
+h1 {
+  font:normal 18px tahoma, sans-serif;
+  margin: 0.5em 0 0.5em 0;
+  color: #010101;
+}
+
+h2 {
+  margin: 0.5em 0 0.5em 0;
+  font:bold 14px tahoma, sans-serif;
+  color: #010101;
+}
+
+table.coverageStats {
+  width: 99%;
+  border-collapse: collapse;
+}
+
+table.overallStats {
+  width: 20%;
+}
+
+table.coverageStats th {
+  font-weight: bold;
+  text-align: left;
+}
+
+table.coverageStats th.coverageStat {
+  width: 20%;
+}
+
+table.coverageStats th.sortedDesc a {
+  background: #fff url(../.img/arrowDown.gif) no-repeat 100% 0;
+  padding-right: 20px;
+}
+
+table.coverageStats th.sortedAsc a {
+  background: #fff url(../.img/arrowUp.gif) no-repeat 100% 0;
+  padding-right: 20px;
+}
+
+table.coverageStats td, table.coverageStats th {
+  border: 1px solid #ccc;
+  padding: 2px;
+}
+
+a {
+  color: #0254D0;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  color: #0254D0;
+}
+
+div.footer {
+  margin: 2em 2em 2em 0.5em;
+  font-size: 85%;
+  text-align: left;
+  line-height: 140%;
+}
+
+div.header {
+  padding: 0.5em;
+  background-color: #E3E9EF;
+  color: #3773C9;
+  font-weight: bold;
+  font-size: 120%;
+  text-align: center;
+}
+
+div.sourceCode {
+  width: 99%;
+  white-space: pre;
+  border: 1px solid #ccc;
+  font-family: monospace;
+  padding: 0;
+}
+
+i {
+  background-color: #eee;
+}
+
+div.sourceCode b {
+  font-weight: normal;
+}
+
+div.sourceCode i {
+  font-style: normal;
+  width: 3em;
+  padding: 0 3px 0 0;
+  display: block;
+  float: left;
+  text-align: right;
+  border-right: 1px solid #ccc;
+  /*margin-right: 3px;*/
+}
+
+div.sourceCode .fc, div.sourceCode .fc i {
+  background-color: #ccffcc;
+}
+
+div.sourceCode .pc, div.sourceCode .pc i {
+  background-color: #ffffcc;
+}
+
+div.sourceCode .nc, div.sourceCode .nc i {
+  background-color: #ffcccc;
+}
+
+.percent, .absValue {
+  font-size: 90%;
+}
+
+.percent .green, .absValue .green {
+  color: limegreen;
+}
+
+.percent .red, .absValue .red {
+  color: red;
+}
+
+.percent .totalDiff {
+  color: #3f3f3f;
+}

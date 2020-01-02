@@ -1,9 +1,10 @@
-Dolphin Scheduler
+Dolphin Scheduler Official Website
+[dolphinscheduler.apache.org](https://dolphinscheduler.apache.org)
 ============
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Total Lines](https://tokei.rs/b1/github/apache/Incubator-DolphinScheduler?category=lines)](https://github.com/apache/Incubator-DolphinScheduler)
 [![codecov](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev)
-![Codacy Badge](https://api.codacy.com/project/badge/Grade/ae514bfb7bb049658e916da091928e62)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
 
 > Dolphin Scheduler for Big Data
 
@@ -88,7 +89,7 @@ Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、g
 
 ### 获得帮助
 1. Submit an issue
-1. Mail list: dev@dolphinscheduler.apache.org. Mail to dev-subscribe@dolphinscheduler.apache.org, follow the reply to subscribe the mail list.
+1. Mail to dev-subscribe@dolphinscheduler.apache.org, follow the reply to subscribe the mail list. then you can send mail to dev@dolphinscheduler.apache.org.
 1. Contact WeChat group manager, ID 510570367. This is for Mandarin(CN) discussion.
 
 ### 版权

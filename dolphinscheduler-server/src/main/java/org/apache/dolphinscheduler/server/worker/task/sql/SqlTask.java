@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.common.task.sql.SqlType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -43,7 +44,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -174,6 +174,9 @@ public class SqlTask extends AbstractTask {
 
             // execute sql task
             con = executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
         } finally {
             if (con != null) {
                 try {
@@ -258,9 +261,7 @@ public class SqlTask extends AbstractTask {
                 Map<String, String> connParamMap = CollectionUtils.stringToMap(sqlParameters.getConnParams(),
                         SEMICOLON,
                         HIVE_CONF);
-                if(connParamMap != null){
-                    paramProp.putAll(connParamMap);
-                }
+                paramProp.putAll(connParamMap);
 
                 connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
                         paramProp);

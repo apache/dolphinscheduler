@@ -25,9 +25,9 @@ import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.slf4j.Logger;
@@ -99,7 +99,7 @@ public class DependentTask extends AbstractTask {
     }
 
     @Override
-    public void handle(){
+    public void handle() throws Exception {
         // set the name of the current thread
         String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
@@ -135,6 +135,7 @@ public class DependentTask extends AbstractTask {
         }catch (Exception e){
             logger.error(e.getMessage(),e);
             exitStatusCode = -1;
+            throw e;
         }
     }
 
