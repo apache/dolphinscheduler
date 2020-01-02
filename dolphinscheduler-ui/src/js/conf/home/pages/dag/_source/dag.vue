@@ -156,8 +156,8 @@
     },
     methods: {
       ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState']),
-      ...mapMutations('dag', ['addTasks', 'resetParams', 'setIsEditDag', 'setName']),
-      
+      ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName']),
+
       // DAG automatic layout
       dagAutomaticLayout() {
         $('#canvas').html('')
@@ -487,6 +487,14 @@
                 setTimeout(() => {
                   removeNodesEvent(fromThis)
                 }, 100)
+              },
+              /**
+               * Cache the item
+               * @param item
+               * @param fromThis
+               */
+              cacheTaskInfo({item, fromThis}) {
+                self.cacheTasks(item)
               },
               close ({ flag, fromThis }) {
                 // Edit status does not allow deletion of nodes
