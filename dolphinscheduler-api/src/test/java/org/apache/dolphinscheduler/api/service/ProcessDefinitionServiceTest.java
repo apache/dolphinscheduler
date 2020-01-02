@@ -16,15 +16,17 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import com.alibaba.fastjson.JSON;
+import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +69,6 @@ public class ProcessDefinitionServiceTest {
 
     @Test
     public void deleteProcessDefinitionByIdTest() throws Exception {
-
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
@@ -75,5 +76,21 @@ public class ProcessDefinitionServiceTest {
 
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
         logger.info(JSON.toJSONString(map));
+    }
+
+    @Test
+    public void testAddTaskNodeSpecialParam() throws JSONException {
+        String shellJson = "{\"globalParams\":[]," +
+                "\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-52423\"," +
+                "\"name\":\"shell-5\",\"params\":{\"resourceList\":[],\"localParams\":[]," +
+                "\"rawScript\":\"echo \\\"shell-5\\\"\"},\"description\":\"\",\"runFlag\":\"NORMAL\"," +
+                "\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
+                "\"timeout\":{\"strategy\":\"\",\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
+                "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
+
+        String correctShellJson = processDefinitionService.addTaskNodeSpecialParam(shellJson);
+
+        JSONAssert.assertEquals(shellJson,correctShellJson,false);
+
     }
 }

@@ -572,7 +572,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processDefinitionJson processDefinitionJson
      * @return correct processDefinitionJson
      */
-    private String addTaskNodeSpecialParam(String processDefinitionJson) {
+    public String addTaskNodeSpecialParam(String processDefinitionJson) {
         JSONObject jsonObject = JSONUtils.parseObject(processDefinitionJson);
         JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
 
