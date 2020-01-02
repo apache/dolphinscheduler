@@ -498,7 +498,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
             if (null != processDefinition) {
                 //correct task param which has data source or dependent param
-                String correctProcessDefinitionJson = addSpecialTaskParam(processDefinition.getProcessDefinitionJson());
+                String correctProcessDefinitionJson = addTaskNodeSpecialParam(processDefinition.getProcessDefinitionJson());
                 processDefinition.setProcessDefinitionJson(correctProcessDefinitionJson);
 
                 Map<String, Object> row = new LinkedHashMap<>();
@@ -545,20 +545,20 @@ public class ProcessDefinitionService extends BaseDAGService {
                     buff.flush();
                     buff.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.warn("export process fail", e);
                 }finally {
                     if (null != buff) {
                         try {
                             buff.close();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            logger.warn("export process buffer not close", e);
                         }
                     }
                     if (null != out) {
                         try {
                             out.close();
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            logger.warn("export process output stream not close", e);
                         }
                     }
 
@@ -572,7 +572,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processDefinitionJson processDefinitionJson
      * @return correct processDefinitionJson
      */
-    private String addSpecialTaskParam(String processDefinitionJson) {
+    private String addTaskNodeSpecialParam(String processDefinitionJson) {
         JSONObject jsonObject = JSONUtils.parseObject(processDefinitionJson);
         JSONArray jsonArray = (JSONArray) jsonObject.get("tasks");
 
