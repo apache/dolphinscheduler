@@ -16,21 +16,18 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.commons.codec.digest.DigestUtils;
-
-/**
- * encryption utils
- */
-public class EncryptionUtils {
 
 
-    /**
-     * 
-     * @param rawStr raw string
-     * @return md5(rawStr)
-     */
-    public static String getMd5(String rawStr) {
-      return DigestUtils.md5Hex(null == rawStr ? StringUtils.EMPTY : rawStr);
+public class EnumUtils {
+
+    public static <E extends Enum<E>> E getEnum(final Class<E> enumClass, final String enumName) {
+        if (enumName == null) {
+            return null;
+        }
+        try {
+            return Enum.valueOf(enumClass, enumName);
+        } catch (final IllegalArgumentException ex) {
+            return null;
+        }
     }
-
 }
