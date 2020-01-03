@@ -161,7 +161,7 @@
       // DAG automatic layout
       dagAutomaticLayout() {
         $('#canvas').html('')
-
+        
       // Destroy round robin
         Dag.init({
         dag: this,
@@ -187,6 +187,13 @@
       })
         if (this.tasks.length) {
           Dag.backfill(true)
+          if (this.type === 'instance') {
+            this._getTaskState(false).then(res => {})
+            // Round robin acquisition status
+            this.setIntervalP = setInterval(() => {
+              this._getTaskState(true).then(res => {})
+            }, 90000)
+          }
         } else {
           Dag.create()
         }
