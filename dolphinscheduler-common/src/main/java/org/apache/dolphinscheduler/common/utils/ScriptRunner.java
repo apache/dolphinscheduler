@@ -183,7 +183,7 @@ public class ScriptRunner {
                                 }
                             }
                         }   
-					} catch (SQLException e) {
+                    } catch (SQLException e) {
                         logger.error(e.getMessage(),e);
                         throw e;
                     }
@@ -256,7 +256,7 @@ public class ScriptRunner {
                                 }
                             }
                         }   
-					} catch (SQLException e) {
+                    } catch (SQLException e) {
                         logger.error(e.getMessage(),e);
                         throw e;
                     }
