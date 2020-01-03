@@ -116,11 +116,9 @@ public class TaskInstanceService extends BaseService {
                 page, project.getId(), processInstanceId, searchVal, taskName, statusArray, host, start, end
         );
         PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
-
         Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);
         exclusionSet.add("taskJson");
-
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
         for(TaskInstance taskInstance : taskInstanceList){
             taskInstance.setDuration(DateUtils.differSec(taskInstance.getStartTime(),
