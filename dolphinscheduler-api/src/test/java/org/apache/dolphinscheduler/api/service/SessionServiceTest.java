@@ -121,6 +121,9 @@ public class SessionServiceTest {
         String ip = "127.0.0.1";
         User user = new User();
         user.setId(userId);
+
+        Mockito.when(sessionMapper.queryByUserIdAndIp(userId,ip)).thenReturn(getSession());
+
         sessionService.signOut(ip ,user);
 
     }
