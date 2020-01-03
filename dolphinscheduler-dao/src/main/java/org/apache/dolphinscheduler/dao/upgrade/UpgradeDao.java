@@ -17,11 +17,11 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.slf4j.Logger;
