@@ -344,7 +344,7 @@ public class TaskQueueZkImpl implements ITaskQueue {
      * @return
      */
     public String getTasksPath(String key){
-        return "/dolphinscheduler" + Constants.SINGLE_SLASH + key;
+        return zookeeperOperator.getZookeeperConfig().getDsRoot() + Constants.SINGLE_SLASH + key;
     }
 
 }
