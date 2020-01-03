@@ -164,7 +164,26 @@
         return true
       }
     },
+    computed: {
+      cacheParams () {
+        return {
+          localParams: this.localParams,
+          httpParams: this.httpParams,
+          url: this.url,
+          httpMethod: this.httpMethod,
+          httpCheckCondition: this.httpCheckCondition,
+          condition: this.condition
+        }
+      }
+    },
     watch: {
+      /**
+       * Watch the cacheParams
+       * @param val
+       */
+      cacheParams (val) {
+        this.$emit('on-cache-params', val);
+      }
     },
     created () {
         let o = this.backfillItem
