@@ -52,23 +52,20 @@ public class PostgrePerformance extends BaseDBPerformance {
             pstmt = conn.createStatement();
             
             try (ResultSet rs1 = pstmt.executeQuery("select count(*) from pg_stat_activity;")) {
-                while(rs1.next()){
+                if(rs1.next()){
                     monitorRecord.setThreadsConnections(rs1.getInt("count"));
-                    break;
                 }
             }
 
             try (ResultSet rs2 = pstmt.executeQuery("show max_connections")) {
-                while(rs2.next()){
+                if(rs2.next()){
                     monitorRecord.setMaxConnections( rs2.getInt("max_connections"));
-                    break;
                 }
             }
 
             try (ResultSet rs3 = pstmt.executeQuery("select count(*) from pg_stat_activity pg where pg.state = 'active';")) {
-                while(rs3.next()){
+                if(rs3.next()){
                     monitorRecord.setThreadsRunningConnections(rs3.getInt("count"));
-                    break;
                 }
             }
         }catch (Exception e) {
