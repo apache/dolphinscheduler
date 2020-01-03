@@ -324,7 +324,7 @@ public class UsersController extends BaseController{
     @GetMapping(value="/get-user-info")
     @ResponseStatus(HttpStatus.OK)
     public Result getUserInfo(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
-        logger.info("login user {},get user info : {}", loginUser.getUserName());
+        logger.info("login user {},get user info", loginUser.getUserName());
         try{
             Map<String, Object> result = usersService.getUserInfo(loginUser);
             return returnDataList(result);
@@ -344,7 +344,7 @@ public class UsersController extends BaseController{
     @GetMapping(value="/list")
     @ResponseStatus(HttpStatus.OK)
     public Result listUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
-        logger.info("login user {}, user list");
+        logger.info("login user {}, user list", loginUser.getUserName());
         try{
             Map<String, Object> result = usersService.queryAllGeneralUsers(loginUser);
             return returnDataList(result);
@@ -364,7 +364,7 @@ public class UsersController extends BaseController{
     @GetMapping(value="/list-all")
     @ResponseStatus(HttpStatus.OK)
     public Result listAll(@RequestAttribute(value = Constants.SESSION_USER) User loginUser){
-        logger.info("login user {}, user list");
+        logger.info("login user {}, user list", loginUser.getUserName());
         try{
             Map<String, Object> result = usersService.queryUserList(loginUser);
             return returnDataList(result);

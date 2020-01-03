@@ -374,12 +374,12 @@ public class SchedulerService extends BaseService {
         try {
             switch (scheduleStatus) {
                 case ONLINE: {
-                    logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}, port: {}", project.getId(), processDefinition.getId(), masterServers);
+                    logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
                     setSchedule(project.getId(), id);
                     break;
                 }
                 case OFFLINE: {
-                    logger.info("Call master client set schedule offline, project id: {}, flow id: {},host: {}, port: {}", project.getId(), processDefinition.getId(), masterServers);
+                    logger.info("Call master client set schedule offline, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
                     deleteSchedule(project.getId(), id);
                     break;
                 }
