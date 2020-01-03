@@ -21,11 +21,11 @@ import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.IOUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.ResourceUtils;
@@ -35,7 +35,6 @@ import javax.mail.internet.*;
 import java.io.*;
 import java.util.*;
 
-import static org.apache.dolphinscheduler.alert.utils.PropertyUtils.getInt;
 
 
 /**
@@ -422,8 +421,8 @@ public class MailUtils {
      * @param e the exception
      */
     private static void handleException(Collection<String> receivers, Map<String, Object> retMap, Exception e) {
-        logger.error("Send email to {} failed", StringUtils.join(",", receivers), e);
-        retMap.put(Constants.MESSAGE, "Send email to {" + StringUtils.join(",", receivers) + "} failed，" + e.toString());
+        logger.error("Send email to {} failed {}", receivers, e);
+        retMap.put(Constants.MESSAGE, "Send email to {" + StringUtils.join(receivers, ",") + "} failed，" + e.toString());
     }
 
     /**

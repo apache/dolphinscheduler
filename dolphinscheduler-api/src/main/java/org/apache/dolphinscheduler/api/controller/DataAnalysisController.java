@@ -188,7 +188,7 @@ public class DataAnalysisController extends BaseController{
     public Result countQueueState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
         try{
-            logger.info("count command state, user:{}, start date: {}, end date:{}, project id {}",
+            logger.info("count command state, user:{}, project id {}",
                     loginUser.getUserName(), projectId);
             Map<String, Object> result = dataAnalysisService.countQueueState(loginUser, projectId);
             return returnDataList(result);
