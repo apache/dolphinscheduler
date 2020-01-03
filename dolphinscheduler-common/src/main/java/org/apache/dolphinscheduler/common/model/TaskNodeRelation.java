@@ -53,6 +53,7 @@ public class TaskNodeRelation {
   }
 
 
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof TaskNodeRelation)) {
       return false;
