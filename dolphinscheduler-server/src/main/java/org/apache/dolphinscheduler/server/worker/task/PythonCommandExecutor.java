@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

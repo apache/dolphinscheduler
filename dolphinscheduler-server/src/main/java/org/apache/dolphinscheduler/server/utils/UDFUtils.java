@@ -18,8 +18,8 @@ package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.text.MessageFormat;
