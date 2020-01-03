@@ -116,7 +116,7 @@ public class HadoopUtils implements Closeable {
                                 if(StringUtils.isNotBlank(defaultFSProp)){
                                     Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
                                     configuration.set(Constants.FS_DEFAULTFS,defaultFSProp);
-                                    fsRelatedProps.entrySet().stream().forEach(entry -> configuration.set(entry.getKey(), entry.getValue()));
+                                    fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
                                 }else{
                                     logger.error("property:{} can not to be empty, please set!");
                                     throw new RuntimeException("property:{} can not to be empty, please set!");
