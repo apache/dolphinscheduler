@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,29 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.alert.utils;
 
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+package org.apache.dolphinscheduler.common.utils;
 
-public class FuncUtils {
 
-    static public String mkString(Iterable<String> list, String split) {
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
-        if (null == list || StringUtils.isEmpty(split)){
-            return null;
-        }
+public class IOUtils {
 
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (String item : list) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(split);
+    public static void closeQuietly(InputStream fis){
+        if(fis != null){
+            try {
+                fis.close();
+            } catch (IOException ignore) {
             }
-            sb.append(item);
         }
-        return sb.toString();
     }
 
+    public static void closeQuietly(InputStreamReader reader){
+        if(reader != null){
+            try {
+                reader.close();
+            } catch (IOException ignore) {
+            }
+        }
+    }
 }
