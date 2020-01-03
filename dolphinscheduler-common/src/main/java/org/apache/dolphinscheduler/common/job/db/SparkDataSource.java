@@ -71,7 +71,6 @@ public class SparkDataSource extends BaseDataSource {
           con.close();
         } catch (SQLException e) {
           logger.error("Spark datasource try conn close conn error", e);
-          throw e;
         }
       }
     }

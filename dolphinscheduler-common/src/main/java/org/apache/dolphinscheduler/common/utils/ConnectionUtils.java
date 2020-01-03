@@ -51,7 +51,6 @@ public class ConnectionUtils {
 			}
 		} catch (SQLException e) {
 			logger.error(e.getMessage(),e);
-			throw new RuntimeException(e);
 		} finally {
 			try {
 				if (stmt != null) {
@@ -60,7 +59,6 @@ public class ConnectionUtils {
 				}
 			} catch (SQLException e) {
 				logger.error(e.getMessage(),e);
-				throw new RuntimeException(e);
 			} finally {
 				try {
 					if (conn != null) {
@@ -69,7 +67,6 @@ public class ConnectionUtils {
 					}
 				} catch (SQLException e) {
 					logger.error(e.getMessage(),e);
-					throw new RuntimeException(e);
 				}
 			}
 		}

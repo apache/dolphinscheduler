@@ -66,7 +66,6 @@ public class ClickHouseDataSource extends BaseDataSource {
                     con.close();
                 } catch (SQLException e) {
                     logger.error("ClickHouse datasource try conn close conn error", e);
-                    throw e;
                 }
             }
         }

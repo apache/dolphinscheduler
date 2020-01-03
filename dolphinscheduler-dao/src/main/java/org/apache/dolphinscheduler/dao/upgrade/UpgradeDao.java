@@ -155,7 +155,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
@@ -312,7 +314,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (SQLException e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
@@ -320,7 +324,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }

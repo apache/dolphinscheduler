@@ -195,12 +195,11 @@ public class ProcessInstanceService extends BaseDAGService {
             processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
         }
 
-        Set<String> exclusionSet = new HashSet<String>(){{
-            add(Constants.CLASS);
-            add("locations");
-            add("connects");
-            add("processInstanceJson");
-        }};
+        Set<String> exclusionSet = new HashSet<String>();
+        exclusionSet.add(Constants.CLASS);
+        exclusionSet.add("locations");
+        exclusionSet.add("connects");
+        exclusionSet.add("processInstanceJson");
 
         PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
         pageInfo.setTotalCount((int) processInstanceList.getTotal());
