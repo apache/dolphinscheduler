@@ -124,18 +124,19 @@ public class SqlTask extends AbstractTask {
         }
 
         dataSource= processDao.findDataSourceById(sqlParameters.getDatasource());
+
+        if (null == dataSource){
+            logger.error("datasource not exists");
+            exitStatusCode = -1;
+            return;
+        }
+
         logger.info("datasource name : {} , type : {} , desc : {}  , user_id : {} , parameter : {}",
                 dataSource.getName(),
                 dataSource.getType(),
                 dataSource.getNote(),
                 dataSource.getUserId(),
                 dataSource.getConnectionParams());
-
-        if (dataSource == null){
-            logger.error("datasource not exists");
-            exitStatusCode = -1;
-            return;
-        }
 
         Connection con = null;
         List<String> createFuncs = null;
@@ -182,7 +183,7 @@ public class SqlTask extends AbstractTask {
                 try {
                     con.close();
                 } catch (SQLException e) {
-                    throw e;
+                    logger.error(e.getMessage(),e);
                 }
             }
         }
