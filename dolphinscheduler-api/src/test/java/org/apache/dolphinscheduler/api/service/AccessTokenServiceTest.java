@@ -18,11 +18,12 @@ package org.apache.dolphinscheduler.api.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.time.DateUtils;
+import java.util.Calendar;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
@@ -152,7 +153,7 @@ public class AccessTokenServiceTest {
         accessToken.setId(1);
         accessToken.setUserId(1);
         accessToken.setToken("AccessTokenServiceTest");
-        Date date = DateUtils.addDays(new Date(),30);
+        Date date = DateUtils.add(new Date(), Calendar.DAY_OF_MONTH, 30);
         accessToken.setExpireTime(date);
         return accessToken;
     }
@@ -175,7 +176,7 @@ public class AccessTokenServiceTest {
      * @return
      */
     private String getDate(){
-        Date date = DateUtils.addDays(new Date(),30);
-       return org.apache.dolphinscheduler.common.utils.DateUtils.dateToString(date);
+        Date date = DateUtils.add(new Date(),Calendar.DAY_OF_MONTH,30);
+       return DateUtils.dateToString(date);
     }
 }

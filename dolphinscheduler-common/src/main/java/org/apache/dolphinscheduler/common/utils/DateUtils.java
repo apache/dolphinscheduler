@@ -394,4 +394,14 @@ public class DateUtils {
         return DateUtils.parse(DateUtils.getCurrentTime(),
                 Constants.YYYY_MM_DD_HH_MM_SS);
     }
+
+    public static Date add(Date date, int calendarField, int amount) {
+        if (date == null) {
+            throw new IllegalArgumentException("The date must not be null");
+        }
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(calendarField, amount);
+        return c.getTime();
+    }
 }
