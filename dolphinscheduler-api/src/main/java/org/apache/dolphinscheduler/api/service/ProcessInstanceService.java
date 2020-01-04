@@ -489,13 +489,14 @@ public class ProcessInstanceService extends BaseDAGService {
         }
         ProcessInstance processInstance = processDao.findProcessInstanceDetailById(processInstanceId);
         List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstanceId);
-        //process instance priority
-        int processInstancePriority = processInstance.getProcessInstancePriority().ordinal();
-        if (processInstance == null) {
+
+        if (null == processInstance) {
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
 
+        //process instance priority
+        int processInstancePriority = processInstance.getProcessInstancePriority().ordinal();
         // delete zk queue
         if (CollectionUtils.isNotEmpty(taskInstanceList)){
             for (TaskInstance taskInstance : taskInstanceList){
