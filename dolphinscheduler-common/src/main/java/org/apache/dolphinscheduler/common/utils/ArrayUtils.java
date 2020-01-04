@@ -14,23 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.commons.codec.digest.DigestUtils;
 
-/**
- * encryption utils
- */
-public class EncryptionUtils {
+public class ArrayUtils {
 
-
-    /**
-     * 
-     * @param rawStr raw string
-     * @return md5(rawStr)
-     */
-    public static String getMd5(String rawStr) {
-      return DigestUtils.md5Hex(null == rawStr ? StringUtils.EMPTY : rawStr);
-    }
-
+  public static boolean isEmpty(final int[] array) {
+    return array == null || array.length == 0;
+  }
 }

@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,23 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.commons.codec.digest.DigestUtils;
 
-/**
- * encryption utils
- */
-public class EncryptionUtils {
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
+public class IOUtils {
 
-    /**
-     * 
-     * @param rawStr raw string
-     * @return md5(rawStr)
-     */
-    public static String getMd5(String rawStr) {
-      return DigestUtils.md5Hex(null == rawStr ? StringUtils.EMPTY : rawStr);
+    public static void closeQuietly(InputStream fis){
+        if(fis != null){
+            try {
+                fis.close();
+            } catch (IOException ignore) {
+            }
+        }
     }
 
+    public static void closeQuietly(InputStreamReader reader){
+        if(reader != null){
+            try {
+                reader.close();
+            } catch (IOException ignore) {
+            }
+        }
+    }
 }

@@ -661,6 +661,7 @@
 				<configuration>
 					<includes>
 						<include>**/common/utils/*.java</include>
+						<include>**/common/threadutils/*.java</include>
 						<include>**/common/graph/*.java</include>
 						<include>**/common/queue/*.java</include>
 						<include>**/api/utils/CheckUtilsTest.java</include>
@@ -675,12 +676,15 @@
 						<include>**/api/service/WorkerGroupServiceTest.java</include>
 						<include>**/api/service/AlertGroupServiceTest.java</include>
 						<include>**/api/service/ProjectServiceTest.java</include>
+						<include>**/api/service/ProcessDefinitionServiceTest.java</include>
+						<include>**/api/service/UdfFuncServiceTest.java</include>
 						<include>**/alert/utils/ExcelUtilsTest.java</include>
 						<include>**/alert/utils/FuncUtilsTest.java</include>
 						<include>**/alert/utils/JSONUtilsTest.java</include>
 						<include>**/alert/utils/PropertyUtilsTest.java</include>
 						<include>**/server/utils/SparkArgsUtilsTest.java</include>
 						<include>**/server/utils/FlinkArgsUtilsTest.java</include>
+						<include>**/server/utils/ParamUtilsTest.java</include>
 						<include>**/dao/mapper/AccessTokenMapperTest.java</include>
 						<include>**/dao/mapper/AlertGroupMapperTest.java</include>
 						<include>**/dao/mapper/AlertMapperTest.java</include>
