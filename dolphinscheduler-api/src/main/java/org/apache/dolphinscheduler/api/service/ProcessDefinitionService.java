@@ -22,8 +22,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -40,6 +38,7 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
@@ -688,31 +687,31 @@ public class ProcessDefinitionService extends BaseDAGService {
                 String scheduleWorkerGroupId = null;
                 String scheduleWorkerGroupName = null;
 
-                if (ObjectUtils.allNotNull(json.get("projectName"))) {
+                if (Objects.nonNull(json.get("projectName"))) {
                     originProjectName = json.get("projectName").toString();
                 } else {
                     putMsg(result, Status.DATA_IS_NULL, "processDefinitionName");
                     return result;
                 }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionName"))) {
+                if (Objects.nonNull(json.get("processDefinitionName"))) {
                     processDefinitionName = json.get("processDefinitionName").toString();
                 } else {
                     putMsg(result, Status.DATA_IS_NULL, "processDefinitionName");
                     return result;
                 }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionJson"))) {
+                if (Objects.nonNull(json.get("processDefinitionJson"))) {
                     processDefinitionJson = json.get("processDefinitionJson").toString();
                 } else {
                     putMsg(result, Status.DATA_IS_NULL, "processDefinitionJson");
                     return result;
                 }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionDescription"))) {
+                if (Objects.nonNull(json.get("processDefinitionDescription"))) {
                     processDefinitionDesc = json.get("processDefinitionDescription").toString();
                 }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionLocations"))) {
+                if (Objects.nonNull(json.get("processDefinitionLocations"))) {
                     processDefinitionLocations = json.get("processDefinitionLocations").toString();
                 }
-                if (ObjectUtils.allNotNull(json.get("processDefinitionConnects"))) {
+                if (Objects.nonNull(json.get("processDefinitionConnects"))) {
                     processDefinitionConnects = json.get("processDefinitionConnects").toString();
                 }
 
@@ -781,10 +780,10 @@ public class ProcessDefinitionService extends BaseDAGService {
 
                     Map<String, Object> createProcessDefinitionResult = createProcessDefinition(loginUser,currentProjectName,processDefinitionName,jsonObject.toString(),processDefinitionDesc,processDefinitionLocations,processDefinitionConnects);
                     Integer processDefinitionId = null;
-                    if (ObjectUtils.allNotNull(createProcessDefinitionResult.get("processDefinitionId"))) {
+                    if (Objects.nonNull(createProcessDefinitionResult.get("processDefinitionId"))) {
                         processDefinitionId = Integer.parseInt(createProcessDefinitionResult.get("processDefinitionId").toString());
                     }
-                    if (ObjectUtils.allNotNull(json.get("scheduleCrontab")) && processDefinitionId != null) {
+                    if (Objects.nonNull(json.get("scheduleCrontab")) && processDefinitionId != null) {
                         Date now = new Date();
                         Schedule scheduleObj = new Schedule();
                         scheduleObj.setProjectName(currentProjectName);
@@ -798,40 +797,40 @@ public class ProcessDefinitionService extends BaseDAGService {
 
                         scheduleCrontab = json.get("scheduleCrontab").toString();
                         scheduleObj.setCrontab(scheduleCrontab);
-                        if (ObjectUtils.allNotNull(json.get("scheduleStartTime"))) {
+                        if (Objects.nonNull(json.get("scheduleStartTime"))) {
                             scheduleStartTime = json.get("scheduleStartTime").toString();
                             scheduleObj.setStartTime(DateUtils.stringToDate(scheduleStartTime));
                         }
-                        if (ObjectUtils.allNotNull(json.get("scheduleEndTime"))) {
+                        if (Objects.nonNull(json.get("scheduleEndTime"))) {
                             scheduleEndTime = json.get("scheduleEndTime").toString();
                             scheduleObj.setEndTime(DateUtils.stringToDate(scheduleEndTime));
                         }
-                        if (ObjectUtils.allNotNull(json.get("scheduleWarningType"))) {
+                        if (Objects.nonNull(json.get("scheduleWarningType"))) {
                             scheduleWarningType = json.get("scheduleWarningType").toString();
                             scheduleObj.setWarningType(WarningType.valueOf(scheduleWarningType));
                         }
-                        if (ObjectUtils.allNotNull(json.get("scheduleWarningGroupId"))) {
+                        if (Objects.nonNull(json.get("scheduleWarningGroupId"))) {
                             scheduleWarningGroupId = json.get("scheduleWarningGroupId").toString();
                             scheduleObj.setWarningGroupId(Integer.parseInt(scheduleWarningGroupId));
                         }
-                        if (ObjectUtils.allNotNull(json.get("scheduleFailureStrategy"))) {
+                        if (Objects.nonNull(json.get("scheduleFailureStrategy"))) {
                             scheduleFailureStrategy = json.get("scheduleFailureStrategy").toString();
                             scheduleObj.setFailureStrategy(FailureStrategy.valueOf(scheduleFailureStrategy));
                         }
-                        if (ObjectUtils.allNotNull(json.get("scheduleReleaseState"))) {
+                        if (Objects.nonNull(json.get("scheduleReleaseState"))) {
                             scheduleReleaseState = json.get("scheduleReleaseState").toString();
                             scheduleObj.setReleaseState(ReleaseState.valueOf(scheduleReleaseState));
                         }
-                        if (ObjectUtils.allNotNull(json.get("scheduleProcessInstancePriority"))) {
+                        if (Objects.nonNull(json.get("scheduleProcessInstancePriority"))) {
                             scheduleProcessInstancePriority = json.get("scheduleProcessInstancePriority").toString();
                             scheduleObj.setProcessInstancePriority(Priority.valueOf(scheduleProcessInstancePriority));
                         }
-                        if (ObjectUtils.allNotNull(json.get("scheduleWorkerGroupId"))) {
+                        if (Objects.nonNull(json.get("scheduleWorkerGroupId"))) {
                             scheduleWorkerGroupId = json.get("scheduleWorkerGroupId").toString();
                             if(scheduleWorkerGroupId != null){
                                 scheduleObj.setWorkerGroupId(Integer.parseInt(scheduleWorkerGroupId));
                             }else{
-                                if (ObjectUtils.allNotNull(json.get("scheduleWorkerGroupName"))) {
+                                if (Objects.nonNull(json.get("scheduleWorkerGroupName"))) {
                                     scheduleWorkerGroupName = json.get("scheduleWorkerGroupName").toString();
                                     List<WorkerGroup> workerGroups = workerGroupMapper.queryWorkerGroupByName(scheduleWorkerGroupName);
                                     if(!workerGroups.isEmpty()){
