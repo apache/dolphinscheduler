@@ -101,7 +101,7 @@ public class SqlTask extends AbstractTask {
         // set the name of the current thread
         String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
-        logger.info(sqlParameters.toString());
+        logger.info("{}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
@@ -283,12 +283,12 @@ public class SqlTask extends AbstractTask {
                 }
             }
 
-            try (PreparedStatement  stmt = prepareStatementAndBind(connection, mainSqlBinds)) {
+            try (PreparedStatement  stmt = prepareStatementAndBind(connection, mainSqlBinds);
+                 ResultSet resultSet = stmt.executeQuery()) {
                 // decide whether to executeQuery or executeUpdate based on sqlType
                 if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                     // query statements need to be convert to JsonArray and inserted into Alert to send
                     JSONArray resultJSONArray = new JSONArray();
-                    ResultSet resultSet = stmt.executeQuery();
                     ResultSetMetaData md = resultSet.getMetaData();
                     int num = md.getColumnCount();
 
@@ -299,11 +299,10 @@ public class SqlTask extends AbstractTask {
                         }
                         resultJSONArray.add(mapOfColValues);
                     }
-                    resultSet.close();
                     logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
 
                     // if there is a result set
-                    if (resultJSONArray.size() > 0) {
+                    if (resultJSONArray.isEmpty()) {
                         if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
                             sendAttachment(sqlParameters.getTitle(),
                                     JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
@@ -331,6 +330,12 @@ public class SqlTask extends AbstractTask {
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage());
+        } finally {
+            try { 
+                connection.close(); 
+            } catch (Exception e) { 
+                logger.error(e.getMessage(), e); 
+            }
         }
         return connection;
     }
@@ -343,22 +348,23 @@ public class SqlTask extends AbstractTask {
      * @throws Exception
      */
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
-        PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql());
         // is the timeout set
         boolean timeoutFlag = taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED ||
                 taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
-        if(timeoutFlag){
-            stmt.setQueryTimeout(taskProps.getTaskTimeout());
-        }
-        Map<Integer, Property> params = sqlBinds.getParamsMap();
-        if(params != null) {
-            for (Map.Entry<Integer, Property> entry : params.entrySet()) {
-                Property prop = entry.getValue();
-                ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+        try (PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql())) {
+            if(timeoutFlag){
+                stmt.setQueryTimeout(taskProps.getTaskTimeout());
             }
+            Map<Integer, Property> params = sqlBinds.getParamsMap();
+            if(params != null) {
+                for (Map.Entry<Integer, Property> entry : params.entrySet()) {
+                    Property prop = entry.getValue();
+                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+                }
+            }
+            logger.info("prepare statement replace sql : {} ", stmt);
+            return stmt;
         }
-        logger.info("prepare statement replace sql : {} ",stmt.toString());
-        return stmt;
     }
 
     /**
@@ -446,6 +452,6 @@ public class SqlTask extends AbstractTask {
         for(int i=1;i<=sqlParamsMap.size();i++){
             logPrint.append(sqlParamsMap.get(i).getValue()+"("+sqlParamsMap.get(i).getType()+")");
         }
-        logger.info(logPrint.toString());
+        logger.info("{}", logPrint);
     }
 }
