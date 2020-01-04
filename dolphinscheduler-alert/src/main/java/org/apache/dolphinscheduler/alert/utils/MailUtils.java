@@ -16,15 +16,12 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
+import org.apache.dolphinscheduler.alert.template.AlertTemplate;
+import org.apache.dolphinscheduler.alert.template.AlertTemplateFactory;
 import org.apache.dolphinscheduler.common.enums.ShowType;
-import freemarker.cache.StringTemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.IOUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,25 +65,7 @@ public class MailUtils {
 
     public static final String sslTrust = PropertyUtils.getString(Constants.MAIL_SMTP_SSL_TRUST);
 
-    private static Template MAIL_TEMPLATE;
-
-    static {
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_21);
-        cfg.setDefaultEncoding(Constants.UTF_8);
-        StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
-        cfg.setTemplateLoader(stringTemplateLoader);
-        InputStreamReader isr = null;
-        try {
-            isr = new InputStreamReader(new FileInputStream(ResourceUtils.getFile(Constants.CLASSPATH_MAIL_TEMPLATES_ALERT_MAIL_TEMPLATE_FTL)),
-                    Constants.UTF_8);
-
-            MAIL_TEMPLATE = new Template("alert_mail_template", isr, cfg);
-        } catch (Exception e) {
-            MAIL_TEMPLATE = null;
-        } finally {
-            IOUtils.closeQuietly(isr);
-        }
-    }
+    public static AlertTemplate alertTemplate = AlertTemplateFactory.getMessageTemplate();
 
 
     /**
@@ -173,46 +152,7 @@ public class MailUtils {
      * @return the html table form
      */
     private static String htmlTable(String content, boolean showAll){
-        if (StringUtils.isNotEmpty(content)){
-            List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
-
-            if(!showAll && mapItemsList.size() > Constants.NUMBER_1000){
-                mapItemsList = mapItemsList.subList(0,Constants.NUMBER_1000);
-            }
-
-            StringBuilder contents = new StringBuilder(200);
-
-            boolean flag = true;
-
-            String title = "";
-            for (LinkedHashMap mapItems : mapItemsList){
-
-                Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
-
-                Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
-
-                StringBuilder t = new StringBuilder(Constants.TR);
-                StringBuilder cs = new StringBuilder(Constants.TR);
-                while (iterator.hasNext()){
-
-                    Map.Entry<String, Object> entry = iterator.next();
-                    t.append(Constants.TH).append(entry.getKey()).append(Constants.TH_END);
-                    cs.append(Constants.TD).append(String.valueOf(entry.getValue())).append(Constants.TD_END);
-
-                }
-                t.append(Constants.TR_END);
-                cs.append(Constants.TR_END);
-                if (flag){
-                    title = t.toString();
-                }
-                flag = false;
-                contents.append(cs);
-            }
-
-            return getTemplateContent(title,contents.toString());
-        }
-
-        return null;
+        return alertTemplate.getMessageFromTemplate(content,ShowType.TABLE,showAll);
     }
 
     /**
@@ -230,32 +170,8 @@ public class MailUtils {
      * @return text in html form
      */
     private static String htmlText(String content){
-
-        if (StringUtils.isNotEmpty(content)){
-            List<String> list;
-            try {
-                list = JSONUtils.toList(content,String.class);
-            }catch (Exception e){
-                logger.error("json format exception",e);
-                return null;
-            }
-
-            StringBuilder contents = new StringBuilder(100);
-            for (String str : list){
-                contents.append(Constants.TR);
-                contents.append(Constants.TD).append(str).append(Constants.TD_END);
-                contents.append(Constants.TR_END);
-            }
-
-            return getTemplateContent(null,contents.toString());
-
-        }
-
-        return null;
+        return alertTemplate.getMessageFromTemplate(content,ShowType.TEXT);
     }
-
-
-
 
     /**
      * send mail as Excel attachment
@@ -425,28 +341,4 @@ public class MailUtils {
         retMap.put(Constants.MESSAGE, "Send email to {" + StringUtils.join(receivers, ",") + "} failed，" + e.toString());
     }
 
-    /**
-     * get the content of the template
-     * @param title the title
-     * @param content the content to retrieve
-     * @return the content in the template or null if exception occurs
-     */
-    private static String getTemplateContent(String title,String content){
-        StringWriter out = new StringWriter();
-        Map<String,String> map = new HashMap<>();
-        if(null != title){
-            map.put(Constants.TITLE,title);
-        }
-        map.put(Constants.CONTENT,content);
-        try {
-            MAIL_TEMPLATE.process(map, out);
-            return out.toString();
-        } catch (TemplateException e) {
-            logger.error(e.getMessage(),e);
-        } catch (IOException e) {
-            logger.error(e.getMessage(),e);
-        }
-
-        return null;
-    }
 }

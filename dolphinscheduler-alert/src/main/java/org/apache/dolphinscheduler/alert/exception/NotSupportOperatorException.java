@@ -14,28 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.alert.template;
-
-import org.apache.dolphinscheduler.common.enums.ShowType;
+package org.apache.dolphinscheduler.alert.exception;
 
 /**
- * alert message template
+ * when an unsupported operation occurs, throw this
  */
-public abstract class AlertTemplate {
+public class NotSupportOperatorException extends RuntimeException {
 
-    /**
-     * get a message from a specified alert template
-     * @param content     alert message content
-     * @param showType    show type
-     * @param showAll    whether to show all
-     * @return a message from a specified alert template
-     */
-    public abstract String getMessageFromTemplate(String content, ShowType showType,boolean showAll);
+    private static final long serialVersionUID = 1L;
 
-    /**
-     * default showAll is true
-     */
-    public String getMessageFromTemplate(String content,ShowType showType){
-        return getMessageFromTemplate(content,showType,true);
+    public NotSupportOperatorException() {
+        super();
+    }
+
+    public NotSupportOperatorException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public NotSupportOperatorException(String message) {
+        super(message);
+    }
+
+    public NotSupportOperatorException(Throwable cause) {
+        super(cause);
     }
 }
