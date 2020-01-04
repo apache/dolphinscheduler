@@ -16,10 +16,11 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
+import java.util.Calendar;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
@@ -133,7 +134,7 @@ public class SessionServiceTest {
         Session session = new Session();
         session.setId(sessionId);
         session.setIp("127.0.0.1");
-        session.setLastLoginTime(DateUtils.addDays(new Date(),40));
+        session.setLastLoginTime(DateUtils.add(new Date(), Calendar.DAY_OF_MONTH, 40));
         session.setUserId(1);
         return session;
     }
