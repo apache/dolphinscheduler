@@ -15,20 +15,18 @@
 # limitations under the License.
 #
 
-on: ["pull_request"]
+on: [push, "pull_request"]
 env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
 
-name: Test Coveralls Parallel
+name: QA Analysis
 
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
-
       - uses: actions/checkout@v1
         with:
           submodules: true
@@ -38,20 +36,23 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Bootstrap database
+      - name: Docker setup
         run: cd ${DOCKER_DIR} && docker-compose up -d
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-      - name: Compile
+      - name: mvn install
         run: |
-          export MAVEN_OPTS='-Dmaven.repo.local=.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx3g'
-          mvn test -Dmaven.test.skip=false cobertura:cobertura
-          CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
-      - name: Collect logs
-        run: |
-          mkdir -p ${LOG_DIR}
-          cd ${DOCKER_DIR}
-          docker-compose logs db > ${LOG_DIR}/db.txt
-        continue-on-error: true
+          mvn clean install
+      - name: Run SonarCloud analysis
+        run: >
+          mvn clean verify --batch-mode
+          org.sonarsource.scanner.maven:sonar-maven-plugin:3.6.1.1688:sonar
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.organization=apache
+          -Dsonar.projectKey=apache-dolphinscheduler
+          -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
+        env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
