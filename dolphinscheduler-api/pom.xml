@@ -27,11 +27,6 @@
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 
-  <properties>
-    <jasper-runtime.version>5.5.23</jasper-runtime.version>
-    <servlet-api.version>2.5</servlet-api.version>
-  </properties>
-
   <dependencies>
       <dependency>
           <groupId>org.apache.dolphinscheduler</groupId>
@@ -131,15 +126,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
     </dependency>
@@ -155,11 +141,6 @@
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
     </dependency>
 
     <dependency>
@@ -181,19 +162,16 @@
     <dependency>
       <groupId>io.springfox</groupId>
       <artifactId>springfox-swagger2</artifactId>
-      <version>2.9.2</version>
     </dependency>
 
     <dependency>
       <groupId>io.springfox</groupId>
       <artifactId>springfox-swagger-ui</artifactId>
-      <version>2.9.2</version>
     </dependency>
 
     <dependency>
       <groupId>com.github.xiaoymin</groupId>
       <artifactId>swagger-bootstrap-ui</artifactId>
-      <version>1.9.3</version>
     </dependency>
 
     <dependency>
@@ -204,18 +182,10 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.apache.curator</groupId>
-      <artifactId>curator-framework</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.curator</groupId>
-      <artifactId>curator-recipes</artifactId>
-    </dependency>
+
     <!-- hadoop -->
     <dependency>
       <groupId>org.apache.hadoop</groupId>
@@ -241,13 +211,11 @@
     <dependency>
       <groupId>tomcat</groupId>
       <artifactId>jasper-runtime</artifactId>
-      <version>${jasper-runtime.version}</version>
     </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>${servlet-api.version}</version>
     </dependency>
 
     <dependency>
