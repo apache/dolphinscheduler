@@ -920,12 +920,14 @@ public class ResourcesService extends BaseService {
 
         User user = userMapper.queryDetailsById(userId);
         if(user == null){
+            logger.error("user {} not exists", userId);
             putMsg(result, Status.USER_NOT_EXIST,userId);
             return null;
         }
 
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (tenant == null){
+            logger.error("tenant not exists");
             putMsg(result, Status.TENANT_NOT_EXIST);
             return null;
         }
