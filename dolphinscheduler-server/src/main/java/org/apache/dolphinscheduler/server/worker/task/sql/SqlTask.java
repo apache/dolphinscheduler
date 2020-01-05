@@ -101,7 +101,7 @@ public class SqlTask extends AbstractTask {
         // set the name of the current thread
         String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
-        logger.info("{}", sqlParameters);
+        logger.info("Full sql parameters: {}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
@@ -452,6 +452,6 @@ public class SqlTask extends AbstractTask {
         for(int i=1;i<=sqlParamsMap.size();i++){
             logPrint.append(sqlParamsMap.get(i).getValue()+"("+sqlParamsMap.get(i).getType()+")");
         }
-        logger.info("{}", logPrint);
+        logger.info("Sql Params are {}", logPrint);
     }
 }
