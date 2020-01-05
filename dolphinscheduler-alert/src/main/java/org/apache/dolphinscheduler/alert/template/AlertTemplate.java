@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.ShowType;
 /**
  * alert message template
  */
-public abstract class AlertTemplate {
+public interface AlertTemplate {
 
     /**
      * get a message from a specified alert template
@@ -30,12 +30,12 @@ public abstract class AlertTemplate {
      * @param showAll    whether to show all
      * @return a message from a specified alert template
      */
-    public abstract String getMessageFromTemplate(String content, ShowType showType,boolean showAll);
+    String getMessageFromTemplate(String content, ShowType showType,boolean showAll);
 
     /**
      * default showAll is true
      */
-    public String getMessageFromTemplate(String content,ShowType showType){
+    default String getMessageFromTemplate(String content,ShowType showType){
         return getMessageFromTemplate(content,showType,true);
     }
 }

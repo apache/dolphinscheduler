@@ -33,7 +33,7 @@ import static org.apache.dolphinscheduler.common.utils.Preconditions.*;
 /**
  * the default html alert message template
  */
-public class DefaultHTMLTemplate extends AlertTemplate {
+public class DefaultHTMLTemplate implements AlertTemplate {
 
     public static final Logger logger = LoggerFactory.getLogger(DefaultHTMLTemplate.class);
 
