@@ -47,9 +47,12 @@ public class AlertTemplateFactoryTest {
     @Test
     public void testGetMessageTemplate(){
 
-        AlertTemplate template = AlertTemplateFactory.getMessageTemplate();
+        PowerMockito.mockStatic(PropertyUtils.class);
+        when(PropertyUtils.getString(Constants.ALERT_TEMPLATE)).thenReturn(null);
 
-        assertTrue(template instanceof DefaultHTMLTemplate);
+        AlertTemplate defaultTemplate = AlertTemplateFactory.getMessageTemplate();
+
+        assertTrue(defaultTemplate instanceof DefaultHTMLTemplate);
     }
 
     /**
