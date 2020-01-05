@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.alert.template;
 
-import org.apache.dolphinscheduler.alert.exception.NotSupportOperatorException;
 import org.apache.dolphinscheduler.alert.template.impl.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
@@ -38,9 +37,8 @@ public class AlertTemplateFactory {
     /**
      * get a template from alert.properties conf file
      * @return a template, default is DefaultHTMLTemplate
-     * @throws NotSupportOperatorException
      */
-    public static AlertTemplate getMessageTemplate() throws NotSupportOperatorException {
+    public static AlertTemplate getMessageTemplate() {
 
         if(StringUtils.isEmpty(alertTemplate)){
             return new DefaultHTMLTemplate();
@@ -50,8 +48,7 @@ public class AlertTemplateFactory {
             case "html":
                 return new DefaultHTMLTemplate();
             default:
-                logger.error("not support alert template: {}",alertTemplate);
-                throw new NotSupportOperatorException(String.format("not support alert template: %s",alertTemplate));
+                throw new IllegalArgumentException(String.format("not support alert template: %s",alertTemplate));
         }
     }
 }

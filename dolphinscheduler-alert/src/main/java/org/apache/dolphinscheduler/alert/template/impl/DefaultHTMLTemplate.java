@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.alert.template.impl;
 
-import org.apache.dolphinscheduler.alert.exception.NotSupportOperatorException;
 import org.apache.dolphinscheduler.alert.template.AlertTemplate;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.JSONUtils;
@@ -46,8 +45,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             case TEXT:
                 return getTextTypeMessage(content,showAll);
             default:
-                logger.error("not support showType: {} in DefaultHTMLTemplate",showType);
-                throw new NotSupportOperatorException(String.format("not support showType: %s in DefaultHTMLTemplate",showType));
+                throw new IllegalArgumentException(String.format("not support showType: %s in DefaultHTMLTemplate",showType));
         }
     }
 
@@ -98,7 +96,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             return getMessageFromHtmlTemplate(title,contents.toString());
         }
 
-        return null;
+        return content;
     }
 
     /**
@@ -129,7 +127,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
 
         }
 
-        return null;
+        return content;
     }
 
     /**
