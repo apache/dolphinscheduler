@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.api.utils;
 
-import java.util.Scanner;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Scanner;
 
 /**
  *	zookeeper state monitor

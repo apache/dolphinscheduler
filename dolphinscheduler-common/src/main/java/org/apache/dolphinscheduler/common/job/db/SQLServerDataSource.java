@@ -62,7 +62,6 @@ public class SQLServerDataSource extends BaseDataSource {
                     con.close();
                 } catch (SQLException e) {
                     logger.error("SQL Server datasource try conn close conn error", e);
-                    throw e;
                 }
             }
         }

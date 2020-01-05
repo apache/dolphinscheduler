@@ -68,7 +68,6 @@ public class PostgreDataSource extends BaseDataSource {
           con.close();
         } catch (SQLException e) {
           logger.error("Postgre datasource try conn close conn error", e);
-          throw e;
         }
       }
     }

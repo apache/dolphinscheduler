@@ -137,7 +137,7 @@ public class TenantController extends BaseController{
     @GetMapping(value="/list")
     @ResponseStatus(HttpStatus.OK)
     public Result queryTenantlist(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
-        logger.info("login user {}, query tenant list");
+        logger.info("login user {}, query tenant list", loginUser.getUserName());
         try{
             Map<String, Object> result = tenantService.queryTenantList(loginUser);
             return returnDataList(result);
