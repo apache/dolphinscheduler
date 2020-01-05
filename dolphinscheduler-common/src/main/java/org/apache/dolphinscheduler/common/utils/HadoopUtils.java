@@ -118,7 +118,7 @@ public class HadoopUtils implements Closeable {
                                     configuration.set(Constants.FS_DEFAULTFS,defaultFSProp);
                                     fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
                                 }else{
-                                    logger.error("property:{} can not to be empty, please set!");
+                                    logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULTFS );
                                     throw new RuntimeException("property:{} can not to be empty, please set!");
                                 }
                             }else{
@@ -337,7 +337,6 @@ public class HadoopUtils implements Closeable {
      * @throws Exception errors
      */
     public FileStatus[] listFileStatus(String filePath)throws Exception{
-        Path path = new Path(filePath);
         try {
             return fs.listStatus(new Path(filePath));
         } catch (IOException e) {
