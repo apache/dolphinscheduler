@@ -59,7 +59,7 @@ public class FourLetterWordMain {
      */
     public static String send4LetterWord(String host, int port, String cmd, int timeout)
             throws IOException {
-        LOG.info("connecting to {0} {1}", host, port);
+        LOG.info("connecting to {} {}", host, port);
         InetSocketAddress hostaddress= host != null ? new InetSocketAddress(host, port) :
                 new InetSocketAddress(InetAddress.getByName(null), port);
         
