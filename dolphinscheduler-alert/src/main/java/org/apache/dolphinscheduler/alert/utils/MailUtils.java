@@ -65,7 +65,7 @@ public class MailUtils {
 
     public static final String sslTrust = PropertyUtils.getString(Constants.MAIL_SMTP_SSL_TRUST);
 
-    public static AlertTemplate alertTemplate = AlertTemplateFactory.getMessageTemplate();
+    public static final AlertTemplate alertTemplate = AlertTemplateFactory.getMessageTemplate();
 
 
     /**
