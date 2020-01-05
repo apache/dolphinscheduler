@@ -119,7 +119,9 @@ public class HadoopUtils implements Closeable {
                                     fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
                                 }else{
                                     logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULTFS );
-                                    throw new RuntimeException("property:{} can not to be empty, please set!");
+                                    throw new RuntimeException(
+                                        String.format("property:{} can not to be empty, please set!", Constants.FS_DEFAULTFS)
+                                        );
                                 }
                             }else{
                                 logger.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULTFS, defaultFS);
@@ -219,10 +221,12 @@ public class HadoopUtils implements Closeable {
             return null;
         }
 
-        FSDataInputStream in = fs.open(new Path(hdfsFilePath));
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        Stream<String> stream = br.lines().skip(skipLineNums).limit(limit);
-        return stream.collect(Collectors.toList());
+        try (FSDataInputStream in = fs.open(new Path(hdfsFilePath))){
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            Stream<String> stream = br.lines().skip(skipLineNums).limit(limit);
+            return stream.collect(Collectors.toList());
+        }
+        
     }
 
     /**

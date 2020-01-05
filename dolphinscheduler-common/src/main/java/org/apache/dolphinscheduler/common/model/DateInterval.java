@@ -35,13 +35,18 @@ public class DateInterval {
 
     @Override
     public boolean equals(Object obj) {
-        try{
-            DateInterval dateInterval = (DateInterval) obj;
-            return startTime.equals(dateInterval.getStartTime()) &&
-                    endTime.equals(dateInterval.getEndTime());
-        }catch (Exception e){
+        if (obj != null) {
+            try{
+                DateInterval dateInterval = (DateInterval) obj;
+                return startTime.equals(dateInterval.getStartTime()) &&
+                        endTime.equals(dateInterval.getEndTime());
+            }catch (Exception e){
+                return false;
+            }
+        } else {
             return false;
         }
+        
     }
 
     public Date getStartTime() {

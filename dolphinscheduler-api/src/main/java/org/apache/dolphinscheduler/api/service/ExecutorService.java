@@ -497,6 +497,10 @@ public class ExecutorService extends BaseService{
             }
         }
 
+        if ( start == null || end == null) {
+            return 0;
+        }
+
         if(commandType == CommandType.COMPLEMENT_DATA){
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
             if(runMode == RunMode.RUN_MODE_SERIAL){
@@ -515,13 +519,13 @@ public class ExecutorService extends BaseService{
                     start = DateUtils.getSomeDay(start, 1);
                 }
                 return runCunt;
+            }else{
+                return 0;
             }
         }else{
             command.setCommandParam(JSONUtils.toJson(cmdParam));
             return processDao.createCommand(command);
-        }
-
-        return 0;
+        }  
     }
 
     /**
