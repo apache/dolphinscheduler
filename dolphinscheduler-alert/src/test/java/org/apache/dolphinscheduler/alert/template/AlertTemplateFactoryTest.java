@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.alert.template;
 
-import org.apache.dolphinscheduler.alert.exception.NotSupportOperatorException;
 import org.apache.dolphinscheduler.alert.template.impl.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
