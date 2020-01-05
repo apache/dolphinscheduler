@@ -120,7 +120,7 @@ public class HadoopUtils implements Closeable {
                                 }else{
                                     logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULTFS );
                                     throw new RuntimeException(
-                                        String.format("property:{} can not to be empty, please set!", Constants.FS_DEFAULTFS)
+                                        String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULTFS)
                                         );
                                 }
                             }else{
