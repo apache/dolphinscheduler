@@ -48,7 +48,7 @@ public class AlertTemplateFactoryTest {
     public void testGetMessageTemplate(){
 
         PowerMockito.mockStatic(PropertyUtils.class);
-        when(PropertyUtils.getString(Constants.ALERT_TEMPLATE)).thenReturn(null);
+        when(PropertyUtils.getString(Constants.ALERT_TEMPLATE)).thenReturn("html");
 
         AlertTemplate defaultTemplate = AlertTemplateFactory.getMessageTemplate();
 
@@ -58,12 +58,10 @@ public class AlertTemplateFactoryTest {
     /**
      * GetMessageTemplate method throw Exception test
      */
-    @Test(expected = NotSupportOperatorException.class)
+    @Test
     public void testGetMessageTemplateException(){
 
-        PowerMockito.mockStatic(PropertyUtils.class);
-        when(PropertyUtils.getString(Constants.ALERT_TEMPLATE)).thenReturn("xx");
-
-        AlertTemplateFactory.getMessageTemplate();
+        AlertTemplate defaultTemplate = AlertTemplateFactory.getMessageTemplate();
+        assertTrue(defaultTemplate instanceof DefaultHTMLTemplate);
     }
 }
