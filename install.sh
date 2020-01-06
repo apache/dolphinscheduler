@@ -47,7 +47,6 @@ else
     exit 1
 fi
 
-source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
 # for example postgresql or mysql ...
@@ -86,7 +85,6 @@ ips="ark0,ark1,ark2,ark3,ark4"
 # Note: if ssh port is not default, modify here
 sshPort=22
 
-# conf/config/run_config.conf config
 # run master machine
 # Note: list of hosts hostname for deploying master
 masters="ark0,ark1"
@@ -147,9 +145,6 @@ enterpriseWechatAgentId="xxxxxxxxxx"
 # Enterprise WeChat user configuration, multiple users to , split
 enterpriseWechatUsers="xxxxx,xxxxx"
 
-# alert port
-alertPort=7789
-
 
 # whether to start monitoring self-starting scripts
 monitorServerState="false"
@@ -192,7 +187,7 @@ downloadPath="/tmp/dolphinscheduler/download"
 execPath="/tmp/dolphinscheduler/exec"
 
 # SHELL environmental variable path
-shellEnvPath="$installPath/conf/env/.dolphinscheduler_env.sh"
+shellEnvPath="$installPath/conf/env/dolphinscheduler_env.sh"
 
 # suffix of the resource file
 resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
@@ -225,15 +220,12 @@ zkSessionTimeout="300"
 zkConnectionTimeout="300"
 
 # zk retry interval
-zkRetrySleep="100"
+zkRetryMaxSleep="100"
 
 # zk retry maximum number of times
 zkRetryMaxtime="5"
 
 
-# master config 
-# master execution thread maximum number, maximum parallelism of process instance
-masterExecThreads="100"
 
 # the maximum number of master task execution threads, the maximum degree of parallelism for each process instance
 masterExecTaskNum="20"
@@ -253,11 +245,7 @@ masterMaxCpuLoadAvg="10"
 # master reserve memory to determine if the master has execution capability
 masterReservedMemory="1"
 
-# master port
-masterPort=5566
-
-
-# worker config 
+# worker config
 # worker execution thread
 workerExecThreads="100"
 
@@ -269,10 +257,6 @@ workerFetchTaskNum="3"
 
 # worker reserve memory to determine if the master has execution capability
 workerReservedMemory="1"
-
-# master port
-workerPort=7788
-
 
 # api config
 # api server port
@@ -350,7 +334,7 @@ sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/common.
 sed -i ${txt} "s#zookeeper.dolphinscheduler.root.*#zookeeper.dolphinscheduler.root=${zkRoot}#g" conf/common.properties
 sed -i ${txt} "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/common.properties
 sed -i ${txt} "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/common.properties
-sed -i ${txt} "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/common.properties
+sed -i ${txt} "s#zookeeper.retry.max.sleep.*#zookeeper.retry.max.sleep=${zkRetryMaxSleep}#g" conf/common.properties
 sed -i ${txt} "s#zookeeper.retry.maxtime.*#zookeeper.retry.maxtime=${zkRetryMaxtime}#g" conf/common.properties
 
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
@@ -384,11 +368,11 @@ sed -i ${txt} "s#ips.*#ips=${ips}#g" conf/config/install_config.conf
 sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/install_config.conf
 
 
-sed -i ${txt} "s#masters.*#masters=${masters}#g" conf/config/run_config.conf
-sed -i ${txt} "s#workers.*#workers=${workers}#g" conf/config/run_config.conf
-sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/run_config.conf
-sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/run_config.conf
-sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/run_config.conf
+sed -i ${txt} "s#masters.*#masters=${masters}#g" conf/config/install_config.conf
+sed -i ${txt} "s#workers.*#workers=${workers}#g" conf/config/install_config.conf
+sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/install_config.conf
+sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/install_config.conf
+sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/install_config.conf
 
 
 # 2,create directory
