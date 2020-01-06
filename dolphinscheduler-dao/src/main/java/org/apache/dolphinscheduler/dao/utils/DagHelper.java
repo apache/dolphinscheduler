@@ -78,17 +78,17 @@ public class DagHelper {
         List<String> startNodeList = startNodeNameList;
 
         if(taskDependType != TaskDependType.TASK_POST
-                && startNodeList.isEmpty()){
+                && CollectionUtils.isEmpty(startNodeList)){
             logger.error("start node list is empty! cannot continue run the process ");
             return destFlowNodeList;
         }
         List<TaskNode> destTaskNodeList = new ArrayList<>();
         List<TaskNode> tmpTaskNodeList = new ArrayList<>();
         if (taskDependType == TaskDependType.TASK_POST
-                && !recoveryNodeNameList.isEmpty()) {
+                && CollectionUtils.isNotEmpty(recoveryNodeNameList)) {
             startNodeList = recoveryNodeNameList;
         }
-        if (startNodeList == null || startNodeList.isEmpty()) {
+        if (CollectionUtils.isEmpty(startNodeList)) {
             // no special designation start nodes
             tmpTaskNodeList = taskNodeList;
         } else {
@@ -152,7 +152,7 @@ public class DagHelper {
             depList = startNode.getDepList();
             resultList.add(startNode);
         }
-        if (depList == null || depList.isEmpty()) {
+        if (CollectionUtils.isEmpty(depList)) {
             return resultList;
         }
         for (String depNodeName : depList) {
