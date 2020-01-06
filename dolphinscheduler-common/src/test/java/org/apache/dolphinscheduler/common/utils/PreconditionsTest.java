@@ -16,13 +16,13 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-        import org.junit.Assert;
-        import org.junit.Test;
-        import org.slf4j.Logger;
-        import org.slf4j.LoggerFactory;
-        import static org.hamcrest.core.StringContains.containsString;
-        import static org.junit.Assert.assertNull;
-        import static org.junit.Assert.assertThat;
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 
 
 public class PreconditionsTest {
