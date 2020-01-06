@@ -17,7 +17,7 @@
 <template>
   <div class="list-model" style="position: relative;">
     <div class="table-box">
-      <table class="fixed" summary="list">
+      <table class="fixed">
         <tr>
           <th scope="col" width="50">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
