@@ -148,12 +148,10 @@ public class DagHelper {
         List<TaskNode> resultList = new ArrayList<>();
 
         List<String> depList = new ArrayList<>();
-
         if (null != startNode) {
             depList = startNode.getDepList();
             resultList.add(startNode);
         }
-
         if (depList == null || depList.isEmpty()) {
             return resultList;
         }
@@ -184,11 +182,9 @@ public class DagHelper {
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
         List<TaskNode> taskNodeList = new ArrayList<>();
-
         if (null != processData) {
             taskNodeList = processData.getTasks();
         }
-
         List<TaskNode> destTaskNodeList = generateFlowNodeListByStartNode(taskNodeList, startNodeNameList, recoveryNodeNameList, depNodeType);
         if (destTaskNodeList.isEmpty()) {
             return null;
@@ -210,11 +206,9 @@ public class DagHelper {
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
         List<TaskNode> taskNodeList = new ArrayList<>();
-
         if (null != processData) {
             taskNodeList = processData.getTasks();
         }
-
         for(TaskNode node : taskNodeList){
             if(node.isForbidden()){
                 forbidTaskNodeMap.putIfAbsent(node.getName(), node);

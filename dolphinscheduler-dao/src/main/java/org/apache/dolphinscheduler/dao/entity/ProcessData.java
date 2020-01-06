@@ -102,13 +102,4 @@ public class ProcessData {
   public void setTenantId(int tenantId) {
     this.tenantId = tenantId;
   }
-
-  @Override
-  public int hashCode() {
-    int result = getTasks() != null ? getTasks().hashCode() : 0;
-    result = 31 * result + (getGlobalParams() != null ? getGlobalParams().hashCode() : 0);
-    result = 31 * result + getTimeout();
-    result = 31 * result + getTenantId();
-    return result;
-  }
 }
