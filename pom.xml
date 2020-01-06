@@ -823,6 +823,7 @@
 					<check>
 					</check>
 					<aggregate>true</aggregate>
+					<outputDirectory>./target/cobertura</outputDirectory>
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<quiet>true</quiet>
 					<format>xml</format>
