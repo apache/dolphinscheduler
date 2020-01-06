@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -32,7 +33,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,10 +116,9 @@ public class TaskInstanceService extends BaseService {
                 page, project.getId(), processInstanceId, searchVal, taskName, statusArray, host, start, end
         );
         PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
-        Set<String> exclusionSet = new HashSet<String>(){{
-            add(Constants.CLASS);
-            add("taskJson");
-        }};
+        Set<String> exclusionSet = new HashSet<>();
+        exclusionSet.add(Constants.CLASS);
+        exclusionSet.add("taskJson");
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
         for(TaskInstance taskInstance : taskInstanceList){
             taskInstance.setDuration(DateUtils.differSec(taskInstance.getStartTime(),

@@ -309,13 +309,13 @@ svg path:hover {
   //min-width: calc(100% - 220px);
   width: 8000px;
   height: 5000px;
-  position: relative;
   svg:not(:root){
     z-index: 11;
   }
 }
 
 .jtk-demo-canvas {
+  position: relative;
   height: 100%;
 }
 

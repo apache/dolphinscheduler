@@ -69,7 +69,6 @@ public class HiveDataSource extends BaseDataSource {
           con.close();
         } catch (SQLException e) {
           logger.error("hive datasource try conn close conn error", e);
-          throw e;
         }
       }
     }

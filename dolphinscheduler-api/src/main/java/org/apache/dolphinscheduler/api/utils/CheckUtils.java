@@ -21,8 +21,8 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -148,7 +148,7 @@ public class CheckUtils {
    * @return true if regex pattern is right, otherwise return false
    */
   private static boolean regexChecks(String str, Pattern pattern) {
-    if (org.apache.commons.lang3.StringUtils.isEmpty(str)) {
+    if (StringUtils.isEmpty(str)) {
       return false;
     }
 

@@ -14,32 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
 
+public class ArrayUtils {
 
-public class EnumUtils {
-
-    public static <E extends Enum<E>> E getEnum(final Class<E> enumClass, final String enumName) {
-        if (enumName == null) {
-            return null;
-        }
-        try {
-            return Enum.valueOf(enumClass, enumName);
-        } catch (final IllegalArgumentException ex) {
-            return null;
-        }
-    }
-
-    public static <E extends Enum<E>> boolean isValidEnum(final Class<E> enumClass, final String enumName) {
-        if (enumName == null) {
-            return false;
-        }
-        try {
-            Enum.valueOf(enumClass, enumName);
-            return true;
-        } catch (final IllegalArgumentException ex) {
-            return false;
-        }
-    }
+  public static boolean isEmpty(final int[] array) {
+    return array == null || array.length == 0;
+  }
 }
