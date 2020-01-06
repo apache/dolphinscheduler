@@ -26,7 +26,7 @@
             style="opacity: 0">
           </textarea>
           <a class="ans-modal-box-max">
-            <i class="ans-icon-max" @click="setEditorVal"></i>
+            <em class="ans-icon-max" @click="setEditorVal"></em>
           </a>
         </div>
       </div>

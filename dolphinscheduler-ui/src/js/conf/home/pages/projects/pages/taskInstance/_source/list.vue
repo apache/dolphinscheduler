@@ -17,42 +17,42 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <table class="fixed">
+      <table class="fixed" summary="list">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Process Instance')}}</span>
           </th>
-          <th width="90">
+          <th scope="col" width="90">
             <span>{{$t('Node Type')}}</span>
           </th>
-          <th width="40">
+          <th scope="col" width="40">
             <span>{{$t('State')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Submit Time')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Start Time')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th width="110">
+          <th scope="col" width="110">
             <span>{{$t('host')}}</span>
           </th>
-          <th width="74">
+          <th scope="col" width="74">
             <span>{{$t('Duration')}}(s)</span>
           </th>
-          <th width="84">
+          <th scope="col" width="84">
             <span>{{$t('Retry Count')}}</span>
           </th>
-          <th width="50">
+          <th scope="col" width="50">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>

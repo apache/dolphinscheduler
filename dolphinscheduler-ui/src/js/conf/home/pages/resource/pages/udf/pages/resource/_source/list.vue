@@ -17,30 +17,30 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <table class="fixed">
+      <table class="fixed" summary="list">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('UDF Resource Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('File Name')}}</span>
           </th>
-          <th width="80">
+          <th scope="col" width="80">
             <span>{{$t('File Size')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="110">
+          <th scope="col" width="110">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>

@@ -17,7 +17,7 @@
 <template>
   <div class="list-model">
     <div class="table-box">
-      <table class="fixed">
+      <table class="fixed" summary="list">
         <tr>
           <th>
             <span>{{$t('#')}}</span>
