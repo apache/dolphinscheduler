@@ -78,17 +78,17 @@ public class DagHelper {
         List<String> startNodeList = startNodeNameList;
 
         if(taskDependType != TaskDependType.TASK_POST
-                && startNodeList.size() == 0){
+                && CollectionUtils.isEmpty(startNodeList)){
             logger.error("start node list is empty! cannot continue run the process ");
             return destFlowNodeList;
         }
         List<TaskNode> destTaskNodeList = new ArrayList<>();
         List<TaskNode> tmpTaskNodeList = new ArrayList<>();
         if (taskDependType == TaskDependType.TASK_POST
-                && recoveryNodeNameList.size() > 0) {
+                && CollectionUtils.isNotEmpty(recoveryNodeNameList)) {
             startNodeList = recoveryNodeNameList;
         }
-        if (startNodeList == null || startNodeList.size() == 0) {
+        if (CollectionUtils.isEmpty(startNodeList)) {
             // no special designation start nodes
             tmpTaskNodeList = taskNodeList;
         } else {
@@ -126,10 +126,8 @@ public class DagHelper {
         List<TaskNode> resultList = new ArrayList<>();
         for (TaskNode taskNode : taskNodeList) {
             List<String> depList = taskNode.getDepList();
-            if (depList != null) {
-                if (depList.contains(startNode.getName())) {
-                    resultList.addAll(getFlowNodeListPost(taskNode, taskNodeList));
-                }
+            if (null != depList && null != startNode && depList.contains(startNode.getName())) {
+                resultList.addAll(getFlowNodeListPost(taskNode, taskNodeList));
             }
 
         }
@@ -149,9 +147,12 @@ public class DagHelper {
 
         List<TaskNode> resultList = new ArrayList<>();
 
-        List<String> depList = startNode.getDepList();
-        resultList.add(startNode);
-        if (depList == null || depList.size() == 0) {
+        List<String> depList = new ArrayList<>();
+        if (null != startNode) {
+            depList = startNode.getDepList();
+            resultList.add(startNode);
+        }
+        if (CollectionUtils.isEmpty(depList)) {
             return resultList;
         }
         for (String depNodeName : depList) {
@@ -180,7 +181,10 @@ public class DagHelper {
                                              TaskDependType depNodeType) throws Exception {
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
-        List<TaskNode> taskNodeList = processData.getTasks();
+        List<TaskNode> taskNodeList = new ArrayList<>();
+        if (null != processData) {
+            taskNodeList = processData.getTasks();
+        }
         List<TaskNode> destTaskNodeList = generateFlowNodeListByStartNode(taskNodeList, startNodeNameList, recoveryNodeNameList, depNodeType);
         if (destTaskNodeList.isEmpty()) {
             return null;
@@ -201,7 +205,10 @@ public class DagHelper {
         Map<String, TaskNode> forbidTaskNodeMap = new ConcurrentHashMap<>();
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
-        List<TaskNode> taskNodeList = processData.getTasks();
+        List<TaskNode> taskNodeList = new ArrayList<>();
+        if (null != processData) {
+            taskNodeList = processData.getTasks();
+        }
         for(TaskNode node : taskNodeList){
             if(node.isForbidden()){
                 forbidTaskNodeMap.putIfAbsent(node.getName(), node);
