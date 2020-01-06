@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -14,32 +15,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
-public class EnumUtils {
+public class IOUtils {
 
-    public static <E extends Enum<E>> E getEnum(final Class<E> enumClass, final String enumName) {
-        if (enumName == null) {
-            return null;
-        }
-        try {
-            return Enum.valueOf(enumClass, enumName);
-        } catch (final IllegalArgumentException ex) {
-            return null;
+    public static void closeQuietly(InputStream fis){
+        if(fis != null){
+            try {
+                fis.close();
+            } catch (IOException ignore) {
+            }
         }
     }
 
-    public static <E extends Enum<E>> boolean isValidEnum(final Class<E> enumClass, final String enumName) {
-        if (enumName == null) {
-            return false;
-        }
-        try {
-            Enum.valueOf(enumClass, enumName);
-            return true;
-        } catch (final IllegalArgumentException ex) {
-            return false;
+    public static void closeQuietly(InputStreamReader reader){
+        if(reader != null){
+            try {
+                reader.close();
+            } catch (IOException ignore) {
+            }
         }
     }
 }
