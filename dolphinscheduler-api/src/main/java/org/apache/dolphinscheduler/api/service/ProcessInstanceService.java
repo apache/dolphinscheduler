@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.dao.ProcessDao;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.slf4j.Logger;
@@ -489,13 +488,14 @@ public class ProcessInstanceService extends BaseDAGService {
         }
         ProcessInstance processInstance = processDao.findProcessInstanceDetailById(processInstanceId);
         List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstanceId);
-        //process instance priority
-        int processInstancePriority = processInstance.getProcessInstancePriority().ordinal();
-        if (processInstance == null) {
+
+        if (null == processInstance) {
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
 
+        //process instance priority
+        int processInstancePriority = processInstance.getProcessInstancePriority().ordinal();
         // delete zk queue
         if (CollectionUtils.isNotEmpty(taskInstanceList)){
             for (TaskInstance taskInstance : taskInstanceList){
