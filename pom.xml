@@ -116,6 +116,8 @@
 		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
 		<mockito.version>2.21.0</mockito.version>
 		<powermock.version>2.0.2</powermock.version>
+		<jasper-runtime.version>5.5.23</jasper-runtime.version>
+		<servlet-api.version>2.5</servlet-api.version>
 	</properties>
 
 	<dependencyManagement>
@@ -516,6 +518,17 @@
 				<version>${jcip.version}</version>
 				<optional>true</optional>
 			</dependency>
+			<dependency>
+				<groupId>tomcat</groupId>
+				<artifactId>jasper-runtime</artifactId>
+				<version>${jasper-runtime.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>${servlet-api.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -661,17 +674,30 @@
 				<configuration>
 					<includes>
 						<include>**/common/utils/*.java</include>
+						<include>**/common/threadutils/*.java</include>
 						<include>**/common/graph/*.java</include>
 						<include>**/common/queue/*.java</include>
 						<include>**/api/utils/CheckUtilsTest.java</include>
 						<include>**/api/utils/FileUtilsTest.java</include>
 						<include>**/api/enums/*.java</include>
+						<include>**/api/service/AccessTokenServiceTest.java</include>
+						<include>**/api/service/QueueServiceTest.java</include>
+						<include>**/api/service/MonitorServiceTest.java</include>
+						<include>**/api/service/SessionServiceTest.java</include>
+						<include>**/api/service/UsersServiceTest.java</include>
+						<include>**/api/service/TenantServiceTest.java</include>
+						<include>**/api/service/WorkerGroupServiceTest.java</include>
+						<include>**/api/service/AlertGroupServiceTest.java</include>
+						<include>**/api/service/ProjectServiceTest.java</include>
+						<include>**/api/service/ProcessDefinitionServiceTest.java</include>
+						<include>**/api/service/UdfFuncServiceTest.java</include>
 						<include>**/alert/utils/ExcelUtilsTest.java</include>
 						<include>**/alert/utils/FuncUtilsTest.java</include>
 						<include>**/alert/utils/JSONUtilsTest.java</include>
 						<include>**/alert/utils/PropertyUtilsTest.java</include>
 						<include>**/server/utils/SparkArgsUtilsTest.java</include>
 						<include>**/server/utils/FlinkArgsUtilsTest.java</include>
+						<include>**/server/utils/ParamUtilsTest.java</include>
 						<include>**/dao/mapper/AccessTokenMapperTest.java</include>
 						<include>**/dao/mapper/AlertGroupMapperTest.java</include>
 						<include>**/dao/mapper/AlertMapperTest.java</include>
@@ -797,6 +823,7 @@
 					<check>
 					</check>
 					<aggregate>true</aggregate>
+					<outputDirectory>./target/cobertura</outputDirectory>
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<quiet>true</quiet>
 					<format>xml</format>

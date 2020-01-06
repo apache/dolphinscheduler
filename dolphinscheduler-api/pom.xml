@@ -27,11 +27,6 @@
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 
-  <properties>
-    <jasper-runtime.version>5.5.23</jasper-runtime.version>
-    <servlet-api.version>2.5</servlet-api.version>
-  </properties>
-
   <dependencies>
       <dependency>
           <groupId>org.apache.dolphinscheduler</groupId>
@@ -158,11 +153,6 @@
     </dependency>
 
     <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
       <exclusions>
@@ -241,13 +231,29 @@
     <dependency>
       <groupId>tomcat</groupId>
       <artifactId>jasper-runtime</artifactId>
-      <version>${jasper-runtime.version}</version>
     </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>${servlet-api.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.powermock</groupId>
+      <artifactId>powermock-api-mockito2</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
   </dependencies>

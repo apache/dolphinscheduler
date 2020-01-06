@@ -226,6 +226,9 @@ zkRetryMaxSleep="100"
 zkRetryMaxtime="5"
 
 
+# master config 
+# master execution thread maximum number, maximum parallelism of process instance
+masterExecThreads="100"
 
 # the maximum number of master task execution threads, the maximum degree of parallelism for each process instance
 masterExecTaskNum="20"

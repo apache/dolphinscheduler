@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.job.db;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +62,6 @@ public class SQLServerDataSource extends BaseDataSource {
                     con.close();
                 } catch (SQLException e) {
                     logger.error("SQL Server datasource try conn close conn error", e);
-                    throw e;
                 }
             }
         }
