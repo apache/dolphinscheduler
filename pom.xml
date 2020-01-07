@@ -119,6 +119,7 @@
 		<servlet-api.version>2.5</servlet-api.version>
 		<swagger.version>1.9.3</swagger.version>
 		<springfox.version>2.9.2</springfox.version>
+		<netty.version>4.1.42.Final</netty.version>
 	</properties>
 
 	<dependencyManagement>
@@ -513,23 +514,29 @@
 				<artifactId>servlet-api</artifactId>
 				<version>${servlet-api.version}</version>
 			</dependency>
-      <dependency>
-        <groupId>io.springfox</groupId>
-        <artifactId>springfox-swagger2</artifactId>
-        <version>${springfox.version}</version>
-      </dependency>
 
-      <dependency>
-        <groupId>io.springfox</groupId>
-        <artifactId>springfox-swagger-ui</artifactId>
-        <version>${springfox.version}</version>
-      </dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
 
-      <dependency>
-        <groupId>com.github.xiaoymin</groupId>
-        <artifactId>swagger-bootstrap-ui</artifactId>
-        <version>${swagger.version}</version>
-      </dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.xiaoymin</groupId>
+				<artifactId>swagger-bootstrap-ui</artifactId>
+				<version>${swagger.version}</version>
+			  </dependency>
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>${netty.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -854,6 +861,7 @@
 		<module>dolphinscheduler-alert</module>
 		<module>dolphinscheduler-rpc</module>
 		<module>dolphinscheduler-dist</module>
+		<module>dolphinscheduler-remote</module>
 	</modules>
 
 </project>
