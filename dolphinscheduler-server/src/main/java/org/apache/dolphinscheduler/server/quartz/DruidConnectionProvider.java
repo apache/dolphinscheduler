@@ -22,7 +22,6 @@ import org.quartz.utils.ConnectionProvider;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-
 /**
  * druid connection provider
  */
