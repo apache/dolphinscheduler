@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
+import java.util.Objects;
 
 @TableName("t_ds_access_token")
 public class AccessToken {
@@ -111,25 +112,12 @@ public class AccessToken {
 
         AccessToken that = (AccessToken) o;
 
-        if (id != that.id) return false;
-        if (userId != that.userId) return false;
-        if (token != null ? !token.equals(that.token) : that.token != null) return false;
-        if (userName != null ? !userName.equals(that.userName) : that.userName != null) return false;
-        if (expireTime != null ? !expireTime.equals(that.expireTime) : that.expireTime != null) return false;
-        if (createTime != null ? !createTime.equals(that.createTime) : that.createTime != null) return false;
-        return updateTime != null ? updateTime.equals(that.updateTime) : that.updateTime == null;
+        return id == that.id;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + userId;
-        result = 31 * result + (token != null ? token.hashCode() : 0);
-        result = 31 * result + (userName != null ? userName.hashCode() : 0);
-        result = 31 * result + (expireTime != null ? expireTime.hashCode() : 0);
-        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
-        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
-        return result;
+        return Objects.hash(id);
     }
 
     @Override
