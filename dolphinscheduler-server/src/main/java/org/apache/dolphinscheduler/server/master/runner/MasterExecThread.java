@@ -170,7 +170,7 @@ public class MasterExecThread implements Runnable {
                 executeProcess();
             }
         }catch (Exception e){
-            logger.error("master exec thread exception: " + e.getMessage(), e);
+            logger.error("master exec thread exception", e);
             logger.error("process execute failed, process id:{}", processInstance.getId());
             processInstance.setState(ExecutionStatus.FAILURE);
             processInstance.setEndTime(new Date());
@@ -355,7 +355,7 @@ public class MasterExecThread implements Runnable {
             try {
                 FileUtils.deleteDirectory(new File(execLocalPath));
             } catch (IOException e) {
-                logger.error("delete exec dir failed : " + e.getMessage(), e);
+                logger.error("delete exec dir failed ", e);
             }
         }
     }
@@ -733,7 +733,7 @@ public class MasterExecThread implements Runnable {
             Date endTime = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
             return processInstance.getScheduleTime().equals(endTime);
         } catch (Exception e) {
-            logger.error("complement end failed : " + e.getMessage(),e);
+            logger.error("complement end failed ",e);
             return false;
         }
     }
@@ -1005,7 +1005,7 @@ public class MasterExecThread implements Runnable {
                 return task;
             }
         }catch (Exception e){
-            logger.error("get recovery task instance failed : " + e.getMessage(),e);
+            logger.error("get recovery task instance failed ",e);
         }
         return null;
     }

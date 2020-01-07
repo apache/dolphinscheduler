@@ -102,7 +102,7 @@ public class LogClient {
             retStrInfo = blockingStub.rollViewLog(pathParameter);
             return retStrInfo.getMsg();
         } catch (StatusRuntimeException e) {
-            logger.error("roll view log failed : " + e.getMessage(), e);
+            logger.error("roll view log failed", e);
             return null;
         }
     }
@@ -122,7 +122,7 @@ public class LogClient {
             retStrInfo = blockingStub.viewLog(pathParameter);
             return retStrInfo.getMsg();
         } catch (StatusRuntimeException e) {
-            logger.error("view log  failed : " + e.getMessage(), e);
+            logger.error("view log failed", e);
             return null;
         }
     }
@@ -142,7 +142,7 @@ public class LogClient {
             retByteInfo = blockingStub.getLogBytes(pathParameter);
             return retByteInfo.getData().toByteArray();
         } catch (StatusRuntimeException e) {
-            logger.error("get log bytes failed : " + e.getMessage(), e);
+            logger.error("get log bytes failed ", e);
             return null;
         }
     }
