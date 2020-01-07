@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.utils.IOUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

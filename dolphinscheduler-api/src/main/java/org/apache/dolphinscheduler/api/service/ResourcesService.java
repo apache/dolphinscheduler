@@ -16,12 +16,15 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.BeanMap;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -29,10 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.collections.BeanMap;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,14 +112,12 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
             return result;
         }
-        //
+
         //If resource type is UDF, only jar packages are allowed to be uploaded, and the suffix must be .jar
-        if (Constants.UDF.equals(type.name())) {
-            if (!JAR.equalsIgnoreCase(fileSuffix)) {
-                logger.error(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
-                putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
-                return result;
-            }
+        if (Constants.UDF.equals(type.name()) && !JAR.equalsIgnoreCase(fileSuffix)) {
+            logger.error(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
+            putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
+            return result;
         }
         if (file.getSize() > Constants.maxFileSize) {
             logger.error("file size is too large: {}", file.getOriginalFilename());
@@ -226,12 +223,16 @@ public class ResourcesService extends BaseService {
         }
 
         //check resource aleady exists
-        if (!resource.getAlias().equals(name)) {
-            if (checkResourceExists(name, 0, type.ordinal())) {
-                logger.error("resource {} already exists, can't recreate", name);
-                putMsg(result, Status.RESOURCE_EXIST);
-                return result;
-            }
+        if (!resource.getAlias().equals(name) && checkResourceExists(name, 0, type.ordinal())) {
+            logger.error("resource {} already exists, can't recreate", name);
+            putMsg(result, Status.RESOURCE_EXIST);
+            return result;
+        }
+
+        // query tenant by user id
+        String tenantCode = getTenantCode(resource.getUserId(),result);
+        if (StringUtils.isEmpty(tenantCode)){
+            return result;
         }
 
         // query tenant by user id
