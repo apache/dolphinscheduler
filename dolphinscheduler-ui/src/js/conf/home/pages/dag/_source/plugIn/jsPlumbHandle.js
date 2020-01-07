@@ -266,10 +266,10 @@ JSP.prototype.tasksContextmenu = function (event) {
     let isTwo = store.state.dag.isDetails
 
     let html = [
-      `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><i class="ans-icon-play"></i><span>${i18n.$t('Start')}</span></a>`,
-      `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><i class="ans-icon-edit"></i><span>${i18n.$t('Edit')}</span></a>`,
-      `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><i class="ans-icon-copy"></i><span>${i18n.$t('Copy')}</span></a>`,
-      `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><i class="ans-icon-trash"></i><span>${i18n.$t('Delete')}</span></a>`
+      `<a href="javascript:" id="startRunning" class="${isOne ? '' : 'disbled'}"><em class="ans-icon-play"></em><span>${i18n.$t('Start')}</span></a>`,
+      `<a href="javascript:" id="editNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-edit"></em><span>${i18n.$t('Edit')}</span></a>`,
+      `<a href="javascript:" id="copyNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-copy"></em><span>${i18n.$t('Copy')}</span></a>`,
+      `<a href="javascript:" id="removeNodes" class="${isTwo ? 'disbled' : ''}"><em class="ans-icon-trash"></em><span>${i18n.$t('Delete')}</span></a>`
     ]
 
     let operationHtml = () => {
