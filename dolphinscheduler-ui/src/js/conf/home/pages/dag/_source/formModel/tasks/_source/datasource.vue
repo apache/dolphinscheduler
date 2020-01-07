@@ -112,7 +112,20 @@
         })
       }
     },
-    watch: {},
+    computed: {
+      cacheParams () {
+        return {
+          type: this.type,
+          datasource: this.datasource
+        }
+      }
+    },
+    // Watch the cacheParams
+    watch: {
+      cacheParams (val) {
+        this.$emit('on-dsData', val);
+      }
+    },
     created () {
       let supportType = this.supportType || []
       this.typeList = _.cloneDeep(this.store.state.dag.dsTypeListS)
