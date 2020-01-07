@@ -37,7 +37,7 @@ const saveTargetarr = (valId, domId) => {
 }
 
 const rtBantpl = () => {
-  return `<i class="ans-icon-forbidden" data-toggle="tooltip" data-html="true" data-container="body" data-placement="left" title="${i18n.$t('Prohibition execution')}"></i>`
+  return `<em class="ans-icon-forbidden" data-toggle="tooltip" data-html="true" data-container="body" data-placement="left" title="${i18n.$t('Prohibition execution')}"></em>`
 }
 
 /**

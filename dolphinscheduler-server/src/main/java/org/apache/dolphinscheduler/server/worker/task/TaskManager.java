@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.server.worker.task.dependent.DependentTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
 import org.apache.dolphinscheduler.server.worker.task.http.HttpTask;
@@ -27,7 +28,6 @@ import org.apache.dolphinscheduler.server.worker.task.python.PythonTask;
 import org.apache.dolphinscheduler.server.worker.task.shell.ShellTask;
 import org.apache.dolphinscheduler.server.worker.task.spark.SparkTask;
 import org.apache.dolphinscheduler.server.worker.task.sql.SqlTask;
-import org.apache.commons.lang3.EnumUtils;
 import org.slf4j.Logger;
 
 /**

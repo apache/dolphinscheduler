@@ -29,6 +29,8 @@ export default {
   globalParams: [],
   // Node information
   tasks: [],
+  // Node cache information, cache the previous input
+  cacheTasks: {},
   // Timeout alarm
   timeout: 0,
   // tenant id

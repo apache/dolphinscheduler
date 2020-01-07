@@ -23,7 +23,7 @@
     <template slot="content">
       <div class="create-worker-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Group Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Group Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -33,7 +33,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>IP</template>
+          <template slot="name"><strong>*</strong>IP</template>
           <template slot="content">
             <x-input
                     :autosize="{ minRows: 4, maxRows: 6 }"
