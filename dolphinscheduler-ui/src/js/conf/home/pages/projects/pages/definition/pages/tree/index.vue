@@ -43,7 +43,7 @@
               <span>Node Type</span>
             </a>
             <a href="javascript:" v-for="(k,v) in tasksType" :key="v">
-              <i class="ans-icon-circle-solid" :style="{color:k.color}"></i>
+              <em class="ans-icon-circle-solid" :style="{color:k.color}"></em>
               <span>{{v}}</span>
             </a>
           </div>
@@ -52,7 +52,7 @@
               <span>{{$t('Task Status')}}</span>
             </a>
             <a href="javascript:" v-for="(item) in tasksState" :key="item.id">
-              <i class="ans-icon-rect-solid" :style="{color:item.color}"></i>
+              <em class="ans-icon-rect-solid" :style="{color:item.color}"></em>
               <span>{{item.desc}}</span>
             </a>
           </div>

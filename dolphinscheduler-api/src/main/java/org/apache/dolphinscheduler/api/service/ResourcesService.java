@@ -16,12 +16,15 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.BeanMap;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -29,10 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.collections.BeanMap;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,14 +112,12 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
             return result;
         }
-        //
+
         //If resource type is UDF, only jar packages are allowed to be uploaded, and the suffix must be .jar
-        if (Constants.UDF.equals(type.name())) {
-            if (!JAR.equalsIgnoreCase(fileSuffix)) {
-                logger.error(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
-                putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
-                return result;
-            }
+        if (Constants.UDF.equals(type.name()) && !JAR.equalsIgnoreCase(fileSuffix)) {
+            logger.error(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
+            putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
+            return result;
         }
         if (file.getSize() > Constants.maxFileSize) {
             logger.error("file size is too large: {}", file.getOriginalFilename());
@@ -226,12 +223,16 @@ public class ResourcesService extends BaseService {
         }
 
         //check resource aleady exists
-        if (!resource.getAlias().equals(name)) {
-            if (checkResourceExists(name, 0, type.ordinal())) {
-                logger.error("resource {} already exists, can't recreate", name);
-                putMsg(result, Status.RESOURCE_EXIST);
-                return result;
-            }
+        if (!resource.getAlias().equals(name) && checkResourceExists(name, 0, type.ordinal())) {
+            logger.error("resource {} already exists, can't recreate", name);
+            putMsg(result, Status.RESOURCE_EXIST);
+            return result;
+        }
+
+        // query tenant by user id
+        String tenantCode = getTenantCode(resource.getUserId(),result);
+        if (StringUtils.isEmpty(tenantCode)){
+            return result;
         }
 
         //get the file suffix
@@ -271,10 +272,6 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        // hdfs move
-        // query tenant by user id
-        User user = userMapper.queryDetailsById(resource.getUserId());
-        String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
         // get file hdfs path
         // delete hdfs file by type
         String originHdfsFileName = "";
@@ -430,10 +427,15 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
+        Tenant tenant = tenantMapper.queryById(loginUser.getTenantId());
+        if (tenant == null){
+            putMsg(result, Status.TENANT_NOT_EXIST);
+            return result;
+        }
         String hdfsFilename = "";
 
         // delete hdfs file by type
+        String tenantCode = tenant.getTenantCode();
         hdfsFilename = getHdfsFileName(resource, tenantCode, hdfsFilename);
 
         //delete data in database
@@ -522,8 +524,11 @@ public class ResourcesService extends BaseService {
             }
         }
 
-        User user = userMapper.queryDetailsById(resource.getUserId());
-        String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
+        String tenantCode = getTenantCode(resource.getUserId(),result);
+        if (StringUtils.isEmpty(tenantCode)){
+            return  result;
+        }
+
         // hdfs path
         String hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resource.getAlias());
         logger.info("resource hdfs path is {} ", hdfsFileName);
@@ -644,18 +649,20 @@ public class ResourcesService extends BaseService {
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
             if (!strList.contains(nameSuffix)) {
-                logger.error("resouce suffix {} not support updateProcessInstance,  resource id {}", nameSuffix, resourceId);
+                logger.error("resource suffix {} not support updateProcessInstance,  resource id {}", nameSuffix, resourceId);
                 putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
         }
 
+        String tenantCode = getTenantCode(resource.getUserId(),result);
+        if (StringUtils.isEmpty(tenantCode)){
+            return  result;
+        }
         resource.setSize(content.getBytes().length);
         resource.setUpdateTime(new Date());
         resourcesMapper.updateById(resource);
 
-        User user = userMapper.queryDetailsById(resource.getUserId());
-        String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
 
         result = uploadContentToHdfs(resource.getAlias(), tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -895,6 +902,31 @@ public class ResourcesService extends BaseService {
             resourceSet.removeAll(authedResourceSet);
 
         }
+    }
+
+    /**
+     * get tenantCode by UserId
+     *
+     * @param userId user id
+     * @param result return result
+     * @return
+     */
+    private String getTenantCode(int userId,Result result){
+
+        User user = userMapper.queryDetailsById(userId);
+        if(user == null){
+            logger.error("user {} not exists", userId);
+            putMsg(result, Status.USER_NOT_EXIST,userId);
+            return null;
+        }
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null){
+            logger.error("tenant not exists");
+            putMsg(result, Status.TENANT_NOT_EXIST);
+            return null;
+        }
+        return tenant.getTenantCode();
     }
 
 }

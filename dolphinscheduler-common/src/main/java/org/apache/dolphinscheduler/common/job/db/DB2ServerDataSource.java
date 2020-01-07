@@ -66,7 +66,6 @@ public class DB2ServerDataSource extends BaseDataSource {
                     con.close();
                 } catch (SQLException e) {
                     logger.error("DB2 Server datasource try conn close conn error", e);
-                    throw e;
                 }
             }
         }
