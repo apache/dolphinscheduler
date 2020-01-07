@@ -140,7 +140,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 }
                 Thread.sleep(commitRetryInterval);
             } catch (Exception e) {
-                logger.error("task commit to mysql and queue failed : " + e.getMessage(),e);
+                logger.error("task commit to mysql and queue failed",e);
             }
             retryTimes += 1;
         }

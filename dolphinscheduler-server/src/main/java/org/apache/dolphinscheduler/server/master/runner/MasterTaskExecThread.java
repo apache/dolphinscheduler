@@ -137,7 +137,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                 processInstance = processDao.findProcessInstanceById(processInstance.getId());
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
-                logger.error("exception: "+ e.getMessage(),e);
+                logger.error("exception",e);
                 if (processInstance != null) {
                     logger.error("wait task quit failed, instance id:{}, task id:{}",
                             processInstance.getId(), taskInstance.getId());

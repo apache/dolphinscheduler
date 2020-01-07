@@ -141,7 +141,7 @@ public class MasterServer implements IStoppable {
             } catch (SchedulerException e1) {
                 logger.error("QuartzExecutors shutdown failed : " + e1.getMessage(), e1);
             }
-            logger.error("start Quartz failed : " + e.getMessage(), e);
+            logger.error("start Quartz failed", e);
         }
 
 
@@ -183,7 +183,7 @@ public class MasterServer implements IStoppable {
                 //thread sleep 3 seconds for thread quitely stop
                 Thread.sleep(3000L);
             }catch (Exception e){
-                logger.warn("thread sleep exception:" + e.getMessage(), e);
+                logger.warn("thread sleep exception ", e);
             }
             try {
                 heartbeatMasterService.shutdownNow();
@@ -228,7 +228,7 @@ public class MasterServer implements IStoppable {
 
 
         } catch (Exception e) {
-            logger.error("master server stop exception : " + e.getMessage(), e);
+            logger.error("master server stop exception ", e);
             System.exit(-1);
         }
     }
