@@ -65,7 +65,7 @@ public class EnvFileTest {
             }
 
         }catch (IOException e){
-            logger.error("read file failed : " + e.getMessage(),e);
+            logger.error("read file failed",e);
         }finally {
             try {
                 if (br != null){
