@@ -143,6 +143,7 @@
         <m-sql
           v-if="taskType === 'SQL'"
           @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
           ref="SQL"
           :create-node-id="id"
           :backfill-item="backfillItem">
