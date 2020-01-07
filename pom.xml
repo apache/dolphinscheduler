@@ -703,6 +703,8 @@
 						<include>**/dao/mapper/AlertGroupMapperTest.java</include>
 						<include>**/dao/mapper/AlertMapperTest.java</include>
 						<include>**/dao/mapper/CommandMapperTest.java</include>
+						<include>**/alert/template/AlertTemplateFactoryTest.java</include>
+						<include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
