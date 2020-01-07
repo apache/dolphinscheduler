@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.server.utils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.rpc.LogClient;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -308,7 +308,7 @@ public class ProcessUtils {
 
         Runtime.getRuntime().exec(runCmd);
       } catch (Exception e) {
-        logger.error("kill application failed : " + e.getMessage(), e);
+        logger.error("kill application failed", e);
       }
     }
   }
@@ -337,7 +337,7 @@ public class ProcessUtils {
       killYarnJob(taskInstance);
 
     } catch (Exception e) {
-      logger.error("kill failed : " + e.getMessage(), e);
+      logger.error("kill task failed", e);
     }
   }
 

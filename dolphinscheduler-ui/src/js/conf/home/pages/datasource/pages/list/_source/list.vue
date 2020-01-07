@@ -19,28 +19,28 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Datasource Name')}}</span>
           </th>
-          <th width="120">
+          <th scope="col" width="120">
             <span>{{$t('Datasource Type')}}</span>
           </th>
-          <th width="100">
+          <th scope="col" width="100">
             <span>{{$t('Datasource Parameter')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th width="150">
+          <th scope="col" width="150">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th width="150">
+          <th scope="col" width="150">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="80">
+          <th scope="col" width="80">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>

@@ -19,25 +19,25 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('File Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th width="100">
+          <th scope="col" width="100">
             <span>{{$t('Size')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>

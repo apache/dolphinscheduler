@@ -31,6 +31,7 @@
   <properties>
     <node.version>v12.12.0</node.version>
     <npm.version>6.11.3</npm.version>
+    <sonar.sources>src</sonar.sources>
   </properties>
   <profiles>
     <profile>
