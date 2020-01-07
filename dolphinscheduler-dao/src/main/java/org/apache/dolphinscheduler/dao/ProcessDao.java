@@ -18,20 +18,19 @@ package org.apache.dolphinscheduler.dao;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
-import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
+import org.apache.dolphinscheduler.common.utils.ArrayUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
@@ -105,7 +104,8 @@ public class ProcessDao {
     /**
      * task queue impl
      */
-    protected ITaskQueue taskQueue = TaskQueueFactory.getTaskQueueInstance();
+    @Autowired
+    private ITaskQueue taskQueue;
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      * @param logger logger
@@ -457,9 +457,12 @@ public class ProcessDao {
         if(tenantId >= 0){
             tenant = tenantMapper.queryById(tenantId);
         }
-        if(tenant == null){
+        if(null == tenant){
             User user = userMapper.selectById(userId);
-            tenant = tenantMapper.queryById(user.getTenantId());
+
+            if (null != user) {
+                tenant = tenantMapper.queryById(user.getTenantId());
+            }
         }
         return tenant;
     }

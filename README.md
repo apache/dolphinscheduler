@@ -4,7 +4,8 @@ Dolphin Scheduler Official Website
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Total Lines](https://tokei.rs/b1/github/apache/Incubator-DolphinScheduler?category=lines)](https://github.com/apache/Incubator-DolphinScheduler)
 [![codecov](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev)
-![Codacy Badge](https://api.codacy.com/project/badge/Grade/ae514bfb7bb049658e916da091928e62)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
+
 
 > Dolphin Scheduler for Big Data
 
@@ -57,25 +58,25 @@ Overload processing: Task queue mechanism, the number of schedulable tasks on a 
 
 ### Document
 
-- <a href="https://dolphinscheduler.apache.org/en-us/docs/user_doc/backend-deployment.html" target="_blank">Backend deployment documentation</a>
+- <a href="https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/backend-deployment.html" target="_blank">Backend deployment documentation</a>
 
-- <a href="https://dolphinscheduler.apache.org/en-us/docs/user_doc/frontend-deployment.html" target="_blank">Front-end deployment documentation</a>
+- <a href="https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/frontend-deployment.html" target="_blank">Front-end deployment documentation</a>
 
-- [**User manual**](https://dolphinscheduler.apache.org/en-us/docs/user_doc/system-manual.html?_blank "System manual")
+- [**User manual**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/system-manual.html?_blank "System manual")
 
-- [**Upgrade document**](https://dolphinscheduler.apache.org/en-us/docs/release/upgrade.html?_blank "Upgrade document")
+- [**Upgrade document**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/release/upgrade.html?_blank "Upgrade document")
 
 - <a href="http://106.75.43.194:8888" target="_blank">Online Demo</a>
 
-More documentation please refer to <a href="https://dolphinscheduler.apache.org/en-us/docs/user_doc/quick-start.html" target="_blank">[DolphinScheduler online documentation]</a>
+More documentation please refer to <a href="https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/quick-start.html" target="_blank">[DolphinScheduler online documentation]</a>
 
 ### Recent R&D plan
 Work plan of Dolphin Scheduler: [R&D plan](https://github.com/apache/incubator-dolphinscheduler/projects/1), Under the `In Develop` card is what is currently being developed, TODO card is to be done (including feature ideas)
 
-### How to contribute code
+### How to contribute
 
-Welcome to participate in contributing code, please refer to the process of submitting the code:
-[[How to contribute code](https://github.com/apache/incubator-dolphinscheduler/issues/310)]
+Welcome to participate in contributing, please refer to the process of submitting the code:
+[[How to contribute](https://dolphinscheduler.apache.org/en-us/docs/development/contribute.html)]
 
 ### How to Build
 

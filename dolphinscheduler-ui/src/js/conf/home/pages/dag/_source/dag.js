@@ -177,8 +177,6 @@ Dag.prototype.backfill = function (arg) {
       // Number of tree node levels
       let countTree = getLeafCountTree(datas[0])
       function getMaxFloor(treeData) {
-        let floor = 0
-        let v = this
         let max = 0
         function each (data, floor) {
           data.forEach(e => {
@@ -224,9 +222,8 @@ Dag.prototype.backfill = function (arg) {
           return []
         }
         function toLine(data){
-          return data.reduce((arr, {id, name, targetarr, x, y, children = []}) =>
-          arr.concat([{id, name, targetarr, x, y}], toLine(children)), [])
-          return result;
+          return data.reduce((arrData, {id, name, targetarr, x, y, children = []}) =>
+          arrData.concat([{id, name, targetarr, x, y}], toLine(children)), [])
         }
         let listarr = toLine(datas);
         let listarrs = toLine(datas)

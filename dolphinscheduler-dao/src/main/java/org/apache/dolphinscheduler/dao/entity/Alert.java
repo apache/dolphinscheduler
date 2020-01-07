@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
@@ -32,7 +31,6 @@ import java.util.Map;
 /**
  *  alert
  */
-@Data
 @TableName("t_ds_alert")
 public class Alert {
 
@@ -218,6 +216,72 @@ public class Alert {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Alert alert = (Alert) o;
+
+        if (id != alert.id) {
+            return false;
+        }
+        if (alertGroupId != alert.alertGroupId) {
+            return false;
+        }
+        if (!title.equals(alert.title)) {
+            return false;
+        }
+        if (showType != alert.showType) {
+            return false;
+        }
+        if (!content.equals(alert.content)) {
+            return false;
+        }
+        if (alertType != alert.alertType) {
+            return false;
+        }
+        if (alertStatus != alert.alertStatus) {
+            return false;
+        }
+        if (!log.equals(alert.log)) {
+            return false;
+        }
+        if (!receivers.equals(alert.receivers)) {
+            return false;
+        }
+        if (!receiversCc.equals(alert.receiversCc)) {
+            return false;
+        }
+        if (!createTime.equals(alert.createTime)) {
+            return false;
+        }
+        return updateTime.equals(alert.updateTime) && info.equals(alert.info);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + title.hashCode();
+        result = 31 * result + showType.hashCode();
+        result = 31 * result + content.hashCode();
+        result = 31 * result + alertType.hashCode();
+        result = 31 * result + alertStatus.hashCode();
+        result = 31 * result + log.hashCode();
+        result = 31 * result + alertGroupId;
+        result = 31 * result + receivers.hashCode();
+        result = 31 * result + receiversCc.hashCode();
+        result = 31 * result + createTime.hashCode();
+        result = 31 * result + updateTime.hashCode();
+        result = 31 * result + info.hashCode();
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "Alert{" +
                 "id=" + id +
@@ -228,10 +292,10 @@ public class Alert {
                 ", alertStatus=" + alertStatus +
                 ", log='" + log + '\'' +
                 ", alertGroupId=" + alertGroupId +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
                 ", receivers='" + receivers + '\'' +
                 ", receiversCc='" + receiversCc + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
                 ", info=" + info +
                 '}';
     }

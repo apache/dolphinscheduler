@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.worker.task.http;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
 import org.apache.dolphinscheduler.common.enums.HttpParametersType;
@@ -27,13 +26,13 @@ import org.apache.dolphinscheduler.common.process.HttpProperty;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
-import org.apache.dolphinscheduler.common.utils.Bytes;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.http.HttpEntity;
@@ -50,6 +49,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -176,7 +176,7 @@ public class HttpTask extends AbstractTask {
         if (entity == null) {
             return null;
         }
-        String webPage = EntityUtils.toString(entity, Bytes.UTF8_ENCODING);
+        String webPage = EntityUtils.toString(entity, StandardCharsets.UTF_8.name());
         return webPage;
     }
 
@@ -264,7 +264,7 @@ public class HttpTask extends AbstractTask {
                 }
             }
             StringEntity postingString = new StringEntity(jsonParam.toString(), Charsets.UTF_8);
-            postingString.setContentEncoding(Bytes.UTF8_ENCODING);
+            postingString.setContentEncoding(StandardCharsets.UTF_8.name());
             postingString.setContentType(APPLICATION_JSON);
             builder.setEntity(postingString);
         }

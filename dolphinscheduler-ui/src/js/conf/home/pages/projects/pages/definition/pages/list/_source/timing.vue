@@ -122,8 +122,8 @@
                 :disabled="!notifyGroupList.length"
                 v-model="warningGroupId">
           <x-input slot="trigger" readonly slot-scope="{ selectedModel }" :placeholder="$t('Please select a notification group')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="warningGroupId = {}">
-            <i slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></i>
-            <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId.id"></i>
+            <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="warningGroupId.id"></em>
+            <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="!warningGroupId.id"></em>
           </x-input>
           <x-option
                   v-for="city in notifyGroupList"
@@ -313,7 +313,23 @@
         this.crontab = this.item.crontab
       }
       if(this.type == 'timing') {
+        let date = new Date()
+        let year = date.getFullYear()
+        let month = date.getMonth() + 1
+        let day = date.getDate()
+        if (month < 10) {
+            month = "0" + month;
+        }
+        if (day < 10) {
+            day = "0" + day;
+        }
+        let startDate = year + "-" + month + "-" + day + ' ' + '00:00:00'
+        let endDate = (year+100) + "-" + month + "-" + day + ' ' + '00:00:00'
+        let times = []
+        times[0] = startDate
+        times[1] = endDate
         this.crontab = '0 0 * * * ? *'
+        this.scheduleTime = times
       }
       this.receivers = _.cloneDeep(this.receiversD)
       this.receiversCc = _.cloneDeep(this.receiversCcD)

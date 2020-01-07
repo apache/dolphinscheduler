@@ -16,21 +16,17 @@
  */
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
 import org.slf4j.Logger;
@@ -155,6 +151,7 @@ public class FetchTaskThread implements Runnable{
                 //whether have tasks, if no tasks , no need lock  //get all tasks
                 List<String> tasksQueueList = taskQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
                 if (CollectionUtils.isEmpty(tasksQueueList)){
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
                 // creating distributed locks, lock path /dolphinscheduler/lock/worker
@@ -189,6 +186,10 @@ public class FetchTaskThread implements Runnable{
                         continue;
                     }
 
+                    if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
+                        continue;
+                    }
+
                     Tenant tenant = processDao.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(),
                             taskInstance.getProcessDefine().getUserId());
 
@@ -205,11 +206,6 @@ public class FetchTaskThread implements Runnable{
                     taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
 
                     logger.info("worker fetch taskId : {} from queue ", taskInstId);
-
-
-                    if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
-                        continue;
-                    }
 
                     // local execute path
                     String execLocalPath = getExecLocalPath();

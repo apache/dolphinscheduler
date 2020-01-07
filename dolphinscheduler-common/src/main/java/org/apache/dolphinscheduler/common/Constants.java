@@ -27,24 +27,9 @@ import java.util.regex.Pattern;
 public final class Constants {
 
     /**
-     * zookeeper properties path
-     */
-    public static final String ZOOKEEPER_PROPERTIES_PATH = "zookeeper.properties";
-
-    /**
-     * hadoop properties path
-     */
-    public static final String HADOOP_PROPERTIES_PATH = "/common/hadoop/hadoop.properties";
-
-    /**
      * common properties path
      */
-    public static final String COMMON_PROPERTIES_PATH = "/common/common.properties";
-
-    /**
-     * dao properties path
-     */
-    public static final String DAO_PROPERTIES_PATH = "application.properties";
+    public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
     /**
      * fs.defaultFS
@@ -139,42 +124,50 @@ public final class Constants {
     /**
      * MasterServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "zookeeper.dolphinscheduler.masters";
+    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "zookeeper.dolphinscheduler.masters";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/masters";
 
     /**
      * WorkerServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "zookeeper.dolphinscheduler.workers";
+    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "zookeeper.dolphinscheduler.workers";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "/workers";
 
     /**
      * all servers directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS = "zookeeper.dolphinscheduler.dead.servers";
+    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS = "zookeeper.dolphinscheduler.dead.servers";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
 
     /**
      * MasterServer lock directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "zookeeper.dolphinscheduler.lock.masters";
+    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "zookeeper.dolphinscheduler.lock.masters";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
 
     /**
      * WorkerServer lock directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS = "zookeeper.dolphinscheduler.lock.workers";
+    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS = "zookeeper.dolphinscheduler.lock.workers";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS = "/lock/workers";
 
     /**
      * MasterServer failover directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "zookeeper.dolphinscheduler.lock.failover.masters";
+    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "zookeeper.dolphinscheduler.lock.failover.masters";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
 
     /**
      * WorkerServer failover directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "zookeeper.dolphinscheduler.lock.failover.workers";
+    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "zookeeper.dolphinscheduler.lock.failover.workers";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
 
     /**
      * MasterServer startup  failover runing and fault tolerance process
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "zookeeper.dolphinscheduler.lock.failover.startup.masters";
+    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "zookeeper.dolphinscheduler.lock.failover.startup.masters";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
 
     /**
      * need send warn times when master server or worker server failover
@@ -219,6 +212,8 @@ public final class Constants {
     public static final String ZOOKEEPER_CONNECTION_TIMEOUT = "zookeeper.connection.timeout";
 
     public static final String ZOOKEEPER_RETRY_SLEEP = "zookeeper.retry.sleep";
+    public static final String ZOOKEEPER_RETRY_BASE_SLEEP = "zookeeper.retry.base.sleep";
+    public static final String ZOOKEEPER_RETRY_MAX_SLEEP = "zookeeper.retry.max.sleep";
 
     public static final String ZOOKEEPER_RETRY_MAXTIME = "zookeeper.retry.maxtime";
 
@@ -461,7 +456,7 @@ public final class Constants {
     /**
      * task record configuration path
      */
-    public static final String APPLICATION_PROPERTIES = "application-dao.properties";
+    public static final String APPLICATION_PROPERTIES = "application.properties";
 
     public static final String TASK_RECORD_URL = "task.record.datasource.url";
 
@@ -997,4 +992,10 @@ public final class Constants {
     public static final String CLASS = "class";
     public static final String RECEIVERS = "receivers";
     public static final String RECEIVERS_CC = "receiversCc";
+
+
+    /**
+     * dataSource sensitive param
+     */
+    public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
 }

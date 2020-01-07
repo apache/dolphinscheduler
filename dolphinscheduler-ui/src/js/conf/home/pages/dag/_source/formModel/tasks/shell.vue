@@ -21,10 +21,13 @@
       <div slot="content">
         <div class="from-mirror">
           <textarea
-                  id="code-shell-mirror"
-                  name="code-shell-mirror"
-                  style="opacity: 0">
+            id="code-shell-mirror"
+            name="code-shell-mirror"
+            style="opacity: 0">
           </textarea>
+          <a class="ans-modal-box-max">
+            <em class="ans-icon-max" @click="setEditorVal"></em>
+          </a>
         </div>
       </div>
     </m-list-box>
@@ -55,6 +58,7 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import mListBox from './_source/listBox'
+  import mScriptBox from './_source/scriptBox'
   import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
@@ -85,8 +89,37 @@
       _onLocalParams (a) {
         this.localParams = a
       },
+      setEditorVal() {
+        let self = this
+          let modal = self.$modal.dialog({
+            className: 'scriptModal',
+            closable: false,
+            showMask: true,
+            maskClosable: true,
+            onClose: function() {
+
+            },
+            render (h) {
+              return h(mScriptBox, {
+                on: {
+                  getSriptBoxValue (val) {
+                    editor.setValue(val)
+                  },
+                  closeAble () {
+                    // this.$modal.destroy()
+                    modal.remove()
+                  }
+                },
+                props: {
+                  item: editor.getValue()
+                }
+              })
+            }
+          })
+      },
       /**
        * return resourceList
+       * 
        */
       _onResourcesData (a) {
         this.resourceList = a
@@ -109,7 +142,6 @@
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
         }
-
         // storage
         this.$emit('on-params', {
           resourceList: this.resourceList,
@@ -138,7 +170,6 @@
 
         // Monitor keyboard
         editor.on('keypress', this.keypress)
-
         editor.setValue(this.rawScript)
 
         return editor
@@ -176,6 +207,27 @@
         editor.off($('.code-shell-mirror'), 'keypress', this.keypress)
       }
     },
-    components: { mLocalParams, mListBox, mResources }
+    components: { mLocalParams, mListBox, mResources, mScriptBox }
   }
 </script>
+<style lang="scss" rel="stylesheet/scss" scope>
+  .scriptModal {
+    .ans-modal-box-content-wrapper {
+      width: 90%;
+      .ans-modal-box-close {
+        right: -12px;
+        top: -16px;
+        color: #fff;
+      }
+    }
+  }
+  .ans-modal-box-close {
+    z-index: 100;
+  }
+  .ans-modal-box-max {
+    position: absolute;
+    right: -12px;
+    top: -16px;
+  }
+  
+</style>

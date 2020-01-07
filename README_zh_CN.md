@@ -4,7 +4,7 @@ Dolphin Scheduler Official Website
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![Total Lines](https://tokei.rs/b1/github/apache/Incubator-DolphinScheduler?category=lines)](https://github.com/apache/Incubator-DolphinScheduler)
 [![codecov](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev)
-![Codacy Badge](https://api.codacy.com/project/badge/Grade/ae514bfb7bb049658e916da091928e62)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
 
 > Dolphin Scheduler for Big Data
 
@@ -44,27 +44,27 @@ Dolphin Scheduler Official Website
 
 ### 文档
 
-- <a href="https://dolphinscheduler.apache.org/zh-cn/docs/user_doc/backend-deployment.html" target="_blank">后端部署文档</a>
+- <a href="https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/backend-deployment.html" target="_blank">后端部署文档</a>
 
-- <a href="https://dolphinscheduler.apache.org/zh-cn/docs/user_doc/frontend-deployment.html" target="_blank">前端部署文档</a>
+- <a href="https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/frontend-deployment.html" target="_blank">前端部署文档</a>
 
-- [**使用手册**](https://dolphinscheduler.apache.org/zh-cn/docs/user_doc/system-manual.html?_blank "系统使用手册")
+- [**使用手册**](https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/system-manual.html?_blank "系统使用手册")
 
-- [**升级文档**](https://dolphinscheduler.apache.org/zh-cn/docs/release/upgrade.html?_blank "升级文档")
+- [**升级文档**](https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/release/upgrade.html?_blank "升级文档")
 
 - <a href="http://106.75.43.194:8888" target="_blank">我要体验</a>
 
-更多文档请参考 <a href="https://dolphinscheduler.apache.org/zh-cn/docs/user_doc/quick-start.html" target="_blank">DolphinScheduler中文在线文档</a>
+更多文档请参考 <a href="https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/quick-start.html" target="_blank">DolphinScheduler中文在线文档</a>
 
 
 ### 近期研发计划
 
 DolphinScheduler的工作计划：<a href="https://github.com/apache/incubator-dolphinscheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是正在研发的功能，TODO卡片是待做事项(包括 feature ideas)
 
-### 贡献代码
+### 参与贡献
 
-非常欢迎大家来参与贡献代码，提交代码流程请参考：
-[[How to contribute code](https://github.com/apache/incubator-dolphinscheduler/issues/310)]
+非常欢迎大家来参与贡献，贡献流程请参考：
+[[参与贡献](https://dolphinscheduler.apache.org/zh-cn/docs/development/contribute.html)]
 
 ### How to Build
 
@@ -88,12 +88,12 @@ Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、g
 
 
 ### 获得帮助
-1. Submit an issue
-1. Mail to dev-subscribe@dolphinscheduler.apache.org, follow the reply to subscribe the mail list. then you can send mail to dev@dolphinscheduler.apache.org.
-1. Contact WeChat group manager, ID 510570367. This is for Mandarin(CN) discussion.
+1. 提交issue
+1. 先订阅邮件开发列表:[订阅邮件列表](https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/subscribe.html), 订阅成功后发送邮件到dev@dolphinscheduler.apache.org.
+1. 联系微信群助手(ID:dailidong66). 微信仅用于中国用户讨论.
 
 ### 版权
-Please refer to [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) file.
+请参考 [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) 文件.
 
 
 

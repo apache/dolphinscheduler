@@ -19,7 +19,7 @@
     <template slot="content">
       <div class="resource-rename-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"

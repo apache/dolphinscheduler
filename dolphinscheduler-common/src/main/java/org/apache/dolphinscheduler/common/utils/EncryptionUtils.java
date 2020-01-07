@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * encryption utils
