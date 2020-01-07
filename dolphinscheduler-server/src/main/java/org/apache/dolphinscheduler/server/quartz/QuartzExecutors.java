@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.server.quartz;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.commons.lang.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.Calendar;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -198,7 +197,7 @@ public class QuartzExecutors {
 
     } catch (Exception e) {
       logger.error("add job failed", e);
-      throw new RuntimeException("add job failed:"+e.getMessage());
+      throw new RuntimeException("add job failed", e);
     } finally {
       lock.writeLock().unlock();
     }

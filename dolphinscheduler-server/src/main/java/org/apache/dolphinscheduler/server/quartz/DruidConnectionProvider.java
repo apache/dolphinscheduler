@@ -18,9 +18,10 @@ package org.apache.dolphinscheduler.server.quartz;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import org.quartz.SchedulerException;
+import org.quartz.utils.ConnectionProvider;
 import java.sql.Connection;
 import java.sql.SQLException;
-import org.quartz.utils.ConnectionProvider;
+
 
 /**
  * druid connection provider
@@ -137,7 +138,7 @@ public class DruidConnectionProvider implements ConnectionProvider {
             datasource.setDriverClassName(this.driver);
         } catch (Exception e) {
             try {
-                throw new SchedulerException("Problem setting driver class name on datasource: " + e.getMessage(), e);
+                throw new SchedulerException("Problem setting driver class name on datasource", e);
             } catch (SchedulerException e1) {
             }
         }
