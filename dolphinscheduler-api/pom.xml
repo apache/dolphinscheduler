@@ -27,6 +27,13 @@
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 
+  <properties>
+    <jasper-runtime.version>5.5.23</jasper-runtime.version>
+    <servlet-api.version>2.5</servlet-api.version>
+    <swagger.version>1.9.3</swagger.version>
+    <springfox.version>2.9.2</springfox.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.dolphinscheduler</groupId>
@@ -111,6 +118,31 @@
     </dependency>
 
     <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
     </dependency>
@@ -139,16 +171,19 @@
     <dependency>
       <groupId>io.springfox</groupId>
       <artifactId>springfox-swagger2</artifactId>
+      <version>${springfox.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.springfox</groupId>
       <artifactId>springfox-swagger-ui</artifactId>
+      <version>${springfox.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.github.xiaoymin</groupId>
       <artifactId>swagger-bootstrap-ui</artifactId>
+      <version>${swagger.version}</version>
     </dependency>
 
     <dependency>
@@ -195,11 +230,13 @@
     <dependency>
       <groupId>tomcat</groupId>
       <artifactId>jasper-runtime</artifactId>
+      <version>${jasper-runtime.version}</version>
     </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
+      <version>${servlet-api.version}</version>
     </dependency>
 
     <!-- just for test -->
