@@ -55,8 +55,7 @@ public class ZooKeeperState {
 	public void getZookeeperInfo() {
 		String content = cmd("srvr");
 		if (StringUtils.isNotBlank(content)) {
-			Scanner scannerForStat = new Scanner(content);
-			try {
+			try (Scanner scannerForStat = new Scanner(content))  {
 				while (scannerForStat.hasNext()) {
 					String line = scannerForStat.nextLine();
 					if (line.startsWith("Latency min/avg/max:")) {
@@ -78,23 +77,18 @@ public class ZooKeeperState {
 						nodeCount = Integer.parseInt(getStringValueFromLine(line));
 					}
 				}
-			} finally {
-				scannerForStat.close();
-			}	
+			} 	
 		}
 
 		String wchsText = cmd("wchs");
 		if (StringUtils.isNotBlank(wchsText)) {
-			Scanner scannerForWchs = new Scanner(wchsText);
-			try {
+			try (Scanner scannerForWchs = new Scanner(wchsText)) {
 				while (scannerForWchs.hasNext()) {
 					String line = scannerForWchs.nextLine();
 					if (line.startsWith("Total watches:")) {
 						watches = Integer.parseInt(getStringValueFromLine(line));
 					}
 				}
-			} finally {
-				scannerForWchs.close();
 			}	
 		}
 
