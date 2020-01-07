@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.rpc.LogClient;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -371,12 +370,14 @@ public class ProcessUtils {
    *
    * @param taskInstance  task instance
    */
+  //TODO
   public static void killYarnJob(TaskInstance taskInstance) {
     try {
       Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-      LogClient logClient = new LogClient(taskInstance.getHost(), Constants.RPC_PORT);
+//      LogClient logClient = new LogClient(taskInstance.getHost(), Constants.RPC_PORT);
 
-      String log = logClient.viewLog(taskInstance.getLogPath());
+//      String log = ""logClient.viewLog(taskInstance.getLogPath())"";
+      String log = "";
       if (StringUtils.isNotEmpty(log)) {
         List<String> appIds = LoggerUtils.getAppIds(log, logger);
         String workerDir = taskInstance.getExecutePath();

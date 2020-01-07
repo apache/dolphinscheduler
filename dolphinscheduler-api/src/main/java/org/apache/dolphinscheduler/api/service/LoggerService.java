@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.log.LogClient;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -65,10 +64,10 @@ public class LoggerService {
 
     logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
 
-    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
-    String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
-    result.setData(log);
-    logger.info(log);
+////    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
+////    String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
+//    result.setData(log);
+//    logger.info(log);
 
     return result;
   }
@@ -85,7 +84,8 @@ public class LoggerService {
       throw new RuntimeException("task instance is null");
     }
     String host = taskInstance.getHost();
-    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
-    return logClient.getLogBytes(taskInstance.getLogPath());
+//    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
+//    return logClient.getLogBytes(taskInstance.getLogPath());
+    return null;
   }
 }

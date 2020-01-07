@@ -18,19 +18,19 @@ package org.apache.dolphinscheduler.remote.config;
 
 public class NettyServerConfig {
 
-    private int soBacklog;
+    private int soBacklog = 1024;
 
-    private boolean tcpNodelay;
+    private boolean tcpNodelay = true;
 
-    private boolean soKeepalive;
+    private boolean soKeepalive = true;
 
-    private int sendBufferSize;
+    private int sendBufferSize = 65535;
 
-    private int receiveBufferSize;
+    private int receiveBufferSize = 65535;
 
-    private int workerThread;
+    private int workerThread = 8;
 
-    private int listenPort;
+    private int listenPort = 12346;
 
     public int getListenPort() {
         return listenPort;
