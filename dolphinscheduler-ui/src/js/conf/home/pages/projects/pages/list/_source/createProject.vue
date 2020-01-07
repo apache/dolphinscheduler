@@ -19,7 +19,7 @@
     <template slot="content">
       <div class="projects-create-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Project Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Project Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"

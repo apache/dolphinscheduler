@@ -19,31 +19,31 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Project Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Owned Users')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Process Define Count')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Process Instance Running Count')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="80">
+          <th scope="col" width="80">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>

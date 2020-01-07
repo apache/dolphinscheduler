@@ -54,12 +54,12 @@ DownChart.prototype.download = function ({ dagThis }) {
     const copyDom = $('#canvas')
     // gain
     const scale = 1
-    // svg handle
-    const nodesToRecover = []
-    const nodesToRemove = []
     // divReport is the id of the dom that needs to be intercepted into a picture
     const svgElem = copyDom.find('svg')
     svgElem.each((index, node) => {
+      // svg handle
+      const nodesToRecover = []
+      const nodesToRemove = []
       let parentNode = node.parentNode
       let svg = node.outerHTML.trim()
       let canvas = document.createElement('canvas')

@@ -22,7 +22,7 @@
     <div class="content-p">
       <div class="create-datasource-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Datasource')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Datasource')}}</template>
           <template slot="content">
             <x-radio-group v-model="type" size="small">
               <x-radio :label="'MYSQL'">MYSQL</x-radio>
@@ -37,7 +37,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Datasource Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Datasource Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -59,7 +59,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('IP')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('IP')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -70,7 +70,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Port')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Port')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -81,7 +81,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f :class="{hidden:showPrincipal}">
-          <template slot="name"><b>*</b>Principal</template>
+          <template slot="name"><strong>*</strong>Principal</template>
           <template slot="content">
             <x-input
               type="input"
@@ -92,7 +92,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('User Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('User Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -114,7 +114,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b :class="{hidden:showdDatabase}">*</b>{{$t('Database Name')}}</template>
+          <template slot="name"><strong :class="{hidden:showdDatabase}">*</strong>{{$t('Database Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
