@@ -75,6 +75,11 @@ public class TaskQueueZkImpl implements ITaskQueue {
         return new ArrayList<>();
     }
 
+    @Override
+    public boolean hasTask(String key) {
+        return zookeeperOperator.hasChildren(key);
+    }
+
     /**
      * check task exists in the task queue or not
      *

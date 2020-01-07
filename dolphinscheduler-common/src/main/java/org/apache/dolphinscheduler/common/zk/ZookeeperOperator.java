@@ -27,6 +27,7 @@ import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.data.ACL;
+import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -135,6 +136,19 @@ public class ZookeeperOperator implements InitializingBean {
             throw new IllegalStateException(ex);
         } catch (Exception ex) {
             logger.error("getChildrenKeys key : {}", key, ex);
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public boolean hasChildren(final String key){
+        try {
+            Stat stat = zkClient.checkExists().forPath(key);
+            return stat.getNumChildren() >= 1;
+        } catch (InterruptedException ex) {
+            logger.error("hasChildren key : {} InterruptedException", key);
+            throw new IllegalStateException(ex);
+        } catch (Exception ex) {
+            logger.error("hasChildren key : {}", key, ex);
             throw new RuntimeException(ex);
         }
     }
