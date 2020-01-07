@@ -767,7 +767,6 @@
 						<exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
 						<exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
 						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
-						<exclude>**/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java</exclude>
 					</excludes>
 					<consoleOutput>true</consoleOutput>
 				</configuration>
