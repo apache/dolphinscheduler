@@ -64,7 +64,6 @@ public class MySQLDataSource extends BaseDataSource {
           con.close();
         } catch (SQLException e) {
           logger.error("Mysql datasource try conn close conn error", e);
-          throw e;
         }
       }
     }

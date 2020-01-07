@@ -23,7 +23,7 @@
     <template slot="content">
       <div class="create-user-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('User Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('User Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -34,7 +34,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="router.history.current.name !== 'account'">
-          <template slot="name"><b>*</b>{{$t('Password')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Password')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -44,7 +44,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isADMIN">
-          <template slot="name"><b>*</b>{{$t('Tenant')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Tenant')}}</template>
           <template slot="content">
             <x-select v-model="tenantId">
               <x-option
@@ -61,8 +61,8 @@
           <template slot="content">
             <x-select v-model="queueName">
               <x-input slot="trigger" slot-scope="{ selectedModel }" readonly :placeholder="$t('Please select a queue')" :value="selectedModel ? selectedModel.label : ''" style="width: 200px;" @on-click-icon.stop="queueName = ''">
-                <i slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></i>
-                <i slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></i>
+                <em slot="suffix" class="ans-icon-fail-solid" style="font-size: 15px;cursor: pointer;" v-show="queueName ==''"></em>
+                <em slot="suffix" class="ans-icon-arrow-down" style="font-size: 12px;" v-show="queueName!=''"></em>
               </x-input>
               <x-option
                       v-for="city in queueList"
@@ -74,7 +74,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Email')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Email')}}</template>
           <template slot="content">
             <x-input
                     type="input"

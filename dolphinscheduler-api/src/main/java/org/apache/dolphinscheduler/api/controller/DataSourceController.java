@@ -461,7 +461,7 @@ public class DataSourceController extends BaseController {
     @GetMapping(value="/kerberos-startup-state")
     @ResponseStatus(HttpStatus.OK)
     public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
-        logger.info("login user {},get kerberos startup state : {}", loginUser.getUserName());
+        logger.info("login user {}", loginUser.getUserName());
         try{
             // if upload resource is HDFS and kerberos startup is true , else false
             return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());

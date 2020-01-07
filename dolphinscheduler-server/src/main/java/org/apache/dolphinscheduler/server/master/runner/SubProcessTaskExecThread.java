@@ -81,9 +81,11 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
             result = true;
 
         }catch (Exception e){
-            logger.error("exception: "+ e.getMessage(),e);
-            logger.error("wait task quit failed, instance id:{}, task id:{}",
-                    processInstance.getId(), taskInstance.getId());
+            logger.error("exception: ",e);
+            if (null != taskInstance) {
+                logger.error("wait task quit failed, instance id:{}, task id:{}",
+                        processInstance.getId(), taskInstance.getId());
+            }
         }
         return result;
     }

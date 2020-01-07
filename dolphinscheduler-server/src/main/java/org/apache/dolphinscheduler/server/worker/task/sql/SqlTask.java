@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.server.worker.task.sql;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ShowType;
@@ -33,10 +31,7 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlBinds;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -124,18 +119,19 @@ public class SqlTask extends AbstractTask {
         }
 
         dataSource= processDao.findDataSourceById(sqlParameters.getDatasource());
+
+        if (null == dataSource){
+            logger.error("datasource not exists");
+            exitStatusCode = -1;
+            return;
+        }
+
         logger.info("datasource name : {} , type : {} , desc : {}  , user_id : {} , parameter : {}",
                 dataSource.getName(),
                 dataSource.getType(),
                 dataSource.getNote(),
                 dataSource.getUserId(),
                 dataSource.getConnectionParams());
-
-        if (dataSource == null){
-            logger.error("datasource not exists");
-            exitStatusCode = -1;
-            return;
-        }
 
         Connection con = null;
         List<String> createFuncs = null;
@@ -182,7 +178,7 @@ public class SqlTask extends AbstractTask {
                 try {
                     con.close();
                 } catch (SQLException e) {
-                    throw e;
+                    logger.error(e.getMessage(),e);
                 }
             }
         }

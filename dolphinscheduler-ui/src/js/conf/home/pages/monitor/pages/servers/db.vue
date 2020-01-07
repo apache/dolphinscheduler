@@ -30,8 +30,8 @@
             </div>
             <div class="value-p">
               <span class="state">
-                <i class="ans-icon-success-solid success" v-if="item.state"></i>
-                <i class="ans-icon-fail-solid error" v-else></i>
+                <em class="ans-icon-success-solid success" v-if="item.state"></em>
+                <em class="ans-icon-fail-solid error" v-else></em>
               </span>
             </div>
             <div class="text-1">{{$t('Health status')}}</div>
@@ -43,7 +43,7 @@
               <span>{{$t('Max connections')}} - {{item.date | formatDate}}</span>
             </div>
             <div class="value-p">
-              <b :style="{color:color[0]}">{{item.maxConnections}}</b>
+              <strong :style="{color:color[0]}">{{item.maxConnections}}</strong>
             </div>
             <div class="text-1">{{$t('Max connections')}}</div>
           </div>
@@ -54,7 +54,7 @@
               <span>{{$t('Threads connections')}}</span>
             </div>
             <div class="value-p">
-              <b :style="{color:color[8]}">{{item.threadsConnections}}</b>
+              <strong :style="{color:color[8]}">{{item.threadsConnections}}</strong>
             </div>
             <div class="text-1">{{$t('Threads connections')}}</div>
           </div>
@@ -65,7 +65,7 @@
                 <span>{{$t('Max used connections')}}</span>
               </div>
               <div class="value-p">
-                <b :style="{color:color[2]}">{{item.maxUsedConnections}}</b>
+                <strong :style="{color:color[2]}">{{item.maxUsedConnections}}</strong>
               </div>
               <div class="text-1">
                 {{$t('Max used connections')}}
@@ -78,7 +78,7 @@
               <span>{{$t('Threads running connections')}}</span>
             </div>
             <div class="value-p">
-              <b :style="{color:color[4]}">{{item.threadsRunningConnections}}</b>
+              <strong :style="{color:color[4]}">{{item.threadsRunningConnections}}</strong>
             </div>
             <div class="text-1">{{$t('Threads running connections')}}</div>
           </div>

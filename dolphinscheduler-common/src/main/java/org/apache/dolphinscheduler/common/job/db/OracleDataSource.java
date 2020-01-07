@@ -66,7 +66,6 @@ public class OracleDataSource extends BaseDataSource {
                     con.close();
                 } catch (SQLException e) {
                     logger.error("Oracle datasource try conn close conn error", e);
-                    throw e;
                 }
             }
         }

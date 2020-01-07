@@ -18,7 +18,7 @@
   <div class="variable-model">
     <template v-if="list">
       <div class="list">
-        <div class="name"><i class="fa ans-icon-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('Global parameters')}}</b></div>
+        <div class="name"><em class="fa ans-icon-code"></em><strong style="padding-top: 3px;display: inline-block">{{$t('Global parameters')}}</strong></div>
         <div class="var-cont">
           <template v-for="(item,$index) in list.globalParams">
             <x-button
@@ -28,13 +28,13 @@
                     :key="$index"
                     :data-clipboard-text="item.prop + ' = ' +item.value"
                     :class="'gbudp-' + $index">
-              <b style="color: #2A455B;">{{item.prop}}</b> = {{item.value}}
+              <strong style="color: #2A455B;">{{item.prop}}</strong> = {{item.value}}
             </x-button>
           </template>
         </div>
       </div>
       <div class="list" style="height: 30px;">
-        <div class="name"><i class="fa ans-icon-code"></i><b style="padding-top: 3px;display: inline-block">{{$t('Local parameters')}}</b></div>
+        <div class="name"><em class="fa ans-icon-code"></em><strong style="padding-top: 3px;display: inline-block">{{$t('Local parameters')}}</strong></div>
         <div class="var-cont">
           &nbsp;
         </div>
@@ -47,11 +47,11 @@
               <span v-for="(e,k,i) in el" :key="i">
                 <template v-if="item.taskType === 'SQL' || item.taskType === 'PROCEDURE'">
                   <template v-if="(k !== 'direct' && k !== 'type')">
-                    <b style="color: #2A455B;">{{k}}</b> = {{e}}
+                    <strong style="color: #2A455B;">{{k}}</strong> = {{e}}
                   </template>
                 </template>
                 <template v-else>
-                  <b style="color: #2A455B;">{{k}}</b> = {{e}}
+                  <strong style="color: #2A455B;">{{k}}</strong> = {{e}}
                 </template>
               </span>
             </x-button>

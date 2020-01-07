@@ -16,15 +16,15 @@
  */
 <template>
   <div class="form-model-model" v-clickoutside="_handleClose">
-    <div class="title-box"> 
+    <div class="title-box">
       <span class="name">{{$t('Current node settings')}}</span>
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
         <m-log :item="backfillItem">
-          <template slot="history"><a href="javascript:" @click="_seeHistory" ><i class="ansicon ans-icon-timer"></i><em>{{$t('View history')}}</em></a></template>
-          <template slot="log"><a href="javascript:"><i class="ansicon ans-icon-log"></i><em>{{$t('View log')}}</em></a></template>
+          <template slot="history"><a href="javascript:" @click="_seeHistory" ><em class="ansicon ans-icon-timer"></em><em>{{$t('View history')}}</em></a></template>
+          <template slot="log"><a href="javascript:"><em class="ansicon ans-icon-log"></em><em>{{$t('View log')}}</em></a></template>
         </m-log>
-        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><i class="ansicon ans-icon-node"></i><em>{{$t('Enter this child node')}}</em></a>
+        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><em class="ansicon ans-icon-node"></em><em>{{$t('Enter this child node')}}</em></a>
       </span>
     </div>
     <div class="content-box" v-if="isContentBox">
@@ -184,6 +184,7 @@
         <m-http
           v-if="taskType === 'HTTP'"
           @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
           ref="HTTP"
           :backfill-item="backfillItem">
         </m-http>
@@ -333,6 +334,31 @@
       _onParams (o) {
         this.params = Object.assign(this.params, {}, o)
       },
+
+      _onCacheParams (o) {
+        this.params = Object.assign(this.params, {}, o)
+        this._cacheItem()
+      },
+
+      _cacheItem () {
+        this.$emit('cacheTaskInfo', {
+          item: {
+            type: this.taskType,
+            id: this.id,
+            name: this.name,
+            params: this.params,
+            description: this.description,
+            runFlag: this.runFlag,
+            dependence: this.dependence,
+            maxRetryTimes: this.maxRetryTimes,
+            retryInterval: this.retryInterval,
+            timeout: this.timeout,
+            taskInstancePriority: this.taskInstancePriority,
+            workerGroupId: this.workerGroupId
+          },
+          fromThis: this
+        })
+      },
       /**
        * verification name
        */
@@ -431,29 +457,43 @@
       }
     },
     watch: {
-
+      /**
+       * Watch the item change, cache the value it changes
+       **/
+      _item (val) {
+        this._cacheItem()
+      }
     },
     created () {
       // Unbind copy and paste events
       JSP.removePaste()
       // Backfill data
       let taskList = this.store.state.dag.tasks
+
+      //fillback use cacheTasks
+      let cacheTasks = this.store.state.dag.cacheTasks
       let o = {}
-      if (taskList.length) {
-        taskList.forEach(v => {
-          if (v.id === this.id) {
-          o = v
-          this.backfillItem = v
+      if (cacheTasks[this.id]) {
+        o = cacheTasks[this.id]
+        this.backfillItem = cacheTasks[this.id]
+      } else {
+        if (taskList.length) {
+          taskList.forEach(v => {
+            if (v.id === this.id) {
+              o = v
+              this.backfillItem = v
+            }
+          })
         }
-      })
-        // Non-null objects represent backfill
-        if (!_.isEmpty(o)) {
-          this.name = o.name
-          this.taskInstancePriority = o.taskInstancePriority
-          this.runFlag = o.runFlag || 'NORMAL'
-          this.description = o.description
-          this.maxRetryTimes = o.maxRetryTimes
-          this.retryInterval = o.retryInterval
+      }
+      // Non-null objects represent backfill
+      if (!_.isEmpty(o)) {
+        this.name = o.name
+        this.taskInstancePriority = o.taskInstancePriority
+        this.runFlag = o.runFlag || 'NORMAL'
+        this.description = o.description
+        this.maxRetryTimes = o.maxRetryTimes
+        this.retryInterval = o.retryInterval
 
           // If the workergroup has been deleted, set the default workergroup
           var hasMatch = false;
@@ -471,7 +511,6 @@
             this.workerGroupId = o.workerGroupId
           }
 
-        }
       }
       this.isContentBox = true
     },
@@ -490,6 +529,23 @@
        */
       _isGoSubProcess () {
         return this.taskType === 'SUB_PROCESS' && this.name
+      },
+
+      //Define the item model
+      _item () {
+        return {
+          type: this.taskType,
+          id: this.id,
+          name: this.name,
+          description: this.description,
+          runFlag: this.runFlag,
+          dependence: this.dependence,
+          maxRetryTimes: this.maxRetryTimes,
+          retryInterval: this.retryInterval,
+          timeout: this.timeout,
+          taskInstancePriority: this.taskInstancePriority,
+          workerGroupId: this.workerGroupId
+        }
       }
     },
     components: {

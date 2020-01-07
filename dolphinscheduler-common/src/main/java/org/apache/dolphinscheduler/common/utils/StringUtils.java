@@ -18,6 +18,8 @@ package org.apache.dolphinscheduler.common.utils;
 
 
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 
@@ -121,5 +123,33 @@ public class StringUtils {
             }
         }
         return false;
+    }
+
+    public static String join(final Iterable<?> iterable, final String separator){
+        Iterator<?> iterator = iterable.iterator();
+        if (iterator == null) {
+            return null;
+        }
+        if (!iterator.hasNext()) {
+            return EMPTY;
+        }
+        final Object first = iterator.next();
+        if (!iterable.iterator().hasNext()) {
+            return Objects.toString(first, "");
+        }
+        final StringBuilder buf = new StringBuilder(64);
+        if (first != null) {
+            buf.append(first);
+        }
+        while (iterator.hasNext()) {
+            if (separator != null) {
+                buf.append(separator);
+            }
+            final Object obj = iterator.next();
+            if (obj != null) {
+                buf.append(obj);
+            }
+        }
+        return buf.toString();
     }
 }

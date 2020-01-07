@@ -67,7 +67,7 @@ public class HttpUtils {
 					logger.warn("http entity is null");
 				}
 			}else{
-				logger.error("htt get:{} response status code is not 200!");
+				logger.error("http get:{} response status code is not 200!", response.getStatusLine().getStatusCode());
 			}
 		}catch (Exception e){
 			logger.error(e.getMessage(),e);
