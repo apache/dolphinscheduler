@@ -23,7 +23,7 @@
     <template slot="content">
       <div class="create-token-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Failure time')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Failure time')}}</template>
           <template slot="content">
             <x-datepicker
                     :disabled-date="disabledDate"
@@ -35,7 +35,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="auth">
-          <template slot="name"><b>*</b>{{$t('User')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('User')}}</template>
           <template slot="content">
             <x-select v-model="userId" @on-change="_onChange">
               <x-option

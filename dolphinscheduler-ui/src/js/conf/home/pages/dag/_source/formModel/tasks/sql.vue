@@ -45,7 +45,7 @@
     </m-list-box>
     <template v-if="sqlType==0">
       <m-list-box>
-        <div slot="text"><b class='requiredIcon'>*</b>{{$t('Title')}}</div>
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Title')}}</div>
         <div slot="content">
           <x-input
             type="input"
@@ -56,7 +56,7 @@
         </div>
       </m-list-box>
       <m-list-box>
-        <div slot="text"><b class='requiredIcon'>*</b>{{$t('Recipient')}}</div>
+        <div slot="text"><strong class='requiredIcon'>*</strong>{{$t('Recipient')}}</div>
         <div slot="content">
           <m-email ref="refEmail" v-model="receivers" :disabled="isDetails" :repeat-data="receiversCc"></m-email>
         </div>
