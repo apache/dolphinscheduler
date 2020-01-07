@@ -66,18 +66,18 @@
       </x-input>
       <span class="lt-add">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
-          <i class="ans-icon-trash" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></i>
+          <em class="ans-icon-trash" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></em>
         </a>
       </span>
       <span class="add" v-if="$index === (localParamsList.length - 1)">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
-          <i class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></i>
+          <em class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
         </a>
       </span>
     </div>
     <span class="add-dp" v-if="!localParamsList.length">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
-        <i class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></i>
+        <em class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
       </a>
     </span>
   </div>
