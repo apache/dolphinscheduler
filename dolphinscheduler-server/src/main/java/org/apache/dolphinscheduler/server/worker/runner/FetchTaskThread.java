@@ -186,6 +186,10 @@ public class FetchTaskThread implements Runnable{
                         continue;
                     }
 
+                    if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
+                        continue;
+                    }
+
                     Tenant tenant = processDao.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(),
                             taskInstance.getProcessDefine().getUserId());
 
@@ -193,10 +197,6 @@ public class FetchTaskThread implements Runnable{
                     if (verifyTenantIsNull(tenant)) {
                         logger.warn("remove task queue : {} due to tenant is null", taskQueueStr);
                         removeNodeFromTaskQueue(taskQueueStr);
-                        continue;
-                    }
-
-                    if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
                         continue;
                     }
 
