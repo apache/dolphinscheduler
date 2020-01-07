@@ -19,12 +19,10 @@ package org.apache.dolphinscheduler.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 /**
  * process instance map
  */
-@Data
 @TableName("t_ds_relation_process_instance")
 public class ProcessInstanceMap {
 
@@ -89,5 +87,27 @@ public class ProcessInstanceMap {
                 ", parentTaskInstanceId=" + parentTaskInstanceId +
                 ", processInstanceId=" + processInstanceId +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ProcessInstanceMap that = (ProcessInstanceMap) o;
+
+        if (id != that.id) return false;
+        if (parentProcessInstanceId != that.parentProcessInstanceId) return false;
+        if (parentTaskInstanceId != that.parentTaskInstanceId) return false;
+        return processInstanceId == that.processInstanceId;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + parentProcessInstanceId;
+        result = 31 * result + parentTaskInstanceId;
+        result = 31 * result + processInstanceId;
+        return result;
     }
 }
