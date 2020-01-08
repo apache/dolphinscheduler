@@ -141,16 +141,16 @@ public class ZookeeperOperator implements InitializingBean {
     }
 
     public boolean hasChildren(final String key){
+
+        Stat stat ;
         try {
-            Stat stat = zkClient.checkExists().forPath(key);
-            return stat.getNumChildren() >= 1;
-        } catch (InterruptedException ex) {
-            logger.error("hasChildren key : {} InterruptedException", key);
-            throw new IllegalStateException(ex);
+            stat = zkClient.checkExists().forPath(key);
         } catch (Exception ex) {
             logger.error("hasChildren key : {}", key, ex);
             throw new RuntimeException(ex);
         }
+        return stat.getNumChildren() >= 1;
+
     }
 
     public boolean isExisted(final String key) {
