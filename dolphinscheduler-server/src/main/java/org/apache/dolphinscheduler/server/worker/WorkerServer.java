@@ -211,7 +211,7 @@ public class WorkerServer implements IStoppable {
                 //thread sleep 3 seconds for thread quitely stop
                 Thread.sleep(3000L);
             }catch (Exception e){
-                logger.warn("thread sleep exception:" + e.getMessage(), e);
+                logger.warn("thread sleep exception", e);
             }
 
             try {
@@ -252,7 +252,7 @@ public class WorkerServer implements IStoppable {
             logger.info("zookeeper service stopped");
 
         } catch (Exception e) {
-            logger.error("worker server stop exception : " + e.getMessage(), e);
+            logger.error("worker server stop exception ", e);
             System.exit(-1);
         }
     }
