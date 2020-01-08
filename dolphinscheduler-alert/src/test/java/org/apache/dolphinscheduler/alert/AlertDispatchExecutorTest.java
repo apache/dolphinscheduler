@@ -68,10 +68,5 @@ public class AlertDispatchExecutorTest {
         PowerMockito.when(SenderManager.send(alert)).thenReturn(true);
         PowerMockito.when(SenderManager.sendGroup(alert)).thenReturn(true);
         AlertDispatchExecutor.send(alert);
-
-        // test alert exception
-        PowerMockito.when(SenderManager.send(alert)).thenThrow(new AlertException("test exception", alert));
-        PowerMockito.when(SenderManager.sendGroup(alert)).thenReturn(true);
-        AlertDispatchExecutor.send(alert);
     }
 }
