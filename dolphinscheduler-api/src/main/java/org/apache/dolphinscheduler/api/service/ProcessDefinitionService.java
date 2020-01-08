@@ -630,7 +630,7 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param loginUser login user
      * @param file process metadata json file
      * @param currentProjectName current project name
-     * @return
+     * @return import process
      */
     @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> importProcessDefinition(User loginUser, MultipartFile file, String currentProjectName) {
@@ -842,6 +842,8 @@ public class ProcessDefinitionService extends BaseDAGService {
      * recursion create sub process
      * @param loginUser login user
      * @param targetProject target project
+     * @param jsonArray process task array
+     * @param subProcessIdMap correct sub process id map
      */
     public void importSubProcess(User loginUser, Project targetProject, JSONArray jsonArray, Map<Integer, Integer> subProcessIdMap) {
         for (int i = 0; i < jsonArray.size(); i++) {
