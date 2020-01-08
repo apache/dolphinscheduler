@@ -499,48 +499,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             ProcessDefinition processDefinition = processDefineMapper.queryByDefineId(processDefinitionId);
 
             if (null != processDefinition) {
-                //correct task param which has data source or dependent param
-                String correctProcessDefinitionJson = addTaskNodeSpecialParam(processDefinition.getProcessDefinitionJson());
-                processDefinition.setProcessDefinitionJson(correctProcessDefinitionJson);
-
-                //export process metadata
-                ProcessMeta exportProcessMeta = new ProcessMeta();
-                exportProcessMeta.setProjectName(processDefinition.getProjectName());
-                exportProcessMeta.setProcessDefinitionName(processDefinition.getName());
-                exportProcessMeta.setProcessDefinitionJson(processDefinition.getProcessDefinitionJson());
-                exportProcessMeta.setProcessDefinitionLocations(processDefinition.getLocations());
-                exportProcessMeta.setProcessDefinitionConnects(processDefinition.getConnects());
-
-                //schedule info
-                List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
-                if (!schedules.isEmpty()) {
-                    Schedule schedule = schedules.get(0);
-                    WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
-
-                    if (null == workerGroup && schedule.getWorkerGroupId() == -1) {
-                        workerGroup = new WorkerGroup();
-                        workerGroup.setId(-1);
-                        workerGroup.setName("");
-                    }
-
-                    exportProcessMeta.setScheduleWarningType(schedule.getWarningType().toString());
-                    exportProcessMeta.setScheduleWarningGroupId(schedule.getWarningGroupId());
-                    exportProcessMeta.setScheduleStartTime(DateUtils.dateToString(schedule.getStartTime()));
-                    exportProcessMeta.setScheduleEndTime(DateUtils.dateToString(schedule.getEndTime()));
-                    exportProcessMeta.setScheduleCrontab(schedule.getCrontab());
-                    exportProcessMeta.setScheduleFailureStrategy(String.valueOf(schedule.getFailureStrategy()));
-                    exportProcessMeta.setScheduleReleaseState(String.valueOf(ReleaseState.OFFLINE));
-                    exportProcessMeta.setScheduleProcessInstancePriority(String.valueOf(schedule.getProcessInstancePriority()));
-
-                    if (null != workerGroup) {
-                        exportProcessMeta.setScheduleWorkerGroupId(workerGroup.getId());
-                        exportProcessMeta.setScheduleWorkerGroupName(workerGroup.getName());
-                    }
-
-                }
-
-                //create workflow json file
-                String exportProcessJson = JSONUtils.toJsonString(exportProcessMeta);
+                String exportProcessJson = exportProcessMetaDataStr(processDefinitionId, processDefinition);
                 response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
                 response.setHeader("Content-Disposition", "attachment;filename="+processDefinition.getName()+".json");
                 BufferedOutputStream buff = null;
@@ -568,10 +527,58 @@ public class ProcessDefinitionService extends BaseDAGService {
                             logger.warn("export process output stream not close", e);
                         }
                     }
-
                 }
             }
         }
+    }
+
+    /**
+     * get export process metadata string
+     * @param processDefinitionId process definition id
+     * @param processDefinition process definition
+     * @return export process metadata string
+     */
+    public String exportProcessMetaDataStr(Integer processDefinitionId, ProcessDefinition processDefinition) {
+        //correct task param which has data source or dependent param
+        String correctProcessDefinitionJson = addTaskNodeSpecialParam(processDefinition.getProcessDefinitionJson());
+        processDefinition.setProcessDefinitionJson(correctProcessDefinitionJson);
+
+        //export process metadata
+        ProcessMeta exportProcessMeta = new ProcessMeta();
+        exportProcessMeta.setProjectName(processDefinition.getProjectName());
+        exportProcessMeta.setProcessDefinitionName(processDefinition.getName());
+        exportProcessMeta.setProcessDefinitionJson(processDefinition.getProcessDefinitionJson());
+        exportProcessMeta.setProcessDefinitionLocations(processDefinition.getLocations());
+        exportProcessMeta.setProcessDefinitionConnects(processDefinition.getConnects());
+
+        //schedule info
+        List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
+        if (!schedules.isEmpty()) {
+            Schedule schedule = schedules.get(0);
+            WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
+
+            if (null == workerGroup && schedule.getWorkerGroupId() == -1) {
+                workerGroup = new WorkerGroup();
+                workerGroup.setId(-1);
+                workerGroup.setName("");
+            }
+
+            exportProcessMeta.setScheduleWarningType(schedule.getWarningType().toString());
+            exportProcessMeta.setScheduleWarningGroupId(schedule.getWarningGroupId());
+            exportProcessMeta.setScheduleStartTime(DateUtils.dateToString(schedule.getStartTime()));
+            exportProcessMeta.setScheduleEndTime(DateUtils.dateToString(schedule.getEndTime()));
+            exportProcessMeta.setScheduleCrontab(schedule.getCrontab());
+            exportProcessMeta.setScheduleFailureStrategy(String.valueOf(schedule.getFailureStrategy()));
+            exportProcessMeta.setScheduleReleaseState(String.valueOf(ReleaseState.OFFLINE));
+            exportProcessMeta.setScheduleProcessInstancePriority(String.valueOf(schedule.getProcessInstancePriority()));
+
+            if (null != workerGroup) {
+                exportProcessMeta.setScheduleWorkerGroupId(workerGroup.getId());
+                exportProcessMeta.setScheduleWorkerGroupName(workerGroup.getName());
+            }
+        }
+        //create workflow json file
+        return JSONUtils.toJsonString(exportProcessMeta);
     }
 
     /**
