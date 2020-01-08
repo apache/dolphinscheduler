@@ -28,18 +28,35 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
 import java.util.Collections;
 import java.util.Map;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({MailUtils.class, DaoFactory.class, AlertDao.class, AlertGroupMapper.class, ConnectionFactory.class})
 public class SenderManagerTest {
+    private static AlertGroupMapper alertGroupMapper;
+    private static AlertDao alertDao;
+
+    @BeforeClass
+    public static void before() {
+        alertGroupMapper = PowerMockito.mock(AlertGroupMapper.class);
+        PowerMockito.mockStatic(ConnectionFactory.class);
+        PowerMockito.when(ConnectionFactory.getMapper(AlertGroupMapper.class)).thenReturn(alertGroupMapper);
+
+        alertDao = PowerMockito.mock(AlertDao.class);
+        PowerMockito.mockStatic(DaoFactory.class);
+        PowerMockito.when(DaoFactory.getDaoInstance(AlertDao.class)).thenReturn(alertDao);
+    }
 
     @Test
     public void testSend() throws AlertException {
@@ -72,10 +89,6 @@ public class SenderManagerTest {
         alert.setContent("test");
         alert.setAlertGroupId(1);
 
-        AlertDao alertDao = PowerMockito.mock(AlertDao.class);
-        PowerMockito.mockStatic(DaoFactory.class);
-        PowerMockito.when(DaoFactory.getDaoInstance(AlertDao.class)).thenReturn(alertDao);
-
         User user = new User();
         user.setEmail("test@test.com");
         PowerMockito.when(alertDao.listUserByAlertgroupId(alert.getAlertGroupId())).thenReturn(Collections.singletonList(user));
@@ -83,10 +96,6 @@ public class SenderManagerTest {
         Map<String, Object> mockResult = Collections.singletonMap(Constants.STATUS, true);
         PowerMockito.when(MailUtils.sendMails(Collections.singletonList("test@test.com"), alert.getTitle(),
                                               alert.getContent(), alert.getShowType())).thenReturn(mockResult);
-
-        AlertGroupMapper alertGroupMapper = PowerMockito.mock(AlertGroupMapper.class);
-        PowerMockito.mockStatic(ConnectionFactory.class);
-        PowerMockito.when(ConnectionFactory.getMapper(AlertGroupMapper.class)).thenReturn(alertGroupMapper);
 
         AlertGroup alertGroup = new AlertGroup();
         alertGroup.setId(1);
