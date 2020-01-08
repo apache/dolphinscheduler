@@ -1,0 +1,231 @@
+package org.apache.dolphinscheduler.api.dto;
+
+/**
+ * @ClassName ProcessMeta
+ */
+public class ProcessMeta {
+
+    /**
+     * project name
+     */
+    private String projectName;
+
+    /**
+     * process definition name
+     */
+    private String processDefinitionName;
+
+    /**
+     * processs definition json
+     */
+    private String processDefinitionJson;
+
+    /**
+     * process definition desc
+     */
+    private String processDefinitionDescription;
+
+    /**
+     * process definition locations
+     */
+    private String processDefinitionLocations;
+
+    /**
+     * process definition connects
+     */
+    private String processDefinitionConnects;
+
+    /**
+     * warning type
+     */
+    private String scheduleWarningType;
+
+    /**
+     * warning group id
+     */
+    private int scheduleWarningGroupId;
+
+    /**
+     * warning group name
+     */
+    private String scheduleWarningGroupName;
+
+    /**
+     * start time
+     */
+    private String scheduleStartTime;
+
+    /**
+     * end time
+     */
+    private String scheduleEndTime;
+
+    /**
+     * crontab
+     */
+    private String scheduleCrontab;
+
+    /**
+     * failure strategy
+     */
+    private String scheduleFailureStrategy;
+
+    /**
+     * release state
+     */
+    private String scheduleReleaseState;
+
+    /**
+     * process instance priority
+     */
+    private String scheduleProcessInstancePriority;
+
+    /**
+     * worker group id
+     */
+    private int scheduleWorkerGroupId;
+
+    /**
+     * worker group name
+     */
+    private String scheduleWorkerGroupName;
+
+    public ProcessMeta() {
+    }
+
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+
+    public String getProcessDefinitionName() {
+        return processDefinitionName;
+    }
+
+    public void setProcessDefinitionName(String processDefinitionName) {
+        this.processDefinitionName = processDefinitionName;
+    }
+
+    public String getProcessDefinitionJson() {
+        return processDefinitionJson;
+    }
+
+    public void setProcessDefinitionJson(String processDefinitionJson) {
+        this.processDefinitionJson = processDefinitionJson;
+    }
+
+    public String getProcessDefinitionDescription() {
+        return processDefinitionDescription;
+    }
+
+    public void setProcessDefinitionDescription(String processDefinitionDescription) {
+        this.processDefinitionDescription = processDefinitionDescription;
+    }
+
+    public String getProcessDefinitionLocations() {
+        return processDefinitionLocations;
+    }
+
+    public void setProcessDefinitionLocations(String processDefinitionLocations) {
+        this.processDefinitionLocations = processDefinitionLocations;
+    }
+
+    public String getProcessDefinitionConnects() {
+        return processDefinitionConnects;
+    }
+
+    public void setProcessDefinitionConnects(String processDefinitionConnects) {
+        this.processDefinitionConnects = processDefinitionConnects;
+    }
+
+    public String getScheduleWarningType() {
+        return scheduleWarningType;
+    }
+
+    public void setScheduleWarningType(String scheduleWarningType) {
+        this.scheduleWarningType = scheduleWarningType;
+    }
+
+    public int getScheduleWarningGroupId() {
+        return scheduleWarningGroupId;
+    }
+
+    public void setScheduleWarningGroupId(int scheduleWarningGroupId) {
+        this.scheduleWarningGroupId = scheduleWarningGroupId;
+    }
+
+    public String getScheduleWarningGroupName() {
+        return scheduleWarningGroupName;
+    }
+
+    public void setScheduleWarningGroupName(String scheduleWarningGroupName) {
+        this.scheduleWarningGroupName = scheduleWarningGroupName;
+    }
+
+    public String getScheduleStartTime() {
+        return scheduleStartTime;
+    }
+
+    public void setScheduleStartTime(String scheduleStartTime) {
+        this.scheduleStartTime = scheduleStartTime;
+    }
+
+    public String getScheduleEndTime() {
+        return scheduleEndTime;
+    }
+
+    public void setScheduleEndTime(String scheduleEndTime) {
+        this.scheduleEndTime = scheduleEndTime;
+    }
+
+    public String getScheduleCrontab() {
+        return scheduleCrontab;
+    }
+
+    public void setScheduleCrontab(String scheduleCrontab) {
+        this.scheduleCrontab = scheduleCrontab;
+    }
+
+    public String getScheduleFailureStrategy() {
+        return scheduleFailureStrategy;
+    }
+
+    public void setScheduleFailureStrategy(String scheduleFailureStrategy) {
+        this.scheduleFailureStrategy = scheduleFailureStrategy;
+    }
+
+    public String getScheduleReleaseState() {
+        return scheduleReleaseState;
+    }
+
+    public void setScheduleReleaseState(String scheduleReleaseState) {
+        this.scheduleReleaseState = scheduleReleaseState;
+    }
+
+    public String getScheduleProcessInstancePriority() {
+        return scheduleProcessInstancePriority;
+    }
+
+    public void setScheduleProcessInstancePriority(String scheduleProcessInstancePriority) {
+        this.scheduleProcessInstancePriority = scheduleProcessInstancePriority;
+    }
+
+    public int getScheduleWorkerGroupId() {
+        return scheduleWorkerGroupId;
+    }
+
+    public void setScheduleWorkerGroupId(int scheduleWorkerGroupId) {
+        this.scheduleWorkerGroupId = scheduleWorkerGroupId;
+    }
+
+    public String getScheduleWorkerGroupName() {
+        return scheduleWorkerGroupName;
+    }
+
+    public void setScheduleWorkerGroupName(String scheduleWorkerGroupName) {
+        this.scheduleWorkerGroupName = scheduleWorkerGroupName;
+    }
+}

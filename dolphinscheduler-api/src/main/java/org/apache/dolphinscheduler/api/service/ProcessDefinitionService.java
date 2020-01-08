@@ -22,11 +22,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.exportprocess.TaskNodeParamFactory;
+import org.apache.dolphinscheduler.api.utils.exportprocess.exportProcessAddTaskParam;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -500,39 +503,35 @@ public class ProcessDefinitionService extends BaseDAGService {
                 String correctProcessDefinitionJson = addTaskNodeSpecialParam(processDefinition.getProcessDefinitionJson());
                 processDefinition.setProcessDefinitionJson(correctProcessDefinitionJson);
 
-                Map<String, Object> row = new LinkedHashMap<>();
-                row.put("projectName", processDefinition.getProjectName());
-                row.put("processDefinitionName", processDefinition.getName());
-                row.put("processDefinitionJson", processDefinition.getProcessDefinitionJson());
-                row.put("processDefinitionDescription", processDefinition.getDescription());
-                row.put("processDefinitionLocations", processDefinition.getLocations());
-                row.put("processDefinitionConnects", processDefinition.getConnects());
+                //export process metadata
+                ProcessMeta exportProcessMeta = new ProcessMeta();
+                exportProcessMeta.setProjectName(processDefinition.getProjectName());
+                exportProcessMeta.setProcessDefinitionName(processDefinition.getName());
+                exportProcessMeta.setProcessDefinitionJson(processDefinition.getProcessDefinitionJson());
+                exportProcessMeta.setProcessDefinitionLocations(processDefinition.getLocations());
+                exportProcessMeta.setProcessDefinitionConnects(processDefinition.getConnects());
 
                 //schedule info
                 List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
                 if (!schedules.isEmpty()) {
                     Schedule schedule = schedules.get(0);
-                    row.put("scheduleWarningType", schedule.getWarningType());
-                    row.put("scheduleWarningGroupId", schedule.getWarningGroupId());
-                    row.put("scheduleStartTime", DateUtils.dateToString(schedule.getStartTime()));
-                    row.put("scheduleEndTime", DateUtils.dateToString(schedule.getEndTime()));
-                    row.put("scheduleCrontab", schedule.getCrontab());
-                    row.put("scheduleFailureStrategy", schedule.getFailureStrategy());
-                    row.put("scheduleReleaseState", ReleaseState.OFFLINE);
-                    row.put("scheduleProcessInstancePriority", schedule.getProcessInstancePriority());
-                    if(schedule.getId() == -1){
-                        row.put("scheduleWorkerGroupId", -1);
-                    }else{
-                        WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
-                        if(workerGroup != null){
-                            row.put("scheduleWorkerGroupName", workerGroup.getName());
-                        }
-                    }
+                    WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
+
+                    exportProcessMeta.setScheduleWarningType(schedule.getWarningType().toString());
+                    exportProcessMeta.setScheduleWarningGroupId(schedule.getWarningGroupId());
+                    exportProcessMeta.setScheduleStartTime(DateUtils.dateToString(schedule.getStartTime()));
+                    exportProcessMeta.setScheduleEndTime(DateUtils.dateToString(schedule.getEndTime()));
+                    exportProcessMeta.setScheduleCrontab(schedule.getCrontab());
+                    exportProcessMeta.setScheduleFailureStrategy(String.valueOf(schedule.getFailureStrategy()));
+                    exportProcessMeta.setScheduleReleaseState(String.valueOf(ReleaseState.OFFLINE));
+                    exportProcessMeta.setScheduleProcessInstancePriority(String.valueOf(schedule.getProcessInstancePriority()));
+                    exportProcessMeta.setScheduleWorkerGroupId(workerGroup.getId());
+                    exportProcessMeta.setScheduleWorkerGroupName(workerGroup.getName());
 
                 }
 
                 //create workflow json file
-                String rowsJson = JSONUtils.toJsonString(row);
+                String rowsJson = JSONUtils.toJsonString(exportProcessMeta);
                 response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
                 response.setHeader("Content-Disposition", "attachment;filename="+processDefinition.getName()+".json");
                 BufferedOutputStream buff = null;
@@ -580,36 +579,8 @@ public class ProcessDefinitionService extends BaseDAGService {
             if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
                 String taskType = taskNode.getString("type");
 
-                if(checkTaskHasDataSource(taskType)){
-                    // add sqlParameters
-                    JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
-                    DataSource dataSource = dataSourceMapper.selectById((Integer) sqlParameters.get("datasource"));
-                    if (null != dataSource) {
-                        sqlParameters.put("datasourceName", dataSource.getName());
-                    }
-                    taskNode.put("params", sqlParameters);
-                }else if(checkTaskHasDependent(taskType)){
-                    // add dependent param
-                    JSONObject dependentParameters =  JSONUtils.parseObject(taskNode.getString("dependence"));
-
-                    if(null != dependentParameters){
-                        JSONArray dependTaskList = (JSONArray) dependentParameters.get("dependTaskList");
-                        for (int j = 0; j < dependTaskList.size(); j++) {
-                            JSONObject dependentTaskModel = dependTaskList.getJSONObject(j);
-                            JSONArray dependItemList = (JSONArray) dependentTaskModel.get("dependItemList");
-                            for (int k = 0; k < dependItemList.size(); k++) {
-                                JSONObject dependentItem = dependItemList.getJSONObject(k);
-                                int definitionId = dependentItem.getInteger("definitionId");
-                                ProcessDefinition definition = processDefineMapper.queryByDefineId(definitionId);
-                                if(null != definition){
-                                    dependentItem.put("projectName",definition.getProjectName());
-                                    dependentItem.put("definitionName",definition.getName());
-                                }
-                            }
-                        }
-                        taskNode.put("dependence", dependentParameters);
-                    }
-                }
+                exportProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+                addTaskParam.addSpecialParam(taskNode);
             }
         }
         jsonObject.put("tasks", jsonArray);
