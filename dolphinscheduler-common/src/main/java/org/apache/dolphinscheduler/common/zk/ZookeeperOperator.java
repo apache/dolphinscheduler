@@ -146,7 +146,6 @@ public class ZookeeperOperator implements InitializingBean {
             stat = zkClient.checkExists().forPath(key);
             return stat.getNumChildren() >= 1;
         } catch (Exception ex) {
-            logger.error("hasChildren key : {}", key, ex);
             throw new IllegalStateException(ex);
         }
     }
