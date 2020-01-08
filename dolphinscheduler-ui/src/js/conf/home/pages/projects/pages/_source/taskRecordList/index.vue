@@ -20,14 +20,14 @@
       <m-conditions @on-query="_onQuery"></m-conditions>
     </template>
     <template slot="content">
-      <template v-if="taskRecordList.length">
+      <template v-if="taskRecordList.length || total>0">
         <m-list :task-record-list="taskRecordList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page"></x-page>
         </div>
       </template>
-      <template v-if="!taskRecordList.length">
+      <template v-if="!taskRecordList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading"></m-spin>
