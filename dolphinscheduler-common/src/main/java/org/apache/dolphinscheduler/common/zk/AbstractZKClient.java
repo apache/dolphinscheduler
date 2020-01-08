@@ -16,18 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.zk;
 
-import static org.apache.dolphinscheduler.common.Constants.ADD_ZK_OP;
-import static org.apache.dolphinscheduler.common.Constants.DELETE_ZK_OP;
-import static org.apache.dolphinscheduler.common.Constants.MASTER_PREFIX;
-import static org.apache.dolphinscheduler.common.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.Constants.UNDERLINE;
-import static org.apache.dolphinscheduler.common.Constants.WORKER_PREFIX;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
@@ -42,6 +30,8 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.*;
+import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
  * abstract zookeeper client
@@ -84,7 +74,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 			zkClient.setData().forPath(znode,str.getBytes());
 
 		} catch (Exception e) {
-			logger.error("heartbeat for zk failed : " + e.getMessage(), e);
+			logger.error("heartbeat for zk failed", e);
 			stoppable.stop("heartbeat for zk exception, release resources and stop myself");
 		}
 	}
@@ -274,7 +264,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 				masterMap.putIfAbsent(server, super.get(path + "/" + server));
 			}
 		} catch (Exception e) {
-			logger.error("get server list failed : " + e.getMessage(), e);
+			logger.error("get server list failed", e);
 		}
 
 		return masterMap;
@@ -406,7 +396,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 				if(e.getMessage().equals("instance must be started before calling this method")){
 					logger.warn("lock release");
 				}else{
-					logger.error("lock release failed : " + e.getMessage(),e);
+					logger.error("lock release failed",e);
 				}
 
 			}
@@ -423,7 +413,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 			persist(getDeadZNodeParentPath(), "");
 
 		} catch (Exception e) {
-			logger.error("init system znode failed : " + e.getMessage(),e);
+			logger.error("init system znode failed",e);
 		}
 	}
 
