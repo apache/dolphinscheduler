@@ -371,6 +371,10 @@
           this.connParams = ''
         }
       },
+      //Watch the cacheParams
+      cacheParams (val) {
+        this.$emit('on-cache-params', val);
+      }
     },
     created () {
       let o = this.backfillItem
@@ -396,7 +400,8 @@
         this.receivers = o.params.receivers && o.params.receivers.split(',') || []
         this.receiversCc = o.params.receiversCc && o.params.receiversCc.split(',') || []
       }
-      if (!_.some(this.store.state.dag.tasks, { id: this.createNodeId }) &&
+      // read tasks from cache
+      if (!_.some(this.store.state.dag.cacheTasks, { id: this.createNodeId }) &&
         this.router.history.current.name !== 'definition-create') {
         this._getReceiver()
       }
@@ -415,7 +420,33 @@
         editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
       }
     },
-    computed: {},
+    computed: {
+      cacheParams () {
+        return {
+          type: this.type,
+          datasource: this.rtDatasource,
+          sql: editor ? editor.getValue() : '',
+          udfs: this.udfs,
+          sqlType: this.sqlType,
+          title: this.title,
+          receivers: this.receivers.join(','),
+          receiversCc: this.receiversCc.join(','),
+          showType: (() => {
+
+            let showType = this.showType
+            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
+              return [showType[1], showType[0]].join(',')
+            } else {
+              return showType.join(',')
+            }
+          })(),
+          localParams: this.localParams,
+          connParams: this.connParams,
+          preStatements: this.preStatements,
+          postStatements: this.postStatements
+        }
+      }
+    },
     components: { mListBox, mDatasource, mLocalParams, mUdfs, mSqlType, mStatementList, mEmail }
   }
 </script>
