@@ -14,23 +14,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.alert.manager;
+package org.apache.dolphinscheduler.alert.sender.impl;
 
 import org.apache.dolphinscheduler.dao.entity.Alert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-/**
- * SMS send manager
- */
-public class MsgManager  {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
-    private static final Logger logger = LoggerFactory.getLogger(MsgManager.class);
-    /**
-     * SMS send
-     * @param alert the alert
-     */
-    public void send(Alert alert){
-        logger.info("send message {}",alert);
+public class ShortMessageServiceSenderTest {
+
+    private ShortMessageServiceSender sender;
+
+    @Before
+    public void setUp() {
+        sender = new ShortMessageServiceSender();
+    }
+
+    @After
+    public void tearDown() {
+    }
+
+    @Test
+    public void testSend() {
+        assertFalse(sender.send(new Alert()));
+    }
+
+    @Test
+    public void testSendGroup() {
+        assertFalse(sender.send(new Alert()));
+    }
+
+    @Test
+    public void testGetName() {
+        assertEquals(sender.getName(), "SMS");
     }
 }

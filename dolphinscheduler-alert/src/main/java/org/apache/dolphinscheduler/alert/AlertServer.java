@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.alert;
 
-import org.apache.dolphinscheduler.alert.runner.AlertSender;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -35,15 +34,11 @@ public class AlertServer {
     /**
      * Alert Dao
      */
-    private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-
-    private AlertSender alertSender;
+    private final AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 
     private static AlertServer instance;
 
-    public AlertServer() {
-
-    }
+    private AlertServer() {}
 
     public synchronized static AlertServer getInstance(){
         if (null == instance) {
@@ -62,8 +57,10 @@ public class AlertServer {
                 Thread.currentThread().interrupt();
             }
             List<Alert> alerts = alertDao.listWaitExecutionAlert();
-            alertSender = new AlertSender(alerts, alertDao);
-            alertSender.run();
+            if (alerts.isEmpty()) {
+                continue;
+            }
+            AlertDispatchExecutor.send(alerts);
         }
     }
 
