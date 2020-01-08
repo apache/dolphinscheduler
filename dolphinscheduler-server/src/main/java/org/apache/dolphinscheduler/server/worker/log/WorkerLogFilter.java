@@ -37,7 +37,7 @@ public class WorkerLogFilter extends Filter<ILoggingEvent> {
      */
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("Worker-") || event.getThreadName().startsWith("main")){
+        if (event.getThreadName().startsWith("Worker-")){
             return FilterReply.ACCEPT;
         }
         return FilterReply.DENY;
