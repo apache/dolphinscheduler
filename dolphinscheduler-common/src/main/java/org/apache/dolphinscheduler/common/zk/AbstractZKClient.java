@@ -128,7 +128,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		// create temporary sequence nodes for master znode
 		String parentPath = getZNodeParentPath(zkNodeType);
 		String serverPathPrefix = parentPath + "/" + OSUtils.getHost();
-    String registerPath = serverPathPrefix + UNDERLINE;
+    String registerPath = serverPathPrefix;
     super.persistEphemeral(registerPath, heartbeatZKInfo);
 		logger.info("register {} node {} success" , zkNodeType.toString(), registerPath);
 		return registerPath;
@@ -167,24 +167,21 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 	 */
 	public void handleDeadServer(String zNode, ZKNodeType zkNodeType, String opType) throws Exception {
 		//ip_sequenceno
-		String[] zNodesPath = zNode.split("\\/");
-		String ipSeqNo = zNodesPath[zNodesPath.length - 1];
+		String host = getHostByEventDataPath(zNode);
 
 		String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_PREFIX : WORKER_PREFIX;
 
 
 		//check server restart, if restart , dead server path in zk should be delete
 		if(opType.equals(DELETE_ZK_OP)){
-			String[] ipAndSeqNo = ipSeqNo.split(UNDERLINE);
-			String ip = ipAndSeqNo[0];
-			removeDeadServerByHost(ip, type);
+			removeDeadServerByHost(host, type);
 
 		}else if(opType.equals(ADD_ZK_OP)){
-			String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
+			String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + host;
 			if(!super.isExisted(deadServerPath)){
 				//add dead server info to zk dead server path : /dead-servers/
 
-				super.persist(deadServerPath,(type + UNDERLINE + ipSeqNo));
+				super.persist(deadServerPath,(type + UNDERLINE + host));
 
 				logger.info("{} server dead , and {} added to zk dead server path success" ,
 						zkNodeType.toString(), zNode);
@@ -285,19 +282,11 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		}
 		Map<String, String> serverMaps = getServerMaps(zkNodeType);
 		for(String hostKey : serverMaps.keySet()){
-			if(hostKey.startsWith(host + UNDERLINE)){
+			if(hostKey.startsWith(host)){
 				return true;
 			}
 		}
 		return false;
-	}
-
-	/**
-	 *  get zkclient
-	 * @return zookeeper client
-	 */
-	public  CuratorFramework getZkClient() {
-		return zkClient;
 	}
 
 	/**
@@ -435,19 +424,22 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 	}
 
 	/**
-	 *  get host ip, string format: masterParentPath/ip_000001/value
+	 *  get host ip, string format: masterParentPath/ip
 	 * @param path path
-	 * @return host ip, string format: masterParentPath/ip_000001/value
+	 * @return host ip, string format: masterParentPath/ip
 	 */
 	protected String getHostByEventDataPath(String path) {
-		int  startIndex = path.lastIndexOf("/")+1;
-		int endIndex = 	path.lastIndexOf("_");
-
-		if(startIndex >= endIndex){
-			logger.error("parse ip error");
+		if(StringUtils.isEmpty(path)){
+		    logger.error("empty path!");
 			return "";
 		}
-		return path.substring(startIndex, endIndex);
+		String[] pathArray = path.split(Constants.SINGLE_SLASH);
+		if(pathArray.length < 1){
+			logger.error("parse ip error: {}", path);
+			return "";
+		}
+		return pathArray[pathArray.length - 1];
+
 	}
 	/**
 	 * acquire zk lock
