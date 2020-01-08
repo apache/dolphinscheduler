@@ -133,6 +133,7 @@ public class MasterServer implements IStoppable {
         // start QuartzExecutors
         // what system should do if exception
         try {
+            logger.info("start Quartz server...");
             ProcessScheduleJob.init(processDao);
             QuartzExecutors.getInstance().start();
         } catch (Exception e) {
@@ -239,6 +240,7 @@ public class MasterServer implements IStoppable {
      * @return
      */
     private Runnable heartBeatThread(){
+        logger.info("start master heart beat thread...");
         Runnable heartBeatThread  = new Runnable() {
             @Override
             public void run() {

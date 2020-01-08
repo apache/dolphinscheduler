@@ -240,13 +240,13 @@ masterHeartbeatInterval="10"
 masterTaskCommitRetryTimes="5"
 
 # master task submission retry interval
-masterTaskCommitInterval="100"
+masterTaskCommitInterval="1000"
 
 # master maximum cpu average load, used to determine whether the master has execution capability
-masterMaxCpuLoadAvg="10"
+masterMaxCpuLoadAvg="100"
 
 # master reserve memory to determine if the master has execution capability
-masterReservedMemory="1"
+masterReservedMemory="0.1"
 
 # worker config
 # worker execution thread
@@ -259,7 +259,7 @@ workerHeartbeatInterval="10"
 workerFetchTaskNum="3"
 
 # worker reserve memory to determine if the master has execution capability
-workerReservedMemory="1"
+workerReservedMemory="0.1"
 
 # api config
 # api server port
@@ -309,7 +309,17 @@ if [ $dbtype == "postgresql" ];then
     sed -i ${txt} "s#org.quartz.jobStore.driverDelegateClass.*#org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.PostgreSQLDelegate#g" conf/quartz.properties
 fi
 
+sed -i ${txt} "s#master.exec.threads.*#master.exec.threads=${masterExecThreads}#g" conf/application.properties
+sed -i ${txt} "s#master.exec.task.num.*#master.exec.task.num=${masterExecTaskNum}#g" conf/application.properties
+sed -i ${txt} "s#master.heartbeat.interval.*#master.heartbeat.interval=${masterHeartbeatInterval}#g" conf/application.properties
+sed -i ${txt} "s#master.task.commit.retryTimes.*#master.task.commit.retryTimes=${masterTaskCommitRetryTimes}#g" conf/application.properties
+sed -i ${txt} "s#master.task.commit.interval.*#master.task.commit.interval=${masterTaskCommitInterval}#g" conf/application.properties
+sed -i ${txt} "s#master.reserved.memory.*#master.reserved.memory=${masterReservedMemory}#g" conf/application.properties
 
+sed -i ${txt} "s#worker.exec.threads.*#worker.exec.threads=${workerExecThreads}#g" conf/application.properties
+sed -i ${txt} "s#worker.heartbeat.interval.*#worker.heartbeat.interval=${workerHeartbeatInterval}#g" conf/application.properties
+sed -i ${txt} "s#worker.fetch.task.num.*#worker.fetch.task.num=${workerFetchTaskNum}#g" conf/application.properties
+sed -i ${txt} "s#worker.reserved.memory.*#worker.reserved.memory=${workerReservedMemory}#g" conf/application.properties
 
 sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common.properties
 sed -i ${txt} "s#fs.s3a.endpoint.*#fs.s3a.endpoint=${s3Endpoint}#g" conf/common.properties
@@ -317,7 +327,6 @@ sed -i ${txt} "s#fs.s3a.access.key.*#fs.s3a.access.key=${s3AccessKey}#g" conf/co
 sed -i ${txt} "s#fs.s3a.secret.key.*#fs.s3a.secret.key=${s3SecretKey}#g" conf/common.properties
 sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common.properties
 sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common.properties
-
 
 sed -i ${txt} "s#data.basedir.path.*#data.basedir.path=${programPath}#g" conf/common.properties
 sed -i ${txt} "s#data.download.basedir.path.*#data.download.basedir.path=${downloadPath}#g" conf/common.properties

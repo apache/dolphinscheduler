@@ -51,6 +51,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 	 */
 	public void init(){
 
+		logger.info("initialize worker client...");
 		// init system znode
 		this.initSystemZNode();
 

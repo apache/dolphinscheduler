@@ -37,7 +37,7 @@ public class MasterLogFilter extends Filter<ILoggingEvent> {
      */
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("Master-")){
+        if (event.getThreadName().startsWith("Master-") || event.getThreadName().startsWith("main") ){
             return FilterReply.ACCEPT;
         }
         return FilterReply.DENY;

@@ -138,6 +138,8 @@ public class WorkerServer implements IStoppable {
      */
     @PostConstruct
     public void run(){
+        logger.info("start worker server...");
+
         zkWorkerClient.init();
 
         this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
@@ -264,6 +266,7 @@ public class WorkerServer implements IStoppable {
      * @return
      */
     private Runnable heartBeatThread(){
+        logger.info("start worker heart beat thread...");
         Runnable heartBeatThread  = new Runnable() {
             @Override
             public void run() {
@@ -288,6 +291,7 @@ public class WorkerServer implements IStoppable {
         Runnable killProcessThread  = new Runnable() {
             @Override
             public void run() {
+                logger.info("start listening kill process thread...");
                 while (Stopper.isRunning()){
                     Set<String> taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                     if (CollectionUtils.isNotEmpty(taskInfoSet)){
