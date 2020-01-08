@@ -110,7 +110,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			}
 
 		}catch (Exception e){
-			logger.error("master start up  exception : " + e.getMessage(),e);
+			logger.error("master start up  exception",e);
 		}finally {
 			releaseMutex(mutex);
 		}
@@ -146,7 +146,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			}
 			masterZNode = serverPath;
 		} catch (Exception e) {
-			logger.error("register master failure : "  + e.getMessage(),e);
+			logger.error("register master failure ",e);
 			System.exit(-1);
 		}
 	}
@@ -195,7 +195,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			}
 		}catch (Exception e){
 			logger.error("{} server failover failed.", zkNodeType.toString());
-			logger.error("failover exception : " + e.getMessage(),e);
+			logger.error("failover exception ",e);
 		}
 		finally {
 			releaseMutex(mutex);

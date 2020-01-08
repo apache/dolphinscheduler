@@ -135,7 +135,7 @@ public class MasterSchedulerThread implements Runnable {
                     }
                 }
             }catch (Exception e){
-                logger.error("master scheduler thread exception : " + e.getMessage(),e);
+                logger.error("master scheduler thread exception",e);
             }finally{
                 AbstractZKClient.releaseMutex(mutex);
             }

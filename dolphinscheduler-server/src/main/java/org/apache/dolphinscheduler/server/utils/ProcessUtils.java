@@ -308,7 +308,7 @@ public class ProcessUtils {
 
         Runtime.getRuntime().exec(runCmd);
       } catch (Exception e) {
-        logger.error("kill application failed : " + e.getMessage(), e);
+        logger.error("kill application failed", e);
       }
     }
   }
@@ -337,7 +337,7 @@ public class ProcessUtils {
       killYarnJob(taskInstance);
 
     } catch (Exception e) {
-      logger.error("kill failed : " + e.getMessage(), e);
+      logger.error("kill task failed", e);
     }
   }
 

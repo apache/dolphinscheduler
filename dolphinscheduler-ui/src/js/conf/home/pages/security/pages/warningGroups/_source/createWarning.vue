@@ -23,7 +23,7 @@
     <template slot="content">
       <div class="create-warning-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Group Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Group Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -33,7 +33,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Group Type')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Group Type')}}</template>
           <template slot="content">
             <x-select v-model="groupType">
               <x-option

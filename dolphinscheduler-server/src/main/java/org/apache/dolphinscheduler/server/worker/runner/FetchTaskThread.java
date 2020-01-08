@@ -187,6 +187,10 @@ public class FetchTaskThread implements Runnable{
                         continue;
                     }
 
+                    if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
+                        continue;
+                    }
+
                     Tenant tenant = processDao.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(),
                             taskInstance.getProcessDefine().getUserId());
 
@@ -203,11 +207,6 @@ public class FetchTaskThread implements Runnable{
                     taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
 
                     logger.info("worker fetch taskId : {} from queue ", taskInstId);
-
-
-                    if(!checkWorkerGroup(taskInstance, OSUtils.getHost())){
-                        continue;
-                    }
 
                     // local execute path
                     String execLocalPath = getExecLocalPath();

@@ -21,10 +21,10 @@
       <span class="go-subtask">
         <!-- Component can't pop up box to do component processing -->
         <m-log :item="backfillItem">
-          <template slot="history"><a href="javascript:" @click="_seeHistory" ><i class="ansicon ans-icon-timer"></i><em>{{$t('View history')}}</em></a></template>
-          <template slot="log"><a href="javascript:"><i class="ansicon ans-icon-log"></i><em>{{$t('View log')}}</em></a></template>
+          <template slot="history"><a href="javascript:" @click="_seeHistory" ><em class="ansicon ans-icon-timer"></em><em>{{$t('View history')}}</em></a></template>
+          <template slot="log"><a href="javascript:"><em class="ansicon ans-icon-log"></em><em>{{$t('View log')}}</em></a></template>
         </m-log>
-        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><i class="ansicon ans-icon-node"></i><em>{{$t('Enter this child node')}}</em></a>
+        <a href="javascript:" @click="_goSubProcess" v-if="_isGoSubProcess"><em class="ansicon ans-icon-node"></em><em>{{$t('Enter this child node')}}</em></a>
       </span>
     </div>
     <div class="content-box" v-if="isContentBox">
@@ -143,6 +143,7 @@
         <m-sql
           v-if="taskType === 'SQL'"
           @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
           ref="SQL"
           :create-node-id="id"
           :backfill-item="backfillItem">

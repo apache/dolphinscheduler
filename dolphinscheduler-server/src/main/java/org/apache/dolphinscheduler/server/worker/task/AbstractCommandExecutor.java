@@ -292,7 +292,7 @@ public abstract class AbstractCommandExecutor {
 
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
-                logger.info("kill attempt failed." + e.getMessage(), e);
+                logger.info("kill attempt failed", e);
             }
         }
 
@@ -312,7 +312,7 @@ public abstract class AbstractCommandExecutor {
 
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
-                logger.error("kill attempt failed." + e.getMessage(), e);
+                logger.error("kill attempt failed ", e);
             }
         }
     }
@@ -407,7 +407,7 @@ public abstract class AbstractCommandExecutor {
                 }
            }
         } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed : " + e.getMessage(), appIds.toString()),e);
+            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()),e);
             result = false;
         }
         return result;

@@ -70,7 +70,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 			}
 			workerZNode = serverPath;
 		} catch (Exception e) {
-			logger.error("register worker failure : "  + e.getMessage(),e);
+			logger.error("register worker failure",e);
 			System.exit(-1);
 		}
 	}

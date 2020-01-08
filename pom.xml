@@ -86,7 +86,6 @@
 		<commons.configuration.version>1.10</commons.configuration.version>
 		<commons.email.version>1.5</commons.email.version>
 		<poi.version>3.17</poi.version>
-		<freemarker.version>2.3.21</freemarker.version>
 		<javax.servlet.api.version>3.1.0</javax.servlet.api.version>
 		<commons.collections4.version>4.1</commons.collections4.version>
 		<guava.version>20.0</guava.version>
@@ -118,6 +117,8 @@
 		<powermock.version>2.0.2</powermock.version>
 		<jasper-runtime.version>5.5.23</jasper-runtime.version>
 		<servlet-api.version>2.5</servlet-api.version>
+		<swagger.version>1.9.3</swagger.version>
+		<springfox.version>2.9.2</springfox.version>
 	</properties>
 
 	<dependencyManagement>
@@ -360,18 +361,8 @@
 				<groupId>commons-collections</groupId>
 				<artifactId>commons-collections</artifactId>
 				<version>${commons.collections.version}</version>
-			</dependency>
+		  	</dependency>
 
-			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
-				<version>${commons.lang.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-lang3</artifactId>
-				<version>${commons.lang3.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>commons-httpclient</groupId>
 				<artifactId>commons-httpclient</artifactId>
@@ -413,13 +404,6 @@
 				<artifactId>poi</artifactId>
 				<version>${poi.version}</version>
 			</dependency>
-
-			<dependency>
-				<groupId>org.freemarker</groupId>
-				<artifactId>freemarker</artifactId>
-				<version>${freemarker.version}</version>
-			</dependency>
-
 
 			<!-- hadoop -->
 			<dependency>
@@ -529,6 +513,23 @@
 				<artifactId>servlet-api</artifactId>
 				<version>${servlet-api.version}</version>
 			</dependency>
+      <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger2</artifactId>
+        <version>${springfox.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger-ui</artifactId>
+        <version>${springfox.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.xiaoymin</groupId>
+        <artifactId>swagger-bootstrap-ui</artifactId>
+        <version>${swagger.version}</version>
+      </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -691,6 +692,7 @@
 						<include>**/api/service/ProjectServiceTest.java</include>
 						<include>**/api/service/ProcessDefinitionServiceTest.java</include>
 						<include>**/api/service/UdfFuncServiceTest.java</include>
+						<include>**/api/service/ResourcesServiceTest.java</include>
 						<include>**/alert/utils/ExcelUtilsTest.java</include>
 						<include>**/alert/utils/FuncUtilsTest.java</include>
 						<include>**/alert/utils/JSONUtilsTest.java</include>
@@ -702,6 +704,8 @@
 						<include>**/dao/mapper/AlertGroupMapperTest.java</include>
 						<include>**/dao/mapper/AlertMapperTest.java</include>
 						<include>**/dao/mapper/CommandMapperTest.java</include>
+						<include>**/alert/template/AlertTemplateFactoryTest.java</include>
+						<include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>

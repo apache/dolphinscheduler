@@ -20,11 +20,9 @@ import org.apache.dolphinscheduler.common.enums.AlertType;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
-@Data
 @TableName("t_ds_alertgroup")
 public class AlertGroup {
 
@@ -144,5 +142,17 @@ public class AlertGroup {
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AlertGroup{" +
+                "id=" + id +
+                ", groupName='" + groupName + '\'' +
+                ", groupType=" + groupType +
+                ", description='" + description + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }
