@@ -76,7 +76,7 @@ io.interceptors.request.use(
     let sIdCookie = cookies.get('sessionId')
     let sessionId = sessionStorage.getItem("sessionId")
     let  requstUrl = config.url.substring(config.url.lastIndexOf("/")+1)
-    if(requstUrl!=='login' && sIdCookie!=sessionId) {
+    if(sIdCookie !== null && requstUrl!=='login' && sIdCookie!=sessionId) {
       window.location.href = `${PUBLIC_PATH}/view/login/index.html`
     } else {
       let { method } = config
