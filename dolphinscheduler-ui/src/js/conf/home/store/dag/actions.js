@@ -110,6 +110,11 @@ export default {
         let processDefinitionJson = JSON.parse(res.data.processDefinitionJson)
         // tasks info
         state.tasks = processDefinitionJson.tasks
+        // tasks cache
+        state.cacheTasks = {}
+        processDefinitionJson.tasks.forEach(v => {
+          state.cacheTasks[v.id] = v
+        })
         // global params
         state.globalParams = processDefinitionJson.globalParams
         // timeout
@@ -270,7 +275,7 @@ export default {
       resolve()
       return
     }
-    io.get(`projects/queryAllProjectList`, payload, res => {
+    io.get(`projects/query-project-list`, payload, res => {
       state.projectListS = res.data
       resolve(res.data)
   }).catch(res => {

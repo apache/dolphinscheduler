@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.common.zk;
 
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.imps.CuratorFrameworkState;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
@@ -23,26 +26,12 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.curator.RetryPolicy;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.imps.CuratorFrameworkState;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
-import org.apache.curator.framework.state.ConnectionState;
-import org.apache.curator.framework.state.ConnectionStateListener;
-import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.zookeeper.CreateMode;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-
 import static org.apache.dolphinscheduler.common.Constants.*;
-
 
 /**
  * abstract zookeeper client
@@ -70,8 +59,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 				return;
 			}
 
-			byte[] bytes = zkClient.getData().forPath(znode);
-			String resInfoStr = new String(bytes);
+			String resInfoStr = super.get(znode);
 			String[] splits = resInfoStr.split(Constants.COMMA);
 			if (splits.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
 				return;
@@ -86,7 +74,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 			zkClient.setData().forPath(znode,str.getBytes());
 
 		} catch (Exception e) {
-			logger.error("heartbeat for zk failed : " + e.getMessage(), e);
+			logger.error("heartbeat for zk failed", e);
 			stoppable.stop("heartbeat for zk exception, release resources and stop myself");
 		}
 	}
@@ -107,8 +95,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		String type = serverType.equals(MASTER_PREFIX) ? MASTER_PREFIX : WORKER_PREFIX;
 		String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
 
-		if(zkClient.checkExists().forPath(zNode) == null ||
-				zkClient.checkExists().forPath(deadServerPath) != null ){
+		if(!isExisted(zNode) || isExisted(deadServerPath)){
 			return true;
 		}
 
@@ -118,14 +105,12 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 
 
 	public void removeDeadServerByHost(String host, String serverType) throws Exception {
-        List<String> deadServers = zkClient.getChildren().forPath(getDeadZNodeParentPath());
+        List<String> deadServers = super.getChildrenKeys(getDeadZNodeParentPath());
         for(String serverPath : deadServers){
             if(serverPath.startsWith(serverType+UNDERLINE+host)){
-				String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
-				if(zkClient.checkExists().forPath(server) != null){
-					zkClient.delete().forPath(server);
-					logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
-				}
+							String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
+              super.remove(server);
+							logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
             }
         }
 	}
@@ -143,8 +128,8 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		// create temporary sequence nodes for master znode
 		String parentPath = getZNodeParentPath(zkNodeType);
 		String serverPathPrefix = parentPath + "/" + OSUtils.getHost();
-		String registerPath = zkClient.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(
-				serverPathPrefix + UNDERLINE, heartbeatZKInfo.getBytes());
+    String registerPath = serverPathPrefix + UNDERLINE;
+    super.persistEphemeral(registerPath, heartbeatZKInfo);
 		logger.info("register {} node {} success" , zkNodeType.toString(), registerPath);
 		return registerPath;
 	}
@@ -165,7 +150,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		}
 		registerPath = createZNodePath(zkNodeType);
 
-        // handle dead server
+    // handle dead server
 		handleDeadServer(registerPath, zkNodeType, Constants.DELETE_ZK_OP);
 
 		return registerPath;
@@ -196,10 +181,10 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 
 		}else if(opType.equals(ADD_ZK_OP)){
 			String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
-			if(zkClient.checkExists().forPath(deadServerPath) == null){
+			if(!super.isExisted(deadServerPath)){
 				//add dead server info to zk dead server path : /dead-servers/
 
-				zkClient.create().forPath(deadServerPath,(type + UNDERLINE + ipSeqNo).getBytes());
+				super.persist(deadServerPath,(type + UNDERLINE + ipSeqNo));
 
 				logger.info("{} server dead , and {} added to zk dead server path success" ,
 						zkNodeType.toString(), zNode);
@@ -226,19 +211,13 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		List<String> childrenList = new ArrayList<>();
 		try {
 			// read master node parent path from conf
-			if(zkClient.checkExists().forPath(getZNodeParentPath(ZKNodeType.MASTER)) != null){
-				childrenList = zkClient.getChildren().forPath(getZNodeParentPath(ZKNodeType.MASTER));
+			if(super.isExisted(getZNodeParentPath(ZKNodeType.MASTER))){
+				childrenList = super.getChildrenKeys(getZNodeParentPath(ZKNodeType.MASTER));
 			}
 		} catch (Exception e) {
-			if(e.getMessage().contains("java.lang.IllegalStateException: instance must be started")){
-				logger.error("zookeeper service not started",e);
-			}else{
-				logger.error(e.getMessage(),e);
-			}
-
-		}finally {
-			return childrenList.size();
+			logger.error("getActiveMasterNum error",e);
 		}
+		return childrenList.size();
 	}
 
 	/**
@@ -280,13 +259,12 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		Map<String, String> masterMap = new HashMap<>();
 		try {
 			String path =  getZNodeParentPath(zkNodeType);
-			List<String> serverList  = getZkClient().getChildren().forPath(path);
+			List<String> serverList  = super.getChildrenKeys(path);
 			for(String server : serverList){
-				byte[] bytes  = getZkClient().getData().forPath(path + "/" + server);
-				masterMap.putIfAbsent(server, new String(bytes));
+				masterMap.putIfAbsent(server, super.get(path + "/" + server));
 			}
 		} catch (Exception e) {
-			logger.error("get server list failed : " + e.getMessage(), e);
+			logger.error("get server list failed", e);
 		}
 
 		return masterMap;
@@ -418,7 +396,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 				if(e.getMessage().equals("instance must be started before calling this method")){
 					logger.warn("lock release");
 				}else{
-					logger.error("lock release failed : " + e.getMessage(),e);
+					logger.error("lock release failed",e);
 				}
 
 			}
@@ -430,24 +408,12 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 	 */
 	protected void initSystemZNode(){
 		try {
-			createNodePath(getMasterZNodeParentPath());
-			createNodePath(getWorkerZNodeParentPath());
-			createNodePath(getDeadZNodeParentPath());
+			persist(getMasterZNodeParentPath(), "");
+			persist(getWorkerZNodeParentPath(), "");
+			persist(getDeadZNodeParentPath(), "");
 
 		} catch (Exception e) {
-			logger.error("init system znode failed : " + e.getMessage(),e);
-		}
-	}
-
-	/**
-	 * create zookeeper node path if not exists
-	 * @param zNodeParentPath zookeeper parent path
-	 * @throws Exception errors
-	 */
-	private void createNodePath(String zNodeParentPath) throws Exception {
-	    if(null == zkClient.checkExists().forPath(zNodeParentPath)){
-	        zkClient.create().creatingParentContainersIfNeeded()
-					.withMode(CreateMode.PERSISTENT).forPath(zNodeParentPath);
+			logger.error("init system znode failed",e);
 		}
 	}
 

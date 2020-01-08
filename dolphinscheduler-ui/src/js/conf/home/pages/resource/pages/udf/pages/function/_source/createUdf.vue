@@ -19,7 +19,7 @@
     <template slot="content">
       <div class="udf-create-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('type')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('type')}}</template>
           <template slot="content">
             <x-radio-group v-model="type">
               <x-radio :label="'HIVE'">HIVE UDF</x-radio>
@@ -28,7 +28,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('UDF Function Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('UDF Function Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -39,7 +39,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Package Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Package Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
@@ -70,7 +70,7 @@
           </template>
         </m-list-box-f> -->
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('UDF Resources')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('UDF Resources')}}</template>
           <template slot="content">
             <x-select
                     filterable
