@@ -517,6 +517,12 @@ public class ProcessDefinitionService extends BaseDAGService {
                     Schedule schedule = schedules.get(0);
                     WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
 
+                    if (null == workerGroup && schedule.getWorkerGroupId() == -1) {
+                        workerGroup = new WorkerGroup();
+                        workerGroup.setId(-1);
+                        workerGroup.setName("");
+                    }
+
                     exportProcessMeta.setScheduleWarningType(schedule.getWarningType().toString());
                     exportProcessMeta.setScheduleWarningGroupId(schedule.getWarningGroupId());
                     exportProcessMeta.setScheduleStartTime(DateUtils.dateToString(schedule.getStartTime()));
@@ -525,13 +531,16 @@ public class ProcessDefinitionService extends BaseDAGService {
                     exportProcessMeta.setScheduleFailureStrategy(String.valueOf(schedule.getFailureStrategy()));
                     exportProcessMeta.setScheduleReleaseState(String.valueOf(ReleaseState.OFFLINE));
                     exportProcessMeta.setScheduleProcessInstancePriority(String.valueOf(schedule.getProcessInstancePriority()));
-                    exportProcessMeta.setScheduleWorkerGroupId(workerGroup.getId());
-                    exportProcessMeta.setScheduleWorkerGroupName(workerGroup.getName());
+
+                    if (null != workerGroup) {
+                        exportProcessMeta.setScheduleWorkerGroupId(workerGroup.getId());
+                        exportProcessMeta.setScheduleWorkerGroupName(workerGroup.getName());
+                    }
 
                 }
 
                 //create workflow json file
-                String rowsJson = JSONUtils.toJsonString(exportProcessMeta);
+                String exportProcessJson = JSONUtils.toJsonString(exportProcessMeta);
                 response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
                 response.setHeader("Content-Disposition", "attachment;filename="+processDefinition.getName()+".json");
                 BufferedOutputStream buff = null;
@@ -539,7 +548,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                 try {
                     out = response.getOutputStream();
                     buff = new BufferedOutputStream(out);
-                    buff.write(rowsJson.getBytes(StandardCharsets.UTF_8));
+                    buff.write(exportProcessJson.getBytes(StandardCharsets.UTF_8));
                     buff.flush();
                     buff.close();
                 } catch (IOException e) {
@@ -580,7 +589,9 @@ public class ProcessDefinitionService extends BaseDAGService {
                 String taskType = taskNode.getString("type");
 
                 exportProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
-                addTaskParam.addSpecialParam(taskNode);
+                if (null != addTaskParam) {
+                    addTaskParam.addSpecialParam(taskNode);
+                }
             }
         }
         jsonObject.put("tasks", jsonArray);

@@ -8,16 +8,23 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
- * @ClassName DependentParam
+ * task node add dependent param strategy
  */
+@Service
 public class DependentParam implements exportProcessAddTaskParam, InitializingBean {
 
 
     @Autowired
     ProcessDefinitionMapper processDefineMapper;
 
+    /**
+     * add dependent param
+     * @param taskNode task node json object
+     * @return task node json object
+     */
     @Override
     public JSONObject addSpecialParam(JSONObject taskNode) {
         // add dependent param
@@ -44,6 +51,9 @@ public class DependentParam implements exportProcessAddTaskParam, InitializingBe
         return taskNode;
     }
 
+    /**
+     * put dependent strategy
+     */
     @Override
     public void afterPropertiesSet() {
         TaskNodeParamFactory.register(TaskType.DEPENDENT.name(), this);

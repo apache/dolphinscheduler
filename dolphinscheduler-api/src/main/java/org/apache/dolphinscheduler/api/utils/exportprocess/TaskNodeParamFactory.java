@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @ClassName TaskNodeParamFactory
+ * task node param factory
  */
 public class TaskNodeParamFactory {
 
