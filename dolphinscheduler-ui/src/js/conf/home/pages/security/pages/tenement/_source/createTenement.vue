@@ -29,6 +29,7 @@
                     type="input"
                     :disabled="item ? true : false"
                     v-model="tenantCode"
+                    maxlength="60"
                     :placeholder="$t('Please enter name')">
             </x-input>
           </template>
@@ -39,6 +40,7 @@
             <x-input
                     type="input"
                     v-model="tenantName"
+                    maxlength="60"
                     :placeholder="$t('Please enter name')"
                     autocomplete="off">
             </x-input>

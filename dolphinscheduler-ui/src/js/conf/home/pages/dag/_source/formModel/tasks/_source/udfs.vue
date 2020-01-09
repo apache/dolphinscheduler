@@ -53,7 +53,7 @@
        * verification
        */
       _verifUdfs () {
-        this.$emit('on-udfsData', _.map(this.udfsStr, v => v.id).join(','))
+        this.$emit('on-udfsData', this.udfsStr.join(','))
         return true
       },
       /**
@@ -68,7 +68,6 @@
               code: v.funcName
             }
           })
-
           let udfs = _.cloneDeep(this.udfs.split(','))
           if (udfs.length) {
             let arr = []
@@ -87,6 +86,9 @@
       }
     },
     watch: {
+      udfsStr (val) {
+        this._verifUdfs()
+      },
       type (a) {
         // The props parameter needs to be changed due to the scene.
         this.udfs = ''

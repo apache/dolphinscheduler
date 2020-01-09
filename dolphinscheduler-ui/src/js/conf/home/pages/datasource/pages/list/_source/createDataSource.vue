@@ -42,6 +42,7 @@
             <x-input
                     type="input"
                     v-model="name"
+                    maxlength="60"
                     :placeholder="$t('Please enter datasource name')"
                     autocomplete="off">
             </x-input>
@@ -64,6 +65,7 @@
             <x-input
                     type="input"
                     v-model="host"
+                    maxlength="60"
                     :placeholder="$t('Please enter IP')"
                     autocomplete="off">
             </x-input>
@@ -97,6 +99,7 @@
             <x-input
                     type="input"
                     v-model="userName"
+                    maxlength="60"
                     :placeholder="$t('Please enter user name')"
                     autocomplete="off">
             </x-input>
@@ -119,6 +122,7 @@
             <x-input
                     type="input"
                     v-model="database"
+                    maxlength="60"
                     :placeholder="$t('Please enter database name')"
                     autocomplete="off">
             </x-input>

@@ -28,6 +28,7 @@
             <x-input
                     type="input"
                     v-model="queueName"
+                    maxlength="60"
                     :placeholder="$t('Please enter name')"
                     autocomplete="off">
             </x-input>
@@ -39,6 +40,7 @@
             <x-input
                     type="input"
                     v-model="queue"
+                    maxlength="60"
                     :placeholder="$t('Please enter queue value')"
                     autocomplete="off">
             </x-input>

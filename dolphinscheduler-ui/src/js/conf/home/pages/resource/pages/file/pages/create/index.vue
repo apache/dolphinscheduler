@@ -24,6 +24,7 @@
             <x-input
                     type="input"
                     v-model="fileName"
+                    maxlength="60"
                     style="width: 300px;"
                     :placeholder="$t('Please enter name')"
                     autocomplete="off">
