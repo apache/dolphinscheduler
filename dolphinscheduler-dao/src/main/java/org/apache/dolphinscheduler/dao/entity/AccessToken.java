@@ -22,32 +22,41 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
-import java.util.Objects;
 
 @TableName("t_ds_access_token")
 public class AccessToken {
-
-    @TableId(value="id", type=IdType.AUTO)
+    /**
+     * primary key
+     */
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
-
-    @TableField("user_id")
+    /**
+     * user_id
+     */
+    @TableField(value = "user_id")
     private int userId;
-
-    @TableField("token")
+    /**
+     * token
+     */
+    @TableField(value = "token")
     private String token;
-
+    /**
+     * expire_time
+     */
+    @TableField(value = "expire_time")
+    private Date expireTime;
+    /**
+     * create_time
+     */
+    @TableField(value = "create_time")
+    private Date createTime;
+    /**
+     * update_time
+     */
+    @TableField(value = "update_time")
+    private Date updateTime;
     @TableField(exist = false)
     private String userName;
-
-    @TableField("expire_time")
-    private Date expireTime;
-
-    @TableField("create_time")
-    private Date createTime;
-
-    @TableField("update_time")
-    private Date updateTime;
 
     public int getId() {
         return id;
@@ -107,17 +116,48 @@ public class AccessToken {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         AccessToken that = (AccessToken) o;
 
-        return id == that.id;
+        if (id != that.id) {
+            return false;
+        }
+        if (userId != that.userId) {
+            return false;
+        }
+        if (userName != null && !userName.equals(that.userName)) {
+            return false;
+        }
+        if (token != null && !token.equals(that.token)) {
+            return false;
+        }
+        if (expireTime != null && !expireTime.equals(that.expireTime)) {
+            return false;
+        }
+        if (createTime != null && !createTime.equals(that.createTime)) {
+            return false;
+        }
+        if (updateTime != null && !updateTime.equals(that.updateTime)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        int result = id;
+        result = 31 * result + userId;
+        result = 31 * result + (userName != null ? userName.hashCode() : 0);
+        result = 31 * result + (token != null ? token.hashCode() : 0);
+        result = 31 * result + (expireTime != null ? expireTime.hashCode() : 0);
+        result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
+        result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
+        return result;
     }
 
     @Override
