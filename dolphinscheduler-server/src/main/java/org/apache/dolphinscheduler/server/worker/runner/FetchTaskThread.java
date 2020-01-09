@@ -140,6 +140,7 @@ public class FetchTaskThread implements Runnable{
 
     @Override
     public void run() {
+        logger.info("worker start fetch tasks...");
         while (Stopper.isRunning()){
             InterProcessMutex mutex = null;
             try {

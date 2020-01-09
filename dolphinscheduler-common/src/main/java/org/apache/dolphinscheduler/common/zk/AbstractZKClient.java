@@ -118,9 +118,9 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
         List<String> deadServers = super.getChildrenKeys(getDeadZNodeParentPath());
         for(String serverPath : deadServers){
             if(serverPath.startsWith(serverType+UNDERLINE+host)){
-							String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
-              super.remove(server);
-							logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
+            	String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
+              	super.remove(server);
+				logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
             }
         }
 	}
@@ -422,6 +422,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 			persist(getWorkerZNodeParentPath(), "");
 			persist(getDeadZNodeParentPath(), "");
 
+			logger.info("initialize server nodes success.");
 		} catch (Exception e) {
 			logger.error("init system znode failed : " + e.getMessage(),e);
 		}
