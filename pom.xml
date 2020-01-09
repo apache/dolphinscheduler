@@ -64,7 +64,6 @@
 		<quartz.version>2.2.3</quartz.version>
 		<jackson.version>2.9.8</jackson.version>
 		<mybatis-plus.version>3.2.0</mybatis-plus.version>
-		<lombok.version>1.18.4</lombok.version>
 		<mybatis.spring.version>2.0.1</mybatis.spring.version>
 		<cron.utils.version>5.0.5</cron.utils.version>
 		<fastjson.version>1.2.61</fastjson.version>
@@ -834,11 +833,6 @@
 					<format>xml</format>
 					<instrumentation>
 						<ignoreTrivial>true</ignoreTrivial>
-						<ignoreMethodAnnotations>
-							<ignoreMethodAnnotation>lombok.Generated</ignoreMethodAnnotation>
-						</ignoreMethodAnnotations>
-						<excludes>
-						</excludes>
 					</instrumentation>
 				</configuration>
 			</plugin>
