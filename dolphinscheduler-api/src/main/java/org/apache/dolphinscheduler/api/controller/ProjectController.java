@@ -256,9 +256,9 @@ public class ProjectController extends BaseController {
 
     /**
      * import process definition
-     *
      * @param loginUser login user
      * @param file resource file
+     * @param projectName project name
      * @return import result code
      */
     @ApiOperation(value = "importProcessDefinition", notes= "EXPORT_PROCCESS_DEFINITION_NOTES")

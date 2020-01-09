@@ -136,6 +136,7 @@ public class FetchTaskThread implements Runnable{
 
     @Override
     public void run() {
+        logger.info("worker start fetch tasks...");
         while (Stopper.isRunning()){
             InterProcessMutex mutex = null;
             try {
@@ -149,8 +150,9 @@ public class FetchTaskThread implements Runnable{
                 }
 
                 //whether have tasks, if no tasks , no need lock  //get all tasks
-                List<String> tasksQueueList = taskQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
-                if (CollectionUtils.isEmpty(tasksQueueList)){
+                boolean hasTask = taskQueue.hasTask(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
+
+                if (!hasTask){
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
