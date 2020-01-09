@@ -99,7 +99,7 @@ It is because of the shoulders of these open source projects that the birth of t
 
 ### Get Help
 1. Submit an issue
-1. Subscribe the mail list : https://dolphinscheduler.apache.org/en-us/docs/user_doc/subscribe.html.  then send mail to dev@dolphinscheduler.apache.org
+1. Subscribe the mail list : https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/subscribe.html.  then send mail to dev@dolphinscheduler.apache.org
 1. Contact WeChat group manager, ID 510570367. This is for Mandarin(CN) discussion.
 
 ### License
