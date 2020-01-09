@@ -31,6 +31,13 @@ public interface ITaskQueue {
     List<String> getAllTasks(String key);
 
     /**
+     * check if has a task
+     * @param key queue name
+     * @return true if has; false if not
+     */
+    boolean hasTask(String key);
+
+    /**
      * check task exists in the task queue or not
      *
      * @param key queue name
