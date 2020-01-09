@@ -967,6 +967,9 @@ public class ProcessDao {
     public Boolean submitTaskToQueue(TaskInstance taskInstance) {
 
         try{
+            if(taskInstance.isSubProcess()){
+                return true;
+            }
             if(taskInstance.getState().typeIsFinished()){
                 logger.info(String.format("submit to task queue, but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
                 return true;
