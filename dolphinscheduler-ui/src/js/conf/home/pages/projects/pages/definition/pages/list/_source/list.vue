@@ -19,31 +19,31 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th width="50">
+          <th scope="col" width="50">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th width="40">
+          <th scope="col" width="40">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Process Name')}}</span>
           </th>
-          <th width="50">
+          <th scope="col" width="50">
             <span>{{$t('State')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" width="130">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th width="130">
+          <th scope="col" width="130">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th width="90">
+          <th scope="col" width="90">
             <span>{{$t('Timing state')}}</span>
           </th>
-          <th width="240">
+          <th scope="col" width="240">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>

@@ -90,6 +90,7 @@ public class MasterSchedulerThread implements Runnable {
      */
     @Override
     public void run() {
+        logger.info("master scheduler start successfully...");
         while (Stopper.isRunning()){
 
             // process instance
@@ -134,11 +135,12 @@ public class MasterSchedulerThread implements Runnable {
                     }
                 }
             }catch (Exception e){
-                logger.error("master scheduler thread exception : " + e.getMessage(),e);
+                logger.error("master scheduler thread exception",e);
             }finally{
                 AbstractZKClient.releaseMutex(mutex);
             }
         }
+        logger.info("master server stopped...");
     }
 
 

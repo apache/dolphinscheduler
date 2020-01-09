@@ -37,8 +37,27 @@ public class TaskQueueZkImpl implements ITaskQueue {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskQueueZkImpl.class);
 
+    private final ZookeeperOperator zookeeperOperator;
+
     @Autowired
-    private ZookeeperOperator zookeeperOperator;
+    public TaskQueueZkImpl(ZookeeperOperator zookeeperOperator) {
+        this.zookeeperOperator = zookeeperOperator;
+
+        try {
+            String tasksQueuePath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
+            String tasksKillPath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_KILL);
+
+            for (String key : new String[]{tasksQueuePath,tasksKillPath}){
+                if (!zookeeperOperator.isExisted(key)){
+                    zookeeperOperator.persist(key, "");
+                    logger.info("create tasks queue parent node success : {}", key);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("create tasks queue parent node failure", e);
+        }
+    }
+
 
     /**
      * get all tasks from tasks queue
@@ -54,6 +73,21 @@ public class TaskQueueZkImpl implements ITaskQueue {
             logger.error("get all tasks from tasks queue exception",e);
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * check if has a task
+     * @param key queue name
+     * @return true if has; false if not
+     */
+    @Override
+    public boolean hasTask(String key) {
+        try {
+            return zookeeperOperator.hasChildren(key);
+        } catch (Exception e) {
+            logger.error("check has task in tasks queue exception",e);
+        }
+        return false;
     }
 
     /**
@@ -321,20 +355,20 @@ public class TaskQueueZkImpl implements ITaskQueue {
     public void delete(){
         try {
             String tasksQueuePath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
-            String tasksCancelPath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_KILL);
+            String tasksKillPath = getTasksPath(Constants.DOLPHINSCHEDULER_TASKS_KILL);
 
-            for(String taskQueuePath : new String[]{tasksQueuePath,tasksCancelPath}){
-                if(zookeeperOperator.isExisted(taskQueuePath)){
-                    List<String> list = zookeeperOperator.getChildrenKeys(taskQueuePath);
+            for (String key : new String[]{tasksQueuePath,tasksKillPath}){
+                if (zookeeperOperator.isExisted(key)){
+                    List<String> list = zookeeperOperator.getChildrenKeys(key);
                     for (String task : list) {
-                        zookeeperOperator.remove(taskQueuePath + Constants.SINGLE_SLASH + task);
-                        logger.info("delete task from tasks queue : {}/{} ",taskQueuePath,task);
+                        zookeeperOperator.remove(key + Constants.SINGLE_SLASH + task);
+                        logger.info("delete task from tasks queue : {}/{} ", key, task);
                     }
                 }
             }
 
         } catch (Exception e) {
-            logger.error("delete all tasks in tasks queue failure",e);
+            logger.error("delete all tasks in tasks queue failure", e);
         }
     }
 
@@ -344,7 +378,7 @@ public class TaskQueueZkImpl implements ITaskQueue {
      * @return
      */
     public String getTasksPath(String key){
-        return "/dolphinscheduler" + Constants.SINGLE_SLASH + key;
+        return zookeeperOperator.getZookeeperConfig().getDsRoot() + Constants.SINGLE_SLASH + key;
     }
 
 }

@@ -20,11 +20,11 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.io.*;
@@ -292,7 +292,7 @@ public abstract class AbstractCommandExecutor {
 
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
-                logger.info("kill attempt failed." + e.getMessage(), e);
+                logger.info("kill attempt failed", e);
             }
         }
 
@@ -312,7 +312,7 @@ public abstract class AbstractCommandExecutor {
 
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
-                logger.error("kill attempt failed." + e.getMessage(), e);
+                logger.error("kill attempt failed ", e);
             }
         }
     }
@@ -407,7 +407,7 @@ public abstract class AbstractCommandExecutor {
                 }
            }
         } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed : " + e.getMessage(), appIds.toString()),e);
+            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()),e);
             result = false;
         }
         return result;

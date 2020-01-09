@@ -64,7 +64,6 @@
 		<quartz.version>2.2.3</quartz.version>
 		<jackson.version>2.9.8</jackson.version>
 		<mybatis-plus.version>3.2.0</mybatis-plus.version>
-		<lombok.version>1.18.4</lombok.version>
 		<mybatis.spring.version>2.0.1</mybatis.spring.version>
 		<cron.utils.version>5.0.5</cron.utils.version>
 		<fastjson.version>1.2.61</fastjson.version>
@@ -86,7 +85,6 @@
 		<commons.configuration.version>1.10</commons.configuration.version>
 		<commons.email.version>1.5</commons.email.version>
 		<poi.version>3.17</poi.version>
-		<freemarker.version>2.3.21</freemarker.version>
 		<javax.servlet.api.version>3.1.0</javax.servlet.api.version>
 		<commons.collections4.version>4.1</commons.collections4.version>
 		<guava.version>20.0</guava.version>
@@ -116,6 +114,10 @@
 		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
 		<mockito.version>2.21.0</mockito.version>
 		<powermock.version>2.0.2</powermock.version>
+		<jasper-runtime.version>5.5.23</jasper-runtime.version>
+		<servlet-api.version>2.5</servlet-api.version>
+		<swagger.version>1.9.3</swagger.version>
+		<springfox.version>2.9.2</springfox.version>
 	</properties>
 
 	<dependencyManagement>
@@ -358,18 +360,8 @@
 				<groupId>commons-collections</groupId>
 				<artifactId>commons-collections</artifactId>
 				<version>${commons.collections.version}</version>
-			</dependency>
+		  	</dependency>
 
-			<dependency>
-				<groupId>commons-lang</groupId>
-				<artifactId>commons-lang</artifactId>
-				<version>${commons.lang.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-lang3</artifactId>
-				<version>${commons.lang3.version}</version>
-			</dependency>
 			<dependency>
 				<groupId>commons-httpclient</groupId>
 				<artifactId>commons-httpclient</artifactId>
@@ -411,13 +403,6 @@
 				<artifactId>poi</artifactId>
 				<version>${poi.version}</version>
 			</dependency>
-
-			<dependency>
-				<groupId>org.freemarker</groupId>
-				<artifactId>freemarker</artifactId>
-				<version>${freemarker.version}</version>
-			</dependency>
-
 
 			<!-- hadoop -->
 			<dependency>
@@ -516,6 +501,34 @@
 				<version>${jcip.version}</version>
 				<optional>true</optional>
 			</dependency>
+			<dependency>
+				<groupId>tomcat</groupId>
+				<artifactId>jasper-runtime</artifactId>
+				<version>${jasper-runtime.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>${servlet-api.version}</version>
+			</dependency>
+      <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger2</artifactId>
+        <version>${springfox.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger-ui</artifactId>
+        <version>${springfox.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.xiaoymin</groupId>
+        <artifactId>swagger-bootstrap-ui</artifactId>
+        <version>${swagger.version}</version>
+      </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -661,10 +674,13 @@
 				<configuration>
 					<includes>
 						<include>**/common/utils/*.java</include>
+						<include>**/common/threadutils/*.java</include>
 						<include>**/common/graph/*.java</include>
 						<include>**/common/queue/*.java</include>
 						<include>**/api/utils/CheckUtilsTest.java</include>
 						<include>**/api/utils/FileUtilsTest.java</include>
+						<include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
+						<include>**/api/utils/exportprocess/DependentParamTest.java</include>
 						<include>**/api/enums/*.java</include>
 						<include>**/api/service/AccessTokenServiceTest.java</include>
 						<include>**/api/service/QueueServiceTest.java</include>
@@ -675,7 +691,9 @@
 						<include>**/api/service/WorkerGroupServiceTest.java</include>
 						<include>**/api/service/AlertGroupServiceTest.java</include>
 						<include>**/api/service/ProjectServiceTest.java</include>
+						<include>**/api/service/ProcessDefinitionServiceTest.java</include>
 						<include>**/api/service/UdfFuncServiceTest.java</include>
+						<include>**/api/service/ResourcesServiceTest.java</include>
 						<include>**/alert/utils/ExcelUtilsTest.java</include>
 						<include>**/alert/utils/FuncUtilsTest.java</include>
 						<include>**/alert/utils/JSONUtilsTest.java</include>
@@ -687,6 +705,8 @@
 						<include>**/dao/mapper/AlertGroupMapperTest.java</include>
 						<include>**/dao/mapper/AlertMapperTest.java</include>
 						<include>**/dao/mapper/CommandMapperTest.java</include>
+						<include>**/alert/template/AlertTemplateFactoryTest.java</include>
+						<include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
 					</includes>
 					<!-- <skip>true</skip> -->
 				</configuration>
@@ -808,16 +828,12 @@
 					<check>
 					</check>
 					<aggregate>true</aggregate>
+					<outputDirectory>./target/cobertura</outputDirectory>
 					<encoding>${project.build.sourceEncoding}</encoding>
 					<quiet>true</quiet>
 					<format>xml</format>
 					<instrumentation>
 						<ignoreTrivial>true</ignoreTrivial>
-						<ignoreMethodAnnotations>
-							<ignoreMethodAnnotation>lombok.Generated</ignoreMethodAnnotation>
-						</ignoreMethodAnnotations>
-						<excludes>
-						</excludes>
 					</instrumentation>
 				</configuration>
 			</plugin>

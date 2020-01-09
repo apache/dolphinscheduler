@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.api.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -26,6 +25,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.hadoop.fs.FileStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -299,6 +298,25 @@ public class TenantService extends BaseService{
     result.put(Constants.DATA_LIST, resourceList);
     putMsg(result, Status.SUCCESS);
     
+    return result;
+  }
+
+  /**
+   * query tenant list via tenant code
+   * @param tenantCode tenant code
+   * @return tenant list
+   */
+  public Map<String, Object> queryTenantList(String tenantCode) {
+    Map<String, Object> result = new HashMap<>(5);
+
+    List<Tenant> resourceList = tenantMapper.queryByTenantCode(tenantCode);
+    if (resourceList != null && resourceList.size() > 0) {
+      result.put(Constants.DATA_LIST, resourceList);
+      putMsg(result, Status.SUCCESS);
+    } else {
+      putMsg(result, Status.TENANT_NOT_EXIST);
+    }
+
     return result;
   }
 

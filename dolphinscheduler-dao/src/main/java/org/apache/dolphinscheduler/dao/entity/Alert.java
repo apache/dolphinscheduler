@@ -30,28 +30,64 @@ import java.util.Map;
 
 @TableName("t_ds_alert")
 public class Alert {
+    /**
+     * primary key
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
+    /**
+     * title
+     */
     @TableField(value = "title")
     private String title;
+    /**
+     * show_type
+     */
     @TableField(value = "show_type")
     private ShowType showType;
+    /**
+     * content
+     */
     @TableField(value = "content")
     private String content;
+    /**
+     * alert_type
+     */
     @TableField(value = "alert_type")
     private AlertType alertType;
+    /**
+     * alert_status
+     */
     @TableField(value = "alert_status")
     private AlertStatus alertStatus;
+    /**
+     * log
+     */
     @TableField(value = "log")
     private String log;
+    /**
+     * alertgroup_id
+     */
     @TableField("alertgroup_id")
     private int alertGroupId;
+    /**
+     * receivers
+     */
     @TableField("receivers")
     private String receivers;
+    /**
+     * receivers_cc
+     */
     @TableField("receivers_cc")
     private String receiversCc;
+    /**
+     * create_time
+     */
     @TableField("create_time")
     private Date createTime;
+    /**
+     * update_time
+     */
     @TableField("update_time")
     private Date updateTime;
     @TableField(exist = false)

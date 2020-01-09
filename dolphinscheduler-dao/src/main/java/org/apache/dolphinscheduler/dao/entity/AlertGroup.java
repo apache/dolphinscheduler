@@ -26,16 +26,34 @@ import java.util.Date;
 
 @TableName("t_ds_alertgroup")
 public class AlertGroup {
+    /**
+     * primary key
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
+    /**
+     * group_name
+     */
     @TableField(value = "group_name")
     private String groupName;
+    /**
+     * group_type
+     */
     @TableField(value = "group_type")
     private AlertType groupType;
+    /**
+     * description
+     */
     @TableField(value = "description")
     private String description;
+    /**
+     * create_time
+     */
     @TableField(value = "create_time")
     private Date createTime;
+    /**
+     * update_time
+     */
     @TableField(value = "update_time")
     private Date updateTime;
 
@@ -123,5 +141,17 @@ public class AlertGroup {
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AlertGroup{" +
+                "id=" + id +
+                ", groupName='" + groupName + '\'' +
+                ", groupType=" + groupType +
+                ", description='" + description + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }

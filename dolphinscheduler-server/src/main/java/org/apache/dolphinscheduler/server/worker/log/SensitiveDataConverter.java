@@ -19,9 +19,8 @@ package org.apache.dolphinscheduler.server.worker.log;
 
 import ch.qos.logback.classic.pattern.MessageConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.utils.SensitiveLogUtil;
 
 import java.util.regex.Matcher;
@@ -30,7 +29,6 @@ import java.util.regex.Pattern;
 /**
  * sensitive data log converter
  */
-@Slf4j
 public class SensitiveDataConverter extends MessageConverter {
 
     /**

@@ -29,16 +29,16 @@
             <span>{{$t('View log')}}</span>
             <div class="full-screen">
               <a href="javascript:" @click="_downloadLog" data-container="body" data-toggle="tooltip" :title="$t('Download Log')">
-                <i class="ans-icon-download" style="font-size: 20px"></i>
+                <em class="ans-icon-download" style="font-size: 20px"></em>
               </a>
               <a href="javascript:" class="refresh-log" :class="loading ? 'active' :''" @click="!loading && _refreshLog()" data-container="body" data-toggle="tooltip" :title="$t('Refresh Log')">
-                <i class="ans-icon-refresh"></i>
+                <em class="ans-icon-refresh"></em>
               </a>
               <a href="javascript:" @click="_screenOpen" v-show="!isScreen" data-container="body" data-toggle="tooltip" :title="$t('Enter full screen')">
-                <i class="ans-icon-max"></i>
+                <em class="ans-icon-max"></em>
               </a>
               <a href="javascript:" @click="_screenClose" v-show="isScreen" data-container="body" data-toggle="tooltip" :title="$t('Cancel full screen')">
-                <i class="ans-icon-min"></i>
+                <em class="ans-icon-min"></em>
               </a>
             </div>
           </div>

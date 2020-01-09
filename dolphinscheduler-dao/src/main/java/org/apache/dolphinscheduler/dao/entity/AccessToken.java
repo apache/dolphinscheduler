@@ -25,16 +25,34 @@ import java.util.Date;
 
 @TableName("t_ds_access_token")
 public class AccessToken {
+    /**
+     * primary key
+     */
     @TableId(value = "id", type = IdType.AUTO)
     private int id;
+    /**
+     * user_id
+     */
     @TableField(value = "user_id")
     private int userId;
+    /**
+     * token
+     */
     @TableField(value = "token")
     private String token;
+    /**
+     * expire_time
+     */
     @TableField(value = "expire_time")
     private Date expireTime;
+    /**
+     * create_time
+     */
     @TableField(value = "create_time")
     private Date createTime;
+    /**
+     * update_time
+     */
     @TableField(value = "update_time")
     private Date updateTime;
     @TableField(exist = false)
@@ -96,7 +114,6 @@ public class AccessToken {
         this.updateTime = updateTime;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -141,5 +158,18 @@ public class AccessToken {
         result = 31 * result + (createTime != null ? createTime.hashCode() : 0);
         result = 31 * result + (updateTime != null ? updateTime.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "AccessToken{" +
+                "id=" + id +
+                ", userId=" + userId +
+                ", token='" + token + '\'' +
+                ", userName='" + userName + '\'' +
+                ", expireTime=" + expireTime +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }
