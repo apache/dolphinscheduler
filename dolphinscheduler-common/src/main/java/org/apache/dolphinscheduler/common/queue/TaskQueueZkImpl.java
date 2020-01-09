@@ -83,7 +83,7 @@ public class TaskQueueZkImpl implements ITaskQueue {
     @Override
     public boolean hasTask(String key) {
         try {
-            return zookeeperOperator.hasChildren(key);
+            return zookeeperOperator.hasChildren(getTasksPath(key));
         } catch (Exception e) {
             logger.error("check has task in tasks queue exception",e);
         }
