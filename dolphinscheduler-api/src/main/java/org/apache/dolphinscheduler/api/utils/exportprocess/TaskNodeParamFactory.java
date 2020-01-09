@@ -14,36 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.log;
+package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.filter.Filter;
-import ch.qos.logback.core.spi.FilterReply;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * master log filter
+ * task node param factory
  */
-public class MasterLogFilter extends Filter<ILoggingEvent> {
-    /**
-     * log level
-     */
-    Level level;
+public class TaskNodeParamFactory {
 
-    /**
-     * Accept or reject based on thread name
-     * @param event event
-     * @return FilterReply
-     */
-    @Override
-    public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("Master-") ){
-            return FilterReply.ACCEPT;
-        }
-        return FilterReply.DENY;
+    private static Map<String, exportProcessAddTaskParam> taskServices = new ConcurrentHashMap<>();
+
+    public static exportProcessAddTaskParam getByTaskType(String taskType){
+        return taskServices.get(taskType);
     }
 
-    public void setLevel(String level) {
-        this.level = Level.toLevel(level);
+    static void register(String taskType, exportProcessAddTaskParam addSpecialTaskParam){
+        if (null != taskType) {
+            taskServices.put(taskType, addSpecialTaskParam);
+        }
     }
 }
