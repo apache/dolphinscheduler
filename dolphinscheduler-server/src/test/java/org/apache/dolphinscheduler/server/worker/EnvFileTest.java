@@ -33,7 +33,7 @@ public class EnvFileTest {
 
     @Test
     public void test() {
-        String path = System.getProperty("user.dir")+"/script/env/.dolphinscheduler_env.sh";
+        String path = System.getProperty("user.dir")+"/script/env/dolphinscheduler_env.sh";
         String pythonHome = getPythonHome(path);
         logger.info(pythonHome);
     }

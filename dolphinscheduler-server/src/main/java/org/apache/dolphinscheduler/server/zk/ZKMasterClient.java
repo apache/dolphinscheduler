@@ -84,6 +84,9 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * init
 	 */
 	public void init(){
+
+		logger.info("initialize master client...");
+
 		// init dao
 		this.initDao();
 
