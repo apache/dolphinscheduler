@@ -21,15 +21,14 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import lombok.Data;
 import org.apache.dolphinscheduler.common.enums.*;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * process instance
  */
-@Data
 @TableName("t_ds_process_instance")
 public class ProcessInstance {
 
@@ -618,5 +617,20 @@ public class ProcessInstance {
                 ", receivers='" + receivers + '\'' +
                 ", receiversCc='" + receiversCc + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ProcessInstance that = (ProcessInstance) o;
+
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

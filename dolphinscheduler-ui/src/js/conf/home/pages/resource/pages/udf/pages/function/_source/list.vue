@@ -19,34 +19,34 @@ v-ps<template>
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('UDF Function Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Class Name')}}</span>
           </th>
-          <!-- <th>
+          <!-- <th scope="col">
             <span>{{$t('Parameter')}}</span>
           </th> -->
-          <th width="80">
+          <th scope="col" width="80">
             <span>{{$t('type')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Jar Package')}}</span>
           </th>
-          <!-- <th>
+          <!-- <th scope="col">
             <span>{{$t('Library Name')}}</span>
           </th> -->
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="80">
+          <th scope="col" width="80">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -142,7 +142,7 @@ v-ps<template>
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.list.splice(i, 1)
+          this.$emit('_updateList')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()
