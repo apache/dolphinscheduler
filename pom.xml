@@ -343,7 +343,6 @@
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
 				<version>${mysql.connector.version}</version>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -680,6 +679,8 @@
 						<include>**/common/queue/*.java</include>
 						<include>**/api/utils/CheckUtilsTest.java</include>
 						<include>**/api/utils/FileUtilsTest.java</include>
+						<include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
+						<include>**/api/utils/exportprocess/DependentParamTest.java</include>
 						<include>**/api/enums/*.java</include>
 						<include>**/api/service/AccessTokenServiceTest.java</include>
 						<include>**/api/service/QueueServiceTest.java</include>

@@ -22,16 +22,11 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.http.entity.ContentType;
 import org.json.JSONException;
 import org.junit.Assert;
@@ -52,8 +47,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
@@ -74,6 +68,29 @@ public class ProcessDefinitionServiceTest {
 
     @Mock
     private ProjectService projectService;
+
+    @Mock
+    private ScheduleMapper scheduleMapper;
+
+    @Mock
+    private WorkerGroupMapper workerGroupMapper;
+
+    private String sqlDependentJson = "{\"globalParams\":[]," +
+            "\"tasks\":[{\"type\":\"SQL\",\"id\":\"tasks-27297\",\"name\":\"sql\"," +
+            "\"params\":{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from test\"," +
+            "\"udfs\":\"\",\"sqlType\":\"1\",\"title\":\"\",\"receivers\":\"\",\"receiversCc\":\"\",\"showType\":\"TABLE\"" +
+            ",\"localParams\":[],\"connParams\":\"\"," +
+            "\"preStatements\":[],\"postStatements\":[]}," +
+            "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\"," +
+            "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\"," +
+            "\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
+            "\"preTasks\":[\"dependent\"]},{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
+            "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"," +
+            "\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\"," +
+            "\"dependItemList\":[{\"projectId\":2,\"definitionId\":46,\"depTasks\":\"ALL\"," +
+            "\"cycle\":\"day\",\"dateValue\":\"today\"}]}]},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
+            "\"timeout\":{\"strategy\":\"\",\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
+            "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
 
     @Test
     public void queryProccessDefinitionList() throws Exception {
@@ -147,29 +164,22 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(dataSourceMapper.selectById(1)).thenReturn(getDataSource());
         Mockito.when(processDefineMapper.queryByDefineId(2)).thenReturn(getProcessDefinition());
 
-
-        String sqlDependentJson = "{\"globalParams\":[]," +
-                "\"tasks\":[{\"type\":\"SQL\",\"id\":\"tasks-27297\",\"name\":\"sql\"," +
-                "\"params\":{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from test\"," +
-                "\"udfs\":\"\",\"sqlType\":\"1\",\"title\":\"\",\"receivers\":\"\",\"receiversCc\":\"\",\"showType\":\"TABLE\"" +
-                ",\"localParams\":[],\"connParams\":\"\"," +
-                "\"preStatements\":[],\"postStatements\":[]}," +
-                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\"," +
-                "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\"," +
-                "\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
-                "\"preTasks\":[\"dependent\"]},{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
-                "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"," +
-                "\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\"," +
-                "\"dependItemList\":[{\"projectId\":2,\"definitionId\":46,\"depTasks\":\"ALL\"," +
-                "\"cycle\":\"day\",\"dateValue\":\"today\"}]}]},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
-                "\"timeout\":{\"strategy\":\"\",\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
-                "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
-
         String corSqlDependentJson = processDefinitionService.addTaskNodeSpecialParam(sqlDependentJson);
-
 
         JSONAssert.assertEquals(sqlDependentJson,corSqlDependentJson,false);
 
+    }
+
+    @Test
+    public void testExportProcessMetaDataStr() {
+        Mockito.when(scheduleMapper.queryByProcessDefinitionId(46)).thenReturn(getSchedulerList());
+        Mockito.when(workerGroupMapper.selectById(-1)).thenReturn(null);
+
+        ProcessDefinition processDefinition = getProcessDefinition();
+        processDefinition.setProcessDefinitionJson(sqlDependentJson);
+
+        String exportProcessMetaDataStr = processDefinitionService.exportProcessMetaDataStr(46, processDefinition);
+        Assert.assertNotEquals(sqlDependentJson,exportProcessMetaDataStr);
     }
 
     /**
@@ -348,6 +358,34 @@ public class ProcessDefinitionServiceTest {
         project.setName(projectName);
         project.setUserId(1);
         return  project;
+    }
+
+    /**
+     * get mock schedule
+     * @return schedule
+     */
+    private Schedule getSchedule() {
+        Date date = new Date();
+        Schedule schedule = new Schedule();
+        schedule.setId(46);
+        schedule.setProcessDefinitionId(1);
+        schedule.setStartTime(date);
+        schedule.setEndTime(date);
+        schedule.setCrontab("0 0 5 * * ? *");
+        schedule.setFailureStrategy(FailureStrategy.END);
+        schedule.setUserId(1);
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setProcessInstancePriority(Priority.MEDIUM);
+        schedule.setWarningType(WarningType.NONE);
+        schedule.setWarningGroupId(1);
+        schedule.setWorkerGroupId(-1);
+        return schedule;
+    }
+
+    private List<Schedule> getSchedulerList() {
+        List<Schedule> scheduleList = new ArrayList<>();
+        scheduleList.add(getSchedule());
+        return scheduleList;
     }
 
     private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
