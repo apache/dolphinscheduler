@@ -297,8 +297,7 @@ public class FetchTaskThread implements Runnable{
      */
     private boolean verifyTenantIsNull(Tenant tenant) {
         if(tenant == null){
-            logger.error("tenant not exists,process define id : {},process instance id : {},task instance id : {}",
-                    taskInstance.getProcessDefine().getId(),
+            logger.error("tenant not exists,process instance id : {},task instance id : {}",
                     taskInstance.getProcessInstance().getId(),
                     taskInstance.getId());
             return true;
