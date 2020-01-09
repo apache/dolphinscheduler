@@ -74,7 +74,7 @@
             _.map(udfs, v => {
               _.map(this.udfsList, v1 => {
                 if (parseInt(v) === v1.id) {
-                  arr.push(v1)
+                  arr.push(parseInt(v))
                 }
               })
             })
