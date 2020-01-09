@@ -40,7 +40,7 @@ If remote branch has a new branch `DEV-1.0`, you need to synchronize this branch
 git checkout -b dev-1.0 upstream/dev-1.0
 git push --set-upstream origin dev1.0
 ```
-
+git push --set-upstream origin dev1.0
 * After modifying the code locally, submit it to your own repository:
 
 `git commit -m 'test commit'`
