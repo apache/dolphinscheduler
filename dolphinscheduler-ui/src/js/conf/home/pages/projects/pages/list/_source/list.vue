@@ -19,31 +19,31 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Project Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Owned Users')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Process Define Count')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Process Instance Running Count')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Create Time')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="80">
+          <th scope="col" width="80">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -152,7 +152,7 @@
           projectId: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.list.splice(i, 1)
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()
@@ -165,7 +165,8 @@
        */
       _edit (item) {
         findComponentDownward(this.$root, 'projects-list')._create(item)
-      }
+      },
+
     },
     watch: {
       projectsList (a) {
