@@ -26,12 +26,8 @@ import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
-import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.IpUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
@@ -45,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
@@ -1761,6 +1758,35 @@ public class ProcessDao {
             projectIdList.add(project.getId());
         }
         return projectIdList;
+    }
+
+    /**
+     * list unauthorized resource
+     * @param userId    user id
+     * @param resNames  resource name
+     * @return unauthorized resource list
+     */
+    public List<String> listUnauthorizedResource(int userId,String[] resNames){
+        List<String> resultList = new ArrayList<String>();
+
+        List<String> originResList = Arrays.asList(resNames);
+        List<Resource> authorizedResourceList = resourceMapper.listAuthorizedResource(userId, resNames);
+
+        if(CollectionUtils.isNotEmpty(authorizedResourceList)){
+            List<String> authorizedResNames = authorizedResourceList.stream().map(t -> t.getAlias()).collect(toList());
+            resultList = originResList.stream().filter(item -> !authorizedResNames.contains(item)).collect(toList());
+        }
+
+        return resultList;
+    }
+
+    /**
+     * get user by user id
+     * @param userId user id
+     * @return User
+     */
+    public User getUserById(int userId){
+        return userMapper.queryDetailsById(userId);
     }
 
 
