@@ -19,7 +19,7 @@
     <div class="clearfix input-element" :class="disabled ? 'disabled' : ''">
       <span class="tag-wrapper" v-for="(item,$index) in activeList" :key="$index" :class="activeIndex === $index ? 'active' : ''">
         <span class="tag-text">{{item}}</span>
-        <i class="remove-tag ans-icon-close" @click.stop="_del($index)" v-if="!disabled"></i>
+        <em class="remove-tag ans-icon-close" @click.stop="_del($index)" v-if="!disabled"></em>
       </span>
       <x-poptip
               placement="bottom-start"
