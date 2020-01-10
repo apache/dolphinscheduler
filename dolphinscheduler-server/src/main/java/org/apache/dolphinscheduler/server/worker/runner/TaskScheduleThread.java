@@ -342,7 +342,7 @@ public class TaskScheduleThread implements Runnable {
             // get user type in order to judge whether the user is admin
             User user = processDao.getUserById(userId);
             if (user.getUserType() != UserType.ADMIN_USER){
-                List<String> unauthorizedResource = processDao.listUnauthorizedResource(userId, (String[]) projectRes.toArray());
+                List<String> unauthorizedResource = processDao.listUnauthorizedResource(userId, projectRes.toArray(new String[projectRes.size()]));
                 // if exist unauthorized resource
                 if(CollectionUtils.isNotEmpty(unauthorizedResource)){
                     logger.error("user {} didn't has download permission of resource file: {}", user.getUserName(), unauthorizedResource.toString());
