@@ -66,14 +66,8 @@ RUN apt-get update && \
     apt-get install -y postgresql postgresql-contrib sudo && \
     sed -i 's/localhost/*/g' /etc/postgresql/10/main/postgresql.conf
 
-#5,install nginx
-RUN apt-get update && \
-  apt-get install -y nginx && \
-  rm -rf /var/lib/apt/lists/* && \
-  echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
-  chown -R www-data:www-data /var/lib/nginx
 
-#6,install sudo,python,vim,ping and ssh command
+#5,install sudo,python,vim,ping and ssh command
 RUN apt-get update && \
   apt-get -y install sudo && \
   apt-get -y install python && \
@@ -84,23 +78,22 @@ RUN apt-get update && \
   apt-get -y install python-pip && \
   pip install kazoo
 
-#7,add dolphinscheduler source code to /opt/dolphinscheduler_source
+#6,add dolphinscheduler source code to /opt/dolphinscheduler_source
 ADD . /opt/dolphinscheduler_source
 
 
-#8,backend compilation
+#7,backend compilation
 RUN cd /opt/dolphinscheduler_source && \
     mvn clean package -Prelease -Dmaven.test.skip=true
 
-#11,modify dolphinscheduler configuration file
+#8,modify dolphinscheduler configuration file
 #backend configuration
-RUN tar -zxvf /opt/dolphinscheduler_source/dolphinscheduler-dist/dolphinscheduler-backend/target/apache-dolphinscheduler-incubating-${tar_version}-dolphinscheduler-backend-bin.tar.gz -C /opt && \
-    mv /opt/apache-dolphinscheduler-incubating-${tar_version}-dolphinscheduler-backend-bin /opt/dolphinscheduler && \
+RUN tar -zxvf /opt/dolphinscheduler_source/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${tar_version}-dolphinscheduler-bin.tar.gz -C /opt && \
+    mv /opt/apache-dolphinscheduler-incubating-${tar_version}-dolphinscheduler-bin /opt/dolphinscheduler && \
     rm -rf /opt/dolphinscheduler/conf
 
 ADD ./dockerfile/conf/dolphinscheduler/conf /opt/dolphinscheduler/conf
-#frontend nginx configuration
-ADD ./dockerfile/conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
+
 
 #9,open port
 EXPOSE 2181 2888 3888 3306 80 12345 8888
