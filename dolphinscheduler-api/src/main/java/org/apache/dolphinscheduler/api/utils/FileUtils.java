@@ -22,9 +22,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,7 +41,7 @@ public class FileUtils {
     /**
      * copy source file to target file
      *
-     * @param file file
+     * @param file         file
      * @param destFilename destination file name
      */
 
@@ -76,5 +79,29 @@ public class FileUtils {
 
         }
         return null;
+    }
+
+    /**
+     * file convert String
+     * @param file MultipartFile file
+     * @return file content string
+     */
+    public static String file2String(MultipartFile file) {
+        StringBuilder strBuilder = new StringBuilder();
+
+        try (InputStreamReader inputStreamReader = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)) {
+            BufferedReader streamReader = new BufferedReader(inputStreamReader);
+            String inputStr;
+
+            while ((inputStr = streamReader.readLine()) != null) {
+                strBuilder.append(inputStr);
+            }
+
+            return strBuilder.toString();
+        } catch (IOException e) {
+            logger.error("file convert to string failed: {}", file.getName());
+        }
+
+        return strBuilder.toString();
     }
 }

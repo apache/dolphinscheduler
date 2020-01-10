@@ -35,25 +35,52 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class DataSourceParamTest {
 
     @Test
-    public void testAddDependentSpecialParam() throws JSONException {
+    public void testAddExportDependentSpecialParam() throws JSONException {
 
-        String dependentJson = "{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
-                "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"," +
-                "\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\"," +
-                "\"dependItemList\":[{\"projectId\":2,\"definitionId\":46,\"depTasks\":\"ALL\"," +
-                "\"cycle\":\"day\",\"dateValue\":\"today\"}]}]}}";
+        String sqlJson = "{\"type\":\"SQL\",\"id\":\"tasks-27297\",\"name\":\"sql\"," +
+                "\"params\":{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from test\"," +
+                "\"udfs\":\"\",\"sqlType\":\"1\",\"title\":\"\",\"receivers\":\"\",\"receiversCc\":\"\",\"showType\":\"TABLE\"" +
+                ",\"localParams\":[],\"connParams\":\"\"," +
+                "\"preStatements\":[],\"postStatements\":[]}," +
+                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\"," +
+                "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\"," +
+                "\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
+                "\"preTasks\":[\"dependent\"]}";
 
 
-        JSONObject taskNode = JSONUtils.parseObject(dependentJson);
+        JSONObject taskNode = JSONUtils.parseObject(sqlJson);
         if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
             String taskType = taskNode.getString("type");
 
-            exportProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject dependent = addTaskParam.addSpecialParam(taskNode);
+            JSONObject sql = addTaskParam.addExportSpecialParam(taskNode);
 
-            JSONAssert.assertEquals(taskNode.toString(),dependent.toString(),false);
+            JSONAssert.assertEquals(taskNode.toString(), sql.toString(), false);
         }
+    }
 
+    @Test
+    public void testAddImportDependentSpecialParam() throws JSONException {
+        String sqlJson = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\"," +
+                "\"type\":\"SQL\",\"params\":{\"postStatements\":[]," +
+                "\"connParams\":\"\",\"receiversCc\":\"\",\"udfs\":\"\"," +
+                "\"type\":\"MYSQL\",\"title\":\"\",\"sql\":\"show tables\",\"" +
+                "preStatements\":[],\"sqlType\":\"1\",\"receivers\":\"\",\"datasource\":1," +
+                "\"showType\":\"TABLE\",\"localParams\":[],\"datasourceName\":\"dsmetadata\"},\"timeout\"" +
+                ":{\"enable\":false,\"strategy\":\"\"},\"maxRetryTimes\":\"0\"," +
+                "\"taskInstancePriority\":\"MEDIUM\",\"name\":\"mysql\",\"dependence\":{}," +
+                "\"retryInterval\":\"1\",\"preTasks\":[\"dependent\"],\"id\":\"tasks-8745\"}";
+
+        JSONObject taskNode = JSONUtils.parseObject(sqlJson);
+        if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
+            String taskType = taskNode.getString("type");
+
+            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+
+            JSONObject sql = addTaskParam.addExportSpecialParam(taskNode);
+
+            JSONAssert.assertEquals(taskNode.toString(), sql.toString(), false);
+        }
     }
 }

@@ -164,7 +164,7 @@ public class ProcessDefinitionServiceTest {
         Mockito.when(dataSourceMapper.selectById(1)).thenReturn(getDataSource());
         Mockito.when(processDefineMapper.queryByDefineId(2)).thenReturn(getProcessDefinition());
 
-        String corSqlDependentJson = processDefinitionService.addTaskNodeSpecialParam(sqlDependentJson);
+        String corSqlDependentJson = processDefinitionService.addExportTaskNodeSpecialParam(sqlDependentJson);
 
         JSONAssert.assertEquals(sqlDependentJson,corSqlDependentJson,false);
 

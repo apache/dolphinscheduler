@@ -59,7 +59,7 @@ public class ProcessMeta {
     /**
      * warning group id
      */
-    private int scheduleWarningGroupId;
+    private Integer scheduleWarningGroupId;
 
     /**
      * warning group name
@@ -99,7 +99,7 @@ public class ProcessMeta {
     /**
      * worker group id
      */
-    private int scheduleWorkerGroupId;
+    private Integer scheduleWorkerGroupId;
 
     /**
      * worker group name
@@ -165,7 +165,7 @@ public class ProcessMeta {
         this.scheduleWarningType = scheduleWarningType;
     }
 
-    public int getScheduleWarningGroupId() {
+    public Integer getScheduleWarningGroupId() {
         return scheduleWarningGroupId;
     }
 
@@ -229,7 +229,7 @@ public class ProcessMeta {
         this.scheduleProcessInstancePriority = scheduleProcessInstancePriority;
     }
 
-    public int getScheduleWorkerGroupId() {
+    public Integer getScheduleWorkerGroupId() {
         return scheduleWorkerGroupId;
     }
 
