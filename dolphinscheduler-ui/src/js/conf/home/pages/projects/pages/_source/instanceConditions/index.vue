@@ -52,10 +52,10 @@
         </x-select>
       </div>
       <div class="list">
-        <x-input v-model="searchParams.host.trim" @on-enterkey="_ckQuery" style="width: 140px;" size="small" :placeholder="$t('host')"></x-input>
+        <x-input v-model.trim="searchParams.host" @on-enterkey="_ckQuery" style="width: 140px;" size="small" :placeholder="$t('host')"></x-input>
       </div>
       <div class="list">
-        <x-input v-model="searchParams.searchVal.trim" @on-enterkey="_ckQuery" style="width: 200px;" size="small" :placeholder="$t('name')"></x-input>
+        <x-input v-model.trim="searchParams.searchVal" @on-enterkey="_ckQuery" style="width: 200px;" size="small" :placeholder="$t('name')"></x-input>
       </div>
     </template>
   </m-conditions>
