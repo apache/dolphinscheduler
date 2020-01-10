@@ -193,13 +193,27 @@ public class ProcessDefinitionServiceTest {
         String currentProjectName = "test";
         String processDefinitionName = "test_process";
         Integer processDefinitionId = 1;
+        Schedule schedule = getSchedule();
 
         ProcessMeta processMeta = getProcessMeta();
 
         int insertFlag = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMeta,
                 processDefinitionName, processDefinitionId);
+        Assert.assertEquals(0, insertFlag);
 
-        Assert.assertEquals(insertFlag,0);
+        ProcessMeta processMetaCron = new ProcessMeta();
+        processMetaCron.setScheduleCrontab(schedule.getCrontab());
+
+        int insertFlagCron = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
+                processDefinitionName, processDefinitionId);
+        Assert.assertEquals(0, insertFlagCron);
+
+        processMetaCron.setScheduleWorkerGroupName("ds-test");
+        int insertFlagWorker = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
+                processDefinitionName, processDefinitionId);
+        Assert.assertEquals(0, insertFlagWorker);
+
+
     }
 
     /**
@@ -341,8 +355,49 @@ public class ProcessDefinitionServiceTest {
 
         Assert.assertTrue(delete);
 
+        String processMetaJson = "{}";
+        improssProcessCheckData(file, loginUser, currentProjectName, processMetaJson);
+
+        processMetaJson = "{\"scheduleWorkerGroupId\":-1}";
+        improssProcessCheckData(file, loginUser, currentProjectName, processMetaJson);
+
+        processMetaJson = "{\"scheduleWorkerGroupId\":-1,\"projectName\":\"test\"}";
+        improssProcessCheckData(file, loginUser, currentProjectName, processMetaJson);
+
+        processMetaJson = "{\"scheduleWorkerGroupId\":-1,\"projectName\":\"test\",\"processDefinitionName\":\"test_definition\"}";
+        improssProcessCheckData(file, loginUser, currentProjectName, processMetaJson);
+
 
     }
+
+    /**
+     * check import process metadata
+     * @param file file
+     * @param loginUser login user
+     * @param currentProjectName current project name
+     * @param processMetaJson process meta json
+     * @throws IOException IO exception
+     */
+    private void improssProcessCheckData(File file, User loginUser, String currentProjectName, String processMetaJson) throws IOException {
+        //check null
+        FileUtils.writeStringToFile(new File("/tmp/task.json"),processMetaJson);
+
+        File fileEmpty = new File("/tmp/task.json");
+
+        FileInputStream fileEmptyInputStream = new FileInputStream("/tmp/task.json");
+
+        MultipartFile multiFileEmpty = new MockMultipartFile(fileEmpty.getName(), fileEmpty.getName(),
+                ContentType.APPLICATION_OCTET_STREAM.toString(), fileEmptyInputStream);
+
+        Map<String, Object> resEmptyProcess = processDefinitionService.importProcessDefinition(loginUser, multiFileEmpty, currentProjectName);
+
+        Assert.assertEquals(Status.DATA_IS_NULL, resEmptyProcess.get(Constants.STATUS));
+
+        boolean deleteFlag = file.delete();
+
+        Assert.assertTrue(deleteFlag);
+    }
+
 
     /**
      * get mock datasource
