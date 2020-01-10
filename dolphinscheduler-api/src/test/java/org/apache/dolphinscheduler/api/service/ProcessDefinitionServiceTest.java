@@ -355,7 +355,7 @@ public class ProcessDefinitionServiceTest {
 
         Assert.assertTrue(delete);
 
-        String processMetaJson = "{}";
+        String processMetaJson = "";
         improssProcessCheckData(file, loginUser, currentProjectName, processMetaJson);
 
         processMetaJson = "{\"scheduleWorkerGroupId\":-1}";
