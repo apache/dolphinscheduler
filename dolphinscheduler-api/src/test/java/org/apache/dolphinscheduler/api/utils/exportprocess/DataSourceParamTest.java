@@ -78,7 +78,7 @@ public class DataSourceParamTest {
 
             ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject sql = addTaskParam.addExportSpecialParam(taskNode);
+            JSONObject sql = addTaskParam.addImportSpecialParam(taskNode);
 
             JSONAssert.assertEquals(taskNode.toString(), sql.toString(), false);
         }

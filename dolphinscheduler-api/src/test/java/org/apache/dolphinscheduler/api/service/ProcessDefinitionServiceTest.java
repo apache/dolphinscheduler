@@ -20,9 +20,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
@@ -180,6 +182,24 @@ public class ProcessDefinitionServiceTest {
 
         String exportProcessMetaDataStr = processDefinitionService.exportProcessMetaDataStr(46, processDefinition);
         Assert.assertNotEquals(sqlDependentJson,exportProcessMetaDataStr);
+    }
+
+    @Test
+    public void testImportProcessSchedule() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+
+        String currentProjectName = "test";
+        String processDefinitionName = "test_process";
+        Integer processDefinitionId = 1;
+
+        ProcessMeta processMeta = getProcessMeta();
+
+        int insertFlag = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMeta,
+                processDefinitionName, processDefinitionId);
+
+        Assert.assertEquals(insertFlag,0);
     }
 
     /**
@@ -380,6 +400,26 @@ public class ProcessDefinitionServiceTest {
         schedule.setWarningGroupId(1);
         schedule.setWorkerGroupId(-1);
         return schedule;
+    }
+
+    /**
+     * get mock processMeta
+     * @return processMeta
+     */
+    private ProcessMeta getProcessMeta() {
+        ProcessMeta processMeta = new ProcessMeta();
+        Schedule schedule = getSchedule();
+        processMeta.setScheduleCrontab(schedule.getCrontab());
+        processMeta.setScheduleStartTime(DateUtils.dateToString(schedule.getStartTime()));
+        processMeta.setScheduleEndTime(DateUtils.dateToString(schedule.getEndTime()));
+        processMeta.setScheduleWarningType(String.valueOf(schedule.getWarningType()));
+        processMeta.setScheduleWarningGroupId(schedule.getWarningGroupId());
+        processMeta.setScheduleFailureStrategy(String.valueOf(schedule.getFailureStrategy()));
+        processMeta.setScheduleReleaseState(String.valueOf(schedule.getReleaseState()));
+        processMeta.setScheduleProcessInstancePriority(String.valueOf(schedule.getProcessInstancePriority()));
+        processMeta.setScheduleWorkerGroupId(schedule.getWorkerGroupId());
+        processMeta.setScheduleWorkerGroupName("workgroup1");
+        return processMeta;
     }
 
     private List<Schedule> getSchedulerList() {

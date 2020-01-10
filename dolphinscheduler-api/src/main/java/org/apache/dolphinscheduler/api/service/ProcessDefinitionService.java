@@ -735,7 +735,8 @@ public class ProcessDefinitionService extends BaseDAGService {
      * @param processDefinitionId process definition id
      * @return insert schedule flag
      */
-    private int importProcessSchedule(User loginUser, String currentProjectName, ProcessMeta processMeta, String processDefinitionName, Integer processDefinitionId) {
+    public int importProcessSchedule(User loginUser, String currentProjectName, ProcessMeta processMeta,
+                                     String processDefinitionName, Integer processDefinitionId) {
         Date now = new Date();
         Schedule scheduleObj = new Schedule();
         scheduleObj.setProjectName(currentProjectName);

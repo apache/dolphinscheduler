@@ -59,7 +59,7 @@ public class DependentParamTest {
     }
 
     @Test
-    public void testAddIMportDependentSpecialParam() throws JSONException {
+    public void testAddImportDependentSpecialParam() throws JSONException {
         String dependentJson = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\"" +
                 ",\"type\":\"DEPENDENT\",\"params\":{},\"timeout\":{\"enable\":false," +
                 "\"strategy\":\"\"},\"maxRetryTimes\":\"0\",\"taskInstancePriority\":\"MEDIUM\"" +
@@ -75,7 +75,7 @@ public class DependentParamTest {
 
             ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject dependent = addTaskParam.addExportSpecialParam(taskNode);
+            JSONObject dependent = addTaskParam.addImportSpecialParam(taskNode);
 
             JSONAssert.assertEquals(taskNode.toString(), dependent.toString(), false);
         }
