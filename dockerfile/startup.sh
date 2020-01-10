@@ -41,12 +41,12 @@ echo "start api-server"
 
 echo "start master-server"
 /opt/dolphinscheduler/bin/dolphinscheduler-daemon.sh stop master-server
-python /opt/dolphinscheduler/script/del-zk-node.py 127.0.0.1 /dolphinscheduler/masters
+sh /opt/dolphinscheduler/script/remove-zk-node.sh  /dolphinscheduler/masters
 /opt/dolphinscheduler/bin/dolphinscheduler-daemon.sh start master-server
 
 echo "start worker-server"
 /opt/dolphinscheduler/bin/dolphinscheduler-daemon.sh stop worker-server
-python /opt/dolphinscheduler/script/del-zk-node.py 127.0.0.1 /dolphinscheduler/workers
+sh /opt/dolphinscheduler/script/remove-zk-node.sh  /dolphinscheduler/workers
 /opt/dolphinscheduler/bin/dolphinscheduler-daemon.sh start worker-server
 
 

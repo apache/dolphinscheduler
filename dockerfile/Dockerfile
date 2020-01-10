@@ -75,8 +75,7 @@ RUN apt-get update && \
   apt-get -y install iputils-ping && \
   apt-get -y install net-tools && \
   apt-get -y install openssh-server && \
-  apt-get -y install python-pip && \
-  pip install kazoo
+  apt-get -y install python-pip
 
 #6,add dolphinscheduler source code to /opt/dolphinscheduler_source
 ADD . /opt/dolphinscheduler_source
