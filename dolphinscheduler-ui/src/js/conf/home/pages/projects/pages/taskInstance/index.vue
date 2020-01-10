@@ -81,6 +81,7 @@
        */
       _onQuery (o) {
         this.searchParams = _.assign(this.searchParams, o)
+        this.searchParams.processInstanceId = ''
         if (this.searchParams.taskName) {
           this.searchParams.taskName = ''
         }
