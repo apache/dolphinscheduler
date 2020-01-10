@@ -60,14 +60,6 @@ echo "start alert-server"
 /opt/dolphinscheduler/bin/dolphinscheduler-daemon.sh start alert-server
 
 
-
-
-
-echo "start nginx"
-/etc/init.d/nginx stop
-nginx &
-
-
 while true
 do
  	sleep 101
