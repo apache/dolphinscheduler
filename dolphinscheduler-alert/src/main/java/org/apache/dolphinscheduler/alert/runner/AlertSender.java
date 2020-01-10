@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -72,9 +73,7 @@ public class AlertSender{
             String receivers = alert.getReceivers();
             if (StringUtils.isNotEmpty(receivers)){
                 String[] splits = receivers.split(",");
-                for (String receiver : splits){
-                    receviersList.add(receiver);
-                }
+                receviersList.addAll(Arrays.asList(splits));
             }
 
             // copy list
@@ -86,9 +85,7 @@ public class AlertSender{
 
             if (StringUtils.isNotEmpty(receiversCc)){
                 String[] splits = receiversCc.split(",");
-                for (String receiverCc : splits){
-                    receviersCcList.add(receiverCc);
-                }
+                receviersCcList.addAll(Arrays.asList(splits));
             }
 
             if (CollectionUtils.isEmpty(receviersList) && CollectionUtils.isEmpty(receviersCcList)) {
@@ -106,7 +103,13 @@ public class AlertSender{
                 alert.setInfo(retMaps);
             }
 
-            boolean flag = Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)));
+            //send flag
+            boolean flag = false;
+
+            if (null != retMaps) {
+                flag = Boolean.parseBoolean(String.valueOf(retMaps.get(Constants.STATUS)));
+            }
+
             if (flag) {
                 alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, "execution success", alert.getId());
                 logger.info("alert send success");
@@ -121,8 +124,10 @@ public class AlertSender{
                 }
 
             } else {
-                alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(retMaps.get(Constants.MESSAGE)), alert.getId());
-                logger.info("alert send error : {}", String.valueOf(retMaps.get(Constants.MESSAGE)));
+                if (null != retMaps) {
+                    alertDao.updateAlert(AlertStatus.EXECUTION_FAILURE, String.valueOf(retMaps.get(Constants.MESSAGE)), alert.getId());
+                    logger.info("alert send error : {}", retMaps.get(Constants.MESSAGE));
+                }
             }
         }
 
