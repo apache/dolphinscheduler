@@ -135,6 +135,7 @@
     created () {
     },
     mounted () {
+      this.$modal.destroy()
       // Cycle acquisition status
       this.setIntervalP = setInterval(() => {
         this._debounceGET('false')
