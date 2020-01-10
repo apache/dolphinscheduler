@@ -79,5 +79,23 @@ public class DependentParamTest {
 
             JSONAssert.assertEquals(taskNode.toString(), dependent.toString(), false);
         }
+
+        String dependentEmpty = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\"" +
+                ",\"type\":\"DEPENDENT\",\"params\":{},\"timeout\":{\"enable\":false," +
+                "\"strategy\":\"\"},\"maxRetryTimes\":\"0\",\"taskInstancePriority\":\"MEDIUM\"" +
+                ",\"name\":\"dependent\"," +
+                "\"retryInterval\":\"1\",\"preTasks\":[],\"id\":\"tasks-55485\"}";;
+
+        JSONObject taskNodeEmpty = JSONUtils.parseObject(dependentEmpty);
+
+        if (StringUtils.isNotEmpty(taskNodeEmpty.getString("type"))) {
+            String taskType = taskNodeEmpty.getString("type");
+
+            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+
+            JSONObject dependent = addTaskParam.addImportSpecialParam(taskNodeEmpty);
+
+            JSONAssert.assertEquals(taskNodeEmpty.toString(), dependent.toString(), false);
+        }
     }
 }

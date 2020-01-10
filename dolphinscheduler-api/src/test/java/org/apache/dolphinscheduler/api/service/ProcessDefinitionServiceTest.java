@@ -208,6 +208,13 @@ public class ProcessDefinitionServiceTest {
                 processDefinitionName, processDefinitionId);
         Assert.assertEquals(0, insertFlagCron);
 
+        WorkerGroup workerGroup = new WorkerGroup();
+        workerGroup.setName("ds-test-workergroup");
+        workerGroup.setId(2);
+        List<WorkerGroup> workerGroups = new ArrayList<>();
+        workerGroups.add(workerGroup);
+        Mockito.when(workerGroupMapper.queryWorkerGroupByName("ds-test")).thenReturn(workerGroups);
+
         processMetaCron.setScheduleWorkerGroupName("ds-test");
         int insertFlagWorker = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
                 processDefinitionName, processDefinitionId);

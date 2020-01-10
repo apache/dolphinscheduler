@@ -97,7 +97,6 @@ public class FileUtils {
                 strBuilder.append(inputStr);
             }
 
-            return strBuilder.toString();
         } catch (IOException e) {
             logger.error("file convert to string failed: {}", file.getName());
         }
