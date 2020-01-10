@@ -39,8 +39,10 @@
         <if test="type != -1">
             and type=#{type}
         </if>
-        and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
-                  union select id as resources_id  from t_ds_resources where user_id=#{userId})
+        <if test="userId != 0">
+            and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
+            union select id as resources_id  from t_ds_resources where user_id=#{userId})
+        </if>
     </select>
     <select id="queryResourcePaging" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select *
@@ -71,4 +73,18 @@
         where t.id = u.tenant_id and u.id = res.user_id and res.type=0
         and res.alias= #{resName}
     </select>
+    <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select *
+        from t_ds_resources
+        where type=0
+        and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
+        union select id as resources_id  from t_ds_resources where user_id=#{userId})
+        <if test="resNames != null and resNames != ''">
+            and alias in
+            <foreach collection="resNames" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+
 </mapper>
