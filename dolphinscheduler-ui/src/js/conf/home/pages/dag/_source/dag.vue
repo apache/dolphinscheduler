@@ -58,7 +58,7 @@
           </x-button>
           <span class="name">{{name}}</span>
           &nbsp;
-          <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><i class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></i></span>
+          <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><em class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></em></span>
         </div>
         <div class="save-btn">
           <div class="operation" style="vertical-align: middle;">
@@ -68,7 +68,7 @@
                :id="item.code"
                :key="$index"
                @click="_ckOperation(item,$event)">
-              <i :class="item.icon" data-toggle="tooltip" :title="item.description" ></i>
+              <em :class="item.icon" data-toggle="tooltip" :title="item.description" ></em>
             </a>
           </div>
           <x-button type="text" icon="ans-icon-triangle-solid-right" @click="dagAutomaticLayout"></x-button>
@@ -156,8 +156,8 @@
     },
     methods: {
       ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState']),
-      ...mapMutations('dag', ['addTasks', 'resetParams', 'setIsEditDag', 'setName']),
-      
+      ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName']),
+
       // DAG automatic layout
       dagAutomaticLayout() {
         $('#canvas').html('')
@@ -257,8 +257,8 @@
                   let state = dom.find('.state-p')
                   dom.attr('data-state-id', v1.stateId)
                   dom.attr('data-dependent-result', v1.dependentResult || '')
-                  state.append(`<b class="${v1.icoUnicode} ${v1.isSpin ? 'as as-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body"></b>`)
-                  state.find('b').attr('title', titleTpl(v2, v1.desc))
+                  state.append(`<strong class="${v1.icoUnicode} ${v1.isSpin ? 'as as-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body"></strong>`)
+                  state.find('strong').attr('title', titleTpl(v2, v1.desc))
                 }
               })
             })
@@ -494,6 +494,14 @@
                 setTimeout(() => {
                   removeNodesEvent(fromThis)
                 }, 100)
+              },
+              /**
+               * Cache the item
+               * @param item
+               * @param fromThis
+               */
+              cacheTaskInfo({item, fromThis}) {
+                self.cacheTasks(item)
               },
               close ({ flag, fromThis }) {
                 // Edit status does not allow deletion of nodes

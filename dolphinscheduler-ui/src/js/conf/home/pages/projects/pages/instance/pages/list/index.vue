@@ -20,14 +20,14 @@
       <m-instance-conditions @on-query="_onQuery"></m-instance-conditions>
     </template>
     <template slot="content">
-      <template v-if="processInstanceList.length">
+      <template v-if="processInstanceList.length || total>0">
         <m-list :process-instance-list="processInstanceList" @on-update="_onUpdate" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!processInstanceList.length">
+      <template v-if="!processInstanceList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading"></m-spin>

@@ -455,6 +455,11 @@ public class ProcessDao {
         if(tenantId >= 0){
             tenant = tenantMapper.queryById(tenantId);
         }
+
+        if (userId == 0){
+            return null;
+        }
+
         if(tenant == null){
             User user = userMapper.selectById(userId);
             tenant = tenantMapper.queryById(user.getTenantId());

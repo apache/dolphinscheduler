@@ -37,7 +37,7 @@
                      placeholder="Please enter keyword"
                      type="text"
                      style="width:202px;">
-              <i slot="suffix" class="ans-icon-search"></i>
+              <em slot="suffix" class="ans-icon-search"></em>
             </x-input>
           </div>-->
           <div class="scrollbar tf-content">
@@ -63,7 +63,7 @@
                      placeholder="Please enter keyword"
                      type="text"
                      style="width:202px;">
-              <i slot="suffix" class="ans-icon-search"></i>
+              <em slot="suffix" class="ans-icon-search"></em>
             </x-input>
           </div>-->
           <div class="scrollbar tf-content">

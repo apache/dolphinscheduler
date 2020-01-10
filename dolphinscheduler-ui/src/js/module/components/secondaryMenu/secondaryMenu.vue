@@ -26,9 +26,9 @@
           <router-link :to="{ name: item.path}">
             <div class="name" @click="_toggleSubMenu(item)">
               <a href="javascript:">
-                <i class="fa icon" :class="item.icon"></i>
+                <em class="fa icon" :class="item.icon"></em>
                 <span>{{item.name}}</span>
-                <i class="fa angle" :class="item.isOpen ? 'ans-icon-arrow-down' : 'ans-icon-arrow-right'" v-if="item.children.length"></i>
+                <em class="fa angle" :class="item.isOpen ? 'ans-icon-arrow-down' : 'ans-icon-arrow-right'" v-if="item.children.length"></em>
               </a>
             </div>
           </router-link>
@@ -36,9 +36,9 @@
         <template v-if="!item.path">
           <div class="name" @click="_toggleSubMenu(item)">
             <a href="javascript:">
-              <i class="fa icon" :class="item.icon"></i>
+              <em class="fa icon" :class="item.icon"></em>
               <span>{{item.name}}</span>
-              <i class="fa angle" :class="item.isOpen ? 'ans-icon-arrow-down' : 'ans-icon-arrow-right'" v-if="item.children.length"></i>
+              <em class="fa angle" :class="item.isOpen ? 'ans-icon-arrow-down' : 'ans-icon-arrow-right'" v-if="item.children.length"></em>
             </a>
           </div>
         </template>
