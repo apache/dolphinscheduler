@@ -1774,10 +1774,10 @@ public class ProcessDao {
     public List<String> listUnauthorizedResource(int userId,String[] resNames){
         List<String> resultList = new ArrayList<String>();
 
-        List<String> originResList = Arrays.asList(resNames);
-        List<Resource> authorizedResourceList = resourceMapper.listAuthorizedResource(userId, resNames);
+        if(ArrayUtils.isNotEmpty(resNames)){
+            List<String> originResList = Arrays.asList(resNames);
+            List<Resource> authorizedResourceList = resourceMapper.listAuthorizedResource(userId, resNames);
 
-        if(CollectionUtils.isNotEmpty(authorizedResourceList)){
             List<String> authorizedResNames = authorizedResourceList.stream().map(t -> t.getAlias()).collect(toList());
             resultList = originResList.stream().filter(item -> !authorizedResNames.contains(item)).collect(toList());
         }
