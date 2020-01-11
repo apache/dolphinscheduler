@@ -24,13 +24,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TaskNodeParamFactory {
 
-    private static Map<String, exportProcessAddTaskParam> taskServices = new ConcurrentHashMap<>();
+    private static Map<String, ProcessAddTaskParam> taskServices = new ConcurrentHashMap<>();
 
-    public static exportProcessAddTaskParam getByTaskType(String taskType){
+    public static ProcessAddTaskParam getByTaskType(String taskType){
         return taskServices.get(taskType);
     }
 
-    static void register(String taskType, exportProcessAddTaskParam addSpecialTaskParam){
+    static void register(String taskType, ProcessAddTaskParam addSpecialTaskParam){
         if (null != taskType) {
             taskServices.put(taskType, addSpecialTaskParam);
         }
