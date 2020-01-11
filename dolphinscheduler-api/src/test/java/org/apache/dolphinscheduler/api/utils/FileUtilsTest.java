@@ -17,21 +17,17 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.http.entity.ContentType;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 import static org.junit.Assert.*;
 
@@ -105,5 +101,24 @@ public class FileUtilsTest {
         Resource resource1 = FileUtils.file2Resource(file.getAbsolutePath()+"abc");
         assertNull(resource1);
 
+    }
+
+    @Test
+    public void testFile2String() throws IOException {
+        String content = "123";
+        org.apache.dolphinscheduler.common.utils.FileUtils.writeStringToFile(new File("/tmp/task.json"),content);
+
+        File file = new File("/tmp/task.json");
+        FileInputStream fileInputStream = new FileInputStream("/tmp/task.json");
+        MultipartFile multipartFile = new MockMultipartFile(file.getName(), file.getName(),
+                ContentType.APPLICATION_OCTET_STREAM.toString(), fileInputStream);
+
+        String resultStr = FileUtils.file2String(multipartFile);
+
+        Assert.assertEquals(content, resultStr);
+
+        boolean delete = file.delete();
+
+        Assert.assertTrue(delete);
     }
 }
