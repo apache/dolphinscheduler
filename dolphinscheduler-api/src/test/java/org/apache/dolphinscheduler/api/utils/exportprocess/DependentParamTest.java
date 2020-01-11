@@ -37,13 +37,11 @@ public class DependentParamTest {
 
     @Test
     public void testAddExportDependentSpecialParam() throws JSONException {
-
         String dependentJson = "{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
                 "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"," +
                 "\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\"," +
                 "\"dependItemList\":[{\"projectId\":2,\"definitionId\":46,\"depTasks\":\"ALL\"," +
                 "\"cycle\":\"day\",\"dateValue\":\"today\"}]}]}}";
-
 
         JSONObject taskNode = JSONUtils.parseObject(dependentJson);
         if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
@@ -54,6 +52,20 @@ public class DependentParamTest {
             JSONObject dependent = addTaskParam.addExportSpecialParam(taskNode);
 
             JSONAssert.assertEquals(taskNode.toString(), dependent.toString(), false);
+        }
+
+        String dependentEmpty = "{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
+                "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"}";
+
+        JSONObject taskEmpty = JSONUtils.parseObject(dependentEmpty);
+        if (StringUtils.isNotEmpty(taskEmpty.getString("type"))) {
+            String taskType = taskEmpty.getString("type");
+
+            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+
+            JSONObject dependent = addTaskParam.addExportSpecialParam(taskEmpty);
+
+            JSONAssert.assertEquals(taskEmpty.toString(), dependent.toString(), false);
         }
 
     }
@@ -80,22 +92,5 @@ public class DependentParamTest {
             JSONAssert.assertEquals(taskNode.toString(), dependent.toString(), false);
         }
 
-        String dependentEmpty = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\"" +
-                ",\"type\":\"DEPENDENT\",\"params\":{},\"timeout\":{\"enable\":false," +
-                "\"strategy\":\"\"},\"maxRetryTimes\":\"0\",\"taskInstancePriority\":\"MEDIUM\"" +
-                ",\"name\":\"dependent\"," +
-                "\"retryInterval\":\"1\",\"preTasks\":[],\"id\":\"tasks-55485\"}";;
-
-        JSONObject taskNodeEmpty = JSONUtils.parseObject(dependentEmpty);
-
-        if (StringUtils.isNotEmpty(taskNodeEmpty.getString("type"))) {
-            String taskType = taskNodeEmpty.getString("type");
-
-            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
-
-            JSONObject dependent = addTaskParam.addImportSpecialParam(taskNodeEmpty);
-
-            JSONAssert.assertEquals(taskNodeEmpty.toString(), dependent.toString(), false);
-        }
     }
 }
