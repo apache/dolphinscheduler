@@ -185,6 +185,18 @@ public class ProcessDefinitionServiceTest {
     }
 
     @Test
+    public void testAddExportTaskNodeSpecialParam() throws JSONException {
+        String shellJson = "{\"globalParams\":[],\"tasks\":[{\"id\":\"tasks-9527\",\"name\":\"shell-1\"," +
+                "\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"#!/bin/bash\\necho \\\"shell-1\\\"\"}," +
+                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\"," +
+                "\"timeout\":{\"strategy\":\"\",\"interval\":1,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\"," +
+                "\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":1,\"timeout\":0}";
+
+        String resultStr = processDefinitionService.addExportTaskNodeSpecialParam(shellJson);
+        JSONAssert.assertEquals(shellJson, resultStr, false);
+    }
+
+    @Test
     public void testImportProcessSchedule() {
         User loginUser = new User();
         loginUser.setId(1);
@@ -219,6 +231,11 @@ public class ProcessDefinitionServiceTest {
         int insertFlagWorker = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
                 processDefinitionName, processDefinitionId);
         Assert.assertEquals(0, insertFlagWorker);
+
+        Mockito.when(workerGroupMapper.queryWorkerGroupByName("ds-test")).thenReturn(null);
+        int workerNullFlag = processDefinitionService.importProcessSchedule(loginUser, currentProjectName, processMetaCron,
+                processDefinitionName, processDefinitionId);
+        Assert.assertEquals(0, workerNullFlag);
 
 
     }
