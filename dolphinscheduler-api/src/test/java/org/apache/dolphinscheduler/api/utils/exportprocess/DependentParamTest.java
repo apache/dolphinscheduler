@@ -63,7 +63,7 @@ public class DependentParamTest {
 
             ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject dependent = addTaskParam.addExportSpecialParam(taskEmpty);
+            JSONObject dependent = addTaskParam.addImportSpecialParam(taskEmpty);
 
             JSONAssert.assertEquals(taskEmpty.toString(), dependent.toString(), false);
         }
