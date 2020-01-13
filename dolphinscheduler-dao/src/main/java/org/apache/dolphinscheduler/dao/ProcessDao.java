@@ -41,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1785,6 +1786,90 @@ public class ProcessDao {
             List<Resource> authorizedResourceList = resourceMapper.listAuthorizedResource(userId, resNames);
 
             Set<String> authorizedResNames = authorizedResourceList.stream().map(t -> t.getAlias()).collect(toSet());
+            originResSet.removeAll(authorizedResNames);
+
+            resultList.addAll(originResSet);
+        }
+
+        return resultList;
+    }
+
+
+
+    /**
+     * list unauthorized udf function
+     * @param userId    user id
+     * @param needChecks  data source id array
+     * @return unauthorized udf function list
+     */
+    public <T> List<T> listUnauthorized(int userId,T[] needChecks,AuthorizationType authorizationType){
+        List<T> resultList = new ArrayList<T>();
+
+        if (ArrayUtils.isNotEmpty(needChecks)) {
+            Set<T> originResSet = new HashSet<T>(Arrays.asList(needChecks));
+
+            switch (authorizationType){
+                case RESOURCE_FILE:
+                    Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(t -> t.getAlias()).collect(toSet());
+                    originResSet.removeAll(authorizedResources);
+                    break;
+                case DATASOURCE:
+                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId,needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedDatasources);
+                    break;
+                case UDF:
+                    Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedUdfs);
+                    break;
+            }
+
+            resultList.addAll(originResSet);
+        }
+
+        return resultList;
+    }
+
+
+    /**
+     * list unauthorized udf function
+     * @param userId    user id
+     * @param udfIds  udf fucntion id array
+     * @return unauthorized udf function list
+     */
+    public List<Integer> listUnauthorizedUdfFunc(int userId,Integer[] udfIds){
+        List<Integer> resultList = new ArrayList<Integer>();
+
+        if (ArrayUtils.isNotEmpty(udfIds)) {
+
+            Set<Integer> originResSet = new HashSet<Integer>(Arrays.asList(udfIds));
+            //List<UdfFunc> listAuthorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(userId, ArrayUtils.toPrimitive(udfIds));
+            List<UdfFunc> listAuthorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(userId, udfIds);
+
+            Set<Integer> authorizedResNames = listAuthorizedUdfFunc.stream().map(t -> t.getId()).collect(toSet());
+            originResSet.removeAll(authorizedResNames);
+
+            resultList.addAll(originResSet);
+        }
+
+        return resultList;
+    }
+
+    /**
+     * list unauthorized udf function
+     * @param userId    user id
+     * @param dataSourceIds  data source id array
+     * @return unauthorized udf function list
+     */
+    public List<Integer> listUnauthorizedDataSource(int userId,Integer[] dataSourceIds){
+        List<Integer> resultList = new ArrayList<Integer>();
+
+        if (ArrayUtils.isNotEmpty(dataSourceIds)) {
+
+            Set<Integer> originResSet = new HashSet<Integer>(Arrays.asList(dataSourceIds));
+            //List<UdfFunc> listAuthorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(userId, ArrayUtils.toPrimitive(dataSourceIds));
+            List<UdfFunc> listAuthorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(userId, dataSourceIds);
+
+            Set<Integer> authorizedResNames = listAuthorizedUdfFunc.stream().map(t -> t.getId()).collect(toSet());
             originResSet.removeAll(authorizedResNames);
 
             resultList.addAll(originResSet);

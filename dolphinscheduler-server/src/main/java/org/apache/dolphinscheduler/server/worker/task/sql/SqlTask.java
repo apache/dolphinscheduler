@@ -20,12 +20,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ShowType;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.job.db.BaseDataSource;
 import org.apache.dolphinscheduler.common.job.db.DataSourceFactory;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -43,6 +42,7 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.permission.PermissionCheck;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -122,8 +122,12 @@ public class SqlTask extends AbstractTask {
             exitStatusCode = -1;
             return;
         }
-
-        dataSource= processDao.findDataSourceById(sqlParameters.getDatasource());
+        int dataSourceId = sqlParameters.getDatasource();
+        if (!checkDataSourcePermission(processDao,dataSourceId)) {
+            exitStatusCode = -1;
+            return;
+        }
+        dataSource= processDao.findDataSourceById(dataSourceId);
         logger.info("datasource name : {} , type : {} , desc : {}  , user_id : {} , parameter : {}",
                 dataSource.getName(),
                 dataSource.getType(),
@@ -167,6 +171,10 @@ public class SqlTask extends AbstractTask {
                 int[] idsArray = new int[ids.length];
                 for(int i=0;i<ids.length;i++){
                     idsArray[i]=Integer.parseInt(ids[i]);
+                }
+                if (!checkUdfPermission(processDao,ArrayUtils.toObject(idsArray))) {
+                    exitStatusCode = -1;
+                    return;
                 }
                 List<UdfFunc> udfFuncList = processDao.queryUdfFunListByids(idsArray);
                 createFuncs = UDFUtils.createFuncs(udfFuncList, taskProps.getTenantCode(), logger);
@@ -453,4 +461,68 @@ public class SqlTask extends AbstractTask {
         }
         logger.info(logPrint.toString());
     }
+
+    /**
+     * check udf function permission
+     * @param processDao    process dao
+     * @param udfFunIds    udf functions
+     * @return if has download permission return true else false
+     */
+    private boolean checkUdfPermission(ProcessDao processDao, Integer[] udfFunIds) {
+        int userId = getUserId(processDao);
+
+        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF,processDao,udfFunIds,userId);
+        return permissionCheckUdf.hasPermission();
+    }
+
+    /**
+     * check data source permission
+     * @param processDao    process dao
+     * @param dataSourceId    data source id
+     * @return if has download permission return true else false
+     */
+    private boolean checkDataSourcePermission(ProcessDao processDao, int dataSourceId) {
+        int userId = getUserId(processDao);
+
+        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE,processDao,new Integer[]{dataSourceId},userId);
+        return permissionCheckDataSource.hasPermission();
+    }
+
+    /**
+     * get user id
+     * @param processDao process dao
+     * @return user id
+     */
+    private int getUserId(ProcessDao processDao) {
+        //  process instance
+        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        // get user id
+        return processInstance.getExecutorId();
+    }
+
+    /**
+     * check data source permission
+     * @param processDao    process dao
+     * @param dataSourceIds    data source ids
+     * @return if has permission of data sources return true else false
+     */
+    private boolean checkDataSourcePermission(ProcessDao processDao, List<Integer> dataSourceIds) {
+        if(CollectionUtils.isNotEmpty(dataSourceIds)){
+            //  process instance
+            int userId = getUserId(processDao);
+            // get user type in order to judge whether the user is admin
+            User user = processDao.getUserById(userId);
+            if (user.getUserType() != UserType.ADMIN_USER){
+                List<Integer> unauthorizedDataSource = processDao.listUnauthorizedDataSource(userId, dataSourceIds.toArray(new Integer[dataSourceIds.size()]));
+                // if exist unauthorized data source
+                if(CollectionUtils.isNotEmpty(unauthorizedDataSource)){
+                    logger.error("user {} didn't has download permission of data source ids: {}", user.getUserName(), unauthorizedDataSource.toString());
+                    throw new RuntimeException(String.format("user %s didn't has download permission of data source id %s", user.getUserName(), unauthorizedDataSource.get(0)));
+                }
+            }
+        }
+        return true;
+    }
+
+
 }
