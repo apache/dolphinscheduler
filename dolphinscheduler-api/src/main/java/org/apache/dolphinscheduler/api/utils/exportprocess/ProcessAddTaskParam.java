@@ -14,36 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.log;
+package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.filter.Filter;
-import ch.qos.logback.core.spi.FilterReply;
+import com.alibaba.fastjson.JSONObject;
 
 /**
- * master log filter
+ * ProcessAddTaskParam
  */
-public class MasterLogFilter extends Filter<ILoggingEvent> {
-    /**
-     * log level
-     */
-    Level level;
+public interface ProcessAddTaskParam {
 
     /**
-     * Accept or reject based on thread name
-     * @param event event
-     * @return FilterReply
+     * add export task special param: sql task dependent task
+     * @param taskNode task node json object
+     * @return task node json object
      */
-    @Override
-    public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("Master-") ){
-            return FilterReply.ACCEPT;
-        }
-        return FilterReply.DENY;
-    }
+    JSONObject addExportSpecialParam(JSONObject taskNode);
 
-    public void setLevel(String level) {
-        this.level = Level.toLevel(level);
-    }
+    /**
+     * add task special param: sql task dependent task
+     * @param taskNode task node json object
+     * @return task node json object
+     */
+    JSONObject addImportSpecialParam(JSONObject taskNode);
 }

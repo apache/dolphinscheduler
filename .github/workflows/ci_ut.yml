@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-on: [push, "pull_request"]
+on: ["push", "pull_request"]
 env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
@@ -47,7 +47,7 @@ jobs:
       - name: Compile
         run: |
           export MAVEN_OPTS='-Dmaven.repo.local=.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx3g'
-          mvn test -Dmaven.test.skip=false cobertura:cobertura
+          mvn test -B -Dmaven.test.skip=false cobertura:cobertura
           CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
       - name: Run SonarCloud Analysis
         run: >

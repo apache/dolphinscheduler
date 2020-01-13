@@ -28,94 +28,72 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- *  alert
- */
 @TableName("t_ds_alert")
 public class Alert {
-
     /**
-     * id
+     * primary key
      */
-    @TableId(value="id", type=IdType.AUTO)
+    @TableId(value = "id", type = IdType.AUTO)
     private int id;
-
     /**
      * title
      */
+    @TableField(value = "title")
     private String title;
-
     /**
-     * show type
+     * show_type
      */
+    @TableField(value = "show_type")
     private ShowType showType;
     /**
      * content
      */
+    @TableField(value = "content")
     private String content;
-
     /**
-     * alert type
+     * alert_type
      */
+    @TableField(value = "alert_type")
     private AlertType alertType;
-
-
-
     /**
-     * alert status
+     * alert_status
      */
+    @TableField(value = "alert_status")
     private AlertStatus alertStatus;
-
     /**
      * log
      */
+    @TableField(value = "log")
     private String log;
-
     /**
-     * alert group id
+     * alertgroup_id
      */
     @TableField("alertgroup_id")
     private int alertGroupId;
-
-
     /**
      * receivers
      */
+    @TableField("receivers")
     private String receivers;
-
     /**
-     * receivers cc
+     * receivers_cc
      */
+    @TableField("receivers_cc")
     private String receiversCc;
-
     /**
-     * create time
+     * create_time
      */
+    @TableField("create_time")
     private Date createTime;
-
     /**
-     * update time
+     * update_time
      */
+    @TableField("update_time")
     private Date updateTime;
-
-
     @TableField(exist = false)
-    private Map<String,Object> info = new HashMap<>();
-
-    public Map<String, Object> getInfo() {
-        return info;
-    }
-
-    public void setInfo(Map<String, Object> info) {
-        this.info = info;
-    }
+    private Map<String, Object> info = new HashMap<>();
 
     public Alert() {
-    }
-
-    public Alert(int id, String title) {
-        this.id = id;
-        this.title = title;
     }
 
     public int getId() {
@@ -158,7 +136,6 @@ public class Alert {
         this.alertType = alertType;
     }
 
-
     public AlertStatus getAlertStatus() {
         return alertStatus;
     }
@@ -183,10 +160,6 @@ public class Alert {
         this.alertGroupId = alertGroupId;
     }
 
-    public Date getCreateTime() {
-        return createTime;
-    }
-
     public String getReceivers() {
         return receivers;
     }
@@ -203,6 +176,10 @@ public class Alert {
         this.receiversCc = receiversCc;
     }
 
+    public Date getCreateTime() {
+        return createTime;
+    }
+
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
@@ -213,6 +190,14 @@ public class Alert {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Map<String, Object> getInfo() {
+        return info;
+    }
+
+    public void setInfo(Map<String, Object> info) {
+        this.info = info;
     }
 
     @Override
