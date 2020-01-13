@@ -152,12 +152,14 @@
         <m-spark
           v-if="taskType === 'SPARK'"
           @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
           ref="SPARK"
           :backfill-item="backfillItem">
         </m-spark>
         <m-flink
           v-if="taskType === 'FLINK'"
           @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
           ref="FLINK"
           :backfill-item="backfillItem">
         </m-flink>
@@ -510,6 +512,8 @@
           }else{
             this.workerGroupId = o.workerGroupId
           }
+
+        this.params = o.params || {};
 
       }
       this.isContentBox = true
