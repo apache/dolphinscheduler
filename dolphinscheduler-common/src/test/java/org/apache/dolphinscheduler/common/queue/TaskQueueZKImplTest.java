@@ -64,7 +64,16 @@ public class TaskQueueZKImplTest extends BaseTaskQueueTest  {
         allTasks = tasksQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
         assertEquals(allTasks.size(),0);
     }
-
+    @Test
+    public void hasTask(){
+        init();
+        boolean hasTask = tasksQueue.hasTask(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
+        assertTrue(hasTask);
+        //delete all
+        tasksQueue.delete();
+        hasTask = tasksQueue.hasTask(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
+        assertFalse(hasTask);
+    }
     /**
      * test check task exists in the task queue or not
      */

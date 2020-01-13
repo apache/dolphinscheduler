@@ -24,14 +24,14 @@
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="udfFuncList.length">
+      <template v-if="udfFuncList.length || total>0">
         <m-list :udf-func-list="udfFuncList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize" @on-update="_updateList">
         </m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!udfFuncList.length">
+      <template v-if="!udfFuncList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading">
@@ -104,8 +104,6 @@
         })
       },
       _updateList () {
-        this.searchParams.pageNo = 1
-        this.searchParams.searchVal = ''
         this._debounceGET()
       },
       _getList (flag) {

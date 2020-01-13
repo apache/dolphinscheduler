@@ -81,6 +81,7 @@
        */
       _onQuery (o) {
         this.searchParams = _.assign(this.searchParams, o)
+        this.searchParams.processInstanceId = ''
         if (this.searchParams.taskName) {
           this.searchParams.taskName = ''
         }
@@ -134,6 +135,7 @@
     created () {
     },
     mounted () {
+      this.$modal.destroy()
       // Cycle acquisition status
       this.setIntervalP = setInterval(() => {
         this._debounceGET('false')

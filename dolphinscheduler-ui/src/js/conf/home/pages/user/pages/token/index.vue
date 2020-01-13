@@ -24,8 +24,10 @@
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="tokenList.length">
-        <m-list @on-edit="_onEdit"
+      <template v-if="tokenList.length || total>0">
+        <m-list 
+                @on-update="_onUpdate"
+                @on-edit="_onEdit"
                 :token-list="tokenList"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
@@ -35,7 +37,7 @@
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!tokenList.length">
+      <template v-if="!tokenList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading"></m-spin>
@@ -87,6 +89,9 @@
       },
       _onEdit (item) {
         this._create(item)
+      },
+      _onUpdate () {
+        this._debounceGET()
       },
       _create (item) {
         let self = this
