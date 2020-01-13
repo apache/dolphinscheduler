@@ -115,21 +115,19 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
         }
 	}
 
-
 	/**
 	 * create zookeeper path according the zk node type.
 	 * @param zkNodeType zookeeper node type
 	 * @return  register zookeeper path
 	 * @throws Exception
 	 */
-	private String createZNodePath(ZKNodeType zkNodeType) throws Exception {
+	private String createZNodePath(ZKNodeType zkNodeType, String host) throws Exception {
 		// specify the format of stored data in ZK nodes
 		String heartbeatZKInfo = ResInfo.getHeartBeatInfo(new Date());
 		// create temporary sequence nodes for master znode
-		String parentPath = getZNodeParentPath(zkNodeType);
-		String serverPathPrefix = parentPath + "/" + OSUtils.getHost();
-    String registerPath = serverPathPrefix;
-    super.persistEphemeral(registerPath, heartbeatZKInfo);
+		String registerPath= getZNodeParentPath(zkNodeType) + SINGLE_SLASH + host;
+
+    	super.persistEphemeral(registerPath, heartbeatZKInfo);
 		logger.info("register {} node {} success" , zkNodeType.toString(), registerPath);
 		return registerPath;
 	}
@@ -148,7 +146,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 					zkNodeType.toString(), host);
 			return registerPath;
 		}
-		registerPath = createZNodePath(zkNodeType);
+		registerPath = createZNodePath(zkNodeType, host);
 
     // handle dead server
 		handleDeadServer(registerPath, zkNodeType, Constants.DELETE_ZK_OP);
@@ -166,11 +164,8 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 	 * @throws Exception errors
 	 */
 	public void handleDeadServer(String zNode, ZKNodeType zkNodeType, String opType) throws Exception {
-		//ip_sequenceno
 		String host = getHostByEventDataPath(zNode);
-
 		String type = (zkNodeType == ZKNodeType.MASTER) ? MASTER_PREFIX : WORKER_PREFIX;
-
 
 		//check server restart, if restart , dead server path in zk should be delete
 		if(opType.equals(DELETE_ZK_OP)){
@@ -434,7 +429,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		    logger.error("empty path!");
 			return "";
 		}
-		String[] pathArray = path.split(Constants.SINGLE_SLASH);
+		String[] pathArray = path.split(SINGLE_SLASH);
 		if(pathArray.length < 1){
 			logger.error("parse ip error: {}", path);
 			return "";
