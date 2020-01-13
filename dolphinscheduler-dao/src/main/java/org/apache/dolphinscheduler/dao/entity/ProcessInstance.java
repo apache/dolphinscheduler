@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import org.apache.dolphinscheduler.common.enums.*;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * process instance
@@ -625,90 +626,11 @@ public class ProcessInstance {
 
         ProcessInstance that = (ProcessInstance) o;
 
-        if (id != that.id) return false;
-        if (processDefinitionId != that.processDefinitionId) return false;
-        if (runTimes != that.runTimes) return false;
-        if (maxTryTimes != that.maxTryTimes) return false;
-        if (executorId != that.executorId) return false;
-        if (workerGroupId != that.workerGroupId) return false;
-        if (timeout != that.timeout) return false;
-        if (tenantId != that.tenantId) return false;
-        if (state != that.state) return false;
-        if (recovery != that.recovery) return false;
-        if (startTime != null ? !startTime.equals(that.startTime) : that.startTime != null) return false;
-        if (endTime != null ? !endTime.equals(that.endTime) : that.endTime != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (host != null ? !host.equals(that.host) : that.host != null) return false;
-        if (processDefinition != null ? !processDefinition.equals(that.processDefinition) : that.processDefinition != null)
-            return false;
-        if (commandType != that.commandType) return false;
-        if (commandParam != null ? !commandParam.equals(that.commandParam) : that.commandParam != null) return false;
-        if (taskDependType != that.taskDependType) return false;
-        if (failureStrategy != that.failureStrategy) return false;
-        if (warningType != that.warningType) return false;
-        if (warningGroupId != null ? !warningGroupId.equals(that.warningGroupId) : that.warningGroupId != null)
-            return false;
-        if (scheduleTime != null ? !scheduleTime.equals(that.scheduleTime) : that.scheduleTime != null) return false;
-        if (commandStartTime != null ? !commandStartTime.equals(that.commandStartTime) : that.commandStartTime != null)
-            return false;
-        if (globalParams != null ? !globalParams.equals(that.globalParams) : that.globalParams != null) return false;
-        if (processInstanceJson != null ? !processInstanceJson.equals(that.processInstanceJson) : that.processInstanceJson != null)
-            return false;
-        if (tenantCode != null ? !tenantCode.equals(that.tenantCode) : that.tenantCode != null) return false;
-        if (queue != null ? !queue.equals(that.queue) : that.queue != null) return false;
-        if (isSubProcess != that.isSubProcess) return false;
-        if (locations != null ? !locations.equals(that.locations) : that.locations != null) return false;
-        if (connects != null ? !connects.equals(that.connects) : that.connects != null) return false;
-        if (historyCmd != null ? !historyCmd.equals(that.historyCmd) : that.historyCmd != null) return false;
-        if (dependenceScheduleTimes != null ? !dependenceScheduleTimes.equals(that.dependenceScheduleTimes) : that.dependenceScheduleTimes != null)
-            return false;
-        if (duration != null ? !duration.equals(that.duration) : that.duration != null) return false;
-        if (processInstancePriority != that.processInstancePriority) return false;
-        if (workerGroupName != null ? !workerGroupName.equals(that.workerGroupName) : that.workerGroupName != null)
-            return false;
-        if (receivers != null ? !receivers.equals(that.receivers) : that.receivers != null) return false;
-        return receiversCc != null ? receiversCc.equals(that.receiversCc) : that.receiversCc == null;
+        return id == that.id;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + processDefinitionId;
-        result = 31 * result + (state != null ? state.hashCode() : 0);
-        result = 31 * result + (recovery != null ? recovery.hashCode() : 0);
-        result = 31 * result + (startTime != null ? startTime.hashCode() : 0);
-        result = 31 * result + (endTime != null ? endTime.hashCode() : 0);
-        result = 31 * result + runTimes;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (host != null ? host.hashCode() : 0);
-        result = 31 * result + (processDefinition != null ? processDefinition.hashCode() : 0);
-        result = 31 * result + (commandType != null ? commandType.hashCode() : 0);
-        result = 31 * result + (commandParam != null ? commandParam.hashCode() : 0);
-        result = 31 * result + (taskDependType != null ? taskDependType.hashCode() : 0);
-        result = 31 * result + maxTryTimes;
-        result = 31 * result + (failureStrategy != null ? failureStrategy.hashCode() : 0);
-        result = 31 * result + (warningType != null ? warningType.hashCode() : 0);
-        result = 31 * result + (warningGroupId != null ? warningGroupId.hashCode() : 0);
-        result = 31 * result + (scheduleTime != null ? scheduleTime.hashCode() : 0);
-        result = 31 * result + (commandStartTime != null ? commandStartTime.hashCode() : 0);
-        result = 31 * result + (globalParams != null ? globalParams.hashCode() : 0);
-        result = 31 * result + (processInstanceJson != null ? processInstanceJson.hashCode() : 0);
-        result = 31 * result + executorId;
-        result = 31 * result + (tenantCode != null ? tenantCode.hashCode() : 0);
-        result = 31 * result + (queue != null ? queue.hashCode() : 0);
-        result = 31 * result + (isSubProcess != null ? isSubProcess.hashCode() : 0);
-        result = 31 * result + (locations != null ? locations.hashCode() : 0);
-        result = 31 * result + (connects != null ? connects.hashCode() : 0);
-        result = 31 * result + (historyCmd != null ? historyCmd.hashCode() : 0);
-        result = 31 * result + (dependenceScheduleTimes != null ? dependenceScheduleTimes.hashCode() : 0);
-        result = 31 * result + (duration != null ? duration.hashCode() : 0);
-        result = 31 * result + (processInstancePriority != null ? processInstancePriority.hashCode() : 0);
-        result = 31 * result + workerGroupId;
-        result = 31 * result + timeout;
-        result = 31 * result + tenantId;
-        result = 31 * result + (workerGroupName != null ? workerGroupName.hashCode() : 0);
-        result = 31 * result + (receivers != null ? receivers.hashCode() : 0);
-        result = 31 * result + (receiversCc != null ? receiversCc.hashCode() : 0);
-        return result;
+        return Objects.hash(id);
     }
 }

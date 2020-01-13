@@ -25,13 +25,11 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ResourceUtils;
 
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.*;
 import java.util.*;
-
 
 
 /**
@@ -320,12 +318,12 @@ public class MailUtils {
     public static void deleteFile(File file){
         if(file.exists()){
             if(file.delete()){
-                logger.info("delete success:"+file.getAbsolutePath()+file.getName());
+                logger.info("delete success: {}",file.getAbsolutePath() + file.getName());
             }else{
-                logger.info("delete fail"+file.getAbsolutePath()+file.getName());
+                logger.info("delete fail: {}", file.getAbsolutePath() + file.getName());
             }
         }else{
-            logger.info("file not exists:"+file.getAbsolutePath()+file.getName());
+            logger.info("file not exists: {}", file.getAbsolutePath() + file.getName());
         }
     }
 
