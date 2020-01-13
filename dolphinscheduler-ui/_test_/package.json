@@ -19,12 +19,18 @@
       "^@/(.*)$": "<rootDir>/src/$1"
     },
     "transform": {
-      "^.+\\.js$": "<rootDir>/node_modules/babel-jest",
-      ".*\\.(vue)$": "<rootDir>/node_modules/vue-jest"
+      "^.+\\.js$": "<rootDir>/_test_/node_modules/babel-jest",
+      ".*\\.(vue)$": "<rootDir>/_test_/node_modules/vue-jest"
     },
     "snapshotSerializers": [
-      "<rootDir>/node_modules/jest-serializer-vue"
-    ]
+      "<rootDir>/_test_/node_modules/jest-serializer-vue"
+    ],
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.{js,vue}",
+      "!**/node_modules/**"
+    ],
+    "rootDir": "../"
   },
   "devDependencies": {
     "@vue/test-utils": "^1.0.0-beta.30",

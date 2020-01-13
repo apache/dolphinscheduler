@@ -26,7 +26,11 @@
     font-weight: 400;
   }
 }
-
+.ans-radio {
+  .ans-radio-inner {
+    border: 1px solid #B3B3B3;
+  }
+}
 .ans-poptip {
   min-width: 158px;
 }
