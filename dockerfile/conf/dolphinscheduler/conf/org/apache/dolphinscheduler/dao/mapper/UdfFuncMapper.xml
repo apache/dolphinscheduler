@@ -18,6 +18,12 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper">
+    <select id="selectUdfById" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        select *
+        from t_ds_udfs
+        where id = #{id}
+    </select>
+
     <select id="queryUdfByIdStr" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
         select *
         from t_ds_udfs
