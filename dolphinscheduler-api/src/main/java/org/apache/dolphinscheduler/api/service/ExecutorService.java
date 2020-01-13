@@ -501,42 +501,47 @@ public class ExecutorService extends BaseService{
 
         if(commandType == CommandType.COMPLEMENT_DATA){
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
-            if(runMode == RunMode.RUN_MODE_SERIAL){
-                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
-                cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));
-                command.setCommandParam(JSONUtils.toJson(cmdParam));
-                return processDao.createCommand(command);
-            }else if (runMode == RunMode.RUN_MODE_PARALLEL){
-                List<Schedule> schedules = processDao.queryReleaseSchedulerListByProcessDefinitionId(processDefineId);
-                List<Date> listDate = new LinkedList<>();
-                if(!CollectionUtils.isEmpty(schedules)){
-                    for (Schedule item : schedules) {
-                        List<Date> list = ScheduleUtils.getRecentTriggerTime(item.getCrontab(), start, end);
-                        listDate.addAll(list);
+            if(null != start && null != end && end.before(start)){
+                if(runMode == RunMode.RUN_MODE_SERIAL){
+                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
+                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));
+                    command.setCommandParam(JSONUtils.toJson(cmdParam));
+                    return processDao.createCommand(command);
+                }else if (runMode == RunMode.RUN_MODE_PARALLEL){
+                    List<Schedule> schedules = processDao.queryReleaseSchedulerListByProcessDefinitionId(processDefineId);
+                    List<Date> listDate = new LinkedList<>();
+                    if(!CollectionUtils.isEmpty(schedules)){
+                        for (Schedule item : schedules) {
+                            List<Date> list = ScheduleUtils.getRecentTriggerTime(item.getCrontab(), start, end);
+                            listDate.addAll(list);
+                        }
+                    }
+                    if(!CollectionUtils.isEmpty(listDate)){
+                        // loop by schedule date
+                        for (Date date : listDate) {
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(date));
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(date));
+                            command.setCommandParam(JSONUtils.toJson(cmdParam));
+                            processDao.createCommand(command);
+                        }
+                        return listDate.size();
+                    }else{
+                        // loop by day
+                        int runCunt = 0;
+                        while(!start.after(end)) {
+                            runCunt += 1;
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
+                            cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(start));
+                            command.setCommandParam(JSONUtils.toJson(cmdParam));
+                            processDao.createCommand(command);
+                            start = DateUtils.getSomeDay(start, 1);
+                        }
+                        return runCunt;
                     }
                 }
-                if(!CollectionUtils.isEmpty(listDate)){
-                    // loop by schedule date
-                    for (Date date : listDate) {
-                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(date));
-                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(date));
-                        command.setCommandParam(JSONUtils.toJson(cmdParam));
-                        processDao.createCommand(command);
-                    }
-                    return listDate.size();
-                }else{
-                    // loop by day
-                    int runCunt = 0;
-                    while(!start.after(end)) {
-                        runCunt += 1;
-                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
-                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(start));
-                        command.setCommandParam(JSONUtils.toJson(cmdParam));
-                        processDao.createCommand(command);
-                        start = DateUtils.getSomeDay(start, 1);
-                    }
-                    return runCunt;
-                }
+            }else{
+                logger.error("there is not vaild schedule date for the process definition: id:{},date:{}",
+                        processDefineId, schedule);
             }
         }else{
             command.setCommandParam(JSONUtils.toJson(cmdParam));

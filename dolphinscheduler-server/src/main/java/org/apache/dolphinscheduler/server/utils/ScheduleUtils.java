@@ -72,7 +72,7 @@ public class ScheduleUtils {
                 trigger.triggered(null);
             }
         } catch (ParseException e) {
-            logger.error("cron:{} error:{}", e.getMessage());
+            logger.error("cron:{} error:{}", cron, e.getMessage());
         }
         return java.util.Collections.unmodifiableList(list);
     }
