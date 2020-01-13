@@ -347,7 +347,6 @@
             type: this.taskType,
             id: this.id,
             name: this.name,
-            params: this.params,
             description: this.description,
             runFlag: this.runFlag,
             dependence: this.dependence,
