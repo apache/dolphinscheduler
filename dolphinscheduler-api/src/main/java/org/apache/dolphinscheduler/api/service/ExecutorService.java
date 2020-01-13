@@ -506,13 +506,15 @@ public class ExecutorService extends BaseService{
                 return processDao.createCommand(command);
             }else if (runMode == RunMode.RUN_MODE_PARALLEL){
                 int runCunt = 0;
-                while(!start.after(end)){
-                    runCunt += 1;
-                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
-                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(start));
-                    command.setCommandParam(JSONUtils.toJson(cmdParam));
-                    processDao.createCommand(command);
-                    start = DateUtils.getSomeDay(start, 1);
+                if (null != start) {
+                    while(!start.after(end)){
+                        runCunt += 1;
+                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
+                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(start));
+                        command.setCommandParam(JSONUtils.toJson(cmdParam));
+                        processDao.createCommand(command);
+                        start = DateUtils.getSomeDay(start, 1);
+                    }
                 }
                 return runCunt;
             }
