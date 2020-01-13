@@ -24,8 +24,9 @@
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="workerGroupList.length">
-        <m-list @on-edit="_onEdit"
+      <template v-if="workerGroupList.length || total>0">
+        <m-list @on-update="_onUpdate"
+                @on-edit="_onEdit"
                 :worker-group-list="workerGroupList"
                 :page-no="searchParams.pageNo"
                 :page-size="searchParams.pageSize">
@@ -34,7 +35,7 @@
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!workerGroupList.length">
+      <template v-if="!workerGroupList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading"></m-spin>
@@ -84,6 +85,9 @@
       },
       _pageSize (val) {
         this.searchParams.pageSize = val
+      },
+      _onUpdate () {
+        this._debounceGET()
       },
       _onEdit (item) {
         this._create(item)
