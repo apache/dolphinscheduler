@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.server.utils.ScheduleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -505,16 +507,36 @@ public class ExecutorService extends BaseService{
                 command.setCommandParam(JSONUtils.toJson(cmdParam));
                 return processDao.createCommand(command);
             }else if (runMode == RunMode.RUN_MODE_PARALLEL){
-                int runCunt = 0;
-                while(!start.after(end)){
-                    runCunt += 1;
-                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
-                    cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(start));
-                    command.setCommandParam(JSONUtils.toJson(cmdParam));
-                    processDao.createCommand(command);
-                    start = DateUtils.getSomeDay(start, 1);
+                List<Schedule> schedules = processDao.queryReleaseSchedulerListByProcessDefinitionId(processDefineId);
+                List<Date> listDate = new LinkedList<>();
+                if(!CollectionUtils.isEmpty(schedules)){
+                    for (Schedule item : schedules) {
+                        List<Date> list = ScheduleUtils.getRecentTriggerTime(item.getCrontab(), start, end);
+                        listDate.addAll(list);
+                    }
                 }
-                return runCunt;
+                if(!CollectionUtils.isEmpty(listDate)){
+                    // loop by schedule date
+                    for (Date date : listDate) {
+                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(date));
+                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(date));
+                        command.setCommandParam(JSONUtils.toJson(cmdParam));
+                        processDao.createCommand(command);
+                    }
+                    return listDate.size();
+                }else{
+                    // loop by day
+                    int runCunt = 0;
+                    while(!start.after(end)) {
+                        runCunt += 1;
+                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
+                        cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(start));
+                        command.setCommandParam(JSONUtils.toJson(cmdParam));
+                        processDao.createCommand(command);
+                        start = DateUtils.getSomeDay(start, 1);
+                    }
+                    return runCunt;
+                }
             }
         }else{
             command.setCommandParam(JSONUtils.toJson(cmdParam));
