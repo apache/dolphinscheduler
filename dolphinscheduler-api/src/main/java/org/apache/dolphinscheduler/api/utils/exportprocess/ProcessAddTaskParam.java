@@ -19,14 +19,21 @@ package org.apache.dolphinscheduler.api.utils.exportprocess;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * exportProcessAddTaskParam
+ * ProcessAddTaskParam
  */
-public interface exportProcessAddTaskParam {
+public interface ProcessAddTaskParam {
+
+    /**
+     * add export task special param: sql task dependent task
+     * @param taskNode task node json object
+     * @return task node json object
+     */
+    JSONObject addExportSpecialParam(JSONObject taskNode);
 
     /**
      * add task special param: sql task dependent task
      * @param taskNode task node json object
      * @return task node json object
      */
-    JSONObject addSpecialParam(JSONObject taskNode);
+    JSONObject addImportSpecialParam(JSONObject taskNode);
 }
