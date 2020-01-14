@@ -65,7 +65,7 @@ public class AlertSender{
             users = alertDao.listUserByAlertgroupId(alert.getAlertGroupId());
 
             // receiving group list
-            List<String> receviersList = new ArrayList<String>();
+            List<String> receviersList = new ArrayList<>();
             for(User user:users){
                 receviersList.add(user.getEmail());
             }
@@ -77,7 +77,7 @@ public class AlertSender{
             }
 
             // copy list
-            List<String> receviersCcList = new ArrayList<String>();
+            List<String> receviersCcList = new ArrayList<>();
 
 
             // Custom Copier

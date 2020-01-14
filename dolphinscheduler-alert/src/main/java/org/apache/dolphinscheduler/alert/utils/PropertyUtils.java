@@ -205,8 +205,7 @@ public class PropertyUtils {
             return null;
         }
         try {
-            String[] propertyArray = value.split(splitStr);
-            return propertyArray;
+            return value.split(splitStr);
         } catch (PatternSyntaxException e) {
             logger.info(e.getMessage(),e);
         }

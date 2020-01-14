@@ -25,11 +25,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * task node add datasource param strategy
  */
 @Service
-public class DataSourceParam implements exportProcessAddTaskParam, InitializingBean {
+public class DataSourceParam implements ProcessAddTaskParam, InitializingBean {
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
@@ -40,7 +42,7 @@ public class DataSourceParam implements exportProcessAddTaskParam, InitializingB
      * @return task node json object
      */
     @Override
-    public JSONObject addSpecialParam(JSONObject taskNode) {
+    public JSONObject addExportSpecialParam(JSONObject taskNode) {
         // add sqlParameters
         JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
         DataSource dataSource = dataSourceMapper.selectById((Integer) sqlParameters.get("datasource"));
@@ -49,6 +51,23 @@ public class DataSourceParam implements exportProcessAddTaskParam, InitializingB
         }
         taskNode.put("params", sqlParameters);
 
+        return taskNode;
+    }
+
+    /**
+     * import process add datasource params
+     * @param taskNode task node json object
+     * @return task node json object
+     */
+    @Override
+    public JSONObject addImportSpecialParam(JSONObject taskNode) {
+        JSONObject sqlParameters = JSONUtils.parseObject(taskNode.getString("params"));
+        List<DataSource> dataSources = dataSourceMapper.queryDataSourceByName(sqlParameters.getString("datasourceName"));
+        if (!dataSources.isEmpty()) {
+            DataSource dataSource = dataSources.get(0);
+            sqlParameters.put("datasource", dataSource.getId());
+        }
+        taskNode.put("params", sqlParameters);
         return taskNode;
     }
 
