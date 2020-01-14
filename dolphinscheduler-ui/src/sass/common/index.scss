@@ -22,10 +22,13 @@
 @import "table";
 
 .ans-input {
-  &.ans-input--default {
-  }
   textarea,input {
     font-weight: 400;
+  }
+}
+.ans-radio {
+  .ans-radio-inner {
+    border: 1px solid #B3B3B3;
   }
 }
 
@@ -43,6 +46,7 @@ a:focus {
 }
 
 a:hover{
+  color:#0097e0;
   text-decoration: none !important;
 }
 
@@ -60,7 +64,6 @@ a:hover{
 
 body{
   background: #EDEEED;
-  font-family: "PingFangSC-Light,Helvetica Neue,Helvetica,Microsoft Yahei,Arial,Hiragino Sans GB,tahoma,SimSun,sans-serif";
   .home-main {
     min-height: calc(100vh - 100px);
     background: #fff;
@@ -119,6 +122,13 @@ body{
       }
     }
   }
+  font-family:13px/1.5 PingFangSC-Light,Helvetica Neue,Helvetica,Microsoft Yahei,Arial,Hiragino Sans GB,tahoma,SimSun,sans-serif;
+	-webkit-backface-visibility:hidden;
+	-webkit-tap-highlight-color:transparent;
+	-webkit-text-size-adjust:none;
+	-webkit-touch-callout:none;
+	-webkit-font-smoothing:antialiased;
+	-moz-osx-font-smoothing:grayscale
 }
 
 // icon disabled state
@@ -225,15 +235,6 @@ ol,ul {
 img {
 	border:0
 }
-body {
-	font:13px/1.5 PingFangSC-Light,Helvetica Neue,Helvetica,Microsoft Yahei,Arial,Hiragino Sans GB,tahoma,SimSun,sans-serif;
-	-webkit-backface-visibility:hidden;
-	-webkit-tap-highlight-color:transparent;
-	-webkit-text-size-adjust:none;
-	-webkit-touch-callout:none;
-	-webkit-font-smoothing:antialiased;
-	-moz-osx-font-smoothing:grayscale
-}
 input::-ms-clear,input::-ms-reveal {
 	display:none
 }
@@ -246,10 +247,6 @@ a,body {
 *,:after,:before {
 	-webkit-box-sizing:border-box;
 	box-sizing:border-box
-}
-a:hover {
-	color:#0097e0;
-	text-decoration:none
 }
 [hidden],[v-cloak] {
 	display:none

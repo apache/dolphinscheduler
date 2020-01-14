@@ -23,16 +23,19 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.server.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.worker.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -94,11 +97,15 @@ public class TaskScheduleThread implements Runnable {
             // task node
             TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
 
+            // get resource files
+            List<String> resourceFiles = createProjectResFiles(taskNode);
             // copy hdfs/minio file to local
-            copyHdfsToLocal(processDao,
-                    taskInstance.getExecutePath(),
-                    createProjectResFiles(taskNode),
-                    logger);
+            if (checkDownloadPermission(processDao,resourceFiles)) {
+                copyHdfsToLocal(processDao,
+                        taskInstance.getExecutePath(),
+                        resourceFiles,
+                        logger);
+            }
 
             // get process instance according to tak instance
             ProcessInstance processInstance = taskInstance.getProcessInstance();
@@ -204,8 +211,8 @@ public class TaskScheduleThread implements Runnable {
     }
 
     /**
-     *  get task log path
-     * @return
+     * get task log path
+     * @return log path
      */
     private String getTaskLogPath() {
         String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
@@ -320,5 +327,29 @@ public class TaskScheduleThread implements Runnable {
                 logger.info("file : {} exists ", resFile.getName());
             }
         }
+    }
+
+    /**
+     * check download resource permission
+     * @param processDao    process dao
+     * @param projectRes    project resources
+     * @return if has download permission return true else false
+     */
+    private boolean checkDownloadPermission(ProcessDao processDao, List<String> projectRes) {
+        if(CollectionUtils.isNotEmpty(projectRes)){
+            // get user id
+            int userId = taskInstance.getProcessInstance().getExecutorId();
+            // get user type in order to judge whether the user is admin
+            User user = processDao.getUserById(userId);
+            if (user.getUserType() != UserType.ADMIN_USER){
+                List<String> unauthorizedResource = processDao.listUnauthorizedResource(userId, projectRes.toArray(new String[projectRes.size()]));
+                // if exist unauthorized resource
+                if(CollectionUtils.isNotEmpty(unauthorizedResource)){
+                    logger.error("user {} didn't has download permission of resource file: {}", user.getUserName(), unauthorizedResource.toString());
+                    throw new RuntimeException(String.format("user %s didn't has download permission of resource file %s", user.getUserName(), unauthorizedResource.get(0)));
+                }
+            }
+        }
+        return true;
     }
 }

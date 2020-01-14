@@ -19,25 +19,25 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('File Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th width="100">
+          <th scope="col" width="100">
             <span>{{$t('Size')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -166,7 +166,7 @@
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.list.splice(i, 1)
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()

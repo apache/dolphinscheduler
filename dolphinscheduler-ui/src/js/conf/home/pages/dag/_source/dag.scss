@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
- .dag-model {
+.dag-model {
   background: url("../img/dag_bg.png");
   height: calc(100vh - 100px);
   ::selection {
@@ -157,6 +157,9 @@
       background: #F2F3F7;
       position: relative;
       border-radius: 0 3px 0 0;
+      .ans-btn-text {
+        color: #337ab7;
+      }
       .assist-btn {
         position: absolute;
         left: 10px;
@@ -317,6 +320,7 @@ svg path:hover {
 .jtk-demo-canvas {
   position: relative;
   height: 100%;
+  display: flex;
 }
 
 .jtk-bootstrap {
@@ -357,10 +361,6 @@ svg path:hover {
 
 .jtk-demo-main .description li {
   list-style-type: disc !important;
-}
-
-.jtk-demo-canvas {
-  display: flex;
 }
 
 .canvas-wide {
@@ -459,6 +459,12 @@ svg path:hover {
   -webkit-transition: background-color 0.25s ease-in;
   -moz-transition: background-color 0.25s ease-in;
   transition: background-color 0.25s ease-in;
+  background-color: white;
+  opacity: 0.8;
+  padding: 0.3em;
+  border-radius: 0.5em;
+  border: 1px solid #346789;
+  cursor: pointer;
 }
 
 .aLabel.jtk-hover,
@@ -485,14 +491,6 @@ svg path:hover {
   }
 }
 
-.aLabel {
-  background-color: white;
-  opacity: 0.8;
-  padding: 0.3em;
-  border-radius: 0.5em;
-  border: 1px solid #346789;
-  cursor: pointer;
-}
 
 .jtk-ep {
   .ep {
@@ -552,3 +550,5 @@ svg path:hover {
   width: 628px;
   left: auto;
 }
+
+
