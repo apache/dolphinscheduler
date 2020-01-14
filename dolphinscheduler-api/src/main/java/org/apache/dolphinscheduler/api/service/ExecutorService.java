@@ -501,7 +501,7 @@ public class ExecutorService extends BaseService{
 
         if(commandType == CommandType.COMPLEMENT_DATA){
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
-            if(null != start && null != end && end.before(start)){
+            if(null != start && null != end && start.before(end)){
                 if(runMode == RunMode.RUN_MODE_SERIAL){
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));
