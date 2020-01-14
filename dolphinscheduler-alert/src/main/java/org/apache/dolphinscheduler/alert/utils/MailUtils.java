@@ -96,7 +96,7 @@ public class MailUtils {
             return retMap;
         }
 
-        receivers.removeIf((from) -> (StringUtils.isEmpty(from)));
+        receivers.removeIf(StringUtils::isEmpty);
         
         if (showType == ShowType.TABLE || showType == ShowType.TEXT){
             // send email
@@ -185,7 +185,7 @@ public class MailUtils {
 
     /**
      * get MimeMessage
-     * @param receivers
+     * @param receivers receivers
      * @return the MimeMessage
      * @throws MessagingException
      */
@@ -229,8 +229,7 @@ public class MailUtils {
             }
         };
 
-        Session session = Session.getInstance(props, auth);
-        return session;
+        return Session.getInstance(props, auth);
     }
 
     /**
