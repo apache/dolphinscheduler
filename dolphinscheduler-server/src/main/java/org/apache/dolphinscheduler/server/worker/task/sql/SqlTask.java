@@ -468,7 +468,7 @@ public class SqlTask extends AbstractTask {
      * @param udfFunIds    udf functions
      * @return if has download permission return true else false
      */
-    private boolean checkUdfPermission(ProcessDao processDao, Integer[] udfFunIds) {
+    private boolean checkUdfPermission(ProcessDao processDao, Integer[] udfFunIds) throws Exception{
         int userId = getUserId(processDao);
 
         PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF,processDao,udfFunIds,userId,logger);
@@ -481,7 +481,7 @@ public class SqlTask extends AbstractTask {
      * @param dataSourceId    data source id
      * @return if has download permission return true else false
      */
-    private boolean checkDataSourcePermission(ProcessDao processDao, int dataSourceId) {
+    private boolean checkDataSourcePermission(ProcessDao processDao, int dataSourceId) throws Exception{
         int userId = getUserId(processDao);
 
         PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE,processDao,new Integer[]{dataSourceId},userId,logger);

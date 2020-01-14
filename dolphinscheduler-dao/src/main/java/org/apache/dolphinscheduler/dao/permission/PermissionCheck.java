@@ -94,7 +94,7 @@ public class PermissionCheck<T> {
      * whether has permission
      * @return true if has permission
      */
-    public Boolean hasPermission(){
+    public Boolean hasPermission() throws Exception{
         if(this.needChecks.length > 0){
             // get user type in order to judge whether the user is admin
             User user = processDao.getUserById(userId);

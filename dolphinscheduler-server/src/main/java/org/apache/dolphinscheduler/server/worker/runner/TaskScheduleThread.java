@@ -336,8 +336,9 @@ public class TaskScheduleThread implements Runnable {
      * @param processDao    process dao
      * @param projectRes    project resources
      * @return if has download permission return true else false
+     * @throws Exception exception
      */
-    private boolean checkDownloadPermission(ProcessDao processDao, List<String> projectRes) {
+    private boolean checkDownloadPermission(ProcessDao processDao, List<String> projectRes) throws Exception{
         int userId = taskInstance.getProcessInstance().getExecutorId();
         String[] resNames = projectRes.toArray(new String[projectRes.size()]);
         PermissionCheck<String> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE,processDao,resNames,userId,logger);
