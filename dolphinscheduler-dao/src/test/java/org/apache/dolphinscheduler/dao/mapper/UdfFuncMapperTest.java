@@ -55,13 +55,6 @@ public class UdfFuncMapperTest {
     @Autowired
     UDFUserMapper udfUserMapper;
 
-    @Autowired
-    ResourceMapper resourceMapper;
-
-
-    @Autowired
-    DataSourceMapper dataSourceMapper;
-
     /**
      * insert one udf
      * @return UdfFunc
