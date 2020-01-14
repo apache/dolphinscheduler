@@ -500,29 +500,5 @@ public class SqlTask extends AbstractTask {
         return processInstance.getExecutorId();
     }
 
-    /**
-     * check data source permission
-     * @param processDao    process dao
-     * @param dataSourceIds    data source ids
-     * @return if has permission of data sources return true else false
-     */
-    private boolean checkDataSourcePermission(ProcessDao processDao, List<Integer> dataSourceIds) {
-        if(CollectionUtils.isNotEmpty(dataSourceIds)){
-            //  process instance
-            int userId = getUserId(processDao);
-            // get user type in order to judge whether the user is admin
-            User user = processDao.getUserById(userId);
-            if (user.getUserType() != UserType.ADMIN_USER){
-                List<Integer> unauthorizedDataSource = processDao.listUnauthorizedDataSource(userId, dataSourceIds.toArray(new Integer[dataSourceIds.size()]));
-                // if exist unauthorized data source
-                if(CollectionUtils.isNotEmpty(unauthorizedDataSource)){
-                    logger.error("user {} didn't has download permission of data source ids: {}", user.getUserName(), unauthorizedDataSource.toString());
-                    throw new RuntimeException(String.format("user %s didn't has download permission of data source id %s", user.getUserName(), unauthorizedDataSource.get(0)));
-                }
-            }
-        }
-        return true;
-    }
-
 
 }

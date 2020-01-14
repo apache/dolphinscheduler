@@ -41,7 +41,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1773,30 +1772,6 @@ public class ProcessDao {
     }
 
     /**
-     * list unauthorized resource
-     * @param userId    user id
-     * @param resNames  resource name
-     * @return unauthorized resource list
-     */
-    public List<String> listUnauthorizedResource(int userId,String[] resNames){
-        List<String> resultList = new ArrayList<String>();
-
-        if (ArrayUtils.isNotEmpty(resNames)) {
-            Set<String> originResSet = new HashSet<String>(Arrays.asList(resNames));
-            List<Resource> authorizedResourceList = resourceMapper.listAuthorizedResource(userId, resNames);
-
-            Set<String> authorizedResNames = authorizedResourceList.stream().map(t -> t.getAlias()).collect(toSet());
-            originResSet.removeAll(authorizedResNames);
-
-            resultList.addAll(originResSet);
-        }
-
-        return resultList;
-    }
-
-
-
-    /**
      * list unauthorized udf function
      * @param userId    user id
      * @param needChecks  data source id array
@@ -1822,55 +1797,6 @@ public class ProcessDao {
                     originResSet.removeAll(authorizedUdfs);
                     break;
             }
-
-            resultList.addAll(originResSet);
-        }
-
-        return resultList;
-    }
-
-
-    /**
-     * list unauthorized udf function
-     * @param userId    user id
-     * @param udfIds  udf fucntion id array
-     * @return unauthorized udf function list
-     */
-    public List<Integer> listUnauthorizedUdfFunc(int userId,Integer[] udfIds){
-        List<Integer> resultList = new ArrayList<Integer>();
-
-        if (ArrayUtils.isNotEmpty(udfIds)) {
-
-            Set<Integer> originResSet = new HashSet<Integer>(Arrays.asList(udfIds));
-            //List<UdfFunc> listAuthorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(userId, ArrayUtils.toPrimitive(udfIds));
-            List<UdfFunc> listAuthorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(userId, udfIds);
-
-            Set<Integer> authorizedResNames = listAuthorizedUdfFunc.stream().map(t -> t.getId()).collect(toSet());
-            originResSet.removeAll(authorizedResNames);
-
-            resultList.addAll(originResSet);
-        }
-
-        return resultList;
-    }
-
-    /**
-     * list unauthorized udf function
-     * @param userId    user id
-     * @param dataSourceIds  data source id array
-     * @return unauthorized udf function list
-     */
-    public List<Integer> listUnauthorizedDataSource(int userId,Integer[] dataSourceIds){
-        List<Integer> resultList = new ArrayList<Integer>();
-
-        if (ArrayUtils.isNotEmpty(dataSourceIds)) {
-
-            Set<Integer> originResSet = new HashSet<Integer>(Arrays.asList(dataSourceIds));
-            //List<UdfFunc> listAuthorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(userId, ArrayUtils.toPrimitive(dataSourceIds));
-            List<UdfFunc> listAuthorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(userId, dataSourceIds);
-
-            Set<Integer> authorizedResNames = listAuthorizedUdfFunc.stream().map(t -> t.getId()).collect(toSet());
-            originResSet.removeAll(authorizedResNames);
 
             resultList.addAll(originResSet);
         }

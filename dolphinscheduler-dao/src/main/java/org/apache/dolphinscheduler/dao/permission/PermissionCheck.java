@@ -90,6 +90,38 @@ public class PermissionCheck<T> {
         this.logger = logger;
     }
 
+    public AuthorizationType getAuthorizationType() {
+        return authorizationType;
+    }
+
+    public void setAuthorizationType(AuthorizationType authorizationType) {
+        this.authorizationType = authorizationType;
+    }
+
+    public ProcessDao getProcessDao() {
+        return processDao;
+    }
+
+    public void setProcessDao(ProcessDao processDao) {
+        this.processDao = processDao;
+    }
+
+    public T[] getNeedChecks() {
+        return needChecks;
+    }
+
+    public void setNeedChecks(T[] needChecks) {
+        this.needChecks = needChecks;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
     /**
      * whether has permission
      * @return true if has permission
