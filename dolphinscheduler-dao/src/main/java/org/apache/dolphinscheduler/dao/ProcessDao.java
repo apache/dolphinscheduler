@@ -1772,20 +1772,31 @@ public class ProcessDao {
     }
 
     /**
-     * list unauthorized resource
+     * list unauthorized udf function
      * @param userId    user id
-     * @param resNames  resource name
-     * @return unauthorized resource list
+     * @param needChecks  data source id array
+     * @return unauthorized udf function list
      */
-    public List<String> listUnauthorizedResource(int userId,String[] resNames){
-        List<String> resultList = new ArrayList<String>();
+    public <T> List<T> listUnauthorized(int userId,T[] needChecks,AuthorizationType authorizationType){
+        List<T> resultList = new ArrayList<T>();
 
-        if (ArrayUtils.isNotEmpty(resNames)) {
-            Set<String> originResSet = new HashSet<String>(Arrays.asList(resNames));
-            List<Resource> authorizedResourceList = resourceMapper.listAuthorizedResource(userId, resNames);
+        if (ArrayUtils.isNotEmpty(needChecks)) {
+            Set<T> originResSet = new HashSet<T>(Arrays.asList(needChecks));
 
-            Set<String> authorizedResNames = authorizedResourceList.stream().map(t -> t.getAlias()).collect(toSet());
-            originResSet.removeAll(authorizedResNames);
+            switch (authorizationType){
+                case RESOURCE_FILE:
+                    Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(t -> t.getAlias()).collect(toSet());
+                    originResSet.removeAll(authorizedResources);
+                    break;
+                case DATASOURCE:
+                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId,needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedDatasources);
+                    break;
+                case UDF:
+                    Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedUdfs);
+                    break;
+            }
 
             resultList.addAll(originResSet);
         }
