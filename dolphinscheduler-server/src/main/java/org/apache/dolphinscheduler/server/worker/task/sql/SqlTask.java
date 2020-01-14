@@ -24,7 +24,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ShowType;
+import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.job.db.BaseDataSource;
 import org.apache.dolphinscheduler.common.job.db.DataSourceFactory;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -123,10 +126,8 @@ public class SqlTask extends AbstractTask {
             return;
         }
         int dataSourceId = sqlParameters.getDatasource();
-        if (!checkDataSourcePermission(processDao,dataSourceId)) {
-            exitStatusCode = -1;
-            return;
-        }
+        // check data source permission
+        checkDataSourcePermission(dataSourceId);
         dataSource= processDao.findDataSourceById(dataSourceId);
         logger.info("datasource name : {} , type : {} , desc : {}  , user_id : {} , parameter : {}",
                 dataSource.getName(),
@@ -172,10 +173,8 @@ public class SqlTask extends AbstractTask {
                 for(int i=0;i<ids.length;i++){
                     idsArray[i]=Integer.parseInt(ids[i]);
                 }
-                if (!checkUdfPermission(processDao,ArrayUtils.toObject(idsArray))) {
-                    exitStatusCode = -1;
-                    return;
-                }
+                // check udf permission
+                checkUdfPermission(ArrayUtils.toObject(idsArray));
                 List<UdfFunc> udfFuncList = processDao.queryUdfFunListByids(idsArray);
                 createFuncs = UDFUtils.createFuncs(udfFuncList, taskProps.getTenantCode(), logger);
             }
@@ -464,41 +463,30 @@ public class SqlTask extends AbstractTask {
 
     /**
      * check udf function permission
-     * @param processDao    process dao
      * @param udfFunIds    udf functions
      * @return if has download permission return true else false
      */
-    private boolean checkUdfPermission(ProcessDao processDao, Integer[] udfFunIds) throws Exception{
-        int userId = getUserId(processDao);
+    private void checkUdfPermission(Integer[] udfFunIds) throws Exception{
+        //  process instance
+        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        int userId = processInstance.getExecutorId();
 
         PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF,processDao,udfFunIds,userId,logger);
-        return permissionCheckUdf.hasPermission();
+        permissionCheckUdf.checkPermission();
     }
 
     /**
      * check data source permission
-     * @param processDao    process dao
      * @param dataSourceId    data source id
      * @return if has download permission return true else false
      */
-    private boolean checkDataSourcePermission(ProcessDao processDao, int dataSourceId) throws Exception{
-        int userId = getUserId(processDao);
-
-        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE,processDao,new Integer[]{dataSourceId},userId,logger);
-        return permissionCheckDataSource.hasPermission();
-    }
-
-    /**
-     * get user id
-     * @param processDao process dao
-     * @return user id
-     */
-    private int getUserId(ProcessDao processDao) {
+    private void checkDataSourcePermission(int dataSourceId) throws Exception{
         //  process instance
         ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
-        // get user id
-        return processInstance.getExecutorId();
-    }
+        int userId = processInstance.getExecutorId();
 
+        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE,processDao,new Integer[]{dataSourceId},userId,logger);
+        permissionCheckDataSource.checkPermission();
+    }
 
 }

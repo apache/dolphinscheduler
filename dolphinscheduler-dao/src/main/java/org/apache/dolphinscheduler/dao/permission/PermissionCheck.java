@@ -123,10 +123,23 @@ public class PermissionCheck<T> {
     }
 
     /**
-     * whether has permission
+     * has permission
      * @return true if has permission
      */
-    public Boolean hasPermission() throws Exception{
+    public boolean hasPermission(){
+        try {
+            checkPermission();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * check permission
+     * @throws Exception exception
+     */
+    public void checkPermission() throws Exception{
         if(this.needChecks.length > 0){
             // get user type in order to judge whether the user is admin
             User user = processDao.getUserById(userId);
@@ -139,7 +152,6 @@ public class PermissionCheck<T> {
                 }
             }
         }
-        return true;
     }
 
 }
