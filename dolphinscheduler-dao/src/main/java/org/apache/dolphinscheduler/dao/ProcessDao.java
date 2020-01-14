@@ -18,8 +18,7 @@ package org.apache.dolphinscheduler.dao;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.DateInterval;
@@ -31,6 +30,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
@@ -1780,7 +1780,7 @@ public class ProcessDao {
     public <T> List<T> listUnauthorized(int userId,T[] needChecks,AuthorizationType authorizationType){
         List<T> resultList = new ArrayList<T>();
 
-        if (ArrayUtils.isNotEmpty(needChecks)) {
+        if (!ArrayUtils.isEmpty(needChecks)) {
             Set<T> originResSet = new HashSet<T>(Arrays.asList(needChecks));
 
             switch (authorizationType){
