@@ -201,7 +201,7 @@ public class WorkerServer implements IStoppable {
 
         try {
             //execute only once
-            if(Stopper.isStoped()){
+            if(Stopper.isStopped()){
                 return;
             }
 
