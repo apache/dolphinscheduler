@@ -469,7 +469,7 @@
       JSP.removePaste()
       // Backfill data
       let taskList = this.store.state.dag.tasks
-
+      
       //fillback use cacheTasks
       let cacheTasks = this.store.state.dag.cacheTasks
       let o = {}
@@ -511,11 +511,13 @@
             this.workerGroupId = o.workerGroupId
           }
 
+          this.params = o.params || {}
+          this.dependence = o.dependence || {}
       }
       this.isContentBox = true
     },
     mounted () {
-
+      
     },
     updated () {
     },
