@@ -83,27 +83,19 @@ public class SessionService extends BaseService{
    */
   @Transactional(rollbackFor = Exception.class)
   public String createSession(User user, String ip) {
-    Session session = null;
 
-    // logined
-    List<Session> sessionList = sessionMapper.queryByUserId(user.getId());
+    //logined, only one userId and ip
+    Session session = sessionMapper.queryByUserIdAndIp(user.getId(),ip);
 
     Date now = new Date();
+    if (session != null) {
 
-    /**
-     * if you have logged in and are still valid, return directly
-     */
-    if (CollectionUtils.isNotEmpty(sessionList)) {
-      // is session list greater 1 ， delete other ，get one
-      if (sessionList.size() > 1){
-        for (int i=1 ; i < sessionList.size();i++){
-          sessionMapper.deleteById(sessionList.get(i).getId());
-        }
-      }
-      session = sessionList.get(0);
+      /**
+       * if you have logged in and are still valid, return directly
+       */
       if (now.getTime() - session.getLastLoginTime().getTime() <= Constants.SESSION_TIME_OUT * 1000) {
         /**
-         * updateProcessInstance the latest login time
+         * update Session the latest login time
          */
         session.setLastLoginTime(now);
         sessionMapper.updateById(session);

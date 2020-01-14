@@ -80,7 +80,6 @@ public class SessionServiceTest {
         //query
         Session session = sessionService.getSession(mockHttpServletRequest);
         Assert.assertNotNull(session);
-        logger.info("session ip {}",session.getIp());
 
         // get sessionId from cookie
         mockHttpServletRequest = new MockHttpServletRequest();
@@ -90,7 +89,6 @@ public class SessionServiceTest {
         //query
         session = sessionService.getSession(mockHttpServletRequest);
         Assert.assertNotNull(session);
-        logger.info("session ip {}",session.getIp());
         Assert.assertEquals(session.getIp(),"127.0.0.1");
 
 
@@ -106,10 +104,23 @@ public class SessionServiceTest {
         User user = new User();
         user.setUserType(UserType.GENERAL_USER);
         user.setId(1);
-        Mockito.when(sessionMapper.queryByUserId(1)).thenReturn(getSessions());
-        String sessionId = sessionService.createSession(user, ip);
-        logger.info("createSessionId is "+sessionId);
+        Session session = getSession();
+        Mockito.when(sessionMapper.queryByUserIdAndIp(1,ip)).thenReturn(session);
+        //session not exist
+        String sessionId = sessionService.createSession(user, "127.0.0.2");
         Assert.assertTrue(StringUtils.isNotEmpty(sessionId));
+
+        //session update
+        Mockito.when(sessionMapper.queryByUserIdAndIp(1,ip)).thenReturn(session);
+        sessionId = sessionService.createSession(user, ip);
+        Assert.assertTrue(StringUtils.isNotEmpty(sessionId));
+
+        //session expire
+        session.setLastLoginTime(DateUtils.add(new Date(), Calendar.DAY_OF_MONTH, 40));
+        Mockito.when(sessionMapper.queryByUserIdAndIp(1,ip)).thenReturn(session);
+        sessionId = sessionService.createSession(user, ip);
+        Assert.assertTrue(StringUtils.isNotEmpty(sessionId));
+
     }
     /**
      * sign out
@@ -134,7 +145,7 @@ public class SessionServiceTest {
         Session session = new Session();
         session.setId(sessionId);
         session.setIp("127.0.0.1");
-        session.setLastLoginTime(DateUtils.add(new Date(), Calendar.DAY_OF_MONTH, 40));
+        session.setLastLoginTime(new Date());
         session.setUserId(1);
         return session;
     }
