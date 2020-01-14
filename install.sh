@@ -145,10 +145,6 @@ enterpriseWechatAgentId="xxxxxxxxxx"
 # Enterprise WeChat user configuration, multiple users to , split
 enterpriseWechatUsers="xxxxx,xxxxx"
 
-
-# whether to start monitoring self-starting scripts
-monitorServerState="false"
-
 # resource Center upload and select storage method：HDFS,S3,NONE
 resUploadStartupType="NONE"
 
@@ -268,9 +264,6 @@ apiServerPort="12345"
 # api session timeout
 apiServerSessionTimeout="7200"
 
-# api server context path
-apiServerContextPath="/dolphinscheduler/"
-
 # spring max file size
 springMaxFileSize="1024MB"
 
@@ -351,7 +344,6 @@ sed -i ${txt} "s#zookeeper.retry.maxtime.*#zookeeper.retry.maxtime=${zkRetryMaxt
 
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
 sed -i ${txt} "s#server.servlet.session.timeout.*#server.servlet.session.timeout=${apiServerSessionTimeout}#g" conf/application-api.properties
-sed -i ${txt} "s#server.servlet.context-path.*#server.servlet.context-path=${apiServerContextPath}#g" conf/application-api.properties
 sed -i ${txt} "s#spring.servlet.multipart.max-file-size.*#spring.servlet.multipart.max-file-size=${springMaxFileSize}#g" conf/application-api.properties
 sed -i ${txt} "s#spring.servlet.multipart.max-request-size.*#spring.servlet.multipart.max-request-size=${springMaxRequestSize}#g" conf/application-api.properties
 sed -i ${txt} "s#server.jetty.max-http-post-size.*#server.jetty.max-http-post-size=${apiMaxHttpPostSize}#g" conf/application-api.properties

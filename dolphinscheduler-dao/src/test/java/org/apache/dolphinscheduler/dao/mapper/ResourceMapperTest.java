@@ -108,23 +108,6 @@ public class ResourceMapperTest {
     }
 
     /**
-     * create admin user
-     * @return User
-     */
-    private User createAdminUser(){
-        User user = new User();
-        user.setUserName("admin1");
-        user.setUserPassword("1");
-        user.setEmail("xx@123.com");
-        user.setUserType(UserType.ADMIN_USER);
-        user.setCreateTime(new Date());
-        user.setTenantId(1);
-        user.setUpdateTime(new Date());
-        userMapper.insert(user);
-        return user;
-    }
-
-    /**
      * create resource user
      * @return ResourcesUser
      */
@@ -318,30 +301,25 @@ public class ResourceMapperTest {
     @Test
     public void testListAuthorizedResource(){
         // create a general user
-        User generalUser = createGeneralUser("user1");
-        User generalUser1 = createGeneralUser("user2");
-        User adminUser = createAdminUser();
+        User generalUser1 = createGeneralUser("user1");
+        User generalUser2 = createGeneralUser("user2");
         // create one resource
-        Resource resource = createResource(generalUser);
-        Resource unauthorizedResource = createResource(generalUser1);
+        Resource resource = createResource(generalUser2);
+        Resource unauthorizedResource = createResource(generalUser2);
 
         // need download resources
         String[] resNames = new String[]{resource.getAlias(), unauthorizedResource.getAlias()};
 
-        List<Resource> resources = resourceMapper.listAuthorizedResource(generalUser.getId(), resNames);
+        List<Resource> resources = resourceMapper.listAuthorizedResource(generalUser2.getId(), resNames);
 
-        Assert.assertEquals(generalUser.getId(),resource.getUserId());
+        Assert.assertEquals(generalUser2.getId(),resource.getUserId());
         Assert.assertFalse(resources.stream().map(t -> t.getAlias()).collect(toList()).containsAll(Arrays.asList(resNames)));
 
 
 
         // authorize object unauthorizedResource to generalUser
-        createResourcesUser(unauthorizedResource,generalUser);
-        List<Resource> authorizedResources = resourceMapper.listAuthorizedResource(generalUser.getId(), resNames);
-        Assert.assertTrue(authorizedResources.stream().map(t -> t.getAlias()).collect(toList()).containsAll(Arrays.asList(resNames)));
-
-        // admin user
-        List<Resource> adminAuthorizedResources = resourceMapper.listAuthorizedResource(adminUser.getId(), resNames);
+        createResourcesUser(unauthorizedResource,generalUser2);
+        List<Resource> authorizedResources = resourceMapper.listAuthorizedResource(generalUser2.getId(), resNames);
         Assert.assertTrue(authorizedResources.stream().map(t -> t.getAlias()).collect(toList()).containsAll(Arrays.asList(resNames)));
 
     }
