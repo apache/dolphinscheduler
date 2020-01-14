@@ -57,7 +57,7 @@ public class FileUtils {
 
             Files.copy(file.getInputStream(), Paths.get(destFilename));
         } catch (IOException e) {
-            logger.error(String.format("failed to copy file , {} is empty file", file.getOriginalFilename()), e);
+            logger.error("failed to copy file , {} is empty file", file.getOriginalFilename(), e);
         }
     }
 
