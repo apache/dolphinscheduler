@@ -312,7 +312,6 @@ public class UdfFuncMapperTest {
         UdfFunc unauthorizdUdfFunc = insertOne(generalUser2);
 
         //udf function ids
-        //int[] udfFuncIds = new int[]{udfFunc.getId(),unauthorizdUdfFunc.getId()};
         int[] udfFuncIds = new int[]{udfFunc.getId(),unauthorizdUdfFunc.getId()};
 
         List<UdfFunc> authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), ArrayUtils.toObject(udfFuncIds));

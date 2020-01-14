@@ -248,7 +248,7 @@ public class DataSourceMapperTest {
     }
 
     @Test
-    public void listAuthorizedDataSource(){
+    public void testListAuthorizedDataSource(){
         //create general user
         User generalUser1 = createGeneralUser("user1");
         User generalUser2 = createGeneralUser("user2");
