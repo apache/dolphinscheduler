@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
@@ -29,13 +30,20 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class UdfFuncMapperTest {
 
     @Autowired
@@ -131,6 +139,23 @@ public class UdfFuncMapperTest {
         udfUser.setUpdateTime(new Date());
         udfUserMapper.insert(udfUser);
         return udfUser;
+    }
+
+    /**
+     * create general user
+     * @return User
+     */
+    private User createGeneralUser(String userName){
+        User user = new User();
+        user.setUserName(userName);
+        user.setUserPassword("1");
+        user.setEmail("xx@123.com");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setCreateTime(new Date());
+        user.setTenantId(1);
+        user.setUpdateTime(new Date());
+        userMapper.insert(user);
+        return user;
     }
 
     /**
@@ -267,5 +292,31 @@ public class UdfFuncMapperTest {
         udfFuncMapper.deleteById(udfFunc.getId());
         udfUserMapper.deleteById(udfUser.getId());
         Assert.assertNotEquals(udfFuncList.size(), 0);
+    }
+
+    @Test
+    public void testListAuthorizedUdfFunc(){
+        //create general user
+        User generalUser1 = createGeneralUser("user1");
+        User generalUser2 = createGeneralUser("user2");
+
+        //create udf function
+        UdfFunc udfFunc = insertOne(generalUser1);
+        UdfFunc unauthorizdUdfFunc = insertOne(generalUser2);
+
+        //udf function ids
+        int[] udfFuncIds = new int[]{udfFunc.getId(),unauthorizdUdfFunc.getId()};
+
+        List<UdfFunc> authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), ArrayUtils.toObject(udfFuncIds));
+
+        Assert.assertEquals(generalUser1.getId(),udfFunc.getUserId());
+        Assert.assertNotEquals(generalUser1.getId(),unauthorizdUdfFunc.getUserId());
+        Assert.assertFalse(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(ArrayUtils.toObject(udfFuncIds))));
+
+
+        //authorize object unauthorizdUdfFunc to generalUser1
+        insertOneUDFUser(generalUser1,unauthorizdUdfFunc);
+        authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), ArrayUtils.toObject(udfFuncIds));
+        Assert.assertTrue(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(ArrayUtils.toObject(udfFuncIds))));
     }
 }
