@@ -21,6 +21,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.permission.PermissionCheck;
 import org.apache.dolphinscheduler.server.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.worker.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -336,20 +338,9 @@ public class TaskScheduleThread implements Runnable {
      * @return if has download permission return true else false
      */
     private boolean checkDownloadPermission(ProcessDao processDao, List<String> projectRes) {
-        if(CollectionUtils.isNotEmpty(projectRes)){
-            // get user id
-            int userId = taskInstance.getProcessInstance().getExecutorId();
-            // get user type in order to judge whether the user is admin
-            User user = processDao.getUserById(userId);
-            if (user.getUserType() != UserType.ADMIN_USER){
-                List<String> unauthorizedResource = processDao.listUnauthorizedResource(userId, projectRes.toArray(new String[projectRes.size()]));
-                // if exist unauthorized resource
-                if(CollectionUtils.isNotEmpty(unauthorizedResource)){
-                    logger.error("user {} didn't has download permission of resource file: {}", user.getUserName(), unauthorizedResource.toString());
-                    throw new RuntimeException(String.format("user %s didn't has download permission of resource file %s", user.getUserName(), unauthorizedResource.get(0)));
-                }
-            }
-        }
-        return true;
+        int userId = taskInstance.getProcessInstance().getExecutorId();
+        String[] resNames = projectRes.toArray(new String[projectRes.size()]);
+        PermissionCheck<String> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE,processDao,resNames,userId,logger);
+        return permissionCheck.hasPermission();
     }
 }

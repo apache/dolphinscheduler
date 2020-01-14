@@ -471,7 +471,7 @@ public class SqlTask extends AbstractTask {
     private boolean checkUdfPermission(ProcessDao processDao, Integer[] udfFunIds) {
         int userId = getUserId(processDao);
 
-        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF,processDao,udfFunIds,userId);
+        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF,processDao,udfFunIds,userId,logger);
         return permissionCheckUdf.hasPermission();
     }
 
@@ -484,7 +484,7 @@ public class SqlTask extends AbstractTask {
     private boolean checkDataSourcePermission(ProcessDao processDao, int dataSourceId) {
         int userId = getUserId(processDao);
 
-        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE,processDao,new Integer[]{dataSourceId},userId);
+        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE,processDao,new Integer[]{dataSourceId},userId,logger);
         return permissionCheckDataSource.hasPermission();
     }
 

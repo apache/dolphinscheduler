@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class PermissionCheck<T> {
     /**
      * logger
      */
-    private final Logger logger = LoggerFactory.getLogger(PermissionCheck.class);
+    private Logger logger;
     /**
      * Authorization Type
      */
@@ -75,6 +74,21 @@ public class PermissionCheck<T> {
         this.userId = userId;
     }
 
+    /**
+     * permission check
+     * @param authorizationType
+     * @param processDao
+     * @param needChecks
+     * @param userId
+     * @param logger
+     */
+    public PermissionCheck(AuthorizationType authorizationType, ProcessDao processDao, T[] needChecks, int userId,Logger logger) {
+        this.authorizationType = authorizationType;
+        this.processDao = processDao;
+        this.needChecks = needChecks;
+        this.userId = userId;
+        this.logger = logger;
+    }
 
     /**
      * whether has permission
