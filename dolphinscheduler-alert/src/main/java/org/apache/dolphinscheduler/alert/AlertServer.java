@@ -56,7 +56,7 @@ public class AlertServer {
         logger.info("alert server ready start ");
         while (Stopper.isRunning()){
             try {
-                Thread.sleep(Constants.ALERT_SCAN_INTERVEL);
+                Thread.sleep(Constants.ALERT_SCAN_INTERVAL);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(),e);
                 Thread.currentThread().interrupt();
