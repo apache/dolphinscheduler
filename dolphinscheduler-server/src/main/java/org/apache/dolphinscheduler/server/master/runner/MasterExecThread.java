@@ -227,10 +227,9 @@ public class MasterExecThread implements Runnable {
             processDao.updateProcessInstance(processInstance);
         }else{
             scheduleDate = processInstance.getScheduleTime();
-        }
-
-        if(scheduleDate == null){
-            scheduleDate = startDate;
+            if(scheduleDate == null){
+                scheduleDate = startDate;
+            }
         }
 
         while(Stopper.isRunning()){
