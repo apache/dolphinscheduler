@@ -42,6 +42,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 
+/**
+ * test for ExecutorService
+ */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class ExecutorService2Test {
 
@@ -99,6 +102,48 @@ public class ExecutorService2Test {
         Mockito.when(processDefinitionMapper.selectById(processDefinitionId)).thenReturn(processDefinition);
         Mockito.when(processDao.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
         Mockito.when(processDao.createCommand(any(Command.class))).thenReturn(1);
+    }
+
+    /**
+     * not complement
+     * @throws ParseException
+     */
+    @Test
+    public void testNoComplement() throws ParseException {
+        try {
+            Mockito.when(processDao.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
+            Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
+                    processDefinitionId, cronTime, CommandType.START_PROCESS,
+                    null, null,
+                    null, null, 0,
+                    "", "", RunMode.RUN_MODE_SERIAL,
+                    Priority.LOW, 0, 110);
+            Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+            verify(processDao, times(1)).createCommand(any(Command.class));
+        }catch (Exception e){
+            Assert.assertTrue(false);
+        }
+    }
+
+    /**
+     * date error
+     * @throws ParseException
+     */
+    @Test
+    public void testDateError() throws ParseException {
+        try {
+            Mockito.when(processDao.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId)).thenReturn(zeroSchedulerList());
+            Map<String, Object> result = executorService.execProcessInstance(loginUser, projectName,
+                    processDefinitionId, "2020-01-31 23:00:00,2020-01-01 00:00:00", CommandType.COMPLEMENT_DATA,
+                    null, null,
+                    null, null, 0,
+                    "", "", RunMode.RUN_MODE_SERIAL,
+                    Priority.LOW, 0, 110);
+            Assert.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
+            verify(processDao, times(0)).createCommand(any(Command.class));
+        }catch (Exception e){
+            Assert.assertTrue(false);
+        }
     }
 
     /**

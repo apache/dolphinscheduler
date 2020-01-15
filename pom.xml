@@ -703,6 +703,7 @@
 						<include>**/server/utils/FlinkArgsUtilsTest.java</include>
 						<include>**/server/utils/ParamUtilsTest.java</include>
 						<include>**/server/utils/ScheduleUtilsTest.java</include>
+						<include>**/server/master/MasterExecThreadTest.java</include>
 						<include>**/dao/mapper/AccessTokenMapperTest.java</include>
 						<include>**/dao/mapper/AlertGroupMapperTest.java</include>
 						<include>**/dao/mapper/AlertMapperTest.java</include>
