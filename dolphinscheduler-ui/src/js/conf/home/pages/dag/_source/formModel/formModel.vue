@@ -513,7 +513,8 @@
             this.workerGroupId = o.workerGroupId
           }
 
-        this.params = o.params || {};
+        this.params = o.params || {}
+        this.dependence = o.dependence || {}
 
       }
       this.isContentBox = true
