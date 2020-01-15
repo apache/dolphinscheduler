@@ -235,12 +235,6 @@ public class ResourcesService extends BaseService {
             return result;
         }
 
-        // query tenant by user id
-        String tenantCode = getTenantCode(resource.getUserId(),result);
-        if (StringUtils.isEmpty(tenantCode)){
-            return result;
-        }
-
         //get the file suffix
         String originResourceName = resource.getAlias();
         String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
