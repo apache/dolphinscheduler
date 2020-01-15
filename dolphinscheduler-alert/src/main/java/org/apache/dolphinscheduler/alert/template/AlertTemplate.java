@@ -34,6 +34,9 @@ public interface AlertTemplate {
 
     /**
      * default showAll is true
+     * @param content alert message content
+     * @param showType show type
+     * @return a message from a specified alert template
      */
     default String getMessageFromTemplate(String content,ShowType showType){
         return getMessageFromTemplate(content,showType,true);

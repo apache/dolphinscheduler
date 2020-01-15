@@ -431,7 +431,7 @@
         margin-right: 20px;
         cursor: pointer;
         margin-top: 16px;
-        i {
+        em {
           font-size: 18px;
           vertical-align: middle;
           color: #fff;

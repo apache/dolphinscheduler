@@ -22,25 +22,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class MasterConfig {
 
-    @Value("${master.exec.threads:100}")
+    @Value("${master.exec.threads}")
     private int masterExecThreads;
 
-    @Value("${master.exec.task.num:20}")
+    @Value("${master.exec.task.num}")
     private int masterExecTaskNum;
 
-    @Value("${master.heartbeat.interval:10}")
+    @Value("${master.heartbeat.interval}")
     private int masterHeartbeatInterval;
 
-    @Value("${master.task.commit.retryTimes:5}")
+    @Value("${master.task.commit.retryTimes}")
     private int masterTaskCommitRetryTimes;
 
-    @Value("${master.task.commit.interval:100}")
+    @Value("${master.task.commit.interval}")
     private int masterTaskCommitInterval;
 
-    @Value("${master.max.cpuload.avg:100}")
+    @Value("${master.max.cpuload.avg}")
     private double masterMaxCpuloadAvg;
 
-    @Value("${master.reserved.memory:0.1}")
+    @Value("${master.reserved.memory}")
     private double masterReservedMemory;
 
     public int getMasterExecThreads() {

@@ -152,7 +152,7 @@
           projectId: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.list.splice(i, 1)
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()
@@ -165,7 +165,8 @@
        */
       _edit (item) {
         findComponentDownward(this.$root, 'projects-list')._create(item)
-      }
+      },
+
     },
     watch: {
       projectsList (a) {

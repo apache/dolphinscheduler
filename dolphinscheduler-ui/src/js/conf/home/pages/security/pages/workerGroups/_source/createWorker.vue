@@ -28,6 +28,7 @@
             <x-input
                     type="input"
                     v-model="name"
+                    maxlength="60"
                     :placeholder="$t('Please enter group name')">
             </x-input>
           </template>

@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.BeanMap;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -28,6 +27,7 @@ import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -104,7 +104,7 @@ public class ResourcesService extends BaseService {
         String nameSuffix = FileUtils.suffix(name);
 
         // determine file suffix
-        if (!StringUtils.equals(fileSuffix, nameSuffix)) {
+        if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
             /**
              * rename file suffix and original suffix must be consistent
              */
@@ -347,7 +347,7 @@ public class ResourcesService extends BaseService {
         String nameSuffix = FileUtils.suffix(name);
 
         // determine file suffix
-        if (!StringUtils.equals(fileSuffix, nameSuffix)) {
+        if (!(StringUtils.isNotEmpty(fileSuffix) && fileSuffix.equalsIgnoreCase(nameSuffix))) {
             return false;
         }
         // query tenant
@@ -545,7 +545,7 @@ public class ResourcesService extends BaseService {
                 putMsg(result, Status.SUCCESS);
                 Map<String, Object> map = new HashMap<>();
                 map.put(ALIAS, resource.getAlias());
-                map.put(CONTENT, StringUtils.join(content.toArray(), "\n"));
+                map.put(CONTENT, StringUtils.join(content, "\n"));
                 result.setData(map);
             }else{
                 logger.error("read file {} not exist in hdfs", hdfsFileName);
@@ -608,7 +608,7 @@ public class ResourcesService extends BaseService {
 
         putMsg(result, Status.SUCCESS);
         Map<Object, Object> dataMap = new BeanMap(resource);
-        Map<String, Object> resultMap = new HashMap<>(5);
+        Map<String, Object> resultMap = new HashMap<>();
         for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
             if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
                 resultMap.put(entry.getKey().toString(), entry.getValue());

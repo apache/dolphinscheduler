@@ -19,14 +19,12 @@ package org.apache.dolphinscheduler.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
 /**
  * resource user relation
  */
-@Data
 @TableName("t_ds_relation_resources_user")
 public class ResourcesUser {
 

@@ -33,7 +33,7 @@ public class EnvFileTest {
 
     @Test
     public void test() {
-        String path = System.getProperty("user.dir")+"/script/env/.dolphinscheduler_env.sh";
+        String path = System.getProperty("user.dir")+"/script/env/dolphinscheduler_env.sh";
         String pythonHome = getPythonHome(path);
         logger.info(pythonHome);
     }
@@ -65,7 +65,7 @@ public class EnvFileTest {
             }
 
         }catch (IOException e){
-            logger.error("read file failed : " + e.getMessage(),e);
+            logger.error("read file failed",e);
         }finally {
             try {
                 if (br != null){

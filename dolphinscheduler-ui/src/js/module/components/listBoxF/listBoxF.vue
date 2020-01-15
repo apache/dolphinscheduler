@@ -42,7 +42,7 @@
       text-align: right;
       line-height: 32px;
       padding-right: 8px;
-      >b {
+      >strong {
         color: #ff0000;
         padding-right: 4px;
       }

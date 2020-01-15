@@ -47,7 +47,6 @@ else
     exit 1
 fi
 
-source ${workDir}/conf/config/run_config.conf
 source ${workDir}/conf/config/install_config.conf
 
 # for example postgresql or mysql ...
@@ -86,7 +85,6 @@ ips="ark0,ark1,ark2,ark3,ark4"
 # Note: if ssh port is not default, modify here
 sshPort=22
 
-# conf/config/run_config.conf config
 # run master machine
 # Note: list of hosts hostname for deploying master
 masters="ark0,ark1"
@@ -147,9 +145,6 @@ enterpriseWechatAgentId="xxxxxxxxxx"
 # Enterprise WeChat user configuration, multiple users to , split
 enterpriseWechatUsers="xxxxx,xxxxx"
 
-# alert port
-alertPort=7789
-
 
 # whether to start monitoring self-starting scripts
 monitorServerState="false"
@@ -192,7 +187,7 @@ downloadPath="/tmp/dolphinscheduler/download"
 execPath="/tmp/dolphinscheduler/exec"
 
 # SHELL environmental variable path
-shellEnvPath="$installPath/conf/env/.dolphinscheduler_env.sh"
+shellEnvPath="$installPath/conf/env/dolphinscheduler_env.sh"
 
 # suffix of the resource file
 resSuffixs="txt,log,sh,conf,cfg,py,java,sql,hql,xml"
@@ -225,7 +220,7 @@ zkSessionTimeout="300"
 zkConnectionTimeout="300"
 
 # zk retry interval
-zkRetrySleep="100"
+zkRetryMaxSleep="100"
 
 # zk retry maximum number of times
 zkRetryMaxtime="5"
@@ -245,19 +240,15 @@ masterHeartbeatInterval="10"
 masterTaskCommitRetryTimes="5"
 
 # master task submission retry interval
-masterTaskCommitInterval="100"
+masterTaskCommitInterval="1000"
 
 # master maximum cpu average load, used to determine whether the master has execution capability
-masterMaxCpuLoadAvg="10"
+masterMaxCpuLoadAvg="100"
 
 # master reserve memory to determine if the master has execution capability
-masterReservedMemory="1"
+masterReservedMemory="0.1"
 
-# master port
-masterPort=5566
-
-
-# worker config 
+# worker config
 # worker execution thread
 workerExecThreads="100"
 
@@ -268,11 +259,7 @@ workerHeartbeatInterval="10"
 workerFetchTaskNum="3"
 
 # worker reserve memory to determine if the master has execution capability
-workerReservedMemory="1"
-
-# master port
-workerPort=7788
-
+workerReservedMemory="0.1"
 
 # api config
 # api server port
@@ -322,7 +309,17 @@ if [ $dbtype == "postgresql" ];then
     sed -i ${txt} "s#org.quartz.jobStore.driverDelegateClass.*#org.quartz.jobStore.driverDelegateClass=org.quartz.impl.jdbcjobstore.PostgreSQLDelegate#g" conf/quartz.properties
 fi
 
+sed -i ${txt} "s#master.exec.threads.*#master.exec.threads=${masterExecThreads}#g" conf/application.properties
+sed -i ${txt} "s#master.exec.task.num.*#master.exec.task.num=${masterExecTaskNum}#g" conf/application.properties
+sed -i ${txt} "s#master.heartbeat.interval.*#master.heartbeat.interval=${masterHeartbeatInterval}#g" conf/application.properties
+sed -i ${txt} "s#master.task.commit.retryTimes.*#master.task.commit.retryTimes=${masterTaskCommitRetryTimes}#g" conf/application.properties
+sed -i ${txt} "s#master.task.commit.interval.*#master.task.commit.interval=${masterTaskCommitInterval}#g" conf/application.properties
+sed -i ${txt} "s#master.reserved.memory.*#master.reserved.memory=${masterReservedMemory}#g" conf/application.properties
 
+sed -i ${txt} "s#worker.exec.threads.*#worker.exec.threads=${workerExecThreads}#g" conf/application.properties
+sed -i ${txt} "s#worker.heartbeat.interval.*#worker.heartbeat.interval=${workerHeartbeatInterval}#g" conf/application.properties
+sed -i ${txt} "s#worker.fetch.task.num.*#worker.fetch.task.num=${workerFetchTaskNum}#g" conf/application.properties
+sed -i ${txt} "s#worker.reserved.memory.*#worker.reserved.memory=${workerReservedMemory}#g" conf/application.properties
 
 sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common.properties
 sed -i ${txt} "s#fs.s3a.endpoint.*#fs.s3a.endpoint=${s3Endpoint}#g" conf/common.properties
@@ -330,7 +327,6 @@ sed -i ${txt} "s#fs.s3a.access.key.*#fs.s3a.access.key=${s3AccessKey}#g" conf/co
 sed -i ${txt} "s#fs.s3a.secret.key.*#fs.s3a.secret.key=${s3SecretKey}#g" conf/common.properties
 sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common.properties
 sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common.properties
-
 
 sed -i ${txt} "s#data.basedir.path.*#data.basedir.path=${programPath}#g" conf/common.properties
 sed -i ${txt} "s#data.download.basedir.path.*#data.download.basedir.path=${downloadPath}#g" conf/common.properties
@@ -350,7 +346,7 @@ sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/common.
 sed -i ${txt} "s#zookeeper.dolphinscheduler.root.*#zookeeper.dolphinscheduler.root=${zkRoot}#g" conf/common.properties
 sed -i ${txt} "s#zookeeper.session.timeout.*#zookeeper.session.timeout=${zkSessionTimeout}#g" conf/common.properties
 sed -i ${txt} "s#zookeeper.connection.timeout.*#zookeeper.connection.timeout=${zkConnectionTimeout}#g" conf/common.properties
-sed -i ${txt} "s#zookeeper.retry.sleep.*#zookeeper.retry.sleep=${zkRetrySleep}#g" conf/common.properties
+sed -i ${txt} "s#zookeeper.retry.max.sleep.*#zookeeper.retry.max.sleep=${zkRetryMaxSleep}#g" conf/common.properties
 sed -i ${txt} "s#zookeeper.retry.maxtime.*#zookeeper.retry.maxtime=${zkRetryMaxtime}#g" conf/common.properties
 
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
@@ -384,11 +380,11 @@ sed -i ${txt} "s#ips.*#ips=${ips}#g" conf/config/install_config.conf
 sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/install_config.conf
 
 
-sed -i ${txt} "s#masters.*#masters=${masters}#g" conf/config/run_config.conf
-sed -i ${txt} "s#workers.*#workers=${workers}#g" conf/config/run_config.conf
-sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/run_config.conf
-sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/run_config.conf
-sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/run_config.conf
+sed -i ${txt} "s#masters.*#masters=${masters}#g" conf/config/install_config.conf
+sed -i ${txt} "s#workers.*#workers=${workers}#g" conf/config/install_config.conf
+sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/install_config.conf
+sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/install_config.conf
+sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/install_config.conf
 
 
 # 2,create directory

@@ -201,22 +201,22 @@ public class EnterpriseWeChatUtils {
     public static String markdownTable(String title,String content){
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
         StringBuilder contents = new StringBuilder(200);
-        for (LinkedHashMap mapItems : mapItemsList){
 
-            Set<Map.Entry<String, String>> entries = mapItems.entrySet();
+        if (null != mapItemsList) {
+            for (LinkedHashMap mapItems : mapItemsList){
+                Set<Map.Entry<String, String>> entries = mapItems.entrySet();
+                Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+                StringBuilder t = new StringBuilder(String.format("`%s`%s",title,Constants.MARKDOWN_ENTER));
 
-            Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+                while (iterator.hasNext()){
 
-            StringBuilder t = new StringBuilder(String.format("`%s`%s",title,Constants.MARKDOWN_ENTER));
-            while (iterator.hasNext()){
-
-                Map.Entry<String, String> entry = iterator.next();
-                t.append(Constants.MARKDOWN_QUOTE);
-                t.append(entry.getKey()).append(":").append(entry.getValue());
-                t.append(Constants.MARKDOWN_ENTER);
+                    Map.Entry<String, String> entry = iterator.next();
+                    t.append(Constants.MARKDOWN_QUOTE);
+                    t.append(entry.getKey()).append(":").append(entry.getValue());
+                    t.append(Constants.MARKDOWN_ENTER);
+                }
+                contents.append(t);
             }
-
-            contents.append(t);
         }
         return contents.toString();
     }
