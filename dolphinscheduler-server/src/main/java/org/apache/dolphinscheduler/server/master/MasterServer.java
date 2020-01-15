@@ -97,7 +97,9 @@ public class MasterServer implements IStoppable {
      * @param args arguments
      */
     public static void main(String[] args) {
+        Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
         new SpringApplicationBuilder(MasterServer.class).web(WebApplicationType.NONE).run(args);
+
     }
 
     /**
@@ -133,6 +135,7 @@ public class MasterServer implements IStoppable {
         // start QuartzExecutors
         // what system should do if exception
         try {
+            logger.info("start Quartz server...");
             ProcessScheduleJob.init(processDao);
             QuartzExecutors.getInstance().start();
         } catch (Exception e) {
@@ -170,7 +173,7 @@ public class MasterServer implements IStoppable {
 
         try {
             //execute only once
-            if(Stopper.isStoped()){
+            if(Stopper.isStopped()){
                 return;
             }
 
@@ -239,6 +242,7 @@ public class MasterServer implements IStoppable {
      * @return
      */
     private Runnable heartBeatThread(){
+        logger.info("start master heart beat thread...");
         Runnable heartBeatThread  = new Runnable() {
             @Override
             public void run() {
