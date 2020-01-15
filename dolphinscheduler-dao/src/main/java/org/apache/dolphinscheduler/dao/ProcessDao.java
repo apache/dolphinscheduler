@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.dao;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.DateInterval;
@@ -25,7 +26,6 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.queue.ITaskQueue;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
-import org.apache.dolphinscheduler.common.utils.ArrayUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -44,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.common.Constants.*;
 
 /**
@@ -462,12 +463,9 @@ public class ProcessDao {
             return null;
         }
 
-        if(null == tenant){
+        if(tenant == null){
             User user = userMapper.selectById(userId);
-
-            if (null != user) {
-                tenant = tenantMapper.queryById(user.getTenantId());
-            }
+            tenant = tenantMapper.queryById(user.getTenantId());
         }
         return tenant;
     }
@@ -974,6 +972,9 @@ public class ProcessDao {
     public Boolean submitTaskToQueue(TaskInstance taskInstance) {
 
         try{
+            if(taskInstance.isSubProcess()){
+                return true;
+            }
             if(taskInstance.getState().typeIsFinished()){
                 logger.info(String.format("submit to task queue, but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
                 return true;
@@ -1768,6 +1769,48 @@ public class ProcessDao {
             projectIdList.add(project.getId());
         }
         return projectIdList;
+    }
+
+    /**
+     * list unauthorized udf function
+     * @param userId    user id
+     * @param needChecks  data source id array
+     * @return unauthorized udf function list
+     */
+    public <T> List<T> listUnauthorized(int userId,T[] needChecks,AuthorizationType authorizationType){
+        List<T> resultList = new ArrayList<T>();
+
+        if (!ArrayUtils.isEmpty(needChecks)) {
+            Set<T> originResSet = new HashSet<T>(Arrays.asList(needChecks));
+
+            switch (authorizationType){
+                case RESOURCE_FILE:
+                    Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(t -> t.getAlias()).collect(toSet());
+                    originResSet.removeAll(authorizedResources);
+                    break;
+                case DATASOURCE:
+                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId,needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedDatasources);
+                    break;
+                case UDF:
+                    Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedUdfs);
+                    break;
+            }
+
+            resultList.addAll(originResSet);
+        }
+
+        return resultList;
+    }
+
+    /**
+     * get user by user id
+     * @param userId user id
+     * @return User
+     */
+    public User getUserById(int userId){
+        return userMapper.queryDetailsById(userId);
     }
 
 
