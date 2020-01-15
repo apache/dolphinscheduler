@@ -122,10 +122,14 @@
       _getList (flag) {
         this.isLoading = !flag
         this.getTenantListP(this.searchParams).then(res => {
-          this.tenementList = []
-          this.tenementList = res.totalList
-          this.total = res.total
-          this.isLoading = false
+          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo -1
+          } else {
+            this.tenementList = []
+            this.tenementList = res.totalList
+            this.total = res.total
+            this.isLoading = false
+          }
         }).catch(e => {
           this.isLoading = false
         })
