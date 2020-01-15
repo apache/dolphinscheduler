@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
@@ -305,18 +304,18 @@ public class UdfFuncMapperTest {
         UdfFunc unauthorizdUdfFunc = insertOne(generalUser2);
 
         //udf function ids
-        int[] udfFuncIds = new int[]{udfFunc.getId(),unauthorizdUdfFunc.getId()};
+        Integer[] udfFuncIds = new Integer[]{udfFunc.getId(),unauthorizdUdfFunc.getId()};
 
-        List<UdfFunc> authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), ArrayUtils.toObject(udfFuncIds));
+        List<UdfFunc> authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), udfFuncIds);
 
         Assert.assertEquals(generalUser1.getId(),udfFunc.getUserId());
         Assert.assertNotEquals(generalUser1.getId(),unauthorizdUdfFunc.getUserId());
-        Assert.assertFalse(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(ArrayUtils.toObject(udfFuncIds))));
+        Assert.assertFalse(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(udfFuncIds)));
 
 
         //authorize object unauthorizdUdfFunc to generalUser1
         insertOneUDFUser(generalUser1,unauthorizdUdfFunc);
-        authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), ArrayUtils.toObject(udfFuncIds));
-        Assert.assertTrue(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(ArrayUtils.toObject(udfFuncIds))));
+        authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), udfFuncIds);
+        Assert.assertTrue(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(udfFuncIds)));
     }
 }
