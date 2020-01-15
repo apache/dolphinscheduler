@@ -83,4 +83,12 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return tenant code
      */
     String queryTenantCodeByResourceName(@Param("resName") String resName);
+
+    /**
+     * list authorized resource
+     * @param userId userId
+     * @param resNames resource names
+     * @return resource list
+     */
+    <T> List<Resource> listAuthorizedResource(@Param("userId") int userId,@Param("resNames")T[] resNames);
 }
