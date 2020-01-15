@@ -22,7 +22,7 @@
         </x-option>
       </x-select>
       <x-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.definitionId" @on-change="_onChangeDefinitionId">
-        <x-option v-for="item in definitionList" :key="item.value" :value="item.value" :label="item.label">
+        <x-option v-for="item in el.definitionList" :key="item.value" :value="item.value" :label="item.label">
         </x-option>
       </x-select>
       <x-select filterable :style="{width:isInstance ? '450px' : '450px'}" :disabled="isDetails" v-model="el.depTasks">
@@ -64,7 +64,6 @@
     data () {
       return {
         list: [],
-        definitionList: [],
         projectList: [],
         cycleList: cycleList,
         isInstance: false,
@@ -88,16 +87,19 @@
       _add () {
         // btn loading
         this.isLoading = true
-        // dependItemList index
-        let is = (value) => _.some(this.dependItemList, { definitionId: value })
-        let noArr = _.filter(this.definitionList, v => !is(v.value))
-        let value = noArr[0] && noArr[0].value || null
-        let val = value || this.definitionList[0].value
+        // // dependItemList index
+        // let is = (value) => _.some(this.dependItemList, { definitionId: value })
+        // let noArr = _.filter(this.definitionList, v => !is(v.value))
+        // let value = noArr[0] && noArr[0].value || null
+        // let val = value || this.definitionList[0].value
         // add task list
         let projectId = this.projectList[0].value
-        this._getDependItemList(val).then(depTasksList => {
-          this.$nextTick(() => {
-            this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(val, depTasksList,projectId)))
+        this._getProcessByProjectId(projectId).then(definitionList => {
+          let val = definitionList[0].value
+          this._getDependItemList(val).then(depTasksList => {
+            this.$nextTick(() => {
+              this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(val, definitionList, depTasksList, projectId)))
+            })
           })
         })
         // remove tooltip
@@ -143,13 +145,13 @@
       _getProcessByProjectId (id) {
         return new Promise((resolve, reject) => {
           this.store.dispatch('dag/getProcessByProjectId', { projectId: id }).then(res => {
-            this.definitionList = _.map(_.cloneDeep(res), v => {
+            let definitionList = _.map(_.cloneDeep(res), v => {
               return {
                 value: v.id,
                 label: v.name
               }
             })
-            resolve(res)
+            resolve(definitionList)
           })
         })
       },
@@ -175,7 +177,7 @@
       _onChangeProjectId ({ value }) {
         this._getProcessByProjectId(value).then(definitionList => {
           /*this.$set(this.dependItemList, this.itemIndex, this._dlOldParams(value, definitionList, item))*/
-          let definitionId = definitionList[0].id
+          let definitionId = definitionList[0].value
           this._getDependItemList(definitionId).then(depTasksList => {
             let item = this.dependItemList[this.itemIndex]
             // init set depTasks All
@@ -191,8 +193,6 @@
           let item = this.dependItemList[this.itemIndex]
           // init set depTasks All
           item.depTasks = 'ALL'
-          // set dependItemList item data
-          this.$set(this.dependItemList, this.itemIndex, this._rtOldParams(value, depTasksList, item))
         })
       },
       _onChangeCycle ({ value }) {
@@ -200,10 +200,11 @@
         this.$set(this.dependItemList[this.itemIndex], 'dateValue', list[0].value)
         this.$set(this.dependItemList[this.itemIndex], 'dateValueList', list)
       },
-      _rtNewParams (value, depTasksList,projectId) {
+      _rtNewParams (value, definitionList, depTasksList, projectId) {
         return {
           projectId: projectId,
           definitionId: value,
+          definitionList: definitionList,
           depTasks: 'ALL',
           depTasksList: depTasksList,
           cycle: 'day',
@@ -212,10 +213,11 @@
           state: ''
         }
       },
-      _rtOldParams (value,depTasksList, item) {
+      _rtOldParams (value, definitionList, depTasksList, item) {
         return {
           projectId: item.projectId,
           definitionId: value,
+          definitionList: definitionList,
           depTasks: item.depTasks || 'ALL',
           depTasksList: depTasksList,
           cycle: item.cycle,
@@ -257,9 +259,9 @@
         let projectId = this.projectList[0].value
         if (!this.dependItemList.length) {
           this._getProcessByProjectId(projectId).then(definitionList => {
-            let value = this.definitionList[0].value
+            let value = definitionList[0].value
             this._getDependItemList(value).then(depTasksList => {
-              this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(value, depTasksList,projectId)))
+              this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams(value, definitionList, depTasksList, projectId)))
             })
           })
         } else {
@@ -269,7 +271,7 @@
           this._getDependItemList(ids, false).then(res => {
             _.map(this.dependItemList, (v, i) => {
               this._getProcessByProjectId(v.projectId).then(definitionList => {
-                this.$set(this.dependItemList, i, this._rtOldParams(v.definitionId, ['ALL'].concat(_.map(res[v.definitionId] || [], v => v.name)), v))
+                this.$set(this.dependItemList, i, this._rtOldParams(v.definitionId, definitionList, ['ALL'].concat(_.map(res[v.definitionId] || [], v => v.name)), v))
               })
             })
           })
