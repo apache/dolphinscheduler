@@ -98,7 +98,7 @@ public class ThreadUtilsTest {
     public void testStopper() {
         assertTrue(Stopper.isRunning());
         Stopper.stop();
-        assertTrue(Stopper.isStoped());
+        assertTrue(Stopper.isStopped());
     }
 
     /**
