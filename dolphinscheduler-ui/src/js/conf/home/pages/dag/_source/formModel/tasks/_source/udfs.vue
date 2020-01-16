@@ -24,7 +24,7 @@
               v-for="city in udfsList"
               :key="city.id"
               :value="city.id"
-              :label="city.code">
+              :label="city.code"> 
       </x-option>
     </x-select>
   </div>
@@ -74,11 +74,12 @@
             _.map(udfs, v => {
               _.map(this.udfsList, v1 => {
                 if (parseInt(v) === v1.id) {
-                  arr.push(v1)
+                  arr.push(parseInt(v))
                 }
               })
             })
             this.$nextTick(() => {
+              _.map(_.cloneDeep(this.udfsList), v => v.res)
               this.udfsStr = arr
             })
           }

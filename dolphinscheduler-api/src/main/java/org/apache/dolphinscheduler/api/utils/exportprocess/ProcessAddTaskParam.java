@@ -14,31 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.alert.template;
+package org.apache.dolphinscheduler.api.utils.exportprocess;
 
-import org.apache.dolphinscheduler.common.enums.ShowType;
+import com.alibaba.fastjson.JSONObject;
 
 /**
- * alert message template
+ * ProcessAddTaskParam
  */
-public interface AlertTemplate {
+public interface ProcessAddTaskParam {
 
     /**
-     * get a message from a specified alert template
-     * @param content     alert message content
-     * @param showType    show type
-     * @param showAll    whether to show all
-     * @return a message from a specified alert template
+     * add export task special param: sql task dependent task
+     * @param taskNode task node json object
+     * @return task node json object
      */
-    String getMessageFromTemplate(String content, ShowType showType,boolean showAll);
+    JSONObject addExportSpecialParam(JSONObject taskNode);
 
     /**
-     * default showAll is true
-     * @param content alert message content
-     * @param showType show type
-     * @return a message from a specified alert template
+     * add task special param: sql task dependent task
+     * @param taskNode task node json object
+     * @return task node json object
      */
-    default String getMessageFromTemplate(String content,ShowType showType){
-        return getMessageFromTemplate(content,showType,true);
-    }
+    JSONObject addImportSpecialParam(JSONObject taskNode);
 }

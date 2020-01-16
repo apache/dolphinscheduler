@@ -77,6 +77,7 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
         return treeCache;
     }
 
+    @Override
     public void close() {
         treeCache.close();
         try {

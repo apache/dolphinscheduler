@@ -34,29 +34,78 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = ApiApplicationServer.class)
 public class DependentParamTest {
 
+
     @Test
-    public void testAddDependentSpecialParam() throws JSONException {
+    public void testAddExportDependentSpecialParam() throws JSONException {
+        String dependentJson = "{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
+                "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"," +
+                "\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\"," +
+                "\"dependItemList\":[{\"projectId\":2,\"definitionId\":46,\"depTasks\":\"ALL\"," +
+                "\"cycle\":\"day\",\"dateValue\":\"today\"}]}]}}";
 
-        String sqlJson = "{\"type\":\"SQL\",\"id\":\"tasks-27297\",\"name\":\"sql\"," +
-                "\"params\":{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select * from test\"," +
-                "\"udfs\":\"\",\"sqlType\":\"1\",\"title\":\"\",\"receivers\":\"\",\"receiversCc\":\"\",\"showType\":\"TABLE\"" +
-                ",\"localParams\":[],\"connParams\":\"\"," +
-                "\"preStatements\":[],\"postStatements\":[]}," +
-                "\"description\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\"," +
-                "\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\"," +
-                "\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1," +
-                "\"preTasks\":[\"dependent\"]}";
-
-
-        JSONObject taskNode = JSONUtils.parseObject(sqlJson);
+        JSONObject taskNode = JSONUtils.parseObject(dependentJson);
         if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
             String taskType = taskNode.getString("type");
 
-            exportProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
 
-            JSONObject sql = addTaskParam.addSpecialParam(taskNode);
+            JSONObject dependent = addTaskParam.addExportSpecialParam(taskNode);
 
-            JSONAssert.assertEquals(taskNode.toString(),sql.toString(),false);
+            JSONAssert.assertEquals(taskNode.toString(), dependent.toString(), false);
+        }
+
+        String dependentEmpty = "{\"type\":\"DEPENDENT\",\"id\":\"tasks-33787\"," +
+                "\"name\":\"dependent\",\"params\":{},\"description\":\"\",\"runFlag\":\"NORMAL\"}";
+
+        JSONObject taskEmpty = JSONUtils.parseObject(dependentEmpty);
+        if (StringUtils.isNotEmpty(taskEmpty.getString("type"))) {
+            String taskType = taskEmpty.getString("type");
+
+            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+
+            JSONObject dependent = addTaskParam.addImportSpecialParam(taskEmpty);
+
+            JSONAssert.assertEquals(taskEmpty.toString(), dependent.toString(), false);
+        }
+
+    }
+
+    @Test
+    public void testAddImportDependentSpecialParam() throws JSONException {
+        String dependentJson = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\"" +
+                ",\"type\":\"DEPENDENT\",\"params\":{},\"timeout\":{\"enable\":false," +
+                "\"strategy\":\"\"},\"maxRetryTimes\":\"0\",\"taskInstancePriority\":\"MEDIUM\"" +
+                ",\"name\":\"dependent\"," +
+                "\"dependence\":{\"dependTaskList\":[{\"dependItemList\":[{\"dateValue\":\"today\"," +
+                "\"definitionName\":\"shell-1\",\"depTasks\":\"shell-1\",\"projectName\":\"test\"," +
+                "\"projectId\":1,\"cycle\":\"day\",\"definitionId\":7}],\"relation\":\"AND\"}]," +
+                "\"relation\":\"AND\"},\"retryInterval\":\"1\",\"preTasks\":[],\"id\":\"tasks-55485\"}";
+
+        JSONObject taskNode = JSONUtils.parseObject(dependentJson);
+        if (StringUtils.isNotEmpty(taskNode.getString("type"))) {
+            String taskType = taskNode.getString("type");
+
+            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+
+            JSONObject dependent = addTaskParam.addImportSpecialParam(taskNode);
+
+            JSONAssert.assertEquals(taskNode.toString(), dependent.toString(), false);
+        }
+
+        String dependentEmpty = "{\"workerGroupId\":-1,\"description\":\"\",\"runFlag\":\"NORMAL\"" +
+                ",\"type\":\"DEPENDENT\",\"params\":{},\"timeout\":{\"enable\":false," +
+                "\"strategy\":\"\"},\"maxRetryTimes\":\"0\",\"taskInstancePriority\":\"MEDIUM\"" +
+                ",\"name\":\"dependent\",\"retryInterval\":\"1\",\"preTasks\":[],\"id\":\"tasks-55485\"}";
+
+        JSONObject taskNodeEmpty = JSONUtils.parseObject(dependentEmpty);
+        if (StringUtils.isNotEmpty(taskNodeEmpty.getString("type"))) {
+            String taskType = taskNodeEmpty.getString("type");
+
+            ProcessAddTaskParam addTaskParam = TaskNodeParamFactory.getByTaskType(taskType);
+
+            JSONObject dependent = addTaskParam.addImportSpecialParam(taskNode);
+
+            JSONAssert.assertEquals(taskNodeEmpty.toString(), dependent.toString(), false);
         }
 
     }
