@@ -224,14 +224,14 @@ public class MasterExecThread implements Runnable {
             // execute process ,waiting for end
             runProcess();
 
-            // process instace failure ,no more complements
+            // process instace failure ，no more complements
             if(!processInstance.getState().typeIsSuccess()){
                 logger.info("process {} state {}, complement not completely!",
                         processInstance.getId(), processInstance.getState());
                 break;
             }
 
-            //  current process instance success ,next execute
+            //  current process instance sucess ，next execute
             scheduleDate = DateUtils.getSomeDay(scheduleDate, 1);
             if(scheduleDate.after(endDate)){
                 // all success
@@ -541,7 +541,7 @@ public class MasterExecThread implements Runnable {
     private DependResult isTaskDepsComplete(String taskName) {
 
         Collection<String> startNodes = dag.getBeginNode();
-        // if the vertex returns true directly
+        // ff the vertex returns true directly
         if(startNodes.contains(taskName)){
             return DependResult.SUCCESS;
         }
