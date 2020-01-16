@@ -139,6 +139,7 @@ public class SessionService extends BaseService{
    * @param loginUser login user
    */
   public void signOut(String ip, User loginUser) {
+    try {
       /**
        * query session by user id and ip
        */
@@ -146,5 +147,8 @@ public class SessionService extends BaseService{
 
       //delete session
       sessionMapper.deleteById(session.getId());
+    }catch (Exception e){
+
+    }
   }
 }
