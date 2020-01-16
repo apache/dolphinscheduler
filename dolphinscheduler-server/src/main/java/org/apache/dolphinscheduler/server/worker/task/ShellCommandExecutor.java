@@ -74,7 +74,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
      * @return command type
      */
     @Override
-    protected String commandType() {
+    protected String commandInterpreter() {
         return SH;
     }
 
