@@ -375,6 +375,7 @@ export default {
   'All_1': 'All',
   'Toolbar': 'Toolbar',
   'View variables': 'View variables',
+  'Format DAG': 'Format DAG',
   'Refresh DAG status': 'Refresh DAG status',
   'Return_1': 'Return',
   'Please enter format': 'Please enter format',

@@ -66,7 +66,7 @@
             <span>{{item.instRunningCount}}</span>
           </td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
             <span v-else>-</span>
           </td>
           <td>

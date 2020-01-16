@@ -370,6 +370,7 @@ export default {
   'All_1': '成功或失败都发',
   'Toolbar': '工具栏',
   'View variables': '查看变量',
+  'Format DAG': '格式化DAG',
   'Refresh DAG status': '刷新DAG状态',
   'Return_1': '返回上一节点',
   'Please enter format': '请输入格式为',
