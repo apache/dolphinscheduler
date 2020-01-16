@@ -17,12 +17,14 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
-import static org.hamcrest.Matchers.*;
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.*;
 
 /**
@@ -57,6 +61,9 @@ public class DataSourceMapperTest {
      */
     @Autowired
     DataSourceUserMapper dataSourceUserMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * test insert
@@ -244,6 +251,33 @@ public class DataSourceMapperTest {
         }
     }
 
+    @Test
+    public void testListAuthorizedDataSource(){
+        //create general user
+        User generalUser1 = createGeneralUser("user1");
+        User generalUser2 = createGeneralUser("user2");
+
+        //create data source
+        DataSource dataSource = createDataSource(generalUser1.getId(), "ds-1");
+        DataSource unauthorizdDataSource = createDataSource(generalUser2.getId(), "ds-2");
+
+
+        //data source ids
+        Integer[] dataSourceIds = new Integer[]{dataSource.getId(),unauthorizdDataSource.getId()};
+
+        List<DataSource> authorizedDataSource = dataSourceMapper.listAuthorizedDataSource(generalUser1.getId(), dataSourceIds);
+
+        Assert.assertEquals(generalUser1.getId(),dataSource.getUserId());
+        Assert.assertNotEquals(generalUser1.getId(),unauthorizdDataSource.getUserId());
+        Assert.assertFalse(authorizedDataSource.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(dataSourceIds)));
+
+        //authorize object unauthorizdDataSource to generalUser1
+        createUserDataSource(generalUser1, unauthorizdDataSource);
+        authorizedDataSource = dataSourceMapper.listAuthorizedDataSource(generalUser1.getId(), dataSourceIds);
+
+        Assert.assertTrue(authorizedDataSource.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(dataSourceIds)));
+    }
+
     /**
      * create datasource relation
      * @param userId
@@ -289,7 +323,6 @@ public class DataSourceMapperTest {
         return dataSourceMap;
     }
 
-
     /**
      * create datasource
      * @return datasource
@@ -328,6 +361,42 @@ public class DataSourceMapperTest {
         dataSourceMapper.insert(dataSource);
 
         return dataSource;
+    }
+
+    /**
+     * create general user
+     * @return User
+     */
+    private User createGeneralUser(String userName){
+        User user = new User();
+        user.setUserName(userName);
+        user.setUserPassword("1");
+        user.setEmail("xx@123.com");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setCreateTime(new Date());
+        user.setTenantId(1);
+        user.setUpdateTime(new Date());
+        userMapper.insert(user);
+        return user;
+    }
+
+    /**
+     * create the relation of user and data source
+     * @param user          user
+     * @param dataSource    data source
+     * @return DatasourceUser
+     */
+    private DatasourceUser createUserDataSource(User user,DataSource dataSource){
+        DatasourceUser datasourceUser = new DatasourceUser();
+
+        datasourceUser.setDatasourceId(dataSource.getId());
+        datasourceUser.setUserId(user.getId());
+        datasourceUser.setPerm(7);
+        datasourceUser.setCreateTime(DateUtils.getCurrentDate());
+        datasourceUser.setUpdateTime(DateUtils.getCurrentDate());
+
+        dataSourceUserMapper.insert(datasourceUser);
+        return datasourceUser;
     }
 
 

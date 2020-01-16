@@ -113,7 +113,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
      * @return python home
      */
     @Override
-    protected String commandType() {
+    protected String commandInterpreter() {
         String pythonHome = getPythonHome(envFile);
         if (StringUtils.isEmpty(pythonHome)){
             return PYTHON;
