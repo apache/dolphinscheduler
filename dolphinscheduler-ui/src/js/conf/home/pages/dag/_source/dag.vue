@@ -61,20 +61,28 @@
           <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><em class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></em></span>
         </div>
         <div class="save-btn">
-          <div class="operation" style="vertical-align: middle;">
+          <div class="operation" style="vertical-align: middle;"> 
             <a href="javascript:"
                v-for="(item,$index) in toolOperList"
                :class="_operationClass(item)"
                :id="item.code"
                :key="$index"
                @click="_ckOperation(item,$event)">
-              <em :class="item.icon" data-toggle="tooltip" :title="item.description" ></em>
+              <x-button type="text" data-container="body" :icon="item.icon" v-tooltip.light="item.desc"></x-button>
             </a>
           </div>
-          <x-button type="text" icon="ans-icon-triangle-solid-right" @click="dagAutomaticLayout"></x-button>
+          <x-button 
+                  type="primary" 
+                  v-tooltip.light="$t('Format DAG')"
+                  icon="ans-icon-triangle-solid-right" 
+                  size="xsmall" 
+                  data-container="body"
+                  v-if="type === 'instance'"
+                  style="vertical-align: middle;" 
+                  @click="dagAutomaticLayout">
+          </x-button>
           <x-button
-                  data-toggle="tooltip"
-                  :title="$t('Refresh DAG status')"
+                  v-tooltip.light="$t('Refresh DAG status')"
                   data-container="body"
                   style="vertical-align: middle;"
                   icon="ans-icon-refresh"
@@ -189,10 +197,6 @@
           Dag.backfill(true)
           if (this.type === 'instance') {
             this._getTaskState(false).then(res => {})
-            // Round robin acquisition status
-            this.setIntervalP = setInterval(() => {
-              this._getTaskState(true).then(res => {})
-            }, 90000)
           }
         } else {
           Dag.create()
