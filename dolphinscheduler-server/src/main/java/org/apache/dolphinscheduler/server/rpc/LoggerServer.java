@@ -24,6 +24,8 @@ import io.grpc.ServerBuilder;
 import org.apache.dolphinscheduler.rpc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -31,6 +33,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 /**
  * logger server
@@ -50,7 +53,7 @@ public class LoggerServer {
      */
     public void start() throws IOException {
 	    /* The port on which the server should run */
-        int port = Constants.RPC_PORT;
+        int port = PropertyUtils.getInt(Constants.LOGGER_SERVER_RPC_PORT);
         server = ServerBuilder.forPort(port)
                 .addService(new LogViewServiceGrpcImpl())
                 .build()
@@ -114,7 +117,6 @@ public class LoggerServer {
                     request.getLimit());
             List<String> list = readFile(request.getPath(), request.getSkipLineNum(), request.getLimit());
             StringBuilder sb = new StringBuilder();
-            boolean errorLineFlag = false;
             for (String line : list){
                 sb.append(line + "\r\n");
             }
@@ -215,7 +217,6 @@ public class LoggerServer {
         StringBuilder sb = new StringBuilder();
         try {
             br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
-            boolean errorLineFlag = false;
             while ((line = br.readLine()) != null){
                 sb.append(line + "\r\n");
             }
