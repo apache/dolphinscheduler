@@ -25,7 +25,7 @@ public class Stopper {
 
 	private static volatile AtomicBoolean signal = new AtomicBoolean(false);
 	
-	public static final boolean isStoped(){
+	public static final boolean isStopped(){
 		return signal.get();
 	}
 	

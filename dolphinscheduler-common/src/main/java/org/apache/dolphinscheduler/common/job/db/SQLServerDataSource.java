@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.job.db;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class SQLServerDataSource extends BaseDataSource {
     public void isConnectable() throws Exception {
         Connection con = null;
         try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
             con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
         } finally {
             if (con != null) {

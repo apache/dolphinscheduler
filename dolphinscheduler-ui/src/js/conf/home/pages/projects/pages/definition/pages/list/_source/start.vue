@@ -141,7 +141,7 @@
       </div>
       <div class="clearfix list">
         <div class="text">
-          {{$t('Date')}}
+          {{$t('Schedule date')}}
         </div>
         <div class="cont">
           <x-datepicker

@@ -20,7 +20,7 @@
             v-model="sqlTypeId"
             :disabled="isDetails"
             @on-change="_handleSqlTypeChanged"
-            style="width: 90px;">
+            style="width: 120px;">
       <x-option
               v-for="city in sqlTypeList"
               :key="city.id"

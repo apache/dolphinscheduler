@@ -147,6 +147,11 @@ export default {
         let processInstanceJson = JSON.parse(res.data.processInstanceJson)
         // tasks info
         state.tasks = processInstanceJson.tasks
+        // tasks cache
+        state.cacheTasks = {}
+        processInstanceJson.tasks.forEach(v => {
+          state.cacheTasks[v.id] = v
+        })
         // global params
         state.globalParams = processInstanceJson.globalParams
         // timeout
