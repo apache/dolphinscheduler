@@ -55,7 +55,7 @@ v-ps<template>
             <span>{{$index + 1}}</span>
           </td>
           <td>
-            <span class="ellipsis">
+            <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.funcName, maxWidth: '500px'}">
               <a href="javascript:" class="links">{{item.funcName}}</a>
             </span>
           </td>
