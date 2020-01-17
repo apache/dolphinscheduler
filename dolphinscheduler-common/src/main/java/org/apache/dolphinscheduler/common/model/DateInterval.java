@@ -34,7 +34,7 @@ public class DateInterval {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DateInterval that = (DateInterval) o;
