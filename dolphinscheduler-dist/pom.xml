@@ -413,6 +413,24 @@
 
                                     </sources>
                                 </mapping>
+
+                                <mapping>
+                                    <directory>/opt/soft/${project.build.finalName}/ui</directory>
+                                    <filemode>755</filemode>
+                                    <username>root</username>
+                                    <groupname>root</groupname>
+                                    <sources>
+                                        <source>
+                                            <location>
+                                                ${basedir}/../dolphinscheduler-ui/dist
+                                            </location>
+                                            <includes>
+                                                <include>**/*.*</include>
+                                            </includes>
+                                        </source>
+
+                                    </sources>
+                                </mapping>
                             </mappings>
 
                             <preinstallScriptlet>
