@@ -444,9 +444,9 @@ public final class Constants {
 
     /***
      *
-     * rpc port
+     * logger server rpc port
      */
-    public static final int RPC_PORT = 50051;
+    public static final String LOGGER_SERVER_RPC_PORT = "loggerserver.rpc.port";
 
     /**
      * forbid running task

@@ -23,6 +23,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -311,8 +312,8 @@ public class TaskScheduleThread implements Runnable {
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String tentnCode = processDao.queryTenantCodeByResName(res);
-                    String resHdfsPath = HadoopUtils.getHdfsFilename(tentnCode, res);
+                    String tentnCode = processDao.queryTenantCodeByResName(res, ResourceType.FILE);
+                    String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tentnCode, res);
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
                     HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + res, false, true);

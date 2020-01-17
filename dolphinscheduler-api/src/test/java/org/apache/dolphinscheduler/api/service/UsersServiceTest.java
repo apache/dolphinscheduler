@@ -22,10 +22,14 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.junit.After;
@@ -41,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -68,6 +73,10 @@ public class UsersServiceTest {
     private DataSourceUserMapper datasourceUserMapper;
     @Mock
     private AlertGroupMapper alertGroupMapper;
+    @Mock
+    private ResourceMapper resourceMapper;
+    @Mock
+    private UdfFuncMapper udfFuncMapper;
 
     private String queueName ="UsersServiceTestQueue";
 
@@ -203,7 +212,7 @@ public class UsersServiceTest {
             logger.info(result.toString());
 
             //success
-            when(userMapper.selectById(1)).thenReturn(getUser());
+            when(userMapper.selectById(1)).thenReturn(getAdminUser());
             result = usersService.updateUser(1,userName,userPassword,"32222s@qq.com",1,"13457864543","queue");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -218,8 +227,8 @@ public class UsersServiceTest {
 
         User loginUser = new User();
         try {
-            when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getUser());
-            when(userMapper.selectById(1)).thenReturn(getUser());
+            when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getAdminUser());
+            when(userMapper.selectById(1)).thenReturn(getAdminUser());
 
             //no operate
             Map<String, Object> result = usersService.deleteUserById(loginUser,3);
@@ -247,7 +256,7 @@ public class UsersServiceTest {
     @Test
     public void testGrantProject(){
 
-        when(userMapper.selectById(1)).thenReturn(getUser());
+        when(userMapper.selectById(1)).thenReturn(getAdminUser());
         User loginUser = new User();
         String  projectIds= "100000,120000";
         Map<String, Object> result = usersService.grantProject(loginUser, 1, projectIds);
@@ -268,20 +277,46 @@ public class UsersServiceTest {
     public void testGrantResources(){
 
         String resourceIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
-        User loginUser = new User();
-        Map<String, Object> result = usersService.grantResources(loginUser, 1, resourceIds);
+        User needAuthorizedUser = new User();
+        needAuthorizedUser.setUserType(UserType.GENERAL_USER);
+        needAuthorizedUser.setId(100);
+
+        User generalUser = getGeneralUser();
+        User adminUser = getAdminUser();
+        when(userMapper.selectById(needAuthorizedUser.getId())).thenReturn(generalUser);
+
+        Map<String, Object> result = usersService.grantResources(generalUser, needAuthorizedUser.getId(), resourceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         //user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        result = usersService.grantResources(loginUser, 2, resourceIds);
+        result = usersService.grantResources(adminUser, 2, resourceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
         //success
-        result = usersService.grantResources(loginUser, 1, resourceIds);
+        result = usersService.grantResources(adminUser, needAuthorizedUser.getId(), resourceIds);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        List<Resource> udfResourceList = new ArrayList<Resource>() {{
+                add(createResource(getAdminUser(), ResourceType.UDF, 100000));
+                add(createResource(getAdminUser(), ResourceType.UDF, 120000));
+        }};
+        when(resourceMapper.queryResourceList("", 0, ResourceType.UDF.ordinal())).thenReturn(udfResourceList);
+
+        //mock udf function list
+        UdfFunc udfFunc = createUdfFunc(getAdminUser(), 100000);
+        List<UdfFunc> udfFuncs = new ArrayList<>();
+        udfFuncs.add(udfFunc);
+
+        when(udfFuncMapper.listUdfByResourceId(new int[]{100000})).thenReturn(udfFuncs);
+
+        //fail if udf resource is already bound by the udf function
+        result = usersService.grantResources(adminUser, needAuthorizedUser.getId(), "120000");
+        Assert.assertEquals(Status.UDF_RESOURCE_IS_BOUND, result.get(Constants.STATUS));
+
+        result = usersService.grantResources(adminUser, needAuthorizedUser.getId(), "100000");
+        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
     }
 
 
@@ -289,7 +324,7 @@ public class UsersServiceTest {
     public void testGrantUDFFunction(){
 
         String udfIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
+        when(userMapper.selectById(1)).thenReturn(getAdminUser());
         User loginUser = new User();
         Map<String, Object> result = usersService.grantUDFFunction(loginUser, 1, udfIds);
         logger.info(result.toString());
@@ -309,7 +344,7 @@ public class UsersServiceTest {
     public void testGrantDataSource(){
 
         String datasourceIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
+        when(userMapper.selectById(1)).thenReturn(getAdminUser());
         User loginUser = new User();
         Map<String, Object> result = usersService.grantDataSource(loginUser, 1, datasourceIds);
         logger.info(result.toString());
@@ -350,7 +385,7 @@ public class UsersServiceTest {
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         tempUser = (User) result.get(Constants.DATA_LIST);
         //check userName
-        Assert.assertEquals("userTest0001",tempUser.getUserName());
+        Assert.assertEquals("general-user-0001",tempUser.getUserName());
     }
 
 
@@ -380,7 +415,7 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
         //exist user
-        when(userMapper.queryByUserNameAccurately("userTest0001")).thenReturn(getUser());
+        when(userMapper.queryByUserNameAccurately("userTest0001")).thenReturn(getAdminUser());
         result = usersService.verifyUserName("userTest0001");
         logger.info(result.toString());
         Assert.assertEquals(Status.USER_NAME_EXIST.getMsg(), result.getMsg());
@@ -430,8 +465,8 @@ public class UsersServiceTest {
 
         User user = new User();
         user.setUserType(UserType.GENERAL_USER);
-        user.setUserName("userTest0001");
-        user.setUserPassword("userTest0001");
+        user.setUserName("general-user-0001");
+        user.setUserPassword("general-user-0001");
         return user;
     }
 
@@ -445,7 +480,7 @@ public class UsersServiceTest {
     /**
      * get user
      */
-    private User getUser(){
+    private User getAdminUser(){
 
         User user = new User();
         user.setUserType(UserType.ADMIN_USER);
@@ -460,5 +495,38 @@ public class UsersServiceTest {
         tenant.setId(1);
         return tenant;
     }
+
+    /**
+     * create resource by user
+     * @param user user
+     * @return Resource
+     */
+    private Resource createResource(User user, ResourceType type,int id){
+        //insertOne
+        Resource resource = new Resource();
+        resource.setId(id);
+        resource.setType(type);
+        resource.setUserId(user.getId());
+        resourceMapper.insert(resource);
+        return resource;
+    }
+
+    /**
+     * create udf function
+     * @return udf function
+     */
+    private UdfFunc createUdfFunc(User user, int resourceId){
+        UdfFunc udfFunc = new UdfFunc();
+        udfFunc.setUserId(user.getId());
+        udfFunc.setFuncName("dolphin_udf_func");
+        udfFunc.setClassName("org.apache.dolphinscheduler.test.mr");
+        udfFunc.setType(UdfType.HIVE);
+        udfFunc.setResourceId(resourceId);
+        udfFunc.setCreateTime(new Date());
+        udfFunc.setUpdateTime(new Date());
+        udfFuncMapper.insert(udfFunc);
+        return udfFunc;
+    }
+
 
 }

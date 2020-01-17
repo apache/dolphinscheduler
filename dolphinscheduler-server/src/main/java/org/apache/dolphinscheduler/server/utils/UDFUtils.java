@@ -23,10 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.utils.CollectionUtils.isNotEmpty;
 
@@ -42,29 +40,18 @@ public class UDFUtils {
 
     /**
      * create function list
-     * @param udfFuncs      udf functions
-     * @param tenantCode    tenant code
+     * @param udfTenantCodeMap    key is tenant code,value is udf function
      * @param logger        logger
      * @return create function list
      */
-    public static List<String> createFuncs(List<UdfFunc> udfFuncs, String tenantCode,Logger logger){
-        // get  hive udf jar path
-        String hiveUdfJarPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-        logger.info("hive udf jar path : {}" , hiveUdfJarPath);
-
-        // is the root directory of udf defined
-        if (StringUtils.isEmpty(hiveUdfJarPath)) {
-            logger.error("not define hive udf jar path");
-            throw new RuntimeException("hive udf jar base path not defined ");
-        }
-        Set<String> resources = getFuncResouces(udfFuncs);
+    public static List<String> createFuncs(Map<String,UdfFunc> udfTenantCodeMap, Logger logger){
         List<String> funcList = new ArrayList<>();
 
         // build jar sql
-        buildJarSql(funcList, resources, hiveUdfJarPath);
+        buildJarSql(funcList, udfTenantCodeMap);
 
         // build temp function sql
-        buildTempFuncSql(funcList, udfFuncs);
+        buildTempFuncSql(funcList, udfTenantCodeMap.values().stream().collect(Collectors.toList()));
 
         return funcList;
     }
@@ -72,18 +59,20 @@ public class UDFUtils {
     /**
      * build jar sql
      * @param sqls          sql list
-     * @param resources     resource set
-     * @param uploadPath    upload path
+     * @param udfTenantCodeMap    key is tenant code,value is udf function
      */
-    private static void buildJarSql(List<String> sqls, Set<String> resources, String uploadPath) {
+    private static void buildJarSql(List<String> sqls, Map<String,UdfFunc> udfTenantCodeMap) {
         String defaultFS = HadoopUtils.getInstance().getConfiguration().get(Constants.FS_DEFAULTFS);
-        if (!uploadPath.startsWith("hdfs:")) {
-            uploadPath = defaultFS + uploadPath;
+
+        Set<Map.Entry<String, UdfFunc>> entries = udfTenantCodeMap.entrySet();
+        for (Map.Entry<String, UdfFunc> entry:udfTenantCodeMap.entrySet()){
+            String uploadPath = HadoopUtils.getHdfsUdfDir(entry.getKey());
+            if (!uploadPath.startsWith("hdfs:")) {
+                uploadPath = defaultFS + uploadPath;
+            }
+            sqls.add(String.format("add jar %s/%s", uploadPath, entry.getValue().getResourceName()));
         }
 
-        for (String resource : resources) {
-            sqls.add(String.format("add jar %s/%s", uploadPath, resource));
-        }
     }
 
     /**

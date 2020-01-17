@@ -87,4 +87,15 @@
             </foreach>
         </if>
     </select>
+    <select id="listUdfByResourceId" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        select *
+        from t_ds_udfs
+        where 1=1
+        <if test="resourceIds != null and resourceIds != ''">
+            and resource_id in
+            <foreach collection="resourceIds" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+    </select>
 </mapper>
