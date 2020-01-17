@@ -49,11 +49,11 @@
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
-            <span class="ellipsis">
+            <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.alias, maxWidth: '500px'}">
               <a href="javascript:" class="links" >{{item.alias}}</a>
             </span>
           </td>
-          <td><span class="ellipsis">{{item.fileName}}</span></td>
+          <td><span class="ellipsis" v-tooltip.large.top.start.light="{text: item.fileName, maxWidth: '500px'}">{{item.fileName}}</span></td>
           <td>
             <span>{{_rtSize(item.size)}}</span>
           </td>
