@@ -427,6 +427,15 @@ public class UsersService extends BaseService {
      * @param resourceIds resource id array
      * @return grant result code
      */
+
+    /**
+     * grant resource
+     * @param loginUser     login user
+     * @param userId        user id
+     * @param resourceIds   resource id array
+     * @return  grant result code
+     */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
@@ -438,8 +447,6 @@ public class UsersService extends BaseService {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
-
-        resourcesUserMapper.deleteResourceUser(userId, 0);
 
         if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
             return result;
@@ -458,6 +465,9 @@ public class UsersService extends BaseService {
             putMsg(result, Status.UDF_RESOURCE_IS_BOUND, udfFuncs.get(0).getFuncName());
             return result;
         }
+
+        resourcesUserMapper.deleteResourceUser(userId, 0);
+
         for (String resourceId : resourcesIdArr) {
             Date now = new Date();
             ResourcesUser resourcesUser = new ResourcesUser();
