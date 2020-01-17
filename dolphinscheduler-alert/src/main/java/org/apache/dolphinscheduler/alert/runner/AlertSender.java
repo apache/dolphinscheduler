@@ -101,6 +101,11 @@ public class AlertSender{
             }else if (alert.getAlertType() == AlertType.SMS){
                 retMaps = emailManager.send(getReciversForSMS(users), alert.getTitle(), alert.getContent(),alert.getShowType());
                 alert.setInfo(retMaps);
+            } else {
+                logger.error("AlertType is not defined. code: {}, descp: {}", 
+                    alert.getAlertType().getCode(), 
+                    alert.getAlertType().getDescp());
+                return;
             }
 
             //send flag

@@ -96,7 +96,13 @@ public class DagHelper {
             for (String startNodeName : startNodeList) {
                 TaskNode startNode = findNodeByName(taskNodeList, startNodeName);
                 List<TaskNode> childNodeList = new ArrayList<>();
-                if (TaskDependType.TASK_POST == taskDependType) {
+                if (startNode == null) {
+                    logger.error("start node name [{}] is not in task node list [{}] ",
+                        startNodeName,
+                        taskNodeList
+                    );
+                    continue;
+                } else if (TaskDependType.TASK_POST == taskDependType) {
                     childNodeList = getFlowNodeListPost(startNode, taskNodeList);
                 } else if (TaskDependType.TASK_PRE == taskDependType) {
                     childNodeList = getFlowNodeListPre(startNode, recoveryNodeNameList, taskNodeList);
@@ -129,7 +135,6 @@ public class DagHelper {
             if (null != depList && null != startNode && depList.contains(startNode.getName())) {
                 resultList.addAll(getFlowNodeListPost(taskNode, taskNodeList));
             }
-
         }
         resultList.add(startNode);
         return resultList;
