@@ -20,8 +20,10 @@ package org.apache.dolphinscheduler.dao.mapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -55,6 +57,9 @@ public class UdfFuncMapperTest {
     @Autowired
     UDFUserMapper udfUserMapper;
 
+    @Autowired
+    ResourceMapper resourceMapper;
+
     /**
      * insert one udf
      * @return UdfFunc
@@ -85,6 +90,24 @@ public class UdfFuncMapperTest {
         udfFunc.setType(UdfType.HIVE);
         udfFunc.setResourceId(1);
         udfFunc.setResourceName("dolphin_resource");
+        udfFunc.setCreateTime(new Date());
+        udfFunc.setUpdateTime(new Date());
+        udfFuncMapper.insert(udfFunc);
+        return udfFunc;
+    }
+
+    /**
+     * insert one udf
+     * @return
+     */
+    private UdfFunc insertOne(User user,Resource resource){
+        UdfFunc udfFunc = new UdfFunc();
+        udfFunc.setUserId(user.getId());
+        udfFunc.setFuncName("dolphin_udf_func");
+        udfFunc.setClassName("org.apache.dolphinscheduler.test.mr");
+        udfFunc.setType(UdfType.HIVE);
+        udfFunc.setResourceId(resource.getId());
+        udfFunc.setResourceName(resource.getAlias());
         udfFunc.setCreateTime(new Date());
         udfFunc.setUpdateTime(new Date());
         udfFuncMapper.insert(udfFunc);
@@ -139,6 +162,20 @@ public class UdfFuncMapperTest {
         udfUser.setUpdateTime(new Date());
         udfUserMapper.insert(udfUser);
         return udfUser;
+    }
+
+    /**
+     * create resource by user
+     * @param user user
+     * @return Resource
+     */
+    private Resource createUdfResource(User user,String resourceName){
+        Resource resource = new Resource();
+        resource.setAlias(resourceName);
+        resource.setType(ResourceType.UDF);
+        resource.setUserId(user.getId());
+        resourceMapper.insert(resource);
+        return resource;
     }
 
     /**
@@ -319,4 +356,25 @@ public class UdfFuncMapperTest {
         authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), ArrayUtils.toObject(udfFuncIds));
         Assert.assertTrue(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList()).containsAll(Arrays.asList(ArrayUtils.toObject(udfFuncIds))));
     }
+
+    @Test
+    public void testListUdfByResourceId(){
+        //create general user
+        User generalUser = createGeneralUser("user1");
+        //create udf resource
+        Resource udfResource1 = createUdfResource(generalUser,"udf-resource-1");
+        //create udf function
+        UdfFunc udfFunc1 = insertOne(generalUser,udfResource1);
+
+        List<UdfFunc> udfFuncList = udfFuncMapper.listUdfByResourceId(new int[]{udfResource1.getId()});
+        Assert.assertTrue(udfFuncList.size() == 1);
+
+        //create udf resource
+        Resource udfResource2 = createUdfResource(generalUser,"udf-resource-2");
+        //create udf function
+        UdfFunc udfFunc2 = insertOne(generalUser,udfResource2);
+        udfFuncList = udfFuncMapper.listUdfByResourceId(new int[]{udfResource1.getId(),udfResource2.getId()});
+        Assert.assertTrue(udfFuncList.size() == 2);
+    }
+
 }

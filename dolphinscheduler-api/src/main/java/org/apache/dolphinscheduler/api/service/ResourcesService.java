@@ -16,12 +16,16 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.commons.collections.BeanMap;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -29,10 +33,6 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.collections.BeanMap;
-import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -277,15 +277,9 @@ public class ResourcesService extends BaseService {
         String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
         // get file hdfs path
         // delete hdfs file by type
-        String originHdfsFileName = "";
-        String destHdfsFileName = "";
-        if (resource.getType().equals(ResourceType.FILE)) {
-            originHdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, originResourceName);
-            destHdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, name);
-        } else if (resource.getType().equals(ResourceType.UDF)) {
-            originHdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, originResourceName);
-            destHdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, name);
-        }
+        String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originResourceName);
+        String destHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,name);
+
         try {
             if (HadoopUtils.getInstance().exists(originHdfsFileName)) {
                 logger.info("hdfs copy {} -> {}", originHdfsFileName, destHdfsFileName);
@@ -354,15 +348,8 @@ public class ResourcesService extends BaseService {
 
 
         // save file to hdfs, and delete original file
-        String hdfsFilename = "";
-        String resourcePath = "";
-        if (type.equals(ResourceType.FILE)) {
-            hdfsFilename = HadoopUtils.getHdfsFilename(tenantCode, name);
-            resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-        } else if (type.equals(ResourceType.UDF)) {
-            hdfsFilename = HadoopUtils.getHdfsUdfFilename(tenantCode, name);
-            resourcePath = HadoopUtils.getHdfsUdfDir(tenantCode);
-        }
+        String hdfsFilename = HadoopUtils.getHdfsFileName(type,tenantCode,name);
+        String resourcePath = HadoopUtils.getHdfsDir(type,tenantCode);
         try {
             // if tenant dir not exists
             if (!HadoopUtils.getInstance().exists(resourcePath)) {
@@ -429,12 +416,19 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
+        //if resource type is UDF,need check whether it is bound by UDF functon
+        if (resource.getType() == (ResourceType.UDF)) {
+            List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(new int[]{resourceId});
+            if (CollectionUtils.isNotEmpty(udfFuncs)) {
+                logger.error("can't be deleted,because it is bound by UDF functions:{}",udfFuncs.toString());
+                putMsg(result,Status.UDF_RESOURCE_IS_BOUND,udfFuncs.get(0).getFuncName());
+                return result;
+            }
+        }
 
-        String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
-        String hdfsFilename = "";
-
+        String tenantCode = userMapper.queryTenantCodeByUserId(resource.getUserId()).getTenantCode();
         // delete hdfs file by type
-        hdfsFilename = getHdfsFileName(resource, tenantCode, hdfsFilename);
+        String hdfsFilename = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getAlias());
 
         //delete data in database
         resourcesMapper.deleteById(resourceId);
@@ -466,7 +460,7 @@ public class ResourcesService extends BaseService {
                 String tenantCode = tenant.getTenantCode();
 
                 try {
-                    String hdfsFilename = getHdfsFileName(type,tenantCode,name);
+                    String hdfsFilename = HadoopUtils.getHdfsFileName(type,tenantCode,name);
                     if(HadoopUtils.getInstance().exists(hdfsFilename)){
                         logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, name,hdfsFilename);
                         putMsg(result, Status.RESOURCE_FILE_EXIST,hdfsFilename);
@@ -525,7 +519,7 @@ public class ResourcesService extends BaseService {
         User user = userMapper.queryDetailsById(resource.getUserId());
         String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
         // hdfs path
-        String hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resource.getAlias());
+        String hdfsFileName = HadoopUtils.getHdfsResourceFileName(tenantCode, resource.getAlias());
         logger.info("resource hdfs path is {} ", hdfsFileName);
         try {
             if(HadoopUtils.getInstance().exists(hdfsFileName)){
@@ -684,8 +678,8 @@ public class ResourcesService extends BaseService {
                 return result;
             }
 
-            // get file hdfs path
-            hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resourceName);
+            // get resource file hdfs path
+            hdfsFileName = HadoopUtils.getHdfsResourceFileName(tenantCode, resourceName);
             String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
             logger.info("resource hdfs path is {} ", hdfsFileName);
 
@@ -732,8 +726,7 @@ public class ResourcesService extends BaseService {
         User user = userMapper.queryDetailsById(resource.getUserId());
         String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();
 
-        String hdfsFileName = "";
-        hdfsFileName = getHdfsFileName(resource, tenantCode, hdfsFileName);
+        String hdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getAlias());
 
         String localFileName = FileUtils.getDownloadFilename(resource.getAlias());
         logger.info("resource hdfs path is {} ", hdfsFileName);
@@ -846,40 +839,6 @@ public class ResourcesService extends BaseService {
         result.put(Constants.DATA_LIST, authedResources);
         putMsg(result,Status.SUCCESS);
         return result;
-    }
-
-    /**
-     * get hdfs file name
-     *
-     * @param resource resource
-     * @param tenantCode tenant code
-     * @param hdfsFileName hdfs file name
-     * @return hdfs file name
-     */
-    private String getHdfsFileName(Resource resource, String tenantCode, String hdfsFileName) {
-        if (resource.getType().equals(ResourceType.FILE)) {
-            hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, resource.getAlias());
-        } else if (resource.getType().equals(ResourceType.UDF)) {
-            hdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, resource.getAlias());
-        }
-        return hdfsFileName;
-    }
-
-    /**
-     * get hdfs file name
-     *
-     * @param resourceType resource type
-     * @param tenantCode tenant code
-     * @param hdfsFileName hdfs file name
-     * @return hdfs file name
-     */
-    private String getHdfsFileName(ResourceType resourceType, String tenantCode, String hdfsFileName) {
-        if (resourceType.equals(ResourceType.FILE)) {
-            hdfsFileName = HadoopUtils.getHdfsFilename(tenantCode, hdfsFileName);
-        } else if (resourceType.equals(ResourceType.UDF)) {
-            hdfsFileName = HadoopUtils.getHdfsUdfFilename(tenantCode, hdfsFileName);
-        }
-        return hdfsFileName;
     }
 
     /**

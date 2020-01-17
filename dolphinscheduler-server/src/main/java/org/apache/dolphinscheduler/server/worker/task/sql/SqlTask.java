@@ -24,10 +24,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.job.db.BaseDataSource;
 import org.apache.dolphinscheduler.common.job.db.DataSourceFactory;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -176,7 +173,14 @@ public class SqlTask extends AbstractTask {
                 // check udf permission
                 checkUdfPermission(ArrayUtils.toObject(idsArray));
                 List<UdfFunc> udfFuncList = processDao.queryUdfFunListByids(idsArray);
-                createFuncs = UDFUtils.createFuncs(udfFuncList, taskProps.getTenantCode(), logger);
+                Map<String,UdfFunc> udfFuncMap = new HashMap<String,UdfFunc>();
+                for(UdfFunc udfFunc : udfFuncList) {
+                    String tenantCode = processDao.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
+                    udfFuncMap.put(tenantCode,udfFunc);
+                }
+
+
+                createFuncs = UDFUtils.createFuncs(udfFuncMap, logger);
             }
 
             // execute sql task
