@@ -550,7 +550,9 @@ public class ExecutorService extends BaseService{
         }else{
             command.setCommandParam(JSONUtils.toJson(cmdParam));
             return processDao.createCommand(command);
-        }  
+        }
+
+        return 0;
     }
 
     /**
