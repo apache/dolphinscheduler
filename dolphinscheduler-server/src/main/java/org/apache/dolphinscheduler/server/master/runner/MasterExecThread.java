@@ -254,7 +254,7 @@ public class MasterExecThread implements Runnable {
                 break;
             }
 
-            //  current process instance sucess ，next execute
+            //  current process instance success ,next execute
             if(null == iterator){
                 // loop by day
                 scheduleDate = DateUtils.getSomeDay(scheduleDate, 1);
@@ -575,7 +575,7 @@ public class MasterExecThread implements Runnable {
     private DependResult isTaskDepsComplete(String taskName) {
 
         Collection<String> startNodes = dag.getBeginNode();
-        // ff the vertex returns true directly
+        // if the vertex returns true directly
         if(startNodes.contains(taskName)){
             return DependResult.SUCCESS;
         }
