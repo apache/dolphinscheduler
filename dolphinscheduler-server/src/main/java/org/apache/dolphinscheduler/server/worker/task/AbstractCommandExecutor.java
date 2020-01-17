@@ -207,7 +207,14 @@ public abstract class AbstractCommandExecutor {
         // merge error information to standard output stream
         processBuilder.redirectErrorStream(true);
         // setting up user to run commands
-        processBuilder.command("sudo", "-u", tenantCode, commandInterpreter(), commandFile);
+        List<String> command = new ArrayList<>();
+        command.add("sudo");
+        command.add("-u");
+        command.add(tenantCode);
+        command.add(commandInterpreter());
+        command.addAll(commandOptions());
+        command.add(commandFile);
+        processBuilder.command(command);
 
         process = processBuilder.start();
 
@@ -562,6 +569,9 @@ public abstract class AbstractCommandExecutor {
 
     protected abstract String buildCommandFilePath();
     protected abstract String commandInterpreter();
+    protected List<String> commandOptions() {
+        return Collections.emptyList();
+    }
     protected abstract boolean checkFindApp(String line);
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 }
