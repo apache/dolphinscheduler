@@ -288,12 +288,12 @@ public class ResourceMapperTest {
         resource.setUserId(user.getId());
         resourceMapper.updateById(resource);
 
-        String resource1 = resourceMapper.queryTenantCodeByResourceName(
-                resource.getAlias()
+        String tenantCode = resourceMapper.queryTenantCodeByResourceName(
+                resource.getAlias(),resource.getType().ordinal()
         );
 
 
-        Assert.assertEquals(resource1, "ut tenant code for resource");
+        Assert.assertEquals(tenantCode, "ut tenant code for resource");
         resourceMapper.deleteById(resource.getId());
 
     }

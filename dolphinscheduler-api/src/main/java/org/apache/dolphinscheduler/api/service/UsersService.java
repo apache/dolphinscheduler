@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * user service
@@ -71,6 +73,9 @@ public class UsersService extends BaseService {
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
+
+    @Autowired
+    private UdfFuncMapper udfFuncMapper;
 
 
     /**
@@ -413,15 +418,14 @@ public class UsersService extends BaseService {
         return result;
     }
 
-
     /**
      * grant resource
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @param resourceIds resource id array
-     * @return grant result code
+     * @param loginUser     login user
+     * @param userId        user id
+     * @param resourceIds   resource id array
+     * @return  grant result code
      */
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
@@ -433,15 +437,28 @@ public class UsersService extends BaseService {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
+        String[] resourcesIdArr = resourceIds.split(",");
+        //if resource type is UDF,need check whether it is bound by UDF functon
+        Set<Integer> needAuthorizedIds = new HashSet<>();
+        if (StringUtils.isNotEmpty(resourceIds)) {
+            needAuthorizedIds = Arrays.stream(resourcesIdArr).map(t->Integer.parseInt(t)).collect(Collectors.toSet());
+        }
+        List<Resource> udfResourceList = resourceMapper.queryResourceList("", 0, ResourceType.UDF.ordinal());
+        Set<Integer> allUdfResIds = udfResourceList.stream().map(t -> t.getId()).collect(Collectors.toSet());
+        allUdfResIds.removeAll(needAuthorizedIds);
+        List<UdfFunc> udfFuncs = udfFuncMapper.listUdfByResourceId(ArrayUtils.toPrimitive(allUdfResIds.toArray(new Integer[allUdfResIds.size()])));
+        if (CollectionUtils.isNotEmpty(udfFuncs)) {
+            logger.error("can't be deleted,because it is bound by UDF functions:{}",udfFuncs.toString());
+            putMsg(result, Status.UDF_RESOURCE_IS_BOUND, udfFuncs.get(0).getFuncName());
+            return result;
+        }
+
 
         resourcesUserMapper.deleteResourceUser(userId, 0);
 
         if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
             return result;
         }
-
-        String[] resourcesIdArr = resourceIds.split(",");
-
         for (String resourceId : resourcesIdArr) {
             Date now = new Date();
             ResourcesUser resourcesUser = new ResourcesUser();
