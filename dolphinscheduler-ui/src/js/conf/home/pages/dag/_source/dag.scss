@@ -159,6 +159,9 @@
       border-radius: 0 3px 0 0;
       .ans-btn-text {
         color: #337ab7;
+        .ans-icon {
+          font-size: 16px;
+        }
       }
       .assist-btn {
         position: absolute;
@@ -206,7 +209,7 @@
               color: #333;
             }
             &.active {
-              background: #e1e2e3;
+              // background: #e1e2e3;
               i {
                 color: #2d8cf0;
               }
@@ -234,7 +237,9 @@
     border-radius: 3px 3px 0px 0px;
   }
 }
-
+#screen {
+  margin-right: 5px;
+}
 .v-modal-custom-log {
   z-index: 101;
 }

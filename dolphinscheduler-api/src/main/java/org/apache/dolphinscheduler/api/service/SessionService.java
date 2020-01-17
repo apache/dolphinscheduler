@@ -139,12 +139,16 @@ public class SessionService extends BaseService{
    * @param loginUser login user
    */
   public void signOut(String ip, User loginUser) {
-      /**
-       * query session by user id and ip
-       */
-      Session session = sessionMapper.queryByUserIdAndIp(loginUser.getId(),ip);
+    try {
+        /**
+         * query session by user id and ip
+         */
+        Session session = sessionMapper.queryByUserIdAndIp(loginUser.getId(),ip);
 
-      //delete session
-      sessionMapper.deleteById(session.getId());
+        //delete session
+        sessionMapper.deleteById(session.getId());
+    }catch (Exception e){
+        logger.warn("userId : {} , ip : {} , find more one session",loginUser.getId(),ip);
+    }
   }
 }

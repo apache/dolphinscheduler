@@ -19,8 +19,11 @@ package org.apache.dolphinscheduler.server.worker.task.sql;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.UdfType;
@@ -38,6 +41,7 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.permission.PermissionCheck;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -101,7 +105,7 @@ public class SqlTask extends AbstractTask {
         // set the name of the current thread
         String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
-        logger.info(sqlParameters.toString());
+        logger.info("Full sql parameters: {}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
@@ -119,19 +123,18 @@ public class SqlTask extends AbstractTask {
         }
 
         dataSource= processDao.findDataSourceById(sqlParameters.getDatasource());
-
-        if (null == dataSource){
-            logger.error("datasource not exists");
-            exitStatusCode = -1;
-            return;
-        }
-
         logger.info("datasource name : {} , type : {} , desc : {}  , user_id : {} , parameter : {}",
                 dataSource.getName(),
                 dataSource.getType(),
                 dataSource.getNote(),
                 dataSource.getUserId(),
                 dataSource.getConnectionParams());
+
+        if (dataSource == null){
+            logger.error("datasource not exists");
+            exitStatusCode = -1;
+            return;
+        }
 
         Connection con = null;
         List<String> createFuncs = null;
@@ -164,6 +167,8 @@ public class SqlTask extends AbstractTask {
                 for(int i=0;i<ids.length;i++){
                     idsArray[i]=Integer.parseInt(ids[i]);
                 }
+                // check udf permission
+                checkUdfPermission(ArrayUtils.toObject(idsArray));
                 List<UdfFunc> udfFuncList = processDao.queryUdfFunListByids(idsArray);
                 createFuncs = UDFUtils.createFuncs(udfFuncList, taskProps.getTenantCode(), logger);
             }
@@ -284,12 +289,12 @@ public class SqlTask extends AbstractTask {
                 }
             }
 
-            try (PreparedStatement  stmt = prepareStatementAndBind(connection, mainSqlBinds)) {
+            try (PreparedStatement  stmt = prepareStatementAndBind(connection, mainSqlBinds);
+                 ResultSet resultSet = stmt.executeQuery()) {
                 // decide whether to executeQuery or executeUpdate based on sqlType
                 if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                     // query statements need to be convert to JsonArray and inserted into Alert to send
                     JSONArray resultJSONArray = new JSONArray();
-                    ResultSet resultSet = stmt.executeQuery();
                     ResultSetMetaData md = resultSet.getMetaData();
                     int num = md.getColumnCount();
 
@@ -300,11 +305,10 @@ public class SqlTask extends AbstractTask {
                         }
                         resultJSONArray.add(mapOfColValues);
                     }
-                    resultSet.close();
                     logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
 
                     // if there is a result set
-                    if (resultJSONArray.size() > 0) {
+                    if ( !resultJSONArray.isEmpty() ) {
                         if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
                             sendAttachment(sqlParameters.getTitle(),
                                     JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
@@ -332,6 +336,12 @@ public class SqlTask extends AbstractTask {
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage());
+        } finally {
+            try { 
+                connection.close(); 
+            } catch (Exception e) { 
+                logger.error(e.getMessage(), e); 
+            }
         }
         return connection;
     }
@@ -344,22 +354,23 @@ public class SqlTask extends AbstractTask {
      * @throws Exception
      */
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
-        PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql());
         // is the timeout set
         boolean timeoutFlag = taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED ||
                 taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
-        if(timeoutFlag){
-            stmt.setQueryTimeout(taskProps.getTaskTimeout());
-        }
-        Map<Integer, Property> params = sqlBinds.getParamsMap();
-        if(params != null) {
-            for (Map.Entry<Integer, Property> entry : params.entrySet()) {
-                Property prop = entry.getValue();
-                ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+        try (PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql())) {
+            if(timeoutFlag){
+                stmt.setQueryTimeout(taskProps.getTaskTimeout());
             }
+            Map<Integer, Property> params = sqlBinds.getParamsMap();
+            if(params != null) {
+                for (Map.Entry<Integer, Property> entry : params.entrySet()) {
+                    Property prop = entry.getValue();
+                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+                }
+            }
+            logger.info("prepare statement replace sql : {} ", stmt);
+            return stmt;
         }
-        logger.info("prepare statement replace sql : {} ",stmt.toString());
-        return stmt;
     }
 
     /**
@@ -447,6 +458,35 @@ public class SqlTask extends AbstractTask {
         for(int i=1;i<=sqlParamsMap.size();i++){
             logPrint.append(sqlParamsMap.get(i).getValue()+"("+sqlParamsMap.get(i).getType()+")");
         }
-        logger.info(logPrint.toString());
+        logger.info("Sql Params are {}", logPrint);
     }
+
+    /**
+     * check udf function permission
+     * @param udfFunIds    udf functions
+     * @return if has download permission return true else false
+     */
+    private void checkUdfPermission(Integer[] udfFunIds) throws Exception{
+        //  process instance
+        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        int userId = processInstance.getExecutorId();
+
+        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF,processDao,udfFunIds,userId,logger);
+        permissionCheckUdf.checkPermission();
+    }
+
+    /**
+     * check data source permission
+     * @param dataSourceId    data source id
+     * @return if has download permission return true else false
+     */
+    private void checkDataSourcePermission(int dataSourceId) throws Exception{
+        //  process instance
+        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        int userId = processInstance.getExecutorId();
+
+        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE,processDao,new Integer[]{dataSourceId},userId,logger);
+        permissionCheckDataSource.checkPermission();
+    }
+
 }
