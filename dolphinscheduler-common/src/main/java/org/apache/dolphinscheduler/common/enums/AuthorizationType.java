@@ -14,19 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.utils.exportprocess;
+package org.apache.dolphinscheduler.common.enums;
 
-import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
- * exportProcessAddTaskParam
+ * Authorization type
  */
-public interface exportProcessAddTaskParam {
-
+public enum AuthorizationType {
     /**
-     * add task special param: sql task dependent task
-     * @param taskNode task node json object
-     * @return task node json object
+     * 0 RESOURCE_FILE;
+     * 1 DATASOURCE;
+     * 2 UDF;
      */
-    JSONObject addSpecialParam(JSONObject taskNode);
+    RESOURCE_FILE(0, "resource file"),
+    DATASOURCE(1, "data source"),
+    UDF(2, "udf function");
+
+    AuthorizationType(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
+
+    @EnumValue
+    private final int code;
+    private final String descp;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
 }

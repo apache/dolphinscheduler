@@ -109,7 +109,7 @@
       }
     }
     .ans-input {
-      width: 60px;
+      width: 80px;
       margin:0 -2px 0 -1px;
       input {
         text-align: center;
