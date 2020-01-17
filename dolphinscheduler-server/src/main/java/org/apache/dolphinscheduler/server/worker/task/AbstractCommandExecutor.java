@@ -30,10 +30,7 @@ import org.slf4j.Logger;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -207,7 +204,7 @@ public abstract class AbstractCommandExecutor {
         // merge error information to standard output stream
         processBuilder.redirectErrorStream(true);
         // setting up user to run commands
-        List<String> command = new ArrayList<>();
+        List<String> command = new LinkedList<>();
         command.add("sudo");
         command.add("-u");
         command.add(tenantCode);
