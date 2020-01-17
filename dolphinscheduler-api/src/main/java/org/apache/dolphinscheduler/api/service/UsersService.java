@@ -448,10 +448,6 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
-            return result;
-        }
-
         String[] resourcesIdArr = resourceIds.split(",");
 
         //if resource type is UDF,need check whether it is bound by UDF functon
@@ -468,6 +464,9 @@ public class UsersService extends BaseService {
 
         resourcesUserMapper.deleteResourceUser(userId, 0);
 
+        if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
+            return result;
+        }
         for (String resourceId : resourcesIdArr) {
             Date now = new Date();
             ResourcesUser resourcesUser = new ResourcesUser();
