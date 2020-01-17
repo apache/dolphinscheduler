@@ -385,7 +385,7 @@ public class UsersServiceTest {
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         tempUser = (User) result.get(Constants.DATA_LIST);
         //check userName
-        Assert.assertEquals("userTest0001",tempUser.getUserName());
+        Assert.assertEquals("general-user-0001",tempUser.getUserName());
     }
 
 
