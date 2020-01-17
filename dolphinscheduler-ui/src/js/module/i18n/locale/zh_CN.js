@@ -356,6 +356,7 @@ export default {
   'Recipient': '收件人',
   'Cc': '抄送人',
   'Whether it is a complement process?': '是否补数',
+  'Schedule date': '调度日期',
   'Mode of execution': '执行方式',
   'Serial execution': '串行执行',
   'Parallel execution': '并行执行',

@@ -361,6 +361,7 @@ export default {
   'Recipient': 'Recipient',
   'Cc': 'Cc',
   'Whether it is a complement process?': 'Whether it is a complement process?',
+  'Schedule date': 'Schedule date',
   'Mode of execution': 'Mode of execution',
   'Serial execution': 'Serial execution',
   'Parallel execution': 'Parallel execution',
