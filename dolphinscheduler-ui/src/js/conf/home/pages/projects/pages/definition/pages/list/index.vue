@@ -100,10 +100,14 @@
       _getList (flag) {
         this.isLoading = !flag
         this.getProcessListP(this.searchParams).then(res => {
-          this.processListP = []
-          this.processListP = res.totalList
-          this.total = res.total
-          this.isLoading = false
+          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo -1
+          } else {
+            this.processListP = []
+            this.processListP = res.totalList
+            this.total = res.total
+            this.isLoading = false
+          }
         }).catch(e => {
           this.isLoading = false
         })

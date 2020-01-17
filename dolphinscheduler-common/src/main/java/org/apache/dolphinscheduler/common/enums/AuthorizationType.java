@@ -14,31 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.alert.template;
+package org.apache.dolphinscheduler.common.enums;
 
-import org.apache.dolphinscheduler.common.enums.ShowType;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
- * alert message template
+ * Authorization type
  */
-public interface AlertTemplate {
-
+public enum AuthorizationType {
     /**
-     * get a message from a specified alert template
-     * @param content     alert message content
-     * @param showType    show type
-     * @param showAll    whether to show all
-     * @return a message from a specified alert template
+     * 0 RESOURCE_FILE;
+     * 1 DATASOURCE;
+     * 2 UDF;
      */
-    String getMessageFromTemplate(String content, ShowType showType,boolean showAll);
+    RESOURCE_FILE(0, "resource file"),
+    DATASOURCE(1, "data source"),
+    UDF(2, "udf function");
 
-    /**
-     * default showAll is true
-     * @param content alert message content
-     * @param showType show type
-     * @return a message from a specified alert template
-     */
-    default String getMessageFromTemplate(String content,ShowType showType){
-        return getMessageFromTemplate(content,showType,true);
+    AuthorizationType(int code, String descp){
+        this.code = code;
+        this.descp = descp;
+    }
+
+    @EnumValue
+    private final int code;
+    private final String descp;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
     }
 }
