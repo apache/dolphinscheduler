@@ -297,18 +297,19 @@ public class UsersServiceTest {
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
-        List<Resource> udfResourceList = new ArrayList<Resource>() {{
+        //the udf resources needAuthorizedUser has the permission to use
+        List<Resource> oldAuthorizedUdfRes = new ArrayList<Resource>() {{
                 add(createResource(getAdminUser(), ResourceType.UDF, 100000));
                 add(createResource(getAdminUser(), ResourceType.UDF, 120000));
         }};
-        when(resourceMapper.queryResourceList("", 0, ResourceType.UDF.ordinal())).thenReturn(udfResourceList);
+        when(resourceMapper.queryResourceListAuthored(needAuthorizedUser.getId(), ResourceType.UDF.ordinal())).thenReturn(oldAuthorizedUdfRes);
 
         //mock udf function list
         UdfFunc udfFunc = createUdfFunc(getAdminUser(), 100000);
         List<UdfFunc> udfFuncs = new ArrayList<>();
         udfFuncs.add(udfFunc);
 
-        when(udfFuncMapper.listUdfByResourceId(new int[]{100000})).thenReturn(udfFuncs);
+        when(udfFuncMapper.listAuthorizedUdfByResourceId(needAuthorizedUser.getId(),new int[]{100000})).thenReturn(udfFuncs);
 
         //fail if udf resource is already bound by the udf function
         result = usersService.grantResources(adminUser, needAuthorizedUser.getId(), "120000");
@@ -316,6 +317,7 @@ public class UsersServiceTest {
 
         result = usersService.grantResources(adminUser, needAuthorizedUser.getId(), "100000");
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        logger.info(result.toString());
 
     }
 

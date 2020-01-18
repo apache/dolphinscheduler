@@ -99,4 +99,12 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return resource list
      */
     <T> List<Resource> listAuthorizedResource(@Param("userId") int userId,@Param("resNames")T[] resNames);
+
+    /**
+     * list authorized resource
+     * @param userId userId
+     * @param resIds resource ids
+     * @return resource list
+     */
+    <T> List<Resource> listAuthorizedResourceById(@Param("userId") int userId,@Param("resIds")T[] resIds);
 }

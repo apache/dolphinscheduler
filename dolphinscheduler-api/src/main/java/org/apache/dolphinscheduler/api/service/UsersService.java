@@ -438,21 +438,30 @@ public class UsersService extends BaseService {
             return result;
         }
         String[] resourcesIdArr = resourceIds.split(",");
-        //if resource type is UDF,need check whether it is bound by UDF functon
         Set<Integer> needAuthorizedIds = new HashSet<>();
         if (StringUtils.isNotEmpty(resourceIds)) {
             needAuthorizedIds = Arrays.stream(resourcesIdArr).map(t->Integer.parseInt(t)).collect(Collectors.toSet());
         }
-        List<Resource> udfResourceList = resourceMapper.queryResourceList("", 0, ResourceType.UDF.ordinal());
-        Set<Integer> allUdfResIds = udfResourceList.stream().map(t -> t.getId()).collect(Collectors.toSet());
-        allUdfResIds.removeAll(needAuthorizedIds);
-        List<UdfFunc> udfFuncs = udfFuncMapper.listUdfByResourceId(ArrayUtils.toPrimitive(allUdfResIds.toArray(new Integer[allUdfResIds.size()])));
-        if (CollectionUtils.isNotEmpty(udfFuncs)) {
-            logger.error("can't be deleted,because it is bound by UDF functions:{}",udfFuncs.toString());
-            putMsg(result, Status.UDF_RESOURCE_IS_BOUND, udfFuncs.get(0).getFuncName());
-            return result;
-        }
+        //if resource type is UDF,need check whether it is bound by UDF functon
 
+        //get the authorized resource id list by user id and resource type
+        List<Resource> oldAuthorizedUdfRes = resourceMapper.queryResourceListAuthored(userId, ResourceType.UDF.ordinal());
+        Set<Integer> oldAuthorizedUdfResIds = oldAuthorizedUdfRes.stream().map(t -> t.getId()).collect(Collectors.toSet());
+
+
+        //get the unauthorized resource id list
+        oldAuthorizedUdfResIds.removeAll(needAuthorizedIds);
+
+        if (CollectionUtils.isNotEmpty(oldAuthorizedUdfResIds)) {
+            int[] unauthorizedResIds = ArrayUtils.toPrimitive(oldAuthorizedUdfResIds.toArray(new Integer[oldAuthorizedUdfResIds.size()]));
+            List<UdfFunc> authorizedUdfFuncs = udfFuncMapper.listAuthorizedUdfByResourceId(userId, unauthorizedResIds);
+
+            if (CollectionUtils.isNotEmpty(authorizedUdfFuncs)) {
+                logger.error("can't be deleted,because it is bound by UDF functions:{}",authorizedUdfFuncs.toString());
+                putMsg(result, Status.UDF_RESOURCE_IS_BOUND, authorizedUdfFuncs.get(0).getFuncName());
+                return result;
+            }
+        }
 
         resourcesUserMapper.deleteResourceUser(userId, 0);
 

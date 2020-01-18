@@ -24,12 +24,14 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 public enum AuthorizationType {
     /**
      * 0 RESOURCE_FILE;
+     * 1 UDF_FILE;
      * 1 DATASOURCE;
      * 2 UDF;
      */
     RESOURCE_FILE(0, "resource file"),
-    DATASOURCE(1, "data source"),
-    UDF(2, "udf function");
+    UDF_FILE(1, "udf file"),
+    DATASOURCE(2, "data source"),
+    UDF(3, "udf function");
 
     AuthorizationType(int code, String descp){
         this.code = code;

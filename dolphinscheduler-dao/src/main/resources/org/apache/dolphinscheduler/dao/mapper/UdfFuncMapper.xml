@@ -98,4 +98,17 @@
             </foreach>
         </if>
     </select>
+    <select id="listAuthorizedUdfByResourceId" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
+        select *
+        from t_ds_udfs
+        where
+        id in (select udf_id from t_ds_relation_udfs_user where user_id=#{userId}
+        union select id as udf_id  from t_ds_udfs where user_id=#{userId})
+        <if test="resourceIds != null and resourceIds != ''">
+            and resource_id in
+            <foreach collection="resourceIds" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+    </select>
 </mapper>
