@@ -94,7 +94,7 @@ public class NettyRemotingServer {
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.SO_BACKLOG, serverConfig.getSoBacklog())
                 .option(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
-                .option(ChannelOption.TCP_NODELAY, serverConfig.isTcpNodelay())
+                .option(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
                 .option(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
                 .option(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
