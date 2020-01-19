@@ -142,7 +142,7 @@ v-ps<template>
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.$emit('_updateList')
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()
@@ -156,6 +156,7 @@ v-ps<template>
           showMask: true,
           escClose: true,
           className: 'v-modal-custom',
+          width: '800px',
           transitionName: 'opacityp',
           render (h) {
             return h(mCreateUdf, {
