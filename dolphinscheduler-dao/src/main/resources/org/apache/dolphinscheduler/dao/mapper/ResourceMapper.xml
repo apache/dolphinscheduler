@@ -70,7 +70,7 @@
     <select id="queryTenantCodeByResourceName" resultType="java.lang.String">
         select tenant_code
         from t_ds_tenant t, t_ds_user u, t_ds_resources res
-        where t.id = u.tenant_id and u.id = res.user_id and res.type=0
+        where t.id = u.tenant_id and u.id = res.user_id and res.type=#{resType}
         and res.alias= #{resName}
     </select>
     <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
