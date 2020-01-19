@@ -76,7 +76,8 @@
                     filterable
                     v-model="resourceId"
                     :disabled="isUpdate"
-                    style="width: 200px">
+                    :add-title="true"
+                    style="width: 261px">
               <x-option
                       v-for="city in udfResourceList"
                       :key="city.id"
