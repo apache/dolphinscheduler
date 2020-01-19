@@ -96,6 +96,10 @@ public class NettyRemotingClient {
         isStarted.compareAndSet(false, true);
     }
 
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
+        registerProcessor(commandType, processor, null);
+    }
+
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         this.clientHandler.registerProcessor(commandType, processor, executor);
     }

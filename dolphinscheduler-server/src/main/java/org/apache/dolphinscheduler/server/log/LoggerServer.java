@@ -31,11 +31,15 @@ public class LoggerServer {
 
     private final NettyRemotingServer server;
 
+    private final NettyServerConfig serverConfig;
+
+    private final LoggerRequestProcessor requestProcessor;
+
     public LoggerServer(){
-        NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(Constants.RPC_PORT);
+        this.serverConfig = new NettyServerConfig();
+        this.serverConfig.setListenPort(Constants.RPC_PORT);
         this.server = new NettyRemotingServer(serverConfig);
-        LoggerRequestProcessor requestProcessor = new LoggerRequestProcessor();
+        this.requestProcessor = new LoggerRequestProcessor();
         this.server.registerProcessor(CommandType.GET_LOG_REQ, requestProcessor, requestProcessor.getExecutor());
         this.server.registerProcessor(CommandType.ROLL_VIEW_LOG_REQ, requestProcessor, requestProcessor.getExecutor());
         this.server.registerProcessor(CommandType.VIEW_LOG_REQ, requestProcessor, requestProcessor.getExecutor());

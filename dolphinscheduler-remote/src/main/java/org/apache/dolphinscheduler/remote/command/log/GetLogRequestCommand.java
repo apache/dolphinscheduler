@@ -47,7 +47,7 @@ public class GetLogRequestCommand implements Serializable {
 
     public Command convert2Command(){
         Command command = new Command(REQUEST.getAndIncrement());
-        command.setType(CommandType.GET_LOG_RES);
+        command.setType(CommandType.VIEW_LOG_REQ);
         byte[] body = FastJsonSerializer.serialize(this);
         command.setBody(body);
         return command;
