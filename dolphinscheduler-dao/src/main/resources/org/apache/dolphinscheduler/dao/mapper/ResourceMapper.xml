@@ -89,8 +89,7 @@
     <select id="listAuthorizedResourceById" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select *
         from t_ds_resources
-        where type=0
-        and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
+        where id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
         union select id as resources_id  from t_ds_resources where user_id=#{userId})
         <if test="resIds != null and resIds != ''">
             and id in
