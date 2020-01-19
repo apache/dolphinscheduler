@@ -238,6 +238,11 @@
 				<artifactId>dolphinscheduler-alert</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-service</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.apache.curator</groupId>
@@ -860,6 +865,7 @@
 		<module>dolphinscheduler-alert</module>
 		<module>dolphinscheduler-dist</module>
 		<module>dolphinscheduler-remote</module>
-	</modules>
+        <module>dolphinscheduler-service</module>
+    </modules>
 
 </project>

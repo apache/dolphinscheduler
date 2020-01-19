@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,10 +65,10 @@ public class LoggerService {
 
     logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
 
-////    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
-////    String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
-//    result.setData(log);
-//    logger.info(log);
+    LogClientService logClient = new LogClientService(host, Constants.RPC_PORT);
+    String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
+    result.setData(log);
+    logger.info(log);
 
     return result;
   }
@@ -84,8 +85,7 @@ public class LoggerService {
       throw new RuntimeException("task instance is null");
     }
     String host = taskInstance.getHost();
-//    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
-//    return logClient.getLogBytes(taskInstance.getLogPath());
-    return null;
+    LogClientService logClient = new LogClientService(host, Constants.RPC_PORT);
+    return logClient.getLogBytes(taskInstance.getLogPath());
   }
 }
