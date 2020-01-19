@@ -1789,6 +1789,10 @@ public class ProcessDao {
                     Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(t -> t.getAlias()).collect(toSet());
                     originResSet.removeAll(authorizedResources);
                     break;
+                case UDF_FILE:
+                    Set<Integer> authorizedUdfFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedUdfFiles);
+                    break;
                 case DATASOURCE:
                     Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId,needChecks).stream().map(t -> t.getId()).collect(toSet());
                     originResSet.removeAll(authorizedDatasources);

@@ -620,7 +620,7 @@ public class ResourcesController extends BaseController{
         try{
 
             logger.info("login user {}, delete udf function id: {}", loginUser.getUserName(),udfFuncId);
-            return udfFuncService.delete(udfFuncId);
+            return udfFuncService.delete(loginUser,udfFuncId);
         }catch (Exception e){
             logger.error(DELETE_UDF_FUNCTION_ERROR.getMsg(),e);
             return error(Status.DELETE_UDF_FUNCTION_ERROR.getCode(), Status.DELETE_UDF_FUNCTION_ERROR.getMsg());

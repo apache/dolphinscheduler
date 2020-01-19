@@ -301,13 +301,24 @@ public class UdfFuncService extends BaseService{
     /**
      * delete udf function
      *
-     * @param id udf function id
+     * @param id        udf function id
+     * @param loginUser login user
      * @return delete result code
      */
     @Transactional(rollbackFor = Exception.class)
-    public Result delete(int id) {
+    public Result delete(User loginUser,int id) {
         Result result = new Result();
-        
+
+        UdfFunc udfFunc = udfFuncMapper.selectUdfById(id);
+        if(udfFunc == null){
+            putMsg(result,Status.UDF_FUNCTION_NOT_EXIST);
+            return result;
+        }
+
+        if (!hasPerm(loginUser,udfFunc.getUserId())){
+            putMsg(result,Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
         udfFuncMapper.deleteById(id);
         udfUserMapper.deleteByUdfFuncId(id);
         putMsg(result, Status.SUCCESS);

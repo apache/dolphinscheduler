@@ -53,6 +53,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
@@ -123,8 +124,11 @@ public class SqlTask extends AbstractTask {
             return;
         }
         int dataSourceId = sqlParameters.getDatasource();
+        //  process instance
+        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        int userId = processInstance.getExecutorId();
         // check data source permission
-        checkDataSourcePermission(dataSourceId);
+        checkDataSourcePermission(userId,dataSourceId);
         dataSource= processDao.findDataSourceById(dataSourceId);
         logger.info("datasource name : {} , type : {} , desc : {}  , user_id : {} , parameter : {}",
                 dataSource.getName(),
@@ -171,8 +175,11 @@ public class SqlTask extends AbstractTask {
                     idsArray[i]=Integer.parseInt(ids[i]);
                 }
                 // check udf permission
-                checkUdfPermission(ArrayUtils.toObject(idsArray));
+                checkUdfPermission(userId,ArrayUtils.toObject(idsArray));
                 List<UdfFunc> udfFuncList = processDao.queryUdfFunListByids(idsArray);
+                // check whether has permission to download udf file
+                checkUdfFilePermission(userId,udfFuncList);
+
                 Map<String,UdfFunc> udfFuncMap = new HashMap<String,UdfFunc>();
                 for(UdfFunc udfFunc : udfFuncList) {
                     String tenantCode = processDao.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
@@ -466,29 +473,36 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * check udf function permission
-     * @param udfFunIds    udf functions
+     * check udf file permission
+     * @param userId          login user id
+     * @param udfFuncList    udf function list
      * @return if has download permission return true else false
      */
-    private void checkUdfPermission(Integer[] udfFunIds) throws Exception{
-        //  process instance
-        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
-        int userId = processInstance.getExecutorId();
+    private void checkUdfFilePermission(int userId,List<UdfFunc> udfFuncList) throws Exception{
+        Integer[] resourceIds = udfFuncList.stream().map(t -> t.getResourceId()).collect(Collectors.toList()).toArray(new Integer[udfFuncList.size()]);
 
+        PermissionCheck<Integer> permissionCheckUdfFile = new PermissionCheck<Integer>(AuthorizationType.UDF_FILE,processDao,resourceIds,userId,logger);
+        permissionCheckUdfFile.checkPermission();
+    }
+
+    /**
+     * check udf function permission
+     * @param userId          login user id
+     * @param udfFunIds    udf functions
+     * @return if has permission return true else false
+     */
+    private void checkUdfPermission(int userId,Integer[] udfFunIds) throws Exception{
         PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF,processDao,udfFunIds,userId,logger);
         permissionCheckUdf.checkPermission();
     }
 
     /**
      * check data source permission
+     * @param userId          login user id
      * @param dataSourceId    data source id
      * @return if has download permission return true else false
      */
-    private void checkDataSourcePermission(int dataSourceId) throws Exception{
-        //  process instance
-        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
-        int userId = processInstance.getExecutorId();
-
+    private void checkDataSourcePermission(int userId,int dataSourceId) throws Exception{
         PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE,processDao,new Integer[]{dataSourceId},userId,logger);
         permissionCheckDataSource.checkPermission();
     }
