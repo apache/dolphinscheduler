@@ -57,6 +57,10 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         processReceived(ctx.channel(), (Command)msg);
     }
 
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
+         this.registerProcessor(commandType, processor, nettyRemotingClient.getDefaultExecutor());
+    }
+
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         ExecutorService executorRef = executor;
         if(executorRef == null){
