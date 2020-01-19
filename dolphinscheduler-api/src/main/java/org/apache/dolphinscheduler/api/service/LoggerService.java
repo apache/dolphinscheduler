@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.log.LogClient;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.commons.lang3.StringUtils;
@@ -63,12 +64,14 @@ public class LoggerService {
 
     Result result = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
 
-    logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
+    int port = PropertyUtils.getInt(Constants.LOGGER_SERVER_RPC_PORT);
 
-    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
+    logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),port);
+
+    LogClient logClient = new LogClient(host, port);
     String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
+
     result.setData(log);
-    logger.info(log);
 
     return result;
   }
@@ -80,12 +83,18 @@ public class LoggerService {
    * @return log byte array
    */
   public byte[] getLogBytes(int taskInstId) {
+
     TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
     if (taskInstance == null){
       throw new RuntimeException("task instance is null");
     }
     String host = taskInstance.getHost();
-    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
+
+    int port = PropertyUtils.getInt(Constants.LOGGER_SERVER_RPC_PORT);
+
+    logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),port);
+
+    LogClient logClient = new LogClient(host, port);
     return logClient.getLogBytes(taskInstance.getLogPath());
   }
 }
