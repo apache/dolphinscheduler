@@ -57,13 +57,7 @@ public class NettyRemotingClient {
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    private final NioEventLoopGroup workGroup = new NioEventLoopGroup(1, new ThreadFactory() {
-        private AtomicInteger threadIndex = new AtomicInteger(0);
-
-        public Thread newThread(Runnable r) {
-            return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
-        }
-    });
+    private final NioEventLoopGroup workerGroup;
 
     private final NettyClientHandler clientHandler = new NettyClientHandler(this);
 
@@ -71,15 +65,23 @@ public class NettyRemotingClient {
 
     public NettyRemotingClient(final NettyClientConfig clientConfig){
         this.clientConfig = clientConfig;
+        this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
+            private AtomicInteger threadIndex = new AtomicInteger(0);
+
+            public Thread newThread(Runnable r) {
+                return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
+            }
+        });
+        this.start();
     }
 
     public void start(){
 
         this.bootstrap
-                .group(this.workGroup)
+                .group(this.workerGroup)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.SO_KEEPALIVE, clientConfig.isSoKeepalive())
-                .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNodelay())
+                .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNoDelay())
                 .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())
                 .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -155,8 +157,8 @@ public class NettyRemotingClient {
         if(isStarted.compareAndSet(true, false)){
             try {
                 closeChannels();
-                if(workGroup != null){
-                    this.workGroup.shutdownGracefully();
+                if(workerGroup != null){
+                    this.workerGroup.shutdownGracefully();
                 }
                 if(defaultExecutor != null){
                     defaultExecutor.shutdown();

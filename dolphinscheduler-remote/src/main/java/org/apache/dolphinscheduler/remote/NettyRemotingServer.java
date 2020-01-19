@@ -84,6 +84,10 @@ public class NettyRemotingServer {
 
     public void start(){
 
+        if(this.isStarted.get()){
+            return;
+        }
+
         this.serverBootstrap
                 .group(this.bossGroup, this.workGroup)
                 .channel(NioServerSocketChannel.class)

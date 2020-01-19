@@ -16,25 +16,34 @@
  */
 package org.apache.dolphinscheduler.remote.config;
 
-//TODO
+import org.apache.dolphinscheduler.remote.utils.Constants;
+
 public class NettyClientConfig {
 
-    private boolean tcpNodelay;
+    private int workerThreads = Constants.CPUS;
 
-    private boolean soKeepalive;
+    private boolean tcpNoDelay = true;
 
-    private int sendBufferSize;
+    private boolean soKeepalive = true;
 
-    private int receiveBufferSize;
+    private int sendBufferSize = 65535;
 
-    private int connectorPort;
+    private int receiveBufferSize = 65535;
 
-    public boolean isTcpNodelay() {
-        return tcpNodelay;
+    public int getWorkerThreads() {
+        return workerThreads;
     }
 
-    public void setTcpNodelay(boolean tcpNodelay) {
-        this.tcpNodelay = tcpNodelay;
+    public void setWorkerThreads(int workerThreads) {
+        this.workerThreads = workerThreads;
+    }
+
+    public boolean isTcpNoDelay() {
+        return tcpNoDelay;
+    }
+
+    public void setTcpNoDelay(boolean tcpNoDelay) {
+        this.tcpNoDelay = tcpNoDelay;
     }
 
     public boolean isSoKeepalive() {
@@ -61,11 +70,4 @@ public class NettyClientConfig {
         this.receiveBufferSize = receiveBufferSize;
     }
 
-    public int getConnectorPort() {
-        return connectorPort;
-    }
-
-    public void setConnectorPort(int connectorPort) {
-        this.connectorPort = connectorPort;
-    }
 }
