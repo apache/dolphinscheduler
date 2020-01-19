@@ -36,6 +36,8 @@ public class LoggerClient implements NettyRequestProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerClient.class);
 
+    private final NettyClientConfig clientConfig;
+
     private final NettyRemotingClient client;
 
     private final Address address;
@@ -49,8 +51,8 @@ public class LoggerClient implements NettyRequestProcessor {
      */
     public LoggerClient(String host, int port) {
         this.address = new Address(host, port);
-        NettyClientConfig clientConfig = new NettyClientConfig();
-        clientConfig.setWorkerThreads(1);
+        this.clientConfig = new NettyClientConfig();
+        this.clientConfig.setWorkerThreads(1);
         this.client = new NettyRemotingClient(clientConfig);
         this.client.registerProcessor(CommandType.ROLL_VIEW_LOG_RES,this);
         this.client.registerProcessor(CommandType.VIEW_LOG_RES, this);
