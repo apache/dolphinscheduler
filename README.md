@@ -58,13 +58,7 @@ Overload processing: Task queue mechanism, the number of schedulable tasks on a 
 
 ### Document
 
-- <a href="https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/backend-deployment.html" target="_blank">Backend deployment documentation</a>
-
-- <a href="https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/frontend-deployment.html" target="_blank">Front-end deployment documentation</a>
-
 - [**User manual**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/system-manual.html?_blank "System manual")
-
-- [**Upgrade document**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/release/upgrade.html?_blank "Upgrade document")
 
 - <a href="http://106.75.43.194:8888" target="_blank">Online Demo</a>
 
@@ -76,7 +70,7 @@ Work plan of Dolphin Scheduler: [R&D plan](https://github.com/apache/incubator-d
 ### How to contribute
 
 Welcome to participate in contributing, please refer to the process of submitting the code:
-[[How to contribute](https://dolphinscheduler.apache.org/en-us/docs/development/contribute.html)]
+[[How to contribute](https://dolphinscheduler.apache.org/en-us/docs/development/submit-code.html)]
 
 ### How to Build
 
