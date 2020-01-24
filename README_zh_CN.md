@@ -50,7 +50,7 @@ Dolphin Scheduler Official Website
 
 - [**使用手册**](https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/system-manual.html?_blank "系统使用手册")
 
-- [**升级文档**](https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/release/upgrade.html?_blank "升级文档")
+- [**升级文档**](https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/upgrade.html?_blank "升级文档")
 
 - <a href="http://106.75.43.194:8888" target="_blank">我要体验</a>
 
