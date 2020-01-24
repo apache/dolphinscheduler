@@ -64,7 +64,7 @@ Overload processing: Task queue mechanism, the number of schedulable tasks on a 
 
 - [**User manual**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/system-manual.html?_blank "System manual")
 
-- [**Upgrade document**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/release/upgrade.html?_blank "Upgrade document")
+- [**Upgrade document**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/upgrade.html?_blank "Upgrade document")
 
 - <a href="http://106.75.43.194:8888" target="_blank">Online Demo</a>
 
