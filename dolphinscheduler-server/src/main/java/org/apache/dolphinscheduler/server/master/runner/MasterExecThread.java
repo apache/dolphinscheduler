@@ -187,7 +187,7 @@ public class MasterExecThread implements Runnable {
 
     /**
      * execute process
-     * @throws Exception excpetion
+     * @throws Exception exception
      */
     private void executeProcess() throws Exception {
         prepareProcess();
@@ -197,7 +197,7 @@ public class MasterExecThread implements Runnable {
 
     /**
      * execute complement process
-     * @throws Exception excpetion
+     * @throws Exception exception
      */
     private void executeComplementProcess() throws Exception {
 
@@ -247,7 +247,7 @@ public class MasterExecThread implements Runnable {
             // execute process ,waiting for end
             runProcess();
 
-            // process instace failure ，no more complements
+            // process instance failure ，no more complements
             if(!processInstance.getState().typeIsSuccess()){
                 logger.info("process {} state {}, complement not completely!",
                         processInstance.getId(), processInstance.getState());
@@ -304,7 +304,7 @@ public class MasterExecThread implements Runnable {
 
     /**
      * prepare process parameter
-     * @throws Exception excpetion
+     * @throws Exception exception
      */
     private void prepareProcess() throws Exception {
         // init task queue
@@ -332,7 +332,7 @@ public class MasterExecThread implements Runnable {
 
     /**
      *  generate process dag
-     * @throws Exception excpetion
+     * @throws Exception exception
      */
     private void buildFlowDag() throws Exception {
         recoverNodeIdList = getStartTaskInstanceList(processInstance.getCommandParam());
@@ -609,7 +609,7 @@ public class MasterExecThread implements Runnable {
     /**
      * query task instance by complete state
      * @param state state
-     * @return task isntance list
+     * @return task instance list
      */
     private List<TaskInstance> getCompleteTaskByState(ExecutionStatus state){
         List<TaskInstance> resultList = new ArrayList<>();
@@ -804,7 +804,7 @@ public class MasterExecThread implements Runnable {
     }
 
     /**
-     * add task to standy list
+     * add task to standby list
      * @param taskInstance task instance
      */
     private void addTaskToStandByList(TaskInstance taskInstance){
