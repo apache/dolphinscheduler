@@ -64,7 +64,7 @@ Overload processing: Task queue mechanism, the number of schedulable tasks on a 
 
 - [**User manual**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/system-manual.html?_blank "System manual")
 
-- [**Upgrade document**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/release/upgrade.html?_blank "Upgrade document")
+- [**Upgrade document**](https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/upgrade.html?_blank "Upgrade document")
 
 - <a href="http://106.75.43.194:8888" target="_blank">Online Demo</a>
 
@@ -99,7 +99,7 @@ It is because of the shoulders of these open source projects that the birth of t
 
 ### Get Help
 1. Submit an issue
-1. Subscribe the mail list : https://dolphinscheduler.apache.org/en-us/docs/user_doc/subscribe.html.  then send mail to dev@dolphinscheduler.apache.org
+1. Subscribe the mail list : https://dolphinscheduler.apache.org/en-us/docs/development/subscribe.html.  then send mail to dev@dolphinscheduler.apache.org
 1. Contact WeChat group manager, ID 510570367. This is for Mandarin(CN) discussion.
 
 ### License

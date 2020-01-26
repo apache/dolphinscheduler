@@ -64,7 +64,6 @@
 		<quartz.version>2.2.3</quartz.version>
 		<jackson.version>2.9.8</jackson.version>
 		<mybatis-plus.version>3.2.0</mybatis-plus.version>
-		<lombok.version>1.18.4</lombok.version>
 		<mybatis.spring.version>2.0.1</mybatis.spring.version>
 		<cron.utils.version>5.0.5</cron.utils.version>
 		<fastjson.version>1.2.61</fastjson.version>
@@ -680,6 +679,8 @@
 						<include>**/common/queue/*.java</include>
 						<include>**/api/utils/CheckUtilsTest.java</include>
 						<include>**/api/utils/FileUtilsTest.java</include>
+						<include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
+						<include>**/api/utils/exportprocess/DependentParamTest.java</include>
 						<include>**/api/enums/*.java</include>
 						<include>**/api/service/AccessTokenServiceTest.java</include>
 						<include>**/api/service/QueueServiceTest.java</include>
@@ -693,6 +694,9 @@
 						<include>**/api/service/ProcessDefinitionServiceTest.java</include>
 						<include>**/api/service/UdfFuncServiceTest.java</include>
 						<include>**/api/service/ResourcesServiceTest.java</include>
+						<include>**/api/service/ExecutorService2Test.java</include>
+						<include>**/api/service/BaseServiceTest.java</include>
+						<include>**/api/service/BaseDAGServiceTest.java</include>
 						<include>**/alert/utils/ExcelUtilsTest.java</include>
 						<include>**/alert/utils/FuncUtilsTest.java</include>
 						<include>**/alert/utils/JSONUtilsTest.java</include>
@@ -700,6 +704,8 @@
 						<include>**/server/utils/SparkArgsUtilsTest.java</include>
 						<include>**/server/utils/FlinkArgsUtilsTest.java</include>
 						<include>**/server/utils/ParamUtilsTest.java</include>
+						<include>**/server/utils/ScheduleUtilsTest.java</include>
+						<include>**/server/master/MasterExecThreadTest.java</include>
 						<include>**/dao/mapper/AccessTokenMapperTest.java</include>
 						<include>**/dao/mapper/AlertGroupMapperTest.java</include>
 						<include>**/dao/mapper/AlertMapperTest.java</include>
@@ -833,11 +839,6 @@
 					<format>xml</format>
 					<instrumentation>
 						<ignoreTrivial>true</ignoreTrivial>
-						<ignoreMethodAnnotations>
-							<ignoreMethodAnnotation>lombok.Generated</ignoreMethodAnnotation>
-						</ignoreMethodAnnotations>
-						<excludes>
-						</excludes>
 					</instrumentation>
 				</configuration>
 			</plugin>

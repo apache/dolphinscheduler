@@ -30,10 +30,7 @@ import org.slf4j.Logger;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -207,7 +204,14 @@ public abstract class AbstractCommandExecutor {
         // merge error information to standard output stream
         processBuilder.redirectErrorStream(true);
         // setting up user to run commands
-        processBuilder.command("sudo", "-u", tenantCode, commandType(), commandFile);
+        List<String> command = new LinkedList<>();
+        command.add("sudo");
+        command.add("-u");
+        command.add(tenantCode);
+        command.add(commandInterpreter());
+        command.addAll(commandOptions());
+        command.add(commandFile);
+        processBuilder.command(command);
 
         process = processBuilder.start();
 
@@ -559,9 +563,11 @@ public abstract class AbstractCommandExecutor {
         }
     }
 
-
+    protected List<String> commandOptions() {
+        return Collections.emptyList();
+    }
     protected abstract String buildCommandFilePath();
-    protected abstract String commandType();
+    protected abstract String commandInterpreter();
     protected abstract boolean checkFindApp(String line);
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 }

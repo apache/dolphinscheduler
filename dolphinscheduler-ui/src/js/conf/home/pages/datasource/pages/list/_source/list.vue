@@ -64,7 +64,7 @@
             </m-tooltips-JSON>
           </td>
           <td>
-            <span v-if="item.note" class="ellipsis" v-tooltip.large.top.start="{text: item.note, maxWidth: '500px'}">{{item.note}}</span>
+            <span v-if="item.note" class="ellipsis" v-tooltip.large.top.start.light="{text: item.note, maxWidth: '500px'}">{{item.note}}</span>
             <span v-else>-</span>
           </td>
           <td>
@@ -148,7 +148,7 @@
         this.deleteDatasource({
           id: item.id
         }).then(res => {
-          this.list.splice(i, 1)
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$message.error(e.msg || '')

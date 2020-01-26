@@ -76,6 +76,21 @@ public class TaskQueueZkImpl implements ITaskQueue {
     }
 
     /**
+     * check if has a task
+     * @param key queue name
+     * @return true if has; false if not
+     */
+    @Override
+    public boolean hasTask(String key) {
+        try {
+            return zookeeperOperator.hasChildren(getTasksPath(key));
+        } catch (Exception e) {
+            logger.error("check has task in tasks queue exception",e);
+        }
+        return false;
+    }
+
+    /**
      * check task exists in the task queue or not
      *
      * @param key       queue name
