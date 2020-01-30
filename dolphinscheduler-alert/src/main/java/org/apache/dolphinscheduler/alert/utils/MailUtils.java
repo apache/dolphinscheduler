@@ -84,6 +84,7 @@ public class MailUtils {
             MAIL_TEMPLATE = new Template("alert_mail_template", isr, cfg);
         } catch (Exception e) {
             MAIL_TEMPLATE = null;
+            logger.error(e.getMessage(),e);
         } finally {
             IOUtils.closeQuietly(isr);
         }
