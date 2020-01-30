@@ -75,7 +75,7 @@ public class NettyRemotingClient {
         this.start();
     }
 
-    public void start(){
+    private void start(){
 
         this.bootstrap
                 .group(this.workerGroup)

@@ -93,10 +93,10 @@ public class NettyRemotingServer {
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .option(ChannelOption.SO_BACKLOG, serverConfig.getSoBacklog())
-                .option(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
-                .option(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
-                .option(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
-                .option(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
+                .childOption(ChannelOption.SO_KEEPALIVE, serverConfig.isSoKeepalive())
+                .childOption(ChannelOption.TCP_NODELAY, serverConfig.isTcpNoDelay())
+                .childOption(ChannelOption.SO_SNDBUF, serverConfig.getSendBufferSize())
+                .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
 
                     protected void initChannel(NioSocketChannel ch) throws Exception {
@@ -127,6 +127,10 @@ public class NettyRemotingServer {
         pipeline.addLast("encoder", encoder);
         pipeline.addLast("decoder", new NettyDecoder());
         pipeline.addLast("handler", serverHandler);
+    }
+
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
+        this.registerProcessor(commandType, processor, null);
     }
 
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
