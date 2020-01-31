@@ -78,8 +78,6 @@
 		<slf4j.api.version>1.7.5</slf4j.api.version>
 		<slf4j.log4j12.version>1.7.5</slf4j.log4j12.version>
 		<commons.collections.version>3.2.2</commons.collections.version>
-		<commons.lang.version>2.3</commons.lang.version>
-		<commons.lang3.version>3.5</commons.lang3.version>
 		<commons.httpclient>3.0.1</commons.httpclient>
 		<commons.beanutils.version>1.7.0</commons.beanutils.version>
 		<commons.configuration.version>1.10</commons.configuration.version>
