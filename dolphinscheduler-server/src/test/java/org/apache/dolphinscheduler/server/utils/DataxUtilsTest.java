@@ -25,10 +25,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * DataxUtils Tester.
- *
- * @author wenhemin
- * @since <pre>一月 31, 2020</pre>
- * @version 1.0
  */
 public class DataxUtilsTest {
 
