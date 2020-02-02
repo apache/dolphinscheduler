@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.junit.After;
@@ -39,6 +40,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -75,11 +77,7 @@ public class DataxTaskTest {
         props.setTaskTimeout(0);
         props.setTaskParams(
             "{\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"datasource\":1,\"dsType\":\"MYSQL\",\"datatarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test1, 2 as test2 from dual\",\"preStatements\":[\"delete from test\"]}");
-        dataxTask = new DataxTask(props, logger);
-        SpringApplicationContext.getBean(ProcessDao.class);
-
-        MockitoAnnotations.initMocks(dataxTask);
-
+        dataxTask = PowerMockito.spy(new DataxTask(props, logger));
         dataxTask.init();
 
         Mockito.when(processDao.findDataSourceById(1)).thenReturn(getDataSource());
@@ -115,10 +113,11 @@ public class DataxTaskTest {
     public void testParsingSqlColumnNames()
         throws Exception {
         try {
+
             BaseDataSource dataSource = DataSourceFactory.getDatasource(getDataSource().getType(),
                     getDataSource().getConnectionParams());
 
-            Method method = dataxTask.getClass().getDeclaredMethod("parsingSqlColumnNames", DbType.class, DbType.class, BaseDataSource.class, String.class);
+            Method method = DataxTask.class.getDeclaredMethod("parsingSqlColumnNames", DbType.class, DbType.class, BaseDataSource.class, String.class);
             method.setAccessible(true);
             String[] columns = (String[]) method.invoke(dataxTask, DbType.MYSQL, DbType.MYSQL, dataSource, "select 1 as a, 2 as `table` from dual");
 
@@ -140,7 +139,7 @@ public class DataxTaskTest {
     public void testTryGrammaticalAnalysisSqlColumnNames()
         throws Exception {
         try {
-            Method method = dataxTask.getClass().getDeclaredMethod("tryGrammaticalAnalysisSqlColumnNames", DbType.class, String.class);
+            Method method = DataxTask.class.getDeclaredMethod("tryGrammaticalAnalysisSqlColumnNames", DbType.class, String.class);
             method.setAccessible(true);
             String[] columns = (String[]) method.invoke(dataxTask, DbType.MYSQL, "select 1 as a, 2 as b from dual");
 
@@ -172,7 +171,7 @@ public class DataxTaskTest {
     public void testBuildDataxJsonFile()
         throws Exception {
         try {
-            Method method = dataxTask.getClass().getDeclaredMethod("buildDataxJsonFile");
+            Method method = DataxTask.class.getDeclaredMethod("buildDataxJsonFile");
             method.setAccessible(true);
             String filePath = (String) method.invoke(dataxTask, null);
             Assert.assertNotNull(filePath);
@@ -189,7 +188,7 @@ public class DataxTaskTest {
     public void testBuildDataxJobContentJson()
         throws Exception {
         try {
-            Method method = dataxTask.getClass().getDeclaredMethod("buildDataxJobContentJson");
+            Method method = DataxTask.class.getDeclaredMethod("buildDataxJobContentJson");
             method.setAccessible(true);
             List<JSONObject> contentList = (List<JSONObject>) method.invoke(dataxTask, null);
             Assert.assertNotNull(contentList);
@@ -219,7 +218,7 @@ public class DataxTaskTest {
     public void testBuildDataxJobSettingJson()
         throws Exception {
         try {
-            Method method = dataxTask.getClass().getDeclaredMethod("buildDataxJobSettingJson");
+            Method method = DataxTask.class.getDeclaredMethod("buildDataxJobSettingJson");
             method.setAccessible(true);
             JSONObject setting = (JSONObject) method.invoke(dataxTask, null);
             Assert.assertNotNull(setting);
@@ -238,7 +237,7 @@ public class DataxTaskTest {
     public void testBuildDataxCoreJson()
         throws Exception {
         try {
-            Method method = dataxTask.getClass().getDeclaredMethod("buildDataxCoreJson");
+            Method method = DataxTask.class.getDeclaredMethod("buildDataxCoreJson");
             method.setAccessible(true);
             JSONObject coreConfig = (JSONObject) method.invoke(dataxTask, null);
             Assert.assertNotNull(coreConfig);
@@ -256,7 +255,7 @@ public class DataxTaskTest {
     public void testBuildShellCommandFile()
         throws Exception {
         try {
-            Method method = dataxTask.getClass().getDeclaredMethod("buildShellCommandFile", String.class);
+            Method method = DataxTask.class.getDeclaredMethod("buildShellCommandFile", String.class);
             method.setAccessible(true);
             Assert.assertNotNull(method.invoke(dataxTask, "test.json"));
         }
@@ -272,7 +271,7 @@ public class DataxTaskTest {
     public void testNotNull()
         throws Exception {
         try {
-            Method method = dataxTask.getClass().getDeclaredMethod("notNull", Object.class, String.class);
+            Method method = DataxTask.class.getDeclaredMethod("notNull", Object.class, String.class);
             method.setAccessible(true);
             method.invoke(dataxTask, "abc", "test throw RuntimeException");
         }
