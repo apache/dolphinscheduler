@@ -701,6 +701,8 @@
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
                         <include>**/alert/utils/PropertyUtilsTest.java</include>
+                        <include>**/alert/utils/EnterpriseWeChatUtilsTest.java</include>
+                        <include>**/alert/utils/MailUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
