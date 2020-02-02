@@ -254,7 +254,7 @@ public class DataxTask extends AbstractTask {
         writerParam.put("username", dataTargetCfg.getUser());
         writerParam.put("password", dataTargetCfg.getPassword());
         writerParam.put("column",
-                parsingSqlColumnNames(dataSource.getType(), dataTarget.getType(), dataSourceCfg, etlParameters.getSql()));
+            parsingSqlColumnNames(dataSource.getType(), dataTarget.getType(), dataSourceCfg, etlParameters.getSql()));
         writerParam.put("connection", writerConnArr);
 
         if (CollectionUtils.isNotEmpty(etlParameters.getPreStatements())) {
@@ -454,11 +454,13 @@ public class DataxTask extends AbstractTask {
                         columnName = expr.getName();
                     }
                 } else {
-                    throw new RuntimeException(String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
+                    throw new RuntimeException(
+                        String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
                 }
 
                 if (columnName == null) {
-                    throw new RuntimeException(String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
+                    throw new RuntimeException(
+                        String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
                 }
 
                 columnNames[i] = columnName;
@@ -483,18 +485,18 @@ public class DataxTask extends AbstractTask {
      */
     public String[] tryExecuteSqlResolveColumnNames(BaseDataSource baseDataSource, String sql) {
         String[] columnNames;
+        sql = String.format("SELECT t.* FROM ( %s ) t WHERE 0 = 1", sql);
+        sql = sql.replace(";", "");
 
-        try (Connection connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(), baseDataSource.getUser(),
-            baseDataSource.getPassword())) {
-            sql = String.format("SELECT t.* FROM ( %s ) t WHERE 0 = 1", sql);
-            sql = sql.replace(";", "");
-
+        try (
+            Connection connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(), baseDataSource.getUser(),
+                baseDataSource.getPassword());
             PreparedStatement stmt = connection.prepareStatement(sql);
-            ResultSet resultSet = stmt.executeQuery();
+            ResultSet resultSet = stmt.executeQuery()) {
+
             ResultSetMetaData md = resultSet.getMetaData();
             int num = md.getColumnCount();
             columnNames = new String[num];
-
             for (int i = 1; i <= num; i++ ) {
                 columnNames[i - 1] = md.getColumnName(i);
             }
