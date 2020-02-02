@@ -33,6 +33,7 @@ public enum TaskType {
      * 7 DEPENDENT
      * 8 FLINK
      * 9 HTTP
+     * 10 ETL
      */
     SHELL(0, "shell"),
     SQL(1, "sql"),
@@ -43,7 +44,8 @@ public enum TaskType {
     PYTHON(6, "python"),
     DEPENDENT(7, "dependent"),
     FLINK(8, "flink"),
-    HTTP(9, "http");
+    HTTP(9, "http"),
+    ETL(10, "etl");
 
     TaskType(int code, String descp){
         this.code = code;

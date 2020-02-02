@@ -279,6 +279,10 @@ let tasksType = {
   'HTTP': {
     desc: 'HTTP',
     color: '#E46F13'
+  },
+  'ETL': {
+    desc: 'ETL',
+    color: '#1fc747'
   }
 }
 

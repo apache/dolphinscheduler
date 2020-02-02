@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.worker.task;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.server.worker.task.dependent.DependentTask;
+import org.apache.dolphinscheduler.server.worker.task.etl.DataxTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
 import org.apache.dolphinscheduler.server.worker.task.http.HttpTask;
 import org.apache.dolphinscheduler.server.worker.task.mr.MapReduceTask;
@@ -65,6 +66,8 @@ public class TaskManager {
         return new DependentTask(props, logger);
       case HTTP:
         return new HttpTask(props, logger);
+      case ETL:
+        return new DataxTask(props, logger);
       default:
         logger.error("unsupport task type: {}", taskType);
         throw new IllegalArgumentException("not support task type");

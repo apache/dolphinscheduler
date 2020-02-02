@@ -191,7 +191,13 @@
           ref="HTTP"
           :backfill-item="backfillItem">
         </m-http>
-
+        <m-etl
+          v-if="taskType === 'ETL'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="ETL"
+          :backfill-item="backfillItem">
+        </m-etl>
       </div>
     </div>
     <div class="bottom-box">
@@ -216,6 +222,7 @@
   import mProcedure from './tasks/procedure'
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
+  import mEtl from './tasks/etl'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
@@ -565,6 +572,7 @@
       mPython,
       mDependent,
       mHttp,
+      mEtl,
       mSelectInput,
       mTimeoutAlarm,
       mPriority,
