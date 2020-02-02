@@ -26,8 +26,9 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
  * Sql/Hql parameter
  */
 public class EtlParameters extends AbstractParameters {
+
     /**
-     * data source type，eg  MYSQL, POSTGRES, HIVE ...
+     * data source type，eg  MYSQL, POSTGRES ...
      */
     private String dsType;
 
@@ -37,7 +38,7 @@ public class EtlParameters extends AbstractParameters {
     private int datasource;
 
     /**
-     * data target type，eg  MYSQL, POSTGRES, HIVE ...
+     * data target type，eg  MYSQL, POSTGRES ...
      */
     private String dtType;
 
@@ -67,12 +68,12 @@ public class EtlParameters extends AbstractParameters {
     private List<String> postStatements;
 
     /**
-     * target table
+     * speed byte num
      */
     private int jobSpeedByte;
 
     /**
-     * target table
+     * speed record count
      */
     private int jobSpeedRecord;
 

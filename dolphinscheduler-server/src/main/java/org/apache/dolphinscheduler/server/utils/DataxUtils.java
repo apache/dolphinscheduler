@@ -105,7 +105,7 @@ public class DataxUtils {
             case SQLSERVER:
                 return String.format("`%s`", column);
             default:
-                return null;
+                return column;
         }
     }
 
