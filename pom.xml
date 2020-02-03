@@ -16,7 +16,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.dolphinscheduler</groupId>
 	<artifactId>dolphinscheduler</artifactId>
@@ -24,7 +25,10 @@
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
 	<url>http://dolphinscheduler.apache.org</url>
-	<description>Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.</description>
+	<description>Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated
+		to solving the complex dependencies in data processing, making the scheduling system out of the box for data
+		processing.
+	</description>
 	<licenses>
 		<license>
 			<name>Apache License 2.0</name>
@@ -78,8 +82,6 @@
 		<slf4j.api.version>1.7.5</slf4j.api.version>
 		<slf4j.log4j12.version>1.7.5</slf4j.log4j12.version>
 		<commons.collections.version>3.2.2</commons.collections.version>
-		<commons.lang.version>2.3</commons.lang.version>
-		<commons.lang3.version>3.5</commons.lang3.version>
 		<commons.httpclient>3.0.1</commons.httpclient>
 		<commons.beanutils.version>1.7.0</commons.beanutils.version>
 		<commons.configuration.version>1.10</commons.configuration.version>
@@ -94,7 +96,7 @@
 		<oshi.core.version>3.5.0</oshi.core.version>
 		<clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
 		<mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
-		<jsp.version>6.1.14</jsp.version>
+		<jsp-2.1.version>6.1.14</jsp-2.1.version>
 		<spotbugs.version>3.1.12</spotbugs.version>
 		<checkstyle.version>3.0.0</checkstyle.version>
 		<apache.rat.version>0.13</apache.rat.version>
@@ -114,7 +116,6 @@
 		<cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
 		<mockito.version>2.21.0</mockito.version>
 		<powermock.version>2.0.2</powermock.version>
-		<jasper-runtime.version>5.5.23</jasper-runtime.version>
 		<servlet-api.version>2.5</servlet-api.version>
 		<swagger.version>1.9.3</swagger.version>
 		<springfox.version>2.9.2</springfox.version>
@@ -342,7 +343,6 @@
 				<groupId>mysql</groupId>
 				<artifactId>mysql-connector-java</artifactId>
 				<version>${mysql.connector.version}</version>
-				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -360,7 +360,7 @@
 				<groupId>commons-collections</groupId>
 				<artifactId>commons-collections</artifactId>
 				<version>${commons.collections.version}</version>
-		  	</dependency>
+			</dependency>
 
 			<dependency>
 				<groupId>commons-httpclient</groupId>
@@ -442,12 +442,6 @@
 			</dependency>
 
 			<dependency>
-				<groupId>javax.servlet</groupId>
-				<artifactId>javax.servlet-api</artifactId>
-				<version>${javax.servlet.api.version}</version>
-			</dependency>
-
-			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-collections4</artifactId>
 				<version>${commons.collections4.version}</version>
@@ -501,10 +495,12 @@
 				<version>${jcip.version}</version>
 				<optional>true</optional>
 			</dependency>
+
+			<!-- for api module -->
 			<dependency>
-				<groupId>tomcat</groupId>
-				<artifactId>jasper-runtime</artifactId>
-				<version>${jasper-runtime.version}</version>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jsp-2.1</artifactId>
+				<version>${jsp-2.1.version}</version>
 			</dependency>
 
 			<dependency>
@@ -512,23 +508,29 @@
 				<artifactId>servlet-api</artifactId>
 				<version>${servlet-api.version}</version>
 			</dependency>
-      <dependency>
-        <groupId>io.springfox</groupId>
-        <artifactId>springfox-swagger2</artifactId>
-        <version>${springfox.version}</version>
-      </dependency>
 
-      <dependency>
-        <groupId>io.springfox</groupId>
-        <artifactId>springfox-swagger-ui</artifactId>
-        <version>${springfox.version}</version>
-      </dependency>
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>javax.servlet-api</artifactId>
+				<version>${javax.servlet.api.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
 
-      <dependency>
-        <groupId>com.github.xiaoymin</groupId>
-        <artifactId>swagger-bootstrap-ui</artifactId>
-        <version>${swagger.version}</version>
-      </dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.xiaoymin</groupId>
+				<artifactId>swagger-bootstrap-ui</artifactId>
+				<version>${swagger.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -655,7 +657,6 @@
 			</plugin>
 
 
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -768,7 +769,9 @@
 						<exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
 						<exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
 						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
-						<exclude>**/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java</exclude>
+						<exclude>
+							**/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java
+						</exclude>
 					</excludes>
 					<consoleOutput>true</consoleOutput>
 				</configuration>
