@@ -55,11 +55,11 @@ v-ps<template>
             <span>{{$index + 1}}</span>
           </td>
           <td>
-            <span class="ellipsis">
+            <span class="ellipsis" v-tooltip.large.top.start="{text: item.funcName, maxWidth: '500px'}">
               <a href="javascript:" class="links">{{item.funcName}}</a>
             </span>
           </td>
-          <td><span class="ellipsis">{{item.className || '-'}}</span></td>
+          <td><span class="ellipsis" v-tooltip.large.top.start="{text: item.className, maxWidth: '500px'}">{{item.className || '-'}}</span></td>
           <!-- <td>
             <span>{{item.argTypes || '-'}}</span>
           </td> -->
