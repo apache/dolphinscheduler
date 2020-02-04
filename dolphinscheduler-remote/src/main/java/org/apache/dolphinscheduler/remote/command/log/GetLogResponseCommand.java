@@ -44,7 +44,7 @@ public class GetLogResponseCommand implements Serializable {
 
     public Command convert2Command(long opaque){
         Command command = new Command(opaque);
-        command.setType(CommandType.GET_LOG_REQ);
+        command.setType(CommandType.GET_LOG_RES);
         byte[] body = FastJsonSerializer.serialize(this);
         command.setBody(body);
         return command;

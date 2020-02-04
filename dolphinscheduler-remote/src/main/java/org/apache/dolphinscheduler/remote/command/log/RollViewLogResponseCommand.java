@@ -44,7 +44,7 @@ public class RollViewLogResponseCommand implements Serializable {
 
     public Command convert2Command(long opaque){
         Command command = new Command(opaque);
-        command.setType(CommandType.ROLL_VIEW_LOG_REQ);
+        command.setType(CommandType.ROLL_VIEW_LOG_RES);
         byte[] body = FastJsonSerializer.serialize(this);
         command.setBody(body);
         return command;
