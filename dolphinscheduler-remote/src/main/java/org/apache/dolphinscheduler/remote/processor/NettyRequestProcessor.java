@@ -14,24 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api;
+package org.apache.dolphinscheduler.remote.processor;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import io.netty.channel.Channel;
+import org.apache.dolphinscheduler.remote.command.Command;
 
-@SpringBootApplication
-@ServletComponentScan
-@ComponentScan("org.apache.dolphinscheduler")
-public class ApiApplicationServer extends SpringBootServletInitializer {
+public interface NettyRequestProcessor {
 
-  public static void main(String[] args) {
-
-    SpringApplication.run(ApiApplicationServer.class, args);
-  }
-
-
+    void process(final Channel channel, final Command command);
 }

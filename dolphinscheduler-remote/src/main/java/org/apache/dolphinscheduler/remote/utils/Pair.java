@@ -14,24 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
-@SpringBootApplication
-@ServletComponentScan
-@ComponentScan("org.apache.dolphinscheduler")
-public class ApiApplicationServer extends SpringBootServletInitializer {
-
-  public static void main(String[] args) {
-
-    SpringApplication.run(ApiApplicationServer.class, args);
-  }
+package org.apache.dolphinscheduler.remote.utils;
 
 
+public class Pair<L, R> {
+
+    private L left;
+
+    private R right;
+
+    public Pair(L left, R right) {
+        this.left = left;
+        this.right = right;
+    }
+
+    public L getLeft() {
+        return left;
+    }
+
+    public void setLeft(L left) {
+        this.left = left;
+    }
+
+    public R getRight() {
+        return right;
+    }
+
+    public void setRight(R right) {
+        this.right = right;
+    }
 }

@@ -14,24 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api;
+package org.apache.dolphinscheduler.remote.utils;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import java.nio.charset.Charset;
 
-@SpringBootApplication
-@ServletComponentScan
-@ComponentScan("org.apache.dolphinscheduler")
-public class ApiApplicationServer extends SpringBootServletInitializer {
+public class Constants {
 
-  public static void main(String[] args) {
+    public static final String COMMA = ",";
 
-    SpringApplication.run(ApiApplicationServer.class, args);
-  }
+    public static final String SLASH = "/";
 
+    public static final Charset UTF8 = Charset.forName("UTF-8");
+
+    public static final int CPUS = Runtime.getRuntime().availableProcessors();
 
 }

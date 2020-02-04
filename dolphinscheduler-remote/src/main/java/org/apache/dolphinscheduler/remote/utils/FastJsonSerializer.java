@@ -14,24 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api;
+package org.apache.dolphinscheduler.remote.utils;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import com.alibaba.fastjson.JSON;
 
-@SpringBootApplication
-@ServletComponentScan
-@ComponentScan("org.apache.dolphinscheduler")
-public class ApiApplicationServer extends SpringBootServletInitializer {
+public class FastJsonSerializer {
 
-  public static void main(String[] args) {
+	public static <T> byte[] serialize(T obj)  {
+		String json = JSON.toJSONString(obj);
+		return json.getBytes(Constants.UTF8);
+	}
 
-    SpringApplication.run(ApiApplicationServer.class, args);
-  }
+	public static <T> String serializeToString(T obj)  {
+		return JSON.toJSONString(obj);
+	}
 
+	public static <T> T deserialize(byte[] src, Class<T> clazz) {
+		return JSON.parseObject(new String(src, Constants.UTF8), clazz);
+	}
 
 }

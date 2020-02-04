@@ -86,7 +86,6 @@
 		<commons.configuration.version>1.10</commons.configuration.version>
 		<commons.email.version>1.5</commons.email.version>
 		<poi.version>3.17</poi.version>
-		<freemarker.version>2.3.21</freemarker.version>
 		<javax.servlet.api.version>3.1.0</javax.servlet.api.version>
 		<commons.collections4.version>4.1</commons.collections4.version>
 		<guava.version>20.0</guava.version>
@@ -120,6 +119,7 @@
 		<servlet-api.version>2.5</servlet-api.version>
 		<swagger.version>1.9.3</swagger.version>
 		<springfox.version>2.9.2</springfox.version>
+		<netty.version>4.1.42.Final</netty.version>
 	</properties>
 
 	<dependencyManagement>
@@ -230,12 +230,17 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.dolphinscheduler</groupId>
-				<artifactId>dolphinscheduler-rpc</artifactId>
+				<artifactId>dolphinscheduler-remote</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.dolphinscheduler</groupId>
 				<artifactId>dolphinscheduler-alert</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.dolphinscheduler</groupId>
+				<artifactId>dolphinscheduler-service</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 
@@ -358,11 +363,11 @@
 				<version>${slf4j.log4j12.version}</version>
 			</dependency>
 
-      <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>${commons.collections.version}</version>
-      </dependency>
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>${commons.collections.version}</version>
+		  	</dependency>
 
 			<dependency>
 				<groupId>commons-httpclient</groupId>
@@ -405,13 +410,6 @@
 				<artifactId>poi</artifactId>
 				<version>${poi.version}</version>
 			</dependency>
-
-			<dependency>
-				<groupId>org.freemarker</groupId>
-				<artifactId>freemarker</artifactId>
-				<version>${freemarker.version}</version>
-			</dependency>
-
 
 			<!-- hadoop -->
 			<dependency>
@@ -521,23 +519,29 @@
 				<artifactId>servlet-api</artifactId>
 				<version>${servlet-api.version}</version>
 			</dependency>
-      <dependency>
-        <groupId>io.springfox</groupId>
-        <artifactId>springfox-swagger2</artifactId>
-        <version>${springfox.version}</version>
-      </dependency>
 
-      <dependency>
-        <groupId>io.springfox</groupId>
-        <artifactId>springfox-swagger-ui</artifactId>
-        <version>${springfox.version}</version>
-      </dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
 
-      <dependency>
-        <groupId>com.github.xiaoymin</groupId>
-        <artifactId>swagger-bootstrap-ui</artifactId>
-        <version>${swagger.version}</version>
-      </dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.xiaoymin</groupId>
+				<artifactId>swagger-bootstrap-ui</artifactId>
+				<version>${swagger.version}</version>
+			  </dependency>
+			<dependency>
+				<groupId>io.netty</groupId>
+				<artifactId>netty-all</artifactId>
+				<version>${netty.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -768,7 +772,6 @@
 						<exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
 						<exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
 						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
-						<exclude>**/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java</exclude>
 					</excludes>
 					<consoleOutput>true</consoleOutput>
 				</configuration>
@@ -860,8 +863,9 @@
 		<module>dolphinscheduler-api</module>
 		<module>dolphinscheduler-dao</module>
 		<module>dolphinscheduler-alert</module>
-		<module>dolphinscheduler-rpc</module>
 		<module>dolphinscheduler-dist</module>
-	</modules>
+		<module>dolphinscheduler-remote</module>
+        <module>dolphinscheduler-service</module>
+    </modules>
 
 </project>
