@@ -150,4 +150,10 @@ public class LogClientService implements NettyRequestProcessor {
                 throw new UnsupportedOperationException(String.format("command type : %s is not supported ", command.getType()));
         }
     }
+
+    public static void main(String[] args) throws Exception{
+        LogClientService logClient = new LogClientService("192.168.220.247", 50051);
+        String log = logClient.rollViewLog("/opt/program/incubator-dolphinscheduler/logs/1/463/540.log",0,1000);
+        System.out.println(log);
+    }
 }
