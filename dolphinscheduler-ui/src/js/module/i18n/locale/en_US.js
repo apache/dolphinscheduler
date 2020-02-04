@@ -510,7 +510,7 @@ export default {
   'Please enter the correct IP': 'Please enter the correct IP',
   'Please generate token': 'Please generate token',
   'Spark Version': 'Spark Version',
-  'Datatarget': 'target database',
+  'TargetDataBase': 'target database',
   'TargetTable': 'target table',
   'Please enter the table of target': 'Please enter the table of target',
   'Please enter a Target Table(required)': 'Please enter a Target Table(required)',

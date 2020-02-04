@@ -40,7 +40,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Datatarget')}}</div>
+      <div slot="text">{{$t('TargetDataBase')}}</div>
       <div slot="content">
         <m-datasource
                 ref="refDt"
@@ -62,7 +62,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Datatarget')}}{{$t('Pre Statement')}}</div>
+      <div slot="text">{{$t('TargetDataBase')}}{{$t('Pre Statement')}}</div>
       <div slot="content">
         <m-statement-list
           ref="refPreStatements"
@@ -72,7 +72,7 @@
       </div>
     </m-list-box>
     <m-list-box>
-      <div slot="text">{{$t('Datatarget')}}{{$t('Post Statement')}}</div>
+      <div slot="text">{{$t('TargetDataBase')}}{{$t('Post Statement')}}</div>
       <div slot="content">
         <m-statement-list
           ref="refPostStatements"
