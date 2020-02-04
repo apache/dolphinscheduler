@@ -122,7 +122,7 @@ public class DataxTaskTest {
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
         props.setTaskInstId(1);
         props.setTenantCode("1");
-        dataxTask = new DataxTask(props, logger);
+        Assert.assertNotNull(new DataxTask(props, logger));
     }
 
     /**
@@ -131,7 +131,11 @@ public class DataxTaskTest {
     @Test
     public void testInit()
             throws Exception {
-        dataxTask.init();
+        try {
+            dataxTask.init();
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     /**
@@ -155,7 +159,11 @@ public class DataxTaskTest {
     @Test
     public void testCancelApplication()
             throws Exception {
-        dataxTask.cancelApplication(true);
+        try {
+            dataxTask.cancelApplication(true);
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
     }
 
     /**
@@ -166,7 +174,6 @@ public class DataxTaskTest {
     public void testParsingSqlColumnNames()
         throws Exception {
         try {
-
             BaseDataSource dataSource = DataSourceFactory.getDatasource(getDataSource().getType(),
                     getDataSource().getConnectionParams());
 
@@ -178,10 +185,10 @@ public class DataxTaskTest {
 
             Assert.assertTrue(columns.length == 2);
 
-            Assert.assertEquals(Arrays.toString(columns), "[`a`, `table`]");
+            Assert.assertEquals("[`a`, `table`]", Arrays.toString(columns));
         }
         catch (Exception e) {
-            throw e;
+            Assert.fail(e.getMessage());
         }
     }
 
@@ -200,10 +207,10 @@ public class DataxTaskTest {
 
             Assert.assertTrue(columns.length == 2);
 
-            Assert.assertEquals(Arrays.toString(columns), "[a, b]");
+            Assert.assertEquals("[a, b]", Arrays.toString(columns));
         }
         catch (Exception e) {
-            throw e;
+            Assert.fail(e.getMessage());
         }
     }
 
@@ -230,7 +237,7 @@ public class DataxTaskTest {
             Assert.assertNotNull(filePath);
         }
         catch (Exception e) {
-            throw e;
+            Assert.fail(e.getMessage());
         }
     }
 
@@ -251,16 +258,16 @@ public class DataxTaskTest {
             Assert.assertNotNull(reader);
 
             String readerPluginName = (String) reader.get("name");
-            Assert.assertEquals(readerPluginName, DataxUtils.DATAX_READER_PLUGIN_MYSQL);
+            Assert.assertEquals(DataxUtils.DATAX_READER_PLUGIN_MYSQL, readerPluginName);
 
             JSONObject writer = (JSONObject) content.get("writer");
             Assert.assertNotNull(writer);
 
             String writerPluginName = (String) writer.get("name");
-            Assert.assertEquals(writerPluginName, DataxUtils.DATAX_WRITER_PLUGIN_MYSQL);
+            Assert.assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_MYSQL, writerPluginName);
         }
         catch (Exception e) {
-            throw e;
+            Assert.fail(e.getMessage());
         }
     }
 
@@ -279,7 +286,7 @@ public class DataxTaskTest {
             Assert.assertNotNull(setting.get("errorLimit"));
         }
         catch (Exception e) {
-            throw e;
+            Assert.fail(e.getMessage());
         }
     }
 
@@ -297,7 +304,7 @@ public class DataxTaskTest {
             Assert.assertNotNull(coreConfig.get("transport"));
         }
         catch (Exception e) {
-            throw e;
+            Assert.fail(e.getMessage());
         }
     }
 
@@ -313,7 +320,7 @@ public class DataxTaskTest {
             Assert.assertNotNull(method.invoke(dataxTask, "test.json"));
         }
         catch (Exception e) {
-            throw e;
+            Assert.fail(e.getMessage());
         }
     }
 
@@ -338,7 +345,7 @@ public class DataxTaskTest {
             method.invoke(dataxTask, "abc", "test throw RuntimeException");
         }
         catch (Exception e) {
-            throw e;
+            Assert.fail(e.getMessage());
         }
     }
 

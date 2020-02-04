@@ -88,7 +88,7 @@ public class DataxUtilsTest {
         assertTrue(fromColumns.length == toColumns.length);
 
         for (int i = 0; i < toColumns.length; i++) {
-            assertEquals(toColumns[i], targetColumns[i]);
+            assertEquals(targetColumns[i], toColumns[i]);
         }
     }
 
@@ -99,10 +99,10 @@ public class DataxUtilsTest {
      */
     @Test
     public void testDoConvertKeywordsColumn() throws Exception {
-        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.MYSQL, " \"`select`\" "), "`select`");
-        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.POSTGRESQL, " \"`select`\" "), "\"select\"");
-        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.SQLSERVER, " \"`select`\" "), "`select`");
-        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.ORACLE, " \"`select`\" "), "\"select\"");
-        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.DB2, " \"`select`\" "), "select");
+        assertEquals("`select`", DataxUtils.doConvertKeywordsColumn(DbType.MYSQL, " \"`select`\" "));
+        assertEquals("\"select\"", DataxUtils.doConvertKeywordsColumn(DbType.POSTGRESQL, " \"`select`\" "));
+        assertEquals("`select`", DataxUtils.doConvertKeywordsColumn(DbType.SQLSERVER, " \"`select`\" "));
+        assertEquals("\"select\"", DataxUtils.doConvertKeywordsColumn(DbType.ORACLE, " \"`select`\" "));
+        assertEquals("select", DataxUtils.doConvertKeywordsColumn(DbType.DB2, " \"`select`\" "));
     }
 }
