@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.task.etl;
+package org.apache.dolphinscheduler.server.worker.task.datax;
 
 
 import java.io.File;
@@ -43,7 +43,7 @@ import org.apache.dolphinscheduler.common.job.db.BaseDataSource;
 import org.apache.dolphinscheduler.common.job.db.DataSourceFactory;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
-import org.apache.dolphinscheduler.common.task.etl.EtlParameters;
+import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -71,7 +71,7 @@ import com.alibaba.fastjson.JSONObject;
 
 
 /**
- * etl task
+ * DataX task
  */
 public class DataxTask extends AbstractTask {
 
@@ -91,9 +91,9 @@ public class DataxTask extends AbstractTask {
     private static final int DATAX_CHANNEL_COUNT = 1;
 
     /**
-     * etl parameters
+     * datax parameters
      */
-    private EtlParameters etlParameters;
+    private DataxParameters dataXParameters;
 
     /**
      * task dir
@@ -132,20 +132,20 @@ public class DataxTask extends AbstractTask {
     }
 
     /**
-     * init etl config
+     * init DataX config
      */
     @Override
     public void init() {
         logger.info("datax task params {}", taskProps.getTaskParams());
-        etlParameters = JSONUtils.parseObject(taskProps.getTaskParams(), EtlParameters.class);
+        dataXParameters = JSONUtils.parseObject(taskProps.getTaskParams(), DataxParameters.class);
 
-        if (!etlParameters.checkParameters()) {
+        if (!dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
         }
     }
 
     /**
-     * run etl process
+     * run DataX process
      * 
      * @throws Exception
      */
@@ -169,7 +169,7 @@ public class DataxTask extends AbstractTask {
     }
 
     /**
-     * cancel etl process
+     * cancel DataX process
      * 
      * @param cancelApplication
      * @throws Exception
@@ -220,17 +220,17 @@ public class DataxTask extends AbstractTask {
      */
     private List<JSONObject> buildDataxJobContentJson()
         throws SQLException {
-        DataSource dataSource = processDao.findDataSourceById(etlParameters.getDatasource());
+        DataSource dataSource = processDao.findDataSourceById(dataXParameters.getDataSource());
         BaseDataSource dataSourceCfg = DataSourceFactory.getDatasource(dataSource.getType(),
             dataSource.getConnectionParams());
 
-        DataSource dataTarget = processDao.findDataSourceById(etlParameters.getDatatarget());
+        DataSource dataTarget = processDao.findDataSourceById(dataXParameters.getDataTarget());
         BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(dataTarget.getType(),
             dataTarget.getConnectionParams());
 
         List<JSONObject> readerConnArr = new ArrayList<>();
         JSONObject readerConn = new JSONObject();
-        readerConn.put("querySql", new String[] {etlParameters.getSql()});
+        readerConn.put("querySql", new String[] {dataXParameters.getSql()});
         readerConn.put("jdbcUrl", new String[] {dataSourceCfg.getJdbcUrl()});
         readerConnArr.add(readerConn);
 
@@ -245,7 +245,7 @@ public class DataxTask extends AbstractTask {
 
         List<JSONObject> writerConnArr = new ArrayList<>();
         JSONObject writerConn = new JSONObject();
-        writerConn.put("table", new String[] {etlParameters.getTargetTable()});
+        writerConn.put("table", new String[] {dataXParameters.getTargetTable()});
         writerConn.put("jdbcUrl", dataTargetCfg.getJdbcUrl());
         writerConnArr.add(writerConn);
 
@@ -253,15 +253,15 @@ public class DataxTask extends AbstractTask {
         writerParam.put("username", dataTargetCfg.getUser());
         writerParam.put("password", dataTargetCfg.getPassword());
         writerParam.put("column",
-            parsingSqlColumnNames(dataSource.getType(), dataTarget.getType(), dataSourceCfg, etlParameters.getSql()));
+            parsingSqlColumnNames(dataSource.getType(), dataTarget.getType(), dataSourceCfg, dataXParameters.getSql()));
         writerParam.put("connection", writerConnArr);
 
-        if (CollectionUtils.isNotEmpty(etlParameters.getPreStatements())) {
-            writerParam.put("preSql", etlParameters.getPreStatements());
+        if (CollectionUtils.isNotEmpty(dataXParameters.getPreStatements())) {
+            writerParam.put("preSql", dataXParameters.getPreStatements());
         }
 
-        if (CollectionUtils.isNotEmpty(etlParameters.getPostStatements())) {
-            writerParam.put("postSql", etlParameters.getPostStatements());
+        if (CollectionUtils.isNotEmpty(dataXParameters.getPostStatements())) {
+            writerParam.put("postSql", dataXParameters.getPostStatements());
         }
 
         JSONObject writer = new JSONObject();
@@ -286,12 +286,12 @@ public class DataxTask extends AbstractTask {
         JSONObject speed = new JSONObject();
         speed.put("channel", DATAX_CHANNEL_COUNT);
 
-        if (etlParameters.getJobSpeedByte() > 0) {
-            speed.put("byte", etlParameters.getJobSpeedByte());
+        if (dataXParameters.getJobSpeedByte() > 0) {
+            speed.put("byte", dataXParameters.getJobSpeedByte());
         }
 
-        if (etlParameters.getJobSpeedRecord() > 0) {
-            speed.put("record", etlParameters.getJobSpeedRecord());
+        if (dataXParameters.getJobSpeedRecord() > 0) {
+            speed.put("record", dataXParameters.getJobSpeedRecord());
         }
 
         JSONObject errorLimit = new JSONObject();
@@ -309,12 +309,12 @@ public class DataxTask extends AbstractTask {
         JSONObject speed = new JSONObject();
         speed.put("channel", DATAX_CHANNEL_COUNT);
 
-        if (etlParameters.getJobSpeedByte() > 0) {
-            speed.put("byte", etlParameters.getJobSpeedByte());
+        if (dataXParameters.getJobSpeedByte() > 0) {
+            speed.put("byte", dataXParameters.getJobSpeedByte());
         }
 
-        if (etlParameters.getJobSpeedRecord() > 0) {
-            speed.put("record", etlParameters.getJobSpeedRecord());
+        if (dataXParameters.getJobSpeedRecord() > 0) {
+            speed.put("record", dataXParameters.getJobSpeedRecord());
         }
 
         JSONObject channel = new JSONObject();
@@ -359,7 +359,7 @@ public class DataxTask extends AbstractTask {
 
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-            taskProps.getDefinedParams(), etlParameters.getLocalParametersMap(),
+            taskProps.getDefinedParams(), dataXParameters.getLocalParametersMap(),
             processInstance.getCmdTypeIfComplement(), processInstance.getScheduleTime());
         if (paramsMap != null) {
             dataxCommand = ParameterUtils.convertParameterPlaceholders(dataxCommand, ParamUtils.convert(paramsMap));
@@ -510,7 +510,7 @@ public class DataxTask extends AbstractTask {
 
     @Override
     public AbstractParameters getParameters() {
-        return etlParameters;
+        return dataXParameters;
     }
 
     private void notNull(Object obj, String message) {

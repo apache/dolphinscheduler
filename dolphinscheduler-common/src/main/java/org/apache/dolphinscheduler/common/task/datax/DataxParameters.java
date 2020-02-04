@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.task.etl;
+package org.apache.dolphinscheduler.common.task.datax;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +23,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
 /**
- * Sql/Hql parameter
+ * DataX parameter
  */
-public class EtlParameters extends AbstractParameters {
+public class DataxParameters extends AbstractParameters {
 
     /**
      * data source type，eg  MYSQL, POSTGRES ...
@@ -35,7 +35,7 @@ public class EtlParameters extends AbstractParameters {
     /**
      * datasource id
      */
-    private int datasource;
+    private int dataSource;
 
     /**
      * data target type，eg  MYSQL, POSTGRES ...
@@ -45,7 +45,7 @@ public class EtlParameters extends AbstractParameters {
     /**
      * datatarget id
      */
-    private int datatarget;
+    private int dataTarget;
 
     /**
      * sql
@@ -85,12 +85,12 @@ public class EtlParameters extends AbstractParameters {
         this.dsType = dsType;
     }
 
-    public int getDatasource() {
-        return datasource;
+    public int getDataSource() {
+        return dataSource;
     }
 
-    public void setDatasource(int datasource) {
-        this.datasource = datasource;
+    public void setDataSource(int dataSource) {
+        this.dataSource = dataSource;
     }
 
     public String getDtType() {
@@ -101,12 +101,12 @@ public class EtlParameters extends AbstractParameters {
         this.dtType = dtType;
     }
 
-    public int getDatatarget() {
-        return datatarget;
+    public int getDataTarget() {
+        return dataTarget;
     }
 
-    public void setDatatarget(int datatarget) {
-        this.datatarget = datatarget;
+    public void setDataTarget(int dataTarget) {
+        this.dataTarget = dataTarget;
     }
 
     public String getSql() {
@@ -159,11 +159,10 @@ public class EtlParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        if (!(datasource != 0 && StringUtils.isNotEmpty(dsType) && StringUtils.isNotEmpty(sql))) {
-            return false;
-        }
-
-        if (!(datatarget != 0 && StringUtils.isNotEmpty(dtType) && StringUtils.isNotEmpty(targetTable))) {
+        if (!(dataSource != 0
+                && dataTarget != 0
+                && StringUtils.isNotEmpty(sql)
+                && StringUtils.isNotEmpty(targetTable))) {
             return false;
         }
 
@@ -179,9 +178,9 @@ public class EtlParameters extends AbstractParameters {
     public String toString() {
         return "EtlParameters{" +
                 "dsType='" + dsType + '\'' +
-                ", datasource=" + datasource +
+                ", dataSource=" + dataSource +
                 ", dtType='" + dtType + '\'' +
-                ", datatarget=" + datatarget +
+                ", dataTarget=" + dataTarget +
                 ", sql='" + sql + '\'' +
                 ", targetTable='" + targetTable + '\'' +
                 ", jobSpeedByte='" + jobSpeedByte + '\'' +

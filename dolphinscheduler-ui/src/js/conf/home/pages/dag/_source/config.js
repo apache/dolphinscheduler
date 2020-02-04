@@ -280,8 +280,8 @@ let tasksType = {
     desc: 'HTTP',
     color: '#E46F13'
   },
-  'ETL': {
-    desc: 'ETL',
+  'DATAX': {
+    desc: 'DataX',
     color: '#1fc747'
   }
 }

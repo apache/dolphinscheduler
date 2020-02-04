@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.task.etl;
+package org.apache.dolphinscheduler.server.worker.task.datax;
 
 
 import java.lang.reflect.Method;
@@ -31,15 +31,14 @@ import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.server.master.runner.MasterExecThread;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
+import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,12 +55,16 @@ public class DataxTaskTest {
 
     private ProcessDao processDao;
 
+    private ShellCommandExecutor shellCommandExecutor;
+
     private ApplicationContext applicationContext;
 
     @Before
     public void before()
         throws Exception {
         processDao = Mockito.mock(ProcessDao.class);
+        shellCommandExecutor = Mockito.mock(ShellCommandExecutor.class);
+
         applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
@@ -76,13 +79,16 @@ public class DataxTaskTest {
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
         props.setTaskParams(
-            "{\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"datasource\":1,\"dsType\":\"MYSQL\",\"datatarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test1, 2 as test2 from dual\",\"preStatements\":[\"delete from test\"]}");
+            "{\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedByte\":1024,\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"datasource\":1,\"dsType\":\"MYSQL\",\"datatarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test from dual\",\"preStatements\":[\"delete from test\"],\"postStatements\":[\"delete from test\"]}");
         dataxTask = PowerMockito.spy(new DataxTask(props, logger));
         dataxTask.init();
 
         Mockito.when(processDao.findDataSourceById(1)).thenReturn(getDataSource());
         Mockito.when(processDao.findDataSourceById(2)).thenReturn(getDataSource());
         Mockito.when(processDao.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
+
+        String fileName = String.format("%s/%s_node.sh", props.getTaskDir(), props.getTaskAppId());
+        Mockito.when(shellCommandExecutor.run(fileName, processDao)).thenReturn(0);
     }
 
     private DataSource getDataSource() {
@@ -104,6 +110,53 @@ public class DataxTaskTest {
     @After
     public void after()
         throws Exception {}
+
+    /**
+     * Method: DataxTask()
+     */
+    @Test
+    public void testDataxTask()
+            throws Exception {
+        TaskProps props = new TaskProps();
+        props.setTaskDir("/tmp");
+        props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
+        props.setTaskInstId(1);
+        props.setTenantCode("1");
+        dataxTask = new DataxTask(props, logger);
+    }
+
+    /**
+     * Method: init
+     */
+    @Test
+    public void testInit()
+            throws Exception {
+        dataxTask.init();
+    }
+
+    /**
+     * Method: handle()
+     */
+    @Test
+    public void testHandle()
+            throws Exception {
+        try {
+            dataxTask.handle();
+        } catch (RuntimeException e) {
+            if (e.getMessage().indexOf("process error . exitCode is :  -1") < 0) {
+                Assert.fail();
+            }
+        }
+    }
+
+    /**
+     * Method: cancelApplication()
+     */
+    @Test
+    public void testCancelApplication()
+            throws Exception {
+        dataxTask.cancelApplication(true);
+    }
 
     /**
      * Method: parsingSqlColumnNames(DbType dsType, DbType dtType, BaseDataSource
@@ -141,7 +194,7 @@ public class DataxTaskTest {
         try {
             Method method = DataxTask.class.getDeclaredMethod("tryGrammaticalAnalysisSqlColumnNames", DbType.class, String.class);
             method.setAccessible(true);
-            String[] columns = (String[]) method.invoke(dataxTask, DbType.MYSQL, "select 1 as a, 2 as b from dual");
+            String[] columns = (String[]) method.invoke(dataxTask, DbType.MYSQL, "select t1.a, t1.b from test t1 union all select a, t2.b from (select a, b from test) t2");
 
             Assert.assertNotNull(columns);
 
@@ -262,6 +315,15 @@ public class DataxTaskTest {
         catch (Exception e) {
             throw e;
         }
+    }
+
+    /**
+     * Method: getParameters
+     */
+    @Test
+    public void testGetParameters()
+            throws Exception {
+        Assert.assertTrue(dataxTask.getParameters() != null);
     }
 
     /**

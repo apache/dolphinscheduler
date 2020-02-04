@@ -17,6 +17,9 @@
 package org.apache.dolphinscheduler.server.utils;
 
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
+import com.alibaba.druid.sql.dialect.oracle.parser.OracleStatementParser;
+import com.alibaba.druid.sql.dialect.postgresql.parser.PGSQLStatementParser;
+import com.alibaba.druid.sql.dialect.sqlserver.parser.SQLServerStatementParser;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,6 +39,10 @@ public class DataxUtilsTest {
     @Test
     public void testGetReaderPluginName() {
         assertEquals(DataxUtils.DATAX_READER_PLUGIN_MYSQL, DataxUtils.getReaderPluginName(DbType.MYSQL));
+        assertEquals(DataxUtils.DATAX_READER_PLUGIN_POSTGRESQL, DataxUtils.getReaderPluginName(DbType.POSTGRESQL));
+        assertEquals(DataxUtils.DATAX_READER_PLUGIN_SQLSERVER, DataxUtils.getReaderPluginName(DbType.SQLSERVER));
+        assertEquals(DataxUtils.DATAX_READER_PLUGIN_ORACLE, DataxUtils.getReaderPluginName(DbType.ORACLE));
+        assertTrue(DataxUtils.getReaderPluginName(DbType.DB2) == null);
     }
 
     /**
@@ -46,6 +53,10 @@ public class DataxUtilsTest {
     @Test
     public void testGetWriterPluginName() {
         assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_MYSQL, DataxUtils.getWriterPluginName(DbType.MYSQL));
+        assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_POSTGRESQL, DataxUtils.getWriterPluginName(DbType.POSTGRESQL));
+        assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_SQLSERVER, DataxUtils.getWriterPluginName(DbType.SQLSERVER));
+        assertEquals(DataxUtils.DATAX_WRITER_PLUGIN_ORACLE, DataxUtils.getWriterPluginName(DbType.ORACLE));
+        assertTrue(DataxUtils.getWriterPluginName(DbType.DB2) == null);
     }
 
     /**
@@ -56,6 +67,10 @@ public class DataxUtilsTest {
     @Test
     public void testGetSqlStatementParser() throws Exception {
         assertTrue(DataxUtils.getSqlStatementParser(DbType.MYSQL, "select 1") instanceof MySqlStatementParser);
+        assertTrue(DataxUtils.getSqlStatementParser(DbType.POSTGRESQL, "select 1") instanceof PGSQLStatementParser);
+        assertTrue(DataxUtils.getSqlStatementParser(DbType.ORACLE, "select 1") instanceof OracleStatementParser);
+        assertTrue(DataxUtils.getSqlStatementParser(DbType.SQLSERVER, "select 1") instanceof SQLServerStatementParser);
+        assertTrue(DataxUtils.getSqlStatementParser(DbType.DB2, "select 1") == null);
     }
 
     /**
@@ -84,9 +99,10 @@ public class DataxUtilsTest {
      */
     @Test
     public void testDoConvertKeywordsColumn() throws Exception {
-        String fromColumn = " \"`select`\" ";
-        String targetColumn = "`select`";
-
-        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.MYSQL, fromColumn), targetColumn);
+        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.MYSQL, " \"`select`\" "), "`select`");
+        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.POSTGRESQL, " \"`select`\" "), "\"select\"");
+        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.SQLSERVER, " \"`select`\" "), "`select`");
+        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.ORACLE, " \"`select`\" "), "\"select\"");
+        assertEquals(DataxUtils.doConvertKeywordsColumn(DbType.DB2, " \"`select`\" "), "select");
     }
 }

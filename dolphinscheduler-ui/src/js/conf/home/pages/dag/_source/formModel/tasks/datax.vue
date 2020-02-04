@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 <template>
-  <div class="etl-model">
+  <div class="datax-model">
     <m-list-box>
       <div slot="text">{{$t('Datasource')}}</div>
       <div slot="content">
@@ -117,7 +117,8 @@
   let editor
 
   export default {
-    name: 'etl',
+    name: 'datax',
+
     data () {
       return {
         // Data source type
@@ -215,9 +216,9 @@
         // storage
         this.$emit('on-params', {
           dsType: this.dsType,
-          datasource: this.rtDatasource,
+          dataSource: this.rtDatasource,
           dtType: this.dtType,
-          datatarget: this.rtDatatarget,
+          dataTarget: this.rtDatatarget,
           sql: editor.getValue(),
           targetTable: this.targetTable,
           jobSpeedByte: this.jobSpeedByte * 1024,
@@ -260,9 +261,9 @@
       if (!_.isEmpty(o)) {
         // backfill
         this.dsType = o.params.dsType || ''
-        this.datasource = o.params.datasource || ''
+        this.datasource = o.params.dataSource || ''
         this.dtType = o.params.dtType || ''
-        this.datatarget = o.params.datatarget || ''
+        this.datatarget = o.params.dataTarget || ''
         this.sql = o.params.sql || ''
         this.targetTable = o.params.targetTable || ''
         this.jobSpeedByte = o.params.jobSpeedByte / 1024 || 0

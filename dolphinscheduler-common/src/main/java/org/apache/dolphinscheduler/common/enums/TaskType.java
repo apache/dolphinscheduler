@@ -33,7 +33,7 @@ public enum TaskType {
      * 7 DEPENDENT
      * 8 FLINK
      * 9 HTTP
-     * 10 ETL
+     * 10 DATAX
      */
     SHELL(0, "shell"),
     SQL(1, "sql"),
@@ -45,7 +45,7 @@ public enum TaskType {
     DEPENDENT(7, "dependent"),
     FLINK(8, "flink"),
     HTTP(9, "http"),
-    ETL(10, "etl");
+    DATAX(10, "datax");
 
     TaskType(int code, String descp){
         this.code = code;

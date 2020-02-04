@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
-import org.apache.dolphinscheduler.common.task.etl.EtlParameters;
+import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
@@ -69,8 +69,8 @@ public class TaskParametersUtils {
           return JSONUtils.parseObject(parameter, FlinkParameters.class);
         case HTTP:
           return JSONUtils.parseObject(parameter, HttpParameters.class);
-        case ETL:
-          return JSONUtils.parseObject(parameter, EtlParameters.class);
+        case DATAX:
+          return JSONUtils.parseObject(parameter, DataxParameters.class);
         default:
           return null;
       }
