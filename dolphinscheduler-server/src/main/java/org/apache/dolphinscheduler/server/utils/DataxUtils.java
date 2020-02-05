@@ -94,11 +94,12 @@ public class DataxUtils {
             return null;
         }
 
+        String[] toColumns = new String[columns.length];
         for (int i = 0; i < columns.length; i++ ) {
-            columns[i] = doConvertKeywordsColumn(dbType, columns[i]);
+            toColumns[i] = doConvertKeywordsColumn(dbType, columns[i]);
         }
 
-        return columns;
+        return toColumns;
     }
 
     public static String doConvertKeywordsColumn(DbType dbType, String column) {
