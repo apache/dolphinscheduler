@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.common.utils;
 
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
