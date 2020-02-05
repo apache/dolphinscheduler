@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
-import org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob;
-import org.apache.dolphinscheduler.server.quartz.QuartzExecutors;
+import org.apache.dolphinscheduler.dao.quartz.ProcessScheduleJob;
+import org.apache.dolphinscheduler.dao.quartz.QuartzExecutors;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -173,7 +173,7 @@ public class MasterServer implements IStoppable {
 
         try {
             //execute only once
-            if(Stopper.isStoped()){
+            if(Stopper.isStopped()){
                 return;
             }
 

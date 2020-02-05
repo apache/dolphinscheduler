@@ -55,7 +55,7 @@ v-ps<template>
             <span>{{$index + 1}}</span>
           </td>
           <td>
-            <span class="ellipsis">
+            <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.funcName, maxWidth: '500px'}">
               <a href="javascript:" class="links">{{item.funcName}}</a>
             </span>
           </td>
@@ -67,7 +67,7 @@ v-ps<template>
             <span>{{item.type}}</span>
           </td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
             <span v-else>-</span>
           </td>
           <td>
@@ -142,7 +142,7 @@ v-ps<template>
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.$emit('_updateList')
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()
@@ -156,6 +156,7 @@ v-ps<template>
           showMask: true,
           escClose: true,
           className: 'v-modal-custom',
+          width: '800px',
           transitionName: 'opacityp',
           render (h) {
             return h(mCreateUdf, {
