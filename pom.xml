@@ -686,7 +686,7 @@
 						<include>**/dao/mapper/AlertMapperTest.java</include>
 						<include>**/dao/mapper/CommandMapperTest.java</include>
 					</includes>
-					<!-- <skip>true</skip> -->
+					 <skip>true</skip>
 				</configuration>
 			</plugin>
 
@@ -722,25 +722,19 @@
 				<configuration>
 					<includes>
 						<include>**/*.java</include>
+						<include>**/*.sql</include>
+						<include>**/pom.xml</include>
+						<include>**/*Mapper.xml</include>
+						<include>**/*.properties</include>
+						<include>**/*.sh</include>
+						<include>**/*.env</include>
+						<include>**/*.editorconfig</include>
 						<include>**/dolphinscheduler-ui/src/**/*.scss</include>
 						<include>**/dolphinscheduler-ui/src/**/*.css</include>
 						<include>**/dolphinscheduler-ui/src/**/*.vue</include>
 						<include>**/dolphinscheduler-ui/src/**/*.js</include>
 						<include>**/dolphinscheduler-ui/src/**/*.html</include>
 					</includes>
-					<excludes>
-						<exclude>**/dolphinscheduler-ui/src/lib/**</exclude>
-						<exclude>**/dolphinscheduler-ui/src/js/module/util/cookie.js</exclude>
-						<exclude>**/dolphinscheduler-ui/src/font/awesome/font-awesome.css</exclude>
-						<exclude>**/dolphinscheduler-ui/src/sass/common/_animation.scss</exclude>
-						<exclude>**/dolphinscheduler-ui/src/sass/common/_normalize.scss</exclude>
-						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/es5.js</exclude>
-						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/base.css</exclude>
-						<exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
-						<exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
-						<exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
-						<exclude>**/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java</exclude>
-					</excludes>
 					<consoleOutput>true</consoleOutput>
 				</configuration>
 			</plugin>

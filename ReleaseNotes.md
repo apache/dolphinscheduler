@@ -29,3 +29,10 @@
 3. Fix #1379,SQL task，date parameter need to add explicit type casts
 4. Fix #1477,some tasks would be running all the time when db delayed
 5. Fix #1514,the field queue in table t_ds_user not change with tabke t_ds_queue modify queue_name field
+6. Fix #1768,There are multiple pages of data. After deleting all the data on one page, the data is displayed as empty
+7. Fix #1770,After canceling the file authorization, the running workflow should not obtain resource files from the original tenant directory
+8. Fix #1779,The execution of the SUB_PROCESS task failed first, but eventually succeeded
+9. Fix #1789,Click to view the history, enter the task instance page, the results of the query based on the search conditions are displayed incorrectly
+10. Fix #1810,Workflow instance does not show dependencies
+11. Fix #1816,Add multiple dependencies, the workflow definitions of the first few dependencies read the workflow definition of the last project
+12. Fix #1828,After executing the authorized UDF function, the path of the read resource file is incorrect
