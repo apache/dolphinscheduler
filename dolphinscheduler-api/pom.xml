@@ -27,6 +27,10 @@
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 
+  <properties>
+    <jasper-runtime.version>5.5.23</jasper-runtime.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.dolphinscheduler</groupId>
@@ -176,6 +180,12 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-aws</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>tomcat</groupId>
+      <artifactId>jasper-runtime</artifactId>
+      <version>${jasper-runtime.version}</version>
     </dependency>
 
     <dependency>
