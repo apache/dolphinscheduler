@@ -31,8 +31,8 @@
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
-        <filter class="org.apache.dolphinscheduler.server.worker.log.TaskLogFilter"></filter>
-        <Discriminator class="org.apache.dolphinscheduler.server.worker.log.TaskLogDiscriminator">
+        <filter class="org.apache.dolphinscheduler.common.log.TaskLogFilter"></filter>
+        <Discriminator class="org.apache.dolphinscheduler.common.log.TaskLogDiscriminator">
             <key>taskAppId</key>
             <logBase>${log.base}</logBase>
         </Discriminator>
@@ -52,7 +52,7 @@
 
     <appender name="COMBINEDLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/dolphinscheduler-combined.log</file>
-        <filter class="org.apache.dolphinscheduler.server.worker.log.WorkerLogFilter">
+        <filter class="org.apache.dolphinscheduler.common.log.WorkerLogFilter">
             <level>INFO</level>
         </filter>
 

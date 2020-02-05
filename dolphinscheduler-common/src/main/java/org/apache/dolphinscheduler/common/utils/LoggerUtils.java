@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.slf4j.Logger;
@@ -45,6 +45,11 @@ public class LoggerUtils {
     public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
 
     /**
+     * Task Logger Thread's name
+     */
+    public static final String TASK_APPID_LOG_FORMAT = "[taskAppId=";
+
+    /**
      * build job id
      *
      * @param affix         Task Logger's prefix
@@ -58,7 +63,7 @@ public class LoggerUtils {
                                   int processInstId,
                                   int taskId){
         // - [taskAppId=TASK_79_4084_15210]
-        return String.format(" - [taskAppId=%s-%s-%s-%s]",affix,
+        return String.format(" - %s%s-%s-%s-%s]",TASK_APPID_LOG_FORMAT,affix,
                 processDefId,
                 processInstId,
                 taskId);

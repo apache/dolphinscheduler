@@ -14,27 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.log;
+package org.apache.dolphinscheduler.common.log;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
-import org.apache.dolphinscheduler.server.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+
+import java.util.Arrays;
 
 /**
- *  task log filter
+ *  worker log filter
  */
-public class TaskLogFilter extends Filter<ILoggingEvent> {
-
+public class WorkerLogFilter extends Filter<ILoggingEvent> {
     /**
      * level
      */
-    private Level level;
-
-    public void setLevel(String level) {
-        this.level = Level.toLevel(level);
-    }
+    Level level;
 
     /**
      * Accept or reject based on thread name
@@ -43,9 +40,13 @@ public class TaskLogFilter extends Filter<ILoggingEvent> {
      */
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith(LoggerUtils.TASK_LOGGER_THREAD_NAME) || event.getLevel().isGreaterOrEqual(level)) {
+        if (event.getThreadName().startsWith("Worker-")){
             return FilterReply.ACCEPT;
         }
+
         return FilterReply.DENY;
+    }
+    public void setLevel(String level) {
+        this.level = Level.toLevel(level);
     }
 }
