@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.log;
+package org.apache.dolphinscheduler.common.log;
 
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.server.utils.SensitiveLogUtil;
+import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -79,7 +79,7 @@ public class SensitiveDataConverterTest {
 
             String password = matcher.group();
 
-            String maskPassword = SensitiveLogUtil.maskDataSourcePwd(password);
+            String maskPassword = SensitiveLogUtils.maskDataSourcePwd(password);
 
             matcher.appendReplacement(sb, maskPassword);
         }
