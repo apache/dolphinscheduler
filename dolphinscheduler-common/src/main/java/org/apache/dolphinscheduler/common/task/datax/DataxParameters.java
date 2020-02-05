@@ -176,15 +176,17 @@ public class DataxParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "EtlParameters{" +
+        return "DataxParameters{" +
                 "dsType='" + dsType + '\'' +
                 ", dataSource=" + dataSource +
                 ", dtType='" + dtType + '\'' +
                 ", dataTarget=" + dataTarget +
                 ", sql='" + sql + '\'' +
                 ", targetTable='" + targetTable + '\'' +
-                ", jobSpeedByte='" + jobSpeedByte + '\'' +
-                ", jobSpeedRecord='" + jobSpeedRecord + '\'' +
+                ", preStatements=" + preStatements +
+                ", postStatements=" + postStatements +
+                ", jobSpeedByte=" + jobSpeedByte +
+                ", jobSpeedRecord=" + jobSpeedRecord +
                 '}';
     }
 }
