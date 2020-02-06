@@ -96,7 +96,7 @@
         <oshi.core.version>3.5.0</oshi.core.version>
         <clickhouse.jdbc.version>0.1.52</clickhouse.jdbc.version>
         <mssql.jdbc.version>6.1.0.jre8</mssql.jdbc.version>
-        <jsp.version>6.1.14</jsp.version>
+        <jsp-2.1.version>6.1.14</jsp-2.1.version>
         <spotbugs.version>3.1.12</spotbugs.version>
         <checkstyle.version>3.0.0</checkstyle.version>
         <apache.rat.version>0.13</apache.rat.version>
@@ -116,7 +116,6 @@
         <cobertura-maven-plugin.version>2.7</cobertura-maven-plugin.version>
         <mockito.version>2.21.0</mockito.version>
         <powermock.version>2.0.2</powermock.version>
-        <jasper-runtime.version>5.5.23</jasper-runtime.version>
         <servlet-api.version>2.5</servlet-api.version>
         <swagger.version>1.9.3</swagger.version>
         <springfox.version>2.9.2</springfox.version>
@@ -443,12 +442,6 @@
             </dependency>
 
             <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>${javax.servlet.api.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${commons.collections4.version}</version>
@@ -502,16 +495,24 @@
                 <version>${jcip.version}</version>
                 <optional>true</optional>
             </dependency>
+
+            <!-- for api module -->
             <dependency>
-                <groupId>tomcat</groupId>
-                <artifactId>jasper-runtime</artifactId>
-                <version>${jasper-runtime.version}</version>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jsp-2.1</artifactId>
+                <version>${jsp-2.1.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>${servlet-api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>javax.servlet-api</artifactId>
+                <version>${javax.servlet.api.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.springfox</groupId>
@@ -713,6 +714,8 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
+                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <include>**/server/utils/DataxUtilsTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
