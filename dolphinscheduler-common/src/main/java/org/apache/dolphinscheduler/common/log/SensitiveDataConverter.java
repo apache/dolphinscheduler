@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.log;
+package org.apache.dolphinscheduler.common.log;
 
 
 import ch.qos.logback.classic.pattern.MessageConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.server.utils.SensitiveLogUtil;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,7 +77,7 @@ public class SensitiveDataConverter extends MessageConverter {
 
             String password = matcher.group();
 
-            String maskPassword = SensitiveLogUtil.maskDataSourcePwd(password);
+            String maskPassword = SensitiveLogUtils.maskDataSourcePwd(password);
 
             matcher.appendReplacement(sb, maskPassword);
         }
