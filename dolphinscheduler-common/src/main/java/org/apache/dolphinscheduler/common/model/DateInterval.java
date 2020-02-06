@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.model;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * date interval class
@@ -62,4 +63,8 @@ public class DateInterval {
         this.endTime = endTime;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(startTime, endTime);
+    }
 }
