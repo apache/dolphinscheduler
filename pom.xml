@@ -713,6 +713,8 @@
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
+                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <include>**/server/utils/DataxUtilsTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
