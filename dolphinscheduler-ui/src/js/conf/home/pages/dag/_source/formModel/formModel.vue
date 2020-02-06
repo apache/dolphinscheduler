@@ -191,7 +191,13 @@
           ref="HTTP"
           :backfill-item="backfillItem">
         </m-http>
-
+        <m-datax
+          v-if="taskType === 'DATAX'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="DATAX"
+          :backfill-item="backfillItem">
+        </m-datax>
       </div>
     </div>
     <div class="bottom-box">
@@ -216,6 +222,7 @@
   import mProcedure from './tasks/procedure'
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
+  import mDatax from './tasks/datax'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
@@ -565,6 +572,7 @@
       mPython,
       mDependent,
       mHttp,
+      mDatax,
       mSelectInput,
       mTimeoutAlarm,
       mPriority,

@@ -27,6 +27,10 @@
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
 
+  <properties>
+    <jasper-runtime.version>5.5.23</jasper-runtime.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.dolphinscheduler</groupId>
@@ -179,8 +183,19 @@
     </dependency>
 
     <dependency>
+      <groupId>tomcat</groupId>
+      <artifactId>jasper-runtime</artifactId>
+      <version>${jasper-runtime.version}</version>
+    </dependency>
+
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mortbay.jetty</groupId>
+      <artifactId>jsp-2.1</artifactId>
     </dependency>
 
     <!-- just for test -->

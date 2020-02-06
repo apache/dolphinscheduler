@@ -509,5 +509,13 @@ export default {
   'IP address cannot be empty': 'IP地址不能为空',
   'Please enter the correct IP': '请输入正确的IP',
   'Please generate token': '请生成Token',
-  'Spark Version': 'Spark版本'
+  'Spark Version': 'Spark版本',
+  'TargetDataBase': '目标库',
+  'TargetTable': '目标表',
+  'Please enter the table of target': '请输入目标表名',
+  'Please enter a Target Table(required)': '请输入目标表(必填)',
+  'SpeedByte': '限流(字节数)',
+  'SpeedRecord': '限流(记录数)',
+  '0 means unlimited by byte': 'KB，0代表不限制',
+  '0 means unlimited by count': '0代表不限制',
 }
