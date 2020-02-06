@@ -31,6 +31,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
+/**
+ *  netty server request handler
+ */
 @ChannelHandler.Sharable
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 

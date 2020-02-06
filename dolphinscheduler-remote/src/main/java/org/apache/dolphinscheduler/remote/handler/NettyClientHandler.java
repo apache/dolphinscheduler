@@ -30,7 +30,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
-
+/**
+ *  netty client request handler
+ */
 @ChannelHandler.Sharable
 public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
@@ -72,6 +74,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         final Pair<NettyRequestProcessor, ExecutorService> pair = processors.get(commandType);
         if (pair != null) {
             Runnable r = new Runnable() {
+                @Override
                 public void run() {
                     try {
                         pair.getLeft().process(channel, msg);

@@ -41,7 +41,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+/**
+ *  remoting netty server
+ */
 public class NettyRemotingServer {
 
     private final Logger logger = LoggerFactory.getLogger(NettyRemotingServer.class);
@@ -99,6 +101,7 @@ public class NettyRemotingServer {
                 .childOption(ChannelOption.SO_RCVBUF, serverConfig.getReceiveBufferSize())
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
 
+                    @Override
                     protected void initChannel(NioSocketChannel ch) throws Exception {
                         initNettyChannel(ch);
                     }

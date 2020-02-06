@@ -18,6 +18,9 @@ package org.apache.dolphinscheduler.remote.command;
 
 import java.io.Serializable;
 
+/**
+ *  command header
+ */
 public class CommandHeader implements Serializable {
 
     private byte type;

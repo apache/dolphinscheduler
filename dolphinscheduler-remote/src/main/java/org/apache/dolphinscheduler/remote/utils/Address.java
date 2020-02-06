@@ -18,6 +18,9 @@ package org.apache.dolphinscheduler.remote.utils;
 
 import java.io.Serializable;
 
+/**
+ *  server address
+ */
 public class Address implements Serializable {
 
     private String host;
@@ -60,21 +63,24 @@ public class Address implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         Address other = (Address) obj;
         if (host == null) {
-            if (other.host != null)
+            if (other.host != null) {
                 return false;
-        } else if (!host.equals(other.host))
+            }
+        } else if (!host.equals(other.host)) {
             return false;
-        if (port != other.port)
-            return false;
-        return true;
+        }
+        return port == other.port;
     }
 
     @Override

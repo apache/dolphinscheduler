@@ -18,6 +18,9 @@ package org.apache.dolphinscheduler.remote.config;
 
 import org.apache.dolphinscheduler.remote.utils.Constants;
 
+/**
+ *  netty server config
+ */
 public class NettyServerConfig {
 
     private int soBacklog = 1024;

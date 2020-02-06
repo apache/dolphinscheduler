@@ -18,6 +18,9 @@ package org.apache.dolphinscheduler.remote.utils;
 
 import com.alibaba.fastjson.JSON;
 
+/**
+ *  json serialize or deserialize
+ */
 public class FastJsonSerializer {
 
 	public static <T> byte[] serialize(T obj)  {

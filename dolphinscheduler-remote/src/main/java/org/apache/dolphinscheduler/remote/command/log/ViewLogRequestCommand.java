@@ -24,6 +24,9 @@ import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ *  view log request command
+ */
 public class ViewLogRequestCommand implements Serializable {
 
     private static final AtomicLong REQUEST = new AtomicLong(1);
@@ -47,7 +50,7 @@ public class ViewLogRequestCommand implements Serializable {
 
     public Command convert2Command(){
         Command command = new Command(REQUEST.getAndIncrement());
-        command.setType(CommandType.VIEW_LOG_REQ);
+        command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
         byte[] body = FastJsonSerializer.serialize(this);
         command.setBody(body);
         return command;

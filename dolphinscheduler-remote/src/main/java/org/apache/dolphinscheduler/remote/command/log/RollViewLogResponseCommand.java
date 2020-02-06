@@ -23,6 +23,9 @@ import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 
 import java.io.Serializable;
 
+/**
+ *  roll view log response command
+ */
 public class RollViewLogResponseCommand implements Serializable {
 
     private String msg;
@@ -44,7 +47,7 @@ public class RollViewLogResponseCommand implements Serializable {
 
     public Command convert2Command(long opaque){
         Command command = new Command(opaque);
-        command.setType(CommandType.ROLL_VIEW_LOG_RES);
+        command.setType(CommandType.ROLL_VIEW_LOG_RESPONSE);
         byte[] body = FastJsonSerializer.serialize(this);
         command.setBody(body);
         return command;

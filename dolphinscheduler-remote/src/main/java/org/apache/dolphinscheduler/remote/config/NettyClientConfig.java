@@ -18,6 +18,9 @@ package org.apache.dolphinscheduler.remote.config;
 
 import org.apache.dolphinscheduler.remote.utils.Constants;
 
+/**
+ *  netty client config
+ */
 public class NettyClientConfig {
 
     private int workerThreads = Constants.CPUS;

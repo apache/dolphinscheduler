@@ -22,32 +22,41 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicLong;
 
-public class GetLogResponseCommand implements Serializable {
+/**
+ *  get log bytes request command
+ */
+public class GetLogBytesRequestCommand implements Serializable {
 
-    private byte[] data;
+    private static final AtomicLong REQUEST = new AtomicLong(1);
 
-    public GetLogResponseCommand() {
+    private String path;
+
+    public GetLogBytesRequestCommand() {
     }
 
-    public GetLogResponseCommand(byte[] data) {
-        this.data = data;
+    public GetLogBytesRequestCommand(String path) {
+        this.path = path;
     }
 
-    public byte[] getData() {
-        return data;
+    public String getPath() {
+        return path;
     }
 
-    public void setData(byte[] data) {
-        this.data = data;
+    public void setPath(String path) {
+        this.path = path;
     }
 
-    public Command convert2Command(long opaque){
-        Command command = new Command(opaque);
-        command.setType(CommandType.GET_LOG_RES);
+    /**
+     *
+     * @return
+     */
+    public Command convert2Command(){
+        Command command = new Command(REQUEST.getAndIncrement());
+        command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
         byte[] body = FastJsonSerializer.serialize(this);
         command.setBody(body);
         return command;
     }
-
 }

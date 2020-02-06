@@ -42,7 +42,10 @@ public class LogClientService implements NettyRequestProcessor {
 
     private final Address address;
 
-    private final long logRequestTimeout = 10 * 1000; //10s
+    /**
+     *  request time out
+     */
+    private final long logRequestTimeout = 10 * 1000;
 
     /**
      * construct client
@@ -54,9 +57,9 @@ public class LogClientService implements NettyRequestProcessor {
         this.clientConfig = new NettyClientConfig();
         this.clientConfig.setWorkerThreads(1);
         this.client = new NettyRemotingClient(clientConfig);
-        this.client.registerProcessor(CommandType.ROLL_VIEW_LOG_RES,this);
-        this.client.registerProcessor(CommandType.VIEW_LOG_RES, this);
-        this.client.registerProcessor(CommandType.GET_LOG_RES, this);
+        this.client.registerProcessor(CommandType.ROLL_VIEW_LOG_RESPONSE,this);
+        this.client.registerProcessor(CommandType.VIEW_WHOLE_LOG_RESPONSE, this);
+        this.client.registerProcessor(CommandType.GET_LOG_BYTES_RESPONSE, this);
 
     }
 
@@ -117,7 +120,7 @@ public class LogClientService implements NettyRequestProcessor {
      */
     public byte[] getLogBytes(String path) {
         logger.info("log path {}", path);
-        GetLogRequestCommand request = new GetLogRequestCommand(path);
+        GetLogBytesRequestCommand request = new GetLogBytesRequestCommand(path);
         byte[] result = null;
         try {
             Command command = request.convert2Command();
@@ -134,20 +137,24 @@ public class LogClientService implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         logger.info("received log response : {}", command);
         switch (command.getType()){
-            case ROLL_VIEW_LOG_RES:
-                RollViewLogResponseCommand rollReviewLog = FastJsonSerializer.deserialize(command.getBody(), RollViewLogResponseCommand.class);
+            case ROLL_VIEW_LOG_RESPONSE:
+                RollViewLogResponseCommand rollReviewLog = FastJsonSerializer.deserialize(
+                        command.getBody(), RollViewLogResponseCommand.class);
                 LogPromise.notify(command.getOpaque(), rollReviewLog.getMsg());
                 break;
-            case VIEW_LOG_RES:
-                ViewLogResponseCommand viewLog = FastJsonSerializer.deserialize(command.getBody(), ViewLogResponseCommand.class);
+            case VIEW_WHOLE_LOG_RESPONSE:
+                ViewLogResponseCommand viewLog = FastJsonSerializer.deserialize(
+                        command.getBody(), ViewLogResponseCommand.class);
                 LogPromise.notify(command.getOpaque(), viewLog.getMsg());
                 break;
-            case GET_LOG_RES:
-                GetLogResponseCommand getLog = FastJsonSerializer.deserialize(command.getBody(), GetLogResponseCommand.class);
+            case GET_LOG_BYTES_RESPONSE:
+                GetLogBytesResponseCommand getLog = FastJsonSerializer.deserialize(
+                        command.getBody(), GetLogBytesResponseCommand.class);
                 LogPromise.notify(command.getOpaque(), getLog.getData());
                 break;
             default:
                 throw new UnsupportedOperationException(String.format("command type : %s is not supported ", command.getType()));
         }
     }
+
 }

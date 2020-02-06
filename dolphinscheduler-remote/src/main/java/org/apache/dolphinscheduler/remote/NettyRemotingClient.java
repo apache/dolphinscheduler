@@ -43,6 +43,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ *  remoting netty client
+ */
 public class NettyRemotingClient {
 
     private final Logger logger = LoggerFactory.getLogger(NettyRemotingClient.class);
@@ -68,6 +71,7 @@ public class NettyRemotingClient {
         this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
             private AtomicInteger threadIndex = new AtomicInteger(0);
 
+            @Override
             public Thread newThread(Runnable r) {
                 return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
             }
@@ -85,6 +89,7 @@ public class NettyRemotingClient {
                 .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())
                 .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())
                 .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline().addLast(
                                 new NettyDecoder(),
@@ -111,6 +116,8 @@ public class NettyRemotingClient {
         }
         try {
             channel.writeAndFlush(command).addListener(new ChannelFutureListener(){
+
+                @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if(future.isSuccess()){
                         logger.info("sent command {} to {}", command, address);

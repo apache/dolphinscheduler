@@ -21,7 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-
+/**
+ *  log asyc callback
+ */
 public class LogPromise {
 
     private static final ConcurrentHashMap<Long, LogPromise> PROMISES = new ConcurrentHashMap<>();
@@ -45,6 +47,11 @@ public class LogPromise {
     }
 
 
+    /**
+     *  notify client finish
+     * @param opaque unique identification
+     * @param result result
+     */
     public static void notify(long opaque, Object result){
         LogPromise promise = PROMISES.remove(opaque);
         if(promise != null){

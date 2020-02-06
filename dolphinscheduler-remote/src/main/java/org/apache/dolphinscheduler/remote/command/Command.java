@@ -18,6 +18,10 @@ package org.apache.dolphinscheduler.remote.command;
 
 import java.io.Serializable;
 
+/**
+ *  receive task log request command and content fill
+ *  for netty data serializable transfer
+ */
 public class Command implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -31,8 +35,14 @@ public class Command implements Serializable {
         this.opaque = opaque;
     }
 
+    /**
+     * comman type
+     */
     private CommandType type;
 
+    /**
+     *  request unique identification
+     */
     private long opaque;
 
     private byte[] body;
@@ -61,6 +71,7 @@ public class Command implements Serializable {
         this.body = body;
     }
 
+    @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -68,17 +79,19 @@ public class Command implements Serializable {
         return result;
     }
 
+    @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         Command other = (Command) obj;
-        if (opaque != other.opaque)
-            return false;
-        return true;
+        return opaque == other.opaque;
     }
 
     @Override

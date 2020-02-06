@@ -37,7 +37,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
+/**
+ *  logger request process logic
+ */
 public class LoggerRequestProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(LoggerRequestProcessor.class);
@@ -51,23 +53,31 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         logger.info("received command : {}", command);
+
+        /**
+         * reuqest task log command type
+         */
         final CommandType commandType = command.getType();
         switch (commandType){
-            case GET_LOG_REQ:
-                GetLogRequestCommand getLogRequest = FastJsonSerializer.deserialize(command.getBody(), GetLogRequestCommand.class);
-                byte[] bytes = getFileBytes(getLogRequest.getPath());
-                GetLogResponseCommand getLogResponse = new GetLogResponseCommand(bytes);
+            case GET_LOG_BYTES_REQUEST:
+                GetLogBytesRequestCommand getLogRequest = FastJsonSerializer.deserialize(
+                        command.getBody(), GetLogBytesRequestCommand.class);
+                byte[] bytes = getFileContentBytes(getLogRequest.getPath());
+                GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
                 channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
                 break;
-            case VIEW_LOG_REQ:
-                ViewLogRequestCommand viewLogRequest = FastJsonSerializer.deserialize(command.getBody(), ViewLogRequestCommand.class);
-                String msg = readFile(viewLogRequest.getPath());
+            case VIEW_WHOLE_LOG_REQUEST:
+                ViewLogRequestCommand viewLogRequest = FastJsonSerializer.deserialize(
+                        command.getBody(), ViewLogRequestCommand.class);
+                String msg = readWholeFileContent(viewLogRequest.getPath());
                 ViewLogResponseCommand viewLogResponse = new ViewLogResponseCommand(msg);
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
                 break;
-            case ROLL_VIEW_LOG_REQ:
-                RollViewLogRequestCommand rollViewLogRequest = FastJsonSerializer.deserialize(command.getBody(), RollViewLogRequestCommand.class);
-                List<String> lines = readFile(rollViewLogRequest.getPath(), rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
+            case ROLL_VIEW_LOG_REQUEST:
+                RollViewLogRequestCommand rollViewLogRequest = FastJsonSerializer.deserialize(
+                        command.getBody(), RollViewLogRequestCommand.class);
+                List<String> lines = readPartFileContent(rollViewLogRequest.getPath(),
+                        rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
                 StringBuilder builder = new StringBuilder();
                 for (String line : lines){
                     builder.append(line + "\r\n");
@@ -76,7 +86,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
                 break;
             default:
-                throw new IllegalArgumentException(String.format("unknown commandType : %s"));
+                throw new IllegalArgumentException("unknown commandType");
         }
     }
 
@@ -85,20 +95,20 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
     }
 
     /**
-     * get files bytes
+     * get files content bytes，for down load file
      *
-     * @param path path
+     * @param filePath file path
      * @return byte array of file
      * @throws Exception exception
      */
-    private byte[] getFileBytes(String path){
+    private byte[] getFileContentBytes(String filePath){
         InputStream in = null;
         ByteArrayOutputStream bos = null;
         try {
-            in = new FileInputStream(path);
+            in = new FileInputStream(filePath);
             bos  = new ByteArrayOutputStream();
             byte[] buf = new byte[1024];
-            int len = 0;
+            int len;
             while ((len = in.read(buf)) != -1) {
                 bos.write(buf, 0, len);
             }
@@ -121,41 +131,42 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
     }
 
     /**
-     * read file content
+     * read part file content，can skip any line and read some lines
      *
-     * @param path
-     * @param skipLine
-     * @param limit
-     * @return
+     * @param filePath file path
+     * @param skipLine skip line
+     * @param limit read lines limit
+     * @return part file content
      */
-    private List<String> readFile(String path, int skipLine, int limit){
-        try (Stream<String> stream = Files.lines(Paths.get(path))) {
+    private List<String> readPartFileContent(String filePath,
+                                            int skipLine,
+                                            int limit){
+        try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
             return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
         } catch (IOException e) {
-            logger.error("read file failed",e);
+            logger.error("read file error",e);
         }
         return Collections.EMPTY_LIST;
     }
 
     /**
-     * read  file content
+     * read whole file content
      *
-     * @param path path
-     * @return string of file content
-     * @throws Exception exception
+     * @param filePath file path
+     * @return whole file content
      */
-    private String readFile(String path){
+    private String readWholeFileContent(String filePath){
         BufferedReader br = null;
-        String line = null;
+        String line;
         StringBuilder sb = new StringBuilder();
         try {
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(path)));
+            br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
             while ((line = br.readLine()) != null){
                 sb.append(line + "\r\n");
             }
             return sb.toString();
         }catch (IOException e){
-            logger.error("read file failed",e);
+            logger.error("read file error",e);
         }finally {
             try {
                 if (br != null){

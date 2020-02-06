@@ -27,6 +27,9 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import java.util.List;
 
+/**
+ *  netty decoder
+ */
 public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
 
     public NettyDecoder(){

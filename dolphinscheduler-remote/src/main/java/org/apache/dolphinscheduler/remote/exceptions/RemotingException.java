@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.remote.exceptions;
 
+/**
+ *  remote exception
+ */
 public class RemotingException extends Exception {
 
     public RemotingException() {

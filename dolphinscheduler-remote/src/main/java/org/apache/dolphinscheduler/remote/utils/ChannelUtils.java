@@ -20,6 +20,9 @@ import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
 
+/**
+ *  channel utils
+ */
 public class ChannelUtils {
 
     public static String getLocalAddress(Channel channel){

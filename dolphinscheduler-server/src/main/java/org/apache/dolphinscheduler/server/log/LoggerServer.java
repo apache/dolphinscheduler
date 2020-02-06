@@ -25,14 +25,26 @@ import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ *  logger server
+ */
 public class LoggerServer {
 
     private static  final Logger logger = LoggerFactory.getLogger(LoggerServer.class);
 
+    /**
+     *  netty server
+     */
     private final NettyRemotingServer server;
 
+    /**
+     *  netty server config
+     */
     private final NettyServerConfig serverConfig;
 
+    /**
+     *  loggger request processor
+     */
     private final LoggerRequestProcessor requestProcessor;
 
     public LoggerServer(){
@@ -40,9 +52,9 @@ public class LoggerServer {
         this.serverConfig.setListenPort(Constants.RPC_PORT);
         this.server = new NettyRemotingServer(serverConfig);
         this.requestProcessor = new LoggerRequestProcessor();
-        this.server.registerProcessor(CommandType.GET_LOG_REQ, requestProcessor, requestProcessor.getExecutor());
-        this.server.registerProcessor(CommandType.ROLL_VIEW_LOG_REQ, requestProcessor, requestProcessor.getExecutor());
-        this.server.registerProcessor(CommandType.VIEW_LOG_REQ, requestProcessor, requestProcessor.getExecutor());
+        this.server.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, requestProcessor, requestProcessor.getExecutor());
+        this.server.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, requestProcessor, requestProcessor.getExecutor());
+        this.server.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, requestProcessor, requestProcessor.getExecutor());
     }
 
     /**
