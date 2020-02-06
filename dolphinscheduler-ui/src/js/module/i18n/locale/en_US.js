@@ -509,5 +509,13 @@ export default {
   'IP address cannot be empty': 'IP address cannot be empty',
   'Please enter the correct IP': 'Please enter the correct IP',
   'Please generate token': 'Please generate token',
-  'Spark Version': 'Spark Version'
+  'Spark Version': 'Spark Version',
+  'TargetDataBase': 'target database',
+  'TargetTable': 'target table',
+  'Please enter the table of target': 'Please enter the table of target',
+  'Please enter a Target Table(required)': 'Please enter a Target Table(required)',
+  'SpeedByte': 'speed(byte count)',
+  'SpeedRecord': 'speed(record count)',
+  '0 means unlimited by byte': '0 means unlimited',
+  '0 means unlimited by count': '0 means unlimited',
 }
