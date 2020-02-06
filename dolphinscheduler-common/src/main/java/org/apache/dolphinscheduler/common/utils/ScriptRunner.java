@@ -184,7 +184,7 @@ public class ScriptRunner {
                             }
                         }   
                     } catch (SQLException e) {
-                        logger.error(e.getMessage(),e);
+                        logger.error("SQLException", e);
                         throw e;
                     }
                     
@@ -257,7 +257,7 @@ public class ScriptRunner {
                             }
                         }   
                     } catch (SQLException e) {
-                        logger.error(e.getMessage(),e);
+                        logger.error("SQLException", e);
                         throw e;
                     }
 
@@ -270,7 +270,6 @@ public class ScriptRunner {
 			}
 
 		} catch (SQLException e) {
-			logger.error("Error executing: {}", sql);
 			throw e;
 		} catch (IOException e) {
 			e.fillInStackTrace();
