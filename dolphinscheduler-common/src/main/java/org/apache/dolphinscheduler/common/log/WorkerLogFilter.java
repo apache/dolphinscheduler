@@ -14,26 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphinscheduler.common.log;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.dolphinscheduler.common.Constants;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.filter.Filter;
+import ch.qos.logback.core.spi.FilterReply;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+
+import java.util.Arrays;
 
 /**
- *  sensitive log Util
+ *  worker log filter
  */
-public class SensitiveLogUtil {
+public class WorkerLogFilter extends Filter<ILoggingEvent> {
+    /**
+     * level
+     */
+    Level level;
 
     /**
-     * @param dataSourcePwd data source password
-     * @return String
+     * Accept or reject based on thread name
+     * @param event event
+     * @return FilterReply
      */
-    public static String maskDataSourcePwd(String dataSourcePwd){
-
-        if (StringUtils.isNotEmpty(dataSourcePwd)) {
-            dataSourcePwd = Constants.PASSWORD_DEFAULT;
+    @Override
+    public FilterReply decide(ILoggingEvent event) {
+        if (event.getThreadName().startsWith("Worker-")){
+            return FilterReply.ACCEPT;
         }
-        return dataSourcePwd;
-    }
 
+        return FilterReply.DENY;
+    }
+    public void setLevel(String level) {
+        this.level = Level.toLevel(level);
+    }
 }

@@ -14,21 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.log;
+package org.apache.dolphinscheduler.common.log;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.spi.FilterReply;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 
 /**
- * master log filter
+ *  task log filter
  */
-public class MasterLogFilter extends Filter<ILoggingEvent> {
+public class TaskLogFilter extends Filter<ILoggingEvent> {
+
     /**
-     * log level
+     * level
      */
-    Level level;
+    private Level level;
+
+    public void setLevel(String level) {
+        this.level = Level.toLevel(level);
+    }
 
     /**
      * Accept or reject based on thread name
@@ -37,13 +43,9 @@ public class MasterLogFilter extends Filter<ILoggingEvent> {
      */
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("Master-") ){
+        if (event.getThreadName().startsWith(LoggerUtils.TASK_LOGGER_THREAD_NAME) || event.getLevel().isGreaterOrEqual(level)) {
             return FilterReply.ACCEPT;
         }
         return FilterReply.DENY;
-    }
-
-    public void setLevel(String level) {
-        this.level = Level.toLevel(level);
     }
 }
