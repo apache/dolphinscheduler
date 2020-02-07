@@ -134,7 +134,7 @@ public class MasterExecThreadTest {
             method.setAccessible(true);
             method.invoke(masterExecThread);
             // one create save, and 15(1 to 31 step 2) for next save, and last day 31 no save
-            verify(processDao, times(16)).saveProcessInstance(processInstance);
+            verify(processDao, times(15)).saveProcessInstance(processInstance);
         }catch (Exception e){
             Assert.assertTrue(false);
         }
