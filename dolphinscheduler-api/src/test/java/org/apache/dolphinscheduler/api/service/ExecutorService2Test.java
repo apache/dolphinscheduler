@@ -203,7 +203,7 @@ public class ExecutorService2Test {
                     "", "", RunMode.RUN_MODE_PARALLEL,
                     Priority.LOW, 0, 110);
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-            verify(processDao, times(16)).createCommand(any(Command.class));
+            verify(processDao, times(15)).createCommand(any(Command.class));
         }catch (Exception e){
             Assert.assertTrue(false);
         }
