@@ -166,7 +166,7 @@ public class CronUtils {
   public static List<Date> getSelfFireDateList(Date startTime, Date endTime, String cron) {
     CronExpression cronExpression = null;
     try {
-      cronExpression = CronUtils.parse2CronExpression(cron);
+      cronExpression = parse2CronExpression(cron);
     }catch (ParseException e){
       logger.error(e.getMessage(), e);
       return Collections.EMPTY_LIST;
