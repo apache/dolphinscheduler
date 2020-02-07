@@ -30,7 +30,8 @@ import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.server.utils.ScheduleUtils;
+import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -512,8 +513,15 @@ public class ExecutorService extends BaseService{
                     List<Date> listDate = new LinkedList<>();
                     if(!CollectionUtils.isEmpty(schedules)){
                         for (Schedule item : schedules) {
-                            List<Date> list = ScheduleUtils.getRecentTriggerTime(item.getCrontab(), start, end);
-                            listDate.addAll(list);
+                            CronExpression cronExpression = null;
+                            try {
+                                cronExpression = CronUtils.parse2CronExpression(item.getCrontab());
+                                List<Date> list = CronUtils.getSelfFireDateList(start, end, cronExpression);
+                                listDate.addAll(list);
+                            } catch (ParseException e) {
+                                logger.error(e.getMessage(), e);
+                                continue;
+                            }
                         }
                     }
                     if(!CollectionUtils.isEmpty(listDate)){
