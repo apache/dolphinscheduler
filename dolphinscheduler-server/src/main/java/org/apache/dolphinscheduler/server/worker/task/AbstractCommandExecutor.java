@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.slf4j.Logger;
 
@@ -146,9 +146,6 @@ public abstract class AbstractCommandExecutor {
 
             // get process id
             int pid = getProcessId(process);
-
-            // task instance id
-            int taskInstId = Integer.parseInt(taskAppId.split("_")[2]);
 
             processDao.updatePidByTaskInstId(taskInstId, pid, "");
 

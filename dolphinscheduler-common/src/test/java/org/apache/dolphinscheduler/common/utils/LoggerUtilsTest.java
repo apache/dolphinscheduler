@@ -14,24 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphinscheduler.common.utils;
 
-
-import org.apache.dolphinscheduler.common.Constants;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.List;
 
-public class SensitiveLogUtilTest {
+public class LoggerUtilsTest {
+    private Logger logger = LoggerFactory.getLogger(LoggerUtilsTest.class);
 
     @Test
-    public void testMaskDataSourcePwd() {
+    public void buildTaskId() {
 
-        String password = "123456";
-        String emptyPassword = "";
+      String taskId = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,79,4084,15210);
 
-        Assert.assertEquals(Constants.PASSWORD_DEFAULT, SensitiveLogUtil.maskDataSourcePwd(password));
-        Assert.assertEquals("", SensitiveLogUtil.maskDataSourcePwd(emptyPassword));
+      Assert.assertEquals(" - [taskAppId=TASK-79-4084-15210]", taskId);
+    }
+
+    @Test
+    public void getAppIds() {
+       List<String> appIdList =  LoggerUtils.getAppIds("Running job: application_1_1",logger);
+       Assert.assertEquals("application_1_1", appIdList.get(0));
 
     }
 }
