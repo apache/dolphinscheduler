@@ -156,6 +156,23 @@ public class CronUtils {
     return dateList;
   }
 
+  /**
+   * gets all scheduled times for a period of time based on self dependency
+   * @param startTime startTime
+   * @param endTime endTime
+   * @param cron cron
+   * @return date list
+   */
+  public static List<Date> getSelfFireDateList(Date startTime, Date endTime, String cron) {
+    CronExpression cronExpression = null;
+    try {
+      cronExpression = parse2CronExpression(cron);
+    }catch (ParseException e){
+      logger.error(e.getMessage(), e);
+      return Collections.EMPTY_LIST;
+    }
+    return getSelfFireDateList(startTime, endTime, cronExpression);
+  }
 
   /**
    * get expiration time
