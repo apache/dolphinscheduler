@@ -33,14 +33,16 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
-import org.apache.dolphinscheduler.server.utils.ScheduleUtils;
+import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -213,8 +215,15 @@ public class MasterExecThread implements Runnable {
         List<Date> listDate = Lists.newLinkedList();
         if(!CollectionUtils.isEmpty(schedules)){
             for (Schedule schedule : schedules) {
-                List<Date> list = ScheduleUtils.getRecentTriggerTime(schedule.getCrontab(), startDate, endDate);
-                listDate.addAll(list);
+                CronExpression cronExpression = null;
+                try {
+                    cronExpression = CronUtils.parse2CronExpression(schedule.getCrontab());
+                    List<Date> list = CronUtils.getSelfFireDateList(startDate, endDate, cronExpression);
+                    listDate.addAll(list);
+                } catch (ParseException e) {
+                    logger.error(e.getMessage(), e);
+                    continue;
+                }
             }
         }
         // get first fire date
