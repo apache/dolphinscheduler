@@ -2,7 +2,7 @@
 
 ### New Feature	
 1. [[#1497](https://github.com/apache/incubator-dolphinscheduler/issues/1497)] DAG automatic layout when use api call process definition create
-2. [[#747](https://github.com/apache/incubator-dolphinscheduler/issues/747)] Worker server runtime log desensitization
+2. [[ #747](https://github.com/apache/incubator-dolphinscheduler/issues/747)]  Worker server runtime log desensitization
 3. [[#1635](https://github.com/apache/incubator-dolphinscheduler/issues/1635)] merge configurations in order to reduce configuration files
 4. [[#1460](https://github.com/apache/incubator-dolphinscheduler/issues/1460)] Add CI
 5. [[#1547](https://github.com/apache/incubator-dolphinscheduler/issues/1547)] node text edit box supports full-screen magnification
@@ -13,14 +13,13 @@
 ### Enhancement	
 1. [[#184](https://github.com/apache/incubator-dolphinscheduler/issues/184)] Use the default workgroup in the page ,Instead of the value id.
 2. [[#1441](https://github.com/apache/incubator-dolphinscheduler/issues/1441)] add user success when user name contains '.'.
-3. Support Mac local development and debugging
-4. [[#839](https://github.com/apache/incubator-dolphinscheduler/issues/839)] add Spark Task Component can switch Spark Version.
-5. 
-6. [[#1511](https://github.com/apache/incubator-dolphinscheduler/issues/1511)] Merge frontend and backend tar into one binary tar
-7. [[#1509](https://github.com/apache/incubator-dolphinscheduler/issues/1509)] Remove master server and worker server listening port (5566、7788)
-8. [[#1575](https://github.com/apache/incubator-dolphinscheduler/issues/1575)] Remove kazoo, simplify deployment
-9. [[#1300](https://github.com/apache/incubator-dolphinscheduler/issues/1300)] Add right alignment function in sql email content
-10. [[#1599](https://github.com/apache/incubator-dolphinscheduler/issues/1599)] add profile nginx in order to deploy frontend
+3. [[#839](https://github.com/apache/incubator-dolphinscheduler/issues/839)] add Spark Task Component can switch Spark Version.
+4. [[#1511](https://github.com/apache/incubator-dolphinscheduler/issues/1511)] Merge frontend and backend tar into one binary tar
+5. [[#1509](https://github.com/apache/incubator-dolphinscheduler/issues/1509)] Remove master server and worker server listening port (5566、7788)
+6. [[#1575](https://github.com/apache/incubator-dolphinscheduler/issues/1575)] Remove kazoo, simplify deployment
+7. [[#1300](https://github.com/apache/incubator-dolphinscheduler/issues/1300)] Add right alignment function in sql email content
+8. [[#1599](https://github.com/apache/incubator-dolphinscheduler/issues/1599)] add profile nginx in order to deploy frontend
+9. Support Mac local development and debugging
 
 
 ### Bug Fixes
