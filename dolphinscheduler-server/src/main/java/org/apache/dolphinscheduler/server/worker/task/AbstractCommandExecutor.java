@@ -147,9 +147,6 @@ public abstract class AbstractCommandExecutor {
             // get process id
             int pid = getProcessId(process);
 
-            // task instance id
-            int taskInstId = Integer.parseInt(taskAppId.split("_")[2]);
-
             processDao.updatePidByTaskInstId(taskInstId, pid, "");
 
             logger.info("process start, process id is: {}", pid);
