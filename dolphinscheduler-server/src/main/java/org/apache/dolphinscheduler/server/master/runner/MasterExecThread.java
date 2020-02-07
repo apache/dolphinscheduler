@@ -33,9 +33,9 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
-import org.apache.dolphinscheduler.server.utils.ScheduleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -213,8 +213,7 @@ public class MasterExecThread implements Runnable {
         List<Date> listDate = Lists.newLinkedList();
         if(!CollectionUtils.isEmpty(schedules)){
             for (Schedule schedule : schedules) {
-                List<Date> list = ScheduleUtils.getRecentTriggerTime(schedule.getCrontab(), startDate, endDate);
-                listDate.addAll(list);
+                listDate.addAll(CronUtils.getSelfFireDateList(startDate, endDate, schedule.getCrontab()));
             }
         }
         // get first fire date
