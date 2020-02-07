@@ -442,12 +442,11 @@ public class UsersService extends BaseService {
         if (StringUtils.isNotEmpty(resourceIds)) {
             needAuthorizedIds = Arrays.stream(resourcesIdArr).map(t->Integer.parseInt(t)).collect(Collectors.toSet());
         }
+
+        //get the authorized resource id list by user id
+        List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
         //if resource type is UDF,need check whether it is bound by UDF functon
-
-        //get the authorized resource id list by user id and resource type
-        List<Resource> oldAuthorizedUdfRes = resourceMapper.queryResourceListAuthored(userId, ResourceType.UDF.ordinal());
-        Set<Integer> oldAuthorizedUdfResIds = oldAuthorizedUdfRes.stream().map(t -> t.getId()).collect(Collectors.toSet());
-
+        Set<Integer> oldAuthorizedUdfResIds = oldAuthorizedRes.stream().filter(t->t.getType().equals(ResourceType.UDF)).map(t -> t.getId()).collect(Collectors.toSet());
 
         //get the unauthorized resource id list
         oldAuthorizedUdfResIds.removeAll(needAuthorizedIds);
