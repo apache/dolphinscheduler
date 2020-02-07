@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.cron;
 
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
 import com.cronutils.builder.CronBuilder;
 import com.cronutils.model.Cron;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
+import java.util.Date;
 
 import static com.cronutils.model.field.expression.FieldExpressionFactory.*;
 
@@ -179,5 +181,18 @@ public class CronUtilsTest {
                 logger.info("can't get scheduleType");
             }
         }
+    }
+
+
+    @Test
+    public void test3(){
+        Date from = DateUtils.stringToDate("2020-01-01 00:00:00");
+        Date to = DateUtils.stringToDate("2020-01-31 01:00:00");
+        // test date
+        Assert.assertEquals(0, CronUtils.getSelfFireDateList(to, from, "0 0 0 * * ? ").size());
+        // test error cron
+        Assert.assertEquals(0, CronUtils.getSelfFireDateList(from, to, "0 0 0 * *").size());
+        // test cron
+        Assert.assertEquals(30, CronUtils.getSelfFireDateList(from, to, "0 0 0 * * ? ").size());
     }
 }
