@@ -14,31 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.common.log;
 
-package org.apache.dolphinscheduler.server.utils;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.filter.Filter;
+import ch.qos.logback.core.spi.FilterReply;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.junit.Test;
-import java.util.Date;
-import static org.junit.Assert.assertEquals;
+import java.util.Arrays;
 
 /**
- * Test ScheduleUtils
+ *  worker log filter
  */
-public class ScheduleUtilsTest {
+public class WorkerLogFilter extends Filter<ILoggingEvent> {
+    /**
+     * level
+     */
+    Level level;
 
     /**
-     * Test the getRecentTriggerTime method
+     * Accept or reject based on thread name
+     * @param event event
+     * @return FilterReply
      */
-    @Test
-    public void testGetRecentTriggerTime() {
-        Date from = DateUtils.stringToDate("2020-01-01 00:00:00");
-        Date to = DateUtils.stringToDate("2020-01-31 01:00:00");
-        // test date
-        assertEquals(0, ScheduleUtils.getRecentTriggerTime("0 0 0 * * ? ", to, from).size());
-        // test error cron
-        assertEquals(0, ScheduleUtils.getRecentTriggerTime("0 0 0 * *", from, to).size());
-        // test cron
-        assertEquals(31, ScheduleUtils.getRecentTriggerTime("0 0 0 * * ? ", from, to).size());
+    @Override
+    public FilterReply decide(ILoggingEvent event) {
+        if (event.getThreadName().startsWith("Worker-")){
+            return FilterReply.ACCEPT;
+        }
+
+        return FilterReply.DENY;
+    }
+    public void setLevel(String level) {
+        this.level = Level.toLevel(level);
     }
 }

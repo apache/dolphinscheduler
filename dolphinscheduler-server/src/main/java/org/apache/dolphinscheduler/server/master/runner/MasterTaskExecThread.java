@@ -122,7 +122,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                     break;
                 }
                 if(checkTimeout){
-                    long remainTime = getRemaintime(taskTimeoutParameter.getInterval()*60);
+                    long remainTime = getRemaintime(taskTimeoutParameter.getInterval() * 60L);
                     if (remainTime < 0) {
                         logger.warn("task id: {} execution time out",taskInstance.getId());
                         // process define
