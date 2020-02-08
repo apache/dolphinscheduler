@@ -26,6 +26,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
@@ -106,6 +107,16 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
                     sb.toString(),
                     StandardCharsets.UTF_8);
         }
+    }
+
+    /**
+     * get command options
+     * @return command options list
+     */
+    @Override
+    protected List<String> commandOptions() {
+        // unbuffered binary stdout and stderr
+        return Collections.singletonList("-u");
     }
 
     /**

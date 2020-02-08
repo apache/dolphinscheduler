@@ -35,8 +35,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
-import org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob;
-import org.apache.dolphinscheduler.server.quartz.QuartzExecutors;
+import org.apache.dolphinscheduler.dao.quartz.ProcessScheduleJob;
+import org.apache.dolphinscheduler.dao.quartz.QuartzExecutors;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.quartz.CronExpression;
@@ -167,6 +167,7 @@ public class SchedulerService extends BaseService {
         processDefinitionMapper.updateById(processDefinition);
         putMsg(result, Status.SUCCESS);
 
+        result.put("scheduleId", scheduleObj.getId());
         return result;
     }
 
