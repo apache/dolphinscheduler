@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.common.utils;
 
 
 public class ArrayUtils {
-
+  private ArrayUtils() {
+    throw new IllegalStateException("ArrayUtils class");
+  }
   public static boolean isEmpty(final int[] array) {
     return array == null || array.length == 0;
   }

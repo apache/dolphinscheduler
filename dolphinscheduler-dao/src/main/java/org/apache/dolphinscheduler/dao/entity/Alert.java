@@ -94,6 +94,7 @@ public class Alert {
     private Map<String, Object> info = new HashMap<>();
 
     public Alert() {
+        // nothing to do now
     }
 
     public int getId() {

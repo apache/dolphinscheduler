@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +57,7 @@ public abstract class AbstractMonitor implements Monitor {
 
         String type = path.split("/")[2];
         String serverName = null;
-        String nodes = null;
+        String nodes = "";
         if ("masters".equals(type)){
             serverName = "master-server";
             nodes = runConfig.getMasters();
@@ -101,20 +102,13 @@ public abstract class AbstractMonitor implements Monitor {
      * @return master set/worker set
      */
     private Set<String> getRunConfigServer(String nodes){
-        Set<String> nodeSet = new HashSet();
-
-
         if (StringUtils.isEmpty(nodes)){
-            return null;
+            return Collections.emptySet();
+        } else {
+            Set<String> nodeSet = new HashSet<>();
+            Collections.addAll(nodeSet, nodes.split(","));
+            return nodeSet;
         }
-
-        String[] nodeArr = nodes.split(",");
-
-        for (String node : nodeArr){
-            nodeSet.add(node);
-        }
-
-        return nodeSet;
     }
 
     /**

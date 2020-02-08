@@ -176,7 +176,7 @@ public abstract class AbstractCommandExecutor {
 
         } catch (InterruptedException e) {
             exitStatusCode = -1;
-            logger.error(String.format("interrupt exception: {}, task may be cancelled or killed",e.getMessage()), e);
+            logger.error("interrupt exception: {}, task may be cancelled or killed", e.getMessage(), e);
             throw new RuntimeException("interrupt exception. exitCode is :  " + exitStatusCode);
         } catch (Exception e) {
             exitStatusCode = -1;
@@ -232,7 +232,7 @@ public abstract class AbstractCommandExecutor {
             logger.info("process id is {}", pid);
 
             List<String> appIds = getAppLinks(taskInstance.getLogPath());
-            if (appIds.size() > 0) {
+            if (!appIds.isEmpty()) {
                 String appUrl = String.join(Constants.COMMA, appIds);
                 logger.info("yarn log url:{}",appUrl);
                 processDao.updatePidByTaskInstId(taskInstId, pid, appUrl);
@@ -423,7 +423,7 @@ public abstract class AbstractCommandExecutor {
     private List<String> getAppLinks(String fileName) {
         List<String> logs = convertFile2List(fileName);
 
-        List<String> appIds = new ArrayList<String>();
+        List<String> appIds = new ArrayList<>();
         /**
          * analysis log，get submited yarn application id
          */
@@ -516,7 +516,7 @@ public abstract class AbstractCommandExecutor {
             f.setAccessible(true);
 
             processId = f.getInt(process);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
 

@@ -193,7 +193,7 @@ public class AlertManager {
             logger.info("add alert to db , alert : {}", alert.toString());
 
         }catch (Exception e){
-            logger.error("send alert failed! " + e);
+            logger.error("send alert failed! {}" , e.getMessage());
         }
 
     }

@@ -21,15 +21,12 @@ import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
  * test class for AlertTemplateFactory
@@ -37,8 +34,6 @@ import static org.junit.Assert.*;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(PropertyUtils.class)
 public class AlertTemplateFactoryTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(AlertTemplateFactoryTest.class);
 
     /**
      * GetMessageTemplate method test

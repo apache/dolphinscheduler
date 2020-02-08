@@ -78,7 +78,7 @@ public abstract class AbstractShell {
   /**
    * If or not script finished executing
    */
-  private volatile AtomicBoolean completed;
+  private AtomicBoolean completed;
   
   public AbstractShell() {
     this(0L);
@@ -179,7 +179,9 @@ public abstract class AbstractShell {
     };
     try {
       errThread.start();
-    } catch (IllegalStateException ise) { }
+    } catch (IllegalStateException ise) {
+      logger.warn("Error thread encounter an illegal state", ise);
+    }
     try {
       // parse the output
       parseExecResult(inReader);
@@ -281,7 +283,7 @@ public abstract class AbstractShell {
         //Process has not terminated.
         //So check if it has completed 
         //if not just destroy it.
-        if (p != null && !shell.completed.get()) {
+        if (!shell.completed.get()) {
           shell.setTimedOut();
           p.destroy();
         }
@@ -293,7 +295,7 @@ public abstract class AbstractShell {
    * This is an IOException with exit code added.
    */
   public static class ExitCodeException extends IOException {
-    int exitCode;
+    final int exitCode;
     
     public ExitCodeException(int exitCode, String message) {
       super(message);
@@ -335,11 +337,11 @@ public abstract class AbstractShell {
 			try{  
 			  entry.getValue().destroy();
 		  	} catch (Exception e) {
-		  		e.printStackTrace();
+		  		logger.error("destroy all process encountered an exception", e);
 		  	}
 		  }
 		  
-		  logger.info("close " + set.size() + " executing process tasks");
+		  logger.info("close {} executing process tasks", set.size());
 	  }
   }	  
 }

@@ -37,15 +37,13 @@ public class AlertServer {
      */
     private AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
 
-    private AlertSender alertSender;
-
     private static AlertServer instance;
 
     public AlertServer() {
-
+        // nothing to do now
     }
 
-    public synchronized static AlertServer getInstance(){
+    public static synchronized AlertServer getInstance(){
         if (null == instance) {
             instance = new AlertServer();
         }
@@ -62,7 +60,7 @@ public class AlertServer {
                 Thread.currentThread().interrupt();
             }
             List<Alert> alerts = alertDao.listWaitExecutionAlert();
-            alertSender = new AlertSender(alerts, alertDao);
+            AlertSender alertSender = new AlertSender(alerts, alertDao);
             alertSender.run();
         }
     }

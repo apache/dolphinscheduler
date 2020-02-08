@@ -104,7 +104,8 @@ public abstract class AbstractTask {
      */
     public void logHandle(List<String> logs) {
         // note that the "new line" is added here to facilitate log parsing
-        logger.info(" -> {}", String.join("\n\t", logs));
+        String joinedLogs = String.join("\n\t", logs);
+        logger.info(" -> {}", joinedLogs);
     }
 
     /**

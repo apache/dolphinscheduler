@@ -20,17 +20,13 @@ import org.apache.dolphinscheduler.alert.template.impl.DefaultHTMLTemplate;
 import org.apache.dolphinscheduler.alert.utils.Constants;
 import org.apache.dolphinscheduler.alert.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * the alert template factory
  */
 public class AlertTemplateFactory {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlertTemplateFactory.class);
-
-    private static final String alertTemplate = PropertyUtils.getString(Constants.ALERT_TEMPLATE);
+    private static final String ALERT_TEMPLATE = PropertyUtils.getString(Constants.ALERT_TEMPLATE);
 
     private AlertTemplateFactory(){}
 
@@ -40,15 +36,10 @@ public class AlertTemplateFactory {
      */
     public static AlertTemplate getMessageTemplate() {
 
-        if(StringUtils.isEmpty(alertTemplate)){
+        if(StringUtils.isEmpty(ALERT_TEMPLATE) || "html".equals(ALERT_TEMPLATE)){
             return new DefaultHTMLTemplate();
         }
 
-        switch (alertTemplate){
-            case "html":
-                return new DefaultHTMLTemplate();
-            default:
-                throw new IllegalArgumentException(String.format("not support alert template: %s",alertTemplate));
-        }
+        throw new IllegalArgumentException(String.format("not support alert template: %s", ALERT_TEMPLATE));
     }
 }

@@ -42,7 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,12 +64,13 @@ public class AlertGroupServiceTest {
 
     @Before
     public void setUp() {
+        // nothing to do now
     }
 
 
     @After
     public void after(){
-
+        // nothing to do now
     }
 
 
@@ -79,8 +79,8 @@ public class AlertGroupServiceTest {
     public  void testQueryAlertgroup(){
 
         Mockito.when(alertGroupMapper.queryAllGroupList()).thenReturn(getList());
-        HashMap<String, Object> result= alertGroupService.queryAlertgroup();
-        logger.info(result.toString());
+        Map<String, Object> result= alertGroupService.queryAlertgroup();
+        logger.info("queryAlertgroup result: {}", result);
         List<AlertGroup> alertGroups = (List<AlertGroup>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(alertGroups));
     }
@@ -93,12 +93,12 @@ public class AlertGroupServiceTest {
         User user = new User();
         // no operate
         Map<String, Object> result = alertGroupService.listPaging(user,groupName,1,10);
-        logger.info(result.toString());
+        logger.info("listPaging(no operate) result: {}", result);
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM,result.get(Constants.STATUS));
         //success
         user.setUserType(UserType.ADMIN_USER);
         result = alertGroupService.listPaging(user,groupName,1,10);
-        logger.info(result.toString());
+        logger.info("listPaging(success) result: {}", result);
         PageInfo<AlertGroup> pageInfo = (PageInfo<AlertGroup>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getLists()));
 
@@ -111,12 +111,12 @@ public class AlertGroupServiceTest {
         User user = new User();
         //no operate
         Map<String, Object>  result = alertGroupService.createAlertgroup(user,groupName, AlertType.EMAIL,groupName);
-        logger.info(result.toString());
+        logger.info("createAlertgroup(no operate) result: {}", result);
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM,result.get(Constants.STATUS));
         user.setUserType(UserType.ADMIN_USER);
         //success
         result = alertGroupService.createAlertgroup(user,groupName, AlertType.EMAIL,groupName);
-        logger.info(result.toString());
+        logger.info("createAlertgroup(success) result: {}", result);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
     }
     @Test
@@ -125,17 +125,17 @@ public class AlertGroupServiceTest {
         User user = new User();
         // no operate
         Map<String, Object>  result = alertGroupService.updateAlertgroup(user,1,groupName, AlertType.SMS,groupName);
-        logger.info(result.toString());
+        logger.info("updateAlertgroup(no operate) result: {}", result);
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM,result.get(Constants.STATUS));
         user.setUserType(UserType.ADMIN_USER);
         // not exist
         result = alertGroupService.updateAlertgroup(user,1,groupName, AlertType.SMS,groupName);
-        logger.info(result.toString());
+        logger.info("updateAlertgroup(not exist) result: {}", result);
         Assert.assertEquals(Status.ALERT_GROUP_NOT_EXIST,result.get(Constants.STATUS));
         //success
         Mockito.when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
         result = alertGroupService.updateAlertgroup(user,2,groupName, AlertType.SMS,groupName);
-        logger.info(result.toString());
+        logger.info("updateAlertgroup(success) result: {}", result);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
 
     }
@@ -145,17 +145,17 @@ public class AlertGroupServiceTest {
         User user = new User();
         // no operate
         Map<String, Object>  result = alertGroupService.delAlertgroupById(user,1);
-        logger.info(result.toString());
+        logger.info("delAlertgroupById(no operate) result: {}", result);
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM,result.get(Constants.STATUS));
         user.setUserType(UserType.ADMIN_USER);
         // not exist
         result = alertGroupService.delAlertgroupById(user,2);
-        logger.info(result.toString());
+        logger.info("delAlertgroupById(not exist) result: {}", result);
         Assert.assertEquals(Status.ALERT_GROUP_NOT_EXIST,result.get(Constants.STATUS));
         //success
         Mockito.when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
         result = alertGroupService.delAlertgroupById(user,2);
-        logger.info(result.toString());
+        logger.info("delAlertgroupById(success) result: {}", result);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
 
 
@@ -164,7 +164,7 @@ public class AlertGroupServiceTest {
     public  void testGrantUser(){
 
         Map<String, Object>  result = alertGroupService.grantUser(getLoginUser(),1,"123,321");
-        logger.info(result.toString());
+        logger.info("grantUser result: {}", result);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
     }
     @Test

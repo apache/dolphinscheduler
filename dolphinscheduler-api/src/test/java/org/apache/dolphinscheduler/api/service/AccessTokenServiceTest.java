@@ -62,13 +62,13 @@ public class AccessTokenServiceTest {
 
     @Before
     public void setUp() {
-
+        // nothing to do now
     }
 
 
     @After
     public void after(){
-
+        // nothing to do now
     }
 
 
@@ -83,7 +83,7 @@ public class AccessTokenServiceTest {
 
         User user =new User();
         Map<String, Object> result = accessTokenService.queryAccessTokenList(user,"zhangsan",1,10);
-        logger.info(result.toString());
+        logger.info("queryAccessTokenList result: {}", result);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
         PageInfo<AccessToken> pageInfo = (PageInfo<AccessToken>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(pageInfo.getTotalCount()>0);
@@ -91,11 +91,9 @@ public class AccessTokenServiceTest {
 
     @Test
     public  void testCreateToken(){
-
-
        when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(2);
         Map<String, Object> result = accessTokenService.createToken(1,getDate(),"AccessTokenServiceTest");
-        logger.info(result.toString());
+        logger.info("createToken result: {}", result);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
     }
 
@@ -103,7 +101,7 @@ public class AccessTokenServiceTest {
     public  void testGenerateToken(){
 
         Map<String, Object> result = accessTokenService.generateToken(Integer.MAX_VALUE,getDate());
-        logger.info(result.toString());
+        logger.info("generateToken result: {}", result);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
         String token = (String) result.get(Constants.DATA_LIST);
         Assert.assertNotNull(token);
@@ -116,17 +114,17 @@ public class AccessTokenServiceTest {
         User userLogin = new User();
         // not exist
         Map<String, Object> result = accessTokenService.delAccessTokenById(userLogin,0);
-        logger.info(result.toString());
+        logger.info("delAccessTokenById(not exist) result: {}", result);
         Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST,result.get(Constants.STATUS));
         // no operate
         result = accessTokenService.delAccessTokenById(userLogin,1);
-        logger.info(result.toString());
+        logger.info("delAccessTokenById(no operate) result: {}", result);
         Assert.assertEquals(Status.USER_NO_OPERATION_PERM,result.get(Constants.STATUS));
         //success
         userLogin.setId(1);
         userLogin.setUserType(UserType.ADMIN_USER);
         result = accessTokenService.delAccessTokenById(userLogin,1);
-        logger.info(result.toString());
+        logger.info("delAccessTokenById result: {}", result);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
     }
 
@@ -135,11 +133,11 @@ public class AccessTokenServiceTest {
 
         when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
         Map<String, Object> result = accessTokenService.updateToken(1,Integer.MAX_VALUE,getDate(),"token");
-        logger.info(result.toString());
+        logger.info("updateToken result: {}", result);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
         // not exist
         result = accessTokenService.updateToken(2,Integer.MAX_VALUE,getDate(),"token");
-        logger.info(result.toString());
+        logger.info("updateToken(not exist) result: {}", result);
         Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST,result.get(Constants.STATUS));
 
     }

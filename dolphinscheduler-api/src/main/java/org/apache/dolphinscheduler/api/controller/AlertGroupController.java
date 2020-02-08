@@ -16,17 +16,17 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -94,7 +93,7 @@ public class AlertGroupController extends  BaseController{
         logger.info("login  user {}, query all alertGroup",
                 loginUser.getUserName());
         try{
-            HashMap<String, Object> result = alertGroupService.queryAlertgroup();
+            Map<String, Object> result = alertGroupService.queryAlertgroup();
             return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.QUERY_ALL_ALERTGROUP_ERROR.getMsg(),e);

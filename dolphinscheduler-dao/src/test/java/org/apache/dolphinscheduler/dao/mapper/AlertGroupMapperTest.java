@@ -17,31 +17,26 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 
-import org.apache.dolphinscheduler.common.enums.AlertType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.AccessToken;
-import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.junit.Assert;
+import org.apache.dolphinscheduler.common.enums.AlertType;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
+import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-import org.junit.Test;
-import org.springframework.transaction.annotation.Transactional;
-
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.junit.Assert.*;
 
 /**
@@ -107,7 +102,7 @@ public class AlertGroupMapperTest {
 
         List<AlertGroup> alertGroupList = alertGroupIPage.getRecords();
 
-        assertEquals(alertGroupList.size(), size.intValue());
+        assertEquals(alertGroupList.size(), (int)size);
 
         for (AlertGroup alertGroup : alertGroupList){
             AlertGroup resultAlertGroup = alertGroupMap.get(alertGroup.getId());

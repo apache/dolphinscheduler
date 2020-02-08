@@ -36,7 +36,7 @@ public abstract class AbstractParameters implements IParameters {
   /**
    * local parameters
    */
-  public List<Property> localParams;
+  private List<Property> localParams;
 
   /**
    * get local parameters list

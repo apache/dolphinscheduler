@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class AlertGroupControllerTest extends AbstractControllerTest{
-    private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
+    private static final Logger logger = LoggerFactory.getLogger(AlertGroupControllerTest.class);
 
     @Test
     public void testCreateAlertgroup() throws Exception {

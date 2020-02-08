@@ -95,12 +95,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator{
 		String type = serverType.equals(MASTER_PREFIX) ? MASTER_PREFIX : WORKER_PREFIX;
 		String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
 
-		if(!isExisted(zNode) || isExisted(deadServerPath)){
-			return true;
-		}
-
-
-		return false;
+		return !isExisted(zNode) || isExisted(deadServerPath);
 	}
 
 
