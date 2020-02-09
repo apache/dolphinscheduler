@@ -17,12 +17,12 @@
 package org.apache.dolphinscheduler.common.queue;
 
 import org.apache.dolphinscheduler.common.zk.ZKServer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.*;
 
 /**
  * base task queue test for only start zk server once
  */
+@Ignore
 public class BaseTaskQueueTest {
 
     protected static ITaskQueue tasksQueue = null;
@@ -39,5 +39,9 @@ public class BaseTaskQueueTest {
     public static void tearDown() {
         tasksQueue.delete();
         ZKServer.stop();
+    }
+    @Test
+    public void tasksQueueNotNull(){
+        Assert.assertNotNull(tasksQueue);
     }
 }
