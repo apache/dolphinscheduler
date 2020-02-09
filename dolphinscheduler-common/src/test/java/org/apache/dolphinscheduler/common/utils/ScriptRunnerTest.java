@@ -36,41 +36,34 @@ public class ScriptRunnerTest {
 
         //connect is not null
         try {
-            Connection conn = Mockito.mock(Connection.class);
-            Mockito.when(conn.getAutoCommit()).thenReturn(true);
-            PreparedStatement st = Mockito.mock(PreparedStatement.class);
-            Mockito.when(conn.createStatement()).thenReturn(st);
-            ResultSet rs = Mockito.mock(ResultSet.class);
-            Mockito.when(st.getResultSet()).thenReturn(rs);
-            ResultSetMetaData md = Mockito.mock(ResultSetMetaData.class);
-            Mockito.when(rs.getMetaData()).thenReturn(md);
-            Mockito.when(md.getColumnCount()).thenReturn(1);
-            Mockito.when(rs.next()).thenReturn(true, false);
-            ScriptRunner s2 = new ScriptRunner(conn, true, true);
+            ScriptRunner s2 = getScriptRunner();
             s2.runScript(new StringReader("select 1;"));
-            Mockito.verify(md).getColumnLabel(0);
         } catch(Exception e) {
             Assert.assertNotNull(e);
         }
+    }
+
+    private ScriptRunner getScriptRunner() throws SQLException {
+        Connection conn = Mockito.mock(Connection.class);
+        Mockito.when(conn.getAutoCommit()).thenReturn(true);
+        PreparedStatement st = Mockito.mock(PreparedStatement.class);
+        Mockito.when(conn.createStatement()).thenReturn(st);
+        ResultSet rs = Mockito.mock(ResultSet.class);
+        Mockito.when(st.getResultSet()).thenReturn(rs);
+        ResultSetMetaData md = Mockito.mock(ResultSetMetaData.class);
+        Mockito.when(rs.getMetaData()).thenReturn(md);
+        Mockito.when(md.getColumnCount()).thenReturn(1);
+        Mockito.when(rs.next()).thenReturn(true, false);
+        ScriptRunner s2 = new ScriptRunner(conn, true, true);
+        Mockito.verify(md).getColumnLabel(0);
     }
 
     @Test
     public void testRunScriptWithDbName() {
         //connect is not null
         try {
-            Connection conn = Mockito.mock(Connection.class);
-            Mockito.when(conn.getAutoCommit()).thenReturn(true);
-            PreparedStatement st = Mockito.mock(PreparedStatement.class);
-            Mockito.when(conn.createStatement()).thenReturn(st);
-            ResultSet rs = Mockito.mock(ResultSet.class);
-            Mockito.when(st.getResultSet()).thenReturn(rs);
-            ResultSetMetaData md = Mockito.mock(ResultSetMetaData.class);
-            Mockito.when(rs.getMetaData()).thenReturn(md);
-            Mockito.when(md.getColumnCount()).thenReturn(1);
-            Mockito.when(rs.next()).thenReturn(true, false);
-            ScriptRunner s = new ScriptRunner(conn, true, true);
+            ScriptRunner s = getScriptRunner();
             s.runScript(new StringReader("select 1;"), "test_db");
-            Mockito.verify(md).getColumnLabel(0);
         } catch(Exception e) {
             Assert.assertNotNull(e);
         }
