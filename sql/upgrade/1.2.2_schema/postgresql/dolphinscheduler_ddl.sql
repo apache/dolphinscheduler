@@ -14,3 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+-- ut_dolphin_T_t_ds_access_token
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_A_modify_by() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_definition'
+                            AND COLUMN_NAME ='modify_by')
+      THEN
+         ALTER TABLE t_ds_process_definition ADD COLUMN modify_by varchar(36) DEFAULT '';
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_process_definition_A_modify_by();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_A_modify_by();
+
