@@ -29,6 +29,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -364,6 +365,42 @@ public class ProcessDefinition {
 
     public void setModifyBy(String modifyBy) {
         this.modifyBy = modifyBy;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProcessDefinition that = (ProcessDefinition) o;
+        return id == that.id &&
+                version == that.version &&
+                projectId == that.projectId &&
+                userId == that.userId &&
+                timeout == that.timeout &&
+                tenantId == that.tenantId &&
+                Objects.equals(name, that.name) &&
+                releaseState == that.releaseState &&
+                Objects.equals(processDefinitionJson, that.processDefinitionJson) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(globalParams, that.globalParams) &&
+                Objects.equals(globalParamList, that.globalParamList) &&
+                Objects.equals(globalParamMap, that.globalParamMap) &&
+                Objects.equals(createTime, that.createTime) &&
+                Objects.equals(updateTime, that.updateTime) &&
+                flag == that.flag &&
+                Objects.equals(userName, that.userName) &&
+                Objects.equals(projectName, that.projectName) &&
+                Objects.equals(locations, that.locations) &&
+                Objects.equals(connects, that.connects) &&
+                Objects.equals(receivers, that.receivers) &&
+                Objects.equals(receiversCc, that.receiversCc) &&
+                scheduleReleaseState == that.scheduleReleaseState &&
+                Objects.equals(modifyBy, that.modifyBy);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, version, releaseState, projectId, processDefinitionJson, description, globalParams, globalParamList, globalParamMap, createTime, updateTime, flag, userId, userName, projectName, locations, connects, receivers, receiversCc, scheduleReleaseState, timeout, tenantId, modifyBy);
     }
 
     @Override

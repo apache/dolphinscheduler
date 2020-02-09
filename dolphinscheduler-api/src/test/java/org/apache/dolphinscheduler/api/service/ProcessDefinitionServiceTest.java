@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.sun.tools.classfile.ConstantPool;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -27,6 +28,7 @@ import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.http.entity.ContentType;
@@ -76,6 +78,9 @@ public class ProcessDefinitionServiceTest {
 
     @Mock
     private WorkerGroupMapper workerGroupMapper;
+
+    @Mock
+    private ProcessDao processDao;
 
     private String sqlDependentJson = "{\"globalParams\":[]," +
             "\"tasks\":[{\"type\":\"SQL\",\"id\":\"tasks-27297\",\"name\":\"sql\"," +
@@ -422,6 +427,28 @@ public class ProcessDefinitionServiceTest {
         Assert.assertTrue(deleteFlag);
     }
 
+    @Test
+    public void testUpdateProcessDefinition () {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.SUCCESS);
+
+        String projectName = "project_test1";
+        Project project = getProject(projectName);
+
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Mockito.when(processDao.findProcessDefineById(1)).thenReturn(getProcessDefinition());
+
+        Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectName, 1, "test",
+                sqlDependentJson, "", "", "");
+
+        Assert.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR, updateResult.get(Constants.STATUS));
+    }
+
 
     /**
      * get mock datasource
@@ -443,6 +470,8 @@ public class ProcessDefinitionServiceTest {
         processDefinition.setId(46);
         processDefinition.setName("testProject");
         processDefinition.setProjectId(2);
+        processDefinition.setTenantId(1);
+        processDefinition.setDescription("");
         return  processDefinition;
     }
 
