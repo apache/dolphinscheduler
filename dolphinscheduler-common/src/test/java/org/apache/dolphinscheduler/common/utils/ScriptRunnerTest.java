@@ -35,37 +35,36 @@ public class ScriptRunnerTest {
         Assert.assertNotNull(exception);
 
         //connect is not null
+        runScript("");
+    }
+
+    private void runScript(String dbName) {
         try {
-            ScriptRunner s2 = getScriptRunner();
-            s2.runScript(new StringReader("select 1;"));
+            Connection conn = Mockito.mock(Connection.class);
+            Mockito.when(conn.getAutoCommit()).thenReturn(true);
+            PreparedStatement st = Mockito.mock(PreparedStatement.class);
+            Mockito.when(conn.createStatement()).thenReturn(st);
+            ResultSet rs = Mockito.mock(ResultSet.class);
+            Mockito.when(st.getResultSet()).thenReturn(rs);
+            ResultSetMetaData md = Mockito.mock(ResultSetMetaData.class);
+            Mockito.when(rs.getMetaData()).thenReturn(md);
+            Mockito.when(md.getColumnCount()).thenReturn(1);
+            Mockito.when(rs.next()).thenReturn(true, false);
+            ScriptRunner s = new ScriptRunner(conn, true, true);
+            if (dbName.isEmpty()) {
+                s.runScript(new StringReader("select 1;"));
+            } else {
+                s.runScript(new StringReader("select 1;"), dbName);
+            }
+            Mockito.verify(md).getColumnLabel(0);
         } catch(Exception e) {
             Assert.assertNotNull(e);
         }
-    }
-
-    private ScriptRunner getScriptRunner() throws SQLException {
-        Connection conn = Mockito.mock(Connection.class);
-        Mockito.when(conn.getAutoCommit()).thenReturn(true);
-        PreparedStatement st = Mockito.mock(PreparedStatement.class);
-        Mockito.when(conn.createStatement()).thenReturn(st);
-        ResultSet rs = Mockito.mock(ResultSet.class);
-        Mockito.when(st.getResultSet()).thenReturn(rs);
-        ResultSetMetaData md = Mockito.mock(ResultSetMetaData.class);
-        Mockito.when(rs.getMetaData()).thenReturn(md);
-        Mockito.when(md.getColumnCount()).thenReturn(1);
-        Mockito.when(rs.next()).thenReturn(true, false);
-        ScriptRunner s2 = new ScriptRunner(conn, true, true);
-        Mockito.verify(md).getColumnLabel(0);
     }
 
     @Test
     public void testRunScriptWithDbName() {
         //connect is not null
-        try {
-            ScriptRunner s = getScriptRunner();
-            s.runScript(new StringReader("select 1;"), "test_db");
-        } catch(Exception e) {
-            Assert.assertNotNull(e);
-        }
+        runScript("db_test");
     }
 }
