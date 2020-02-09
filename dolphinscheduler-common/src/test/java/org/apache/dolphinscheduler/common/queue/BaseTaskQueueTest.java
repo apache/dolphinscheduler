@@ -17,14 +17,12 @@
 package org.apache.dolphinscheduler.common.queue;
 
 import org.apache.dolphinscheduler.common.zk.ZKServer;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 /**
  * base task queue test for only start zk server once
  */
+@Ignore
 public class BaseTaskQueueTest {
 
     protected static ITaskQueue tasksQueue = null;
