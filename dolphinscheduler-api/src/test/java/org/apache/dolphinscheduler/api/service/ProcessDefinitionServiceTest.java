@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.sun.tools.classfile.ConstantPool;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.dto.ProcessMeta;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -447,8 +446,28 @@ public class ProcessDefinitionServiceTest {
                 sqlDependentJson, "", "", "");
 
         Assert.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR, updateResult.get(Constants.STATUS));
-    }
 
+        ProcessDefinition processDefinition = getProcessDefinition();
+        processDefinition.setUserName(loginUser.getUserName());
+        processDefinition.setModifyBy("test_user");
+        processDefinition.setProjectId(1);
+        processDefinition.setProcessDefinitionJson(sqlDependentJson);
+        processDefinition.setReleaseState(ReleaseState.OFFLINE);
+        processDefinition.setUpdateTime(new Date());
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setScheduleReleaseState(ReleaseState.OFFLINE);
+        processDefinition.setUserId(1);
+        processDefinition.setVersion(1);
+        processDefinition.setGlobalParams("");
+        processDefinition.setFlag(Flag.NO);
+        processDefinition.setReceivers("");
+        processDefinition.setReceiversCc("");
+
+        ProcessDefinition processDefinitionTest = getProcessDefinition();
+
+        boolean equalsFlag = processDefinition.equals(processDefinitionTest);
+        Assert.assertFalse(equalsFlag);
+    }
 
     /**
      * get mock datasource
