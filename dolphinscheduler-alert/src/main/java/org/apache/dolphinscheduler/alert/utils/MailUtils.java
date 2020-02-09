@@ -91,7 +91,7 @@ public class MailUtils {
     public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, ShowType showType) {
         Map<String,Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
-
+        
         // if there is no receivers && no receiversCc, no need to process
         if (CollectionUtils.isEmpty(receivers) && CollectionUtils.isEmpty(receiversCc)) {
             return retMap;
