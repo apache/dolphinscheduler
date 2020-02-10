@@ -88,14 +88,16 @@ public class LoggerServiceTest {
         //task instance is null
         try{
             loggerService.getLogBytes(2);
-        }catch (Exception e){
+        }catch (RuntimeException e){
+            Assert.assertTrue(true);
             logger.error("testGetLogBytes error: {}","task instance is null");
         }
 
         //task instance host is null
         try{
             loggerService.getLogBytes(1);
-        }catch (Exception e){
+        }catch (RuntimeException e){
+            Assert.assertTrue(true);
             logger.error("testGetLogBytes error: {}","task instance host is null");
         }
 
