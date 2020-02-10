@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.*;
-import org.apache.parquet.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -540,7 +539,7 @@ public class ResourcesService extends BaseService {
                 putMsg(result, Status.SUCCESS);
                 Map<String, Object> map = new HashMap<>();
                 map.put(ALIAS, resource.getAlias());
-                map.put(CONTENT, Strings.join(content, "\n"));
+                map.put(CONTENT, String.join("\n", content));
                 result.setData(map);
             }else{
                 logger.error("read file {} not exist in hdfs", hdfsFileName);

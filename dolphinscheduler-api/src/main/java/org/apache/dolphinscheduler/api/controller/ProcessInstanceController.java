@@ -391,7 +391,7 @@ public class ProcessInstanceController extends BaseController{
                 }
             }
             if(deleteFailedIdList.size() > 0){
-                putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR, Strings.join(deleteFailedIdList,","));
+                putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR, String.join(",", deleteFailedIdList));
             }else{
                 putMsg(result, Status.SUCCESS);
             }

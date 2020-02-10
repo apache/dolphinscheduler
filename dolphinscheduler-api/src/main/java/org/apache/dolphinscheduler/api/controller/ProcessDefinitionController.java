@@ -462,7 +462,7 @@ public class ProcessDefinitionController extends BaseController{
             }
 
             if(!deleteFailedIdList.isEmpty()){
-                putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR, Strings.join(deleteFailedIdList,","));
+                putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR, String.join(",", deleteFailedIdList));
             }else{
                 putMsg(result, Status.SUCCESS);
             }
