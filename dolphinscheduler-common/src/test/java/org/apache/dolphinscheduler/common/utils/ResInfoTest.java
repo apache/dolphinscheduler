@@ -14,13 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.common.utils;
 
+import org.junit.Assert;
+import org.junit.Test;
+import java.util.Date;
+import org.apache.dolphinscheduler.common.model.Server;
 
-public class ArrayUtils {
+public class ResInfoTest {
+    @Test
+    public void testGetHeartBeatInfo() {
+        String info = ResInfo.getHeartBeatInfo(new Date());
+        Assert.assertEquals(info.split(",").length, 7);
+    }
 
-  public static boolean isEmpty(final int[] array) {
-    return array == null || array.length == 0;
-  }
+    @Test
+    public void testParseHeartbeatForZKInfo() {
+        //normal info
+        String info = ResInfo.getHeartBeatInfo(new Date());
+        Server s = ResInfo.parseHeartbeatForZKInfo(info);
+        Assert.assertNotNull(s);
+        Assert.assertNotNull(s.getResInfo());
+
+        //null param
+        s = ResInfo.parseHeartbeatForZKInfo(null);
+        Assert.assertNull(s);
+    }
 }
