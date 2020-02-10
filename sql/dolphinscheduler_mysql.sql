@@ -366,6 +366,7 @@ CREATE TABLE `t_ds_process_definition` (
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  `modify_by` varchar(36) DEFAULT '' COMMENT 'modify user',
   PRIMARY KEY (`id`),
   KEY `process_definition_index` (`project_id`,`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
