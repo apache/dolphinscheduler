@@ -20,9 +20,9 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.log.LogClientService;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class LoggerService {
   private static final Logger logger = LoggerFactory.getLogger(LoggerService.class);
 
   @Autowired
-  private ProcessDao processDao;
+  private ProcessService processService;
 
   /**
    * view log
@@ -49,7 +49,7 @@ public class LoggerService {
    */
   public Result queryLog(int taskInstId, int skipLineNum, int limit) {
 
-    TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+    TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
     if (taskInstance == null){
       return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(), Status.TASK_INSTANCE_NOT_FOUND.getMsg());
@@ -80,7 +80,7 @@ public class LoggerService {
    * @return log byte array
    */
   public byte[] getLogBytes(int taskInstId) {
-    TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+    TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
     if (taskInstance == null){
       throw new RuntimeException("task instance is null");
     }

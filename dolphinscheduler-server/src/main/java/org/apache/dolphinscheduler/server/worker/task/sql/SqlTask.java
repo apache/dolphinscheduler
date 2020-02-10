@@ -36,16 +36,16 @@ import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlType;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.permission.PermissionCheck;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.permission.PermissionCheck;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.sql.*;
@@ -67,9 +67,9 @@ public class SqlTask extends AbstractTask {
     private SqlParameters sqlParameters;
 
     /**
-     *  process database access
+     *  process service
      */
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     /**
      *  alert dao
@@ -96,7 +96,7 @@ public class SqlTask extends AbstractTask {
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
         }
-        this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
         this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
     }
 
@@ -122,7 +122,7 @@ public class SqlTask extends AbstractTask {
             return;
         }
 
-        dataSource= processDao.findDataSourceById(sqlParameters.getDatasource());
+        dataSource= processService.findDataSourceById(sqlParameters.getDatasource());
 
         // data source is null
         if (dataSource == null){
@@ -171,7 +171,7 @@ public class SqlTask extends AbstractTask {
                 }
                 // check udf permission
                 checkUdfPermission(ArrayUtils.toObject(idsArray));
-                List<UdfFunc> udfFuncList = processDao.queryUdfFunListByids(idsArray);
+                List<UdfFunc> udfFuncList = processService.queryUdfFunListByids(idsArray);
                 createFuncs = UDFUtils.createFuncs(udfFuncList, taskProps.getTenantCode(), logger);
             }
 
@@ -383,7 +383,7 @@ public class SqlTask extends AbstractTask {
     public void sendAttachment(String title,String content){
 
         //  process instance
-        ProcessInstance instance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance instance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
 
         List<User> users = alertDao.queryUserByAlertGroupId(instance.getWarningGroupId());
 
@@ -470,10 +470,10 @@ public class SqlTask extends AbstractTask {
      */
     private void checkUdfPermission(Integer[] udfFunIds) throws Exception{
         //  process instance
-        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
         int userId = processInstance.getExecutorId();
 
-        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF,processDao,udfFunIds,userId,logger);
+        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF, processService,udfFunIds,userId,logger);
         permissionCheckUdf.checkPermission();
     }
 
@@ -484,10 +484,10 @@ public class SqlTask extends AbstractTask {
      */
     private void checkDataSourcePermission(int dataSourceId) throws Exception{
         //  process instance
-        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
         int userId = processInstance.getExecutorId();
 
-        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE,processDao,new Integer[]{dataSourceId},userId,logger);
+        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE, processService,new Integer[]{dataSourceId},userId,logger);
         permissionCheckDataSource.checkPermission();
     }
 
