@@ -13,25 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package org.apache.dolphinscheduler.server.utils;
-
-
-import org.apache.dolphinscheduler.common.Constants;
-import org.junit.Assert;
-import org.junit.Test;
-
-
-public class SensitiveLogUtilTest {
-
-    @Test
-    public void testMaskDataSourcePwd() {
-
-        String password = "123456";
-        String emptyPassword = "";
-
-        Assert.assertEquals(Constants.PASSWORD_DEFAULT, SensitiveLogUtil.maskDataSourcePwd(password));
-        Assert.assertEquals("", SensitiveLogUtil.maskDataSourcePwd(emptyPassword));
-
-    }
-}
+*/

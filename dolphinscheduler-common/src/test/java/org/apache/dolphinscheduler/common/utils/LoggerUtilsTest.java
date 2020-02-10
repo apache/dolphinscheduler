@@ -14,31 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.common.utils;
 
-package org.apache.dolphinscheduler.server.utils;
-
-import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.junit.Assert;
 import org.junit.Test;
-import java.util.Date;
-import static org.junit.Assert.assertEquals;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * Test ScheduleUtils
- */
-public class ScheduleUtilsTest {
+import java.util.List;
 
-    /**
-     * Test the getRecentTriggerTime method
-     */
+public class LoggerUtilsTest {
+    private Logger logger = LoggerFactory.getLogger(LoggerUtilsTest.class);
+
     @Test
-    public void testGetRecentTriggerTime() {
-        Date from = DateUtils.stringToDate("2020-01-01 00:00:00");
-        Date to = DateUtils.stringToDate("2020-01-31 01:00:00");
-        // test date
-        assertEquals(0, ScheduleUtils.getRecentTriggerTime("0 0 0 * * ? ", to, from).size());
-        // test error cron
-        assertEquals(0, ScheduleUtils.getRecentTriggerTime("0 0 0 * *", from, to).size());
-        // test cron
-        assertEquals(31, ScheduleUtils.getRecentTriggerTime("0 0 0 * * ? ", from, to).size());
+    public void buildTaskId() {
+
+      String taskId = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,79,4084,15210);
+
+      Assert.assertEquals(" - [taskAppId=TASK-79-4084-15210]", taskId);
+    }
+
+    @Test
+    public void getAppIds() {
+       List<String> appIdList =  LoggerUtils.getAppIds("Running job: application_1_1",logger);
+       Assert.assertEquals("application_1_1", appIdList.get(0));
+
     }
 }

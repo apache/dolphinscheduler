@@ -343,6 +343,7 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -675,6 +676,7 @@
                 <configuration>
                     <includes>
                         <include>**/common/utils/*.java</include>
+                        <include>**/common/log/*.java</include>
                         <include>**/common/threadutils/*.java</include>
                         <include>**/common/graph/*.java</include>
                         <include>**/common/queue/*.java</include>
@@ -705,14 +707,16 @@
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
-                        <include>**/server/utils/ScheduleUtilsTest.java</include>
                         <include>**/server/master/MasterExecThreadTest.java</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/AlertMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
+                        <include>**/dao/cron/CronUtilsTest.java</include>
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
+                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <include>**/server/utils/DataxUtilsTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>

@@ -13,37 +13,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package org.apache.dolphinscheduler.server.master.log;
+*/
+-- uc_dolphin_T_t_ds_process_definition_A_modify_by
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_A_modify_by() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_process_definition'
+                            AND COLUMN_NAME ='modify_by')
+      THEN
+         ALTER TABLE t_ds_process_definition ADD COLUMN modify_by varchar(36) DEFAULT '';
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.filter.Filter;
-import ch.qos.logback.core.spi.FilterReply;
+delimiter ;
+SELECT uc_dolphin_T_t_ds_process_definition_A_modify_by();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_A_modify_by();
 
-/**
- * master log filter
- */
-public class MasterLogFilter extends Filter<ILoggingEvent> {
-    /**
-     * log level
-     */
-    Level level;
-
-    /**
-     * Accept or reject based on thread name
-     * @param event event
-     * @return FilterReply
-     */
-    @Override
-    public FilterReply decide(ILoggingEvent event) {
-        if (event.getThreadName().startsWith("Master-") ){
-            return FilterReply.ACCEPT;
-        }
-        return FilterReply.DENY;
-    }
-
-    public void setLevel(String level) {
-        this.level = Level.toLevel(level);
-    }
-}

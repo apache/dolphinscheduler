@@ -70,7 +70,9 @@
         // Data source type
         type: '',
         // data source
-        datasource: ''
+        datasource: '',
+        // Return to the selected data source
+        rtDatasource: ''
       }
     },
     mixins: [disabledState],
@@ -83,7 +85,7 @@
        */
       _onDsData (o) {
         this.type = o.type
-        this.datasource = o.datasource
+        this.rtDatasource = o.datasource
       },
       /**
        * return udp
@@ -112,14 +114,29 @@
         // storage
         this.$emit('on-params', {
           type: this.type,
-          datasource: this.datasource,
+          datasource: this.rtDatasource,
           method: this.method,
           localParams: this.localParams
         })
         return true
       }
     },
-    watch: {},
+    watch: {
+      //Watch the cacheParams
+      cacheParams (val) {
+        this.$emit('on-cache-params', val);
+      }
+    },
+    computed: {
+      cacheParams () {
+        return {
+          type: this.type,
+          datasource: this.rtDatasource,
+          method: this.method,
+          localParams: this.localParams
+        }
+      }
+    },
     created () {
       let o = this.backfillItem
 
