@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
--- ut_dolphin_T_t_ds_access_token
+-- uc_dolphin_T_t_ds_process_definition_A_modify_by
 delimiter d//
 CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_process_definition_A_modify_by() RETURNS void AS $$
 BEGIN
