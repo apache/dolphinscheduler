@@ -29,7 +29,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
-    System.setProperty("spring.profiles.active","api");
     SpringApplication.run(ApiApplicationServer.class, args);
   }
 
