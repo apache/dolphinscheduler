@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.rpc.LogClient;
 import org.apache.commons.io.FileUtils;
+import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -375,7 +375,7 @@ public class ProcessUtils {
   public static void killYarnJob(TaskInstance taskInstance) {
     try {
       Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-      LogClient logClient = new LogClient(taskInstance.getHost(), Constants.RPC_PORT);
+      LogClientService logClient = new LogClientService(taskInstance.getHost(), Constants.RPC_PORT);
 
       String log = logClient.viewLog(taskInstance.getLogPath());
       if (StringUtils.isNotEmpty(log)) {

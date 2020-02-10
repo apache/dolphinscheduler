@@ -129,13 +129,13 @@
     </dependency>
 
     <dependency>
-      <groupId>com.github.xiaoymin</groupId>
-      <artifactId>swagger-bootstrap-ui</artifactId>
+      <groupId>org.apache.dolphinscheduler</groupId>
+      <artifactId>dolphinscheduler-service</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.dolphinscheduler</groupId>
-      <artifactId>dolphinscheduler-rpc</artifactId>
+      <groupId>com.github.xiaoymin</groupId>
+      <artifactId>swagger-bootstrap-ui</artifactId>
     </dependency>
 
     <dependency>
