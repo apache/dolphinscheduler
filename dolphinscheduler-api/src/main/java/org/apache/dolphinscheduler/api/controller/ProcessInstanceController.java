@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.queue.ITaskQueue;
-import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
+import org.apache.dolphinscheduler.service.queue.ITaskQueue;
+import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +58,7 @@ public class ProcessInstanceController extends BaseController{
 
     /**
      * query process instance list paging
-     * 
+     *
      * @param loginUser login user
      * @param projectName project name
      * @param pageNo page number
@@ -372,7 +372,7 @@ public class ProcessInstanceController extends BaseController{
             // task queue
             ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
             Map<String, Object> result = new HashMap<>(5);
-            List<Integer> deleteFailedIdList = new ArrayList<Integer>();
+            List<String> deleteFailedIdList = new ArrayList<>();
             if(StringUtils.isNotEmpty(processInstanceIds)){
                 String[] processInstanceIdArray = processInstanceIds.split(",");
 
@@ -381,16 +381,16 @@ public class ProcessInstanceController extends BaseController{
                     try {
                         Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
                         if(!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))){
-                            deleteFailedIdList.add(processInstanceId);
+                            deleteFailedIdList.add(strProcessInstanceId);
                             logger.error((String)deleteResult.get(Constants.MSG));
                         }
                     } catch (Exception e) {
-                        deleteFailedIdList.add(processInstanceId);
+                        deleteFailedIdList.add(strProcessInstanceId);
                     }
                 }
             }
             if(deleteFailedIdList.size() > 0){
-                putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList,","));
+                putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR, String.join(",", deleteFailedIdList));
             }else{
                 putMsg(result, Status.SUCCESS);
             }

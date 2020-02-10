@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.http.entity.ContentType;
 import org.json.JSONException;
 import org.junit.Assert;
@@ -76,6 +77,9 @@ public class ProcessDefinitionServiceTest {
 
     @Mock
     private WorkerGroupMapper workerGroupMapper;
+
+    @Mock
+    private ProcessService processService;
 
     private String sqlDependentJson = "{\"globalParams\":[]," +
             "\"tasks\":[{\"type\":\"SQL\",\"id\":\"tasks-27297\",\"name\":\"sql\"," +
@@ -422,6 +426,27 @@ public class ProcessDefinitionServiceTest {
         Assert.assertTrue(deleteFlag);
     }
 
+    @Test
+    public void testUpdateProcessDefinition () {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.ADMIN_USER);
+
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.SUCCESS);
+
+        String projectName = "project_test1";
+        Project project = getProject(projectName);
+
+        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
+        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
+        Mockito.when(processService.findProcessDefineById(1)).thenReturn(getProcessDefinition());
+
+        Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectName, 1, "test",
+                sqlDependentJson, "", "", "");
+
+        Assert.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR, updateResult.get(Constants.STATUS));
+    }
 
     /**
      * get mock datasource
@@ -443,6 +468,8 @@ public class ProcessDefinitionServiceTest {
         processDefinition.setId(46);
         processDefinition.setName("testProject");
         processDefinition.setProjectId(2);
+        processDefinition.setTenantId(1);
+        processDefinition.setDescription("");
         return  processDefinition;
     }
 
