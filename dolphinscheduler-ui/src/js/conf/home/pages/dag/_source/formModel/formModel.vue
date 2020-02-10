@@ -121,6 +121,7 @@
         <m-shell
           v-if="taskType === 'SHELL'"
           @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
           ref="SHELL"
           :backfill-item="backfillItem">
         </m-shell>
@@ -128,6 +129,7 @@
         <m-sub-process
           v-if="taskType === 'SUB_PROCESS'"
           @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
           @on-set-process-name="_onSetProcessName"
           ref="SUB_PROCESS"
           :backfill-item="backfillItem">
@@ -136,6 +138,7 @@
         <m-procedure
           v-if="taskType === 'PROCEDURE'"
           @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
           ref="PROCEDURE"
           :backfill-item="backfillItem">
         </m-procedure>
@@ -167,6 +170,7 @@
         <m-mr
           v-if="taskType === 'MR'"
           @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
           ref="MR"
           :backfill-item="backfillItem">
         </m-mr>
@@ -174,6 +178,7 @@
         <m-python
           v-if="taskType === 'PYTHON'"
           @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
           ref="PYTHON"
           :backfill-item="backfillItem">
         </m-python>
@@ -181,6 +186,7 @@
         <m-dependent
           v-if="taskType === 'DEPENDENT'"
           @on-dependent="_onDependent"
+          @on-cache-dependent="_onCacheDependent"
           ref="DEPENDENT"
           :backfill-item="backfillItem">
         </m-dependent>
@@ -248,6 +254,8 @@
         resourcesList: [],
         // dependence
         dependence: {},
+        // cache dependence
+        cacheDependence: {},
         // Current node params data
         params: {},
         // Running sign
@@ -282,6 +290,12 @@
        */
       _onDependent (o) {
         this.dependence = Object.assign(this.dependence, {}, o)
+      },
+      /**
+       * cache dependent
+       */
+      _onCacheDependent (o) {
+        this.cacheDependence = Object.assign(this.cacheDependence, {}, o)
       },
       /**
        * Task timeout alarm
@@ -356,9 +370,10 @@
             type: this.taskType,
             id: this.id,
             name: this.name,
+            params: this.params,
             description: this.description,
             runFlag: this.runFlag,
-            dependence: this.dependence,
+            dependence: this.cacheDependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
             timeout: this.timeout,
@@ -522,6 +537,7 @@
 
         this.params = o.params || {}
         this.dependence = o.dependence || {}
+        this.cacheDependence = o.dependence || {}
 
       }
       this.isContentBox = true
@@ -551,7 +567,7 @@
           name: this.name,
           description: this.description,
           runFlag: this.runFlag,
-          dependence: this.dependence,
+          dependence: this.cacheDependence,
           maxRetryTimes: this.maxRetryTimes,
           retryInterval: this.retryInterval,
           timeout: this.timeout,

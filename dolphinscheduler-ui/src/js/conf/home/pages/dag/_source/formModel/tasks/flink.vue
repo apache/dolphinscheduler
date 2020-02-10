@@ -379,7 +379,7 @@
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.mainClass = o.params.mainClass || ''
-          this.mainJar = o.params.mainJar.res || ''
+          this.mainJar = o.params.mainJar && o.params.mainJar.res ? o.params.mainJar.res : ''
           this.deployMode = o.params.deployMode || ''
           this.slot = o.params.slot || 1
           this.taskManager = o.params.taskManager || '2'
