@@ -339,7 +339,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
     try{
       Map.Entry<Boolean, List<Node>> entry = topologicalSortImpl();
 
-      if (entry.getKey()) {
+      if (Boolean.TRUE.equals(entry.getKey())) {
         return entry.getValue();
       }
 
@@ -393,11 +393,9 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
           return false;
       }
 
-      if (!createNode) {
-          if (!containsNode(fromNode) || !containsNode(toNode)){
-              logger.error("edge fromNode({}) or toNode({}) is not in vertices map", fromNode, toNode);
-              return false;
-          }
+      if (!createNode && (!containsNode(fromNode) || !containsNode(toNode)) ){
+          logger.error("edge fromNode({}) or toNode({}) is not in vertices map", fromNode, toNode);
+          return false;
       }
 
       // Whether an edge can be successfully added(fromNode -> toNode),need to determine whether the DAG has cycle!
@@ -435,7 +433,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
     final Map<Node, EdgeInfo> neighborEdges = edges.get(node);
 
     if (neighborEdges == null) {
-      return Collections.EMPTY_MAP.keySet();
+      return Collections.emptySet();
     }
 
     return neighborEdges.keySet();
@@ -510,8 +508,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
     }
 
     // if notZeroIndegreeNodeMap is empty,there is no ring!
-    AbstractMap.SimpleEntry resultMap = new AbstractMap.SimpleEntry(notZeroIndegreeNodeMap.size() == 0 , topoResultList);
-    return resultMap;
+    return new AbstractMap.SimpleEntry(notZeroIndegreeNodeMap.size() == 0 , topoResultList);
 
   }
 

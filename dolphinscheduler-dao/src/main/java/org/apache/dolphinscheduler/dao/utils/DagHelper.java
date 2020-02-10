@@ -38,7 +38,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DagHelper {
 
-
+    private DagHelper() {
+        throw new IllegalStateException("DagHelper class");
+    }
     private static final Logger logger = LoggerFactory.getLogger(DagHelper.class);
 
 
@@ -215,7 +217,7 @@ public class DagHelper {
             taskNodeList = processData.getTasks();
         }
         for(TaskNode node : taskNodeList){
-            if(node.isForbidden()){
+            if(Boolean.TRUE.equals(node.isForbidden())){
                 forbidTaskNodeMap.putIfAbsent(node.getName(), node);
             }
         }
@@ -267,7 +269,7 @@ public class DagHelper {
 
         for(String start : startVertexs){
             TaskNode startNode = dag.getNode(start);
-            if(!startNode.isForbidden() && !completeTaskList.containsKey(start)){
+            if(Boolean.FALSE.equals(startNode.isForbidden()) && !completeTaskList.containsKey(start)){
                 // the start can be submit if not forbidden and not in complete tasks
                 continue;
             }
@@ -302,7 +304,7 @@ public class DagHelper {
 
         for(String dependNodeName : dependList){
             TaskNode dependNode = dag.getNode(dependNodeName);
-            if(!dependNode.isForbidden() && !completeTaskList.containsKey(dependNodeName)){
+            if(Boolean.FALSE.equals(dependNode.isForbidden()) && !completeTaskList.containsKey(dependNodeName)){
                 return false;
             }
         }

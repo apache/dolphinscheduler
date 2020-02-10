@@ -46,7 +46,7 @@ public class DAGTest {
     graph = null;
     graph = new DAG<>();
 
-    assertEquals(graph.getNodesCount(), 0);
+    assertEquals(0, graph.getNodesCount());
   }
 
 
@@ -77,8 +77,8 @@ public class DAGTest {
 
     assertTrue(graph.addEdge(6, 7));
 
-    assertEquals(graph.getNodesCount(), 7);
-    assertEquals(graph.getEdgesCount(), 6);
+    assertEquals(7, graph.getNodesCount());
+    assertEquals( 6, graph.getEdgesCount());
 
   }
 
@@ -94,9 +94,9 @@ public class DAGTest {
     graph.addNode(2, null);
     graph.addNode(5, "v(5)");
 
-    assertEquals(graph.getNodesCount(), 3);
+    assertEquals(3, graph.getNodesCount());
 
-    assertEquals(graph.getNode(1), "v(1)");
+    assertEquals("v(1)", graph.getNode(1));
     assertTrue(graph.containsNode(1));
 
     assertFalse(graph.containsNode(10));
@@ -123,7 +123,7 @@ public class DAGTest {
     assertFalse(graph.containsEdge(1, 3));
 
     assertTrue(graph.containsEdge(1, 2));
-    assertEquals(graph.getEdgesCount(), 1);
+    assertEquals(1, graph.getEdgesCount());
 
     int node = 3;
     graph.addNode(node, "v(3)");
@@ -139,7 +139,7 @@ public class DAGTest {
   public void testSubsequentNodes() {
     makeGraph();
 
-    assertEquals(graph.getSubsequentNodes(1).size(), 1);
+    assertEquals(1, graph.getSubsequentNodes(1).size());
 
   }
 
@@ -151,10 +151,10 @@ public class DAGTest {
   public void testIndegree() {
     makeGraph();
 
-    assertEquals(graph.getIndegree(1), 0);
-    assertEquals(graph.getIndegree(2), 1);
-    assertEquals(graph.getIndegree(3), 0);
-    assertEquals(graph.getIndegree(4), 0);
+    assertEquals(0, graph.getIndegree(1));
+    assertEquals(1, graph.getIndegree(2));
+    assertEquals(0, graph.getIndegree(3));
+    assertEquals(0, graph.getIndegree(4));
   }
 
 
@@ -165,7 +165,7 @@ public class DAGTest {
   public void testBeginNode() {
     makeGraph();
 
-    assertEquals(graph.getBeginNode().size(), 3);
+    assertEquals(3, graph.getBeginNode().size());
 
     assertTrue(graph.getBeginNode().contains(1));
     assertTrue(graph.getBeginNode().contains(3));
@@ -180,7 +180,7 @@ public class DAGTest {
   public void testEndNode() {
     makeGraph();
 
-    assertEquals(graph.getEndNode().size(), 1);
+    assertEquals(1, graph.getEndNode().size());
 
     assertTrue(graph.getEndNode().contains(7));
   }
@@ -335,7 +335,7 @@ public class DAGTest {
 
 
 
-    assertEquals(graph.getNodesCount(), 8);
+    assertEquals(8, graph.getNodesCount());
 
     logger.info(Arrays.toString(graph.topologicalSort().toArray()));
 
