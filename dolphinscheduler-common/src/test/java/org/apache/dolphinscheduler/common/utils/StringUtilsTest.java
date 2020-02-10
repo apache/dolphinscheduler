@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.parquet.Strings;
 import org.junit.Assert;
 import org.junit.Test;
 
