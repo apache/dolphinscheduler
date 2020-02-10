@@ -27,9 +27,9 @@ import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.http.entity.ContentType;
 import org.json.JSONException;
 import org.junit.Assert;
@@ -79,7 +79,7 @@ public class ProcessDefinitionServiceTest {
     private WorkerGroupMapper workerGroupMapper;
 
     @Mock
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     private String sqlDependentJson = "{\"globalParams\":[]," +
             "\"tasks\":[{\"type\":\"SQL\",\"id\":\"tasks-27297\",\"name\":\"sql\"," +
@@ -440,7 +440,7 @@ public class ProcessDefinitionServiceTest {
 
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject(projectName));
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
-        Mockito.when(processDao.findProcessDefineById(1)).thenReturn(getProcessDefinition());
+        Mockito.when(processService.findProcessDefineById(1)).thenReturn(getProcessDefinition());
 
         Map<String, Object> updateResult = processDefinitionService.updateProcessDefinition(loginUser, projectName, 1, "test",
                 sqlDependentJson, "", "", "");

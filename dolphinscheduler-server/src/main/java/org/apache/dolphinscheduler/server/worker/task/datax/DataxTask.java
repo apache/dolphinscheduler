@@ -47,7 +47,6 @@ import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
@@ -56,6 +55,7 @@ import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
@@ -106,9 +106,9 @@ public class DataxTask extends AbstractTask {
     private ShellCommandExecutor shellCommandExecutor;
 
     /**
-     * process database access
+     * process dao
      */
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     /**
      * constructor
@@ -128,7 +128,7 @@ public class DataxTask extends AbstractTask {
             props.getTaskInstId(), props.getTenantCode(), props.getEnvFile(), props.getTaskStartTime(),
             props.getTaskTimeout(), logger);
 
-        this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     /**
@@ -160,7 +160,7 @@ public class DataxTask extends AbstractTask {
             // run datax process
             String jsonFilePath = buildDataxJsonFile();
             String shellCommandFilePath = buildShellCommandFile(jsonFilePath);
-            exitStatusCode = shellCommandExecutor.run(shellCommandFilePath, processDao);
+            exitStatusCode = shellCommandExecutor.run(shellCommandFilePath, processService);
         }
         catch (Exception e) {
             exitStatusCode = -1;
@@ -220,11 +220,11 @@ public class DataxTask extends AbstractTask {
      */
     private List<JSONObject> buildDataxJobContentJson()
         throws SQLException {
-        DataSource dataSource = processDao.findDataSourceById(dataXParameters.getDataSource());
+        DataSource dataSource = processService.findDataSourceById(dataXParameters.getDataSource());
         BaseDataSource dataSourceCfg = DataSourceFactory.getDatasource(dataSource.getType(),
             dataSource.getConnectionParams());
 
-        DataSource dataTarget = processDao.findDataSourceById(dataXParameters.getDataTarget());
+        DataSource dataTarget = processService.findDataSourceById(dataXParameters.getDataTarget());
         BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(dataTarget.getType(),
             dataTarget.getConnectionParams());
 
@@ -355,7 +355,7 @@ public class DataxTask extends AbstractTask {
         String dataxCommand = sbr.toString();
 
         // find process instance by task id
-        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
 
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
