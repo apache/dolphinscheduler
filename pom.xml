@@ -229,7 +229,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-rpc</artifactId>
+                <artifactId>dolphinscheduler-remote</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -770,9 +775,6 @@
                         <exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
                         <exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
                         <exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
-                        <exclude>
-                            **/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java
-                        </exclude>
                     </excludes>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
@@ -859,8 +861,9 @@
         <module>dolphinscheduler-api</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-alert</module>
-        <module>dolphinscheduler-rpc</module>
         <module>dolphinscheduler-dist</module>
+        <module>dolphinscheduler-remote</module>
+        <module>dolphinscheduler-service</module>
     </modules>
 
 </project>
