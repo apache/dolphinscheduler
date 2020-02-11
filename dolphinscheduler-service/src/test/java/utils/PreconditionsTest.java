@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.utils;
+package utils;
 
+import org.apache.dolphinscheduler.service.utils.Preconditions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class PreconditionsTest {
     public void testCheckNotNull() throws Exception {
         String testReference = "test reference";
         //test  reference is not null
-        Assert.assertEquals(testReference,Preconditions.checkNotNull(testReference));
+        Assert.assertEquals(testReference, Preconditions.checkNotNull(testReference));
         Assert.assertEquals(testReference,Preconditions.checkNotNull(testReference,"reference is null"));
         Assert.assertEquals(testReference,Preconditions.checkNotNull(testReference,"%s is null",testReference));
 
