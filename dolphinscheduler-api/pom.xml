@@ -184,6 +184,11 @@
       <artifactId>jsp-2.1</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+
     <!-- just for test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
