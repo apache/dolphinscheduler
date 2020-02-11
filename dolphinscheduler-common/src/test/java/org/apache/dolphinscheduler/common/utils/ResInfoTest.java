@@ -14,34 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.queue;
+package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.zk.ZKServer;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
+import java.util.Date;
+import org.apache.dolphinscheduler.common.model.Server;
 
-/**
- * base task queue test for only start zk server once
- */
-@Ignore
-public class BaseTaskQueueTest {
-
-    protected static ITaskQueue tasksQueue = null;
-
-    @BeforeClass
-    public static void setup() {
-        ZKServer.start();
-        tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-        //clear all data
-        tasksQueue.delete();
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        tasksQueue.delete();
-        ZKServer.stop();
-    }
+public class ResInfoTest {
     @Test
-    public void tasksQueueNotNull(){
-        Assert.assertNotNull(tasksQueue);
+    public void testGetHeartBeatInfo() {
+        String info = ResInfo.getHeartBeatInfo(new Date());
+        Assert.assertEquals(7, info.split(",").length);
+    }
+
+    @Test
+    public void testParseHeartbeatForZKInfo() {
+        //normal info
+        String info = ResInfo.getHeartBeatInfo(new Date());
+        Server s = ResInfo.parseHeartbeatForZKInfo(info);
+        Assert.assertNotNull(s);
+        Assert.assertNotNull(s.getResInfo());
+
+        //null param
+        s = ResInfo.parseHeartbeatForZKInfo(null);
+        Assert.assertNull(s);
     }
 }

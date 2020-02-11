@@ -518,4 +518,5 @@ export default {
   'SpeedRecord': '限流(记录数)',
   '0 means unlimited by byte': 'KB，0代表不限制',
   '0 means unlimited by count': '0代表不限制',
+  'Modify User': '修改用户'
 }

@@ -13,35 +13,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package org.apache.dolphinscheduler.common.queue;
+*/
 
-import org.apache.dolphinscheduler.common.zk.ZKServer;
-import org.junit.*;
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+-- uc_dolphin_T_t_ds_process_definition_A_modify_by
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_definition_A_modify_by;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_process_definition_A_modify_by()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='modify_by')
+   THEN
+         ALTER TABLE t_ds_process_definition ADD `modify_by` varchar(36) DEFAULT '' COMMENT 'modify user';
+       END IF;
+ END;
 
-/**
- * base task queue test for only start zk server once
- */
-@Ignore
-public class BaseTaskQueueTest {
+d//
 
-    protected static ITaskQueue tasksQueue = null;
-
-    @BeforeClass
-    public static void setup() {
-        ZKServer.start();
-        tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-        //clear all data
-        tasksQueue.delete();
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        tasksQueue.delete();
-        ZKServer.stop();
-    }
-    @Test
-    public void tasksQueueNotNull(){
-        Assert.assertNotNull(tasksQueue);
-    }
-}
+delimiter ;
+CALL uc_dolphin_T_t_ds_process_definition_A_modify_by;
+DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_modify_by;
