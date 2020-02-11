@@ -22,11 +22,11 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
@@ -77,17 +77,18 @@ public class MasterServer implements IStoppable {
     private ExecutorService masterSchedulerService;
 
     /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
+
+
+    /**
      *  spring application context
      *  only use it for initialization
      */
     @Autowired
     private SpringApplicationContext springApplicationContext;
-
-    /**
-     * master config
-     */
-    @Autowired
-    private MasterConfig masterConfig;
 
 
     /**

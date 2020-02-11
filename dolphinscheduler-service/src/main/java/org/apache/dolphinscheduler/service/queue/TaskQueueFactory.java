@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
