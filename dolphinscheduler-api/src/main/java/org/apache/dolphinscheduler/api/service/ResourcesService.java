@@ -539,7 +539,7 @@ public class ResourcesService extends BaseService {
                 putMsg(result, Status.SUCCESS);
                 Map<String, Object> map = new HashMap<>();
                 map.put(ALIAS, resource.getAlias());
-                map.put(CONTENT, StringUtils.join(content, "\n"));
+                map.put(CONTENT, String.join("\n", content));
                 result.setData(map);
             }else{
                 logger.error("read file {} not exist in hdfs", hdfsFileName);
