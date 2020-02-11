@@ -13,35 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package org.apache.dolphinscheduler.common.queue;
-
-import org.apache.dolphinscheduler.common.zk.ZKServer;
-import org.junit.*;
-
-/**
- * base task queue test for only start zk server once
- */
-@Ignore
-public class BaseTaskQueueTest {
-
-    protected static ITaskQueue tasksQueue = null;
-
-    @BeforeClass
-    public static void setup() {
-        ZKServer.start();
-        tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-        //clear all data
-        tasksQueue.delete();
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        tasksQueue.delete();
-        ZKServer.stop();
-    }
-    @Test
-    public void tasksQueueNotNull(){
-        Assert.assertNotNull(tasksQueue);
-    }
-}
+*/

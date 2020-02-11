@@ -13,14 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.common.utils;
-
-
-public class ArrayUtils {
-
-  public static boolean isEmpty(final int[] array) {
-    return array == null || array.length == 0;
-  }
-}
+*/

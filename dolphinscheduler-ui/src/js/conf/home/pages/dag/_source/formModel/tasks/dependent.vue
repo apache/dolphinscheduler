@@ -131,6 +131,9 @@
         setTimeout(() => {
           this.isLoading = false
         }, 600)
+      },
+      cacheDependence (val) {
+        this.$emit('on-cache-dependent', val)
       }
     },
     beforeCreate () {
@@ -151,7 +154,19 @@
     },
     destroyed () {
     },
-    computed: {},
+    computed: {
+      cacheDependence () {
+        return {
+          relation: this.relation,
+          dependTaskList: _.map(this.dependTaskList, v => {
+            return {
+              relation: v.relation,
+              dependItemList: _.map(v.dependItemList, v1 => _.omit(v1, ['depTasksList', 'state', 'dateValueList']))
+            }
+          })
+        }
+      }
+    },
     components: { mListBox, mDependItemList }
   }
 </script>
