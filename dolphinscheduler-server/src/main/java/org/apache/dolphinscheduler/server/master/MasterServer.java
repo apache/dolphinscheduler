@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
@@ -75,13 +74,6 @@ public class MasterServer implements IStoppable {
      *  master exec thread pool
      */
     private ExecutorService masterSchedulerService;
-
-    /**
-     *  spring application context
-     *  only use it for initialization
-     */
-    @Autowired
-    private SpringApplicationContext springApplicationContext;
 
     /**
      * master config

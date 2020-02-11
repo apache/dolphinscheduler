@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
@@ -103,13 +102,6 @@ public class WorkerServer implements IStoppable {
      *  fetch task executor service
      */
     private ExecutorService fetchTaskExecutorService;
-
-    /**
-     *  spring application context
-     *  only use it for initialization
-     */
-    @Autowired
-    private SpringApplicationContext springApplicationContext;
 
     /**
      * CountDownLatch latch
