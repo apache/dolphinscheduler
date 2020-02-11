@@ -587,8 +587,6 @@
 			<scope>compile</scope>
         </dependency>
 
-
-
 		<dependency>
 			<groupId>org.codehaus.janino</groupId>
 			<artifactId>janino</artifactId>

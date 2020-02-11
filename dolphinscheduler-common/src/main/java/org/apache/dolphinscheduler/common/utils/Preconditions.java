@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.service.utils;
+package org.apache.dolphinscheduler.common.utils;
 
-import org.springframework.lang.Nullable;
 
 /**
  * A collection of static utility methods to validate input.
@@ -57,7 +56,7 @@ public final class Preconditions {
      *
      * @throws NullPointerException Thrown, if the passed reference was null.
      */
-    public static <T> T checkNotNull(T reference, @Nullable String errorMessage) {
+    public static <T> T checkNotNull(T reference,  String errorMessage) {
         if (reference == null) {
             throw new NullPointerException(String.valueOf(errorMessage));
         }
@@ -84,8 +83,8 @@ public final class Preconditions {
      * @throws NullPointerException Thrown, if the passed reference was null.
      */
     public static <T> T checkNotNull(T reference,
-                                     @Nullable String errorMessageTemplate,
-                                     @Nullable Object... errorMessageArgs) {
+                                      String errorMessageTemplate,
+                                      Object... errorMessageArgs) {
 
         if (reference == null) {
             throw new NullPointerException(format(errorMessageTemplate, errorMessageArgs));
@@ -121,7 +120,7 @@ public final class Preconditions {
      *
      * @throws IllegalArgumentException Thrown, if the condition is violated.
      */
-    public static void checkArgument(boolean condition, @Nullable Object errorMessage) {
+    public static void checkArgument(boolean condition,  Object errorMessage) {
         if (!condition) {
             throw new IllegalArgumentException(String.valueOf(errorMessage));
         }
@@ -141,8 +140,8 @@ public final class Preconditions {
      * @throws IllegalArgumentException Thrown, if the condition is violated.
      */
     public static void checkArgument(boolean condition,
-                                     @Nullable String errorMessageTemplate,
-                                     @Nullable Object... errorMessageArgs) {
+                                      String errorMessageTemplate,
+                                      Object... errorMessageArgs) {
 
         if (!condition) {
             throw new IllegalArgumentException(format(errorMessageTemplate, errorMessageArgs));
@@ -177,7 +176,7 @@ public final class Preconditions {
      *
      * @throws IllegalStateException Thrown, if the condition is violated.
      */
-    public static void checkState(boolean condition, @Nullable Object errorMessage) {
+    public static void checkState(boolean condition,  Object errorMessage) {
         if (!condition) {
             throw new IllegalStateException(String.valueOf(errorMessage));
         }
@@ -197,8 +196,8 @@ public final class Preconditions {
      * @throws IllegalStateException Thrown, if the condition is violated.
      */
     public static void checkState(boolean condition,
-                                  @Nullable String errorMessageTemplate,
-                                  @Nullable Object... errorMessageArgs) {
+                                   String errorMessageTemplate,
+                                   Object... errorMessageArgs) {
 
         if (!condition) {
             throw new IllegalStateException(format(errorMessageTemplate, errorMessageArgs));
@@ -231,7 +230,7 @@ public final class Preconditions {
      * @throws IllegalArgumentException Thrown, if size is negative.
      * @throws IndexOutOfBoundsException Thrown, if the index negative or greater than or equal to size
      */
-    public static void checkElementIndex(int index, int size, @Nullable String errorMessage) {
+    public static void checkElementIndex(int index, int size,  String errorMessage) {
         checkArgument(size >= 0, "Size was negative.");
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException(String.valueOf(errorMessage) + " Index: " + index + ", Size: " + size);
@@ -248,7 +247,7 @@ public final class Preconditions {
      *
      * <p>This method is taken quasi verbatim from the Guava Preconditions class.
      */
-    private static String format(@Nullable String template, @Nullable Object... args) {
+    private static String format( String template,  Object... args) {
         final int numArgs = args == null ? 0 : args.length;
         template = String.valueOf(template); // null -> "null"
 
