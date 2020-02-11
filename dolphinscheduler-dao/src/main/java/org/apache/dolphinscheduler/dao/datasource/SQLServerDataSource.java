@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.job.db;
+package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -26,10 +26,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * data source of DB2 Server
+ * data source of SQL Server
  */
-public class DB2ServerDataSource extends BaseDataSource {
-    private static final Logger logger = LoggerFactory.getLogger(DB2ServerDataSource.class);
+public class SQLServerDataSource extends BaseDataSource {
+    private static final Logger logger = LoggerFactory.getLogger(SQLServerDataSource.class);
 
     /**
      * gets the JDBC url for the data source connection
@@ -38,15 +38,12 @@ public class DB2ServerDataSource extends BaseDataSource {
     @Override
     public String getJdbcUrl() {
         String jdbcUrl = getAddress();
-        if (jdbcUrl.lastIndexOf("/") != (jdbcUrl.length() - 1)) {
-            jdbcUrl += "/";
-        }
-
-        jdbcUrl += getDatabase();
+        jdbcUrl += ";databaseName=" + getDatabase();
 
         if (StringUtils.isNotEmpty(getOther())) {
-            jdbcUrl += ":" + getOther();
+            jdbcUrl += ";" + getOther();
         }
+
         return jdbcUrl;
     }
 
@@ -58,14 +55,14 @@ public class DB2ServerDataSource extends BaseDataSource {
     public void isConnectable() throws Exception {
         Connection con = null;
         try {
-            Class.forName(Constants.COM_DB2_JDBC_DRIVER);
+            Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
             con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
         } finally {
             if (con != null) {
                 try {
                     con.close();
                 } catch (SQLException e) {
-                    logger.error("DB2 Server datasource try conn close conn error", e);
+                    logger.error("SQL Server datasource try conn close conn error", e);
                 }
             }
         }

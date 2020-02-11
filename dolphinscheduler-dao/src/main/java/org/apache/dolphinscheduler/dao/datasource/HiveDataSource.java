@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.job.db;
+package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -26,12 +26,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * data source of postgreSQL
+ * data source of hive
  */
-public class PostgreDataSource extends BaseDataSource {
+public class HiveDataSource extends BaseDataSource {
 
-  private static final Logger logger = LoggerFactory.getLogger(PostgreDataSource.class);
-
+  private static final Logger logger = LoggerFactory.getLogger(HiveDataSource.class);
 
   /**
    * gets the JDBC url for the data source connection
@@ -46,8 +45,12 @@ public class PostgreDataSource extends BaseDataSource {
 
     jdbcUrl += getDatabase();
 
+    if (StringUtils.isNotEmpty(getPrincipal())){
+      jdbcUrl += ";principal=" + getPrincipal();
+    }
+
     if (StringUtils.isNotEmpty(getOther())) {
-      jdbcUrl += "?" + getOther();
+      jdbcUrl += ";" + getOther();
     }
 
     return jdbcUrl;
@@ -61,17 +64,16 @@ public class PostgreDataSource extends BaseDataSource {
   public void isConnectable() throws Exception {
     Connection con = null;
     try {
-      Class.forName(Constants.ORG_POSTGRESQL_DRIVER);
-      con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
+      Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
+      con = DriverManager.getConnection(getJdbcUrl(), getUser(), "");
     } finally {
       if (con != null) {
         try {
           con.close();
         } catch (SQLException e) {
-          logger.error("Postgre datasource try conn close conn error", e);
+          logger.error("hive datasource try conn close conn error", e);
         }
       }
     }
-
   }
 }
