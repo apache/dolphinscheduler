@@ -14,21 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.job.db;
+package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
- * data source of hive
+ * data source of mySQL
  */
-public class HiveDataSource extends BaseDataSource {
+public class MySQLDataSource extends BaseDataSource {
 
-  private static final Logger logger = LoggerFactory.getLogger(HiveDataSource.class);
+  private static final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
 
   /**
    * gets the JDBC url for the data source connection
@@ -36,21 +38,14 @@ public class HiveDataSource extends BaseDataSource {
    */
   @Override
   public String getJdbcUrl() {
-    String jdbcUrl = getAddress();
-    if (jdbcUrl.lastIndexOf("/") != (jdbcUrl.length() - 1)) {
-      jdbcUrl += "/";
+    String address = getAddress();
+    if (address.lastIndexOf("/") != (address.length() - 1)) {
+      address += "/";
     }
-
-    jdbcUrl += getDatabase();
-
-    if (StringUtils.isNotEmpty(getPrincipal())){
-      jdbcUrl += ";principal=" + getPrincipal();
-    }
-
+    String jdbcUrl = address + getDatabase();
     if (StringUtils.isNotEmpty(getOther())) {
-      jdbcUrl += ";" + getOther();
+      jdbcUrl += "?" + getOther();
     }
-
     return jdbcUrl;
   }
 
@@ -62,16 +57,17 @@ public class HiveDataSource extends BaseDataSource {
   public void isConnectable() throws Exception {
     Connection con = null;
     try {
-      Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
-      con = DriverManager.getConnection(getJdbcUrl(), getUser(), "");
+      Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
+      con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
     } finally {
       if (con != null) {
         try {
           con.close();
         } catch (SQLException e) {
-          logger.error("hive datasource try conn close conn error", e);
+          logger.error("Mysql datasource try conn close conn error", e);
         }
       }
     }
   }
+
 }
