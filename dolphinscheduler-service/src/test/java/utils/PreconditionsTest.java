@@ -16,7 +16,7 @@
  */
 package utils;
 
-import org.apache.dolphinscheduler.service.utils.Preconditions;
+import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
