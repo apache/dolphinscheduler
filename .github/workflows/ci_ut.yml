@@ -47,17 +47,16 @@ jobs:
       - name: Compile
         run: |
           export MAVEN_OPTS='-Dmaven.repo.local=.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx3g'
-          mvn test -B -Dmaven.test.skip=false
+          mvn test -B -Dmaven.test.skip=false cobertura:cobertura
           CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
       - name: Run SonarCloud Analysis
         run: >
           mvn verify --batch-mode
           org.sonarsource.scanner.maven:sonar-maven-plugin:3.6.1.1688:sonar
-          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+          -Dsonar.junit.reportPaths=target/cobertura
           -Dmaven.test.skip=true
           -Dsonar.host.url=https://sonarcloud.io
           -Dsonar.organization=apache
-          -Dsonar.core.codeCoveragePlugin=jacoco
           -Dsonar.projectKey=apache-dolphinscheduler
           -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
         env:
