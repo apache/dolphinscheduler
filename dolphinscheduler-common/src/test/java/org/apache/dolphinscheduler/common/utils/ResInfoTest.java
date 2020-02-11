@@ -25,7 +25,7 @@ public class ResInfoTest {
     @Test
     public void testGetHeartBeatInfo() {
         String info = ResInfo.getHeartBeatInfo(new Date());
-        Assert.assertEquals(7, info.split(",").length, );
+        Assert.assertEquals(7, info.split(",").length);
     }
 
     @Test
