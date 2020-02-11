@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.job.db;
+package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -26,11 +26,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * data source of mySQL
+ * data source of spark
  */
-public class MySQLDataSource extends BaseDataSource {
+public class SparkDataSource extends BaseDataSource {
 
-  private static final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
+  private static final Logger logger = LoggerFactory.getLogger(SparkDataSource.class);
 
   /**
    * gets the JDBC url for the data source connection
@@ -38,14 +38,21 @@ public class MySQLDataSource extends BaseDataSource {
    */
   @Override
   public String getJdbcUrl() {
-    String address = getAddress();
-    if (address.lastIndexOf("/") != (address.length() - 1)) {
-      address += "/";
+    String jdbcUrl = getAddress();
+    if (jdbcUrl.lastIndexOf("/") != (jdbcUrl.length() - 1)) {
+      jdbcUrl += "/";
     }
-    String jdbcUrl = address + getDatabase();
+
+    jdbcUrl += getDatabase();
+
+    if (StringUtils.isNotEmpty(getPrincipal())){
+      jdbcUrl += ";principal=" + getPrincipal();
+    }
+
     if (StringUtils.isNotEmpty(getOther())) {
-      jdbcUrl += "?" + getOther();
+      jdbcUrl += ";" + getOther();
     }
+
     return jdbcUrl;
   }
 
@@ -57,17 +64,17 @@ public class MySQLDataSource extends BaseDataSource {
   public void isConnectable() throws Exception {
     Connection con = null;
     try {
-      Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
-      con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
+      Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
+      con = DriverManager.getConnection(getJdbcUrl(), getUser(), "");
     } finally {
       if (con != null) {
         try {
           con.close();
         } catch (SQLException e) {
-          logger.error("Mysql datasource try conn close conn error", e);
+          logger.error("Spark datasource try conn close conn error", e);
         }
       }
     }
-  }
 
+  }
 }
