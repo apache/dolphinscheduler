@@ -84,6 +84,7 @@ public class LoggerService {
     if (taskInstance == null){
       throw new RuntimeException("task instance is null");
     }
+
     String host = taskInstance.getHost();
     LogClientService logClient = new LogClientService(host, Constants.RPC_PORT);
     return logClient.getLogBytes(taskInstance.getLogPath());
