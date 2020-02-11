@@ -89,6 +89,8 @@ public class LoggerServiceTest {
         //success
         taskInstance.setHost("127.0.0.1");
         taskInstance.setLogPath("/temp/log");
+        //if use @RunWith(PowerMockRunner.class) mock object,sonarcloud will not calculate the coverage,
+        // so no assert will be added here
         loggerService.getLogBytes(1);
 
     }
