@@ -705,6 +705,7 @@
                         <include>**/api/service/ExecutorService2Test.java</include>
                         <include>**/api/service/BaseServiceTest.java</include>
                         <include>**/api/service/BaseDAGServiceTest.java</include>
+                        <include>**/api/service/LoggerServiceTest.java</include>
                         <include>**/alert/utils/ExcelUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
