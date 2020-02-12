@@ -28,14 +28,15 @@ import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
-import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,9 +125,9 @@ public class MasterExecThread implements Runnable {
     private DAG<String,TaskNode,TaskNodeRelation> dag;
 
     /**
-     *  process dao
+     *  process service
      */
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     /**
      * master config
@@ -136,10 +137,10 @@ public class MasterExecThread implements Runnable {
     /**
      * constructor of MasterExecThread
      * @param processInstance   process instance
-     * @param processDao        process dao
+     * @param processService        process dao
      */
-    public MasterExecThread(ProcessInstance processInstance,ProcessDao processDao){
-        this.processDao = processDao;
+    public MasterExecThread(ProcessInstance processInstance, ProcessService processService){
+        this.processService = processService;
 
         this.processInstance = processInstance;
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
@@ -177,7 +178,7 @@ public class MasterExecThread implements Runnable {
             logger.error("process execute failed, process id:{}", processInstance.getId());
             processInstance.setState(ExecutionStatus.FAILURE);
             processInstance.setEndTime(new Date());
-            processDao.updateProcessInstance(processInstance);
+            processService.updateProcessInstance(processInstance);
         }finally {
             taskExecService.shutdown();
             // post handle
@@ -205,11 +206,11 @@ public class MasterExecThread implements Runnable {
 
         Date startDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
         Date endDate = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-        processDao.saveProcessInstance(processInstance);
+        processService.saveProcessInstance(processInstance);
 
         // get schedules
         int processDefinitionId = processInstance.getProcessDefinitionId();
-        List<Schedule> schedules = processDao.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId);
+        List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionId(processDefinitionId);
         List<Date> listDate = Lists.newLinkedList();
         if(!CollectionUtils.isEmpty(schedules)){
             for (Schedule schedule : schedules) {
@@ -223,7 +224,7 @@ public class MasterExecThread implements Runnable {
             iterator = listDate.iterator();
             scheduleDate = iterator.next();
             processInstance.setScheduleTime(scheduleDate);
-            processDao.updateProcessInstance(processInstance);
+            processService.updateProcessInstance(processInstance);
         }else{
             scheduleDate = processInstance.getScheduleTime();
             if(scheduleDate == null){
@@ -239,7 +240,7 @@ public class MasterExecThread implements Runnable {
                 logger.error("process {} dag is null, please check out parameters",
                         processInstance.getId());
                 processInstance.setState(ExecutionStatus.SUCCESS);
-                processDao.updateProcessInstance(processInstance);
+                processService.updateProcessInstance(processInstance);
                 return;
             }
 
@@ -281,10 +282,10 @@ public class MasterExecThread implements Runnable {
                 processInstance.setCommandParam(JSONUtils.toJson(cmdParam));
             }
 
-            List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstance.getId());
+            List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
             for(TaskInstance taskInstance : taskInstanceList){
                 taskInstance.setFlag(Flag.NO);
-                processDao.updateTaskInstance(taskInstance);
+                processService.updateTaskInstance(taskInstance);
             }
             processInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
             processInstance.setGlobalParams(ParameterUtils.curingGlobalParams(
@@ -292,7 +293,7 @@ public class MasterExecThread implements Runnable {
                     processInstance.getProcessDefinition().getGlobalParamList(),
                     CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime()));
 
-            processDao.saveProcessInstance(processInstance);
+            processService.saveProcessInstance(processInstance);
         }
 
         // flow end
@@ -320,11 +321,11 @@ public class MasterExecThread implements Runnable {
      */
     private void endProcess() {
         processInstance.setEndTime(new Date());
-        processDao.updateProcessInstance(processInstance);
+        processService.updateProcessInstance(processInstance);
         if(processInstance.getState().typeIsWaittingThread()){
-            processDao.createRecoveryWaitingThreadCommand(null, processInstance);
+            processService.createRecoveryWaitingThreadCommand(null, processInstance);
         }
-        List<TaskInstance> taskInstances = processDao.findValidTaskListByProcessId(processInstance.getId());
+        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(processInstance.getId());
         alertManager.sendAlertProcessInstance(processInstance, taskInstances);
     }
 
@@ -361,7 +362,7 @@ public class MasterExecThread implements Runnable {
         dependFailedTask.clear();
         completeTaskList.clear();
         errorTaskList.clear();
-        List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstance.getId());
+        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
         for(TaskInstance task : taskInstanceList){
             if(task.isTaskComplete()){
                 completeTaskList.put(task.getName(), task);
@@ -417,7 +418,7 @@ public class MasterExecThread implements Runnable {
      * @return TaskInstance
      */
     private TaskInstance findTaskIfExists(String taskName){
-        List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(this.processInstance.getId());
+        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(this.processInstance.getId());
         for(TaskInstance taskInstance : taskInstanceList){
             if(taskInstance.getName().equals(taskName)){
                 return taskInstance;
@@ -706,7 +707,7 @@ public class MasterExecThread implements Runnable {
      * @return process instance execution status
      */
     private ExecutionStatus getProcessInstanceState(){
-        ProcessInstance instance = processDao.findProcessInstanceById(processInstance.getId());
+        ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
         ExecutionStatus state = instance.getState();
 
         if(activeTaskNode.size() > 0){
@@ -784,10 +785,10 @@ public class MasterExecThread implements Runnable {
                     processInstance.getState().toString(), state.toString(),
                     processInstance.getCommandType().toString());
             processInstance.setState(state);
-            ProcessInstance instance = processDao.findProcessInstanceById(processInstance.getId());
+            ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
             instance.setState(state);
             instance.setProcessDefinition(processInstance.getProcessDefinition());
-            processDao.updateProcessInstance(instance);
+            processService.updateProcessInstance(instance);
             processInstance = instance;
         }
     }
@@ -845,7 +846,7 @@ public class MasterExecThread implements Runnable {
             // send warning email if process time out.
             if( !sendTimeWarning && checkProcessTimeOut(processInstance) ){
                 alertManager.sendProcessTimeoutAlert(processInstance,
-                        processDao.findProcessDefineById(processInstance.getProcessDefinitionId()));
+                        processService.findProcessDefineById(processInstance.getProcessDefinitionId()));
                 sendTimeWarning = true;
             }
             for(Map.Entry<MasterBaseTaskExecThread,Future<Boolean>> entry: activeTaskNode.entrySet()) {
@@ -903,7 +904,7 @@ public class MasterExecThread implements Runnable {
                     if(completeTask.getState()== ExecutionStatus.PAUSE){
                         completeTask.setState(ExecutionStatus.KILL);
                         completeTaskList.put(entry.getKey(), completeTask);
-                        processDao.updateTaskInstance(completeTask);
+                        processService.updateTaskInstance(completeTask);
                     }
                 }
             }
@@ -961,7 +962,7 @@ public class MasterExecThread implements Runnable {
             Future<Boolean> future = entry.getValue();
 
             TaskInstance taskInstance = taskExecThread.getTaskInstance();
-            taskInstance = processDao.findTaskInstanceById(taskInstance.getId());
+            taskInstance = processService.findTaskInstanceById(taskInstance.getId());
             if(taskInstance.getState().typeIsFinished()){
                 continue;
             }
@@ -1031,7 +1032,7 @@ public class MasterExecThread implements Runnable {
         }
         try {
             Integer intId = Integer.valueOf(taskId);
-            TaskInstance task = processDao.findTaskInstanceById(intId);
+            TaskInstance task = processService.findTaskInstanceById(intId);
             if(task == null){
                 logger.error("start node id cannot be found: {}",  taskId);
             }else {
