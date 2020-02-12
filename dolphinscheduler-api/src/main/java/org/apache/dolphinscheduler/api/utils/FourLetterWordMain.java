@@ -60,21 +60,22 @@ public class FourLetterWordMain {
     public static String send4LetterWord(String host, int port, String cmd, int timeout)
             throws IOException {
         LOG.info("connecting to {} {}", host, port);
+        Socket sock = new Socket();
         InetSocketAddress hostaddress= host != null ? new InetSocketAddress(host, port) :
                 new InetSocketAddress(InetAddress.getByName(null), port);
-        
-        try (Socket sock = new Socket();
-             OutputStream outstream = sock.getOutputStream();
-             BufferedReader reader =
-                    new BufferedReader(
-                            new InputStreamReader(sock.getInputStream()))) {
+        BufferedReader reader = null;
+        try {
             sock.setSoTimeout(timeout);
             sock.connect(hostaddress, timeout);
+            OutputStream outstream = sock.getOutputStream();
             outstream.write(cmd.getBytes());
             outstream.flush();
             // this replicates NC - close the output stream before reading
             sock.shutdownOutput();
 
+            reader =
+                    new BufferedReader(
+                            new InputStreamReader(sock.getInputStream()));
             StringBuilder sb = new StringBuilder();
             String line;
             while((line = reader.readLine()) != null) {
@@ -83,6 +84,11 @@ public class FourLetterWordMain {
             return sb.toString();
         } catch (SocketTimeoutException e) {
             throw new IOException("Exception while executing four letter word: " + cmd, e);
+        } finally {
+            sock.close();
+            if (reader != null) {
+                reader.close();
+            }
         }
     }
 }
