@@ -370,25 +370,14 @@ public class OSUtils {
     double systemCpuLoad;
     double systemReservedMemory;
 
-    if(isMaster){
+    if(Boolean.TRUE.equals(isMaster)){
       systemCpuLoad = conf.getDouble(Constants.MASTER_MAX_CPULOAD_AVG, Constants.DEFAULT_MASTER_CPU_LOAD);
       systemReservedMemory = conf.getDouble(Constants.MASTER_RESERVED_MEMORY, Constants.DEFAULT_MASTER_RESERVED_MEMORY);
     }else{
       systemCpuLoad = conf.getDouble(Constants.WORKER_MAX_CPULOAD_AVG, Constants.DEFAULT_WORKER_CPU_LOAD);
       systemReservedMemory = conf.getDouble(Constants.WORKER_RESERVED_MEMORY, Constants.DEFAULT_WORKER_RESERVED_MEMORY);
     }
-
-    // judging usage
-    double loadAverage = OSUtils.loadAverage();
-    //
-    double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
-
-    if(loadAverage > systemCpuLoad || availablePhysicalMemorySize < systemReservedMemory){
-      logger.warn("load or availablePhysicalMemorySize(G) is too high, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize , loadAverage);
-      return false;
-    }else{
-      return true;
-    }
+    return checkResource(systemCpuLoad,systemReservedMemory);
   }
 
 }
