@@ -22,13 +22,13 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
-import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class MasterSchedulerThread implements Runnable {
     /**
      * dolphinscheduler database interface
      */
-    private final ProcessDao processDao;
+    private final ProcessService processService;
 
     /**
      * zookeeper master client
@@ -74,11 +74,11 @@ public class MasterSchedulerThread implements Runnable {
     /**
      * constructor of MasterSchedulerThread
      * @param zkClient              zookeeper master client
-     * @param processDao            process dao
+     * @param processService            process service
      * @param masterExecThreadNum   master exec thread num
      */
-    public MasterSchedulerThread(ZKMasterClient zkClient, ProcessDao processDao, int masterExecThreadNum){
-        this.processDao = processDao;
+    public MasterSchedulerThread(ZKMasterClient zkClient, ProcessService processService, int masterExecThreadNum){
+        this.processService = processService;
         this.zkMasterClient = zkClient;
         this.masterExecThreadNum = masterExecThreadNum;
         this.masterExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread",masterExecThreadNum);
@@ -115,19 +115,19 @@ public class MasterSchedulerThread implements Runnable {
                     ThreadPoolExecutor poolExecutor = (ThreadPoolExecutor) masterExecService;
                     int activeCount = poolExecutor.getActiveCount();
                     // make sure to scan and delete command  table in one transaction
-                    Command command = processDao.findOneCommand();
+                    Command command = processService.findOneCommand();
                     if (command != null) {
                         logger.info(String.format("find one command: id: %d, type: %s", command.getId(),command.getCommandType().toString()));
 
                         try{
-                            processInstance = processDao.handleCommand(logger, OSUtils.getHost(), this.masterExecThreadNum - activeCount, command);
+                            processInstance = processService.handleCommand(logger, OSUtils.getHost(), this.masterExecThreadNum - activeCount, command);
                             if (processInstance != null) {
                                 logger.info("start master exec thread , split DAG ...");
-                                masterExecService.execute(new MasterExecThread(processInstance,processDao));
+                                masterExecService.execute(new MasterExecThread(processInstance, processService));
                             }
                         }catch (Exception e){
                             logger.error("scan command error ", e);
-                            processDao.moveToErrorCommand(command, e.toString());
+                            processService.moveToErrorCommand(command, e.toString());
                         }
                     } else{
                         //indicate that no command ,sleep for 1s
