@@ -108,8 +108,8 @@ public class DataAnalysisService extends BaseService{
         List<ExecuteStatusCount> taskInstanceStateCounts =
                 taskInstanceMapper.countTaskInstanceStateByUser(start, end, projectIds);
 
-        TaskCountDto taskCountResult = new TaskCountDto(taskInstanceStateCounts);
-        if (taskInstanceStateCounts != null) {
+        if (taskInstanceStateCounts != null && !taskInstanceStateCounts.isEmpty()) {
+            TaskCountDto taskCountResult = new TaskCountDto(taskInstanceStateCounts);
             result.put(Constants.DATA_LIST, taskCountResult);
             putMsg(result, Status.SUCCESS);
         } else {
@@ -155,8 +155,8 @@ public class DataAnalysisService extends BaseService{
                 processInstanceMapper.countInstanceStateByUser(start, end,
                         projectIdArray);
 
-        TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
-        if (processInstanceStateCounts != null) {
+        if (processInstanceStateCounts != null && !processInstanceStateCounts.isEmpty()) {
+            TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
             result.put(Constants.DATA_LIST, taskCountResult);
             putMsg(result, Status.SUCCESS);
         } else {
@@ -340,7 +340,7 @@ public class DataAnalysisService extends BaseService{
             if (StringUtils.isNotEmpty(taskQueueStr)){
                 String[] splits = taskQueueStr.split("_");
                 if (splits.length >= 4){
-                    tasksQueueIds[i++]=Integer.parseInt(splits[3]);
+                    tasksQueueIds[i++] = Integer.parseInt(splits[3]);
                 }
             }
         }
@@ -350,7 +350,7 @@ public class DataAnalysisService extends BaseService{
             if (StringUtils.isNotEmpty(taskKillStr)){
                 String[] splits = taskKillStr.split("-");
                 if (splits.length == 2){
-                    tasksKillIds[i++]=Integer.parseInt(splits[1]);
+                    tasksKillIds[i++] = Integer.parseInt(splits[1]);
                 }
             }
         }
