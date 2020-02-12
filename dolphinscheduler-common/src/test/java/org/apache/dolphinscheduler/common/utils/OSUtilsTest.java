@@ -67,7 +67,7 @@ public class OSUtilsTest {
         if(OSUtils.isMacOS() || !OSUtils.isWindows()){
             try {
                 String result = OSUtils.exeCmd("echo helloWorld");
-                Assert.assertEquals("helloWorld",result);
+                Assert.assertEquals("helloWorld\n",result);
             } catch (IOException e) {
                 Assert.fail("exeCmd " + e.getMessage());
             }
