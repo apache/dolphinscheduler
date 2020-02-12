@@ -442,6 +442,13 @@ public class ProcessDefinitionService extends BaseDAGService {
         }
 
         ReleaseState state = ReleaseState.getEnum(releaseState);
+
+        // check state
+        if (null == state) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "releaseState");
+            return result;
+        }
+
         ProcessDefinition processDefinition = processDefineMapper.selectById(id);
 
         switch (state) {
