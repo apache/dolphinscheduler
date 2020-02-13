@@ -129,6 +129,7 @@ public class WorkerServer implements IStoppable {
      * @param args arguments
      */
     public static void main(String[] args) {
+        Thread.currentThread().setName(Constants.THREAD_NAME_WORKER_SERVER);
         new SpringApplicationBuilder(WorkerServer.class).web(WebApplicationType.NONE).run(args);
     }
 
@@ -138,6 +139,8 @@ public class WorkerServer implements IStoppable {
      */
     @PostConstruct
     public void run(){
+        logger.info("start worker server...");
+
         zkWorkerClient.init();
 
         this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
@@ -146,7 +149,7 @@ public class WorkerServer implements IStoppable {
 
         this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
 
-        heartbeatWorkerService = ThreadUtils.newDaemonThreadScheduledExecutor("Worker-Heartbeat-Thread-Executor", Constants.defaulWorkerHeartbeatThreadNum);
+        heartbeatWorkerService = ThreadUtils.newDaemonThreadScheduledExecutor("Worker-Heartbeat-Thread-Executor", Constants.DEFAUL_WORKER_HEARTBEAT_THREAD_NUM);
 
         // heartbeat thread implement
         Runnable heartBeatThread = heartBeatThread();
@@ -198,7 +201,7 @@ public class WorkerServer implements IStoppable {
 
         try {
             //execute only once
-            if(Stopper.isStoped()){
+            if(Stopper.isStopped()){
                 return;
             }
 
@@ -264,6 +267,7 @@ public class WorkerServer implements IStoppable {
      * @return
      */
     private Runnable heartBeatThread(){
+        logger.info("start worker heart beat thread...");
         Runnable heartBeatThread  = new Runnable() {
             @Override
             public void run() {
@@ -288,6 +292,7 @@ public class WorkerServer implements IStoppable {
         Runnable killProcessThread  = new Runnable() {
             @Override
             public void run() {
+                logger.info("start listening kill process thread...");
                 while (Stopper.isRunning()){
                     Set<String> taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                     if (CollectionUtils.isNotEmpty(taskInfoSet)){

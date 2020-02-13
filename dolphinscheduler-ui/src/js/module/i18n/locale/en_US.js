@@ -361,6 +361,7 @@ export default {
   'Recipient': 'Recipient',
   'Cc': 'Cc',
   'Whether it is a complement process?': 'Whether it is a complement process?',
+  'Schedule date': 'Schedule date',
   'Mode of execution': 'Mode of execution',
   'Serial execution': 'Serial execution',
   'Parallel execution': 'Parallel execution',
@@ -374,6 +375,7 @@ export default {
   'All_1': 'All',
   'Toolbar': 'Toolbar',
   'View variables': 'View variables',
+  'Format DAG': 'Format DAG',
   'Refresh DAG status': 'Refresh DAG status',
   'Return_1': 'Return',
   'Please enter format': 'Please enter format',
@@ -507,5 +509,14 @@ export default {
   'IP address cannot be empty': 'IP address cannot be empty',
   'Please enter the correct IP': 'Please enter the correct IP',
   'Please generate token': 'Please generate token',
-  'Spark Version': 'Spark Version'
+  'Spark Version': 'Spark Version',
+  'TargetDataBase': 'target database',
+  'TargetTable': 'target table',
+  'Please enter the table of target': 'Please enter the table of target',
+  'Please enter a Target Table(required)': 'Please enter a Target Table(required)',
+  'SpeedByte': 'speed(byte count)',
+  'SpeedRecord': 'speed(record count)',
+  '0 means unlimited by byte': '0 means unlimited',
+  '0 means unlimited by count': '0 means unlimited',
+  'Modify User': 'Modify User'
 }

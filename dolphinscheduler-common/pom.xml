@@ -29,6 +29,7 @@
 	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<codehaus.janino.version>3.1.0</codehaus.janino.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -603,6 +604,12 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+			<version>${codehaus.janino.version}</version>
 		</dependency>
 	</dependencies>
 </project>

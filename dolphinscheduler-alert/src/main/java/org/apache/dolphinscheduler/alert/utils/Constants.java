@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.alert.utils;
  * constants
  */
 public class Constants {
-
+    private Constants() {
+        throw new IllegalStateException("Constants class");
+    }
     /**
      * alert properties path
      */
@@ -133,7 +135,7 @@ public class Constants {
 
     public static final String TH_END = "</th>";
 
-    public static final int ALERT_SCAN_INTERVEL = 5000;
+    public static final int ALERT_SCAN_INTERVAL = 5000;
 
     public static final String MARKDOWN_QUOTE = ">";
 

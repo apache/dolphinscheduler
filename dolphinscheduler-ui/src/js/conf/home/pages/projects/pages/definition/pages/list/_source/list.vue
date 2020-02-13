@@ -40,6 +40,9 @@
           <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
+          <th scope="col" width="130">
+            <span>{{$t('Modify User')}}</span>
+          </th>
           <th scope="col" width="90">
             <span>{{$t('Timing state')}}</span>
           </th>
@@ -69,7 +72,11 @@
             <span v-else>-</span>
           </td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-else>-</span>
+          </td>
+          <td>
+            <span v-if="item.modifyBy">{{item.modifyBy}}</span>
             <span v-else>-</span>
           </td>
           <td>

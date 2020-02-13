@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.cron;
 
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
 import com.cronutils.builder.CronBuilder;
 import com.cronutils.model.Cron;
@@ -31,10 +32,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
+import java.util.Date;
 
 import static com.cronutils.model.field.expression.FieldExpressionFactory.*;
 
 /**
+ * CronUtilsTest
  */
 public class CronUtilsTest {
 
@@ -55,9 +58,10 @@ public class CronUtilsTest {
                 .withSecond(on(0))
                 .instance();
         // Obtain the string expression
-        String cronAsString = cron.asString(); // 0 */5 * * * ? *  Every five minutes(once every 5 minutes)
+        String cronAsString = cron.asString();
 
-        Assert.assertEquals(cronAsString, "0 */5 * * * ? *");
+        // 0 */5 * * * ? *  Every five minutes(once every 5 minutes)
+        Assert.assertEquals("0 */5 * * * ? *", cronAsString);
     }
 
 
@@ -68,17 +72,14 @@ public class CronUtilsTest {
     @Test
     public void testCronParse() throws ParseException {
         String strCrontab = "0 1 2 3 * ? *";
-        strCrontab = "0/50 0/59 * * * ? *";
-        strCrontab = "3/5 * 0/5 * * ? *";
-        strCrontab = "1/5 3/5 1/5 3/30 * ? *";
 
         Cron depCron = CronUtils.parse2Cron(strCrontab);
-        Assert.assertEquals(depCron.retrieve(CronFieldName.SECOND).getExpression().asString(), "0");
-        Assert.assertEquals(depCron.retrieve(CronFieldName.MINUTE).getExpression().asString(), "1");
-        Assert.assertEquals(depCron.retrieve(CronFieldName.HOUR).getExpression().asString(), "2");
-        Assert.assertEquals(depCron.retrieve(CronFieldName.DAY_OF_MONTH).getExpression().asString(), "3");
-        Assert.assertEquals(depCron.retrieve(CronFieldName.MONTH).getExpression().asString(), "*");
-        Assert.assertEquals(depCron.retrieve(CronFieldName.YEAR).getExpression().asString(), "*");
+        Assert.assertEquals("0", depCron.retrieve(CronFieldName.SECOND).getExpression().asString());
+        Assert.assertEquals("1", depCron.retrieve(CronFieldName.MINUTE).getExpression().asString());
+        Assert.assertEquals("2", depCron.retrieve(CronFieldName.HOUR).getExpression().asString());
+        Assert.assertEquals("3", depCron.retrieve(CronFieldName.DAY_OF_MONTH).getExpression().asString());
+        Assert.assertEquals("*", depCron.retrieve(CronFieldName.MONTH).getExpression().asString());
+        Assert.assertEquals("*", depCron.retrieve(CronFieldName.YEAR).getExpression().asString());
     }
 
     /**
@@ -87,12 +88,14 @@ public class CronUtilsTest {
      */
     @Test
     public void testScheduleType() throws ParseException {
-
-        CycleEnum cycleEnum = CronUtils.getMaxCycle("0 */1 * * * ? *");
-        Assert.assertEquals(cycleEnum.name(), "MINUTE");
+        CycleEnum cycleEnum = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 */1 * * * ? *"));
+        Assert.assertEquals("MINUTE", cycleEnum.name());
 
         CycleEnum cycleEnum2 = CronUtils.getMaxCycle("0 * * * * ? *");
-        Assert.assertEquals(cycleEnum2.name(), "MINUTE");
+        Assert.assertEquals("MINUTE", cycleEnum2.name());
+
+        CycleEnum cycleEnum3 = CronUtils.getMiniCycle(CronUtils.parse2Cron("0 * * * * ? *"));
+        Assert.assertEquals("MINUTE", cycleEnum3.name());
     }
 
     /**
@@ -109,26 +112,9 @@ public class CronUtilsTest {
                 .withMinute(every(5))
                 .withSecond(on(0))
                 .instance();
-
-        String cronAsString = cron1.asString(); // 0 */5 * * * ? * once every 5 minutes
-        //logger.info(cronAsString);
-        // Obtain the string expression
-        //String minCrontab = "0 0 * * * ? *";
-        //String minCrontab = "0 0 10,14,16 * * ?";
-        //String minCrontab = "0 0-5 14 * * ? *";
-        //String minCrontab = "0 0 2 ? * SUN *";
-        //String minCrontab = "* 0,3 2 SUN * 1#1 *";
-        //String minCrontab = "* 0,3 * 1W * ? *";
-        //cron = CronUtils.parse2Cron("0 * * * * ? *");
-        // month cycle
-        /*String[] cronArayy = new String[]{"* 0,3 * 1W * ? *","* 0 0 1W * ? *",
-                "0 0 0 L 3/5 ? *","0 0 0 ? 3/5 2/2 *"};*/
         // minute cycle
         String[] cronArayy = new String[]{"* * * * * ? *","* 0 * * * ? *",
                 "* 5 * * 3/5 ? *","0 0 * * * ? *"};
-        // week cycle
-        /*String[] cronArayy = new String[]{"* * * ? * 2/1 *","0 *//*5 * ? * 2/1 *",
-                "* * *//*5 ? * 2/1 *"};*/
         for(String minCrontab:cronArayy){
             if (!org.quartz.CronExpression.isValidExpression(minCrontab)) {
                 throw new RuntimeException(minCrontab+" verify failure, cron expression not valid");
@@ -171,7 +157,6 @@ public class CronUtilsTest {
             logger.info("dayOfWeekField instanceof And:"+(dayOfWeekField.getExpression() instanceof And));
             logger.info("dayOfWeekField instanceof QuestionMark:"+(dayOfWeekField.getExpression() instanceof QuestionMark));
 
-
             CycleEnum cycleEnum = CronUtils.getMaxCycle(minCrontab);
             if(cycleEnum !=null){
                 logger.info(cycleEnum.name());
@@ -179,5 +164,36 @@ public class CronUtilsTest {
                 logger.info("can't get scheduleType");
             }
         }
+        Assert.assertTrue(true);
+    }
+
+    @Test
+    public void getSelfFireDateList() throws ParseException{
+        Date from = DateUtils.stringToDate("2020-01-01 00:00:00");
+        Date to = DateUtils.stringToDate("2020-01-31 00:00:00");
+        // test date
+        Assert.assertEquals(0, CronUtils.getSelfFireDateList(to, from, "0 0 0 * * ? ").size());
+        // test error cron
+        Assert.assertEquals(0, CronUtils.getSelfFireDateList(from, to, "0 0 0 * *").size());
+        // test cron
+        Assert.assertEquals(29, CronUtils.getSelfFireDateList(from, to, "0 0 0 * * ? ").size());
+        // test other
+        Assert.assertEquals(30, CronUtils.getFireDateList(from, to, CronUtils.parse2CronExpression("0 0 0 * * ? ")).size());
+        Assert.assertEquals(5, CronUtils.getSelfFireDateList(from, to, CronUtils.parse2CronExpression("0 0 0 * * ? "), 5).size());
+    }
+
+    @Test
+    public void getExpirationTime(){
+        Date startTime = DateUtils.stringToDate("2020-02-07 18:30:00");
+        Date expirationTime = CronUtils.getExpirationTime(startTime, CycleEnum.HOUR);
+        Assert.assertEquals("2020-02-07 19:30:00", DateUtils.dateToString(expirationTime));
+        expirationTime = CronUtils.getExpirationTime(startTime, CycleEnum.DAY);
+        Assert.assertEquals("2020-02-07 23:59:59", DateUtils.dateToString(expirationTime));
+        expirationTime = CronUtils.getExpirationTime(startTime, CycleEnum.WEEK);
+        Assert.assertEquals("2020-02-07 23:59:59", DateUtils.dateToString(expirationTime));
+        expirationTime = CronUtils.getExpirationTime(startTime, CycleEnum.MONTH);
+        Assert.assertEquals("2020-02-07 23:59:59", DateUtils.dateToString(expirationTime));
+        expirationTime = CronUtils.getExpirationTime(startTime, CycleEnum.YEAR);
+        Assert.assertEquals("2020-02-07 18:30:00", DateUtils.dateToString(expirationTime));
     }
 }

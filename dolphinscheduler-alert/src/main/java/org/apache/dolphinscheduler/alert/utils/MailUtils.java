@@ -25,13 +25,11 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ResourceUtils;
 
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.*;
 import java.util.*;
-
 
 
 /**
@@ -92,14 +90,14 @@ public class MailUtils {
     public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, ShowType showType) {
         Map<String,Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
-        
+
         // if there is no receivers && no receiversCc, no need to process
         if (CollectionUtils.isEmpty(receivers) && CollectionUtils.isEmpty(receiversCc)) {
             return retMap;
         }
 
-        receivers.removeIf((from) -> (StringUtils.isEmpty(from)));
-        
+        receivers.removeIf(StringUtils::isEmpty);
+
         if (showType == ShowType.TABLE || showType == ShowType.TEXT){
             // send email
             HtmlEmail email = new HtmlEmail();
@@ -187,7 +185,7 @@ public class MailUtils {
 
     /**
      * get MimeMessage
-     * @param receivers
+     * @param receivers receivers
      * @return the MimeMessage
      * @throws MessagingException
      */
@@ -231,8 +229,7 @@ public class MailUtils {
             }
         };
 
-        Session session = Session.getInstance(props, auth);
-        return session;
+        return Session.getInstance(props, auth);
     }
 
     /**
@@ -320,12 +317,12 @@ public class MailUtils {
     public static void deleteFile(File file){
         if(file.exists()){
             if(file.delete()){
-                logger.info("delete success:"+file.getAbsolutePath()+file.getName());
+                logger.info("delete success: {}",file.getAbsolutePath() + file.getName());
             }else{
-                logger.info("delete fail"+file.getAbsolutePath()+file.getName());
+                logger.info("delete fail: {}", file.getAbsolutePath() + file.getName());
             }
         }else{
-            logger.info("file not exists:"+file.getAbsolutePath()+file.getName());
+            logger.info("file not exists: {}", file.getAbsolutePath() + file.getName());
         }
     }
 
@@ -338,7 +335,7 @@ public class MailUtils {
      */
     private static void handleException(Collection<String> receivers, Map<String, Object> retMap, Exception e) {
         logger.error("Send email to {} failed {}", receivers, e);
-        retMap.put(Constants.MESSAGE, "Send email to {" + StringUtils.join(receivers, ",") + "} failed，" + e.toString());
+        retMap.put(Constants.MESSAGE, "Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 
 }

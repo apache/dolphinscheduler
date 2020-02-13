@@ -182,6 +182,7 @@
         <m-resources
                 ref="refResources"
                 @on-resourcesData="_onResourcesData"
+                @on-cache-resourcesData="_onCacheResourcesData"
                 :resource-list="resourceList">
         </m-resources>
       </div>
@@ -221,6 +222,8 @@
         deployMode: 'cluster',
         // Resource(list)
         resourceList: [],
+        // Cache ResourceList
+        cacheResourceList: [],
         // Custom function
         localParams: [],
         // Driver Number of cores
@@ -263,6 +266,12 @@
        */
       _onResourcesData (a) {
         this.resourceList = a
+      },
+      /**
+       * cache resourceList
+       */
+      _onCacheResourcesData (a) {
+        this.cacheResourceList = a
       },
       /**
        * verification
@@ -368,6 +377,32 @@
         if (type === 'PYTHON') {
           this.mainClass = ''
         }
+      },
+      //Watch the cacheParams
+      cacheParams (val) {
+        this.$emit('on-cache-params', val)
+      }
+    },
+    computed: {
+      cacheParams () {
+        return {
+          mainClass: this.mainClass,
+          mainJar: {
+            res: this.mainJar
+          },
+          deployMode: this.deployMode,
+          resourceList: this.cacheResourceList,
+          localParams: this.localParams,
+          driverCores: this.driverCores,
+          driverMemory: this.driverMemory,
+          numExecutors: this.numExecutors,
+          executorMemory: this.executorMemory,
+          executorCores: this.executorCores,
+          mainArgs: this.mainArgs,
+          others: this.others,
+          programType: this.programType,
+          sparkVersion: this.sparkVersion
+        }
       }
     },
     created () {
@@ -377,7 +412,7 @@
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.mainClass = o.params.mainClass || ''
-          this.mainJar = o.params.mainJar.res || ''
+          this.mainJar = o.params.mainJar && o.params.mainJar.res ? o.params.mainJar.res : ''
           this.deployMode = o.params.deployMode || ''
           this.driverCores = o.params.driverCores || 1
           this.driverMemory = o.params.driverMemory || '512M'
@@ -393,6 +428,7 @@
           let resourceList = o.params.resourceList || []
           if (resourceList.length) {
             this.resourceList = resourceList
+            this.cacheResourceList = resourceList
           }
 
           // backfill localParams

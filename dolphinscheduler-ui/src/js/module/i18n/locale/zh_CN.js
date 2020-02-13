@@ -356,6 +356,7 @@ export default {
   'Recipient': '收件人',
   'Cc': '抄送人',
   'Whether it is a complement process?': '是否补数',
+  'Schedule date': '调度日期',
   'Mode of execution': '执行方式',
   'Serial execution': '串行执行',
   'Parallel execution': '并行执行',
@@ -369,6 +370,7 @@ export default {
   'All_1': '成功或失败都发',
   'Toolbar': '工具栏',
   'View variables': '查看变量',
+  'Format DAG': '格式化DAG',
   'Refresh DAG status': '刷新DAG状态',
   'Return_1': '返回上一节点',
   'Please enter format': '请输入格式为',
@@ -507,5 +509,14 @@ export default {
   'IP address cannot be empty': 'IP地址不能为空',
   'Please enter the correct IP': '请输入正确的IP',
   'Please generate token': '请生成Token',
-  'Spark Version': 'Spark版本'
+  'Spark Version': 'Spark版本',
+  'TargetDataBase': '目标库',
+  'TargetTable': '目标表',
+  'Please enter the table of target': '请输入目标表名',
+  'Please enter a Target Table(required)': '请输入目标表(必填)',
+  'SpeedByte': '限流(字节数)',
+  'SpeedRecord': '限流(记录数)',
+  '0 means unlimited by byte': 'KB，0代表不限制',
+  '0 means unlimited by count': '0代表不限制',
+  'Modify User': '修改用户'
 }

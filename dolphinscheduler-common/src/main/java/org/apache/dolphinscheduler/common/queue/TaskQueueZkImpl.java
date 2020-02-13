@@ -30,7 +30,7 @@ import java.util.*;
 
 /**
  * A singleton of a task queue implemented with zookeeper
- * tasks queue implemention
+ * tasks queue implementation
  */
 @Service
 public class TaskQueueZkImpl implements ITaskQueue {
@@ -72,7 +72,22 @@ public class TaskQueueZkImpl implements ITaskQueue {
         } catch (Exception e) {
             logger.error("get all tasks from tasks queue exception",e);
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
+    }
+
+    /**
+     * check if has a task
+     * @param key queue name
+     * @return true if has; false if not
+     */
+    @Override
+    public boolean hasTask(String key) {
+        try {
+            return zookeeperOperator.hasChildren(getTasksPath(key));
+        } catch (Exception e) {
+            logger.error("check has task in tasks queue exception",e);
+        }
+        return false;
     }
 
     /**
@@ -181,11 +196,11 @@ public class TaskQueueZkImpl implements ITaskQueue {
                     }
                 }
 
-                List<String> taskslist = getTasksListFromTreeSet(tasksNum, taskTreeSet);
+                List<String> tasksList = getTasksListFromTreeSet(tasksNum, taskTreeSet);
 
-                logger.info("consume tasks: {},there still have {} tasks need to be executed", Arrays.toString(taskslist.toArray()), size - taskslist.size());
+                logger.info("consume tasks: {},there still have {} tasks need to be executed", Arrays.toString(tasksList.toArray()), size - tasksList.size());
 
-                return taskslist;
+                return tasksList;
             }else{
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             }
@@ -193,7 +208,7 @@ public class TaskQueueZkImpl implements ITaskQueue {
         } catch (Exception e) {
             logger.error("add task to tasks queue exception",e);
         }
-        return new ArrayList<String>();
+        return Collections.emptyList();
     }
 
 
@@ -206,15 +221,15 @@ public class TaskQueueZkImpl implements ITaskQueue {
     public List<String> getTasksListFromTreeSet(int tasksNum, Set<String> taskTreeSet) {
         Iterator<String> iterator = taskTreeSet.iterator();
         int j = 0;
-        List<String> taskslist = new ArrayList<>(tasksNum);
+        List<String> tasksList = new ArrayList<>(tasksNum);
         while(iterator.hasNext()){
             if(j++ >= tasksNum){
                 break;
             }
             String task = iterator.next();
-            taskslist.add(getOriginTaskFormat(task));
+            tasksList.add(getOriginTaskFormat(task));
         }
-        return taskslist;
+        return tasksList;
     }
 
     /**
@@ -315,22 +330,13 @@ public class TaskQueueZkImpl implements ITaskQueue {
      */
     @Override
     public Set<String> smembers(String key) {
-
-        Set<String> tasksSet = new HashSet<>();
-
         try {
             List<String> list = zookeeperOperator.getChildrenKeys(getTasksPath(key));
-
-            for (String task : list) {
-                tasksSet.add(task);
-            }
-
-            return tasksSet;
+            return new HashSet<>(list);
         } catch (Exception e) {
             logger.error("get all tasks from tasks queue exception",e);
         }
-
-        return tasksSet;
+        return Collections.emptySet();
     }
 
     /**

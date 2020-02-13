@@ -101,6 +101,9 @@
   .icos-HTTP {
     background: url("../img/toobar_HTTP.png") no-repeat 50% 50%;
   }
+  .icos-DATAX {
+    background: url("../img/toolbar_DATAX.png") no-repeat 50% 50%;
+  }
   .toolbar {
     width: 60px;
     height: 100%;
@@ -157,6 +160,12 @@
       background: #F2F3F7;
       position: relative;
       border-radius: 0 3px 0 0;
+      .ans-btn-text {
+        color: #337ab7;
+        .ans-icon {
+          font-size: 16px;
+        }
+      }
       .assist-btn {
         position: absolute;
         left: 10px;
@@ -203,7 +212,7 @@
               color: #333;
             }
             &.active {
-              background: #e1e2e3;
+              // background: #e1e2e3;
               i {
                 color: #2d8cf0;
               }
@@ -231,7 +240,9 @@
     border-radius: 3px 3px 0px 0px;
   }
 }
-
+#screen {
+  margin-right: 5px;
+}
 .v-modal-custom-log {
   z-index: 101;
 }

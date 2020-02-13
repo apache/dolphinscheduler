@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
-import org.apache.dolphinscheduler.server.quartz.ProcessScheduleJob;
-import org.apache.dolphinscheduler.server.quartz.QuartzExecutors;
+import org.apache.dolphinscheduler.dao.quartz.ProcessScheduleJob;
+import org.apache.dolphinscheduler.dao.quartz.QuartzExecutors;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -97,7 +97,9 @@ public class MasterServer implements IStoppable {
      * @param args arguments
      */
     public static void main(String[] args) {
+        Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
         new SpringApplicationBuilder(MasterServer.class).web(WebApplicationType.NONE).run(args);
+
     }
 
     /**
@@ -109,7 +111,7 @@ public class MasterServer implements IStoppable {
 
         masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
 
-        heartbeatMasterService = ThreadUtils.newDaemonThreadScheduledExecutor("Master-Main-Thread",Constants.defaulMasterHeartbeatThreadNum);
+        heartbeatMasterService = ThreadUtils.newDaemonThreadScheduledExecutor("Master-Main-Thread",Constants.DEFAULT_MASTER_HEARTBEAT_THREAD_NUM);
 
         // heartbeat thread implement
         Runnable heartBeatThread = heartBeatThread();
@@ -133,6 +135,7 @@ public class MasterServer implements IStoppable {
         // start QuartzExecutors
         // what system should do if exception
         try {
+            logger.info("start Quartz server...");
             ProcessScheduleJob.init(processDao);
             QuartzExecutors.getInstance().start();
         } catch (Exception e) {
@@ -170,7 +173,7 @@ public class MasterServer implements IStoppable {
 
         try {
             //execute only once
-            if(Stopper.isStoped()){
+            if(Stopper.isStopped()){
                 return;
             }
 
@@ -239,6 +242,7 @@ public class MasterServer implements IStoppable {
      * @return
      */
     private Runnable heartBeatThread(){
+        logger.info("start master heart beat thread...");
         Runnable heartBeatThread  = new Runnable() {
             @Override
             public void run() {

@@ -25,7 +25,9 @@ import com.cronutils.model.field.expression.QuestionMark;
  * Crontab Cycle Tool Factory
  */
 public class CycleFactory {
-
+    private CycleFactory() {
+        throw new IllegalStateException("CycleFactory class");
+    }
     /**
      * min
      * @param cron cron
