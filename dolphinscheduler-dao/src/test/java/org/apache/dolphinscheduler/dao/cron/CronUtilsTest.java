@@ -61,7 +61,7 @@ public class CronUtilsTest {
         String cronAsString = cron.asString();
 
         // 0 */5 * * * ? *  Every five minutes(once every 5 minutes)
-        Assert.assertEquals(cronAsString, "0 */5 * * * ? *");
+        Assert.assertEquals("0 */5 * * * ? *", cronAsString);
     }
 
 
@@ -74,12 +74,12 @@ public class CronUtilsTest {
         String strCrontab = "0 1 2 3 * ? *";
 
         Cron depCron = CronUtils.parse2Cron(strCrontab);
-        Assert.assertEquals(depCron.retrieve(CronFieldName.SECOND).getExpression().asString(), "0");
-        Assert.assertEquals(depCron.retrieve(CronFieldName.MINUTE).getExpression().asString(), "1");
-        Assert.assertEquals(depCron.retrieve(CronFieldName.HOUR).getExpression().asString(), "2");
-        Assert.assertEquals(depCron.retrieve(CronFieldName.DAY_OF_MONTH).getExpression().asString(), "3");
-        Assert.assertEquals(depCron.retrieve(CronFieldName.MONTH).getExpression().asString(), "*");
-        Assert.assertEquals(depCron.retrieve(CronFieldName.YEAR).getExpression().asString(), "*");
+        Assert.assertEquals("0", depCron.retrieve(CronFieldName.SECOND).getExpression().asString());
+        Assert.assertEquals("1", depCron.retrieve(CronFieldName.MINUTE).getExpression().asString());
+        Assert.assertEquals("2", depCron.retrieve(CronFieldName.HOUR).getExpression().asString());
+        Assert.assertEquals("3", depCron.retrieve(CronFieldName.DAY_OF_MONTH).getExpression().asString());
+        Assert.assertEquals("*", depCron.retrieve(CronFieldName.MONTH).getExpression().asString());
+        Assert.assertEquals("*", depCron.retrieve(CronFieldName.YEAR).getExpression().asString());
     }
 
     /**
@@ -89,13 +89,13 @@ public class CronUtilsTest {
     @Test
     public void testScheduleType() throws ParseException {
         CycleEnum cycleEnum = CronUtils.getMaxCycle(CronUtils.parse2Cron("0 */1 * * * ? *"));
-        Assert.assertEquals(cycleEnum.name(), "MINUTE");
+        Assert.assertEquals("MINUTE", cycleEnum.name());
 
         CycleEnum cycleEnum2 = CronUtils.getMaxCycle("0 * * * * ? *");
-        Assert.assertEquals(cycleEnum2.name(), "MINUTE");
+        Assert.assertEquals("MINUTE", cycleEnum2.name());
 
         CycleEnum cycleEnum3 = CronUtils.getMiniCycle(CronUtils.parse2Cron("0 * * * * ? *"));
-        Assert.assertEquals(cycleEnum3.name(), "MINUTE");
+        Assert.assertEquals("MINUTE", cycleEnum3.name());
     }
 
     /**
@@ -164,6 +164,7 @@ public class CronUtilsTest {
                 logger.info("can't get scheduleType");
             }
         }
+        Assert.assertTrue(true);
     }
 
     @Test

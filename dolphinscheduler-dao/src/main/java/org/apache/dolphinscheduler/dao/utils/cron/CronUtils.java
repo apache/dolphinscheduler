@@ -38,7 +38,9 @@ import static org.apache.dolphinscheduler.dao.utils.cron.CycleFactory.*;
  * cron utils
  */
 public class CronUtils {
-
+  private CronUtils() {
+    throw new IllegalStateException("CronUtils class");
+  }
   private static final Logger logger = LoggerFactory.getLogger(CronUtils.class);
 
 
@@ -169,7 +171,7 @@ public class CronUtils {
       cronExpression = parse2CronExpression(cron);
     }catch (ParseException e){
       logger.error(e.getMessage(), e);
-      return Collections.EMPTY_LIST;
+      return Collections.emptyList();
     }
     return getSelfFireDateList(startTime, endTime, cronExpression);
   }
@@ -202,7 +204,7 @@ public class CronUtils {
           calendar.add(Calendar.DATE, 1);
           break;
         default:
-          logger.error("Dependent process definition's  cycleEnum is {},not support!!", cycleEnum.name());
+          logger.error("Dependent process definition's  cycleEnum is {},not support!!", cycleEnum);
           break;
       }
       maxExpirationTime = calendar.getTime();

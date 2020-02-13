@@ -38,7 +38,7 @@ public class SubProcessParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return this.processDefinitionId != 0;
+        return this.processDefinitionId != null && this.processDefinitionId != 0;
     }
 
     @Override
