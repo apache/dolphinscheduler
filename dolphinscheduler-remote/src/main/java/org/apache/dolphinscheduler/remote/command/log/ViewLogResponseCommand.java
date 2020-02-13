@@ -28,6 +28,9 @@ import java.io.Serializable;
  */
 public class ViewLogResponseCommand implements Serializable {
 
+    /**
+     *  response data
+     */
     private String msg;
 
     public ViewLogResponseCommand() {
@@ -45,6 +48,12 @@ public class ViewLogResponseCommand implements Serializable {
         this.msg = msg;
     }
 
+    /**
+     * package response command
+     *
+     * @param opaque request unique identification
+     * @return command
+     */
     public Command convert2Command(long opaque){
         Command command = new Command(opaque);
         command.setType(CommandType.VIEW_WHOLE_LOG_RESPONSE);
