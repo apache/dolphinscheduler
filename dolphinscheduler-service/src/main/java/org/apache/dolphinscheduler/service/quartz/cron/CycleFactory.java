@@ -25,7 +25,9 @@ import org.apache.dolphinscheduler.common.enums.CycleEnum;
  * Crontab Cycle Tool Factory
  */
 public class CycleFactory {
-
+    private CycleFactory() {
+        throw new IllegalStateException("CycleFactory class");
+    }
     /**
      * min
      * @param cron cron
