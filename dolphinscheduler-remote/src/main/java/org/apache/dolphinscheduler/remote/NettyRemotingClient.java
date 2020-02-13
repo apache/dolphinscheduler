@@ -132,6 +132,21 @@ public class NettyRemotingClient {
         }
     }
 
+    //TODO
+    public void sendSync(final Address address, final Command command, final long timeoutMillis) throws RemotingException {
+        final Channel channel = getChannel(address);
+        if (channel == null) {
+            throw new RemotingException("network error");
+        }
+        final long opaque = command.getOpaque();
+        try {
+
+        } catch (Exception ex) {
+            String msg = String.format("send command %s to address %s encounter error", command, address);
+            throw new RemotingException(msg, ex);
+        }
+    }
+
     public Channel getChannel(Address address) {
         Channel channel = channels.get(address);
         if(channel != null && channel.isActive()){
@@ -188,7 +203,7 @@ public class NettyRemotingClient {
         this.channels.clear();
     }
 
-    public void removeChannel(Address address){
+    public void closeChannel(Address address){
         Channel channel = this.channels.remove(address);
         if(channel != null){
             channel.close();
