@@ -22,13 +22,24 @@ import io.netty.buffer.Unpooled;
 
 import java.io.Serializable;
 
-
+/**
+ * Pong return after ping
+ */
 public class Pong implements Serializable {
 
+    /**
+     *  pong body
+     */
     protected static ByteBuf EMPTY_BODY = Unpooled.EMPTY_BUFFER;
 
+    /**
+     *  pong command body
+     */
     private static byte[] EMPTY_BODY_ARRAY = new byte[0];
 
+    /**
+     *  ping byte buffer
+     */
     private static final ByteBuf PONG_BUF;
 
     static {
@@ -41,10 +52,20 @@ public class Pong implements Serializable {
         PONG_BUF = Unpooled.unreleasableBuffer(ping).asReadOnly();
     }
 
+    /**
+     *  ping content
+     * @return result
+     */
     public static ByteBuf pingContent(){
         return PONG_BUF.duplicate();
     }
 
+    /**
+     * package pong command
+     *
+     * @param opaque request unique identification
+     * @return command
+     */
     public static Command create(long opaque){
         Command command = new Command(opaque);
         command.setType(CommandType.PONG);

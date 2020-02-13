@@ -39,28 +39,60 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
+    /**
+     *  netty remote server
+     */
     private final NettyRemotingServer nettyRemotingServer;
 
+    /**
+     *  server processors queue
+     */
     private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors = new ConcurrentHashMap();
 
     public NettyServerHandler(NettyRemotingServer nettyRemotingServer){
         this.nettyRemotingServer = nettyRemotingServer;
     }
 
+    /**
+     *  When the current channel is not active,
+     *  the current channel has reached the end of its life cycle
+     * @param ctx channel handler context
+     * @throws Exception
+     */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         ctx.channel().close();
     }
 
+    /**
+     * The current channel reads data from the remote end
+     *
+     * @param ctx channel handler context
+     * @param msg message
+     * @throws Exception
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         processReceived(ctx.channel(), (Command)msg);
     }
 
+    /**
+     * register processor
+     *
+     * @param commandType command type
+     * @param processor processor
+     */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
         this.registerProcessor(commandType, processor, null);
     }
 
+    /**
+     *  register processor
+     *
+     * @param commandType command type
+     * @param processor processor
+     * @param executor thread executor
+     */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         ExecutorService executorRef = executor;
         if(executorRef == null){
@@ -69,11 +101,18 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         this.processors.putIfAbsent(commandType, new Pair<NettyRequestProcessor, ExecutorService>(processor, executorRef));
     }
 
+    /**
+     *  process received logic
+     * @param channel channel
+     * @param msg message
+     */
     private void processReceived(final Channel channel, final Command msg) {
         final CommandType commandType = msg.getType();
         final Pair<NettyRequestProcessor, ExecutorService> pair = processors.get(commandType);
         if (pair != null) {
             Runnable r = new Runnable() {
+
+                @Override
                 public void run() {
                     try {
                         pair.getLeft().process(channel, msg);
@@ -92,12 +131,25 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    /**
+     *  caught exception
+     *
+     * @param ctx channel handler context
+     * @param cause cause
+     * @throws Exception
+     */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.error("exceptionCaught : {}", cause);
         ctx.channel().close();
     }
 
+    /**
+     *  channel write changed
+     *
+     * @param ctx  channel handler context
+     * @throws Exception
+     */
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel ch = ctx.channel();

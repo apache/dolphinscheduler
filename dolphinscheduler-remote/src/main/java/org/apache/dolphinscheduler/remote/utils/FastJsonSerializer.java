@@ -23,15 +23,36 @@ import com.alibaba.fastjson.JSON;
  */
 public class FastJsonSerializer {
 
+	/**
+	 * serialize to byte
+	 *
+	 * @param obj object
+	 * @param <T> object type
+	 * @return byte array
+	 */
 	public static <T> byte[] serialize(T obj)  {
 		String json = JSON.toJSONString(obj);
 		return json.getBytes(Constants.UTF8);
 	}
 
+	/**
+	 *  serialize to string
+	 * @param obj object
+	 * @param <T> object type
+	 * @return string
+	 */
 	public static <T> String serializeToString(T obj)  {
 		return JSON.toJSONString(obj);
 	}
 
+	/**
+	 *  deserialize
+	 *
+	 * @param src byte array
+	 * @param clazz class
+	 * @param <T> deserialize type
+	 * @return deserialize type
+	 */
 	public static <T> T deserialize(byte[] src, Class<T> clazz) {
 		return JSON.parseObject(new String(src, Constants.UTF8), clazz);
 	}

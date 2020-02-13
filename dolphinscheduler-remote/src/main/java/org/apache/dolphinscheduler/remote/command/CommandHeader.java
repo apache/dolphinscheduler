@@ -23,10 +23,19 @@ import java.io.Serializable;
  */
 public class CommandHeader implements Serializable {
 
+    /**
+     * type
+     */
     private byte type;
 
+    /**
+     * request unique identification
+     */
     private long opaque;
 
+    /**
+     *  body length
+     */
     private int bodyLength;
 
     public int getBodyLength() {

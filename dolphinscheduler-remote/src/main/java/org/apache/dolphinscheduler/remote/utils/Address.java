@@ -23,8 +23,14 @@ import java.io.Serializable;
  */
 public class Address implements Serializable {
 
+    /**
+     *  host
+     */
     private String host;
 
+    /**
+     *  port
+     */
     private int port;
 
     public Address(){

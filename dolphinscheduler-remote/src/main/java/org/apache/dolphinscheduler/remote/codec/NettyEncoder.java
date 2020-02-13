@@ -28,6 +28,14 @@ import org.apache.dolphinscheduler.remote.command.Command;
 @Sharable
 public class NettyEncoder extends MessageToByteEncoder<Command> {
 
+    /**
+     * encode
+     *
+     * @param ctx channel handler context
+     * @param msg command
+     * @param out byte buffer
+     * @throws Exception
+     */
     @Override
     protected void encode(ChannelHandlerContext ctx, Command msg, ByteBuf out) throws Exception {
         if(msg == null){

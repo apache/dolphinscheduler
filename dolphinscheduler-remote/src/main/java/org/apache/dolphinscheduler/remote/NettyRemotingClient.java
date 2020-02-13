@@ -50,22 +50,51 @@ public class NettyRemotingClient {
 
     private final Logger logger = LoggerFactory.getLogger(NettyRemotingClient.class);
 
+    /**
+     *  bootstrap
+     */
     private final Bootstrap bootstrap = new Bootstrap();
 
+    /**
+     *  encoder
+     */
     private final NettyEncoder encoder = new NettyEncoder();
 
+    /**
+     *  channels
+     */
     private final ConcurrentHashMap<Address, Channel> channels = new ConcurrentHashMap();
 
+    /**
+     *  default executor
+     */
     private final ExecutorService defaultExecutor = Executors.newFixedThreadPool(Constants.CPUS);
 
+    /**
+     *  started flag
+     */
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
+    /**
+     *  worker group
+     */
     private final NioEventLoopGroup workerGroup;
 
+    /**
+     *  client handler
+     */
     private final NettyClientHandler clientHandler = new NettyClientHandler(this);
 
+    /**
+     *  netty client config
+     */
     private final NettyClientConfig clientConfig;
 
+    /**
+     *  netty client init
+     *
+     * @param clientConfig client config
+     */
     public NettyRemotingClient(final NettyClientConfig clientConfig){
         this.clientConfig = clientConfig;
         this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
@@ -79,6 +108,9 @@ public class NettyRemotingClient {
         this.start();
     }
 
+    /**
+     *  netty server start
+     */
     private void start(){
 
         this.bootstrap
@@ -97,18 +129,36 @@ public class NettyRemotingClient {
                                 encoder);
                     }
                 });
-        //
         isStarted.compareAndSet(false, true);
     }
 
+    /**
+     *  register processor
+     *
+     * @param commandType command type
+     * @param processor processor
+     */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
         registerProcessor(commandType, processor, null);
     }
 
+    /**
+     * register processor
+     *
+     * @param commandType command type
+     * @param processor processor
+     * @param executor thread executor
+     */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         this.clientHandler.registerProcessor(commandType, processor, executor);
     }
 
+    /**
+     *  send connect
+     * @param address address
+     * @param command command
+     * @throws RemotingException
+     */
     public void send(final Address address, final Command command) throws RemotingException {
         final Channel channel = getChannel(address);
         if (channel == null) {
@@ -132,6 +182,11 @@ public class NettyRemotingClient {
         }
     }
 
+    /**
+     *  get channel
+     * @param address address
+     * @return channel
+     */
     public Channel getChannel(Address address) {
         Channel channel = channels.get(address);
         if(channel != null && channel.isActive()){
@@ -140,6 +195,12 @@ public class NettyRemotingClient {
         return createChannel(address, true);
     }
 
+    /**
+     *  create channel
+     * @param address address
+     * @param isSync is sync
+     * @return channel
+     */
     public Channel createChannel(Address address, boolean isSync) {
         ChannelFuture future;
         try {
@@ -160,10 +221,17 @@ public class NettyRemotingClient {
         return null;
     }
 
+    /**
+     *  get default thread executor
+     * @return thread executor
+     */
     public ExecutorService getDefaultExecutor() {
         return defaultExecutor;
     }
 
+    /**
+     *  close client
+     */
     public void close() {
         if(isStarted.compareAndSet(true, false)){
             try {
@@ -181,6 +249,9 @@ public class NettyRemotingClient {
         }
     }
 
+    /**
+     *  close channel
+     */
     private void closeChannels(){
         for (Channel channel : this.channels.values()) {
             channel.close();
@@ -188,6 +259,10 @@ public class NettyRemotingClient {
         this.channels.clear();
     }
 
+    /**
+     *  remove channel
+     * @param address address
+     */
     public void removeChannel(Address address){
         Channel channel = this.channels.remove(address);
         if(channel != null){

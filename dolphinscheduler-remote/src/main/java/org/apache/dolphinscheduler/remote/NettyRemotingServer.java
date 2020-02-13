@@ -48,28 +48,58 @@ public class NettyRemotingServer {
 
     private final Logger logger = LoggerFactory.getLogger(NettyRemotingServer.class);
 
+    /**
+     *  server bootstart
+     */
     private final ServerBootstrap serverBootstrap = new ServerBootstrap();
 
+    /**
+     *  encoder
+     */
     private final NettyEncoder encoder = new NettyEncoder();
 
+    /**
+     *  default executor
+     */
     private final ExecutorService defaultExecutor = Executors.newFixedThreadPool(Constants.CPUS);
 
+    /**
+     * boss group
+     */
     private final NioEventLoopGroup bossGroup;
 
+    /**
+     *  worker group
+     */
     private final NioEventLoopGroup workGroup;
 
+    /**
+     *  server config
+     */
     private final NettyServerConfig serverConfig;
 
+    /**
+     *  server handler
+     */
     private final NettyServerHandler serverHandler = new NettyServerHandler(this);
 
+    /**
+     * started flag
+     */
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
+    /**
+     *  server init
+     *
+     * @param serverConfig server config
+     */
     public NettyRemotingServer(final NettyServerConfig serverConfig){
         this.serverConfig = serverConfig;
 
         this.bossGroup = new NioEventLoopGroup(1, new ThreadFactory() {
             private AtomicInteger threadIndex = new AtomicInteger(0);
 
+            @Override
             public Thread newThread(Runnable r) {
                 return new Thread(r, String.format("NettyServerBossThread_%d", this.threadIndex.incrementAndGet()));
             }
@@ -78,12 +108,16 @@ public class NettyRemotingServer {
         this.workGroup = new NioEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
             private AtomicInteger threadIndex = new AtomicInteger(0);
 
+            @Override
             public Thread newThread(Runnable r) {
                 return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
             }
         });
     }
 
+    /**
+     *  server start
+     */
     public void start(){
 
         if(this.isStarted.get()){
@@ -125,6 +159,11 @@ public class NettyRemotingServer {
         isStarted.compareAndSet(false, true);
     }
 
+    /**
+     *  init netty channel
+     * @param ch socket channel
+     * @throws Exception
+     */
     private void initNettyChannel(NioSocketChannel ch) throws Exception{
         ChannelPipeline pipeline = ch.pipeline();
         pipeline.addLast("encoder", encoder);
@@ -132,14 +171,30 @@ public class NettyRemotingServer {
         pipeline.addLast("handler", serverHandler);
     }
 
+    /**
+     *  register processor
+     * @param commandType command type
+     * @param processor processor
+     */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
         this.registerProcessor(commandType, processor, null);
     }
 
+    /**
+     *  register processor
+     *
+     * @param commandType command type
+     * @param processor processor
+     * @param executor thread executor
+     */
     public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
         this.serverHandler.registerProcessor(commandType, processor, executor);
     }
 
+    /**
+     *  get default thread executor
+     * @return thread executor
+     */
     public ExecutorService getDefaultExecutor() {
         return defaultExecutor;
     }

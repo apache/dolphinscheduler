@@ -28,6 +28,9 @@ import java.io.Serializable;
  */
 public class GetLogBytesResponseCommand implements Serializable {
 
+    /**
+     *  log byte data
+     */
     private byte[] data;
 
     public GetLogBytesResponseCommand() {
@@ -45,6 +48,12 @@ public class GetLogBytesResponseCommand implements Serializable {
         this.data = data;
     }
 
+    /**
+     * package response command
+     *
+     * @param opaque request unique identification
+     * @return command
+     */
     public Command convert2Command(long opaque){
         Command command = new Command(opaque);
         command.setType(CommandType.GET_LOG_BYTES_RESPONSE);

@@ -29,12 +29,24 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class RollViewLogRequestCommand implements Serializable {
 
+    /**
+     *  request id
+     */
     private static final AtomicLong REQUEST = new AtomicLong(1);
 
+    /**
+     *  log path
+     */
     private String path;
 
+    /**
+     *  skip line number
+     */
     private int skipLineNum;
 
+    /**
+     *  query log line number limit
+     */
     private int limit;
 
     public RollViewLogRequestCommand() {
@@ -70,6 +82,11 @@ public class RollViewLogRequestCommand implements Serializable {
         this.limit = limit;
     }
 
+    /**
+     *  package request command
+     *
+     * @return command
+     */
     public Command convert2Command(){
         Command command = new Command(REQUEST.getAndIncrement());
         command.setType(CommandType.ROLL_VIEW_LOG_REQUEST);

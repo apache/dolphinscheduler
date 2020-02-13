@@ -38,6 +38,14 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
 
     private final CommandHeader commandHeader = new CommandHeader();
 
+    /**
+     * decode
+     *
+     * @param ctx channel handler context
+     * @param in byte buffer
+     * @param out out content
+     * @throws Exception
+     */
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
         switch (state()){
@@ -67,6 +75,11 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
         }
     }
 
+    /**
+     *  get command type
+     * @param type type
+     * @return
+     */
     private CommandType commandType(byte type){
         for(CommandType ct : CommandType.values()){
             if(ct.ordinal() == type){
@@ -76,6 +89,10 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
         return null;
     }
 
+    /**
+     *  check magic
+     * @param magic magic
+     */
     private void checkMagic(byte magic) {
         if (magic != Command.MAGIC) {
             throw new IllegalArgumentException("illegal packet [magic]" + magic);

@@ -23,18 +23,39 @@ import org.apache.dolphinscheduler.remote.utils.Constants;
  */
 public class NettyServerConfig {
 
+    /**
+     * init the server connectable queue
+     */
     private int soBacklog = 1024;
 
+    /**
+     *  whether tpc delay
+     */
     private boolean tcpNoDelay = true;
 
+    /**
+     *  whether keep alive
+     */
     private boolean soKeepalive = true;
 
+    /**
+     *  send buffer size
+     */
     private int sendBufferSize = 65535;
 
+    /**
+     *  receive buffer size
+     */
     private int receiveBufferSize = 65535;
 
+    /**
+     *  worker threads，default get machine cpus
+     */
     private int workerThread = Constants.CPUS;
 
+    /**
+     *  listen port
+     */
     private int listenPort = 12346;
 
     public int getListenPort() {

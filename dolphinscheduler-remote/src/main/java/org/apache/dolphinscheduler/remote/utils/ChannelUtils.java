@@ -25,14 +25,30 @@ import java.net.InetSocketAddress;
  */
 public class ChannelUtils {
 
+    /**
+     *  get local address
+     *
+     * @param channel channel
+     * @return local address
+     */
     public static String getLocalAddress(Channel channel){
         return ((InetSocketAddress)channel.localAddress()).getAddress().getHostAddress();
     }
 
+    /**
+     *  get remote address
+     * @param channel channel
+     * @return remote address
+     */
     public static String getRemoteAddress(Channel channel){
         return ((InetSocketAddress)channel.remoteAddress()).getAddress().getHostAddress();
     }
 
+    /**
+     *  channel to address
+     * @param channel channel
+     * @return address
+     */
     public static Address toAddress(Channel channel){
         InetSocketAddress socketAddress = ((InetSocketAddress)channel.remoteAddress());
         return new Address(socketAddress.getAddress().getHostAddress(), socketAddress.getPort());
