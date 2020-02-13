@@ -32,6 +32,6 @@ public class ConnectionFactoryTest {
     @Test
     public void testConnection()throws Exception{
         Connection connection = ConnectionFactory.getDataSource().getPooledConnection().getConnection();
-        Assert.assertEquals(connection != null , true);
+        Assert.assertTrue(connection != null);
     }
 }

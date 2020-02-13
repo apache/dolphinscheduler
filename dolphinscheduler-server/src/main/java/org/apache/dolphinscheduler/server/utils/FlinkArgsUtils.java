@@ -87,7 +87,7 @@ public class FlinkArgsUtils {
                 args.add(taskManagerMemory);
             }
 
-            args.add(Constants.FLINK_detach); //-d
+            args.add(Constants.FLINK_DETACH); //-d
 
         }
 

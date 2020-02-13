@@ -37,6 +37,9 @@ import java.util.*;
  */
 public class CollectionUtils {
 
+    private CollectionUtils() {
+        throw new IllegalStateException("CollectionUtils class");
+    }
     /**
      * Returns a new {@link Collection} containing <i>a</i> minus a subset of
      * <i>b</i>.  Only the elements of <i>b</i> that satisfy the predicate
@@ -140,26 +143,6 @@ public class CollectionUtils {
         }
 
         /**
-         * Returns the maximum frequency of an object.
-         *
-         * @param obj the object
-         * @return the maximum frequency of the object
-         */
-        private int max(final Object obj) {
-            return Math.max(freqA(obj), freqB(obj));
-        }
-
-        /**
-         * Returns the minimum frequency of an object.
-         *
-         * @param obj the object
-         * @return the minimum frequency of the object
-         */
-        private int min(final Object obj) {
-            return Math.min(freqA(obj), freqB(obj));
-        }
-
-        /**
          * Returns the frequency of this object in collection A.
          *
          * @param obj the object
@@ -225,7 +208,7 @@ public class CollectionUtils {
         if (a.size() != b.size()) {
             return false;
         }
-        final CardinalityHelper<Object> helper = new CardinalityHelper<Object>(a, b);
+        final CardinalityHelper<Object> helper = new CardinalityHelper<>(a, b);
         if (helper.cardinalityA.size() != helper.cardinalityB.size()) {
             return false;
         }
@@ -250,7 +233,7 @@ public class CollectionUtils {
      * @return the populated cardinality map
      */
     public static <O> Map<O, Integer> getCardinalityMap(final Iterable<? extends O> coll) {
-        final Map<O, Integer> count = new HashMap<O, Integer>();
+        final Map<O, Integer> count = new HashMap<>();
         for (final O obj : coll) {
             count.put(obj, count.getOrDefault(obj, 0) + 1);
         }
