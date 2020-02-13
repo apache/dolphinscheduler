@@ -64,11 +64,11 @@ public class LogClientService implements NettyRequestProcessor {
     }
 
     /**
-     * shutdown
+     * close
      */
-    public void shutdown()  {
+    public void close()  {
         this.client.close();
-        logger.info("logger client shutdown");
+        logger.info("logger client closed");
     }
 
     /**
