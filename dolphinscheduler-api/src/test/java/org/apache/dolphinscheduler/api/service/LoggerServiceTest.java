@@ -18,8 +18,8 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,14 +40,14 @@ public class LoggerServiceTest {
     @InjectMocks
     private LoggerService loggerService;
     @Mock
-    private ProcessDao processDao;
+    private ProcessService processService;
 
 
     @Test
     public void testQueryDataSourceList(){
 
         TaskInstance taskInstance = new TaskInstance();
-        Mockito.when(processDao.findTaskInstanceById(1)).thenReturn(taskInstance);
+        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Result result = loggerService.queryLog(2,1,1);
         //TASK_INSTANCE_NOT_FOUND
         Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(),result.getCode().intValue());
@@ -59,7 +59,7 @@ public class LoggerServiceTest {
         //SUCCESS
         taskInstance.setHost("127.0.0.1");
         taskInstance.setLogPath("/temp/log");
-        Mockito.when(processDao.findTaskInstanceById(1)).thenReturn(taskInstance);
+        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         result = loggerService.queryLog(1,1,1);
         Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
     }
@@ -68,7 +68,7 @@ public class LoggerServiceTest {
     public void testGetLogBytes(){
 
         TaskInstance taskInstance = new TaskInstance();
-        Mockito.when(processDao.findTaskInstanceById(1)).thenReturn(taskInstance);
+        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
 
         //task instance is null
         try{
