@@ -213,6 +213,7 @@ public class OSUtils {
 
       if (count == lines[i].length()) {
         startPos = i + 1;
+        break;
       }
     }
 
