@@ -32,9 +32,15 @@ import org.junit.Test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ *  netty remote client test
+ */
 public class NettyRemotingClientTest {
 
 
+    /**
+     *  test ping
+     */
     @Test
     public void testSend(){
         NettyServerConfig serverConfig = new NettyServerConfig();

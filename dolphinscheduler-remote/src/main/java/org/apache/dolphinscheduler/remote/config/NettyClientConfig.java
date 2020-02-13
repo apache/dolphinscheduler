@@ -23,14 +23,29 @@ import org.apache.dolphinscheduler.remote.utils.Constants;
  */
 public class NettyClientConfig {
 
+    /**
+     *  worker threads，default get machine cpus
+     */
     private int workerThreads = Constants.CPUS;
 
+    /**
+     *  whether tpc delay
+     */
     private boolean tcpNoDelay = true;
 
+    /**
+     * whether keep alive
+     */
     private boolean soKeepalive = true;
 
+    /**
+     *  send buffer size
+     */
     private int sendBufferSize = 65535;
 
+    /**
+     *  receive buffer size
+     */
     private int receiveBufferSize = 65535;
 
     public int getWorkerThreads() {

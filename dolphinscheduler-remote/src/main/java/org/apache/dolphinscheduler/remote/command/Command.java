@@ -36,7 +36,7 @@ public class Command implements Serializable {
     }
 
     /**
-     * comman type
+     * command type
      */
     private CommandType type;
 
@@ -45,6 +45,9 @@ public class Command implements Serializable {
      */
     private long opaque;
 
+    /**
+     *  data body
+     */
     private byte[] body;
 
     public CommandType getType() {

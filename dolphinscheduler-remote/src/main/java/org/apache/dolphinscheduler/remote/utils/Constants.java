@@ -18,14 +18,24 @@ package org.apache.dolphinscheduler.remote.utils;
 
 import java.nio.charset.Charset;
 
+
+/**
+ *  constant
+ */
 public class Constants {
 
     public static final String COMMA = ",";
 
     public static final String SLASH = "/";
 
+    /**
+     *  charset
+     */
     public static final Charset UTF8 = Charset.forName("UTF-8");
 
+    /**
+     *  cpus
+     */
     public static final int CPUS = Runtime.getRuntime().availableProcessors();
 
 }
