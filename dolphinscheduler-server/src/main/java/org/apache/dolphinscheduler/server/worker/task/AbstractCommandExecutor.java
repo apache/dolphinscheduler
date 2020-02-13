@@ -535,7 +535,7 @@ public abstract class AbstractCommandExecutor {
         /**
          * when log buffer siz or flush time reach condition , then flush
          */
-        if (logBuffer.size() >= Constants.defaultLogRowsNum  || now - lastFlushTime > Constants.defaultLogFlushInterval) {
+        if (logBuffer.size() >= Constants.DEFAULT_LOG_ROWS_NUM || now - lastFlushTime > Constants.DEFAULT_LOG_FLUSH_INTERVAL) {
             lastFlushTime = now;
             /** log handle */
             logHandler.accept(logBuffer);
