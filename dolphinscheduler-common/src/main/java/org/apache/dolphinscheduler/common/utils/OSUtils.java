@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * os utils
@@ -138,7 +139,7 @@ public class OSUtils {
       if (isMacOS()) {
         return getUserListFromMac();
       } else if (isWindows()) {
-        // do something
+        return getUserListFromWindows();
       } else {
         return getUserListFromLinux();
       }
@@ -186,6 +187,46 @@ public class OSUtils {
   }
 
   /**
+   *  get user list from windows
+   * @return user list
+   * @throws IOException
+   */
+  private static List<String> getUserListFromWindows() throws IOException {
+    String result = exeCmd("net user");
+    String[] lines = result.split("\n");
+
+    int startPos = 0;
+    int endPos = lines.length - 2;
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].isEmpty()) {
+        continue;
+      }
+
+      int count = 0;
+      if (lines[i].charAt(0) == '-') {
+        for (int j = 0; j < lines[i].length(); j++) {
+          if (lines[i].charAt(i) == '-') {
+            count++;
+          }
+        }
+      }
+
+      if (count == lines[i].length()) {
+        startPos = i + 1;
+      }
+    }
+
+    List<String> users = new ArrayList<>();
+    while (startPos <= endPos) {
+      Pattern pattern = Pattern.compile("\\s+");
+      users.addAll(Arrays.asList(pattern.split(lines[startPos])));
+      startPos++;
+    }
+
+    return users;
+  }
+
+  /**
    * create user
    * @param userName user name
    * @return true if creation was successful, otherwise false
@@ -200,7 +241,7 @@ public class OSUtils {
       if (isMacOS()) {
         createMacUser(userName, userGroup);
       } else if (isWindows()) {
-        // do something
+        createWindowsUser(userName, userGroup);
       } else {
         createLinuxUser(userName, userGroup);
       }
@@ -244,15 +285,45 @@ public class OSUtils {
   }
 
   /**
+   * create windows user
+   * @param userName user name
+   * @param userGroup user group
+   * @throws IOException in case of an I/O error
+   */
+  private static void createWindowsUser(String userName, String userGroup) throws IOException {
+    logger.info("create windows os user : {}", userName);
+    String userCreateCmd = String.format("net user \"%s\" /add", userName);
+    String appendGroupCmd = String.format("net localgroup \"%s\" \"%s\" /add", userGroup, userName);
+
+    logger.info("execute create user command : {}", userCreateCmd);
+    OSUtils.exeCmd(userCreateCmd);
+
+    logger.info("execute append user to group : {}", appendGroupCmd);
+    OSUtils.exeCmd(appendGroupCmd);
+  }
+
+  /**
    * get system group information
    * @return system group info
    * @throws IOException errors
    */
   public static String getGroup() throws IOException {
-    String result = exeCmd("groups");
-    if (StringUtils.isNotEmpty(result)) {
-      String[] groupInfo = result.split(" ");
-      return groupInfo[0];
+    if (isWindows()) {
+      String currentProcUserName = System.getProperty("user.name");
+      String result = exeCmd(String.format("net user \"%s\"", currentProcUserName));
+      String line = result.split("\n")[22];
+      String group = Pattern.compile("\\s+").split(line)[1];
+      if (group.charAt(0) == '*') {
+        return group.substring(1);
+      } else {
+        return group;
+      }
+    } else {
+      String result = exeCmd("groups");
+      if (StringUtils.isNotEmpty(result)) {
+        String[] groupInfo = result.split(" ");
+        return groupInfo[0];
+      }
     }
 
     return null;
