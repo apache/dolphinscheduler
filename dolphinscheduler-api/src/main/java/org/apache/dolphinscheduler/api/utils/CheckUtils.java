@@ -35,7 +35,9 @@ import java.util.regex.Pattern;
  */
 public class CheckUtils {
 
-
+  private CheckUtils() {
+    throw new IllegalStateException("CheckUtils class");
+  }
   /**
    * check username
    *
