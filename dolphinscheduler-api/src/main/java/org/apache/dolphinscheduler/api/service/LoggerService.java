@@ -64,11 +64,17 @@ public class LoggerService {
     Result result = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
 
     logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
-
-    LogClientService logClient = new LogClientService(host, Constants.RPC_PORT);
-    String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
-    result.setData(log);
-    logger.info(log);
+    LogClientService logClient = null;
+    try {
+      logClient = new LogClientService(host, Constants.RPC_PORT);
+      String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
+      result.setData(log);
+      logger.info(log);
+    } finally {
+      if(logClient != null){
+        logClient.close();
+      }
+    }
 
     return result;
   }
@@ -86,7 +92,14 @@ public class LoggerService {
     }
 
     String host = taskInstance.getHost();
-    LogClientService logClient = new LogClientService(host, Constants.RPC_PORT);
-    return logClient.getLogBytes(taskInstance.getLogPath());
+    LogClientService logClient = null;
+    try {
+      logClient = new LogClientService(host, Constants.RPC_PORT);
+      return logClient.getLogBytes(taskInstance.getLogPath());
+    } finally {
+      if(logClient != null){
+        logClient.close();
+      }
+    }
   }
 }
