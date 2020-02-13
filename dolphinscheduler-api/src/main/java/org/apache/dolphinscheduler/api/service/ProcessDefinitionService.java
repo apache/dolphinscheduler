@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.utils.DagHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -948,10 +949,15 @@ public class ProcessDefinitionService extends BaseDAGService {
             return result;
         }
 
-
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
-
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
+
+        //process data check
+        if (null == processData) {
+            logger.error("process data is null");
+            putMsg(result,Status.DATA_IS_NOT_VALID, processDefinitionJson);
+            return result;
+        }
 
         List<TaskNode> taskNodeList = (processData.getTasks() == null) ? new ArrayList<>() : processData.getTasks();
 
@@ -974,14 +980,13 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         Map<Integer, List<TaskNode>> taskNodeMap = new HashMap<>();
         String[] idList = defineIdList.split(",");
-        List<String> definitionIdList = Arrays.asList(idList);
         List<Integer> idIntList = new ArrayList<>();
-        for(String definitionId : definitionIdList) {
+        for(String definitionId : idList) {
             idIntList.add(Integer.parseInt(definitionId));
         }
         Integer[] idArray = idIntList.toArray(new Integer[idIntList.size()]);
         List<ProcessDefinition> processDefinitionList = processDefineMapper.queryDefinitionListByIdList(idArray);
-        if (processDefinitionList == null || processDefinitionList.size() ==0) {
+        if (CollectionUtils.isEmpty(processDefinitionList)) {
             logger.info("process definition not exists");
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, defineIdList);
             return result;
@@ -1031,9 +1036,10 @@ public class ProcessDefinitionService extends BaseDAGService {
         Map<String, Object> result = new HashMap<>();
 
         ProcessDefinition processDefinition = processDefineMapper.selectById(processId);
-        if (processDefinition == null) {
+        if (null == processDefinition) {
             logger.info("process define not exists");
-            throw new RuntimeException("process define not exists");
+            putMsg(result,Status.PROCESS_DEFINE_NOT_EXIST, processDefinition);
+            return result;
         }
         DAG<String, TaskNode, TaskNodeRelation> dag = genDagGraph(processDefinition);
         /**
@@ -1121,10 +1127,10 @@ public class ProcessDefinitionService extends BaseDAGService {
                     pTreeViewDto.getChildren().add(treeViewDto);
                 }
                 postNodeList = dag.getSubsequentNodes(nodeName);
-                if (postNodeList != null && postNodeList.size() > 0) {
+                if (CollectionUtils.isNotEmpty(postNodeList)) {
                     for (String nextNodeName : postNodeList) {
                         List<TreeViewDto> treeViewDtoList = waitingRunningNodeMap.get(nextNodeName);
-                        if (treeViewDtoList != null && treeViewDtoList.size() > 0) {
+                        if (CollectionUtils.isNotEmpty(treeViewDtoList)) {
                             treeViewDtoList.add(treeViewDto);
                             waitingRunningNodeMap.put(nextNodeName, treeViewDtoList);
                         } else {
@@ -1136,7 +1142,6 @@ public class ProcessDefinitionService extends BaseDAGService {
                 }
                 runningNodeMap.remove(nodeName);
             }
-
             if (waitingRunningNodeMap == null || waitingRunningNodeMap.size() == 0) {
                 break;
             } else {
@@ -1161,68 +1166,22 @@ public class ProcessDefinitionService extends BaseDAGService {
     private DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) throws Exception {
 
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
-
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
-        List<TaskNode> taskNodeList = processData.getTasks();
+        //check process data
+        if (null != processData) {
+            List<TaskNode> taskNodeList = processData.getTasks();
+            processDefinition.setGlobalParamList(processData.getGlobalParams());
+            ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
 
-        processDefinition.setGlobalParamList(processData.getGlobalParams());
-
-
-        List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
-
-        // Traverse node information and build relationships
-        for (TaskNode taskNode : taskNodeList) {
-            String preTasks = taskNode.getPreTasks();
-            List<String> preTasksList = JSONUtils.toList(preTasks, String.class);
-
-            // If the dependency is not empty
-            if (preTasksList != null) {
-                for (String depNode : preTasksList) {
-                    taskNodeRelations.add(new TaskNodeRelation(depNode, taskNode.getName()));
-                }
-            }
+            // Generate concrete Dag to be executed
+            return DagHelper.buildDagGraph(processDag);
         }
 
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(taskNodeList);
-
-
-        // Generate concrete Dag to be executed
-        return genDagGraph(processDag);
-
-
+        return new DAG<>();
     }
 
-    /**
-     * Generate the DAG of process
-     *
-     * @return DAG
-     */
-    private DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDag processDag) {
-        DAG<String, TaskNode, TaskNodeRelation> dag = new DAG<>();
 
-        /**
-         * Add the ndoes
-         */
-        if (CollectionUtils.isNotEmpty(processDag.getNodes())) {
-            for (TaskNode node : processDag.getNodes()) {
-                dag.addNode(node.getName(), node);
-            }
-        }
-
-        /**
-         * Add the edges
-         */
-        if (CollectionUtils.isNotEmpty(processDag.getEdges())) {
-            for (TaskNodeRelation edge : processDag.getEdges()) {
-                dag.addEdge(edge.getStartNode(), edge.getEndNode());
-            }
-        }
-
-        return dag;
-    }
 
 
     /**
