@@ -375,9 +375,16 @@ public class ProcessUtils {
   public static void killYarnJob(TaskInstance taskInstance) {
     try {
       Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-      LogClientService logClient = new LogClientService(taskInstance.getHost(), Constants.RPC_PORT);
-
-      String log = logClient.viewLog(taskInstance.getLogPath());
+      LogClientService logClient = null;
+      String log = null;
+      try {
+        logClient = new LogClientService(taskInstance.getHost(), Constants.RPC_PORT);
+        log = logClient.viewLog(taskInstance.getLogPath());
+      } finally {
+        if(logClient != null){
+          logClient.close();
+        }
+      }
       if (StringUtils.isNotEmpty(log)) {
         List<String> appIds = LoggerUtils.getAppIds(log, logger);
         String workerDir = taskInstance.getExecutePath();
