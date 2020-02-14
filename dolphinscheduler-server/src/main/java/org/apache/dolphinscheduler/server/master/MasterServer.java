@@ -22,14 +22,14 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
-import org.apache.dolphinscheduler.dao.quartz.ProcessScheduleJob;
-import org.apache.dolphinscheduler.dao.quartz.QuartzExecutors;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
+import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,10 +66,10 @@ public class MasterServer implements IStoppable {
     private ScheduledExecutorService heartbeatMasterService;
 
     /**
-     *  dolphinscheduler database interface
+     *  process service
      */
     @Autowired
-    protected ProcessDao processDao;
+    protected ProcessService processService;
 
     /**
      *  master exec thread pool
@@ -77,17 +77,18 @@ public class MasterServer implements IStoppable {
     private ExecutorService masterSchedulerService;
 
     /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
+
+
+    /**
      *  spring application context
      *  only use it for initialization
      */
     @Autowired
     private SpringApplicationContext springApplicationContext;
-
-    /**
-     * master config
-     */
-    @Autowired
-    private MasterConfig masterConfig;
 
 
     /**
@@ -126,7 +127,7 @@ public class MasterServer implements IStoppable {
         // master scheduler thread
         MasterSchedulerThread masterSchedulerThread = new MasterSchedulerThread(
                 zkMasterClient,
-                processDao,
+                processService,
                 masterConfig.getMasterExecThreads());
 
         // submit master scheduler thread
@@ -136,7 +137,7 @@ public class MasterServer implements IStoppable {
         // what system should do if exception
         try {
             logger.info("start Quartz server...");
-            ProcessScheduleJob.init(processDao);
+            ProcessScheduleJob.init(processService);
             QuartzExecutors.getInstance().start();
         } catch (Exception e) {
             try {

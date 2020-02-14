@@ -24,13 +24,13 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.queue.ITaskQueue;
-import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.ITaskQueue;
+import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +69,7 @@ public class DataAnalysisService extends BaseService{
     TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
-    ProcessDao processDao;
+    ProcessService processService;
 
     /**
      * statistical task instance status data
@@ -296,7 +296,7 @@ public class DataAnalysisService extends BaseService{
         if(projectId !=0){
             projectIds.add(projectId);
         }else if(loginUser.getUserType() == UserType.GENERAL_USER){
-            projectIds = processDao.getProjectIdListHavePerm(loginUser.getId());
+            projectIds = processService.getProjectIdListHavePerm(loginUser.getId());
             if(projectIds.size() ==0 ){
                 projectIds.add(0);
             }
