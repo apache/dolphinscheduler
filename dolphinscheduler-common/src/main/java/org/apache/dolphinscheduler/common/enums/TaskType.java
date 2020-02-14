@@ -60,7 +60,10 @@ public enum TaskType {
         TaskType taskType = TaskType.valueOf(typeName);
         return !(taskType == TaskType.SUB_PROCESS || taskType == TaskType.DEPENDENT);
     }
-
+    public static boolean typeIsYarnTask(String typeName){
+        TaskType taskType = TaskType.valueOf(typeName);
+        return TaskType.MR == taskType || TaskType.SPARK == taskType || TaskType.FLINK == taskType;
+    }
     public int getCode() {
         return code;
     }

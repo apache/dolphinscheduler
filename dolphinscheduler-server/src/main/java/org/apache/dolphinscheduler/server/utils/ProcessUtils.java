@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -334,8 +335,10 @@ public class ProcessUtils {
 
       OSUtils.exeCmd(cmd);
 
-      // find log and kill yarn job
-      killYarnJob(taskInstance);
+      if(TaskType.typeIsYarnTask(taskInstance.getTaskType())){
+        // find log and kill yarn job
+        killYarnJob(taskInstance);
+      }
 
     } catch (Exception e) {
       logger.error("kill task failed", e);
