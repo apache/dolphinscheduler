@@ -16,13 +16,10 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.log.*;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Address;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.slf4j.Logger;
@@ -32,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * log client
  */
-public class LogClientService implements NettyRequestProcessor {
+public class LogClientService {
 
     private static final Logger logger = LoggerFactory.getLogger(LogClientService.class);
 
@@ -52,9 +49,6 @@ public class LogClientService implements NettyRequestProcessor {
         this.clientConfig = new NettyClientConfig();
         this.clientConfig.setWorkerThreads(4);
         this.client = new NettyRemotingClient(clientConfig);
-        this.client.registerProcessor(CommandType.ROLL_VIEW_LOG_RESPONSE,this);
-        this.client.registerProcessor(CommandType.VIEW_WHOLE_LOG_RESPONSE, this);
-        this.client.registerProcessor(CommandType.GET_LOG_BYTES_RESPONSE, this);
     }
 
     /**
@@ -81,9 +75,12 @@ public class LogClientService implements NettyRequestProcessor {
         final Address address = new Address(host, port);
         try {
             Command command = request.convert2Command();
-            this.client.send(address, command);
-            LogPromise promise = new LogPromise(command.getOpaque(), logRequestTimeout);
-            result = ((String)promise.getResult());
+            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            if(response != null){
+                RollViewLogResponseCommand rollReviewLog = FastJsonSerializer.deserialize(
+                        command.getBody(), RollViewLogResponseCommand.class);
+                return rollReviewLog.getMsg();
+            }
         } catch (Exception e) {
             logger.error("roll view log error", e);
         } finally {
@@ -106,9 +103,12 @@ public class LogClientService implements NettyRequestProcessor {
         final Address address = new Address(host, port);
         try {
             Command command = request.convert2Command();
-            this.client.send(address, command);
-            LogPromise promise = new LogPromise(command.getOpaque(), logRequestTimeout);
-            result = ((String)promise.getResult());
+            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            if(response != null){
+                ViewLogResponseCommand viewLog = FastJsonSerializer.deserialize(
+                        response.getBody(), ViewLogResponseCommand.class);
+                return viewLog.getMsg();
+            }
         } catch (Exception e) {
             logger.error("view log error", e);
         } finally {
@@ -131,38 +131,17 @@ public class LogClientService implements NettyRequestProcessor {
         final Address address = new Address(host, port);
         try {
             Command command = request.convert2Command();
-            this.client.send(address, command);
-            LogPromise promise = new LogPromise(command.getOpaque(), logRequestTimeout);
-            result = (byte[])promise.getResult();
+            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            if(response != null){
+                GetLogBytesResponseCommand getLog = FastJsonSerializer.deserialize(
+                        response.getBody(), GetLogBytesResponseCommand.class);
+                return getLog.getData();
+            }
         } catch (Exception e) {
             logger.error("get log size error", e);
         } finally {
             this.client.closeChannel(address);
         }
         return result;
-    }
-
-    @Override
-    public void process(Channel channel, Command command) {
-        logger.info("received log response : {}", command);
-        switch (command.getType()){
-            case ROLL_VIEW_LOG_RESPONSE:
-                RollViewLogResponseCommand rollReviewLog = FastJsonSerializer.deserialize(
-                        command.getBody(), RollViewLogResponseCommand.class);
-                LogPromise.notify(command.getOpaque(), rollReviewLog.getMsg());
-                break;
-            case VIEW_WHOLE_LOG_RESPONSE:
-                ViewLogResponseCommand viewLog = FastJsonSerializer.deserialize(
-                        command.getBody(), ViewLogResponseCommand.class);
-                LogPromise.notify(command.getOpaque(), viewLog.getMsg());
-                break;
-            case GET_LOG_BYTES_RESPONSE:
-                GetLogBytesResponseCommand getLog = FastJsonSerializer.deserialize(
-                        command.getBody(), GetLogBytesResponseCommand.class);
-                LogPromise.notify(command.getOpaque(), getLog.getData());
-                break;
-            default:
-                throw new UnsupportedOperationException(String.format("command type : %s is not supported ", command.getType()));
-        }
     }
 }
