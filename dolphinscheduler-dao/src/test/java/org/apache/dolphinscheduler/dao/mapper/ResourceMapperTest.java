@@ -289,7 +289,7 @@ public class ResourceMapperTest {
         resourceMapper.updateById(resource);
 
         String resource1 = resourceMapper.queryTenantCodeByResourceName(
-                resource.getAlias()
+                resource.getAlias(),ResourceType.FILE.ordinal()
         );
 
 
