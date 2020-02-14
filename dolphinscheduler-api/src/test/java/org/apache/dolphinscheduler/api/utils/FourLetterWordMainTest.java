@@ -92,8 +92,6 @@ public class FourLetterWordMainTest {
      * Mode: standalone
      * Node count: 263
      */
-    @Ignore
-    @Test
     public void testCmd() {
         // "192.168.64.11"
         // final String zkHost = localHost;
