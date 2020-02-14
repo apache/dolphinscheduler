@@ -682,6 +682,7 @@
                         <include>**/common/queue/*.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/FileUtilsTest.java</include>
+                        <include>**/api/utils/FourLetterWordTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/enums/*.java</include>
@@ -701,7 +702,7 @@
                         <include>**/api/service/BaseServiceTest.java</include>
                         <include>**/api/service/BaseDAGServiceTest.java</include>
                         <include>**/api/service/LoggerServiceTest.java</include>
-                        <include>**/api/utils/FourLetterWordTest.java</include>
+                        <include>**/api/service/DataAnalysisServiceTest.java</include>
                         <include>**/alert/utils/ExcelUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
