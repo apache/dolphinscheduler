@@ -25,17 +25,19 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingTimeoutException;
+import org.apache.dolphinscheduler.remote.future.InvokeCallback;
+import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.handler.NettyClientHandler;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Address;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.rmi.RemoteException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -101,15 +103,8 @@ public class NettyRemotingClient {
         isStarted.compareAndSet(false, true);
     }
 
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
-        registerProcessor(commandType, processor, null);
-    }
-
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
-        this.clientHandler.registerProcessor(commandType, processor, executor);
-    }
-
-    public void send(final Address address, final Command command) throws RemotingException {
+    //TODO
+    public void send(final Address address, final Command command, final InvokeCallback invokeCallback) throws RemotingException {
         final Channel channel = getChannel(address);
         if (channel == null) {
             throw new RemotingException("network error");
@@ -132,17 +127,39 @@ public class NettyRemotingClient {
         }
     }
 
-    //TODO
-    public void sendSync(final Address address, final Command command, final long timeoutMillis) throws RemotingException {
+    public Command sendSync(final Address address, final Command command, final long timeoutMillis) throws RemotingException {
         final Channel channel = getChannel(address);
         if (channel == null) {
-            throw new RemotingException("network error");
+            throw new RemotingException(String.format("connect to : %s fail", address));
         }
         final long opaque = command.getOpaque();
         try {
-
+            final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null);
+            channel.writeAndFlush(command).addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                    if(channelFuture.isSuccess()){
+                        responseFuture.setSendOk(true);
+                        return;
+                    } else{
+                        responseFuture.setSendOk(false);
+                        responseFuture.setCause(channelFuture.cause());
+                        responseFuture.putResponse(null);
+                        logger.error("send command {} to address {} failed", command, address);
+                    }
+                }
+            });
+            Command result = responseFuture.waitResponse();
+            if(result == null){
+                if(responseFuture.isSendOK()){
+                    throw new RemotingTimeoutException(address.toString(), timeoutMillis, responseFuture.getCause());
+                } else{
+                    throw new RemoteException(address.toString(), responseFuture.getCause());
+                }
+            }
+            return result;
         } catch (Exception ex) {
-            String msg = String.format("send command %s to address %s encounter error", command, address);
+            String msg = String.format("send command %s to address %s error", command, address);
             throw new RemotingException(msg, ex);
         }
     }

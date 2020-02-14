@@ -16,7 +16,10 @@
  */
 package org.apache.dolphinscheduler.remote.command;
 
+import com.sun.org.apache.regexp.internal.RE;
+
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *  receive task log request command and content fill
@@ -24,11 +27,12 @@ import java.io.Serializable;
  */
 public class Command implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final AtomicLong REQUEST_ID = new AtomicLong(1);
 
     public static final byte MAGIC = (byte) 0xbabe;
 
     public Command(){
+        this.opaque = REQUEST_ID.getAndIncrement();
     }
 
     public Command(long opaque){
