@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -34,11 +33,12 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.utils.cron.CronUtils;
-import org.apache.dolphinscheduler.dao.quartz.ProcessScheduleJob;
-import org.apache.dolphinscheduler.dao.quartz.QuartzExecutors;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
+import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
+import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +68,7 @@ public class SchedulerService extends BaseService {
     private MonitorService monitorService;
 
     @Autowired
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     @Autowired
     private ScheduleMapper scheduleMapper;
@@ -119,7 +119,7 @@ public class SchedulerService extends BaseService {
         }
 
         // check work flow define release state
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(processDefineId);
+        ProcessDefinition processDefinition = processService.findProcessDefineById(processDefineId);
         result = executorService.checkProcessDefinitionValid(processDefinition, processDefineId);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
@@ -221,7 +221,7 @@ public class SchedulerService extends BaseService {
             return result;
         }
 
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(schedule.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processService.findProcessDefineById(schedule.getProcessDefinitionId());
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, schedule.getProcessDefinitionId());
             return result;
@@ -321,7 +321,7 @@ public class SchedulerService extends BaseService {
             putMsg(result, Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, scheduleStatus);
             return result;
         }
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(scheduleObj.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processService.findProcessDefineById(scheduleObj.getProcessDefinitionId());
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, scheduleObj.getProcessDefinitionId());
             return result;
@@ -338,7 +338,7 @@ public class SchedulerService extends BaseService {
             }
             // check sub process definition release state
             List<Integer> subProcessDefineIds = new ArrayList<>();
-            processDao.recurseFindSubProcessId(scheduleObj.getProcessDefinitionId(), subProcessDefineIds);
+            processService.recurseFindSubProcessId(scheduleObj.getProcessDefinitionId(), subProcessDefineIds);
             Integer[] idArray = subProcessDefineIds.toArray(new Integer[subProcessDefineIds.size()]);
             if (subProcessDefineIds.size() > 0){
                 List<ProcessDefinition> subProcessDefinitionList =
@@ -423,7 +423,7 @@ public class SchedulerService extends BaseService {
             return result;
         }
 
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(processDefineId);
+        ProcessDefinition processDefinition = processService.findProcessDefineById(processDefineId);
         if (processDefinition == null) {
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processDefineId);
             return result;
@@ -472,7 +472,7 @@ public class SchedulerService extends BaseService {
         logger.info("set schedule, project id: {}, scheduleId: {}", projectId, scheduleId);
 
 
-        Schedule schedule = processDao.querySchedule(scheduleId);
+        Schedule schedule = processService.querySchedule(scheduleId);
         if (schedule == null) {
             logger.warn("process schedule info not exists");
             return;

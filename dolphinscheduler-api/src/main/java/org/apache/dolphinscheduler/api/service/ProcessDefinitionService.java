@@ -43,10 +43,10 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +95,7 @@ public class ProcessDefinitionService extends BaseDAGService {
     private ScheduleMapper scheduleMapper;
 
     @Autowired
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     @Autowired
     private WorkerGroupMapper workerGroupMapper;
@@ -284,7 +284,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         if ((checkProcessJson.get(Constants.STATUS) != Status.SUCCESS)) {
             return checkProcessJson;
         }
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(id);
+        ProcessDefinition processDefinition = processService.findProcessDefineById(id);
         if (processDefinition == null) {
             // check process definition exists
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, id);
@@ -297,7 +297,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             putMsg(result, Status.SUCCESS);
         }
 
-        ProcessDefinition processDefine = processDao.findProcessDefineById(id);
+        ProcessDefinition processDefine = processService.findProcessDefineById(id);
         Date now = new Date();
 
         processDefine.setId(id);
@@ -466,7 +466,7 @@ public class ProcessDefinitionService extends BaseDAGService {
                 );
 
                 for(Schedule schedule:scheduleList){
-                    logger.info("set schedule offline, schedule id: {}, process definition id: {}", project.getId(), schedule.getId(), id);
+                    logger.info("set schedule offline, project id: {}, schedule id: {}, process definition id: {}", project.getId(), schedule.getId(), id);
                     // set status
                     schedule.setReleaseState(ReleaseState.OFFLINE);
                     scheduleMapper.updateById(schedule);
@@ -1187,8 +1187,8 @@ public class ProcessDefinitionService extends BaseDAGService {
     /**
      * whether the graph has a ring
      *
-     * @param taskNodeResponseList
-     * @return
+     * @param taskNodeResponseList task node response list
+     * @return if graph has cycle flag
      */
     private boolean graphHasCycle(List<TaskNode> taskNodeResponseList) {
         DAG<String, TaskNode, String> graph = new DAG<>();
