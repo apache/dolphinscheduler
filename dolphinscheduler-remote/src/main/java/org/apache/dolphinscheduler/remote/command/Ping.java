@@ -26,8 +26,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class Ping implements Serializable {
 
-    private static final AtomicLong ID = new AtomicLong(1);
-
     protected static ByteBuf EMPTY_BODY = Unpooled.EMPTY_BUFFER;
 
     private static byte[] EMPTY_BODY_ARRAY = new byte[0];
@@ -49,7 +47,7 @@ public class Ping implements Serializable {
     }
 
     public static Command create(){
-        Command command = new Command(ID.getAndIncrement());
+        Command command = new Command();
         command.setType(CommandType.PING);
         command.setBody(EMPTY_BODY_ARRAY);
         return command;
