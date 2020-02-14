@@ -81,7 +81,7 @@ public class FourLetterWordMainTest {
 
     /**
      * None mock test method, just to check zookeeper status.
-     * Comment @Before and @Ignore notation to use it.
+     * Comment @Before notation to run this test.
      * Zookeeper status will be as:
      * Zookeeper version: 3.4.11 ...
      * Received: 6739707
