@@ -30,12 +30,12 @@ public interface ResourceMapper extends BaseMapper<Resource> {
 
     /**
      * query resource list
-     * @param alias alias
+     * @param fullName full name
      * @param userId userId
      * @param type type
      * @return resource list
      */
-    List<Resource> queryResourceList(@Param("alias") String alias,
+    List<Resource> queryResourceList(@Param("fullName") String fullName,
                                      @Param("userId") int userId,
                                      @Param("type") int type);
 

@@ -67,6 +67,50 @@ public class ResourcesController extends BaseController{
      * @param alias alias
      * @param description description
      * @param type type
+     * @return create result code
+     */
+
+    /**
+     *
+     * @param loginUser     login user
+     * @param type          type
+     * @param alias         alias
+     * @param description   description
+     * @param pid           parent id
+     * @param currentDir    current directory
+     * @return
+     */
+    @ApiOperation(value = "createDirctory", notes= "CREATE_RESOURCE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
+            @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType ="String"),
+            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC",  dataType ="String"),
+            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
+    })
+    @PostMapping(value = "/directory/create")
+    public Result createDirectory(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                 @RequestParam(value = "type") ResourceType type,
+                                 @RequestParam(value ="name") String alias,
+                                 @RequestParam(value = "description", required = false) String description,
+                                 @RequestParam(value ="pid") int pid,
+                                 @RequestParam(value ="currentDir") String currentDir) {
+        try {
+            logger.info("login user {}, create resource, type: {}, resource alias: {}, desc: {}, file: {},{}",
+                    loginUser.getUserName(),type, alias, description,pid,currentDir);
+            return resourceService.createDirectory(loginUser,alias, description,type ,pid,currentDir);
+        } catch (Exception e) {
+            logger.error(CREATE_RESOURCE_ERROR.getMsg(),e);
+            return error(CREATE_RESOURCE_ERROR.getCode(), CREATE_RESOURCE_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * create resource
+     *
+     * @param loginUser login user
+     * @param alias alias
+     * @param description description
+     * @param type type
      * @param file file
      * @return create result code
      */
@@ -80,13 +124,16 @@ public class ResourcesController extends BaseController{
     @PostMapping(value = "/create")
     public Result createResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "type") ResourceType type,
-                                 @RequestParam(value ="name")String alias,
+                                 @RequestParam(value ="name") String alias,
                                  @RequestParam(value = "description", required = false) String description,
-                                 @RequestParam("file") MultipartFile file) {
+                                 @RequestParam("file") MultipartFile file,
+                                 @RequestParam(value ="pid") int pid,
+                                 @RequestParam(value ="currentDir") String currentDir,
+                                 @RequestParam(value ="isDirecoty") boolean isDirecoty) {
         try {
             logger.info("login user {}, create resource, type: {}, resource alias: {}, desc: {}, file: {},{}",
                     loginUser.getUserName(),type, alias, description, file.getName(), file.getOriginalFilename());
-            return resourceService.createResource(loginUser,alias, description,type ,file);
+            return resourceService.createResource(loginUser,alias, description,type ,file,pid,currentDir,isDirecoty);
         } catch (Exception e) {
             logger.error(CREATE_RESOURCE_ERROR.getMsg(),e);
             return error(CREATE_RESOURCE_ERROR.getCode(), CREATE_RESOURCE_ERROR.getMsg());
@@ -310,16 +357,18 @@ public class ResourcesController extends BaseController{
                                        @RequestParam(value ="fileName")String fileName,
                                        @RequestParam(value ="suffix")String fileSuffix,
                                        @RequestParam(value = "description", required = false) String description,
-                                       @RequestParam(value = "content") String content
+                                       @RequestParam(value = "content") String content,
+                                       @RequestParam(value ="pid") int pid,
+                                       @RequestParam(value ="currentDirectory") String currentDirectory
     ) {
         try{
             logger.info("login user {}, online create resource! fileName : {}, type : {}, suffix : {},desc : {},content : {}",
-                    loginUser.getUserName(),fileName,type,fileSuffix,description,content);
+                    loginUser.getUserName(),fileName,type,fileSuffix,description,content,pid,currentDirectory);
             if(StringUtils.isEmpty(content)){
                 logger.error("resource file contents are not allowed to be empty");
                 return error(Status.RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
             }
-            return resourceService.onlineCreateResource(loginUser,type,fileName,fileSuffix,description,content);
+            return resourceService.onlineCreateResource(loginUser,type,fileName,fileSuffix,description,content,pid,currentDirectory);
         }catch (Exception e){
             logger.error(CREATE_RESOURCE_FILE_ON_LINE_ERROR.getMsg(),e);
             return error(Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR.getCode(), Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR.getMsg());

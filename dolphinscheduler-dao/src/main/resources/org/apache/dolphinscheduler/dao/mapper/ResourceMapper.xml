@@ -22,8 +22,8 @@
         select *
         from t_ds_resources
         where 1= 1
-        <if test="alias != null and alias != ''">
-            and alias = #{alias}
+        <if test="fullName != null and fullName != ''">
+            and full_name = #{fullName}
         </if>
         <if test="type != -1">
             and type = #{type}
