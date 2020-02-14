@@ -80,7 +80,6 @@ public class LoggerService {
     String log = logClient.rollViewLog(host, Constants.RPC_PORT, taskInstance.getLogPath(),skipLineNum,limit);
     result.setData(log);
     logger.info(log);
-
     return result;
   }
 
