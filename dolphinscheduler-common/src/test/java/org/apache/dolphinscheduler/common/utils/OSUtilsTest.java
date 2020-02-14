@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.yetus.audience.InterfaceAudience;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;

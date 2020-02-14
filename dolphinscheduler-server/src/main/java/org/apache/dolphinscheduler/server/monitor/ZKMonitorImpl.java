@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.monitor;
 
-import org.apache.dolphinscheduler.common.zk.ZookeeperOperator;
+import org.apache.dolphinscheduler.service.zk.ZookeeperOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

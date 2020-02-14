@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,5 +92,4 @@ public class FourLetterWordMain {
             throw new IOException("Exception while executing four letter word: " + cmd, e);
         }
     }
-
 }
