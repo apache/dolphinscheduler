@@ -1558,10 +1558,11 @@ public class ProcessDao {
     /**
      * find tenant code by resource name
      * @param resName resource name
+     * @param resourceType resource type
      * @return tenant code
      */
-    public String queryTenantCodeByResName(String resName){
-        return resourceMapper.queryTenantCodeByResourceName(resName);
+    public String queryTenantCodeByResName(String resName,ResourceType resourceType){
+        return resourceMapper.queryTenantCodeByResourceName(resName,resourceType.ordinal());
     }
 
     /**
@@ -1796,6 +1797,10 @@ public class ProcessDao {
                 case RESOURCE_FILE:
                     Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(t -> t.getAlias()).collect(toSet());
                     originResSet.removeAll(authorizedResources);
+                    break;
+                case UDF_FILE:
+                    Set<Integer> authorizedUdfFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedUdfFiles);
                     break;
                 case DATASOURCE:
                     Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId,needChecks).stream().map(t -> t.getId()).collect(toSet());

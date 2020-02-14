@@ -76,13 +76,13 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      */
     List<Resource> queryResourceExceptUserId(@Param("userId") int userId);
 
-
     /**
      * query tenant code by name
      * @param resName resource name
+     * @param resType resource type
      * @return tenant code
      */
-    String queryTenantCodeByResourceName(@Param("resName") String resName);
+    String queryTenantCodeByResourceName(@Param("resName") String resName,@Param("resType") int resType);
 
     /**
      * list authorized resource
@@ -91,4 +91,12 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      * @return resource list
      */
     <T> List<Resource> listAuthorizedResource(@Param("userId") int userId,@Param("resNames")T[] resNames);
+
+    /**
+     * list authorized resource
+     * @param userId userId
+     * @param resIds resource ids
+     * @return resource list
+     */
+    <T> List<Resource> listAuthorizedResourceById(@Param("userId") int userId,@Param("resIds")T[] resIds);
 }
