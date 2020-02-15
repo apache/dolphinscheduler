@@ -20,12 +20,11 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessData;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.utils.DagHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,41 +47,8 @@ public class BaseDAGService extends BaseService{
 
         List<TaskNode> taskNodeList = processData.getTasks();
 
-        List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
+        ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
 
-        //Traversing node information and building relationships
-        for (TaskNode taskNode : taskNodeList) {
-            String preTasks = taskNode.getPreTasks();
-            List<String> preTasksList = JSONUtils.toList(preTasks, String.class);
-
-            //if previous tasks not empty
-            if (preTasksList != null) {
-                for (String depNode : preTasksList) {
-                    taskNodeRelations.add(new TaskNodeRelation(depNode, taskNode.getName()));
-                }
-            }
-        }
-
-        ProcessDag processDag = new ProcessDag();
-        processDag.setEdges(taskNodeRelations);
-        processDag.setNodes(taskNodeList);
-
-
-        // generate detail Dag, to be executed
-        DAG<String, TaskNode, TaskNodeRelation> dag = new DAG<>();
-
-        if (CollectionUtils.isNotEmpty(processDag.getNodes())) {
-            for (TaskNode node : processDag.getNodes()) {
-                dag.addNode(node.getName(), node);
-            }
-        }
-
-        if (CollectionUtils.isNotEmpty(processDag.getEdges())) {
-            for (TaskNodeRelation edge : processDag.getEdges()) {
-                dag.addEdge(edge.getStartNode(), edge.getEndNode());
-            }
-        }
-
-        return dag;
+        return DagHelper.buildDagGraph(processDag);
     }
 }
