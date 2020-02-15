@@ -91,6 +91,7 @@
         <m-resources
                 ref="refResources"
                 @on-resourcesData="_onResourcesData"
+                @on-cache-resourcesData="_onCacheResourcesData"
                 :resource-list="resourceList">
         </m-resources>
       </div>
@@ -127,6 +128,8 @@
         mainJarList: [],
         // Resource(list)
         resourceList: [],
+        // Cache ResourceList
+        cacheResourceList: [],
         // Custom parameter
         localParams: [],
         // Command line argument
@@ -155,6 +158,12 @@
        */
       _onResourcesData (a) {
         this.resourceList = a
+      },
+      /**
+       * cache resourceList
+       */
+      _onCacheResourcesData (a) {
+        this.cacheResourceList = a
       },
       /**
        * verification
@@ -220,6 +229,25 @@
         if (type === 'PYTHON') {
           this.mainClass = ''
         }
+      },
+      //Watch the cacheParams
+      cacheParams (val) {
+        this.$emit('on-cache-params', val);
+      }
+    },
+    computed: {
+      cacheParams () {
+        return {
+          mainClass: this.mainClass,
+          mainJar: {
+            res: this.mainJar
+          },
+          resourceList: this.cacheResourceList,
+          localParams: this.localParams,
+          mainArgs: this.mainArgs,
+          others: this.others,
+          programType: this.programType
+        }
       }
     },
     created () {
@@ -238,6 +266,7 @@
           let resourceList = o.params.resourceList || []
           if (resourceList.length) {
             this.resourceList = resourceList
+            this.cacheResourceList = resourceList
           }
 
           // backfill localParams

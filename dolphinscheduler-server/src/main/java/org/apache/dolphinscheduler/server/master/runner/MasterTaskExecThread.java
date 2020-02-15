@@ -82,7 +82,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
             result = waitTaskQuit();
         }
         taskInstance.setEndTime(new Date());
-        processDao.updateTaskInstance(taskInstance);
+        processService.updateTaskInstance(taskInstance);
         logger.info("task :{} id:{}, process id:{}, exec thread completed ",
                 this.taskInstance.getName(),taskInstance.getId(), processInstance.getId() );
         return result;
@@ -94,7 +94,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     public Boolean waitTaskQuit(){
         // query new state
-        taskInstance = processDao.findTaskInstanceById(taskInstance.getId());
+        taskInstance = processService.findTaskInstanceById(taskInstance.getId());
         logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
                 this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
         // task time out
@@ -126,15 +126,15 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                     if (remainTime < 0) {
                         logger.warn("task id: {} execution time out",taskInstance.getId());
                         // process define
-                        ProcessDefinition processDefine = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
+                        ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
                         // send warn mail
                         alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),processDefine.getReceiversCc(),taskInstance.getId(),taskInstance.getName());
                         checkTimeout = false;
                     }
                 }
                 // updateProcessInstance task instance
-                taskInstance = processDao.findTaskInstanceById(taskInstance.getId());
-                processInstance = processDao.findProcessInstanceById(processInstance.getId());
+                taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+                processInstance = processService.findProcessInstanceById(processInstance.getId());
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
                 logger.error("exception",e);

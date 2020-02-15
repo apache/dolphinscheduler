@@ -22,22 +22,22 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.queue.ITaskQueue;
-import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
-import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.FetchTaskThread;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.queue.ITaskQueue;
+import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
+import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,10 +73,10 @@ public class WorkerServer implements IStoppable {
 
 
     /**
-     *  process database access
+     *  process service
      */
     @Autowired
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     /**
      *  alert database access
@@ -105,13 +105,6 @@ public class WorkerServer implements IStoppable {
     private ExecutorService fetchTaskExecutorService;
 
     /**
-     *  spring application context
-     *  only use it for initialization
-     */
-    @Autowired
-    private SpringApplicationContext springApplicationContext;
-
-    /**
      * CountDownLatch latch
      */
     private CountDownLatch latch;
@@ -121,6 +114,13 @@ public class WorkerServer implements IStoppable {
 
     @Autowired
     private WorkerConfig workerConfig;
+
+    /**
+     *  spring application context
+     *  only use it for initialization
+     */
+    @Autowired
+    private SpringApplicationContext springApplicationContext;
 
     /**
      * master server startup
@@ -149,7 +149,7 @@ public class WorkerServer implements IStoppable {
 
         this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
 
-        heartbeatWorkerService = ThreadUtils.newDaemonThreadScheduledExecutor("Worker-Heartbeat-Thread-Executor", Constants.defaulWorkerHeartbeatThreadNum);
+        heartbeatWorkerService = ThreadUtils.newDaemonThreadScheduledExecutor("Worker-Heartbeat-Thread-Executor", Constants.DEFAUL_WORKER_HEARTBEAT_THREAD_NUM);
 
         // heartbeat thread implement
         Runnable heartBeatThread = heartBeatThread();
@@ -167,7 +167,7 @@ public class WorkerServer implements IStoppable {
         killExecutorService.execute(killProcessThread);
 
         // new fetch task thread
-        FetchTaskThread fetchTaskThread = new FetchTaskThread(zkWorkerClient, processDao, taskQueue);
+        FetchTaskThread fetchTaskThread = new FetchTaskThread(zkWorkerClient, processService, taskQueue);
 
         // submit fetch task thread
         fetchTaskExecutorService.execute(fetchTaskThread);
@@ -297,7 +297,7 @@ public class WorkerServer implements IStoppable {
                     Set<String> taskInfoSet = taskQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_KILL);
                     if (CollectionUtils.isNotEmpty(taskInfoSet)){
                         for (String taskInfo : taskInfoSet){
-                            killTask(taskInfo, processDao);
+                            killTask(taskInfo, processService);
                             removeKillInfoFromQueue(taskInfo);
                         }
                     }
@@ -319,7 +319,7 @@ public class WorkerServer implements IStoppable {
      * @param taskInfo  task info
      * @param pd        process dao
      */
-    private void killTask(String taskInfo, ProcessDao pd) {
+    private void killTask(String taskInfo, ProcessService pd) {
         logger.info("get one kill command from tasks kill queue: " + taskInfo);
         String[] taskInfoArray = taskInfo.split("-");
         if(taskInfoArray.length != 2){
@@ -357,7 +357,7 @@ public class WorkerServer implements IStoppable {
      * @param taskInstance
      * @param pd process dao
      */
-    private void deleteTaskFromQueue(TaskInstance taskInstance, ProcessDao pd){
+    private void deleteTaskFromQueue(TaskInstance taskInstance, ProcessService pd){
         // creating distributed locks, lock path /dolphinscheduler/lock/worker
         InterProcessMutex mutex = null;
         logger.info("delete task from tasks queue: " + taskInstance.getId());

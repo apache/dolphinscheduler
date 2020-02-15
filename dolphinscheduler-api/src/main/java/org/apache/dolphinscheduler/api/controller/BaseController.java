@@ -157,8 +157,7 @@ public class BaseController {
      * @return success result code
      */
     public Result success(String msg, Object list) {
-        Result result = getResult(msg, list);
-        return result;
+        return getResult(msg, list);
     }
 
     /**
@@ -168,8 +167,7 @@ public class BaseController {
      * @return success result code
      */
     public Result success(Object list) {
-        Result result = getResult(Status.SUCCESS.getMsg(), list);
-        return result;
+        return getResult(Status.SUCCESS.getMsg(), list);
     }
 
     /**
@@ -181,8 +179,7 @@ public class BaseController {
      * @return success result code
      */
     public Result success(String msg, Map<String, Object> object) {
-        Result result = getResult(msg, object);
-        return result;
+        return getResult(msg, object);
     }
 
     /**
