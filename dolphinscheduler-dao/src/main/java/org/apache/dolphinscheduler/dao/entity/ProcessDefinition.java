@@ -29,6 +29,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -157,6 +158,11 @@ public class ProcessDefinition {
      * tenant id
      */
     private int tenantId;
+
+    /**
+     * modify user name
+     */
+    private String modifyBy;
 
 
     public String getName() {
@@ -337,6 +343,30 @@ public class ProcessDefinition {
         this.timeout = timeout;
     }
 
+    public int getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(int tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getModifyBy() {
+        return modifyBy;
+    }
+
+    public void setModifyBy(String modifyBy) {
+        this.modifyBy = modifyBy;
+    }
+
     @Override
     public String toString() {
         return "ProcessDefinition{" +
@@ -346,6 +376,7 @@ public class ProcessDefinition {
                 ", releaseState=" + releaseState +
                 ", projectId=" + projectId +
                 ", processDefinitionJson='" + processDefinitionJson + '\'' +
+                ", description='" + description + '\'' +
                 ", globalParams='" + globalParams + '\'' +
                 ", globalParamList=" + globalParamList +
                 ", globalParamMap=" + globalParamMap +
@@ -362,22 +393,7 @@ public class ProcessDefinition {
                 ", scheduleReleaseState=" + scheduleReleaseState +
                 ", timeout=" + timeout +
                 ", tenantId=" + tenantId +
+                ", modifyBy='" + modifyBy + '\'' +
                 '}';
-    }
-
-    public int getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(int tenantId) {
-        this.tenantId = tenantId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }
