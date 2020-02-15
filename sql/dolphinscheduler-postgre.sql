@@ -319,6 +319,7 @@ CREATE TABLE t_ds_process_definition (
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   update_time timestamp DEFAULT NULL ,
+  modify_by varchar(36) DEFAULT '' ,
   PRIMARY KEY (id)
 ) ;
 

@@ -31,6 +31,7 @@
         <m-resources
                 ref="refResources"
                 @on-resourcesData="_onResourcesData"
+                @on-cache-resourcesData="_onCacheResourcesData"
                 :resource-list="resourceList">
         </m-resources>
       </div>
@@ -69,7 +70,9 @@
         // Custom parameter
         localParams: [],
         // resource(list)
-        resourceList: []
+        resourceList: [],
+        // Cache ResourceList
+        cacheResourceList: []
       }
     },
     mixins: [disabledState],
@@ -88,6 +91,12 @@
        */
       _onResourcesData (a) {
         this.resourceList = a
+      },
+      /**
+       * cache resourceList
+       */
+      _onCacheResourcesData (a) {
+        this.cacheResourceList = a
       },
       /**
        * verification
@@ -142,18 +151,33 @@
         return editor
       }
     },
-    watch: {},
+    watch: {
+      //Watch the cacheParams
+      cacheParams (val) {
+        this.$emit('on-cache-params', val);
+      }
+    },
+    computed: {
+      cacheParams () {
+        return {
+          resourceList: this.cacheResourceList,
+          localParams: this.localParams,
+          rawScript: editor ? editor.getValue() : ''
+        }
+      }
+    },
     created () {
       let o = this.backfillItem
 
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
-        this.rawScript = o.params.rawScript
+        this.rawScript = o.params.rawScript || ''
 
         // backfill resourceList
         let resourceList = o.params.resourceList || []
         if (resourceList.length) {
           this.resourceList = resourceList
+          this.cacheResourceList = resourceList
         }
 
         // backfill localParams

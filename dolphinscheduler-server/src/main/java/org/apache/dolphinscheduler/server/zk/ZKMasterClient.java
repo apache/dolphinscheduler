@@ -21,10 +21,8 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
@@ -32,6 +30,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.utils.ThreadUtils;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,10 +70,10 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	private AlertDao alertDao = null;
 	/**
-	 *  flow database access
+	 *  process service
 	 */
 	@Autowired
-	private ProcessDao processDao;
+	private ProcessService processService;
 
 	/**
 	 * default constructor
@@ -374,7 +374,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	private void failoverWorker(String workerHost, boolean needCheckWorkerAlive) throws Exception {
 		logger.info("start worker[{}] failover ...", workerHost);
 
-		List<TaskInstance> needFailoverTaskInstanceList = processDao.queryNeedFailoverTaskInstances(workerHost);
+		List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
 		for(TaskInstance taskInstance : needFailoverTaskInstanceList){
 			if(needCheckWorkerAlive){
 				if(!checkTaskInstanceNeedFailover(taskInstance)){
@@ -382,7 +382,7 @@ public class ZKMasterClient extends AbstractZKClient {
                 }
 			}
 
-			ProcessInstance instance = processDao.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
+			ProcessInstance instance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
 			if(instance!=null){
 				taskInstance.setProcessInstance(instance);
 			}
@@ -390,7 +390,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			ProcessUtils.killYarnJob(taskInstance);
 
 			taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
-			processDao.saveTaskInstance(taskInstance);
+			processService.saveTaskInstance(taskInstance);
 		}
 		logger.info("end worker[{}] failover ...", workerHost);
 	}
@@ -403,11 +403,11 @@ public class ZKMasterClient extends AbstractZKClient {
 	private void failoverMaster(String masterHost) {
 		logger.info("start master failover ...");
 
-		List<ProcessInstance> needFailoverProcessInstanceList = processDao.queryNeedFailoverProcessInstances(masterHost);
+		List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(masterHost);
 
 		//updateProcessInstance host is null and insert into command
 		for(ProcessInstance processInstance : needFailoverProcessInstanceList){
-			processDao.processNeedFailoverProcessInstances(processInstance);
+			processService.processNeedFailoverProcessInstances(processInstance);
 		}
 
 		logger.info("master failover end");
