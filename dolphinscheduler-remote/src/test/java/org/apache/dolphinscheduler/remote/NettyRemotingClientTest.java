@@ -48,6 +48,8 @@ public class NettyRemotingClientTest {
                 channel.writeAndFlush(Pong.create(command.getOpaque()));
             }
         });
+
+
         server.start();
         //
         final NettyClientConfig clientConfig = new NettyClientConfig();
