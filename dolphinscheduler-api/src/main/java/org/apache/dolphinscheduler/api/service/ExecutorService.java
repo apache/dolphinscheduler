@@ -117,7 +117,7 @@ public class ExecutorService extends BaseService{
         }
 
         if (!checkTenantSuitable(processDefinition)){
-            logger.error("there is not any vaild tenant for the process definition: id:{},name:{}, ",
+            logger.error("there is not any valid tenant for the process definition: id:{},name:{}, ",
                     processDefinition.getId(), processDefinition.getName());
             putMsg(result, Status.TENANT_NOT_SUITABLE);
             return result;
@@ -206,7 +206,7 @@ public class ExecutorService extends BaseService{
             return checkResult;
         }
         if (!checkTenantSuitable(processDefinition)){
-            logger.error("there is not any vaild tenant for the process definition: id:{},name:{}, ",
+            logger.error("there is not any valid tenant for the process definition: id:{},name:{}, ",
                     processDefinition.getId(), processDefinition.getName());
             putMsg(result, Status.TENANT_NOT_SUITABLE);
         }
@@ -539,7 +539,7 @@ public class ExecutorService extends BaseService{
                     }
                 }
             }else{
-                logger.error("there is not vaild schedule date for the process definition: id:{},date:{}",
+                logger.error("there is not valid schedule date for the process definition: id:{},date:{}",
                         processDefineId, schedule);
             }
         }else{
