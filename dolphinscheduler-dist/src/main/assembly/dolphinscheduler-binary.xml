@@ -112,16 +112,23 @@
 		</fileSet>
 		<!--server end-->
 
+
+		<!--service end-->
 		<fileSet>
-			<directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
+			<directory>${basedir}/../dolphinscheduler-service/src/main/resources</directory>
 			<includes>
-				<include>**/*.*</include>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+				<include>**/*.yml</include>
 			</includes>
-			<outputDirectory>.</outputDirectory>
+			<outputDirectory>conf</outputDirectory>
 		</fileSet>
+		<!--service end-->
+
 
 		<fileSet>
-			<directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-service-${project.version}</directory>
+			<directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
 			</includes>
