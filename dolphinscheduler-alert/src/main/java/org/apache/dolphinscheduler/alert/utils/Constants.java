@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.alert.utils;
  * constants
  */
 public class Constants {
-
+    private Constants() {
+        throw new IllegalStateException("Constants class");
+    }
     /**
      * alert properties path
      */

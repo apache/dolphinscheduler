@@ -518,4 +518,5 @@ export default {
   'SpeedRecord': 'speed(record count)',
   '0 means unlimited by byte': '0 means unlimited',
   '0 means unlimited by count': '0 means unlimited',
+  'Modify User': 'Modify User'
 }

@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 package org.apache.dolphinscheduler.common.utils;
-
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.model.Server;
 
@@ -135,14 +134,15 @@ public class ResInfo {
      * @return heartbeat info to Server
      */
     public static Server parseHeartbeatForZKInfo(String heartBeatInfo){
-        Server masterServer =  null;
+        if (StringUtils.isEmpty(heartBeatInfo)) {
+            return null;
+        }
         String[] masterArray = heartBeatInfo.split(Constants.COMMA);
-        if(masterArray == null ||
-                masterArray.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
-            return masterServer;
+        if(masterArray.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
+            return null;
 
         }
-        masterServer = new Server();
+        Server masterServer = new Server();
         masterServer.setHost(masterArray[0]);
         masterServer.setPort(Integer.parseInt(masterArray[1]));
         masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[2]),
