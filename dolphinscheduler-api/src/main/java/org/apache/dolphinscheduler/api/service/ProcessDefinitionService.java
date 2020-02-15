@@ -922,7 +922,11 @@ public class ProcessDefinitionService extends BaseDAGService {
                 }
 
                 // check extra params
-                CheckUtils.checkOtherParams(taskNode.getExtras());
+                if(!CheckUtils.checkOtherParams(taskNode.getExtras())){
+                    logger.error("task node {} extra parameter {} invalid", taskNode.getName(), taskNode.getExtras());
+                    putMsg(result, Status.PROCESS_NODE_EXTRA_PARAMETER_INVALID, taskNode.getName());
+                    return result;
+                }
             }
             putMsg(result,Status.SUCCESS);
         } catch (Exception e) {

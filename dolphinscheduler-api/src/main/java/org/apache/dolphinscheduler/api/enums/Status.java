@@ -220,6 +220,7 @@ public enum Status {
     TENANT_NOT_SUITABLE(50027,"there is not any tenant suitable, please choose a tenant available."),
     EXPORT_PROCESS_DEFINE_BY_ID_ERROR(50028,"export process definition by id error"),
     IMPORT_PROCESS_DEFINE_ERROR(50029,"import process definition error"),
+    PROCESS_NODE_EXTRA_PARAMETER_INVALID(50030,"process node %s extra parameter invalid"),
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup"),
     HDFS_TERANT_RESOURCES_FILE_EXISTS(60002,"resource file exists,please delete resource first"),
