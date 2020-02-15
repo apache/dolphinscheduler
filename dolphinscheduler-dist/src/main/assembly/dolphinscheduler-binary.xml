@@ -121,6 +121,14 @@
 		</fileSet>
 
 		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-service-${project.version}</directory>
+			<includes>
+				<include>**/*.*</include>
+			</includes>
+			<outputDirectory>.</outputDirectory>
+		</fileSet>
+
+		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-api/target/dolphinscheduler-api-${project.version}</directory>
 			<includes>
 				<include>**/*.*</include>
