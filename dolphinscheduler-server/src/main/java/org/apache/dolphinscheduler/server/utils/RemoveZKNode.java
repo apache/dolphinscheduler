@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.utils;
 
-import org.apache.dolphinscheduler.common.zk.ZookeeperOperator;
+import org.apache.dolphinscheduler.service.zk.ZookeeperOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
