@@ -675,6 +675,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
+                        <include>**/common/enums/*.java</include>
                         <include>**/common/utils/*.java</include>
                         <include>**/common/log/*.java</include>
                         <include>**/common/threadutils/*.java</include>
