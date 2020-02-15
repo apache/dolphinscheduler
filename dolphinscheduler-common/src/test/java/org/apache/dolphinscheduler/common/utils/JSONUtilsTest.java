@@ -117,9 +117,9 @@ public class JSONUtilsTest {
     }
 
     @Test
-    public void testCheckJsonVaild() {
-        Assert.assertTrue(JSONUtils.checkJsonVaild("3"));
-        Assert.assertFalse(JSONUtils.checkJsonVaild(""));
+    public void testCheckJsonValid() {
+        Assert.assertTrue(JSONUtils.checkJsonValid("3"));
+        Assert.assertFalse(JSONUtils.checkJsonValid(""));
     }
 
     @Test

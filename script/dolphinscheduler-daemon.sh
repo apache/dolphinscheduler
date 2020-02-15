@@ -69,7 +69,7 @@ elif [ "$command" = "alert-server" ]; then
   LOG_FILE="-Dserver=alert-server"
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "logger-server" ]; then
-  CLASS=org.apache.dolphinscheduler.server.rpc.LoggerServer
+  CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
 elif [ "$command" = "combined-server" ]; then
   LOG_FILE="-Dlogging.config=classpath:combined_logback.xml -Dspring.profiles.active=api -Dserver.is-combined-server=true"
   CLASS=org.apache.dolphinscheduler.api.CombinedApplicationServer
