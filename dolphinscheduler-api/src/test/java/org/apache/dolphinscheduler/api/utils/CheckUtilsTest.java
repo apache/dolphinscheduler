@@ -98,8 +98,8 @@ public class CheckUtilsTest {
 
     @Test
     public void testCheckOtherParams() {
-        assertFalse(CheckUtils.checkOtherParams(null));
-        assertFalse(CheckUtils.checkOtherParams(""));
+        assertTrue(CheckUtils.checkOtherParams(null));
+        assertTrue(CheckUtils.checkOtherParams(""));
         assertTrue(CheckUtils.checkOtherParams("xxx"));
         assertFalse(CheckUtils.checkOtherParams("{}"));
         assertFalse(CheckUtils.checkOtherParams("{\"key1\":111}"));
