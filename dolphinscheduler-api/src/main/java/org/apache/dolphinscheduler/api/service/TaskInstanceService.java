@@ -61,6 +61,12 @@ public class TaskInstanceService extends BaseService {
     @Autowired
     TaskInstanceMapper taskInstanceMapper;
 
+    @Autowired
+    ProcessInstanceService processInstanceService;
+
+    @Autowired
+    UsersService usersService;
+
 
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
@@ -79,8 +85,8 @@ public class TaskInstanceService extends BaseService {
      * @return task list page
      */
     public Map<String,Object> queryTaskListPaging(User loginUser, String projectName,
-                                                  Integer processInstanceId, String taskName, String startDate, String endDate,
-                                                  String searchVal, ExecutionStatus stateType,String host,
+                                                  Integer processInstanceId, String taskName, String executorName, String startDate,
+                                                  String endDate, String searchVal, ExecutionStatus stateType,String host,
                                                   Integer pageNo, Integer pageSize) {
         Map<String, Object> result = new HashMap<>(5);
         Project project = projectMapper.queryByName(projectName);
@@ -111,9 +117,15 @@ public class TaskInstanceService extends BaseService {
             return result;
         }
 
+        //executor name query
+        int executorId = 0;
+        if (StringUtils.isNotEmpty(executorName)) {
+            executorId = usersService.queryUser(executorName).getId();
+        }
+
         Page<TaskInstance> page = new Page(pageNo, pageSize);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                page, project.getId(), processInstanceId, searchVal, taskName, statusArray, host, start, end
+                page, project.getId(), processInstanceId, searchVal, taskName, executorId, statusArray, host, start, end
         );
         PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
         Set<String> exclusionSet = new HashSet<>();
@@ -121,8 +133,10 @@ public class TaskInstanceService extends BaseService {
         exclusionSet.add("taskJson");
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
         for(TaskInstance taskInstance : taskInstanceList){
-            taskInstance.setDuration(DateUtils.differSec(taskInstance.getStartTime(),
-                    taskInstance.getEndTime()));
+            taskInstance.setDuration(DateUtils.differSec(taskInstance.getStartTime(), taskInstance.getEndTime()));
+            ProcessInstance processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
+            String instanceExecutorName = usersService.queryUser(processInstance.getExecutorId()).getUserName();
+            taskInstance.setExecutorName(instanceExecutorName);
         }
         pageInfo.setTotalCount((int)taskInstanceIPage.getTotal());
         pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(),exclusionSet));

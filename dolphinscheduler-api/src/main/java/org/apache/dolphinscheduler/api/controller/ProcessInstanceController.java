@@ -88,6 +88,7 @@ public class ProcessInstanceController extends BaseController{
                                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                                    @RequestParam(value = "processDefinitionId", required = false, defaultValue = "0") Integer processDefinitionId,
                                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                                   @RequestParam(value = "executorName", required = false) String executorName,
                                                                    @RequestParam(value = "stateType", required = false) ExecutionStatus stateType,
                                                                    @RequestParam(value = "host", required = false) String host,
                                                                    @RequestParam(value = "startDate", required = false) String startTime,
@@ -96,12 +97,12 @@ public class ProcessInstanceController extends BaseController{
                                                                    @RequestParam("pageSize") Integer pageSize){
         try{
             logger.info("query all process instance list, login user:{},project name:{}, define id:{}," +
-                    "search value:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
-                    loginUser.getUserName(), projectName, processDefinitionId, searchVal, stateType,host,
+                    "search value:{},executor name:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
+                    loginUser.getUserName(), projectName, processDefinitionId, searchVal, executorName,stateType,host,
                     startTime, endTime, pageNo, pageSize);
             searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = processInstanceService.queryProcessInstanceList(
-                    loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+                    loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){
             logger.error(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR.getMsg(),e);

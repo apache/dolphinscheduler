@@ -95,6 +95,9 @@ public class ProcessInstanceService extends BaseDAGService {
     @Autowired
     WorkerGroupMapper workerGroupMapper;
 
+    @Autowired
+    UsersService usersService;
+
     /**
      * query process instance by id
      *
@@ -151,7 +154,7 @@ public class ProcessInstanceService extends BaseDAGService {
      */
     public Map<String, Object> queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,
                                                         String startDate, String endDate,
-                                                        String searchVal, ExecutionStatus stateType, String host,
+                                                        String searchVal, String executorName,ExecutionStatus stateType, String host,
                                                         Integer pageNo, Integer pageSize) {
 
         Map<String, Object> result = new HashMap<>(5);
@@ -184,14 +187,22 @@ public class ProcessInstanceService extends BaseDAGService {
         }
         Page<ProcessInstance> page = new Page(pageNo, pageSize);
 
+        //executor name query
+        int executorId = 0;
+        if (StringUtils.isNotEmpty(executorName)) {
+            executorId = usersService.queryUser(executorName).getId();
+        }
+
         IPage<ProcessInstance> processInstanceList =
                 processInstanceMapper.queryProcessInstanceListPaging(page,
-                project.getId(), processDefineId, searchVal, statusArray, host, start, end);
+                project.getId(), processDefineId, searchVal, executorId,statusArray, host, start, end);
 
         List<ProcessInstance> processInstances = processInstanceList.getRecords();
 
         for(ProcessInstance processInstance: processInstances){
             processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
+            String processExecutorName = usersService.queryUser(processInstance.getExecutorId()).getUserName();
+            processInstance.setExecutorName(processExecutorName);
         }
 
         Set<String> exclusionSet = new HashSet<String>();
