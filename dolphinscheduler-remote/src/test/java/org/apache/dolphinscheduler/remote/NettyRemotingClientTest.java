@@ -41,7 +41,7 @@ public class NettyRemotingClientTest {
 
 
     /**
-     *  test ping
+     *  test sned sync
      */
     @Test
     public void testSendSync(){
@@ -69,6 +69,9 @@ public class NettyRemotingClientTest {
         }
     }
 
+    /**
+     *  test sned async
+     */
     @Test
     public void testSendAsync(){
         NettyServerConfig serverConfig = new NettyServerConfig();
