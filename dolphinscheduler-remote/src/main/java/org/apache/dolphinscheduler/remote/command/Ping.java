@@ -28,8 +28,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Ping implements Serializable {
 
-    private static final AtomicLong ID = new AtomicLong(1);
-
     /**
      *  ping body
      */
@@ -53,7 +51,7 @@ public class Ping implements Serializable {
     }
 
     /**
-     *  ping connect
+     *  ping content
      * @return result
      */
     public static ByteBuf pingContent(){
@@ -61,12 +59,12 @@ public class Ping implements Serializable {
     }
 
     /**
-     * package ping command
+     *  create ping command
      *
      * @return command
      */
     public static Command create(){
-        Command command = new Command(ID.getAndIncrement());
+        Command command = new Command();
         command.setType(CommandType.PING);
         command.setBody(EMPTY_BODY_ARRAY);
         return command;
