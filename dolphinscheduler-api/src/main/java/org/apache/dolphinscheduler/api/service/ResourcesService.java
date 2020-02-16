@@ -87,18 +87,20 @@ public class ResourcesService extends BaseService {
         Result result = new Result();
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name):String.format("%s/%s",currentDir,name);
 
+        if (pid != -1) {
+            Resource parentResource = resourcesMapper.selectById(pid);
 
-        Resource parentResource = resourcesMapper.selectById(pid);
+            if (parentResource == null) {
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
 
-        if (parentResource == null) {
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
-            return result;
+            if (!hasPerm(loginUser, parentResource.getUserId())) {
+                putMsg(result, Status.USER_NO_OPERATION_PERM);
+                return result;
+            }
         }
 
-        if (!hasPerm(loginUser, parentResource.getUserId())) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
 
         if (checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource directory {} has exist, can't recreate", fullName);
