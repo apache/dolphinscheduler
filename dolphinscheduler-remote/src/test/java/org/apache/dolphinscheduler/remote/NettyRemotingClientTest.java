@@ -54,24 +54,14 @@ public class NettyRemotingClientTest {
         });
         server.start();
         //
-        CountDownLatch latch = new CountDownLatch(1);
-        AtomicLong opaque = new AtomicLong(1);
         final NettyClientConfig clientConfig = new NettyClientConfig();
         NettyRemotingClient client = new NettyRemotingClient(clientConfig);
-        client.registerProcessor(CommandType.PONG, new NettyRequestProcessor() {
-            @Override
-            public void process(Channel channel, Command command) {
-                opaque.set(command.getOpaque());
-                latch.countDown();
-            }
-        });
         Command commandPing = Ping.create();
         try {
-            client.send(new Address("127.0.0.1", serverConfig.getListenPort()), commandPing);
-            latch.await();
+            Command response = client.sendSync(new Address("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000);
+            Assert.assertEquals(commandPing.getOpaque(), response.getOpaque());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Assert.assertEquals(opaque.get(), commandPing.getOpaque());
     }
 }

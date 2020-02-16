@@ -378,8 +378,8 @@ public class ProcessUtils {
       LogClientService logClient = null;
       String log = null;
       try {
-        logClient = new LogClientService(taskInstance.getHost(), Constants.RPC_PORT);
-        log = logClient.viewLog(taskInstance.getLogPath());
+        logClient = new LogClientService();
+        log = logClient.viewLog(taskInstance.getHost(), Constants.RPC_PORT, taskInstance.getLogPath());
       } finally {
         if(logClient != null){
           logClient.close();

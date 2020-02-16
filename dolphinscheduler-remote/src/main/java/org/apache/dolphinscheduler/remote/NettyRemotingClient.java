@@ -25,17 +25,19 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingTimeoutException;
+import org.apache.dolphinscheduler.remote.future.InvokeCallback;
+import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.handler.NettyClientHandler;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Address;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.rmi.RemoteException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -50,51 +52,22 @@ public class NettyRemotingClient {
 
     private final Logger logger = LoggerFactory.getLogger(NettyRemotingClient.class);
 
-    /**
-     *  bootstrap
-     */
     private final Bootstrap bootstrap = new Bootstrap();
 
-    /**
-     *  encoder
-     */
     private final NettyEncoder encoder = new NettyEncoder();
 
-    /**
-     *  channels
-     */
     private final ConcurrentHashMap<Address, Channel> channels = new ConcurrentHashMap();
 
-    /**
-     *  default executor
-     */
     private final ExecutorService defaultExecutor = Executors.newFixedThreadPool(Constants.CPUS);
 
-    /**
-     *  started flag
-     */
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    /**
-     *  worker group
-     */
     private final NioEventLoopGroup workerGroup;
 
-    /**
-     *  client handler
-     */
     private final NettyClientHandler clientHandler = new NettyClientHandler(this);
 
-    /**
-     *  netty client config
-     */
     private final NettyClientConfig clientConfig;
 
-    /**
-     *  netty client init
-     *
-     * @param clientConfig client config
-     */
     public NettyRemotingClient(final NettyClientConfig clientConfig){
         this.clientConfig = clientConfig;
         this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
@@ -108,9 +81,6 @@ public class NettyRemotingClient {
         this.start();
     }
 
-    /**
-     *  netty server start
-     */
     private void start(){
 
         this.bootstrap
@@ -129,37 +99,12 @@ public class NettyRemotingClient {
                                 encoder);
                     }
                 });
+        //
         isStarted.compareAndSet(false, true);
     }
 
-    /**
-     *  register processor
-     *
-     * @param commandType command type
-     * @param processor processor
-     */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
-        registerProcessor(commandType, processor, null);
-    }
-
-    /**
-     * register processor
-     *
-     * @param commandType command type
-     * @param processor processor
-     * @param executor thread executor
-     */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
-        this.clientHandler.registerProcessor(commandType, processor, executor);
-    }
-
-    /**
-     *  send connect
-     * @param address address
-     * @param command command
-     * @throws RemotingException
-     */
-    public void send(final Address address, final Command command) throws RemotingException {
+    //TODO
+    public void send(final Address address, final Command command, final InvokeCallback invokeCallback) throws RemotingException {
         final Channel channel = getChannel(address);
         if (channel == null) {
             throw new RemotingException("network error");
@@ -182,11 +127,43 @@ public class NettyRemotingClient {
         }
     }
 
-    /**
-     *  get channel
-     * @param address address
-     * @return channel
-     */
+    public Command sendSync(final Address address, final Command command, final long timeoutMillis) throws RemotingException {
+        final Channel channel = getChannel(address);
+        if (channel == null) {
+            throw new RemotingException(String.format("connect to : %s fail", address));
+        }
+        final long opaque = command.getOpaque();
+        try {
+            final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null);
+            channel.writeAndFlush(command).addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                    if(channelFuture.isSuccess()){
+                        responseFuture.setSendOk(true);
+                        return;
+                    } else{
+                        responseFuture.setSendOk(false);
+                        responseFuture.setCause(channelFuture.cause());
+                        responseFuture.putResponse(null);
+                        logger.error("send command {} to address {} failed", command, address);
+                    }
+                }
+            });
+            Command result = responseFuture.waitResponse();
+            if(result == null){
+                if(responseFuture.isSendOK()){
+                    throw new RemotingTimeoutException(address.toString(), timeoutMillis, responseFuture.getCause());
+                } else{
+                    throw new RemoteException(address.toString(), responseFuture.getCause());
+                }
+            }
+            return result;
+        } catch (Exception ex) {
+            String msg = String.format("send command %s to address %s error", command, address);
+            throw new RemotingException(msg, ex);
+        }
+    }
+
     public Channel getChannel(Address address) {
         Channel channel = channels.get(address);
         if(channel != null && channel.isActive()){
@@ -195,12 +172,6 @@ public class NettyRemotingClient {
         return createChannel(address, true);
     }
 
-    /**
-     *  create channel
-     * @param address address
-     * @param isSync is sync
-     * @return channel
-     */
     public Channel createChannel(Address address, boolean isSync) {
         ChannelFuture future;
         try {
@@ -221,17 +192,10 @@ public class NettyRemotingClient {
         return null;
     }
 
-    /**
-     *  get default thread executor
-     * @return thread executor
-     */
     public ExecutorService getDefaultExecutor() {
         return defaultExecutor;
     }
 
-    /**
-     *  close client
-     */
     public void close() {
         if(isStarted.compareAndSet(true, false)){
             try {
@@ -249,9 +213,6 @@ public class NettyRemotingClient {
         }
     }
 
-    /**
-     *  close channel
-     */
     private void closeChannels(){
         for (Channel channel : this.channels.values()) {
             channel.close();
@@ -259,11 +220,7 @@ public class NettyRemotingClient {
         this.channels.clear();
     }
 
-    /**
-     *  remove channel
-     * @param address address
-     */
-    public void removeChannel(Address address){
+    public void closeChannel(Address address){
         Channel channel = this.channels.remove(address);
         if(channel != null){
             channel.close();

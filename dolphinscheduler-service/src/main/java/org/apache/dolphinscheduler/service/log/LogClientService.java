@@ -16,13 +16,10 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.log.*;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Address;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.slf4j.Logger;
@@ -32,15 +29,13 @@ import org.slf4j.LoggerFactory;
 /**
  * log client
  */
-public class LogClientService implements NettyRequestProcessor {
+public class LogClientService {
 
     private static final Logger logger = LoggerFactory.getLogger(LogClientService.class);
 
     private final NettyClientConfig clientConfig;
 
     private final NettyRemotingClient client;
-
-    private final Address address;
 
     /**
      *  request time out
@@ -49,18 +44,11 @@ public class LogClientService implements NettyRequestProcessor {
 
     /**
      * construct client
-     * @param host host
-     * @param port port
      */
-    public LogClientService(String host, int port) {
-        this.address = new Address(host, port);
+    public LogClientService() {
         this.clientConfig = new NettyClientConfig();
-        this.clientConfig.setWorkerThreads(1);
+        this.clientConfig.setWorkerThreads(4);
         this.client = new NettyRemotingClient(clientConfig);
-        this.client.registerProcessor(CommandType.ROLL_VIEW_LOG_RESPONSE,this);
-        this.client.registerProcessor(CommandType.VIEW_WHOLE_LOG_RESPONSE, this);
-        this.client.registerProcessor(CommandType.GET_LOG_BYTES_RESPONSE, this);
-
     }
 
     /**
@@ -73,94 +61,87 @@ public class LogClientService implements NettyRequestProcessor {
 
     /**
      * roll view log
+     * @param host host
+     * @param port port
      * @param path path
      * @param skipLineNum skip line number
      * @param limit limit
      * @return log content
      */
-    public String rollViewLog(String path,int skipLineNum,int limit) {
-        logger.info("roll view log, path {}, skipLineNum {} ,limit {}", path, skipLineNum, limit);
+    public String rollViewLog(String host, int port, String path,int skipLineNum,int limit) {
+        logger.info("roll view log, host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path, skipLineNum, limit);
         RollViewLogRequestCommand request = new RollViewLogRequestCommand(path, skipLineNum, limit);
         String result = "";
+        final Address address = new Address(host, port);
         try {
             Command command = request.convert2Command();
-            this.client.send(address, command);
-            LogPromise promise = new LogPromise(command.getOpaque(), logRequestTimeout);
-            result = ((String)promise.getResult());
+            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            if(response != null){
+                RollViewLogResponseCommand rollReviewLog = FastJsonSerializer.deserialize(
+                        command.getBody(), RollViewLogResponseCommand.class);
+                return rollReviewLog.getMsg();
+            }
         } catch (Exception e) {
             logger.error("roll view log error", e);
+        } finally {
+            this.client.closeChannel(address);
         }
         return result;
     }
 
     /**
      * view log
+     * @param host host
+     * @param port port
      * @param path path
      * @return log content
      */
-    public String viewLog(String path) {
+    public String viewLog(String host, int port, String path) {
         logger.info("view log path {}", path);
         ViewLogRequestCommand request = new ViewLogRequestCommand(path);
         String result = "";
+        final Address address = new Address(host, port);
         try {
             Command command = request.convert2Command();
-            this.client.send(address, command);
-            LogPromise promise = new LogPromise(command.getOpaque(), logRequestTimeout);
-            result = ((String)promise.getResult());
+            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            if(response != null){
+                ViewLogResponseCommand viewLog = FastJsonSerializer.deserialize(
+                        response.getBody(), ViewLogResponseCommand.class);
+                return viewLog.getMsg();
+            }
         } catch (Exception e) {
             logger.error("view log error", e);
+        } finally {
+            this.client.closeChannel(address);
         }
         return result;
     }
 
     /**
      * get log size
+     * @param host host
+     * @param port port
      * @param path log path
      * @return log content bytes
      */
-    public byte[] getLogBytes(String path) {
+    public byte[] getLogBytes(String host, int port, String path) {
         logger.info("log path {}", path);
         GetLogBytesRequestCommand request = new GetLogBytesRequestCommand(path);
         byte[] result = null;
+        final Address address = new Address(host, port);
         try {
             Command command = request.convert2Command();
-            this.client.send(address, command);
-            LogPromise promise = new LogPromise(command.getOpaque(), logRequestTimeout);
-            result = (byte[])promise.getResult();
+            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            if(response != null){
+                GetLogBytesResponseCommand getLog = FastJsonSerializer.deserialize(
+                        response.getBody(), GetLogBytesResponseCommand.class);
+                return getLog.getData();
+            }
         } catch (Exception e) {
             logger.error("get log size error", e);
+        } finally {
+            this.client.closeChannel(address);
         }
         return result;
     }
-
-    @Override
-    public void process(Channel channel, Command command) {
-        logger.info("received log response : {}", command);
-        switch (command.getType()){
-            case ROLL_VIEW_LOG_RESPONSE:
-                RollViewLogResponseCommand rollReviewLog = FastJsonSerializer.deserialize(
-                        command.getBody(), RollViewLogResponseCommand.class);
-                LogPromise.notify(command.getOpaque(), rollReviewLog.getMsg());
-                break;
-            case VIEW_WHOLE_LOG_RESPONSE:
-                ViewLogResponseCommand viewLog = FastJsonSerializer.deserialize(
-                        command.getBody(), ViewLogResponseCommand.class);
-                LogPromise.notify(command.getOpaque(), viewLog.getMsg());
-                break;
-            case GET_LOG_BYTES_RESPONSE:
-                GetLogBytesResponseCommand getLog = FastJsonSerializer.deserialize(
-                        command.getBody(), GetLogBytesResponseCommand.class);
-                LogPromise.notify(command.getOpaque(), getLog.getData());
-                break;
-            default:
-                throw new UnsupportedOperationException(String.format("command type : %s is not supported ", command.getType()));
-        }
-    }
-
-    public static void main(String[] args) throws Exception{
-        LogClientService logClient = new LogClientService("192.168.220.247", 50051);
-        byte[] logBytes = logClient.getLogBytes("/opt/program/incubator-dolphinscheduler/logs/1/463/540.log");
-        System.out.println(new String(logBytes));
-    }
-
 }
