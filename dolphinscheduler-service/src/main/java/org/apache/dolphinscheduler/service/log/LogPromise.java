@@ -28,14 +28,29 @@ public class LogPromise {
 
     private static final ConcurrentHashMap<Long, LogPromise> PROMISES = new ConcurrentHashMap<>();
 
+    /**
+     *  request unique identification
+     */
     private long opaque;
 
+    /**
+     *  start timemillis
+     */
     private final long start;
 
+    /**
+     *  timeout
+     */
     private final long timeout;
 
+    /**
+     *  latch
+     */
     private final CountDownLatch latch;
 
+    /**
+     *  result
+     */
     private Object result;
 
     public LogPromise(long opaque, long timeout){
@@ -59,15 +74,28 @@ public class LogPromise {
         }
     }
 
+    /**
+     *  countdown
+     *
+     * @param result result
+     */
     private void doCountDown(Object result){
         this.result = result;
         this.latch.countDown();
     }
 
+    /**
+     *  whether timeout
+     * @return timeout
+     */
     public boolean isTimeout(){
         return System.currentTimeMillis() - start > timeout;
     }
 
+    /**
+     *  get result
+     * @return
+     */
     public Object getResult(){
         try {
             latch.await(timeout, TimeUnit.MILLISECONDS);
