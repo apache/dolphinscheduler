@@ -23,21 +23,11 @@ import io.netty.buffer.Unpooled;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- *  ping machine
- */
+
 public class Ping implements Serializable {
 
-    private static final AtomicLong ID = new AtomicLong(1);
-
-    /**
-     *  ping body
-     */
     protected static ByteBuf EMPTY_BODY = Unpooled.EMPTY_BUFFER;
 
-    /**
-     *  request command body
-     */
     private static byte[] EMPTY_BODY_ARRAY = new byte[0];
 
     private static final ByteBuf PING_BUF;
@@ -52,21 +42,12 @@ public class Ping implements Serializable {
         PING_BUF = Unpooled.unreleasableBuffer(ping).asReadOnly();
     }
 
-    /**
-     *  ping connect
-     * @return result
-     */
     public static ByteBuf pingContent(){
         return PING_BUF.duplicate();
     }
 
-    /**
-     * package ping command
-     *
-     * @return command
-     */
     public static Command create(){
-        Command command = new Command(ID.getAndIncrement());
+        Command command = new Command();
         command.setType(CommandType.PING);
         command.setBody(EMPTY_BODY_ARRAY);
         return command;
