@@ -49,7 +49,7 @@ public class TaskInstanceServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
 
         Map<String, Object> map = taskInstanceService.queryTaskListPaging(loginUser, "project_test1", 0, "",
-                "2019-02-26 19:48:00", "2019-02-26 19:48:22", "", null, "", 1, 20);
+                "test_user", "2019-02-26 19:48:00", "2019-02-26 19:48:22", "", null, "", 1, 20);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, map.get(Constants.STATUS));
         PageInfo pageInfo = (PageInfo) map.get("data");
 
