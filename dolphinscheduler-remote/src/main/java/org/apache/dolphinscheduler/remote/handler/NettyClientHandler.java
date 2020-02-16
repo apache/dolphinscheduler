@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutorService;
+
 /**
  *  netty client request handler
  */
@@ -34,8 +36,11 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     private final NettyRemotingClient nettyRemotingClient;
 
-    public NettyClientHandler(NettyRemotingClient nettyRemotingClient){
+    private final ExecutorService callbackExecutor;
+
+    public NettyClientHandler(NettyRemotingClient nettyRemotingClient, ExecutorService callbackExecutor){
         this.nettyRemotingClient = nettyRemotingClient;
+        this.callbackExecutor = callbackExecutor;
     }
 
     @Override
@@ -52,8 +57,18 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     private void processReceived(final Command responseCommand) {
         ResponseFuture future = ResponseFuture.getFuture(responseCommand.getOpaque());
         if(future != null){
-            future.putResponse(responseCommand);
-            future.executeInvokeCallback();
+            future.setResponseCommand(responseCommand);
+            future.release();
+            if(future.getInvokeCallback() != null){
+                this.callbackExecutor.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        future.executeInvokeCallback();
+                    }
+                });
+            } else{
+                future.putResponse(responseCommand);
+            }
         } else{
             logger.warn("receive response {}, but not matched any request ", responseCommand);
         }
