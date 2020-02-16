@@ -29,6 +29,9 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class GetLogBytesRequestCommand implements Serializable {
 
+    /**
+     *  log path
+     */
     private String path;
 
     public GetLogBytesRequestCommand() {
@@ -47,8 +50,9 @@ public class GetLogBytesRequestCommand implements Serializable {
     }
 
     /**
+     * package request command
      *
-     * @return
+     * @return command
      */
     public Command convert2Command(){
         Command command = new Command();

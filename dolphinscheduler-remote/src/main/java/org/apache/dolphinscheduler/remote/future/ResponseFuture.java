@@ -28,18 +28,33 @@ public class ResponseFuture {
 
     private final static ConcurrentHashMap<Long,ResponseFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
 
+    /**
+     *  request unique identification
+     */
     private final long opaque;
 
+    /**
+     *  timeout
+     */
     private final long timeoutMillis;
 
+    /**
+     *  invokeCallback function
+     */
     private final InvokeCallback invokeCallback;
 
+    /**
+     *  releaseSemaphore
+     */
     private final ReleaseSemaphore releaseSemaphore;
 
     private final CountDownLatch latch = new CountDownLatch(1);
 
     private final long beginTimestamp = System.currentTimeMillis();
 
+    /**
+     *  response command
+     */
     private volatile Command responseCommand;
 
     private volatile boolean sendOk = true;
@@ -54,11 +69,22 @@ public class ResponseFuture {
         FUTURE_TABLE.put(opaque, this);
     }
 
+    /**
+     *  wait for response
+     *
+     * @return command
+     * @throws InterruptedException
+     */
     public Command waitResponse() throws InterruptedException {
         this.latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
         return this.responseCommand;
     }
 
+    /**
+     *  put response
+     *
+     * @param responseCommand responseCommand
+     */
     public void putResponse(final Command responseCommand) {
         this.responseCommand = responseCommand;
         this.latch.countDown();
@@ -69,11 +95,18 @@ public class ResponseFuture {
         return FUTURE_TABLE.get(opaque);
     }
 
+    /**
+     *  whether timeout
+     * @return timeout
+     */
     public boolean isTimeout() {
         long diff = System.currentTimeMillis() - this.beginTimestamp;
         return diff > this.timeoutMillis;
     }
 
+    /**
+     *  execute invoke callback
+     */
     public void executeInvokeCallback() {
         if (invokeCallback != null) {
             invokeCallback.operationComplete(this);
@@ -120,6 +153,9 @@ public class ResponseFuture {
         return invokeCallback;
     }
 
+    /**
+     *  release
+     */
     public void release() {
         if(this.releaseSemaphore != null){
             this.releaseSemaphore.release();

@@ -19,12 +19,21 @@ package org.apache.dolphinscheduler.remote.utils;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ *  thread factory
+ */
 public class NamedThreadFactory implements ThreadFactory {
 
     private final AtomicInteger increment = new AtomicInteger(1);
 
+    /**
+     *  name
+     */
     private final String name;
 
+    /**
+     *  count
+     */
     private final int count;
 
     public NamedThreadFactory(String name){
@@ -36,6 +45,11 @@ public class NamedThreadFactory implements ThreadFactory {
         this.count = count;
     }
 
+    /**
+     *  create thread
+     * @param r runnable
+     * @return thread
+     */
     @Override
     public Thread newThread(Runnable r) {
         final String threadName = count > 0 ? String.format(name + "_%d_%d", count, increment.getAndIncrement())

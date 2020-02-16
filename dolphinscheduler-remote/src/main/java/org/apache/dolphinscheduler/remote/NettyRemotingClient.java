@@ -51,24 +51,55 @@ public class NettyRemotingClient {
 
     private final Logger logger = LoggerFactory.getLogger(NettyRemotingClient.class);
 
+    /**
+     * client bootstrap
+     */
     private final Bootstrap bootstrap = new Bootstrap();
 
+    /**
+     *  encoder
+     */
     private final NettyEncoder encoder = new NettyEncoder();
 
+    /**
+     * channels
+     */
     private final ConcurrentHashMap<Address, Channel> channels = new ConcurrentHashMap(128);
 
+    /**
+     *  started flag
+     */
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
+    /**
+     *  worker group
+     */
     private final NioEventLoopGroup workerGroup;
 
+    /**
+     *  client config
+     */
     private final NettyClientConfig clientConfig;
 
+    /**
+     *  saync semaphore
+     */
     private final Semaphore asyncSemaphore = new Semaphore(200, true);
 
+    /**
+     *  callback thread executor
+     */
     private final ExecutorService callbackExecutor;
 
+    /**
+     *  client handler
+     */
     private final NettyClientHandler clientHandler;
 
+    /**
+     *  client init
+     * @param clientConfig client config
+     */
     public NettyRemotingClient(final NettyClientConfig clientConfig){
         this.clientConfig = clientConfig;
         this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
@@ -80,12 +111,16 @@ public class NettyRemotingClient {
             }
         });
         this.callbackExecutor = new ThreadPoolExecutor(5, 10, 1, TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>(1000), new NamedThreadFactory("CallbackExecutor", 10), new CallerThreadExecutePolicy());
+                new LinkedBlockingQueue<>(1000), new NamedThreadFactory("CallbackExecutor", 10),
+                new CallerThreadExecutePolicy());
         this.clientHandler = new NettyClientHandler(this, callbackExecutor);
 
         this.start();
     }
 
+    /**
+     *  start
+     */
     private void start(){
 
         this.bootstrap
@@ -108,16 +143,40 @@ public class NettyRemotingClient {
         isStarted.compareAndSet(false, true);
     }
 
-    public void sendAsync(final Address address, final Command command, final long timeoutMillis, final InvokeCallback invokeCallback) throws InterruptedException, RemotingException {
+    /**
+     *  async send
+     * @param address address
+     * @param command command
+     * @param timeoutMillis timeoutMillis
+     * @param invokeCallback callback function
+     * @throws InterruptedException
+     * @throws RemotingException
+     */
+    public void sendAsync(final Address address, final Command command,
+                          final long timeoutMillis,
+                          final InvokeCallback invokeCallback) throws InterruptedException, RemotingException {
         final Channel channel = getChannel(address);
         if (channel == null) {
             throw new RemotingException("network error");
         }
+        /**
+         * request unique identification
+         */
         final long opaque = command.getOpaque();
+        /**
+         *  control concurrency number
+         */
         boolean acquired = this.asyncSemaphore.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
         if(acquired){
             final ReleaseSemaphore releaseSemaphore = new ReleaseSemaphore(this.asyncSemaphore);
-            final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, invokeCallback, releaseSemaphore);
+
+            /**
+             *  response future
+             */
+            final ResponseFuture responseFuture = new ResponseFuture(opaque,
+                    timeoutMillis,
+                    invokeCallback,
+                    releaseSemaphore);
             try {
                 channel.writeAndFlush(command).addListener(new ChannelFutureListener(){
 
@@ -151,6 +210,15 @@ public class NettyRemotingClient {
         }
     }
 
+    /**
+     * sync send
+     * @param address address
+     * @param command command
+     * @param timeoutMillis timeoutMillis
+     * @return command
+     * @throws InterruptedException
+     * @throws RemotingException
+     */
     public Command sendSync(final Address address, final Command command, final long timeoutMillis) throws InterruptedException, RemotingException {
         final Channel channel = getChannel(address);
         if (channel == null) {
@@ -172,6 +240,9 @@ public class NettyRemotingClient {
                 logger.error("send command {} to address {} failed", command, address);
             }
         });
+        /**
+         * sync wait for result
+         */
         Command result = responseFuture.waitResponse();
         if(result == null){
             if(responseFuture.isSendOK()){
@@ -183,6 +254,11 @@ public class NettyRemotingClient {
         return result;
     }
 
+    /**
+     *  get channel
+     * @param address
+     * @return
+     */
     public Channel getChannel(Address address) {
         Channel channel = channels.get(address);
         if(channel != null && channel.isActive()){
@@ -191,6 +267,12 @@ public class NettyRemotingClient {
         return createChannel(address, true);
     }
 
+    /**
+     * create channel
+     * @param address address
+     * @param isSync sync flag
+     * @return channel
+     */
     public Channel createChannel(Address address, boolean isSync) {
         ChannelFuture future;
         try {
@@ -211,6 +293,9 @@ public class NettyRemotingClient {
         return null;
     }
 
+    /**
+     * close
+     */
     public void close() {
         if(isStarted.compareAndSet(true, false)){
             try {
@@ -228,6 +313,9 @@ public class NettyRemotingClient {
         }
     }
 
+    /**
+     *  close channels
+     */
     private void closeChannels(){
         for (Channel channel : this.channels.values()) {
             channel.close();
@@ -235,6 +323,10 @@ public class NettyRemotingClient {
         this.channels.clear();
     }
 
+    /**
+     * close channel
+     * @param address address
+     */
     public void closeChannel(Address address){
         Channel channel = this.channels.remove(address);
         if(channel != null){
