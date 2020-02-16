@@ -29,14 +29,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class GetLogBytesRequestCommand implements Serializable {
 
-    /**
-     *  request id
-     */
-    private static final AtomicLong REQUEST = new AtomicLong(1);
-
-    /**
-     *  log path
-     */
     private String path;
 
     public GetLogBytesRequestCommand() {
@@ -55,12 +47,11 @@ public class GetLogBytesRequestCommand implements Serializable {
     }
 
     /**
-     * package request command
      *
-     * @return command
+     * @return
      */
     public Command convert2Command(){
-        Command command = new Command(REQUEST.getAndIncrement());
+        Command command = new Command();
         command.setType(CommandType.GET_LOG_BYTES_REQUEST);
         byte[] body = FastJsonSerializer.serialize(this);
         command.setBody(body);

@@ -29,11 +29,6 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class ViewLogRequestCommand implements Serializable {
 
-    /**
-     *  request id
-     */
-    private static final AtomicLong REQUEST = new AtomicLong(1);
-
     private String path;
 
     public ViewLogRequestCommand() {
@@ -51,13 +46,8 @@ public class ViewLogRequestCommand implements Serializable {
         this.path = path;
     }
 
-    /**
-     * package request command
-     *
-     * @return command
-     */
     public Command convert2Command(){
-        Command command = new Command(REQUEST.getAndIncrement());
+        Command command = new Command();
         command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
         byte[] body = FastJsonSerializer.serialize(this);
         command.setBody(body);
