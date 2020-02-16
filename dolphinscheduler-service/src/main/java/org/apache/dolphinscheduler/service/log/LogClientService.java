@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.*;
