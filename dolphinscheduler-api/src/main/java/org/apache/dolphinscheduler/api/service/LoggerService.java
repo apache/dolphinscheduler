@@ -28,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
+
 /**
  * log service
  */
@@ -38,6 +40,17 @@ public class LoggerService {
 
   @Autowired
   private ProcessService processService;
+
+  private final LogClientService logClient;
+
+  public LoggerService(){
+    logClient = new LogClientService();
+  }
+
+  @PreDestroy
+  public void close(){
+    logClient.close();
+  }
 
   /**
    * view log
@@ -64,18 +77,9 @@ public class LoggerService {
     Result result = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
 
     logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
-    LogClientService logClient = null;
-    try {
-      logClient = new LogClientService(host, Constants.RPC_PORT);
-      String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
-      result.setData(log);
-      logger.info(log);
-    } finally {
-      if(logClient != null){
-        logClient.close();
-      }
-    }
-
+    String log = logClient.rollViewLog(host, Constants.RPC_PORT, taskInstance.getLogPath(),skipLineNum,limit);
+    result.setData(log);
+    logger.info(log);
     return result;
   }
 
@@ -90,16 +94,7 @@ public class LoggerService {
     if (taskInstance == null){
       throw new RuntimeException("task instance is null");
     }
-
     String host = taskInstance.getHost();
-    LogClientService logClient = null;
-    try {
-      logClient = new LogClientService(host, Constants.RPC_PORT);
-      return logClient.getLogBytes(taskInstance.getLogPath());
-    } finally {
-      if(logClient != null){
-        logClient.close();
-      }
-    }
+    return logClient.getLogBytes(host, Constants.RPC_PORT, taskInstance.getLogPath());
   }
 }
