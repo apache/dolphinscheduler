@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.remote.future;
+package org.apache.dolphinscheduler.remote.exceptions;
 
-/**
- * invoke callback
- */
-public interface InvokeCallback {
+public class RemotingTooMuchRequestException extends RemotingException{
 
-    void operationComplete(final ResponseFuture responseFuture);
-
+    public RemotingTooMuchRequestException(String message) {
+        super(message);
+    }
 }

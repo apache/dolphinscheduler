@@ -14,13 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.remote.future;
+
+package org.apache.dolphinscheduler.remote.utils;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * invoke callback
+ * caller thread execute
  */
-public interface InvokeCallback {
+public class CallerThreadExecutePolicy implements RejectedExecutionHandler {
 
-    void operationComplete(final ResponseFuture responseFuture);
+    private final Logger logger = LoggerFactory.getLogger(CallerThreadExecutePolicy.class);
 
+    @Override
+    public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+        logger.warn("queue is full, trigger caller thread execute");
+        r.run();
+    }
 }

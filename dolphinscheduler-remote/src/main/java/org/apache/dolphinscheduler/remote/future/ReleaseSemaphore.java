@@ -16,11 +16,26 @@
  */
 package org.apache.dolphinscheduler.remote.future;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
- * invoke callback
+ * release semaphore
  */
-public interface InvokeCallback {
+public class ReleaseSemaphore {
 
-    void operationComplete(final ResponseFuture responseFuture);
+    private final Semaphore semaphore;
 
+    private final AtomicBoolean released;
+
+    public ReleaseSemaphore(Semaphore semaphore){
+        this.semaphore = semaphore;
+        this.released = new AtomicBoolean(false);
+    }
+
+    public void release(){
+        if(this.released.compareAndSet(false, true)){
+            this.semaphore.release();
+        }
+    }
 }
