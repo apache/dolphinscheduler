@@ -121,7 +121,7 @@ public class TaskInstanceMapperTest {
     }
 
     /**
-     * test find vaild task list by process instance id
+     * test find valid task list by process instance id
      */
     @Test
     public void testFindValidTaskListByProcessId() {
