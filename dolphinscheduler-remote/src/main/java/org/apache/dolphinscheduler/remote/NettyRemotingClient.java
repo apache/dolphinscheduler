@@ -28,20 +28,19 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingTimeoutException;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingTooMuchRequestException;
 import org.apache.dolphinscheduler.remote.future.InvokeCallback;
+import org.apache.dolphinscheduler.remote.future.ReleaseSemaphore;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.handler.NettyClientHandler;
 import org.apache.dolphinscheduler.remote.utils.Address;
-import org.apache.dolphinscheduler.remote.utils.Constants;
+import org.apache.dolphinscheduler.remote.utils.CallerThreadExecutePolicy;
+import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.rmi.RemoteException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -56,17 +55,19 @@ public class NettyRemotingClient {
 
     private final NettyEncoder encoder = new NettyEncoder();
 
-    private final ConcurrentHashMap<Address, Channel> channels = new ConcurrentHashMap();
-
-    private final ExecutorService defaultExecutor = Executors.newFixedThreadPool(Constants.CPUS);
+    private final ConcurrentHashMap<Address, Channel> channels = new ConcurrentHashMap(128);
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
     private final NioEventLoopGroup workerGroup;
 
-    private final NettyClientHandler clientHandler = new NettyClientHandler(this);
-
     private final NettyClientConfig clientConfig;
+
+    private final Semaphore asyncSemaphore = new Semaphore(200, true);
+
+    private final ExecutorService callbackExecutor;
+
+    private final NettyClientHandler clientHandler;
 
     public NettyRemotingClient(final NettyClientConfig clientConfig){
         this.clientConfig = clientConfig;
@@ -78,6 +79,10 @@ public class NettyRemotingClient {
                 return new Thread(r, String.format("NettyClient_%d", this.threadIndex.incrementAndGet()));
             }
         });
+        this.callbackExecutor = new ThreadPoolExecutor(5, 10, 1, TimeUnit.MINUTES,
+                new LinkedBlockingQueue<>(1000), new NamedThreadFactory("CallbackExecutor", 10), new CallerThreadExecutePolicy());
+        this.clientHandler = new NettyClientHandler(this, callbackExecutor);
+
         this.start();
     }
 
@@ -103,65 +108,79 @@ public class NettyRemotingClient {
         isStarted.compareAndSet(false, true);
     }
 
-    //TODO
-    public void send(final Address address, final Command command, final InvokeCallback invokeCallback) throws RemotingException {
+    public void sendAsync(final Address address, final Command command, final long timeoutMillis, final InvokeCallback invokeCallback) throws InterruptedException, RemotingException {
         final Channel channel = getChannel(address);
         if (channel == null) {
             throw new RemotingException("network error");
         }
-        try {
-            channel.writeAndFlush(command).addListener(new ChannelFutureListener(){
+        final long opaque = command.getOpaque();
+        boolean acquired = this.asyncSemaphore.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
+        if(acquired){
+            final ReleaseSemaphore releaseSemaphore = new ReleaseSemaphore(this.asyncSemaphore);
+            final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, invokeCallback, releaseSemaphore);
+            try {
+                channel.writeAndFlush(command).addListener(new ChannelFutureListener(){
 
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if(future.isSuccess()){
-                        logger.info("sent command {} to {}", command, address);
-                    } else{
-                        logger.error("send command {} to {} failed, error {}", command, address, future.cause());
+                    @Override
+                    public void operationComplete(ChannelFuture future) throws Exception {
+                        if(future.isSuccess()){
+                            responseFuture.setSendOk(true);
+                            return;
+                        } else {
+                            responseFuture.setSendOk(false);
+                        }
+                        responseFuture.setCause(future.cause());
+                        responseFuture.putResponse(null);
+                        try {
+                            responseFuture.executeInvokeCallback();
+                        } catch (Throwable ex){
+                            logger.error("execute callback error", ex);
+                        } finally{
+                            responseFuture.release();
+                        }
                     }
-                }
-            });
-        } catch (Exception ex) {
-            String msg = String.format("send command %s to address %s encounter error", command, address);
-            throw new RemotingException(msg, ex);
+                });
+            } catch (Throwable ex){
+                responseFuture.release();
+                throw new RemotingException(String.format("send command to address: %s failed", address), ex);
+            }
+        } else{
+            String message = String.format("try to acquire async semaphore timeout: %d, waiting thread num: %d, total permits: %d",
+                    timeoutMillis, asyncSemaphore.getQueueLength(), asyncSemaphore.availablePermits());
+            throw new RemotingTooMuchRequestException(message);
         }
     }
 
-    public Command sendSync(final Address address, final Command command, final long timeoutMillis) throws RemotingException {
+    public Command sendSync(final Address address, final Command command, final long timeoutMillis) throws InterruptedException, RemotingException {
         final Channel channel = getChannel(address);
         if (channel == null) {
             throw new RemotingException(String.format("connect to : %s fail", address));
         }
         final long opaque = command.getOpaque();
-        try {
-            final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null);
-            channel.writeAndFlush(command).addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture channelFuture) throws Exception {
-                    if(channelFuture.isSuccess()){
-                        responseFuture.setSendOk(true);
-                        return;
-                    } else{
-                        responseFuture.setSendOk(false);
-                        responseFuture.setCause(channelFuture.cause());
-                        responseFuture.putResponse(null);
-                        logger.error("send command {} to address {} failed", command, address);
-                    }
+        final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null, null);
+        channel.writeAndFlush(command).addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                if(future.isSuccess()){
+                    responseFuture.setSendOk(true);
+                    return;
+                } else {
+                    responseFuture.setSendOk(false);
                 }
-            });
-            Command result = responseFuture.waitResponse();
-            if(result == null){
-                if(responseFuture.isSendOK()){
-                    throw new RemotingTimeoutException(address.toString(), timeoutMillis, responseFuture.getCause());
-                } else{
-                    throw new RemoteException(address.toString(), responseFuture.getCause());
-                }
+                responseFuture.setCause(future.cause());
+                responseFuture.putResponse(null);
+                logger.error("send command {} to address {} failed", command, address);
             }
-            return result;
-        } catch (Exception ex) {
-            String msg = String.format("send command %s to address %s error", command, address);
-            throw new RemotingException(msg, ex);
+        });
+        Command result = responseFuture.waitResponse();
+        if(result == null){
+            if(responseFuture.isSendOK()){
+                throw new RemotingTimeoutException(address.toString(), timeoutMillis, responseFuture.getCause());
+            } else{
+                throw new RemotingException(address.toString(), responseFuture.getCause());
+            }
         }
+        return result;
     }
 
     public Channel getChannel(Address address) {
@@ -192,10 +211,6 @@ public class NettyRemotingClient {
         return null;
     }
 
-    public ExecutorService getDefaultExecutor() {
-        return defaultExecutor;
-    }
-
     public void close() {
         if(isStarted.compareAndSet(true, false)){
             try {
@@ -203,8 +218,8 @@ public class NettyRemotingClient {
                 if(workerGroup != null){
                     this.workerGroup.shutdownGracefully();
                 }
-                if(defaultExecutor != null){
-                    defaultExecutor.shutdown();
+                if(callbackExecutor != null){
+                    this.callbackExecutor.shutdownNow();
                 }
             } catch (Exception ex) {
                 logger.error("netty client close exception", ex);
