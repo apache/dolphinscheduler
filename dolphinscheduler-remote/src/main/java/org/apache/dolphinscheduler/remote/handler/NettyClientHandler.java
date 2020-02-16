@@ -34,8 +34,14 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(NettyClientHandler.class);
 
+    /**
+     *  netty client
+     */
     private final NettyRemotingClient nettyRemotingClient;
 
+    /**
+     *  callback thread executor
+     */
     private final ExecutorService callbackExecutor;
 
     public NettyClientHandler(NettyRemotingClient nettyRemotingClient, ExecutorService callbackExecutor){
@@ -43,17 +49,36 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         this.callbackExecutor = callbackExecutor;
     }
 
+    /**
+     *  When the current channel is not active,
+     *  the current channel has reached the end of its life cycle
+     *
+     * @param ctx channel handler context
+     * @throws Exception
+     */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         nettyRemotingClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
         ctx.channel().close();
     }
 
+    /**
+     *  The current channel reads data from the remote
+     *
+     * @param ctx channel handler context
+     * @param msg message
+     * @throws Exception
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         processReceived((Command)msg);
     }
 
+    /**
+     *  process received logic
+     *
+     * @param responseCommand responseCommand
+     */
     private void processReceived(final Command responseCommand) {
         ResponseFuture future = ResponseFuture.getFuture(responseCommand.getOpaque());
         if(future != null){
@@ -74,6 +99,12 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    /**
+     *  caught exception
+     * @param ctx channel handler context
+     * @param cause  cause
+     * @throws Exception
+     */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         logger.error("exceptionCaught : {}", cause);
@@ -81,6 +112,12 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         ctx.channel().close();
     }
 
+    /**
+     *  channel write changed
+     *
+     * @param ctx channel handler context
+     * @throws Exception
+     */
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
         Channel ch = ctx.channel();

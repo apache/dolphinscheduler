@@ -49,7 +49,7 @@ public class NettyRemotingServer {
     private final Logger logger = LoggerFactory.getLogger(NettyRemotingServer.class);
 
     /**
-     *  server bootstart
+     *  server bootstrap
      */
     private final ServerBootstrap serverBootstrap = new ServerBootstrap();
 
