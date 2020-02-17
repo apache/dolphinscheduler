@@ -110,7 +110,7 @@ public class ResourcesService extends BaseService {
 
         Date now = new Date();
 
-        Resource resource = new Resource(pid,name,fullName,true,name,description,loginUser.getId(),type,-1,now,now);
+        Resource resource = new Resource(pid,name,fullName,true,description,name,loginUser.getId(),type,-1,now,now);
 
         try {
             resourcesMapper.insert(resource);
@@ -378,7 +378,7 @@ public class ResourcesService extends BaseService {
      * @param pageSize page size
      * @return resource list page
      */
-    public Map<String, Object> queryResourceListPaging(User loginUser, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
+    public Map<String, Object> queryResourceListPaging(User loginUser, int direcotryId, ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
 
         HashMap<String, Object> result = new HashMap<>(5);
         Page<Resource> page = new Page(pageNo, pageSize);
@@ -387,7 +387,7 @@ public class ResourcesService extends BaseService {
             userId= 0;
         }
         IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page,
-                userId, type.ordinal(), searchVal);
+                userId,direcotryId, type.ordinal(), searchVal);
         PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
         pageInfo.setTotalCount((int)resourceIPage.getTotal());
         pageInfo.setLists(resourceIPage.getRecords());

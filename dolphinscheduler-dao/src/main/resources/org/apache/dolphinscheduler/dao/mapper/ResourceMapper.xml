@@ -52,6 +52,9 @@
             and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
             union select id as resources_id  from t_ds_resources where user_id=#{userId})
         </if>
+        <if test="id != null and id != 0">
+            and  pid = #{id}
+        </if>
         <if test="searchVal != null and searchVal != ''">
             and  alias like concat('%', #{searchVal}, '%')
         </if>
