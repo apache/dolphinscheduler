@@ -163,11 +163,12 @@ public class ResourcesController extends BaseController{
                                  @RequestParam(value ="id") int resourceId,
                                  @RequestParam(value = "type") ResourceType type,
                                  @RequestParam(value ="name")String alias,
+                                 @RequestParam(value ="fullName")String fullName,
                                  @RequestParam(value = "description", required = false) String description) {
         try {
             logger.info("login user {}, update resource, type: {}, resource alias: {}, desc: {}",
                     loginUser.getUserName(),type, alias, description);
-            return resourceService.updateResource(loginUser,resourceId,alias, description,type);
+            return resourceService.updateResource(loginUser,resourceId,alias, fullName,description,type);
         } catch (Exception e) {
             logger.error(UPDATE_RESOURCE_ERROR.getMsg(),e);
             return error(Status.UPDATE_RESOURCE_ERROR.getCode(), Status.UPDATE_RESOURCE_ERROR.getMsg());

@@ -265,10 +265,22 @@ public class ResourcesService extends BaseService {
      * @param desc description
      * @return update result code
      */
+
+    /**
+     *
+     * @param loginUser     login user
+     * @param resourceId    resource id
+     * @param name          name
+     * @param fullName      full name
+     * @param desc description
+     * @param type          resource type
+     * @return
+     */
     @Transactional(rollbackFor = Exception.class)
     public Result updateResource(User loginUser,
                                  int resourceId,
                                  String name,
+                                 String fullName,
                                  String desc,
                                  ResourceType type) {
         Result result = new Result();
@@ -297,7 +309,7 @@ public class ResourcesService extends BaseService {
         }
 
         //check resource aleady exists
-        if (!resource.getAlias().equals(name) && checkResourceExists(name, 0, type.ordinal())) {
+        if (!resource.getAlias().equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
             return result;
@@ -308,20 +320,23 @@ public class ResourcesService extends BaseService {
         if (StringUtils.isEmpty(tenantCode)){
             return result;
         }
-
-        //get the file suffix
-        String originResourceName = resource.getAlias();
-        String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
-
-        //if the name without suffix then add it ,else use the origin name
         String nameWithSuffix = name;
-        if(!name.endsWith(suffix)){
-            nameWithSuffix = nameWithSuffix + suffix;
+        String originResourceName = resource.getAlias();
+        if (!resource.isDirectory()) {
+            //get the file suffix
+
+            String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
+
+            //if the name without suffix then add it ,else use the origin name
+            if(!name.endsWith(suffix)){
+                nameWithSuffix = nameWithSuffix + suffix;
+            }
         }
 
         // updateResource data
         Date now = new Date();
         resource.setAlias(nameWithSuffix);
+        resource.setFullName(fullName);
         resource.setDescription(desc);
         resource.setUpdateTime(now);
 
