@@ -126,7 +126,7 @@ public class JSONUtils {
    * @param json json
    * @return true if valid
    */
-  public static boolean checkJsonVaild(String json) {
+  public static boolean checkJsonValid(String json) {
 
     if (StringUtils.isEmpty(json)) {
       return false;

@@ -229,7 +229,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-rpc</artifactId>
+                <artifactId>dolphinscheduler-remote</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -682,6 +687,7 @@
                         <include>**/common/queue/*.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/FileUtilsTest.java</include>
+                        <include>**/api/utils/FourLetterWordTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/enums/*.java</include>
@@ -715,6 +721,7 @@
                         <include>**/dao/mapper/AlertMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/cron/CronUtilsTest.java</include>
+                        <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
@@ -773,9 +780,6 @@
                         <exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
                         <exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
                         <exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
-                        <exclude>
-                            **/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java
-                        </exclude>
                     </excludes>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
@@ -862,8 +866,9 @@
         <module>dolphinscheduler-api</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-alert</module>
-        <module>dolphinscheduler-rpc</module>
         <module>dolphinscheduler-dist</module>
+        <module>dolphinscheduler-remote</module>
+        <module>dolphinscheduler-service</module>
     </modules>
 
 </project>
