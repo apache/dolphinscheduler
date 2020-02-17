@@ -70,9 +70,6 @@ elif [ "$command" = "alert-server" ]; then
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "logger-server" ]; then
   CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
-elif [ "$command" = "combined-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:combined_logback.xml -Dspring.profiles.active=api -Dserver.is-combined-server=true"
-  CLASS=org.apache.dolphinscheduler.api.CombinedApplicationServer
 else
   echo "Error: No command named \`$command' was found."
   exit 1
