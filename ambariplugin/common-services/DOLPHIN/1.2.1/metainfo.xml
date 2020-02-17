@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<metainfo>
+    <schemaVersion>2.0</schemaVersion>
+    <services>
+        <service>
+            <name>DOLPHIN</name>
+            <displayName>Dolphin Scheduler</displayName>
+            <comment>分布式易扩展的可视化DAG工作流任务调度系统</comment>
+            <version>1.2.1</version>
+            <components>
+                <component>
+                    <name>DOLPHIN_MASTER</name>
+                    <displayName>DS Master</displayName>
+                    <category>MASTER</category>
+                    <cardinality>1</cardinality>
+                    <dependencies>
+                        <dependency>
+                            <name>DOLPHIN/DOLPHIN_API</name>
+                            <scope>cluster</scope>
+                            <auto-deploy>
+                                <enabled>true</enabled>
+                            </auto-deploy>
+                        </dependency>
+                    </dependencies>
+                    <commandScript>
+                        <script>scripts/dolphin_master_service.py</script>
+                        <scriptType>PYTHON</scriptType>
+                        <timeout>600</timeout>
+                    </commandScript>
+                </component>
+
+                <component>
+                    <name>DOLPHIN_LOGGER</name>
+                    <displayName>DS Logger</displayName>
+                    <category>SLAVE</category>
+                    <cardinality>1+</cardinality>
+                    <dependencies>
+                        <dependency>
+                            <name>DOLPHIN/DOLPHIN_API</name>
+                            <scope>cluster</scope>
+                            <auto-deploy>
+                                <enabled>true</enabled>
+                            </auto-deploy>
+                        </dependency>
+                    </dependencies>
+                    <commandScript>
+                        <script>scripts/dolphin_logger_service.py</script>
+                        <scriptType>PYTHON</scriptType>
+                        <timeout>600</timeout>
+                    </commandScript>
+                </component>
+
+                <component>
+                    <name>DOLPHIN_WORKER</name>
+                    <displayName>DS Worker</displayName>
+                    <category>SLAVE</category>
+                    <cardinality>1+</cardinality>
+                    <dependencies>
+                        <dependency>
+                            <name>DOLPHIN/DOLPHIN_LOGGER</name>
+                            <scope>host</scope>
+                            <auto-deploy>
+                                <enabled>true</enabled>
+                            </auto-deploy>
+                        </dependency>
+                        <dependency>
+                            <name>DOLPHIN/DOLPHIN_API</name>
+                            <scope>cluster</scope>
+                            <auto-deploy>
+                                <enabled>true</enabled>
+                            </auto-deploy>
+                        </dependency>
+                    </dependencies>
+                    <commandScript>
+                        <script>scripts/dolphin_worker_service.py</script>
+                        <scriptType>PYTHON</scriptType>
+                        <timeout>600</timeout>
+                    </commandScript>
+                </component>
+
+                <component>
+                    <name>DOLPHIN_ALERT</name>
+                    <displayName>DS Alert</displayName>
+                    <category>SLAVE</category>
+                    <cardinality>1</cardinality>
+                    <dependencies>
+                        <dependency>
+                            <name>DOLPHIN/DOLPHIN_API</name>
+                            <scope>cluster</scope>
+                            <auto-deploy>
+                                <enabled>true</enabled>
+                            </auto-deploy>
+                        </dependency>
+                    </dependencies>
+                    <commandScript>
+                        <script>scripts/dolphin_alert_service.py</script>
+                        <scriptType>PYTHON</scriptType>
+                        <timeout>600</timeout>
+                    </commandScript>
+                </component>
+
+                <component>
+                    <name>DOLPHIN_API</name>
+                    <displayName>DS_Api</displayName>
+                    <category>SLAVE</category>
+                    <cardinality>1</cardinality>
+                    <commandScript>
+                        <script>scripts/dolphin_api_service.py</script>
+                        <scriptType>PYTHON</scriptType>
+                        <timeout>600</timeout>
+                    </commandScript>
+                </component>
+            </components>
+
+            <requiredServices>
+                <service>ZOOKEEPER</service>
+            </requiredServices>
+
+            <osSpecifics>
+                <osSpecific>
+                    <osFamily>any</osFamily>
+                    <packages>
+                        <package>
+                            <name>apache-dolphinscheduler-incubating-1.2.1*</name>
+                        </package>
+                    </packages>
+                </osSpecific>
+            </osSpecifics>
+
+            <configuration-dependencies>
+                <config-type>dolphin-alert</config-type>
+                <config-type>dolphin-app-api</config-type>
+                <config-type>dolphin-app-dao</config-type>
+                <config-type>dolphin-common</config-type>
+                <config-type>dolphin-env</config-type>
+                <config-type>dolphin-quartz</config-type>
+            </configuration-dependencies>
+
+            <themes>
+                <theme>
+                    <fileName>theme.json</fileName>
+                    <default>true</default>
+                </theme>
+            </themes>
+
+            <quickLinksConfigurations-dir>quicklinks</quickLinksConfigurations-dir>
+            <quickLinksConfigurations>
+                <quickLinksConfiguration>
+                    <fileName>quicklinks.json</fileName>
+                    <default>true</default>
+                </quickLinksConfiguration>
+            </quickLinksConfigurations>
+        </service>
+    </services>
+</metainfo>
