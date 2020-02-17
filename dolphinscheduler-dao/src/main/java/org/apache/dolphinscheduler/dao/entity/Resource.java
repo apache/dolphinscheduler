@@ -50,7 +50,7 @@ public class Resource {
   /**
    * is directory
    */
-  private boolean isDirectory;
+  private boolean isDirectory=false;
 
   /**
    * description
@@ -230,9 +230,12 @@ public class Resource {
   public String toString() {
     return "Resource{" +
             "id=" + id +
+            ", pid=" + pid +
             ", alias='" + alias + '\'' +
-            ", fileName='" + fileName + '\'' +
+            ", fullName='" + fullName + '\'' +
+            ", isDirectory=" + isDirectory +
             ", description='" + description + '\'' +
+            ", fileName='" + fileName + '\'' +
             ", userId=" + userId +
             ", type=" + type +
             ", size=" + size +

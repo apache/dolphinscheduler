@@ -212,8 +212,8 @@ public class ResourcesServiceTest {
         resourcePage.setTotal(1);
         resourcePage.setRecords(getResourceList());
         Mockito.when(resourcesMapper.queryResourcePaging(Mockito.any(Page.class),
-                Mockito.eq(0),Mockito.eq(0), Mockito.eq(0), Mockito.eq("test"))).thenReturn(resourcePage);
-        Map<String, Object> result = resourcesService.queryResourceListPaging(loginUser,0,ResourceType.FILE,"test",1,10);
+                Mockito.eq(0),Mockito.eq(-1), Mockito.eq(0), Mockito.eq("test"))).thenReturn(resourcePage);
+        Map<String, Object> result = resourcesService.queryResourceListPaging(loginUser,-1,ResourceType.FILE,"test",1,10);
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         PageInfo pageInfo = (PageInfo) result.get(Constants.DATA_LIST);

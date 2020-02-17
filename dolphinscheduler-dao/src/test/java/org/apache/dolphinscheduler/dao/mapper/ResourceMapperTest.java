@@ -200,12 +200,14 @@ public class ResourceMapperTest {
 
         IPage<Resource> resourceIPage = resourceMapper.queryResourcePaging(
                 page,
+                0,
                 resource.getUserId(),
                 resource.getType().ordinal(),
                 ""
         );
         IPage<Resource> resourceIPage1 = resourceMapper.queryResourcePaging(
                 page,
+                0,
                 1110,
                 resource.getType().ordinal(),
                 ""
