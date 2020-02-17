@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.yetus.audience.InterfaceAudience;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -37,9 +36,9 @@ public class OSUtilsTest {
         Assert.assertNotEquals("System user list should not be empty", userList.size(), 0);
         logger.info("OS user list : {}", userList.toString());
     }
+
     @Test
     public void testOSMetric(){
-
         double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
         Assert.assertTrue(availablePhysicalMemorySize > 0.0f);
         double totalMemorySize = OSUtils.totalMemorySize();
@@ -51,17 +50,23 @@ public class OSUtilsTest {
         double cpuUsage = OSUtils.cpuUsage();
         Assert.assertTrue(cpuUsage > 0.0f);
     }
+
     @Test
     public void getGroup() {
-        if(OSUtils.isMacOS() || !OSUtils.isWindows()){
-            try {
-                String group = OSUtils.getGroup();
-                Assert.assertNotNull(group);
-            } catch (IOException e) {
-                Assert.fail("get group failed " + e.getMessage());
-            }
+        try {
+            String group = OSUtils.getGroup();
+            Assert.assertNotNull(group);
+        } catch (IOException e) {
+            Assert.fail("get group failed " + e.getMessage());
         }
     }
+
+    @Test
+    public void createUser() {
+        boolean result = OSUtils.createUser("test123");
+        Assert.assertTrue(result);
+    }
+
     @Test
     public void exeCmd() {
         if(OSUtils.isMacOS() || !OSUtils.isWindows()){
@@ -114,4 +119,5 @@ public class OSUtilsTest {
         Assert.assertFalse(resource);
 
     }
+
 }

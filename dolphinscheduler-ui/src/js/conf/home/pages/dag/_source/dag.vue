@@ -61,7 +61,7 @@
           <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><em class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></em></span>
         </div>
         <div class="save-btn">
-          <div class="operation" style="vertical-align: middle;"> 
+          <div class="operation" style="vertical-align: middle;">
             <a href="javascript:"
                v-for="(item,$index) in toolOperList"
                :class="_operationClass(item)"
@@ -71,14 +71,14 @@
               <x-button type="text" data-container="body" :icon="item.icon" v-tooltip.light="item.desc"></x-button>
             </a>
           </div>
-          <x-button 
-                  type="primary" 
+          <x-button
+                  type="primary"
                   v-tooltip.light="$t('Format DAG')"
-                  icon="ans-icon-triangle-solid-right" 
-                  size="xsmall" 
+                  icon="ans-icon-triangle-solid-right"
+                  size="xsmall"
                   data-container="body"
                   v-if="type === 'instance'"
-                  style="vertical-align: middle;" 
+                  style="vertical-align: middle;"
                   @click="dagAutomaticLayout">
           </x-button>
           <x-button
@@ -169,7 +169,7 @@
       // DAG automatic layout
       dagAutomaticLayout() {
         $('#canvas').html('')
-        
+
       // Destroy round robin
         Dag.init({
         dag: this,
@@ -527,6 +527,11 @@
             }
           })
         })
+      },
+      removeEventModelById ($id) {
+        if(eventModel && this.taskId == $id){
+          eventModel.remove()
+        }
       }
     },
     watch: {
@@ -580,6 +585,9 @@
       clearInterval(this.setIntervalP)
     },
     destroyed () {
+      if (eventModel) {
+        eventModel.remove()
+      }
     },
     computed: {
       ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name'])
