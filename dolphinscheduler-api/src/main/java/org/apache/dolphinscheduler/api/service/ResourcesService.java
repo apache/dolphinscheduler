@@ -143,7 +143,6 @@ public class ResourcesService extends BaseService {
      * @param type type
      * @param pid parent id
      * @param currentDir current directory
-     * @param isDirecoty is directory
      * @return create result code
      */
     @Transactional(rollbackFor = Exception.class)
@@ -153,8 +152,7 @@ public class ResourcesService extends BaseService {
                                  ResourceType type,
                                  MultipartFile file,
                                  int pid,
-                                 String currentDir,
-                                 boolean isDirecoty) {
+                                 String currentDir) {
         Result result = new Result();
 
         // if hdfs not startup
@@ -208,7 +206,7 @@ public class ResourcesService extends BaseService {
 
 
 
-        Resource resource = new Resource(pid,name,fullName,isDirecoty,file.getOriginalFilename(),desc,loginUser.getId(),type,file.getSize(),now,now);
+        Resource resource = new Resource(pid,name,fullName,false,file.getOriginalFilename(),desc,loginUser.getId(),type,file.getSize(),now,now);
 
         try {
             resourcesMapper.insert(resource);

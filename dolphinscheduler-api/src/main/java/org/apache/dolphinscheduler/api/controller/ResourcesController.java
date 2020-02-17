@@ -128,12 +128,11 @@ public class ResourcesController extends BaseController{
                                  @RequestParam(value = "description", required = false) String description,
                                  @RequestParam("file") MultipartFile file,
                                  @RequestParam(value ="pid") int pid,
-                                 @RequestParam(value ="currentDir") String currentDir,
-                                 @RequestParam(value ="isDirecoty") boolean isDirecoty) {
+                                 @RequestParam(value ="currentDir") String currentDir) {
         try {
             logger.info("login user {}, create resource, type: {}, resource alias: {}, desc: {}, file: {},{}",
                     loginUser.getUserName(),type, alias, description, file.getName(), file.getOriginalFilename());
-            return resourceService.createResource(loginUser,alias, description,type ,file,pid,currentDir,isDirecoty);
+            return resourceService.createResource(loginUser,alias, description,type ,file,pid,currentDir);
         } catch (Exception e) {
             logger.error(CREATE_RESOURCE_ERROR.getMsg(),e);
             return error(CREATE_RESOURCE_ERROR.getCode(), CREATE_RESOURCE_ERROR.getMsg());
@@ -362,16 +361,16 @@ public class ResourcesController extends BaseController{
                                        @RequestParam(value = "description", required = false) String description,
                                        @RequestParam(value = "content") String content,
                                        @RequestParam(value ="pid") int pid,
-                                       @RequestParam(value ="currentDirectory") String currentDirectory
+                                       @RequestParam(value ="currentDir") String currentDir
     ) {
         try{
             logger.info("login user {}, online create resource! fileName : {}, type : {}, suffix : {},desc : {},content : {}",
-                    loginUser.getUserName(),fileName,type,fileSuffix,description,content,pid,currentDirectory);
+                    loginUser.getUserName(),fileName,type,fileSuffix,description,content,pid,currentDir);
             if(StringUtils.isEmpty(content)){
                 logger.error("resource file contents are not allowed to be empty");
                 return error(Status.RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
             }
-            return resourceService.onlineCreateResource(loginUser,type,fileName,fileSuffix,description,content,pid,currentDirectory);
+            return resourceService.onlineCreateResource(loginUser,type,fileName,fileSuffix,description,content,pid,currentDir);
         }catch (Exception e){
             logger.error(CREATE_RESOURCE_FILE_ON_LINE_ERROR.getMsg(),e);
             return error(Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR.getCode(), Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR.getMsg());
