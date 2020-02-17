@@ -58,11 +58,13 @@ let JSP = function () {
 /**
  * dag init
  */
-JSP.prototype.init = function ({ dag, instance }) {
+JSP.prototype.init = function ({ dag, instance, options }) {
   // Get the dag component instance
   this.dag = dag
   // Get jsplumb instance
   this.JspInstance = instance
+  // Get JSP options
+  this.options = options || {}
   // Register jsplumb connection type and configuration
   this.JspInstance.registerConnectionType('basic', {
     anchor: 'Continuous',
@@ -494,6 +496,9 @@ JSP.prototype.removeNodes = function ($id) {
 
   // delete dom
   $(`#${$id}`).remove()
+
+  // callback onRemoveNodes event
+  this.options&&this.options.onRemoveNodes&&this.options.onRemoveNodes($id)
 }
 
 /**
