@@ -12,16 +12,7 @@
                     <name>DOLPHIN_MASTER</name>
                     <displayName>DS Master</displayName>
                     <category>MASTER</category>
-                    <cardinality>1</cardinality>
-                    <dependencies>
-                        <dependency>
-                            <name>DOLPHIN/DOLPHIN_API</name>
-                            <scope>cluster</scope>
-                            <auto-deploy>
-                                <enabled>true</enabled>
-                            </auto-deploy>
-                        </dependency>
-                    </dependencies>
+                    <cardinality>1-2</cardinality>
                     <commandScript>
                         <script>scripts/dolphin_master_service.py</script>
                         <scriptType>PYTHON</scriptType>
@@ -34,15 +25,6 @@
                     <displayName>DS Logger</displayName>
                     <category>SLAVE</category>
                     <cardinality>1+</cardinality>
-                    <dependencies>
-                        <dependency>
-                            <name>DOLPHIN/DOLPHIN_API</name>
-                            <scope>cluster</scope>
-                            <auto-deploy>
-                                <enabled>true</enabled>
-                            </auto-deploy>
-                        </dependency>
-                    </dependencies>
                     <commandScript>
                         <script>scripts/dolphin_logger_service.py</script>
                         <scriptType>PYTHON</scriptType>
@@ -63,13 +45,6 @@
                                 <enabled>true</enabled>
                             </auto-deploy>
                         </dependency>
-                        <dependency>
-                            <name>DOLPHIN/DOLPHIN_API</name>
-                            <scope>cluster</scope>
-                            <auto-deploy>
-                                <enabled>true</enabled>
-                            </auto-deploy>
-                        </dependency>
                     </dependencies>
                     <commandScript>
                         <script>scripts/dolphin_worker_service.py</script>
@@ -83,15 +58,6 @@
                     <displayName>DS Alert</displayName>
                     <category>SLAVE</category>
                     <cardinality>1</cardinality>
-                    <dependencies>
-                        <dependency>
-                            <name>DOLPHIN/DOLPHIN_API</name>
-                            <scope>cluster</scope>
-                            <auto-deploy>
-                                <enabled>true</enabled>
-                            </auto-deploy>
-                        </dependency>
-                    </dependencies>
                     <commandScript>
                         <script>scripts/dolphin_alert_service.py</script>
                         <scriptType>PYTHON</scriptType>

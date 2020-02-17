@@ -13,10 +13,6 @@ class DolphinApiService(Script):
         self.install_packages(env)
         Execute(('chmod', '-R', '777', params.dolphin_home), user=params.dolphin_user, sudo=True)
 
-        # init table
-        start_cmd = format("sh " + params.dolphin_home + "/script/create-dolphinscheduler.sh")
-        Execute(start_cmd, user=params.dolphin_user, sudo=True)
-
     def configure(self, env):
         import params
         params.pika_slave = True
@@ -29,10 +25,13 @@ class DolphinApiService(Script):
         env.set_params(params)
         self.configure(env)
 
+        #init
+        init_cmd=format("sh " + params.dolphin_home + "/script/create-dolphinscheduler.sh")
+        Execute(init_cmd, user=params.dolphin_user)
+
         #upgrade
-        Execute("sh {0}/script/upgrade-dolphinscheduler.sh".format(params.dolphin_home),
-                user=params.dolphin_user
-                )
+        upgrade_cmd=format("sh " + params.dolphin_home + "/script/upgrade-dolphinscheduler.sh")
+        Execute(upgrade_cmd, user=params.dolphin_user)
 
         start_cmd = format("sh " + params.dolphin_bin_dir + "/dolphinscheduler-daemon.sh start api-server")
         Execute(start_cmd, user=params.dolphin_user)
