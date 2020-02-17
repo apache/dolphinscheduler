@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.remote;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,9 +15,9 @@ package org.apache.dolphinscheduler.remote;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.remote;
+
 import io.netty.channel.Channel;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.Ping;
@@ -67,6 +67,8 @@ public class NettyRemotingClientTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        server.close();
+        client.close();
     }
 
     /**
@@ -103,5 +105,7 @@ public class NettyRemotingClientTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        server.close();
+        client.close();
     }
 }
