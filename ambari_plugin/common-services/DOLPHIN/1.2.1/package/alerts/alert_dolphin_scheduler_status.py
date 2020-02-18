@@ -1,6 +1,3 @@
-# coding=utf8
-#!/usr/bin/env python
-
 """
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,14 +15,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+
+import socket
 import urllib2
-import urllib
 import os
 import logging
 import ambari_simplejson as json
-import time
 from resource_management.libraries.script.script import Script
-import telnetlib 
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -89,6 +85,10 @@ def execute(configurations={}, parameters={}, host_name=None):
         pid_file_path = dolphin_pidfile_dir + "/worker-server.pid"
     elif alert_name == 'DOLPHIN_ALERT':
         pid_file_path = dolphin_pidfile_dir + "/alert-server.pid"
+    elif alert_name == 'DOLPHIN_LOGGER':
+        pid_file_path = dolphin_pidfile_dir + "/logger-server.pid"
+    elif alert_name == 'DOLPHIN_API':
+        pid_file_path = dolphin_pidfile_dir + "/api-server.pid"
         
     if not pid_file_path or not os.path.isfile(pid_file_path):
         is_running = False
@@ -107,31 +107,17 @@ def execute(configurations={}, parameters={}, host_name=None):
         sudo.kill(pid, 0)
     except OSError:
         is_running = False
-    
+
+    if host_name is None:
+        host_name = socket.getfqdn()
+
     if not is_running:
         result_code = "CRITICAL"
-        label_content = {
-            "serviceName": "DOLPHIN_SCHEDULER",
-            "show_type": "text",
-            "alert_message": [
-                "serviceName：DOLPHIN_SCHEDULER",
-                "alertName：" + alert_name,
-                "ARK_STREAMING , server is failed !"
-            ]
-        }
     else:
         result_code = "OK"
-        label_content = {
-            "serviceName": "DOLPHIN_SCHEDULER",
-            "show_type": "text",
-            "alert_message": [
-                "serviceName：DOLPHIN_SCHEDULER",
-                "alertName：" + alert_name,
-                "ARK_STREAMING , server is Ok ！"
-            ]
-        }
-    label = json.dumps(label_content, encoding="utf-8")
-        
+
+    label = "The comment {0} of DOLPHIN_SCHEDULER on {1} is {2}".format(alert_name, host_name, result_code)
+
     return ((result_code, [label]))
 
 if __name__ == "__main__":

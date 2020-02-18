@@ -1,3 +1,19 @@
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 <configuration>
 	<property>
 		<name>dolphin.database.type</name>
@@ -23,28 +39,28 @@
 
 	<property>
 		<name>dolphin.database.host</name>
-		<value>ark1</value>
+		<value></value>
 		<display-name>Dolphin Database Host</display-name>
 		<on-ambari-upgrade add="true"/>
 	</property>
 
 	<property>
 		<name>dolphin.database.port</name>
-		<value>3306</value>
+		<value></value>
 		<display-name>Dolphin Database Port</display-name>
 		<on-ambari-upgrade add="true"/>
 	</property>
 
 	<property>
 		<name>dolphin.database.username</name>
-		<value>streaming</value>
+		<value></value>
 		<display-name>Dolphin Database Username</display-name>
 		<on-ambari-upgrade add="true"/>
 	</property>
 
 	<property>
 		<name>dolphin.database.password</name>
-		<value>ark_Streaming@0927Sa</value>
+		<value></value>
 		<display-name>Dolphin Database Password</display-name>
 		<property-type>PASSWORD</property-type>
 		<value-attributes>
@@ -55,14 +71,14 @@
 
 	<property>
 		<name>dolphin.user</name>
-		<value>root</value>
+		<value></value>
 		<description>Which user to install and admin dolphin scheduler</description>
 		<display-name>Deploy User</display-name>
 		<on-ambari-upgrade add="true"/>
 	</property>
 	<property>
 		<name>dolphin.group</name>
-		<value>root</value>
+		<value></value>
 		<description>Which user to install and admin dolphin scheduler</description>
 		<display-name>Deploy Group</display-name>
 		<on-ambari-upgrade add="true"/>
@@ -102,13 +118,6 @@ export FLINK_HOME=/opt/soft/flink</value>
 			<empty-value-valid>false</empty-value-valid>
 			<show-property-name>false</show-property-name>
 		</value-attributes>
-		<on-ambari-upgrade add="true"/>
-	</property>
-
-	<property>
-		<name>dolphin.api.address</name>
-		<value>ark1:12345</value>
-		<display-name>Dolphin Application Address</display-name>
 		<on-ambari-upgrade add="true"/>
 	</property>
 </configuration>
