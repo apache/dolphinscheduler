@@ -101,30 +101,6 @@ public class ProcessInstanceServiceTest {
                 "2020-01-02 00:00:00", "", "test_user", ExecutionStatus.SUBMITTED_SUCCESS,
                 "192.168.xx.xx", 1, 10);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
-
-        //
-        putMsg(result, Status.SUCCESS, projectName);
-        Project project = getProject(projectName);
-        int[] statusArray = new int[]{ExecutionStatus.SUBMITTED_SUCCESS.ordinal()};
-        Page<ProcessInstance> page = new Page(1, 10);
-        Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
-        Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
-        ProcessInstance processInstance = getProcessInstance();
-        List<ProcessInstance> processInstanceList = new ArrayList<>();
-        Page<ProcessInstance> pageReturn = new Page(1, 10);
-        processInstanceList.add(processInstance);
-        pageReturn.setRecords(processInstanceList);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
-        Mockito.when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
-        Mockito.when(usersService.queryUser(loginUser.getUserName())).thenReturn(loginUser);
-        Mockito.when(processInstanceMapper.queryProcessInstanceListPaging(page, project.getId(), 1, "", -1, statusArray,
-                "192.168.xx.xx", start, end)).thenReturn(pageReturn);
-
-        Map<String, Object> successRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "2020-01-01 00:00:00",
-                "2020-01-02 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
-                "192.168.xx.xx", 1, 10);
-        Assert.assertEquals(Status.SUCCESS, proejctAuthFailRes.get(Constants.STATUS));
-
     }
 
     @Test
