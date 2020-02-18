@@ -35,3 +35,23 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_process_definition_A_modify_by;
 DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_modify_by;
+
+-- uc_dolphin_T_t_ds_process_definition_A_modify_by
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_executor_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_executor_id()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='executor_id')
+   THEN
+         ALTER TABLE t_ds_task_instance ADD `executor_id` int(11) DEFAULT NULL COMMENT 'executor id';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_task_instance_A_executor_id;
+DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_executor_id;

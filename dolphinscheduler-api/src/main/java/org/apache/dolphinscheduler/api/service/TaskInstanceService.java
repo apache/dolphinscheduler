@@ -117,17 +117,24 @@ public class TaskInstanceService extends BaseService {
             return result;
         }
 
+
+        Page<TaskInstance> page = new Page(pageNo, pageSize);
+        PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
+
         //executor name query
         int executorId = 0;
         if (StringUtils.isNotEmpty(executorName)) {
-            executorId = usersService.queryUser(executorName).getId();
+            User executor = usersService.queryUser(executorName);
+            if (null != executor) {
+                executorId = executor.getId();
+            } else {
+                executorId = -1;
+            }
         }
 
-        Page<TaskInstance> page = new Page(pageNo, pageSize);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
                 page, project.getId(), processInstanceId, searchVal, taskName, executorId, statusArray, host, start, end
         );
-        PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
         Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);
         exclusionSet.add("taskJson");

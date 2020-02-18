@@ -75,6 +75,7 @@ public class ProcessInstanceController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type ="String"),
+            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type ="String"),
             @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type ="ExecutionStatus"),
             @ApiImplicitParam(name = "host", value = "HOST", type ="String"),
             @ApiImplicitParam(name = "startDate", value = "START_DATE", type ="String"),

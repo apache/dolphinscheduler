@@ -204,6 +204,7 @@ public class TaskInstance {
     /**
      * executor name
      */
+    @TableField(exist = false)
     private String executorName;
 
 

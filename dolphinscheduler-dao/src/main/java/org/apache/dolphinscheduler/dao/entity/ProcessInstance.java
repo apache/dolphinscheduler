@@ -142,6 +142,7 @@ public class ProcessInstance {
     /**
      * executor name
      */
+    @TableField(exist = false)
     private String executorName;
 
     /**

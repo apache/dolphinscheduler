@@ -185,12 +185,19 @@ public class ProcessInstanceService extends BaseDAGService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startDate,endDate");
             return result;
         }
+
         Page<ProcessInstance> page = new Page(pageNo, pageSize);
+        PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
 
         //executor name query
         int executorId = 0;
         if (StringUtils.isNotEmpty(executorName)) {
-            executorId = usersService.queryUser(executorName).getId();
+            User executor = usersService.queryUser(executorName);
+            if (null != executor) {
+                executorId = executor.getId();
+            } else {
+                executorId = -1;
+            }
         }
 
         IPage<ProcessInstance> processInstanceList =
@@ -211,7 +218,6 @@ public class ProcessInstanceService extends BaseDAGService {
         exclusionSet.add("connects");
         exclusionSet.add("processInstanceJson");
 
-        PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
         pageInfo.setTotalCount((int) processInstanceList.getTotal());
         pageInfo.setLists(CollectionUtils.getListByExclusion(processInstances, exclusionSet));
         result.put(Constants.DATA_LIST, pageInfo);

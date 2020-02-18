@@ -69,6 +69,7 @@ public class TaskInstanceController extends BaseController{
             @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID",required = false, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type ="String"),
             @ApiImplicitParam(name = "taskName", value = "TASK_NAME", type ="String"),
+            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type ="String"),
             @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type ="ExecutionStatus"),
             @ApiImplicitParam(name = "host", value = "HOST", type ="String"),
             @ApiImplicitParam(name = "startDate", value = "START_DATE", type ="String"),
