@@ -162,12 +162,11 @@ public class ResourcesController extends BaseController{
                                  @RequestParam(value ="id") int resourceId,
                                  @RequestParam(value = "type") ResourceType type,
                                  @RequestParam(value ="name")String alias,
-                                 @RequestParam(value ="fullName")String fullName,
                                  @RequestParam(value = "description", required = false) String description) {
         try {
             logger.info("login user {}, update resource, type: {}, resource alias: {}, desc: {}",
                     loginUser.getUserName(),type, alias, description);
-            return resourceService.updateResource(loginUser,resourceId,alias, fullName,description,type);
+            return resourceService.updateResource(loginUser,resourceId,alias,description,type);
         } catch (Exception e) {
             logger.error(UPDATE_RESOURCE_ERROR.getMsg(),e);
             return error(Status.UPDATE_RESOURCE_ERROR.getCode(), Status.UPDATE_RESOURCE_ERROR.getMsg());
@@ -218,7 +217,7 @@ public class ResourcesController extends BaseController{
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType ="Int",example = "20")
     })
-    @PostMapping(value="/list-paging")
+    @GetMapping(value="/list-paging")
     @ResponseStatus(HttpStatus.OK)
     public Result queryResourceListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value ="type") ResourceType type,

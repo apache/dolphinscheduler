@@ -252,33 +252,19 @@ public class ResourcesService extends BaseService {
     }
 
 
-
     /**
      * update resource
-     *
-     * @param loginUser login user
-     * @param name alias
-     * @param resourceId resource id
-     * @param type resource type
-     * @param desc description
-     * @return update result code
-     */
-
-    /**
-     *
      * @param loginUser     login user
      * @param resourceId    resource id
      * @param name          name
-     * @param fullName      full name
-     * @param desc description
+     * @param desc          description
      * @param type          resource type
-     * @return
+     * @return  update result code
      */
     @Transactional(rollbackFor = Exception.class)
     public Result updateResource(User loginUser,
                                  int resourceId,
                                  String name,
-                                 String fullName,
                                  String desc,
                                  ResourceType type) {
         Result result = new Result();
@@ -307,6 +293,9 @@ public class ResourcesService extends BaseService {
         }
 
         //check resource aleady exists
+        String originFullName = resource.getFullName();
+
+        String fullName = String.format("%s%s",originFullName.substring(0,originFullName.lastIndexOf("/")+1),name);
         if (!resource.getAlias().equals(name) && checkResourceExists(fullName, 0, type.ordinal())) {
             logger.error("resource {} already exists, can't recreate", name);
             putMsg(result, Status.RESOURCE_EXIST);
