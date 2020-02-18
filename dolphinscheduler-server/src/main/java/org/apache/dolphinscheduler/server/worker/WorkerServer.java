@@ -169,10 +169,10 @@ public class WorkerServer implements IStoppable {
         //init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.EXECUTE_TASK_REQUEST, new WorkerNettyRequestProcessor());
+        this.nettyRemotingServer.registerProcessor(CommandType.EXECUTE_TASK_REQUEST, new WorkerNettyRequestProcessor(processService));
         this.nettyRemotingServer.start();
 
-        //register worker
+        //worker registry
         this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort());
         this.workerRegistry.registry();
 
@@ -202,10 +202,10 @@ public class WorkerServer implements IStoppable {
         killExecutorService.execute(killProcessThread);
 
         // new fetch task thread
-        FetchTaskThread fetchTaskThread = new FetchTaskThread(zkWorkerClient, processService, taskQueue);
-
-        // submit fetch task thread
-        fetchTaskExecutorService.execute(fetchTaskThread);
+//        FetchTaskThread fetchTaskThread = new FetchTaskThread(zkWorkerClient, processService, taskQueue);
+//
+//        // submit fetch task thread
+//        fetchTaskExecutorService.execute(fetchTaskThread);
 
         /**
          * register hooks, which are called before the process exits
