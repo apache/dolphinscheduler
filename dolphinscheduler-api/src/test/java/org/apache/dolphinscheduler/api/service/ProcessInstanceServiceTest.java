@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -44,6 +43,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
+
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 @SpringBootTest(classes = ApiApplicationServer.class)
@@ -86,7 +88,6 @@ public class ProcessInstanceServiceTest {
     @Mock
     UsersService usersService;
 
-    @Ignore
     @Test
     public void testQueryProcessInstanceList() {
         String projectName = "project_test1";
@@ -95,12 +96,35 @@ public class ProcessInstanceServiceTest {
         putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
 
         //project auth fail
-        Mockito.when(projectMapper.queryByName(projectName)).thenReturn(null);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser,null,projectName)).thenReturn(result);
+        when(projectMapper.queryByName(projectName)).thenReturn(null);
+        when(projectService.checkProjectAndAuth(loginUser,null,projectName)).thenReturn(result);
         Map<String, Object> proejctAuthFailRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 46, "2020-01-01 00:00:00",
                 "2020-01-02 00:00:00", "", "test_user", ExecutionStatus.SUBMITTED_SUCCESS,
                 "192.168.xx.xx", 1, 10);
         Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
+
+        //project
+        putMsg(result, Status.SUCCESS, projectName);
+        Project project = getProject(projectName);
+        Date start = DateUtils.getScheduleDate("2020-01-01 00:00:00");
+        Date end = DateUtils.getScheduleDate("2020-01-02 00:00:00");
+        ProcessInstance processInstance = getProcessInstance();
+        List<ProcessInstance> processInstanceList = new ArrayList<>();
+        Page<ProcessInstance> pageReturn = new Page<>(1, 10);
+        processInstanceList.add(processInstance);
+        pageReturn.setRecords(processInstanceList);
+        when(projectMapper.queryByName(projectName)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
+        when(usersService.queryUser(loginUser.getUserName())).thenReturn(loginUser);
+        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(-1), Mockito.any(),
+                eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
+        when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
+
+        Map<String, Object> successRes = processInstanceService.queryProcessInstanceList(loginUser, projectName, 1, "2020-01-01 00:00:00",
+                "2020-01-02 00:00:00", "", loginUser.getUserName(), ExecutionStatus.SUBMITTED_SUCCESS,
+                "192.168.xx.xx", 1, 10);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
     }
 
     @Test

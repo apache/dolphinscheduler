@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.api.service;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
@@ -24,14 +26,11 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +118,7 @@ public class TaskInstanceService extends BaseService {
 
 
         Page<TaskInstance> page = new Page(pageNo, pageSize);
-        PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
+        PageInfo pageInfo = new PageInfo<TaskInstance>(pageNo, pageSize);
 
         //executor name query
         int executorId = 0;
@@ -139,11 +138,13 @@ public class TaskInstanceService extends BaseService {
         exclusionSet.add(Constants.CLASS);
         exclusionSet.add("taskJson");
         List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
+
         for(TaskInstance taskInstance : taskInstanceList){
             taskInstance.setDuration(DateUtils.differSec(taskInstance.getStartTime(), taskInstance.getEndTime()));
-            ProcessInstance processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
-            String instanceExecutorName = usersService.queryUser(processInstance.getExecutorId()).getUserName();
-            taskInstance.setExecutorName(instanceExecutorName);
+            User executor = usersService.queryUser(taskInstance.getExecutorId());
+            if (null != executor) {
+                taskInstance.setExecutorName(executor.getUserName());
+            }
         }
         pageInfo.setTotalCount((int)taskInstanceIPage.getTotal());
         pageInfo.setLists(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(),exclusionSet));

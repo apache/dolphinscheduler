@@ -208,11 +208,13 @@ public class ProcessInstanceService extends BaseDAGService {
 
         for(ProcessInstance processInstance: processInstances){
             processInstance.setDuration(DateUtils.differSec(processInstance.getStartTime(),processInstance.getEndTime()));
-            String processExecutorName = usersService.queryUser(processInstance.getExecutorId()).getUserName();
-            processInstance.setExecutorName(processExecutorName);
+            User executor = usersService.queryUser(processInstance.getExecutorId());
+            if (null != executor) {
+                processInstance.setExecutorName(executor.getUserName());
+            }
         }
 
-        Set<String> exclusionSet = new HashSet<String>();
+        Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);
         exclusionSet.add("locations");
         exclusionSet.add("connects");
