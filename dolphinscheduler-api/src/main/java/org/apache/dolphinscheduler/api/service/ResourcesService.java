@@ -206,7 +206,7 @@ public class ResourcesService extends BaseService {
 
 
 
-        Resource resource = new Resource(pid,name,fullName,false,file.getOriginalFilename(),desc,loginUser.getId(),type,file.getSize(),now,now);
+        Resource resource = new Resource(pid,name,fullName,false,desc,file.getOriginalFilename(),loginUser.getId(),type,file.getSize(),now,now);
 
         try {
             resourcesMapper.insert(resource);
@@ -701,7 +701,7 @@ public class ResourcesService extends BaseService {
         // save data
         Date now = new Date();
         String fullName = currentDirectory.equals("/") ? String.format("%s%s",currentDirectory,name):String.format("%s/%s",currentDirectory,name);
-        Resource resource = new Resource(pid,name,fullName,false,name,desc,loginUser.getId(),type,content.getBytes().length,now,now);
+        Resource resource = new Resource(pid,name,fullName,false,desc,name,loginUser.getId(),type,content.getBytes().length,now,now);
 
         resourcesMapper.insert(resource);
 
@@ -840,6 +840,10 @@ public class ResourcesService extends BaseService {
         if (resource == null) {
             logger.error("download file not exist,  resource id {}", resourceId);
             return null;
+        }
+        if (resource.isDirectory()) {
+            logger.error("resource id {} is directory,can't download it", resourceId);
+            throw new RuntimeException("cant't download directory");
         }
         User user = userMapper.queryDetailsById(resource.getUserId());
         String tenantCode = tenantMapper.queryById(user.getTenantId()).getTenantCode();

@@ -218,7 +218,7 @@ public class ResourcesController extends BaseController{
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType ="Int",example = "20")
     })
-    @GetMapping(value="/list-paging")
+    @PostMapping(value="/list-paging")
     @ResponseStatus(HttpStatus.OK)
     public Result queryResourceListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value ="type") ResourceType type,
@@ -435,6 +435,9 @@ public class ResourcesController extends BaseController{
                     .ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                     .body(file);
+        }catch (RuntimeException e){
+            logger.error(e.getMessage(),e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }catch (Exception e){
             logger.error(DOWNLOAD_RESOURCE_FILE_ERROR.getMsg(),e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Status.DOWNLOAD_RESOURCE_FILE_ERROR.getMsg());
