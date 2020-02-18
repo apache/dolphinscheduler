@@ -32,6 +32,11 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.utils.Address;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.utils.AlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -135,11 +140,16 @@ public class MasterExecThread implements Runnable {
     private MasterConfig masterConfig;
 
     /**
+     *
+     */
+    private NettyRemotingClient nettyRemotingClient;
+
+    /**
      * constructor of MasterExecThread
      * @param processInstance   process instance
      * @param processService        process dao
      */
-    public MasterExecThread(ProcessInstance processInstance, ProcessService processService){
+    public MasterExecThread(ProcessInstance processInstance, ProcessService processService, NettyRemotingClient nettyRemotingClient){
         this.processService = processService;
 
         this.processInstance = processInstance;
@@ -147,6 +157,22 @@ public class MasterExecThread implements Runnable {
         int masterTaskExecNum = masterConfig.getMasterExecTaskNum();
         this.taskExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Task-Exec-Thread",
                 masterTaskExecNum);
+        this.nettyRemotingClient = nettyRemotingClient;
+    }
+
+    //TODO
+    /**端口，默认是123456
+     * 需要构造ExecuteTaskRequestCommand，里面就是TaskInstance的属性。
+     */
+    private void sendToWorker(){
+        final Address address = new Address("localhost", 12346);
+        ExecuteTaskRequestCommand command = new ExecuteTaskRequestCommand();
+        try {
+            Command response = nettyRemotingClient.sendSync(address, command.convert2Command(), 5000);
+            //结果可能为空，所以不用管，能发过去，就行。
+        } catch (InterruptedException | RemotingException ex) {
+            logger.error(String.format("send command to : %s error", address), ex);
+        }
     }
 
 
