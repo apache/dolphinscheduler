@@ -520,7 +520,6 @@ export default {
   '0 means unlimited by byte': 'KB，0代表不限制',
   '0 means unlimited by count': '0代表不限制',
   'Modify User': '修改用户',
-
   'Please enter Mysql Database(required)': '请输入Mysql数据库(必填)',
   'Please enter Mysql Table(required)': '请输入Mysql表名(必填)',
   'Please enter Columns (Comma separated)': '请输入列名，用 , 隔开',
@@ -528,7 +527,6 @@ export default {
   'Please enter Export Dir(required)': '请输入数据源路径(必填)',
   'Please enter Hive Database(required)': '请输入Hive数据库(必填)',
   'Please enter Hive Table(required)': '请输入Hive表名(必填)',
-
   'Please enter Hive Partition Keys': '请输入分区键',
   'Please enter Hive Partition Values': '请输入分区值',
   'Please enter Replace Delimiter': '请输入替换分隔符',
@@ -536,38 +534,30 @@ export default {
   'Please enter Lines Terminated': '请输入行分隔符',
   'Please enter Concurrency': '请输入并发度',
   'Please enter Update Key': '请输入更新列',
-
   'Direct': '流向',
   'Type': '类型',
   'ModelType': '模式',
   'ColumnType': '列类型',
   'Database': '数据库',
-  'Table': '表',
   'Column': '列',
   'Map Column Hive': 'Hive类型映射',
   'Map Column Java': 'Java类型映射',
-
   'Export Dir': '数据源路径',
-
   'Hive partition Keys': 'Hive 分区键',
   'Hive partition Values': 'Hive 分区值',
-
   'FieldsTerminated': '列分隔符',
   'LinesTerminated': '行分隔符',
   'IsUpdate': '是否更新',
   'UpdateKey': '更新列',
   'UpdateMode': '更新类型',
-
   'Target Dir': '目标路径',
   'DeleteTargetDir': '是否删除目录',
   'FileType': '保存格式',
   'CompressionCodec': '压缩类型',
-
   'CreateHiveTable': '是否创建新表',
   'DropDelimiter': '是否删除分隔符',
   'OverWriteSrc': '是否覆盖数据源',
   'ReplaceDelimiter': '替换分隔符',
-  
   'Concurrency': '并发度',
   'Form': '表单',
   'OnlyUpdate': '只更新',

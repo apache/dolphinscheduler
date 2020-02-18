@@ -528,7 +528,6 @@ export default {
   'Please enter Export Dir(required)': 'Please enter Export Dir(required)',
   'Please enter Hive Database(required)': 'Please enter Hive Databasec(required)',
   'Please enter Hive Table(required)': 'Please enter Hive Table(required)',
-
   'Please enter Hive Partition Keys': 'Please enter Hive Partition Key',
   'Please enter Hive Partition Values': 'Please enter Partition Value',
   'Please enter Replace Delimiter': 'Please enter Replace Delimiter',
@@ -536,40 +535,31 @@ export default {
   'Please enter Lines Terminated': 'Please enter Lines Terminated',
   'Please enter Concurrency': 'Please enter Concurrency',
   'Please enter Update Key': 'Please enter Update Key',
-
   'Direct': 'Direct',
   'Type': 'Type',
   'ModelType': 'ModelType',
   'ColumnType': 'ColumnType',
   'Database': 'Database',
-  'Table': 'Table',
   'Column': 'Column',
   'Map Column Hive': 'Map Column Hive',
   'Map Column Java': 'Map Column Java',
-
   'Export Dir': 'Export Dir',
-
   'Hive partition Keys': 'Hive partition Keys',
   'Hive partition Values': 'Hive partition Values',
-
   'FieldsTerminated': 'FieldsTerminated',
   'LinesTerminated': 'LinesTerminated',
   'IsUpdate': 'IsUpdate',
   'UpdateKey': 'UpdateKey',
   'UpdateMode': 'UpdateMode',
-
   'Target Dir': 'Target Dir',
   'DeleteTargetDir': 'DeleteTargetDir',
   'FileType': 'FileType',
   'CompressionCodec': 'CompressionCodec',
-
   'CreateHiveTable': 'CreateHiveTable',
   'DropDelimiter': 'DropDelimiter',
   'OverWriteSrc': 'OverWriteSrc',
   'ReplaceDelimiter': 'ReplaceDelimiter',
-
   'Concurrency': 'Concurrency',
-
   'Form': 'Form',
   'OnlyUpdate': 'OnlyUpdate',
   'AllowInsert': 'AllowInsert',
@@ -578,5 +568,5 @@ export default {
   'All Columns': 'All Columns',
   'Some Columns': 'Some Columns'
 
- 
+
 }
