@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.base;
 
 
-import org.apache.dolphinscheduler.data.LoginData;
 import org.apache.dolphinscheduler.util.PropertiesReader;
 import org.apache.dolphinscheduler.util.RedisUtil;
 import org.openqa.selenium.WebDriver;
@@ -112,13 +111,13 @@ public class BaseTest {
     /**
      * Execute after executing a testcase
 //     */
-//    @AfterTest(alwaysRun = true)
-//    public void afterTest() throws InterruptedException {
-//        // close browser
-//        baseDriver.closeBrowser();
-//        // redis Connection recycling
-//        redisUtil.returnJedis();
-//    }
+    @AfterTest(alwaysRun = true)
+    public void afterTest() throws InterruptedException {
+        // close browser
+        baseDriver.closeBrowser();
+        // redis Connection recycling
+        redisUtil.returnJedis();
+    }
 
     /**
      * Execute after executing a testsuite
