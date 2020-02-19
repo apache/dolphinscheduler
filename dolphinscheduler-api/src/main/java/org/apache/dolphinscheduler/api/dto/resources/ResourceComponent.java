@@ -35,6 +35,8 @@ public abstract class ResourceComponent {
         this.fullName = fullName;
         this.description = description;
         this.isDirctory = isDirctory;
+        int directoryFlag = isDirctory ? 1:0;
+        this.idValue = String.format("%s_%s",id,directoryFlag);
     }
 
 
@@ -57,10 +59,12 @@ public abstract class ResourceComponent {
     protected String description;
     @JSONField(ordinal = 6)
     protected boolean isDirctory;
+    @JSONField(ordinal = 7)
+    protected String idValue;
     /**
      * children
      */
-    @JSONField(ordinal = 7)
+    @JSONField(ordinal = 8)
     protected List<ResourceComponent> children = new ArrayList<>();
     public void add(ResourceComponent resourceComponent){
         children.add(resourceComponent);
@@ -122,6 +126,15 @@ public abstract class ResourceComponent {
         isDirctory = dirctory;
     }
 
+    public String getIdValue() {
+        return idValue;
+    }
+
+    public void setIdValue(int id,boolean isDirctory) {
+        int directoryFlag = isDirctory ? 1:0;
+        this.idValue = String.format("%s_%s",id,directoryFlag);
+    }
+
     public List<ResourceComponent> getChildren() {
         return children;
     }
@@ -136,9 +149,11 @@ public abstract class ResourceComponent {
                 "id=" + id +
                 ", pid=" + pid +
                 ", name='" + name + '\'' +
+                ", currentDir='" + currentDir + '\'' +
                 ", fullName='" + fullName + '\'' +
                 ", description='" + description + '\'' +
                 ", isDirctory=" + isDirctory +
+                ", idValue='" + idValue + '\'' +
                 ", children=" + children +
                 '}';
     }

@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.api.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.BeanMap;
+import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
+import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -946,8 +948,9 @@ public class ResourcesService extends BaseService {
             return result;
         }
         List<Resource> authedResources = resourcesMapper.queryAuthorizedResourceList(userId);
+        Visitor visitor = new ResourceTreeVisitor(authedResources);
 
-        result.put(Constants.DATA_LIST, authedResources);
+        result.put(Constants.DATA_LIST, visitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
         return result;
     }
