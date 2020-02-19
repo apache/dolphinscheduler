@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -70,6 +72,11 @@ public class MasterSchedulerThread implements Runnable {
      */
     private MasterConfig masterConfig;
 
+    /**
+     *  netty remoting client
+     */
+    private NettyRemotingClient nettyRemotingClient;
+
 
     /**
      * constructor of MasterSchedulerThread
@@ -83,6 +90,9 @@ public class MasterSchedulerThread implements Runnable {
         this.masterExecThreadNum = masterExecThreadNum;
         this.masterExecService = ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread",masterExecThreadNum);
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        //
+        NettyClientConfig clientConfig = new NettyClientConfig();
+        this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
 
     /**
@@ -123,7 +133,7 @@ public class MasterSchedulerThread implements Runnable {
                             processInstance = processService.handleCommand(logger, OSUtils.getHost(), this.masterExecThreadNum - activeCount, command);
                             if (processInstance != null) {
                                 logger.info("start master exec thread , split DAG ...");
-                                masterExecService.execute(new MasterExecThread(processInstance, processService));
+                                masterExecService.execute(new MasterExecThread(processInstance, processService, nettyRemotingClient));
                             }
                         }catch (Exception e){
                             logger.error("scan command error ", e);
@@ -140,6 +150,7 @@ public class MasterSchedulerThread implements Runnable {
                 AbstractZKClient.releaseMutex(mutex);
             }
         }
+        nettyRemotingClient.close();
         logger.info("master server stopped...");
     }
 
