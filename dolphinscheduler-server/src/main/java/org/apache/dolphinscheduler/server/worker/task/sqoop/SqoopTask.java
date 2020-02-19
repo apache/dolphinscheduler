@@ -17,32 +17,62 @@
 package org.apache.dolphinscheduler.server.worker.task.sqoop;
 
 import com.alibaba.fastjson.JSON;
-import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
+import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.server.utils.ParamUtils;
+import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.server.worker.task.shell.ShellTask;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.SqoopJobGenerator;
 import org.slf4j.Logger;
+import java.util.Map;
 
 /**
  * sqoop task extends the shell task
  */
-public class SqoopTask extends ShellTask {
+public class SqoopTask extends AbstractYarnTask {
 
-    public SqoopTask(TaskProps taskProps, Logger logger){
-        super(taskProps,logger);
-        // get sqoopParameters
-        SqoopParameters sqoopParameters =
+    private SqoopParameters sqoopParameters;
+
+    public SqoopTask(TaskProps props, Logger logger){
+        super(props,logger);
+    }
+
+    @Override
+    public void init() throws Exception {
+        logger.info("sqoop task params {}", taskProps.getTaskParams());
+        sqoopParameters =
                 JSON.parseObject(taskProps.getTaskParams(),SqoopParameters.class);
+        if (!sqoopParameters.checkParameters()) {
+            throw new RuntimeException("sqoop task params is not valid");
+        }
+
+    }
+
+    @Override
+    protected String buildCommand() throws Exception {
         //get sqoop scripts
         SqoopJobGenerator generator = new SqoopJobGenerator();
         String script = generator.generateSqoopJob(sqoopParameters);
-        logger.info("sqoop script: {}", script);
 
-        //set the sqoop scripts into shell parameters
-        ShellParameters shellParameters = new ShellParameters();
-        shellParameters.setRawScript(script);
+        Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
+                taskProps.getDefinedParams(),
+                sqoopParameters.getLocalParametersMap(),
+                taskProps.getCmdTypeIfComplement(),
+                taskProps.getScheduleTime());
 
-        this.taskProps.setTaskParams(JSON.toJSONString(shellParameters));
+        if(paramsMap != null){
+            String resultScripts = ParameterUtils.convertParameterPlaceholders(script,  ParamUtils.convert(paramsMap));
+            logger.info("sqoop script: {}", resultScripts);
+            return resultScripts;
+        }
+
+        return null;
+    }
+
+    @Override
+    public AbstractParameters getParameters() {
+        return sqoopParameters;
     }
 }

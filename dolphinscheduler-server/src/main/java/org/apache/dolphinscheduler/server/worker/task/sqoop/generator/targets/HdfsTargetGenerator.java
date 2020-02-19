@@ -56,6 +56,14 @@ public class HdfsTargetGenerator implements ITargetGenerator {
                     result.append(" --delete-target-dir");
                 }
 
+                if(StringUtils.isNotEmpty(targetHdfsParameter.getFieldsTerminated())){
+                    result.append(" --fields-terminated-by '").append(targetHdfsParameter.getFieldsTerminated()).append("'");
+                }
+
+                if(StringUtils.isNotEmpty(targetHdfsParameter.getLinesTerminated())){
+                    result.append(" --lines-terminated-by '").append(targetHdfsParameter.getLinesTerminated()).append("'");
+                }
+
                 result.append(" --null-non-string 'NULL' --null-string 'NULL'");
             }
         }catch(Exception e){

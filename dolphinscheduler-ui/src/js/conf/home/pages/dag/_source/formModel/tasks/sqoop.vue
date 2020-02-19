@@ -334,25 +334,47 @@
           </div>
         </m-list-box>
       <m-list-box>
-          <div slot="text">{{$t('CompressionCodec')}}</div>
+        <div slot="text">{{$t('CompressionCodec')}}</div>
+        <div slot="content">
+          <x-radio-group v-model="targetHdfsParams.compressionCodec">
+            <x-radio label="snappy">snappy</x-radio>
+            <x-radio label="lzo">lzo</x-radio>
+            <x-radio label="gzip">gzip</x-radio>
+            <x-radio label="">no</x-radio>
+          </x-radio-group>
+        </div>
+      </m-list-box>
+      <m-list-box>
+        <div slot="text">{{$t('FileType')}}</div>
+        <div slot="content">
+          <x-radio-group v-model="targetHdfsParams.fileType">
+            <x-radio label="--as-avrodatafile">avro</x-radio>
+            <x-radio label="--as-sequencefile">sequence</x-radio>
+            <x-radio label="--as-textfile">text</x-radio>
+            <x-radio label="--as-parquetfile">parquet</x-radio>
+          </x-radio-group>
+        </div>
+      </m-list-box>
+      <m-list-box>
+          <div slot="text">{{$t('FieldsTerminated')}}</div>
           <div slot="content">
-            <x-radio-group v-model="targetHdfsParams.compressionCodec">
-              <x-radio label="snappy">snappy</x-radio>
-              <x-radio label="lzo">lzo</x-radio>
-              <x-radio label="gzip">gzip</x-radio>
-              <x-radio label="">no</x-radio>
-            </x-radio-group>
+            <x-input
+                    :disabled="isDetails"
+                    type="text"
+                    v-model="targetHdfsParams.fieldsTerminated"
+                    :placeholder="$t('Please enter Fields Terminated')">
+            </x-input>
           </div>
         </m-list-box>
         <m-list-box>
-          <div slot="text">{{$t('FileType')}}</div>
+          <div slot="text">{{$t('LinesTerminated')}}</div>
           <div slot="content">
-            <x-radio-group v-model="targetHdfsParams.fileType">
-              <x-radio label="--as-avrodatafile">avro</x-radio>
-              <x-radio label="--as-sequencefile">sequence</x-radio>
-              <x-radio label="--as-textfile">text</x-radio>
-              <x-radio label="--as-parquetfile">parquet</x-radio>
-            </x-radio-group>
+            <x-input
+                    :disabled="isDetails"
+                    type="text"
+                    v-model="targetHdfsParams.linesTerminated"
+                    :placeholder="$t('Please enter Lines Terminated')">
+            </x-input>
           </div>
         </m-list-box>
     </div>
@@ -390,7 +412,7 @@
             </x-input>
           </div>
         </m-list-box>
-          <m-list-box>
+        <m-list-box>
           <div slot="text">{{$t('FieldsTerminated')}}</div>
           <div slot="content">
             <x-input
@@ -429,7 +451,6 @@
             </x-input>
           </div>
         </m-list-box>
-    
         <m-list-box v-show="targetMysqlParams.isUpdate">
           <div slot="text">{{$t('UpdateMode')}}</div>
           <div slot="content">
@@ -544,7 +565,9 @@
           targetPath:"",
           deleteTargetDir:true,
           fileType:"--as-avrodatafile",
-          compressionCodec:"snappy"
+          compressionCodec:"snappy",
+          fieldsTerminated:"",
+          linesTerminated:"",
         },
 
         targetMysqlParams:{

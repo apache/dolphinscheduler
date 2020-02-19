@@ -55,8 +55,8 @@ public class SqoopJobGenerator {
     }
 
     private void createSqoopJobGenerator(String sourceType,String targetType){
-        this.sourceGenerator = createSourceGenerator(sourceType);
-        this.targetGenerator = createTargetGenerator(targetType);
+        sourceGenerator = createSourceGenerator(sourceType);
+        targetGenerator = createTargetGenerator(targetType);
     }
 
     /**
@@ -66,9 +66,13 @@ public class SqoopJobGenerator {
      */
     public String generateSqoopJob(SqoopParameters sqoopParameters){
         createSqoopJobGenerator(sqoopParameters.getSourceType(),sqoopParameters.getTargetType());
-        return this.commonGenerator.generate(sqoopParameters)
-                + this.sourceGenerator.generate(sqoopParameters)
-                + this.targetGenerator.generate(sqoopParameters);
+        if(sourceGenerator == null || targetGenerator == null){
+            return null;
+        }
+
+        return commonGenerator.generate(sqoopParameters)
+                + sourceGenerator.generate(sqoopParameters)
+                + targetGenerator.generate(sqoopParameters);
     }
 
     /**

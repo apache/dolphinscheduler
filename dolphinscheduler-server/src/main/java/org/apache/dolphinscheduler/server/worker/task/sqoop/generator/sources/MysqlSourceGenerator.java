@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ISourceGenerator;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -49,8 +48,8 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                     = JSONUtils.parseObject(sqoopParameters.getSourceParams(),SourceMysqlParameter.class);
 
             if(sourceMysqlParameter != null){
-                ProcessService processDao = SpringApplicationContext.getBean(ProcessService.class);
-                DataSource dataSource= processDao.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
+                ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+                DataSource dataSource= processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
                 BaseDataSource baseDataSource = DataSourceFactory.getDatasource(dataSource.getType(),
                         dataSource.getConnectionParams());
                 if(baseDataSource != null){

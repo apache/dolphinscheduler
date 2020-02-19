@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.task.sqoop;
 
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +99,12 @@ public class SqoopParameters  extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return true;
+        return StringUtils.isNotEmpty(modelType)&&
+                concurrency != 0 &&
+                StringUtils.isNotEmpty(sourceType)&&
+                StringUtils.isNotEmpty(targetType)&&
+                StringUtils.isNotEmpty(sourceParams)&&
+                StringUtils.isNotEmpty(targetParams);
     }
 
     @Override

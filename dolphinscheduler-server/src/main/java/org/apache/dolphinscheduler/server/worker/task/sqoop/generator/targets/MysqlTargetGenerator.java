@@ -47,9 +47,8 @@ public class MysqlTargetGenerator implements ITargetGenerator {
 
             if(targetMysqlParameter != null && targetMysqlParameter.getTargetDatasource() != 0){
 
-                ProcessService processDao = SpringApplicationContext.getBean(ProcessService.class);
-                DataSource dataSource= processDao.findDataSourceById(targetMysqlParameter.getTargetDatasource());
-
+                ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+                DataSource dataSource= processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());
                 // get datasource
                 BaseDataSource baseDataSource = DataSourceFactory.getDatasource(dataSource.getType(),
                         dataSource.getConnectionParams());
@@ -69,11 +68,11 @@ public class MysqlTargetGenerator implements ITargetGenerator {
                     }
 
                     if(StringUtils.isNotEmpty(targetMysqlParameter.getFieldsTerminated())){
-                        result.append(" --fields-terminated-by ").append(targetMysqlParameter.getFieldsTerminated());
+                        result.append(" --fields-terminated-by '").append(targetMysqlParameter.getFieldsTerminated()).append("'");
                     }
 
                     if(StringUtils.isNotEmpty(targetMysqlParameter.getLinesTerminated())){
-                        result.append(" --lines-terminated-by ").append(targetMysqlParameter.getLinesTerminated());
+                        result.append(" --lines-terminated-by '").append(targetMysqlParameter.getLinesTerminated()).append("'");
                     }
 
                     if(targetMysqlParameter.isUpdate()){

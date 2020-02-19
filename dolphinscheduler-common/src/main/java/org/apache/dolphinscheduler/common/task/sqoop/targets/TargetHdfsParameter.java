@@ -34,6 +34,14 @@ public class TargetHdfsParameter {
      * compression codec
      */
     private String compressionCodec;
+    /**
+     * fields terminated
+     */
+    private String fieldsTerminated;
+    /**
+     * lines terminated
+     */
+    private String linesTerminated;
 
     public String getTargetPath() {
         return targetPath;
@@ -66,4 +74,21 @@ public class TargetHdfsParameter {
     public void setCompressionCodec(String compressionCodec) {
         this.compressionCodec = compressionCodec;
     }
+
+    public String getFieldsTerminated() {
+        return fieldsTerminated;
+    }
+
+    public void setFieldsTerminated(String fieldsTerminated) {
+        this.fieldsTerminated = fieldsTerminated;
+    }
+
+    public String getLinesTerminated() {
+        return linesTerminated;
+    }
+
+    public void setLinesTerminated(String linesTerminated) {
+        this.linesTerminated = linesTerminated;
+    }
+
 }
