@@ -51,8 +51,11 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
 
     private final WorkerConfig workerConfig;
 
+    private final TaskInstanceCallbackService taskInstanceCallbackService;
+
     public WorkerNettyRequestProcessor(ProcessService processService){
         this.processService = processService;
+        this.taskInstanceCallbackService = new TaskInstanceCallbackService();
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
     }
@@ -62,6 +65,7 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.EXECUTE_TASK_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
         logger.debug("received command : {}", command);
         TaskInstance taskInstance = FastJsonSerializer.deserialize(command.getBody(), TaskInstance.class);
+        //TODO 需要干掉，然后移到master里面。
         int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
         // verify tenant is null
@@ -73,6 +77,7 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
         String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
+        //TODO 到这里。
         // local execute path
         String execLocalPath = getExecLocalPath(taskInstance);
         logger.info("task instance  local execute path : {} ", execLocalPath);
@@ -84,7 +89,8 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
             logger.error(String.format("create execLocalPath : %s", execLocalPath), ex);
         }
         // submit task
-        workerExecService.submit(new TaskScheduleThread(taskInstance, processService));
+        taskInstanceCallbackService.addCallbackChannel(taskInstance.getId(), new CallbackChannel(channel, command.getOpaque()));
+        workerExecService.submit(new TaskScheduleThread(taskInstance, processService, taskInstanceCallbackService));
     }
 
     private boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
