@@ -116,20 +116,9 @@ public class TaskInstanceService extends BaseService {
             return result;
         }
 
-
         Page<TaskInstance> page = new Page(pageNo, pageSize);
         PageInfo pageInfo = new PageInfo<TaskInstance>(pageNo, pageSize);
-
-        //executor name query
-        int executorId = 0;
-        if (StringUtils.isNotEmpty(executorName)) {
-            User executor = usersService.queryUser(executorName);
-            if (null != executor) {
-                executorId = executor.getId();
-            } else {
-                executorId = -1;
-            }
-        }
+        int executorId = usersService.getUserIdByName(executorName);
 
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
                 page, project.getId(), processInstanceId, searchVal, taskName, executorId, statusArray, host, start, end

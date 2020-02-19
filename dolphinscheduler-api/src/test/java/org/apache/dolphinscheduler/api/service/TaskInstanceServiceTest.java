@@ -103,9 +103,9 @@ public class TaskInstanceServiceTest {
         when(projectMapper.queryByName(Mockito.anyString())).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
-        when(usersService.queryUser(loginUser.getUserName())).thenReturn(loginUser);
+        when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
         when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getId()), eq(1), eq(""), eq(""),
-                eq(loginUser.getId()), Mockito.any(), eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
+                eq(0), Mockito.any(), eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
         when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
         when(processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId())).thenReturn(processInstance);
 
@@ -122,7 +122,7 @@ public class TaskInstanceServiceTest {
 
         //executor null
         when(usersService.queryUser(loginUser.getId())).thenReturn(null);
-        when(usersService.queryUser(loginUser.getUserName())).thenReturn(null);
+        when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(-1);
         Map<String, Object> executorNullRes = taskInstanceService.queryTaskListPaging(loginUser, projectName, 1, "",
                 "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", ExecutionStatus.SUCCESS, "192.168.xx.xx", 1, 20);
         Assert.assertEquals(Status.SUCCESS, executorNullRes.get(Constants.STATUS));

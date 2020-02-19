@@ -188,17 +188,7 @@ public class ProcessInstanceService extends BaseDAGService {
 
         Page<ProcessInstance> page = new Page(pageNo, pageSize);
         PageInfo pageInfo = new PageInfo<ProcessInstance>(pageNo, pageSize);
-
-        //executor name query
-        int executorId = 0;
-        if (StringUtils.isNotEmpty(executorName)) {
-            User executor = usersService.queryUser(executorName);
-            if (null != executor) {
-                executorId = executor.getId();
-            } else {
-                executorId = -1;
-            }
-        }
+        int executorId = usersService.getUserIdByName(executorName);
 
         IPage<ProcessInstance> processInstanceList =
                 processInstanceMapper.queryProcessInstanceListPaging(page,
