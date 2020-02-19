@@ -29,8 +29,14 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.remote.NettyRemotingServer;
+import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.processor.WorkerNettyRequestProcessor;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.worker.runner.FetchTaskThread;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -112,8 +118,27 @@ public class WorkerServer implements IStoppable {
     @Value("${server.is-combined-server:false}")
     private Boolean isCombinedServer;
 
+    /**
+     *  worker config
+     */
     @Autowired
     private WorkerConfig workerConfig;
+
+    /**
+     *  zookeeper registry center
+     */
+    @Autowired
+    private ZookeeperRegistryCenter zookeeperRegistryCenter;
+
+    /**
+     *  netty remote server
+     */
+    private NettyRemotingServer nettyRemotingServer;
+
+    /**
+     *  worker registry
+     */
+    private WorkerRegistry workerRegistry;
 
     /**
      *  spring application context
@@ -141,7 +166,17 @@ public class WorkerServer implements IStoppable {
     public void run(){
         logger.info("start worker server...");
 
-        zkWorkerClient.init();
+        //init remoting server
+        NettyServerConfig serverConfig = new NettyServerConfig();
+        this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
+        this.nettyRemotingServer.registerProcessor(CommandType.EXECUTE_TASK_REQUEST, new WorkerNettyRequestProcessor(processService));
+        this.nettyRemotingServer.start();
+
+        //worker registry
+        this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort());
+        this.workerRegistry.registry();
+
+        this.zkWorkerClient.init();
 
         this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
 
@@ -167,10 +202,10 @@ public class WorkerServer implements IStoppable {
         killExecutorService.execute(killProcessThread);
 
         // new fetch task thread
-        FetchTaskThread fetchTaskThread = new FetchTaskThread(zkWorkerClient, processService, taskQueue);
-
-        // submit fetch task thread
-        fetchTaskExecutorService.execute(fetchTaskThread);
+//        FetchTaskThread fetchTaskThread = new FetchTaskThread(zkWorkerClient, processService, taskQueue);
+//
+//        // submit fetch task thread
+//        fetchTaskExecutorService.execute(fetchTaskThread);
 
         /**
          * register hooks, which are called before the process exits
@@ -217,6 +252,9 @@ public class WorkerServer implements IStoppable {
                 logger.warn("thread sleep exception", e);
             }
 
+            this.nettyRemotingServer.close();
+            this.workerRegistry.unRegistry();
+
             try {
                 heartbeatWorkerService.shutdownNow();
             }catch (Exception e){
@@ -259,7 +297,6 @@ public class WorkerServer implements IStoppable {
             System.exit(-1);
         }
     }
-
 
     /**
      * heartbeat thread implement
