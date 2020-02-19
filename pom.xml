@@ -229,7 +229,12 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-rpc</artifactId>
+                <artifactId>dolphinscheduler-remote</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-service</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -343,6 +348,7 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -675,11 +681,13 @@
                 <configuration>
                     <includes>
                         <include>**/common/utils/*.java</include>
+                        <include>**/common/log/*.java</include>
                         <include>**/common/threadutils/*.java</include>
                         <include>**/common/graph/*.java</include>
                         <include>**/common/queue/*.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/FileUtilsTest.java</include>
+                        <include>**/api/utils/FourLetterWordTest.java</include>
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/enums/*.java</include>
@@ -698,6 +706,8 @@
                         <include>**/api/service/ExecutorService2Test.java</include>
                         <include>**/api/service/BaseServiceTest.java</include>
                         <include>**/api/service/BaseDAGServiceTest.java</include>
+                        <include>**/api/service/LoggerServiceTest.java</include>
+                        <include>**/api/service/DataAnalysisServiceTest.java</include>
                         <include>**/alert/utils/ExcelUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
@@ -705,12 +715,13 @@
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
-                        <include>**/server/utils/ScheduleUtilsTest.java</include>
                         <include>**/server/master/MasterExecThreadTest.java</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/AlertMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
+                        <include>**/dao/cron/CronUtilsTest.java</include>
+                        <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
@@ -769,9 +780,6 @@
                         <exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
                         <exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
                         <exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
-                        <exclude>
-                            **/dolphinscheduler-rpc/src/main/java/org/apache/dolphinscheduler/rpc/LogViewServiceGrpc.java
-                        </exclude>
                     </excludes>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
@@ -858,8 +866,9 @@
         <module>dolphinscheduler-api</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-alert</module>
-        <module>dolphinscheduler-rpc</module>
         <module>dolphinscheduler-dist</module>
+        <module>dolphinscheduler-remote</module>
+        <module>dolphinscheduler-service</module>
     </modules>
 
 </project>

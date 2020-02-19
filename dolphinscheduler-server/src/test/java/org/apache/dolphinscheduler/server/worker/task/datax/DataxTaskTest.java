@@ -25,15 +25,15 @@ import java.util.List;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.job.db.BaseDataSource;
-import org.apache.dolphinscheduler.common.job.db.DataSourceFactory;
-import org.apache.dolphinscheduler.common.utils.SpringApplicationContext;
-import org.apache.dolphinscheduler.dao.ProcessDao;
+import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
+import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,7 +53,7 @@ public class DataxTaskTest {
 
     private DataxTask dataxTask;
 
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     private ShellCommandExecutor shellCommandExecutor;
 
@@ -62,13 +62,13 @@ public class DataxTaskTest {
     @Before
     public void before()
         throws Exception {
-        processDao = Mockito.mock(ProcessDao.class);
+        processService = Mockito.mock(ProcessService.class);
         shellCommandExecutor = Mockito.mock(ShellCommandExecutor.class);
 
         applicationContext = Mockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
-        Mockito.when(applicationContext.getBean(ProcessDao.class)).thenReturn(processDao);
+        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
         TaskProps props = new TaskProps();
         props.setTaskDir("/tmp");
@@ -83,12 +83,12 @@ public class DataxTaskTest {
         dataxTask = PowerMockito.spy(new DataxTask(props, logger));
         dataxTask.init();
 
-        Mockito.when(processDao.findDataSourceById(1)).thenReturn(getDataSource());
-        Mockito.when(processDao.findDataSourceById(2)).thenReturn(getDataSource());
-        Mockito.when(processDao.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
+        Mockito.when(processService.findDataSourceById(1)).thenReturn(getDataSource());
+        Mockito.when(processService.findDataSourceById(2)).thenReturn(getDataSource());
+        Mockito.when(processService.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
 
         String fileName = String.format("%s/%s_node.sh", props.getTaskDir(), props.getTaskAppId());
-        Mockito.when(shellCommandExecutor.run(fileName, processDao)).thenReturn(0);
+        Mockito.when(shellCommandExecutor.run(fileName, processService)).thenReturn(0);
     }
 
     private DataSource getDataSource() {

@@ -25,12 +25,12 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.server.utils.ScheduleUtils;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +67,7 @@ public class ExecutorService extends BaseService{
 
 
     @Autowired
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     /**
      * execute process instance
@@ -117,7 +117,7 @@ public class ExecutorService extends BaseService{
         }
 
         if (!checkTenantSuitable(processDefinition)){
-            logger.error("there is not any vaild tenant for the process definition: id:{},name:{}, ",
+            logger.error("there is not any valid tenant for the process definition: id:{},name:{}, ",
                     processDefinition.getId(), processDefinition.getName());
             putMsg(result, Status.TENANT_NOT_SUITABLE);
             return result;
@@ -186,13 +186,13 @@ public class ExecutorService extends BaseService{
             return checkResult;
         }
 
-        ProcessInstance processInstance = processDao.findProcessInstanceDetailById(processInstanceId);
+        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId);
         if (processInstance == null) {
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
             return result;
         }
 
-        ProcessDefinition processDefinition = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
+        ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
         if(executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE){
             result = checkProcessDefinitionValid(processDefinition, processInstance.getProcessDefinitionId());
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
@@ -206,7 +206,7 @@ public class ExecutorService extends BaseService{
             return checkResult;
         }
         if (!checkTenantSuitable(processDefinition)){
-            logger.error("there is not any vaild tenant for the process definition: id:{},name:{}, ",
+            logger.error("there is not any valid tenant for the process definition: id:{},name:{}, ",
                     processDefinition.getId(), processDefinition.getName());
             putMsg(result, Status.TENANT_NOT_SUITABLE);
         }
@@ -227,7 +227,7 @@ public class ExecutorService extends BaseService{
                 } else {
                     processInstance.setCommandType(CommandType.STOP);
                     processInstance.addHistoryCmd(CommandType.STOP);
-                    processDao.updateProcessInstance(processInstance);
+                    processService.updateProcessInstance(processInstance);
                     result = updateProcessInstanceState(processInstanceId, ExecutionStatus.READY_STOP);
                 }
                 break;
@@ -237,7 +237,7 @@ public class ExecutorService extends BaseService{
                 } else {
                     processInstance.setCommandType(CommandType.PAUSE);
                     processInstance.addHistoryCmd(CommandType.PAUSE);
-                    processDao.updateProcessInstance(processInstance);
+                    processService.updateProcessInstance(processInstance);
                     result = updateProcessInstanceState(processInstanceId, ExecutionStatus.READY_PAUSE);
                 }
                 break;
@@ -257,7 +257,7 @@ public class ExecutorService extends BaseService{
      */
     private boolean checkTenantSuitable(ProcessDefinition processDefinition) {
         // checkTenantExists();
-        Tenant tenant = processDao.getTenantForProcess(processDefinition.getTenantId(),
+        Tenant tenant = processService.getTenantForProcess(processDefinition.getTenantId(),
                 processDefinition.getUserId());
         if(tenant == null){
             return false;
@@ -319,7 +319,7 @@ public class ExecutorService extends BaseService{
     private Map<String, Object> updateProcessInstanceState(Integer processInstanceId, ExecutionStatus executionStatus) {
         Map<String, Object> result = new HashMap<>(5);
 
-        int update = processDao.updateProcessInstanceState(processInstanceId, executionStatus);
+        int update = processService.updateProcessInstanceState(processInstanceId, executionStatus);
         if (update > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
@@ -347,12 +347,12 @@ public class ExecutorService extends BaseService{
                 CMDPARAM_RECOVER_PROCESS_ID_STRING, instanceId));
         command.setExecutorId(loginUser.getId());
 
-        if(!processDao.verifyIsNeedCreateCommand(command)){
+        if(!processService.verifyIsNeedCreateCommand(command)){
             putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND,processDefinitionId);
             return result;
         }
 
-        int create = processDao.createCommand(command);
+        int create = processService.createCommand(command);
 
         if (create > 0) {
             putMsg(result, Status.SUCCESS);
@@ -376,7 +376,7 @@ public class ExecutorService extends BaseService{
             putMsg(result,Status.REQUEST_PARAMS_NOT_VALID_ERROR,"process definition id");
         }
         List<Integer> ids = new ArrayList<>();
-        processDao.recurseFindSubProcessId(processDefineId, ids);
+        processService.recurseFindSubProcessId(processDefineId, ids);
         Integer[] idArray = ids.toArray(new Integer[ids.size()]);
         if (ids.size() > 0){
             List<ProcessDefinition> processDefinitionList;
@@ -506,14 +506,13 @@ public class ExecutorService extends BaseService{
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
                     cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(end));
                     command.setCommandParam(JSONUtils.toJson(cmdParam));
-                    return processDao.createCommand(command);
+                    return processService.createCommand(command);
                 }else if (runMode == RunMode.RUN_MODE_PARALLEL){
-                    List<Schedule> schedules = processDao.queryReleaseSchedulerListByProcessDefinitionId(processDefineId);
+                    List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionId(processDefineId);
                     List<Date> listDate = new LinkedList<>();
                     if(!CollectionUtils.isEmpty(schedules)){
                         for (Schedule item : schedules) {
-                            List<Date> list = ScheduleUtils.getRecentTriggerTime(item.getCrontab(), start, end);
-                            listDate.addAll(list);
+                            listDate.addAll(CronUtils.getSelfFireDateList(start, end, item.getCrontab()));
                         }
                     }
                     if(!CollectionUtils.isEmpty(listDate)){
@@ -522,7 +521,7 @@ public class ExecutorService extends BaseService{
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(date));
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(date));
                             command.setCommandParam(JSONUtils.toJson(cmdParam));
-                            processDao.createCommand(command);
+                            processService.createCommand(command);
                         }
                         return listDate.size();
                     }else{
@@ -533,19 +532,19 @@ public class ExecutorService extends BaseService{
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.dateToString(start));
                             cmdParam.put(CMDPARAM_COMPLEMENT_DATA_END_DATE, DateUtils.dateToString(start));
                             command.setCommandParam(JSONUtils.toJson(cmdParam));
-                            processDao.createCommand(command);
+                            processService.createCommand(command);
                             start = DateUtils.getSomeDay(start, 1);
                         }
                         return runCunt;
                     }
                 }
             }else{
-                logger.error("there is not vaild schedule date for the process definition: id:{},date:{}",
+                logger.error("there is not valid schedule date for the process definition: id:{},date:{}",
                         processDefineId, schedule);
             }
         }else{
             command.setCommandParam(JSONUtils.toJson(cmdParam));
-            return processDao.createCommand(command);
+            return processService.createCommand(command);
         }
 
         return 0;

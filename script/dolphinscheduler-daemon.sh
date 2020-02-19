@@ -57,22 +57,19 @@ pid=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command.pid
 cd $DOLPHINSCHEDULER_HOME
 
 if [ "$command" = "api-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:apiserver_logback.xml -Dspring.profiles.active=api"
+  LOG_FILE="-Dserver=api-server -Dspring.profiles.active=api"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
 elif [ "$command" = "master-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:master_logback.xml -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dserver=master-server -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.master.MasterServer
 elif [ "$command" = "worker-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:worker_logback.xml -Ddruid.mysql.usePingMethod=false"
+  LOG_FILE="-Dserver=worker-server -Ddruid.mysql.usePingMethod=false"
   CLASS=org.apache.dolphinscheduler.server.worker.WorkerServer
 elif [ "$command" = "alert-server" ]; then
-  LOG_FILE="-Dlogback.configurationFile=conf/alert_logback.xml"
+  LOG_FILE="-Dserver=alert-server"
   CLASS=org.apache.dolphinscheduler.alert.AlertServer
 elif [ "$command" = "logger-server" ]; then
-  CLASS=org.apache.dolphinscheduler.server.rpc.LoggerServer
-elif [ "$command" = "combined-server" ]; then
-  LOG_FILE="-Dlogging.config=classpath:combined_logback.xml -Dspring.profiles.active=api -Dserver.is-combined-server=true"
-  CLASS=org.apache.dolphinscheduler.api.CombinedApplicationServer
+  CLASS=org.apache.dolphinscheduler.server.log.LoggerServer
 else
   echo "Error: No command named \`$command' was found."
   exit 1
@@ -93,8 +90,8 @@ case $startStop in
 
     exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
 
-    echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 < /dev/null &"
-    nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 < /dev/null &
+    echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 > /dev/null &"
+    nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 > /dev/null &
     echo $! > $pid
     ;;
 
