@@ -24,17 +24,21 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.log.TaskLogDiscriminator;
+import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
+import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
+import org.apache.dolphinscheduler.server.worker.processor.TaskInstanceCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -74,22 +78,31 @@ public class TaskScheduleThread implements Runnable {
     private AbstractTask task;
 
     /**
+     *  task instance callback service
+     */
+    private TaskInstanceCallbackService taskInstanceCallbackService;
+
+    /**
      * constructor
      *
      * @param taskInstance  task instance
      * @param processService    process dao
      */
-    public TaskScheduleThread(TaskInstance taskInstance, ProcessService processService){
+    public TaskScheduleThread(TaskInstance taskInstance, ProcessService processService, TaskInstanceCallbackService taskInstanceCallbackService){
         this.processService = processService;
         this.taskInstance = taskInstance;
+        this.taskInstanceCallbackService = taskInstanceCallbackService;
     }
 
     @Override
     public void run() {
 
+        ExecuteTaskResponseCommand responseCommand = new ExecuteTaskResponseCommand(taskInstance.getId());
+
         try {
-            // update task state is running according to task type
-            updateTaskState(taskInstance.getTaskType());
+            // tell master that task is in executing
+            ExecuteTaskAckCommand ackCommand = buildAckCommand(taskInstance.getTaskType());
+            taskInstanceCallbackService.sendAck(taskInstance.getId(), ackCommand);
 
             logger.info("script path : {}", taskInstance.getExecutePath());
             // task node
@@ -148,22 +161,21 @@ public class TaskScheduleThread implements Runnable {
             // task result process
             task.after();
 
+            //
+            responseCommand.setStatus(task.getExitStatus().getCode());
+            responseCommand.setEndTime(new Date());
+            logger.info("task instance id : {},task final status : {}", taskInstance.getId(), task.getExitStatus());
+
         }catch (Exception e){
             logger.error("task scheduler failure", e);
             kill();
-            // update task instance state
-            processService.changeTaskState(ExecutionStatus.FAILURE,
-                    new Date(),
-                    taskInstance.getId());
+            responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
+            responseCommand.setEndTime(new Date());
+
+        } finally {
+            taskInstanceCallbackService.sendResult(taskInstance.getId(), responseCommand);
         }
 
-        logger.info("task instance id : {},task final status : {}",
-                taskInstance.getId(),
-                task.getExitStatus());
-        // update task instance state
-        processService.changeTaskState(task.getExitStatus(),
-                new Date(),
-                taskInstance.getId());
     }
 
     /**
@@ -182,29 +194,22 @@ public class TaskScheduleThread implements Runnable {
         }
         return globalParamsMap;
     }
-
     /**
-     *  update task state according to task type
+     *  build ack command
      * @param taskType
      */
-    private void updateTaskState(String taskType) {
-        // update task status is running
-        if(taskType.equals(TaskType.SQL.name())  ||
-                taskType.equals(TaskType.PROCEDURE.name())){
-            processService.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
-                    taskInstance.getStartTime(),
-                    taskInstance.getHost(),
-                    null,
-                    getTaskLogPath(),
-                    taskInstance.getId());
+    private ExecuteTaskAckCommand buildAckCommand(String taskType) {
+        ExecuteTaskAckCommand ackCommand = new ExecuteTaskAckCommand();
+        ackCommand.setStatus(ExecutionStatus.RUNNING_EXEUTION.getCode());
+        ackCommand.setLogPath(getTaskLogPath());
+        ackCommand.setHost("localhost");
+        ackCommand.setStartTime(new Date());
+        if(taskType.equals(TaskType.SQL.name()) || taskType.equals(TaskType.PROCEDURE.name())){
+            ackCommand.setExecutePath(null);
         }else{
-            processService.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
-                    taskInstance.getStartTime(),
-                    taskInstance.getHost(),
-                    taskInstance.getExecutePath(),
-                    getTaskLogPath(),
-                    taskInstance.getId());
+            ackCommand.setExecutePath(taskInstance.getExecutePath());
         }
+        return ackCommand;
     }
 
     /**

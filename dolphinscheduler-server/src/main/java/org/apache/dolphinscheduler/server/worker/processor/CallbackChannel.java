@@ -15,43 +15,35 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.utils;
+package org.apache.dolphinscheduler.server.worker.processor;
+
+import io.netty.channel.Channel;
 
 
-/**
- * key value pair
- *
- * @param <L> L generic type
- * @param <R> R generic type
- */
-public class Pair<L, R> {
+public class CallbackChannel {
 
-    private L left;
+    private Channel channel;
 
-    private R right;
+    private long opaque;
 
-    public Pair(L left, R right) {
-        this.left = left;
-        this.right = right;
+    public CallbackChannel(Channel channel, long opaque) {
+        this.channel = channel;
+        this.opaque = opaque;
     }
 
-    public L getLeft() {
-        return left;
+    public Channel getChannel() {
+        return channel;
     }
 
-    public void setLeft(L left) {
-        this.left = left;
+    public void setChannel(Channel channel) {
+        this.channel = channel;
     }
 
-    public R getRight() {
-        return right;
+    public long getOpaque() {
+        return opaque;
     }
 
-    public void setRight(R right) {
-        this.right = right;
-    }
-
-    public static <L, R> Pair of(L left, R right){
-        return new Pair(left, right);
+    public void setOpaque(long opaque) {
+        this.opaque = opaque;
     }
 }
