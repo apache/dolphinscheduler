@@ -92,6 +92,7 @@
   import store from '@/conf/home/store'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
+  import localStore from '@/module/util/localStorage'
   import mProgressBar from '@/module/components/progressBar/progressBar'
 
   export default {
@@ -107,8 +108,8 @@
         progress: 0,
         // file
         file: '',
-        currentDir: '/',
-        pid: -1,
+        currentDir: localStore.getItem('currentDir'),
+        pid: this.id,
         // Whether to drag upload
         dragOver: false
       }
@@ -116,7 +117,8 @@
     watch: {
     },
     props: {
-      type: String
+      type: String,
+      id: Number
     },
     methods: {
       /**
