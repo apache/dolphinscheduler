@@ -20,8 +20,8 @@
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <x-button-group size="small" >
-            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-createFolder'})">{{$t('Create folder')}}</x-button>
-            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})">{{$t('Create File')}}</x-button>
+            <x-button type="ghost" @click="() => $router.push({path: `/resource/file/subFileFolder/${searchParams.id}`})">{{$t('Create folder')}}</x-button>
+            <x-button type="ghost" @click="() => $router.push({path: `/resource/file/subFile/${searchParams.id}`})">{{$t('Create File')}}</x-button>
             <x-button type="ghost" @click="_uploading">{{$t('Upload Files')}}</x-button>
           </x-button-group>
         </template>
@@ -29,7 +29,7 @@
     </template>
     <template slot="content">
       <template v-if="fileResourcesList.length || total>0">
-        <m-list @on-update="_onUpdate" :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+        <m-list @on-update="_onUpdate" @on-updateList="_updateList" :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
@@ -62,7 +62,7 @@
         isLoading: false,
         fileResourcesList: [],
         searchParams: {
-          id: -1,
+          id: this.$route.params.id,
           pageSize: 10,
           pageNo: 1,
           searchVal: '',
@@ -78,7 +78,7 @@
        * File Upload
        */
       _uploading () {
-        findComponentDownward(this.$root, 'roof-nav')._fileUpdate('FILE')
+        findComponentDownward(this.$root, 'roof-nav')._fileChildUpdate('FILE',this.searchParams.id)
       },
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
@@ -104,20 +104,23 @@
           this.isLoading = false
         })
       },
-      _updateList () {
+      _updateList (data) {
+        this.searchParams.id = data
         this.searchParams.pageNo = 1
         this.searchParams.searchVal = ''
         this._debounceGET()
       },
-       _onUpdate () {
+       _onUpdate (data) {
+        this.searchParams.id = data
         this._debounceGET()
-      }
+      }, 
     },
     watch: {
       // router
       '$route' (a) {
         // url no params get instance list
         this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+        this.searchParams.id = a.params.id
       }
     },
     created () {

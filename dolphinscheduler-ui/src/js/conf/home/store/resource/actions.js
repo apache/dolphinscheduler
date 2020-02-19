@@ -161,6 +161,18 @@ export default {
     })
   },
   /**
+   * Resource online create folder
+   */
+  createResourceFolder ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.post(`resources/directory/create`, payload, res => {
+        resolve(res)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
+  /**
    * Resource rename
    */
   resourceRename ({ state }, payload) {
