@@ -97,6 +97,9 @@ public class TaskScheduleThread implements Runnable {
     @Override
     public void run() {
 
+        // TODO 需要去掉，暂时保留
+        updateTaskState(taskInstance.getTaskType());
+
         ExecuteTaskResponseCommand responseCommand = new ExecuteTaskResponseCommand(taskInstance.getId());
 
         try {
@@ -169,12 +172,26 @@ public class TaskScheduleThread implements Runnable {
         }catch (Exception e){
             logger.error("task scheduler failure", e);
             kill();
+
+            //TODO 需要去掉，暂时保留 update task instance state
+            processService.changeTaskState(ExecutionStatus.FAILURE,
+                    new Date(),
+                    taskInstance.getId());
+
             responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
             responseCommand.setEndTime(new Date());
 
         } finally {
             taskInstanceCallbackService.sendResult(taskInstance.getId(), responseCommand);
         }
+
+        logger.info("task instance id : {},task final status : {}",
+                taskInstance.getId(),
+                task.getExitStatus());
+        // update task instance state
+        processService.changeTaskState(task.getExitStatus(),
+                new Date(),
+                taskInstance.getId());
 
     }
 
@@ -341,5 +358,29 @@ public class TaskScheduleThread implements Runnable {
         String[] resNames = projectRes.toArray(new String[projectRes.size()]);
         PermissionCheck<String> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE, processService,resNames,userId,logger);
         permissionCheck.checkPermission();
+    }
+
+    /**
+     *  update task state according to task type
+     * @param taskType
+     */
+    private void updateTaskState(String taskType) {
+        // update task status is running
+        if(taskType.equals(TaskType.SQL.name())  ||
+                taskType.equals(TaskType.PROCEDURE.name())){
+            processService.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
+                    taskInstance.getStartTime(),
+                    taskInstance.getHost(),
+                    null,
+                    getTaskLogPath(),
+                    taskInstance.getId());
+        }else{
+            processService.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
+                    taskInstance.getStartTime(),
+                    taskInstance.getHost(),
+                    taskInstance.getExecutePath(),
+                    getTaskLogPath(),
+                    taskInstance.getId());
+        }
     }
 }

@@ -16,10 +16,17 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.BeanContext;
+import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
+import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.utils.Address;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -75,6 +82,12 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      */
     private MasterConfig masterConfig;
 
+
+    /**
+     *  netty remoting client
+     */
+    private NettyRemotingClient nettyRemotingClient;
+
     /**
      * constructor of MasterBaseTaskExecThread
      * @param taskInstance      task instance
@@ -88,6 +101,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         this.cancel = false;
         this.taskInstance = taskInstance;
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+
+        NettyClientConfig clientConfig = new NettyClientConfig();
+        this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
 
     /**
@@ -103,6 +119,23 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      */
     public void kill(){
         this.cancel = true;
+    }
+
+
+    //TODO
+    /**端口，默认是123456
+     * 需要构造ExecuteTaskRequestCommand，里面就是TaskInstance的属性。
+     */
+    public void sendToWorker(String taskInstanceJson){
+        final Address address = new Address("192.168.220.247", 12346);
+        ExecuteTaskRequestCommand command = new ExecuteTaskRequestCommand();
+        try {
+            Command response = nettyRemotingClient.sendSync(address, command.convert2Command(), 5000);
+            logger.info("已发送任务到Worker上，Worker需要执行任务");
+            //结果可能为空，所以不用管，能发过去，就行。
+        } catch (InterruptedException | RemotingException ex) {
+            logger.error(String.format("send command to : %s error", address), ex);
+        }
     }
 
     /**
@@ -128,7 +161,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 }
                 if(submitDB && !submitQueue){
                     // submit task to queue
-                    submitQueue = processService.submitTaskToQueue(task);
+                    sendToWorker(JSONObject.toJSONString(task));
                 }
                 if(submitDB && submitQueue){
                     return task;
