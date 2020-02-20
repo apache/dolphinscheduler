@@ -22,11 +22,12 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.BeanContext;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
+import org.apache.dolphinscheduler.remote.command.*;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Address;
+import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -122,10 +123,29 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     // TODO send task to worker
     public void sendToWorker(String taskInstanceJson){
         final Address address = new Address("127.0.0.1", 12346);
-        ExecuteTaskRequestCommand command = new ExecuteTaskRequestCommand(taskInstanceJson);
+        ExecuteTaskRequestCommand taskRequestCommand = new ExecuteTaskRequestCommand(taskInstanceJson);
         try {
-            Command response = nettyRemotingClient.sendSync(address, command.convert2Command(), Integer.MAX_VALUE);
-            logger.info("response result : {}",response);
+            Command responseCommand = nettyRemotingClient.sendSync(address,
+                    taskRequestCommand.convert2Command(), Integer.MAX_VALUE);
+
+            logger.info("receive command : {}", responseCommand);
+
+            final CommandType commandType = responseCommand.getType();
+            switch (commandType){
+                case EXECUTE_TASK_ACK:
+                    ExecuteTaskAckCommand taskAckCommand = FastJsonSerializer.deserialize(
+                            responseCommand.getBody(), ExecuteTaskAckCommand.class);
+                    logger.info("taskAckCommand : {}",taskAckCommand);
+                    break;
+                case EXECUTE_TASK_RESPONSE:
+                    ExecuteTaskResponseCommand taskResponseCommand = FastJsonSerializer.deserialize(
+                            responseCommand.getBody(), ExecuteTaskResponseCommand.class);
+                    logger.info("taskResponseCommand : {}",taskResponseCommand);
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown commandType");
+            }
+            logger.info("response result : {}",responseCommand);
         } catch (InterruptedException | RemotingException ex) {
             logger.error(String.format("send command to : %s error", address), ex);
         }

@@ -96,7 +96,7 @@ public class TaskScheduleThread implements Runnable {
     @Override
     public void run() {
 
-        // TODO 需要去掉，暂时保留
+        // TODO Need to be removed and kept temporarily update task instance state
         updateTaskState(taskInstance.getTaskType());
 
         ExecuteTaskResponseCommand responseCommand = new ExecuteTaskResponseCommand(taskInstance.getId());
@@ -172,7 +172,7 @@ public class TaskScheduleThread implements Runnable {
             logger.error("task scheduler failure", e);
             kill();
 
-            //TODO 需要去掉，暂时保留 update task instance state
+            //TODO Need to be removed and kept temporarily update task instance state
             processService.changeTaskState(ExecutionStatus.FAILURE,
                     new Date(),
                     taskInstance.getId());

@@ -56,7 +56,8 @@ public class TaskCallbackService {
 
     public void sendResult(int taskInstanceId, ExecuteTaskResponseCommand responseCommand){
         CallbackChannel callbackChannel = getCallbackChannel(taskInstanceId);
-        callbackChannel.getChannel().writeAndFlush(responseCommand.convert2Command(0)).addListener(new ChannelFutureListener(){
+        callbackChannel.getChannel().writeAndFlush(responseCommand.convert2Command(
+                callbackChannel.getOpaque())).addListener(new ChannelFutureListener(){
 
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
@@ -68,7 +69,7 @@ public class TaskCallbackService {
         });
     }
 
-    //TODO
+    // TODO
     private Channel createChannel(){
         return null;
     }
