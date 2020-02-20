@@ -14,33 +14,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 #alert type is EMAIL/SMS
 alert.type=EMAIL
 
+# alter msg template, default is html template
+#alert.template=html
 # mail server configuration
 mail.protocol=SMTP
-mail.server.host=smtp.126.com
-mail.server.port=
-mail.sender=dolphinscheduler@126.com
-mail.user=dolphinscheduler@126.com
-mail.passwd=escheduler123
-
+mail.server.host=${MAIL_SERVER_HOST}
+mail.server.port=${MAIL_SERVER_PORT}
+mail.sender=${MAIL_SENDER}
+mail.user=${MAIL_USER}
+mail.passwd=${MAIL_PASSWD}
 # TLS
-mail.smtp.starttls.enable=false
+mail.smtp.starttls.enable=${MAIL_SMTP_STARTTLS_ENABLE}
 # SSL
-mail.smtp.ssl.enable=true
-mail.smtp.ssl.trust=smtp.126.com
+mail.smtp.ssl.enable=${MAIL_SMTP_SSL_ENABLE}
+mail.smtp.ssl.trust=${MAIL_SMTP_SSL_TRUST}
 
 #xls file path,need create if not exist
-xls.file.path=/tmp/xls
+xls.file.path=${XLS_FILE_PATH}
 
 # Enterprise WeChat configuration
-enterprise.wechat.enable=false
-enterprise.wechat.corp.id=xxxxxxx
-enterprise.wechat.secret=xxxxxxx
-enterprise.wechat.agent.id=xxxxxxx
-enterprise.wechat.users=xxxxxxx
+enterprise.wechat.enable=${ENTERPRISE_WECHAT_ENABLE}
+enterprise.wechat.corp.id=${ENTERPRISE_WECHAT_CORP_ID}
+enterprise.wechat.secret=${ENTERPRISE_WECHAT_SECRET}
+enterprise.wechat.agent.id=${ENTERPRISE_WECHAT_AGENT_ID}
+enterprise.wechat.users=${ENTERPRISE_WECHAT_USERS}
 enterprise.wechat.token.url=https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=$corpId&corpsecret=$secret
 enterprise.wechat.push.url=https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=$token
 enterprise.wechat.team.send.msg={\"toparty\":\"$toParty\",\"agentid\":\"$agentId\",\"msgtype\":\"text\",\"text\":{\"content\":\"$msg\"},\"safe\":\"0\"}
