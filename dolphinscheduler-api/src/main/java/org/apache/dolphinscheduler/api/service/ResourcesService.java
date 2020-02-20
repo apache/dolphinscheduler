@@ -231,7 +231,7 @@ public class ResourcesService extends BaseService {
         }
 
         // fail upload
-        if (!upload(loginUser, name, file, type)) {
+        if (!upload(loginUser, fullName, file, type)) {
             logger.error("upload resource: {} file: {} failed.", name, file.getOriginalFilename());
             putMsg(result, Status.HDFS_OPERATION_ERROR);
             throw new RuntimeException(String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
@@ -542,7 +542,7 @@ public class ResourcesService extends BaseService {
         resourcesMapper.deleteById(resourceId);
         resourceUserMapper.deleteResourceUser(0, resourceId);
         //delete file on hdfs
-        HadoopUtils.getInstance().delete(hdfsFilename, false);
+        HadoopUtils.getInstance().delete(hdfsFilename, true);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -713,7 +713,7 @@ public class ResourcesService extends BaseService {
 
         String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
 
-        result = uploadContentToHdfs(name, tenantCode, content);
+        result = uploadContentToHdfs(fullName, tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new RuntimeException(result.getMsg());
         }

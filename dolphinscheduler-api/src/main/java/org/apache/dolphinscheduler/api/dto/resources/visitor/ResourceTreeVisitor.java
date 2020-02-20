@@ -89,7 +89,7 @@ public class ResourceTreeVisitor implements Visitor{
             resourceComponent.setChildren(setChildren(resourceComponent.getId(),list));
         }
         if (childList.size()==0){
-            return null;
+            return new ArrayList<>();
         }
         return childList;
     }
