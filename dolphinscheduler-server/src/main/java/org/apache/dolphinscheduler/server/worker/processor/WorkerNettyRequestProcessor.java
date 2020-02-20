@@ -107,7 +107,7 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
         workerExecService.submit(new TaskScheduleThread(taskInstance, processService, taskInstanceCallbackService));
 
         ExecuteTaskResponseCommand executeTaskResponseCommand = new ExecuteTaskResponseCommand(taskInstance.getId());
-        channel.writeAndFlush(executeTaskResponseCommand.convert2Command());
+        channel.writeAndFlush(executeTaskResponseCommand.convert2Command(command.getOpaque()));
     }
 
     private boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
