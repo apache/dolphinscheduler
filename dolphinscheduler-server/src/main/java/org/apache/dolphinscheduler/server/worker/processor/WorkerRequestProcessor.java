@@ -125,6 +125,12 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
                 processService, taskCallbackService));
     }
 
+    /**
+     *  whehter tenant is null
+     * @param tenant tenant
+     * @param taskInstance taskInstance
+     * @return result
+     */
     private boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
         if(tenant == null){
             logger.error("tenant not exists,process instance id : {},task instance id : {}",
@@ -135,6 +141,11 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
         return false;
     }
 
+    /**
+     *  get execute local path
+     * @param taskInstance taskInstance
+     * @return execute local path
+     */
     private String getExecLocalPath(TaskInstance taskInstance){
         return FileUtils.getProcessExecDir(taskInstance.getProcessDefine().getProjectId(),
                 taskInstance.getProcessDefine().getId(),
