@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -482,7 +483,9 @@ public class ResourcesService extends BaseService {
             userId = 0;
         }
         resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        result.put(Constants.DATA_LIST, resourceList);
+        Visitor resourceTreeVisitor = new ResourceTreeVisitor(resourceList);
+        //JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(resourceTreeVisitor.visit().getChildren(), SerializerFeature.SortField));
+        result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
 
         return result;
@@ -951,8 +954,10 @@ public class ResourcesService extends BaseService {
         }
         List<Resource> authedResources = resourcesMapper.queryAuthorizedResourceList(userId);
         Visitor visitor = new ResourceTreeVisitor(authedResources);
+        logger.info(JSON.toJSONString(visitor.visit(), SerializerFeature.SortField));
         String jsonTreeStr = JSON.toJSONString(visitor.visit().getChildren(), SerializerFeature.SortField);
-        result.put(Constants.DATA_LIST, jsonTreeStr);
+        logger.info(jsonTreeStr);
+        result.put(Constants.DATA_LIST, visitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
         return result;
     }
