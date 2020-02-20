@@ -26,8 +26,6 @@ import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetHdfsParameter
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetHiveParameter;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.server.utils.EntityTestUtils;
-import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.SqoopJobGenerator;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -41,13 +39,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.lang.reflect.*;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.net.URLDecoder;
+
 import java.util.*;
 
 /**
@@ -147,19 +139,20 @@ public class SqoopTaskTest {
 
     @Test
     public void testParameters(){
-        try {
-            List<Class> classList = new ArrayList<>();
-            classList.add(SqoopParameters.class);
-            classList.add(SourceHdfsParameter.class);
-            classList.add(SourceMysqlParameter.class);
-            classList.add(SourceHiveParameter.class);
-            classList.add(TargetHdfsParameter.class);
-            classList.add(TargetMysqlParameter.class);
-            classList.add(TargetHiveParameter.class);
-            EntityTestUtils.run(classList);
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
-        }
-}
+       SourceMysqlParameter sourceMysqlParameter = new SourceMysqlParameter();
+       sourceMysqlParameter.setSrcDatasource(2);
+       sourceMysqlParameter.setSrcTable("person");
+       sourceMysqlParameter.setSrcQueryType(1);
+       sourceMysqlParameter.setSrcColumns("id,name");
+       sourceMysqlParameter.setSrcQuerySql("select * from person");
+       sourceMysqlParameter.setSrcColumnType(1);
+
+       Assert.assertEquals(2, sourceMysqlParameter.getSrcDatasource());
+       Assert.assertEquals("person", sourceMysqlParameter.getSrcTable());
+       Assert.assertEquals(1, sourceMysqlParameter.getSrcQueryType());
+       Assert.assertEquals("id,name", sourceMysqlParameter.getSrcColumns());
+       Assert.assertEquals("select * from person", sourceMysqlParameter.getSrcQuerySql());
+       Assert.assertEquals(1, sourceMysqlParameter.getSrcColumnType());
+    }
 
 }
