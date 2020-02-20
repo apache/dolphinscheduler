@@ -35,10 +35,9 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
-import org.apache.dolphinscheduler.server.worker.processor.TaskInstanceCallbackService;
+import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -80,7 +79,7 @@ public class TaskScheduleThread implements Runnable {
     /**
      *  task instance callback service
      */
-    private TaskInstanceCallbackService taskInstanceCallbackService;
+    private TaskCallbackService taskInstanceCallbackService;
 
     /**
      * constructor
@@ -88,7 +87,7 @@ public class TaskScheduleThread implements Runnable {
      * @param taskInstance  task instance
      * @param processService    process dao
      */
-    public TaskScheduleThread(TaskInstance taskInstance, ProcessService processService, TaskInstanceCallbackService taskInstanceCallbackService){
+    public TaskScheduleThread(TaskInstance taskInstance, ProcessService processService, TaskCallbackService taskInstanceCallbackService){
         this.processService = processService;
         this.taskInstance = taskInstance;
         this.taskInstanceCallbackService = taskInstanceCallbackService;
@@ -105,7 +104,7 @@ public class TaskScheduleThread implements Runnable {
         try {
             // tell master that task is in executing
             ExecuteTaskAckCommand ackCommand = buildAckCommand(taskInstance.getTaskType());
-//            taskInstanceCallbackService.sendAck(taskInstance.getId(), ackCommand);
+            taskInstanceCallbackService.sendAck(taskInstance.getId(), ackCommand);
 
             logger.info("script path : {}", taskInstance.getExecutePath());
             // task node
@@ -182,7 +181,7 @@ public class TaskScheduleThread implements Runnable {
             responseCommand.setEndTime(new Date());
 
         } finally {
-//            taskInstanceCallbackService.sendResult(taskInstance.getId(), responseCommand);
+            taskInstanceCallbackService.sendResult(taskInstance.getId(), responseCommand);
         }
 
         logger.info("task instance id : {},task final status : {}",

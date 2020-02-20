@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -44,22 +43,36 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
+/**
+ *  worker request processor
+ */
+public class WorkerRequestProcessor implements NettyRequestProcessor {
 
-public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
+    private final Logger logger = LoggerFactory.getLogger(WorkerRequestProcessor.class);
 
-    private final Logger logger = LoggerFactory.getLogger(WorkerNettyRequestProcessor.class);
-
+    /**
+     * process service
+     */
     private final ProcessService processService;
 
+    /**
+     *  thread executor service
+     */
     private final ExecutorService workerExecService;
 
+    /**
+     *  worker config
+     */
     private final WorkerConfig workerConfig;
 
-    private final TaskInstanceCallbackService taskInstanceCallbackService;
+    /**
+     *  task callback service
+     */
+    private final TaskCallbackService taskCallbackService;
 
-    public WorkerNettyRequestProcessor(ProcessService processService){
+    public WorkerRequestProcessor(ProcessService processService){
         this.processService = processService;
-        this.taskInstanceCallbackService = new TaskInstanceCallbackService();
+        this.taskCallbackService = new TaskCallbackService();
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
     }
@@ -68,7 +81,7 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.EXECUTE_TASK_REQUEST == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
-        logger.debug("received command : {}", command);
+        logger.info("received command : {}", command);
         ExecuteTaskRequestCommand taskRequestCommand = FastJsonSerializer.deserialize(
                 command.getBody(), ExecuteTaskRequestCommand.class);
 
@@ -79,7 +92,7 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
         taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstance.getId());
 
 
-        //TODO 需要干掉，然后移到master里面。
+        //TODO this logic need add to master
         int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
         // verify tenant is null
@@ -91,7 +104,8 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
         String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
-        //TODO 到这里。
+        //TODO end
+
         // local execute path
         String execLocalPath = getExecLocalPath(taskInstance);
         logger.info("task instance  local execute path : {} ", execLocalPath);
@@ -102,9 +116,13 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
         } catch (Exception ex){
             logger.error(String.format("create execLocalPath : %s", execLocalPath), ex);
         }
+
+        taskCallbackService.addCallbackChannel(taskInstance.getId(),
+                new CallbackChannel(channel, command.getOpaque()));
+
         // submit task
-        taskInstanceCallbackService.addCallbackChannel(taskInstance.getId(), new CallbackChannel(channel, command.getOpaque()));
-        workerExecService.submit(new TaskScheduleThread(taskInstance, processService, taskInstanceCallbackService));
+        workerExecService.submit(new TaskScheduleThread(taskInstance,
+                processService, taskCallbackService));
 
         ExecuteTaskResponseCommand executeTaskResponseCommand = new ExecuteTaskResponseCommand(taskInstance.getId());
         channel.writeAndFlush(executeTaskResponseCommand.convert2Command(command.getOpaque()));

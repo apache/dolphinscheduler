@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class TaskInstanceCallbackService {
+public class TaskCallbackService {
 
     private static final ConcurrentHashMap<Integer, CallbackChannel> CALL_BACK_CHANNELS = new ConcurrentHashMap<>();
 
@@ -56,7 +56,7 @@ public class TaskInstanceCallbackService {
 
     public void sendResult(int taskInstanceId, ExecuteTaskResponseCommand responseCommand){
         CallbackChannel callbackChannel = getCallbackChannel(taskInstanceId);
-        callbackChannel.getChannel().writeAndFlush(responseCommand.convert2Command()).addListener(new ChannelFutureListener(){
+        callbackChannel.getChannel().writeAndFlush(responseCommand.convert2Command(0)).addListener(new ChannelFutureListener(){
 
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {

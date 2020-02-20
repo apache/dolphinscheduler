@@ -121,7 +121,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
     // TODO send task to worker
     public void sendToWorker(String taskInstanceJson){
-        final Address address = new Address("192.168.220.247", 12346);
+        final Address address = new Address("127.0.0.1", 12346);
         ExecuteTaskRequestCommand command = new ExecuteTaskRequestCommand(taskInstanceJson);
         try {
             Command response = nettyRemotingClient.sendSync(address, command.convert2Command(), Integer.MAX_VALUE);
@@ -155,6 +155,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 if(submitDB && !submitQueue){
                     // submit task to queue
                     sendToWorker(JSONObject.toJSONString(task));
+                    submitQueue = true;
                 }
                 if(submitDB && submitQueue){
                     return task;
