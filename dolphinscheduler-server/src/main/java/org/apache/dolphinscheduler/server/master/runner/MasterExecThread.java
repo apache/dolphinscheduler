@@ -160,20 +160,7 @@ public class MasterExecThread implements Runnable {
         this.nettyRemotingClient = nettyRemotingClient;
     }
 
-    //TODO
-    /**端口，默认是123456
-     * 需要构造ExecuteTaskRequestCommand，里面就是TaskInstance的属性。
-     */
-    private void sendToWorker(){
-        final Address address = new Address("localhost", 12346);
-        ExecuteTaskRequestCommand command = new ExecuteTaskRequestCommand();
-        try {
-            Command response = nettyRemotingClient.sendSync(address, command.convert2Command(), 5000);
-            //结果可能为空，所以不用管，能发过去，就行。
-        } catch (InterruptedException | RemotingException ex) {
-            logger.error(String.format("send command to : %s error", address), ex);
-        }
-    }
+
 
 
     @Override

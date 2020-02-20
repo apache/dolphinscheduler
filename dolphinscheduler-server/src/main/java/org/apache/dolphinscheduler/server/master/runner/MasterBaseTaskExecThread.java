@@ -16,10 +16,18 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.utils.BeanContext;
+import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.command.*;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
+import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.utils.Address;
+import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -75,6 +83,12 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      */
     private MasterConfig masterConfig;
 
+
+    /**
+     *  netty remoting client
+     */
+    private static final NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(new NettyClientConfig());
+
     /**
      * constructor of MasterBaseTaskExecThread
      * @param taskInstance      task instance
@@ -105,6 +119,38 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         this.cancel = true;
     }
 
+
+    // TODO send task to worker
+    public void sendToWorker(String taskInstanceJson){
+        final Address address = new Address("127.0.0.1", 12346);
+        ExecuteTaskRequestCommand taskRequestCommand = new ExecuteTaskRequestCommand(taskInstanceJson);
+        try {
+            Command responseCommand = nettyRemotingClient.sendSync(address,
+                    taskRequestCommand.convert2Command(), Integer.MAX_VALUE);
+
+            logger.info("receive command : {}", responseCommand);
+
+            final CommandType commandType = responseCommand.getType();
+            switch (commandType){
+                case EXECUTE_TASK_ACK:
+                    ExecuteTaskAckCommand taskAckCommand = FastJsonSerializer.deserialize(
+                            responseCommand.getBody(), ExecuteTaskAckCommand.class);
+                    logger.info("taskAckCommand : {}",taskAckCommand);
+                    break;
+                case EXECUTE_TASK_RESPONSE:
+                    ExecuteTaskResponseCommand taskResponseCommand = FastJsonSerializer.deserialize(
+                            responseCommand.getBody(), ExecuteTaskResponseCommand.class);
+                    logger.info("taskResponseCommand : {}",taskResponseCommand);
+                    break;
+                default:
+                    throw new IllegalArgumentException("unknown commandType");
+            }
+            logger.info("response result : {}",responseCommand);
+        } catch (InterruptedException | RemotingException ex) {
+            logger.error(String.format("send command to : %s error", address), ex);
+        }
+    }
+
     /**
      * submit master base task exec thread
      * @return TaskInstance
@@ -128,7 +174,8 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 }
                 if(submitDB && !submitQueue){
                     // submit task to queue
-                    submitQueue = processService.submitTaskToQueue(task);
+                    sendToWorker(JSONObject.toJSONString(task));
+                    submitQueue = true;
                 }
                 if(submitDB && submitQueue){
                     return task;
