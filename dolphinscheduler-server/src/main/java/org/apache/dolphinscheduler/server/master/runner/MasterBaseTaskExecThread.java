@@ -124,7 +124,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         final Address address = new Address("192.168.220.247", 12346);
         ExecuteTaskRequestCommand command = new ExecuteTaskRequestCommand(taskInstanceJson);
         try {
-            Command response = nettyRemotingClient.sendSync(address, command.convert2Command(), 5000);
+            Command response = nettyRemotingClient.sendSync(address, command.convert2Command(), Integer.MAX_VALUE);
             logger.info("response result : {}",response);
         } catch (InterruptedException | RemotingException ex) {
             logger.error(String.format("send command to : %s error", address), ex);
