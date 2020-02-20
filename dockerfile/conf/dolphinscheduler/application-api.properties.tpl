@@ -14,22 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# server port
+server.port=12345
+# session config
+server.servlet.session.timeout=7200
+# servlet config
+server.servlet.context-path=/dolphinscheduler/
+# file size limit for upload
+spring.servlet.multipart.max-file-size=1024MB
+spring.servlet.multipart.max-request-size=1024MB
+# post content
+server.jetty.max-http-post-size=5000000
+# i18n
+spring.messages.encoding=UTF-8
+#i18n classpath folder , file prefix messages， if have many files, use "," seperator
+spring.messages.basename=i18n/messages
+# Authentication types (supported types: PASSWORD)
+security.authentication.type=PASSWORD
 
-# ha or single namenode,If namenode ha needs to copy core-site.xml and hdfs-site.xml
-# to the conf directory，support s3，for example : s3a://dolphinscheduler
-fs.defaultFS=hdfs://mycluster:8020
 
-# s3 need，s3 endpoint
-fs.s3a.endpoint=http://192.168.199.91:9010
 
-# s3 need，s3 access key
-fs.s3a.access.key=A3DXS30FO22544RE
 
-# s3 need，s3 secret key
-fs.s3a.secret.key=OloCLq3n+8+sdPHUhJ21XrSxTC+JK
-
-#resourcemanager ha note this need ips , this empty if single
-yarn.resourcemanager.ha.rm.ids=192.168.xx.xx,192.168.xx.xx
-
-# If it is a single resourcemanager, you only need to configure one host name. If it is resourcemanager HA, the default configuration is fine
-yarn.application.status.address=http://ark1:8088/ws/v1/cluster/apps/%s
