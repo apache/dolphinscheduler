@@ -45,7 +45,8 @@ public enum TaskType {
     DEPENDENT(7, "dependent"),
     FLINK(8, "flink"),
     HTTP(9, "http"),
-    DATAX(10, "datax");
+    DATAX(10, "datax"),
+    CONDITIONS(11, "conditions");
 
     TaskType(int code, String descp){
         this.code = code;

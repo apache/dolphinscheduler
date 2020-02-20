@@ -230,6 +230,20 @@ const positionList = [
   {
     id: 'HEADERS',
     code: "Headers"
+  },
+]
+
+/**
+ * node status
+ */
+const nodeStatusList = [
+  {
+    value: 'SUCCESS',
+    label: `${i18n.$t('success')}`
+  },
+  {
+    value: 'FAILURE',
+    label: `${i18n.$t('failed')}`
   }
 ]
 
@@ -239,5 +253,6 @@ export {
   typeList,
   directList,
   sqlTypeList,
-  positionList
+  positionList,
+  nodeStatusList
 }

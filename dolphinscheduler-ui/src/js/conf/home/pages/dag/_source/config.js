@@ -283,7 +283,13 @@ let tasksType = {
   'DATAX': {
     desc: 'DataX',
     color: '#1fc747'
-  }
+  },
+  'CONDITIONS':
+  {
+    desc: 'CONDITIONS',
+    color: '#E46F13'
+}
+
 }
 
 
