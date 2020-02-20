@@ -869,7 +869,7 @@ public class ResourcesService extends BaseService {
             return result;
         }
         List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
-        List<Object> list ;
+        List<Resource> list ;
         if (resourceList != null && resourceList.size() > 0) {
             Set<Resource> resourceSet = new HashSet<>(resourceList);
             List<Resource> authedResourceList = resourcesMapper.queryAuthorizedResourceList(userId);
@@ -879,8 +879,8 @@ public class ResourcesService extends BaseService {
         }else {
             list = new ArrayList<>(0);
         }
-
-        result.put(Constants.DATA_LIST, list);
+        Visitor visitor = new ResourceTreeVisitor(list);
+        result.put(Constants.DATA_LIST, visitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
         return result;
     }

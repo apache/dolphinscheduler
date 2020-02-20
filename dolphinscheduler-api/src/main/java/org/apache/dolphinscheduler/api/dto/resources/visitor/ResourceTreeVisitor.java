@@ -37,10 +37,6 @@ public class ResourceTreeVisitor implements Visitor{
 
     public ResourceComponent visit() {
         ResourceComponent rootDirectory = new Directory();
-        rootDirectory.setId(-1);
-        rootDirectory.setPid(0);
-        rootDirectory.setName("/");
-        rootDirectory.setDirctory(true);
         for (Resource resource : resourceList) {
 
             ResourceComponent tempResourceComponent;
@@ -50,7 +46,7 @@ public class ResourceTreeVisitor implements Visitor{
                 tempResourceComponent = new FileLeaf();
             }
             //表明是一级父类
-            if (resource.getPid()==-1){
+            if (rootNode(resource)){
                 tempResourceComponent.setName(resource.getAlias());
                 tempResourceComponent.setFullName(resource.getFullName());
                 tempResourceComponent.setId(resource.getId());
@@ -92,6 +88,26 @@ public class ResourceTreeVisitor implements Visitor{
             return new ArrayList<>();
         }
         return childList;
+    }
+
+    /**
+     * Determine whether it is the root node
+     * @param resource resource
+     * @return true if it is the root node
+     */
+
+    public boolean rootNode(Resource resource) {
+
+        boolean isRootNode = true;
+        if(resource.getPid() != -1 ){
+            for (Resource parent : resourceList) {
+                if (resource.getPid() == parent.getId()) {
+                    isRootNode = false;
+                    break;
+                }
+            }
+        }
+        return isRootNode;
     }
 
 }
