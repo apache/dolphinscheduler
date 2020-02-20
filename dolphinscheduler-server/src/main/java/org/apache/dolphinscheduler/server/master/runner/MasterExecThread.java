@@ -554,7 +554,7 @@ public class MasterExecThread implements Runnable {
      * @param nodeName
      * @return
      */
-    public List<String> parseConditionTask(String nodeName){
+    private List<String> parseConditionTask(String nodeName){
         List<String> conditionTaskList = new ArrayList<>();
         TaskNode taskNode = dag.getNode(nodeName);
         if(!taskNode.isConditionsTask()){
@@ -580,7 +580,7 @@ public class MasterExecThread implements Runnable {
         return conditionTaskList;
     }
 
-    public List<String> parsePostNodeList(String parentNodeName){
+    private List<String> parsePostNodeList(String parentNodeName){
         List<String> postNodeList = new ArrayList<>();
 
         TaskNode taskNode = dag.getNode(parentNodeName);
