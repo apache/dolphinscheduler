@@ -140,6 +140,12 @@ public class ProcessInstance {
     private int executorId;
 
     /**
+     * executor name
+     */
+    @TableField(exist = false)
+    private String executorName;
+
+    /**
      * tenant code
      */
     @TableField(exist = false)
@@ -470,6 +476,14 @@ public class ProcessInstance {
 
     public String getHistoryCmd() {
         return historyCmd;
+    }
+
+    public String getExecutorName() {
+        return executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this.executorName = executorName;
     }
 
     public void setHistoryCmd(String historyCmd) {
