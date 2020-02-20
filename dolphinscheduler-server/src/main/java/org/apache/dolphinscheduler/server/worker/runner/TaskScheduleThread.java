@@ -105,7 +105,7 @@ public class TaskScheduleThread implements Runnable {
         try {
             // tell master that task is in executing
             ExecuteTaskAckCommand ackCommand = buildAckCommand(taskInstance.getTaskType());
-            taskInstanceCallbackService.sendAck(taskInstance.getId(), ackCommand);
+//            taskInstanceCallbackService.sendAck(taskInstance.getId(), ackCommand);
 
             logger.info("script path : {}", taskInstance.getExecutePath());
             // task node
@@ -182,7 +182,7 @@ public class TaskScheduleThread implements Runnable {
             responseCommand.setEndTime(new Date());
 
         } finally {
-            taskInstanceCallbackService.sendResult(taskInstance.getId(), responseCommand);
+//            taskInstanceCallbackService.sendResult(taskInstance.getId(), responseCommand);
         }
 
         logger.info("task instance id : {},task final status : {}",
