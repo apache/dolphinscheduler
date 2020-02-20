@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -28,6 +29,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
+import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -40,32 +43,56 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
+/**
+ *  worker request processor
+ */
+public class WorkerRequestProcessor implements NettyRequestProcessor {
 
-public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
+    private final Logger logger = LoggerFactory.getLogger(WorkerRequestProcessor.class);
 
-    private final Logger logger = LoggerFactory.getLogger(WorkerNettyRequestProcessor.class);
-
+    /**
+     * process service
+     */
     private final ProcessService processService;
 
+    /**
+     *  thread executor service
+     */
     private final ExecutorService workerExecService;
 
+    /**
+     *  worker config
+     */
     private final WorkerConfig workerConfig;
 
-    private final TaskInstanceCallbackService taskInstanceCallbackService;
+    /**
+     *  task callback service
+     */
+    private final TaskCallbackService taskCallbackService;
 
-    public WorkerNettyRequestProcessor(ProcessService processService){
+    public WorkerRequestProcessor(ProcessService processService){
         this.processService = processService;
-        this.taskInstanceCallbackService = new TaskInstanceCallbackService();
+        this.taskCallbackService = new TaskCallbackService();
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
     }
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.EXECUTE_TASK_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
-        logger.debug("received command : {}", command);
-        TaskInstance taskInstance = FastJsonSerializer.deserialize(command.getBody(), TaskInstance.class);
-        //TODO 需要干掉，然后移到master里面。
+        Preconditions.checkArgument(CommandType.EXECUTE_TASK_REQUEST == command.getType(),
+                String.format("invalid command type : %s", command.getType()));
+        logger.info("received command : {}", command);
+        ExecuteTaskRequestCommand taskRequestCommand = FastJsonSerializer.deserialize(
+                command.getBody(), ExecuteTaskRequestCommand.class);
+
+        String taskInstanceJson = taskRequestCommand.getTaskInstanceJson();
+
+        TaskInstance taskInstance = JSONObject.parseObject(taskInstanceJson, TaskInstance.class);
+
+        taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstance.getId());
+
+
+        //TODO this logic need add to master
         int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
         // verify tenant is null
@@ -77,7 +104,8 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
         String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
-        //TODO 到这里。
+        //TODO end
+
         // local execute path
         String execLocalPath = getExecLocalPath(taskInstance);
         logger.info("task instance  local execute path : {} ", execLocalPath);
@@ -88,11 +116,21 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
         } catch (Exception ex){
             logger.error(String.format("create execLocalPath : %s", execLocalPath), ex);
         }
+
+        taskCallbackService.addCallbackChannel(taskInstance.getId(),
+                new CallbackChannel(channel, command.getOpaque()));
+
         // submit task
-        taskInstanceCallbackService.addCallbackChannel(taskInstance.getId(), new CallbackChannel(channel, command.getOpaque()));
-        workerExecService.submit(new TaskScheduleThread(taskInstance, processService, taskInstanceCallbackService));
+        workerExecService.submit(new TaskScheduleThread(taskInstance,
+                processService, taskCallbackService));
     }
 
+    /**
+     *  whehter tenant is null
+     * @param tenant tenant
+     * @param taskInstance taskInstance
+     * @return result
+     */
     private boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
         if(tenant == null){
             logger.error("tenant not exists,process instance id : {},task instance id : {}",
@@ -103,6 +141,11 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
         return false;
     }
 
+    /**
+     *  get execute local path
+     * @param taskInstance taskInstance
+     * @return execute local path
+     */
     private String getExecLocalPath(TaskInstance taskInstance){
         return FileUtils.getProcessExecDir(taskInstance.getProcessDefine().getProjectId(),
                 taskInstance.getProcessDefine().getId(),

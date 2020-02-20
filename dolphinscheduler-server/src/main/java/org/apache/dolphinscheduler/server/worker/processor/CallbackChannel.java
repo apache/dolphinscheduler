@@ -19,11 +19,19 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import io.netty.channel.Channel;
 
-
+/**
+ *  callback channel
+ */
 public class CallbackChannel {
 
+    /**
+     *  channel
+     */
     private Channel channel;
 
+    /**
+     *  equest unique identification
+     */
     private long opaque;
 
     public CallbackChannel(Channel channel, long opaque) {

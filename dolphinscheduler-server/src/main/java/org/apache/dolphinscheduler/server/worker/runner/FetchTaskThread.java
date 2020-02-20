@@ -235,7 +235,7 @@ public class FetchTaskThread implements Runnable{
 
                     logger.info("task : {} ready to submit to task scheduler thread",taskInstId);
                     // submit task
-                    workerExecService.submit(new TaskScheduleThread(taskInstance, processService));
+//                    workerExecService.submit(new TaskScheduleThread(taskInstance, processService));
 
                     // remove node from zk
                     removeNodeFromTaskQueue(taskQueueStr);
