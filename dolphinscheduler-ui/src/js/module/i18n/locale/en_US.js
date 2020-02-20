@@ -240,6 +240,7 @@ export default {
   'Service-Master': 'Service-Master',
   'Service-Worker': 'Service-Worker',
   'Process Name': 'Process Name',
+  'Executor': 'Executor',
   'Run Type': 'Run Type',
   'Scheduling Time': 'Scheduling Time',
   'Run Times': 'Run Times',

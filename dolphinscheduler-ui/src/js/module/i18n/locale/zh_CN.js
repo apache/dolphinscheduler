@@ -239,6 +239,7 @@ export default {
   'Service-Master': '服务管理-Master',
   'Service-Worker': '服务管理-Worker',
   'Process Name': '工作流名称',
+  'Executor': '执行用户',
   'Run Type': '运行类型',
   'Scheduling Time': '调度时间',
   'Run Times': '运行次数',

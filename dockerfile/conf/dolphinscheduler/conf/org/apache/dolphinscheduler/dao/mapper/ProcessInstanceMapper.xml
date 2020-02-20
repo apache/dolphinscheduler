@@ -90,6 +90,9 @@
         <if test="host != null and host != ''">
             and instance.host like concat('%', #{host}, '%')
         </if>
+        <if test="executorId != 0">
+            and instance.executorId = #{executorId}
+        </if>
         order by instance.start_time desc
     </select>
     <update id="setFailoverByHostAndStateArray">
