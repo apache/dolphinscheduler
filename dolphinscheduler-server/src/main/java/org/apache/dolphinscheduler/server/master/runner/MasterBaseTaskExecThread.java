@@ -86,7 +86,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      *  netty remoting client
      */
-    private NettyRemotingClient nettyRemotingClient;
+    private static final NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(new NettyClientConfig());
 
     /**
      * constructor of MasterBaseTaskExecThread
@@ -101,9 +101,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         this.cancel = false;
         this.taskInstance = taskInstance;
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
-
-        NettyClientConfig clientConfig = new NettyClientConfig();
-        this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
 
     /**
@@ -122,17 +119,13 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     }
 
 
-    //TODO
-    /**端口，默认是123456
-     * 需要构造ExecuteTaskRequestCommand，里面就是TaskInstance的属性。
-     */
+    // TODO send task to worker
     public void sendToWorker(String taskInstanceJson){
         final Address address = new Address("192.168.220.247", 12346);
-        ExecuteTaskRequestCommand command = new ExecuteTaskRequestCommand();
+        ExecuteTaskRequestCommand command = new ExecuteTaskRequestCommand(taskInstanceJson);
         try {
             Command response = nettyRemotingClient.sendSync(address, command.convert2Command(), 5000);
-            logger.info("已发送任务到Worker上，Worker需要执行任务");
-            //结果可能为空，所以不用管，能发过去，就行。
+            logger.info("response result : {}",response);
         } catch (InterruptedException | RemotingException ex) {
             logger.error(String.format("send command to : %s error", address), ex);
         }

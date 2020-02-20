@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -28,6 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -64,7 +66,15 @@ public class WorkerNettyRequestProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.EXECUTE_TASK_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
         logger.debug("received command : {}", command);
-        TaskInstance taskInstance = FastJsonSerializer.deserialize(command.getBody(), TaskInstance.class);
+        ExecuteTaskRequestCommand taskRequestCommand = FastJsonSerializer.deserialize(command.getBody(), ExecuteTaskRequestCommand.class);
+
+        String taskInstanceJson = taskRequestCommand.getTaskInstanceJson();
+
+        TaskInstance taskInstance = JSONObject.parseObject(taskInstanceJson, TaskInstance.class);
+
+        taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstance.getId());
+
+
         //TODO 需要干掉，然后移到master里面。
         int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
