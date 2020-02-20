@@ -592,12 +592,10 @@
         this.description = o.description
         this.maxRetryTimes = o.maxRetryTimes
         this.retryInterval = o.retryInterval
-
         if(o.conditionResult) {
           this.successBranch = o.conditionResult.successNode[0]
           this.failedBranch = o.conditionResult.failedNode[0]
         }
-
           // If the workergroup has been deleted, set the default workergroup
           var hasMatch = false;
           for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
@@ -613,7 +611,7 @@
           }else{
             this.workerGroupId = o.workerGroupId
           }
-
+          
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}

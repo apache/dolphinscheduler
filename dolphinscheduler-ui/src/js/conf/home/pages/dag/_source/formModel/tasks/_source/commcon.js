@@ -230,12 +230,8 @@ const positionList = [
   {
     id: 'HEADERS',
     code: "Headers"
-  },
+  }
 ]
-
-/**
- * node status
- */
 const nodeStatusList = [
   {
     value: 'SUCCESS',

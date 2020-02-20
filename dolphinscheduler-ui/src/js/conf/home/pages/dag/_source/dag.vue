@@ -479,14 +479,14 @@
         $('div[data-targetarr*="' + id + '"]').each(function(){
           rearNode.push($(this).attr("id"))
         })
-
+        
         if (rearNode.length>0) {
-            rearNode.forEach(v => {
+          rearNode.forEach(v => {
             let rearobj = {}
             rearobj.value = $(`#${v}`).find('.name-p').text()
             rearobj.label = $(`#${v}`).find('.name-p').text()
             rearList.push(rearobj)
-            })
+          })
         } else {
           rearList = []
         }
@@ -498,7 +498,7 @@
             nodeobj.value = $(`#${v}`).find('.name-p').text()
             nodeobj.label = $(`#${v}`).find('.name-p').text()
             preNode.push(nodeobj)
-            })
+          })
         } else {
           preNode = []
         }
@@ -540,6 +540,7 @@
                 if (flag) {
                   jsPlumb.remove(id)
                 }
+
                 removeNodesEvent(fromThis)
               },
               onSubProcess ({ subProcessId, fromThis }) {
