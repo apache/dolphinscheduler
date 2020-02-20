@@ -19,16 +19,17 @@ package org.apache.dolphinscheduler.api.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.assertj.core.error.future.Warning;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -144,6 +145,86 @@ public class ProcessInstanceServiceTest {
     }
 
     @Test
+    public void testQueryProcessInstanceById() {
+        String projectName = "project_test1";
+        User loginUser = getAdminUser();
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
+
+        //project auth fail
+        when(projectMapper.queryByName(projectName)).thenReturn(null);
+        when(projectService.checkProjectAndAuth(loginUser,null,projectName)).thenReturn(result);
+        Map<String, Object> proejctAuthFailRes = processInstanceService.queryProcessInstanceById(loginUser, projectName, 1);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
+
+        //project auth success
+        ProcessInstance processInstance = getProcessInstance();
+        processInstance.setWorkerGroupId(-1);
+        processInstance.setReceivers("xxx@qq.com");
+        processInstance.setReceiversCc("xxx@qq.com");
+        processInstance.setProcessDefinitionId(46);
+        putMsg(result, Status.SUCCESS, projectName);
+        Project project = getProject(projectName);
+        ProcessDefinition processDefinition = getProcessDefinition();
+        when(projectMapper.queryByName(projectName)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        when(processService.findProcessInstanceDetailById(processInstance.getId())).thenReturn(processInstance);
+        when(processService.findProcessDefineById(processInstance.getProcessDefinitionId())).thenReturn(processDefinition);
+        Map<String, Object> successRes = processInstanceService.queryProcessInstanceById(loginUser, projectName, 1);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+
+        //worker group null
+        processInstance.setWorkerGroupId(1);
+        when(workerGroupMapper.selectById(processInstance.getWorkerGroupId())).thenReturn(null);
+        Map<String, Object> workerNullRes = processInstanceService.queryProcessInstanceById(loginUser, projectName, 1);
+        Assert.assertEquals(Status.SUCCESS, workerNullRes.get(Constants.STATUS));
+
+        //worker group exist
+        WorkerGroup workerGroup = getWorkGroup();
+        when(workerGroupMapper.selectById(processInstance.getWorkerGroupId())).thenReturn(workerGroup);
+        processInstance.setWorkerGroupId(1);
+        when(workerGroupMapper.selectById(processInstance.getWorkerGroupId())).thenReturn(null);
+        Map<String, Object> workerExistRes = processInstanceService.queryProcessInstanceById(loginUser, projectName, 1);
+        Assert.assertEquals(Status.SUCCESS, workerExistRes.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testQueryTaskListByProcessId() throws IOException {
+        String projectName = "project_test1";
+        User loginUser = getAdminUser();
+        Map<String, Object> result = new HashMap<>(5);
+        putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
+
+        //project auth fail
+        when(projectMapper.queryByName(projectName)).thenReturn(null);
+        when(projectService.checkProjectAndAuth(loginUser,null,projectName)).thenReturn(result);
+        Map<String, Object> proejctAuthFailRes = processInstanceService.queryTaskListByProcessId(loginUser, projectName, 1);
+        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
+
+        //project auth success
+        putMsg(result, Status.SUCCESS, projectName);
+        Project project = getProject(projectName);
+        ProcessInstance processInstance = getProcessInstance();
+        processInstance.setState(ExecutionStatus.SUCCESS);
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setTaskType(TaskType.SHELL.getDescp());
+        List<TaskInstance> taskInstanceList = new ArrayList<>();
+        taskInstanceList.add(taskInstance);
+        Result res = new Result();
+        res.setCode(Status.SUCCESS.ordinal());
+        res.setData("xxx");
+        when(projectMapper.queryByName(projectName)).thenReturn(project);
+        when(projectService.checkProjectAndAuth(loginUser,project,projectName)).thenReturn(result);
+        when(processService.findProcessInstanceDetailById(processInstance.getId())).thenReturn(processInstance);
+        when(processService.findValidTaskListByProcessId(processInstance.getId())).thenReturn(taskInstanceList);
+        when(loggerService.queryLog(taskInstance.getId(), 0, 4098)).thenReturn(res);
+        Map<String, Object> successRes = processInstanceService.queryTaskListByProcessId(loginUser, projectName, 1);
+        Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+    }
+
+
+
+    @Test
     public void testDependResult(){
         String logString = "[INFO] 2019-03-19 17:11:08.475 org.apache.dolphinscheduler.server.worker.log.TaskLogger:[172] - [taskAppId=TASK_223_10739_452334] dependent item complete :|| 223-ALL-day-last1Day,SUCCESS\n" +
                 "[INFO] 2019-03-19 17:11:08.476 org.apache.dolphinscheduler.server.worker.runner.TaskScheduleThread:[172] - task : 223_10739_452334 exit status code : 0\n" +
@@ -193,6 +274,45 @@ public class ProcessInstanceServiceTest {
         processInstance.setStartTime(new Date());
         processInstance.setEndTime(new Date());
         return processInstance;
+    }
+
+    /**
+     * get mock processDefinition
+     * @return ProcessDefinition
+     */
+    private ProcessDefinition getProcessDefinition(){
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setId(46);
+        processDefinition.setName("test_pdf");
+        processDefinition.setProjectId(2);
+        processDefinition.setTenantId(1);
+        processDefinition.setDescription("");
+        return  processDefinition;
+    }
+
+    /**
+     * get Mock worker group
+     * @return worker group
+     */
+    private WorkerGroup getWorkGroup() {
+        WorkerGroup workerGroup = new WorkerGroup();
+        workerGroup.setId(1);
+        workerGroup.setName("test_workergroup");
+        return workerGroup;
+    }
+
+    /**
+     * get Mock task instance
+     * @return task instance
+     */
+    private TaskInstance getTaskInstance() {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setName("test_task_instance");
+        taskInstance.setStartTime(new Date());
+        taskInstance.setEndTime(new Date());
+        taskInstance.setExecutorId(-1);
+        return taskInstance;
     }
 
     private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
