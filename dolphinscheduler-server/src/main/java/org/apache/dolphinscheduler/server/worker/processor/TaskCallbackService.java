@@ -26,14 +26,30 @@ import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ *  taks callback service
+ */
 public class TaskCallbackService {
 
+    /**
+     *  callback channels
+     */
     private static final ConcurrentHashMap<Integer, CallbackChannel> CALL_BACK_CHANNELS = new ConcurrentHashMap<>();
 
+    /**
+     *  add callback channel
+     * @param taskInstanceId taskInstanceId
+     * @param channel  channel
+     */
     public void addCallbackChannel(int taskInstanceId, CallbackChannel channel){
         CALL_BACK_CHANNELS.put(taskInstanceId, channel);
     }
 
+    /**
+     *  get callback channel
+     * @param taskInstanceId taskInstanceId
+     * @return callback channel
+     */
     public CallbackChannel getCallbackChannel(int taskInstanceId){
         CallbackChannel callbackChannel = CALL_BACK_CHANNELS.get(taskInstanceId);
         if(callbackChannel.getChannel().isActive()){
@@ -45,15 +61,30 @@ public class TaskCallbackService {
         return callbackChannel;
     }
 
+    /**
+     *  remove callback channels
+     * @param taskInstanceId taskInstanceId
+     */
     public void remove(int taskInstanceId){
         CALL_BACK_CHANNELS.remove(taskInstanceId);
     }
 
+    /**
+     *  send ack
+     * @param taskInstanceId taskInstanceId
+     * @param ackCommand ackCommand
+     */
     public void sendAck(int taskInstanceId, ExecuteTaskAckCommand ackCommand){
         CallbackChannel callbackChannel = getCallbackChannel(taskInstanceId);
         callbackChannel.getChannel().writeAndFlush(ackCommand.convert2Command(callbackChannel.getOpaque()));
     }
 
+    /**
+     *  send result
+     *
+     * @param taskInstanceId taskInstanceId
+     * @param responseCommand responseCommand
+     */
     public void sendResult(int taskInstanceId, ExecuteTaskResponseCommand responseCommand){
         CallbackChannel callbackChannel = getCallbackChannel(taskInstanceId);
         callbackChannel.getChannel().writeAndFlush(responseCommand.convert2Command(

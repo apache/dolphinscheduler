@@ -24,20 +24,36 @@ import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ *  worker registry
+ */
 public class WorkerRegistry {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerRegistry.class);
 
+    /**
+     *  zookeeper registry center
+     */
     private final ZookeeperRegistryCenter zookeeperRegistryCenter;
 
+    /**
+     *  port
+     */
     private final int port;
 
+    /**
+     *  construct
+     * @param zookeeperRegistryCenter zookeeperRegistryCenter
+     * @param port port
+     */
     public WorkerRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port){
         this.zookeeperRegistryCenter = zookeeperRegistryCenter;
         this.port = port;
     }
 
+    /**
+     *  registry
+     */
     public void registry() {
         String address = Constants.LOCAL_ADDRESS;
         String localNodePath = getWorkerPath();
@@ -58,6 +74,9 @@ public class WorkerRegistry {
         logger.info("scheduler node : {} registry to ZK successfully.", address);
     }
 
+    /**
+     *  remove registry info
+     */
     public void unRegistry() {
         String address = getLocalAddress();
         String localNodePath = getWorkerPath();
@@ -65,12 +84,20 @@ public class WorkerRegistry {
         logger.info("worker node : {} unRegistry to ZK.", address);
     }
 
+    /**
+     *  get worker path
+     * @return
+     */
     private String getWorkerPath() {
         String address = getLocalAddress();
         String localNodePath = this.zookeeperRegistryCenter.getWorkerPath() + "/" + address;
         return localNodePath;
     }
 
+    /**
+     *  get local address
+     * @return
+     */
     private String getLocalAddress(){
         return Constants.LOCAL_ADDRESS + ":" + port;
     }
