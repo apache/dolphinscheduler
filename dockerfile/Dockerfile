@@ -23,7 +23,9 @@ ENV TZ Asia/Shanghai
 ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND noninteractive
 
-#1. using aliyun mirror, and install dos2unix shadow bash openrc python sudo vim wget iputils net-tools ssh pip kazoo
+#1. install dos2unix shadow bash openrc python sudo vim wget iputils net-tools ssh pip kazoo.
+#If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
+#RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
 RUN apk update && \
     apk add dos2unix shadow bash openrc python sudo vim wget iputils net-tools openssh-server py2-pip && \
     apk add --update procps && \
