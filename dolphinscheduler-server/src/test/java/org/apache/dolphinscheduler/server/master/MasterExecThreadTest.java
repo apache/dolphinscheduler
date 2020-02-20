@@ -151,4 +151,8 @@ public class MasterExecThreadTest {
         schedulerList.add(schedule);
         return schedulerList;
     }
+
+    public void testParsePostNode(){
+
+    }
 }

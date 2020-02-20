@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
@@ -197,6 +198,9 @@ public abstract class AbstractTask {
                 break;
             case DATAX:
                 paramsClass = DataxParameters.class;
+                break;
+            case CONDITIONS:
+                paramsClass = ConditionsParameters.class;
                 break;
             default:
                 logger.error("not support this task type: {}", taskType);
