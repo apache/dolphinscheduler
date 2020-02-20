@@ -96,9 +96,6 @@ public class TaskScheduleThread implements Runnable {
     @Override
     public void run() {
 
-        // TODO Need to be removed and kept temporarily update task instance state
-        updateTaskState(taskInstance.getTaskType());
-
         ExecuteTaskResponseCommand responseCommand = new ExecuteTaskResponseCommand(taskInstance.getId());
 
         try {
@@ -167,31 +164,14 @@ public class TaskScheduleThread implements Runnable {
             responseCommand.setStatus(task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
             logger.info("task instance id : {},task final status : {}", taskInstance.getId(), task.getExitStatus());
-
         }catch (Exception e){
             logger.error("task scheduler failure", e);
             kill();
-
-            //TODO Need to be removed and kept temporarily update task instance state
-            processService.changeTaskState(ExecutionStatus.FAILURE,
-                    new Date(),
-                    taskInstance.getId());
-
             responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
             responseCommand.setEndTime(new Date());
-
         } finally {
             taskInstanceCallbackService.sendResult(taskInstance.getId(), responseCommand);
         }
-
-        logger.info("task instance id : {},task final status : {}",
-                taskInstance.getId(),
-                task.getExitStatus());
-        // update task instance state
-        processService.changeTaskState(task.getExitStatus(),
-                new Date(),
-                taskInstance.getId());
-
     }
 
     /**
