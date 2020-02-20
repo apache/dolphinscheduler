@@ -172,9 +172,9 @@ public class WorkerServer implements IStoppable {
         this.nettyRemotingServer.registerProcessor(CommandType.EXECUTE_TASK_REQUEST, new WorkerNettyRequestProcessor(processService));
         this.nettyRemotingServer.start();
 
-        //worker registry
-        this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort());
-        this.workerRegistry.registry();
+        // TODO 注释掉，因为有心跳，可以复用心跳的逻辑，worker registry
+//        this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort());
+//        this.workerRegistry.registry();
 
         this.zkWorkerClient.init();
 
