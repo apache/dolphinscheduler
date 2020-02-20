@@ -708,6 +708,8 @@
                         <include>**/api/service/BaseDAGServiceTest.java</include>
                         <include>**/api/service/LoggerServiceTest.java</include>
                         <include>**/api/service/DataAnalysisServiceTest.java</include>
+                        <include>**/api/service/ProcessInstanceServiceTest.java</include>
+                        <include>**/api/service/TaskInstanceServiceTest.java</include>
                         <include>**/alert/utils/ExcelUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
