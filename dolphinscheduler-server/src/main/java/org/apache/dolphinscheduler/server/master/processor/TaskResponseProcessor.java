@@ -46,6 +46,13 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
         this.processService = processService;
     }
 
+    /**
+     * task final result response
+     * need master process , state persistence
+     *
+     * @param channel channel
+     * @param command command
+     */
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.EXECUTE_TASK_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
