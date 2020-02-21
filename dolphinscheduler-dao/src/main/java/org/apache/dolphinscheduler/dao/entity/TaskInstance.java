@@ -27,13 +27,14 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * task instance
  */
 @TableName("t_ds_task_instance")
-public class TaskInstance {
+public class TaskInstance implements Serializable {
 
     /**
      * id
@@ -198,7 +199,7 @@ public class TaskInstance {
 
 
 
-    public void  init(String host,Date startTime,String executePath){
+    public void init(String host,Date startTime,String executePath){
         this.host = host;
         this.startTime = startTime;
         this.executePath = executePath;
