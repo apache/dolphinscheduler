@@ -22,6 +22,7 @@ import ch.qos.logback.classic.sift.SiftingAppender;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.log.TaskLogDiscriminator;
@@ -29,14 +30,12 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskInfo;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
@@ -64,7 +63,7 @@ public class TaskScheduleThread implements Runnable {
     /**
      *  task instance
      */
-    private TaskInstance taskInstance;
+    private TaskInfo taskInfo;
 
     /**
      *  process service
@@ -82,72 +81,69 @@ public class TaskScheduleThread implements Runnable {
     private TaskCallbackService taskInstanceCallbackService;
 
     /**
-     * constructor
+     *  constructor
      *
-     * @param taskInstance  task instance
-     * @param processService    process dao
+     * @param taskInfo taskInfo
+     * @param processService processService
+     * @param taskInstanceCallbackService taskInstanceCallbackService
      */
-    public TaskScheduleThread(TaskInstance taskInstance, ProcessService processService, TaskCallbackService taskInstanceCallbackService){
+    public TaskScheduleThread(TaskInfo taskInfo, ProcessService processService, TaskCallbackService taskInstanceCallbackService){
         this.processService = processService;
-        this.taskInstance = taskInstance;
+        this.taskInfo = taskInfo;
         this.taskInstanceCallbackService = taskInstanceCallbackService;
     }
 
     @Override
     public void run() {
 
-        ExecuteTaskResponseCommand responseCommand = new ExecuteTaskResponseCommand(taskInstance.getId());
+        ExecuteTaskResponseCommand responseCommand = new ExecuteTaskResponseCommand(taskInfo.getTaskId());
 
         try {
             // tell master that task is in executing
-            ExecuteTaskAckCommand ackCommand = buildAckCommand(taskInstance.getTaskType());
-            taskInstanceCallbackService.sendAck(taskInstance.getId(), ackCommand);
+            ExecuteTaskAckCommand ackCommand = buildAckCommand(taskInfo.getTaskType());
+            taskInstanceCallbackService.sendAck(taskInfo.getTaskId(), ackCommand);
 
-            logger.info("script path : {}", taskInstance.getExecutePath());
+            logger.info("script path : {}", taskInfo.getExecutePath());
             // task node
-            TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
+            TaskNode taskNode = JSONObject.parseObject(taskInfo.getTaskJson(), TaskNode.class);
 
             // get resource files
             List<String> resourceFiles = createProjectResFiles(taskNode);
             // copy hdfs/minio file to local
             downloadResource(
-                    taskInstance.getExecutePath(),
+                    taskInfo.getExecutePath(),
                     resourceFiles,
                     logger);
 
-
-            // get process instance according to tak instance
-            ProcessInstance processInstance = taskInstance.getProcessInstance();
-
             // set task props
             TaskProps taskProps = new TaskProps(taskNode.getParams(),
-                    taskInstance.getExecutePath(),
-                    processInstance.getScheduleTime(),
-                    taskInstance.getName(),
-                    taskInstance.getTaskType(),
-                    taskInstance.getId(),
+                    taskInfo.getExecutePath(),
+                    taskInfo.getScheduleTime(),
+                    taskInfo.getTaskName(),
+                    taskInfo.getTaskType(),
+                    taskInfo.getTaskId(),
                     CommonUtils.getSystemEnvPath(),
-                    processInstance.getTenantCode(),
-                    processInstance.getQueue(),
-                    taskInstance.getStartTime(),
+                    taskInfo.getTenantCode(),
+                    taskInfo.getQueue(),
+                    taskInfo.getStartTime(),
                     getGlobalParamsMap(),
-                    taskInstance.getDependency(),
-                    processInstance.getCmdTypeIfComplement());
+                    null,
+                    CommandType.of(taskInfo.getCmdTypeIfComplement()));
             // set task timeout
             setTaskTimeout(taskProps, taskNode);
 
             taskProps.setTaskAppId(String.format("%s_%s_%s",
-                    taskInstance.getProcessDefine().getId(),
-                    taskInstance.getProcessInstance().getId(),
-                    taskInstance.getId()));
+                    taskInfo.getProcessDefineId(),
+                    taskInfo.getProcessInstanceId(),
+                    taskInfo.getTaskId()));
 
             // custom logger
             Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
-                    taskInstance.getProcessDefine().getId(),
-                    taskInstance.getProcessInstance().getId(),
-                    taskInstance.getId()));
+                    taskInfo.getProcessDefineId(),
+                    taskInfo.getProcessInstanceId(),
+                    taskInfo.getTaskId()));
 
-            task = TaskManager.newTask(taskInstance.getTaskType(),
+            task = TaskManager.newTask(taskInfo.getTaskType(),
                     taskProps,
                     taskLogger);
 
@@ -163,14 +159,14 @@ public class TaskScheduleThread implements Runnable {
             //
             responseCommand.setStatus(task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
-            logger.info("task instance id : {},task final status : {}", taskInstance.getId(), task.getExitStatus());
+            logger.info("task instance id : {},task final status : {}", taskInfo.getTaskId(), task.getExitStatus());
         }catch (Exception e){
             logger.error("task scheduler failure", e);
             kill();
             responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
             responseCommand.setEndTime(new Date());
         } finally {
-            taskInstanceCallbackService.sendResult(taskInstance.getId(), responseCommand);
+            taskInstanceCallbackService.sendResult(taskInfo.getTaskId(), responseCommand);
         }
     }
 
@@ -182,7 +178,7 @@ public class TaskScheduleThread implements Runnable {
         Map<String,String> globalParamsMap = new HashMap<>(16);
 
         // global params string
-        String globalParamsStr = taskInstance.getProcessInstance().getGlobalParams();
+        String globalParamsStr = taskInfo.getGlobalParams();
 
         if (globalParamsStr != null) {
             List<Property> globalParamsList = JSONObject.parseArray(globalParamsStr, Property.class);
@@ -192,18 +188,18 @@ public class TaskScheduleThread implements Runnable {
     }
     /**
      *  build ack command
-     * @param taskType
+     * @param taskType taskType
      */
     private ExecuteTaskAckCommand buildAckCommand(String taskType) {
         ExecuteTaskAckCommand ackCommand = new ExecuteTaskAckCommand();
         ackCommand.setStatus(ExecutionStatus.RUNNING_EXEUTION.getCode());
         ackCommand.setLogPath(getTaskLogPath());
-        ackCommand.setHost("localhost");
+        ackCommand.setHost(OSUtils.getHost());
         ackCommand.setStartTime(new Date());
         if(taskType.equals(TaskType.SQL.name()) || taskType.equals(TaskType.PROCEDURE.name())){
             ackCommand.setExecutePath(null);
         }else{
-            ackCommand.setExecutePath(taskInstance.getExecutePath());
+            ackCommand.setExecutePath(taskInfo.getExecutePath());
         }
         return ackCommand;
     }
@@ -219,15 +215,15 @@ public class TaskScheduleThread implements Runnable {
                 .getDiscriminator()).getLogBase();
         if (baseLog.startsWith(Constants.SINGLE_SLASH)){
             return baseLog + Constants.SINGLE_SLASH +
-                    taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
-                    taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                    taskInstance.getId() + ".log";
+                    taskInfo.getProcessDefineId() + Constants.SINGLE_SLASH  +
+                    taskInfo.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                    taskInfo.getTaskId() + ".log";
         }
         return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
                 baseLog +  Constants.SINGLE_SLASH +
-                taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
-                taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                taskInstance.getId() + ".log";
+                taskInfo.getProcessDefineId() + Constants.SINGLE_SLASH  +
+                taskInfo.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                taskInfo.getTaskId() + ".log";
     }
 
     /**
@@ -333,33 +329,9 @@ public class TaskScheduleThread implements Runnable {
      * @throws Exception exception
      */
     private void checkDownloadPermission(List<String> projectRes) throws Exception {
-        int userId = taskInstance.getProcessInstance().getExecutorId();
+        int userId = taskInfo.getExecutorId();
         String[] resNames = projectRes.toArray(new String[projectRes.size()]);
         PermissionCheck<String> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE, processService,resNames,userId,logger);
         permissionCheck.checkPermission();
-    }
-
-    /**
-     *  update task state according to task type
-     * @param taskType
-     */
-    private void updateTaskState(String taskType) {
-        // update task status is running
-        if(taskType.equals(TaskType.SQL.name())  ||
-                taskType.equals(TaskType.PROCEDURE.name())){
-            processService.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
-                    taskInstance.getStartTime(),
-                    taskInstance.getHost(),
-                    null,
-                    getTaskLogPath(),
-                    taskInstance.getId());
-        }else{
-            processService.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
-                    taskInstance.getStartTime(),
-                    taskInstance.getHost(),
-                    taskInstance.getExecutePath(),
-                    getTaskLogPath(),
-                    taskInstance.getId());
-        }
     }
 }

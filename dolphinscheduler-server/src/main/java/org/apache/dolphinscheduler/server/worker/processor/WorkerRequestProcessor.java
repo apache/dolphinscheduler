@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskInfo;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -85,71 +85,39 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
         ExecuteTaskRequestCommand taskRequestCommand = FastJsonSerializer.deserialize(
                 command.getBody(), ExecuteTaskRequestCommand.class);
 
-        String taskInstanceJson = taskRequestCommand.getTaskInstanceJson();
+        String taskInstanceJson = taskRequestCommand.getTaskInfoJson();
 
-        TaskInstance taskInstance = JSONObject.parseObject(taskInstanceJson, TaskInstance.class);
-
-        taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstance.getId());
-
-
-        //TODO this logic need add to master
-        int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
-        Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
-        // verify tenant is null
-        if (verifyTenantIsNull(tenant, taskInstance)) {
-            processService.changeTaskState(ExecutionStatus.FAILURE, taskInstance.getStartTime(), taskInstance.getHost(), null, null, taskInstance.getId());
-            return;
-        }
-        // set queue for process instance, user-specified queue takes precedence over tenant queue
-        String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
-        taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
-        taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
-        //TODO end
+        TaskInfo taskInfo = JSONObject.parseObject(taskInstanceJson, TaskInfo.class);
 
         // local execute path
-        String execLocalPath = getExecLocalPath(taskInstance);
+        String execLocalPath = getExecLocalPath(taskInfo);
         logger.info("task instance  local execute path : {} ", execLocalPath);
-        // init task
-        taskInstance.init(OSUtils.getHost(), new Date(), execLocalPath);
+
         try {
-            FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, tenant.getTenantCode());
+            FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, taskInfo.getTenantCode());
         } catch (Exception ex){
             logger.error(String.format("create execLocalPath : %s", execLocalPath), ex);
         }
 
-        taskCallbackService.addCallbackChannel(taskInstance.getId(),
+        taskCallbackService.addCallbackChannel(taskInfo.getTaskId(),
                 new CallbackChannel(channel, command.getOpaque()));
 
         // submit task
-        workerExecService.submit(new TaskScheduleThread(taskInstance,
+        workerExecService.submit(new TaskScheduleThread(taskInfo,
                 processService, taskCallbackService));
     }
 
-    /**
-     *  whehter tenant is null
-     * @param tenant tenant
-     * @param taskInstance taskInstance
-     * @return result
-     */
-    private boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
-        if(tenant == null){
-            logger.error("tenant not exists,process instance id : {},task instance id : {}",
-                    taskInstance.getProcessInstance().getId(),
-                    taskInstance.getId());
-            return true;
-        }
-        return false;
-    }
 
     /**
-     *  get execute local path
-     * @param taskInstance taskInstance
+     * get execute local path
+     *
+     * @param taskInfo taskInfo
      * @return execute local path
      */
-    private String getExecLocalPath(TaskInstance taskInstance){
-        return FileUtils.getProcessExecDir(taskInstance.getProcessDefine().getProjectId(),
-                taskInstance.getProcessDefine().getId(),
-                taskInstance.getProcessInstance().getId(),
-                taskInstance.getId());
+    private String getExecLocalPath(TaskInfo taskInfo){
+        return FileUtils.getProcessExecDir(taskInfo.getProjectId(),
+                taskInfo.getProcessDefineId(),
+                taskInfo.getProcessInstanceId(),
+                taskInfo.getTaskId());
     }
 }
