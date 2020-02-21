@@ -222,38 +222,36 @@
           type: 'file',
           category: 'resources'
         }).then(data => {
-          let sourceListPrs = _.map(data[0], v => {
-            return {
-              id: v.id,
-              name: v.alias,
-              type: v.type
-            }
-          })
+          // let sourceListPrs = _.map(data[0], v => {
+          //   return {
+          //     id: v.id,
+          //     name: v.alias,
+          //     type: v.type
+          //   }
+          // })
           let fileSourceList = []
           let udfSourceList = []
-          sourceListPrs.forEach((value,index,array)=>{
-            if(value.type =='FILE'){
-              fileSourceList.push(value)
-            } else{
-              udfSourceList.push(value)
-            }
-          })
+          fileSourceList = data[1].concat(data[0])
+          // sourceListPrs.forEach((value,index,array)=>{
+          //   if(value.type =='FILE'){
+          //     fileSourceList.push(value)
+          //   } else{
+          //     udfSourceList.push(value)
+          //   }
+          // })
           let targetListPrs = _.map(data[1], v => {
-            return {
-              id: v.id,
-              name: v.alias,
-              type: v.type
-            }
+            return v.id
           })
           let fileTargetList = []
           let udfTargetList = []
-          targetListPrs.forEach((value,index,array)=>{
-            if(value.type =='FILE'){
-              fileTargetList.push(value)
-            } else{
-              udfTargetList.push(value)
-            }
-          })
+          fileTargetList = targetListPrs
+          // targetListPrs.forEach((value,index,array)=>{
+          //   if(value.type =='FILE'){
+          //     fileTargetList.push(value)
+          //   } else{
+          //     udfTargetList.push(value)
+          //   }
+          // })
           let self = this
           let modal = this.$modal.dialog({
             closable: false,

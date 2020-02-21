@@ -24,22 +24,14 @@
                 <x-button type="ghost" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</x-button>
             </x-button-group>
         </div>
-        <div class="select-list-box">
+        <treeselect v-model="selectFileSource" :multiple="true" :options="fileSourceList" :normalizer="normalizer">
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+        </treeselect>
+        <!-- <div class="select-list-box">
           <div class="tf-header">
             <div class="title">{{type.name}}{{$t('List')}}</div>
             <div class="count">（{{cacheSourceList.length}}）</div>
           </div>
-          <!--<div class="tf-search">
-            <x-input v-model="searchSourceVal"
-                     @on-enterkey="_sourceQuery"
-                     @on-click-icon="_sourceQuery"
-                     size="small"
-                     placeholder="Please enter keyword"
-                     type="text"
-                     style="width:202px;">
-              <em slot="suffix" class="ans-icon-search"></em>
-            </x-input>
-          </div>-->
           <div class="scrollbar tf-content">
             <ul>
               <li v-for="(item,$index) in sourceList" :key="$index" @click="_ckSource(item)">
@@ -55,23 +47,12 @@
             <div class="title">{{$t('Selected')}}{{type.name}}</div>
             <div class="count">（{{cacheTargetList.length}}）</div>
           </div>
-          <!--<div class="tf-search">
-            <x-input v-model="searchTargetVal"
-                     @on-enterkey="_targetQuery"
-                     @on-click-icon="_targetQuery"
-                     size="small"
-                     placeholder="Please enter keyword"
-                     type="text"
-                     style="width:202px;">
-              <em slot="suffix" class="ans-icon-search"></em>
-            </x-input>
-          </div>-->
           <div class="scrollbar tf-content">
             <ul>
               <li v-for="(item,$index) in targetList" :key="$index" @click="_ckTarget(item)"><span :title="item.name">{{item.name}}</span></li>
             </ul>
           </div>
-        </div>
+        </div> -->
       </div>
     </template>
   </m-popup>
@@ -80,6 +61,9 @@
   import _ from 'lodash'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
+  import Treeselect from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+
 
   export default {
     name: 'transfer',
@@ -92,11 +76,19 @@
         cacheTargetList: this.fileTargetList,
 
         fileSource: this.fileSourceList,
+        selectFileSource: [],
         fileTarget: this.fileTargetList,
         udfSource: this.udfSourceList,
         udfTarget: this.udfTargetList,
         searchSourceVal: '',
-        searchTargetVal: ''
+        searchTargetVal: '',
+        // define default value
+        value: null,
+        normalizer(node) {
+          return {
+            label: node.name
+          }
+        },
       }
     },
     props: {
@@ -106,12 +98,15 @@
       fileTargetList: Array,
       udfTargetList: Array,
     },
+    created() {
+      this.selectFileSource = this.fileTargetList
+    },
     methods: {
       _ok () {
         this.$refs['popup'].spinnerLoading = true
         setTimeout(() => {
           this.$refs['popup'].spinnerLoading = false
-          this.$emit('onUpdate', _.map(this.fileTarget.concat(this.udfTarget), v => v.id).join(','))
+          this.$emit('onUpdate', _.map(this.selectFileSource, v => v).join(','))
         }, 800)
       },
       _ckFile() {
@@ -187,7 +182,7 @@
         this._targetQuery()
       }
     },
-    components: { mPopup, mListBoxF }
+    components: { mPopup, mListBoxF, Treeselect }
   }
 </script>
 
