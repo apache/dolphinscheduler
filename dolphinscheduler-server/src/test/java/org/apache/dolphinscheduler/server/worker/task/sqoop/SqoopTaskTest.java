@@ -137,22 +137,4 @@ public class SqoopTaskTest {
         }
     }
 
-    @Test
-    public void testParameters(){
-       SourceMysqlParameter sourceMysqlParameter = new SourceMysqlParameter();
-       sourceMysqlParameter.setSrcDatasource(2);
-       sourceMysqlParameter.setSrcTable("person");
-       sourceMysqlParameter.setSrcQueryType(1);
-       sourceMysqlParameter.setSrcColumns("id,name");
-       sourceMysqlParameter.setSrcQuerySql("select * from person");
-       sourceMysqlParameter.setSrcColumnType(1);
-
-       Assert.assertEquals(2, sourceMysqlParameter.getSrcDatasource());
-       Assert.assertEquals("person", sourceMysqlParameter.getSrcTable());
-       Assert.assertEquals(1, sourceMysqlParameter.getSrcQueryType());
-       Assert.assertEquals("id,name", sourceMysqlParameter.getSrcColumns());
-       Assert.assertEquals("select * from person", sourceMysqlParameter.getSrcQuerySql());
-       Assert.assertEquals(1, sourceMysqlParameter.getSrcColumnType());
-    }
-
 }
