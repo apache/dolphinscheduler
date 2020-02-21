@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
-import org.apache.dolphinscheduler.remote.command.TaskInfo;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Address;
@@ -137,7 +137,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 FastJsonSerializer.serializeToString(convertToTaskInfo(destTaskInstance)));
         try {
             Command responseCommand = nettyRemotingClient.sendSync(address,
-                    taskRequestCommand.convert2Command(), Integer.MAX_VALUE);
+                    taskRequestCommand.convert2Command(), 2000);
 
             ExecuteTaskAckCommand taskAckCommand = FastJsonSerializer.deserialize(
                     responseCommand.getBody(), ExecuteTaskAckCommand.class);
@@ -154,6 +154,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
             logger.error(String.format("send command to : %s error", address), ex);
         }
     }
+
 
 
     /**
@@ -203,25 +204,25 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * @param taskInstance taskInstance
      * @return taskInfo
      */
-    private TaskInfo convertToTaskInfo(TaskInstance taskInstance){
-        TaskInfo taskInfo = new TaskInfo();
-        taskInfo.setTaskId(taskInstance.getId());
-        taskInfo.setTaskName(taskInstance.getName());
-        taskInfo.setStartTime(taskInstance.getStartTime());
-        taskInfo.setTaskType(taskInstance.getTaskType());
-        taskInfo.setExecutePath(getExecLocalPath(taskInstance));
-        taskInfo.setTaskJson(taskInstance.getTaskJson());
-        taskInfo.setProcessInstanceId(taskInstance.getProcessInstance().getId());
-        taskInfo.setScheduleTime(taskInstance.getProcessInstance().getScheduleTime());
-        taskInfo.setGlobalParams(taskInstance.getProcessInstance().getGlobalParams());
-        taskInfo.setExecutorId(taskInstance.getProcessInstance().getExecutorId());
-        taskInfo.setCmdTypeIfComplement(taskInstance.getProcessInstance().getCmdTypeIfComplement().getCode());
-        taskInfo.setTenantCode(taskInstance.getProcessInstance().getTenantCode());
-        taskInfo.setQueue(taskInstance.getProcessInstance().getQueue());
-        taskInfo.setProcessDefineId(taskInstance.getProcessDefine().getId());
-        taskInfo.setProjectId(taskInstance.getProcessDefine().getProjectId());
+    private TaskExecutionContext convertToTaskInfo(TaskInstance taskInstance){
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskId(taskInstance.getId());
+        taskExecutionContext.setTaskName(taskInstance.getName());
+        taskExecutionContext.setStartTime(taskInstance.getStartTime());
+        taskExecutionContext.setTaskType(taskInstance.getTaskType());
+        taskExecutionContext.setExecutePath(getExecLocalPath(taskInstance));
+        taskExecutionContext.setTaskJson(taskInstance.getTaskJson());
+        taskExecutionContext.setProcessInstanceId(taskInstance.getProcessInstance().getId());
+        taskExecutionContext.setScheduleTime(taskInstance.getProcessInstance().getScheduleTime());
+        taskExecutionContext.setGlobalParams(taskInstance.getProcessInstance().getGlobalParams());
+        taskExecutionContext.setExecutorId(taskInstance.getProcessInstance().getExecutorId());
+        taskExecutionContext.setCmdTypeIfComplement(taskInstance.getProcessInstance().getCmdTypeIfComplement().getCode());
+        taskExecutionContext.setTenantCode(taskInstance.getProcessInstance().getTenantCode());
+        taskExecutionContext.setQueue(taskInstance.getProcessInstance().getQueue());
+        taskExecutionContext.setProcessDefineId(taskInstance.getProcessDefine().getId());
+        taskExecutionContext.setProjectId(taskInstance.getProcessDefine().getProjectId());
 
-        return taskInfo;
+        return taskExecutionContext;
     }
 
 

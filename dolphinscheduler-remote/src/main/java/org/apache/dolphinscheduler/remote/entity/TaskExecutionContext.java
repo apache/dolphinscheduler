@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.command;
+package org.apache.dolphinscheduler.remote.entity;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -23,7 +23,7 @@ import java.util.Date;
 /**
  *  master/worker task transport
  */
-public class TaskInfo implements Serializable{
+public class TaskExecutionContext implements Serializable{
 
     /**
      *  task instance id
@@ -229,7 +229,7 @@ public class TaskInfo implements Serializable{
 
     @Override
     public String toString() {
-        return "TaskInfo{" +
+        return "TaskExecutionContext{" +
                 "taskId=" + taskId +
                 ", taskName='" + taskName + '\'' +
                 ", startTime=" + startTime +

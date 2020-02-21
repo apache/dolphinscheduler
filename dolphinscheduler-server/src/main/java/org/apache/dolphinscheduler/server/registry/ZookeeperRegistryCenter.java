@@ -22,6 +22,9 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
@@ -74,6 +77,28 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     public String getWorkerPath() {
         return WORKER_PATH;
+    }
+
+    public Set<String> getMasterNodesDirectly() {
+        List<String> masters = getChildrenKeys(MASTER_PATH);
+        return new HashSet<>(masters);
+    }
+
+    public Set<String> getWorkerNodesDirectly() {
+        List<String> workers = getChildrenKeys(WORKER_PATH);
+        return new HashSet<>(workers);
+    }
+
+    public boolean isWorkerPath(String path) {
+        return path != null && path.contains(WORKER_PATH);
+    }
+
+    public boolean isMasterPath(String path) {
+        return path != null && path.contains(MASTER_PATH);
+    }
+
+    public List<String> getChildrenKeys(final String key) {
+        return zookeeperCachedOperator.getChildrenKeys(key);
     }
 
     public ZookeeperCachedOperator getZookeeperCachedOperator() {
