@@ -96,7 +96,7 @@ public class TaskScheduleThread implements Runnable {
     @Override
     public void run() {
 
-        ExecuteTaskResponseCommand responseCommand = new ExecuteTaskResponseCommand(taskInfo.getTaskId());
+        ExecuteTaskResponseCommand responseCommand = new ExecuteTaskResponseCommand(taskInstance.getId());
 
         try {
             // tell master that task is in executing
