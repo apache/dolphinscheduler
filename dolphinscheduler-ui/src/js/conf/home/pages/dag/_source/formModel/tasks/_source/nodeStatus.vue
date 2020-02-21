@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*    http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 <template>
   <div class="dep-list-model">
     <div v-for="(el,$index) in dependItemList" :key='$index' class="list" @click="itemIndex = $index">
@@ -78,8 +78,8 @@
       _add () {
         // btn loading
         this.isLoading = true
-        this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
-
+            this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
+         
         // remove tooltip
         this._removeTip()
       },
@@ -98,26 +98,26 @@
       _getProjectList () {
         return new Promise((resolve, reject) => {
           this.projectList = _.map(_.cloneDeep(this.store.state.dag.projectListS), v => {
-          return {
-            value: v.id,
-            label: v.name
-          }
+            return {
+              value: v.id,
+              label: v.name
+            }
+          })
+          resolve()
         })
-        resolve()
-      })
       },
       _getProcessByProjectId (id) {
         return new Promise((resolve, reject) => {
           this.store.dispatch('dag/getProcessByProjectId', { projectId: id }).then(res => {
-          this.definitionList = _.map(_.cloneDeep(res), v => {
-          return {
-            value: v.id,
-            label: v.name
-          }
+            this.definitionList = _.map(_.cloneDeep(res), v => {
+              return {
+                value: v.id,
+                label: v.name
+              }
+            })
+            resolve(res)
+          })
         })
-        resolve(res)
-      })
-      })
       },
       /**
        * get dependItemList
@@ -127,13 +127,13 @@
           if (is) {
             this.store.dispatch('dag/getProcessTasksList', { processDefinitionId: ids }).then(res => {
               resolve(['ALL'].concat(_.map(res, v => v.name)))
-          })
+            })
           } else {
             this.store.dispatch('dag/getTaskListDefIdAll', { processDefinitionIdList: ids }).then(res => {
-            resolve(res)
-          })
-      }
-      })
+              resolve(res)
+            })
+          }
+        })
       },
       _rtNewParams () {
         return {
@@ -165,20 +165,20 @@
       this._getProjectList().then(() => {
         let projectId = this.projectList[0].value
         if (!this.dependItemList.length) {
-        this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
-      } else {
-        // get definitionId ids
-        let ids = _.map(this.dependItemList, v => v.definitionId).join(',')
-        // get item list
-        this._getDependItemList(ids, false).then(res => {
-          _.map(this.dependItemList, (v, i) => {
-          this._getProcessByProjectId(v.projectId).then(definitionList => {
-          this.$set(this.dependItemList, i, this._rtOldParams(v.definitionId, ['ALL'].concat(_.map(res[v.definitionId] || [], v => v.name)), v))
+          this.$emit('dependItemListEvent', _.concat(this.dependItemList, this._rtNewParams()))
+        } else {
+          // get definitionId ids
+          let ids = _.map(this.dependItemList, v => v.definitionId).join(',')
+          // get item list
+          this._getDependItemList(ids, false).then(res => {
+            _.map(this.dependItemList, (v, i) => {
+              this._getProcessByProjectId(v.projectId).then(definitionList => {
+                this.$set(this.dependItemList, i, this._rtOldParams(v.definitionId, ['ALL'].concat(_.map(res[v.definitionId] || [], v => v.name)), v))
+              })
+            })
+          })
+        }
       })
-      })
-      })
-      }
-    })
     },
     mounted () {
     },

@@ -46,7 +46,6 @@ const rtBantpl = () => {
 const rtTasksTpl = ({ id, name, x, y, targetarr, isAttachment, taskType, runFlag, nodenumber }) => {
   let tpl = ``
   tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-nodenumber="${nodenumber || 0}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
-  tpl += `<div class="w jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected ${isAttachment ? 'jtk-ep' : ''}" data-targetarr="${targetarr || ''}" data-tasks-type="${taskType}" id="${id}" style="left: ${x}px; top: ${y}px;">`
   tpl += `<div>`
   tpl += `<div class="state-p"></div>`
   tpl += `<div class="icos icos-${taskType}"></div>`

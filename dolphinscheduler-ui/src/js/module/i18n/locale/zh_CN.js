@@ -510,8 +510,6 @@ export default {
   'IP address cannot be empty': 'IP地址不能为空',
   'Please enter the correct IP': '请输入正确的IP',
   'Please generate token': '请生成Token',
-  'Branch flow': '分支流转',
-  'Cannot select the same node for successful branch flow and failed branch flow': '成功分支流转和失败分支流转不能选择同一个节点',
   'Spark Version': 'Spark版本',
   'TargetDataBase': '目标库',
   'TargetTable': '目标表',
@@ -521,5 +519,7 @@ export default {
   'SpeedRecord': '限流(记录数)',
   '0 means unlimited by byte': 'KB，0代表不限制',
   '0 means unlimited by count': '0代表不限制',
-  'Modify User': '修改用户'
+  'Modify User': '修改用户',
+  'Branch flow': '分支流转',
+  'Cannot select the same node for successful branch flow and failed branch flow': '成功分支流转和失败分支流转不能选择同一个节点'
 }

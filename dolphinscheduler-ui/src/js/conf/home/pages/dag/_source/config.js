@@ -284,12 +284,10 @@ let tasksType = {
     desc: 'DataX',
     color: '#1fc747'
   },
-  'CONDITIONS':
-  {
+  'CONDITIONS': {
     desc: 'CONDITIONS',
     color: '#E46F13'
-}
-
+  }
 }
 
 

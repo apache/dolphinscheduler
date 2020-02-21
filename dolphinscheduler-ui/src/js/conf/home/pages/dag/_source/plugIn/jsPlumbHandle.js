@@ -721,7 +721,7 @@ JSP.prototype.handleEvent = function () {
     } else {
       $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))+1)
     }
-
+    
     // Storage node dependency information
     saveTargetarr(sourceId, targetId)
 

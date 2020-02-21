@@ -510,8 +510,6 @@ export default {
   'IP address cannot be empty': 'IP address cannot be empty',
   'Please enter the correct IP': 'Please enter the correct IP',
   'Please generate token': 'Please generate token',
-  'Branch flow': 'Branch flow',
-  'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow',
   'Spark Version': 'Spark Version',
   'TargetDataBase': 'target database',
   'TargetTable': 'target table',
@@ -521,5 +519,7 @@ export default {
   'SpeedRecord': 'speed(record count)',
   '0 means unlimited by byte': '0 means unlimited',
   '0 means unlimited by count': '0 means unlimited',
-  'Modify User': 'Modify User'
+  'Modify User': 'Modify User',
+  'Branch flow': 'Branch flow',
+  'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow'
 }
