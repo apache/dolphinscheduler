@@ -1827,5 +1827,14 @@ public class ProcessDao {
         return userMapper.queryDetailsById(userId);
     }
 
+    /**
+     * get resource by resoruce id
+     * @param resoruceId resource id
+     * @return Resource
+     */
+    public Resource getResourceById(int resoruceId){
+        return resourceMapper.selectById(resoruceId);
+    }
+
 
 }

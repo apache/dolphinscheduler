@@ -630,7 +630,7 @@ public class ResourcesService extends BaseService {
         }
 
         // hdfs path
-        String hdfsFileName = HadoopUtils.getHdfsResourceFileName(tenantCode, resource.getAlias());
+        String hdfsFileName = HadoopUtils.getHdfsResourceFileName(tenantCode, resource.getFullName());
         logger.info("resource hdfs path is {} ", hdfsFileName);
         try {
             if(HadoopUtils.getInstance().exists(hdfsFileName)){

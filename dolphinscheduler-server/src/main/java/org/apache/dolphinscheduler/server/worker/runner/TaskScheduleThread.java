@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.permission.PermissionCheck;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
@@ -97,7 +99,7 @@ public class TaskScheduleThread implements Runnable {
             TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
 
             // get resource files
-            List<String> resourceFiles = createProjectResFiles(taskNode);
+            List<ResourceInfo> resourceFiles = createProjectResFiles(taskNode);
             // copy hdfs/minio file to local
             downloadResource(
                     taskInstance.getExecutePath(),
@@ -283,13 +285,13 @@ public class TaskScheduleThread implements Runnable {
     /**
      *  create project resource files
      */
-    private List<String> createProjectResFiles(TaskNode taskNode) throws Exception{
+    private List<ResourceInfo> createProjectResFiles(TaskNode taskNode) throws Exception{
 
-        Set<String> projectFiles = new HashSet<>();
+        Set<ResourceInfo> projectFiles = new HashSet<>();
         AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
 
         if (baseParam != null) {
-            List<String> projectResourceFiles = baseParam.getResourceFilesList();
+            List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
             if (projectResourceFiles != null) {
                 projectFiles.addAll(projectResourceFiles);
             }
@@ -305,15 +307,22 @@ public class TaskScheduleThread implements Runnable {
      * @param projectRes
      * @param logger
      */
-    private void downloadResource(String execLocalPath, List<String> projectRes, Logger logger) throws Exception {
+    private void downloadResource(String execLocalPath, List<ResourceInfo> projectRes, Logger logger) throws Exception {
         checkDownloadPermission(projectRes);
-        for (String res : projectRes) {
-            File resFile = new File(execLocalPath, res);
+        String resourceName;
+        for (ResourceInfo res : projectRes) {
+            if (res.getId() != 0) {
+                Resource resource = processDao.getResourceById(res.getId());
+                resourceName = resource.getFullName();
+            }else{
+                resourceName = res.getRes();
+            }
+            File resFile = new File(execLocalPath, resourceName);
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String tentnCode = processDao.queryTenantCodeByResName(res, ResourceType.FILE);
-                    String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tentnCode, res);
+                    String tentnCode = processDao.queryTenantCodeByResName(resourceName, ResourceType.FILE);
+                    String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tentnCode, resourceName);
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
                     HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + res, false, true);
@@ -332,10 +341,10 @@ public class TaskScheduleThread implements Runnable {
      * @param projectRes resource name list
      * @throws Exception exception
      */
-    private void checkDownloadPermission(List<String> projectRes) throws Exception {
+    private void checkDownloadPermission(List<ResourceInfo> projectRes) throws Exception {
         int userId = taskInstance.getProcessInstance().getExecutorId();
         String[] resNames = projectRes.toArray(new String[projectRes.size()]);
-        PermissionCheck<String> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE,processDao,resNames,userId,logger);
+        PermissionCheck<ResourceInfo> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE,processDao,projectRes.toArray(),userId,logger);
         permissionCheck.checkPermission();
     }
 }
