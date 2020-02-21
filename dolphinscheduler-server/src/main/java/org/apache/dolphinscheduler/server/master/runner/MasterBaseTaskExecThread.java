@@ -128,7 +128,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     // TODO send task to worker
     public void sendToWorker(TaskInstance taskInstance){
         final Address address = new Address("127.0.0.1", 12346);
-
         /**
          *  set taskInstance relation
          */
@@ -144,7 +143,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                     responseCommand.getBody(), ExecuteTaskAckCommand.class);
 
             logger.info("taskAckCommand : {}",taskAckCommand);
-
             processService.changeTaskState(ExecutionStatus.of(taskAckCommand.getStatus()),
                     taskAckCommand.getStartTime(),
                     taskAckCommand.getHost(),
