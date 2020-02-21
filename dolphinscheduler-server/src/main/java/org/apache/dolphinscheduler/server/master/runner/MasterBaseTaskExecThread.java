@@ -17,14 +17,17 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.utils.BeanContext;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
+import org.apache.dolphinscheduler.remote.command.TaskInfo;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Address;
@@ -124,11 +127,23 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     // TODO send task to worker
     public void sendToWorker(TaskInstance taskInstance){
         final Address address = new Address("127.0.0.1", 12346);
-        ExecuteTaskRequestCommand taskRequestCommand = new ExecuteTaskRequestCommand(FastJsonSerializer.serializeToString(taskInstance));
+
+        /**
+         *  set taskInstance relation
+         */
+        setTaskInstanceRelation(taskInstance);
+
+        ExecuteTaskRequestCommand taskRequestCommand = new ExecuteTaskRequestCommand(
+                FastJsonSerializer.serializeToString(convertToTaskInfo(taskInstance)));
         try {
-            Command responseCommand = nettyRemotingClient.sendSync(address, taskRequestCommand.convert2Command(), Integer.MAX_VALUE);
-            ExecuteTaskAckCommand taskAckCommand = FastJsonSerializer.deserialize(responseCommand.getBody(), ExecuteTaskAckCommand.class);
+            Command responseCommand = nettyRemotingClient.sendSync(address,
+                    taskRequestCommand.convert2Command(), Integer.MAX_VALUE);
+
+            ExecuteTaskAckCommand taskAckCommand = FastJsonSerializer.deserialize(
+                    responseCommand.getBody(), ExecuteTaskAckCommand.class);
+
             logger.info("taskAckCommand : {}",taskAckCommand);
+
             processService.changeTaskState(ExecutionStatus.of(taskAckCommand.getStatus()),
                     taskAckCommand.getStartTime(),
                     taskAckCommand.getHost(),
@@ -139,6 +154,73 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         } catch (InterruptedException | RemotingException ex) {
             logger.error(String.format("send command to : %s error", address), ex);
         }
+    }
+
+
+    /**
+     *  set task instance relation
+     *
+     * @param taskInstance taskInstance
+     */
+    private void setTaskInstanceRelation(TaskInstance taskInstance){
+        taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstance.getId());
+
+        int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
+        Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
+        // verify tenant is null
+        if (verifyTenantIsNull(tenant, taskInstance)) {
+            processService.changeTaskState(ExecutionStatus.FAILURE, taskInstance.getStartTime(), taskInstance.getHost(), null, null, taskInstance.getId());
+            return;
+        }
+        // set queue for process instance, user-specified queue takes precedence over tenant queue
+        String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
+        taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
+        taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
+    }
+
+
+    /**
+     *  whehter tenant is null
+     * @param tenant tenant
+     * @param taskInstance taskInstance
+     * @return result
+     */
+    private boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
+        if(tenant == null){
+            logger.error("tenant not exists,process instance id : {},task instance id : {}",
+                    taskInstance.getProcessInstance().getId(),
+                    taskInstance.getId());
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * taskInstance convert to taskInfo
+     *
+     * @param taskInstance taskInstance
+     * @return taskInfo
+     */
+    private TaskInfo convertToTaskInfo(TaskInstance taskInstance){
+        TaskInfo taskInfo = new TaskInfo();
+        taskInfo.setTaskId(taskInstance.getId());
+        taskInfo.setTaskName(taskInstance.getName());
+        taskInfo.setStartTime(taskInstance.getStartTime());
+        taskInfo.setTaskType(taskInstance.getTaskType());
+        taskInfo.setExecutePath(taskInstance.getExecutePath());
+        taskInfo.setTaskJson(taskInstance.getTaskJson());
+        taskInfo.setProcessInstanceId(taskInstance.getProcessInstance().getId());
+        taskInfo.setScheduleTime(taskInstance.getProcessInstance().getScheduleTime());
+        taskInfo.setGlobalParams(taskInstance.getProcessInstance().getGlobalParams());
+        taskInfo.setExecutorId(taskInstance.getProcessInstance().getExecutorId());
+        taskInfo.setCmdTypeIfComplement(taskInstance.getProcessInstance().getCmdTypeIfComplement().getCode());
+        taskInfo.setTenantCode(taskInstance.getProcessInstance().getTenantCode());
+        taskInfo.setQueue(taskInstance.getProcessInstance().getQueue());
+        taskInfo.setProcessDefineId(taskInstance.getProcessDefine().getId());
+        taskInfo.setProjectId(taskInstance.getProcessDefine().getProjectId());
+
+        return taskInfo;
     }
 
     /**
