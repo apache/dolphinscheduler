@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -208,7 +209,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         taskInfo.setTaskName(taskInstance.getName());
         taskInfo.setStartTime(taskInstance.getStartTime());
         taskInfo.setTaskType(taskInstance.getTaskType());
-        taskInfo.setExecutePath(taskInstance.getExecutePath());
+        taskInfo.setExecutePath(getExecLocalPath(taskInstance));
         taskInfo.setTaskJson(taskInstance.getTaskJson());
         taskInfo.setProcessInstanceId(taskInstance.getProcessInstance().getId());
         taskInfo.setScheduleTime(taskInstance.getProcessInstance().getScheduleTime());
@@ -221,6 +222,19 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         taskInfo.setProjectId(taskInstance.getProcessDefine().getProjectId());
 
         return taskInfo;
+    }
+
+
+    /**
+     * get execute local path
+     *
+     * @return execute local path
+     */
+    private String getExecLocalPath(TaskInstance taskInstance){
+        return FileUtils.getProcessExecDir(taskInstance.getProcessDefine().getProjectId(),
+                taskInstance.getProcessDefine().getId(),
+                taskInstance.getProcessInstance().getId(),
+                taskInstance.getId());
     }
 
     /**
