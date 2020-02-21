@@ -19,18 +19,13 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
-import org.apache.dolphinscheduler.remote.command.TaskInfo;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -40,7 +35,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -87,23 +81,23 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
 
         String taskInstanceJson = taskRequestCommand.getTaskInfoJson();
 
-        TaskInfo taskInfo = JSONObject.parseObject(taskInstanceJson, TaskInfo.class);
+        TaskExecutionContext taskExecutionContext = JSONObject.parseObject(taskInstanceJson, TaskExecutionContext.class);
 
         // local execute path
-        String execLocalPath = getExecLocalPath(taskInfo);
+        String execLocalPath = getExecLocalPath(taskExecutionContext);
         logger.info("task instance  local execute path : {} ", execLocalPath);
 
         try {
-            FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, taskInfo.getTenantCode());
+            FileUtils.createWorkDirAndUserIfAbsent(execLocalPath, taskExecutionContext.getTenantCode());
         } catch (Exception ex){
             logger.error(String.format("create execLocalPath : %s", execLocalPath), ex);
         }
 
-        taskCallbackService.addCallbackChannel(taskInfo.getTaskId(),
+        taskCallbackService.addCallbackChannel(taskExecutionContext.getTaskId(),
                 new CallbackChannel(channel, command.getOpaque()));
 
         // submit task
-        workerExecService.submit(new TaskScheduleThread(taskInfo,
+        workerExecService.submit(new TaskScheduleThread(taskExecutionContext,
                 processService, taskCallbackService));
     }
 
@@ -111,13 +105,13 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
     /**
      * get execute local path
      *
-     * @param taskInfo taskInfo
+     * @param taskExecutionContext taskExecutionContext
      * @return execute local path
      */
-    private String getExecLocalPath(TaskInfo taskInfo){
-        return FileUtils.getProcessExecDir(taskInfo.getProjectId(),
-                taskInfo.getProcessDefineId(),
-                taskInfo.getProcessInstanceId(),
-                taskInfo.getTaskId());
+    private String getExecLocalPath(TaskExecutionContext taskExecutionContext){
+        return FileUtils.getProcessExecDir(taskExecutionContext.getProjectId(),
+                taskExecutionContext.getProcessDefineId(),
+                taskExecutionContext.getProcessInstanceId(),
+                taskExecutionContext.getTaskId());
     }
 }

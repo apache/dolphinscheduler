@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.worker.registry;
+package org.apache.dolphinscheduler.server.master.registry;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
@@ -25,11 +25,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  worker registry
+ *  master registry
  */
-public class WorkerRegistry {
+public class MasterRegistry {
 
-    private final Logger logger = LoggerFactory.getLogger(WorkerRegistry.class);
+    private final Logger logger = LoggerFactory.getLogger(MasterRegistry.class);
 
     /**
      *  zookeeper registry center
@@ -46,7 +46,7 @@ public class WorkerRegistry {
      * @param zookeeperRegistryCenter zookeeperRegistryCenter
      * @param port port
      */
-    public WorkerRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port){
+    public MasterRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port){
         this.zookeeperRegistryCenter = zookeeperRegistryCenter;
         this.port = port;
     }
@@ -62,16 +62,16 @@ public class WorkerRegistry {
             @Override
             public void stateChanged(CuratorFramework client, ConnectionState newState) {
                 if(newState == ConnectionState.LOST){
-                    logger.error("worker : {} connection lost from zookeeper", address);
+                    logger.error("master : {} connection lost from zookeeper", address);
                 } else if(newState == ConnectionState.RECONNECTED){
-                    logger.info("worker : {} reconnected to zookeeper", address);
+                    logger.info("master : {} reconnected to zookeeper", address);
                     zookeeperRegistryCenter.getZookeeperCachedOperator().persist(localNodePath, "");
                 } else if(newState == ConnectionState.SUSPENDED){
-                    logger.warn("worker : {} connection SUSPENDED ", address);
+                    logger.warn("master : {} connection SUSPENDED ", address);
                 }
             }
         });
-        logger.info("worker node : {} registry to ZK successfully.", address);
+        logger.info("master node : {} registry to ZK successfully.", address);
     }
 
     /**
