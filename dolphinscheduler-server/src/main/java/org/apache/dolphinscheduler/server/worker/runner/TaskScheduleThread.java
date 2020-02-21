@@ -80,7 +80,6 @@ public class TaskScheduleThread implements Runnable {
 
     /**
      *  constructor
-     *
      * @param taskExecutionContext taskExecutionContext
      * @param processService processService
      * @param taskInstanceCallbackService taskInstanceCallbackService
@@ -177,7 +176,6 @@ public class TaskScheduleThread implements Runnable {
 
         // global params string
         String globalParamsStr = taskExecutionContext.getGlobalParams();
-
         if (globalParamsStr != null) {
             List<Property> globalParamsList = JSONObject.parseArray(globalParamsStr, Property.class);
             globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
