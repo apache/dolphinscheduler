@@ -155,8 +155,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         }
     }
 
-
-
     /**
      *  set task instance relation
      *
