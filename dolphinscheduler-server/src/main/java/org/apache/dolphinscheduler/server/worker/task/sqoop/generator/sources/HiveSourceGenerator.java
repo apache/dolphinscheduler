@@ -34,23 +34,28 @@ public class HiveSourceGenerator implements ISourceGenerator {
     @Override
     public String generate(SqoopParameters sqoopParameters) {
         StringBuilder sb = new StringBuilder();
-        SourceHiveParameter sourceHiveParameter
+        try{
+            SourceHiveParameter sourceHiveParameter
                     = JSONUtils.parseObject(sqoopParameters.getSourceParams(),SourceHiveParameter.class);
-        if(sourceHiveParameter != null){
-            if(StringUtils.isNotEmpty(sourceHiveParameter.getHiveDatabase())){
-                sb.append(" --hcatalog-database ").append(sourceHiveParameter.getHiveDatabase());
-            }
+            if(sourceHiveParameter != null){
+                if(StringUtils.isNotEmpty(sourceHiveParameter.getHiveDatabase())){
+                    sb.append(" --hcatalog-database ").append(sourceHiveParameter.getHiveDatabase());
+                }
 
-            if(StringUtils.isNotEmpty(sourceHiveParameter.getHiveTable())){
-                sb.append(" --hcatalog-table ").append(sourceHiveParameter.getHiveTable());
-            }
+                if(StringUtils.isNotEmpty(sourceHiveParameter.getHiveTable())){
+                    sb.append(" --hcatalog-table ").append(sourceHiveParameter.getHiveTable());
+                }
 
-            if(StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionKey())&&
-                    StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())){
-                sb.append(" --hcatalog-partition-keys ").append(sourceHiveParameter.getHivePartitionKey())
-                        .append(" --hcatalog-partition-values ").append(sourceHiveParameter.getHivePartitionValue());
+                if(StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionKey())&&
+                        StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())){
+                    sb.append(" --hcatalog-partition-keys ").append(sourceHiveParameter.getHivePartitionKey())
+                            .append(" --hcatalog-partition-values ").append(sourceHiveParameter.getHivePartitionValue());
+                }
             }
+        }catch (Exception e){
+            logger.error(e.getMessage());
         }
+
         return sb.toString();
     }
 }

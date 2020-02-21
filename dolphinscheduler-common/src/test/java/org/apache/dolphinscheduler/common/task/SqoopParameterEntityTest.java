@@ -25,13 +25,11 @@ import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetHiveParameter
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.junit.Assert;
 import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author simfo
- * @date 2020/2/21 13:41
+ * sqoop parameter entity test
  */
 public class SqoopParameterEntityTest {
 

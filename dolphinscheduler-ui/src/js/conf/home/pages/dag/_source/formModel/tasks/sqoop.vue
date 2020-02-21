@@ -46,7 +46,7 @@
                   style="width: 130px;"
                   v-model="sourceType"
                   :disabled="isDetails"
-                  @on-change="handleSourceTypeChange">
+                  @on-change="_handleSourceTypeChange">
             <x-option
                     v-for="city in sourceTypeList"
                     :key="city.code"
@@ -74,7 +74,7 @@
         <m-list-box>
           <div slot="text">{{$t('ModelType')}}</div>
           <div slot="content">
-            <x-radio-group v-model="srcQueryType" @on-change="handleQueryType">
+            <x-radio-group v-model="srcQueryType" @on-change="_handleQueryType">
               <x-radio label="0">{{$t('Form')}}</x-radio>
               <x-radio label="1">SQL</x-radio>
             </x-radio-group>
@@ -82,7 +82,7 @@
         </m-list-box>
 
         <template v-if="sourceMysqlParams.srcQueryType=='0'">
-          
+
           <m-list-box>
             <div slot="text">{{$t('Table')}}</div>
             <div slot="content">
@@ -94,7 +94,7 @@
               </x-input>
             </div>
           </m-list-box>
-          
+
           <m-list-box>
             <div slot="text">{{$t('ColumnType')}}</div>
             <div slot="content">
@@ -104,7 +104,7 @@
               </x-radio-group>
             </div>
           </m-list-box>
-          
+
           <m-list-box v-if="sourceMysqlParams.srcColumnType=='1'">
             <div slot="text">{{$t('Column')}}</div>
             <div slot="content">
@@ -180,7 +180,7 @@
         </div>
       </m-list-box>
     </template>
-     
+
     <m-list-box v-show="srcQueryType === '1' && sourceType ==='MYSQL'">
       <div slot="text">{{$t('SQL Statement')}}</div>
       <div slot="content">
@@ -470,7 +470,7 @@
                 type="text"
                 v-model="concurrency"
                 :placeholder="$t('Please enter Concurrency')">
-                
+
         </x-input>
       </div>
     </m-list-box>
@@ -504,13 +504,31 @@
     data () {
       return {
 
+        /**
+         * Customer Params
+         */
         localParams: [],
+        /**
+         * mysql query type
+         */
         srcQueryType:'1',
+        /**
+         * source data source
+         */
         srcDatasource:'',
+        /**
+         * target data source
+         */
         targetDatasource:'',
-        // Data source type
+        /**
+         * concurrency
+         */
         concurrency:1,
+        /**
+         * direct model type
+         */
         modelType:'import',
+
         modelTypeList: [{ code: 'import' }, { code: 'export' }],
 
         sourceTypeList:[
@@ -534,7 +552,6 @@
           }
         ],
 
-        // Custom parameter
         sourceType:"MYSQL",
         targetType:"HDFS",
 
@@ -591,7 +608,7 @@
           replaceDelimiter:"",
           hivePartitionKey:"",
           hivePartitionValue:""
-        
+
         }
       }
     },
@@ -601,17 +618,16 @@
     },
     methods: {
 
-      handleQueryType(o){
-        console.log(o)
+      _handleQueryType(o){
         this.sourceMysqlParams.srcQueryType = this.srcQueryType
       },
-      
-      handleSourceTypeChange(a){
-         this.getTargetTypeList(a.label)
-         this.targetType = this.targetTypeList[0].code
-      }, 
 
-      getTargetTypeList(data){
+      _handleSourceTypeChange(a){
+         this._getTargetTypeList(a.label)
+         this.targetType = this.targetTypeList[0].code
+      },
+
+      _getTargetTypeList(data){
         switch(data){
           case 'MYSQL':
             this.targetTypeList = [
@@ -659,7 +675,7 @@
         this.sourceMysqlParams.mapColumnJava = a
         console.log(this.sourceMysqlParams.mapColumnJava)
       },
-     
+
       /**
        * return data source
        */
@@ -674,7 +690,10 @@
         this.targetMysqlParams.targetDatasource = o.datasource
       },
 
-      handleSourceParams() {
+      /**
+      * stringify the source params
+      */
+      _handleSourceParams() {
         var params = null
         switch(this.sourceType){
           case "MYSQL":
@@ -697,7 +716,10 @@
         return params
       },
 
-      handleTargetParams() {
+     /**
+      * stringify the target params
+      */
+      _handleTargetParams() {
         var params = null
         switch(this.targetType){
           case "HIVE":
@@ -717,7 +739,10 @@
         return params
       },
 
-      getSourceParams(data) {
+      /**
+       * get source params by source type
+       */
+      _getSourceParams(data) {
         switch(this.sourceType){
           case "MYSQL":
             this.sourceMysqlParams = JSON.parse(data)
@@ -737,7 +762,10 @@
         }
       },
 
-      getTargetParams(data) {
+      /**
+       * get target params by target type
+       */
+      _getTargetParams(data) {
         switch(this.targetType){
           case "HIVE":
             this.targetHiveParams = JSON.parse(data)
@@ -781,7 +809,7 @@
                 return false
               }
             }
-              
+
             break;
           case "HDFS":
               if(this.sourceHdfsParams.exportDir === ""){
@@ -833,19 +861,20 @@
           default:
             break;
         }
-       
+
         // storage
         this.$emit('on-params', {
           concurrency:this.concurrency,
           modelType:this.modelType,
           sourceType:this.sourceType,
           targetType:this.targetType,
-          sourceParams:this.handleSourceParams(),
-          targetParams:this.handleTargetParams(),
+          sourceParams:this._handleSourceParams(),
+          targetParams:this._handleTargetParams(),
           localParams:this.localParams
         })
         return true
       },
+
       /**
        * Processing code highlighting
        */
@@ -901,7 +930,7 @@
         this.$emit('on-cache-params', val);
       }
     },
-    
+
     created () {
       let o = this.backfillItem
 
@@ -910,10 +939,10 @@
         this.concurrency = o.params.concurrency || 1,
         this.modelType = o.params.modelType,
         this.sourceType = o.params.sourceType,
-        this.getTargetTypeList(this.sourceType)
+        this._getTargetTypeList(this.sourceType)
         this.targetType = o.params.targetType,
-        this.getSourceParams(o.params.sourceParams),
-        this.getTargetParams(o.params.targetParams),
+        this._getSourceParams(o.params.sourceParams),
+        this._getTargetParams(o.params.targetParams),
         this.localParams = o.params.localParams
       }
     },
@@ -939,10 +968,6 @@
     },
 
     computed: {
-      cacheParams () {
-        return {
-        }
-      }
     },
     components: { mListBox, mDatasource, mLocalParams}
   }

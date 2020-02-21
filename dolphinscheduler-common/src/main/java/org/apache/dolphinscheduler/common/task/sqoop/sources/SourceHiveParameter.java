@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.common.task.sqoop.sources;
 
+/**
+ * source hive parameter
+ */
 public class SourceHiveParameter {
 
     /**

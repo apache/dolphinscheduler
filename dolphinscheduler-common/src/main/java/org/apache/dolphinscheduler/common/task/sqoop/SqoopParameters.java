@@ -22,6 +22,9 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * sqoop parameters
+ */
 public class SqoopParameters  extends AbstractParameters {
 
     /**

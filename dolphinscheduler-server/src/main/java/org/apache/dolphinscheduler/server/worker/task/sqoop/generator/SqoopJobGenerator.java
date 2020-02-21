@@ -23,15 +23,11 @@ import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.My
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets.HdfsTargetGenerator;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets.HiveTargetGenerator;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.targets.MysqlTargetGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Sqoop Job Scripts Generator
  */
 public class SqoopJobGenerator {
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final String MYSQL = "MYSQL";
     private static final String HIVE = "HIVE";

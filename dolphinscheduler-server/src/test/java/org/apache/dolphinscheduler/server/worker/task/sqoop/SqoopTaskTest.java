@@ -43,8 +43,7 @@ import org.springframework.context.ApplicationContext;
 import java.util.*;
 
 /**
- * @author simfo
- * @date 2020/2/17 15:05
+ * sqoop task test
  */
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class SqoopTaskTest {

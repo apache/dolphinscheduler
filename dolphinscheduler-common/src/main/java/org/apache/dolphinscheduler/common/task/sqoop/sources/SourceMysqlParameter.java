@@ -20,6 +20,9 @@ import org.apache.dolphinscheduler.common.process.Property;
 
 import java.util.List;
 
+/**
+ * source mysql parameter
+ */
 public class SourceMysqlParameter {
 
     /**

@@ -69,21 +69,6 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                             result.append(" --columns ").append(sourceMysqlParameter.getSrcColumns());
                         }
 
-//                        StringBuilder srcWhere = new StringBuilder();
-//                        if(sourceMysqlParameter.getSrcConditionList().size()>0){
-//                            List<Property> items = sourceMysqlParameter.getSrcConditionList();
-//                            for(int i=0;i<items.size();i++){
-//                                if(i>0){
-//                                    srcWhere.append(" ")
-//                                            .append(items.get(i).getProp())
-//                                            .append(" ")
-//                                            .append(items.get(i).getValue());
-//                                }
-//                            }
-//
-//                            result.append(" --where \'"+srcWhere.toString()+"\'");
-//                        }
-
                     }else if(sourceMysqlParameter.getSrcQueryType() == QueryType.SQL.ordinal()){
                         if(StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())){
 

@@ -18,7 +18,15 @@ package org.apache.dolphinscheduler.server.worker.task.sqoop.generator;
 
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 
+/**
+ * Source Generator Interface
+ */
 public interface ISourceGenerator {
 
+    /**
+     * generate the source script
+     * @param sqoopParameters sqoop params
+     * @return
+     */
     String generate(SqoopParameters sqoopParameters);
 }

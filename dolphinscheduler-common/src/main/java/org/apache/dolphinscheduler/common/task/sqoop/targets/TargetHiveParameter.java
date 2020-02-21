@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.common.task.sqoop.targets;
 
+/**
+ * target hive parameter
+ */
 public class TargetHiveParameter {
 
     /**

@@ -16,6 +16,9 @@
  */
 package org.apache.dolphinscheduler.common.task.sqoop.targets;
 
+/**
+ * target hdfs parameter
+ */
 public class TargetHdfsParameter {
 
     /**
