@@ -23,7 +23,11 @@ import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.remote.NettyRemotingServer;
+import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -90,6 +94,8 @@ public class MasterServer implements IStoppable {
     @Autowired
     private SpringApplicationContext springApplicationContext;
 
+    private NettyRemotingServer nettyRemotingServer;
+
 
     /**
      * master server startup
@@ -108,6 +114,15 @@ public class MasterServer implements IStoppable {
      */
     @PostConstruct
     public void run(){
+
+        //
+        //init remoting server
+        NettyServerConfig serverConfig = new NettyServerConfig();
+        this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
+        this.nettyRemotingServer.registerProcessor(CommandType.EXECUTE_TASK_RESPONSE, new TaskResponseProcessor(processService));
+        this.nettyRemotingServer.start();
+
+        //
         zkMasterClient.init();
 
         masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
