@@ -132,10 +132,10 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         /**
          *  set taskInstance relation
          */
-        setTaskInstanceRelation(taskInstance);
+        TaskInstance destTaskInstance = setTaskInstanceRelation(taskInstance);
 
         ExecuteTaskRequestCommand taskRequestCommand = new ExecuteTaskRequestCommand(
-                FastJsonSerializer.serializeToString(convertToTaskInfo(taskInstance)));
+                FastJsonSerializer.serializeToString(convertToTaskInfo(destTaskInstance)));
         try {
             Command responseCommand = nettyRemotingClient.sendSync(address,
                     taskRequestCommand.convert2Command(), Integer.MAX_VALUE);
@@ -163,7 +163,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      *
      * @param taskInstance taskInstance
      */
-    private void setTaskInstanceRelation(TaskInstance taskInstance){
+    private TaskInstance setTaskInstanceRelation(TaskInstance taskInstance){
         taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstance.getId());
 
         int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
@@ -171,12 +171,14 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         // verify tenant is null
         if (verifyTenantIsNull(tenant, taskInstance)) {
             processService.changeTaskState(ExecutionStatus.FAILURE, taskInstance.getStartTime(), taskInstance.getHost(), null, null, taskInstance.getId());
-            return;
+            return null;
         }
         // set queue for process instance, user-specified queue takes precedence over tenant queue
         String userQueue = processService.queryUserQueueByProcessInstanceId(taskInstance.getProcessInstanceId());
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
+
+        return taskInstance;
     }
 
 
