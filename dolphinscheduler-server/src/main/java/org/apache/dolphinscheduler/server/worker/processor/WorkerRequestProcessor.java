@@ -92,7 +92,6 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
         } catch (Exception ex){
             logger.error(String.format("create execLocalPath : %s", execLocalPath), ex);
         }
-
         taskCallbackService.addCallbackChannel(taskExecutionContext.getTaskId(),
                 new CallbackChannel(channel, command.getOpaque()));
 
@@ -104,7 +103,6 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
 
     /**
      * get execute local path
-     *
      * @param taskExecutionContext taskExecutionContext
      * @return execute local path
      */
