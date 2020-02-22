@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Address;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -128,13 +130,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     // TODO send task to worker
     public void sendToWorker(TaskInstance taskInstance){
         final Address address = new Address("127.0.0.1", 12346);
-        /**
-         *  set taskInstance relation
-         */
-        TaskInstance destTaskInstance = setTaskInstanceRelation(taskInstance);
 
         ExecuteTaskRequestCommand taskRequestCommand = new ExecuteTaskRequestCommand(
-                FastJsonSerializer.serializeToString(convertToTaskInfo(destTaskInstance)));
+                FastJsonSerializer.serializeToString(getTaskExecutionContext(taskInstance)));
         try {
             Command responseCommand = nettyRemotingClient.sendSync(address,
                     taskRequestCommand.convert2Command(), 2000);
@@ -156,18 +154,25 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     }
 
     /**
-     *  set task instance relation
+     * get TaskExecutionContext
      *
      * @param taskInstance taskInstance
+     * @return TaskExecutionContext
      */
-    private TaskInstance setTaskInstanceRelation(TaskInstance taskInstance){
+    private TaskExecutionContext getTaskExecutionContext(TaskInstance taskInstance){
         taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstance.getId());
 
-        int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
+        Integer userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
+
         // verify tenant is null
         if (verifyTenantIsNull(tenant, taskInstance)) {
-            processService.changeTaskState(ExecutionStatus.FAILURE, taskInstance.getStartTime(), taskInstance.getHost(), null, null, taskInstance.getId());
+            processService.changeTaskState(ExecutionStatus.FAILURE,
+                    taskInstance.getStartTime(),
+                    taskInstance.getHost(),
+                    null,
+                    null,
+                    taskInstance.getId());
             return null;
         }
         // set queue for process instance, user-specified queue takes precedence over tenant queue
@@ -175,7 +180,11 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
 
-        return taskInstance;
+        return TaskExecutionContextBuilder.get()
+                .buildTaskInstanceRelatedInfo(taskInstance)
+                .buildProcessInstanceRelatedInfo(taskInstance.getProcessInstance())
+                .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
+                .create();
     }
 
 
@@ -194,35 +203,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         }
         return false;
     }
-
-
-    /**
-     * taskInstance convert to taskInfo
-     *
-     * @param taskInstance taskInstance
-     * @return taskInfo
-     */
-    private TaskExecutionContext convertToTaskInfo(TaskInstance taskInstance){
-        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        taskExecutionContext.setTaskId(taskInstance.getId());
-        taskExecutionContext.setTaskName(taskInstance.getName());
-        taskExecutionContext.setStartTime(taskInstance.getStartTime());
-        taskExecutionContext.setTaskType(taskInstance.getTaskType());
-        taskExecutionContext.setExecutePath(getExecLocalPath(taskInstance));
-        taskExecutionContext.setTaskJson(taskInstance.getTaskJson());
-        taskExecutionContext.setProcessInstanceId(taskInstance.getProcessInstance().getId());
-        taskExecutionContext.setScheduleTime(taskInstance.getProcessInstance().getScheduleTime());
-        taskExecutionContext.setGlobalParams(taskInstance.getProcessInstance().getGlobalParams());
-        taskExecutionContext.setExecutorId(taskInstance.getProcessInstance().getExecutorId());
-        taskExecutionContext.setCmdTypeIfComplement(taskInstance.getProcessInstance().getCmdTypeIfComplement().getCode());
-        taskExecutionContext.setTenantCode(taskInstance.getProcessInstance().getTenantCode());
-        taskExecutionContext.setQueue(taskInstance.getProcessInstance().getQueue());
-        taskExecutionContext.setProcessDefineId(taskInstance.getProcessDefine().getId());
-        taskExecutionContext.setProjectId(taskInstance.getProcessDefine().getProjectId());
-
-        return taskExecutionContext;
-    }
-
 
     /**
      * get execute local path
