@@ -14,14 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.server.master.dispatch.context;
 
-package org.apache.dolphinscheduler.server.master.host;
 
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+public class ExecutionContext {
 
-public interface HostManager {
+    private Host host;
 
-    Host select(TaskExecutionContext context);
+    private final Object context;
 
+    private final ExecutorType executorType;
+
+    public ExecutionContext(Object context, ExecutorType executorType) {
+        this.context = context;
+        this.executorType = executorType;
+    }
+
+    public ExecutorType getExecutorType() {
+        return executorType;
+    }
+
+    public Object getContext() {
+        return context;
+    }
+
+    public Host getHost() {
+        return host;
+    }
+
+    public void setHost(Host host) {
+        this.host = host;
+    }
 }

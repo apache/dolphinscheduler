@@ -14,26 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.thread;
+package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import org.springframework.stereotype.Service;
 
-/**
- *  if the process closes, a signal is placed as true, and all threads get this flag to stop working
- */
-public class Stopper {
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
-	private static volatile AtomicBoolean signal = new AtomicBoolean(false);
-	
-	public static final boolean isStopped(){
-		return signal.get();
-	}
-	
-	public static final boolean isRunning(){
-		return !signal.get();
-	}
-	
-	public static final void stop(){
-		signal.set(true);
-	}
+@Service
+public class RoundRobinSelector<T> implements Selector<T> {
+
+    private final AtomicInteger index = new AtomicInteger(0);
+
+    @Override
+    public T select(Collection<T> source) {
+        if (source == null || source.size() == 0) {
+            throw new IllegalArgumentException("Empty source.");
+        }
+
+        if (source.size() == 1) {
+            return (T)source.toArray()[0];
+        }
+
+        int size = source.size();
+        return (T) source.toArray()[index.getAndIncrement() % size];
+    }
 }
