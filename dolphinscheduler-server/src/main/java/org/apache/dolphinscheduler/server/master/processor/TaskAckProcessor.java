@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
+import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -30,35 +30,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *  task response processor
+ *  task ack processor
  */
-public class TaskResponseProcessor implements NettyRequestProcessor {
+public class TaskAckProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskResponseProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskAckProcessor.class);
 
     /**
      * process service
      */
     private final ProcessService processService;
 
-    public TaskResponseProcessor(ProcessService processService){
+    public TaskAckProcessor(ProcessService processService){
         this.processService = processService;
     }
 
-    /**
-     * task final result response
-     * need master process , state persistence
-     *
-     * @param channel channel
-     * @param command command
-     */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.EXECUTE_TASK_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
-        logger.info("received command : {}", command);
-        ExecuteTaskResponseCommand responseCommand = FastJsonSerializer.deserialize(command.getBody(), ExecuteTaskResponseCommand.class);
-        processService.changeTaskState(ExecutionStatus.of(responseCommand.getStatus()), responseCommand.getEndTime(), responseCommand.getTaskInstanceId());
+        Preconditions.checkArgument(CommandType.EXECUTE_TASK_ACK == command.getType(), String.format("invalid command type : %s", command.getType()));
+        ExecuteTaskAckCommand taskAckCommand = FastJsonSerializer.deserialize(command.getBody(), ExecuteTaskAckCommand.class);
+        logger.info("taskAckCommand : {}",taskAckCommand);
+        processService.changeTaskState(ExecutionStatus.of(taskAckCommand.getStatus()),
+                taskAckCommand.getStartTime(),
+                taskAckCommand.getHost(),
+                taskAckCommand.getExecutePath(),
+                taskAckCommand.getLogPath(),
+                taskAckCommand.getTaskInstanceId());
     }
-
 
 }
