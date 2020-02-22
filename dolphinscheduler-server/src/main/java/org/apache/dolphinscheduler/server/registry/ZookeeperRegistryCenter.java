@@ -47,7 +47,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
+        init();
     }
 
     public void init() {

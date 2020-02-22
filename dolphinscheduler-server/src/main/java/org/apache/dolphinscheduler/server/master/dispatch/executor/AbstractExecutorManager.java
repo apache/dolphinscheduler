@@ -15,31 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.host.assign;
+package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
-import java.util.Collection;
-import java.util.Random;
+import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 
 
-public class RandomSelector<T> implements Selector<T> {
-
-    private final Random random = new Random();
+public abstract class AbstractExecutorManager implements ExecutorManager{
 
     @Override
-    public T select(final Collection<T> source) {
-
-        if (source == null || source.size() == 0) {
-            throw new IllegalArgumentException("Empty source.");
-        }
-
-        if (source.size() == 1) {
-            return (T) source.toArray()[0];
-        }
-
-        int size = source.size();
-        int randomIndex = random.nextInt(size);
-
-        return (T) source.toArray()[randomIndex];
+    public void beforeExecute(ExecutionContext executeContext) throws ExecuteException {
+        //TODO add time monitor
     }
 
+    @Override
+    public void afterExecute(ExecutionContext executeContext) throws ExecuteException {
+        //TODO add dispatch monitor
+
+    }
 }

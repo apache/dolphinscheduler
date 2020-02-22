@@ -35,7 +35,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 @Service
-public abstract class ZookeeperNodeManager implements InitializingBean {
+public class ZookeeperNodeManager implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(ZookeeperNodeManager.class);
 

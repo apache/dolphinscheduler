@@ -14,26 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.thread;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-/**
- *  if the process closes, a signal is placed as true, and all threads get this flag to stop working
- */
-public class Stopper {
+import java.util.Collection;
 
-	private static volatile AtomicBoolean signal = new AtomicBoolean(false);
-	
-	public static final boolean isStopped(){
-		return signal.get();
-	}
-	
-	public static final boolean isRunning(){
-		return !signal.get();
-	}
-	
-	public static final void stop(){
-		signal.set(true);
-	}
+
+public interface Selector<T> {
+
+    T select(Collection<T> source);
 }
