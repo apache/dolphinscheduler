@@ -1794,7 +1794,11 @@ public class ProcessDao {
             Set<T> originResSet = new HashSet<T>(Arrays.asList(needChecks));
 
             switch (authorizationType){
-                case RESOURCE_FILE:
+                case RESOURCE_FILE_ID:
+                    Set<Integer> authorizedResourceFiles = resourceMapper.listAuthorizedResourceById(userId, needChecks).stream().map(t -> t.getId()).collect(toSet());
+                    originResSet.removeAll(authorizedResourceFiles);
+                    break;
+                case RESOURCE_FILE_NAME:
                     Set<String> authorizedResources = resourceMapper.listAuthorizedResource(userId, needChecks).stream().map(t -> t.getAlias()).collect(toSet());
                     originResSet.removeAll(authorizedResources);
                     break;
