@@ -14,27 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.master.host.assign;
 
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicInteger;
+package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 
-public class RoundRobinSelector<T> implements Selector<T> {
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 
-    private final AtomicInteger index = new AtomicInteger(0);
+public interface HostManager {
 
-    @Override
-    public T select(Collection<T> source) {
-        if (source == null || source.size() == 0) {
-            throw new IllegalArgumentException("Empty source.");
-        }
+    Host select(ExecutionContext context);
 
-        if (source.size() == 1) {
-            return (T)source.toArray()[0];
-        }
-
-        int size = source.size();
-        return (T) source.toArray()[index.getAndIncrement() % size];
-    }
 }

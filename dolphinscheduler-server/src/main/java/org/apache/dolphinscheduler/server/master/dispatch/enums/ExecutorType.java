@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.apache.dolphinscheduler.server.master.host.assign;
-
-import java.util.Collection;
+package org.apache.dolphinscheduler.server.master.dispatch.enums;
 
 
-public interface Selector<T> {
+public enum ExecutorType {
 
-    T select(Collection<T> source);
+    WORKER,
+
+    CLIENT;
 }

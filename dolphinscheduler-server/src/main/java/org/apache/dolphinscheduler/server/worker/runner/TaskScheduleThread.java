@@ -93,12 +93,12 @@ public class TaskScheduleThread implements Runnable {
     @Override
     public void run() {
 
-        ExecuteTaskResponseCommand responseCommand = new ExecuteTaskResponseCommand(taskExecutionContext.getTaskId());
+        ExecuteTaskResponseCommand responseCommand = new ExecuteTaskResponseCommand(taskExecutionContext.getTaskInstanceId());
 
         try {
             // tell master that task is in executing
             ExecuteTaskAckCommand ackCommand = buildAckCommand(taskExecutionContext.getTaskType());
-            taskInstanceCallbackService.sendAck(taskExecutionContext.getTaskId(), ackCommand);
+            taskInstanceCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
 
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
             // task node
@@ -118,7 +118,7 @@ public class TaskScheduleThread implements Runnable {
                     taskExecutionContext.getScheduleTime(),
                     taskExecutionContext.getTaskName(),
                     taskExecutionContext.getTaskType(),
-                    taskExecutionContext.getTaskId(),
+                    taskExecutionContext.getTaskInstanceId(),
                     CommonUtils.getSystemEnvPath(),
                     taskExecutionContext.getTenantCode(),
                     taskExecutionContext.getQueue(),
@@ -132,13 +132,13 @@ public class TaskScheduleThread implements Runnable {
             taskProps.setTaskAppId(String.format("%s_%s_%s",
                     taskExecutionContext.getProcessDefineId(),
                     taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskId()));
+                    taskExecutionContext.getTaskInstanceId()));
 
             // custom logger
             Logger taskLogger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                     taskExecutionContext.getProcessDefineId(),
                     taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskId()));
+                    taskExecutionContext.getTaskInstanceId()));
 
             task = TaskManager.newTask(taskExecutionContext.getTaskType(),
                     taskProps,
@@ -156,14 +156,14 @@ public class TaskScheduleThread implements Runnable {
             //
             responseCommand.setStatus(task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
-            logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskId(), task.getExitStatus());
+            logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), task.getExitStatus());
         }catch (Exception e){
             logger.error("task scheduler failure", e);
             kill();
             responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
             responseCommand.setEndTime(new Date());
         } finally {
-            taskInstanceCallbackService.sendResult(taskExecutionContext.getTaskId(), responseCommand);
+            taskInstanceCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand);
         }
     }
 
@@ -213,13 +213,13 @@ public class TaskScheduleThread implements Runnable {
             return baseLog + Constants.SINGLE_SLASH +
                     taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
                     taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                    taskExecutionContext.getTaskId() + ".log";
+                    taskExecutionContext.getTaskInstanceId() + ".log";
         }
         return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
                 baseLog +  Constants.SINGLE_SLASH +
                 taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
                 taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                taskExecutionContext.getTaskId() + ".log";
+                taskExecutionContext.getTaskInstanceId() + ".log";
     }
 
     /**
@@ -325,9 +325,9 @@ public class TaskScheduleThread implements Runnable {
      * @throws Exception exception
      */
     private void checkDownloadPermission(List<String> projectRes) throws Exception {
-        int userId = taskExecutionContext.getExecutorId();
+        int executorId = taskExecutionContext.getExecutorId();
         String[] resNames = projectRes.toArray(new String[projectRes.size()]);
-        PermissionCheck<String> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE, processService,resNames,userId,logger);
+        PermissionCheck<String> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE, processService,resNames,executorId,logger);
         permissionCheck.checkPermission();
     }
 }

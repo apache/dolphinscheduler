@@ -40,7 +40,7 @@ public class TaskExecutionContextBuilder {
      * @return TaskExecutionContextBuilder
      */
     public TaskExecutionContextBuilder buildTaskInstanceRelatedInfo(TaskInstance taskInstance){
-        taskExecutionContext.setTaskId(taskInstance.getId());
+        taskExecutionContext.setTaskInstanceId(taskInstance.getId());
         taskExecutionContext.setTaskName(taskInstance.getName());
         taskExecutionContext.setStartTime(taskInstance.getStartTime());
         taskExecutionContext.setTaskType(taskInstance.getTaskType());
