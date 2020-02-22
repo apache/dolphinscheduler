@@ -76,7 +76,7 @@ public class TaskCallbackService {
      */
     public void sendAck(int taskInstanceId, ExecuteTaskAckCommand ackCommand){
         CallbackChannel callbackChannel = getCallbackChannel(taskInstanceId);
-        callbackChannel.getChannel().writeAndFlush(ackCommand.convert2Command(callbackChannel.getOpaque()));
+        callbackChannel.getChannel().writeAndFlush(ackCommand.convert2Command());
     }
 
     /**
@@ -87,8 +87,7 @@ public class TaskCallbackService {
      */
     public void sendResult(int taskInstanceId, ExecuteTaskResponseCommand responseCommand){
         CallbackChannel callbackChannel = getCallbackChannel(taskInstanceId);
-        callbackChannel.getChannel().writeAndFlush(responseCommand.convert2Command(
-                callbackChannel.getOpaque())).addListener(new ChannelFutureListener(){
+        callbackChannel.getChannel().writeAndFlush(responseCommand.convert2Command()).addListener(new ChannelFutureListener(){
 
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {

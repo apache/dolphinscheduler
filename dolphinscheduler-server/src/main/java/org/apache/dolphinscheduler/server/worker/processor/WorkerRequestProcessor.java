@@ -79,9 +79,9 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
         ExecuteTaskRequestCommand taskRequestCommand = FastJsonSerializer.deserialize(
                 command.getBody(), ExecuteTaskRequestCommand.class);
 
-        String taskInstanceJson = taskRequestCommand.getTaskInfoJson();
+        String contextJson = taskRequestCommand.getTaskExecutionContext();
 
-        TaskExecutionContext taskExecutionContext = JSONObject.parseObject(taskInstanceJson, TaskExecutionContext.class);
+        TaskExecutionContext taskExecutionContext = JSONObject.parseObject(contextJson, TaskExecutionContext.class);
 
         // local execute path
         String execLocalPath = getExecLocalPath(taskExecutionContext);
@@ -92,7 +92,7 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
         } catch (Exception ex){
             logger.error(String.format("create execLocalPath : %s", execLocalPath), ex);
         }
-        taskCallbackService.addCallbackChannel(taskExecutionContext.getTaskId(),
+        taskCallbackService.addCallbackChannel(taskExecutionContext.getTaskInstanceId(),
                 new CallbackChannel(channel, command.getOpaque()));
 
         // submit task
@@ -110,6 +110,6 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
         return FileUtils.getProcessExecDir(taskExecutionContext.getProjectId(),
                 taskExecutionContext.getProcessDefineId(),
                 taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskId());
+                taskExecutionContext.getTaskInstanceId());
     }
 }

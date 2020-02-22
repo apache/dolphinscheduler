@@ -32,16 +32,23 @@ import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
 import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.utils.Address;
+import org.apache.dolphinscheduler.remote.future.InvokeCallback;
+import org.apache.dolphinscheduler.remote.future.ResponseFuture;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
+import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.ITaskQueue;
 import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.Callable;
 
@@ -92,9 +99,9 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
 
     /**
-     *  netty remoting client
+     * executor dispatcher
      */
-    private static final NettyRemotingClient nettyRemotingClient = new NettyRemotingClient(new NettyClientConfig());
+    private ExecutorDispatcher dispatcher;
 
     /**
      * constructor of MasterBaseTaskExecThread
@@ -102,13 +109,14 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * @param processInstance   process instance
      */
     public MasterBaseTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
-        this.processService = BeanContext.getBean(ProcessService.class);
-        this.alertDao = BeanContext.getBean(AlertDao.class);
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+        this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
         this.processInstance = processInstance;
         this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
         this.cancel = false;
         this.taskInstance = taskInstance;
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
+        this.dispatcher = SpringApplicationContext.getBean(ExecutorDispatcher.class);
     }
 
     /**
@@ -126,30 +134,17 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         this.cancel = true;
     }
 
-
-    // TODO send task to worker
-    public void sendToWorker(TaskInstance taskInstance){
-        final Address address = new Address("127.0.0.1", 12346);
-
-        ExecuteTaskRequestCommand taskRequestCommand = new ExecuteTaskRequestCommand(
-                FastJsonSerializer.serializeToString(getTaskExecutionContext(taskInstance)));
+    /**
+     * dispatch task to worker
+     * @param taskInstance
+     */
+    public void dispatch(TaskInstance taskInstance){
+        TaskExecutionContext context = getTaskExecutionContext(taskInstance);
+        ExecutionContext executionContext = new ExecutionContext(context, ExecutorType.WORKER);
         try {
-            Command responseCommand = nettyRemotingClient.sendSync(address,
-                    taskRequestCommand.convert2Command(), 2000);
-
-            ExecuteTaskAckCommand taskAckCommand = FastJsonSerializer.deserialize(
-                    responseCommand.getBody(), ExecuteTaskAckCommand.class);
-
-            logger.info("taskAckCommand : {}",taskAckCommand);
-            processService.changeTaskState(ExecutionStatus.of(taskAckCommand.getStatus()),
-                    taskAckCommand.getStartTime(),
-                    taskAckCommand.getHost(),
-                    taskAckCommand.getExecutePath(),
-                    taskAckCommand.getLogPath(),
-                    taskInstance.getId());
-
-        } catch (InterruptedException | RemotingException ex) {
-            logger.error(String.format("send command to : %s error", address), ex);
+            dispatcher.dispatch(executionContext);
+        } catch (ExecuteException e) {
+            logger.error("execute exception", e);
         }
     }
 
@@ -204,7 +199,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         return false;
     }
 
-
     /**
      * get execute local path
      *
@@ -240,7 +234,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 }
                 if(submitDB && !submitQueue){
                     // submit task to queue
-                    sendToWorker(task);
+                    dispatch(task);
                     submitQueue = true;
                 }
                 if(submitDB && submitQueue){
