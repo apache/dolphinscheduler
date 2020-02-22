@@ -15,11 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.host;
+package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.host.assign.RoundRobinSelector;
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
+import org.apache.dolphinscheduler.server.master.dispatch.host.assign.RoundRobinSelector;
+import org.apache.dolphinscheduler.server.master.dispatch.host.assign.Selector;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,20 +40,35 @@ public class RoundRobinHostManager implements HostManager {
     private final Logger logger = LoggerFactory.getLogger(RoundRobinHostManager.class);
 
     @Autowired
-    private RoundRobinSelector<Host> selector;
-
-    @Autowired
     private ZookeeperNodeManager zookeeperNodeManager;
 
+    private final Selector<Host> selector;
+
+    public RoundRobinHostManager(){
+        this.selector = new RoundRobinSelector<>();
+    }
+
     @Override
-    public Host select(TaskExecutionContext context){
+    public Host select(ExecutionContext context){
         Host host = new Host();
-        Collection<String> nodes = zookeeperNodeManager.getWorkerNodes();
+        Collection<String> nodes = null;
+        ExecutorType executorType = context.getExecutorType();
+        switch (executorType){
+            case WORKER:
+                nodes = zookeeperNodeManager.getWorkerNodes();
+                break;
+            case CLIENT:
+                break;
+            default:
+                throw new IllegalArgumentException("invalid executorType : " + executorType);
+
+        }
         if(CollectionUtils.isEmpty(nodes)){
             return host;
         }
         List<Host> candidateHosts = new ArrayList<>(nodes.size());
         nodes.stream().forEach(node -> candidateHosts.add(Host.of(node)));
+
         return selector.select(candidateHosts);
     }
 

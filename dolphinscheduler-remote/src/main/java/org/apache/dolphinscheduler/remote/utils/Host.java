@@ -14,14 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.remote.utils;
 
-package org.apache.dolphinscheduler.server.master.host;
-
-
+import java.io.Serializable;
 import java.util.Objects;
 
-
-public class Host {
+/**
+ *  server address
+ */
+public class Host implements Serializable {
 
     private String address;
 
@@ -67,7 +68,7 @@ public class Host {
     public static Host of(String address){
         String[] parts = address.split(":");
         if (parts.length != 2) {
-            throw new IllegalArgumentException(String.format("Address : %s illegal.", address));
+            throw new IllegalArgumentException(String.format("Host : %s illegal.", address));
         }
         Host host = new Host(parts[0], Integer.parseInt(parts[1]));
         return host;

@@ -26,9 +26,9 @@ import java.util.Date;
 public class TaskExecutionContext implements Serializable{
 
     /**
-     *  task instance id
+     *  task id
      */
-    private Integer taskId;
+    private Integer taskInstanceId;
 
 
     /**
@@ -107,12 +107,13 @@ public class TaskExecutionContext implements Serializable{
      */
     private Integer projectId;
 
-    public Integer getTaskId() {
-        return taskId;
+
+    public Integer getTaskInstanceId() {
+        return taskInstanceId;
     }
 
-    public void setTaskId(Integer taskId) {
-        this.taskId = taskId;
+    public void setTaskInstanceId(Integer taskInstanceId) {
+        this.taskInstanceId = taskInstanceId;
     }
 
     public String getTaskName() {
@@ -230,7 +231,7 @@ public class TaskExecutionContext implements Serializable{
     @Override
     public String toString() {
         return "TaskExecutionContext{" +
-                "taskId=" + taskId +
+                "taskInstanceId=" + taskInstanceId +
                 ", taskName='" + taskName + '\'' +
                 ", startTime=" + startTime +
                 ", taskType='" + taskType + '\'' +
