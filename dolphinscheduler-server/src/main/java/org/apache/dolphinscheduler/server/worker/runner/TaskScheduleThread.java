@@ -97,7 +97,7 @@ public class TaskScheduleThread implements Runnable {
 
         try {
             // tell master that task is in executing
-            ExecuteTaskAckCommand ackCommand = buildAckCommand(taskExecutionContext.getTaskType());
+            ExecuteTaskAckCommand ackCommand = buildAckCommand(taskExecutionContext);
             taskInstanceCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
 
             logger.info("script path : {}", taskExecutionContext.getExecutePath());
@@ -182,17 +182,20 @@ public class TaskScheduleThread implements Runnable {
         }
         return globalParamsMap;
     }
+
     /**
-     *  build ack command
-     * @param taskType taskType
+     * build ack command
+     * @param taskExecutionContext taskExecutionContext
+     * @return ExecuteTaskAckCommand
      */
-    private ExecuteTaskAckCommand buildAckCommand(String taskType) {
+    private ExecuteTaskAckCommand buildAckCommand(TaskExecutionContext taskExecutionContext) {
         ExecuteTaskAckCommand ackCommand = new ExecuteTaskAckCommand();
+        ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         ackCommand.setStatus(ExecutionStatus.RUNNING_EXEUTION.getCode());
         ackCommand.setLogPath(getTaskLogPath());
         ackCommand.setHost(OSUtils.getHost());
         ackCommand.setStartTime(new Date());
-        if(taskType.equals(TaskType.SQL.name()) || taskType.equals(TaskType.PROCEDURE.name())){
+        if(taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())){
             ackCommand.setExecutePath(null);
         }else{
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
