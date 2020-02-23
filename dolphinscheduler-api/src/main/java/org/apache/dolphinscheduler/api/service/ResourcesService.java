@@ -539,7 +539,7 @@ public class ResourcesService extends BaseService {
         String hdfsFilename = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getAlias());
 
         //delete data in database
-        resourcesMapper.deleteById(resourceId);
+        resourcesMapper.deleteDirectory(resourceId);
         resourceUserMapper.deleteResourceUser(0, resourceId);
         //delete file on hdfs
         HadoopUtils.getInstance().delete(hdfsFilename, true);

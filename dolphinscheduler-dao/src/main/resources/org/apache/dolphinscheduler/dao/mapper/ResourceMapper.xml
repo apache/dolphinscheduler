@@ -70,7 +70,36 @@
     <select id="queryTenantCodeByResourceName" resultType="java.lang.String">
         select tenant_code
         from t_ds_tenant t, t_ds_user u, t_ds_resources res
-        where t.id = u.tenant_id and u.id = res.user_id and res.type=0
-        and res.alias= #{resName}
+        where t.id = u.tenant_id and u.id = res.user_id and res.type=#{resType}
+        and res.full_name= #{resName}
     </select>
+    <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select *
+        from t_ds_resources
+        where type=0
+        and id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
+        union select id as resources_id  from t_ds_resources where user_id=#{userId})
+        <if test="resNames != null and resNames != ''">
+            and full_name in
+            <foreach collection="resNames" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+    <select id="listAuthorizedResourceById" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select *
+        from t_ds_resources
+        where id in (select resources_id from  t_ds_relation_resources_user where user_id=#{userId}
+        union select id as resources_id  from t_ds_resources where user_id=#{userId})
+        <if test="resIds != null and resIds != ''">
+            and id in
+            <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+    
+    <delete id="deleteDirectory" parameterType="java.lang.Integer">
+        delete from t_ds_resources where id = #{direcotyId} or pid = #{direcotyId}
+    </delete>
 </mapper>
