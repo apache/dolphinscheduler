@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +42,8 @@ public class TaskAckProcessor implements NettyRequestProcessor {
      */
     private final ProcessService processService;
 
-    public TaskAckProcessor(ProcessService processService){
-        this.processService = processService;
+    public TaskAckProcessor(){
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     @Override
