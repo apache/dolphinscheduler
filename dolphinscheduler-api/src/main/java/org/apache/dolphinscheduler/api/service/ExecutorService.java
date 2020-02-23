@@ -377,9 +377,8 @@ public class ExecutorService extends BaseService{
         processService.recurseFindSubProcessId(processDefineId, ids);
         Integer[] idArray = ids.toArray(new Integer[ids.size()]);
         if (!ids.isEmpty()){
-            List<ProcessDefinition> processDefinitionList;
-            processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(idArray);
-            if (processDefinitionList != null && !processDefinitionList.isEmpty()){
+            List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(idArray);
+            if (processDefinitionList != null){
                 for (ProcessDefinition processDefinition : processDefinitionList){
                     /**
                      * if there is no online process, exit directly
