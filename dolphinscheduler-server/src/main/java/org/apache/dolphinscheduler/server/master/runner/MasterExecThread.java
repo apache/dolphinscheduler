@@ -568,6 +568,7 @@ public class MasterExecThread implements Runnable {
             logger.error("task instance cannot find, please check it!", nodeName);
             return conditionTaskList;
         }
+
         if(taskInstance.getState().typeIsSuccess()){
             conditionTaskList = conditionsParameters.getSuccessNode();
             setTaskNodeSkip(conditionsParameters.getFailedNode());
@@ -580,17 +581,24 @@ public class MasterExecThread implements Runnable {
         return conditionTaskList;
     }
 
-    private List<String> parsePostNodeList(String parentNodeName){
+    /**
+     * parse post node list of previous node
+     * if condition node: return process according to the settings
+     * if post node completed, return post nodes of the completed node
+     * @param previousNodeName
+     * @return
+     */
+    private List<String> parsePostNodeList(String previousNodeName){
         List<String> postNodeList = new ArrayList<>();
 
-        TaskNode taskNode = dag.getNode(parentNodeName);
+        TaskNode taskNode = dag.getNode(previousNodeName);
         if(taskNode != null  && taskNode.isConditionsTask()){
-            return parseConditionTask(parentNodeName);
+            return parseConditionTask(previousNodeName);
         }
-        Collection<String> postNodeCollection = DagHelper.getStartVertex(parentNodeName, dag, completeTaskList);
+        Collection<String> postNodeCollection = DagHelper.getStartVertex(previousNodeName, dag, completeTaskList);
         List<String> postSkipList = new ArrayList<>();
         // delete success node, parse the past nodes
-        // when conditions node,
+        // if conditions node,
         //  1. parse the branch process according the conditions setting
         //  2. set skip flag on anther branch process
         for(String postNode : postNodeCollection){
