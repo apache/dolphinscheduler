@@ -29,6 +29,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+/**
+ *  task fulture
+ */
 public class TaskFuture {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(TaskFuture.class);
@@ -139,19 +142,6 @@ public class TaskFuture {
     }
 
 
-    @Override
-    public String toString() {
-        return "ResponseFuture{" +
-                "opaque=" + opaque +
-                ", timeoutMillis=" + timeoutMillis +
-                ", latch=" + latch +
-                ", beginTimestamp=" + beginTimestamp +
-                ", responseCommand=" + responseCommand +
-                ", sendOk=" + sendOk +
-                ", cause=" + cause +
-                '}';
-    }
-
     /**
      * scan future table
      */
@@ -167,5 +157,18 @@ public class TaskFuture {
                 LOGGER.warn("remove timeout request : {}", future);
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return "TaskFuture{" +
+                "opaque=" + opaque +
+                ", timeoutMillis=" + timeoutMillis +
+                ", latch=" + latch +
+                ", beginTimestamp=" + beginTimestamp +
+                ", responseCommand=" + responseCommand +
+                ", sendOk=" + sendOk +
+                ", cause=" + cause +
+                '}';
     }
 }

@@ -32,12 +32,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * executor dispatcher
+ */
 @Service
 public class ExecutorDispatcher implements InitializingBean {
 
+    /**
+     * netty executor manager
+     */
     @Autowired
     private NettyExecutorManager nettyExecutorManager;
 
+    /**
+     * round robin host manager
+     */
     @Autowired
     private RoundRobinHostManager hostManager;
 
@@ -47,30 +56,54 @@ public class ExecutorDispatcher implements InitializingBean {
         this.executorManagers = new ConcurrentHashMap<>();
     }
 
-    public void dispatch(final ExecutionContext executeContext) throws ExecuteException {
-        ExecutorManager executorManager = this.executorManagers.get(executeContext.getExecutorType());
+    /**
+     *  task dispatch
+     * @param context context
+     * @throws ExecuteException
+     */
+    public void dispatch(final ExecutionContext context) throws ExecuteException {
+        /**
+         * get executor manager
+         */
+        ExecutorManager executorManager = this.executorManagers.get(context.getExecutorType());
         if(executorManager == null){
-            throw new ExecuteException("no ExecutorManager for type : " + executeContext.getExecutorType());
+            throw new ExecuteException("no ExecutorManager for type : " + context.getExecutorType());
         }
-        Host host = hostManager.select(executeContext);
+
+        /**
+         * host select
+         */
+        Host host = hostManager.select(context);
         if (StringUtils.isEmpty(host.getAddress())) {
-            throw new ExecuteException(String.format("fail to execute : %s due to no worker ", executeContext.getContext()));
+            throw new ExecuteException(String.format("fail to execute : %s due to no worker ", context.getContext()));
         }
-        executeContext.setHost(host);
-        executorManager.beforeExecute(executeContext);
+        context.setHost(host);
+        executorManager.beforeExecute(context);
         try {
-            executorManager.execute(executeContext);
+            /**
+             * task execute
+             */
+            executorManager.execute(context);
         } finally {
-            executorManager.afterExecute(executeContext);
+            executorManager.afterExecute(context);
         }
     }
 
+    /**
+     * register init
+     * @throws Exception
+     */
     @Override
     public void afterPropertiesSet() throws Exception {
         register(ExecutorType.WORKER, nettyExecutorManager);
         register(ExecutorType.CLIENT, nettyExecutorManager);
     }
 
+    /**
+     *  register
+     * @param type executor type
+     * @param executorManager executorManager
+     */
     public void register(ExecutorType type, ExecutorManager executorManager){
         executorManagers.put(type, executorManager);
     }

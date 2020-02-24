@@ -16,7 +16,9 @@
  */
 package org.apache.dolphinscheduler.server.master.dispatch.enums;
 
-
+/**
+ *  executor type
+ */
 public enum ExecutorType {
 
     WORKER,
