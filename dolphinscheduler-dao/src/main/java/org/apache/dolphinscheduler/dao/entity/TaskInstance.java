@@ -154,20 +154,17 @@ public class TaskInstance {
 
     /**
      * duration
-     * @return
      */
     @TableField(exist = false)
     private Long duration;
 
     /**
      * max retry times
-     * @return
      */
     private int maxRetryTimes;
 
     /**
      * task retry interval, unit: minute
-     * @return
      */
     private int retryInterval;
 
@@ -184,7 +181,6 @@ public class TaskInstance {
 
     /**
      * dependent state
-     * @return
      */
     @TableField(exist = false)
     private String dependentResult;
@@ -192,7 +188,6 @@ public class TaskInstance {
 
     /**
      * worker group id
-     * @return
      */
     private int workerGroupId;
 
