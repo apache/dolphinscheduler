@@ -18,7 +18,8 @@
 echo "------ dolphinscheduler start - build -------"
 printenv
 
-if [[ "${DOCKER_REPO}x" = "x" ]]; then
+if [ "${DOCKER_REPO}x" = "x" ]
+then
     DOCKER_REPO='dolphinscheduler'
 fi
 
