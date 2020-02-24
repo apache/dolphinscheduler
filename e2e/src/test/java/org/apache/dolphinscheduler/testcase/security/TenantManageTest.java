@@ -29,6 +29,6 @@ public class TenantManageTest extends BaseTest {
         // enter tenant manage page
         tenantManagePage.jumpPage();
         //assert tenant manage page
-        assert tenantManagePage.creatTenant();
+        assert tenantManagePage.createTenant();
     }
 }

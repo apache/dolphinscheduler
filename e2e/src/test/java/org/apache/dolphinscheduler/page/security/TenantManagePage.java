@@ -45,11 +45,11 @@ public class TenantManagePage extends PageCommon {
     }
 
     /**
-     * creatTenant
+     * createTenant
      *
      * @return Whether to enter the specified page after creat tenant
      */
-    public boolean creatTenant() throws InterruptedException {
+    public boolean createTenant() throws InterruptedException {
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
         //create tenant

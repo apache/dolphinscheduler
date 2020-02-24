@@ -20,7 +20,7 @@ import org.openqa.selenium.By;
 
 public class UserManageLocator {
 
-    public static final By CLICK_USERMANAGE = By.xpath("//div[3]/div/a/div/a/span");
+    public static final By CLICK_USER_MANAGE = By.xpath("//div[3]/div/a/div/a/span");
 
     public static final By CLICK_CREATE_USER_BUTTON = By.xpath("//span[contains(.,'创建用户')]");
 

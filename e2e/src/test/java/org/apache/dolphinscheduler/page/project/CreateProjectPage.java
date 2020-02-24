@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.locator.project;
+package org.apache.dolphinscheduler.page.project;
 
-public class CreatProjectLocator {
+public class CreateProjectPage {
 }

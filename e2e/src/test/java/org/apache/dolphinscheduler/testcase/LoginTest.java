@@ -25,7 +25,7 @@ public class LoginTest extends BaseTest {
 
 
     @Test(description = "LoginTest", priority = 1)
-    public void testlogin() throws InterruptedException {
+    public void testLogin() throws InterruptedException {
         // init login page
         loginPage = new LoginPage(driver, redisUtil);
 

@@ -29,6 +29,6 @@ public class UserManageTest extends BaseTest {
         // enter user manage page
         userManagePage.jumpPage();
         //assert user manage page
-        assert userManagePage.creatUser();
+        assert userManagePage.createUser();
     }
 }
