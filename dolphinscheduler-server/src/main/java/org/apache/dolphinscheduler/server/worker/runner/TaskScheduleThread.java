@@ -344,15 +344,13 @@ public class TaskScheduleThread implements Runnable {
     private void checkDownloadPermission(List<ResourceInfo> projectRes) throws Exception {
 
         int userId = taskInstance.getProcessInstance().getExecutorId();
-        AuthorizationType type = AuthorizationType.RESOURCE_FILE_ID;
         if (projectRes.stream().allMatch(t->t.getId() == 0)) {
-            type = AuthorizationType.RESOURCE_FILE_NAME;
             String[] resNames = projectRes.stream().map(t -> t.getRes()).collect(Collectors.toList()).toArray(new String[projectRes.size()]);
             PermissionCheck<String> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_NAME,processDao,resNames,userId,logger);
             permissionCheck.checkPermission();
         }else{
             Integer[] resIds = projectRes.stream().map(t -> t.getId()).collect(Collectors.toList()).toArray(new Integer[projectRes.size()]);
-            PermissionCheck<String> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_ID,processDao,resIds,userId,logger);
+            PermissionCheck<Integer> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_ID,processDao,resIds,userId,logger);
             permissionCheck.checkPermission();
         }
     }
