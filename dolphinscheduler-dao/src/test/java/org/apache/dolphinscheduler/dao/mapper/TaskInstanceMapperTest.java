@@ -293,20 +293,4 @@ public class TaskInstanceMapperTest {
         Assert.assertNotEquals(taskInstanceIPage.getTotal(), 0);
 
     }
-
-    /**
-     * task instance sub process
-     */
-    @Test
-    public void testTaskInstanceIsSubProcess() {
-        TaskInstance taskInstance = new TaskInstance();
-
-        //sub process
-        taskInstance.setTaskType("sub process");
-        Assert.assertTrue(taskInstance.isSubProcess());
-
-        //not sub process
-        taskInstance.setTaskType("http");
-        Assert.assertFalse(taskInstance.isSubProcess());
-    }
 }
