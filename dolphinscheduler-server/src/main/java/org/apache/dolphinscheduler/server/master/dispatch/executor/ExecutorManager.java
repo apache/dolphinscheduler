@@ -20,12 +20,29 @@ package org.apache.dolphinscheduler.server.master.dispatch.executor;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 
-
+/**
+ *  executor manager
+ */
 public interface ExecutorManager {
 
+    /**
+     * before execute
+     * @param executeContext executeContext
+     * @throws ExecuteException
+     */
     void beforeExecute(ExecutionContext executeContext) throws ExecuteException;
 
-    void execute(ExecutionContext executeContext) throws ExecuteException;
+    /**
+     * execute task
+     * @param context context
+     * @throws ExecuteException
+     */
+    void execute(ExecutionContext context) throws ExecuteException;
 
-    void afterExecute(ExecutionContext executeContext) throws ExecuteException;
+    /**
+     * after execute
+     * @param context context
+     * @throws ExecuteException
+     */
+    void afterExecute(ExecutionContext context) throws ExecuteException;
 }
