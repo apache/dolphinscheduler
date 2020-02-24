@@ -39,9 +39,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Build Image
-        run: export VERSION=latest && sh ./dockerfile/hooks/build
+        run: |
+          export VERSION=`cat $(pwd)/pom.xml| grep "SNAPSHOT</version>" | awk -F "-SNAPSHOT" '{print $1}' | awk -F ">" '{print $2}'`
+          sh ./dockerfile/hooks/build
       - name: Docker Run
-        run: docker run -dit -e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test -p 8888:8888 dolphinscheduler all
+        run: |
+          VERSION=`cat $(pwd)/pom.xml| grep "SNAPSHOT</version>" | awk -F "-SNAPSHOT" '{print $1}' | awk -F ">" '{print $2}'`
+          docker run -dit -e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test -p 8888:8888 dolphinscheduler:$VERSION all
       - name: Check Server Status
         run: sh ./dockerfile/hooks/check
       - name: Run e2e Test
