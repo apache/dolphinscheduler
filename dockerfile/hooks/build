@@ -18,10 +18,6 @@
 echo "------ dolphinscheduler start - build -------"
 printenv
 
-if [[ "${VERSION}x" = "x" ]]; then
-    VERSION=`cat $(pwd)/pom.xml| grep "SNAPSHOT</version>" | awk -F "-SNAPSHOT" '{print $1}' | awk -F ">" '{print $2}'`
-fi
-
 if [[ "${DOCKER_REPO}x" = "x" ]]; then
     DOCKER_REPO='dolphinscheduler'
 fi
