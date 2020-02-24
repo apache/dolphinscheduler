@@ -20,7 +20,16 @@ package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 import java.util.Collection;
 
 
+/**
+ * selector
+ * @param <T> T
+ */
 public interface Selector<T> {
 
+    /**
+     * select
+     * @param source source
+     * @return T
+     */
     T select(Collection<T> source);
 }

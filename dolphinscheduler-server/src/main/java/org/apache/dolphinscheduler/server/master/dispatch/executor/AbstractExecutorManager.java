@@ -20,17 +20,26 @@ package org.apache.dolphinscheduler.server.master.dispatch.executor;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 
-
+/**
+ *  abstract executor manager
+ */
 public abstract class AbstractExecutorManager implements ExecutorManager{
 
+    /**
+     * before execute , add time monitor ， timeout
+     * @param context context
+     * @throws ExecuteException
+     */
     @Override
-    public void beforeExecute(ExecutionContext executeContext) throws ExecuteException {
-        //TODO add time monitor
+    public void beforeExecute(ExecutionContext context) throws ExecuteException {
     }
 
+    /**
+     * after execute , add dispatch monitor
+     * @param context context
+     * @throws ExecuteException
+     */
     @Override
-    public void afterExecute(ExecutionContext executeContext) throws ExecuteException {
-        //TODO add dispatch monitor
-
+    public void afterExecute(ExecutionContext context) throws ExecuteException {
     }
 }

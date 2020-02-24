@@ -42,47 +42,78 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-
+/**
+ *  netty executor manager
+ */
 @Service
 public class NettyExecutorManager extends AbstractExecutorManager{
 
     private final Logger logger = LoggerFactory.getLogger(NettyExecutorManager.class);
 
+    /**
+     * zookeeper node manager
+     */
     @Autowired
     private ZookeeperNodeManager zookeeperNodeManager;
 
+    /**
+     * netty remote client
+     */
     private final NettyRemotingClient nettyRemotingClient;
 
     public NettyExecutorManager(){
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+        /**
+         * register EXECUTE_TASK_RESPONSE command type TaskResponseProcessor
+         * register EXECUTE_TASK_ACK command type TaskAckProcessor
+         */
         this.nettyRemotingClient.registerProcessor(CommandType.EXECUTE_TASK_RESPONSE, new TaskResponseProcessor());
         this.nettyRemotingClient.registerProcessor(CommandType.EXECUTE_TASK_ACK, new TaskAckProcessor());
     }
 
+    /**
+     *  execute logic
+     * @param context context
+     * @throws ExecuteException
+     */
     @Override
-    public void execute(ExecutionContext executeContext) throws ExecuteException {
-        Set<String> allNodes = getAllNodes(executeContext);
+    public void execute(ExecutionContext context) throws ExecuteException {
+
+        /**
+         *  all nodes
+         */
+        Set<String> allNodes = getAllNodes(context);
+
+        /**
+         * fail nodes
+         */
         Set<String> failNodeSet = new HashSet<>();
-        //
-        Command command = buildCommand(executeContext);
-        Host host = executeContext.getHost();
+
+        /**
+         *  build command accord executeContext
+         */
+        Command command = buildCommand(context);
+
+        /**
+         * execute task host
+         */
+        Host host = context.getHost();
         boolean success = false;
-        //
         while (!success) {
             try {
-                doExecute(host, command);
+                doExecute(host,command);
                 success = true;
-                executeContext.setHost(host);
+                context.setHost(host);
             } catch (ExecuteException ex) {
-                logger.error(String.format("execute context : %s error", executeContext.getContext()), ex);
+                logger.error(String.format("execute context : %s error", context.getContext()), ex);
                 try {
                     failNodeSet.add(host.getAddress());
                     Set<String> tmpAllIps = new HashSet<>(allNodes);
                     Collection<String> remained = CollectionUtils.subtract(tmpAllIps, failNodeSet);
                     if (remained != null && remained.size() > 0) {
                         host = Host.of(remained.iterator().next());
-                        logger.error("retry execute context : {} host : {}", executeContext.getContext(), host);
+                        logger.error("retry execute context : {} host : {}", context.getContext(), host);
                     } else {
                         throw new ExecuteException("fail after try all nodes");
                     }
@@ -93,6 +124,11 @@ public class NettyExecutorManager extends AbstractExecutorManager{
         }
     }
 
+    /**
+     *  build command
+     * @param context context
+     * @return command
+     */
     private Command buildCommand(ExecutionContext context) {
         ExecuteTaskRequestCommand requestCommand = new ExecuteTaskRequestCommand();
         ExecutorType executorType = context.getExecutorType();
@@ -110,7 +146,16 @@ public class NettyExecutorManager extends AbstractExecutorManager{
         return requestCommand.convert2Command();
     }
 
+    /**
+     *  execute logic
+     * @param host host
+     * @param command command
+     * @throws ExecuteException
+     */
     private void doExecute(final Host host, final Command command) throws ExecuteException {
+        /**
+         * retry count，default retry 3
+         */
         int retryCount = 3;
         boolean success = false;
         do {
@@ -131,8 +176,16 @@ public class NettyExecutorManager extends AbstractExecutorManager{
         }
     }
 
+    /**
+     *  get all nodes
+     * @param context context
+     * @return nodes
+     */
     private Set<String> getAllNodes(ExecutionContext context){
         Set<String> nodes = Collections.EMPTY_SET;
+        /**
+         * executor type
+         */
         ExecutorType executorType = context.getExecutorType();
         switch (executorType){
             case WORKER:

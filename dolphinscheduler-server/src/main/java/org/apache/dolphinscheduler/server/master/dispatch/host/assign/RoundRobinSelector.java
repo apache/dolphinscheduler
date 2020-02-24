@@ -21,6 +21,10 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * round robin selector
+ * @param <T> T
+ */
 @Service
 public class RoundRobinSelector<T> implements Selector<T> {
 
@@ -32,11 +36,17 @@ public class RoundRobinSelector<T> implements Selector<T> {
             throw new IllegalArgumentException("Empty source.");
         }
 
+        /**
+         * if only one , return directly
+         */
         if (source.size() == 1) {
             return (T)source.toArray()[0];
         }
 
         int size = source.size();
+        /**
+         * round robin
+         */
         return (T) source.toArray()[index.getAndIncrement() % size];
     }
 }

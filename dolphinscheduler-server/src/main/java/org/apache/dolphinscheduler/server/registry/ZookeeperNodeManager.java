@@ -33,37 +33,80 @@ import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-
+/**
+ *  zookeeper node manager
+ */
 @Service
 public class ZookeeperNodeManager implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(ZookeeperNodeManager.class);
 
+    /**
+     *  master lock
+     */
     private final Lock masterLock = new ReentrantLock();
 
+    /**
+     *  worker lock
+     */
     private final Lock workerLock = new ReentrantLock();
 
+    /**
+     *  worker nodes
+     */
     private final Set<String> workerNodes = new HashSet<>();
 
+    /**
+     *  master nodes
+     */
     private final Set<String> masterNodes = new HashSet<>();
 
+    /**
+     * zookeeper registry center
+     */
     @Autowired
     private ZookeeperRegistryCenter registryCenter;
 
+    /**
+     *  init listener
+     * @throws Exception
+     */
     @Override
     public void afterPropertiesSet() throws Exception {
+        /**
+         *  load nodes from zookeeper
+         */
         load();
+        /**
+         * init MasterNodeListener listener
+         */
         registryCenter.getZookeeperCachedOperator().addListener(new MasterNodeListener());
+        /**
+         * init WorkerNodeListener listener
+         */
         registryCenter.getZookeeperCachedOperator().addListener(new WorkerNodeListener());
     }
 
+    /**
+     *  load nodes from zookeeper
+     */
     private void load(){
-        Set<String> schedulerNodes = registryCenter.getMasterNodesDirectly();
-        syncMasterNodes(schedulerNodes);
+        /**
+         * master nodes from zookeeper
+         */
+        Set<String> masterNodes = registryCenter.getMasterNodesDirectly();
+        syncMasterNodes(masterNodes);
+
+        /**
+         * worker nodes from zookeeper
+         */
         Set<String> workersNodes = registryCenter.getWorkerNodesDirectly();
         syncWorkerNodes(workersNodes);
     }
 
+    /**
+     *  worker node listener
+     */
     class WorkerNodeListener extends AbstractListener {
 
         @Override
@@ -91,6 +134,9 @@ public class ZookeeperNodeManager implements InitializingBean {
     }
 
 
+    /**
+     *  master node listener
+     */
     class MasterNodeListener extends AbstractListener {
 
         @Override
@@ -115,6 +161,10 @@ public class ZookeeperNodeManager implements InitializingBean {
         }
     }
 
+    /**
+     *  get master nodes
+     * @return master nodes
+     */
     public Set<String> getMasterNodes() {
         masterLock.lock();
         try {
@@ -124,6 +174,10 @@ public class ZookeeperNodeManager implements InitializingBean {
         }
     }
 
+    /**
+     *  sync master nodes
+     * @param nodes master nodes
+     */
     private void syncMasterNodes(Set<String> nodes){
         masterLock.lock();
         try {
@@ -134,6 +188,10 @@ public class ZookeeperNodeManager implements InitializingBean {
         }
     }
 
+    /**
+     *  sync worker nodes
+     * @param nodes worker nodes
+     */
     private void syncWorkerNodes(Set<String> nodes){
         workerLock.lock();
         try {
@@ -144,6 +202,10 @@ public class ZookeeperNodeManager implements InitializingBean {
         }
     }
 
+    /**
+     * get worker nodes
+     * @return worker nodes
+     */
     public Set<String> getWorkerNodes(){
         workerLock.lock();
         try {
@@ -153,6 +215,9 @@ public class ZookeeperNodeManager implements InitializingBean {
         }
     }
 
+    /**
+     *  close
+     */
     public void close(){
         registryCenter.close();
     }

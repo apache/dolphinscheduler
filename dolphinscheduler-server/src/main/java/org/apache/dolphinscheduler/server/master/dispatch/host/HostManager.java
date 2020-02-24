@@ -21,8 +21,16 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 
+/**
+ *  host manager
+ */
 public interface HostManager {
 
+    /**
+     *  select host
+     * @param context context
+     * @return host
+     */
     Host select(ExecutionContext context);
 
 }

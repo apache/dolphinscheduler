@@ -27,17 +27,32 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ *  zookeeper register center
+ */
 @Service
 public class ZookeeperRegistryCenter implements InitializingBean {
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
+    /**
+     * namespace
+     */
     public static final String NAMESPACE = "/dolphinscheduler";
 
+    /**
+     * nodes namespace
+     */
     public static final String NODES = NAMESPACE + "/nodes";
 
+    /**
+     * master path
+     */
     public static final String MASTER_PATH = NODES + "/master";
 
+    /**
+     * worker path
+     */
     public static final String WORKER_PATH = NODES + "/worker";
 
     public static final String EMPTY = "";
@@ -50,19 +65,26 @@ public class ZookeeperRegistryCenter implements InitializingBean {
         init();
     }
 
+    /**
+     * init node persist
+     */
     public void init() {
         if (isStarted.compareAndSet(false, true)) {
-            //TODO
-//            zookeeperCachedOperator.start(NODES);
             initNodes();
         }
     }
 
+    /**
+     * init nodes
+     */
     private void initNodes() {
         zookeeperCachedOperator.persist(MASTER_PATH, EMPTY);
         zookeeperCachedOperator.persist(WORKER_PATH, EMPTY);
     }
 
+    /**
+     * close
+     */
     public void close() {
         if (isStarted.compareAndSet(true, false)) {
             if (zookeeperCachedOperator != null) {
@@ -71,36 +93,71 @@ public class ZookeeperRegistryCenter implements InitializingBean {
         }
     }
 
+    /**
+     * get master path
+     * @return master path
+     */
     public String getMasterPath() {
         return MASTER_PATH;
     }
 
+    /**
+     * get worker path
+     * @return worker path
+     */
     public String getWorkerPath() {
         return WORKER_PATH;
     }
 
+    /**
+     *  get master nodes directly
+     * @return master nodes
+     */
     public Set<String> getMasterNodesDirectly() {
         List<String> masters = getChildrenKeys(MASTER_PATH);
         return new HashSet<>(masters);
     }
 
+    /**
+     *  get worker nodes directly
+     * @return master nodes
+     */
     public Set<String> getWorkerNodesDirectly() {
         List<String> workers = getChildrenKeys(WORKER_PATH);
         return new HashSet<>(workers);
     }
 
+    /**
+     * whether worker path
+     * @param path path
+     * @return result
+     */
     public boolean isWorkerPath(String path) {
         return path != null && path.contains(WORKER_PATH);
     }
 
+    /**
+     * whether master path
+     * @param path path
+     * @return result
+     */
     public boolean isMasterPath(String path) {
         return path != null && path.contains(MASTER_PATH);
     }
 
+    /**
+     * get children nodes
+     * @param key key
+     * @return children nodes
+     */
     public List<String> getChildrenKeys(final String key) {
         return zookeeperCachedOperator.getChildrenKeys(key);
     }
 
+    /**
+     * get zookeeperCachedOperator
+     * @return zookeeperCachedOperator
+     */
     public ZookeeperCachedOperator getZookeeperCachedOperator() {
         return zookeeperCachedOperator;
     }
