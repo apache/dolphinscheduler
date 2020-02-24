@@ -283,6 +283,10 @@ let tasksType = {
   'DATAX': {
     desc: 'DataX',
     color: '#1fc747'
+  },
+  'SQOOP': {
+    desc: 'SQOOP',
+    color: '#E46F13'
   }
 }
 
