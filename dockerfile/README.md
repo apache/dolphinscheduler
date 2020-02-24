@@ -12,7 +12,7 @@ Official Website: https://dolphinscheduler.apache.org
 
 #### You can start a dolphinscheduler instance
 ```
-$ docker run -d --name dolphinscheduler \ 
+$ docker run -dit --name dolphinscheduler \ 
 -e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test \
 -p 8888:8888 \
 dolphinscheduler all
