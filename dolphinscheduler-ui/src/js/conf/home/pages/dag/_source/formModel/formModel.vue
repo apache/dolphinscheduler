@@ -241,6 +241,13 @@
           ref="DATAX"
           :backfill-item="backfillItem">
         </m-datax>
+        <m-sqoop
+          v-if="taskType === 'SQOOP'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="SQOOP"
+          :backfill-item="backfillItem">
+        </m-sqoop>
         <m-conditions
           v-if="taskType === 'CONDITIONS'"
           ref="CONDITIONS"
@@ -274,6 +281,7 @@
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
   import mConditions from './tasks/CONDITIONS'
+  import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
@@ -611,7 +619,7 @@
           }else{
             this.workerGroupId = o.workerGroupId
           }
-          
+
         this.params = o.params || {}
         this.dependence = o.dependence || {}
         this.cacheDependence = o.dependence || {}
@@ -666,6 +674,7 @@
       mDependent,
       mHttp,
       mDatax,
+      mSqoop,
       mConditions,
       mSelectInput,
       mTimeoutAlarm,
