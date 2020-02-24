@@ -18,11 +18,22 @@
 echo "------ dolphinscheduler start - build -------"
 printenv
 
+if [[ "${VERSION}x" = "x" ]]; then
+    VERSION=`cat $(pwd)/pom.xml| grep "SNAPSHOT</version>" | awk -F "-SNAPSHOT" '{print $1}' | awk -F ">" '{print $2}'`
+fi
+
+if [[ "${DOCKER_REPO}x" = "x" ]]; then
+    DOCKER_REPO='dolphinscheduler'
+fi
+
+echo "Version: $VERSION"
+echo "Repo: $DOCKER_REPO"
+
 echo -e "Current Directory is $(pwd)\n"
 
 # maven package(Project Directory)
-echo -e "mvn clean compile package -Prelease"
-mvn clean compile package -Prelease
+echo -e "mvn -B clean compile package -Prelease -Dmaven.test.skip=true"
+mvn -B clean compile package -Prelease -Dmaven.test.skip=true
 
 # mv dolphinscheduler-bin.tar.gz file to dockerfile directory
 echo -e "mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-SNAPSHOT-dolphinscheduler-bin.tar.gz $(pwd)/dockerfile/\n"
