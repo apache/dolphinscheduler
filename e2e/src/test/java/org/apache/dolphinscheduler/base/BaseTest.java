@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.base;
 
 
+import org.apache.dolphinscheduler.page.LoginPage;
+import org.apache.dolphinscheduler.testcase.LoginTest;
 import org.apache.dolphinscheduler.util.PropertiesReader;
 import org.apache.dolphinscheduler.util.RedisUtil;
 import org.openqa.selenium.WebDriver;
@@ -28,7 +30,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Test base class
+ *  base test class
  */
 public class BaseTest {
     /**
@@ -96,9 +98,13 @@ public class BaseTest {
      * Executed before executing a class method in a test case
      */
     @BeforeClass(alwaysRun = true)
-    public void beforeClass() {
-        // login
+    public void setUp() throws IOException, InterruptedException {
+
+        LoginPage loginPage = new LoginPage(driver, redisUtil);
+        loginPage.jumpPage();
+        loginPage.login();
     }
+
 
     /**
      * Execute after executing a class method in a test case

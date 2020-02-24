@@ -14,17 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.locator;
+package org.apache.dolphinscheduler.testcase.security;
 
-import org.openqa.selenium.By;
+import org.apache.dolphinscheduler.base.BaseTest;
+import org.apache.dolphinscheduler.page.security.TenantManagePage;
+import org.testng.annotations.Test;
 
-/**
- * Page object: element positioning
- */
+public class TenantManageTest extends BaseTest {
+    private TenantManagePage tenantManagePage;
 
-public class LoginLocator {
-    public static final By LOGIN_INPUT_USER = By.xpath("//input[@class='input-element suffix']");
-    public static final By LOGIN_INPUT_PASSWORD = By.xpath("//input[@class='input-element suffix']");
-    public static final By LOGIN_BUTTON = By.xpath("//button");
-    public static final By LOGIN_BUTTON_MOVE = By.xpath("//button[contains(.,' Loading...')]");
+    @Test(description = "TenantTest", priority = 1)
+    public void testTenantManage() throws InterruptedException {
+        tenantManagePage = new TenantManagePage(driver, redisUtil);
+        // enter tenant manage page
+        tenantManagePage.jumpPage();
+        //assert tenant manage page
+        assert tenantManagePage.creatTenant();
+    }
 }

@@ -18,22 +18,20 @@ package org.apache.dolphinscheduler.testcase;
 
 import org.apache.dolphinscheduler.base.BaseTest;
 import org.apache.dolphinscheduler.page.LoginPage;
-import org.apache.dolphinscheduler.page.security.TenantPage;
 import org.testng.annotations.Test;
 
 public class LoginTest extends BaseTest {
     private LoginPage loginPage;
-    private TenantPage tenantPage;
 
 
     @Test(description = "LoginTest", priority = 1)
-    public void testlogin() {
+    public void testlogin() throws InterruptedException {
         // init login page
         loginPage = new LoginPage(driver, redisUtil);
 
         // enter login page
         loginPage.jumpPage();
-
+        
         //assert login page
         assert loginPage.login();
     }

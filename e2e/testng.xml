@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="testproj" parallel="false">
-    <test name="testDemo1">
+<suite name="dolphinscheduler_e2e" parallel="false">
+    <test name="dolphinscheduler_e2e">
         <packages>
             <package name="org.apache.dolphinscheduler.testcase"/>
+            <package name="org.apache.dolphinscheduler.testcase.security"/>
         </packages>
         <!--<classes>-->
         <!--<class name="org.apache.dolphinscheduler.testcase.*"></class>-->

@@ -14,17 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.locator;
-
-import org.openqa.selenium.By;
 
 /**
- * Page object: element positioning
+ * Tenant page object: data
  */
+package org.apache.dolphinscheduler.data.security;
 
-public class LoginLocator {
-    public static final By LOGIN_INPUT_USER = By.xpath("//input[@class='input-element suffix']");
-    public static final By LOGIN_INPUT_PASSWORD = By.xpath("//input[@class='input-element suffix']");
-    public static final By LOGIN_BUTTON = By.xpath("//button");
-    public static final By LOGIN_BUTTON_MOVE = By.xpath("//button[contains(.,' Loading...')]");
+import org.apache.dolphinscheduler.data.LoginData;
+
+public class TenantManageData {
+    /**
+     * Tenant URL
+     */
+    public static final String TENANAT_URL =  LoginData.URL + "/ui/#/security/tenant";
+
+    /**
+     * Tenant Code
+     */
+    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code2";
+
+    /**
+     * Tenant Name
+     */
+    public static final String TENANAT_NAME = "dolphinscheduler_tenant_Name";
+
+    /**
+     * Queue
+     */
+    public static final String QUEUE = "default";
+
+    /**
+     * Description
+     */
+    public static final String DESCRIPTION = "creat tenant test";
+
+    public static final String TENANAT_MANAGE = "租户管理 - DolphinScheduler";
+
+
+
 }

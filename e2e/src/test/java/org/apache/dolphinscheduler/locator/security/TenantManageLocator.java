@@ -14,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.locator;
+package org.apache.dolphinscheduler.locator.security;
 
 import org.openqa.selenium.By;
 
-/**
- * Page object: element positioning
- */
+public class TenantManageLocator{
+    public static final By CREATE_TENANT_BUTTON = By.xpath("//button[@class='ans-btn ans-btn-ghost ans-btn-small']");
 
-public class LoginLocator {
-    public static final By LOGIN_INPUT_USER = By.xpath("//input[@class='input-element suffix']");
-    public static final By LOGIN_INPUT_PASSWORD = By.xpath("//input[@class='input-element suffix']");
-    public static final By LOGIN_BUTTON = By.xpath("//button");
-    public static final By LOGIN_BUTTON_MOVE = By.xpath("//button[contains(.,' Loading...')]");
+    public static final By TENANT_INPUT_CODE = By.xpath("//div[2]/div/div/div[2]/div/input");
+
+    public static final By TENANT_INPUT_NAME = By.xpath("//div[2]/div[2]/div/input");
+
+    public static final By QUEUE = By.xpath("//textarea");
+
+    public static final By DESCRIPTION = By.xpath("//textarea");
+
+    public static final By SUBMIT_BUTTON = By.xpath("//div[3]/button[2]/span");
 }

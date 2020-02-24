@@ -14,24 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.page;
+package org.apache.dolphinscheduler.page.security;
 
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.LoginData;
+import org.apache.dolphinscheduler.data.security.TenantManageData;
 import org.apache.dolphinscheduler.locator.LoginLocator;
+import org.apache.dolphinscheduler.locator.security.TenantManageLocator;
 import org.apache.dolphinscheduler.util.RedisUtil;
 import org.openqa.selenium.WebDriver;
 
-
-
-public class LoginPage extends PageCommon {
+public class TenantManagePage extends PageCommon {
     /**
      * Unique constructor
      * @param driver driver
      * @param redisUtil redisUtil
      */
-    public LoginPage(WebDriver driver, RedisUtil redisUtil) {
+    public TenantManagePage(WebDriver driver, RedisUtil redisUtil) {
         super(driver, redisUtil);
     }
 
@@ -40,27 +40,31 @@ public class LoginPage extends PageCommon {
      * jump page
      */
     public void jumpPage() {
-        System.out.println("jump login page");
-        super.jumpPage(LoginData.URL);
+        System.out.println("jump tenant page");
+        super.jumpPage(TenantManageData.TENANAT_URL);
     }
 
     /**
-     * login
+     * creatTenant
      *
-     * @return Whether to enter the specified page after searching
+     * @return Whether to enter the specified page after creat tenant
      */
-    public boolean login() throws InterruptedException {
-        System.out.println("LoginPage");
-        // login data
-        sendInput(LoginLocator.LOGIN_INPUT_USER, LoginData.USER);
-        sendInput(LoginLocator.LOGIN_INPUT_PASSWORD, LoginData.PASSWORD);
+    public boolean creatTenant() throws InterruptedException {
+        Thread.sleep(TestConstant.ONE_THOUSANG);
 
-        // click login button
-        clickButton(LoginLocator.LOGIN_BUTTON);
+        //create tenant
+        clickButton(TenantManageLocator.CREATE_TENANT_BUTTON);
 
-        moveToElement(LoginLocator.LOGIN_BUTTON_MOVE);
+        // tenant data
+        sendInput(TenantManageLocator.TENANT_INPUT_CODE, TenantManageData.TENANAT_CODE);
+        sendInput(TenantManageLocator.TENANT_INPUT_NAME, TenantManageData.TENANAT_NAME);
+        sendInput(TenantManageLocator.QUEUE, TenantManageData.QUEUE);
+        sendInput(TenantManageLocator.DESCRIPTION, TenantManageData.DESCRIPTION);
 
-        // Whether to enter the specified page after login
-        return ifTitleContains(LoginData.TENANT);
+        // click  button
+        clickButton(TenantManageLocator.SUBMIT_BUTTON);
+
+        // Whether to enter the specified page after submit
+        return ifTitleContains(TenantManageData.TENANAT_MANAGE);
     }
 }

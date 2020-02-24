@@ -18,6 +18,13 @@ package org.apache.dolphinscheduler.constant;
 
 public class TestConstant {
     /**
+     * 1000
+     */
+    public static final int ONE_THOUSANG = 1000;
+
+
+
+    /**
      * 3000
      */
     public static final int THREE_THOUSANG = 3000;

@@ -119,7 +119,7 @@ public class BrowserCommon {
     }
 
     /**
-     * Click element
+     * Click button element
      * @param locator By
      * @return clickButton
      */
@@ -127,9 +127,20 @@ public class BrowserCommon {
         WebElement buttonElement = locateElement(locator);
         wait.until(ExpectedConditions.elementToBeClickable(locator));
         ExpectedConditions.elementToBeClickable(locator);
-
         buttonElement.click();
         return buttonElement;
+    }
+
+    /**
+     * Click element
+     *
+     * @param locator By
+     * @return inputElement
+     */
+    public WebElement clickElement(By locator) {
+        WebElement clickElement = locateElement(locator);
+        clickElement.click();
+        return clickElement;
     }
 
     /**

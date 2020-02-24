@@ -24,17 +24,17 @@ public class LoginData {
     /**
      * Login URL
      */
-    public static final String url = "http://192.168.220.189:12345/dolphinscheduler";
+    public static final String URL = "http://192.168.220.189:12345/dolphinscheduler";
 
     /**
      * user
      */
-    public static final String user = "admin";
+    public static final String USER = "admin";
 
     /**
      * password
      */
-    public static final String password = "123456";
+    public static final String PASSWORD = "123456";
 
-    public static final String tenant = "租户管理 - DolphinScheduler";
+    public static final String TENANT = "租户管理 - DolphinScheduler";
 }

@@ -112,7 +112,7 @@ public class BaseDriver {
      */
     public void closeBrowser() throws InterruptedException {
         // JS Show a pop-up box to indicate the end of the test
-        Thread.sleep(TestConstant.THREE_THOUSANG);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
         ((JavascriptExecutor) driver).executeScript("alert('Test completed, browser closes after 3s')");
         Thread.sleep(TestConstant.THREE_THOUSANG);
         if (driver != null) {
