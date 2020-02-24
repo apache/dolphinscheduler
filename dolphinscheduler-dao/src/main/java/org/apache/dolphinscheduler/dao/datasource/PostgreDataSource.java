@@ -35,7 +35,7 @@ public class PostgreDataSource extends BaseDataSource {
 
   /**
    * gets the JDBC url for the data source connection
-   * @return
+   * @return jdbc url
    */
   @Override
   public String getJdbcUrl() {

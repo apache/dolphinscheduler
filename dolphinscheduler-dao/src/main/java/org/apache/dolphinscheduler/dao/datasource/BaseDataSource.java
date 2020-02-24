@@ -57,6 +57,7 @@ public abstract class BaseDataSource {
   public void setPrincipal(String principal) {
     this.principal = principal;
   }
+
   /**
    * test whether the data source can be connected successfully
    * @throws Exception
