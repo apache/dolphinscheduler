@@ -204,6 +204,13 @@
           ref="DATAX"
           :backfill-item="backfillItem">
         </m-datax>
+        <m-sqoop
+          v-if="taskType === 'SQOOP'"
+          @on-params="_onParams"
+          @on-cache-params="_onCacheParams"
+          ref="SQOOP"
+          :backfill-item="backfillItem">
+        </m-sqoop>
       </div>
     </div>
     <div class="bottom-box">
@@ -229,6 +236,7 @@
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
+  import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
   import mTimeoutAlarm from './_source/timeoutAlarm'
@@ -589,6 +597,7 @@
       mDependent,
       mHttp,
       mDatax,
+      mSqoop,
       mSelectInput,
       mTimeoutAlarm,
       mPriority,

@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.task.python.PythonParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
+import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,8 @@ public class TaskParametersUtils {
           return JSONUtils.parseObject(parameter, HttpParameters.class);
         case DATAX:
           return JSONUtils.parseObject(parameter, DataxParameters.class);
+        case SQOOP:
+          return JSONUtils.parseObject(parameter, SqoopParameters.class);
         default:
           return null;
       }

@@ -685,6 +685,7 @@
                         <include>**/common/threadutils/*.java</include>
                         <include>**/common/graph/*.java</include>
                         <include>**/common/queue/*.java</include>
+                        <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/FileUtilsTest.java</include>
                         <include>**/api/utils/FourLetterWordTest.java</include>
@@ -727,6 +728,7 @@
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
