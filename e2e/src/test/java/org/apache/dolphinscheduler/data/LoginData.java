@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.data;
 
+import org.apache.dolphinscheduler.util.PropertiesReader;
+
 /**
  * Landing page object: data
  */
@@ -24,17 +26,18 @@ public class LoginData {
     /**
      * Login URL
      */
-    public static final String URL = "http://192.168.220.189:12345/dolphinscheduler";
+    public static final String URL = PropertiesReader.getKey("LOGIN_URL");
+
 
     /**
-     * user
+     * Login username
      */
-    public static final String USER = "admin";
+    public static final String USER = PropertiesReader.getKey("USER_NAME");
 
     /**
-     * password
+     * Login password
      */
-    public static final String PASSWORD = "123456";
+    public static final String PASSWORD = PropertiesReader.getKey("PASSWORD");
 
     public static final String TENANT = "租户管理 - DolphinScheduler";
 }
