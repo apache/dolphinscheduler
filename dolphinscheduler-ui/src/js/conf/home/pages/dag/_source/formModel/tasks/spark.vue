@@ -179,6 +179,14 @@
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
+        <treeselect v-model="resourceList" :multiple="true" :options="mainJarList" :normalizer="normalizer">
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+        </treeselect>
+      </div>
+    </m-list-box>
+    <!-- <m-list-box>
+      <div slot="text">{{$t('Resources')}}</div>
+      <div slot="content">
         <m-resources
                 ref="refResources"
                 @on-resourcesData="_onResourcesData"
@@ -186,7 +194,7 @@
                 :resource-list="resourceList">
         </m-resources>
       </div>
-    </m-list-box>
+    </m-list-box> -->
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
@@ -206,6 +214,7 @@
   import mLocalParams from './_source/localParams'
   import mListBox from './_source/listBox'
   import mResources from './_source/resources'
+  import Treeselect from '@riophae/vue-treeselect'
   import disabledState from '@/module/mixin/disabledState'
 
   export default {
@@ -247,7 +256,12 @@
         // Spark version
         sparkVersion: 'SPARK2',
         // Spark version(LIst)
-        sparkVersionList: [{ code: 'SPARK2' }, { code: 'SPARK1' }]
+        sparkVersionList: [{ code: 'SPARK2' }, { code: 'SPARK1' }],
+        normalizer(node) {
+          return {
+            label: node.name
+          }
+        }
       }
     },
     props: {
@@ -330,6 +344,12 @@
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
         }
+        // Process resourcelist
+        let dataProcessing= _.map(this.resourceList, v => {
+          return {
+            id: v
+          }
+        })
 
         // storage
         this.$emit('on-params', {
@@ -338,7 +358,7 @@
             res: this.mainJar
           },
           deployMode: this.deployMode,
-          resourceList: this.resourceList,
+          resourceList: dataProcessing,
           localParams: this.localParams,
           driverCores: this.driverCores,
           driverMemory: this.driverMemory,
@@ -351,24 +371,6 @@
           sparkVersion: this.sparkVersion
         })
         return true
-      },
-      /**
-       * get resources list
-       */
-      _getResourcesList () {
-        return new Promise((resolve, reject) => {
-          let isJar = (alias) => {
-            return alias.substring(alias.lastIndexOf('.') + 1, alias.length) !== 'jar'
-          }
-          this.mainJarList = _.map(_.cloneDeep(this.store.state.dag.resourcesListS), v => {
-            return {
-              id: v.id,
-              code: v.alias,
-              disabled: isJar(v.alias)
-            }
-          })
-          resolve()
-        })
       }
     },
     watch: {
@@ -406,7 +408,7 @@
       }
     },
     created () {
-      this._getResourcesList().then(() => {
+        this.mainJarList = this.store.state.dag.resourcesListS
         let o = this.backfillItem
 
         // Non-null objects represent backfill
@@ -427,7 +429,9 @@
           // backfill resourceList
           let resourceList = o.params.resourceList || []
           if (resourceList.length) {
-            this.resourceList = resourceList
+            this.resourceList = _.map(resourceList, v => {
+            return v.id
+          })
             this.cacheResourceList = resourceList
           }
 
@@ -437,12 +441,11 @@
             this.localParams = localParams
           }
         }
-      })
     },
     mounted () {
 
     },
-    components: { mLocalParams, mListBox, mResources }
+    components: { mLocalParams, mListBox, mResources, Treeselect }
   }
 </script>
 

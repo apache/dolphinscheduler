@@ -89,8 +89,6 @@
         resourceList: [],
         // Cache ResourceList
         cacheResourceList: [],
-        // define default value
-        value: null,
         // define options
         options: [],
         normalizer(node) {
@@ -172,10 +170,10 @@
         }
         // Process resourcelist
         let dataProcessing= _.map(this.resourceList, v => {
-            return {
-              id: v
-            }
-          })
+          return {
+            id: v
+          }
+        })
         // storage
         this.$emit('on-params', {
           resourceList: dataProcessing,
