@@ -24,10 +24,19 @@ import java.util.Objects;
  */
 public class Host implements Serializable {
 
+    /**
+     * address
+     */
     private String address;
 
+    /**
+     * ip
+     */
     private String ip;
 
+    /**
+     * port
+     */
     private int port;
 
     public Host() {
@@ -65,6 +74,11 @@ public class Host implements Serializable {
         this.address = ip + ":" + port;
     }
 
+    /**
+     * address convert host
+     * @param address address
+     * @return host
+     */
     public static Host of(String address){
         String[] parts = address.split(":");
         if (parts.length != 2) {
@@ -75,16 +89,13 @@ public class Host implements Serializable {
     }
 
     @Override
-    public String toString() {
-        return "Host{" +
-                "address='" + address + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Host host = (Host) o;
         return Objects.equals(getAddress(), host.getAddress());
     }
@@ -92,5 +103,12 @@ public class Host implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(getAddress());
+    }
+
+    @Override
+    public String toString() {
+        return "Host{" +
+                "address='" + address + '\'' +
+                '}';
     }
 }
