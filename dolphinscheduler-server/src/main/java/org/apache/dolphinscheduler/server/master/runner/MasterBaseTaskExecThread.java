@@ -20,22 +20,10 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.utils.BeanContext;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
 import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.future.InvokeCallback;
-import org.apache.dolphinscheduler.remote.future.ResponseFuture;
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
@@ -48,7 +36,6 @@ import org.apache.dolphinscheduler.service.queue.ITaskQueue;
 import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.concurrent.Callable;
 
@@ -138,14 +125,16 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * dispatch task to worker
      * @param taskInstance
      */
-    public void dispatch(TaskInstance taskInstance){
+    private Boolean dispatch(TaskInstance taskInstance){
         TaskExecutionContext context = getTaskExecutionContext(taskInstance);
         ExecutionContext executionContext = new ExecutionContext(context, ExecutorType.WORKER);
         try {
-            dispatcher.dispatch(executionContext);
+            return dispatcher.dispatch(executionContext);
         } catch (ExecuteException e) {
             logger.error("execute exception", e);
+            return false;
         }
+
     }
 
     /**
@@ -234,8 +223,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                 }
                 if(submitDB && !submitQueue){
                     // submit task to queue
-                    dispatch(task);
-                    submitQueue = true;
+                    submitQueue = dispatch(task);
                 }
                 if(submitDB && submitQueue){
                     return task;
