@@ -67,7 +67,8 @@ public class BaseDriver {
     public BaseDriver() throws IOException {
         /* driver test class path */
         chromeDriverPath = PropertiesReader.getKey("driver.chromeDriver");
-        /* wait timeout */
+
+        /* wait time */
         implicitlyWait = Long.valueOf(PropertiesReader.getKey("driver.timeouts.implicitlyWait"));
         pageLoadTimeout = Long.valueOf(PropertiesReader.getKey("driver.timeouts.pageLoadTimeout"));
         setScriptTimeout = Long.valueOf(PropertiesReader.getKey("driver.timeouts.setScriptTimeout"));
@@ -78,17 +79,27 @@ public class BaseDriver {
      * start chrome browser
      */
     public void startBrowser() throws Exception {
+        // set chrome driver
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-
         driver = new ChromeDriver();
-        driver.manage().window().maximize();
+
+        /* driver setting wait time */
+        // implicitly wait time
         driver.manage().timeouts().implicitlyWait(implicitlyWait, TimeUnit.SECONDS);
+        // page load timeout
         driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
+        // script timeout
         driver.manage().timeouts().setScriptTimeout(setScriptTimeout, TimeUnit.SECONDS);
+
+        // window maximize
+        driver.manage().window().maximize();
+
+        // set threadLocal
+        threadLocal.set(driver);
     }
 
     /**
-     * get webdriver
+     * get webDriver
      *
      * @return driver
      */
@@ -97,7 +108,7 @@ public class BaseDriver {
     }
 
     /**
-     * set webdriver
+     * set webDriver
      *
      * @param driver driver
      */

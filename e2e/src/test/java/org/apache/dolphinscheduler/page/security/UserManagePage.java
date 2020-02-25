@@ -18,16 +18,13 @@ package org.apache.dolphinscheduler.page.security;
 
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
-import org.apache.dolphinscheduler.data.LoginData;
 import org.apache.dolphinscheduler.data.security.UserManageData;
-import org.apache.dolphinscheduler.locator.LoginLocator;
 import org.apache.dolphinscheduler.locator.security.UserManageLocator;
-import org.apache.dolphinscheduler.util.RedisUtil;
 import org.openqa.selenium.WebDriver;
 
 public class UserManagePage extends PageCommon {
-    public UserManagePage(WebDriver driver, RedisUtil redisUtil) {
-        super(driver, redisUtil);
+    public UserManagePage(WebDriver driver) {
+        super(driver);
     }
     /**
      * jump page
@@ -44,13 +41,11 @@ public class UserManagePage extends PageCommon {
      */
     public boolean createUser() throws InterruptedException {
         Thread.sleep(TestConstant.ONE_THOUSANG);
-
-        //click  user manage
+        // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
-
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
-        //click  create user button
+        // click  create user button
         clickButton(UserManageLocator.CLICK_CREATE_USER_BUTTON);
 
         // input user data

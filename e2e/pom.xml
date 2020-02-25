@@ -19,10 +19,9 @@
         <guava.version>22.0</guava.version>
         <commons-io.version>2.6</commons-io.version>
         <reportng.version>1.1.4</reportng.version>
-        <jedis.version>3.2.0</jedis.version>
         <commons-pool2.version>2.8.0</commons-pool2.version>
-        <!--<inject.version>4.2.1</inject.version>-->
-
+        <inject.version>4.2.1</inject.version>
+        <xml.file>testng.xml</xml.file>
     </properties>
 
     <dependencies>
@@ -31,17 +30,19 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
+
+
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.google.inject</groupId>-->
-            <!--<artifactId>guice</artifactId>-->
-            <!--<version>${inject.version}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${inject.version}</version>
+        </dependency>
         <!-- testng -->
         <dependency>
             <groupId>org.testng</groupId>
@@ -66,23 +67,17 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
-            <scope>test</scope>
         </dependency>
 
-        <!--<dependency>-->
-            <!--<groupId>org.apache.servicemix.bundles</groupId>-->
-            <!--<artifactId>org.apache.servicemix.bundles.jedis</artifactId>-->
-            <!--<version>2.6.0_2-SNAPSHOT</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.jedis</artifactId>
+            <version>2.6.0_2-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
             <version>${commons-pool2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>${jedis.version}</version>
         </dependency>
     </dependencies>
 
@@ -90,9 +85,24 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.5</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
                 <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.20.1</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>${xml.file}</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
                     <properties>
                         <property>
                             <name>usedefaultlisteners</name>
@@ -104,10 +114,32 @@
                             <value>org.uncommons.reportng.HTMLReporter,org.uncommons.reportng.JUnitXMLReporter</value>
                         </property>
                     </properties>
-                    <workingDirectory>target/</workingDirectory>
-                    <forkMode>always</forkMode>
+                    <!--<workingDirectory>target/</workingDirectory>-->
+                    <!--<forkMode>always</forkMode>-->
                 </configuration>
             </plugin>
+
+
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-surefire-plugin</artifactId>-->
+                <!--<version>2.5</version>-->
+                <!--<configuration>-->
+                    <!--<properties>-->
+                        <!--<property>-->
+                            <!--<name>usedefaultlisteners</name>-->
+                            <!--&lt;!&ndash;Set listen false, Do not use the default report testng, use reportng&ndash;&gt;-->
+                            <!--<value>false</value>-->
+                        <!--</property>-->
+                        <!--<property>-->
+                            <!--<name>listener</name>-->
+                            <!--<value>org.uncommons.reportng.HTMLReporter,org.uncommons.reportng.JUnitXMLReporter</value>-->
+                        <!--</property>-->
+                    <!--</properties>-->
+                    <!--<workingDirectory>target/</workingDirectory>-->
+                    <!--<forkMode>always</forkMode>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
         </plugins>
     </build>
 </project>

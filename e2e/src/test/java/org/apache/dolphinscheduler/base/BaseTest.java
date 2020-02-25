@@ -18,13 +18,9 @@ package org.apache.dolphinscheduler.base;
 
 
 import org.apache.dolphinscheduler.page.LoginPage;
-import org.apache.dolphinscheduler.testcase.LoginTest;
 import org.apache.dolphinscheduler.util.PropertiesReader;
-import org.apache.dolphinscheduler.util.RedisUtil;
 import org.openqa.selenium.WebDriver;
 import org.testng.annotations.*;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
 import java.io.IOException;
 import java.util.Properties;
@@ -38,20 +34,6 @@ public class BaseTest {
      */
     private static Properties properties;
 
-    /**
-     * redis
-     */
-    private static JedisPool jedisPool;
-
-    /**
-     * redis util
-     */
-    public RedisUtil redisUtil;
-
-    /**
-     * jedis
-     */
-    public Jedis jedis;
 
     /**
      * baseDriver
@@ -75,8 +57,6 @@ public class BaseTest {
     public void beforeSuite(@Optional("src/test/resources/config/config.properties") String propertiesPath) throws IOException {
         // read properties
         properties = PropertiesReader.readProperties(propertiesPath);
-        // redis init
-        jedisPool = RedisUtil.getJedisPool();
     }
 
     /**
@@ -84,10 +64,6 @@ public class BaseTest {
      */
     @BeforeTest(alwaysRun = true)
     public void beforeTest() throws Exception {
-        redisUtil = new RedisUtil();
-        // set jedis expire time
-        redisUtil.setJedisAndExpire(redisUtil.getNewJedis());
-        jedis = redisUtil.getJedis();
         //base driver
         baseDriver = new BaseDriver();
         baseDriver.startBrowser();
@@ -99,8 +75,7 @@ public class BaseTest {
      */
     @BeforeClass(alwaysRun = true)
     public void setUp() throws IOException, InterruptedException {
-
-        LoginPage loginPage = new LoginPage(driver, redisUtil);
+        LoginPage loginPage = new LoginPage(driver);
         loginPage.jumpPage();
         loginPage.login();
     }
@@ -116,13 +91,11 @@ public class BaseTest {
 
     /**
      * Execute after executing a testcase
-//     */
+    */
     @AfterTest(alwaysRun = true)
     public void afterTest() throws InterruptedException {
         // close browser
         baseDriver.closeBrowser();
-        // redis Connection recycling
-        redisUtil.returnJedis();
     }
 
     /**

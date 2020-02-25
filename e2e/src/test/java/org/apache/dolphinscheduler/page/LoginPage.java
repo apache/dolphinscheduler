@@ -29,10 +29,9 @@ public class LoginPage extends PageCommon {
     /**
      * Unique constructor
      * @param driver driver
-     * @param redisUtil redisUtil
      */
-    public LoginPage(WebDriver driver, RedisUtil redisUtil) {
-        super(driver, redisUtil);
+    public LoginPage(WebDriver driver) {
+        super(driver);
     }
 
 

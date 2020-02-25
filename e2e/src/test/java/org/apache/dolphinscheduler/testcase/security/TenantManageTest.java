@@ -25,7 +25,7 @@ public class TenantManageTest extends BaseTest {
 
     @Test(description = "TenantTest", priority = 1)
     public void testTenantManage() throws InterruptedException {
-        tenantManagePage = new TenantManagePage(driver, redisUtil);
+        tenantManagePage = new TenantManagePage(driver);
         // enter tenant manage page
         tenantManagePage.jumpPage();
         //assert tenant manage page

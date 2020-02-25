@@ -16,5 +16,21 @@
  */
 package org.apache.dolphinscheduler.testcase.project;
 
-public class CreateProjectTest {
+import org.apache.dolphinscheduler.base.BaseTest;
+import org.apache.dolphinscheduler.page.project.CreateProjectPage;
+import org.testng.annotations.Test;
+
+public class CreateProjectTest  extends BaseTest {
+    private CreateProjectPage createProjectPage;
+
+    @Test(description = "TenantTest", priority = 1)
+    public void testUserManage() throws InterruptedException {
+        createProjectPage = new CreateProjectPage(driver);
+        // enter user manage page
+        createProjectPage.jumpPage();
+        //assert user manage page
+        assert createProjectPage.createProject();
+    }
+
 }
+

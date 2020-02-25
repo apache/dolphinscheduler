@@ -102,8 +102,8 @@ public class BrowserCommon {
         // show wait timeout
         long timeout = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDriverWait"));
         wait = new WebDriverWait(driver, timeout);
-        this.redisUtil = redisUtil;
-        this.jedis = redisUtil.getJedis();
+//        this.redisUtil = redisUtil;
+//        this.jedis = redisUtil.getJedis();
     }
 
 

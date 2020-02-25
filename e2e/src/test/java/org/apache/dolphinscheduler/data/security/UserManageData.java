@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.data.LoginData;
 public class UserManageData  {
     public static final String USER_URL = LoginData.URL + "/ui/#/security/users";
 
-    public static final String USERNAME = "selenium1";
+    public static final String USERNAME = "selenium111";
 
     public static final String PASSWORD = "123456qwe";
 

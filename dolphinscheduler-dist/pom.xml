@@ -41,10 +41,6 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>e2e</artifactId>
-        </dependency>
     </dependencies>
 
     <profiles>
@@ -99,26 +95,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.5</version>
-                        <configuration>
-                            <properties>
-                                <property>
-                                    <name>usedefaultlisteners</name>
-                                    <!--Set listen false, Do not use the default report testng, use reportng-->
-                                    <value>false</value>
-                                </property>
-                                <property>
-                                    <name>listener</name>
-                                    <value>org.uncommons.reportng.HTMLReporter,org.uncommons.reportng.JUnitXMLReporter</value>
-                                </property>
-                            </properties>
-                            <workingDirectory>target/</workingDirectory>
-                            <forkMode>always</forkMode>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>

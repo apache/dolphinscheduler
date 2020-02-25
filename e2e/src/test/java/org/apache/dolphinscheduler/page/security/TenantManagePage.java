@@ -29,10 +29,9 @@ public class TenantManagePage extends PageCommon {
     /**
      * Unique constructor
      * @param driver driver
-     * @param redisUtil redisUtil
      */
-    public TenantManagePage(WebDriver driver, RedisUtil redisUtil) {
-        super(driver, redisUtil);
+    public TenantManagePage(WebDriver driver) {
+        super(driver);
     }
 
 

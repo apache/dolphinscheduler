@@ -30,7 +30,6 @@ public class UserManageLocator {
 
     public static final By CLICK_TENANT = By.xpath("//div[3]/div[2]/div/div/div/input");
 
-
     public static final By SELECT_TENANT = By.xpath("//div[3]/div[2]/div/div[2]/div/div/div/ul/li/span");
 
     public static final By CLICK_QUEUE = By.xpath("//div[4]/div[2]/div/div/div/input");

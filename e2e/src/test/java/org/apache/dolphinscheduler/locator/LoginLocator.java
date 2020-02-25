@@ -24,7 +24,10 @@ import org.openqa.selenium.By;
 
 public class LoginLocator {
     public static final By LOGIN_INPUT_USER = By.xpath("//input[@class='input-element suffix']");
+
     public static final By LOGIN_INPUT_PASSWORD = By.xpath("//input[@class='input-element suffix']");
+
     public static final By LOGIN_BUTTON = By.xpath("//button");
+
     public static final By LOGIN_BUTTON_MOVE = By.xpath("//button[contains(.,' Loading...')]");
 }

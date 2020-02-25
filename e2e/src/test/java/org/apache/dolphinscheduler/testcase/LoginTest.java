@@ -20,18 +20,17 @@ import org.apache.dolphinscheduler.base.BaseTest;
 import org.apache.dolphinscheduler.page.LoginPage;
 import org.testng.annotations.Test;
 
+
 public class LoginTest extends BaseTest {
     private LoginPage loginPage;
-
-
     @Test(description = "LoginTest", priority = 1)
     public void testLogin() throws InterruptedException {
         // init login page
-        loginPage = new LoginPage(driver, redisUtil);
+        loginPage = new LoginPage(driver);
 
         // enter login page
         loginPage.jumpPage();
-        
+
         //assert login page
         assert loginPage.login();
     }

@@ -16,5 +16,43 @@
  */
 package org.apache.dolphinscheduler.page.project;
 
-public class CreateProjectPage {
+import org.apache.dolphinscheduler.common.PageCommon;
+import org.apache.dolphinscheduler.constant.TestConstant;
+import org.apache.dolphinscheduler.data.project.CreatProjectData;
+import org.apache.dolphinscheduler.locator.project.CreateProjectLocator;
+import org.openqa.selenium.WebDriver;
+
+public class CreateProjectPage extends PageCommon {
+    public CreateProjectPage(WebDriver driver) {
+        super(driver);
+    }
+    /**
+     * jump page
+     */
+    public void jumpPage() throws InterruptedException {
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+        clickElement(CreateProjectLocator.PROJECT_MANAGE);
+    }
+
+    /**
+     * creatTenant
+     *
+     * @return Whether to enter the specified page after creat tenant
+     */
+    public boolean createProject() throws InterruptedException {
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+        //click  create project
+        clickElement(CreateProjectLocator.CREATE_PROJECT_BUTTON);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+
+        // input create project data
+        sendInput(CreateProjectLocator.PROJECT_NAME, CreatProjectData.PROJECT_NAME);
+        sendInput(CreateProjectLocator.PROJECT_DESCRIPTION, CreatProjectData.DESCRIPTION);
+
+        // click submit  button
+        clickButton(CreateProjectLocator.SUBMIT_BUTTON);
+
+        // Whether to enter the specified page after submit
+        return ifTitleContains(CreatProjectData.PROJECT_TITLE);
+    }
 }
