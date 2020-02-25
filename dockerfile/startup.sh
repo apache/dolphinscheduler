@@ -187,4 +187,6 @@ case "$1" in
     ;;
 esac
 
+echo "tee begin"
 exec tee ${LOGFILE}
+

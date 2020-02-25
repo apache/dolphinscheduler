@@ -486,6 +486,7 @@
         }
 
         this.taskId = id
+        type = type || self.dagBarId
 
         eventModel = this.$drawer({
           closable: false,
@@ -522,7 +523,7 @@
             },
             props: {
               id: id,
-              taskType: type || self.dagBarId,
+              taskType: type,
               self: self
             }
           })

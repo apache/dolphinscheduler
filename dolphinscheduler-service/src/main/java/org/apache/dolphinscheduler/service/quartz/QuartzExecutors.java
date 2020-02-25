@@ -223,7 +223,7 @@ public class QuartzExecutors {
       }
 
     } catch (SchedulerException e) {
-      logger.error(String.format("delete job : %s failed",jobName), e);
+      logger.error("delete job : {} failed",jobName, e);
     } finally {
       lock.writeLock().unlock();
     }
@@ -247,7 +247,7 @@ public class QuartzExecutors {
 
       return scheduler.deleteJobs(jobKeys);
     } catch (SchedulerException e) {
-      logger.error(String.format("delete all jobs in job group: %s failed",jobGroupName), e);
+      logger.error("delete all jobs in job group: {} failed",jobGroupName, e);
     } finally {
       lock.writeLock().unlock();
     }
