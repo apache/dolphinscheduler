@@ -17,32 +17,41 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.sift.SiftingAppender;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
 import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.runner.TaskScheduleThread;
+import org.apache.dolphinscheduler.server.worker.runner.TaskExecuteThread;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 
 /**
  *  worker request processor
  */
-public class WorkerRequestProcessor implements NettyRequestProcessor {
+public class TaskExecuteProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(WorkerRequestProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
 
     /**
      * process service
@@ -64,7 +73,7 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
      */
     private final TaskCallbackService taskCallbackService;
 
-    public WorkerRequestProcessor(ProcessService processService){
+    public TaskExecuteProcessor(ProcessService processService){
         this.processService = processService;
         this.taskCallbackService = new TaskCallbackService();
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
@@ -92,14 +101,62 @@ public class WorkerRequestProcessor implements NettyRequestProcessor {
         } catch (Exception ex){
             logger.error(String.format("create execLocalPath : %s", execLocalPath), ex);
         }
-        taskCallbackService.addCallbackChannel(taskExecutionContext.getTaskInstanceId(),
-                new CallbackChannel(channel, command.getOpaque()));
+        taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
+                new NettyRemoteChannel(channel, command.getOpaque()));
 
+        this.doAck(taskExecutionContext);
         // submit task
-        workerExecService.submit(new TaskScheduleThread(taskExecutionContext,
+        workerExecService.submit(new TaskExecuteThread(taskExecutionContext,
                 processService, taskCallbackService));
     }
 
+    private void doAck(TaskExecutionContext taskExecutionContext){
+        // tell master that task is in executing
+        ExecuteTaskAckCommand ackCommand = buildAckCommand(taskExecutionContext);
+        taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
+    }
+
+    /**
+     * get task log path
+     * @return log path
+     */
+    private String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
+        String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+                .getLogger("ROOT")
+                .getAppender("TASKLOGFILE"))
+                .getDiscriminator()).getLogBase();
+        if (baseLog.startsWith(Constants.SINGLE_SLASH)){
+            return baseLog + Constants.SINGLE_SLASH +
+                    taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
+                    taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                    taskExecutionContext.getTaskInstanceId() + ".log";
+        }
+        return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
+                baseLog +  Constants.SINGLE_SLASH +
+                taskExecutionContext.getProcessDefineId() + Constants.SINGLE_SLASH  +
+                taskExecutionContext.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                taskExecutionContext.getTaskInstanceId() + ".log";
+    }
+
+    /**
+     * build ack command
+     * @param taskExecutionContext taskExecutionContext
+     * @return ExecuteTaskAckCommand
+     */
+    private ExecuteTaskAckCommand buildAckCommand(TaskExecutionContext taskExecutionContext) {
+        ExecuteTaskAckCommand ackCommand = new ExecuteTaskAckCommand();
+        ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        ackCommand.setStatus(ExecutionStatus.RUNNING_EXEUTION.getCode());
+        ackCommand.setLogPath(getTaskLogPath(taskExecutionContext));
+        ackCommand.setHost(OSUtils.getHost());
+        ackCommand.setStartTime(new Date());
+        if(taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())){
+            ackCommand.setExecutePath(null);
+        }else{
+            ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
+        }
+        return ackCommand;
+    }
 
     /**
      * get execute local path
