@@ -242,7 +242,7 @@ public class ExecutorService extends BaseService{
                 }
                 break;
             default:
-                logger.error(String.format("unknown execute type : %s", executeType.toString()));
+                logger.error("unknown execute type : {}", executeType);
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "unknown execute type");
 
                 break;

@@ -176,7 +176,7 @@ public abstract class AbstractCommandExecutor {
 
         } catch (InterruptedException e) {
             exitStatusCode = -1;
-            logger.error(String.format("interrupt exception: {}, task may be cancelled or killed",e.getMessage()), e);
+            logger.error("interrupt exception: {}, task may be cancelled or killed", e.getMessage(), e);
             throw new RuntimeException("interrupt exception. exitCode is :  " + exitStatusCode);
         } catch (Exception e) {
             exitStatusCode = -1;
@@ -408,7 +408,7 @@ public abstract class AbstractCommandExecutor {
                 }
            }
         } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed ", appIds.toString()),e);
+            logger.error("yarn applications: {}  status failed ", appIds,e);
             result = false;
         }
         return result;
@@ -458,7 +458,7 @@ public abstract class AbstractCommandExecutor {
                 lineList.add(line);
             }
         } catch (Exception e) {
-            logger.error(String.format("read file: %s failed : ",filename),e);
+            logger.error("read file: {} failed",filename,e);
         } finally {
             if(br != null){
                 try {
