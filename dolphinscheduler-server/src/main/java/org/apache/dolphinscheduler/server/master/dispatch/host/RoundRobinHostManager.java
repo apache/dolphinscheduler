@@ -34,24 +34,44 @@ import java.util.Collection;
 import java.util.List;
 
 
+/**
+ *  round robin host manager
+ */
 @Service
 public class RoundRobinHostManager implements HostManager {
 
     private final Logger logger = LoggerFactory.getLogger(RoundRobinHostManager.class);
 
+    /**
+     * zookeeperNodeManager
+     */
     @Autowired
     private ZookeeperNodeManager zookeeperNodeManager;
 
+    /**
+     * selector
+     */
     private final Selector<Host> selector;
 
+    /**
+     * set round robin
+     */
     public RoundRobinHostManager(){
         this.selector = new RoundRobinSelector<>();
     }
 
+    /**
+     * select host
+     * @param context context
+     * @return host
+     */
     @Override
     public Host select(ExecutionContext context){
         Host host = new Host();
         Collection<String> nodes = null;
+        /**
+         * executor type
+         */
         ExecutorType executorType = context.getExecutorType();
         switch (executorType){
             case WORKER:
@@ -69,6 +89,9 @@ public class RoundRobinHostManager implements HostManager {
         List<Host> candidateHosts = new ArrayList<>(nodes.size());
         nodes.stream().forEach(node -> candidateHosts.add(Host.of(node)));
 
+        /**
+         * select
+         */
         return selector.select(candidateHosts);
     }
 
