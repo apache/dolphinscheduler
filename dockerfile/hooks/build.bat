@@ -13,14 +13,30 @@
 :: See the License for the specific language governing permissions and
 :: limitations under the License.
 ::
+@echo off
+
 echo "------ dolphinscheduler start - build -------"
 set
+
+if not defined VERSION (
+    echo "set environment variable [VERSION]"
+    for /f %%l in (%cd%\sql\soft_version) do (set VERSION=%%l)
+)
+
+if not defined DOCKER_REPO (
+    echo "set environment variable [DOCKER_REPO]"
+    set DOCKER_REPO='dolphinscheduler'
+)
+
+echo "Version: %VERSION%"
+echo "Repo: %DOCKER_REPO%"
 
 echo "Current Directory is %cd%"
 
 :: maven package(Project Directory)
 echo "call mvn clean compile package -Prelease"
 call mvn clean compile package -Prelease -DskipTests=true
+if "%errorlevel%"=="1" goto :mvnFailed
 
 :: move dolphinscheduler-bin.tar.gz file to dockerfile directory
 echo "move %cd%\dolphinscheduler-dist\target\apache-dolphinscheduler-incubating-%VERSION%-SNAPSHOT-dolphinscheduler-bin.tar.gz %cd%\dockerfile\"
@@ -29,5 +45,12 @@ move %cd%\dolphinscheduler-dist\target\apache-dolphinscheduler-incubating-%VERSI
 :: docker build
 echo "docker build --build-arg VERSION=%VERSION% -t %DOCKER_REPO%:%VERSION% %cd%\dockerfile\"
 docker build --build-arg VERSION=%VERSION% -t %DOCKER_REPO%:%VERSION% %cd%\dockerfile\
+if "%errorlevel%"=="1" goto :dockerBuildFailed
 
-echo "------ dolphinscheduler end   - build -------"
+echo "------ dolphinscheduler end - build -------"
+
+:mvnFailed
+echo "MAVEN PACKAGE FAILED!"
+
+:dockerBuildFailed
+echo "DOCKER BUILD FAILED!"
