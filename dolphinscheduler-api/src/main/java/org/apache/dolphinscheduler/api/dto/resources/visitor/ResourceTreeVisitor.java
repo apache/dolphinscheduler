@@ -53,6 +53,7 @@ public class ResourceTreeVisitor implements Visitor{
                 tempResourceComponent.setPid(resource.getPid());
                 tempResourceComponent.setIdValue(resource.getId(),resource.isDirectory());
                 tempResourceComponent.setDescription(resource.getDescription());
+                tempResourceComponent.setType(resource.getType());
                 rootDirectory.add(tempResourceComponent);
             }
 
@@ -78,6 +79,7 @@ public class ResourceTreeVisitor implements Visitor{
                 tempResourceComponent.setPid(resource.getPid());
                 tempResourceComponent.setIdValue(resource.getId(),resource.isDirectory());
                 tempResourceComponent.setDescription(resource.getDescription());
+                tempResourceComponent.setType(resource.getType());
                 childList.add(tempResourceComponent);
             }
         }

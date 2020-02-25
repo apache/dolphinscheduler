@@ -2,6 +2,7 @@ package org.apache.dolphinscheduler.api.dto.resources;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.alibaba.fastjson.annotation.JSONType;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@JSONType(orders={"id","pid","name","fullName","description","isDirctory","children"})
+@JSONType(orders={"id","pid","name","fullName","description","isDirctory","children","type"})
 public abstract class ResourceComponent {
     public ResourceComponent() {
     }
@@ -61,6 +62,8 @@ public abstract class ResourceComponent {
     protected boolean isDirctory;
     @JSONField(ordinal = 7)
     protected String idValue;
+    @JSONField(ordinal = 8)
+    protected ResourceType type;
     /**
      * children
      */
@@ -135,6 +138,14 @@ public abstract class ResourceComponent {
         this.idValue = String.format("%s_%s",id,directoryFlag);
     }
 
+    public ResourceType getType() {
+        return type;
+    }
+
+    public void setType(ResourceType type) {
+        this.type = type;
+    }
+
     public List<ResourceComponent> getChildren() {
         return children;
     }
@@ -154,11 +165,9 @@ public abstract class ResourceComponent {
                 ", description='" + description + '\'' +
                 ", isDirctory=" + isDirctory +
                 ", idValue='" + idValue + '\'' +
+                ", type=" + type +
                 ", children=" + children +
                 '}';
     }
 
-    public void print(){
-        System.out.println(toString());
-    }
 }
