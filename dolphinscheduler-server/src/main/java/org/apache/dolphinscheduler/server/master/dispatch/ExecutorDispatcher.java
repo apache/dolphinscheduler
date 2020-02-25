@@ -50,7 +50,7 @@ public class ExecutorDispatcher implements InitializingBean {
     @Autowired
     private RoundRobinHostManager hostManager;
 
-    private final ConcurrentHashMap<ExecutorType, ExecutorManager> executorManagers;
+    private final ConcurrentHashMap<ExecutorType, ExecutorManager<Boolean>> executorManagers;
 
     public ExecutorDispatcher(){
         this.executorManagers = new ConcurrentHashMap<>();
@@ -61,11 +61,11 @@ public class ExecutorDispatcher implements InitializingBean {
      * @param context context
      * @throws ExecuteException
      */
-    public void dispatch(final ExecutionContext context) throws ExecuteException {
+    public Boolean dispatch(final ExecutionContext context) throws ExecuteException {
         /**
          * get executor manager
          */
-        ExecutorManager executorManager = this.executorManagers.get(context.getExecutorType());
+        ExecutorManager<Boolean> executorManager = this.executorManagers.get(context.getExecutorType());
         if(executorManager == null){
             throw new ExecuteException("no ExecutorManager for type : " + context.getExecutorType());
         }
@@ -83,7 +83,7 @@ public class ExecutorDispatcher implements InitializingBean {
             /**
              * task execute
              */
-            executorManager.execute(context);
+            return executorManager.execute(context);
         } finally {
             executorManager.afterExecute(context);
         }

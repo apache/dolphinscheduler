@@ -46,7 +46,7 @@ import java.util.Set;
  *  netty executor manager
  */
 @Service
-public class NettyExecutorManager extends AbstractExecutorManager{
+public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
 
     private final Logger logger = LoggerFactory.getLogger(NettyExecutorManager.class);
 
@@ -64,6 +64,10 @@ public class NettyExecutorManager extends AbstractExecutorManager{
     public NettyExecutorManager(){
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+        /**
+         * register EXECUTE_TASK_RESPONSE command type TaskResponseProcessor
+         * register EXECUTE_TASK_ACK command type TaskAckProcessor
+         */
         this.nettyRemotingClient.registerProcessor(CommandType.EXECUTE_TASK_RESPONSE, new TaskResponseProcessor());
         this.nettyRemotingClient.registerProcessor(CommandType.EXECUTE_TASK_ACK, new TaskAckProcessor());
     }
@@ -74,7 +78,7 @@ public class NettyExecutorManager extends AbstractExecutorManager{
      * @throws ExecuteException
      */
     @Override
-    public void execute(ExecutionContext context) throws ExecuteException {
+    public Boolean execute(ExecutionContext context) throws ExecuteException {
 
         /**
          *  all nodes
@@ -118,6 +122,8 @@ public class NettyExecutorManager extends AbstractExecutorManager{
                 }
             }
         }
+
+        return success;
     }
 
     /**
@@ -189,7 +195,7 @@ public class NettyExecutorManager extends AbstractExecutorManager{
                 break;
             case CLIENT:
                 break;
-             default:
+            default:
                 throw new IllegalArgumentException("invalid executor type : " + executorType);
 
         }

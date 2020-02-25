@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 /**
  *  executor manager
  */
-public interface ExecutorManager {
+public interface ExecutorManager<T> {
 
     /**
      * before execute
@@ -37,7 +37,7 @@ public interface ExecutorManager {
      * @param context context
      * @throws ExecuteException
      */
-    void execute(ExecutionContext context) throws ExecuteException;
+    T execute(ExecutionContext context) throws ExecuteException;
 
     /**
      * after execute
