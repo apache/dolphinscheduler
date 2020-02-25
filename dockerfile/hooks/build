@@ -15,11 +15,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+set -e
+
 echo "------ dolphinscheduler start - build -------"
 printenv
 
+if [ -z "${VERSION}" ]
+then
+    echo "set default environment variable [VERSION]"
+    VERSION=$(cat $(pwd)/sql/soft_version)
+fi
+
 if [ "${DOCKER_REPO}x" = "x" ]
 then
+    echo "set default environment variable [DOCKER_REPO]"
     DOCKER_REPO='dolphinscheduler'
 fi
 
