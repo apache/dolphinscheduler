@@ -20,7 +20,10 @@ package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 import java.util.Collection;
 import java.util.Random;
 
-
+/**
+ * random selector
+ * @param <T> T
+ */
 public class RandomSelector<T> implements Selector<T> {
 
     private final Random random = new Random();
@@ -32,11 +35,17 @@ public class RandomSelector<T> implements Selector<T> {
             throw new IllegalArgumentException("Empty source.");
         }
 
+        /**
+         * if only one , return directly
+         */
         if (source.size() == 1) {
             return (T) source.toArray()[0];
         }
 
         int size = source.size();
+        /**
+         *  random select
+         */
         int randomIndex = random.nextInt(size);
 
         return (T) source.toArray()[randomIndex];

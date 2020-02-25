@@ -20,12 +20,24 @@ package org.apache.dolphinscheduler.server.master.dispatch.context;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
+/**
+ *  execution context
+ */
 public class ExecutionContext {
 
+    /**
+     * host
+     */
     private Host host;
 
+    /**
+     *  context
+     */
     private final Object context;
 
+    /**
+     *  executor type : worker or client
+     */
     private final ExecutorType executorType;
 
     public ExecutionContext(Object context, ExecutorType executorType) {

@@ -46,11 +46,19 @@ public class TaskAckProcessor implements NettyRequestProcessor {
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
+    /**
+     *  task ack process
+     * @param channel channel channel
+     * @param command command ExecuteTaskAckCommand
+     */
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.EXECUTE_TASK_ACK == command.getType(), String.format("invalid command type : %s", command.getType()));
         ExecuteTaskAckCommand taskAckCommand = FastJsonSerializer.deserialize(command.getBody(), ExecuteTaskAckCommand.class);
         logger.info("taskAckCommand : {}",taskAckCommand);
+        /**
+         * change Task state
+         */
         processService.changeTaskState(ExecutionStatus.of(taskAckCommand.getStatus()),
                 taskAckCommand.getStartTime(),
                 taskAckCommand.getHost(),
