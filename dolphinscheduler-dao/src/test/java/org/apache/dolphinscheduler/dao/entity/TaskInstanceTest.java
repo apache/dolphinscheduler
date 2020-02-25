@@ -19,11 +19,6 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * @ClassName TaskInstanceTest
- * @Author HuangLi
- * @Version 2020/2/24
- */
 public class TaskInstanceTest {
 
     /**
