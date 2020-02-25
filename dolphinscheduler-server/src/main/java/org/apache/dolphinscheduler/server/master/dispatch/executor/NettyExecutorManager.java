@@ -64,10 +64,6 @@ public class NettyExecutorManager extends AbstractExecutorManager{
     public NettyExecutorManager(){
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
-        /**
-         * register EXECUTE_TASK_RESPONSE command type TaskResponseProcessor
-         * register EXECUTE_TASK_ACK command type TaskAckProcessor
-         */
         this.nettyRemotingClient.registerProcessor(CommandType.EXECUTE_TASK_RESPONSE, new TaskResponseProcessor());
         this.nettyRemotingClient.registerProcessor(CommandType.EXECUTE_TASK_ACK, new TaskAckProcessor());
     }
