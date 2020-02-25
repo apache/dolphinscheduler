@@ -269,7 +269,7 @@ public class TaskQueueZkImpl implements ITaskQueue {
             zookeeperOperator.remove(taskIdPath);
 
         }catch(Exception e){
-            logger.error(String.format("delete task:%s from zookeeper fail, exception:" ,nodeValue) ,e);
+            logger.error("delete task:{} from zookeeper fail, exception:" ,nodeValue ,e);
         }
 
     }
@@ -318,7 +318,7 @@ public class TaskQueueZkImpl implements ITaskQueue {
             zookeeperOperator.remove(path + value);
 
         }catch(Exception e){
-            logger.error(String.format("delete task:" + value + " exception"),e);
+            logger.error("delete task:{} exception",value,e);
         }
     }
 
