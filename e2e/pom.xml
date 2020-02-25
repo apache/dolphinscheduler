@@ -2,16 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>dolphinscheduler</artifactId>
-        <groupId>org.apache.dolphinscheduler</groupId>
-        <version>1.2.1-SNAPSHOT</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
-
-    <artifactId>e2e</artifactId>
-    <name>${project.artifactId}</name>
-    <packaging>jar</packaging>
+    <groupId>org.apache.dolphinscheduler</groupId>
+    <artifactId>dolphinscheduler-e2e</artifactId>
+    <version>1.0.0</version>
 
     <properties>
         <testng.version>6.14.3</testng.version>
@@ -30,8 +24,6 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
-
-
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
