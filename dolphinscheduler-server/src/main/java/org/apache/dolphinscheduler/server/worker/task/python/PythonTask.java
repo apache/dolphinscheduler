@@ -77,6 +77,8 @@ public class PythonTask extends AbstractTask {
             taskProps.getEnvFile(),
             taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(),
+            taskProps.getLogPath(),
+            taskProps.getExecutePath(),
             logger);
     this.processService = SpringApplicationContext.getBean(ProcessService.class);
   }

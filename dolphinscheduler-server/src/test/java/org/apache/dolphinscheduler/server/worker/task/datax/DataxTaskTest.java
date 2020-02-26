@@ -88,7 +88,7 @@ public class DataxTaskTest {
         Mockito.when(processService.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
 
         String fileName = String.format("%s/%s_node.sh", props.getExecutePath(), props.getTaskAppId());
-        Mockito.when(shellCommandExecutor.run(fileName, processService)).thenReturn(0);
+        Mockito.when(shellCommandExecutor.run(fileName)).thenReturn(null);
     }
 
     private DataSource getDataSource() {
