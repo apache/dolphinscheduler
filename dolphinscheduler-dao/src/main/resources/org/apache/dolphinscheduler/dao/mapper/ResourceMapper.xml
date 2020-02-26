@@ -99,7 +99,16 @@
         </if>
     </select>
     
-    <delete id="deleteDirectory" parameterType="java.lang.Integer">
-        delete from t_ds_resources where id = #{direcotyId} or pid = #{direcotyId}
+    <delete id="deleteIds" parameterType="java.lang.Integer">
+        delete from t_ds_resources where id in
+        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
     </delete>
+
+    <select id="listChildren" resultType="java.lang.Integer">
+        select id
+        from t_ds_resources
+        where pid = #{direcotyId}
+    </select>
 </mapper>

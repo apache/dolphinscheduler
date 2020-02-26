@@ -539,7 +539,8 @@ public class ResourcesService extends BaseService {
         String hdfsFilename = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getAlias());
 
         //delete data in database
-        resourcesMapper.deleteDirectory(resourceId);
+        List<Integer> allChildren = listAllChildren(resource);
+        resourcesMapper.deleteIds(allChildren.toArray(new Integer[allChildren.size()]));
         resourceUserMapper.deleteResourceUser(0, resourceId);
         //delete file on hdfs
         HadoopUtils.getInstance().delete(hdfsFilename, true);
@@ -547,6 +548,8 @@ public class ResourcesService extends BaseService {
 
         return result;
     }
+
+
 
     /**
      * verify resource by name and type
@@ -885,9 +888,6 @@ public class ResourcesService extends BaseService {
         return result;
     }
 
-
-
-
     /**
      * unauthorized udf function
      *
@@ -1000,6 +1000,38 @@ public class ResourcesService extends BaseService {
             return null;
         }
         return tenant.getTenantCode();
+    }
+
+    /**
+     * list all children id
+     * @param resource resource
+     * @return all children id
+     */
+    List<Integer> listAllChildren(Resource resource){
+        List<Integer> childList = new ArrayList<>();
+        childList.add(resource.getId());
+        if(resource.isDirectory()){
+            listAllChildren(resource.getId(),childList);
+        }
+        return childList;
+    }
+
+    /**
+     * /**
+     * list all children id
+     * @param resourceId resource id
+     * @param childIds child resource id list
+     * @return all children id
+     */
+    List<Integer> listAllChildren(int resourceId,List<Integer> childIds){
+
+        List<Integer> children = resourcesMapper.listChildren(resourceId);
+        for(int chlidId:children){
+            children.add(chlidId);
+            listAllChildren(chlidId,childIds);
+        }
+        return children;
+
     }
 
 }

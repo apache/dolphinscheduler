@@ -102,9 +102,16 @@ public interface ResourceMapper extends BaseMapper<Resource> {
     <T> List<Resource> listAuthorizedResourceById(@Param("userId") int userId,@Param("resIds")T[] resIds);
 
     /**
-     * delete directory
-     * @param direcotyId direcoty id
-     * @return resource list
+     * delete resource by id array
+     * @param resIds resource id array
+     * @return delete num
      */
-    int deleteDirectory(@Param("direcotyId") int direcotyId);
+    int deleteIds(@Param("resIds")Integer[] resIds);
+
+    /**
+     * list children
+     * @param direcotyId directory id
+     * @return resource id array
+     */
+    List<Integer> listChildren(@Param("direcotyId") int direcotyId);
 }
