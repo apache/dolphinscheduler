@@ -38,4 +38,10 @@ public interface TaskInstanceCacheManager {
      * @param executeTaskResponseCommand executeTaskResponseCommand
      */
     void cacheTaskInstance(ExecuteTaskResponseCommand executeTaskResponseCommand);
+
+    /**
+     * remove taskInstance by taskInstanceId
+     * @param taskInstanceId taskInstanceId
+     */
+    void removeByTaskInstanceId(Integer taskInstanceId);
 }

@@ -130,6 +130,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                 }
                 // task instance finished
                 if (taskInstance.getState().typeIsFinished()){
+                    // if task is final result , then remove taskInstance from cache
+                    taskInstanceCacheManager.removeByTaskInstanceId(taskInstance.getId());
                     break;
                 }
                 if(checkTimeout){

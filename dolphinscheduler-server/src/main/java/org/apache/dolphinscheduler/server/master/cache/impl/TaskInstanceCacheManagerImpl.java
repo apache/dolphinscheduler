@@ -85,4 +85,13 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
         taskInstance.setState(ExecutionStatus.of(executeTaskResponseCommand.getStatus()));
         taskInstance.setEndTime(executeTaskResponseCommand.getEndTime());
     }
+
+    /**
+     * remove taskInstance by taskInstanceId
+     * @param taskInstanceId taskInstanceId
+     */
+    @Override
+    public void removeByTaskInstanceId(Integer taskInstanceId) {
+        taskInstanceCache.remove(taskInstanceId);
+    }
 }
