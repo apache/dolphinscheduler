@@ -71,9 +71,9 @@ public class DataxTaskTest {
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
         TaskProps props = new TaskProps();
-        props.setTaskDir("/tmp");
+        props.setExecutePath("/tmp");
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
-        props.setTaskInstId(1);
+        props.setTaskInstanceId(1);
         props.setTenantCode("1");
         props.setEnvFile(".dolphinscheduler_env.sh");
         props.setTaskStartTime(new Date());
@@ -87,8 +87,8 @@ public class DataxTaskTest {
         Mockito.when(processService.findDataSourceById(2)).thenReturn(getDataSource());
         Mockito.when(processService.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
 
-        String fileName = String.format("%s/%s_node.sh", props.getTaskDir(), props.getTaskAppId());
-        Mockito.when(shellCommandExecutor.run(fileName, processService)).thenReturn(0);
+        String fileName = String.format("%s/%s_node.sh", props.getExecutePath(), props.getTaskAppId());
+        Mockito.when(shellCommandExecutor.run(fileName)).thenReturn(null);
     }
 
     private DataSource getDataSource() {
@@ -118,9 +118,9 @@ public class DataxTaskTest {
     public void testDataxTask()
             throws Exception {
         TaskProps props = new TaskProps();
-        props.setTaskDir("/tmp");
+        props.setExecutePath("/tmp");
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
-        props.setTaskInstId(1);
+        props.setTaskInstanceId(1);
         props.setTenantCode("1");
         Assert.assertNotNull(new DataxTask(props, logger));
     }
