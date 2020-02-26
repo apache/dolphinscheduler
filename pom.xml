@@ -242,7 +242,6 @@
                 <artifactId>dolphinscheduler-alert</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-framework</artifactId>
