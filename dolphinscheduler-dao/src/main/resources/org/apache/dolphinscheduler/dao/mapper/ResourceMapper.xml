@@ -111,4 +111,10 @@
         from t_ds_resources
         where pid = #{direcotyId}
     </select>
+
+    <select id="queryResourceByName" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select *
+        from t_ds_resources
+        where full_name = #{fullName} and type = #{type}
+    </select>
 </mapper>

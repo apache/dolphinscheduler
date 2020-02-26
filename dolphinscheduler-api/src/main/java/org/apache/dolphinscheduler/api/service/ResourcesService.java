@@ -591,6 +591,26 @@ public class ResourcesService extends BaseService {
     }
 
     /**
+     * verify resource by name and type
+     * @param fullName  resource full name
+     * @param type      resource type
+     * @return true if the resource full name not exists, otherwise return false
+     */
+    public Result queryByResourceName(String fullName, ResourceType type) {
+        Result result = new Result();
+        Resource resource = resourcesMapper.queryResourceByName(fullName,type.ordinal());
+        if (resource == null) {
+            logger.error("resource file not exist,  resource full name {}", fullName);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+        putMsg(result, Status.SUCCESS);
+        result.setData(resource);
+
+        return result;
+    }
+
+    /**
      * view resource file online
      *
      * @param resourceId resource id
@@ -611,7 +631,7 @@ public class ResourcesService extends BaseService {
         // get resource by id
         Resource resource = resourcesMapper.selectById(resourceId);
         if (resource == null) {
-            logger.error("resouce file not exist,  resource id {}", resourceId);
+            logger.error("resource file not exist,  resource id {}", resourceId);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
@@ -621,7 +641,7 @@ public class ResourcesService extends BaseService {
         if (StringUtils.isNotEmpty(resourceViewSuffixs)) {
             List<String> strList = Arrays.asList(resourceViewSuffixs.split(","));
             if (!strList.contains(nameSuffix)) {
-                logger.error("resouce suffix {} not support view,  resource id {}", nameSuffix, resourceId);
+                logger.error("resource suffix {} not support view,  resource id {}", nameSuffix, resourceId);
                 putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
