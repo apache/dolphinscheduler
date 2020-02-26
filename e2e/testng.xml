@@ -7,7 +7,7 @@
             <!--<package name="org.apache.dolphinscheduler.testcase.security.*"/>-->
         <!--</packages>-->
         <classes>
-        <class name="org.apache.dolphinscheduler.testcase.security.UserManageTest"></class>
+        <class name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"></class>
         </classes>
         </test>
 
