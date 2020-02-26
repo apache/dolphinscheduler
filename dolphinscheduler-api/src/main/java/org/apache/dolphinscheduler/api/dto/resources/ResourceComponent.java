@@ -23,11 +23,13 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * resource component
+ */
 @JSONType(orders={"id","pid","name","fullName","description","isDirctory","children","type"})
 public abstract class ResourceComponent {
     public ResourceComponent() {
     }
-    //public abstract void accept(Visitor visitor);
 
     public ResourceComponent(int id, int pid, String name, String fullName, String description, boolean isDirctory) {
         this.id = id;
@@ -51,17 +53,38 @@ public abstract class ResourceComponent {
      */
     @JSONField(ordinal = 2)
     protected int pid;
+    /**
+     * name
+     */
     @JSONField(ordinal = 3)
     protected String name;
+    /**
+     * current directory
+     */
     protected String currentDir;
+    /**
+     * full name
+     */
     @JSONField(ordinal = 4)
     protected String fullName;
+    /**
+     * description
+     */
     @JSONField(ordinal = 5)
     protected String description;
+    /**
+     * is directory
+     */
     @JSONField(ordinal = 6)
     protected boolean isDirctory;
+    /**
+     * id value
+     */
     @JSONField(ordinal = 7)
     protected String idValue;
+    /**
+     * resoruce type
+     */
     @JSONField(ordinal = 8)
     protected ResourceType type;
     /**
@@ -69,16 +92,13 @@ public abstract class ResourceComponent {
      */
     @JSONField(ordinal = 8)
     protected List<ResourceComponent> children = new ArrayList<>();
+
+    /**
+     * add resource component
+     * @param resourceComponent resource component
+     */
     public void add(ResourceComponent resourceComponent){
         children.add(resourceComponent);
-    }
-
-    public void remove(ResourceComponent resourceComponent){
-        throw new UnsupportedOperationException();
-    }
-
-    public void getChild(int i){
-        throw new UnsupportedOperationException();
     }
 
     public String getName(){

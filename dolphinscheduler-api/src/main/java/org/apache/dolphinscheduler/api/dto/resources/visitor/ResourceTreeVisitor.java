@@ -26,60 +26,51 @@ import java.util.List;
  * limitations under the License.
  */
 public class ResourceTreeVisitor implements Visitor{
+
+    /**
+     * resource list
+     */
     private List<Resource> resourceList;
 
     public ResourceTreeVisitor() {
     }
 
+    /**
+     * constructor
+     * @param resourceList resource list
+     */
     public ResourceTreeVisitor(List<Resource> resourceList) {
         this.resourceList = resourceList;
     }
 
+    /**
+     * visit
+     * @return resoruce component
+     */
     public ResourceComponent visit() {
         ResourceComponent rootDirectory = new Directory();
         for (Resource resource : resourceList) {
-
-            ResourceComponent tempResourceComponent;
-            if(resource.isDirectory()){
-                tempResourceComponent = new Directory();
-            }else{
-                tempResourceComponent = new FileLeaf();
-            }
             //表明是一级父类
             if (rootNode(resource)){
-                tempResourceComponent.setName(resource.getAlias());
-                tempResourceComponent.setFullName(resource.getFullName());
-                tempResourceComponent.setId(resource.getId());
-                tempResourceComponent.setPid(resource.getPid());
-                tempResourceComponent.setIdValue(resource.getId(),resource.isDirectory());
-                tempResourceComponent.setDescription(resource.getDescription());
-                tempResourceComponent.setType(resource.getType());
+                ResourceComponent tempResourceComponent = getResourceComponent(resource);
                 rootDirectory.add(tempResourceComponent);
+                tempResourceComponent.setChildren(setChildren(tempResourceComponent.getId(),resourceList));
             }
-
-            //resource.setList(setChild(resource.getId(),resourceList));
-            tempResourceComponent.setChildren(setChildren(tempResourceComponent.getId(),resourceList));
         }
         return rootDirectory;
     }
 
+    /**
+     * set children
+     * @param id    id
+     * @param list  resource list
+     * @return resource component list
+     */
     public static List<ResourceComponent> setChildren(int id, List<Resource> list ){
         List<ResourceComponent> childList = new ArrayList<>();
         for (Resource resource : list) {
-            ResourceComponent tempResourceComponent;
-            if(resource.isDirectory()){
-                tempResourceComponent = new Directory();
-            }else{
-                tempResourceComponent = new FileLeaf();
-            }
             if (id == resource.getPid()){
-                tempResourceComponent.setName(resource.getAlias());
-                tempResourceComponent.setFullName(resource.getFullName());
-                tempResourceComponent.setId(resource.getId());
-                tempResourceComponent.setPid(resource.getPid());
-                tempResourceComponent.setIdValue(resource.getId(),resource.isDirectory());
-                tempResourceComponent.setDescription(resource.getDescription());
-                tempResourceComponent.setType(resource.getType());
+                ResourceComponent tempResourceComponent = getResourceComponent(resource);
                 childList.add(tempResourceComponent);
             }
         }
@@ -97,7 +88,6 @@ public class ResourceTreeVisitor implements Visitor{
      * @param resource resource
      * @return true if it is the root node
      */
-
     public boolean rootNode(Resource resource) {
 
         boolean isRootNode = true;
@@ -110,6 +100,28 @@ public class ResourceTreeVisitor implements Visitor{
             }
         }
         return isRootNode;
+    }
+
+    /**
+     * get resource component by resource
+     * @param resource resource
+     * @return resource component
+     */
+    private static ResourceComponent getResourceComponent(Resource resource) {
+        ResourceComponent tempResourceComponent;
+        if(resource.isDirectory()){
+            tempResourceComponent = new Directory();
+        }else{
+            tempResourceComponent = new FileLeaf();
+        }
+        tempResourceComponent.setName(resource.getAlias());
+        tempResourceComponent.setFullName(resource.getFullName());
+        tempResourceComponent.setId(resource.getId());
+        tempResourceComponent.setPid(resource.getPid());
+        tempResourceComponent.setIdValue(resource.getId(),resource.isDirectory());
+        tempResourceComponent.setDescription(resource.getDescription());
+        tempResourceComponent.setType(resource.getType());
+        return tempResourceComponent;
     }
 
 }

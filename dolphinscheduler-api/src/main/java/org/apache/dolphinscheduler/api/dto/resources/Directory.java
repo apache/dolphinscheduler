@@ -16,5 +16,8 @@ package org.apache.dolphinscheduler.api.dto.resources;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/**
+ * directory
+ */
 public class Directory extends ResourceComponent{
 }
