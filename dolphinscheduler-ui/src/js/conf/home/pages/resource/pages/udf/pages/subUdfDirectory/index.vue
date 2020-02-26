@@ -15,28 +15,26 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('File Manage')">
+  <m-list-construction :title="$t('UDF Resources')">
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button-group size="small" >
-            <x-button type="ghost" @click="() => $router.push({path: `/resource/file/subFileFolder/${searchParams.id}`})">{{$t('Create folder')}}</x-button>
-            <x-button type="ghost" @click="() => $router.push({path: `/resource/file/subFile/${searchParams.id}`})">{{$t('Create File')}}</x-button>
-            <x-button type="ghost" @click="_uploading">{{$t('Upload Files')}}</x-button>
-            <a style="padding: 7px 0;line-height: 14px;position: relative;float: left;cursor: pointer;" @click="() => $router.push({path: `/resource/file`})">全部文件</a>
+          <x-button-group size="small">
+            <x-button type="ghost" @click="() => $router.push({name: 'resource-udf-subCreateUdfFolder'})">{{$t('Create folder')}}</x-button>
+            <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
           </x-button-group>
         </template>
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="fileResourcesList.length || total>0">
-        <m-list @on-update="_onUpdate" @on-updateList="_updateList" :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+      <template v-if="udfResourcesList.length || total>0">
+        <m-list @on-update="_onUpdate" :udf-resources-list="udfResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!fileResourcesList.length && total<=0">
+      <template v-if="!udfResourcesList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading">
@@ -56,18 +54,18 @@
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
-    name: 'resource-list-index-FILE',
+    name: 'resource-list-index-UDF',
     data () {
       return {
         total: null,
         isLoading: false,
-        fileResourcesList: [],
+        udfResourcesList: [],
         searchParams: {
           id: this.$route.params.id,
           pageSize: 10,
           pageNo: 1,
           searchVal: '',
-          type: 'FILE'
+          type: 'UDF'
         }
       }
     },
@@ -79,7 +77,7 @@
        * File Upload
        */
       _uploading () {
-        findComponentDownward(this.$root, 'roof-nav')._fileChildUpdate('FILE',this.searchParams.id)
+        findComponentDownward(this.$root, 'roof-nav')._resourceChildUpdate('UDF',this.searchParams.id)
       },
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
@@ -91,19 +89,8 @@
       _pageSize (val) {
         this.searchParams.pageSize = val
       },
-      _getList (flag) {
-        this.isLoading = !flag
-        this.getResourcesListP(this.searchParams).then(res => {
-          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
-            this.searchParams.pageNo = this.searchParams.pageNo -1
-          } else {
-            this.fileResourcesList = res.totalList
-            this.total = res.total
-            this.isLoading = false
-          }
-        }).catch(e => {
-          this.isLoading = false
-        })
+      _onUpdate () {
+        this._debounceGET()
       },
       _updateList (data) {
         this.searchParams.id = data
@@ -111,10 +98,21 @@
         this.searchParams.searchVal = ''
         this._debounceGET()
       },
-       _onUpdate (data) {
-        this.searchParams.id = data
-        this._debounceGET()
-      }, 
+      _getList (flag) {
+        this.isLoading = !flag
+        this.getResourcesListP(this.searchParams).then(res => {
+          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo -1
+          } else {
+            this.udfResourcesList = []
+            this.udfResourcesList = res.totalList
+            this.total = res.total
+            this.isLoading = false
+          }
+        }).catch(e => {
+          this.isLoading = false
+        })
+      }
     },
     watch: {
       // router

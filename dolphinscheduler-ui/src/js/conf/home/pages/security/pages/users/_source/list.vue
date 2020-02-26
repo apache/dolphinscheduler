@@ -231,27 +231,30 @@
           // })
           let fileSourceList = []
           let udfSourceList = []
-          fileSourceList = data[1].concat(data[0])
-          // sourceListPrs.forEach((value,index,array)=>{
-          //   if(value.type =='FILE'){
-          //     fileSourceList.push(value)
-          //   } else{
-          //     udfSourceList.push(value)
-          //   }
-          // })
-          let targetListPrs = _.map(data[1], v => {
-            return v.id
+          data[0].forEach((value,index,array)=>{
+            if(value.type =='FILE'){
+              fileSourceList.push(value)
+            } else{
+              udfSourceList.push(value)
+            }
           })
           let fileTargetList = []
           let udfTargetList = []
-          fileTargetList = targetListPrs
-          // targetListPrs.forEach((value,index,array)=>{
-          //   if(value.type =='FILE'){
-          //     fileTargetList.push(value)
-          //   } else{
-          //     udfTargetList.push(value)
-          //   }
-          // })
+          data[1].forEach((value,index,array)=>{
+            if(value.type =='FILE'){
+              fileTargetList.push(value)
+            } else{
+              udfTargetList.push(value)
+            }
+          })
+          fileSourceList = fileSourceList.concat(fileTargetList)
+          udfSourceList  = udfSourceList.concat(udfTargetList)
+          fileTargetList = _.map(fileTargetList, v => {
+            return v.id
+          })
+          udfTargetList = _.map(udfTargetList, v => {
+            return v.id
+          })
           let self = this
           let modal = this.$modal.dialog({
             closable: false,

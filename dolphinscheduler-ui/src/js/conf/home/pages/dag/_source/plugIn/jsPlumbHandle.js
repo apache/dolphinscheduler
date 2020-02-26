@@ -66,7 +66,7 @@ JSP.prototype.init = function ({ dag, instance }) {
   // Register jsplumb connection type and configuration
   this.JspInstance.registerConnectionType('basic', {
     anchor: 'Continuous',
-    connector: 'Straight' // Line type
+    connector: 'Bezier' // Line type
   })
 
   // Initial configuration
@@ -232,7 +232,7 @@ JSP.prototype.initNode = function (el) {
     filter: '.ep',
     anchor: 'Continuous',
     connectorStyle: {
-      stroke: '#555',
+      stroke: '#2d8cf0',
       strokeWidth: 2,
       outlineStroke: 'transparent',
       outlineWidth: 4

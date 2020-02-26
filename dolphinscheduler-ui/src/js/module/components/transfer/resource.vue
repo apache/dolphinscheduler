@@ -24,7 +24,10 @@
                 <x-button type="ghost" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</x-button>
             </x-button-group>
         </div>
-        <treeselect v-model="selectFileSource" :multiple="true" :options="fileSourceList" :normalizer="normalizer">
+        <treeselect v-show="checkedValue=='fileResource'" v-model="selectFileSource" :multiple="true" :options="fileList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+        </treeselect>
+        <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :disable-branch-nodes="true" :options="udfList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
         <!-- <div class="select-list-box">
@@ -76,7 +79,10 @@
         cacheTargetList: this.fileTargetList,
 
         fileSource: this.fileSourceList,
+        fileList: [],
+        udfList: [],
         selectFileSource: [],
+        selectUdfSource: [],
         fileTarget: this.fileTargetList,
         udfSource: this.udfSourceList,
         udfTarget: this.udfTargetList,
@@ -99,14 +105,21 @@
       udfTargetList: Array,
     },
     created() {
+      let file = this.fileSourceList
+      let udf = this.udfSourceList
+      this.diGuiTree(file)
+      this.diGuiTree(udf)
+      this.fileList = file
+      this.udfList = udf
       this.selectFileSource = this.fileTargetList
+      this.selectUdfSource = this.udfTargetList
     },
     methods: {
       _ok () {
         this.$refs['popup'].spinnerLoading = true
         setTimeout(() => {
           this.$refs['popup'].spinnerLoading = false
-          this.$emit('onUpdate', _.map(this.selectFileSource, v => v).join(','))
+          this.$emit('onUpdate', _.map(this.selectFileSource.concat(this.selectUdfSource), v => v).join(','))
         }, 800)
       },
       _ckFile() {
@@ -164,6 +177,12 @@
             this.udfSource = this.sourceList
             this.udfTarget = this.targetList
         }
+      },
+      diGuiTree(item) {  // Recursive convenience tree structure
+        item.forEach(item => {
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
+            delete item.children : this.diGuiTree(item.children);
+        })
       }
     },
     watch: {
