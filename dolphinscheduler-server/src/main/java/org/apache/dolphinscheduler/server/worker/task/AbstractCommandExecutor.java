@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -225,6 +226,7 @@ public abstract class AbstractCommandExecutor {
             logger.error("process has failure , exitStatusCode : {} , ready to kill ...", result.getExitStatusCode());
             TaskInstance taskInstance = new TaskInstance();
             taskInstance.setPid(processId);
+            taskInstance.setHost(OSUtils.getHost());
             taskInstance.setLogPath(logPath);
             taskInstance.setExecutePath(executePath);
 
