@@ -82,9 +82,11 @@ public class BaseDriver {
     public void startBrowser() throws Exception {
         // set chrome driver
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-dev-shm-usage");
-        driver = new ChromeDriver(options);
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("–no-sandbox");
+        chromeOptions.addArguments("–disable-dev-shm-usage");
+        chromeOptions.addArguments("–headless");
+        driver = new ChromeDriver(chromeOptions);
 
         /* driver setting wait time */
         // implicitly wait time
