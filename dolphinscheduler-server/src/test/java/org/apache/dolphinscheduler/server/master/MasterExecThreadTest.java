@@ -152,7 +152,4 @@ public class MasterExecThreadTest {
         return schedulerList;
     }
 
-    public void testParsePostNode(){
-
-    }
 }
