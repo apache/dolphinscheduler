@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -38,6 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
+
+import static org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE;
 
 /**
  * master task exec base class
@@ -211,7 +214,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
 
         int retryTimes = 1;
         boolean submitDB = false;
-        boolean submitQueue = false;
+        boolean submitTask = false;
         TaskInstance task = null;
         while (retryTimes <= commitRetryTimes){
             try {
@@ -222,25 +225,58 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                         submitDB = true;
                     }
                 }
-                if(submitDB && !submitQueue){
-                    // submit task to queue
-                    submitQueue = dispatch(task);
+                if(submitDB && !submitTask){
+                    // dispatcht task
+                    submitTask = dispatchtTask(task);
                 }
-                if(submitDB && submitQueue){
+                if(submitDB && submitTask){
                     return task;
                 }
                 if(!submitDB){
                     logger.error("task commit to db failed , taskId {} has already retry {} times, please check the database", taskInstance.getId(), retryTimes);
-                }else if(!submitQueue){
-                    logger.error("task commit to queue failed , taskId {} has already retry {} times, please check the queue", taskInstance.getId(), retryTimes);
+                }else if(!submitTask){
+                    logger.error("task commit  failed , taskId {} has already retry {} times, please check", taskInstance.getId(), retryTimes);
                 }
                 Thread.sleep(commitRetryInterval);
             } catch (Exception e) {
-                logger.error("task commit to mysql and queue failed",e);
+                logger.error("task commit to mysql and dispatcht task failed",e);
             }
             retryTimes += 1;
         }
         return task;
+    }
+
+
+
+    /**
+     * dispatcht task
+     * @param taskInstance taskInstance
+     * @return whether submit task success
+     */
+    public Boolean dispatchtTask(TaskInstance taskInstance) {
+
+        try{
+            if(taskInstance.isSubProcess()){
+                return true;
+            }
+            if(taskInstance.getState().typeIsFinished()){
+                logger.info(String.format("submit task , but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
+                return true;
+            }
+            // task cannot submit when running
+            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
+                logger.info(String.format("submit to task, but task [%s] state already be running. ", taskInstance.getName()));
+                return true;
+            }
+            logger.info("task ready to submit: {}" , taskInstance);
+            boolean submitTask = dispatch(taskInstance);
+            logger.info(String.format("master submit success, task : %s", taskInstance.getName()) );
+            return submitTask;
+        }catch (Exception e){
+            logger.error("submit task  Exception: ", e);
+            logger.error("task error : %s", JSONUtils.toJson(taskInstance));
+            return false;
+        }
     }
 
     /**
