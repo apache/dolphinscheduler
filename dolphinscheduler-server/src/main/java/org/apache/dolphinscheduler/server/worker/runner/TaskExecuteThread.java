@@ -144,7 +144,6 @@ public class TaskExecuteThread implements Runnable {
             // task result process
             task.after();
 
-
             responseCommand.setStatus(task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
             logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), task.getExitStatus());
