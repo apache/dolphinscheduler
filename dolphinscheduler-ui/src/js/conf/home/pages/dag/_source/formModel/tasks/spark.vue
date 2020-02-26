@@ -179,7 +179,7 @@
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
-        <treeselect v-model="resourceList" :multiple="true" :options="mainJarList" :normalizer="normalizer">
+        <treeselect v-model="resourceList" :multiple="true" :options="mainJarList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
       </div>
@@ -286,6 +286,12 @@
        */
       _onCacheResourcesData (a) {
         this.cacheResourceList = a
+      },
+      diGuiTree(item) {  // Recursive convenience tree structure
+        item.forEach(item => {
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
+            delete item.children : this.diGuiTree(item.children);
+        })
       },
       /**
        * verification
@@ -408,7 +414,9 @@
       }
     },
     created () {
-        this.mainJarList = this.store.state.dag.resourcesListS
+        let item = this.store.state.dag.resourcesListS
+        this.diGuiTree(item)
+        this.mainJarList = item
         let o = this.backfillItem
 
         // Non-null objects represent backfill
