@@ -50,9 +50,14 @@ jobs:
         run: sh ./dockerfile/hooks/check
       - name: Prepare e2e env
         run: |
+          sudo apt-get install libxss1 libappindicator1 libindicator7
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo dpkg -i google-chrome*.deb
+          sudo apt-get install -f
           wget -N http://chromedriver.storage.googleapis.com/2.26/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip
-          sudo mv -f chromedriver /tmp/chromedriver
+          sudo mv -f chromedriver /usr/local/share/chromedriver
+          sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
       - name: Run e2e Test
         run: cd ./e2e && mvn clean test
       - name: Collect logs
