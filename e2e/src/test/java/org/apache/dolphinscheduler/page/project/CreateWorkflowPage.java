@@ -29,18 +29,21 @@ public class CreateWorkflowPage extends PageCommon {
     /**
      * jump page
      */
+
     public boolean createWorkflow() throws InterruptedException {
         // click project name
         clickElement(CreateWorkflowLocator.CLICK_PROJECT_NAME);
 
         // click workflow define
         clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         // click create workflow button
         clickElement(CreateWorkflowLocator.CLICK_CREATE_WORKFLOW_BUTTON);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         //drag shell_task
-        dragAndDropBy(CreateWorkflowLocator.MOUSE_DOWN_AT_SHELL,CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG);
+        dragAndDrop(CreateWorkflowLocator.MOUSE_DOWN_AT_SHELL,CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG);
 
         //input shell task _name
         sendInput(CreateWorkflowLocator.INPUT_SHELL_TASK_NAME , CreatWorkflowData.SHELL_TASK_NAME);
@@ -48,10 +51,8 @@ public class CreateWorkflowPage extends PageCommon {
         //click stop run type
         clickElement(CreateWorkflowLocator.CLICK_STOP_RUN_TYPE);
 
-
         //click normal run type
         clickElement(CreateWorkflowLocator.CLICK_NORMAL_RUN_TYPE);
-
 
         //input shell task description
         sendInput(CreateWorkflowLocator.INPUT_SHELL_TASK_DESCRIPTION , CreatWorkflowData.SHELL_TASK_DESCRIPTION);
@@ -127,7 +128,7 @@ public class CreateWorkflowPage extends PageCommon {
         clickElement(CreateWorkflowLocator.CLICK_SUBMIT_BUTTON);
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
-        moveToElement(CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG,-300,-100);
+        moveToDragElement(CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG,-300,-100);
 
         return ifTitleContains(CreatWorkflowData.WORKFLOW_TITLE);
     }

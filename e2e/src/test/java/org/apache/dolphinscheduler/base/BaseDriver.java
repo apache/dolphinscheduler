@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.base;
 
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.util.PropertiesReader;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -27,6 +26,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * base driver class
@@ -93,6 +93,9 @@ public class BaseDriver {
         /* driver setting wait time */
         // implicitly wait time
         driver.manage().timeouts().implicitlyWait(implicitlyWait, TimeUnit.SECONDS);
+
+        // page load timeout
+        driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
 
         // page load timeout
         driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);

@@ -178,14 +178,12 @@ public class BrowserCommon {
         codeMirrorLineElement.sendKeys(content);
     }
 
-
     /**
      * move to element
-     *
      * @param locator BY
      * @return actions
      */
-    public Actions moveToElement(By locator) {
+    public Actions moveToElement(By locator){
         return actions.moveToElement(locateElement(locator));
     }
 
@@ -194,21 +192,20 @@ public class BrowserCommon {
      *
      * @param source_locator BY
      * @param target_locator BY
-     * @param X  X-axis
-     * @param Y Y-axis
      */
-    public void dragAndDropBy(By source_locator, By target_locator) {
+    public void dragAndDrop(By source_locator, By target_locator){
         WebElement sourceElement = locateElement(source_locator);
         WebElement targetElement = locateElement(target_locator);
         actions.dragAndDrop(sourceElement, targetElement).perform();
         actions.release();
     }
 
-    public void moveToElement(By target_locator, int X, int Y) {
+    public void moveToDragElement(By target_locator, int X, int Y){
         WebElement targetElement = locateElement(target_locator);
         actions.dragAndDropBy(targetElement, X, Y).perform();
         actions.release();
     }
+
 
     /**
      * jump page
@@ -322,6 +319,7 @@ public class BrowserCommon {
         WebElement webElement = driver.findElement(By.xpath("/html/body/div[4]/div/div[2]/div/div[2]/div/div[7]/div[3]"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", webElement);
     }
+
 
     /**
      * Page swipe makes the top of the element align with the top of the page

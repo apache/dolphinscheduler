@@ -39,7 +39,7 @@ public class CreateWorkflowLocator {
     public static final By MOUSE_DOWN_AT_SPARK = By.xpath("//div[5]/div/div");
 
     //mouse move at DAG
-    public static final By MOUSE_MOVE_SHELL_AT_DAG = By.xpath("//*[@id=\"canvas\"]");
+    public static final By MOUSE_MOVE_SHELL_AT_DAG = By.xpath("//*[@id=canvas]");
 
     //input shell task _name
     public static final By INPUT_SHELL_TASK_NAME = By.xpath("//input");
