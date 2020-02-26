@@ -187,19 +187,6 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         }
         return false;
     }
-
-    /**
-     * get execute local path
-     *
-     * @return execute local path
-     */
-    private String getExecLocalPath(TaskInstance taskInstance){
-        return FileUtils.getProcessExecDir(taskInstance.getProcessDefine().getProjectId(),
-                taskInstance.getProcessDefine().getId(),
-                taskInstance.getProcessInstance().getId(),
-                taskInstance.getId());
-    }
-
     /**
      * submit master base task exec thread
      * @return TaskInstance

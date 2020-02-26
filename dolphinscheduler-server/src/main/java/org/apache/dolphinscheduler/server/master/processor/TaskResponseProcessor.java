@@ -58,7 +58,9 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.EXECUTE_TASK_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
         logger.info("received command : {}", command);
         ExecuteTaskResponseCommand responseCommand = FastJsonSerializer.deserialize(command.getBody(), ExecuteTaskResponseCommand.class);
-        processService.changeTaskState(ExecutionStatus.of(responseCommand.getStatus()), responseCommand.getEndTime(), responseCommand.getTaskInstanceId());
+        processService.changeTaskState(ExecutionStatus.of(responseCommand.getStatus()),
+                responseCommand.getEndTime(),
+                responseCommand.getTaskInstanceId());
     }
 
 

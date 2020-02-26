@@ -26,6 +26,9 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +46,12 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     private static final Logger logger = LoggerFactory.getLogger(MasterTaskExecThread.class);
 
+
+    /**
+     * taskInstance state manager
+     */
+    private TaskInstanceCacheManager taskInstanceCacheManager;
+
     /**
      * constructor of MasterTaskExecThread
      * @param taskInstance      task instance
@@ -50,6 +59,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     public MasterTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
         super(taskInstance, processInstance);
+        this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
     }
 
     /**
@@ -67,7 +77,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     private Boolean alreadyKilled = false;
 
     /**
-     * submit task instance and wait complete
+     * TODO submit task instance and wait complete
      * @return true is task quit is true
      */
     @Override
@@ -89,12 +99,13 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
-     * wait task quit
+     * TODO 在这里轮询数据库
+     * TODO wait task quit
      * @return true if task quit success
      */
     public Boolean waitTaskQuit(){
         // query new state
-        taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+        taskInstance = taskInstanceCacheManager.getByTaskInstanceId(taskInstance.getId());
         logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
                 this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
         // task time out
@@ -133,7 +144,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                     }
                 }
                 // updateProcessInstance task instance
-                taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+                taskInstance = taskInstanceCacheManager.getByTaskInstanceId(taskInstance.getId());
                 processInstance = processService.findProcessInstanceById(processInstance.getId());
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
