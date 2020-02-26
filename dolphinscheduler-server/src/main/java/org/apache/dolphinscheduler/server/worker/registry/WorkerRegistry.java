@@ -19,10 +19,21 @@ package org.apache.dolphinscheduler.server.worker.registry;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.utils.Constants;
+import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
+
 
 /**
  *  worker registry
@@ -42,13 +53,31 @@ public class WorkerRegistry {
     private final int port;
 
     /**
+     * heartbeat interval
+     */
+    private final long heartBeatInterval;
+
+    /**
+     * heartbeat executor
+     */
+    private final ScheduledExecutorService heartBeatExecutor;
+
+    /**
+     * worker start time
+     */
+    private final String startTime;
+
+    /**
      *  construct
      * @param zookeeperRegistryCenter zookeeperRegistryCenter
      * @param port port
      */
-    public WorkerRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port){
+    public WorkerRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port, long heartBeatInterval){
         this.zookeeperRegistryCenter = zookeeperRegistryCenter;
         this.port = port;
+        this.heartBeatInterval = heartBeatInterval;
+        this.startTime = DateUtils.dateToString(new Date());
+        this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
 
     /**
@@ -71,7 +100,9 @@ public class WorkerRegistry {
                 }
             }
         });
-        logger.info("worker node : {} registry to ZK successfully.", address);
+        this.heartBeatExecutor.scheduleAtFixedRate(new HeartBeatTask(), heartBeatInterval, heartBeatInterval, TimeUnit.SECONDS);
+        logger.info("worker node : {} registry to ZK successfully with heartBeatInterval : {}s", address, heartBeatInterval);
+
     }
 
     /**
@@ -81,6 +112,7 @@ public class WorkerRegistry {
         String address = getLocalAddress();
         String localNodePath = getWorkerPath();
         zookeeperRegistryCenter.getZookeeperCachedOperator().remove(localNodePath);
+        this.heartBeatExecutor.shutdownNow();
         logger.info("worker node : {} unRegistry to ZK.", address);
     }
 
@@ -100,5 +132,27 @@ public class WorkerRegistry {
      */
     private String getLocalAddress(){
         return Constants.LOCAL_ADDRESS + ":" + port;
+    }
+
+    /**
+     * hear beat task
+     */
+    class HeartBeatTask implements Runnable{
+
+        @Override
+        public void run() {
+            try {
+                StringBuilder builder = new StringBuilder(100);
+                builder.append(OSUtils.cpuUsage()).append(COMMA);
+                builder.append(OSUtils.memoryUsage()).append(COMMA);
+                builder.append(OSUtils.loadAverage()).append(COMMA);
+                builder.append(startTime).append(COMMA);
+                builder.append(DateUtils.dateToString(new Date()));
+                String workerPath = getWorkerPath();
+                zookeeperRegistryCenter.getZookeeperCachedOperator().persist(workerPath, builder.toString());
+            } catch (Throwable ex){
+                logger.error("error write worker heartbeat info", ex);
+            }
+        }
     }
 }
