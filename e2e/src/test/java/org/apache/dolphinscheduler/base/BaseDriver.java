@@ -83,9 +83,9 @@ public class BaseDriver {
         // set chrome driver
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("–no-sandbox");
-        chromeOptions.addArguments("–disable-dev-shm-usage");
-        chromeOptions.addArguments("–headless");
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-dev-shm-usage");
+        chromeOptions.addArguments("--headless");
         driver = new ChromeDriver(chromeOptions);
 
         /* driver setting wait time */
