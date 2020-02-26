@@ -24,11 +24,11 @@ public class CreateWorkflowTest  extends BaseTest {
     private CreateWorkflowPage createWorkflowPage;
 
     @Test(description = "CreateWorkflowTest", priority = 1)
-    public void testUserManage() throws InterruptedException {
+    public void CreateWorkflowTest() throws InterruptedException {
         createWorkflowPage = new CreateWorkflowPage(driver);
         // enter user manage page
-        createWorkflowPage.jumpPage();
+//        createWorkflowPage.jumpPage();
         //assert user manage page
-//        assert createProjectPage.createProject();
+        assert createWorkflowPage.CreateWorkflow();
     }
 }

@@ -19,9 +19,8 @@ package org.apache.dolphinscheduler.page.project;
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.project.CreatWorkflowData;
-import org.apache.dolphinscheduler.locator.project.CreateWorkflowLocator;
 import org.apache.dolphinscheduler.locator.project.CreateProjectLocator;
-import org.apache.dolphinscheduler.util.RedisUtil;
+import org.apache.dolphinscheduler.locator.project.CreateWorkflowLocator;
 import org.openqa.selenium.WebDriver;
 
 public class CreateWorkflowPage extends PageCommon {
@@ -31,7 +30,8 @@ public class CreateWorkflowPage extends PageCommon {
     /**
      * jump page
      */
-    public void jumpPage() throws InterruptedException {
+    public boolean CreateWorkflow() throws InterruptedException {
+        Thread.sleep(TestConstant.ONE_THOUSANG);
         // click project manage
         clickElement(CreateProjectLocator.PROJECT_MANAGE);
         Thread.sleep(TestConstant.ONE_THOUSANG);
@@ -46,14 +46,8 @@ public class CreateWorkflowPage extends PageCommon {
         // click create workflow button
         clickElement(CreateWorkflowLocator.CLICK_CREATE_WORKFLOW_BUTTON);
 
-        //mouse down at shell
-        moveToElement(CreateWorkflowLocator.MOUSE_DOWN_AT_SHELL);
-
-        //mouse move at DAG
-        moveToElement(CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG);
-
-        //click shell task
-        clickElement(CreateWorkflowLocator.CLICK_SHELL_TASK);
+        //drag shell_task
+        dragAndDropBy(CreateWorkflowLocator.MOUSE_DOWN_AT_SHELL,CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG, 3 ,6);
 
         //input shell task _name
         sendInput(CreateWorkflowLocator.INPUT_SHELL_TASK_NAME , CreatWorkflowData.SHELL_TASK_NAME);
@@ -70,14 +64,15 @@ public class CreateWorkflowPage extends PageCommon {
         sendInput(CreateWorkflowLocator.INPUT_SHELL_TASK_DESCRIPTION , CreatWorkflowData.SHELL_TASK_DESCRIPTION);
 
         //select task priority
+        clickElement(CreateWorkflowLocator.CLICK_TASK_PRIORITY);
         clickElement(CreateWorkflowLocator.SELECT_TASK_PRIORITY);
 
         //select work group
+        clickElement(CreateWorkflowLocator.CLICK_WORK_GROUP);
         clickElement(CreateWorkflowLocator.SELECT_WORK_GROUP);
 
         //select number of failed retries
         clickElement(CreateWorkflowLocator.SELECT_FAIL_RETRIES_NUMBER);
-
 
         //select failed retry interval
         clickElement(CreateWorkflowLocator.SELECT_FAIL_RETRIES_INTERVAL);
@@ -98,12 +93,16 @@ public class CreateWorkflowPage extends PageCommon {
         //select timeout alarm
         clickElement(CreateWorkflowLocator.SELECT_TIMEOUT_ALARM);
 
+        //clear input
+        clearInput(CreateWorkflowLocator.SELECT_TIMEOUT);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
 
-        //select timeout
-        clickElement(CreateWorkflowLocator.SELECT_TIMEOUT);
+        //input timeout
+        sendInput(CreateWorkflowLocator.SELECT_TIMEOUT,CreatWorkflowData.INPUT_TIMEOUT);
 
         //input script
         sendInput(CreateWorkflowLocator.INPUT_SCRIPT, CreatWorkflowData.SHELL_SCRIPT);
 
+        return ifTitleContains(CreatWorkflowData.WORKFLOW_TITLE);
     }
 }

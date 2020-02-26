@@ -18,10 +18,7 @@ package org.apache.dolphinscheduler.common;
 
 import org.apache.dolphinscheduler.util.PropertiesReader;
 import org.apache.dolphinscheduler.util.RedisUtil;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -156,6 +153,19 @@ public class BrowserCommon {
         inputElement.sendKeys(content);
         return inputElement;
     }
+    /**
+     * clear element
+     *
+     * @param locator By
+     */
+    public void clearInput(By locator) {
+        WebElement clearElement = locateElement(locator);
+        clearElement.click();
+        clearElement.clear();
+        clearElement.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        clearElement.sendKeys(Keys.DELETE);
+    }
+
 
     /**
      * move to element
@@ -166,6 +176,22 @@ public class BrowserCommon {
     public Actions moveToElement(By locator) {
         return actions.moveToElement(locateElement(locator));
     }
+
+    /**
+     * mouse drag  element
+     *
+     * @param source_locator BY
+     * @param target_locator BY
+     * @param X  X-axis
+     * @param Y Y-axis
+     */
+    public void dragAndDropBy(By source_locator, By target_locator, int X, int Y) {
+        WebElement sourcetElement = locateElement(source_locator);
+        WebElement targetElement = locateElement(target_locator);
+        actions.dragAndDrop(sourcetElement, targetElement).moveToElement(targetElement, X, Y).perform();
+        actions.release();
+    }
+
 
     /**
      * jump page

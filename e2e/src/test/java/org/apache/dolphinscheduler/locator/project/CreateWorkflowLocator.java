@@ -33,13 +33,16 @@ public class CreateWorkflowLocator {
     public static final By CLICK_CREATE_WORKFLOW_BUTTON = By.xpath("//button/span");
 
     //mouse down at shell
-    public static final By MOUSE_DOWN_AT_SHELL = By.xpath("//div[2]/div/div/div[2]/div/div/div");
+    public static final By MOUSE_DOWN_AT_SHELL = By.xpath("//*[@id='SHELL']/div/div");
+
+    //mouse down at spark
+    public static final By MOUSE_DOWN_AT_SPARK = By.xpath("//div[5]/div/div");
 
     //mouse move at DAG
     public static final By MOUSE_MOVE_SHELL_AT_DAG = By.xpath("//div[2]/div/div[2]/div[2]/div/div");
 
-    //click shell task
-    public static final By CLICK_SHELL_TASK = By.xpath("//div[2]/div/div[2]/div[2]/div/div");
+//    //click shell task
+//    public static final By CLICK_SHELL_TASK = By.xpath("//div[2]/div/div[2]/div[2]/div/div");
 
     //input shell task _name
     public static final By INPUT_SHELL_TASK_NAME = By.xpath("//input");
@@ -53,31 +56,37 @@ public class CreateWorkflowLocator {
     //input shell task description
     public static final By INPUT_SHELL_TASK_DESCRIPTION = By.xpath("//label/div/textarea");
 
+    //click task priority
+    public static final By CLICK_TASK_PRIORITY = By.xpath("//span/div/div/div/div/div");
+
     //select task priority
-    public static final By SELECT_TASK_PRIORITY = By.xpath("//span/div/div/div/div/div");
+    public static final By SELECT_TASK_PRIORITY = By.xpath("//li[2]/li/span");
+
+    //click work group
+    public static final By CLICK_WORK_GROUP = By.xpath("//div/div/input");
 
     //select work group
-    public static final By SELECT_WORK_GROUP = By.xpath("//li/li/span");
+    public static final By SELECT_WORK_GROUP = By.xpath("//div[4]/div[2]/div/div[1]/div/input");
 
     //select number of failed retries
-    public static final By SELECT_FAIL_RETRIES_NUMBER = By.xpath("//div/div/input");
+    public static final By SELECT_FAIL_RETRIES_NUMBER = By.xpath("//div[5]/div[2]/div[1]/div[1]/div/input");
 
     //select failed retry interval
-    public static final By SELECT_FAIL_RETRIES_INTERVAL = By.xpath("//div[2]/div/div/div/ul/li/span");
+    public static final By SELECT_FAIL_RETRIES_INTERVAL = By.xpath("//div[5]/div[2]/div[2]/div[1]/div/input");
 
     //click timeout alarm
-    public static final By CLICK_TIMEOUT_ALARM = By.xpath("//div[5]/div[2]/div/div/div/input");
+    public static final By CLICK_TIMEOUT_ALARM = By.xpath("//label/div/span/span");
 
     //select timeout fail
-    public static final By SELECT_TIMEOUT_FAIL = By.xpath("//div[5]/div[2]/div/div[2]/div/div/div/ul/li/span");
+    public static final By SELECT_TIMEOUT_FAIL = By.xpath("//div/div/label[2]/span/input");
 
     //cancel timeout alarm
-    public static final By CANCEL_TIMEOUT_ALARM = By.xpath("//div[2]/div/div/input");
+    public static final By CANCEL_TIMEOUT_ALARM = By.xpath("//div/div/label/span/input");
 
     //select timeout alarm
-    public static final By SELECT_TIMEOUT_ALARM = By.xpath("//div[2]/div[2]/div/div/div/ul/li/span");
+    public static final By SELECT_TIMEOUT_ALARM = By.xpath("//div/div/label/span/input");
 
-    //select timeout
+    //input timeout
     public static final By SELECT_TIMEOUT = By.xpath("//div[3]/div[2]/label/div/input");
 
     //input script
