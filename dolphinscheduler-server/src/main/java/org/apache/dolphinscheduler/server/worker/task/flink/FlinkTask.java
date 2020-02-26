@@ -68,7 +68,7 @@ public class FlinkTask extends AbstractYarnTask {
     if (StringUtils.isNotEmpty(flinkParameters.getMainArgs())) {
       String args = flinkParameters.getMainArgs();
       // get process instance by task instance id
-      ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+      ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
 
       /**
        *  combining local and global parameters

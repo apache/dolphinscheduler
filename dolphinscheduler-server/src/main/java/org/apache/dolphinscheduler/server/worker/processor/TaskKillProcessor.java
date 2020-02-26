@@ -42,6 +42,12 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskKillProcessor.class);
 
+    /**
+     *  task kill process
+     *
+     * @param channel channel
+     * @param command command
+     */
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.KILL_TASK_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
@@ -50,7 +56,11 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         doKill(killCommand);
     }
 
-
+    /**
+     * kill task logic
+     *
+     * @param killCommand killCommand
+     */
     private void doKill(KillTaskRequestCommand killCommand){
         try {
             if(killCommand.getProcessId() == 0 ){
@@ -71,6 +81,14 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         }
     }
 
+    /**
+     *  kill yarn job
+     *
+     * @param host host
+     * @param logPath logPath
+     * @param executePath executePath
+     * @param tenantCode tenantCode
+     */
     public void killYarnJob(String host, String logPath, String executePath, String tenantCode) {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);

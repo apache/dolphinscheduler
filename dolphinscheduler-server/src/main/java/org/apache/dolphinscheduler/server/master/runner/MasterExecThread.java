@@ -404,7 +404,7 @@ public class MasterExecThread implements Runnable {
     }
 
     /**
-     * submit task to execute
+     * TODO submit task to execute
      * @param taskInstance task instance
      * @return TaskInstance
      */
@@ -873,7 +873,7 @@ public class MasterExecThread implements Runnable {
                 }
                 logger.info("task :{}, id:{} complete, state is {} ",
                         task.getName(), task.getId(), task.getState().toString());
-                // node success , post node submit
+                //TODO  node success , post node submit
                 if(task.getState() == ExecutionStatus.SUCCESS){
                     completeTaskList.put(task.getName(), task);
                     submitPostNode(task.getName());

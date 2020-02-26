@@ -67,8 +67,10 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
                                  String envFile,
                                  Date startTime,
                                  int timeout,
+                                 String logPath,
+                                 String executePath,
                                  Logger logger) {
-        super(logHandler,taskDir,taskAppId,taskInstId,tenantCode, envFile, startTime, timeout, logger);
+        super(logHandler,taskDir,taskAppId,taskInstId,tenantCode, envFile, startTime, timeout,logPath,executePath,logger);
     }
 
 
@@ -132,15 +134,6 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
         return pythonHome;
     }
 
-    /**
-     * check find yarn application id
-     * @param line line
-     * @return boolean
-     */
-    @Override
-    protected boolean checkFindApp(String line) {
-        return true;
-    }
 
 
     /**

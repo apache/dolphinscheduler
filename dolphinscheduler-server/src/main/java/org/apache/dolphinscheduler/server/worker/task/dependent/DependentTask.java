@@ -107,7 +107,7 @@ public class DependentTask extends AbstractTask {
         try{
             TaskInstance taskInstance = null;
             while(Stopper.isRunning()){
-                taskInstance = processService.findTaskInstanceById(this.taskProps.getTaskInstId());
+                taskInstance = processService.findTaskInstanceById(this.taskProps.getTaskInstanceId());
 
                 if(taskInstance == null){
                     exitStatusCode = -1;

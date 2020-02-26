@@ -56,6 +56,17 @@ public abstract class AbstractTask {
 
 
     /**
+     *  SHELL process pid
+     */
+    protected Integer processId;
+
+    /**
+     * other resource manager appId , for example : YARN etc
+     */
+    protected String appIds;
+
+
+    /**
      * cancel
      */
     protected volatile boolean cancel = false;
@@ -119,11 +130,28 @@ public abstract class AbstractTask {
         this.exitStatusCode = exitStatusCode;
     }
 
+    public String getAppIds() {
+        return appIds;
+    }
+
+    public void setAppIds(String appIds) {
+        this.appIds = appIds;
+    }
+
+    public Integer getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(Integer processId) {
+        this.processId = processId;
+    }
+
     /**
      * get task parameters
      * @return AbstractParameters
      */
     public abstract AbstractParameters getParameters();
+
 
 
     /**
@@ -146,7 +174,7 @@ public abstract class AbstractTask {
                         && paramsMap.containsKey("v_proc_date")){
                     String vProcDate = paramsMap.get("v_proc_date").getValue();
                     if (!StringUtils.isEmpty(vProcDate)){
-                        TaskRecordStatus taskRecordState = TaskRecordDao.getTaskRecordState(taskProps.getNodeName(), vProcDate);
+                        TaskRecordStatus taskRecordState = TaskRecordDao.getTaskRecordState(taskProps.getTaskName(), vProcDate);
                         logger.info("task record status : {}",taskRecordState);
                         if (taskRecordState == TaskRecordStatus.FAILURE){
                             setExitStatusCode(Constants.EXIT_CODE_FAILURE);

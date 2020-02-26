@@ -26,11 +26,6 @@ import org.slf4j.Logger;
  *  abstract yarn task
  */
 public abstract class AbstractYarnTask extends AbstractTask {
-
-  /**
-   *  process instance
-   */
-
   /**
    *  process task
    */
@@ -50,21 +45,26 @@ public abstract class AbstractYarnTask extends AbstractTask {
     super(taskProps, logger);
     this.processService = SpringApplicationContext.getBean(ProcessService.class);
     this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskProps.getTaskDir(),
+            taskProps.getExecutePath(),
             taskProps.getTaskAppId(),
-            taskProps.getTaskInstId(),
+            taskProps.getTaskInstanceId(),
             taskProps.getTenantCode(),
             taskProps.getEnvFile(),
             taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(),
+            taskProps.getLogPath(),
+            taskProps.getExecutePath(),
             logger);
   }
 
   @Override
   public void handle() throws Exception {
     try {
-      // construct process
-      exitStatusCode = shellCommandExecutor.run(buildCommand(), processService);
+      // SHELL task exit code
+      CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
+      setExitStatusCode(commandExecuteResult.getExitStatusCode());
+      setAppIds(commandExecuteResult.getAppIds());
+      setProcessId(commandExecuteResult.getProcessId());
     } catch (Exception e) {
       logger.error("yarn process failure", e);
       exitStatusCode = -1;
@@ -82,7 +82,7 @@ public abstract class AbstractYarnTask extends AbstractTask {
     cancel = true;
     // cancel process
     shellCommandExecutor.cancelApplication();
-    TaskInstance taskInstance = processService.findTaskInstanceById(taskProps.getTaskInstId());
+    TaskInstance taskInstance = processService.findTaskInstanceById(taskProps.getTaskInstanceId());
     if (status && taskInstance != null){
       ProcessUtils.killYarnJob(taskInstance);
     }

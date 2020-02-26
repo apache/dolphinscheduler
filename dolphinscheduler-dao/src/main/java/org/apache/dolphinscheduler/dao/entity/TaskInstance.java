@@ -462,6 +462,14 @@ public class TaskInstance implements Serializable {
         this.workerGroupId = workerGroupId;
     }
 
+    public String getDependentResult() {
+        return dependentResult;
+    }
+
+    public void setDependentResult(String dependentResult) {
+        this.dependentResult = dependentResult;
+    }
+
     @Override
     public String toString() {
         return "TaskInstance{" +
@@ -481,27 +489,19 @@ public class TaskInstance implements Serializable {
                 ", logPath='" + logPath + '\'' +
                 ", retryTimes=" + retryTimes +
                 ", alertFlag=" + alertFlag +
-                ", flag=" + flag +
                 ", processInstance=" + processInstance +
                 ", processDefine=" + processDefine +
                 ", pid=" + pid +
                 ", appLink='" + appLink + '\'' +
                 ", flag=" + flag +
-                ", dependency=" + dependency +
+                ", dependency='" + dependency + '\'' +
                 ", duration=" + duration +
                 ", maxRetryTimes=" + maxRetryTimes +
                 ", retryInterval=" + retryInterval +
                 ", taskInstancePriority=" + taskInstancePriority +
                 ", processInstancePriority=" + processInstancePriority +
-                ", workGroupId=" + workerGroupId +
+                ", dependentResult='" + dependentResult + '\'' +
+                ", workerGroupId=" + workerGroupId +
                 '}';
-    }
-
-    public String getDependentResult() {
-        return dependentResult;
-    }
-
-    public void setDependentResult(String dependentResult) {
-        this.dependentResult = dependentResult;
     }
 }
