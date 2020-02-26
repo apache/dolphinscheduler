@@ -106,6 +106,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     public Boolean waitTaskQuit(){
         // query new state
         taskInstance = taskInstanceCacheManager.getByTaskInstanceId(taskInstance.getId());
+        if (taskInstance == null){
+            taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+        }
         logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
                 this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
         // task time out
