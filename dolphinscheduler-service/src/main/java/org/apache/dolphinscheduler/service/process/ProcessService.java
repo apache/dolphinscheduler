@@ -969,7 +969,7 @@ public class ProcessService {
     public Boolean submitTaskToQueue(TaskInstance taskInstance) {
 
         try{
-            if(taskInstance.isSubProcess()){
+            if(!taskInstance.needSubmitToTaskQueue()){
                 return true;
             }
             if(taskInstance.getState().typeIsFinished()){
@@ -1808,6 +1808,19 @@ public class ProcessService {
         }
 
         return resultList;
+    }
+
+    public String formatTaskAppId(TaskInstance taskInstance){
+        ProcessDefinition definition = this.findProcessDefineById(taskInstance.getProcessDefinitionId());
+        ProcessInstance processInstanceById = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
+
+        if(definition == null || processInstanceById == null){
+            return "";
+        }
+        return String.format("%s_%s_%s",
+                taskInstance.getProcessDefine().getId(),
+                taskInstance.getProcessInstance().getId(),
+                taskInstance.getId());
     }
 
     /**

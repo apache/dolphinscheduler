@@ -372,11 +372,6 @@ public class TaskInstance {
         this.appLink = appLink;
     }
 
-
-    public Boolean isSubProcess(){
-        return TaskType.SUB_PROCESS.toString().equals(this.taskType.toUpperCase());
-    }
-
     public String getDependency(){
 
         if(this.dependency != null){
@@ -449,6 +444,23 @@ public class TaskInstance {
                 || this.getState().typeIsCancel()
                 || (this.getState().typeIsFailure() && !taskCanRetry());
     }
+
+    public Boolean isSubProcess(){
+        return TaskType.SUB_PROCESS.toString().equals(this.taskType.toUpperCase());
+    }
+
+    public Boolean isDependTask(){
+        return TaskType.DEPENDENT.toString().equals(this.taskType.toUpperCase());
+    }
+
+    public Boolean isConditionsTask(){
+        return TaskType.CONDITIONS.toString().equals(this.taskType.toUpperCase());
+    }
+
+    public Boolean needSubmitToTaskQueue(){
+        return !isSubProcess() && !isDependTask() && !isConditionsTask() ;
+    }
+
     /**
      * determine if you can try again
      * @return can try result

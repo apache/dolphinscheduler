@@ -64,22 +64,10 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
             }
             setTaskInstanceState();
             waitTaskQuit();
-            subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
-
-            // at the end of the subflow , the task state is changed to the subflow state
-            if(subProcessInstance != null){
-                if(subProcessInstance.getState() == ExecutionStatus.STOP){
-                    this.taskInstance.setState(ExecutionStatus.KILL);
-                }else{
-                    this.taskInstance.setState(subProcessInstance.getState());
-                }
-            }
-            taskInstance.setEndTime(new Date());
-            processService.updateTaskInstance(taskInstance);
+            updateSubProcessState();
             logger.info("subflow task :{} id:{}, process id:{}, exec thread completed ",
                     this.taskInstance.getName(),taskInstance.getId(), processInstance.getId() );
             result = true;
-
         }catch (Exception e){
             logger.error("exception: ",e);
             if (null != taskInstance) {
@@ -90,6 +78,18 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
         return result;
     }
 
+    private Boolean updateSubProcessState(){
+        subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
+        // at the end of the subflow , the task state is changed to the subflow state
+        if(subProcessInstance != null){
+            if(subProcessInstance.getState() == ExecutionStatus.STOP){
+                this.taskInstance.setState(ExecutionStatus.KILL);
+            }else{
+                this.taskInstance.setState(subProcessInstance.getState());
+            }
+        }
+        return true;
+    }
 
     /**
      *  set task instance state
@@ -125,9 +125,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
      * @throws InterruptedException
      */
     private void waitTaskQuit() throws InterruptedException {
-
         logger.info("wait sub work flow: {} complete", this.taskInstance.getName());
-
         if (taskInstance.getState().typeIsFinished()) {
             logger.info("sub work flow task {} already complete. task state:{}, parent work flow instance state:{}",
                     this.taskInstance.getName(),
@@ -160,6 +158,8 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
             }
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
         }
+        taskInstance.setEndTime(new Date());
+        processService.updateTaskInstance(taskInstance);
     }
 
     /**
