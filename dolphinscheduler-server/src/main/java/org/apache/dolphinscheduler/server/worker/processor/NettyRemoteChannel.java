@@ -18,24 +18,35 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
+import org.apache.dolphinscheduler.remote.utils.Host;
 
 /**
  *  callback channel
  */
-public class CallbackChannel {
+public class NettyRemoteChannel {
 
     /**
      *  channel
      */
-    private Channel channel;
+    private final Channel channel;
 
     /**
      *  equest unique identification
      */
-    private long opaque;
+    private final long opaque;
 
-    public CallbackChannel(Channel channel, long opaque) {
+    /**
+     * master host
+     */
+    private final Host host;
+
+
+    public NettyRemoteChannel(Channel channel, long opaque) {
         this.channel = channel;
+        this.host = ChannelUtils.toAddress(channel);
         this.opaque = opaque;
     }
 
@@ -43,15 +54,23 @@ public class CallbackChannel {
         return channel;
     }
 
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-    }
-
     public long getOpaque() {
         return opaque;
     }
 
-    public void setOpaque(long opaque) {
-        this.opaque = opaque;
+    public Host getHost() {
+        return host;
+    }
+
+    public boolean isActive(){
+        return this.channel.isActive();
+    }
+
+    public ChannelFuture writeAndFlush(Command command){
+        return this.channel.writeAndFlush(command);
+    }
+
+    public void close(){
+        this.channel.close();
     }
 }
