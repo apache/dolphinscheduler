@@ -19,9 +19,12 @@ package org.apache.dolphinscheduler.base;
 
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.util.PropertiesReader;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -81,13 +84,19 @@ public class BaseDriver {
     public void startBrowser() throws Exception {
         // set chrome driver
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-        driver = new ChromeDriver();
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("–no-sandbox");
+        chromeOptions.addArguments("–disable-dev-shm-usage");
+        chromeOptions.addArguments("–headless");
+        driver = new ChromeDriver(chromeOptions);
 
         /* driver setting wait time */
         // implicitly wait time
         driver.manage().timeouts().implicitlyWait(implicitlyWait, TimeUnit.SECONDS);
+
         // page load timeout
         driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
+
         // script timeout
         driver.manage().timeouts().setScriptTimeout(setScriptTimeout, TimeUnit.SECONDS);
 
