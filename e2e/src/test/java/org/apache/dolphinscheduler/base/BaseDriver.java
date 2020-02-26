@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.util.PropertiesReader;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
@@ -81,7 +82,9 @@ public class BaseDriver {
     public void startBrowser() throws Exception {
         // set chrome driver
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-dev-shm-usage");
+        driver = new ChromeDriver(options);
 
         /* driver setting wait time */
         // implicitly wait time
