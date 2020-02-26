@@ -165,7 +165,6 @@ public class TaskScheduleThread implements Runnable {
                 new Date(),
                 taskInstance.getId());
     }
-
     /**
      * get global paras map
      * @return
