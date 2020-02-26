@@ -316,7 +316,7 @@ public class SqlTask extends AbstractTask {
                             sendAttachment(sqlParameters.getTitle(),
                                     JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
                         }else{
-                            sendAttachment(taskProps.getNodeName() + " query resultsets ",
+                            sendAttachment(taskProps.getTaskName() + " query resultsets ",
                                     JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
                         }
                     }
@@ -384,7 +384,7 @@ public class SqlTask extends AbstractTask {
     public void sendAttachment(String title,String content){
 
         //  process instance
-        ProcessInstance instance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance instance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
 
         List<User> users = alertDao.queryUserByAlertGroupId(instance.getWarningGroupId());
 
@@ -471,7 +471,7 @@ public class SqlTask extends AbstractTask {
      */
     private void checkUdfPermission(Integer[] udfFunIds) throws Exception{
         //  process instance
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
         int userId = processInstance.getExecutorId();
 
         PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF, processService,udfFunIds,userId,logger);
@@ -485,7 +485,7 @@ public class SqlTask extends AbstractTask {
      */
     private void checkDataSourcePermission(int dataSourceId) throws Exception{
         //  process instance
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
         int userId = processInstance.getExecutorId();
 
         PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE, processService,new Integer[]{dataSourceId},userId,logger);

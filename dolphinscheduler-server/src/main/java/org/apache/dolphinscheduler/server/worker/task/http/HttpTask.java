@@ -138,7 +138,7 @@ public class HttpTask extends AbstractTask {
      */
     protected CloseableHttpResponse sendRequest(CloseableHttpClient client) throws IOException {
         RequestBuilder builder = createRequestBuilder();
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
 
         Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
                 taskProps.getDefinedParams(),

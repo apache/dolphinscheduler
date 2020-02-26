@@ -53,13 +53,15 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     public ShellCommandExecutor(Consumer<List<String>> logHandler,
                                 String taskDir,
                                 String taskAppId,
-                                int taskInstId,
+                                Integer taskInstId,
                                 String tenantCode,
                                 String envFile,
                                 Date startTime,
-                                int timeout,
+                                Integer timeout,
+                                String logPath,
+                                String executePath,
                                 Logger logger) {
-        super(logHandler,taskDir,taskAppId,taskInstId,tenantCode, envFile, startTime, timeout, logger);
+        super(logHandler,taskDir,taskAppId,taskInstId,tenantCode, envFile, startTime, timeout,logPath,executePath,logger);
     }
 
 
@@ -78,15 +80,6 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
         return SH;
     }
 
-    /**
-     * check find yarn application id
-     * @param line line
-     * @return true if line contains task app id
-     */
-    @Override
-    protected boolean checkFindApp(String line) {
-        return line.contains(taskAppId);
-    }
 
     /**
      * create command file if not exists

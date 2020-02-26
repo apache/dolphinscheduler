@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -74,15 +75,17 @@ public class ShellTask extends AbstractTask {
   public ShellTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
 
-    this.taskDir = taskProps.getTaskDir();
+    this.taskDir = taskProps.getExecutePath();
 
-    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskProps.getTaskDir(),
+    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskProps.getExecutePath(),
             taskProps.getTaskAppId(),
-            taskProps.getTaskInstId(),
+            taskProps.getTaskInstanceId(),
             taskProps.getTenantCode(),
             taskProps.getEnvFile(),
             taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(),
+            taskProps.getLogPath(),
+            taskProps.getExecutePath(),
             logger);
     this.processService = SpringApplicationContext.getBean(ProcessService.class);
   }
@@ -102,10 +105,13 @@ public class ShellTask extends AbstractTask {
   public void handle() throws Exception {
     try {
       // construct process
-      exitStatusCode = shellCommandExecutor.run(buildCommand(), processService);
+      CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(buildCommand());
+      setExitStatusCode(commandExecuteResult.getExitStatusCode());
+      setAppIds(commandExecuteResult.getAppIds());
+      setProcessId(commandExecuteResult.getProcessId());
     } catch (Exception e) {
       logger.error("shell task failure", e);
-      exitStatusCode = -1;
+      setExitStatusCode(Constants.EXIT_CODE_FAILURE);
       throw e;
     }
   }

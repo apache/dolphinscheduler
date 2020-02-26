@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
@@ -42,8 +44,14 @@ public class TaskAckProcessor implements NettyRequestProcessor {
      */
     private final ProcessService processService;
 
+    /**
+     * taskInstance cache manager
+     */
+    private final TaskInstanceCacheManager taskInstanceCacheManager;
+
     public TaskAckProcessor(){
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
+        this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
     }
 
     /**
@@ -55,7 +63,9 @@ public class TaskAckProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.EXECUTE_TASK_ACK == command.getType(), String.format("invalid command type : %s", command.getType()));
         ExecuteTaskAckCommand taskAckCommand = FastJsonSerializer.deserialize(command.getBody(), ExecuteTaskAckCommand.class);
-        logger.info("taskAckCommand : {}",taskAckCommand);
+        logger.info("taskAckCommand : {}", taskAckCommand);
+
+        taskInstanceCacheManager.cacheTaskInstance(taskAckCommand);
         /**
          * change Task state
          */
@@ -65,6 +75,7 @@ public class TaskAckProcessor implements NettyRequestProcessor {
                 taskAckCommand.getExecutePath(),
                 taskAckCommand.getLogPath(),
                 taskAckCommand.getTaskInstanceId());
+
     }
 
 }
