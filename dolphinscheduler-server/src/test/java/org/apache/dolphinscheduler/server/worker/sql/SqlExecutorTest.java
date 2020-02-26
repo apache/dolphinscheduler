@@ -97,15 +97,15 @@ public class SqlExecutorTest {
      */
     private void sharedTestSqlTask(String nodeName, String taskAppId, String tenantCode, int taskInstId) throws Exception {
         TaskProps taskProps = new TaskProps();
-        taskProps.setTaskDir("");
+        taskProps.setExecutePath("");
         // processDefineId_processInstanceId_taskInstanceId
         taskProps.setTaskAppId(taskAppId);
         // set tenant -> task execute linux user
         taskProps.setTenantCode(tenantCode);
         taskProps.setTaskStartTime(new Date());
         taskProps.setTaskTimeout(360000);
-        taskProps.setTaskInstId(taskInstId);
-        taskProps.setNodeName(nodeName);
+        taskProps.setTaskInstanceId(taskInstId);
+        taskProps.setTaskName(nodeName);
         taskProps.setCmdTypeIfComplement(CommandType.START_PROCESS);
 
 

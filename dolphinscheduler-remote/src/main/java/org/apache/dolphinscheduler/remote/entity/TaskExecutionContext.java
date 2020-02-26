@@ -52,10 +52,14 @@ public class TaskExecutionContext implements Serializable{
     private String executePath;
 
     /**
+     * log path
+     */
+    private String logPath;
+
+    /**
      *  task json
      */
     private String taskJson;
-
 
     /**
      *  process instance id
@@ -228,6 +232,14 @@ public class TaskExecutionContext implements Serializable{
         this.cmdTypeIfComplement = cmdTypeIfComplement;
     }
 
+    public String getLogPath() {
+        return logPath;
+    }
+
+    public void setLogPath(String logPath) {
+        this.logPath = logPath;
+    }
+
     @Override
     public String toString() {
         return "TaskExecutionContext{" +
@@ -236,6 +248,7 @@ public class TaskExecutionContext implements Serializable{
                 ", startTime=" + startTime +
                 ", taskType='" + taskType + '\'' +
                 ", executePath='" + executePath + '\'' +
+                ", logPath='" + logPath + '\'' +
                 ", taskJson='" + taskJson + '\'' +
                 ", processInstanceId=" + processInstanceId +
                 ", scheduleTime=" + scheduleTime +

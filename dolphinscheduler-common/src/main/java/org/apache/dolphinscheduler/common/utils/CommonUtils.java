@@ -26,7 +26,7 @@ import java.io.File;
 /**
  * common utils
  */
-public class  CommonUtils {
+public class CommonUtils {
   private CommonUtils() {
     throw new IllegalStateException("CommonUtils class");
   }

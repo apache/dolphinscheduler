@@ -121,11 +121,11 @@ public class DataxTask extends AbstractTask {
     public DataxTask(TaskProps props, Logger logger) {
         super(props, logger);
 
-        this.taskDir = props.getTaskDir();
+        this.taskDir = props.getExecutePath();
         logger.info("task dir : {}", taskDir);
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, props.getTaskDir(), props.getTaskAppId(),
-            props.getTaskInstId(), props.getTenantCode(), props.getEnvFile(), props.getTaskStartTime(),
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, props.getExecutePath(), props.getTaskAppId(),
+            props.getTaskInstanceId(), props.getTenantCode(), props.getEnvFile(), props.getTaskStartTime(),
             props.getTaskTimeout(), logger);
 
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
@@ -355,7 +355,7 @@ public class DataxTask extends AbstractTask {
         String dataxCommand = sbr.toString();
 
         // find process instance by task id
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
 
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),

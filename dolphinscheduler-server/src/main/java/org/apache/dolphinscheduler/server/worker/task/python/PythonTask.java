@@ -65,12 +65,12 @@ public class PythonTask extends AbstractTask {
   public PythonTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
 
-    this.taskDir = taskProps.getTaskDir();
+    this.taskDir = taskProps.getExecutePath();
 
     this.pythonCommandExecutor = new PythonCommandExecutor(this::logHandle,
-            taskProps.getTaskDir(),
+            taskProps.getExecutePath(),
             taskProps.getTaskAppId(),
-            taskProps.getTaskInstId(),
+            taskProps.getTaskInstanceId(),
             taskProps.getTenantCode(),
             taskProps.getEnvFile(),
             taskProps.getTaskStartTime(),

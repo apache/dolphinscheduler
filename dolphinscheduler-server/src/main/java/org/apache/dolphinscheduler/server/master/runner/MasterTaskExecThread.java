@@ -162,6 +162,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
 
     /**
+     *  TODO Kill 任务
      *  task instance add queue , waiting worker to kill
      */
     private void cancelTaskInstance(){
@@ -175,6 +176,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         }
         String queueValue = String.format("%s-%d",
                 host, taskInstance.getId());
+        // TODO 这里写
         taskQueue.sadd(DOLPHINSCHEDULER_TASKS_KILL, queueValue);
 
         logger.info("master add kill task :{} id:{} to kill queue",
