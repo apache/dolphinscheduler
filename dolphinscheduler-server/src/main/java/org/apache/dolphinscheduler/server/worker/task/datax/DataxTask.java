@@ -52,6 +52,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -121,12 +122,12 @@ public class DataxTask extends AbstractTask {
     public DataxTask(TaskProps props, Logger logger) {
         super(props, logger);
 
-        this.taskDir = props.getTaskDir();
+        this.taskDir = props.getExecutePath();
         logger.info("task dir : {}", taskDir);
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, props.getTaskDir(), props.getTaskAppId(),
-            props.getTaskInstId(), props.getTenantCode(), props.getEnvFile(), props.getTaskStartTime(),
-            props.getTaskTimeout(), logger);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, props.getExecutePath(), props.getTaskAppId(),
+            props.getTaskInstanceId(), props.getTenantCode(), props.getEnvFile(), props.getTaskStartTime(),
+            props.getTaskTimeout(), props.getLogPath(),props.getExecutePath(),logger);
 
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
@@ -160,10 +161,15 @@ public class DataxTask extends AbstractTask {
             // run datax process
             String jsonFilePath = buildDataxJsonFile();
             String shellCommandFilePath = buildShellCommandFile(jsonFilePath);
-            exitStatusCode = shellCommandExecutor.run(shellCommandFilePath, processService);
+            CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
+
+            setExitStatusCode(commandExecuteResult.getExitStatusCode());
+            setAppIds(commandExecuteResult.getAppIds());
+            setProcessId(commandExecuteResult.getProcessId());
         }
         catch (Exception e) {
-            exitStatusCode = -1;
+            logger.error("datax task failure", e);
+            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
             throw e;
         }
     }
@@ -355,7 +361,7 @@ public class DataxTask extends AbstractTask {
         String dataxCommand = sbr.toString();
 
         // find process instance by task id
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
 
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),

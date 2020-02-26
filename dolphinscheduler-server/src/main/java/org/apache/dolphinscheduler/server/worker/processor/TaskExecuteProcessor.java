@@ -155,6 +155,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         }else{
             ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
         }
+        taskExecutionContext.setLogPath(ackCommand.getLogPath());
         return ackCommand;
     }
 

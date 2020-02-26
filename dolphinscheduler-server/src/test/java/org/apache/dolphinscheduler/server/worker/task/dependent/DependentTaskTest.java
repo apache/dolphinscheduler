@@ -50,7 +50,7 @@ public class DependentTaskTest {
                 "\"relation\":\"OR\"\n" +
                 "}";
 
-        taskProps.setTaskInstId(252612);
+        taskProps.setTaskInstanceId(252612);
         taskProps.setDependence(dependString);
         DependentTask dependentTask = new DependentTask(taskProps, logger);
         dependentTask.init();

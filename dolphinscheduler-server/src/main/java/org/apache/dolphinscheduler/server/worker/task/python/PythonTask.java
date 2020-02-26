@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task.python;
 
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
@@ -24,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.PythonCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -65,16 +67,18 @@ public class PythonTask extends AbstractTask {
   public PythonTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
 
-    this.taskDir = taskProps.getTaskDir();
+    this.taskDir = taskProps.getExecutePath();
 
     this.pythonCommandExecutor = new PythonCommandExecutor(this::logHandle,
-            taskProps.getTaskDir(),
+            taskProps.getExecutePath(),
             taskProps.getTaskAppId(),
-            taskProps.getTaskInstId(),
+            taskProps.getTaskInstanceId(),
             taskProps.getTenantCode(),
             taskProps.getEnvFile(),
             taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(),
+            taskProps.getLogPath(),
+            taskProps.getExecutePath(),
             logger);
     this.processService = SpringApplicationContext.getBean(ProcessService.class);
   }
@@ -94,10 +98,15 @@ public class PythonTask extends AbstractTask {
   public void handle() throws Exception {
     try {
       //  construct process
-      exitStatusCode = pythonCommandExecutor.run(buildCommand(), processService);
-    } catch (Exception e) {
+      CommandExecuteResult commandExecuteResult = pythonCommandExecutor.run(buildCommand());
+
+      setExitStatusCode(commandExecuteResult.getExitStatusCode());
+      setAppIds(commandExecuteResult.getAppIds());
+      setProcessId(commandExecuteResult.getProcessId());
+    }
+    catch (Exception e) {
       logger.error("python task failure", e);
-      exitStatusCode = -1;
+      setExitStatusCode(Constants.EXIT_CODE_FAILURE);
       throw e;
     }
   }
