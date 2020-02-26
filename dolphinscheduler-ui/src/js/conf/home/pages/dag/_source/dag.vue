@@ -552,7 +552,7 @@
             props: {
               id: id,
               taskType: type,
-              self: self
+              self: self,
               preNode: preNode,
               rearList: rearList
             }
