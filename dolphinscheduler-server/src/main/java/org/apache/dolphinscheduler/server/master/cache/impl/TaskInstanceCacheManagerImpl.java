@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
 import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -38,6 +40,12 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
      */
     private Map<Integer,TaskInstance> taskInstanceCache = new ConcurrentHashMap<>();
 
+    /**
+     *  process service
+     */
+    @Autowired
+    private ProcessService processService;
+
 
     /**
      * get taskInstance by taskInstance id
@@ -47,6 +55,10 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
      */
     @Override
     public TaskInstance getByTaskInstanceId(Integer taskInstanceId) {
+        TaskInstance taskInstance = getByTaskInstanceId(taskInstanceId);
+        if (taskInstance == null){
+            return taskInstance = processService.findTaskInstanceById(taskInstanceId);
+        }
         return taskInstanceCache.get(taskInstanceId);
     }
 
@@ -58,9 +70,6 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     @Override
     public void cacheTaskInstance(TaskExecutionContext taskExecutionContext) {
         TaskInstance taskInstance = getByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        if (taskInstance == null){
-            taskInstance = new TaskInstance();
-        }
         taskInstance.setId(taskExecutionContext.getTaskInstanceId());
         taskInstance.setName(taskExecutionContext.getTaskName());
         taskInstance.setStartTime(taskExecutionContext.getStartTime());
@@ -77,9 +86,6 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     @Override
     public void cacheTaskInstance(ExecuteTaskAckCommand taskAckCommand) {
         TaskInstance taskInstance = getByTaskInstanceId(taskAckCommand.getTaskInstanceId());
-        if (taskInstance == null){
-            taskInstance = new TaskInstance();
-        }
         taskInstance.setState(ExecutionStatus.of(taskAckCommand.getStatus()));
         taskInstance.setStartTime(taskAckCommand.getStartTime());
         taskInstance.setHost(taskAckCommand.getHost());
@@ -95,9 +101,6 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     @Override
     public void cacheTaskInstance(ExecuteTaskResponseCommand executeTaskResponseCommand) {
         TaskInstance taskInstance = getByTaskInstanceId(executeTaskResponseCommand.getTaskInstanceId());
-        if (taskInstance == null){
-            taskInstance = new TaskInstance();
-        }
         taskInstance.setState(ExecutionStatus.of(executeTaskResponseCommand.getStatus()));
         taskInstance.setEndTime(executeTaskResponseCommand.getEndTime());
     }

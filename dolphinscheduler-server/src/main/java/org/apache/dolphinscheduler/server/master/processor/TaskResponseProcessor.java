@@ -64,8 +64,9 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.EXECUTE_TASK_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
-        logger.info("received command : {}", command);
+
         ExecuteTaskResponseCommand responseCommand = FastJsonSerializer.deserialize(command.getBody(), ExecuteTaskResponseCommand.class);
+        logger.info("received command : {}", command);
 
         taskInstanceCacheManager.cacheTaskInstance(responseCommand);
 
