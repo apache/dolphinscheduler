@@ -591,21 +591,27 @@ public class ResourcesService extends BaseService {
     }
 
     /**
-     * verify resource by name and type
+     * verify resource by full name or pid and type
      * @param fullName  resource full name
+     * @param pid       parent id
      * @param type      resource type
-     * @return true if the resource full name not exists, otherwise return false
+     * @return true if the resource full name or pid not exists, otherwise return false
      */
-    public Result queryByResourceName(String fullName, ResourceType type) {
+    public Result queryResource(String fullName,Integer pid,ResourceType type) {
         Result result = new Result();
-        Resource resource = resourcesMapper.queryResourceByName(fullName,type.ordinal());
-        if (resource == null) {
+        if (StringUtils.isBlank(fullName) && pid == null) {
+            logger.error("You must input one of fullName and pid");
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+            return result;
+        }
+        List<Resource> resourceList = resourcesMapper.queryResource(fullName,pid,type.ordinal());
+        if (CollectionUtils.isEmpty(resourceList)) {
             logger.error("resource file not exist,  resource full name {}", fullName);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
         putMsg(result, Status.SUCCESS);
-        result.setData(resource);
+        result.setData(resourceList.get(0));
 
         return result;
     }

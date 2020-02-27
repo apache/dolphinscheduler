@@ -116,10 +116,11 @@ public interface ResourceMapper extends BaseMapper<Resource> {
     List<Integer> listChildren(@Param("direcotyId") int direcotyId);
 
     /**
-     * query resource by full name
+     * query resource by full name or pid
      * @param fullName  full name
+     * @param pid       parent id
      * @param type      resource type
      * @return resource
      */
-    Resource queryResourceByName(@Param("fullName") String fullName,@Param("type") int type);
+    List<Resource> queryResource(@Param("fullName") String fullName,@Param("pid") int pid,@Param("type") int type);
 }

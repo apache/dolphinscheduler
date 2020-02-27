@@ -112,9 +112,15 @@
         where pid = #{direcotyId}
     </select>
 
-    <select id="queryResourceByName" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <select id="queryResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select *
         from t_ds_resources
-        where full_name = #{fullName} and type = #{type}
+        where and type = #{type}
+        <if test="fullName != null and fullName != ''">
+            and full_name = #{fullName}
+        </if>
+        <if test="pid != null and pid != 0">
+            and pid = #{pid}
+        </if>
     </select>
 </mapper>

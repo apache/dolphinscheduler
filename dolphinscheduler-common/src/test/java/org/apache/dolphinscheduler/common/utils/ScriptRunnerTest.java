@@ -48,7 +48,7 @@ public class ScriptRunnerTest {
             Mockito.when(st.getResultSet()).thenReturn(rs);
             ResultSetMetaData md = Mockito.mock(ResultSetMetaData.class);
             Mockito.when(rs.getMetaData()).thenReturn(md);
-            Mockito.when(md.getColumnCount()).thenReturn(1);
+            Mockito.when(md.getColumnCount()).thenReturn(2);
             Mockito.when(rs.next()).thenReturn(true, false);
             ScriptRunner s = new ScriptRunner(conn, true, true);
             if (dbName.isEmpty()) {
@@ -56,7 +56,7 @@ public class ScriptRunnerTest {
             } else {
                 s.runScript(new StringReader("select 1;"), dbName);
             }
-            Mockito.verify(md).getColumnLabel(0);
+            Mockito.verify(md).getColumnLabel(1);
         } catch(Exception e) {
             Assert.assertNotNull(e);
         }

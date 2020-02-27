@@ -309,22 +309,23 @@ public class ResourcesController extends BaseController{
      * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
-    @ApiOperation(value = "queryByFullName", notes= "QUERY_BY_RESOURCE_NAME")
+    @ApiOperation(value = "queryResource", notes= "QUERY_BY_RESOURCE_NAME")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType ="String")
     })
-    @GetMapping(value = "/queryByFullName")
+    @GetMapping(value = "/queryResource")
     @ResponseStatus(HttpStatus.OK)
-    public Result queryByResourceName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                     @RequestParam(value ="fullName") String fullName,
+    public Result queryResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                     @RequestParam(value ="fullName",required = false) String fullName,
+                                     @RequestParam(value ="pid",required = false) Integer pid,
                                      @RequestParam(value ="type") ResourceType type
     ) {
         try {
-            logger.info("login user {}, query resource by full name: {},resource type: {}",
-                    loginUser.getUserName(), fullName,type);
+            logger.info("login user {}, query resource by full name: {} or pid: {},resource type: {}",
+                    loginUser.getUserName(), fullName,pid,type);
 
-            return resourceService.queryByResourceName(fullName,type);
+            return resourceService.queryResource(fullName,pid,type);
         } catch (Exception e) {
             logger.error(RESOURCE_NOT_EXIST.getMsg(), e);
             return error(Status.RESOURCE_NOT_EXIST.getCode(), Status.RESOURCE_NOT_EXIST.getMsg());
