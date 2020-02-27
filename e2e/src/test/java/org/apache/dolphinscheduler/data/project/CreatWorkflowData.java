@@ -29,8 +29,18 @@ public class CreatWorkflowData {
     //input shell script
     public static final String SHELL_SCRIPT = "echo 1111111";
 
+    //input custom parameters
+    public static final String INPUT_CUSTOM_PARAMETERS = "selenium_parameter";
+
+    //input custom parameters value
+    public static final String INPUT_CUSTOM_PARAMETERS_VALUE = "selenium_parameter_123";
+
+    //input add custom parameters
+    public static final String INPUT_ADD_CUSTOM_PARAMETERS = "selenium_parameter_delete";
+
+    //input add custom parameters value
+    public static final String INPUT_ADD_CUSTOM_PARAMETERS_VALUE = "selenium_parameter_delete_456";
+
+    //create workflow title
     public static final String WORKFLOW_TITLE = "创建流程定义 - DolphinScheduler";
-
-
-
 }

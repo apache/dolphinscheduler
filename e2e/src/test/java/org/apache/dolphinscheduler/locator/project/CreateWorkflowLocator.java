@@ -20,9 +20,6 @@ package org.apache.dolphinscheduler.locator.project;
 import org.openqa.selenium.By;
 
 public class CreateWorkflowLocator {
-    // click project manage
-    public static final By CLICK_PROJECT_MANAGE = By.xpath("//div[2]/div/a/span");
-
     // click project name
     public static final By CLICK_PROJECT_NAME = By.xpath("//span/a");
 
@@ -33,16 +30,13 @@ public class CreateWorkflowLocator {
     public static final By CLICK_CREATE_WORKFLOW_BUTTON = By.xpath("//button/span");
 
     //mouse down at shell
-    public static final By MOUSE_DOWN_AT_SHELL = By.xpath("//*[@id='SHELL']/div/div");
+    public static final By MOUSE_DOWN_AT_SHELL = By.xpath("//div[@id='SHELL']/div/div");
 
     //mouse down at spark
     public static final By MOUSE_DOWN_AT_SPARK = By.xpath("//div[5]/div/div");
 
     //mouse move at DAG
-    public static final By MOUSE_MOVE_SHELL_AT_DAG = By.xpath("//div[2]/div/div[2]/div[2]/div/div");
-
-//    //click shell task
-//    public static final By CLICK_SHELL_TASK = By.xpath("//div[2]/div/div[2]/div[2]/div/div");
+    public static final By MOUSE_MOVE_SHELL_AT_DAG = By.xpath("//div[@id='canvas']");
 
     //input shell task _name
     public static final By INPUT_SHELL_TASK_NAME = By.xpath("//input");
@@ -89,9 +83,33 @@ public class CreateWorkflowLocator {
     //input timeout
     public static final By SELECT_TIMEOUT = By.xpath("//div[3]/div[2]/label/div/input");
 
+    //click codeMirror
+    public static final By CLICK_CODE_MIRROR = By.xpath("//div[5]/div/pre");
+
     //input script
     public static final By INPUT_SCRIPT = By.xpath("//div[2]/div/div/div/div/div/textarea");
 
+    //click custom parameters
+    public static final By CLICK_CUSTOM_PARAMETERS = By.xpath("//span/a/em");
 
+    //input custom parameters
+    public static final By INPUT_CUSTOM_PARAMETERS = By.xpath("//div[2]/div/div/div/div/div/input");
 
+    //input custom parameters value
+    public static final By INPUT_CUSTOM_PARAMETERS_VALUE = By.xpath("//div[2]/input");
+
+    //click add custom parameters
+    public static final By CLICK_ADD_CUSTOM_PARAMETERS = By.xpath("//span[2]/a/em");
+
+    //input add custom parameters
+    public static final By INPUT_ADD_CUSTOM_PARAMETERS = By.xpath("//div[2]/div/div/div/div[2]/div/input");
+
+    //input add custom parameters value
+    public static final By INPUT_ADD_CUSTOM_PARAMETERS_VALUE = By.xpath("//div[2]/div[2]/input");
+
+    //delete custom parameters
+    public static final By CLICK_DELETE_CUSTOM_PARAMETERS = By.xpath("//div[2]/span/a/em");
+
+    //click submit button
+    public static final By CLICK_SUBMIT_BUTTON = By.xpath("//button[2]/span");
 }

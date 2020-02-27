@@ -17,18 +17,21 @@
 package org.apache.dolphinscheduler.testcase.project;
 
 import org.apache.dolphinscheduler.base.BaseTest;
+import org.apache.dolphinscheduler.page.project.CreateProjectPage;
 import org.apache.dolphinscheduler.page.project.CreateWorkflowPage;
 import org.testng.annotations.Test;
 
 public class CreateWorkflowTest  extends BaseTest {
     private CreateWorkflowPage createWorkflowPage;
+    private CreateProjectPage createProjectPage;
+
 
     @Test(description = "CreateWorkflowTest", priority = 1)
     public void CreateWorkflowTest() throws InterruptedException {
+        createProjectPage = new CreateProjectPage(driver);
+        createProjectPage.jumpProjectManagePage();
         createWorkflowPage = new CreateWorkflowPage(driver);
-        // enter user manage page
-//        createWorkflowPage.jumpPage();
-        //assert user manage page
-        assert createWorkflowPage.CreateWorkflow();
+        //assert create workflow
+        assert createWorkflowPage.createWorkflow();
     }
 }

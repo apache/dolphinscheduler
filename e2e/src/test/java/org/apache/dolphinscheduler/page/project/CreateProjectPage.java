@@ -29,9 +29,10 @@ public class CreateProjectPage extends PageCommon {
     /**
      * jump page
      */
-    public void jumpPage() throws InterruptedException {
+    public void jumpProjectManagePage() throws InterruptedException {
         Thread.sleep(TestConstant.ONE_THOUSANG);
         clickElement(CreateProjectLocator.PROJECT_MANAGE);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
     }
 
     /**
@@ -40,7 +41,6 @@ public class CreateProjectPage extends PageCommon {
      * @return Whether to enter the specified page after creat tenant
      */
     public boolean createProject() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
         //click  create project
         clickElement(CreateProjectLocator.CREATE_PROJECT_BUTTON);
         Thread.sleep(TestConstant.ONE_THOUSANG);
