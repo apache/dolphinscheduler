@@ -115,7 +115,7 @@
     <select id="queryResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select *
         from t_ds_resources
-        where and type = #{type}
+        where type = #{type}
         <if test="fullName != null and fullName != ''">
             and full_name = #{fullName}
         </if>
