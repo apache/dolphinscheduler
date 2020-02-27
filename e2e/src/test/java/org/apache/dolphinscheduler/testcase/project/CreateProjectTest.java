@@ -27,7 +27,7 @@ public class CreateProjectTest  extends BaseTest {
     public void testUserManage() throws InterruptedException {
         createProjectPage = new CreateProjectPage(driver);
         // enter user manage page
-        createProjectPage.jumpPage();
+        createProjectPage.jumpProjectManagePage();
         //assert user manage page
         assert createProjectPage.createProject();
     }
