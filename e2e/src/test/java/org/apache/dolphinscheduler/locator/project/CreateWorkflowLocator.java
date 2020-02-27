@@ -104,9 +104,6 @@ public class CreateWorkflowLocator {
     //click add custom parameters
     public static final By CLICK_ADD_CUSTOM_PARAMETERS = By.xpath("//span[2]/a/em");
 
-    public static final By TASK_DIV = By.xpath("/html/body/div[4]/div/div[2]/div/div[2]");
-
-
     //input add custom parameters
     public static final By INPUT_ADD_CUSTOM_PARAMETERS = By.xpath("//div[2]/div/div/div/div[2]/div/input");
 

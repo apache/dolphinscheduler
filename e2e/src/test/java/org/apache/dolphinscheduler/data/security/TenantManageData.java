@@ -48,7 +48,7 @@ public class TenantManageData {
      */
     public static final String DESCRIPTION = "creat tenant test";
 
-    public static final String TENANAT_MANAGE = "租户管理 - DolphinScheduler";
+    public static final String TENANAT_MANAGE = "Tenant Manage - DolphinScheduler";
 
 
 

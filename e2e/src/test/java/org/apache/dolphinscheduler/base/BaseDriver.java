@@ -23,9 +23,9 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import org.openqa.selenium.PageLoadStrategy;
 
 
 /**
@@ -85,9 +85,14 @@ public class BaseDriver {
         // set chrome driver
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("–no-sandbox");
-        chromeOptions.addArguments("–disable-dev-shm-usage");
-        chromeOptions.addArguments("–headless");
+        chromeOptions.setPageLoadStrategy(PageLoadStrategy.NONE);
+        chromeOptions.addArguments("--no-sandbox");
+        chromeOptions.addArguments("--disable-dev-shm-usage");
+        chromeOptions.addArguments("--headless");
+        chromeOptions.addArguments("--disable-gpu");
+        chromeOptions.addArguments("--whitelisted-ips");
+        chromeOptions.addArguments("--disable-infobars");
+        chromeOptions.addArguments("--disable-browser-side-navigation");
         driver = new ChromeDriver(chromeOptions);
 
         /* driver setting wait time */
