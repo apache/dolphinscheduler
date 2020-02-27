@@ -22,14 +22,15 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
+import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -45,8 +46,6 @@ import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * master server
@@ -66,11 +65,6 @@ public class MasterServer implements IStoppable {
     private ZKMasterClient zkMasterClient = null;
 
     /**
-     *  heartbeat thread pool
-     */
-    private ScheduledExecutorService heartbeatMasterService;
-
-    /**
      *  process service
      */
     @Autowired
@@ -87,6 +81,11 @@ public class MasterServer implements IStoppable {
     @Autowired
     private MasterConfig masterConfig;
 
+    /**
+     *  zookeeper registry center
+     */
+    @Autowired
+    private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
     /**
      *  spring application context
@@ -95,8 +94,15 @@ public class MasterServer implements IStoppable {
     @Autowired
     private SpringApplicationContext springApplicationContext;
 
+    /**
+     * netty remote server
+     */
     private NettyRemotingServer nettyRemotingServer;
 
+    /**
+     * master registry
+     */
+    private MasterRegistry masterRegistry;
 
     /**
      * master server startup
@@ -115,7 +121,6 @@ public class MasterServer implements IStoppable {
     @PostConstruct
     public void run(){
 
-        //
         //init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(45678);
@@ -125,21 +130,15 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.start();
 
         //
+        this.masterRegistry = new MasterRegistry(zookeeperRegistryCenter, serverConfig.getListenPort(), masterConfig.getMasterHeartbeatInterval());
+        this.masterRegistry.registry();
+
+        //
         zkMasterClient.init();
 
         masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
 
-        heartbeatMasterService = ThreadUtils.newDaemonThreadScheduledExecutor("Master-Main-Thread",Constants.DEFAULT_MASTER_HEARTBEAT_THREAD_NUM);
-
-        // heartbeat thread implement
-        Runnable heartBeatThread = heartBeatThread();
-
         zkMasterClient.setStoppable(this);
-
-        // regular heartbeat
-        // delay 5 seconds, send heartbeat every 30 seconds
-        heartbeatMasterService.
-                scheduleAtFixedRate(heartBeatThread, 5, masterConfig.getMasterHeartbeatInterval(), TimeUnit.SECONDS);
 
         // master scheduler thread
         MasterSchedulerThread masterSchedulerThread = new MasterSchedulerThread(
@@ -206,13 +205,8 @@ public class MasterServer implements IStoppable {
             }catch (Exception e){
                 logger.warn("thread sleep exception ", e);
             }
-            try {
-                heartbeatMasterService.shutdownNow();
-            }catch (Exception e){
-                logger.warn("heartbeat service stopped exception");
-            }
-
-            logger.info("heartbeat service stopped");
+            this.nettyRemotingServer.close();
+            this.masterRegistry.unRegistry();
 
             //close quartz
             try{
@@ -247,35 +241,10 @@ public class MasterServer implements IStoppable {
 
             logger.info("zookeeper service stopped");
 
-
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
             System.exit(-1);
         }
-    }
-
-
-    /**
-     *  heartbeat thread implement
-     * @return
-     */
-    private Runnable heartBeatThread(){
-        logger.info("start master heart beat thread...");
-        Runnable heartBeatThread  = new Runnable() {
-            @Override
-            public void run() {
-                if(Stopper.isRunning()) {
-                    // send heartbeat to zk
-                    if (StringUtils.isBlank(zkMasterClient.getMasterZNode())) {
-                        logger.error("master send heartbeat to zk failed: can't find zookeeper path of master server");
-                        return;
-                    }
-
-                    zkMasterClient.heartBeatForZk(zkMasterClient.getMasterZNode(), Constants.MASTER_PREFIX);
-                }
-            }
-        };
-        return heartBeatThread;
     }
 }
 
