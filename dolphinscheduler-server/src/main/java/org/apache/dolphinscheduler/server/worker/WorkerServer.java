@@ -91,11 +91,6 @@ public class WorkerServer implements IStoppable {
     private AlertDao alertDao;
 
     /**
-     * heartbeat thread pool
-     */
-    private ScheduledExecutorService heartbeatWorkerService;
-
-    /**
      * task queue impl
      */
     protected ITaskQueue taskQueue;
@@ -155,6 +150,7 @@ public class WorkerServer implements IStoppable {
      */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_WORKER_SERVER);
+        System.setProperty("spring.profiles.active","worker");
         new SpringApplicationBuilder(WorkerServer.class).web(WebApplicationType.NONE).run(args);
     }
 
@@ -173,7 +169,7 @@ public class WorkerServer implements IStoppable {
         this.nettyRemotingServer.registerProcessor(CommandType.KILL_TASK_REQUEST, new TaskKillProcessor());
         this.nettyRemotingServer.start();
 
-        this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort());
+        this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort(), workerConfig.getWorkerHeartbeatInterval());
         this.workerRegistry.registry();
 
         this.zkWorkerClient.init();
@@ -184,16 +180,7 @@ public class WorkerServer implements IStoppable {
 
         this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
 
-        heartbeatWorkerService = ThreadUtils.newDaemonThreadScheduledExecutor("Worker-Heartbeat-Thread-Executor", Constants.DEFAUL_WORKER_HEARTBEAT_THREAD_NUM);
-
-        // heartbeat thread implement
-        Runnable heartBeatThread = heartBeatThread();
-
         zkWorkerClient.setStoppable(this);
-
-        // regular heartbeat
-        // delay 5 seconds, send heartbeat every 30 seconds
-        heartbeatWorkerService.scheduleAtFixedRate(heartBeatThread, 5, workerConfig.getWorkerHeartbeatInterval(), TimeUnit.SECONDS);
 
         // kill process thread implement
         Runnable killProcessThread = getKillProcessThread();
@@ -256,13 +243,6 @@ public class WorkerServer implements IStoppable {
             this.workerRegistry.unRegistry();
 
             try {
-                heartbeatWorkerService.shutdownNow();
-            }catch (Exception e){
-                logger.warn("heartbeat service stopped exception");
-            }
-            logger.info("heartbeat service stopped");
-
-            try {
                 ThreadPoolExecutors.getInstance().shutdown();
             }catch (Exception e){
                 logger.warn("threadpool service stopped exception:{}",e.getMessage());
@@ -297,28 +277,6 @@ public class WorkerServer implements IStoppable {
             System.exit(-1);
         }
     }
-
-    /**
-     * heartbeat thread implement
-     *
-     * @return
-     */
-    private Runnable heartBeatThread(){
-        logger.info("start worker heart beat thread...");
-        Runnable heartBeatThread  = new Runnable() {
-            @Override
-            public void run() {
-                // send heartbeat to zk
-                if (StringUtils.isEmpty(zkWorkerClient.getWorkerZNode())){
-                    logger.error("worker send heartbeat to zk failed");
-                }
-
-                zkWorkerClient.heartBeatForZk(zkWorkerClient.getWorkerZNode() , Constants.WORKER_PREFIX);
-            }
-        };
-        return heartBeatThread;
-    }
-
 
     /**
      * kill process thread implement
