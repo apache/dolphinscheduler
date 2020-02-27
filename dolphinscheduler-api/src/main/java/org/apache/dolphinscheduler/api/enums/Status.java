@@ -265,12 +265,7 @@ public enum Status {
     }
 
     public String getMsg() {
-        Locale locale = LocaleContextHolder.getLocale();
-        if (locale == null) {
-            return this.enMsg;
-        }
-
-        if (Locale.SIMPLIFIED_CHINESE.getLanguage().equals(locale.getLanguage())) {
+        if (Locale.SIMPLIFIED_CHINESE.getLanguage().equals(LocaleContextHolder.getLocale().getLanguage())) {
             return this.zhMsg;
         } else {
             return this.enMsg;
