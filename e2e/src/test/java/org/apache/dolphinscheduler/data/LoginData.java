@@ -39,5 +39,5 @@ public class LoginData {
      */
     public static final String PASSWORD = PropertiesReader.getKey("PASSWORD");
 
-    public static final String TENANT = "租户管理 - DolphinScheduler";
+    public static final String TENANT = "Tenant Manage - DolphinScheduler";
 }
