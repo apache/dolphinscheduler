@@ -34,8 +34,19 @@ public class WorkerConfig {
     @Value("${worker.max.cpuload.avg}")
     private int workerMaxCpuloadAvg;
 
-    @Value("${master.reserved.memory}")
+    @Value("${worker.reserved.memory}")
     private double workerReservedMemory;
+
+    @Value("${worker.group: DEFAULT}")
+    private String workerGroup;
+
+    public String getWorkerGroup() {
+        return workerGroup;
+    }
+
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
+    }
 
     public int getWorkerExecThreads() {
         return workerExecThreads;
