@@ -50,7 +50,7 @@ public class ResourceTreeVisitor implements Visitor{
     public ResourceComponent visit() {
         ResourceComponent rootDirectory = new Directory();
         for (Resource resource : resourceList) {
-            //表明是一级父类
+            // judge whether is root node
             if (rootNode(resource)){
                 ResourceComponent tempResourceComponent = getResourceComponent(resource);
                 rootDirectory.add(tempResourceComponent);

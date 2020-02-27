@@ -275,26 +275,26 @@ public class ResourcesController extends BaseController{
      * verify resource by alias and type
      *
      * @param loginUser login user
-     * @param alias resource name
-     * @param type resource type
+     * @param fullName  resource full name
+     * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyResourceName", notes= "VERIFY_RESOURCE_NAME_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
-            @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType ="String")
+            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType ="String")
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     public Result verifyResourceName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                     @RequestParam(value ="name") String alias,
+                                     @RequestParam(value ="fullName") String fullName,
                                      @RequestParam(value ="type") ResourceType type
     ) {
         try {
             logger.info("login user {}, verfiy resource alias: {},resource type: {}",
-                    loginUser.getUserName(), alias,type);
+                    loginUser.getUserName(), fullName,type);
 
-            return resourceService.verifyResourceName(alias,type,loginUser);
+            return resourceService.verifyResourceName(fullName,type,loginUser);
         } catch (Exception e) {
             logger.error(VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg(), e);
             return error(Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getCode(), Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg());
@@ -309,7 +309,7 @@ public class ResourcesController extends BaseController{
      * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
-    @ApiOperation(value = "queryByResourceName", notes= "QUERY_BY_RESOURCE_NAME")
+    @ApiOperation(value = "queryByFullName", notes= "QUERY_BY_RESOURCE_NAME")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType ="String")
@@ -326,8 +326,8 @@ public class ResourcesController extends BaseController{
 
             return resourceService.queryByResourceName(fullName,type);
         } catch (Exception e) {
-            logger.error(VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg(), e);
-            return error(Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getCode(), Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg());
+            logger.error(RESOURCE_NOT_EXIST.getMsg(), e);
+            return error(Status.RESOURCE_NOT_EXIST.getCode(), Status.RESOURCE_NOT_EXIST.getMsg());
         }
     }
 

@@ -554,15 +554,15 @@ public class ResourcesService extends BaseService {
     /**
      * verify resource by name and type
      * @param loginUser login user
-     * @param name resource alias
-     * @param type resource type
+     * @param fullName  resource full name
+     * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
-    public Result verifyResourceName(String name, ResourceType type,User loginUser) {
+    public Result verifyResourceName(String fullName, ResourceType type,User loginUser) {
         Result result = new Result();
         putMsg(result, Status.SUCCESS);
-        if (checkResourceExists(name, 0, type.ordinal())) {
-            logger.error("resource type:{} name:{} has exist, can't create again.", type, name);
+        if (checkResourceExists(fullName, 0, type.ordinal())) {
+            logger.error("resource type:{} name:{} has exist, can't create again.", type, fullName);
             putMsg(result, Status.RESOURCE_EXIST);
         } else {
             // query tenant
@@ -571,9 +571,9 @@ public class ResourcesService extends BaseService {
                 String tenantCode = tenant.getTenantCode();
 
                 try {
-                    String hdfsFilename = HadoopUtils.getHdfsFileName(type,tenantCode,name);
+                    String hdfsFilename = HadoopUtils.getHdfsFileName(type,tenantCode,fullName);
                     if(HadoopUtils.getInstance().exists(hdfsFilename)){
-                        logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, name,hdfsFilename);
+                        logger.error("resource type:{} name:{} has exist in hdfs {}, can't create again.", type, fullName,hdfsFilename);
                         putMsg(result, Status.RESOURCE_FILE_EXIST,hdfsFilename);
                     }
 
