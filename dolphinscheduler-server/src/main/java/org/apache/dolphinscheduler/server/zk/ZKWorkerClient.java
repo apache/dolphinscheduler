@@ -55,24 +55,6 @@ public class ZKWorkerClient extends AbstractZKClient {
 		// init system znode
 		this.initSystemZNode();
 
-		// register worker
-		this.registWorker();
-	}
-
-	/**
-	 *  register worker
-	 */
-	private void registWorker(){
-		try {
-			String serverPath = registerServer(ZKNodeType.WORKER);
-			if(StringUtils.isEmpty(serverPath)){
-				System.exit(-1);
-			}
-			workerZNode = serverPath;
-		} catch (Exception e) {
-			logger.error("register worker failure",e);
-			System.exit(-1);
-		}
 	}
 
 	/**
