@@ -1818,8 +1818,8 @@ public class ProcessService {
             return "";
         }
         return String.format("%s_%s_%s",
-                taskInstance.getProcessDefine().getId(),
-                taskInstance.getProcessInstance().getId(),
+                definition.getId(),
+                processInstanceById.getId(),
                 taskInstance.getId());
     }
 

@@ -8,6 +8,7 @@ import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.worker.task.dependent.DependentExecute;
@@ -56,7 +57,11 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
         super(taskInstance, processInstance);
     }
 
+    /**
+     * init dependent parameters
+     */
     private void initDependParameters() {
+
         String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
         Thread.currentThread().setName(threadLoggerInfoName);
 
@@ -67,9 +72,6 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
             this.dependentTaskList.add(new DependentExecute(
                     taskModel.getDependItemList(), taskModel.getRelation()));
         }
-
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
-
         if(this.processInstance.getScheduleTime() != null){
             this.dependentDate = this.processInstance.getScheduleTime();
         }else{
@@ -82,7 +84,7 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
         try{
             logger.info("dependent task start");
             this.taskInstance = submit();
-            setTaskInstanceState();
+            setTaskInstanceParameters();
             initDependParameters();
             waitTaskQuit();
             updateDependResultState();
@@ -151,11 +153,13 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
      * cancel dependent task
      */
     private void cancelTaskInstance() {
+        this.cancel = true;
         this.taskInstance.setState(ExecutionStatus.KILL);
         processService.updateTaskInstance(taskInstance);
     }
 
-    private void setTaskInstanceState() {
+    private void setTaskInstanceParameters() {
+        taskInstance.setHost(OSUtils.getHost());
         taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
         taskInstance.setStartTime(new Date());
         processService.updateTaskInstance(taskInstance);
