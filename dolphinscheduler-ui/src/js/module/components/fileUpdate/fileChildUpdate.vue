@@ -90,9 +90,9 @@
   import io from '@/module/io'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
+  import localStore from '@/module/util/localStorage'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import localStore from '@/module/util/localStorage'
   import mProgressBar from '@/module/components/progressBar/progressBar'
 
   export default {
@@ -128,7 +128,7 @@
         this.$refs['popup'].spinnerLoading = true
         if (this._validation()) {
           this.store.dispatch('resource/resourceVerifyName', {
-            name: this.name,
+            fullName: this.currentDir+'/'+this.name,
             type: this.type
           }).then(res => {
             const isLt1024M = this.file.size / 1024 / 1024 < 1024

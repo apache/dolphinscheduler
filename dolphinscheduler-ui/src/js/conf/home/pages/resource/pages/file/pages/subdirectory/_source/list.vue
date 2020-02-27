@@ -238,7 +238,8 @@
       // }
     },
     beforeRouteUpdate (to, from, next) {
-      next() // 一定要有next
+      next()
+     console.log(7777)
     },
     created () {
     },
