@@ -15,14 +15,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+set -e
+
 echo "------ dolphinscheduler start - build -------"
 printenv
+
+if [ -z "${VERSION}" ]
+then
+    echo "set default environment variable [VERSION]"
+    VERSION=$(cat $(pwd)/sql/soft_version)
+fi
+
+if [ "${DOCKER_REPO}x" = "x" ]
+then
+    echo "set default environment variable [DOCKER_REPO]"
+    DOCKER_REPO='dolphinscheduler'
+fi
+
+echo "Version: $VERSION"
+echo "Repo: $DOCKER_REPO"
 
 echo -e "Current Directory is $(pwd)\n"
 
 # maven package(Project Directory)
-echo -e "mvn clean compile package -Prelease"
-mvn clean compile package -Prelease
+echo -e "mvn -B clean compile package -Prelease -Dmaven.test.skip=true"
+mvn -B clean compile package -Prelease -Dmaven.test.skip=true
 
 # mv dolphinscheduler-bin.tar.gz file to dockerfile directory
 echo -e "mv $(pwd)/dolphinscheduler-dist/target/apache-dolphinscheduler-incubating-${VERSION}-SNAPSHOT-dolphinscheduler-bin.tar.gz $(pwd)/dockerfile/\n"

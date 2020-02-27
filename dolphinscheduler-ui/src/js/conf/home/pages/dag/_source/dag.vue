@@ -479,7 +479,7 @@
         $('div[data-targetarr*="' + id + '"]').each(function(){
           rearNode.push($(this).attr("id"))
         })
-        
+
         if (rearNode.length>0) {
           rearNode.forEach(v => {
             let rearobj = {}
@@ -514,6 +514,7 @@
         }
 
         this.taskId = id
+        type = type || self.dagBarId
 
         eventModel = this.$drawer({
           closable: false,
@@ -550,7 +551,7 @@
             },
             props: {
               id: id,
-              taskType: type || self.dagBarId,
+              taskType: type,
               self: self,
               preNode: preNode,
               rearList: rearList

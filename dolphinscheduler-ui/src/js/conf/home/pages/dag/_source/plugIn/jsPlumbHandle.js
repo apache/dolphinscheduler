@@ -135,15 +135,6 @@ JSP.prototype.draggable = function () {
       helper: 'clone',
       containment: $('.dag-model'),
       stop: function (e, ui) {
-        self.tasksEvent(selfId)
-
-        // Dom structure is not generated without pop-up form form
-        if ($(`#${selfId}`).html()) {
-          // dag event
-          findComponentDownward(self.dag.$root, 'dag-chart')._createNodes({
-            id: selfId
-          })
-        }
       },
       drag: function () {
         $('body').find('.tooltip.fade.top.in').remove()
@@ -178,6 +169,16 @@ JSP.prototype.draggable = function () {
           self.initNode(thisDom[thisDom.length - 1])
         })
         selfId = id
+
+        self.tasksEvent(selfId)
+
+        // Dom structure is not generated without pop-up form form
+        if ($(`#${selfId}`).html()) {
+          // dag event
+          findComponentDownward(self.dag.$root, 'dag-chart')._createNodes({
+            id: selfId
+          })
+        }
       }
     })
   }

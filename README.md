@@ -45,17 +45,17 @@ HA is supported by itself | All process definition operations are visualized, dr
 Overload processing: Task queue mechanism, the number of schedulable tasks on a single machine can be flexibly configured, when too many tasks will be cached in the task queue, will not cause machine jam. | One-click deployment | Supports traditional shell tasks, and also support big data platform task scheduling: MR, Spark, SQL (mysql, postgresql, hive, sparksql), Python, Procedure, Sub_Process |  |
 
 
-
-
 ### System partial screenshot
 
-![image](https://user-images.githubusercontent.com/48329107/61368744-1f5f3b00-a8c1-11e9-9cf1-10f8557a6b3b.png)
-
-![image](https://user-images.githubusercontent.com/48329107/61368966-9dbbdd00-a8c1-11e9-8dcc-a9469d33583e.png)
-
-![image](https://user-images.githubusercontent.com/48329107/61372146-f347b800-a8c8-11e9-8882-66e8934ada23.png)
-
-
+![home page](https://user-images.githubusercontent.com/15833811/75218288-bf286400-57d4-11ea-8263-d639c6511d5f.jpg)
+![dag](https://user-images.githubusercontent.com/15833811/75236750-3374fe80-57f9-11ea-857d-62a66a5a559d.png)
+![process definition list page](https://user-images.githubusercontent.com/15833811/75216886-6f479e00-57d0-11ea-92dd-66e7640a186f.png)
+![view task log online](https://user-images.githubusercontent.com/15833811/75216924-9900c500-57d0-11ea-91dc-3522a76bdbbe.png)
+![resource management](https://user-images.githubusercontent.com/15833811/75216984-be8dce80-57d0-11ea-840d-58546edc8788.png)
+![datasource management](https://user-images.githubusercontent.com/15833811/75217041-cfd6db00-57d0-11ea-8451-8b376d0dc8f1.png)
+![monitor](https://user-images.githubusercontent.com/15833811/75217091-fac12f00-57d0-11ea-9665-d8dc19813707.png)
+![security](https://user-images.githubusercontent.com/15833811/75236441-bfd2f180-57f8-11ea-88bd-f24311e01b7e.png)
+![treeview](https://user-images.githubusercontent.com/15833811/75217191-3fe56100-57d1-11ea-8856-f19180d9a879.png)
 ### Document
 
 - <a href="https://dolphinscheduler.apache.org/en-us/docs/1.2.0/user_doc/backend-deployment.html" target="_blank">Backend deployment documentation</a>
@@ -104,12 +104,5 @@ It is because of the shoulders of these open source projects that the birth of t
 
 ### License
 Please refer to [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) file.
-
-
-
-
-
-
-
 
 
