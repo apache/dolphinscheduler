@@ -20,9 +20,6 @@ package org.apache.dolphinscheduler.locator.project;
 import org.openqa.selenium.By;
 
 public class CreateWorkflowLocator {
-    // click project manage
-    public static final By CLICK_PROJECT_MANAGE = By.xpath("//div[2]/div/a/span");
-
     // click project name
     public static final By CLICK_PROJECT_NAME = By.xpath("//span/a");
 
@@ -33,13 +30,13 @@ public class CreateWorkflowLocator {
     public static final By CLICK_CREATE_WORKFLOW_BUTTON = By.xpath("//button/span");
 
     //mouse down at shell
-    public static final By MOUSE_DOWN_AT_SHELL = By.xpath("//*[@id='SHELL']/div/div");
+    public static final By MOUSE_DOWN_AT_SHELL = By.xpath("//div[@id='SHELL']/div/div");
 
     //mouse down at spark
     public static final By MOUSE_DOWN_AT_SPARK = By.xpath("//div[5]/div/div");
 
     //mouse move at DAG
-    public static final By MOUSE_MOVE_SHELL_AT_DAG = By.xpath("//*[@id=canvas]");
+    public static final By MOUSE_MOVE_SHELL_AT_DAG = By.xpath("//div[@id='canvas']");
 
     //input shell task _name
     public static final By INPUT_SHELL_TASK_NAME = By.xpath("//input");

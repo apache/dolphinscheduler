@@ -33,6 +33,8 @@ public class CreateWorkflowPage extends PageCommon {
     public boolean createWorkflow() throws InterruptedException {
         // click project name
         clickElement(CreateWorkflowLocator.CLICK_PROJECT_NAME);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+
 
         // click workflow define
         clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
