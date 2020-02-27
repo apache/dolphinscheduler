@@ -6,9 +6,9 @@
             <!--&lt;!&ndash;<package name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"/>&ndash;&gt;-->
             <!--<package name="org.apache.dolphinscheduler.testcase.security.*"/>-->
         <!--</packages>-->
-        <!--<classes>-->
-        <!--<class name="org.apache.dolphinscheduler.testcase.security.UserManageTest"></class>-->
-        <!--</classes>-->
+        <classes>
+        <class name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"></class>
+        </classes>
         </test>
 
         <!--<suite-files>-->
