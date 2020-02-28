@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -38,22 +39,14 @@ public abstract class AbstractYarnTask extends AbstractTask {
 
   /**
    * Abstract Yarn Task
-   * @param taskProps task rops
+   * @param taskExecutionContext taskExecutionContext
    * @param logger    logger
    */
-  public AbstractYarnTask(TaskProps taskProps, Logger logger) {
-    super(taskProps, logger);
+  public AbstractYarnTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+    super(taskExecutionContext, logger);
     this.processService = SpringApplicationContext.getBean(ProcessService.class);
     this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskProps.getExecutePath(),
-            taskProps.getTaskAppId(),
-            taskProps.getTaskInstanceId(),
-            taskProps.getTenantCode(),
-            taskProps.getEnvFile(),
-            taskProps.getTaskStartTime(),
-            taskProps.getTaskTimeout(),
-            taskProps.getLogPath(),
-            taskProps.getExecutePath(),
+            taskExecutionContext,
             logger);
   }
 
@@ -82,9 +75,9 @@ public abstract class AbstractYarnTask extends AbstractTask {
     cancel = true;
     // cancel process
     shellCommandExecutor.cancelApplication();
-    TaskInstance taskInstance = processService.findTaskInstanceById(taskProps.getTaskInstanceId());
+    TaskInstance taskInstance = processService.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
     if (status && taskInstance != null){
-      ProcessUtils.killYarnJob(taskInstance);
+      ProcessUtils.killYarnJob(taskExecutionContext);
     }
   }
 

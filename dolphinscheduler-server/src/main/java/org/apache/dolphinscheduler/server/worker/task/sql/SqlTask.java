@@ -23,10 +23,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.ShowType;
-import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlBinds;
@@ -40,6 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -87,12 +85,19 @@ public class SqlTask extends AbstractTask {
      */
     private BaseDataSource baseDataSource;
 
+    /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
 
-    public SqlTask(TaskProps taskProps, Logger logger) {
-        super(taskProps, logger);
 
-        logger.info("sql task params {}", taskProps.getTaskParams());
-        this.sqlParameters = JSONObject.parseObject(taskProps.getTaskParams(), SqlParameters.class);
+    public SqlTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+
+        this.taskExecutionContext = taskExecutionContext;
+
+        logger.info("sql task params {}", taskExecutionContext.getTaskParams());
+        this.sqlParameters = JSONObject.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
 
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
@@ -104,7 +109,7 @@ public class SqlTask extends AbstractTask {
     @Override
     public void handle() throws Exception {
         // set the name of the current thread
-        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
         logger.info("Full sql parameters: {}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {}",
@@ -170,10 +175,9 @@ public class SqlTask extends AbstractTask {
                 for(int i=0;i<ids.length;i++){
                     idsArray[i]=Integer.parseInt(ids[i]);
                 }
-                // check udf permission
-                checkUdfPermission(ArrayUtils.toObject(idsArray));
+
                 List<UdfFunc> udfFuncList = processService.queryUdfFunListByids(idsArray);
-                createFuncs = UDFUtils.createFuncs(udfFuncList, taskProps.getTenantCode(), logger);
+                createFuncs = UDFUtils.createFuncs(udfFuncList, taskExecutionContext.getTenantCode(), logger);
             }
 
             // execute sql task
@@ -203,11 +207,11 @@ public class SqlTask extends AbstractTask {
         // find process instance by task id
 
 
-        Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-                taskProps.getDefinedParams(),
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                taskExecutionContext.getDefinedParams(),
                 sqlParameters.getLocalParametersMap(),
-                taskProps.getCmdTypeIfComplement(),
-                taskProps.getScheduleTime());
+                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                taskExecutionContext.getScheduleTime());
 
         // spell SQL according to the final user-defined variable
         if(paramsMap == null){
@@ -316,7 +320,7 @@ public class SqlTask extends AbstractTask {
                             sendAttachment(sqlParameters.getTitle(),
                                     JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
                         }else{
-                            sendAttachment(taskProps.getTaskName() + " query resultsets ",
+                            sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
                                     JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
                         }
                     }
@@ -358,11 +362,11 @@ public class SqlTask extends AbstractTask {
      */
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
         // is the timeout set
-        boolean timeoutFlag = taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED ||
-                taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
+        boolean timeoutFlag = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED ||
+                TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
         try (PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql())) {
             if(timeoutFlag){
-                stmt.setQueryTimeout(taskProps.getTaskTimeout());
+                stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
             Map<Integer, Property> params = sqlBinds.getParamsMap();
             if(params != null) {
@@ -384,7 +388,7 @@ public class SqlTask extends AbstractTask {
     public void sendAttachment(String title,String content){
 
         //  process instance
-        ProcessInstance instance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
+        ProcessInstance instance = processService.findProcessInstanceByTaskId(taskExecutionContext.getTaskInstanceId());
 
         List<User> users = alertDao.queryUserByAlertGroupId(instance.getWarningGroupId());
 
@@ -463,33 +467,4 @@ public class SqlTask extends AbstractTask {
         }
         logger.info("Sql Params are {}", logPrint);
     }
-
-    /**
-     * check udf function permission
-     * @param udfFunIds    udf functions
-     * @return if has download permission return true else false
-     */
-    private void checkUdfPermission(Integer[] udfFunIds) throws Exception{
-        //  process instance
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
-        int userId = processInstance.getExecutorId();
-
-        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF, processService,udfFunIds,userId,logger);
-        permissionCheckUdf.checkPermission();
-    }
-
-    /**
-     * check data source permission
-     * @param dataSourceId    data source id
-     * @return if has download permission return true else false
-     */
-    private void checkDataSourcePermission(int dataSourceId) throws Exception{
-        //  process instance
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
-        int userId = processInstance.getExecutorId();
-
-        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE, processService,new Integer[]{dataSourceId},userId,logger);
-        permissionCheckDataSource.checkPermission();
-    }
-
 }
