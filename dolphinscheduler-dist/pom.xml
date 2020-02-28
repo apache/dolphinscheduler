@@ -396,7 +396,7 @@
                                 <script>mkdir -p /opt/soft</script>
                             </preinstallScriptlet>
                             <postinstallScriptlet>
-                                <script>rm -rf /opt/soft/dolphinscheduler ; ln -s opt/soft/apache-dolphinscheduler-incubating-${project.version} /opt/soft/dolphinscheduler</script>
+                                <script>rm -rf /opt/soft/dolphinscheduler ; ln -s /opt/soft/apache-dolphinscheduler-incubating-${project.version} /opt/soft/dolphinscheduler</script>
                             </postinstallScriptlet>
                             <postremoveScriptlet>
                                 <script>rm -rf /opt/soft/apache-dolphinscheduler-incubating-${project.version}</script>
