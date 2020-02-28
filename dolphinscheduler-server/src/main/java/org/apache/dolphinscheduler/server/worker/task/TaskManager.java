@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.EnumUtils;
-import org.apache.dolphinscheduler.server.worker.task.dependent.DependentTask;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.datax.DataxTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
 import org.apache.dolphinscheduler.server.worker.task.http.HttpTask;
@@ -36,40 +36,37 @@ import org.slf4j.Logger;
  */
 public class TaskManager {
 
-
   /**
    * create new task
-   * @param taskType  task type
-   * @param props     props
+   * @param taskExecutionContext  taskExecutionContext
    * @param logger    logger
    * @return AbstractTask
    * @throws IllegalArgumentException illegal argument exception
    */
-  public static AbstractTask newTask(String taskType, TaskProps props, Logger logger)
+  public static AbstractTask newTask(TaskExecutionContext taskExecutionContext,
+                                     Logger logger)
       throws IllegalArgumentException {
-    switch (EnumUtils.getEnum(TaskType.class,taskType)) {
+    switch (EnumUtils.getEnum(TaskType.class,taskExecutionContext.getTaskType())) {
         case SHELL:
-        return new ShellTask(props, logger);
+        return new ShellTask(taskExecutionContext, logger);
       case PROCEDURE:
-        return new ProcedureTask(props, logger);
+        return new ProcedureTask(taskExecutionContext, logger);
       case SQL:
-        return new SqlTask(props, logger);
+        return new SqlTask(taskExecutionContext, logger);
       case MR:
-        return new MapReduceTask(props, logger);
+        return new MapReduceTask(taskExecutionContext, logger);
       case SPARK:
-        return new SparkTask(props, logger);
+        return new SparkTask(taskExecutionContext, logger);
       case FLINK:
-        return new FlinkTask(props, logger);
+        return new FlinkTask(taskExecutionContext, logger);
       case PYTHON:
-        return new PythonTask(props, logger);
-      case DEPENDENT:
-        return new DependentTask(props, logger);
+        return new PythonTask(taskExecutionContext, logger);
       case HTTP:
-        return new HttpTask(props, logger);
+        return new HttpTask(taskExecutionContext, logger);
       case DATAX:
-        return new DataxTask(props, logger);
+        return new DataxTask(taskExecutionContext, logger);
       default:
-        logger.error("unsupport task type: {}", taskType);
+        logger.error("unsupport task type: {}", taskExecutionContext.getTaskType());
         throw new IllegalArgumentException("not support task type");
     }
   }

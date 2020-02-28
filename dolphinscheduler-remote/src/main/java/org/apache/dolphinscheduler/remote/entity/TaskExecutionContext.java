@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.remote.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  *  master/worker task transport
@@ -47,6 +50,11 @@ public class TaskExecutionContext implements Serializable{
     private String taskType;
 
     /**
+     * host
+     */
+    private String host;
+
+    /**
      *  task execute path
      */
     private String executePath;
@@ -60,6 +68,16 @@ public class TaskExecutionContext implements Serializable{
      *  task json
      */
     private String taskJson;
+
+    /**
+     * processId
+     */
+    private Integer processId;
+
+    /**
+     * appIds
+     */
+    private String appIds;
 
     /**
      *  process instance id
@@ -110,6 +128,37 @@ public class TaskExecutionContext implements Serializable{
      *  project id
      */
     private Integer projectId;
+
+    /**
+     * taskParams
+     */
+    private String taskParams;
+
+    /**
+     *  envFile
+     */
+    private String envFile;
+
+    /**
+     *  definedParams
+     */
+    private Map<String, String> definedParams;
+
+
+    /**
+     * task AppId
+     */
+    private String taskAppId;
+
+    /**
+     *  task timeout strategy
+     */
+    private int taskTimeoutStrategy;
+
+    /**
+     * task timeout
+     */
+    private int taskTimeout;
 
 
     public Integer getTaskInstanceId() {
@@ -240,6 +289,79 @@ public class TaskExecutionContext implements Serializable{
         this.logPath = logPath;
     }
 
+    public String getTaskParams() {
+        return taskParams;
+    }
+
+    public void setTaskParams(String taskParams) {
+        this.taskParams = taskParams;
+    }
+
+    public String getEnvFile() {
+        return envFile;
+    }
+
+    public void setEnvFile(String envFile) {
+        this.envFile = envFile;
+    }
+
+    public Map<String, String> getDefinedParams() {
+        return definedParams;
+    }
+
+    public void setDefinedParams(Map<String, String> definedParams) {
+        this.definedParams = definedParams;
+    }
+
+    public String getTaskAppId() {
+        return taskAppId;
+    }
+
+    public void setTaskAppId(String taskAppId) {
+        this.taskAppId = taskAppId;
+    }
+
+    public int getTaskTimeoutStrategy() {
+        return taskTimeoutStrategy;
+    }
+
+    public void setTaskTimeoutStrategy(int taskTimeoutStrategy) {
+        this.taskTimeoutStrategy = taskTimeoutStrategy;
+    }
+
+    public int getTaskTimeout() {
+        return taskTimeout;
+    }
+
+    public void setTaskTimeout(int taskTimeout) {
+        this.taskTimeout = taskTimeout;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public Integer getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(Integer processId) {
+        this.processId = processId;
+    }
+
+    public String getAppIds() {
+        return appIds;
+    }
+
+    public void setAppIds(String appIds) {
+        this.appIds = appIds;
+    }
+
+
     @Override
     public String toString() {
         return "TaskExecutionContext{" +
@@ -247,9 +369,12 @@ public class TaskExecutionContext implements Serializable{
                 ", taskName='" + taskName + '\'' +
                 ", startTime=" + startTime +
                 ", taskType='" + taskType + '\'' +
+                ", host='" + host + '\'' +
                 ", executePath='" + executePath + '\'' +
                 ", logPath='" + logPath + '\'' +
                 ", taskJson='" + taskJson + '\'' +
+                ", processId=" + processId +
+                ", appIds='" + appIds + '\'' +
                 ", processInstanceId=" + processInstanceId +
                 ", scheduleTime=" + scheduleTime +
                 ", globalParams='" + globalParams + '\'' +
@@ -259,6 +384,12 @@ public class TaskExecutionContext implements Serializable{
                 ", queue='" + queue + '\'' +
                 ", processDefineId=" + processDefineId +
                 ", projectId=" + projectId +
+                ", taskParams='" + taskParams + '\'' +
+                ", envFile='" + envFile + '\'' +
+                ", definedParams=" + definedParams +
+                ", taskAppId='" + taskAppId + '\'' +
+                ", taskTimeoutStrategy=" + taskTimeoutStrategy +
+                ", taskTimeout=" + taskTimeout +
                 '}';
     }
 }
