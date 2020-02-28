@@ -331,14 +331,6 @@
 
                                         <source>
                                             <location>
-                                                ${basedir}/../dolphinscheduler-ui
-                                            </location>
-                                            <includes>
-                                                <include>install-dolphinscheduler-ui.sh</include>
-                                            </includes>
-                                        </source>
-                                        <source>
-                                            <location>
                                                 ${basedir}/release-docs
                                             </location>
                                             <includes>
@@ -349,7 +341,7 @@
                                     </sources>
                                 </mapping>
                                 <mapping>
-                                    <directory>/opt/soft/${project.build.finalName}/dist</directory>
+                                    <directory>/opt/soft/${project.build.finalName}/ui</directory>
                                     <filemode>755</filemode>
                                     <username>root</username>
                                     <groupname>root</groupname>
