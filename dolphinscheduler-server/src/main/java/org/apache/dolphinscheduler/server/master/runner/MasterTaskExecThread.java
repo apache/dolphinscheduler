@@ -100,7 +100,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      * TODO 在这里轮询数据库
-     * 
+     *
      * wait task quit
      * @return true if task quit success
      */
