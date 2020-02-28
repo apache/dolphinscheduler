@@ -30,7 +30,7 @@ sys.setdefaultencoding('utf-8')
 config = Script.get_config()
 
 # conf_dir = "/etc/"
-dolphin_home = "/opt/soft/dolphinscheduler-incubating"
+dolphin_home = "/opt/soft/dolphinscheduler"
 dolphin_conf_dir = dolphin_home + "/conf"
 dolphin_log_dir = dolphin_home + "/logs"
 dolphin_bin_dir = dolphin_home + "/bin"
