@@ -50,18 +50,22 @@ public class ProcessBuilderForWin32Test {
 
     @Test
     public void testCreateProcessBuilderForWin32() {
-        ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
-        Assert.assertNotNull(builder);
-
-        builder = new ProcessBuilderForWin32("net");
-        Assert.assertNotNull(builder);
-
-        builder = new ProcessBuilderForWin32(Collections.singletonList("net"));
-        Assert.assertNotNull(builder);
-
         try {
-            builder = new ProcessBuilderForWin32((List<String>) null);
+            ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
             Assert.assertNotNull(builder);
+
+            builder = new ProcessBuilderForWin32("net");
+            Assert.assertNotNull(builder);
+
+            builder = new ProcessBuilderForWin32(Collections.singletonList("net"));
+            Assert.assertNotNull(builder);
+
+            try {
+                builder = new ProcessBuilderForWin32((List<String>) null);
+                Assert.assertNotNull(builder);
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -69,26 +73,34 @@ public class ProcessBuilderForWin32Test {
 
     @Test
     public void testBuildUser() {
-        ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
-        builder.user("test", StringUtils.EMPTY);
-        Assert.assertNotNull(builder);
+        try {
+            ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
+            builder.user("test", StringUtils.EMPTY);
+            Assert.assertNotNull(builder);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
     }
 
     @Test
     public void testBuildCommand() {
-        ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
-        builder.command(Collections.singletonList("net"));
-        Assert.assertNotEquals(0, builder.command().size());
+        try {
+            ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
+            builder.command(Collections.singletonList("net"));
+            Assert.assertNotEquals(0, builder.command().size());
 
-        builder = new ProcessBuilderForWin32();
-        builder.command("net");
-        Assert.assertNotEquals(0, builder.command().size());
+            builder = new ProcessBuilderForWin32();
+            builder.command("net");
+            Assert.assertNotEquals(0, builder.command().size());
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
     }
 
     @Test
     public void testEnvironment() {
-        ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
         try {
+            ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
             Assert.assertNotNull(builder.environment());
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -104,34 +116,43 @@ public class ProcessBuilderForWin32Test {
 
     @Test
     public void testDirectory() {
-        ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
-        builder.directory(new File("/tmp"));
-        Assert.assertNotNull(builder.directory());
+        try {
+            ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
+            builder.directory(new File("/tmp"));
+            Assert.assertNotNull(builder.directory());
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
     }
 
     @Test
     public void testRedirect() {
-        ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
-        builder.redirectInput(new File("/tmp"));
-        Assert.assertNotNull(builder.redirectInput());
-        builder.redirectOutput(new File("/tmp"));
-        Assert.assertNotNull(builder.redirectOutput());
-        builder.redirectError(new File("/tmp"));
-        Assert.assertNotNull(builder.redirectError());
+        try {
+            ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
+            builder.redirectInput(new File("/tmp"));
+            Assert.assertNotNull(builder.redirectInput());
+            builder.redirectOutput(new File("/tmp"));
+            Assert.assertNotNull(builder.redirectOutput());
+            builder.redirectError(new File("/tmp"));
+            Assert.assertNotNull(builder.redirectError());
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
     }
 
     @Test
     public void runCmdViaUser() {
-        ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
-        builder.user("test123", StringUtils.EMPTY);
-
-        List<String> commands = new ArrayList<>();
-        commands.add("cmd.exe");
-        commands.add("/c");
-        commands.add("net user");
-
-        builder.command(commands);
         try {
+            ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
+            builder.user("test123", StringUtils.EMPTY);
+
+            List<String> commands = new ArrayList<>();
+            commands.add("cmd.exe");
+            commands.add("/c");
+            commands.add("net user");
+
+            builder.command(commands);
+
             Process process = builder.start();
             BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.forName("GBK")));
             String line;
