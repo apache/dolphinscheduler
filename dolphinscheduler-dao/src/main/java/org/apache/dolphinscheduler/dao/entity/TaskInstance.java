@@ -26,14 +26,12 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
 /**
  * task instance
  */
-@Data
 @TableName("t_ds_task_instance")
 public class TaskInstance {
 
@@ -197,6 +195,17 @@ public class TaskInstance {
      * @return
      */
     private int workerGroupId;
+
+    /**
+     * executor id
+     */
+    private int executorId;
+
+    /**
+     * executor name
+     */
+    @TableField(exist = false)
+    private String executorName;
 
 
 
@@ -417,6 +426,22 @@ public class TaskInstance {
         this.retryInterval = retryInterval;
     }
 
+    public int getExecutorId() {
+        return executorId;
+    }
+
+    public void setExecutorId(int executorId) {
+        this.executorId = executorId;
+    }
+
+    public String getExecutorName() {
+        return executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this.executorName = executorName;
+    }
+
     public Boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
@@ -468,6 +493,14 @@ public class TaskInstance {
         this.workerGroupId = workerGroupId;
     }
 
+    public String getDependentResult() {
+        return dependentResult;
+    }
+
+    public void setDependentResult(String dependentResult) {
+        this.dependentResult = dependentResult;
+    }
+
     @Override
     public String toString() {
         return "TaskInstance{" +
@@ -487,27 +520,21 @@ public class TaskInstance {
                 ", logPath='" + logPath + '\'' +
                 ", retryTimes=" + retryTimes +
                 ", alertFlag=" + alertFlag +
-                ", flag=" + flag +
                 ", processInstance=" + processInstance +
                 ", processDefine=" + processDefine +
                 ", pid=" + pid +
                 ", appLink='" + appLink + '\'' +
                 ", flag=" + flag +
-                ", dependency=" + dependency +
+                ", dependency='" + dependency + '\'' +
                 ", duration=" + duration +
                 ", maxRetryTimes=" + maxRetryTimes +
                 ", retryInterval=" + retryInterval +
                 ", taskInstancePriority=" + taskInstancePriority +
                 ", processInstancePriority=" + processInstancePriority +
-                ", workGroupId=" + workerGroupId +
+                ", dependentResult='" + dependentResult + '\'' +
+                ", workerGroupId=" + workerGroupId +
+                ", executorId=" + executorId +
+                ", executorName='" + executorName + '\'' +
                 '}';
-    }
-
-    public String getDependentResult() {
-        return dependentResult;
-    }
-
-    public void setDependentResult(String dependentResult) {
-        this.dependentResult = dependentResult;
     }
 }

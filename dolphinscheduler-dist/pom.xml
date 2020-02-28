@@ -41,7 +41,6 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-api</artifactId>
         </dependency>
-
     </dependencies>
 
     <profiles>
@@ -62,6 +61,62 @@
                                 <configuration>
                                     <descriptors>
                                         <descriptor>src/main/assembly/dolphinscheduler-binary.xml</descriptor>
+                                    </descriptors>
+                                    <appendAssemblyId>true</appendAssemblyId>
+                                </configuration>
+                            </execution>
+
+                            <execution>
+                                <id>src</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/dolphinscheduler-src.xml</descriptor>
+                                    </descriptors>
+                                    <appendAssemblyId>true</appendAssemblyId>
+                                </configuration>
+                            </execution>
+
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>nginx</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>dolphinscheduler-nginx</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>src/main/assembly/dolphinscheduler-nginx.xml</descriptor>
                                     </descriptors>
                                     <appendAssemblyId>true</appendAssemblyId>
                                 </configuration>
@@ -165,10 +220,7 @@
                                                 ${basedir}/../dolphinscheduler-alert/src/main/resources
                                             </location>
                                             <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
-                                                <include>**/*.ftl</include>
+                                                <include>**/*.*</include>
                                             </includes>
                                         </source>
 
@@ -177,9 +229,7 @@
                                                 ${basedir}/../dolphinscheduler-common/src/main/resources
                                             </location>
                                             <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
+                                                <include>**/*.*</include>
                                             </includes>
                                         </source>
 
@@ -188,10 +238,7 @@
                                                 ${basedir}/../dolphinscheduler-dao/src/main/resources
                                             </location>
                                             <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
-                                                <include>**/*.yml</include>
+                                                <include>**/*.*</include>
                                             </includes>
                                         </source>
 
@@ -200,9 +247,7 @@
                                                 ${basedir}/../dolphinscheduler-api/src/main/resources
                                             </location>
                                             <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
+                                                <include>**/*.*</include>
                                             </includes>
                                         </source>
 
@@ -211,9 +256,7 @@
                                                 ${basedir}/../dolphinscheduler-server/src/main/resources
                                             </location>
                                             <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
+                                                <include>config/*.*</include>
                                             </includes>
                                         </source>
 
@@ -222,7 +265,6 @@
                                                 ${basedir}/../script
                                             </location>
                                             <includes>
-                                                <include>config/*.*</include>
                                                 <include>env/*.*</include>
                                             </includes>
                                         </source>

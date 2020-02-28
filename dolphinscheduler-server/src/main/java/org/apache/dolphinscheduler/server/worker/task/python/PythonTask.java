@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.python.PythonParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.PythonCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.util.Map;
@@ -53,9 +53,9 @@ public class PythonTask extends AbstractTask {
   private PythonCommandExecutor pythonCommandExecutor;
 
   /**
-   * process database access
+   * process service
    */
-  private ProcessDao processDao;
+  private ProcessService processService;
 
   /**
    * constructor
@@ -76,7 +76,7 @@ public class PythonTask extends AbstractTask {
             taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(),
             logger);
-    this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
+    this.processService = SpringApplicationContext.getBean(ProcessService.class);
   }
 
   @Override
@@ -94,7 +94,7 @@ public class PythonTask extends AbstractTask {
   public void handle() throws Exception {
     try {
       //  construct process
-      exitStatusCode = pythonCommandExecutor.run(buildCommand(), processDao);
+      exitStatusCode = pythonCommandExecutor.run(buildCommand(), processService);
     } catch (Exception e) {
       logger.error("python task failure", e);
       exitStatusCode = -1;

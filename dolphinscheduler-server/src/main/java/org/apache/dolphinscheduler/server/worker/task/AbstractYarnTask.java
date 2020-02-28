@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.server.worker.task;
 
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 /**
@@ -39,7 +39,7 @@ public abstract class AbstractYarnTask extends AbstractTask {
   /**
    *  process database access
    */
-  protected ProcessDao processDao;
+  protected ProcessService processService;
 
   /**
    * Abstract Yarn Task
@@ -48,7 +48,7 @@ public abstract class AbstractYarnTask extends AbstractTask {
    */
   public AbstractYarnTask(TaskProps taskProps, Logger logger) {
     super(taskProps, logger);
-    this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
+    this.processService = SpringApplicationContext.getBean(ProcessService.class);
     this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
             taskProps.getTaskDir(),
             taskProps.getTaskAppId(),
@@ -64,7 +64,7 @@ public abstract class AbstractYarnTask extends AbstractTask {
   public void handle() throws Exception {
     try {
       // construct process
-      exitStatusCode = shellCommandExecutor.run(buildCommand(), processDao);
+      exitStatusCode = shellCommandExecutor.run(buildCommand(), processService);
     } catch (Exception e) {
       logger.error("yarn process failure", e);
       exitStatusCode = -1;
@@ -82,7 +82,7 @@ public abstract class AbstractYarnTask extends AbstractTask {
     cancel = true;
     // cancel process
     shellCommandExecutor.cancelApplication();
-    TaskInstance taskInstance = processDao.findTaskInstanceById(taskProps.getTaskInstId());
+    TaskInstance taskInstance = processService.findTaskInstanceById(taskProps.getTaskInstId());
     if (status && taskInstance != null){
       ProcessUtils.killYarnJob(taskInstance);
     }

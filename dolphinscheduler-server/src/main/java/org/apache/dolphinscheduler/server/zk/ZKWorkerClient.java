@@ -16,36 +16,28 @@
  */
 package org.apache.dolphinscheduler.server.zk;
 
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
-import org.apache.dolphinscheduler.common.zk.AbstractZKClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
-import org.apache.curator.utils.ThreadUtils;
+import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.ThreadFactory;
+import org.springframework.stereotype.Component;
 
 
 /**
  *  zookeeper worker client
  *  single instance
  */
+@Component
 public class ZKWorkerClient extends AbstractZKClient {
 
 	/**
 	 * logger
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(ZKWorkerClient.class);
-
-	/**
-	 * thread factory
-	 */
-	private static final ThreadFactory defaultThreadFactory = ThreadUtils.newGenericThreadFactory("Worker-Main-Thread");
 
 
 	/**
@@ -55,58 +47,17 @@ public class ZKWorkerClient extends AbstractZKClient {
 
 
 	/**
-	 * zookeeper worker client
-	 */
-	private static ZKWorkerClient zkWorkerClient = null;
-
-	/**
-	 * worker path children cache
-	 */
-	private PathChildrenCache workerPathChildrenCache;
-
-	private ZKWorkerClient(){
-		init();
-	}
-
-	/**
 	 * init
 	 */
-	private void init(){
+	public void init(){
 
+		logger.info("initialize worker client...");
 		// init system znode
 		this.initSystemZNode();
-
-		// monitor worker
-		this.listenerWorker();
 
 		// register worker
 		this.registWorker();
 	}
-
-	@Override
-	public void close(){
-		try {
-			if(workerPathChildrenCache != null){
-				workerPathChildrenCache.close();
-			}
-			super.close();
-		} catch (Exception ignore) {
-		}
-	}
-
-
-	/**
-	 * get zookeeper worker client
-	 *
-	 * @return ZKWorkerClient
-	 */
-	public static synchronized ZKWorkerClient  getZKWorkerClient(){
-		if(zkWorkerClient == null){
-			zkWorkerClient = new ZKWorkerClient();
-		}
-		return zkWorkerClient;
-	}
-
 
 	/**
 	 *  register worker
@@ -119,44 +70,42 @@ public class ZKWorkerClient extends AbstractZKClient {
 			}
 			workerZNode = serverPath;
 		} catch (Exception e) {
-			logger.error("register worker failure : "  + e.getMessage(),e);
+			logger.error("register worker failure",e);
 			System.exit(-1);
 		}
 	}
-	
-	/**
-	 *  monitor worker
-	 */
-	private void listenerWorker(){
-		workerPathChildrenCache = new PathChildrenCache(zkClient, getZNodeParentPath(ZKNodeType.WORKER), true, defaultThreadFactory);
-		try {
-			workerPathChildrenCache.start();
-			workerPathChildrenCache.getListenable().addListener(new PathChildrenCacheListener() {
-				@Override
-				public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-					switch (event.getType()) {
-						case CHILD_ADDED:
-							logger.info("node added : {}" ,event.getData().getPath());
-							break;
-						case CHILD_REMOVED:
-                            String path = event.getData().getPath();
-							//find myself dead
-							String serverHost = getHostByEventDataPath(path);
-							if(checkServerSelfDead(serverHost, ZKNodeType.WORKER)){
-								return;
-							}
-							break;
-						case CHILD_UPDATED:
-							break;
-						default:
-							break;
-					}
-				}
-			});
-		}catch (Exception e){
-			logger.error("monitor worker failed : " + e.getMessage(),e);
-		}
 
+	/**
+	 * handle path events that this class cares about
+	 * @param client   zkClient
+	 * @param event	   path event
+	 * @param path     zk path
+	 */
+	@Override
+	protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
+		if(path.startsWith(getZNodeParentPath(ZKNodeType.WORKER)+Constants.SINGLE_SLASH)){
+			handleWorkerEvent(event,path);
+		}
+	}
+
+	/**
+	 * monitor worker
+	 */
+	public void handleWorkerEvent(TreeCacheEvent event, String path){
+		switch (event.getType()) {
+			case NODE_ADDED:
+				logger.info("worker node added : {}", path);
+				break;
+			case NODE_REMOVED:
+				//find myself dead
+				String serverHost = getHostByEventDataPath(path);
+				if(checkServerSelfDead(serverHost, ZKNodeType.WORKER)){
+					return;
+				}
+				break;
+			default:
+				break;
+		}
 	}
 
 	/**
@@ -166,14 +115,5 @@ public class ZKWorkerClient extends AbstractZKClient {
 	public String getWorkerZNode() {
 		return workerZNode;
 	}
-
-	/**
-	 * get worker lock path
-	 * @return worker lock path
-	 */
-	public String getWorkerLockPath(){
-		return conf.getString(Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS);
-	}
-
 
 }

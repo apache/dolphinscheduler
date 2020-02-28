@@ -16,12 +16,12 @@
  */
 package org.apache.dolphinscheduler.api.configuration;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import io.swagger.models.*;
 import io.swagger.models.parameters.Parameter;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -41,6 +41,7 @@ import static com.google.common.collect.Maps.newTreeMap;
  */
 @Component(value = "ServiceModelToSwagger2Mapper")
 @Primary
+@ConditionalOnWebApplication
 public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapper {
 
 
@@ -158,7 +159,8 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
             Iterator<String> it = from.getTags().iterator();
             while(it.hasNext()){
                String tag = it.next();
-               list.add(StringUtils.isNotBlank(tag) ? messageSource.getMessage(tag, null, tag, locale) : " ");
+               list.add(
+                   StringUtils.isNotBlank(tag) ? messageSource.getMessage(tag, null, tag, locale) : " ");
             }
 
             operation.setTags(list);

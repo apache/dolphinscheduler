@@ -17,9 +17,7 @@
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.Getter;
 
-@Getter
 public enum SparkVersion {
 
     /**
@@ -37,4 +35,12 @@ public enum SparkVersion {
     @EnumValue
     private final int code;
     private final String descp;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
 }

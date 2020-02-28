@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.common.task.python.PythonParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
+import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
@@ -193,6 +195,12 @@ public abstract class AbstractTask {
                 break;
             case PYTHON:
                 paramsClass = PythonParameters.class;
+                break;
+            case DATAX:
+                paramsClass = DataxParameters.class;
+                break;
+            case SQOOP:
+                paramsClass = SqoopParameters.class;
                 break;
             default:
                 logger.error("not support this task type: {}", taskType);

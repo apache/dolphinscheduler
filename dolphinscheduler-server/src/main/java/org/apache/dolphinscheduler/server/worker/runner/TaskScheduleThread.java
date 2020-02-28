@@ -21,6 +21,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
@@ -30,19 +31,19 @@ import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.LoggerUtils;
-import org.apache.dolphinscheduler.server.worker.log.TaskLogDiscriminator;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.log.TaskLogDiscriminator;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.permission.PermissionCheck;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,9 +64,9 @@ public class TaskScheduleThread implements Runnable {
     private TaskInstance taskInstance;
 
     /**
-     *  process database access
+     *  process service
      */
-    private final ProcessDao processDao;
+    private final ProcessService processService;
 
     /**
      *  abstract task
@@ -76,10 +77,10 @@ public class TaskScheduleThread implements Runnable {
      * constructor
      *
      * @param taskInstance  task instance
-     * @param processDao    process dao
+     * @param processService    process dao
      */
-    public TaskScheduleThread(TaskInstance taskInstance, ProcessDao processDao){
-        this.processDao = processDao;
+    public TaskScheduleThread(TaskInstance taskInstance, ProcessService processService){
+        this.processService = processService;
         this.taskInstance = taskInstance;
     }
 
@@ -94,11 +95,14 @@ public class TaskScheduleThread implements Runnable {
             // task node
             TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
 
+            // get resource files
+            List<String> resourceFiles = createProjectResFiles(taskNode);
             // copy hdfs/minio file to local
-            copyHdfsToLocal(processDao,
+            downloadResource(
                     taskInstance.getExecutePath(),
-                    createProjectResFiles(taskNode),
+                    resourceFiles,
                     logger);
+
 
             // get process instance according to tak instance
             ProcessInstance processInstance = taskInstance.getProcessInstance();
@@ -148,7 +152,7 @@ public class TaskScheduleThread implements Runnable {
             logger.error("task scheduler failure", e);
             kill();
             // update task instance state
-            processDao.changeTaskState(ExecutionStatus.FAILURE,
+            processService.changeTaskState(ExecutionStatus.FAILURE,
                     new Date(),
                     taskInstance.getId());
         }
@@ -157,7 +161,7 @@ public class TaskScheduleThread implements Runnable {
                 taskInstance.getId(),
                 task.getExitStatus());
         // update task instance state
-        processDao.changeTaskState(task.getExitStatus(),
+        processService.changeTaskState(task.getExitStatus(),
                 new Date(),
                 taskInstance.getId());
     }
@@ -187,14 +191,14 @@ public class TaskScheduleThread implements Runnable {
         // update task status is running
         if(taskType.equals(TaskType.SQL.name())  ||
                 taskType.equals(TaskType.PROCEDURE.name())){
-            processDao.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
+            processService.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
                     taskInstance.getStartTime(),
                     taskInstance.getHost(),
                     null,
                     getTaskLogPath(),
                     taskInstance.getId());
         }else{
-            processDao.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
+            processService.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
                     taskInstance.getStartTime(),
                     taskInstance.getHost(),
                     taskInstance.getExecutePath(),
@@ -204,8 +208,8 @@ public class TaskScheduleThread implements Runnable {
     }
 
     /**
-     *  get task log path
-     * @return
+     * get task log path
+     * @return log path
      */
     private String getTaskLogPath() {
         String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
@@ -294,20 +298,20 @@ public class TaskScheduleThread implements Runnable {
     }
 
     /**
-     * copy hdfs file to local
+     * download resource file
      *
-     * @param processDao
      * @param execLocalPath
      * @param projectRes
      * @param logger
      */
-    private void copyHdfsToLocal(ProcessDao processDao, String execLocalPath, List<String> projectRes, Logger logger) throws IOException {
+    private void downloadResource(String execLocalPath, List<String> projectRes, Logger logger) throws Exception {
+        checkDownloadPermission(projectRes);
         for (String res : projectRes) {
             File resFile = new File(execLocalPath, res);
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String tentnCode = processDao.queryTenantCodeByResName(res);
+                    String tentnCode = processService.queryTenantCodeByResName(res);
                     String resHdfsPath = HadoopUtils.getHdfsFilename(tentnCode, res);
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
@@ -320,5 +324,17 @@ public class TaskScheduleThread implements Runnable {
                 logger.info("file : {} exists ", resFile.getName());
             }
         }
+    }
+
+    /**
+     * check download resource permission
+     * @param projectRes resource name list
+     * @throws Exception exception
+     */
+    private void checkDownloadPermission(List<String> projectRes) throws Exception {
+        int userId = taskInstance.getProcessInstance().getExecutorId();
+        String[] resNames = projectRes.toArray(new String[projectRes.size()]);
+        PermissionCheck<String> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE, processService,resNames,userId,logger);
+        permissionCheck.checkPermission();
     }
 }

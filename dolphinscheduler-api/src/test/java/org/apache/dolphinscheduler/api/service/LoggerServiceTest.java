@@ -16,37 +16,83 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
+@RunWith(MockitoJUnitRunner.class)
+@PrepareForTest({LoggerService.class})
 public class LoggerServiceTest {
+
     private static final Logger logger = LoggerFactory.getLogger(LoggerServiceTest.class);
 
-    @Autowired
+    @InjectMocks
     private LoggerService loggerService;
+    @Mock
+    private ProcessService processService;
+
 
     @Test
-    public void queryDataSourceList(){
+    public void testQueryDataSourceList(){
 
-        User loginUser = new User();
-        loginUser.setId(27);
-        loginUser.setUserType(UserType.GENERAL_USER);
-
-        Result result = loggerService.queryLog(-1, 0, 100);
-
+        TaskInstance taskInstance = new TaskInstance();
+        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+        Result result = loggerService.queryLog(2,1,1);
+        //TASK_INSTANCE_NOT_FOUND
         Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(),result.getCode().intValue());
+
+        //HOST NOT FOUND
+        result = loggerService.queryLog(1,1,1);
+        Assert.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(),result.getCode().intValue());
+
+        //SUCCESS
+        taskInstance.setHost("127.0.0.1");
+        taskInstance.setLogPath("/temp/log");
+        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+        result = loggerService.queryLog(1,1,1);
+        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
     }
+
+    @Test
+    public void testGetLogBytes(){
+
+        TaskInstance taskInstance = new TaskInstance();
+        Mockito.when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
+
+        //task instance is null
+        try{
+            loggerService.getLogBytes(2);
+        }catch (RuntimeException e){
+            Assert.assertTrue(true);
+            logger.error("testGetLogBytes error: {}","task instance is null");
+        }
+
+        //task instance host is null
+        try{
+            loggerService.getLogBytes(1);
+        }catch (RuntimeException e){
+            Assert.assertTrue(true);
+            logger.error("testGetLogBytes error: {}","task instance host is null");
+        }
+
+        //success
+        taskInstance.setHost("127.0.0.1");
+        taskInstance.setLogPath("/temp/log");
+        //if use @RunWith(PowerMockRunner.class) mock object,sonarcloud will not calculate the coverage,
+        // so no assert will be added here
+        loggerService.getLogBytes(1);
+
+    }
+
 }

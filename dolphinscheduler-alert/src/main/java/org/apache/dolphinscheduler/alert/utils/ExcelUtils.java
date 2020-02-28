@@ -16,10 +16,13 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +48,7 @@ public class ExcelUtils {
         //The JSONUtils.toList has been try catch ex
         itemsList = JSONUtils.toList(content, LinkedHashMap.class);
 
-        if (itemsList == null || itemsList.size() == 0){
+        if (CollectionUtils.isEmpty(itemsList)){
             logger.error("itemsList is null");
             throw new RuntimeException("itemsList is null");
         }
@@ -71,10 +74,14 @@ public class ExcelUtils {
                //set the height of the first line
                row.setHeight((short)500);
 
+               //set Horizontal right
+               CellStyle cellStyle = wb.createCellStyle();
+               cellStyle.setAlignment(HorizontalAlignment.RIGHT);
 
                //setting excel headers
                for (int i = 0; i < headerList.size(); i++) {
                    HSSFCell cell = row.createCell(i);
+                   cell.setCellStyle(cellStyle);
                    cell.setCellValue(headerList.get(i));
                }
 
@@ -88,6 +95,7 @@ public class ExcelUtils {
                    rowIndex++;
                    for (int j = 0 ; j < values.length ; j++){
                        HSSFCell cell1 = row.createCell(j);
+                       cell1.setCellStyle(cellStyle);
                        cell1.setCellValue(String.valueOf(values[j]));
                    }
                }

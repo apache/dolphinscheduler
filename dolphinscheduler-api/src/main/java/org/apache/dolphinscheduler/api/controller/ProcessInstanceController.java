@@ -16,18 +16,18 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.queue.ITaskQueue;
-import org.apache.dolphinscheduler.common.queue.TaskQueueFactory;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
+import org.apache.dolphinscheduler.service.queue.ITaskQueue;
+import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +58,7 @@ public class ProcessInstanceController extends BaseController{
 
     /**
      * query process instance list paging
-     * 
+     *
      * @param loginUser login user
      * @param projectName project name
      * @param pageNo page number
@@ -75,6 +75,7 @@ public class ProcessInstanceController extends BaseController{
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type ="String"),
+            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type ="String"),
             @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type ="ExecutionStatus"),
             @ApiImplicitParam(name = "host", value = "HOST", type ="String"),
             @ApiImplicitParam(name = "startDate", value = "START_DATE", type ="String"),
@@ -88,6 +89,7 @@ public class ProcessInstanceController extends BaseController{
                                            @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
                                                                    @RequestParam(value = "processDefinitionId", required = false, defaultValue = "0") Integer processDefinitionId,
                                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                                   @RequestParam(value = "executorName", required = false) String executorName,
                                                                    @RequestParam(value = "stateType", required = false) ExecutionStatus stateType,
                                                                    @RequestParam(value = "host", required = false) String host,
                                                                    @RequestParam(value = "startDate", required = false) String startTime,
@@ -96,12 +98,12 @@ public class ProcessInstanceController extends BaseController{
                                                                    @RequestParam("pageSize") Integer pageSize){
         try{
             logger.info("query all process instance list, login user:{},project name:{}, define id:{}," +
-                    "search value:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
-                    loginUser.getUserName(), projectName, processDefinitionId, searchVal, stateType,host,
+                    "search value:{},executor name:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
+                    loginUser.getUserName(), projectName, processDefinitionId, searchVal, executorName,stateType,host,
                     startTime, endTime, pageNo, pageSize);
             searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = processInstanceService.queryProcessInstanceList(
-                    loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+                    loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){
             logger.error(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR.getMsg(),e);
@@ -372,7 +374,7 @@ public class ProcessInstanceController extends BaseController{
             // task queue
             ITaskQueue tasksQueue = TaskQueueFactory.getTaskQueueInstance();
             Map<String, Object> result = new HashMap<>(5);
-            List<Integer> deleteFailedIdList = new ArrayList<Integer>();
+            List<String> deleteFailedIdList = new ArrayList<>();
             if(StringUtils.isNotEmpty(processInstanceIds)){
                 String[] processInstanceIdArray = processInstanceIds.split(",");
 
@@ -381,16 +383,16 @@ public class ProcessInstanceController extends BaseController{
                     try {
                         Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId,tasksQueue);
                         if(!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))){
-                            deleteFailedIdList.add(processInstanceId);
+                            deleteFailedIdList.add(strProcessInstanceId);
                             logger.error((String)deleteResult.get(Constants.MSG));
                         }
                     } catch (Exception e) {
-                        deleteFailedIdList.add(processInstanceId);
+                        deleteFailedIdList.add(strProcessInstanceId);
                     }
                 }
             }
             if(deleteFailedIdList.size() > 0){
-                putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
+                putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR, String.join(",", deleteFailedIdList));
             }else{
                 putMsg(result, Status.SUCCESS);
             }

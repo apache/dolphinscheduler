@@ -319,6 +319,7 @@ CREATE TABLE t_ds_process_definition (
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   update_time timestamp DEFAULT NULL ,
+  modify_by varchar(36) DEFAULT '' ,
   PRIMARY KEY (id)
 ) ;
 
@@ -573,6 +574,7 @@ CREATE TABLE t_ds_task_instance (
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
   worker_group_id int DEFAULT '-1' ,
+  executor_id int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 

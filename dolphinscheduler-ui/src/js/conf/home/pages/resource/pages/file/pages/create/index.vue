@@ -19,11 +19,12 @@
     <template slot="content">
       <div class="resource-create-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('File Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('File Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="fileName"
+                    maxlength="60"
                     style="width: 300px;"
                     :placeholder="$t('Please enter name')"
                     autocomplete="off">
@@ -31,7 +32,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('File Format')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('File Format')}}</template>
           <template slot="content">
             <x-select v-model="suffix" style="width: 100px;" @on-change="_onChange">
               <x-option
@@ -56,7 +57,7 @@
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('File Content')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('File Content')}}</template>
           <template slot="content">
             <textarea id="code-create-mirror" name="code-create-mirror"></textarea>
           </template>
