@@ -34,15 +34,6 @@ public class TenantManagePage extends PageCommon {
         super(driver);
     }
 
-
-    /**
-     * jump page
-     */
-    public void jumpPage() {
-        System.out.println("jump tenant page");
-        super.jumpPage(TenantManageData.TENANAT_URL);
-    }
-
     /**
      * createTenant
      *

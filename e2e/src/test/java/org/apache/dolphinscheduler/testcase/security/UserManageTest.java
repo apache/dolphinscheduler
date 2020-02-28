@@ -23,11 +23,9 @@ import org.testng.annotations.Test;
 public class UserManageTest extends BaseTest {
     private UserManagePage userManagePage;
 
-    @Test(description = "TenantTest", priority = 1)
+    @Test(groups={"functionTests"},description = "TenantTest",priority=3)
     public void testUserManage() throws InterruptedException {
         userManagePage = new UserManagePage(driver);
-        // enter user manage page
-        userManagePage.jumpPage();
         //assert user manage page
         assert userManagePage.createUser();
     }

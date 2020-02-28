@@ -26,16 +26,9 @@ public class UserManagePage extends PageCommon {
     public UserManagePage(WebDriver driver) {
         super(driver);
     }
-    /**
-     * jump page
-     */
-    public void jumpPage() {
-        System.out.println("jump tenant page");
-        super.jumpPage(UserManageData.USER_URL);
-    }
 
     /**
-     * creatTenant
+     * createTenant
      *
      * @return Whether to enter the specified page after creat tenant
      */

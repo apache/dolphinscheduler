@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.base;
 
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.util.PropertiesReader;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -35,7 +36,7 @@ public class BaseDriver {
     /**
      * driver
      */
-    private WebDriver driver;
+    private static WebDriver driver;
 
     /**
      * chrome driver path
@@ -88,12 +89,14 @@ public class BaseDriver {
         chromeOptions.setPageLoadStrategy(PageLoadStrategy.NONE);
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable-dev-shm-usage");
-        chromeOptions.addArguments("--headless");
+//        chromeOptions.addArguments("--headless");
+        chromeOptions.addArguments("Cookie:language=en-US");
         chromeOptions.addArguments("--disable-gpu");
         chromeOptions.addArguments("--whitelisted-ips");
         chromeOptions.addArguments("--disable-infobars");
         chromeOptions.addArguments("--disable-browser-side-navigation");
         driver = new ChromeDriver(chromeOptions);
+
 
         /* driver setting wait time */
         // implicitly wait time
@@ -108,6 +111,8 @@ public class BaseDriver {
         // script timeout
         driver.manage().timeouts().setScriptTimeout(setScriptTimeout, TimeUnit.SECONDS);
 
+
+
         // window maximize
         driver.manage().window().maximize();
 
@@ -120,7 +125,7 @@ public class BaseDriver {
      *
      * @return driver
      */
-    public WebDriver getDriver() {
+    public static WebDriver getDriver() {
         return driver;
     }
 
