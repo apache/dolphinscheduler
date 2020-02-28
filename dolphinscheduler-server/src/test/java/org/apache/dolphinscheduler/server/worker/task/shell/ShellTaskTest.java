@@ -130,7 +130,7 @@ public class ShellTaskTest {
             PowerMockito.when(OSUtils.isWindows()).thenReturn(false);
             shellTask.init();
             Assert.assertTrue(true);
-        } catch (Exception e) {
+        } catch (Error | Exception e) {
             Assert.fail(e.getMessage());
         }
     }
@@ -144,7 +144,7 @@ public class ShellTaskTest {
             PowerMockito.when(OSUtils.isWindows()).thenReturn(true);
             shellTask.init();
             Assert.assertTrue(true);
-        } catch (Exception e) {
+        } catch (Error | Exception e) {
             Assert.fail(e.getMessage());
         }
     }
@@ -158,7 +158,7 @@ public class ShellTaskTest {
             PowerMockito.when(OSUtils.isWindows()).thenReturn(false);
             shellTask.handle();
             Assert.assertTrue(true);
-        } catch (RuntimeException e) {
+        } catch (Error | Exception e) {
             if (!e.getMessage().contains("process error . exitCode is :  -1")
                     && !System.getProperty("os.name").startsWith("Windows")) {
                 Assert.fail();
@@ -175,7 +175,7 @@ public class ShellTaskTest {
             PowerMockito.when(OSUtils.isWindows()).thenReturn(true);
             shellTask.handle();
             Assert.assertTrue(true);
-        } catch (RuntimeException e) {
+        } catch (Error | Exception e) {
             if (!e.getMessage().contains("process error . exitCode is :  -1")) {
                 Assert.fail();
             }
@@ -190,7 +190,7 @@ public class ShellTaskTest {
         try {
             shellTask.cancelApplication(true);
             Assert.assertTrue(true);
-        } catch (Exception e) {
+        } catch (Error | Exception e) {
             Assert.fail();
         }
     }

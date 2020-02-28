@@ -60,13 +60,9 @@ public class ProcessBuilderForWin32Test {
             builder = new ProcessBuilderForWin32(Collections.singletonList("net"));
             Assert.assertNotNull(builder);
 
-            try {
-                builder = new ProcessBuilderForWin32((List<String>) null);
-                Assert.assertNotNull(builder);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-        } catch (Exception e) {
+            builder = new ProcessBuilderForWin32((List<String>) null);
+            Assert.assertNotNull(builder);
+        } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
     }
@@ -77,7 +73,7 @@ public class ProcessBuilderForWin32Test {
             ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
             builder.user("test", StringUtils.EMPTY);
             Assert.assertNotNull(builder);
-        } catch (Exception e) {
+        } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
     }
@@ -92,7 +88,7 @@ public class ProcessBuilderForWin32Test {
             builder = new ProcessBuilderForWin32();
             builder.command("net");
             Assert.assertNotEquals(0, builder.command().size());
-        } catch (Exception e) {
+        } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
     }
@@ -102,14 +98,14 @@ public class ProcessBuilderForWin32Test {
         try {
             ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
             Assert.assertNotNull(builder.environment());
-        } catch (Exception e) {
+        } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
 
         try {
             Process process = Runtime.getRuntime().exec("net", new String[]{ "a=123" });
             Assert.assertNotNull(process);
-        } catch (Exception e) {
+        } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
     }
@@ -120,7 +116,7 @@ public class ProcessBuilderForWin32Test {
             ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
             builder.directory(new File("/tmp"));
             Assert.assertNotNull(builder.directory());
-        } catch (Exception e) {
+        } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
     }
@@ -135,7 +131,7 @@ public class ProcessBuilderForWin32Test {
             Assert.assertNotNull(builder.redirectOutput());
             builder.redirectError(new File("/tmp"));
             Assert.assertNotNull(builder.redirectError());
-        } catch (Exception e) {
+        } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
     }
@@ -162,7 +158,7 @@ public class ProcessBuilderForWin32Test {
             }
             logger.info("net user: {}", sb.toString());
             Assert.assertNotEquals(StringUtils.EMPTY, sb.toString());
-        } catch (Exception e) {
+        } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
     }
