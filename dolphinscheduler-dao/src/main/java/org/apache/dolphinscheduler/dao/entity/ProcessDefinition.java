@@ -158,6 +158,8 @@ public class ProcessDefinition {
      */
     private int tenantId;
 
+    private String resourceIds;
+
 
     public String getName() {
         return name;
@@ -329,6 +331,14 @@ public class ProcessDefinition {
         this.scheduleReleaseState = scheduleReleaseState;
     }
 
+    public String getResourceIds() {
+        return resourceIds;
+    }
+
+    public void setResourceIds(String resourceIds) {
+        this.resourceIds = resourceIds;
+    }
+
     public int getTimeout() {
         return timeout;
     }
@@ -346,6 +356,7 @@ public class ProcessDefinition {
                 ", releaseState=" + releaseState +
                 ", projectId=" + projectId +
                 ", processDefinitionJson='" + processDefinitionJson + '\'' +
+                ", description='" + description + '\'' +
                 ", globalParams='" + globalParams + '\'' +
                 ", globalParamList=" + globalParamList +
                 ", globalParamMap=" + globalParamMap +
@@ -362,6 +373,7 @@ public class ProcessDefinition {
                 ", scheduleReleaseState=" + scheduleReleaseState +
                 ", timeout=" + timeout +
                 ", tenantId=" + tenantId +
+                ", resourceIds='" + resourceIds + '\'' +
                 '}';
     }
 

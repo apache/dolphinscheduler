@@ -87,4 +87,10 @@
             pd.user_id = u.id AND pd.project_id = p.id
         AND pd.id = #{processDefineId}
     </select>
+
+    <select id="listResourceIds" resultType="java.lang.String">
+        SELECT resource_ids
+        FROM t_ds_process_definition
+        WHERE release_state = 1
+    </select>
 </mapper>

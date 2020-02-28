@@ -124,13 +124,8 @@ public class MapreduceParameters extends AbstractParameters {
     }
 
     @Override
-    public List<String> getResourceFilesList() {
-        if (resourceList != null) {
-            this.resourceList.add(mainJar);
-            return resourceList.stream()
-                    .map(p -> p.getRes()).collect(Collectors.toList());
-        }
-        return null;
+    public List<ResourceInfo> getResourceFilesList() {
+        return resourceList;
     }
 
     @Override

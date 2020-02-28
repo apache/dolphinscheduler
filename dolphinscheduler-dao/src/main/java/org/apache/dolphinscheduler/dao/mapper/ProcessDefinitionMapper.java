@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * process definition mapper interface
@@ -83,7 +84,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     List<ProcessDefinition> queryDefinitionListByTenant(@Param("tenantId") int tenantId);
 
     /**
-     *  count process definition group by user
+     * count process definition group by user
      * @param userId userId
      * @param projectIds projectIds
      * @param isAdmin isAdmin
@@ -93,4 +94,10 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
             @Param("userId") Integer userId,
             @Param("projectIds") Integer[] projectIds,
             @Param("isAdmin") boolean isAdmin);
+
+    /**
+     * list all resource ids
+     * @return resource ids list
+     */
+    List<String> listResourceIds();
 }

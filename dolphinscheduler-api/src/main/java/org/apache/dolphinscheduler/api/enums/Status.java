@@ -180,9 +180,11 @@ public enum Status {
     RESOURCE_SIZE_EXCEED_LIMIT(20007, "upload resource file size exceeds limit"),
     RESOURCE_SUFFIX_FORBID_CHANGE(20008, "resource suffix not allowed to be modified"),
     UDF_RESOURCE_SUFFIX_NOT_JAR(20009, "UDF resource suffix name must be jar"),
-    HDFS_COPY_FAIL(20009, "hdfs copy {0} -> {1} fail"),
-    RESOURCE_FILE_EXIST(20010, "resource file {0} already exists in hdfs,please delete it or change name!"),
-    RESOURCE_FILE_NOT_EXIST(20011, "resource file {0} not exists in hdfs!"),
+    HDFS_COPY_FAIL(20010, "hdfs copy {0} -> {1} fail"),
+    RESOURCE_FILE_EXIST(20011, "resource file {0} already exists in hdfs,please delete it or change name!"),
+    RESOURCE_FILE_NOT_EXIST(20012, "resource file {0} not exists in hdfs!"),
+    UDF_RESOURCE_IS_BOUND(20013, "udf resource file is bound by UDF functions:{0}"),
+    RESOURCE_IS_USED(20014, "resource file is used by process definition"),
 
 
 
