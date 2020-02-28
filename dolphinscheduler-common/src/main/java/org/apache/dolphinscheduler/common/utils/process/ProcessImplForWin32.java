@@ -373,11 +373,9 @@ public class ProcessImplForWin32 extends Process {
     {
         String cmdstr;
         final SecurityManager security = System.getSecurityManager();
-        final String value = GetPropertyAction.
-                privilegedGetProperty("jdk.lang.Process.allowAmbiguousCommands",
-                        (security == null ? "true" : "false"));
-        final boolean allowAmbiguousCommands = !"false".equalsIgnoreCase(value);
-
+        GetPropertyAction action = new GetPropertyAction("jdk.lang.Process.allowAmbiguousCommands",
+                (security == null) ? "true" : "false");
+        final boolean allowAmbiguousCommands = !"false".equalsIgnoreCase(action.run());
         if (allowAmbiguousCommands && security == null) {
             // Legacy mode.
 
