@@ -374,7 +374,7 @@ JSP.prototype.tasksClick = function (e) {
     $('.w').removeClass('jtk-tasks-active')
     $(e.currentTarget).addClass('jtk-tasks-active')
     if ($connect) {
-      setSvgColor($connect, '#555')
+      setSvgColor($connect, '#2d8cf0')
       this.selectedElement.connect = null
     }
     this.selectedElement.id = $(e.currentTarget).attr('id')
@@ -428,24 +428,25 @@ JSP.prototype.connectClick = function (e) {
  * @param {Pointer}
  */
 JSP.prototype.handleEventPointer = function (is) {
+  console.log(is)
   let wDom = $('.w')
   this.setConfig({
     isClick: is,
     isAttachment: false
   })
-  wDom.removeClass('jtk-ep')
-  if (!is) {
-    wDom.removeClass('jtk-tasks-active')
-    this.selectedElement = {}
-    _.map($('#canvas svg'), v => {
-      if ($(v).attr('class')) {
-        _.map($(v).find('path'), v1 => {
-          $(v1).attr('fill', '#555')
-          $(v1).attr('stroke', '#555')
-        })
-      }
-    })
-  }
+  // wDom.removeClass('jtk-ep')
+  // if (!is) {
+  //   wDom.removeClass('jtk-tasks-active')
+  //   this.selectedElement = {}
+  //   _.map($('#canvas svg'), v => {
+  //     if ($(v).attr('class')) {
+  //       _.map($(v).find('path'), v1 => {
+  //         $(v1).attr('fill', '#2d8cf0')
+  //         $(v1).attr('stroke', '#2d8cf0')
+  //       })
+  //     }
+  //   })
+  // }
 }
 
 /**
@@ -746,7 +747,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
         source: sourceId,
         target: targetId,
         type: 'basic',
-        paintStyle: { strokeWidth: 2, stroke: '#555' }
+        paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' }
       })
     })
   })

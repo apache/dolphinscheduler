@@ -247,7 +247,7 @@ const router = new Router({
           name: 'resource-file-subdirectory',
           component: resolve => require(['../pages/resource/pages/file/pages/subdirectory/index'], resolve),
           meta: {
-            title: `${i18n.$t('File Subdirectory')}`
+            title: `${i18n.$t('File Manage')}`
           }
         },
         {
@@ -279,7 +279,7 @@ const router = new Router({
               name: 'resource-udf-subUdfDirectory',
               component: resolve => require(['../pages/resource/pages/udf/pages/subUdfDirectory/index'], resolve),
               meta: {
-                title: `${i18n.$t('File Subdirectory')}`
+                title: `${i18n.$t('UDF Resources')}`
               }
             },
             {

@@ -24,7 +24,7 @@
             <x-button type="ghost" @click="() => $router.push({path: `/resource/file/subFile/${searchParams.id}`})">{{$t('Create File')}}</x-button>
             <x-button type="ghost" @click="_uploading">{{$t('Upload Files')}}</x-button>
             <span class="bread">(</span>
-            <a class="bread" @click="() => $router.push({path: `/resource/file`})">全部文件</a>
+            <a class="bread" @click="() => $router.push({path: `/resource/file`})">{{$t('File Manage')}}</a>
             <a class="bread" v-for="(item,$index) in breadList" :key="$index" @click="_ckOperation($index)">{{'>'+item}}</a>
             <span class="bread">)</span>
           </x-button-group>

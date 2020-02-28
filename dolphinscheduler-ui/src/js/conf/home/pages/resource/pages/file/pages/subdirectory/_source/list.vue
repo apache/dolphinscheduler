@@ -95,6 +95,7 @@
                     size="xsmall"
                     data-toggle="tooltip"
                     :title="$t('Download')"
+                    :disabled="item.directory? true: false"
                     @click="_downloadFile(item)"
                     icon="ans-icon-download">
             </x-button>

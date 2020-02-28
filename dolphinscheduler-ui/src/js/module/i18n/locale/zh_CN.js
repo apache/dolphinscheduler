@@ -526,7 +526,7 @@ export default {
   '0 means unlimited by byte': 'KB，0代表不限制',
   '0 means unlimited by count': '0代表不限制',
   'Modify User': '修改用户',
-  'Whether directory' : '是否目录',
+  'Whether directory' : '是否文件夹',
   'Yes': '是',
   'No': '否'
 }
