@@ -40,6 +40,12 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
      */
     private Map<Integer,TaskInstance> taskInstanceCache = new ConcurrentHashMap<>();
 
+    /**
+     * process service
+     */
+    @Autowired
+    private ProcessService processService;
+
 
     /**
      * get taskInstance by taskInstance id
@@ -49,7 +55,12 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
      */
     @Override
     public TaskInstance getByTaskInstanceId(Integer taskInstanceId) {
-        return taskInstanceCache.get(taskInstanceId);
+        TaskInstance taskInstance = getByTaskInstanceId(taskInstanceId);
+        if (taskInstance == null){
+            taskInstance = processService.findTaskInstanceById(taskInstanceId);
+            taskInstanceCache.put(taskInstanceId,taskInstance);
+        }
+        return taskInstance;
     }
 
     /**
@@ -60,9 +71,6 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     @Override
     public void cacheTaskInstance(TaskExecutionContext taskExecutionContext) {
         TaskInstance taskInstance = getByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        if (taskInstance == null){
-            taskInstance = new TaskInstance();
-        }
         taskInstance.setId(taskExecutionContext.getTaskInstanceId());
         taskInstance.setName(taskExecutionContext.getTaskName());
         taskInstance.setStartTime(taskExecutionContext.getStartTime());
@@ -79,9 +87,6 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     @Override
     public void cacheTaskInstance(ExecuteTaskAckCommand taskAckCommand) {
         TaskInstance taskInstance = getByTaskInstanceId(taskAckCommand.getTaskInstanceId());
-        if (taskInstance == null){
-            taskInstance = new TaskInstance();
-        }
         taskInstance.setState(ExecutionStatus.of(taskAckCommand.getStatus()));
         taskInstance.setStartTime(taskAckCommand.getStartTime());
         taskInstance.setHost(taskAckCommand.getHost());
@@ -97,9 +102,6 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     @Override
     public void cacheTaskInstance(ExecuteTaskResponseCommand executeTaskResponseCommand) {
         TaskInstance taskInstance = getByTaskInstanceId(executeTaskResponseCommand.getTaskInstanceId());
-        if (taskInstance == null){
-            taskInstance = new TaskInstance();
-        }
         taskInstance.setState(ExecutionStatus.of(executeTaskResponseCommand.getStatus()));
         taskInstance.setEndTime(executeTaskResponseCommand.getEndTime());
     }
