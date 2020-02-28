@@ -191,7 +191,6 @@ public class ProcessBuilderForWin32Test {
             commands.add("cmd.exe");
             commands.add("/c");
             commands.add("net user");
-
             builder.command(commands);
 
             Process process = builder.start();
