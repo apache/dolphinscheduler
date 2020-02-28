@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
 /**
@@ -170,7 +171,7 @@ public class DataxParameters extends AbstractParameters {
     }
 
     @Override
-    public List<String> getResourceFilesList() {
+    public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
     }
 

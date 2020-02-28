@@ -13,42 +13,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package org.apache.dolphinscheduler.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-
-/**
- * Authorization type
- */
-public enum AuthorizationType {
-    /**
-     * 0 RESOURCE_FILE_ID;
-     * 0 RESOURCE_FILE_NAME;
-     * 1 UDF_FILE;
-     * 1 DATASOURCE;
-     * 2 UDF;
-     */
-    RESOURCE_FILE_ID(0, "resource file id"),
-    RESOURCE_FILE_NAME(1, "resource file name"),
-    UDF_FILE(2, "udf file"),
-    DATASOURCE(3, "data source"),
-    UDF(4, "udf function");
-
-    AuthorizationType(int code, String descp){
-        this.code = code;
-        this.descp = descp;
-    }
-
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
-}
+*/
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+SET FOREIGN_KEY_CHECKS=0;
+UPDATE t_ds_resources SET pid=-1,is_directory=false WHERE pid IS NULL;
+UPDATE t_ds_resources SET full_name = concat('/',alias) WHERE pid=-1 and full_name IS NULL;
