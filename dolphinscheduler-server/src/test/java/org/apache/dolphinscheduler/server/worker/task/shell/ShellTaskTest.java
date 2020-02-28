@@ -177,7 +177,7 @@ public class ShellTaskTest {
             Assert.assertTrue(true);
         } catch (Error | Exception e) {
             if (!e.getMessage().contains("process error . exitCode is :  -1")) {
-                Assert.fail();
+                Assert.fail(e.getMessage());
             }
         }
     }
