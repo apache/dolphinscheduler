@@ -28,9 +28,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,6 +86,10 @@ public class ProcessBuilderForWin32Test {
             builder = new ProcessBuilderForWin32();
             builder.command("net");
             Assert.assertNotEquals(0, builder.command().size());
+
+            builder = new ProcessBuilderForWin32();
+            builder.command((List<String>) null);
+            Assert.assertNotEquals(0, builder.command().size());
         } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
@@ -103,8 +105,9 @@ public class ProcessBuilderForWin32Test {
         }
 
         try {
-            Process process = Runtime.getRuntime().exec("net", new String[]{ "a=123" });
-            Assert.assertNotNull(process);
+            ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
+            builder.environment(new String[]{ "a=123" });
+            Assert.assertNotEquals(0, builder.environment().size());
         } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
@@ -122,15 +125,57 @@ public class ProcessBuilderForWin32Test {
     }
 
     @Test
+    public void testStream() {
+        try {
+            InputStream in = ProcessBuilderForWin32.NullInputStream.INSTANCE;
+            Assert.assertNotNull(in);
+            Assert.assertEquals(-1, in.read());
+            Assert.assertEquals(0, in.available());
+
+            OutputStream out = ProcessBuilderForWin32.NullOutputStream.INSTANCE;
+            Assert.assertNotNull(out);
+            out.write(new byte[] {1});
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    @Test
     public void testRedirect() {
         try {
             ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
+
             builder.redirectInput(new File("/tmp"));
             Assert.assertNotNull(builder.redirectInput());
+            Assert.assertNotNull(builder.redirectInput().file());
+
             builder.redirectOutput(new File("/tmp"));
             Assert.assertNotNull(builder.redirectOutput());
+            Assert.assertNotNull(builder.redirectOutput().file());
+
             builder.redirectError(new File("/tmp"));
             Assert.assertNotNull(builder.redirectError());
+            Assert.assertNotNull(builder.redirectError().file());
+
+            builder.redirectInput(builder.redirectOutput());
+            builder.redirectOutput(builder.redirectInput());
+            builder.redirectError(builder.redirectInput());
+
+            Assert.assertNotNull(ProcessBuilderForWin32.Redirect.PIPE.type());
+            Assert.assertNotNull(ProcessBuilderForWin32.Redirect.PIPE.toString());
+            Assert.assertNotNull(ProcessBuilderForWin32.Redirect.INHERIT.type());
+            Assert.assertNotNull(ProcessBuilderForWin32.Redirect.INHERIT.toString());
+        } catch (Error | Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testRedirectErrorStream() {
+        try {
+            ProcessBuilderForWin32 builder = new ProcessBuilderForWin32();
+            builder.redirectErrorStream(true);
+            Assert.assertTrue(builder.redirectErrorStream());
         } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }

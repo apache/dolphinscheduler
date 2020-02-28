@@ -20,8 +20,7 @@ import com.sun.jna.platform.win32.Kernel32Util;
 
 import java.util.*;
 
-final class ProcessEnvironmentForWin32 extends HashMap<String,String>
-{
+final class ProcessEnvironmentForWin32 extends HashMap<String,String> {
 
     private static final long serialVersionUID = -8017839552603542824L;
 
@@ -67,9 +66,7 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String>
         return super.remove(nonNullString(key));
     }
 
-    private static class CheckedEntry
-            implements Entry<String,String>
-    {
+    private static class CheckedEntry implements Entry<String,String> {
         private final Entry<String,String> e;
         public CheckedEntry(Entry<String,String> e) {this.e = e;}
         public String getKey()   { return e.getKey();}
@@ -82,9 +79,7 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String>
         public int hashCode()    {return e.hashCode();}
     }
 
-    private static class CheckedEntrySet
-            extends AbstractSet<Entry<String,String>>
-    {
+    private static class CheckedEntrySet extends AbstractSet<Entry<String,String>> {
         private final Set<Entry<String,String>> s;
         public CheckedEntrySet(Set<Entry<String,String>> s) {this.s = s;}
         public int size()        {return s.size();}
@@ -145,9 +140,7 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String>
         return new CheckedEntrySet(super.entrySet());
     }
 
-
-    private static final class NameComparator
-            implements Comparator<String> {
+    private static final class NameComparator implements Comparator<String> {
         public int compare(String s1, String s2) {
             // We can't use String.compareToIgnoreCase since it
             // canonicalizes to lower case, while Windows
@@ -171,8 +164,7 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String>
         }
     }
 
-    private static final class EntryComparator
-            implements Comparator<Entry<String,String>> {
+    private static final class EntryComparator implements Comparator<Entry<String,String>> {
         public int compare(Entry<String,String> e1,
                            Entry<String,String> e2) {
             return nameComparator.compare(e1.getKey(), e2.getKey());
@@ -192,8 +184,7 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String>
         nameComparator  = new NameComparator();
         entryComparator = new EntryComparator();
         theEnvironment  = new ProcessEnvironmentForWin32();
-        theUnmodifiableEnvironment
-                = Collections.unmodifiableMap(theEnvironment);
+        theUnmodifiableEnvironment = Collections.unmodifiableMap(theEnvironment);
 
         theEnvironment.putAll(environmentBlock());
 
@@ -290,7 +281,6 @@ final class ProcessEnvironmentForWin32 extends HashMap<String,String>
     }
 
     static String toEnvironmentBlock(Map<String,String> map) {
-        return map == null ? null :
-                ((ProcessEnvironmentForWin32)map).toEnvironmentBlock();
+        return map == null ? null : ((ProcessEnvironmentForWin32)map).toEnvironmentBlock();
     }
 }
