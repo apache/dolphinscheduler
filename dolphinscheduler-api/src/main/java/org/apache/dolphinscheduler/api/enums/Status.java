@@ -184,6 +184,7 @@ public enum Status {
     RESOURCE_FILE_EXIST(20011, "resource file {0} already exists in hdfs,please delete it or change name!"),
     RESOURCE_FILE_NOT_EXIST(20012, "resource file {0} not exists in hdfs!"),
     UDF_RESOURCE_IS_BOUND(20013, "udf resource file is bound by UDF functions:{0}"),
+    RESOURCE_IS_USED(20014, "resource file is used by process definition"),
 
 
 

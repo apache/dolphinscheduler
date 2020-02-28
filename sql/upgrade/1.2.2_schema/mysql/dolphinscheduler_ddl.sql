@@ -53,8 +53,8 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_resources_A_full_name()
 d//
 
 delimiter ;
-CALL ac_dolphin_T_t_ds_resources_A_pid;
-DROP PROCEDURE ac_dolphin_T_t_ds_resources_A_pid;
+CALL ac_dolphin_T_t_ds_resources_A_full_name;
+DROP PROCEDURE ac_dolphin_T_t_ds_resources_A_full_name;
 
 -- ac_dolphin_T_t_ds_resources_A_pid
 drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_resources_is_directory;
@@ -66,7 +66,7 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_resources_is_directory()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='is_directory')
    THEN
-         ALTER TABLE t_ds_resources ADD `is_directory` tinyint(1) DEFAULT 0 COMMENT 'parent id';
+         ALTER TABLE t_ds_resources ADD `is_directory` tinyint(1) DEFAULT 0 COMMENT 'is directory';
        END IF;
  END;
 
@@ -75,3 +75,23 @@ d//
 delimiter ;
 CALL ac_dolphin_T_t_ds_resources_is_directory;
 DROP PROCEDURE ac_dolphin_T_t_ds_resources_is_directory;
+
+-- ac_dolphin_T_t_ds_process_definition_A_resource_ids
+drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_process_definition_A_resource_ids;
+delimiter d//
+CREATE PROCEDURE ac_dolphin_T_t_ds_process_definition_A_resource_ids()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='resource_ids')
+   THEN
+         ALTER TABLE t_ds_process_definition ADD `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource ids';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL ac_dolphin_T_t_ds_process_definition_A_resource_ids;
+DROP PROCEDURE ac_dolphin_T_t_ds_process_definition_A_resource_ids;

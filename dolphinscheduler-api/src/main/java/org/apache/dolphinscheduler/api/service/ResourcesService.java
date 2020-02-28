@@ -30,10 +30,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +42,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.apache.dolphinscheduler.common.Constants.*;
 
@@ -70,6 +68,9 @@ public class ResourcesService extends BaseService {
 
     @Autowired
     private ResourceUserMapper resourceUserMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * create directory
@@ -535,13 +536,35 @@ public class ResourcesService extends BaseService {
         if (StringUtils.isEmpty(tenantCode)){
             return  result;
         }
-        // delete hdfs file by type
+
+        // get all resource id of process definitions those is released
+        List<String> resourceIdsList = processDefinitionMapper.listResourceIds();
+        Set<Integer> resourceIdSet = new HashSet<>();
+        resourceIdsList.stream().map(t->t.split(",")).forEach(t-> {
+            resourceIdSet.addAll(Arrays.stream(t).map(s->Integer.parseInt(s)).collect(Collectors.toSet()));
+        });
+
+        // get all children of the resource
+        List<Integer> allChildren = listAllChildren(resource);
+        if (resourceIdSet.contains(resource.getPid())) {
+            logger.error("can't be deleted,because it is used of process definition");
+            putMsg(result, Status.RESOURCE_IS_USED);
+            return result;
+        }
+        resourceIdSet.retainAll(allChildren);
+        if (CollectionUtils.isNotEmpty(resourceIdSet)) {
+            logger.error("can't be deleted,because it is used of process definition");
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        // get hdfs file by type
         String hdfsFilename = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getAlias());
 
         //delete data in database
-        List<Integer> allChildren = listAllChildren(resource);
         resourcesMapper.deleteIds(allChildren.toArray(new Integer[allChildren.size()]));
         resourceUserMapper.deleteResourceUser(0, resourceId);
+
         //delete file on hdfs
         HadoopUtils.getInstance().delete(hdfsFilename, true);
         putMsg(result, Status.SUCCESS);
