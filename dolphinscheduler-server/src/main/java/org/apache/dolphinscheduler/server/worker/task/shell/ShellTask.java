@@ -18,11 +18,13 @@ package org.apache.dolphinscheduler.server.worker.task.shell;
 
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
@@ -63,38 +65,29 @@ public class ShellTask extends AbstractTask {
   private ShellCommandExecutor shellCommandExecutor;
 
   /**
-   * process database access
+   *  taskExecutionContext
    */
-  private ProcessService processService;
+  private TaskExecutionContext taskExecutionContext;
 
   /**
    * constructor
-   * @param taskProps task props
+   * @param taskExecutionContext taskExecutionContext
    * @param logger    logger
    */
-  public ShellTask(TaskProps taskProps, Logger logger) {
-    super(taskProps, logger);
+  public ShellTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+    super(taskExecutionContext, logger);
 
-    this.taskDir = taskProps.getExecutePath();
-
-    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskProps.getExecutePath(),
-            taskProps.getTaskAppId(),
-            taskProps.getTaskInstanceId(),
-            taskProps.getTenantCode(),
-            taskProps.getEnvFile(),
-            taskProps.getTaskStartTime(),
-            taskProps.getTaskTimeout(),
-            taskProps.getLogPath(),
-            taskProps.getExecutePath(),
+    this.taskExecutionContext = taskExecutionContext;
+    this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
+            taskExecutionContext,
             logger);
-    this.processService = SpringApplicationContext.getBean(ProcessService.class);
   }
 
   @Override
   public void init() {
-    logger.info("shell task params {}", taskProps.getTaskParams());
+    logger.info("shell task params {}", taskExecutionContext.getTaskParams());
 
-    shellParameters = JSONUtils.parseObject(taskProps.getTaskParams(), ShellParameters.class);
+    shellParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ShellParameters.class);
 
     if (!shellParameters.checkParameters()) {
       throw new RuntimeException("shell task params is not valid");
@@ -129,7 +122,7 @@ public class ShellTask extends AbstractTask {
    */
   private String buildCommand() throws Exception {
     // generate scripts
-    String fileName = String.format("%s/%s_node.sh", taskDir, taskProps.getTaskAppId());
+    String fileName = String.format("%s/%s_node.sh", taskDir, taskExecutionContext.getTaskAppId());
     Path path = new File(fileName).toPath();
 
     if (Files.exists(path)) {
@@ -142,11 +135,11 @@ public class ShellTask extends AbstractTask {
     /**
      *  combining local and global parameters
      */
-    Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-            taskProps.getDefinedParams(),
+    Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+            taskExecutionContext.getDefinedParams(),
             shellParameters.getLocalParametersMap(),
-            taskProps.getCmdTypeIfComplement(),
-            taskProps.getScheduleTime());
+            CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+            taskExecutionContext.getScheduleTime());
     if (paramsMap != null){
       script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
     }

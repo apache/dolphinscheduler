@@ -26,7 +26,11 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
+import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.slf4j.Logger;
@@ -63,36 +67,6 @@ public abstract class AbstractCommandExecutor {
     protected Consumer<List<String>> logHandler;
 
     /**
-     *  task dir
-     */
-    protected final String taskDir;
-
-    /**
-     *  task appId
-     */
-    protected final String taskAppId;
-
-    /**
-     *  task appId
-     */
-    protected final int taskInstanceId;
-
-    /**
-     *  tenant code , execute task linux user
-     */
-    protected final String tenantCode;
-
-    /**
-     *  env file
-     */
-    protected final String envFile;
-
-    /**
-     *  start time
-     */
-    protected final Date startTime;
-
-    /**
      *  timeout
      */
     protected int timeout;
@@ -108,33 +82,23 @@ public abstract class AbstractCommandExecutor {
     protected final List<String> logBuffer;
 
     /**
-     *  log path
+     * taskExecutionContext
      */
-    private String logPath;
+    protected TaskExecutionContext taskExecutionContext;
 
     /**
-     *  execute path
+     * taskExecutionContextCacheManager
      */
-    private String executePath;
+    private TaskExecutionContextCacheManager taskExecutionContextCacheManager;
 
     public AbstractCommandExecutor(Consumer<List<String>> logHandler,
-                                   String taskDir,
-                                   String taskAppId,
-                                   Integer taskInstanceId,
-                                   String tenantCode, String envFile,
-                                   Date startTime, int timeout, String logPath,String executePath,Logger logger){
+                                   TaskExecutionContext taskExecutionContext ,
+                                   Logger logger){
         this.logHandler = logHandler;
-        this.taskDir = taskDir;
-        this.taskAppId = taskAppId;
-        this.taskInstanceId = taskInstanceId;
-        this.tenantCode = tenantCode;
-        this.envFile = envFile;
-        this.startTime = startTime;
-        this.timeout = timeout;
-        this.logPath = logPath;
-        this.executePath = executePath;
+        this.taskExecutionContext = taskExecutionContext;
         this.logger = logger;
         this.logBuffer = Collections.synchronizedList(new ArrayList<>());
+        this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
     }
 
     /**
@@ -147,14 +111,14 @@ public abstract class AbstractCommandExecutor {
         //init process builder
         ProcessBuilder processBuilder = new ProcessBuilder();
         // setting up a working directory
-        processBuilder.directory(new File(taskDir));
+        processBuilder.directory(new File(taskExecutionContext.getExecutePath()));
         // merge error information to standard output stream
         processBuilder.redirectErrorStream(true);
         // setting up user to run commands
         List<String> command = new LinkedList<>();
         command.add("sudo");
         command.add("-u");
-        command.add(tenantCode);
+        command.add(taskExecutionContext.getTenantCode());
         command.add(commandInterpreter());
         command.addAll(commandOptions());
         command.add(commandFile);
@@ -197,6 +161,10 @@ public abstract class AbstractCommandExecutor {
 
         result.setProcessId(processId);
 
+        // cache processId
+        taskExecutionContext.setProcessId(processId);
+        taskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
+
         // print process id
         logger.info("process start, process id is: {}", processId);
 
@@ -210,31 +178,21 @@ public abstract class AbstractCommandExecutor {
         result.setExitStatusCode(process.exitValue());
 
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
-                taskDir,
+                taskExecutionContext.getExecutePath(),
                 processId
                 , result.getExitStatusCode());
 
         // if SHELL task exit
         if (status) {
             // set appIds
-            List<String> appIds = getAppIds(logPath);
+            List<String> appIds = getAppIds(taskExecutionContext.getLogPath());
             result.setAppIds(String.join(Constants.COMMA, appIds));
 
             // if yarn task , yarn state is final state
             result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
         } else {
             logger.error("process has failure , exitStatusCode : {} , ready to kill ...", result.getExitStatusCode());
-            TaskInstance taskInstance = new TaskInstance();
-            taskInstance.setPid(processId);
-            taskInstance.setHost(OSUtils.getHost());
-            taskInstance.setLogPath(logPath);
-            taskInstance.setExecutePath(executePath);
-
-            ProcessInstance processInstance = new ProcessInstance();
-            processInstance.setTenantCode(tenantCode);
-            taskInstance.setProcessInstance(processInstance);
-
-            ProcessUtils.kill(taskInstance);
+            ProcessUtils.kill(taskExecutionContext);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
         return result;
@@ -284,7 +242,7 @@ public abstract class AbstractCommandExecutor {
                 // sudo -u user command to run command
                 String cmd = String.format("sudo kill %d", processId);
 
-                logger.info("soft kill task:{}, process id:{}, cmd:{}", taskAppId, processId, cmd);
+                logger.info("soft kill task:{}, process id:{}, cmd:{}", taskExecutionContext.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
@@ -304,7 +262,7 @@ public abstract class AbstractCommandExecutor {
             try {
                 String cmd = String.format("sudo kill -9 %d", processId);
 
-                logger.info("hard kill task:{}, process id:{}, cmd:{}", taskAppId, processId, cmd);
+                logger.info("hard kill task:{}, process id:{}, cmd:{}", taskExecutionContext.getTaskAppId(), processId, cmd);
 
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
@@ -345,7 +303,7 @@ public abstract class AbstractCommandExecutor {
      * @param process process
      */
     private void parseProcessOutput(Process process) {
-        String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskAppId);
+        String threadLoggerInfoName = String.format(LoggerUtils.TASK_LOGGER_THREAD_NAME + "-%s", taskExecutionContext.getTaskAppId());
         ExecutorService parseProcessOutputExecutorService = ThreadUtils.newDaemonSingleThreadExecutor(threadLoggerInfoName);
         parseProcessOutputExecutorService.submit(new Runnable(){
             @Override
@@ -487,7 +445,7 @@ public abstract class AbstractCommandExecutor {
      * @return remain time
      */
     private long getRemaintime() {
-        long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
+        long usedTime = (System.currentTimeMillis() - taskExecutionContext.getStartTime().getTime()) / 1000;
         long remainTime = timeout - usedTime;
 
         if (remainTime < 0) {

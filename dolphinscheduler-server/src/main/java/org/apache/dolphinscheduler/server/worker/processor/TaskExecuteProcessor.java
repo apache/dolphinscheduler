@@ -53,10 +53,6 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteProcessor.class);
 
-    /**
-     * process service
-     */
-    private final ProcessService processService;
 
     /**
      *  thread executor service
@@ -73,8 +69,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
      */
     private final TaskCallbackService taskCallbackService;
 
-    public TaskExecuteProcessor(ProcessService processService){
-        this.processService = processService;
+    public TaskExecuteProcessor(){
         this.taskCallbackService = new TaskCallbackService();
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
@@ -106,8 +101,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
         this.doAck(taskExecutionContext);
         // submit task
-        workerExecService.submit(new TaskExecuteThread(taskExecutionContext,
-                processService, taskCallbackService));
+        workerExecService.submit(new TaskExecuteThread(taskExecutionContext,taskCallbackService));
     }
 
     private void doAck(TaskExecutionContext taskExecutionContext){
