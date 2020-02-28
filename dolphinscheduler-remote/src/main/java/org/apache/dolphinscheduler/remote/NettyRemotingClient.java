@@ -269,6 +269,12 @@ public class NettyRemotingClient {
         return result;
     }
 
+    /**
+     *  send task
+     * @param host host
+     * @param command command
+     * @throws RemotingException
+     */
     public void send(final Host host, final Command command) throws RemotingException {
         Channel channel = getChannel(host);
         if (channel == null) {

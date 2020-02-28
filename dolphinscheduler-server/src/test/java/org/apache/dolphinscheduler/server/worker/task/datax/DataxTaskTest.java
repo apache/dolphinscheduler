@@ -80,7 +80,7 @@ public class DataxTaskTest {
         props.setTaskTimeout(0);
         props.setTaskParams(
             "{\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedByte\":1024,\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"datasource\":1,\"dsType\":\"MYSQL\",\"datatarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test from dual\",\"preStatements\":[\"delete from test\"],\"postStatements\":[\"delete from test\"]}");
-        dataxTask = PowerMockito.spy(new DataxTask(props, logger));
+        dataxTask = PowerMockito.spy(new DataxTask(null, logger));
         dataxTask.init();
 
         Mockito.when(processService.findDataSourceById(1)).thenReturn(getDataSource());
@@ -122,7 +122,7 @@ public class DataxTaskTest {
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
         props.setTaskInstanceId(1);
         props.setTenantCode("1");
-        Assert.assertNotNull(new DataxTask(props, logger));
+        Assert.assertNotNull(new DataxTask(null, logger));
     }
 
     /**

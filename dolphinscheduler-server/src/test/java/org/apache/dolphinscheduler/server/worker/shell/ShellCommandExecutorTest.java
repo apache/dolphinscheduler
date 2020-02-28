@@ -79,7 +79,9 @@ public class ShellCommandExecutorTest {
                 taskInstance.getId()));
 
 
-        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+//        AbstractTask task = TaskManager.newTask(taskInstance.getTaskType(), taskProps, taskLogger);
+
+        AbstractTask task = null;
 
         logger.info("task info : {}", task);
 
