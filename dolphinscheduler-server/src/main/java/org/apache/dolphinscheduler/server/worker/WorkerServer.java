@@ -150,7 +150,6 @@ public class WorkerServer implements IStoppable {
      */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_WORKER_SERVER);
-        System.setProperty("spring.profiles.active","worker");
         new SpringApplicationBuilder(WorkerServer.class).web(WebApplicationType.NONE).run(args);
     }
 
@@ -169,7 +168,7 @@ public class WorkerServer implements IStoppable {
         this.nettyRemotingServer.registerProcessor(CommandType.KILL_TASK_REQUEST, new TaskKillProcessor());
         this.nettyRemotingServer.start();
 
-        this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort(), workerConfig.getWorkerHeartbeatInterval());
+        this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort(), workerConfig.getWorkerHeartbeatInterval(), workerConfig.getWorkerGroup());
         this.workerRegistry.registry();
 
         this.zkWorkerClient.init();
@@ -188,22 +187,12 @@ public class WorkerServer implements IStoppable {
         // submit kill process thread
         killExecutorService.execute(killProcessThread);
 
-        // new fetch task thread
-//        FetchTaskThread fetchTaskThread = new FetchTaskThread(zkWorkerClient, processService, taskQueue);
-//
-//        // submit fetch task thread
-//        fetchTaskExecutorService.execute(fetchTaskThread);
-
         /**
          * register hooks, which are called before the process exits
          */
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                // worker server exit alert
-                if (zkWorkerClient.getActiveMasterNum() <= 1) {
-                    alertDao.sendServerStopedAlert(1, OSUtils.getHost(), "Worker-Server");
-                }
                 stop("shutdownhook");
             }
         }));

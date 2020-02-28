@@ -21,6 +21,7 @@ import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
@@ -33,6 +34,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
+import static org.apache.dolphinscheduler.remote.utils.Constants.SLASH;
 
 
 /**
@@ -41,6 +43,8 @@ import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
 public class WorkerRegistry {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerRegistry.class);
+
+    private static final String DEFAULT_GROUP = "DEFAULT";
 
     /**
      *  zookeeper registry center
@@ -68,14 +72,29 @@ public class WorkerRegistry {
     private final String startTime;
 
     /**
+     * worker group
+     */
+    private final String workerGroup;
+
+    /**
      *  construct
      * @param zookeeperRegistryCenter zookeeperRegistryCenter
      * @param port port
      */
     public WorkerRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port, long heartBeatInterval){
+        this(zookeeperRegistryCenter, port, heartBeatInterval, DEFAULT_GROUP);
+    }
+
+    /**
+     *  construct
+     * @param zookeeperRegistryCenter zookeeperRegistryCenter
+     * @param port port
+     */
+    public WorkerRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port, long heartBeatInterval, String workerGroup){
         this.zookeeperRegistryCenter = zookeeperRegistryCenter;
         this.port = port;
         this.heartBeatInterval = heartBeatInterval;
+        this.workerGroup = workerGroup;
         this.startTime = DateUtils.dateToString(new Date());
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
@@ -86,7 +105,7 @@ public class WorkerRegistry {
     public void registry() {
         String address = Constants.LOCAL_ADDRESS;
         String localNodePath = getWorkerPath();
-        zookeeperRegistryCenter.getZookeeperCachedOperator().persist(localNodePath, "");
+        zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
         zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
             @Override
             public void stateChanged(CuratorFramework client, ConnectionState newState) {
@@ -94,7 +113,7 @@ public class WorkerRegistry {
                     logger.error("worker : {} connection lost from zookeeper", address);
                 } else if(newState == ConnectionState.RECONNECTED){
                     logger.info("worker : {} reconnected to zookeeper", address);
-                    zookeeperRegistryCenter.getZookeeperCachedOperator().persist(localNodePath, "");
+                    zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
                 } else if(newState == ConnectionState.SUSPENDED){
                     logger.warn("worker : {} connection SUSPENDED ", address);
                 }
@@ -122,8 +141,14 @@ public class WorkerRegistry {
      */
     private String getWorkerPath() {
         String address = getLocalAddress();
-        String localNodePath = this.zookeeperRegistryCenter.getWorkerPath() + "/" + address;
-        return localNodePath;
+        StringBuilder builder = new StringBuilder(100);
+        String workerPath = this.zookeeperRegistryCenter.getWorkerPath();
+        builder.append(workerPath).append(SLASH);
+        if(StringUtils.isNotEmpty(workerGroup) && !DEFAULT_GROUP.equalsIgnoreCase(workerGroup)){
+            builder.append(workerGroup.trim()).append(SLASH);
+        }
+        builder.append(address);
+        return builder.toString();
     }
 
     /**
@@ -149,7 +174,7 @@ public class WorkerRegistry {
                 builder.append(startTime).append(COMMA);
                 builder.append(DateUtils.dateToString(new Date()));
                 String workerPath = getWorkerPath();
-                zookeeperRegistryCenter.getZookeeperCachedOperator().persist(workerPath, builder.toString());
+                zookeeperRegistryCenter.getZookeeperCachedOperator().update(workerPath, builder.toString());
             } catch (Throwable ex){
                 logger.error("error write worker heartbeat info", ex);
             }
