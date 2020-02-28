@@ -37,14 +37,11 @@ public class ProcessEnvironmentForWin32Test {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessBuilderForWin32Test.class);
 
-    private ProcessEnvironmentForWin32 processEnvironmentForWin32;
-
     @Before
     public void before() {
         try {
             PowerMockito.mockStatic(OSUtils.class);
             PowerMockito.when(OSUtils.isWindows()).thenReturn(true);
-            processEnvironmentForWin32 = (ProcessEnvironmentForWin32) ProcessEnvironmentForWin32.emptyEnvironment(0);
         } catch (Error | Exception e) {
             logger.error(e.getMessage());
         }
@@ -53,6 +50,7 @@ public class ProcessEnvironmentForWin32Test {
     @Test
     public void testPutAndGet() {
         try {
+            ProcessEnvironmentForWin32 processEnvironmentForWin32 = (ProcessEnvironmentForWin32) ProcessEnvironmentForWin32.emptyEnvironment(0);
             processEnvironmentForWin32.put("a", "123");
             Assert.assertEquals("123", processEnvironmentForWin32.get("a"));
             Assert.assertTrue(processEnvironmentForWin32.containsKey("a"));
@@ -63,6 +61,7 @@ public class ProcessEnvironmentForWin32Test {
         }
 
         try {
+            ProcessEnvironmentForWin32 processEnvironmentForWin32 = (ProcessEnvironmentForWin32) ProcessEnvironmentForWin32.emptyEnvironment(0);
             processEnvironmentForWin32.put("b=", "123");
         } catch (Error | Exception e) {
             logger.error(e.getMessage());
@@ -72,6 +71,7 @@ public class ProcessEnvironmentForWin32Test {
         }
 
         try {
+            ProcessEnvironmentForWin32 processEnvironmentForWin32 = (ProcessEnvironmentForWin32) ProcessEnvironmentForWin32.emptyEnvironment(0);
             processEnvironmentForWin32.put("b", "\u0000");
         } catch (Error | Exception e) {
             logger.error(e.getMessage());
@@ -81,6 +81,7 @@ public class ProcessEnvironmentForWin32Test {
         }
 
         try {
+            ProcessEnvironmentForWin32 processEnvironmentForWin32 = (ProcessEnvironmentForWin32) ProcessEnvironmentForWin32.emptyEnvironment(0);
             processEnvironmentForWin32.get(null);
         } catch (Error | Exception e) {
             logger.error(e.getMessage());
@@ -90,6 +91,7 @@ public class ProcessEnvironmentForWin32Test {
     @Test
     public void testEntrySet() {
         try {
+            ProcessEnvironmentForWin32 processEnvironmentForWin32 = (ProcessEnvironmentForWin32) ProcessEnvironmentForWin32.emptyEnvironment(0);
             processEnvironmentForWin32.clear();
             processEnvironmentForWin32.put("a", "123");
             Assert.assertEquals(0, processEnvironmentForWin32.entrySet().size());
@@ -118,6 +120,7 @@ public class ProcessEnvironmentForWin32Test {
     @Test
     public void testToEnvironmentBlock() {
         try {
+            ProcessEnvironmentForWin32 processEnvironmentForWin32 = (ProcessEnvironmentForWin32) ProcessEnvironmentForWin32.emptyEnvironment(0);
             Assert.assertNotNull(processEnvironmentForWin32.toEnvironmentBlock());
         } catch (Error | Exception e) {
             logger.error(e.getMessage());
