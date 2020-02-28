@@ -23,14 +23,16 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.server.worker.task.datax.DataxTaskTest;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -40,9 +42,11 @@ import java.util.Date;
 /**
  *  shell task test
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(OSUtils.class)
 public class ShellTaskTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataxTaskTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(ShellTaskTest.class);
 
     private ShellTask shellTask;
 
@@ -53,15 +57,15 @@ public class ShellTaskTest {
     private ApplicationContext applicationContext;
 
     @Before
-    public void before()
-            throws Exception {
-        processService = Mockito.mock(ProcessService.class);
-        shellCommandExecutor = Mockito.mock(ShellCommandExecutor.class);
+    public void before() throws Exception {
+        PowerMockito.mockStatic(OSUtils.class);
+        processService = PowerMockito.mock(ProcessService.class);
+        shellCommandExecutor = PowerMockito.mock(ShellCommandExecutor.class);
 
-        applicationContext = Mockito.mock(ApplicationContext.class);
+        applicationContext = PowerMockito.mock(ApplicationContext.class);
         SpringApplicationContext springApplicationContext = new SpringApplicationContext();
         springApplicationContext.setApplicationContext(applicationContext);
-        Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+        PowerMockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
         TaskProps props = new TaskProps();
         props.setTaskDir("/tmp");
@@ -75,12 +79,12 @@ public class ShellTaskTest {
         shellTask = new ShellTask(props, logger);
         shellTask.init();
 
-        Mockito.when(processService.findDataSourceById(1)).thenReturn(getDataSource());
-        Mockito.when(processService.findDataSourceById(2)).thenReturn(getDataSource());
-        Mockito.when(processService.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
+        PowerMockito.when(processService.findDataSourceById(1)).thenReturn(getDataSource());
+        PowerMockito.when(processService.findDataSourceById(2)).thenReturn(getDataSource());
+        PowerMockito.when(processService.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
 
         String fileName = String.format("%s/%s_node.%s", props.getTaskDir(), props.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
-        Mockito.when(shellCommandExecutor.run(fileName, processService)).thenReturn(0);
+        PowerMockito.when(shellCommandExecutor.run(fileName, processService)).thenReturn(0);
     }
 
     private DataSource getDataSource() {
@@ -100,8 +104,7 @@ public class ShellTaskTest {
     }
 
     @After
-    public void after()
-            throws Exception {}
+    public void after() {}
 
     /**
      * Method: ShellTask()
@@ -114,16 +117,17 @@ public class ShellTaskTest {
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
         props.setTaskInstId(1);
         props.setTenantCode("1");
-        Assert.assertNotNull(new ShellTask(props, logger));
+        ShellTask shellTaskTest = new ShellTask(props, logger);
+        Assert.assertNotNull(shellTaskTest);
     }
 
     /**
-     * Method: init
+     * Method: init for Unix-like
      */
     @Test
-    public void testInit()
-            throws Exception {
+    public void testInitForUnix() {
         try {
+            PowerMockito.when(OSUtils.isWindows()).thenReturn(false);
             shellTask.init();
         } catch (Exception e) {
             Assert.fail(e.getMessage());
@@ -131,17 +135,41 @@ public class ShellTaskTest {
     }
 
     /**
-     * Method: handle()
+     * Method: init for Windows
      */
     @Test
-    public void testHandle()
-            throws Exception {
+    public void testInitForWindows() {
         try {
+            PowerMockito.when(OSUtils.isWindows()).thenReturn(true);
+            shellTask.init();
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
+    }
+
+    /**
+     * Method: handle() for Unix-like
+     */
+    @Test
+    public void testHandleForUnix() throws Exception {
+        try {
+            PowerMockito.when(OSUtils.isWindows()).thenReturn(false);
             shellTask.handle();
         } catch (RuntimeException e) {
-            if (e.getMessage().indexOf("process error . exitCode is :  -1") < 0) {
-                Assert.fail();
-            }
+            logger.error(e.getMessage());
+        }
+    }
+
+    /**
+     * Method: handle() for windows
+     */
+    @Test
+    public void testHandleForWindows() throws Exception {
+        try {
+            PowerMockito.when(OSUtils.isWindows()).thenReturn(true);
+            shellTask.handle();
+        } catch (RuntimeException e) {
+            logger.error(e.getMessage());
         }
     }
 
@@ -149,8 +177,7 @@ public class ShellTaskTest {
      * Method: cancelApplication()
      */
     @Test
-    public void testCancelApplication()
-            throws Exception {
+    public void testCancelApplication() throws Exception {
         try {
             shellTask.cancelApplication(true);
         } catch (Exception e) {
