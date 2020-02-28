@@ -23,7 +23,7 @@
             <x-button type="ghost" @click="() => $router.push({name: 'resource-udf-subCreateUdfFolder'})">{{$t('Create folder')}}</x-button>
             <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
             <span class="bread">(</span>
-            <a class="bread" @click="() => $router.push({path: `/resource/udf`})">全部文件</a>
+            <a class="bread" @click="() => $router.push({path: `/resource/udf`})">{{$t('Resource manage')}}</a>
             <a class="bread" v-for="(item,$index) in breadList" :key="$index" @click="_ckOperation($index)">{{'>'+item}}</a>
             <span class="bread">)</span>
           </x-button-group>
