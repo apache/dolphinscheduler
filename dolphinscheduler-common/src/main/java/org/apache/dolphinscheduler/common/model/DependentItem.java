@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.model;
 
 import org.apache.dolphinscheduler.common.enums.DependResult;
+import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 
 /**
  * dependent item
@@ -28,6 +29,7 @@ public class DependentItem {
     private String cycle;
     private String dateValue;
     private DependResult dependResult;
+    private ExecutionStatus status;
 
 
     public String getKey(){
@@ -76,5 +78,13 @@ public class DependentItem {
 
     public void setDependResult(DependResult dependResult) {
         this.dependResult = dependResult;
+    }
+
+    public ExecutionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ExecutionStatus status) {
+        this.status = status;
     }
 }

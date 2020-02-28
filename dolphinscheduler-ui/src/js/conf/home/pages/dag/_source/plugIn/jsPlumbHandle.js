@@ -198,7 +198,8 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       targetarr: locations[v.id]['targetarr'],
       isAttachment: this.config.isAttachment,
       taskType: v.type,
-      runFlag: v.runFlag
+      runFlag: v.runFlag,
+      nodenumber: locations[v.id]['nodenumber'],
     }))
 
     // contextmenu event
@@ -517,6 +518,9 @@ JSP.prototype.removeConnect = function ($connect) {
     targetarr = _.filter(targetarr, v => v !== sourceId)
     $(`#${targetId}`).attr('data-targetarr', targetarr.toString())
   }
+  if ($(`#${sourceId}`).attr('data-tasks-type')=='CONDITIONS') {
+    $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))-1)
+  }
   this.JspInstance.deleteConnection($connect)
 
   this.selectedElement = {}
@@ -572,6 +576,7 @@ JSP.prototype.copyNodes = function ($id) {
     [newId]: {
       name: newName,
       targetarr: '',
+      nodenumber: 0,
       x: newX,
       y: newY
     }
@@ -658,6 +663,7 @@ JSP.prototype.saveStore = function () {
       locations[v.id] = {
         name: v.name,
         targetarr: v.targetarr,
+        nodenumber: v.nodenumber,
         x: v.x,
         y: v.y
       }
@@ -711,6 +717,12 @@ JSP.prototype.handleEvent = function () {
       return false
     }
 
+    if ($(`#${sourceId}`).attr('data-tasks-type')=='CONDITIONS' && $(`#${sourceId}`).attr('data-nodenumber')==2) {
+      return false
+    } else {
+      $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))+1)
+    }
+    
     // Storage node dependency information
     saveTargetarr(sourceId, targetId)
 
