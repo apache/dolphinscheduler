@@ -47,40 +47,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 	protected IStoppable stoppable = null;
 
 	/**
-	 *  heartbeat for zookeeper
-	 * @param znode  zookeeper node
-	 * @param serverType server type
-	 */
-	public void heartBeatForZk(String znode, String serverType){
-		try {
-
-			//check dead or not in zookeeper
-			if(zkClient.getState() == CuratorFrameworkState.STOPPED || checkIsDeadServer(znode, serverType)){
-				stoppable.stop("i was judged to death, release resources and stop myself");
-				return;
-			}
-
-			String resInfoStr = super.get(znode);
-			String[] splits = resInfoStr.split(Constants.COMMA);
-			if (splits.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
-				return;
-			}
-			String str = splits[0] + Constants.COMMA
-					+ splits[1] + Constants.COMMA
-					+ OSUtils.cpuUsage() + Constants.COMMA
-					+ OSUtils.memoryUsage() + Constants.COMMA
-					+ OSUtils.loadAverage() + Constants.COMMA
-					+ splits[5] + Constants.COMMA
-					+ DateUtils.dateToString(new Date());
-			zkClient.setData().forPath(znode,str.getBytes());
-
-		} catch (Exception e) {
-			logger.error("heartbeat for zk failed", e);
-			stoppable.stop("heartbeat for zk exception, release resources and stop myself");
-		}
-	}
-
-	/**
 	 *	check dead server or not , if dead, stop self
 	 *
 	 * @param zNode   	 node path

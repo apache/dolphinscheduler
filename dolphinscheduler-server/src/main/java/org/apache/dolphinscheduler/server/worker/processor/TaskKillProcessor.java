@@ -56,7 +56,6 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         doKill(killCommand);
     }
 
-
     /**
      * kill task logic
      *
