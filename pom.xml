@@ -679,7 +679,8 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>**/common/utils/**.java</include>
+                        <include>**/common/utils/*.java</include>
+                        <include>**/common/utils/process/ProcessBuilderForWin32Test.java</include>
                         <include>**/common/log/*.java</include>
                         <include>**/common/threadutils/*.java</include>
                         <include>**/common/graph/*.java</include>
