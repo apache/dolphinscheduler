@@ -370,6 +370,14 @@
                                                 <include>**/*.*</include>
                                             </includes>
                                         </source>
+                                        <source>
+                                            <location>
+                                                ${basedir}/../sql
+                                            </location>
+                                            <includes>
+                                                <include>soft_version</include>
+                                            </includes>
+                                        </source>
                                     </sources>
                                 </mapping>
 
