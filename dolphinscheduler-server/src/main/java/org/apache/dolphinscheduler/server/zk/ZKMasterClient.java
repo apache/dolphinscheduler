@@ -100,9 +100,6 @@ public class ZKMasterClient extends AbstractZKClient {
 			// init system znode
 			this.initSystemZNode();
 
-			// register master
-			this.registerMaster();
-
 			// check if fault tolerance is required，failure and tolerance
 			if (getActiveMasterNum() == 1) {
 				failoverWorker(null, true);
@@ -130,25 +127,6 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	public AlertDao getAlertDao() {
 		return alertDao;
-	}
-
-
-
-
-	/**
-	 *  register master znode
-	 */
-	public void registerMaster(){
-		try {
-		    String serverPath = registerServer(ZKNodeType.MASTER);
-		    if(StringUtils.isEmpty(serverPath)){
-		    	System.exit(-1);
-			}
-			masterZNode = serverPath;
-		} catch (Exception e) {
-			logger.error("register master failure ",e);
-			System.exit(-1);
-		}
 	}
 
 	/**
