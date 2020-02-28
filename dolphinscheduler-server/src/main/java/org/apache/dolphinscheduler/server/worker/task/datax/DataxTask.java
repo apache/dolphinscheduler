@@ -38,6 +38,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -49,6 +50,7 @@ import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -107,29 +109,31 @@ public class DataxTask extends AbstractTask {
     private ShellCommandExecutor shellCommandExecutor;
 
     /**
-     * process dao
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
+
+    /**
+     * processService
      */
     private ProcessService processService;
 
     /**
      * constructor
-     * 
-     * @param props
-     *            props
-     * @param logger
-     *            logger
+     * @param taskExecutionContext taskExecutionContext
+     * @param logger logger
      */
-    public DataxTask(TaskProps props, Logger logger) {
-        super(props, logger);
+    public DataxTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.taskExecutionContext = taskExecutionContext;
 
-        this.taskDir = props.getExecutePath();
         logger.info("task dir : {}", taskDir);
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, props.getExecutePath(), props.getTaskAppId(),
-            props.getTaskInstanceId(), props.getTenantCode(), props.getEnvFile(), props.getTaskStartTime(),
-            props.getTaskTimeout(), props.getLogPath(),props.getExecutePath(),logger);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
+                taskExecutionContext,logger);
 
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+        processService = SpringApplicationContext.getBean(ProcessService.class);
+
     }
 
     /**
@@ -137,8 +141,8 @@ public class DataxTask extends AbstractTask {
      */
     @Override
     public void init() {
-        logger.info("datax task params {}", taskProps.getTaskParams());
-        dataXParameters = JSONUtils.parseObject(taskProps.getTaskParams(), DataxParameters.class);
+        logger.info("datax task params {}", taskExecutionContext.getTaskParams());
+        dataXParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DataxParameters.class);
 
         if (!dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
@@ -155,7 +159,7 @@ public class DataxTask extends AbstractTask {
         throws Exception {
         try {
             // set the name of the current thread
-            String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskProps.getTaskAppId());
+            String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskExecutionContext.getTaskAppId());
             Thread.currentThread().setName(threadLoggerInfoName);
 
             // run datax process
@@ -196,7 +200,7 @@ public class DataxTask extends AbstractTask {
     private String buildDataxJsonFile()
         throws Exception {
         // generate json
-        String fileName = String.format("%s/%s_job.json", taskDir, taskProps.getTaskAppId());
+        String fileName = String.format("%s/%s_job.json", taskDir, taskExecutionContext.getTaskAppId());
 
         Path path = new File(fileName).toPath();
         if (Files.exists(path)) {
@@ -344,7 +348,7 @@ public class DataxTask extends AbstractTask {
     private String buildShellCommandFile(String jobConfigFilePath)
         throws Exception {
         // generate scripts
-        String fileName = String.format("%s/%s_node.sh", taskDir, taskProps.getTaskAppId());
+        String fileName = String.format("%s/%s_node.sh", taskDir, taskExecutionContext.getTaskAppId());
         Path path = new File(fileName).toPath();
 
         if (Files.exists(path)) {
@@ -361,12 +365,15 @@ public class DataxTask extends AbstractTask {
         String dataxCommand = sbr.toString();
 
         // find process instance by task id
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
+        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskExecutionContext.getTaskInstanceId());
 
         // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-            taskProps.getDefinedParams(), dataXParameters.getLocalParametersMap(),
-            processInstance.getCmdTypeIfComplement(), processInstance.getScheduleTime());
+        // replace placeholder
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                taskExecutionContext.getDefinedParams(),
+                dataXParameters.getLocalParametersMap(),
+                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                taskExecutionContext.getScheduleTime());
         if (paramsMap != null) {
             dataxCommand = ParameterUtils.convertParameterPlaceholders(dataxCommand, ParamUtils.convert(paramsMap));
         }

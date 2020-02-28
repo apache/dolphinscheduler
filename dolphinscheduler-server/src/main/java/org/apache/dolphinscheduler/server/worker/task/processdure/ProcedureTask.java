@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.task.processdure;
 import com.alibaba.fastjson.JSONObject;
 import com.cronutils.utils.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -30,6 +31,7 @@ import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -65,17 +67,25 @@ public class ProcedureTask extends AbstractTask {
      */
     private BaseDataSource baseDataSource;
 
+
+    /**
+     * taskExecutionContext
+     */
+    private TaskExecutionContext taskExecutionContext;
+
     /**
      * constructor
-     * @param taskProps task props
+     * @param taskExecutionContext taskExecutionContext
      * @param logger    logger
      */
-    public ProcedureTask(TaskProps taskProps, Logger logger) {
-        super(taskProps, logger);
+    public ProcedureTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
 
-        logger.info("procedure task params {}", taskProps.getTaskParams());
+        this.taskExecutionContext = taskExecutionContext;
 
-        this.procedureParameters = JSONObject.parseObject(taskProps.getTaskParams(), ProcedureParameters.class);
+        logger.info("procedure task params {}", taskExecutionContext.getTaskParams());
+
+        this.procedureParameters = JSONObject.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
 
         // check parameters
         if (!procedureParameters.checkParameters()) {
@@ -88,7 +98,7 @@ public class ProcedureTask extends AbstractTask {
     @Override
     public void handle() throws Exception {
         // set the name of the current thread
-        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskProps.getTaskAppId());
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
 
         logger.info("processdure type : {}, datasource : {}, method : {} , localParams : {}",
@@ -128,11 +138,11 @@ public class ProcedureTask extends AbstractTask {
 
 
             // combining local and global parameters
-            Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-                    taskProps.getDefinedParams(),
+            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                    taskExecutionContext.getDefinedParams(),
                     procedureParameters.getLocalParametersMap(),
-                    taskProps.getCmdTypeIfComplement(),
-                    taskProps.getScheduleTime());
+                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                    taskExecutionContext.getScheduleTime());
 
 
             Collection<Property> userDefParamsList = null;
@@ -159,8 +169,11 @@ public class ProcedureTask extends AbstractTask {
             logger.info("call method : {}",method);
             // call method
             stmt = connection.prepareCall(method);
-            if(taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED || taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED){
-                stmt.setQueryTimeout(taskProps.getTaskTimeout());
+
+            Boolean failed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED;
+            Boolean warnfailed = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
+            if(failed || warnfailed){
+                stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
             Map<Integer,Property> outParameterMap = new HashMap<>();
             if (userDefParamsList != null && userDefParamsList.size() > 0){

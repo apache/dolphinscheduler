@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -360,12 +362,18 @@ public class ZKMasterClient extends AbstractZKClient {
                 }
 			}
 
-			ProcessInstance instance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
-			if(instance!=null){
-				taskInstance.setProcessInstance(instance);
+			ProcessInstance processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
+			if(processInstance != null){
+				taskInstance.setProcessInstance(processInstance);
 			}
+
+			TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
+					.buildTaskInstanceRelatedInfo(taskInstance)
+					.buildProcessInstanceRelatedInfo(processInstance)
+					.buildProcessDefinitionRelatedInfo(null)
+					.create();
 			// only kill yarn job if exists , the local thread has exited
-			ProcessUtils.killYarnJob(taskInstance);
+			ProcessUtils.killYarnJob(taskExecutionContext);
 
 			taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
 			processService.saveTaskInstance(taskInstance);

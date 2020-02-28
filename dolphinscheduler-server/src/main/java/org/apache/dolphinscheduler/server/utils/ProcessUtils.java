@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.commons.io.FileUtils;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -317,14 +318,14 @@ public class ProcessUtils {
   /**
    * kill tasks according to different task types
    *
-   * @param taskInstance  task instance
+   * @param taskExecutionContext  taskExecutionContext
    */
-  public static void kill(TaskInstance taskInstance) {
+  public static void kill(TaskExecutionContext taskExecutionContext) {
     try {
-      int processId = taskInstance.getPid();
+      int processId = taskExecutionContext.getProcessId();
       if(processId == 0 ){
           logger.error("process kill failed, process id :{}, task id:{}",
-                  processId, taskInstance.getId());
+                  processId, taskExecutionContext.getTaskInstanceId());
           return ;
       }
 
@@ -335,7 +336,7 @@ public class ProcessUtils {
       OSUtils.exeCmd(cmd);
 
       // find log and kill yarn job
-      killYarnJob(taskInstance);
+      killYarnJob(taskExecutionContext);
 
     } catch (Exception e) {
       logger.error("kill task failed", e);
@@ -370,16 +371,16 @@ public class ProcessUtils {
   /**
    * find logs and kill yarn tasks
    *
-   * @param taskInstance  task instance
+   * @param taskExecutionContext  taskExecutionContext
    */
-  public static void killYarnJob(TaskInstance taskInstance) {
+  public static void killYarnJob(TaskExecutionContext taskExecutionContext) {
     try {
       Thread.sleep(Constants.SLEEP_TIME_MILLIS);
       LogClientService logClient = null;
       String log = null;
       try {
         logClient = new LogClientService();
-        log = logClient.viewLog(taskInstance.getHost(), Constants.RPC_PORT, taskInstance.getLogPath());
+        log = logClient.viewLog(taskExecutionContext.getHost(), Constants.RPC_PORT, taskExecutionContext.getLogPath());
       } finally {
         if(logClient != null){
           logClient.close();
@@ -387,13 +388,13 @@ public class ProcessUtils {
       }
       if (StringUtils.isNotEmpty(log)) {
         List<String> appIds = LoggerUtils.getAppIds(log, logger);
-        String workerDir = taskInstance.getExecutePath();
+        String workerDir = taskExecutionContext.getExecutePath();
         if (StringUtils.isEmpty(workerDir)) {
           logger.error("task instance work dir is empty");
           throw new RuntimeException("task instance work dir is empty");
         }
         if (appIds.size() > 0) {
-          cancelApplication(appIds, logger, taskInstance.getProcessInstance().getTenantCode(), taskInstance.getExecutePath());
+          cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
         }
       }
 
