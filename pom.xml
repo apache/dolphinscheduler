@@ -679,7 +679,7 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <includes>
-                        <include>**/common/utils/*.java</include>
+                        <include>**/common/utils/**.java</include>
                         <include>**/common/log/*.java</include>
                         <include>**/common/threadutils/*.java</include>
                         <include>**/common/graph/*.java</include>
@@ -727,6 +727,7 @@
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <include>**/server/worker/task/shell/ShellTaskTest.java</include>
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                     </includes>
