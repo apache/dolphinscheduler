@@ -90,7 +90,7 @@
       _verifyName () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('resource/resourceVerifyName', {
-            name: this.udfName,
+            fullName: '/'+this.udfName,
             type: 'UDF'
           }).then(res => {
             resolve()

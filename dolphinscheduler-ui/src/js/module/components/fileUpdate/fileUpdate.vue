@@ -126,7 +126,7 @@
         this.$refs['popup'].spinnerLoading = true
         if (this._validation()) {
           this.store.dispatch('resource/resourceVerifyName', {
-            name: this.name,
+            fullName: '/'+this.name,
             type: this.type
           }).then(res => {
             const isLt1024M = this.file.size / 1024 / 1024 < 1024

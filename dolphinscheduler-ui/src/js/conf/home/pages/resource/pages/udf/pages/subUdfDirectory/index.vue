@@ -22,6 +22,10 @@
           <x-button-group size="small">
             <x-button type="ghost" @click="() => $router.push({name: 'resource-udf-subCreateUdfFolder'})">{{$t('Create folder')}}</x-button>
             <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
+            <span class="bread">(</span>
+            <a class="bread" @click="() => $router.push({path: `/resource/udf`})">全部文件</a>
+            <a class="bread" v-for="(item,$index) in breadList" :key="$index" @click="_ckOperation($index)">{{'>'+item}}</a>
+            <span class="bread">)</span>
           </x-button-group>
         </template>
       </m-conditions>
@@ -46,6 +50,7 @@
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mList from './_source/list'
+  import localStore from '@/module/util/localStorage'
   import mSpin from '@/module/components/spin/spin'
   import { findComponentDownward } from '@/module/util/'
   import mNoData from '@/module/components/noData/noData'
@@ -66,13 +71,14 @@
           pageNo: 1,
           searchVal: '',
           type: 'UDF'
-        }
+        },
+        breadList: []
       }
     },
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('resource', ['getResourcesListP']),
+      ...mapActions('resource', ['getResourcesListP','getResourceId']),
       /**
        * File Upload
        */
@@ -112,6 +118,26 @@
         }).catch(e => {
           this.isLoading = false
         })
+      },
+       _ckOperation(index) {
+        let breadName =''
+        this.breadList.forEach((item, i) => {
+          if(i<=index) {
+            breadName = breadName+'/'+item
+          }
+        })
+        this.transferApi(breadName)
+      },
+      transferApi(api) {
+        this.getResourceId({
+          type: 'UDF',
+          fullName: api
+        }).then(res => {
+          localStore.setItem('currentDir', `${res.fullName}`)
+          this.$router.push({ path: `/resource/udf/subUdfDirectory/${res.id}` })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
       }
     },
     watch: {
@@ -120,13 +146,38 @@
         // url no params get instance list
         this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
         this.searchParams.id = a.params.id
+        let dir = localStore.getItem('currentDir').split('/')
+        dir.shift()
+        this.breadList = dir
+        this.getResourceId({
+          type: 'UDF',
+          pid: a.params.id
+        }).then(res => {
+          dir = res.fullName.split('/')
+          dir.shift()
+          this.breadList = dir
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
       }
     },
     created () {
     },
     mounted () {
+      let dir = localStore.getItem('currentDir').split('/')
+      dir.shift()
+      this.breadList = dir
       this.$modal.destroy()
     },
     components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }
 </script>
+<style lang="scss" rel="stylesheet/scss">
+  .bread {
+    padding: 7px 0;
+    line-height: 14px;
+    position: relative;
+    float: left;
+    cursor: pointer;
+  }
+</style>
