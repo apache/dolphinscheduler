@@ -100,15 +100,13 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      * TODO 在这里轮询数据库
-     * TODO wait task quit
+     * 
+     * wait task quit
      * @return true if task quit success
      */
     public Boolean waitTaskQuit(){
         // query new state
         taskInstance = taskInstanceCacheManager.getByTaskInstanceId(taskInstance.getId());
-        if (taskInstance == null){
-            taskInstance = processService.findTaskInstanceById(taskInstance.getId());
-        }
         logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
                 this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
         // task time out
