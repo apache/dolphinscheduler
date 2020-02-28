@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -98,7 +97,7 @@ public class ProcessBuilderForWin32Test {
         try {
             Process process = Runtime.getRuntime().exec("net", new String[]{ "a=123" });
             Assert.assertNotNull(process);
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
@@ -142,7 +141,7 @@ public class ProcessBuilderForWin32Test {
             }
             logger.info("net user: {}", sb.toString());
             Assert.assertNotEquals(StringUtils.EMPTY, sb.toString());
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
