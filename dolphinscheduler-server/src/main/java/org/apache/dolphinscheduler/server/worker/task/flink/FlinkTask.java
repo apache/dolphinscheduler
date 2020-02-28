@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.flink;
 
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
@@ -23,6 +24,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.FlinkArgsUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
@@ -49,35 +51,38 @@ public class FlinkTask extends AbstractYarnTask {
    */
   private FlinkParameters flinkParameters;
 
-  public FlinkTask(TaskProps props, Logger logger) {
-    super(props, logger);
+  /**
+   * taskExecutionContext
+   */
+  private TaskExecutionContext taskExecutionContext;
+
+  public FlinkTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+    super(taskExecutionContext, logger);
+    this.taskExecutionContext = taskExecutionContext;
   }
 
   @Override
   public void init() {
 
-    logger.info("flink task params {}", taskProps.getTaskParams());
+    logger.info("flink task params {}", taskExecutionContext.getTaskParams());
 
-    flinkParameters = JSONUtils.parseObject(taskProps.getTaskParams(), FlinkParameters.class);
+    flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkParameters.class);
 
     if (!flinkParameters.checkParameters()) {
       throw new RuntimeException("flink task params is not valid");
     }
-    flinkParameters.setQueue(taskProps.getQueue());
+    flinkParameters.setQueue(taskExecutionContext.getQueue());
 
     if (StringUtils.isNotEmpty(flinkParameters.getMainArgs())) {
       String args = flinkParameters.getMainArgs();
-      // get process instance by task instance id
-      ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstanceId());
 
-      /**
-       *  combining local and global parameters
-       */
-      Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-              taskProps.getDefinedParams(),
+
+      // replace placeholder
+      Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+              taskExecutionContext.getDefinedParams(),
               flinkParameters.getLocalParametersMap(),
-              processInstance.getCmdTypeIfComplement(),
-              processInstance.getScheduleTime());
+              CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+              taskExecutionContext.getScheduleTime());
 
       logger.info("param Map : {}", paramsMap);
       if (paramsMap != null ){
@@ -104,7 +109,7 @@ public class FlinkTask extends AbstractYarnTask {
     args.addAll(FlinkArgsUtils.buildArgs(flinkParameters));
 
     String command = ParameterUtils
-            .convertParameterPlaceholders(String.join(" ", args), taskProps.getDefinedParams());
+            .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
 
     logger.info("flink task command : {}", command);
 
