@@ -18,8 +18,6 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
@@ -31,9 +29,6 @@ import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskManager;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.service.permission.PermissionCheck;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,11 +53,6 @@ public class TaskExecuteThread implements Runnable {
     private TaskExecutionContext taskExecutionContext;
 
     /**
-     *  process service
-     */
-    private final ProcessService processService;
-
-    /**
      *  abstract task
      */
     private AbstractTask task;
@@ -75,11 +65,9 @@ public class TaskExecuteThread implements Runnable {
     /**
      *  constructor
      * @param taskExecutionContext taskExecutionContext
-     * @param processService processService
      * @param taskCallbackService taskCallbackService
      */
-    public TaskExecuteThread(TaskExecutionContext taskExecutionContext, ProcessService processService, TaskCallbackService taskCallbackService){
-        this.processService = processService;
+    public TaskExecuteThread(TaskExecutionContext taskExecutionContext, TaskCallbackService taskCallbackService){
         this.taskExecutionContext = taskExecutionContext;
         this.taskCallbackService = taskCallbackService;
     }
@@ -96,31 +84,19 @@ public class TaskExecuteThread implements Runnable {
             // get resource files
             List<String> resourceFiles = createProjectResFiles(taskNode);
             // copy hdfs/minio file to local
-            downloadResource(
-                    taskExecutionContext.getExecutePath(),
+            downloadResource(taskExecutionContext.getExecutePath(),
                     resourceFiles,
+                    taskExecutionContext.getTenantCode(),
                     logger);
 
-            // set task props
-            TaskProps taskProps = new TaskProps(taskNode.getParams(),
-                    taskExecutionContext.getScheduleTime(),
-                    taskExecutionContext.getTaskName(),
-                    taskExecutionContext.getTaskType(),
-                    taskExecutionContext.getTaskInstanceId(),
-                    CommonUtils.getSystemEnvPath(),
-                    taskExecutionContext.getTenantCode(),
-                    taskExecutionContext.getQueue(),
-                    taskExecutionContext.getStartTime(),
-                    getGlobalParamsMap(),
-                    null,
-                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
-                    OSUtils.getHost(),
-                    taskExecutionContext.getLogPath(),
-                    taskExecutionContext.getExecutePath());
-            // set task timeout
-            setTaskTimeout(taskProps, taskNode);
+            taskExecutionContext.setTaskParams(taskNode.getParams());
+            taskExecutionContext.setEnvFile(CommonUtils.getSystemEnvPath());
+            taskExecutionContext.setDefinedParams(getGlobalParamsMap());
 
-            taskProps.setTaskAppId(String.format("%s_%s_%s",
+            // set task timeout
+            setTaskTimeout(taskExecutionContext, taskNode);
+
+            taskExecutionContext.setTaskAppId(String.format("%s_%s_%s",
                     taskExecutionContext.getProcessDefineId(),
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
@@ -131,8 +107,9 @@ public class TaskExecuteThread implements Runnable {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId()));
 
-            task = TaskManager.newTask(taskExecutionContext.getTaskType(),
-                    taskProps,
+
+
+            task = TaskManager.newTask(taskExecutionContext,
                     taskLogger);
 
             // task init
@@ -146,12 +123,16 @@ public class TaskExecuteThread implements Runnable {
 
             responseCommand.setStatus(task.getExitStatus().getCode());
             responseCommand.setEndTime(new Date());
+            responseCommand.setProcessId(task.getProcessId());
+            responseCommand.setAppIds(task.getAppIds());
             logger.info("task instance id : {},task final status : {}", taskExecutionContext.getTaskInstanceId(), task.getExitStatus());
         }catch (Exception e){
             logger.error("task scheduler failure", e);
             kill();
             responseCommand.setStatus(ExecutionStatus.FAILURE.getCode());
             responseCommand.setEndTime(new Date());
+            responseCommand.setProcessId(task.getProcessId());
+            responseCommand.setAppIds(task.getAppIds());
         } finally {
             taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand);
         }
@@ -175,27 +156,27 @@ public class TaskExecuteThread implements Runnable {
 
     /**
      * set task timeout
-     * @param taskProps
+     * @param taskExecutionContext TaskExecutionContext
      * @param taskNode
      */
-    private void setTaskTimeout(TaskProps taskProps, TaskNode taskNode) {
+    private void setTaskTimeout(TaskExecutionContext taskExecutionContext, TaskNode taskNode) {
         // the default timeout is the maximum value of the integer
-        taskProps.setTaskTimeout(Integer.MAX_VALUE);
+        taskExecutionContext.setTaskTimeout(Integer.MAX_VALUE);
         TaskTimeoutParameter taskTimeoutParameter = taskNode.getTaskTimeoutParameter();
         if (taskTimeoutParameter.getEnable()){
             // get timeout strategy
-            taskProps.setTaskTimeoutStrategy(taskTimeoutParameter.getStrategy());
+            taskExecutionContext.setTaskTimeoutStrategy(taskTimeoutParameter.getStrategy().getCode());
             switch (taskTimeoutParameter.getStrategy()){
                 case WARN:
                     break;
                 case FAILED:
                     if (Integer.MAX_VALUE > taskTimeoutParameter.getInterval() * 60) {
-                        taskProps.setTaskTimeout(taskTimeoutParameter.getInterval() * 60);
+                        taskExecutionContext.setTaskTimeout(taskTimeoutParameter.getInterval() * 60);
                     }
                     break;
                 case WARNFAILED:
                     if (Integer.MAX_VALUE > taskTimeoutParameter.getInterval() * 60) {
-                        taskProps.setTaskTimeout(taskTimeoutParameter.getInterval() * 60);
+                        taskExecutionContext.setTaskTimeout(taskTimeoutParameter.getInterval() * 60);
                     }
                     break;
                 default:
@@ -246,18 +227,19 @@ public class TaskExecuteThread implements Runnable {
      * @param projectRes
      * @param logger
      */
-    private void downloadResource(String execLocalPath, List<String> projectRes, Logger logger) throws Exception {
-        checkDownloadPermission(projectRes);
-        for (String res : projectRes) {
-            File resFile = new File(execLocalPath, res);
+    private void downloadResource(String execLocalPath,
+                                  List<String> projectRes,
+                                  String tenantCode,
+                                  Logger logger) throws Exception {
+        for (String resource : projectRes) {
+            File resFile = new File(execLocalPath, resource);
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String tentnCode = processService.queryTenantCodeByResName(res);
-                    String resHdfsPath = HadoopUtils.getHdfsFilename(tentnCode, res);
+                    String resHdfsPath = HadoopUtils.getHdfsFilename(tenantCode, resource);
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
-                    HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + res, false, true);
+                    HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + resource, false, true);
                 }catch (Exception e){
                     logger.error(e.getMessage(),e);
                     throw new RuntimeException(e.getMessage());
@@ -266,17 +248,5 @@ public class TaskExecuteThread implements Runnable {
                 logger.info("file : {} exists ", resFile.getName());
             }
         }
-    }
-
-    /**
-     * check download resource permission
-     * @param projectRes resource name list
-     * @throws Exception exception
-     */
-    private void checkDownloadPermission(List<String> projectRes) throws Exception {
-        int executorId = taskExecutionContext.getExecutorId();
-        String[] resNames = projectRes.toArray(new String[projectRes.size()]);
-        PermissionCheck<String> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE, processService,resNames,executorId,logger);
-        permissionCheck.checkPermission();
     }
 }

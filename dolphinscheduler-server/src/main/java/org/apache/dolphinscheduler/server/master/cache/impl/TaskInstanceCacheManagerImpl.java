@@ -70,13 +70,14 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
      */
     @Override
     public void cacheTaskInstance(TaskExecutionContext taskExecutionContext) {
-        TaskInstance taskInstance = getByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(taskExecutionContext.getTaskInstanceId());
         taskInstance.setName(taskExecutionContext.getTaskName());
         taskInstance.setStartTime(taskExecutionContext.getStartTime());
         taskInstance.setTaskType(taskInstance.getTaskType());
         taskInstance.setExecutePath(taskInstance.getExecutePath());
         taskInstance.setTaskJson(taskInstance.getTaskJson());
+        taskInstanceCache.put(taskExecutionContext.getTaskInstanceId(), taskInstance);
     }
 
     /**
@@ -86,12 +87,13 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
      */
     @Override
     public void cacheTaskInstance(ExecuteTaskAckCommand taskAckCommand) {
-        TaskInstance taskInstance = getByTaskInstanceId(taskAckCommand.getTaskInstanceId());
+        TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(ExecutionStatus.of(taskAckCommand.getStatus()));
         taskInstance.setStartTime(taskAckCommand.getStartTime());
         taskInstance.setHost(taskAckCommand.getHost());
         taskInstance.setExecutePath(taskAckCommand.getExecutePath());
         taskInstance.setLogPath(taskAckCommand.getLogPath());
+        taskInstanceCache.put(taskAckCommand.getTaskInstanceId(), taskInstance);
     }
 
     /**

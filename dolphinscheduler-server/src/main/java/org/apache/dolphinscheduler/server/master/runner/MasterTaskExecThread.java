@@ -164,6 +164,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      *  TODO Kill 任务
+     *
      *  task instance add queue , waiting worker to kill
      */
     private void cancelTaskInstance(){
