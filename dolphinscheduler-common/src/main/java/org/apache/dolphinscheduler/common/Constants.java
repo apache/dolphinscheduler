@@ -174,6 +174,11 @@ public final class Constants {
     public static final String COMMA = ",";
 
     /**
+     * slash /
+     */
+    public static final String SLASH = "/";
+
+    /**
      * COLON :
      */
     public static final String COLON = ":";
@@ -994,4 +999,9 @@ public final class Constants {
      * dataSource sensitive param
      */
     public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
+
+    /**
+     * default worker group
+     */
+    public static final String DEFAULT_WORKER_GROUP = "default";
 }

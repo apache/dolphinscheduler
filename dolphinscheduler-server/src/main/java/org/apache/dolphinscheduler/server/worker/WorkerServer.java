@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
@@ -37,13 +36,11 @@ import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.PostConstruct;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
@@ -58,29 +55,16 @@ public class WorkerServer implements IStoppable {
      */
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
-
     /**
      *  zk worker client
      */
     @Autowired
     private ZKWorkerClient zkWorkerClient = null;
 
-
-    /**
-     *  alert database access
-     */
-    @Autowired
-    private AlertDao alertDao;
-
     /**
      * task queue impl
      */
     protected ITaskQueue taskQueue;
-
-    /**
-     * kill executor service
-     */
-    private ExecutorService killExecutorService;
 
     /**
      *  fetch task executor service
@@ -91,9 +75,6 @@ public class WorkerServer implements IStoppable {
      * CountDownLatch latch
      */
     private CountDownLatch latch;
-
-    @Value("${server.is-combined-server:false}")
-    private Boolean isCombinedServer;
 
     /**
      *  worker config
@@ -157,8 +138,6 @@ public class WorkerServer implements IStoppable {
 
         this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
 
-        this.killExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Kill-Thread-Executor");
-
         this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
 
         zkWorkerClient.setStoppable(this);
@@ -169,17 +148,15 @@ public class WorkerServer implements IStoppable {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                stop("shutdownhook");
+                stop("shutdownHook");
             }
         }));
 
         //let the main thread await
         latch = new CountDownLatch(1);
-        if (!isCombinedServer) {
-            try {
-                latch.await();
-            } catch (InterruptedException ignore) {
-            }
+        try {
+            latch.await();
+        } catch (InterruptedException ignore) {
         }
     }
 
@@ -210,17 +187,10 @@ public class WorkerServer implements IStoppable {
             try {
                 ThreadPoolExecutors.getInstance().shutdown();
             }catch (Exception e){
-                logger.warn("threadpool service stopped exception:{}",e.getMessage());
+                logger.warn("threadPool service stopped exception:{}",e.getMessage());
             }
 
-            logger.info("threadpool service stopped");
-
-            try {
-                killExecutorService.shutdownNow();
-            }catch (Exception e){
-                logger.warn("worker kill executor service stopped exception:{}",e.getMessage());
-            }
-            logger.info("worker kill executor service stopped");
+            logger.info("threadPool service stopped");
 
             try {
                 fetchTaskExecutorService.shutdownNow();
