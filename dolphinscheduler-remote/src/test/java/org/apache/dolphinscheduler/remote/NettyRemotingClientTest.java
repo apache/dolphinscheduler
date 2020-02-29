@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.remote;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,15 +15,17 @@ package org.apache.dolphinscheduler.remote;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.remote;
+
 import io.netty.channel.Channel;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.Ping;
 import org.apache.dolphinscheduler.remote.command.Pong;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+import org.apache.dolphinscheduler.remote.future.InvokeCallback;
+import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Address;
 import org.junit.Assert;
@@ -39,10 +41,41 @@ public class NettyRemotingClientTest {
 
 
     /**
-     *  test ping
+     *  test sned sync
      */
     @Test
-    public void testSend(){
+    public void testSendSync(){
+        NettyServerConfig serverConfig = new NettyServerConfig();
+
+        NettyRemotingServer server = new NettyRemotingServer(serverConfig);
+        server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
+            @Override
+            public void process(Channel channel, Command command) {
+                channel.writeAndFlush(Pong.create(command.getOpaque()));
+            }
+        });
+
+
+        server.start();
+        //
+        final NettyClientConfig clientConfig = new NettyClientConfig();
+        NettyRemotingClient client = new NettyRemotingClient(clientConfig);
+        Command commandPing = Ping.create();
+        try {
+            Command response = client.sendSync(new Address("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000);
+            Assert.assertEquals(commandPing.getOpaque(), response.getOpaque());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        server.close();
+        client.close();
+    }
+
+    /**
+     *  test sned async
+     */
+    @Test
+    public void testSendAsync(){
         NettyServerConfig serverConfig = new NettyServerConfig();
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);
@@ -54,24 +87,25 @@ public class NettyRemotingClientTest {
         });
         server.start();
         //
-        CountDownLatch latch = new CountDownLatch(1);
-        AtomicLong opaque = new AtomicLong(1);
         final NettyClientConfig clientConfig = new NettyClientConfig();
         NettyRemotingClient client = new NettyRemotingClient(clientConfig);
-        client.registerProcessor(CommandType.PONG, new NettyRequestProcessor() {
-            @Override
-            public void process(Channel channel, Command command) {
-                opaque.set(command.getOpaque());
-                latch.countDown();
-            }
-        });
+        CountDownLatch latch = new CountDownLatch(1);
         Command commandPing = Ping.create();
         try {
-            client.send(new Address("127.0.0.1", serverConfig.getListenPort()), commandPing);
+            final AtomicLong opaque = new AtomicLong(0);
+            client.sendAsync(new Address("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000, new InvokeCallback() {
+                @Override
+                public void operationComplete(ResponseFuture responseFuture) {
+                    opaque.set(responseFuture.getOpaque());
+                    latch.countDown();
+                }
+            });
             latch.await();
+            Assert.assertEquals(commandPing.getOpaque(), opaque.get());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Assert.assertEquals(opaque.get(), commandPing.getOpaque());
+        server.close();
+        client.close();
     }
 }
