@@ -165,6 +165,7 @@ public class ProcessInstanceMapperTest {
                 processDefinition.getProjectId(),
                 processInstance.getProcessDefinitionId(),
                 processInstance.getName(),
+                0,
                 stateArray,
                 processInstance.getHost(),
                 null,

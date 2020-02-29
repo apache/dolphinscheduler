@@ -134,6 +134,7 @@ export default {
     state.locations[payload.id] = _.assign(state.locations[payload.id], {
       name: dom.find('.name-p').text(),
       targetarr: dom.attr('data-targetarr'),
+      nodenumber: dom.attr('data-nodenumber'),
       x: parseInt(dom.css('left'), 10),
       y: parseInt(dom.css('top'), 10)
     })

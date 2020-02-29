@@ -90,7 +90,7 @@ public class PlaceholderUtils {
             try {
                 return paramsMap.get(placeholderName);
             } catch (Exception ex) {
-                logger.error(String.format("resolve placeholder '%s' in [ %s ]" , placeholderName, value), ex);
+                logger.error("resolve placeholder '{}' in [ {} ]" , placeholderName, value, ex);
                 return null;
             }
         }

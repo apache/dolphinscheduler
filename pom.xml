@@ -242,7 +242,6 @@
                 <artifactId>dolphinscheduler-alert</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-framework</artifactId>
@@ -685,6 +684,7 @@
                         <include>**/common/threadutils/*.java</include>
                         <include>**/common/graph/*.java</include>
                         <include>**/common/queue/*.java</include>
+                        <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/FileUtilsTest.java</include>
                         <include>**/api/utils/FourLetterWordTest.java</include>
@@ -708,6 +708,8 @@
                         <include>**/api/service/BaseDAGServiceTest.java</include>
                         <include>**/api/service/LoggerServiceTest.java</include>
                         <include>**/api/service/DataAnalysisServiceTest.java</include>
+                        <include>**/api/service/ProcessInstanceServiceTest.java</include>
+                        <include>**/api/service/TaskInstanceServiceTest.java</include>
                         <include>**/alert/utils/ExcelUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
@@ -720,11 +722,13 @@
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/AlertMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
+                        <include>**/dao/entity/TaskInstanceTest.java</include>
                         <include>**/dao/cron/CronUtilsTest.java</include>
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->

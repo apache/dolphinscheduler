@@ -49,10 +49,16 @@ Dag.prototype.setConfig = function (o) {
  * create dag
  */
 Dag.prototype.create = function () {
+  let self = this
   jsPlumb.ready(() => {
     JSP.init({
       dag: this.dag,
-      instance: this.instance
+      instance: this.instance,
+      options: {
+        onRemoveNodes ($id) {
+          self.dag.removeEventModelById($id)
+        }
+      }
     })
 
     // init event
@@ -108,7 +114,7 @@ Dag.prototype.backfill = function (arg) {
         tmp.push(locationsValue2[i])
       }
     }
-    
+
     function copy (array) {
       let newArray = []
       for(let item of array) {
@@ -117,7 +123,7 @@ Dag.prototype.backfill = function (arg) {
       return  newArray;
     }
 
-    
+
     let newArr = copy(arr)
     function getNewArr() {
       for(let i= 0; i<newArr.length; i++) {
@@ -231,7 +237,7 @@ Dag.prototype.backfill = function (arg) {
         for(let i = 0; i<listarrs.length; i++) {
           delete(listarrs[i].id)
         }
-        
+
         for(let a = 0; a<listarr.length; a++) {
           dataObject[listarr[a].id] = listarrs[a]
         }
@@ -250,9 +256,9 @@ Dag.prototype.backfill = function (arg) {
             }
           };
         }
-        
+
         lastchildren = lastchildren.sort(createComparisonFunction('x'))
-        
+
         // Coordinate value of each leaf node
         for(let a = 0; a<lastchildren.length; a++) {
           dataObject[lastchildren[a].id].y = (a+1)*120
@@ -280,12 +286,18 @@ Dag.prototype.backfill = function (arg) {
         if(countTree>1) {
           dataObject[Object.keys(locationsValue1)[0]].y = (countTree/2)*120+50
         }
-    
+
     locationsValue = dataObject
+    let self = this
     jsPlumb.ready(() => {
       JSP.init({
         dag: this.dag,
-        instance: this.instance
+        instance: this.instance,
+        options: {
+          onRemoveNodes ($id) {
+            self.dag.removeEventModelById($id)
+          }
+        }
       })
       // Backfill
       JSP.jspBackfill({
@@ -298,10 +310,16 @@ Dag.prototype.backfill = function (arg) {
       })
     })
   } else {
+    let self = this
     jsPlumb.ready(() => {
       JSP.init({
         dag: this.dag,
-        instance: this.instance
+        instance: this.instance,
+        options: {
+          onRemoveNodes ($id) {
+            self.dag.removeEventModelById($id)
+          }
+        }
       })
       // Backfill
       JSP.jspBackfill({

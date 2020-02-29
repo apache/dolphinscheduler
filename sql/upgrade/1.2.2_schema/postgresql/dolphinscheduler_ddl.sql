@@ -32,3 +32,20 @@ delimiter ;
 SELECT uc_dolphin_T_t_ds_process_definition_A_modify_by();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_A_modify_by();
 
+-- uc_dolphin_T_t_ds_process_definition_A_modify_by
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_instance_A_executor_id() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_task_instance'
+                            AND COLUMN_NAME ='executor_id')
+      THEN
+         ALTER TABLE t_ds_task_instance ADD COLUMN executor_id int DEFAULT NULL;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_task_instance_A_executor_id();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_executor_id();

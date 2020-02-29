@@ -61,7 +61,7 @@ public class ParameterUtils {
       try {
         cronTime = DateUtils.parseDate(cronTimeStr, new String[]{Constants.PARAMETER_FORMAT_TIME});
       } catch (ParseException e) {
-        logger.error(String.format("parse %s exception", cronTimeStr), e);
+        logger.error("parse {} exception", cronTimeStr, e);
       }
     } else {
       cronTime = new Date();

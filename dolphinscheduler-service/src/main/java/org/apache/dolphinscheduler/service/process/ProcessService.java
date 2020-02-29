@@ -477,7 +477,7 @@ public class ProcessService {
             if(cmdParam == null
                     || !cmdParam.containsKey(Constants.CMDPARAM_START_NODE_NAMES)
                     || cmdParam.get(Constants.CMDPARAM_START_NODE_NAMES).isEmpty()){
-                logger.error(String.format("command node depend type is %s, but start nodes is null ", command.getTaskDependType().toString()));
+                logger.error("command node depend type is {}, but start nodes is null ", command.getTaskDependType());
                 return false;
             }
         }
@@ -500,7 +500,7 @@ public class ProcessService {
         if(command.getProcessDefinitionId() != 0){
             processDefinition = processDefineMapper.selectById(command.getProcessDefinitionId());
             if(processDefinition == null){
-                logger.error(String.format("cannot find the work process define! define id : %d", command.getProcessDefinitionId()));
+                logger.error("cannot find the work process define! define id : {}", command.getProcessDefinitionId());
                 return null;
             }
         }
@@ -950,6 +950,7 @@ public class ProcessService {
                 }
             }
         }
+        taskInstance.setExecutorId(processInstance.getExecutorId());
         taskInstance.setProcessInstancePriority(processInstance.getProcessInstancePriority());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstanceState));
         taskInstance.setSubmitTime(new Date());
@@ -972,21 +973,21 @@ public class ProcessService {
                 return true;
             }
             if(taskInstance.getState().typeIsFinished()){
-                logger.info(String.format("submit to task queue, but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
+                logger.info("submit to task queue, but task [{}] state [{}] is already  finished. ", taskInstance.getName(), taskInstance.getState());
                 return true;
             }
             // task cannot submit when running
             if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
-                logger.info(String.format("submit to task queue, but task [%s] state already be running. ", taskInstance.getName()));
+                logger.info("submit to task queue, but task [{}] state already be running. ", taskInstance.getName());
                 return true;
             }
             if(checkTaskExistsInTaskQueue(taskInstance)){
-                logger.info(String.format("submit to task queue, but task [%s] already exists in the queue.", taskInstance.getName()));
+                logger.info("submit to task queue, but task [{}] already exists in the queue.", taskInstance.getName());
                 return true;
             }
             logger.info("task ready to queue: {}" , taskInstance);
             boolean insertQueueResult = taskQueue.add(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo(taskInstance));
-            logger.info(String.format("master insert into queue success, task : %s", taskInstance.getName()) );
+            logger.info("master insert into queue success, task : {}", taskInstance.getName());
             return insertQueueResult;
         }catch (Exception e){
             logger.error("submit task to queue Exception: ", e);
