@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.master.dispatch.context;
 
 
+import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
@@ -33,23 +34,27 @@ public class ExecutionContext {
     /**
      *  context
      */
-    private final Object context;
+    private final TaskExecutionContext context;
 
     /**
      *  executor type : worker or client
      */
     private final ExecutorType executorType;
 
-    public ExecutionContext(Object context, ExecutorType executorType) {
+    public ExecutionContext(TaskExecutionContext context, ExecutorType executorType) {
         this.context = context;
         this.executorType = executorType;
+    }
+
+    public String getWorkerGroup(){
+        return context.getWorkerGroup();
     }
 
     public ExecutorType getExecutorType() {
         return executorType;
     }
 
-    public Object getContext() {
+    public TaskExecutionContext getContext() {
         return context;
     }
 

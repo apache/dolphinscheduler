@@ -37,7 +37,7 @@ public class WorkerConfig {
     @Value("${worker.reserved.memory}")
     private double workerReservedMemory;
 
-    @Value("${worker.group: DEFAULT}")
+    @Value("${worker.group: default}")
     private String workerGroup;
 
     public String getWorkerGroup() {
