@@ -422,17 +422,8 @@ fi
 done
 
 
-# 3,stop server
-echo "3,stop server"
-sh ${workDir}/script/stop-all.sh
-
-# 4,delete zk node
-echo "4,delete zk node"
-
-sh ${workDir}/script/remove-zk-node.sh $zkRoot
-
-# 5,scp resources
-echo "5,scp resources"
+# 3,scp resources
+echo "3,scp resources"
 sh ${workDir}/script/scp-hosts.sh
 if [ $? -eq 0 ]
 then
@@ -441,6 +432,18 @@ else
 	echo 'scp copy failed to exit'
 	exit -1
 fi
+
+
+# 4,stop server
+echo "4,stop server"
+sh ${workDir}/script/stop-all.sh
+
+
+# 5,delete zk node
+echo "5,delete zk node"
+
+sh ${workDir}/script/remove-zk-node.sh $zkRoot
+
 
 # 6,startup
 echo "6,startup"

@@ -20,7 +20,7 @@ env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
 
-name: Test Coveralls Parallel
+name: Unit Test
 
 jobs:
 

@@ -36,11 +36,19 @@ Dolphin Scheduler Official Website
 
 ### 系统部分截图
 
-![](http://geek.analysys.cn/static/upload/221/2019-03-29/0a9dea80-fb02-4fa5-a812-633b67035ffc.jpeg)
+![home page](https://user-images.githubusercontent.com/15833811/75208819-abbad000-57b7-11ea-8d3c-67e7c270671f.jpg)
 
-![](http://geek.analysys.cn/static/upload/221/2019-04-01/83686def-a54f-4169-8cae-77b1f8300cc1.png)
+![dag](https://user-images.githubusercontent.com/15833811/75209584-93e44b80-57b9-11ea-952e-537fb24ec72d.jpg)
 
-![](http://geek.analysys.cn/static/upload/221/2019-03-29/83c937c7-1793-4d7a-aa28-b98460329fe0.jpeg)
+![log](https://user-images.githubusercontent.com/15833811/75209645-c55d1700-57b9-11ea-94d4-e3fa91ab5218.jpg)
+
+![gantt](https://user-images.githubusercontent.com/15833811/75209640-c0986300-57b9-11ea-878e-a2098533ad44.jpg)
+
+![resources](https://user-images.githubusercontent.com/15833811/75209403-11f42280-57b9-11ea-9b59-d4be77063553.jpg)
+
+![monitor](https://user-images.githubusercontent.com/15833811/75209631-b5ddce00-57b9-11ea-8d22-cdf15cf0ee25.jpg)
+
+![security](https://user-images.githubusercontent.com/15833811/75209633-baa28200-57b9-11ea-9def-94bef2e212a7.jpg)
 
 ### 文档
 
