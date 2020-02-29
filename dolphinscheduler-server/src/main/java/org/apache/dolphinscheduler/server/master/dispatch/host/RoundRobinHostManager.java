@@ -75,7 +75,7 @@ public class RoundRobinHostManager implements HostManager {
         ExecutorType executorType = context.getExecutorType();
         switch (executorType){
             case WORKER:
-                nodes = zookeeperNodeManager.getWorkerNodes();
+                nodes = zookeeperNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
                 break;
             case CLIENT:
                 break;
