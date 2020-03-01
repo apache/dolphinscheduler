@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.cache.impl;
 
 import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  *  TaskExecutionContextCache
  */
+@Service
 public class TaskExecutionContextCacheManagerImpl implements TaskExecutionContextCacheManager {
 
 
