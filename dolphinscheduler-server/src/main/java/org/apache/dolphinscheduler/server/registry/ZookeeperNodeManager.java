@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
@@ -225,6 +226,10 @@ public class ZookeeperNodeManager implements InitializingBean {
         } finally {
             workerGroupLock.unlock();
         }
+    }
+
+    public Map<String, Set<String>> getWorkerGroupNodes(){
+        return Collections.unmodifiableMap(workerGroupNodes);
     }
 
     /**
