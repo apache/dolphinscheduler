@@ -128,6 +128,25 @@ public class ZookeeperRegistryCenter implements InitializingBean {
     }
 
     /**
+     * get worker group directly
+     * @return
+     */
+    public Set<String> getWorkerGroupDirectly() {
+        List<String> workers = getChildrenKeys(getWorkerPath());
+        return new HashSet<>(workers);
+    }
+
+    /**
+     * get worker group nodes
+     * @param workerGroup
+     * @return
+     */
+    public Set<String> getWorkerGroupNodesDirectly(String workerGroup) {
+        List<String> workers = getChildrenKeys(getWorkerGroupPath(workerGroup));
+        return new HashSet<>(workers);
+    }
+
+    /**
      * whether worker path
      * @param path path
      * @return result
@@ -143,6 +162,15 @@ public class ZookeeperRegistryCenter implements InitializingBean {
      */
     public boolean isMasterPath(String path) {
         return path != null && path.contains(MASTER_PATH);
+    }
+
+    /**
+     * get worker group path
+     * @param workerGroup
+     * @return
+     */
+    public String getWorkerGroupPath(String workerGroup) {
+        return WORKER_PATH + "/" + workerGroup;
     }
 
     /**
