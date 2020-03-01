@@ -15,35 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host;
-
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.RoundRobinSelector;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.Selector;
-
-import java.util.Collection;
-
+package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 /**
- *  round robin host manager
+ * host selector
  */
-public class RoundRobinHostManager extends CommonHostManager {
+public enum HostSelector {
 
-    /**
-     * selector
-     */
-    private final Selector<Host> selector;
+    RANDOM,
 
-    /**
-     * set round robin
-     */
-    public RoundRobinHostManager(){
-        this.selector = new RoundRobinSelector<>();
+    ROUNDROBIN,
+
+    LOWERWEIGHT;
+
+    public static HostSelector of(String selector){
+        for(HostSelector hs : values()){
+            if(hs.name().equalsIgnoreCase(selector)){
+                return hs;
+            }
+        }
+        throw new IllegalArgumentException("invalid host selector : " + selector);
     }
-
-    @Override
-    public Host select(Collection<Host> nodes) {
-        return selector.select(nodes);
-    }
-
 }

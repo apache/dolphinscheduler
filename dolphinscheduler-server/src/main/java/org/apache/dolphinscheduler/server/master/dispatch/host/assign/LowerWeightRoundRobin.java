@@ -15,35 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host;
-
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.RoundRobinSelector;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.Selector;
+package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 import java.util.Collection;
 
-
 /**
- *  round robin host manager
+ *  lower weight round robin
  */
-public class RoundRobinHostManager extends CommonHostManager {
+public class LowerWeightRoundRobin implements Selector<HostWeight>{
 
-    /**
-     * selector
-     */
-    private final Selector<Host> selector;
+    public HostWeight select(Collection<HostWeight> sources){
+        int totalWeight = 0;
+        int lowWeight = 0;
+        HostWeight lowerNode = null;
+        for (HostWeight hostWeight : sources) {
+            totalWeight += hostWeight.getWeight();
+            hostWeight.setCurrentWeight(hostWeight.getCurrentWeight() + hostWeight.getWeight());
+            if (lowerNode == null || lowWeight > hostWeight.getCurrentWeight() ) {
+                lowerNode = hostWeight;
+                lowWeight = hostWeight.getCurrentWeight();
+            }
+        }
+        lowerNode.setCurrentWeight(lowerNode.getCurrentWeight() + totalWeight);
+        return lowerNode;
 
-    /**
-     * set round robin
-     */
-    public RoundRobinHostManager(){
-        this.selector = new RoundRobinSelector<>();
     }
-
-    @Override
-    public Host select(Collection<Host> nodes) {
-        return selector.select(nodes);
-    }
-
 }
+
+
+
