@@ -43,6 +43,17 @@ public class MasterConfig {
     @Value("${master.reserved.memory}")
     private double masterReservedMemory;
 
+    @Value("${master.host.selector:lowerWeight}")
+    private String hostSelector;
+
+    public String getHostSelector() {
+        return hostSelector;
+    }
+
+    public void setHostSelector(String hostSelector) {
+        this.hostSelector = hostSelector;
+    }
+
     public int getMasterExecThreads() {
         return masterExecThreads;
     }

@@ -14,36 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.RoundRobinSelector;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.Selector;
+import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight;
+import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
+import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 
-/**
- *  round robin host manager
- */
-public class RoundRobinHostManager extends CommonHostManager {
+public class LowerWeightRoundRobinTest {
 
-    /**
-     * selector
-     */
-    private final Selector<Host> selector;
 
-    /**
-     * set round robin
-     */
-    public RoundRobinHostManager(){
-        this.selector = new RoundRobinSelector<>();
+    @Test
+    public void testSelect(){
+        Collection<HostWeight> sources = new ArrayList<>();
+        sources.add(new HostWeight(Host.of("192.158.2.1:11"), 0.06, 0.44, 3.84));
+        sources.add(new HostWeight(Host.of("192.158.2.1:22"), 0.06, 0.56, 3.24));
+        sources.add(new HostWeight(Host.of("192.158.2.1:33"), 0.06, 0.80, 3.15));
+        System.out.println(sources);
+        LowerWeightRoundRobin roundRobin = new LowerWeightRoundRobin();
+        for(int i = 0; i < 100; i ++){
+            System.out.println(roundRobin.select(sources));
+        }
     }
-
-    @Override
-    public Host select(Collection<Host> nodes) {
-        return selector.select(nodes);
-    }
-
 }

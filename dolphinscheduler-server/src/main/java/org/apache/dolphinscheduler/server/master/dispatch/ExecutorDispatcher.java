@@ -20,12 +20,13 @@ package org.apache.dolphinscheduler.server.master.dispatch;
 
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.ExecutorManager;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
-import org.apache.dolphinscheduler.server.master.dispatch.host.RoundRobinHostManager;
+import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,14 +45,23 @@ public class ExecutorDispatcher implements InitializingBean {
     @Autowired
     private NettyExecutorManager nettyExecutorManager;
 
+    @Autowired
+    private MasterConfig masterConfig;
+
     /**
      * round robin host manager
      */
     @Autowired
-    private RoundRobinHostManager hostManager;
+    private HostManager hostManager;
 
+    /**
+     * executor manager
+     */
     private final ConcurrentHashMap<ExecutorType, ExecutorManager<Boolean>> executorManagers;
 
+    /**
+     * constructor
+     */
     public ExecutorDispatcher(){
         this.executorManagers = new ConcurrentHashMap<>();
     }
