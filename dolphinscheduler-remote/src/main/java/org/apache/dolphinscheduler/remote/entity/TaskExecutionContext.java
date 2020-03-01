@@ -160,6 +160,18 @@ public class TaskExecutionContext implements Serializable{
      */
     private int taskTimeout;
 
+    /**
+     * worker group
+     */
+    private String workerGroup;
+
+    public String getWorkerGroup() {
+        return workerGroup;
+    }
+
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
+    }
 
     public Integer getTaskInstanceId() {
         return taskInstanceId;
