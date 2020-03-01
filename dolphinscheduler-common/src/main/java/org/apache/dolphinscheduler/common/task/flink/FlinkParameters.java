@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -212,7 +213,7 @@ public class FlinkParameters extends AbstractParameters {
       return resourceList.stream()
               .map(p -> p.getRes()).collect(Collectors.toList());
     }
-    return null;
+    return Collections.emptyList();
   }
 
 
