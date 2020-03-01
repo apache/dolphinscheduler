@@ -391,7 +391,7 @@ public class DataSourceController extends BaseController {
         try {
             return dataSourceService.verifyDataSourceName(loginUser, name);
         } catch (Exception e) {
-            logger.error(VERIFY_DATASOURCE_NAME_FAILURE.getMsg(),e);
+            logger.error(VERIFY_DATASOURCE_NAME_FAILURE.getMsg(), e);
             return error(VERIFY_DATASOURCE_NAME_FAILURE.getCode(), VERIFY_DATASOURCE_NAME_FAILURE.getMsg());
         }
     }
