@@ -59,8 +59,10 @@ public class NettyKillManager extends AbstractExecutorManager<Boolean>{
     }
 
     /**
-     *  execute logic
+     * execute logic
+     *
      * @param context context
+     * @return result
      * @throws ExecuteException
      */
     @Override

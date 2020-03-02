@@ -236,6 +236,8 @@ public class ZKMasterClient extends AbstractZKClient {
 
 	/**
 	 * monitor master
+	 * @param event event
+	 * @param path path
 	 */
 	public void handleMasterEvent(TreeCacheEvent event, String path){
 		switch (event.getType()) {
@@ -256,6 +258,8 @@ public class ZKMasterClient extends AbstractZKClient {
 
 	/**
 	 * monitor worker
+	 * @param event event
+	 * @param path path
 	 */
 	public void handleWorkerEvent(TreeCacheEvent event, String path){
 		switch (event.getType()) {

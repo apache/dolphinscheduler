@@ -138,12 +138,11 @@ public class DataxTask extends AbstractTask {
 
     /**
      * run DataX process
-     * 
+     *
      * @throws Exception
      */
     @Override
-    public void handle()
-        throws Exception {
+    public void handle() throws Exception {
         try {
             // set the name of the current thread
             String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskExecutionContext.getTaskAppId());
@@ -167,8 +166,8 @@ public class DataxTask extends AbstractTask {
 
     /**
      * cancel DataX process
-     * 
-     * @param cancelApplication
+     *
+     * @param cancelApplication cancelApplication
      * @throws Exception
      */
     @Override

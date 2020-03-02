@@ -123,6 +123,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * task specific execution logic
+     *
      * @param execCommand execCommand
      * @return CommandExecuteResult
      * @throws Exception
@@ -164,7 +165,6 @@ public abstract class AbstractCommandExecutor {
 
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
-
 
 
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",

@@ -72,9 +72,11 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         this.nettyRemotingClient.registerProcessor(CommandType.EXECUTE_TASK_ACK, new TaskAckProcessor());
     }
 
+
     /**
-     *  execute logic
+     * execute logic
      * @param context context
+     * @return result
      * @throws ExecuteException
      */
     @Override
