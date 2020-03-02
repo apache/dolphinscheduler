@@ -33,8 +33,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
-import static org.apache.dolphinscheduler.remote.utils.Constants.SLASH;
+import static org.apache.dolphinscheduler.common.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.SLASH;
 
 
 /**
@@ -43,8 +44,6 @@ import static org.apache.dolphinscheduler.remote.utils.Constants.SLASH;
 public class WorkerRegistry {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerRegistry.class);
-
-    private static final String DEFAULT_GROUP = "DEFAULT";
 
     /**
      *  zookeeper registry center
@@ -74,7 +73,7 @@ public class WorkerRegistry {
     /**
      * worker group
      */
-    private final String workerGroup;
+    private String workerGroup;
 
     /**
      *  construct
@@ -82,7 +81,7 @@ public class WorkerRegistry {
      * @param port port
      */
     public WorkerRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port, long heartBeatInterval){
-        this(zookeeperRegistryCenter, port, heartBeatInterval, DEFAULT_GROUP);
+        this(zookeeperRegistryCenter, port, heartBeatInterval, DEFAULT_WORKER_GROUP);
     }
 
     /**
@@ -144,9 +143,11 @@ public class WorkerRegistry {
         StringBuilder builder = new StringBuilder(100);
         String workerPath = this.zookeeperRegistryCenter.getWorkerPath();
         builder.append(workerPath).append(SLASH);
-        if(StringUtils.isNotEmpty(workerGroup) && !DEFAULT_GROUP.equalsIgnoreCase(workerGroup)){
-            builder.append(workerGroup.trim()).append(SLASH);
+        if(StringUtils.isEmpty(workerGroup)){
+            workerGroup = DEFAULT_WORKER_GROUP;
         }
+        //trim and lower case is need
+        builder.append(workerGroup.trim().toLowerCase()).append(SLASH);
         builder.append(address);
         return builder.toString();
     }

@@ -15,33 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.cache;
-
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 /**
- *  TaskExecutionContextCacheManager
+ * host selector
  */
-public interface TaskExecutionContextCacheManager {
+public enum HostSelector {
 
-    /**
-     * get taskInstance by taskInstance id
-     *
-     * @param taskInstanceId taskInstanceId
-     * @return taskInstance
-     */
-    TaskExecutionContext getByTaskInstanceId(Integer taskInstanceId);
+    RANDOM,
 
-    /**
-     * cache taskInstance
-     *
-     * @param taskExecutionContext taskExecutionContext
-     */
-    void cacheTaskExecutionContext(TaskExecutionContext taskExecutionContext);
+    ROUNDROBIN,
 
-    /**
-     * remove taskInstance by taskInstanceId
-     * @param taskInstanceId taskInstanceId
-     */
-    void removeByTaskInstanceId(Integer taskInstanceId);
+    LOWERWEIGHT;
+
+    public static HostSelector of(String selector){
+        for(HostSelector hs : values()){
+            if(hs.name().equalsIgnoreCase(selector)){
+                return hs;
+            }
+        }
+        throw new IllegalArgumentException("invalid host selector : " + selector);
+    }
 }

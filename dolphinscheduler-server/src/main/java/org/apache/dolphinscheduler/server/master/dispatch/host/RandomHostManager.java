@@ -15,33 +15,34 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.cache;
+package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.dispatch.host.assign.RandomSelector;
+import org.apache.dolphinscheduler.server.master.dispatch.host.assign.Selector;
+
+import java.util.Collection;
+
 
 /**
- *  TaskExecutionContextCacheManager
+ *  round robin host manager
  */
-public interface TaskExecutionContextCacheManager {
+public class RandomHostManager extends CommonHostManager {
 
     /**
-     * get taskInstance by taskInstance id
-     *
-     * @param taskInstanceId taskInstanceId
-     * @return taskInstance
+     * selector
      */
-    TaskExecutionContext getByTaskInstanceId(Integer taskInstanceId);
+    private final Selector<Host> selector;
 
     /**
-     * cache taskInstance
-     *
-     * @param taskExecutionContext taskExecutionContext
+     * set round robin
      */
-    void cacheTaskExecutionContext(TaskExecutionContext taskExecutionContext);
+    public RandomHostManager(){
+        this.selector = new RandomSelector<>();
+    }
 
-    /**
-     * remove taskInstance by taskInstanceId
-     * @param taskInstanceId taskInstanceId
-     */
-    void removeByTaskInstanceId(Integer taskInstanceId);
+    @Override
+    public Host select(Collection<Host> nodes) {
+        return selector.select(nodes);
+    }
 }

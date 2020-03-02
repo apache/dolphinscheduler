@@ -136,7 +136,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         ExecutorType executorType = context.getExecutorType();
         switch (executorType){
             case WORKER:
-                TaskExecutionContext taskExecutionContext = (TaskExecutionContext)context.getContext();
+                TaskExecutionContext taskExecutionContext = context.getContext();
                 requestCommand.setTaskExecutionContext(FastJsonSerializer.serializeToString(taskExecutionContext));
                 break;
             case CLIENT:
@@ -191,7 +191,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         ExecutorType executorType = context.getExecutorType();
         switch (executorType){
             case WORKER:
-                nodes = zookeeperNodeManager.getWorkerNodes();
+                nodes = zookeeperNodeManager.getWorkerGroupNodes(context.getWorkerGroup());
                 break;
             case CLIENT:
                 break;
