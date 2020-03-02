@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -75,32 +76,33 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
     }
+
     /**
      * kill task logic
      *
-     * @param killCommand killCommand
+     * @param context context
+     * @return execute result
      */
-    private Boolean doKill(KillTaskRequestCommand killCommand){
+    private Boolean doKill(TaskExecutionContext context){
         try {
-            TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
+            TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(context.getTaskInstanceId());
 
             Integer processId = taskExecutionContext.getProcessId();
 
             if (processId == null || processId.equals(0)){
-                logger.error("process kill failed, process id :{}, task id:{}", processId, killCommand.getTaskInstanceId());
+                logger.error("process kill failed, process id :{}, task id:{}", processId, taskExecutionContext.getTaskInstanceId());
                 return false;
             }
 
-            killCommand.setProcessId(processId);
 
-            String cmd = String.format("sudo kill -9 %s", ProcessUtils.getPidsStr(killCommand.getProcessId()));
+            String cmd = String.format("sudo kill -9 %s", ProcessUtils.getPidsStr(taskExecutionContext.getProcessId()));
 
-            logger.info("process id:{}, cmd:{}", killCommand.getProcessId(), cmd);
+            logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
 
             OSUtils.exeCmd(cmd);
 
             // find log and kill yarn job
-            killYarnJob(killCommand.getHost(), killCommand.getLogPath(), killCommand.getExecutePath(), killCommand.getTenantCode());
+            killYarnJob(taskExecutionContext.getHost(), taskExecutionContext.getLogPath(), taskExecutionContext.getExecutePath(), taskExecutionContext.getTenantCode());
 
             return true;
         } catch (Exception e) {
@@ -115,29 +117,34 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         KillTaskRequestCommand killTaskRequestCommand = FastJsonSerializer.deserialize(command.getBody(), KillTaskRequestCommand.class);
         logger.info("received command : {}", killTaskRequestCommand);
 
-        Boolean killStatus = doKill(killTaskRequestCommand);
 
-        KillTaskResponseCommand killTaskResponseCommand = buildKillTaskResponseCommand(killTaskRequestCommand,killStatus);
+        String contextJson = killTaskRequestCommand.getTaskExecutionContext();
+
+        TaskExecutionContext taskExecutionContext = JSONObject.parseObject(contextJson, TaskExecutionContext.class);
+
+        Boolean killStatus = doKill(taskExecutionContext);
+
+        KillTaskResponseCommand killTaskResponseCommand = buildKillTaskResponseCommand(taskExecutionContext,killStatus);
         killTaskCallbackService.sendKillResult(killTaskResponseCommand.getTaskInstanceId(),killTaskResponseCommand);
     }
 
     /**
      * build KillTaskResponseCommand
      *
-     * @param killTaskRequestCommand killTaskRequestCommand
+     * @param taskExecutionContext taskExecutionContext
      * @param killStatus killStatus
-     * @return KillTaskResponseCommand
+     * @return build KillTaskResponseCommand
      */
-    private KillTaskResponseCommand buildKillTaskResponseCommand(KillTaskRequestCommand killTaskRequestCommand,
+    private KillTaskResponseCommand buildKillTaskResponseCommand(TaskExecutionContext taskExecutionContext,
                                                                  Boolean killStatus) {
         KillTaskResponseCommand killTaskResponseCommand = new KillTaskResponseCommand();
-        killTaskResponseCommand.setTaskInstanceId(killTaskRequestCommand.getTaskInstanceId());
-        killTaskResponseCommand.setHost(killTaskRequestCommand.getHost());
+        killTaskResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        killTaskResponseCommand.setHost(taskExecutionContext.getHost());
         killTaskResponseCommand.setStatus(killStatus ? ExecutionStatus.SUCCESS.getCode() : ExecutionStatus.FAILURE.getCode());
-        killTaskResponseCommand.setProcessId(killTaskRequestCommand.getProcessId());
+        killTaskResponseCommand.setProcessId(taskExecutionContext.getProcessId());
         killTaskResponseCommand.setAppIds(appIds);
 
-        return null;
+        return killTaskResponseCommand;
     }
 
     /**

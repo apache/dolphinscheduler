@@ -147,7 +147,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * @param taskInstance taskInstance
      * @return TaskExecutionContext
      */
-    private TaskExecutionContext getTaskExecutionContext(TaskInstance taskInstance){
+    protected TaskExecutionContext getTaskExecutionContext(TaskInstance taskInstance){
         taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstance.getId());
 
         Integer userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();

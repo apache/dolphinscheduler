@@ -187,11 +187,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
             host = Constants.NULL;
         }
 
-        TaskExecutionContext context = TaskExecutionContextBuilder.get()
-                .buildTaskInstanceRelatedInfo(taskInstance)
-                .create();
+        TaskExecutionContext taskExecutionContext = super.getTaskExecutionContext(taskInstance);
 
-        ExecutionContext executionContext = new ExecutionContext(context, ExecutorType.WORKER);
+        ExecutionContext executionContext = new ExecutionContext(taskExecutionContext, ExecutorType.WORKER);
 
         nettyKillManager.execute(executionContext);
 
