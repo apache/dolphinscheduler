@@ -25,7 +25,7 @@
                 <span>{{$t('command number of waiting for running')}}</span>
               </div>
               <div class="value-p">
-                <b :style="{color:color[0]}"> {{commandCountData.normalCount}}</b>
+                <strong :style="{color:color[0]}"> {{commandCountData.normalCount}}</strong>
               </div>
             </div>
           </div>
@@ -35,7 +35,7 @@
               <span >{{$t('failure command number')}}</span>
             </div>
             <div class="value-p">
-              <b :style="{color:color[1]}"> {{commandCountData.errorCount}}</b>
+              <strong :style="{color:color[1]}"> {{commandCountData.errorCount}}</strong>
             </div>
           </div>
         </div>
@@ -45,7 +45,7 @@
               <span >{{$t('tasks number of waiting running')}}</span>
             </div>
             <div class="value-p">
-              <b :style="{color:color[0]}"> {{queueCount.taskQueue}}</b>
+              <strong :style="{color:color[0]}"> {{queueCount.taskQueue}}</strong>
             </div>
           </div>
         </div>
@@ -55,7 +55,7 @@
               <span >{{$t('task number of ready to kill')}}</span>
             </div>
             <div class="value-p">
-              <b :style="{color:color[1]}">{{queueCount.taskKill}}</b>
+              <strong :style="{color:color[1]}">{{queueCount.taskKill}}</strong>
             </div>
           </div>
         </div>

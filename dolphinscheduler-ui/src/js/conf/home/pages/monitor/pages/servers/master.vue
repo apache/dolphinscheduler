@@ -48,7 +48,7 @@
             <div class="col-md-4">
               <div class="text-num-model">
                 <div class="value-p">
-                  <b :style="{color:color[$index]}">{{item.resInfo.loadAverage > 0? item.resInfo.loadAverage.toFixed(2):0}}</b>
+                  <strong :style="{color:color[$index]}">{{item.resInfo.loadAverage > 0? item.resInfo.loadAverage.toFixed(2):0}}</strong>
                 </div>
                 <div class="text-1">
                   loadAverage

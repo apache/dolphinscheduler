@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.common.model;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * date interval class
@@ -35,12 +36,14 @@ public class DateInterval {
 
     @Override
     public boolean equals(Object obj) {
-        try{
-            DateInterval dateInterval = (DateInterval) obj;
-            return startTime.equals(dateInterval.getStartTime()) &&
-                    endTime.equals(dateInterval.getEndTime());
-        }catch (Exception e){
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
+        } else if (this == obj) {
+            return true;
+        } else {
+            DateInterval that = (DateInterval) obj;
+            return startTime.equals(that.startTime) &&
+                    endTime.equals(that.endTime);
         }
     }
 
@@ -58,5 +61,10 @@ public class DateInterval {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startTime, endTime);
     }
 }

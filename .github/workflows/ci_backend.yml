@@ -51,7 +51,7 @@ jobs:
         with:
           java-version: 1.8
       - name: Compile
-        run: mvn -U -B -T 1C clean install -Prelease -Dmaven.compile.fork=true -Dmaven.test.skip=true
+        run: mvn -B clean compile package -Prelease -Dmaven.test.skip=true
   License-check:
     runs-on: ubuntu-latest
     steps:

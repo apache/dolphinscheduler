@@ -61,7 +61,7 @@
 <script>
   import i18n from '@/module/i18n'
   import io from '@/module/io'
-  import cookie from '@/module/util/cookie'
+  import cookies from 'js-cookie'
 
   export default {
     name: 'login-model',
@@ -84,8 +84,12 @@
           this._gLogin().then(res => {
             setTimeout(() => {
               this.spinnerLoading = false
-              sessionStorage.setItem("sessionId", res.data)
-              cookie.set('sessionId', res.data,{ path: '/' })
+              if (res.data.hasOwnProperty("sessionId")) {
+                let sessionId=res.data.sessionId
+                sessionStorage.setItem("sessionId", sessionId)
+                cookies.set('sessionId', sessionId,{ path: '/' })
+              }
+              
               if (this.userName === 'admin') {
                 window.location.href = `${PUBLIC_PATH}/#/security/tenant`
               } else {

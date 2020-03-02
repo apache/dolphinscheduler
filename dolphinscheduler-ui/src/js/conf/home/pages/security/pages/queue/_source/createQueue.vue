@@ -23,22 +23,24 @@
     <template slot="content">
       <div class="create-tenement-model">
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="queueName"
+                    maxlength="60"
                     :placeholder="$t('Please enter name')"
                     autocomplete="off">
             </x-input>
           </template>
         </m-list-box-f>
         <m-list-box-f>
-          <template slot="name"><b>*</b>{{$t('Queue value')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Queue value')}}</template>
           <template slot="content">
             <x-input
                     type="input"
                     v-model="queue"
+                    maxlength="60"
                     :placeholder="$t('Please enter queue value')"
                     autocomplete="off">
             </x-input>

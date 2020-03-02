@@ -32,7 +32,7 @@ import java.util.Map;
  * Enterprise WeChat Manager
  */
 public class EnterpriseWeChatManager {
-    private static final Logger logger = LoggerFactory.getLogger(MsgManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(EnterpriseWeChatManager.class);
     /**
      * Enterprise We Chat send
      * @param alert the alert

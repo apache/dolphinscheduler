@@ -17,7 +17,7 @@
 const webpack = require('webpack')
 const merge = require('webpack-merge')
 const { assetsDir, baseConfig } = require('./config')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const ProgressPlugin = require('progress-bar-webpack-plugin')
 const getEnv = require('env-parse').getEnv
 
@@ -25,70 +25,6 @@ const config = merge.smart(baseConfig, {
   devtool: 'eval-source-map',
   output: {
     filename: 'js/[name].js'
-  },
-  module: {
-    rules: [
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          hotReload: true // Open hot overload
-        }
-      },
-      {
-        test: /\.css$/,
-        loader: ExtractTextPlugin.extract({
-          use: [
-            'css-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                plugins: (loader) => [
-                  require('autoprefixer')({
-                    overrideBrowserslist: [
-                      "Android 4.1",
-                      "iOS 7.1",
-                      "Chrome > 31",
-                      "ff > 31",
-                      "ie >= 8"
-                    ]              
-                  }),
-                  require('cssnano')
-                ]
-              }
-            }
-          ],
-          fallback: ['vue-style-loader']
-        })
-      },
-      {
-        test: /\.scss$/,
-        loader: ExtractTextPlugin.extract({
-          use: [
-            'css-loader',
-            'sass-loader',
-            {
-              loader: 'postcss-loader',
-              options: {
-                plugins: (loader) => [
-                  require('autoprefixer')({
-                    overrideBrowserslist: [
-                      "Android 4.1",
-                      "iOS 7.1",
-                      "Chrome > 31",
-                      "ff > 31",
-                      "ie >= 8"
-                    ] 
-                  }),
-                  require('cssnano')
-                ]
-              }
-            }
-          ],
-          fallback: ['vue-style-loader']
-        })
-      }
-    ]
   },
   devServer: {
     hot: true,
@@ -116,10 +52,9 @@ const config = merge.smart(baseConfig, {
   plugins: [
     new ProgressPlugin(),
     new webpack.HotModuleReplacementPlugin(),
-    new ExtractTextPlugin({ filename: 'css/[name].css', allChunks: true }),
-    new webpack.optimize.CommonsChunkPlugin({ name: 'common', filename: 'js/[name].js' }),
-    new webpack.optimize.OccurrenceOrderPlugin()
-  ]
+    new MiniCssExtractPlugin({ filename: 'css/[name].css' })
+  ],
+  mode: 'development'
 })
 
 module.exports = config

@@ -22,6 +22,7 @@
         <div class="bar-box roundedRect jtk-draggable jtk-droppable jtk-endpoint-anchor jtk-connected"
              :class="v === dagBarId ? 'active' : ''"
              :id="v"
+             :key="v"
              v-for="(item,v) in tasksTypeList"
              @mousedown="_getDagId(v)">
           <div data-toggle="tooltip" :title="item.description">
@@ -42,7 +43,7 @@
                   size="xsmall"
                   :disabled="$route.name !== 'projects-instance-details'"
                   @click="_toggleView"
-                  icon="fa fa-code">
+                  icon="ans-icon-code">
           </x-button>
           <x-button
             style="vertical-align: middle;"
@@ -53,11 +54,11 @@
             size="xsmall"
             :disabled="$route.name !== 'projects-instance-details'"
             @click="_toggleParam"
-            icon="fa fa-chevron-circle-right">
+            icon="ans-icon-arrow-circle-right">
           </x-button>
           <span class="name">{{name}}</span>
           &nbsp;
-          <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><i class="iconfont" data-container="body"  data-toggle="tooltip" title="复制名称" >&#xe61e;</i></span>
+          <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><em class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></em></span>
         </div>
         <div class="save-btn">
           <div class="operation" style="vertical-align: middle;">
@@ -65,16 +66,26 @@
                v-for="(item,$index) in toolOperList"
                :class="_operationClass(item)"
                :id="item.code"
+               :key="$index"
                @click="_ckOperation(item,$event)">
-              <i class="iconfont" v-html="item.icon" data-toggle="tooltip" :title="item.description" ></i>
+              <x-button type="text" data-container="body" :icon="item.icon" v-tooltip.light="item.desc"></x-button>
             </a>
           </div>
           <x-button
-                  data-toggle="tooltip"
-                  :title="$t('Refresh DAG status')"
+                  type="primary"
+                  v-tooltip.light="$t('Format DAG')"
+                  icon="ans-icon-triangle-solid-right"
+                  size="xsmall"
+                  data-container="body"
+                  v-if="type === 'instance'"
+                  style="vertical-align: middle;"
+                  @click="dagAutomaticLayout">
+          </x-button>
+          <x-button
+                  v-tooltip.light="$t('Refresh DAG status')"
                   data-container="body"
                   style="vertical-align: middle;"
-                  icon="fa fa-refresh"
+                  icon="ans-icon-refresh"
                   type="primary"
                   :loading="isRefresh"
                   v-if="type === 'instance'"
@@ -86,7 +97,7 @@
                   style="vertical-align: middle;"
                   type="primary"
                   size="xsmall"
-                  icon="fa fa-reply"
+                  icon="ans-icon-play"
                   @click="_rtNodesDag" >
             {{$t('Return_1')}}
           </x-button>
@@ -96,7 +107,7 @@
                   size="xsmall"
                   :loading="spinnerLoading"
                   @click="_saveChart"
-                  icon="fa fa-save"
+                  icon="ans-icon-save"
                   >
             {{spinnerLoading ? 'Loading...' : $t('Save')}}
           </x-button>
@@ -142,7 +153,8 @@
         isRtTasks: false,
         isRefresh: false,
         isLoading: false,
-        taskId: null
+        taskId: null,
+        arg: false,
       }
     },
     mixins: [disabledState],
@@ -152,10 +164,48 @@
     },
     methods: {
       ...mapActions('dag', ['saveDAGchart', 'updateInstance', 'updateDefinition', 'getTaskState']),
-      ...mapMutations('dag', ['addTasks', 'resetParams', 'setIsEditDag', 'setName']),
-      init () {
+      ...mapMutations('dag', ['addTasks', 'cacheTasks', 'resetParams', 'setIsEditDag', 'setName']),
+
+      // DAG automatic layout
+      dagAutomaticLayout() {
+        $('#canvas').html('')
+
+      // Destroy round robin
+        Dag.init({
+        dag: this,
+        instance: jsPlumb.getInstance({
+          Endpoint: [
+            'Dot', { radius: 1, cssClass: 'dot-style' }
+          ],
+          Connector: 'Straight',
+          PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
+          ConnectionOverlays: [
+            [
+              'Arrow',
+              {
+                location: 1,
+                id: 'arrow',
+                length: 12,
+                foldback: 0.8
+              }
+            ]
+          ],
+          Container: 'canvas'
+        })
+      })
         if (this.tasks.length) {
-          Dag.backfill()
+          Dag.backfill(true)
+          if (this.type === 'instance') {
+            this._getTaskState(false).then(res => {})
+          }
+        } else {
+          Dag.create()
+        }
+      },
+
+      init (args) {
+        if (this.tasks.length) {
+          Dag.backfill(args)
           // Process instances can view status
           if (this.type === 'instance') {
             this._getTaskState(false).then(res => {})
@@ -211,8 +261,8 @@
                   let state = dom.find('.state-p')
                   dom.attr('data-state-id', v1.stateId)
                   dom.attr('data-dependent-result', v1.dependentResult || '')
-                  state.append(`<b class="iconfont ${v1.isSpin ? 'fa fa-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body">${v1.icoUnicode}</b>`)
-                  state.find('b').attr('title', titleTpl(v2, v1.desc))
+                  state.append(`<strong class="${v1.icoUnicode} ${v1.isSpin ? 'as as-spin' : ''}" style="color:${v1.color}" data-toggle="tooltip" data-html="true" data-container="body"></strong>`)
+                  state.find('strong').attr('title', titleTpl(v2, v1.desc))
                 }
               })
             })
@@ -423,7 +473,35 @@
        */
       _createNodes ({ id, type }) {
         let self = this
+        let preNode = []
+        let rearNode = []
+        let rearList = []
+        $('div[data-targetarr*="' + id + '"]').each(function(){
+          rearNode.push($(this).attr("id"))
+        })
 
+        if (rearNode.length>0) {
+          rearNode.forEach(v => {
+            let rearobj = {}
+            rearobj.value = $(`#${v}`).find('.name-p').text()
+            rearobj.label = $(`#${v}`).find('.name-p').text()
+            rearList.push(rearobj)
+          })
+        } else {
+          rearList = []
+        }
+        let targetarr = $(`#${id}`).attr('data-targetarr')
+        if (targetarr) {
+          let nodearr = targetarr.split(',')
+          nodearr.forEach(v => {
+            let nodeobj = {}
+            nodeobj.value = $(`#${v}`).find('.name-p').text()
+            nodeobj.label = $(`#${v}`).find('.name-p').text()
+            preNode.push(nodeobj)
+          })
+        } else {
+          preNode = []
+        }
         if (eventModel) {
           eventModel.remove()
         }
@@ -436,6 +514,7 @@
         }
 
         this.taskId = id
+        type = type || self.dagBarId
 
         eventModel = this.$drawer({
           closable: false,
@@ -448,6 +527,14 @@
                 setTimeout(() => {
                   removeNodesEvent(fromThis)
                 }, 100)
+              },
+              /**
+               * Cache the item
+               * @param item
+               * @param fromThis
+               */
+              cacheTaskInfo({item, fromThis}) {
+                self.cacheTasks(item)
               },
               close ({ flag, fromThis }) {
                 // Edit status does not allow deletion of nodes
@@ -464,11 +551,18 @@
             },
             props: {
               id: id,
-              taskType: type || self.dagBarId,
-              self: self
+              taskType: type,
+              self: self,
+              preNode: preNode,
+              rearList: rearList
             }
           })
         })
+      },
+      removeEventModelById ($id) {
+        if(eventModel && this.taskId == $id){
+          eventModel.remove()
+        }
       }
     },
     watch: {
@@ -513,7 +607,7 @@
       })
     },
     mounted () {
-      this.init()
+      this.init(this.arg)
     },
     beforeDestroy () {
       this.resetParams()
@@ -522,6 +616,9 @@
       clearInterval(this.setIntervalP)
     },
     destroyed () {
+      if (eventModel) {
+        eventModel.remove()
+      }
     },
     computed: {
       ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name'])

@@ -17,7 +17,7 @@
 <template>
   <m-popup :ok-text="$t('Submit')" :nameText="type.name + $t('Authorize')" @ok="_ok" ref="popup">
     <template slot="content">
-      <div class="clearfix transfer-model">
+      <div class="clearfix transfer-model" style="width: 660px">
         <div>
             <x-button-group v-model="checkedValue" size="small">
                 <x-button type="ghost" value="fileResource" @click="_ckFile">{{$t('File resources')}}</x-button>
@@ -37,7 +37,7 @@
                      placeholder="Please enter keyword"
                      type="text"
                      style="width:202px;">
-              <i slot="suffix" class="ans-icon-search"></i>
+              <em slot="suffix" class="ans-icon-search"></em>
             </x-input>
           </div>-->
           <div class="scrollbar tf-content">
@@ -63,7 +63,7 @@
                      placeholder="Please enter keyword"
                      type="text"
                      style="width:202px;">
-              <i slot="suffix" class="ans-icon-search"></i>
+              <em slot="suffix" class="ans-icon-search"></em>
             </x-input>
           </div>-->
           <div class="scrollbar tf-content">
@@ -195,7 +195,7 @@
   .transfer-model {
     padding: 0 20px;
     .select-list-box {
-      width: 220px;
+      width: 300px;
       float: left;
       border: 1px solid #dcdee2;
       border-radius: 3px;
@@ -237,7 +237,7 @@
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
-              width: 210px;
+              width: 290px;
               display: inline-block;
             }
             &:hover {

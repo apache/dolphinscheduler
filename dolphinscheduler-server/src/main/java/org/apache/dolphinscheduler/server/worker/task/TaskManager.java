@@ -18,7 +18,10 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 
 import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.utils.EnumUtils;
+import org.apache.dolphinscheduler.server.worker.task.conditions.ConditionsTask;
 import org.apache.dolphinscheduler.server.worker.task.dependent.DependentTask;
+import org.apache.dolphinscheduler.server.worker.task.datax.DataxTask;
 import org.apache.dolphinscheduler.server.worker.task.flink.FlinkTask;
 import org.apache.dolphinscheduler.server.worker.task.http.HttpTask;
 import org.apache.dolphinscheduler.server.worker.task.mr.MapReduceTask;
@@ -27,7 +30,7 @@ import org.apache.dolphinscheduler.server.worker.task.python.PythonTask;
 import org.apache.dolphinscheduler.server.worker.task.shell.ShellTask;
 import org.apache.dolphinscheduler.server.worker.task.spark.SparkTask;
 import org.apache.dolphinscheduler.server.worker.task.sql.SqlTask;
-import org.apache.commons.lang3.EnumUtils;
+import org.apache.dolphinscheduler.server.worker.task.sqoop.SqoopTask;
 import org.slf4j.Logger;
 
 /**
@@ -65,6 +68,12 @@ public class TaskManager {
         return new DependentTask(props, logger);
       case HTTP:
         return new HttpTask(props, logger);
+      case DATAX:
+        return new DataxTask(props, logger);
+      case SQOOP:
+        return new SqoopTask(props, logger);
+      case CONDITIONS:
+        return new ConditionsTask(props, logger);
       default:
         logger.error("unsupport task type: {}", taskType);
         throw new IllegalArgumentException("not support task type");

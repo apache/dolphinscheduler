@@ -24,13 +24,13 @@
       </m-conditions>
     </template>
     <template slot="content">
-      <template v-if="datasourcesList.length">
-        <m-list :datasources-list="datasourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
+      <template v-if="datasourcesList.length || total>0">
+        <m-list @on-update="_onUpdate" :datasources-list="datasourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize"></m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!datasourcesList.length">
+      <template v-if="!datasourcesList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading" :is-left="false">
@@ -124,14 +124,21 @@
       _getList (flag) {
         this.isLoading = !flag
         this.getDatasourcesListP(this.searchParams).then(res => {
-          this.datasourcesList = []
-          this.datasourcesList = res.totalList
-          this.total = res.total
-          this.isLoading = false
+          if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
+            this.searchParams.pageNo = this.searchParams.pageNo -1
+          } else {
+            this.datasourcesList = []
+            this.datasourcesList = res.totalList
+            this.total = res.total
+            this.isLoading = false
+          }
         }).catch(e => {
           this.isLoading = false
         })
-      }
+      },
+      _onUpdate () {
+        this._debounceGET('false')
+      },
     },
     watch: {
       // router

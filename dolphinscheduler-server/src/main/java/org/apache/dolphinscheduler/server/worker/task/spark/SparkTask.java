@@ -16,16 +16,17 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.spark;
 
+import org.apache.dolphinscheduler.common.enums.SparkVersion;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.SparkArgsUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -38,9 +39,14 @@ import java.util.Map;
 public class SparkTask extends AbstractYarnTask {
 
   /**
-   * spark command
+   * spark1 command
    */
-  private static final String SPARK_COMMAND = "spark-submit";
+  private static final String SPARK1_COMMAND = "${SPARK_HOME1}/bin/spark-submit";
+
+  /**
+   * spark2 command
+   */
+  private static final String SPARK2_COMMAND = "${SPARK_HOME2}/bin/spark-submit";
 
   /**
    *  spark parameters
@@ -89,7 +95,14 @@ public class SparkTask extends AbstractYarnTask {
   protected String buildCommand() {
     List<String> args = new ArrayList<>();
 
-    args.add(SPARK_COMMAND);
+    //spark version
+    String sparkCommand = SPARK2_COMMAND;
+
+    if (SparkVersion.SPARK1.name().equals(sparkParameters.getSparkVersion())) {
+      sparkCommand = SPARK1_COMMAND;
+    }
+
+    args.add(sparkCommand);
 
     // other parameters
     args.addAll(SparkArgsUtils.buildArgs(sparkParameters));

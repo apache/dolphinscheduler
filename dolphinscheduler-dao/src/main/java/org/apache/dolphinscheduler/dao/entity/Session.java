@@ -19,14 +19,12 @@ package org.apache.dolphinscheduler.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.util.Date;
 
 /**
  * session
  */
-@Data
 @TableName("t_ds_session")
 public class Session {
 
@@ -91,5 +89,27 @@ public class Session {
                 ", ip='" + ip + '\'' +
                 ", lastLoginTime=" + lastLoginTime +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Session session = (Session) o;
+
+        if (userId != session.userId) return false;
+        if (!id.equals(session.id)) return false;
+        if (!lastLoginTime.equals(session.lastLoginTime)) return false;
+        return ip.equals(session.ip);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id.hashCode();
+        result = 31 * result + userId;
+        result = 31 * result + lastLoginTime.hashCode();
+        result = 31 * result + ip.hashCode();
+        return result;
     }
 }

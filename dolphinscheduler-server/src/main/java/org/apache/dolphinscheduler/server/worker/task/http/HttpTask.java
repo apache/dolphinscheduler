@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.worker.task.http;
 
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.HttpMethod;
 import org.apache.dolphinscheduler.common.enums.HttpParametersType;
@@ -27,15 +26,15 @@ import org.apache.dolphinscheduler.common.process.HttpProperty;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.http.HttpParameters;
-import org.apache.dolphinscheduler.common.utils.Bytes;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;
@@ -50,6 +49,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -66,9 +66,9 @@ public class HttpTask extends AbstractTask {
     private HttpParameters httpParameters;
 
     /**
-     *  process database access
+     *  process service
      */
-    private ProcessDao processDao;
+    private ProcessService processService;
 
     /**
      * Convert mill seconds to second unit
@@ -92,7 +92,7 @@ public class HttpTask extends AbstractTask {
      */
     public HttpTask(TaskProps props, Logger logger) {
         super(props, logger);
-        this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     @Override
@@ -113,23 +113,20 @@ public class HttpTask extends AbstractTask {
         long startTime = System.currentTimeMillis();
         String statusCode = null;
         String body = null;
-        try(CloseableHttpClient client = createHttpClient()) {
-            try(CloseableHttpResponse response = sendRequest(client)) {
-                statusCode = String.valueOf(getStatusCode(response));
-                body = getResponseBody(response);
-                exitStatusCode = validResponse(body, statusCode);
-                long costTime = System.currentTimeMillis() - startTime;
-                logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {}Millisecond, statusCode : {}, body : {}, log : {}",
-                        DateUtils.format2Readable(startTime), httpParameters.getUrl(),httpParameters.getHttpMethod(), costTime, statusCode, body, output);
-            }catch (Exception e) {
-                appendMessage(e.toString());
-                exitStatusCode = -1;
-                logger.error("httpUrl[" + httpParameters.getUrl() + "] connection failed："+output, e);
-            }
-        } catch (Exception e) {
+
+        try(CloseableHttpClient client = createHttpClient();
+            CloseableHttpResponse response = sendRequest(client)) {
+            statusCode = String.valueOf(getStatusCode(response));
+            body = getResponseBody(response);
+            exitStatusCode = validResponse(body, statusCode);
+            long costTime = System.currentTimeMillis() - startTime;
+            logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {}Millisecond, statusCode : {}, body : {}, log : {}",
+                    DateUtils.format2Readable(startTime), httpParameters.getUrl(),httpParameters.getHttpMethod(), costTime, statusCode, body, output);
+        }catch (Exception e){
             appendMessage(e.toString());
             exitStatusCode = -1;
             logger.error("httpUrl[" + httpParameters.getUrl() + "] connection failed："+output, e);
+            throw e;
         }
     }
 
@@ -141,7 +138,7 @@ public class HttpTask extends AbstractTask {
      */
     protected CloseableHttpResponse sendRequest(CloseableHttpClient client) throws IOException {
         RequestBuilder builder = createRequestBuilder();
-        ProcessInstance processInstance = processDao.findProcessInstanceByTaskId(taskProps.getTaskInstId());
+        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
 
         Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
                 taskProps.getDefinedParams(),
@@ -179,7 +176,7 @@ public class HttpTask extends AbstractTask {
         if (entity == null) {
             return null;
         }
-        String webPage = EntityUtils.toString(entity, Bytes.UTF8_ENCODING);
+        String webPage = EntityUtils.toString(entity, StandardCharsets.UTF_8.name());
         return webPage;
     }
 
@@ -267,7 +264,7 @@ public class HttpTask extends AbstractTask {
                 }
             }
             StringEntity postingString = new StringEntity(jsonParam.toString(), Charsets.UTF_8);
-            postingString.setContentEncoding(Bytes.UTF8_ENCODING);
+            postingString.setContentEncoding(StandardCharsets.UTF_8.name());
             postingString.setContentType(APPLICATION_JSON);
             builder.setEntity(postingString);
         }

@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.common.utils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import oshi.SystemInfo;
@@ -38,7 +37,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * os utils
@@ -132,18 +134,32 @@ public class OSUtils {
     return Double.parseDouble(df.format(cpuUsage));
   }
 
+  public static List<String> getUserList() {
+    try {
+      if (isMacOS()) {
+        return getUserListFromMac();
+      } else if (isWindows()) {
+        return getUserListFromWindows();
+      } else {
+        return getUserListFromLinux();
+      }
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
+
+    return Collections.emptyList();
+  }
 
   /**
-   * get user list
+   * get user list from linux
    *
    * @return user list
    */
-  public static List<String> getUserList() {
+  private static List<String> getUserListFromLinux() throws IOException {
     List<String> userList = new ArrayList<>();
-    BufferedReader bufferedReader = null;
 
-    try {
-      bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream("/etc/passwd")));
+    try (BufferedReader bufferedReader = new BufferedReader(
+            new InputStreamReader(new FileInputStream("/etc/passwd")))) {
       String line;
 
       while ((line = bufferedReader.readLine()) != null) {
@@ -152,19 +168,139 @@ public class OSUtils {
           userList.add(userInfo[0]);
         }
       }
-    } catch (Exception e) {
-      logger.error(e.getMessage(), e);
-    } finally {
-      try {
-        if (bufferedReader != null) {
-          bufferedReader.close();
-        }
-      } catch (IOException e) {
-        logger.error(e.getMessage(), e);
-      }
     }
 
     return userList;
+  }
+
+  /**
+   * get user list from mac
+   * @return user list
+   */
+  private static List<String> getUserListFromMac() throws IOException {
+    String result = exeCmd("dscl . list /users");
+    if (StringUtils.isNotEmpty(result)) {
+      return Arrays.asList(result.split( "\n"));
+    }
+
+    return Collections.emptyList();
+  }
+
+  /**
+   *  get user list from windows
+   * @return user list
+   * @throws IOException
+   */
+  private static List<String> getUserListFromWindows() throws IOException {
+    String result = exeCmd("net user");
+    String[] lines = result.split("\n");
+
+    int startPos = 0;
+    int endPos = lines.length - 2;
+    for (int i = 0; i < lines.length; i++) {
+      if (lines[i].isEmpty()) {
+        continue;
+      }
+
+      int count = 0;
+      if (lines[i].charAt(0) == '-') {
+        for (int j = 0; j < lines[i].length(); j++) {
+          if (lines[i].charAt(i) == '-') {
+            count++;
+          }
+        }
+      }
+
+      if (count == lines[i].length()) {
+        startPos = i + 1;
+        break;
+      }
+    }
+
+    List<String> users = new ArrayList<>();
+    while (startPos <= endPos) {
+      Pattern pattern = Pattern.compile("\\s+");
+      users.addAll(Arrays.asList(pattern.split(lines[startPos])));
+      startPos++;
+    }
+
+    return users;
+  }
+
+  /**
+   * create user
+   * @param userName user name
+   * @return true if creation was successful, otherwise false
+   */
+  public static boolean createUser(String userName) {
+    try {
+      String userGroup = OSUtils.getGroup();
+      if (StringUtils.isEmpty(userGroup)) {
+        logger.error("{} group does not exist for this operating system.", userGroup);
+        return false;
+      }
+      if (isMacOS()) {
+        createMacUser(userName, userGroup);
+      } else if (isWindows()) {
+        createWindowsUser(userName, userGroup);
+      } else {
+        createLinuxUser(userName, userGroup);
+      }
+      return true;
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+    }
+
+    return false;
+  }
+
+  /**
+   * create linux user
+   * @param userName user name
+   * @param userGroup user group
+   * @throws IOException in case of an I/O error
+   */
+  private static void createLinuxUser(String userName, String userGroup) throws IOException {
+    logger.info("create linux os user : {}", userName);
+    String cmd = String.format("sudo useradd -g %s %s", userGroup, userName);
+
+    logger.info("execute cmd : {}", cmd);
+    OSUtils.exeCmd(cmd);
+  }
+
+  /**
+   * create mac user (Supports Mac OSX 10.10+)
+   * @param userName user name
+   * @param userGroup user group
+   * @throws IOException in case of an I/O error
+   */
+  private static void createMacUser(String userName, String userGroup) throws IOException {
+    logger.info("create mac os user : {}", userName);
+    String userCreateCmd = String.format("sudo sysadminctl -addUser %s -password %s", userName, userName);
+    String appendGroupCmd = String.format("sudo dseditgroup -o edit -a %s -t user %s", userName, userGroup);
+
+    logger.info("create user command : {}", userCreateCmd);
+    OSUtils.exeCmd(userCreateCmd);
+    logger.info("append user to group : {}", appendGroupCmd);
+    OSUtils.exeCmd(appendGroupCmd);
+  }
+
+  /**
+   * create windows user
+   * @param userName user name
+   * @param userGroup user group
+   * @throws IOException in case of an I/O error
+   */
+  private static void createWindowsUser(String userName, String userGroup) throws IOException {
+    logger.info("create windows os user : {}", userName);
+    String userCreateCmd = String.format("net user \"%s\" /add", userName);
+    String appendGroupCmd = String.format("net localgroup \"%s\" \"%s\" /add", userGroup, userName);
+
+    logger.info("execute create user command : {}", userCreateCmd);
+    OSUtils.exeCmd(userCreateCmd);
+
+    logger.info("execute append user to group : {}", appendGroupCmd);
+    OSUtils.exeCmd(appendGroupCmd);
   }
 
   /**
@@ -173,11 +309,22 @@ public class OSUtils {
    * @throws IOException errors
    */
   public static String getGroup() throws IOException {
-    String result = exeCmd("groups");
-
-    if (StringUtils.isNotEmpty(result)) {
-      String[] groupInfo = StringUtils.split(result);
-      return groupInfo[0];
+    if (isWindows()) {
+      String currentProcUserName = System.getProperty("user.name");
+      String result = exeCmd(String.format("net user \"%s\"", currentProcUserName));
+      String line = result.split("\n")[22];
+      String group = Pattern.compile("\\s+").split(line)[1];
+      if (group.charAt(0) == '*') {
+        return group.substring(1);
+      } else {
+        return group;
+      }
+    } else {
+      String result = exeCmd("groups");
+      if (StringUtils.isNotEmpty(result)) {
+        String[] groupInfo = result.split(" ");
+        return groupInfo[0];
+      }
     }
 
     return null;
@@ -295,25 +442,14 @@ public class OSUtils {
     double systemCpuLoad;
     double systemReservedMemory;
 
-    if(isMaster){
-      systemCpuLoad = conf.getDouble(Constants.MASTER_MAX_CPULOAD_AVG, Constants.defaultMasterCpuLoad);
-      systemReservedMemory = conf.getDouble(Constants.MASTER_RESERVED_MEMORY, Constants.defaultMasterReservedMemory);
+    if(Boolean.TRUE.equals(isMaster)){
+      systemCpuLoad = conf.getDouble(Constants.MASTER_MAX_CPULOAD_AVG, Constants.DEFAULT_MASTER_CPU_LOAD);
+      systemReservedMemory = conf.getDouble(Constants.MASTER_RESERVED_MEMORY, Constants.DEFAULT_MASTER_RESERVED_MEMORY);
     }else{
-      systemCpuLoad = conf.getDouble(Constants.WORKER_MAX_CPULOAD_AVG, Constants.defaultWorkerCpuLoad);
-      systemReservedMemory = conf.getDouble(Constants.WORKER_RESERVED_MEMORY, Constants.defaultWorkerReservedMemory);
+      systemCpuLoad = conf.getDouble(Constants.WORKER_MAX_CPULOAD_AVG, Constants.DEFAULT_WORKER_CPU_LOAD);
+      systemReservedMemory = conf.getDouble(Constants.WORKER_RESERVED_MEMORY, Constants.DEFAULT_WORKER_RESERVED_MEMORY);
     }
-
-    // judging usage
-    double loadAverage = OSUtils.loadAverage();
-    //
-    double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
-
-    if(loadAverage > systemCpuLoad || availablePhysicalMemorySize < systemReservedMemory){
-      logger.warn("load or availablePhysicalMemorySize(G) is too high, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize , loadAverage);
-      return false;
-    }else{
-      return true;
-    }
+    return checkResource(systemCpuLoad,systemReservedMemory);
   }
 
 }

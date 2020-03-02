@@ -17,11 +17,11 @@
 package org.apache.dolphinscheduler.alert.utils;
 
 import org.apache.dolphinscheduler.common.enums.ShowType;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import com.alibaba.fastjson.JSON;
 
 import com.google.common.reflect.TypeToken;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -86,20 +86,24 @@ public class EnterpriseWeChatUtils {
         String resp;
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpGet httpGet = new HttpGet(enterpriseWeChatTokenUrlReplace);
-        CloseableHttpResponse response = httpClient.execute(httpGet);
         try {
-            HttpEntity entity = response.getEntity();
-            resp = EntityUtils.toString(entity, Constants.UTF_8);
-            EntityUtils.consume(entity);
-        } finally {
-            response.close();
-        }
+            HttpGet httpGet = new HttpGet(enterpriseWeChatTokenUrlReplace);
+            CloseableHttpResponse response = httpClient.execute(httpGet);
+            try {
+                HttpEntity entity = response.getEntity();
+                resp = EntityUtils.toString(entity, Constants.UTF_8);
+                EntityUtils.consume(entity);
+            } finally {
+                response.close();
+            }
 
-        Map<String, Object> map = JSON.parseObject(resp,
-                new TypeToken<Map<String, Object>>() {
-                }.getType());
-        return map.get("access_token").toString();
+            Map<String, Object> map = JSON.parseObject(resp,
+                    new TypeToken<Map<String, Object>>() {
+                    }.getType());
+            return map.get("access_token").toString();
+        } finally {
+            httpClient.close();
+        }
     }
 
     /**
@@ -167,20 +171,25 @@ public class EnterpriseWeChatUtils {
     public static String sendEnterpriseWeChat(String charset, String data, String token) throws IOException {
         String enterpriseWeChatPushUrlReplace = enterpriseWeChatPushUrl.replaceAll("\\$token", token);
 
-        CloseableHttpClient httpclient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(enterpriseWeChatPushUrlReplace);
-        httpPost.setEntity(new StringEntity(data, charset));
-        CloseableHttpResponse response = httpclient.execute(httpPost);
-        String resp;
+        CloseableHttpClient httpClient = HttpClients.createDefault();
         try {
-            HttpEntity entity = response.getEntity();
-            resp = EntityUtils.toString(entity, charset);
-            EntityUtils.consume(entity);
+            HttpPost httpPost = new HttpPost(enterpriseWeChatPushUrlReplace);
+            httpPost.setEntity(new StringEntity(data, charset));
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String resp;
+            try {
+                HttpEntity entity = response.getEntity();
+                resp = EntityUtils.toString(entity, charset);
+                EntityUtils.consume(entity);
+            } finally {
+                response.close();
+            }
+            logger.info("Enterprise WeChat send [{}], param:{}, resp:{}", 
+                enterpriseWeChatPushUrl, data, resp);
+            return resp;
         } finally {
-            response.close();
+            httpClient.close();
         }
-        logger.info("Enterprise WeChat send [{}], param:{}, resp:{}", enterpriseWeChatPushUrl, data, resp);
-        return resp;
     }
 
     /**
@@ -192,22 +201,22 @@ public class EnterpriseWeChatUtils {
     public static String markdownTable(String title,String content){
         List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
         StringBuilder contents = new StringBuilder(200);
-        for (LinkedHashMap mapItems : mapItemsList){
 
-            Set<Map.Entry<String, String>> entries = mapItems.entrySet();
+        if (null != mapItemsList) {
+            for (LinkedHashMap mapItems : mapItemsList){
+                Set<Map.Entry<String, String>> entries = mapItems.entrySet();
+                Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+                StringBuilder t = new StringBuilder(String.format("`%s`%s",title,Constants.MARKDOWN_ENTER));
 
-            Iterator<Map.Entry<String, String>> iterator = entries.iterator();
+                while (iterator.hasNext()){
 
-            StringBuilder t = new StringBuilder(String.format("`%s`%s",title,Constants.MARKDOWN_ENTER));
-            while (iterator.hasNext()){
-
-                Map.Entry<String, String> entry = iterator.next();
-                t.append(Constants.MARKDOWN_QUOTE);
-                t.append(entry.getKey()).append(":").append(entry.getValue());
-                t.append(Constants.MARKDOWN_ENTER);
+                    Map.Entry<String, String> entry = iterator.next();
+                    t.append(Constants.MARKDOWN_QUOTE);
+                    t.append(entry.getKey()).append(":").append(entry.getValue());
+                    t.append(Constants.MARKDOWN_ENTER);
+                }
+                contents.append(t);
             }
-
-            contents.append(t);
         }
         return contents.toString();
     }

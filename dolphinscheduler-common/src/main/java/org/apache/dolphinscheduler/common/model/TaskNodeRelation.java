@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.common.model;
 
+import java.util.Objects;
+
 public class TaskNodeRelation {
 
   /**
@@ -53,6 +55,7 @@ public class TaskNodeRelation {
   }
 
 
+  @Override
   public boolean equals(Object o){
     if (!(o instanceof TaskNodeRelation)) {
       return false;
@@ -67,5 +70,10 @@ public class TaskNodeRelation {
             "startNode='" + startNode + '\'' +
             ", endNode='" + endNode + '\'' +
             '}';
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(startNode, endNode);
   }
 }

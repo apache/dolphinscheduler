@@ -19,25 +19,25 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('File Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th width="100">
+          <th scope="col" width="100">
             <span>{{$t('Size')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -46,13 +46,13 @@
             <span>{{parseInt(pageNo === 1 ? ($index + 1) : (($index + 1) + (pageSize * (pageNo - 1))))}}</span>
           </td>
           <td>
-            <span class="ellipsis">
+            <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.alias, maxWidth: '500px'}">
               <a href="javascript:" class="links" @click="_go(item)">{{item.alias}}</a>
             </span>
           </td>
-          <td><span class="ellipsis">{{item.fileName}}</span></td>
+          <td><span class="ellipsis" v-tooltip.large.top.start.light="{text: item.fileName, maxWidth: '500px'}">{{item.fileName}}</span></td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
             <span v-else>-</span>
           </td>
           <td>
@@ -71,13 +71,13 @@
                     :title="$t('Edit')"
                     :disabled="_rtDisb(item)"
                     @click="_edit(item,$index)"
-                    icon="iconfont icon-bianjixiugai">
+                    icon="ans-icon-edit">
             </x-button>
             <x-button
                     type="info"
                     shape="circle"
                     size="xsmall"
-                    icon="iconfont icon-wendangxiugai"
+                    icon="ans-icon-play"
                     data-toggle="tooltip"
                     :title="$t('Rename')"
                     @click="_rename(item,$index)">
@@ -90,7 +90,7 @@
                     data-toggle="tooltip"
                     :title="$t('Download')"
                     @click="_downloadFile(item)"
-                    icon="iconfont icon-download">
+                    icon="ans-icon-download">
             </x-button>
 
             <x-poptip
@@ -104,7 +104,7 @@
               </div>
               <template slot="reference">
                 <x-button
-                        icon="iconfont icon-shanchu"
+                        icon="ans-icon-trash"
                         type="error"
                         shape="circle"
                         size="xsmall"
@@ -166,7 +166,7 @@
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.list.splice(i, 1)
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()

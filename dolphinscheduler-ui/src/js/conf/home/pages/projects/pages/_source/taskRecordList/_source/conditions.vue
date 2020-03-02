@@ -18,7 +18,7 @@
   <m-conditions>
     <template slot="search-group">
       <div class="list">
-        <x-button type="ghost" size="small" @click="_ckQuery" icon="fa fa-search"></x-button>
+        <x-button type="ghost" size="small" @click="_ckQuery" icon="ans-icon-search"></x-button>
       </div>
       <div class="list">
         <x-datepicker
@@ -30,12 +30,12 @@
                 placement="bottom-end"
                 :panelNum="2">
           <x-input slot="input" readonly slot-scope="{value}" :value="value" style="width: 310px;" size="small" :placeholder="$t('Select date range')">
-            <i slot="suffix"
+            <em slot="suffix"
                @click.stop="_dateEmpty()"
                class="ans-icon-fail-solid"
                v-show="value"
                style="font-size: 13px;cursor: pointer;margin-top: 1px;">
-            </i>
+            </em>
           </x-input>
         </x-datepicker>
       </div>

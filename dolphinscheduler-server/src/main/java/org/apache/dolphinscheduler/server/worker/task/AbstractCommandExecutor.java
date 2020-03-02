@@ -20,20 +20,17 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -124,10 +121,10 @@ public abstract class AbstractCommandExecutor {
      * task specific execution logic
      *
      * @param execCommand   exec command
-     * @param processDao    process dao
+     * @param processService    process dao
      * @return exit status code
      */
-    public int run(String execCommand, ProcessDao processDao) {
+    public int run(String execCommand, ProcessService processService) {
         int exitStatusCode;
 
         try {
@@ -150,10 +147,7 @@ public abstract class AbstractCommandExecutor {
             // get process id
             int pid = getProcessId(process);
 
-            // task instance id
-            int taskInstId = Integer.parseInt(taskAppId.split("_")[2]);
-
-            processDao.updatePidByTaskInstId(taskInstId, pid, "");
+            processService.updatePidByTaskInstId(taskInstId, pid, "");
 
             logger.info("process start, process id is: {}", pid);
 
@@ -167,10 +161,10 @@ public abstract class AbstractCommandExecutor {
                 exitStatusCode = process.exitValue();
                 logger.info("process has exited, work dir:{}, pid:{} ,exitStatusCode:{}", taskDir, pid,exitStatusCode);
                 //update process state to db
-                exitStatusCode = updateState(processDao, exitStatusCode, pid, taskInstId);
+                exitStatusCode = updateState(processService, exitStatusCode, pid, taskInstId);
 
             } else {
-                TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+                TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
                 if (taskInstance == null) {
                     logger.error("task instance id:{} not exist", taskInstId);
                 } else {
@@ -182,7 +176,7 @@ public abstract class AbstractCommandExecutor {
 
         } catch (InterruptedException e) {
             exitStatusCode = -1;
-            logger.error(String.format("interrupt exception: {}, task may be cancelled or killed",e.getMessage()), e);
+            logger.error("interrupt exception: {}, task may be cancelled or killed", e.getMessage(), e);
             throw new RuntimeException("interrupt exception. exitCode is :  " + exitStatusCode);
         } catch (Exception e) {
             exitStatusCode = -1;
@@ -207,7 +201,14 @@ public abstract class AbstractCommandExecutor {
         // merge error information to standard output stream
         processBuilder.redirectErrorStream(true);
         // setting up user to run commands
-        processBuilder.command("sudo", "-u", tenantCode, commandType(), commandFile);
+        List<String> command = new LinkedList<>();
+        command.add("sudo");
+        command.add("-u");
+        command.add(tenantCode);
+        command.add(commandInterpreter());
+        command.addAll(commandOptions());
+        command.add(commandFile);
+        processBuilder.command(command);
 
         process = processBuilder.start();
 
@@ -218,23 +219,23 @@ public abstract class AbstractCommandExecutor {
     /**
      * update process state to db
      *
-     * @param processDao        process dao
+     * @param processService        process dao
      * @param exitStatusCode    exit status code
      * @param pid               process id
      * @param taskInstId        task instance id
      * @return exit status code
      */
-    private int updateState(ProcessDao processDao, int exitStatusCode, int pid, int taskInstId) {
+    private int updateState(ProcessService processService, int exitStatusCode, int pid, int taskInstId) {
         //get yarn state by log
         if (exitStatusCode == 0) {
-            TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+            TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
             logger.info("process id is {}", pid);
 
             List<String> appIds = getAppLinks(taskInstance.getLogPath());
             if (appIds.size() > 0) {
                 String appUrl = String.join(Constants.COMMA, appIds);
                 logger.info("yarn log url:{}",appUrl);
-                processDao.updatePidByTaskInstId(taskInstId, pid, appUrl);
+                processService.updatePidByTaskInstId(taskInstId, pid, appUrl);
             }
 
             // check if all operations are completed
@@ -292,7 +293,7 @@ public abstract class AbstractCommandExecutor {
 
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
-                logger.info("kill attempt failed." + e.getMessage(), e);
+                logger.info("kill attempt failed", e);
             }
         }
 
@@ -312,7 +313,7 @@ public abstract class AbstractCommandExecutor {
 
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
-                logger.error("kill attempt failed." + e.getMessage(), e);
+                logger.error("kill attempt failed ", e);
             }
         }
     }
@@ -407,7 +408,7 @@ public abstract class AbstractCommandExecutor {
                 }
            }
         } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed : " + e.getMessage(), appIds.toString()),e);
+            logger.error("yarn applications: {}  status failed ", appIds,e);
             result = false;
         }
         return result;
@@ -457,7 +458,7 @@ public abstract class AbstractCommandExecutor {
                 lineList.add(line);
             }
         } catch (Exception e) {
-            logger.error(String.format("read file: %s failed : ",filename),e);
+            logger.error("read file: {} failed",filename,e);
         } finally {
             if(br != null){
                 try {
@@ -534,7 +535,7 @@ public abstract class AbstractCommandExecutor {
         /**
          * when log buffer siz or flush time reach condition , then flush
          */
-        if (logBuffer.size() >= Constants.defaultLogRowsNum  || now - lastFlushTime > Constants.defaultLogFlushInterval) {
+        if (logBuffer.size() >= Constants.DEFAULT_LOG_ROWS_NUM || now - lastFlushTime > Constants.DEFAULT_LOG_FLUSH_INTERVAL) {
             lastFlushTime = now;
             /** log handle */
             logHandler.accept(logBuffer);
@@ -559,9 +560,11 @@ public abstract class AbstractCommandExecutor {
         }
     }
 
-
+    protected List<String> commandOptions() {
+        return Collections.emptyList();
+    }
     protected abstract String buildCommandFilePath();
-    protected abstract String commandType();
+    protected abstract String commandInterpreter();
     protected abstract boolean checkFindApp(String line);
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 }

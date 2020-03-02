@@ -18,11 +18,8 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -30,8 +27,9 @@ import java.io.File;
  * common utils
  */
 public class  CommonUtils {
-
-  private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
+  private CommonUtils() {
+    throw new IllegalStateException("CommonUtils class");
+  }
 
   /**
    * @return get the path of system environment variables

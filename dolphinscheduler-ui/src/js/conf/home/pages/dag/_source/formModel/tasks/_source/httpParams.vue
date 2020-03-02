@@ -52,18 +52,18 @@
       </x-input>
       <span class="lt-add">
         <a href="javascript:" style="color:red;" @click="!isDetails && _removeUdp($index)" >
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" >&#xe611;</i>
+          <em class="ans-icon-trash" :class="_isDetails" data-toggle="tooltip" :title="$t('delete')" ></em>
         </a>
       </span>
       <span class="add" v-if="$index === (httpParamsList.length - 1)">
         <a href="javascript:" @click="!isDetails && _addUdp()" >
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
+          <em class="ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
         </a>
       </span>
     </div>
     <span class="add-dp" v-if="!httpParamsList.length">
       <a href="javascript:" @click="!isDetails && _addUdp()" >
-        <i class="iconfont" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')">&#xe636;</i>
+        <em class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" :title="$t('Add')"></em>
       </a>
     </span>
   </div>
@@ -219,10 +219,10 @@
       a {
         color: #000;
         .iconfont {
-          font-size: 18px;
+          font-size: 16px;
           vertical-align: middle;
           display: inline-block;
-          margin-top: 1px;
+          margin-top: -5px;
         }
       }
     }

@@ -18,7 +18,6 @@
 
 workDir=`dirname $0`
 workDir=`cd ${workDir};pwd`
-source $workDir/../conf/config/run_config.conf
 source $workDir/../conf/config/install_config.conf
 
 hostsArr=(${ips//,/ })
@@ -29,11 +28,12 @@ do
       ssh -p $sshPort $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
     fi
 
-	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/"
+	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/ ui/"
 	scp -P $sshPort -r $workDir/../bin  $host:$installPath
 	scp -P $sshPort -r $workDir/../conf  $host:$installPath
 	scp -P $sshPort -r $workDir/../lib   $host:$installPath
 	scp -P $sshPort -r $workDir/../script  $host:$installPath
 	scp -P $sshPort -r $workDir/../sql  $host:$installPath
+	scp -P $sshPort -r $workDir/../ui  $host:$installPath
 	scp -P $sshPort  $workDir/../install.sh  $host:$installPath
 done
