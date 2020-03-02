@@ -192,6 +192,26 @@ public class UsersService extends BaseService {
     }
 
     /**
+     * get user id by user name
+     * @param name user name
+     * @return if name empty 0, user not exists -1, user exist user id
+     */
+    public int getUserIdByName(String name) {
+        //executor name query
+        int executorId = 0;
+        if (StringUtils.isNotEmpty(name)) {
+            User executor = queryUser(name);
+            if (null != executor) {
+                executorId = executor.getId();
+            } else {
+                executorId = -1;
+            }
+        }
+
+        return executorId;
+    }
+
+    /**
      * query user list
      *
      * @param loginUser login user

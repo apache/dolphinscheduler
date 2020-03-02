@@ -17,16 +17,18 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.log.LogClient;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.service.log.LogClientService;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.PreDestroy;
 
 /**
  * log service
@@ -37,7 +39,18 @@ public class LoggerService {
   private static final Logger logger = LoggerFactory.getLogger(LoggerService.class);
 
   @Autowired
-  private ProcessDao processDao;
+  private ProcessService processService;
+
+  private final LogClientService logClient;
+
+  public LoggerService(){
+    logClient = new LogClientService();
+  }
+
+  @PreDestroy
+  public void close(){
+    logClient.close();
+  }
 
   /**
    * view log
@@ -49,7 +62,7 @@ public class LoggerService {
    */
   public Result queryLog(int taskInstId, int skipLineNum, int limit) {
 
-    TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+    TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
 
     if (taskInstance == null){
       return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(), Status.TASK_INSTANCE_NOT_FOUND.getMsg());
@@ -64,12 +77,9 @@ public class LoggerService {
     Result result = new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
 
     logger.info("log host : {} , logPath : {} , logServer port : {}",host,taskInstance.getLogPath(),Constants.RPC_PORT);
-
-    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
-    String log = logClient.rollViewLog(taskInstance.getLogPath(),skipLineNum,limit);
+    String log = logClient.rollViewLog(host, Constants.RPC_PORT, taskInstance.getLogPath(),skipLineNum,limit);
     result.setData(log);
     logger.info(log);
-
     return result;
   }
 
@@ -80,17 +90,11 @@ public class LoggerService {
    * @return log byte array
    */
   public byte[] getLogBytes(int taskInstId) {
-    TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+    TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
     if (taskInstance == null){
       throw new RuntimeException("task instance is null");
     }
-
     String host = taskInstance.getHost();
-    if(StringUtils.isEmpty(host)){
-      throw new RuntimeException("task instance host is null");
-    }
-
-    LogClient logClient = new LogClient(host, Constants.RPC_PORT);
-    return logClient.getLogBytes(taskInstance.getLogPath());
+    return logClient.getLogBytes(host, Constants.RPC_PORT, taskInstance.getLogPath());
   }
 }
