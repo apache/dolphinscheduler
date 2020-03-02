@@ -58,11 +58,13 @@ let JSP = function () {
 /**
  * dag init
  */
-JSP.prototype.init = function ({ dag, instance }) {
+JSP.prototype.init = function ({ dag, instance, options }) {
   // Get the dag component instance
   this.dag = dag
   // Get jsplumb instance
   this.JspInstance = instance
+  // Get JSP options
+  this.options = options || {}
   // Register jsplumb connection type and configuration
   this.JspInstance.registerConnectionType('basic', {
     anchor: 'Continuous',
@@ -133,15 +135,6 @@ JSP.prototype.draggable = function () {
       helper: 'clone',
       containment: $('.dag-model'),
       stop: function (e, ui) {
-        self.tasksEvent(selfId)
-
-        // Dom structure is not generated without pop-up form form
-        if ($(`#${selfId}`).html()) {
-          // dag event
-          findComponentDownward(self.dag.$root, 'dag-chart')._createNodes({
-            id: selfId
-          })
-        }
       },
       drag: function () {
         $('body').find('.tooltip.fade.top.in').remove()
@@ -176,6 +169,16 @@ JSP.prototype.draggable = function () {
           self.initNode(thisDom[thisDom.length - 1])
         })
         selfId = id
+
+        self.tasksEvent(selfId)
+
+        // Dom structure is not generated without pop-up form form
+        if ($(`#${selfId}`).html()) {
+          // dag event
+          findComponentDownward(self.dag.$root, 'dag-chart')._createNodes({
+            id: selfId
+          })
+        }
       }
     })
   }
@@ -195,7 +198,8 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       targetarr: locations[v.id]['targetarr'],
       isAttachment: this.config.isAttachment,
       taskType: v.type,
-      runFlag: v.runFlag
+      runFlag: v.runFlag,
+      nodenumber: locations[v.id]['nodenumber'],
     }))
 
     // contextmenu event
@@ -494,6 +498,9 @@ JSP.prototype.removeNodes = function ($id) {
 
   // delete dom
   $(`#${$id}`).remove()
+
+  // callback onRemoveNodes event
+  this.options&&this.options.onRemoveNodes&&this.options.onRemoveNodes($id)
 }
 
 /**
@@ -510,6 +517,9 @@ JSP.prototype.removeConnect = function ($connect) {
   if (targetarr.length) {
     targetarr = _.filter(targetarr, v => v !== sourceId)
     $(`#${targetId}`).attr('data-targetarr', targetarr.toString())
+  }
+  if ($(`#${sourceId}`).attr('data-tasks-type')=='CONDITIONS') {
+    $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))-1)
   }
   this.JspInstance.deleteConnection($connect)
 
@@ -566,6 +576,7 @@ JSP.prototype.copyNodes = function ($id) {
     [newId]: {
       name: newName,
       targetarr: '',
+      nodenumber: 0,
       x: newX,
       y: newY
     }
@@ -652,6 +663,7 @@ JSP.prototype.saveStore = function () {
       locations[v.id] = {
         name: v.name,
         targetarr: v.targetarr,
+        nodenumber: v.nodenumber,
         x: v.x,
         y: v.y
       }
@@ -705,6 +717,12 @@ JSP.prototype.handleEvent = function () {
       return false
     }
 
+    if ($(`#${sourceId}`).attr('data-tasks-type')=='CONDITIONS' && $(`#${sourceId}`).attr('data-nodenumber')==2) {
+      return false
+    } else {
+      $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))+1)
+    }
+    
     // Storage node dependency information
     saveTargetarr(sourceId, targetId)
 

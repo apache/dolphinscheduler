@@ -31,12 +31,6 @@
     <dependency>
       <groupId>org.apache.dolphinscheduler</groupId>
       <artifactId>dolphinscheduler-alert</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.dolphinscheduler</groupId>
-          <artifactId>dolphinscheduler-dao</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -129,13 +123,13 @@
     </dependency>
 
     <dependency>
-      <groupId>com.github.xiaoymin</groupId>
-      <artifactId>swagger-bootstrap-ui</artifactId>
+      <groupId>org.apache.dolphinscheduler</groupId>
+      <artifactId>dolphinscheduler-service</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.apache.dolphinscheduler</groupId>
-      <artifactId>dolphinscheduler-rpc</artifactId>
+      <groupId>com.github.xiaoymin</groupId>
+      <artifactId>swagger-bootstrap-ui</artifactId>
     </dependency>
 
     <dependency>
@@ -152,6 +146,12 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -162,11 +162,23 @@
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-hdfs</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-yarn-common</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>servlet-api</artifactId>
+          <groupId>javax.servlet</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -175,13 +187,14 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.mortbay.jetty</groupId>
       <artifactId>jsp-2.1</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>servlet-api-2.5</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- just for test -->

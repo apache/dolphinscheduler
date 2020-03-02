@@ -25,7 +25,9 @@ import java.util.regex.Pattern;
  * Constants
  */
 public final class Constants {
-
+    private Constants() {
+        throw new IllegalStateException("Constants class");
+    }
     /**
      * common properties path
      */
@@ -124,49 +126,41 @@ public final class Constants {
     /**
      * MasterServer directory registered in zookeeper
      */
-    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "zookeeper.dolphinscheduler.masters";
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/masters";
 
     /**
      * WorkerServer directory registered in zookeeper
      */
-    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "zookeeper.dolphinscheduler.workers";
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "/workers";
 
     /**
      * all servers directory registered in zookeeper
      */
-    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS = "zookeeper.dolphinscheduler.dead.servers";
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_DEAD_SERVERS = "/dead-servers";
 
     /**
      * MasterServer lock directory registered in zookeeper
      */
-    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "zookeeper.dolphinscheduler.lock.masters";
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
 
     /**
      * WorkerServer lock directory registered in zookeeper
      */
-    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS = "zookeeper.dolphinscheduler.lock.workers";
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS = "/lock/workers";
 
     /**
      * MasterServer failover directory registered in zookeeper
      */
-    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "zookeeper.dolphinscheduler.lock.failover.masters";
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
 
     /**
      * WorkerServer failover directory registered in zookeeper
      */
-    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "zookeeper.dolphinscheduler.lock.failover.workers";
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_WORKERS = "/lock/failover/workers";
 
     /**
      * MasterServer startup  failover runing and fault tolerance process
      */
-    //public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "zookeeper.dolphinscheduler.lock.failover.startup.masters";
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
 
     /**
@@ -354,87 +348,87 @@ public final class Constants {
     /**
      * heartbeat threads number
      */
-    public static final int defaulWorkerHeartbeatThreadNum = 1;
+    public static final int DEFAUL_WORKER_HEARTBEAT_THREAD_NUM = 1;
 
     /**
      * heartbeat interval
      */
-    public static final int defaultWorkerHeartbeatInterval = 60;
+    public static final int DEFAULT_WORKER_HEARTBEAT_INTERVAL = 60;
 
     /**
      * worker fetch task number
      */
-    public static final int defaultWorkerFetchTaskNum = 1;
+    public static final int DEFAULT_WORKER_FETCH_TASK_NUM = 1;
 
     /**
      * worker execute threads number
      */
-    public static final int defaultWorkerExecThreadNum = 10;
+    public static final int DEFAULT_WORKER_EXEC_THREAD_NUM = 10;
 
     /**
      * master cpu load
      */
-    public static final int defaultMasterCpuLoad = Runtime.getRuntime().availableProcessors() * 2;
+    public static final int DEFAULT_MASTER_CPU_LOAD = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
      * master reserved memory
      */
-    public static final double defaultMasterReservedMemory = OSUtils.totalMemorySize() / 10;
+    public static final double DEFAULT_MASTER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
 
     /**
      * worker cpu load
      */
-    public static final int defaultWorkerCpuLoad = Runtime.getRuntime().availableProcessors() * 2;
+    public static final int DEFAULT_WORKER_CPU_LOAD = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
      * worker reserved memory
      */
-    public static final double defaultWorkerReservedMemory = OSUtils.totalMemorySize() / 10;
+    public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
 
 
     /**
      * master execute threads number
      */
-    public static final int defaultMasterExecThreadNum = 100;
+    public static final int DEFAULT_MASTER_EXEC_THREAD_NUM = 100;
 
 
     /**
      * default master concurrent task execute num
      */
-    public static final int defaultMasterTaskExecNum = 20;
+    public static final int DEFAULT_MASTER_TASK_EXEC_NUM = 20;
 
     /**
      * default log cache rows num,output when reach the number
      */
-    public static final int defaultLogRowsNum = 4 * 16;
+    public static final int DEFAULT_LOG_ROWS_NUM = 4 * 16;
 
     /**
      * log flush interval，output when reach the interval
      */
-    public static final int defaultLogFlushInterval = 1000;
+    public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
 
 
     /**
      * default master heartbeat thread number
      */
-    public static final int defaulMasterHeartbeatThreadNum = 1;
+    public static final int DEFAULT_MASTER_HEARTBEAT_THREAD_NUM = 1;
 
 
     /**
      * default master heartbeat interval
      */
-    public static final int defaultMasterHeartbeatInterval = 60;
+    public static final int DEFAULT_MASTER_HEARTBEAT_INTERVAL = 60;
 
     /**
      * default master commit retry times
      */
-    public static final int defaultMasterCommitRetryTimes = 5;
+    public static final int DEFAULT_MASTER_COMMIT_RETRY_TIMES = 5;
 
 
     /**
      * default master commit retry interval
      */
-    public static final int defaultMasterCommitRetryInterval = 3000;
+    public static final int DEFAULT_MASTER_COMMIT_RETRY_INTERVAL = 3000;
 
     /**
      * time unit secong to minutes
@@ -474,9 +468,9 @@ public final class Constants {
     public static final String THREAD_NAME_MASTER_SERVER = "Master-Server";
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
 
-    public static  String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
+    public static final String TASK_RECORD_TABLE_HIVE_LOG = "eamp_hive_log_hd";
 
-    public static  String TASK_RECORD_TABLE_HISTORY_HIVE_LOG = "eamp_hive_hist_log_hd";
+    public static final String TASK_RECORD_TABLE_HISTORY_HIVE_LOG = "eamp_hive_hist_log_hd";
 
 
     /**
@@ -874,7 +868,7 @@ public final class Constants {
 
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
     public static final String FLINK_TASK_MANAGE_MEM = "-ytm";
-    public static final String FLINK_detach = "-d";
+    public static final String FLINK_DETACH = "-d";
     public static final String FLINK_MAIN_CLASS = "-c";
 
 
@@ -989,7 +983,7 @@ public final class Constants {
      * session timeout
      */
     public static final int SESSION_TIME_OUT = 7200;
-    public static final int maxFileSize = 1024 * 1024 * 1024;
+    public static final int MAX_FILE_SIZE = 1024 * 1024 * 1024;
     public static final String UDF = "UDF";
     public static final String CLASS = "class";
     public static final String RECEIVERS = "receivers";
