@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
-import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyKillManager;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     private TaskInstanceCacheManager taskInstanceCacheManager;
 
 
-    private NettyKillManager nettyKillManager;
+    private NettyExecutorManager nettyExecutorManager;
 
     /**
      * constructor of MasterTaskExecThread
@@ -67,7 +67,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     public MasterTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
         super(taskInstance, processInstance);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
-        this.nettyKillManager = SpringApplicationContext.getBean(NettyKillManager.class);
+        this.nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
     }
 
     /**
@@ -191,7 +191,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         host.setPort(12346);
         executionContext.setHost(host);
 
-        nettyKillManager.execute(executionContext);
+        nettyExecutorManager.executeDirectly(executionContext);
 
         logger.info("master add kill task :{} id:{} to kill queue",
                 taskInstance.getName(), taskInstance.getId() );

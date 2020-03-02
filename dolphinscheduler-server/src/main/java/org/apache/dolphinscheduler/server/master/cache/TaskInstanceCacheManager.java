@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.cache;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
 /**
@@ -47,14 +47,14 @@ public interface TaskInstanceCacheManager {
      *
      * @param taskAckCommand taskAckCommand
      */
-    void cacheTaskInstance(ExecuteTaskAckCommand taskAckCommand);
+    void cacheTaskInstance(TaskExecuteAckCommand taskAckCommand);
 
     /**
      * cache taskInstance
      *
-     * @param executeTaskResponseCommand executeTaskResponseCommand
+     * @param taskExecuteResponseCommand taskExecuteResponseCommand
      */
-    void cacheTaskInstance(ExecuteTaskResponseCommand executeTaskResponseCommand);
+    void cacheTaskInstance(TaskExecuteResponseCommand taskExecuteResponseCommand);
 
     /**
      * remove taskInstance by taskInstanceId
