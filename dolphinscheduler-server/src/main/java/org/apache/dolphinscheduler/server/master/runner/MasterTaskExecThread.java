@@ -26,11 +26,17 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
+import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyKillManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.SpringApplication;
 
 import java.util.Date;
 
@@ -52,6 +58,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     private TaskInstanceCacheManager taskInstanceCacheManager;
 
+
+    private NettyKillManager nettyKillManager;
+
     /**
      * constructor of MasterTaskExecThread
      * @param taskInstance      task instance
@@ -60,6 +69,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     public MasterTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
         super(taskInstance, processInstance);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
+        this.nettyKillManager = SpringApplicationContext.getBean(NettyKillManager.class);
     }
 
     /**
@@ -167,7 +177,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      *
      *  task instance add queue , waiting worker to kill
      */
-    private void cancelTaskInstance(){
+    private void cancelTaskInstance() throws Exception{
         if(alreadyKilled){
             return ;
         }
@@ -176,10 +186,14 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         if(host == null){
             host = Constants.NULL;
         }
-        String queueValue = String.format("%s-%d",
-                host, taskInstance.getId());
-        // TODO 这里写
-        taskQueue.sadd(DOLPHINSCHEDULER_TASKS_KILL, queueValue);
+
+        TaskExecutionContext context = TaskExecutionContextBuilder.get()
+                .buildTaskInstanceRelatedInfo(taskInstance)
+                .create();
+
+        ExecutionContext executionContext = new ExecutionContext(context, ExecutorType.WORKER);
+
+        nettyKillManager.execute(executionContext);
 
         logger.info("master add kill task :{} id:{} to kill queue",
                 taskInstance.getName(), taskInstance.getId() );
