@@ -29,22 +29,22 @@
              @dragleave.prevent="dragOver = false"
              id="file-update-model">
           <div class="tooltip-info">
-            <i class="fa fa-info-circle"></i>
+            <em class="ans ans-icon-warn-solid"></em>
             <span>{{$t('Drag the file into the current upload window')}}</span>
           </div>
           <!--<div class="hide-archive" v-if="progress !== 0" @click="_ckArchive">
-            <i class="fa fa-minus" data-toggle="tooltip" title="关闭窗口 继续上传" data-container="body" ></i>
+            <em class="fa fa-minus" data-toggle="tooltip" title="关闭窗口 继续上传" data-container="body" ></em>
           </div>-->
           <div class="update-popup" v-if="dragOver">
             <div class="icon-box">
-              <i class="fa fa-cloud-upload"></i>
+              <em class="ans ans-icon-upload"></em>
             </div>
             <p class="p1">
               <span>{{$t('Drag area upload')}}</span>
             </p>
           </div>
           <m-list-box-f>
-            <template slot="name"><b>*</b>{{$t('File Name')}}</template>
+            <template slot="name"><strong>*</strong>{{$t('File Name')}}</template>
             <template slot="content">
               <x-input
                       type="input"
@@ -68,7 +68,7 @@
             </template>
           </m-list-box-f>
           <m-list-box-f>
-            <template slot="name"><b>*</b>{{$t('Upload Files')}}</template>
+            <template slot="name"><strong>*</strong>{{$t('Upload Files')}}</template>
             <template slot="content">
               <div class="file-update-box">
                 <template v-if="progress === 0">
@@ -234,7 +234,7 @@
         color: #666;
         vertical-align: middle;
       }
-      .fa {
+      .fa,.ans {
         color: #0097e0;
         font-size: 14px;
         vertical-align: middle;
@@ -244,7 +244,7 @@
       position: absolute;
       right: 22px;
       top: 17px;
-      .fa{
+      .fa,.ans{
         font-size: 16px;
         color: #333;
         font-weight: normal;
@@ -296,7 +296,7 @@
       .icon-box {
         text-align: center;
         margin-top: 96px;
-        .fa {
+        .fa,.ans {
           font-size: 50px;
           color: #2d8cf0;
         }

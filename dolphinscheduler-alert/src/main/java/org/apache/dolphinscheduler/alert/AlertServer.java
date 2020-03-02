@@ -39,19 +39,15 @@ public class AlertServer {
 
     private AlertSender alertSender;
 
-    private static volatile AlertServer instance;
+    private static AlertServer instance;
 
     public AlertServer() {
 
     }
 
-    public static AlertServer getInstance(){
+    public synchronized static AlertServer getInstance(){
         if (null == instance) {
-            synchronized (AlertServer.class) {
-                if(null == instance) {
-                    instance = new AlertServer();
-                }
-            }
+            instance = new AlertServer();
         }
         return instance;
     }
@@ -60,9 +56,10 @@ public class AlertServer {
         logger.info("alert server ready start ");
         while (Stopper.isRunning()){
             try {
-                Thread.sleep(Constants.ALERT_SCAN_INTERVEL);
+                Thread.sleep(Constants.ALERT_SCAN_INTERVAL);
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(),e);
+                Thread.currentThread().interrupt();
             }
             List<Alert> alerts = alertDao.listWaitExecutionAlert();
             alertSender = new AlertSender(alerts, alertDao);

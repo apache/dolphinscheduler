@@ -64,7 +64,7 @@
             <span v-else>-</span>
           </td>
           <td>
-            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-bianjixiugai" :title="$t('Edit')" @click="_edit(item)">
+            <x-button type="info" shape="circle" size="xsmall" data-toggle="tooltip" icon="ans-icon-edit" :title="$t('Edit')" @click="_edit(item)">
             </x-button>
             <x-poptip
                     :ref="'poptip-delete-' + $index"
@@ -76,7 +76,7 @@
                 <x-button type="primary" size="xsmall" shape="circle" @click="_delete(item,$index)">{{$t('Confirm')}}</x-button>
               </div>
               <template slot="reference">
-                <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" icon="iconfont icon-shanchu" :title="$t('delete')">
+                <x-button type="error" shape="circle" size="xsmall" data-toggle="tooltip" icon="ans-icon-trash" :title="$t('delete')">
                 </x-button>
               </template>
             </x-poptip>
@@ -111,7 +111,7 @@
           id: item.id
         }).then(res => {
           this.$refs[`poptip-delete-${i}`][0].doClose()
-          this.list.splice(i, 1)
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-delete-${i}`][0].doClose()

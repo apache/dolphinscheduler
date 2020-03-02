@@ -16,9 +16,9 @@
  */
 package org.apache.dolphinscheduler.api.interceptor;
 
+import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.commons.httpclient.HttpStatus;
@@ -44,6 +44,9 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
   @Autowired
   private UserMapper userMapper;
 
+  @Autowired
+  private Authenticator authenticator;
+
   /**
    * Intercept the execution of a handler. Called after HandlerMapping determined
    * an appropriate handler object, but before HandlerAdapter invokes the handler.
@@ -68,17 +71,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     String token = request.getHeader("token");
     User user = null;
     if (StringUtils.isEmpty(token)){
-      Session session = sessionService.getSession(request);
-
-      if (session == null) {
-        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-        logger.info("session info is null ");
-        return false;
-      }
-
-      //get user object from session
-      user = userMapper.selectById(session.getUserId());
-
+      user = authenticator.getAuthUser(request);
       // if user is null
       if (user == null) {
         response.setStatus(HttpStatus.SC_UNAUTHORIZED);

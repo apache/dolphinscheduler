@@ -23,10 +23,10 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.DependentItem;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +37,9 @@ import java.util.*;
  */
 public class DependentExecute {
     /**
-     * process dao
+     * process service
      */
-    private final ProcessDao processDao = SpringApplicationContext.getBean(ProcessDao.class);
+    private final ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
     /**
      * depend item list
@@ -108,7 +108,7 @@ public class DependentExecute {
                 result = getDependResultByState(processInstance.getState());
             }else{
                 TaskInstance taskInstance = null;
-                List<TaskInstance> taskInstanceList = processDao.findValidTaskListByProcessId(processInstance.getId());
+                List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
 
                 for(TaskInstance task : taskInstanceList){
                     if(task.getName().equals(dependentItem.getDepTasks())){
@@ -141,16 +141,16 @@ public class DependentExecute {
      */
     private ProcessInstance findLastProcessInterval(int definitionId, DateInterval dateInterval) {
 
-        ProcessInstance runningProcess = processDao.findLastRunningProcess(definitionId, dateInterval);
+        ProcessInstance runningProcess = processService.findLastRunningProcess(definitionId, dateInterval);
         if(runningProcess != null){
             return runningProcess;
         }
 
-        ProcessInstance lastSchedulerProcess = processDao.findLastSchedulerProcessInterval(
+        ProcessInstance lastSchedulerProcess = processService.findLastSchedulerProcessInterval(
                 definitionId, dateInterval
         );
 
-        ProcessInstance lastManualProcess = processDao.findLastManualProcessInterval(
+        ProcessInstance lastManualProcess = processService.findLastManualProcessInterval(
                 definitionId, dateInterval
         );
 

@@ -32,6 +32,22 @@
         </x-select>
       </div>
     </m-list-box>
+    <m-list-box>
+      <div slot="text">{{$t('Spark Version')}}</div>
+      <div slot="content">
+        <x-select
+                style="width: 130px;"
+                v-model="sparkVersion"
+                :disabled="isDetails">
+          <x-option
+                  v-for="city in sparkVersionList"
+                  :key="city.code"
+                  :value="city.code"
+                  :label="city.code">
+          </x-option>
+        </x-select>
+      </div>
+    </m-list-box>
     <m-list-box v-if="programType !== 'PYTHON'">
       <div slot="text">{{$t('Main class')}}</div>
       <div slot="content">
@@ -166,6 +182,7 @@
         <m-resources
                 ref="refResources"
                 @on-resourcesData="_onResourcesData"
+                @on-cache-resourcesData="_onCacheResourcesData"
                 :resource-list="resourceList">
         </m-resources>
       </div>
@@ -205,6 +222,8 @@
         deployMode: 'cluster',
         // Resource(list)
         resourceList: [],
+        // Cache ResourceList
+        cacheResourceList: [],
         // Custom function
         localParams: [],
         // Driver Number of cores
@@ -224,7 +243,11 @@
         // Program type
         programType: 'SCALA',
         // Program type(List)
-        programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }]
+        programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }],
+        // Spark version
+        sparkVersion: 'SPARK2',
+        // Spark version(LIst)
+        sparkVersionList: [{ code: 'SPARK2' }, { code: 'SPARK1' }]
       }
     },
     props: {
@@ -243,6 +266,12 @@
        */
       _onResourcesData (a) {
         this.resourceList = a
+      },
+      /**
+       * cache resourceList
+       */
+      _onCacheResourcesData (a) {
+        this.cacheResourceList = a
       },
       /**
        * verification
@@ -318,7 +347,8 @@
           executorCores: this.executorCores,
           mainArgs: this.mainArgs,
           others: this.others,
-          programType: this.programType
+          programType: this.programType,
+          sparkVersion: this.sparkVersion
         })
         return true
       },
@@ -347,6 +377,32 @@
         if (type === 'PYTHON') {
           this.mainClass = ''
         }
+      },
+      //Watch the cacheParams
+      cacheParams (val) {
+        this.$emit('on-cache-params', val)
+      }
+    },
+    computed: {
+      cacheParams () {
+        return {
+          mainClass: this.mainClass,
+          mainJar: {
+            res: this.mainJar
+          },
+          deployMode: this.deployMode,
+          resourceList: this.cacheResourceList,
+          localParams: this.localParams,
+          driverCores: this.driverCores,
+          driverMemory: this.driverMemory,
+          numExecutors: this.numExecutors,
+          executorMemory: this.executorMemory,
+          executorCores: this.executorCores,
+          mainArgs: this.mainArgs,
+          others: this.others,
+          programType: this.programType,
+          sparkVersion: this.sparkVersion
+        }
       }
     },
     created () {
@@ -356,7 +412,7 @@
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.mainClass = o.params.mainClass || ''
-          this.mainJar = o.params.mainJar.res || ''
+          this.mainJar = o.params.mainJar && o.params.mainJar.res ? o.params.mainJar.res : ''
           this.deployMode = o.params.deployMode || ''
           this.driverCores = o.params.driverCores || 1
           this.driverMemory = o.params.driverMemory || '512M'
@@ -366,11 +422,13 @@
           this.mainArgs = o.params.mainArgs || ''
           this.others = o.params.others
           this.programType = o.params.programType || 'SCALA'
+          this.sparkVersion = o.params.sparkVersion || 'SPARK2'
 
           // backfill resourceList
           let resourceList = o.params.resourceList || []
           if (resourceList.length) {
             this.resourceList = resourceList
+            this.cacheResourceList = resourceList
           }
 
           // backfill localParams

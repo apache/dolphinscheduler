@@ -391,8 +391,8 @@ public class DataSourceController extends BaseController {
         try {
             return dataSourceService.verifyDataSourceName(loginUser, name);
         } catch (Exception e) {
-            logger.error(VERFIY_DATASOURCE_NAME_FAILURE.getMsg(),e);
-            return error(VERFIY_DATASOURCE_NAME_FAILURE.getCode(), VERFIY_DATASOURCE_NAME_FAILURE.getMsg());
+            logger.error(VERIFY_DATASOURCE_NAME_FAILURE.getMsg(), e);
+            return error(VERIFY_DATASOURCE_NAME_FAILURE.getCode(), VERIFY_DATASOURCE_NAME_FAILURE.getMsg());
         }
     }
 
@@ -461,7 +461,7 @@ public class DataSourceController extends BaseController {
     @GetMapping(value="/kerberos-startup-state")
     @ResponseStatus(HttpStatus.OK)
     public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
-        logger.info("login user {},get kerberos startup state : {}", loginUser.getUserName());
+        logger.info("login user {}", loginUser.getUserName());
         try{
             // if upload resource is HDFS and kerberos startup is true , else false
             return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
