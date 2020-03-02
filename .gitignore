@@ -31,7 +31,6 @@ logs/*
 .www
 t.*
 yarn.lock
-package-lock.json
 config.gypi
 test/coverage
 /docs/zh_CN/介绍
