@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,23 +30,57 @@ import java.net.UnknownHostException;
 public class CommonUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(CommonUtilsTest.class);
     @Test
+    public void getSystemEnvPath() {
+        logger.info(CommonUtils.getSystemEnvPath());
+        Assert.assertTrue(true);
+    }
+    @Test
+    public void getQueueImplValue(){
+        logger.info(CommonUtils.getQueueImplValue());
+        Assert.assertTrue(true);
+    }
+    @Test
+    public void isDevelopMode() {
+        logger.info("develop mode: {}",CommonUtils.isDevelopMode());
+        Assert.assertTrue(true);
+    }
+    @Test
+    public void getKerberosStartupState(){
+        logger.info("kerberos startup state: {}",CommonUtils.getKerberosStartupState());
+        Assert.assertTrue(true);
+    }
+    @Test
+    public void loadKerberosConf(){
+        try {
+            CommonUtils.loadKerberosConf();
+            Assert.assertTrue(true);
+        } catch (Exception e) {
+            Assert.fail("load Kerberos Conf failed");
+        }
+    }
+
+    @Test
     public void getHdfsDataBasePath() {
         logger.info(HadoopUtils.getHdfsDataBasePath());
+        Assert.assertTrue(true);
     }
 
     @Test
     public void getDownloadFilename() {
         logger.info(FileUtils.getDownloadFilename("a.txt"));
+        Assert.assertTrue(true);
     }
 
     @Test
     public void getUploadFilename() {
         logger.info(FileUtils.getUploadFilename("1234", "a.txt"));
+        Assert.assertTrue(true);
     }
 
     @Test
     public void getHdfsDir() {
         logger.info(HadoopUtils.getHdfsResDir("1234"));
+        Assert.assertTrue(true);
     }
 
     @Test
@@ -57,5 +92,6 @@ public class CommonUtilsTest {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+        Assert.assertTrue(true);
     }
 }

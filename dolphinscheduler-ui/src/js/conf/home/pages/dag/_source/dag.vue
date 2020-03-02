@@ -61,7 +61,7 @@
           <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><em class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></em></span>
         </div>
         <div class="save-btn">
-          <div class="operation" style="vertical-align: middle;"> 
+          <div class="operation" style="vertical-align: middle;">
             <a href="javascript:"
                v-for="(item,$index) in toolOperList"
                :class="_operationClass(item)"
@@ -71,14 +71,14 @@
               <x-button type="text" data-container="body" :icon="item.icon" v-tooltip.light="item.desc"></x-button>
             </a>
           </div>
-          <x-button 
-                  type="primary" 
+          <x-button
+                  type="primary"
                   v-tooltip.light="$t('Format DAG')"
-                  icon="ans-icon-triangle-solid-right" 
-                  size="xsmall" 
+                  icon="ans-icon-triangle-solid-right"
+                  size="xsmall"
                   data-container="body"
                   v-if="type === 'instance'"
-                  style="vertical-align: middle;" 
+                  style="vertical-align: middle;"
                   @click="dagAutomaticLayout">
           </x-button>
           <x-button
@@ -169,7 +169,7 @@
       // DAG automatic layout
       dagAutomaticLayout() {
         $('#canvas').html('')
-        
+
       // Destroy round robin
         Dag.init({
         dag: this,
@@ -473,7 +473,35 @@
        */
       _createNodes ({ id, type }) {
         let self = this
+        let preNode = []
+        let rearNode = []
+        let rearList = []
+        $('div[data-targetarr*="' + id + '"]').each(function(){
+          rearNode.push($(this).attr("id"))
+        })
 
+        if (rearNode.length>0) {
+          rearNode.forEach(v => {
+            let rearobj = {}
+            rearobj.value = $(`#${v}`).find('.name-p').text()
+            rearobj.label = $(`#${v}`).find('.name-p').text()
+            rearList.push(rearobj)
+          })
+        } else {
+          rearList = []
+        }
+        let targetarr = $(`#${id}`).attr('data-targetarr')
+        if (targetarr) {
+          let nodearr = targetarr.split(',')
+          nodearr.forEach(v => {
+            let nodeobj = {}
+            nodeobj.value = $(`#${v}`).find('.name-p').text()
+            nodeobj.label = $(`#${v}`).find('.name-p').text()
+            preNode.push(nodeobj)
+          })
+        } else {
+          preNode = []
+        }
         if (eventModel) {
           eventModel.remove()
         }
@@ -486,6 +514,7 @@
         }
 
         this.taskId = id
+        type = type || self.dagBarId
 
         eventModel = this.$drawer({
           closable: false,
@@ -522,11 +551,18 @@
             },
             props: {
               id: id,
-              taskType: type || self.dagBarId,
-              self: self
+              taskType: type,
+              self: self,
+              preNode: preNode,
+              rearList: rearList
             }
           })
         })
+      },
+      removeEventModelById ($id) {
+        if(eventModel && this.taskId == $id){
+          eventModel.remove()
+        }
       }
     },
     watch: {
@@ -580,6 +616,9 @@
       clearInterval(this.setIntervalP)
     },
     destroyed () {
+      if (eventModel) {
+        eventModel.remove()
+      }
     },
     computed: {
       ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name'])

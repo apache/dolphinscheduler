@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="dolphinscheduler_e2e" parallel="false">
+    <test name="dolphinscheduler_test">
+        <!--<packages>-->
+            <!--&lt;!&ndash;<package name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"/>&ndash;&gt;-->
+            <!--<package name="org.apache.dolphinscheduler.testcase.security.*"/>-->
+        <!--</packages>-->
+        <classes>
+        <class name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"></class>
+        </classes>
+        </test>
+
+        <!--<suite-files>-->
+            <!--<suite-file path="suite.xml"/>-->
+        <!--</suite-files>-->
+
+    <listeners>
+        <listener class-name="org.uncommons.reportng.HTMLReporter" />
+        <listener class-name="org.uncommons.reportng.JUnitXMLReporter" />
+    </listeners>
+</suite>

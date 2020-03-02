@@ -119,7 +119,7 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
             return result;
         }
-        if (file.getSize() > Constants.maxFileSize) {
+        if (file.getSize() > Constants.MAX_FILE_SIZE) {
             logger.error("file size is too large: {}", file.getOriginalFilename());
             putMsg(result, Status.RESOURCE_SIZE_EXCEED_LIMIT);
             return result;
@@ -547,7 +547,7 @@ public class ResourcesService extends BaseService {
             }
 
         } catch (Exception e) {
-            logger.error(String.format("Resource %s read failed", hdfsFileName), e);
+            logger.error("Resource {} read failed", hdfsFileName, e);
             putMsg(result, Status.HDFS_OPERATION_ERROR);
         }
 

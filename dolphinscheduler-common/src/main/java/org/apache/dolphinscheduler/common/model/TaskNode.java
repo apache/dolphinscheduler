@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.model;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -107,6 +108,11 @@ public class TaskNode {
   @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
   @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
   private String dependence;
+
+
+  @JsonDeserialize(using = JSONUtils.JsonDataDeserializer.class)
+  @JsonSerialize(using = JSONUtils.JsonDataSerializer.class)
+  private String conditionResult;
 
   /**
    *  task instance priority
@@ -230,6 +236,7 @@ public class TaskNode {
             Objects.equals(extras, taskNode.extras) &&
             Objects.equals(runFlag, taskNode.runFlag) &&
             Objects.equals(dependence, taskNode.dependence) &&
+            Objects.equals(conditionResult, taskNode.conditionResult) &&
             Objects.equals(workerGroupId, taskNode.workerGroupId) &&
             CollectionUtils.equalLists(depList, taskNode.depList);
   }
@@ -292,6 +299,10 @@ public class TaskNode {
     return new TaskTimeoutParameter(false);
   }
 
+  public boolean isConditionsTask(){
+    return this.getType().toUpperCase().equals(TaskType.CONDITIONS.toString());
+  }
+
   @Override
   public String toString() {
     return "TaskNode{" +
@@ -320,5 +331,13 @@ public class TaskNode {
 
   public void setWorkerGroupId(int workerGroupId) {
     this.workerGroupId = workerGroupId;
+  }
+
+  public String getConditionResult() {
+    return conditionResult;
+  }
+
+  public void setConditionResult(String conditionResult) {
+    this.conditionResult = conditionResult;
   }
 }

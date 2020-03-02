@@ -35,7 +35,9 @@ import java.util.regex.Pattern;
  */
 public class CheckUtils {
 
-
+  private CheckUtils() {
+    throw new IllegalStateException("CheckUtils class");
+  }
   /**
    * check username
    *
@@ -84,7 +86,7 @@ public class CheckUtils {
    * @return true if other parameters are valid, otherwise return false
    */
   public static boolean checkOtherParams(String otherParams) {
-    return StringUtils.isNotEmpty(otherParams) && !JSONUtils.checkJsonVaild(otherParams);
+    return StringUtils.isNotEmpty(otherParams) && !JSONUtils.checkJsonValid(otherParams);
   }
 
   /**
