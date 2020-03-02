@@ -76,9 +76,11 @@ public class WorkerRegistry {
     private String workerGroup;
 
     /**
-     *  construct
+     * construct
+     *
      * @param zookeeperRegistryCenter zookeeperRegistryCenter
      * @param port port
+     * @param heartBeatInterval heartBeatInterval
      */
     public WorkerRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port, long heartBeatInterval){
         this(zookeeperRegistryCenter, port, heartBeatInterval, DEFAULT_WORKER_GROUP);
