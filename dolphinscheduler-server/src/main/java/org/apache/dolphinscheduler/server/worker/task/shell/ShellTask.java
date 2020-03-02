@@ -24,14 +24,11 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -53,11 +50,6 @@ public class ShellTask extends AbstractTask {
    * shell parameters
    */
   private ShellParameters shellParameters;
-
-  /**
-   * task dir
-   */
-  private String taskDir;
 
   /**
    * shell command executor
@@ -122,7 +114,10 @@ public class ShellTask extends AbstractTask {
    */
   private String buildCommand() throws Exception {
     // generate scripts
-    String fileName = String.format("%s/%s_node.sh", taskDir, taskExecutionContext.getTaskAppId());
+    String fileName = String.format("%s/%s_node.sh",
+            taskExecutionContext.getExecutePath(),
+            taskExecutionContext.getTaskAppId());
+
     Path path = new File(fileName).toPath();
 
     if (Files.exists(path)) {
@@ -148,7 +143,7 @@ public class ShellTask extends AbstractTask {
     shellParameters.setRawScript(script);
 
     logger.info("raw script : {}", shellParameters.getRawScript());
-    logger.info("task dir : {}", taskDir);
+    logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
     FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);

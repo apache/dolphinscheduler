@@ -67,8 +67,10 @@ public class ExecutorDispatcher implements InitializingBean {
     }
 
     /**
-     *  task dispatch
+     * task dispatch
+     *
      * @param context context
+     * @return result
      * @throws ExecuteException
      */
     public Boolean dispatch(final ExecutionContext context) throws ExecuteException {

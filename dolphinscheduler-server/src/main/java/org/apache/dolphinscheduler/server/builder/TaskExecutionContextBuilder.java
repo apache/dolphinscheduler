@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.server.builder;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
 /**
  *  TaskExecutionContext builder
@@ -47,6 +48,8 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setLogPath(taskInstance.getLogPath());
         taskExecutionContext.setExecutePath(taskInstance.getExecutePath());
         taskExecutionContext.setTaskJson(taskInstance.getTaskJson());
+        taskExecutionContext.setHost(taskInstance.getHost());
+        taskExecutionContext.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
         return this;
     }
 
@@ -54,7 +57,7 @@ public class TaskExecutionContextBuilder {
     /**
      * build processInstance related info
      *
-     * @param processInstance
+     * @param processInstance processInstance
      * @return TaskExecutionContextBuilder
      */
     public TaskExecutionContextBuilder buildProcessInstanceRelatedInfo(ProcessInstance processInstance){
