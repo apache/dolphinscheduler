@@ -72,6 +72,8 @@ public class ZKWorkerClient extends AbstractZKClient {
 
 	/**
 	 * monitor worker
+	 * @param event event
+	 * @param path path
 	 */
 	public void handleWorkerEvent(TreeCacheEvent event, String path){
 		switch (event.getType()) {
