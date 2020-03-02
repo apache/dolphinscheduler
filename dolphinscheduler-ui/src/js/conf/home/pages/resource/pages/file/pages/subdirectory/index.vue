@@ -15,23 +15,23 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('File Manage')">
-    <template slot="conditions">
+  <div class="home-main list-construction-model">
+    <div class="content-title">
+      <a class="bread" style="padding-left: 15px;" @click="() => $router.push({path: `/resource/file`})">{{$t('File Manage')}}</a>
+      <a class="bread" v-for="(item,$index) in breadList" :key="$index" @click="_ckOperation($index)">{{'>'+item}}</a>
+    </div>
+    <div class="conditions-box">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <x-button-group size="small" >
             <x-button type="ghost" @click="() => $router.push({path: `/resource/file/subFileFolder/${searchParams.id}`})">{{$t('Create folder')}}</x-button>
             <x-button type="ghost" @click="() => $router.push({path: `/resource/file/subFile/${searchParams.id}`})">{{$t('Create File')}}</x-button>
             <x-button type="ghost" @click="_uploading">{{$t('Upload Files')}}</x-button>
-            <span class="bread">(</span>
-            <a class="bread" @click="() => $router.push({path: `/resource/file`})">{{$t('File Manage')}}</a>
-            <a class="bread" v-for="(item,$index) in breadList" :key="$index" @click="_ckOperation($index)">{{'>'+item}}</a>
-            <span class="bread">)</span>
           </x-button-group>
         </template>
       </m-conditions>
-    </template>
-    <template slot="content">
+    </div>
+    <div class="list-box">
       <template v-if="fileResourcesList.length || total>0">
         <m-list @on-update="_onUpdate" @on-updateList="_updateList" :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
@@ -44,8 +44,8 @@
       </template>
       <m-spin :is-spin="isLoading">
       </m-spin>
-    </template>
-  </m-list-construction>
+    </div>
+  </div>
 </template>
 <script>
   import _ from 'lodash'
@@ -174,10 +174,10 @@
 </script>
 <style lang="scss" rel="stylesheet/scss">
   .bread {
-    padding: 7px 0;
-    line-height: 14px;
-    position: relative;
-    float: left;
+    font-size: 22px;
+    padding-top: 10px;
     cursor: pointer;
+    color: #2a455b;
+    display: inline-block;
   }
 </style>
