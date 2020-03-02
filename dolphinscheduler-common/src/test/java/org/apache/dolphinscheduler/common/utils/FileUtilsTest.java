@@ -31,6 +31,9 @@ public class FileUtilsTest {
     @Test
     public void suffix() {
         Assert.assertEquals("java", FileUtils.suffix("ninfor.java"));
+        Assert.assertEquals("", FileUtils.suffix(null));
+        Assert.assertEquals("", FileUtils.suffix(""));
+        Assert.assertEquals("", FileUtils.suffix("ninfor-java"));
     }
 
     @Test
