@@ -21,7 +21,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionConte
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.registry.ZookeeperNodeManager;
 import org.slf4j.Logger;
@@ -68,8 +69,9 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
          * register EXECUTE_TASK_RESPONSE command type TaskResponseProcessor
          * register EXECUTE_TASK_ACK command type TaskAckProcessor
          */
-        this.nettyRemotingClient.registerProcessor(CommandType.EXECUTE_TASK_RESPONSE, new TaskResponseProcessor());
-        this.nettyRemotingClient.registerProcessor(CommandType.EXECUTE_TASK_ACK, new TaskAckProcessor());
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskKillResponseProcessor());
     }
 
 
@@ -128,13 +130,19 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         return success;
     }
 
+    public void executeDirectly(ExecutionContext context) throws ExecuteException {
+        Command command = buildCommand(context);
+        Host host = context.getHost();
+        doExecute(host,command);
+    }
+
     /**
      *  build command
      * @param context context
      * @return command
      */
     private Command buildCommand(ExecutionContext context) {
-        ExecuteTaskRequestCommand requestCommand = new ExecuteTaskRequestCommand();
+        TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
         ExecutorType executorType = context.getExecutorType();
         switch (executorType){
             case WORKER:
@@ -202,5 +210,9 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
 
         }
         return nodes;
+    }
+
+    public NettyRemotingClient getNettyRemotingClient() {
+        return nettyRemotingClient;
     }
 }
