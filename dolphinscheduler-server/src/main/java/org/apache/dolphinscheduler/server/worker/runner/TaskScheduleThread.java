@@ -194,47 +194,19 @@ public class TaskScheduleThread implements Runnable {
                     taskInstance.getStartTime(),
                     taskInstance.getHost(),
                     null,
-                    getTaskLogPath(),
+                    processService.getTaskLogPath(taskInstance),
                     taskInstance.getId());
         }else{
             processService.changeTaskState(ExecutionStatus.RUNNING_EXEUTION,
                     taskInstance.getStartTime(),
                     taskInstance.getHost(),
                     taskInstance.getExecutePath(),
-                    getTaskLogPath(),
+                    processService.getTaskLogPath(taskInstance),
                     taskInstance.getId());
         }
     }
 
-    /**
-     * get task log path
-     * @return log path
-     */
-    private String getTaskLogPath() {
-        String logPath;
-        try{
-            String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
-                    .getLogger("ROOT")
-                    .getAppender("TASKLOGFILE"))
-                    .getDiscriminator()).getLogBase();
-            if (baseLog.startsWith(Constants.SINGLE_SLASH)){
-                logPath =  baseLog + Constants.SINGLE_SLASH +
-                        taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
-                        taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                        taskInstance.getId() + ".log";
-            }else{
-                logPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-                        baseLog +  Constants.SINGLE_SLASH +
-                        taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
-                        taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                        taskInstance.getId() + ".log";
-            }
-        }catch (Exception e){
-            logger.error("logger" + e);
-            logPath = "";
-        }
-        return logPath;
-    }
+
 
     /**
      * set task timeout

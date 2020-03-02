@@ -8,12 +8,11 @@ import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.worker.task.dependent.DependentExecute;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +21,6 @@ import java.util.*;
 import static org.apache.dolphinscheduler.common.Constants.DEPENDENT_SPLIT;
 
 public class DependentTaskExecThread extends MasterBaseTaskExecThread {
-
-    /**
-     * logger of MasterBaseTaskExecThread
-     */
-    private static final Logger logger = LoggerFactory.getLogger(DependentTaskExecThread.class);
 
     private DependentParameters dependentParameters;
 
@@ -55,6 +49,31 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
      */
     public DependentTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance) {
         super(taskInstance, processInstance);
+        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
+        Thread.currentThread().setName(threadLoggerInfoName);
+
+        logger = LoggerFactory.getLogger(LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
+                taskInstance.getProcessDefinitionId(),
+                taskInstance.getProcessInstanceId(),
+                taskInstance.getId()));
+
+
+    }
+
+
+    @Override
+    public Boolean submitWaitComplete() {
+        try{
+            logger.info("dependent task start");
+            this.taskInstance = submit();
+            initTaskParameters();
+            initDependParameters();
+            waitTaskQuit();
+            updateTaskState();
+        }catch (Exception e){
+            logger.error("" + e);
+        }
+        return true;
     }
 
     /**
@@ -62,8 +81,6 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
      */
     private void initDependParameters() {
 
-        String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, processService.formatTaskAppId(this.taskInstance));
-        Thread.currentThread().setName(threadLoggerInfoName);
 
         this.dependentParameters = JSONUtils.parseObject(this.taskInstance.getDependency(),
                 DependentParameters.class);
@@ -79,32 +96,17 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
         }
     }
 
-    @Override
-    public Boolean submitWaitComplete() {
-        try{
-            logger.info("dependent task start");
-            this.taskInstance = submit();
-            setTaskInstanceParameters();
-            initDependParameters();
-            waitTaskQuit();
-            updateDependResultState();
-        }catch (Exception e){
-            logger.error("" + e);
-        }
-        return true;
-    }
-
     /**
      *
      */
-    private void updateDependResultState() {
+    private void updateTaskState() {
+        ExecutionStatus status;
         if(this.cancel){
-            return;
+            status = ExecutionStatus.KILL;
+        }else{
+            DependResult result = getTaskDependResult();
+            status = (result == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
         }
-        DependResult result = getTaskDependResult();
-
-        ExecutionStatus status = (result == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
-
         taskInstance.setState(status);
         taskInstance.setEndTime(new Date());
         processService.updateTaskInstance(taskInstance);
@@ -154,11 +156,10 @@ public class DependentTaskExecThread extends MasterBaseTaskExecThread {
      */
     private void cancelTaskInstance() {
         this.cancel = true;
-        this.taskInstance.setState(ExecutionStatus.KILL);
-        processService.updateTaskInstance(taskInstance);
     }
 
-    private void setTaskInstanceParameters() {
+    private void initTaskParameters() {
+        taskInstance.setLogPath(processService.getTaskLogPath(taskInstance));
         taskInstance.setHost(OSUtils.getHost());
         taskInstance.setState(ExecutionStatus.RUNNING_EXEUTION);
         taskInstance.setStartTime(new Date());
