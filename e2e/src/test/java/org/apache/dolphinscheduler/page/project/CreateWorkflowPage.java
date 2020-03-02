@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.page.project;
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.project.CreatWorkflowData;
-import org.apache.dolphinscheduler.locator.project.CreateProjectLocator;
 import org.apache.dolphinscheduler.locator.project.CreateWorkflowLocator;
 import org.openqa.selenium.WebDriver;
 
@@ -30,24 +29,23 @@ public class CreateWorkflowPage extends PageCommon {
     /**
      * jump page
      */
-    public boolean CreateWorkflow() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
-        // click project manage
-        clickElement(CreateProjectLocator.PROJECT_MANAGE);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
+    public boolean createWorkflow() throws InterruptedException {
         // click project name
         clickElement(CreateWorkflowLocator.CLICK_PROJECT_NAME);
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
+
         // click workflow define
         clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         // click create workflow button
         clickElement(CreateWorkflowLocator.CLICK_CREATE_WORKFLOW_BUTTON);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         //drag shell_task
-        dragAndDropBy(CreateWorkflowLocator.MOUSE_DOWN_AT_SHELL,CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG, 3 ,6);
+        dragAndDrop(CreateWorkflowLocator.MOUSE_DOWN_AT_SHELL,CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG);
 
         //input shell task _name
         sendInput(CreateWorkflowLocator.INPUT_SHELL_TASK_NAME , CreatWorkflowData.SHELL_TASK_NAME);
@@ -55,10 +53,8 @@ public class CreateWorkflowPage extends PageCommon {
         //click stop run type
         clickElement(CreateWorkflowLocator.CLICK_STOP_RUN_TYPE);
 
-
         //click normal run type
         clickElement(CreateWorkflowLocator.CLICK_NORMAL_RUN_TYPE);
-
 
         //input shell task description
         sendInput(CreateWorkflowLocator.INPUT_SHELL_TASK_DESCRIPTION , CreatWorkflowData.SHELL_TASK_DESCRIPTION);
@@ -93,15 +89,48 @@ public class CreateWorkflowPage extends PageCommon {
         //select timeout alarm
         clickElement(CreateWorkflowLocator.SELECT_TIMEOUT_ALARM);
 
-        //clear input
+        //clear timeout
         clearInput(CreateWorkflowLocator.SELECT_TIMEOUT);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+        clearInput(CreateWorkflowLocator.SELECT_TIMEOUT);
 
         //input timeout
         sendInput(CreateWorkflowLocator.SELECT_TIMEOUT,CreatWorkflowData.INPUT_TIMEOUT);
 
-        //input script
-        sendInput(CreateWorkflowLocator.INPUT_SCRIPT, CreatWorkflowData.SHELL_SCRIPT);
+        //click codeMirror and input script
+        inputCodeMirror(CreateWorkflowLocator.CLICK_CODE_MIRROR, CreateWorkflowLocator.INPUT_SCRIPT,CreatWorkflowData.SHELL_SCRIPT);
+        scrollToElementBottom();
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+
+        //click custom parameters
+        clickElement(CreateWorkflowLocator.CLICK_CUSTOM_PARAMETERS);
+
+        //input custom parameters
+        sendInput(CreateWorkflowLocator.INPUT_CUSTOM_PARAMETERS, CreatWorkflowData.INPUT_CUSTOM_PARAMETERS);
+
+        //input custom parameters value
+        sendInput(CreateWorkflowLocator.INPUT_CUSTOM_PARAMETERS_VALUE, CreatWorkflowData.INPUT_CUSTOM_PARAMETERS_VALUE);
+
+        //click add custom parameters
+        clickElement(CreateWorkflowLocator.CLICK_ADD_CUSTOM_PARAMETERS);
+
+        scrollToElementBottom();
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+
+        //input add custom parameters
+        sendInput(CreateWorkflowLocator.INPUT_ADD_CUSTOM_PARAMETERS,CreatWorkflowData.INPUT_ADD_CUSTOM_PARAMETERS);
+
+        //input add custom parameters value
+        sendInput(CreateWorkflowLocator.INPUT_ADD_CUSTOM_PARAMETERS_VALUE,CreatWorkflowData.INPUT_ADD_CUSTOM_PARAMETERS_VALUE);
+
+        //click delete custom parameters
+        clickElement(CreateWorkflowLocator.CLICK_DELETE_CUSTOM_PARAMETERS);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+
+        //click submit button
+        clickElement(CreateWorkflowLocator.CLICK_SUBMIT_BUTTON);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+
+        moveToDragElement(CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG,-300,-100);
 
         return ifTitleContains(CreatWorkflowData.WORKFLOW_TITLE);
     }

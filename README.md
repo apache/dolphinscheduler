@@ -52,8 +52,7 @@ Overload processing: Task queue mechanism, the number of schedulable tasks on a 
 ![process definition list page](https://user-images.githubusercontent.com/15833811/75216886-6f479e00-57d0-11ea-92dd-66e7640a186f.png)
 ![view task log online](https://user-images.githubusercontent.com/15833811/75216924-9900c500-57d0-11ea-91dc-3522a76bdbbe.png)
 ![resource management](https://user-images.githubusercontent.com/15833811/75216984-be8dce80-57d0-11ea-840d-58546edc8788.png)
-![datasource management](https://user-images.githubusercontent.com/15833811/75217041-cfd6db00-57d0-11ea-8451-8b376d0dc8f1.png)
-![monitor](https://user-images.githubusercontent.com/15833811/75217091-fac12f00-57d0-11ea-9665-d8dc19813707.png)
+![monitor](https://user-images.githubusercontent.com/59273635/75625839-c698a480-5bfc-11ea-8bbe-895b561b337f.png)
 ![security](https://user-images.githubusercontent.com/15833811/75236441-bfd2f180-57f8-11ea-88bd-f24311e01b7e.png)
 ![treeview](https://user-images.githubusercontent.com/15833811/75217191-3fe56100-57d1-11ea-8856-f19180d9a879.png)
 ### Document
@@ -100,7 +99,7 @@ It is because of the shoulders of these open source projects that the birth of t
 ### Get Help
 1. Submit an issue
 1. Subscribe the mail list : https://dolphinscheduler.apache.org/en-us/docs/development/subscribe.html.  then send mail to dev@dolphinscheduler.apache.org
-1. Contact WeChat group manager, ID 510570367. This is for Mandarin(CN) discussion.
+1. Contact WeChat(dailidong66). This is just for Mandarin(CN) discussion.
 
 ### License
 Please refer to [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) file.
