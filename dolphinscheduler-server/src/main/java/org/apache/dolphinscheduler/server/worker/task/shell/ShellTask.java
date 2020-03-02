@@ -52,11 +52,6 @@ public class ShellTask extends AbstractTask {
   private ShellParameters shellParameters;
 
   /**
-   * task dir
-   */
-  private String taskDir;
-
-  /**
    * shell command executor
    */
   private ShellCommandExecutor shellCommandExecutor;
@@ -119,7 +114,10 @@ public class ShellTask extends AbstractTask {
    */
   private String buildCommand() throws Exception {
     // generate scripts
-    String fileName = String.format("%s/%s_node.sh", taskDir, taskExecutionContext.getTaskAppId());
+    String fileName = String.format("%s/%s_node.sh",
+            taskExecutionContext.getExecutePath(),
+            taskExecutionContext.getTaskAppId());
+
     Path path = new File(fileName).toPath();
 
     if (Files.exists(path)) {
@@ -145,7 +143,7 @@ public class ShellTask extends AbstractTask {
     shellParameters.setRawScript(script);
 
     logger.info("raw script : {}", shellParameters.getRawScript());
-    logger.info("task dir : {}", taskDir);
+    logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
     FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
