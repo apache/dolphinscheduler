@@ -31,8 +31,8 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskRequestCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -69,18 +69,18 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     private final TaskCallbackService taskCallbackService;
 
     public TaskExecuteProcessor(){
-        this.taskCallbackService = new TaskCallbackService();
+        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.workerExecService = ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getWorkerExecThreads());
     }
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.EXECUTE_TASK_REQUEST == command.getType(),
+        Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
         logger.info("received command : {}", command);
-        ExecuteTaskRequestCommand taskRequestCommand = FastJsonSerializer.deserialize(
-                command.getBody(), ExecuteTaskRequestCommand.class);
+        TaskExecuteRequestCommand taskRequestCommand = FastJsonSerializer.deserialize(
+                command.getBody(), TaskExecuteRequestCommand.class);
 
         String contextJson = taskRequestCommand.getTaskExecutionContext();
 
@@ -105,8 +105,8 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
 
     private void doAck(TaskExecutionContext taskExecutionContext){
         // tell master that task is in executing
-        ExecuteTaskAckCommand ackCommand = buildAckCommand(taskExecutionContext);
-        taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
+        TaskExecuteAckCommand ackCommand = buildAckCommand(taskExecutionContext);
+        taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand.convert2Command());
     }
 
     /**
@@ -134,10 +134,10 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     /**
      * build ack command
      * @param taskExecutionContext taskExecutionContext
-     * @return ExecuteTaskAckCommand
+     * @return TaskExecuteAckCommand
      */
-    private ExecuteTaskAckCommand buildAckCommand(TaskExecutionContext taskExecutionContext) {
-        ExecuteTaskAckCommand ackCommand = new ExecuteTaskAckCommand();
+    private TaskExecuteAckCommand buildAckCommand(TaskExecutionContext taskExecutionContext) {
+        TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
         ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         ackCommand.setStatus(ExecutionStatus.RUNNING_EXEUTION.getCode());
         ackCommand.setLogPath(getTaskLogPath(taskExecutionContext));
