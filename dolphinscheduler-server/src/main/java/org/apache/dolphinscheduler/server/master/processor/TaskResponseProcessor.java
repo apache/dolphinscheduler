@@ -72,6 +72,8 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
 
         processService.changeTaskState(ExecutionStatus.of(responseCommand.getStatus()),
                 responseCommand.getEndTime(),
+                responseCommand.getProcessId(),
+                responseCommand.getAppIds(),
                 responseCommand.getTaskInstanceId());
     }
 
