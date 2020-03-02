@@ -684,6 +684,7 @@
                         <include>**/common/threadutils/*.java</include>
                         <include>**/common/graph/*.java</include>
                         <include>**/common/queue/*.java</include>
+                        <include>**/common/task/FlinkParametersTest.java</include>
                         <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/FileUtilsTest.java</include>
