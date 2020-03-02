@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.slf4j.Logger;
@@ -114,6 +114,31 @@ public class UsersService extends BaseService {
             return result;
         }
 
+        User user = createUser(userName, userPassword, email, tenantId, phone, queue);
+
+        Tenant tenant = tenantMapper.queryById(tenantId);
+        // resource upload startup
+        if (PropertyUtils.getResUploadStartupState()){
+            // if tenant not exists
+            if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))){
+                createTenantDirIfNotExists(tenant.getTenantCode());
+            }
+            String userPath = HadoopUtils.getHdfsUserDir(tenant.getTenantCode(),user.getId());
+            HadoopUtils.getInstance().mkdir(userPath);
+        }
+
+        putMsg(result, Status.SUCCESS);
+        return result;
+
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public User createUser(String userName,
+                                          String userPassword,
+                                          String email,
+                                          int tenantId,
+                                          String phone,
+                                          String queue) throws Exception {
         User user = new User();
         Date now = new Date();
 
@@ -133,21 +158,25 @@ public class UsersService extends BaseService {
 
         // save user
         userMapper.insert(user);
+        return user;
+    }
 
-        Tenant tenant = tenantMapper.queryById(tenantId);
-        // resource upload startup
-        if (PropertyUtils.getResUploadStartupState()){
-            // if tenant not exists
-            if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))){
-                createTenantDirIfNotExists(tenant.getTenantCode());
-            }
-            String userPath = HadoopUtils.getHdfsUserDir(tenant.getTenantCode(),user.getId());
-            HadoopUtils.getInstance().mkdir(userPath);
-        }
+    /**
+     * query user by id
+     * @param id id
+     * @return user info
+     */
+    public User queryUser(int id) {
+        return userMapper.selectById(id);
+    }
 
-        putMsg(result, Status.SUCCESS);
-        return result;
-
+    /**
+     * query user
+     * @param name name
+     * @return user info
+     */
+    public User queryUser(String name) {
+        return userMapper.queryByUserNameAccurately(name);
     }
 
     /**
@@ -160,6 +189,26 @@ public class UsersService extends BaseService {
     public User queryUser(String name, String password) {
         String md5 = EncryptionUtils.getMd5(password);
         return userMapper.queryUserByNamePassword(name, md5);
+    }
+
+    /**
+     * get user id by user name
+     * @param name user name
+     * @return if name empty 0, user not exists -1, user exist user id
+     */
+    public int getUserIdByName(String name) {
+        //executor name query
+        int executorId = 0;
+        if (StringUtils.isNotEmpty(name)) {
+            User executor = queryUser(name);
+            if (null != executor) {
+                executorId = executor.getId();
+            } else {
+                executorId = -1;
+            }
+        }
+
+        return executorId;
     }
 
     /**
@@ -221,9 +270,13 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        Date now = new Date();
-
         if (StringUtils.isNotEmpty(userName)) {
+
+            if (!CheckUtils.checkUserName(userName)){
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,userName);
+                return result;
+            }
+
             User tempUser = userMapper.queryByUserNameAccurately(userName);
             if (tempUser != null && tempUser.getId() != userId) {
                 putMsg(result, Status.USER_NAME_EXIST);
@@ -233,14 +286,30 @@ public class UsersService extends BaseService {
         }
 
         if (StringUtils.isNotEmpty(userPassword)) {
+            if (!CheckUtils.checkPassword(userPassword)){
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,userPassword);
+                return result;
+            }
             user.setUserPassword(EncryptionUtils.getMd5(userPassword));
         }
 
         if (StringUtils.isNotEmpty(email)) {
+            if (!CheckUtils.checkEmail(email)){
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,email);
+                return result;
+            }
             user.setEmail(email);
         }
+
+        if (StringUtils.isNotEmpty(phone)) {
+            if (!CheckUtils.checkPhone(phone)){
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR,phone);
+                return result;
+            }
+            user.setPhone(phone);
+        }
         user.setQueue(queue);
-        user.setPhone(phone);
+        Date now = new Date();
         user.setUpdateTime(now);
 
         //if user switches the tenant, the user's resources need to be copied to the new tenant
@@ -318,10 +387,15 @@ public class UsersService extends BaseService {
         Map<String, Object> result = new HashMap<>(5);
         //only admin can operate
         if (!isAdmin(loginUser)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM, id);
+            return result;
+        }
+        //check exist
+        User tempUser = userMapper.selectById(id);
+        if (tempUser == null) {
             putMsg(result, Status.USER_NOT_EXIST, id);
             return result;
         }
-
         // delete user
         User user = userMapper.queryTenantCodeByUserId(id);
 
@@ -357,6 +431,12 @@ public class UsersService extends BaseService {
             return result;
         }
 
+        //check exist
+        User tempUser = userMapper.selectById(userId);
+        if (tempUser == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
         //if the selected projectIds are empty, delete all items associated with the user
         projectUserMapper.deleteProjectRelation(0, userId);
 
@@ -443,6 +523,11 @@ public class UsersService extends BaseService {
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
         }
+        User user = userMapper.selectById(userId);
+        if(user == null){
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
 
         udfUserMapper.deleteByUserId(userId);
 
@@ -483,6 +568,11 @@ public class UsersService extends BaseService {
 
         //only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
+        User user = userMapper.selectById(userId);
+        if(user == null){
+            putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
 

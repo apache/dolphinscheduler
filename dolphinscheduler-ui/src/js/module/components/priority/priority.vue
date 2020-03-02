@@ -21,7 +21,7 @@
         <div class="input-element" :class="isDetails?'disabled' : ''">
           <span v-html="_rtUnicode(selectedModel ? selectedModel.label : 'MEDIUM')"></span>
           <span class="label-p">{{selectedModel ? selectedModel.label : 'MEDIUM'}}</span>
-          <i class="ans-icon-arrow-down" ></i>
+          <em class="ans-icon-arrow-down" ></em>
         </div>
       </div>
       <x-option
@@ -31,7 +31,7 @@
               :label="item.code">
         <li class="ans-option ans-option-listp">
           <span class="default-option-class">
-            <i class="iconfont" v-html="item.unicode" :style="{color:item.color}"></i>
+            <em :class="item.unicode" :style="{color:item.color}"></em>
             {{item.code}}
           </span>
         </li>
@@ -50,27 +50,27 @@
         priorityList: [
           {
             code: 'HIGHEST',
-            unicode: '&#xe632;',
+            unicode: 'ans-icon-line-arrow-up',
             color: '#ff0000'
           },
           {
             code: 'HIGH',
-            unicode: '&#xe632;',
+            unicode: 'ans-icon-line-arrow-up',
             color: '#ff0000'
           },
           {
             code: 'MEDIUM',
-            unicode: '&#xe632;',
+            unicode: 'ans-icon-line-arrow-up',
             color: '#EA7D24'
           },
           {
             code: 'LOW',
-            unicode: '&#xeef8;',
+            unicode: 'ans-icon-line-arrow-down',
             color: '#2A8734'
           },
           {
             code: 'LOWEST',
-            unicode: '&#xeef8;',
+            unicode: 'ans-icon-line-arrow-down',
             color: '#2A8734'
           }
         ]
@@ -90,7 +90,7 @@
     methods: {
       _rtUnicode (value) {
         let o = _.find(this.priorityList, ['code', value])
-        return `<i class="iconfont" style="color:${o.color}">${o.unicode}</i>`
+        return `<em class="${o.unicode}" style="color:${o.color}"></em>`
       },
       _onChange (o) {
         this.value = o.value

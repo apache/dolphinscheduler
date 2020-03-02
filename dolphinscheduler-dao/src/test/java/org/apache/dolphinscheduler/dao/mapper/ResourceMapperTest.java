@@ -17,22 +17,36 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 
-import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.dao.entity.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class ResourceMapperTest {
 
     @Autowired
@@ -61,6 +75,59 @@ public class ResourceMapperTest {
         return resource;
     }
 
+    /**
+     * create resource by user
+     * @param user user
+     * @return Resource
+     */
+    private Resource createResource(User user){
+        //insertOne
+        Resource resource = new Resource();
+        resource.setAlias(String.format("ut resource %s",user.getUserName()));
+        resource.setType(ResourceType.FILE);
+        resource.setUserId(user.getId());
+        resourceMapper.insert(resource);
+        return resource;
+    }
+
+    /**
+     * create user
+     * @return User
+     */
+    private User createGeneralUser(String userName){
+        User user = new User();
+        user.setUserName(userName);
+        user.setUserPassword("1");
+        user.setEmail("xx@123.com");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setCreateTime(new Date());
+        user.setTenantId(1);
+        user.setUpdateTime(new Date());
+        userMapper.insert(user);
+        return user;
+    }
+
+    /**
+     * create resource user
+     * @return ResourcesUser
+     */
+    private ResourcesUser createResourcesUser(Resource resource,User user){
+        //insertOne
+        ResourcesUser resourcesUser = new ResourcesUser();
+        resourcesUser.setCreateTime(new Date());
+        resourcesUser.setUpdateTime(new Date());
+        resourcesUser.setUserId(user.getId());
+        resourcesUser.setResourcesId(resource.getId());
+        resourceUserMapper.insert(resourcesUser);
+        return resourcesUser;
+    }
+
+    @Test
+    public void testInsert(){
+        Resource resource = insertOne();
+        assertNotNull(resource.getId());
+        assertThat(resource.getId(),greaterThan(0));
+    }
     /**
      * test update
      */
@@ -228,6 +295,32 @@ public class ResourceMapperTest {
 
         Assert.assertEquals(resource1, "ut tenant code for resource");
         resourceMapper.deleteById(resource.getId());
+
+    }
+
+    @Test
+    public void testListAuthorizedResource(){
+        // create a general user
+        User generalUser1 = createGeneralUser("user1");
+        User generalUser2 = createGeneralUser("user2");
+        // create one resource
+        Resource resource = createResource(generalUser2);
+        Resource unauthorizedResource = createResource(generalUser2);
+
+        // need download resources
+        String[] resNames = new String[]{resource.getAlias(), unauthorizedResource.getAlias()};
+
+        List<Resource> resources = resourceMapper.listAuthorizedResource(generalUser2.getId(), resNames);
+
+        Assert.assertEquals(generalUser2.getId(),resource.getUserId());
+        Assert.assertFalse(resources.stream().map(t -> t.getAlias()).collect(toList()).containsAll(Arrays.asList(resNames)));
+
+
+
+        // authorize object unauthorizedResource to generalUser
+        createResourcesUser(unauthorizedResource,generalUser2);
+        List<Resource> authorizedResources = resourceMapper.listAuthorizedResource(generalUser2.getId(), resNames);
+        Assert.assertTrue(authorizedResources.stream().map(t -> t.getAlias()).collect(toList()).containsAll(Arrays.asList(resNames)));
 
     }
 }

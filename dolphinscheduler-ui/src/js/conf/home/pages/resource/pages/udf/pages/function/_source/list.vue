@@ -19,34 +19,34 @@ v-ps<template>
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('UDF Function Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Class Name')}}</span>
           </th>
-          <!-- <th>
+          <!-- <th scope="col">
             <span>{{$t('Parameter')}}</span>
           </th> -->
-          <th width="80">
+          <th scope="col" width="80">
             <span>{{$t('type')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Description')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Jar Package')}}</span>
           </th>
-          <!-- <th>
+          <!-- <th scope="col">
             <span>{{$t('Library Name')}}</span>
           </th> -->
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
-          <th width="80">
+          <th scope="col" width="80">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -55,7 +55,7 @@ v-ps<template>
             <span>{{$index + 1}}</span>
           </td>
           <td>
-            <span class="ellipsis">
+            <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.funcName, maxWidth: '500px'}">
               <a href="javascript:" class="links">{{item.funcName}}</a>
             </span>
           </td>
@@ -67,7 +67,7 @@ v-ps<template>
             <span>{{item.type}}</span>
           </td>
           <td>
-            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
+            <span v-if="item.description" class="ellipsis" v-tooltip.large.top.start.light="{text: item.description, maxWidth: '500px'}">{{item.description}}</span>
             <span v-else>-</span>
           </td>
           <td>
@@ -88,7 +88,7 @@ v-ps<template>
                     data-toggle="tooltip"
                     :title="$t('Edit')"
                     @click="_edit(item)"
-                    icon="iconfont icon-bianjixiugai">
+                    icon="ans-icon-edit">
             </x-button>
             <x-poptip
                     :ref="'poptip-' + $index"
@@ -104,7 +104,7 @@ v-ps<template>
                         type="error"
                         shape="circle"
                         size="xsmall"
-                        icon="iconfont icon-shanchu"
+                        icon="ans-icon-trash"
                         data-toggle="tooltip"
                         :title="$t('delete')">
                 </x-button>
@@ -142,7 +142,7 @@ v-ps<template>
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.list.splice(i, 1)
+          this.$emit('on-update')
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()
@@ -156,6 +156,7 @@ v-ps<template>
           showMask: true,
           escClose: true,
           className: 'v-modal-custom',
+          width: '800px',
           transitionName: 'opacityp',
           render (h) {
             return h(mCreateUdf, {

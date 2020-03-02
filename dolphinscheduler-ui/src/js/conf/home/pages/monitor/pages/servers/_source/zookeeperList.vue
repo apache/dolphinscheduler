@@ -97,8 +97,8 @@
           </td>
           <td>
             <span class="state">
-              <i class="iconfont success" v-if="item.state">&#xe607;</i>
-              <i class="iconfont error" v-else>&#xe626;</i>
+              <em class="ans-icon-success-solid success" v-if="item.state"></em>
+              <em class="ans-icon-fail-solid error" v-else></em>
             </span>
           </td>
         </tr>

@@ -19,40 +19,43 @@
     <div class="table-box">
       <table class="fixed">
         <tr>
-          <th>
+          <th scope="col">
             <span>{{$t('#')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Name')}}</span>
           </th>
-          <th>
+          <th scope="col">
             <span>{{$t('Process Instance')}}</span>
           </th>
-          <th width="90">
+          <th scope="col" width="70">
+            <span>{{$t('Executor')}}</span>
+          </th>
+          <th scope="col" width="90">
             <span>{{$t('Node Type')}}</span>
           </th>
-          <th width="40">
+          <th scope="col" width="40">
             <span>{{$t('State')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Submit Time')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('Start Time')}}</span>
           </th>
-          <th width="140">
+          <th scope="col" width="140">
             <span>{{$t('End Time')}}</span>
           </th>
-          <th width="110">
+          <th scope="col" width="110">
             <span>{{$t('host')}}</span>
           </th>
-          <th width="74">
+          <th scope="col" width="74">
             <span>{{$t('Duration')}}(s)</span>
           </th>
-          <th width="84">
+          <th scope="col" width="84">
             <span>{{$t('Retry Count')}}</span>
           </th>
-          <th width="50">
+          <th scope="col" width="50">
             <span>{{$t('Operation')}}</span>
           </th>
         </tr>
@@ -64,6 +67,10 @@
             <span class="ellipsis" :title="item.name">{{item.name}}</span>
           </td>
           <td><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis">{{item.processInstanceName}}</span></a></td>
+          <td>
+            <span v-if="item.executorName">{{item.executorName}}</span>
+            <span v-else>-</span>
+          </td>
           <td><span>{{item.taskType}}</span></td>
           <td><span v-html="_rtState(item.state)" style="cursor: pointer;"></span></td>
           <td>
@@ -88,7 +95,7 @@
                     size="xsmall"
                     data-toggle="tooltip"
                     :title="$t('View log')"
-                    icon="iconfont icon-xitongcaozuorizhi"
+                    icon="ans-icon-log"
                     @click="_refreshLog(item)">
             </x-button>
           </td>
@@ -119,7 +126,7 @@
     methods: {
       _rtState (code) {
         let o = tasksState[code]
-        return `<em class="iconfont ${o.isSpin ? 'fa fa-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}">${o.icoUnicode}</em>`
+        return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
       _refreshLog (item) {
         let self = this

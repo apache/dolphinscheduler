@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +26,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
@@ -109,11 +110,21 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     }
 
     /**
+     * get command options
+     * @return command options list
+     */
+    @Override
+    protected List<String> commandOptions() {
+        // unbuffered binary stdout and stderr
+        return Collections.singletonList("-u");
+    }
+
+    /**
      * get python home
      * @return python home
      */
     @Override
-    protected String commandType() {
+    protected String commandInterpreter() {
         String pythonHome = getPythonHome(envFile);
         if (StringUtils.isEmpty(pythonHome)){
             return PYTHON;
