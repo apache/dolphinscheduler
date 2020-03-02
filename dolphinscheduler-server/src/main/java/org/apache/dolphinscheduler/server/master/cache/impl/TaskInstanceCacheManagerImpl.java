@@ -18,8 +18,8 @@ package org.apache.dolphinscheduler.server.master.cache.impl;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -86,7 +86,7 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
      * @param taskAckCommand taskAckCommand
      */
     @Override
-    public void cacheTaskInstance(ExecuteTaskAckCommand taskAckCommand) {
+    public void cacheTaskInstance(TaskExecuteAckCommand taskAckCommand) {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(ExecutionStatus.of(taskAckCommand.getStatus()));
         taskInstance.setStartTime(taskAckCommand.getStartTime());
@@ -99,13 +99,13 @@ public class TaskInstanceCacheManagerImpl implements TaskInstanceCacheManager {
     /**
      * cache taskInstance
      *
-     * @param executeTaskResponseCommand executeTaskResponseCommand
+     * @param taskExecuteResponseCommand taskExecuteResponseCommand
      */
     @Override
-    public void cacheTaskInstance(ExecuteTaskResponseCommand executeTaskResponseCommand) {
-        TaskInstance taskInstance = getByTaskInstanceId(executeTaskResponseCommand.getTaskInstanceId());
-        taskInstance.setState(ExecutionStatus.of(executeTaskResponseCommand.getStatus()));
-        taskInstance.setEndTime(executeTaskResponseCommand.getEndTime());
+    public void cacheTaskInstance(TaskExecuteResponseCommand taskExecuteResponseCommand) {
+        TaskInstance taskInstance = getByTaskInstanceId(taskExecuteResponseCommand.getTaskInstanceId());
+        taskInstance.setState(ExecutionStatus.of(taskExecuteResponseCommand.getStatus()));
+        taskInstance.setEndTime(taskExecuteResponseCommand.getEndTime());
     }
 
     /**

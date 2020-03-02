@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.KillTaskRequestCommand;
-import org.apache.dolphinscheduler.remote.command.KillTaskResponseCommand;
+import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
+import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
@@ -58,7 +58,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     /**
      *  task callback service
      */
-    private final KillTaskCallbackService killTaskCallbackService;
+    private final TaskCallbackService taskCallbackService;
 
     /**
      * taskExecutionContextCacheManager
@@ -72,7 +72,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
 
     public TaskKillProcessor(){
-        this.killTaskCallbackService = new KillTaskCallbackService();
+        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
         this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
         this.taskExecutionContextCacheManager = SpringApplicationContext.getBean(TaskExecutionContextCacheManagerImpl.class);
     }
@@ -115,41 +115,41 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.KILL_TASK_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
-        KillTaskRequestCommand killTaskRequestCommand = FastJsonSerializer.deserialize(command.getBody(), KillTaskRequestCommand.class);
-        logger.info("received command : {}", killTaskRequestCommand);
+        Preconditions.checkArgument(CommandType.TASK_KILL_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
+        TaskKillRequestCommand taskKillRequestCommand = FastJsonSerializer.deserialize(command.getBody(), TaskKillRequestCommand.class);
+        logger.info("received command : {}", taskKillRequestCommand);
 
 
-        String contextJson = killTaskRequestCommand.getTaskExecutionContext();
+        String contextJson = taskKillRequestCommand.getTaskExecutionContext();
 
         TaskExecutionContext taskExecutionContext = JSONObject.parseObject(contextJson, TaskExecutionContext.class);
 
         Boolean killStatus = doKill(taskExecutionContext);
 
-        killTaskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
+        taskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
                 new NettyRemoteChannel(channel, command.getOpaque()));
 
-        KillTaskResponseCommand killTaskResponseCommand = buildKillTaskResponseCommand(taskExecutionContext,killStatus);
-        killTaskCallbackService.sendKillResult(killTaskResponseCommand.getTaskInstanceId(),killTaskResponseCommand);
+        TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(taskExecutionContext,killStatus);
+        taskCallbackService.sendResult(taskKillResponseCommand.getTaskInstanceId(), taskKillResponseCommand.convert2Command());
     }
 
     /**
-     * build KillTaskResponseCommand
+     * build TaskKillResponseCommand
      *
      * @param taskExecutionContext taskExecutionContext
      * @param killStatus killStatus
-     * @return build KillTaskResponseCommand
+     * @return build TaskKillResponseCommand
      */
-    private KillTaskResponseCommand buildKillTaskResponseCommand(TaskExecutionContext taskExecutionContext,
+    private TaskKillResponseCommand buildKillTaskResponseCommand(TaskExecutionContext taskExecutionContext,
                                                                  Boolean killStatus) {
-        KillTaskResponseCommand killTaskResponseCommand = new KillTaskResponseCommand();
-        killTaskResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        killTaskResponseCommand.setHost(taskExecutionContext.getHost());
-        killTaskResponseCommand.setStatus(killStatus ? ExecutionStatus.SUCCESS.getCode() : ExecutionStatus.FAILURE.getCode());
-        killTaskResponseCommand.setProcessId(taskExecutionContext.getProcessId());
-        killTaskResponseCommand.setAppIds(appIds);
+        TaskKillResponseCommand taskKillResponseCommand = new TaskKillResponseCommand();
+        taskKillResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskKillResponseCommand.setHost(taskExecutionContext.getHost());
+        taskKillResponseCommand.setStatus(killStatus ? ExecutionStatus.SUCCESS.getCode() : ExecutionStatus.FAILURE.getCode());
+        taskKillResponseCommand.setProcessId(taskExecutionContext.getProcessId());
+        taskKillResponseCommand.setAppIds(appIds);
 
-        return killTaskResponseCommand;
+        return taskKillResponseCommand;
     }
 
     /**
