@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
