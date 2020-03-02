@@ -101,7 +101,7 @@
         <checkstyle.version>3.0.0</checkstyle.version>
         <apache.rat.version>0.13</apache.rat.version>
         <zookeeper.version>3.4.14</zookeeper.version>
-        <frontend-maven-plugin.version>1.7.5</frontend-maven-plugin.version>
+        <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
