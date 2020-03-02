@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -236,6 +236,8 @@ public class ZKMasterClient extends AbstractZKClient {
 
 	/**
 	 * monitor master
+	 * @param event event
+	 * @param path path
 	 */
 	public void handleMasterEvent(TreeCacheEvent event, String path){
 		switch (event.getType()) {
@@ -256,6 +258,8 @@ public class ZKMasterClient extends AbstractZKClient {
 
 	/**
 	 * monitor worker
+	 * @param event event
+	 * @param path path
 	 */
 	public void handleWorkerEvent(TreeCacheEvent event, String path){
 		switch (event.getType()) {

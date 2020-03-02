@@ -67,9 +67,10 @@ public class MasterRegistry {
     private final String startTime;
 
     /**
-     *  construct
+     * construct
      * @param zookeeperRegistryCenter zookeeperRegistryCenter
      * @param port port
+     * @param heartBeatInterval heartBeatInterval
      */
     public MasterRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port, long heartBeatInterval){
         this.zookeeperRegistryCenter = zookeeperRegistryCenter;

@@ -129,19 +129,21 @@ public class TaskProps {
 
   /**
    * constructor
-   * @param taskParams          task params
-   * @param taskDir             task dir
-   * @param scheduleTime        schedule time
-   * @param nodeName            node name
-   * @param taskType            task type
-   * @param taskInstanceId          task instance id
-   * @param envFile             env file
-   * @param tenantCode          tenant code
-   * @param queue               queue
-   * @param taskStartTime       task start time
-   * @param definedParams       defined params
-   * @param dependence          dependence
-   * @param cmdTypeIfComplement cmd type if complement
+   * @param taskParams taskParams
+   * @param scheduleTime scheduleTime
+   * @param nodeName nodeName
+   * @param taskType taskType
+   * @param taskInstanceId taskInstanceId
+   * @param envFile envFile
+   * @param tenantCode tenantCode
+   * @param queue queue
+   * @param taskStartTime taskStartTime
+   * @param definedParams definedParams
+   * @param dependence dependence
+   * @param cmdTypeIfComplement cmdTypeIfComplement
+   * @param host host
+   * @param logPath logPath
+   * @param executePath executePath
    */
   public TaskProps(String taskParams,
                    Date scheduleTime,
