@@ -17,8 +17,8 @@
 package org.apache.dolphinscheduler.server.master.dispatch.context;
 
 
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
 /**

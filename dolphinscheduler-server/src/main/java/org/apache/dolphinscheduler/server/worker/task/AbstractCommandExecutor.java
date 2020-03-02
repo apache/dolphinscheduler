@@ -21,17 +21,13 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.server.worker.cache.impl.TaskExecutionContextCacheManagerImpl;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.slf4j.Logger;
 
@@ -65,11 +61,6 @@ public abstract class AbstractCommandExecutor {
      *  log handler
      */
     protected Consumer<List<String>> logHandler;
-
-    /**
-     *  timeout
-     */
-    protected int timeout;
 
     /**
      *  logger
@@ -132,6 +123,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * task specific execution logic
+     *
      * @param execCommand execCommand
      * @return CommandExecuteResult
      * @throws Exception
@@ -174,8 +166,6 @@ public abstract class AbstractCommandExecutor {
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
-        // SHELL task state
-        result.setExitStatusCode(process.exitValue());
 
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
                 taskExecutionContext.getExecutePath(),
@@ -195,6 +185,9 @@ public abstract class AbstractCommandExecutor {
             ProcessUtils.kill(taskExecutionContext);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
+
+        // SHELL task state
+        result.setExitStatusCode(process.exitValue());
         return result;
     }
 
@@ -378,7 +371,7 @@ public abstract class AbstractCommandExecutor {
 
         List<String> appIds = new ArrayList<>();
         /**
-         * analysis log，get submited yarn application id
+         * analysis log?get submited yarn application id
          */
         for (String log : logs) {
             String appId = findAppId(log);
@@ -440,13 +433,13 @@ public abstract class AbstractCommandExecutor {
 
 
     /**
-     * get remain time（s）
+     * get remain time?s?
      *
      * @return remain time
      */
     private long getRemaintime() {
         long usedTime = (System.currentTimeMillis() - taskExecutionContext.getStartTime().getTime()) / 1000;
-        long remainTime = timeout - usedTime;
+        long remainTime = taskExecutionContext.getTaskTimeout() - usedTime;
 
         if (remainTime < 0) {
             throw new RuntimeException("task execution time out");

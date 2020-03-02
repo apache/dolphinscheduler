@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.cache;
 
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
 /**
  *  TaskExecutionContextCacheManager

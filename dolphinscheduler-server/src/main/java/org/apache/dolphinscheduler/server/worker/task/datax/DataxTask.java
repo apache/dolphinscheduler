@@ -39,6 +39,7 @@ import java.util.Set;
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -50,13 +51,13 @@ import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
@@ -99,11 +100,6 @@ public class DataxTask extends AbstractTask {
     private DataxParameters dataXParameters;
 
     /**
-     * task dir
-     */
-    private String taskDir;
-
-    /**
      * shell command executor
      */
     private ShellCommandExecutor shellCommandExecutor;
@@ -114,11 +110,6 @@ public class DataxTask extends AbstractTask {
     private TaskExecutionContext taskExecutionContext;
 
     /**
-     * processService
-     */
-    private ProcessService processService;
-
-    /**
      * constructor
      * @param taskExecutionContext taskExecutionContext
      * @param logger logger
@@ -127,13 +118,9 @@ public class DataxTask extends AbstractTask {
         super(taskExecutionContext, logger);
         this.taskExecutionContext = taskExecutionContext;
 
-        logger.info("task dir : {}", taskDir);
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext,logger);
-
-        processService = SpringApplicationContext.getBean(ProcessService.class);
-
     }
 
     /**
@@ -151,12 +138,11 @@ public class DataxTask extends AbstractTask {
 
     /**
      * run DataX process
-     * 
+     *
      * @throws Exception
      */
     @Override
-    public void handle()
-        throws Exception {
+    public void handle() throws Exception {
         try {
             // set the name of the current thread
             String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskExecutionContext.getTaskAppId());
@@ -180,8 +166,8 @@ public class DataxTask extends AbstractTask {
 
     /**
      * cancel DataX process
-     * 
-     * @param cancelApplication
+     *
+     * @param cancelApplication cancelApplication
      * @throws Exception
      */
     @Override
@@ -200,7 +186,9 @@ public class DataxTask extends AbstractTask {
     private String buildDataxJsonFile()
         throws Exception {
         // generate json
-        String fileName = String.format("%s/%s_job.json", taskDir, taskExecutionContext.getTaskAppId());
+        String fileName = String.format("%s/%s_job.json",
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
 
         Path path = new File(fileName).toPath();
         if (Files.exists(path)) {
@@ -230,13 +218,14 @@ public class DataxTask extends AbstractTask {
      */
     private List<JSONObject> buildDataxJobContentJson()
         throws SQLException {
-        DataSource dataSource = processService.findDataSourceById(dataXParameters.getDataSource());
-        BaseDataSource dataSourceCfg = DataSourceFactory.getDatasource(dataSource.getType(),
-            dataSource.getConnectionParams());
+        DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
 
-        DataSource dataTarget = processService.findDataSourceById(dataXParameters.getDataTarget());
-        BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(dataTarget.getType(),
-            dataTarget.getConnectionParams());
+
+        BaseDataSource dataSourceCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+                dataxTaskExecutionContext.getSourceConnectionParams());
+
+        BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getTargetType()),
+                dataxTaskExecutionContext.getTargetConnectionParams());
 
         List<JSONObject> readerConnArr = new ArrayList<>();
         JSONObject readerConn = new JSONObject();
@@ -250,7 +239,7 @@ public class DataxTask extends AbstractTask {
         readerParam.put("connection", readerConnArr);
 
         JSONObject reader = new JSONObject();
-        reader.put("name", DataxUtils.getReaderPluginName(dataSource.getType()));
+        reader.put("name", DataxUtils.getReaderPluginName(DbType.of(dataxTaskExecutionContext.getSourcetype())));
         reader.put("parameter", readerParam);
 
         List<JSONObject> writerConnArr = new ArrayList<>();
@@ -263,7 +252,9 @@ public class DataxTask extends AbstractTask {
         writerParam.put("username", dataTargetCfg.getUser());
         writerParam.put("password", dataTargetCfg.getPassword());
         writerParam.put("column",
-            parsingSqlColumnNames(dataSource.getType(), dataTarget.getType(), dataSourceCfg, dataXParameters.getSql()));
+            parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+                    DbType.of(dataxTaskExecutionContext.getTargetType()),
+                    dataSourceCfg, dataXParameters.getSql()));
         writerParam.put("connection", writerConnArr);
 
         if (CollectionUtils.isNotEmpty(dataXParameters.getPreStatements())) {
@@ -275,7 +266,7 @@ public class DataxTask extends AbstractTask {
         }
 
         JSONObject writer = new JSONObject();
-        writer.put("name", DataxUtils.getWriterPluginName(dataTarget.getType()));
+        writer.put("name", DataxUtils.getWriterPluginName(DbType.of(dataxTaskExecutionContext.getTargetType())));
         writer.put("parameter", writerParam);
 
         List<JSONObject> contentList = new ArrayList<>();
@@ -348,7 +339,9 @@ public class DataxTask extends AbstractTask {
     private String buildShellCommandFile(String jobConfigFilePath)
         throws Exception {
         // generate scripts
-        String fileName = String.format("%s/%s_node.sh", taskDir, taskExecutionContext.getTaskAppId());
+        String fileName = String.format("%s/%s_node.sh",
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
         Path path = new File(fileName).toPath();
 
         if (Files.exists(path)) {
@@ -363,9 +356,6 @@ public class DataxTask extends AbstractTask {
         sbr.append(" ");
         sbr.append(jobConfigFilePath);
         String dataxCommand = sbr.toString();
-
-        // find process instance by task id
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskExecutionContext.getTaskInstanceId());
 
         // combining local and global parameters
         // replace placeholder

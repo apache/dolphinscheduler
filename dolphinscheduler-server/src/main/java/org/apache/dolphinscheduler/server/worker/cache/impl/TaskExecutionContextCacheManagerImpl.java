@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.cache.impl;
 
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
 import org.springframework.stereotype.Service;
 

@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.worker.task.sql;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -33,18 +32,15 @@ import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.UDFUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.permission.PermissionCheck;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.sql.*;
@@ -64,22 +60,10 @@ public class SqlTask extends AbstractTask {
      *  sql parameters
      */
     private SqlParameters sqlParameters;
-
-    /**
-     *  process service
-     */
-    private ProcessService processService;
-
     /**
      *  alert dao
      */
     private AlertDao alertDao;
-
-    /**
-     * datasource
-     */
-    private DataSource dataSource;
-
     /**
      * base datasource
      */
@@ -102,7 +86,7 @@ public class SqlTask extends AbstractTask {
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
         }
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+
         this.alertDao = SpringApplicationContext.getBean(AlertDao.class);
     }
 
@@ -111,6 +95,7 @@ public class SqlTask extends AbstractTask {
         // set the name of the current thread
         String threadLoggerInfoName = String.format(Constants.TASK_LOG_INFO_FORMAT, taskExecutionContext.getTaskAppId());
         Thread.currentThread().setName(threadLoggerInfoName);
+
         logger.info("Full sql parameters: {}", sqlParameters);
         logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {}",
                 sqlParameters.getType(),
@@ -121,37 +106,15 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getShowType(),
                 sqlParameters.getConnParams());
 
-        // not set data source
-        if (sqlParameters.getDatasource() == 0){
-            logger.error("datasource id not exists");
-            exitStatusCode = -1;
-            return;
-        }
-
-        dataSource= processService.findDataSourceById(sqlParameters.getDatasource());
-
-        // data source is null
-        if (dataSource == null){
-            logger.error("datasource not exists");
-            exitStatusCode = -1;
-            return;
-        }
-
-        logger.info("datasource name : {} , type : {} , desc : {}  , user_id : {} , parameter : {}",
-                dataSource.getName(),
-                dataSource.getType(),
-                dataSource.getNote(),
-                dataSource.getUserId(),
-                dataSource.getConnectionParams());
-
         Connection con = null;
         List<String> createFuncs = null;
         try {
             // load class
-            DataSourceFactory.loadClass(dataSource.getType());
+            DataSourceFactory.loadClass(DbType.valueOf(sqlParameters.getType()));
+
             // get datasource
-            baseDataSource = DataSourceFactory.getDatasource(dataSource.getType(),
-                    dataSource.getConnectionParams());
+            baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(sqlParameters.getType()),
+                    sqlParameters.getConnParams());
 
             // ready to execute SQL and parameter entity Map
             SqlBinds mainSqlBinds = getSqlAndSqlParamsMap(sqlParameters.getSql());
@@ -175,9 +138,8 @@ public class SqlTask extends AbstractTask {
                 for(int i=0;i<ids.length;i++){
                     idsArray[i]=Integer.parseInt(ids[i]);
                 }
-
-                List<UdfFunc> udfFuncList = processService.queryUdfFunListByids(idsArray);
-                createFuncs = UDFUtils.createFuncs(udfFuncList, taskExecutionContext.getTenantCode(), logger);
+                SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
+                createFuncs = UDFUtils.createFuncs(sqlTaskExecutionContext.getUdfFuncList(), taskExecutionContext.getTenantCode(), logger);
             }
 
             // execute sql task
@@ -262,7 +224,7 @@ public class SqlTask extends AbstractTask {
             CommonUtils.loadKerberosConf();
 
             // if hive , load connection params if exists
-            if (HIVE == dataSource.getType()) {
+            if (HIVE == DbType.valueOf(sqlParameters.getType())) {
                 Properties paramProp = new Properties();
                 paramProp.setProperty(USER, baseDataSource.getUser());
                 paramProp.setProperty(PASSWORD, baseDataSource.getPassword());
@@ -387,10 +349,7 @@ public class SqlTask extends AbstractTask {
      */
     public void sendAttachment(String title,String content){
 
-        //  process instance
-        ProcessInstance instance = processService.findProcessInstanceByTaskId(taskExecutionContext.getTaskInstanceId());
-
-        List<User> users = alertDao.queryUserByAlertGroupId(instance.getWarningGroupId());
+        List<User> users = alertDao.queryUserByAlertGroupId(taskExecutionContext.getSqlTaskExecutionContext().getWarningGroupId());
 
         // receiving group list
         List<String> receviersList = new ArrayList<String>();

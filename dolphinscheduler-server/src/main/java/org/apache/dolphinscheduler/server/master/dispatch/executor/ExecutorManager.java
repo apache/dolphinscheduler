@@ -27,6 +27,7 @@ public interface ExecutorManager<T> {
 
     /**
      * before execute
+     *
      * @param executeContext executeContext
      * @throws ExecuteException
      */
@@ -35,12 +36,13 @@ public interface ExecutorManager<T> {
     /**
      * execute task
      * @param context context
+     * @return T
      * @throws ExecuteException
      */
     T execute(ExecutionContext context) throws ExecuteException;
 
     /**
-     * after execute
+     *  after execute
      * @param context context
      * @throws ExecuteException
      */
