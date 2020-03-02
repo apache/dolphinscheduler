@@ -86,23 +86,25 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     private Boolean doKill(TaskExecutionContext context){
         try {
             TaskExecutionContext taskExecutionContext = taskExecutionContextCacheManager.getByTaskInstanceId(context.getTaskInstanceId());
+            context.setProcessId(taskExecutionContext.getProcessId());
 
             Integer processId = taskExecutionContext.getProcessId();
 
             if (processId == null || processId.equals(0)){
-                logger.error("process kill failed, process id :{}, task id:{}", processId, taskExecutionContext.getTaskInstanceId());
+                logger.error("process kill failed, process id :{}, task id:{}", processId, context.getTaskInstanceId());
                 return false;
             }
 
 
-            String cmd = String.format("sudo kill -9 %s", ProcessUtils.getPidsStr(taskExecutionContext.getProcessId()));
+            String cmd = String.format("sudo kill -9 %s", ProcessUtils.getPidsStr(context.getProcessId()));
 
-            logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
+            logger.info("process id:{}, cmd:{}", context.getProcessId(), cmd);
 
             OSUtils.exeCmd(cmd);
 
+
             // find log and kill yarn job
-            killYarnJob(taskExecutionContext.getHost(), taskExecutionContext.getLogPath(), taskExecutionContext.getExecutePath(), taskExecutionContext.getTenantCode());
+            killYarnJob(context.getHost(), context.getLogPath(), context.getExecutePath(), context.getTenantCode());
 
             return true;
         } catch (Exception e) {
@@ -123,6 +125,9 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         TaskExecutionContext taskExecutionContext = JSONObject.parseObject(contextJson, TaskExecutionContext.class);
 
         Boolean killStatus = doKill(taskExecutionContext);
+
+        killTaskCallbackService.addRemoteChannel(taskExecutionContext.getTaskInstanceId(),
+                new NettyRemoteChannel(channel, command.getOpaque()));
 
         KillTaskResponseCommand killTaskResponseCommand = buildKillTaskResponseCommand(taskExecutionContext,killStatus);
         killTaskCallbackService.sendKillResult(killTaskResponseCommand.getTaskInstanceId(),killTaskResponseCommand);
@@ -163,6 +168,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             String log = null;
             try {
                 logClient = new LogClientService();
+                logger.info("view log host : {},logPath : {}", host,logPath);
                 log = logClient.viewLog(host, Constants.RPC_PORT, logPath);
             } finally {
                 if(logClient != null){

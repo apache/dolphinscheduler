@@ -63,11 +63,6 @@ public abstract class AbstractCommandExecutor {
     protected Consumer<List<String>> logHandler;
 
     /**
-     *  timeout
-     */
-    protected int timeout;
-
-    /**
      *  logger
      */
     protected Logger logger;
@@ -170,8 +165,7 @@ public abstract class AbstractCommandExecutor {
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
-        // SHELL task state
-        result.setExitStatusCode(process.exitValue());
+
 
         logger.info("process has exited, execute path:{}, processId:{} ,exitStatusCode:{}",
                 taskExecutionContext.getExecutePath(),
@@ -191,6 +185,9 @@ public abstract class AbstractCommandExecutor {
             ProcessUtils.kill(taskExecutionContext);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
+
+        // SHELL task state
+        result.setExitStatusCode(process.exitValue());
         return result;
     }
 
@@ -374,7 +371,7 @@ public abstract class AbstractCommandExecutor {
 
         List<String> appIds = new ArrayList<>();
         /**
-         * analysis log，get submited yarn application id
+         * analysis log?get submited yarn application id
          */
         for (String log : logs) {
             String appId = findAppId(log);
@@ -436,13 +433,13 @@ public abstract class AbstractCommandExecutor {
 
 
     /**
-     * get remain time（s）
+     * get remain time?s?
      *
      * @return remain time
      */
     private long getRemaintime() {
         long usedTime = (System.currentTimeMillis() - taskExecutionContext.getStartTime().getTime()) / 1000;
-        long remainTime = timeout - usedTime;
+        long remainTime = taskExecutionContext.getTaskTimeout() - usedTime;
 
         if (remainTime < 0) {
             throw new RuntimeException("task execution time out");
