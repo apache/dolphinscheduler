@@ -14,31 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.enums;
+package org.apache.dolphinscheduler.dao.entity;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.context.i18n.LocaleContextHolder;
 
-import java.util.Locale;
+public class TaskInstanceTest {
 
-import static org.junit.Assert.*;
-
-public class StatusTest {
-
+    /**
+     * task instance sub process
+     */
     @Test
-    public void testGetCode() {
-        assertEquals(Status.SUCCESS.getCode(), 0);
-        assertNotEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 0);
+    public void testTaskInstanceIsSubProcess() {
+        TaskInstance taskInstance = new TaskInstance();
+
+        //sub process
+        taskInstance.setTaskType("sub process");
+        Assert.assertTrue(taskInstance.isSubProcess());
+
+        //not sub process
+        taskInstance.setTaskType("http");
+        Assert.assertFalse(taskInstance.isSubProcess());
     }
-
-    @Test
-    public void testGetMsg() {
-        LocaleContextHolder.setLocale(Locale.US);
-        Assert.assertEquals("success", Status.SUCCESS.getMsg());
-
-        LocaleContextHolder.setLocale(Locale.SIMPLIFIED_CHINESE);
-        Assert.assertEquals("成功", Status.SUCCESS.getMsg());
-    }
-
 }
