@@ -111,7 +111,8 @@ public class ParamUtils {
 
     /**
      * get parameters map
-     * @return user defined params map
+     * @param definedParams definedParams
+     * @return parameters map
      */
     public static Map<String,Property> getUserDefParamsMap(Map<String,String> definedParams) {
         if (definedParams != null) {

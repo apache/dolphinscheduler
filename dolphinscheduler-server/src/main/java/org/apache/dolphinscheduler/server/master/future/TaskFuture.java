@@ -68,7 +68,7 @@ public class TaskFuture {
     }
 
     /**
-     *  wait for response
+     * wait for response
      * @return command
      * @throws InterruptedException
      */

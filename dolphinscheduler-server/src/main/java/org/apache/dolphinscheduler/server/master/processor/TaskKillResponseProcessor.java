@@ -23,36 +23,23 @@ import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
+import org.apache.dolphinscheduler.remote.command.KillTaskResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.hadoop.mapreduce.v2.api.protocolrecords.KillTaskResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  *  task response processor
  */
-public class TaskResponseProcessor implements NettyRequestProcessor {
+public class TaskKillResponseProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskResponseProcessor.class);
-
-    /**
-     * process service
-     */
-    private final ProcessService processService;
-
-    /**
-     * taskInstance cache manager
-     */
-    private final TaskInstanceCacheManager taskInstanceCacheManager;
-
-    public TaskResponseProcessor(){
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
-        this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
-    }
+    private final Logger logger = LoggerFactory.getLogger(TaskKillResponseProcessor.class);
 
     /**
      * task final result response
@@ -63,18 +50,11 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.EXECUTE_TASK_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
+        Preconditions.checkArgument(CommandType.KILL_TASK_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
 
-        ExecuteTaskResponseCommand responseCommand = FastJsonSerializer.deserialize(command.getBody(), ExecuteTaskResponseCommand.class);
+        KillTaskResponseCommand responseCommand = FastJsonSerializer.deserialize(command.getBody(), KillTaskResponseCommand.class);
         logger.info("received command : {}", responseCommand);
-
-        taskInstanceCacheManager.cacheTaskInstance(responseCommand);
-
-        processService.changeTaskState(ExecutionStatus.of(responseCommand.getStatus()),
-                responseCommand.getEndTime(),
-                responseCommand.getProcessId(),
-                responseCommand.getAppIds(),
-                responseCommand.getTaskInstanceId());
+        logger.info("已经接受到了worker杀任务的回应");
     }
 
 

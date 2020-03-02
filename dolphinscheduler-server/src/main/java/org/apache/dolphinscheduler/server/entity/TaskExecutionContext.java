@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.entity;
+package org.apache.dolphinscheduler.server.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -144,7 +142,6 @@ public class TaskExecutionContext implements Serializable{
      */
     private Map<String, String> definedParams;
 
-
     /**
      * task AppId
      */
@@ -164,6 +161,20 @@ public class TaskExecutionContext implements Serializable{
      * worker group
      */
     private String workerGroup;
+
+
+    /**
+     *  sql TaskExecutionContext
+     */
+    private SQLTaskExecutionContext sqlTaskExecutionContext;
+
+    /**
+     *  datax TaskExecutionContext
+     */
+    private DataxTaskExecutionContext dataxTaskExecutionContext;
+
+
+
 
     public String getWorkerGroup() {
         return workerGroup;
@@ -373,6 +384,21 @@ public class TaskExecutionContext implements Serializable{
         this.appIds = appIds;
     }
 
+    public SQLTaskExecutionContext getSqlTaskExecutionContext() {
+        return sqlTaskExecutionContext;
+    }
+
+    public void setSqlTaskExecutionContext(SQLTaskExecutionContext sqlTaskExecutionContext) {
+        this.sqlTaskExecutionContext = sqlTaskExecutionContext;
+    }
+
+    public DataxTaskExecutionContext getDataxTaskExecutionContext() {
+        return dataxTaskExecutionContext;
+    }
+
+    public void setDataxTaskExecutionContext(DataxTaskExecutionContext dataxTaskExecutionContext) {
+        this.dataxTaskExecutionContext = dataxTaskExecutionContext;
+    }
 
     @Override
     public String toString() {
@@ -402,6 +428,9 @@ public class TaskExecutionContext implements Serializable{
                 ", taskAppId='" + taskAppId + '\'' +
                 ", taskTimeoutStrategy=" + taskTimeoutStrategy +
                 ", taskTimeout=" + taskTimeout +
+                ", workerGroup='" + workerGroup + '\'' +
+                ", sqlTaskExecutionContext=" + sqlTaskExecutionContext +
+                ", dataxTaskExecutionContext=" + dataxTaskExecutionContext +
                 '}';
     }
 }

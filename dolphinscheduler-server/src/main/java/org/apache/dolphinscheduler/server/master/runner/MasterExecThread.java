@@ -142,8 +142,9 @@ public class MasterExecThread implements Runnable {
 
     /**
      * constructor of MasterExecThread
-     * @param processInstance   process instance
-     * @param processService        process dao
+     * @param processInstance processInstance
+     * @param processService processService
+     * @param nettyRemotingClient nettyRemotingClient
      */
     public MasterExecThread(ProcessInstance processInstance, ProcessService processService, NettyRemotingClient nettyRemotingClient){
         this.processService = processService;

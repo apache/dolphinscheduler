@@ -74,7 +74,7 @@ public class ZookeeperNodeManager implements InitializingBean {
     private ZookeeperRegistryCenter registryCenter;
 
     /**
-     *  init listener
+     * init listener
      * @throws Exception
      */
     @Override
@@ -234,8 +234,8 @@ public class ZookeeperNodeManager implements InitializingBean {
 
     /**
      * get worker group nodes
-     * @param workerGroup
-     * @return
+     * @param workerGroup workerGroup
+     * @return worker nodes
      */
     public Set<String> getWorkerGroupNodes(String workerGroup){
         workerGroupLock.lock();

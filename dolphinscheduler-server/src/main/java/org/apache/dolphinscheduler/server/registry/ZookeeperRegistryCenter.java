@@ -129,7 +129,7 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get worker group directly
-     * @return
+     * @return worker group nodes
      */
     public Set<String> getWorkerGroupDirectly() {
         List<String> workers = getChildrenKeys(getWorkerPath());
@@ -166,8 +166,8 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     /**
      * get worker group path
-     * @param workerGroup
-     * @return
+     * @param workerGroup workerGroup
+     * @return worker group path
      */
     public String getWorkerGroupPath(String workerGroup) {
         return WORKER_PATH + "/" + workerGroup;

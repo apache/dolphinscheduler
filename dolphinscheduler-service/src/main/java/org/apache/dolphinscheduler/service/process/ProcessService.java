@@ -1411,8 +1411,12 @@ public class ProcessService {
      */
     public void changeTaskState(ExecutionStatus state,
                                 Date endTime,
+                                int processId,
+                                String appIds,
                                 int taskInstId) {
         TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
+        taskInstance.setPid(processId);
+        taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
         taskInstance.setEndTime(endTime);
         saveTaskInstance(taskInstance);

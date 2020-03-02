@@ -24,6 +24,12 @@ import java.util.Collection;
  */
 public class LowerWeightRoundRobin implements Selector<HostWeight>{
 
+    /**
+     * select
+     * @param sources sources
+     * @return HostWeight
+     */
+    @Override
     public HostWeight select(Collection<HostWeight> sources){
         int totalWeight = 0;
         int lowWeight = 0;

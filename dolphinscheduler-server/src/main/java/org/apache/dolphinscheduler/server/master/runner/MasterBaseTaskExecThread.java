@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.remote.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -147,7 +147,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * @param taskInstance taskInstance
      * @return TaskExecutionContext
      */
-    private TaskExecutionContext getTaskExecutionContext(TaskInstance taskInstance){
+    protected TaskExecutionContext getTaskExecutionContext(TaskInstance taskInstance){
         taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstance.getId());
 
         Integer userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
