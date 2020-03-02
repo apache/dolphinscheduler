@@ -22,17 +22,18 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskAckCommand;
-import org.apache.dolphinscheduler.remote.command.ExecuteTaskResponseCommand;
+import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *  taks callback service
  */
+@Service
 public class TaskCallbackService {
 
     private final Logger logger = LoggerFactory.getLogger(TaskCallbackService.class);
@@ -92,14 +93,14 @@ public class TaskCallbackService {
     /**
      *  send ack
      * @param taskInstanceId taskInstanceId
-     * @param ackCommand ackCommand
+     * @param command command
      */
-    public void sendAck(int taskInstanceId, ExecuteTaskAckCommand ackCommand){
+    public void sendAck(int taskInstanceId, Command command){
         NettyRemoteChannel nettyRemoteChannel = getRemoteChannel(taskInstanceId);
         if(nettyRemoteChannel == null){
             //TODO
         } else{
-            nettyRemoteChannel.writeAndFlush(ackCommand.convert2Command());
+            nettyRemoteChannel.writeAndFlush(command);
         }
     }
 
@@ -107,14 +108,14 @@ public class TaskCallbackService {
      *  send result
      *
      * @param taskInstanceId taskInstanceId
-     * @param responseCommand responseCommand
+     * @param command command
      */
-    public void sendResult(int taskInstanceId, ExecuteTaskResponseCommand responseCommand){
+    public void sendResult(int taskInstanceId, Command command){
         NettyRemoteChannel nettyRemoteChannel = getRemoteChannel(taskInstanceId);
         if(nettyRemoteChannel == null){
             //TODO
         } else{
-            nettyRemoteChannel.writeAndFlush(responseCommand.convert2Command()).addListener(new ChannelFutureListener(){
+            nettyRemoteChannel.writeAndFlush(command).addListener(new ChannelFutureListener(){
 
                 @Override
                 public void operationComplete(ChannelFuture future) throws Exception {
