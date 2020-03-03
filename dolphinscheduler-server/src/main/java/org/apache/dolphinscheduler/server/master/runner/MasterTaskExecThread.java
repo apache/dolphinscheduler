@@ -186,9 +186,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         TaskExecutionContext taskExecutionContext = super.getTaskExecutionContext(taskInstance);
         ExecutionContext executionContext = new ExecutionContext(taskExecutionContext, ExecutorType.WORKER);
 
-        Host host = new Host();
-        host.setIp(taskInstance.getHost());
-        host.setPort(12346);
+        Host host = Host.of(taskInstance.getHost());
         executionContext.setHost(host);
 
         nettyExecutorManager.executeDirectly(executionContext);
