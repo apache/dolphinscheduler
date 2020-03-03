@@ -173,7 +173,7 @@ public class ExecutorController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Result startCheckProcessDefinition(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam(value = "processDefinitionId") int processDefinitionId) {
-        logger.info("login user {}, check process definition", loginUser.getUserName(), processDefinitionId);
+        logger.info("login user {}, check process definition {}", loginUser.getUserName(), processDefinitionId);
         try {
             Map<String, Object> result = execService.startCheckByProcessDefinedId(processDefinitionId);
             return returnDataList(result);
