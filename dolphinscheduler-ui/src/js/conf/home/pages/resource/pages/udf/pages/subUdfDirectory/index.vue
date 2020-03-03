@@ -15,22 +15,22 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('UDF Resources')">
-    <template slot="conditions">
+  <div class="home-main list-construction-model">
+    <div class="content-title">
+      <a class="bread" style="padding-left: 15px;" @click="() => $router.push({path: `/resource/udf`})">{{$t('Resource manage')}}</a>
+      <a class="bread" v-for="(item,$index) in breadList" :key="$index" @click="_ckOperation($index)">{{'>'+item}}</a>
+    </div>
+    <div class="conditions-box">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button-group size="small">
+          <x-button-group size="small" >
             <x-button type="ghost" @click="() => $router.push({name: 'resource-udf-subCreateUdfFolder'})">{{$t('Create folder')}}</x-button>
             <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
-            <span class="bread">(</span>
-            <a class="bread" @click="() => $router.push({path: `/resource/udf`})">{{$t('Resource manage')}}</a>
-            <a class="bread" v-for="(item,$index) in breadList" :key="$index" @click="_ckOperation($index)">{{'>'+item}}</a>
-            <span class="bread">)</span>
           </x-button-group>
         </template>
       </m-conditions>
-    </template>
-    <template slot="content">
+      </div>
+      <div class="list-box">
       <template v-if="udfResourcesList.length || total>0">
         <m-list @on-update="_onUpdate" :udf-resources-list="udfResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
@@ -43,8 +43,8 @@
       </template>
       <m-spin :is-spin="isLoading">
       </m-spin>
-    </template>
-  </m-list-construction>
+    </div>
+  </div>
 </template>
 <script>
   import _ from 'lodash'
@@ -174,10 +174,10 @@
 </script>
 <style lang="scss" rel="stylesheet/scss">
   .bread {
-    padding: 7px 0;
-    line-height: 14px;
-    position: relative;
-    float: left;
+    font-size: 22px;
+    padding-top: 10px;
+    color: #2a455b;
+    display: inline-block;
     cursor: pointer;
   }
 </style>
