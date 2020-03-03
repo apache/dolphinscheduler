@@ -91,13 +91,19 @@ public class ResourcesService extends BaseService {
                                  int pid,
                                  String currentDir) {
         Result result = new Result();
+        // if hdfs not startup
+        if (!PropertyUtils.getResUploadStartupState()){
+            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+            putMsg(result, Status.HDFS_NOT_STARTUP);
+            return result;
+        }
         String fullName = currentDir.equals("/") ? String.format("%s%s",currentDir,name):String.format("%s/%s",currentDir,name);
 
         if (pid != -1) {
             Resource parentResource = resourcesMapper.selectById(pid);
 
             if (parentResource == null) {
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
                 return result;
             }
 
@@ -406,6 +412,10 @@ public class ResourcesService extends BaseService {
 
     /**
      * create direcoty
+     * @param loginUser login user
+     * @param fullName  full name
+     * @param type      resource type
+     * @param result    Result
      */
     private void createDirecotry(User loginUser,String fullName,ResourceType type,Result result){
         // query tenant
@@ -554,7 +564,7 @@ public class ResourcesService extends BaseService {
         resourceIdSet.retainAll(allChildren);
         if (CollectionUtils.isNotEmpty(resourceIdSet)) {
             logger.error("can't be deleted,because it is used of process definition");
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            putMsg(result, Status.RESOURCE_IS_USED);
             return result;
         }
 
