@@ -473,7 +473,35 @@
        */
       _createNodes ({ id, type }) {
         let self = this
+        let preNode = []
+        let rearNode = []
+        let rearList = []
+        $('div[data-targetarr*="' + id + '"]').each(function(){
+          rearNode.push($(this).attr("id"))
+        })
 
+        if (rearNode.length>0) {
+          rearNode.forEach(v => {
+            let rearobj = {}
+            rearobj.value = $(`#${v}`).find('.name-p').text()
+            rearobj.label = $(`#${v}`).find('.name-p').text()
+            rearList.push(rearobj)
+          })
+        } else {
+          rearList = []
+        }
+        let targetarr = $(`#${id}`).attr('data-targetarr')
+        if (targetarr) {
+          let nodearr = targetarr.split(',')
+          nodearr.forEach(v => {
+            let nodeobj = {}
+            nodeobj.value = $(`#${v}`).find('.name-p').text()
+            nodeobj.label = $(`#${v}`).find('.name-p').text()
+            preNode.push(nodeobj)
+          })
+        } else {
+          preNode = []
+        }
         if (eventModel) {
           eventModel.remove()
         }
@@ -486,6 +514,7 @@
         }
 
         this.taskId = id
+        type = type || self.dagBarId
 
         eventModel = this.$drawer({
           closable: false,
@@ -522,8 +551,10 @@
             },
             props: {
               id: id,
-              taskType: type || self.dagBarId,
-              self: self
+              taskType: type,
+              self: self,
+              preNode: preNode,
+              rearList: rearList
             }
           })
         })

@@ -8,11 +8,14 @@ Official Website: https://dolphinscheduler.apache.org
 
 ![Dolphin Scheduler](https://dolphinscheduler.apache.org/img/hlogo_colorful.svg)
 
-## How to use this image
+[![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
+[![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
+
+## How to use this docker image
 
 #### You can start a dolphinscheduler instance
 ```
-$ docker run -d --name dolphinscheduler \ 
+$ docker run -dit --name dolphinscheduler \ 
 -e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test \
 -p 8888:8888 \
 dolphinscheduler all
@@ -27,7 +30,7 @@ The default zookeeper is created in the `startup.sh`.
 You can specify **existing postgres service**. Example:
 
 ```
-$ docker run -d --name dolphinscheduler \
+$ docker run -dit --name dolphinscheduler \
 -e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" \
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
 -p 8888:8888 \
@@ -37,7 +40,7 @@ dolphinscheduler all
 You can specify **existing zookeeper service**. Example:
 
 ```
-$ docker run -d --name dolphinscheduler \
+$ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
 -p 8888:8888 \
@@ -51,7 +54,7 @@ You can start a standalone dolphinscheduler server.
 * Start a **master server**, For example:
 
 ```
-$ docker run -d --name dolphinscheduler \
+$ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
 -e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" \
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
@@ -61,7 +64,7 @@ dolphinscheduler master-server
 * Start a **worker server**, For example:
 
 ```
-$ docker run -d --name dolphinscheduler \
+$ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
 -e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" \
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
@@ -71,7 +74,7 @@ dolphinscheduler worker-server
 * Start a **api server**, For example:
 
 ```
-$ docker run -d --name dolphinscheduler \
+$ docker run -dit --name dolphinscheduler \
 -e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" \
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
 -p 12345:12345 \
@@ -81,7 +84,7 @@ dolphinscheduler api-server
 * Start a **alert server**, For example:
 
 ```
-$ docker run -d --name dolphinscheduler \
+$ docker run -dit --name dolphinscheduler \
 -e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" \
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
 dolphinscheduler alert-server
@@ -90,13 +93,32 @@ dolphinscheduler alert-server
 * Start a **frontend**, For example:
 
 ```
-$ docker run -d --name dolphinscheduler \
+$ docker run -dit --name dolphinscheduler \
 -e FRONTEND_API_SERVER_HOST="192.168.x.x" -e FRONTEND_API_SERVER_PORT="12345" \
 -p 8888:8888 \
 dolphinscheduler frontend
 ```
 
 **Note**: You must be specify `POSTGRESQL_HOST` `POSTGRESQL_PORT` `ZOOKEEPER_QUORUM` when start a standalone dolphinscheduler server.
+
+## How to build a docker image
+
+You can build a docker image in A Unix-like operating system, You can also build it in Windows operating system.
+
+In Unix-Like, Example:
+
+```bash
+$ cd path/incubator-dolphinscheduler
+$ sh ./dockerfile/hooks/build
+```
+
+In Windows, Example:
+
+```bat
+c:\incubator-dolphinscheduler>.\dockerfile\hooks\build.bat
+```
+
+Please read `./dockerfile/hooks/build` `./dockerfile/hooks/build.bat` script files if you don't understand
 
 ## Environment Variables
 
