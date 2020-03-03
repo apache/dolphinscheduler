@@ -46,8 +46,7 @@ public class TaskKillResponseProcessor implements NettyRequestProcessor {
         Preconditions.checkArgument(CommandType.TASK_KILL_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
 
         TaskKillResponseCommand responseCommand = FastJsonSerializer.deserialize(command.getBody(), TaskKillResponseCommand.class);
-        logger.info("received command : {}", responseCommand);
-        logger.info("已经接受到了worker杀任务的回应");
+        logger.info("received task kill response command : {}", responseCommand);
     }
 
 
