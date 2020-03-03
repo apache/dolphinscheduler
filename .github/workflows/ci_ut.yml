@@ -20,7 +20,7 @@ env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
 
-name: Test Coveralls Parallel
+name: Unit Test
 
 jobs:
 
@@ -29,9 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v1
-        with:
-          submodules: true
+      - uses: actions/checkout@v2
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository

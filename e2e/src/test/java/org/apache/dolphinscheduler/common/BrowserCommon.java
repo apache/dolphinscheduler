@@ -99,8 +99,6 @@ public class BrowserCommon {
         // show wait timeout
         long timeout = Long.valueOf(PropertiesReader.getKey("driver.timeouts.webDriverWait"));
         wait = new WebDriverWait(driver, timeout);
-//        this.redisUtil = redisUtil;
-//        this.jedis = redisUtil.getJedis();
     }
 
 
@@ -158,22 +156,34 @@ public class BrowserCommon {
      *
      * @param locator By
      */
-    public void clearInput(By locator) {
+    public WebElement clearInput(By locator) {
         WebElement clearElement = locateElement(locator);
         clearElement.click();
-        clearElement.clear();
         clearElement.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        clearElement.sendKeys(Keys.DELETE);
+        clearElement.sendKeys(Keys.BACK_SPACE);
+        return clearElement;
     }
 
+    /**
+     * input codeMirror
+     *
+     * @param codeMirrorLocator By codeMirror
+     * @param codeMirrorLineLocator By codeMirrorLine
+
+     */
+    public void inputCodeMirror(By codeMirrorLocator,By codeMirrorLineLocator,String content) {
+        WebElement codeMirrorElement = locateElement(codeMirrorLocator);
+        WebElement codeMirrorLineElement = locateElement(codeMirrorLineLocator);
+        codeMirrorElement.click();
+        codeMirrorLineElement.sendKeys(content);
+    }
 
     /**
      * move to element
-     *
      * @param locator BY
      * @return actions
      */
-    public Actions moveToElement(By locator) {
+    public Actions moveToElement(By locator){
         return actions.moveToElement(locateElement(locator));
     }
 
@@ -182,13 +192,17 @@ public class BrowserCommon {
      *
      * @param source_locator BY
      * @param target_locator BY
-     * @param X  X-axis
-     * @param Y Y-axis
      */
-    public void dragAndDropBy(By source_locator, By target_locator, int X, int Y) {
-        WebElement sourcetElement = locateElement(source_locator);
+    public void dragAndDrop(By source_locator, By target_locator){
+        WebElement sourceElement = locateElement(source_locator);
         WebElement targetElement = locateElement(target_locator);
-        actions.dragAndDrop(sourcetElement, targetElement).moveToElement(targetElement, X, Y).perform();
+        actions.dragAndDrop(sourceElement, targetElement).perform();
+        actions.release();
+    }
+
+    public void moveToDragElement(By target_locator, int X, int Y){
+        WebElement targetElement = locateElement(target_locator);
+        actions.dragAndDropBy(targetElement, X, Y).perform();
         actions.release();
     }
 
@@ -299,6 +313,13 @@ public class BrowserCommon {
     public void scrollToBottom() {
         executeScript("window.scrollTo(0, document.body.scrollHeight)");
     }
+
+    public void scrollToElementBottom() {
+
+        WebElement webElement = driver.findElement(By.xpath("/html/body/div[4]/div/div[2]/div/div[2]/div/div[7]/div[3]"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", webElement);
+    }
+
 
     /**
      * Page swipe makes the top of the element align with the top of the page
