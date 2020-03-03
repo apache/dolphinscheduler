@@ -80,7 +80,6 @@ public class ZKServer {
      */
     public static void startLocalZkServer(final int port) {
         startLocalZkServer(port, org.apache.commons.io.FileUtils.getTempDirectoryPath() + File.separator + "test-" + System.currentTimeMillis());
-        startLocalZkServer(port, org.apache.commons.io.FileUtils.getTempDirectoryPath() + "test-" + System.currentTimeMillis());
     }
 
     /**
