@@ -121,7 +121,7 @@ public class ProcessService {
             return null;
         }
         if(!checkThreadNum(command, validThreadNum)){
-            logger.info("there is not enough thread for this command: {}",command );
+            logger.info("there is not enough thread for this command: {}", command);
             return setWaitingThreadProcess(command, processInstance);
         }
         processInstance.setCommandType(command.getCommandType());
