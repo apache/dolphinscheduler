@@ -27,17 +27,17 @@
       </x-select>
       <template v-if="isInstance">
         <span class="instance-state">
-          <i class="iconfont" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')">&#xe607;</i>
-          <i class="iconfont" :class="'icon-' + el.state" v-if="el.state === 'WAITING'" data-toggle="tooltip" data-container="body" :title="$t('waiting')">&#xe62a;</i>
-          <i class="iconfont" :class="'icon-' + el.state" v-if="el.state === 'FAILED'" data-toggle="tooltip" data-container="body" :title="$t('failed')">&#xe626;</i>
+          <em class="iconfont ans-icon-success-solid" :class="'icon-' + el.state" v-if="el.state === 'SUCCESS'" data-toggle="tooltip" data-container="body" :title="$t('success')"></em>
+          <em class="iconfont ans-icon-clock" :class="'icon-' + el.state" v-if="el.state === 'WAITING'" data-toggle="tooltip" data-container="body" :title="$t('waiting')"></em>
+          <em class="iconfont ans-icon-fail-solid" :class="'icon-' + el.state" v-if="el.state === 'FAILED'" data-toggle="tooltip" data-container="body" :title="$t('failed')"></em>
         </span>
       </template>
       <span class="operation">
         <a href="javascript:" class="delete" @click="!isDetails && _remove($index)">
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('delete')" >&#xe611;</i>
+          <em class="iconfont ans-icon-trash" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('delete')" ></em>
         </a>
         <a href="javascript:" class="add" @click="!isDetails && _add()" v-if="$index === (dependItemList.length - 1)">
-          <i class="iconfont" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('Add')">&#xe636;</i>
+          <em class="iconfont ans-icon-increase" :class="_isDetails" data-toggle="tooltip" data-container="body" :title="$t('Add')"></em>
         </a>
       </span>
     </div>
