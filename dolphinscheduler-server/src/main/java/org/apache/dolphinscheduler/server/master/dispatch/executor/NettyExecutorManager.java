@@ -130,6 +130,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         return success;
     }
 
+    @Override
     public void executeDirectly(ExecutionContext context) throws ExecuteException {
         Command command = buildCommand(context);
         Host host = context.getHost();
