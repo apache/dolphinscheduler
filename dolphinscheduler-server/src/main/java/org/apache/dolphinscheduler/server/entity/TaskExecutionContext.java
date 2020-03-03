@@ -29,7 +29,7 @@ public class TaskExecutionContext implements Serializable{
     /**
      *  task id
      */
-    private Integer taskInstanceId;
+    private int taskInstanceId;
 
 
     /**
@@ -51,7 +51,7 @@ public class TaskExecutionContext implements Serializable{
      * host
      */
     private String host;
-
+    
     /**
      *  task execute path
      */
@@ -70,7 +70,7 @@ public class TaskExecutionContext implements Serializable{
     /**
      * processId
      */
-    private Integer processId;
+    private int processId;
 
     /**
      * appIds
@@ -80,7 +80,7 @@ public class TaskExecutionContext implements Serializable{
     /**
      *  process instance id
      */
-    private Integer processInstanceId;
+    private int processInstanceId;
 
 
     /**
@@ -97,13 +97,13 @@ public class TaskExecutionContext implements Serializable{
     /**
      *  execute user id
      */
-    private Integer executorId;
+    private int executorId;
 
 
     /**
      *  command type if complement
      */
-    private Integer cmdTypeIfComplement;
+    private int cmdTypeIfComplement;
 
 
     /**
@@ -120,12 +120,12 @@ public class TaskExecutionContext implements Serializable{
     /**
      *  process define id
      */
-    private Integer processDefineId;
+    private int processDefineId;
 
     /**
      *  project id
      */
-    private Integer projectId;
+    private int projectId;
 
     /**
      * taskParams
@@ -173,22 +173,11 @@ public class TaskExecutionContext implements Serializable{
      */
     private DataxTaskExecutionContext dataxTaskExecutionContext;
 
-
-
-
-    public String getWorkerGroup() {
-        return workerGroup;
-    }
-
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
-    }
-
-    public Integer getTaskInstanceId() {
+    public int getTaskInstanceId() {
         return taskInstanceId;
     }
 
-    public void setTaskInstanceId(Integer taskInstanceId) {
+    public void setTaskInstanceId(int taskInstanceId) {
         this.taskInstanceId = taskInstanceId;
     }
 
@@ -216,12 +205,28 @@ public class TaskExecutionContext implements Serializable{
         this.taskType = taskType;
     }
 
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     public String getExecutePath() {
         return executePath;
     }
 
     public void setExecutePath(String executePath) {
         this.executePath = executePath;
+    }
+
+    public String getLogPath() {
+        return logPath;
+    }
+
+    public void setLogPath(String logPath) {
+        this.logPath = logPath;
     }
 
     public String getTaskJson() {
@@ -232,11 +237,27 @@ public class TaskExecutionContext implements Serializable{
         this.taskJson = taskJson;
     }
 
-    public Integer getProcessInstanceId() {
+    public int getProcessId() {
+        return processId;
+    }
+
+    public void setProcessId(int processId) {
+        this.processId = processId;
+    }
+
+    public String getAppIds() {
+        return appIds;
+    }
+
+    public void setAppIds(String appIds) {
+        this.appIds = appIds;
+    }
+
+    public int getProcessInstanceId() {
         return processInstanceId;
     }
 
-    public void setProcessInstanceId(Integer processInstanceId) {
+    public void setProcessInstanceId(int processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
@@ -256,6 +277,22 @@ public class TaskExecutionContext implements Serializable{
         this.globalParams = globalParams;
     }
 
+    public int getExecutorId() {
+        return executorId;
+    }
+
+    public void setExecutorId(int executorId) {
+        this.executorId = executorId;
+    }
+
+    public int getCmdTypeIfComplement() {
+        return cmdTypeIfComplement;
+    }
+
+    public void setCmdTypeIfComplement(int cmdTypeIfComplement) {
+        this.cmdTypeIfComplement = cmdTypeIfComplement;
+    }
+
     public String getTenantCode() {
         return tenantCode;
     }
@@ -272,44 +309,20 @@ public class TaskExecutionContext implements Serializable{
         this.queue = queue;
     }
 
-    public Integer getProcessDefineId() {
+    public int getProcessDefineId() {
         return processDefineId;
     }
 
-    public void setProcessDefineId(Integer processDefineId) {
+    public void setProcessDefineId(int processDefineId) {
         this.processDefineId = processDefineId;
     }
 
-    public Integer getProjectId() {
+    public int getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(Integer projectId) {
+    public void setProjectId(int projectId) {
         this.projectId = projectId;
-    }
-
-    public Integer getExecutorId() {
-        return executorId;
-    }
-
-    public void setExecutorId(Integer executorId) {
-        this.executorId = executorId;
-    }
-
-    public Integer getCmdTypeIfComplement() {
-        return cmdTypeIfComplement;
-    }
-
-    public void setCmdTypeIfComplement(Integer cmdTypeIfComplement) {
-        this.cmdTypeIfComplement = cmdTypeIfComplement;
-    }
-
-    public String getLogPath() {
-        return logPath;
-    }
-
-    public void setLogPath(String logPath) {
-        this.logPath = logPath;
     }
 
     public String getTaskParams() {
@@ -360,28 +373,12 @@ public class TaskExecutionContext implements Serializable{
         this.taskTimeout = taskTimeout;
     }
 
-    public String getHost() {
-        return host;
+    public String getWorkerGroup() {
+        return workerGroup;
     }
 
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public Integer getProcessId() {
-        return processId;
-    }
-
-    public void setProcessId(Integer processId) {
-        this.processId = processId;
-    }
-
-    public String getAppIds() {
-        return appIds;
-    }
-
-    public void setAppIds(String appIds) {
-        this.appIds = appIds;
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
     }
 
     public SQLTaskExecutionContext getSqlTaskExecutionContext() {
