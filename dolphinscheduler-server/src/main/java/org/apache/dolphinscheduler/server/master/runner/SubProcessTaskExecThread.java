@@ -108,19 +108,6 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
-     *  updateProcessInstance parent state
-     */
-    private void updateParentProcessState(){
-        ProcessInstance parentProcessInstance = processService.findProcessInstanceById(this.processInstance.getId());
-
-        if(parentProcessInstance == null){
-            logger.error("parent work flow instance is null ,  please check it! work flow id {}", processInstance.getId());
-            return;
-        }
-        this.processInstance.setState(parentProcessInstance.getState());
-    }
-
-    /**
      * wait task quit
      * @throws InterruptedException
      */
@@ -144,11 +131,11 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
                 }
             }
             subProcessInstance = processService.findProcessInstanceById(subProcessInstance.getId());
-            updateParentProcessState();
             if (subProcessInstance.getState().typeIsFinished()){
                 break;
             }
 
+            this.processInstance = processService.findProcessInstanceById(this.processInstance.getId());
             if(this.processInstance.getState() == ExecutionStatus.READY_PAUSE){
                 // parent process "ready to pause" , child process "pause"
                 pauseSubProcess();
