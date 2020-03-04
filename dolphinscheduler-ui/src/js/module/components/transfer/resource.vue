@@ -27,7 +27,7 @@
         <treeselect v-show="checkedValue=='fileResource'" v-model="selectFileSource" :multiple="true" :options="fileList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
-        <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :disable-branch-nodes="true" :options="udfList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
+        <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :multiple="true" :options="udfList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
           <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
         </treeselect>
         <!-- <div class="select-list-box">
