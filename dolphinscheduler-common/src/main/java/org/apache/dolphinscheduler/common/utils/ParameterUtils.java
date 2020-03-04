@@ -119,10 +119,15 @@ public class ParameterUtils {
    */
   public static String curingGlobalParams(Map<String,String> globalParamMap, List<Property> globalParamList,
                                    CommandType commandType, Date scheduleTime){
-      Map<String, String> globalMap = new HashMap<>();
-      if(globalParamMap!= null){
-        globalMap.putAll(globalParamMap);
-      }
+
+    if(globalParamList == null || globalParamList.isEmpty()) {
+      return null;
+    }
+
+    Map<String, String> globalMap = new HashMap<>();
+    if(globalParamMap!= null){
+      globalMap.putAll(globalParamMap);
+    }
     Map<String,String> allParamMap = new HashMap<>();
     //If it is a complement, a complement time needs to be passed in, according to the task type
     Map<String,String> timeParams = BusinessTimeUtils
@@ -151,17 +156,13 @@ public class ParameterUtils {
       globalMap.putAll(resolveMap);
     }
 
-    if (globalParamList != null && globalParamList.size() > 0){
-
-      for (Property property : globalParamList){
-        String val = globalMap.get(property.getProp());
-        if (val != null){
-          property.setValue(val);
-        }
+    for (Property property : globalParamList){
+      String val = globalMap.get(property.getProp());
+      if (val != null){
+        property.setValue(val);
       }
-      return JSONObject.toJSONString(globalParamList);
     }
-    return null;
+    return JSONObject.toJSONString(globalParamList);
   }
 
 
