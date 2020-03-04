@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.master.dispatch;
 
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
@@ -44,9 +43,6 @@ public class ExecutorDispatcher implements InitializingBean {
      */
     @Autowired
     private NettyExecutorManager nettyExecutorManager;
-
-    @Autowired
-    private MasterConfig masterConfig;
 
     /**
      * round robin host manager
@@ -87,10 +83,9 @@ public class ExecutorDispatcher implements InitializingBean {
          */
         Host host = hostManager.select(context);
         if (StringUtils.isEmpty(host.getAddress())) {
-            throw new ExecuteException(String.format("fail to execute : %s due to no worker ", context.getContext()));
+            throw new ExecuteException(String.format("fail to execute : %s due to no worker ", context.getCommand()));
         }
         context.setHost(host);
-        context.getContext().setHost(host.getAddress());
         executorManager.beforeExecute(context);
         try {
             /**
