@@ -140,7 +140,7 @@
     <logger name="org.apache.hadoop" level="WARN"/>
 
 
-    <root level="INFO">
+    <root level="debug">
         <appender-ref ref="STDOUT"/>
 
         <if condition='p("server").contains("master-server")'>
