@@ -18,6 +18,7 @@ package queue;
 
 import org.apache.dolphinscheduler.service.queue.ITaskQueue;
 import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
+import org.apache.dolphinscheduler.service.zk.ZKServer;
 import org.junit.*;
 
 /**
