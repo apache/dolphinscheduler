@@ -90,6 +90,7 @@ public class ExecutorDispatcher implements InitializingBean {
             throw new ExecuteException(String.format("fail to execute : %s due to no worker ", context.getContext()));
         }
         context.setHost(host);
+        context.getContext().setHost(host.getAddress());
         executorManager.beforeExecute(context);
         try {
             /**

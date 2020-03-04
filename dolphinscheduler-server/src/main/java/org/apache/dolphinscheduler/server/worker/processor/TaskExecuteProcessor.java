@@ -78,9 +78,11 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_REQUEST == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
-        logger.info("received command : {}", command);
+
         TaskExecuteRequestCommand taskRequestCommand = FastJsonSerializer.deserialize(
                 command.getBody(), TaskExecuteRequestCommand.class);
+
+        logger.info("received command : {}", taskRequestCommand);
 
         String contextJson = taskRequestCommand.getTaskExecutionContext();
 
@@ -141,7 +143,7 @@ public class TaskExecuteProcessor implements NettyRequestProcessor {
         ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         ackCommand.setStatus(ExecutionStatus.RUNNING_EXEUTION.getCode());
         ackCommand.setLogPath(getTaskLogPath(taskExecutionContext));
-        ackCommand.setHost(OSUtils.getHost());
+        ackCommand.setHost(taskExecutionContext.getHost());
         ackCommand.setStartTime(new Date());
         if(taskExecutionContext.getTaskType().equals(TaskType.SQL.name()) || taskExecutionContext.getTaskType().equals(TaskType.PROCEDURE.name())){
             ackCommand.setExecutePath(null);

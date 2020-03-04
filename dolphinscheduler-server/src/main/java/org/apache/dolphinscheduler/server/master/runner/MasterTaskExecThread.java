@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
@@ -183,12 +184,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         alreadyKilled = true;
 
         TaskExecutionContext taskExecutionContext = super.getTaskExecutionContext(taskInstance);
-
         ExecutionContext executionContext = new ExecutionContext(taskExecutionContext, ExecutorType.WORKER);
 
-        Host host = new Host();
-        host.setIp(taskInstance.getHost());
-        host.setPort(12346);
+        Host host = Host.of(taskInstance.getHost());
         executionContext.setHost(host);
 
         nettyExecutorManager.executeDirectly(executionContext);

@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
+import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -71,7 +72,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
          */
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskKillResponseProcessor());
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
     }
 
 
@@ -130,8 +131,9 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         return success;
     }
 
+    @Override
     public void executeDirectly(ExecutionContext context) throws ExecuteException {
-        Command command = buildCommand(context);
+        Command command = buildKillCommand(context);
         Host host = context.getHost();
         doExecute(host,command);
     }
@@ -143,6 +145,28 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      */
     private Command buildCommand(ExecutionContext context) {
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
+        ExecutorType executorType = context.getExecutorType();
+        switch (executorType){
+            case WORKER:
+                TaskExecutionContext taskExecutionContext = context.getContext();
+                requestCommand.setTaskExecutionContext(FastJsonSerializer.serializeToString(taskExecutionContext));
+                break;
+            case CLIENT:
+                break;
+            default:
+                throw new IllegalArgumentException("invalid executor type : " + executorType);
+
+        }
+        return requestCommand.convert2Command();
+    }
+
+    /**
+     *  build command
+     * @param context context
+     * @return command
+     */
+    private Command buildKillCommand(ExecutionContext context) {
+        TaskKillRequestCommand requestCommand = new TaskKillRequestCommand();
         ExecutorType executorType = context.getExecutorType();
         switch (executorType){
             case WORKER:
