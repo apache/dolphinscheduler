@@ -40,7 +40,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 
-import static org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE;
 
 /**
  * master task exec base class
@@ -131,7 +130,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      */
     private Boolean dispatch(TaskInstance taskInstance){
         TaskExecutionContext context = getTaskExecutionContext(taskInstance);
-        ExecutionContext executionContext = new ExecutionContext(context, ExecutorType.WORKER);
+        ExecutionContext executionContext = new ExecutionContext(context.toCommand(), ExecutorType.WORKER, context.getWorkerGroup());
         try {
             return dispatcher.dispatch(executionContext);
         } catch (ExecuteException e) {
@@ -227,8 +226,8 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                     }
                 }
                 if(submitDB && !submitTask){
-                    // dispatcht task
-                    submitTask = dispatchtTask(task);
+                    // dispatch task
+                    submitTask = dispatchTask(task);
                 }
                 if(submitDB && submitTask){
                     return task;
@@ -254,7 +253,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
      * @param taskInstance taskInstance
      * @return whether submit task success
      */
-    public Boolean dispatchtTask(TaskInstance taskInstance) {
+    public Boolean dispatchTask(TaskInstance taskInstance) {
 
         try{
             if(taskInstance.isSubProcess()){
