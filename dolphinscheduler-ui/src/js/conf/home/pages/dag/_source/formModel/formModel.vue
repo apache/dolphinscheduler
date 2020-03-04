@@ -280,7 +280,7 @@
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
-  import mConditions from './tasks/CONDITIONS'
+  import mConditions from './tasks/conditions'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
