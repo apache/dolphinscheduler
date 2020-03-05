@@ -140,7 +140,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("exceptionCaught : {}", cause);
+        logger.error("exceptionCaught : {}",cause.getMessage(), cause);
         ctx.channel().close();
     }
 

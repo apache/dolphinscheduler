@@ -103,7 +103,7 @@ public class DataAnalysisController extends BaseController{
                                             @RequestParam(value="endDate", required=false) String endDate,
                                             @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
         try{
-            logger.info("count process instance state, user:{}, start date: {}, end date:{}, project id",
+            logger.info("count process instance state, user:{}, start date: {}, end date:{}, project id:{}",
                     loginUser.getUserName(), startDate, endDate, projectId);
             Map<String, Object> result = dataAnalysisService.countProcessInstanceStateByProject(loginUser, projectId, startDate, endDate);
             return returnDataList(result);
@@ -129,7 +129,7 @@ public class DataAnalysisController extends BaseController{
     public Result countDefinitionByUser(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value="projectId", required=false, defaultValue = "0") int projectId){
         try{
-            logger.info("count process definition , user:{}, project id",
+            logger.info("count process definition , user:{}, project id:{}",
                     loginUser.getUserName(), projectId);
             Map<String, Object> result = dataAnalysisService.countDefinitionByUser(loginUser, projectId);
             return returnDataList(result);
