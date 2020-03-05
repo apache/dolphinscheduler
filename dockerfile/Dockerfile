@@ -23,8 +23,8 @@ ENV TZ Asia/Shanghai
 ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND noninteractive
 
-#1. install dos2unix shadow bash openrc python sudo vim wget iputils net-tools ssh pip kazoo.
-#If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
+#1. install dos2unix shadow bash openrc python sudo vim :wq:::wget iputils net-tools ssh pip kazoo.
+#If install slowly, you can replcae alpine's mirr:q:P:::or with aliyun's mirror, Example:
 #RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
 RUN apk update && \
     apk add dos2unix shadow bash openrc python sudo vim wget iputils net-tools openssh-server py2-pip && \
@@ -63,16 +63,19 @@ RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
 ADD ./conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
 
 #7. add configuration and modify permissions and set soft links
+ADD ./checkpoint.sh /root/checkpoint.sh
 ADD ./startup-init-conf.sh /root/startup-init-conf.sh
 ADD ./startup.sh /root/startup.sh
 ADD ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
 ADD ./conf/dolphinscheduler/env/dolphinscheduler_env /opt/dolphinscheduler/conf/env/
-RUN chmod +x /root/startup-init-conf.sh && \
+RUN chmod +x /root/checkpoint.sh && \
+    chmod +x /root/startup-init-conf.sh && \
     chmod +x /root/startup.sh && \
     chmod +x /opt/dolphinscheduler/conf/env/dolphinscheduler_env && \
     chmod +x /opt/dolphinscheduler/script/*.sh && \
     chmod +x /opt/dolphinscheduler/bin/*.sh && \
     chmod +x /opt/zookeeper/bin/*.sh && \
+    dos2unix /root/checkpoint.sh && \
     dos2unix /root/startup-init-conf.sh && \
     dos2unix /root/startup.sh && \
     dos2unix /opt/dolphinscheduler/conf/env/dolphinscheduler_env && \
