@@ -21,7 +21,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *  ping machine
