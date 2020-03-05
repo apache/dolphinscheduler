@@ -128,7 +128,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                         // process define
                         ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
                         // send warn mail
-                        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),processDefine.getReceiversCc(),taskInstance.getId(),taskInstance.getName());
+                        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),
+                                processDefine.getReceiversCc(), processInstance.getId(), processInstance.getName(),
+                                taskInstance.getId(),taskInstance.getName());
                         checkTimeout = false;
                     }
                 }

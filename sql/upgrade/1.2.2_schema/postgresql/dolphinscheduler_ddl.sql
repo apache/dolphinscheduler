@@ -32,7 +32,7 @@ delimiter ;
 SELECT uc_dolphin_T_t_ds_process_definition_A_modify_by();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_definition_A_modify_by();
 
--- uc_dolphin_T_t_ds_process_definition_A_modify_by
+-- uc_dolphin_T_t_ds_task_instance_A_executor_id
 delimiter d//
 CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_instance_A_executor_id() RETURNS void AS $$
 BEGIN
