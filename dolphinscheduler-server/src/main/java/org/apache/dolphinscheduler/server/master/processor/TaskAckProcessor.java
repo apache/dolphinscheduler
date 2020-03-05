@@ -68,7 +68,7 @@ public class TaskAckProcessor implements NettyRequestProcessor {
 
         taskInstanceCacheManager.cacheTaskInstance(taskAckCommand);
 
-        String workerAddress = ChannelUtils.getRemoteAddress(channel);
+        String workerAddress = ChannelUtils.toAddress(channel).getAddress();
         /**
          * change Task state
          */
