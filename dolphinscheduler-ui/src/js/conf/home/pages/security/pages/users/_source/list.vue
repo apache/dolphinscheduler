@@ -247,8 +247,8 @@
               udfTargetList.push(value)
             }
           })
-          fileSourceList = fileSourceList.concat(fileTargetList)
-          udfSourceList  = udfSourceList.concat(udfTargetList)
+          fileSourceList = fileTargetList.concat(fileSourceList)
+          udfSourceList  = udfTargetList.concat(udfSourceList)
           fileTargetList = _.map(fileTargetList, v => {
             return v.id
           })
