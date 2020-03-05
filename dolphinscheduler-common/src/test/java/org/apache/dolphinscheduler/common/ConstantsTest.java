@@ -14,36 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.server.utils;
+package org.apache.dolphinscheduler.common;
 
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * Constants Test
+ */
+public class ConstantsTest {
 
-public class ProcessUtilsTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessUtilsTest.class);
-
+    /**
+     * Test PID via env
+     */
     @Test
-    public void getPidsStr() throws Exception {
-        String pidList = ProcessUtils.getPidsStr(1);
-        Assert.assertNotEquals("The child process of process 1 should not be empty", pidList, "");
-        logger.info("Sub process list : {}", pidList);
-    }
-
-    @Test
-    public void testBuildCommandStr() {
-        List<String> commands = new ArrayList<>();
-        commands.add("sudo");
-        try {
-            Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "sudo");
-        } catch (IOException e) {
-            Assert.fail(e.getMessage());
+    public void testPID() {
+        if (OSUtils.isWindows()) {
+            Assert.assertEquals(Constants.PID, "handle");
+        } else {
+            Assert.assertEquals(Constants.PID, "pid");
         }
     }
 
