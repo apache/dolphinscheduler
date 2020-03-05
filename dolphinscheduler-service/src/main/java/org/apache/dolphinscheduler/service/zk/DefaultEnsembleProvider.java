@@ -45,4 +45,14 @@ public class DefaultEnsembleProvider implements EnsembleProvider {
     public void close() throws IOException {
         //NOP
     }
+
+    @Override
+    public void setConnectionString(String connectionString) {
+        //NOP
+    }
+
+    @Override
+    public boolean updateServerListEnabled() {
+        return false;
+    }
 }
