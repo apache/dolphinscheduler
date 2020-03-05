@@ -14,36 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package queue;
+package org.apache.dolphinscheduler.service.zk;
 
-import org.apache.dolphinscheduler.service.queue.ITaskQueue;
-import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
-import org.apache.dolphinscheduler.service.zk.ZKServer;
-import org.junit.*;
+import org.junit.Ignore;
+import org.junit.Test;
 
-/**
- * base task queue test for only start zk server once
- */
+import static org.junit.Assert.*;
+
 @Ignore
-public class BaseTaskQueueTest {
+public class ZKServerTest {
 
-    protected static ITaskQueue tasksQueue = null;
-
-    @BeforeClass
-    public static void setup() {
-        ZKServer.start();
-        tasksQueue = TaskQueueFactory.getTaskQueueInstance();
-        //clear all data
-        tasksQueue.delete();
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        tasksQueue.delete();
-        ZKServer.stop();
-    }
     @Test
-    public void tasksQueueNotNull(){
-        Assert.assertNotNull(tasksQueue);
+    public void start() {
+        //ZKServer is a process, can't unit test
+    }
+
+    @Test
+    public void isStarted() {
+
+    }
+
+    @Test
+    public void stop() {
+        ZKServer.stop();
     }
 }
