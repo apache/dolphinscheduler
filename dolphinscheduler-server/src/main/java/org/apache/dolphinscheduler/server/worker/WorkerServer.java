@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
 import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.queue.ITaskQueue;
 import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,10 +60,7 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private ZKWorkerClient zkWorkerClient = null;
 
-    /**
-     * task queue impl
-     */
-    protected ITaskQueue taskQueue;
+
 
     /**
      *  fetch task executor service
@@ -136,7 +132,7 @@ public class WorkerServer implements IStoppable {
 
         this.zkWorkerClient.init();
 
-        this.taskQueue = TaskQueueFactory.getTaskQueueInstance();
+
 
         this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
 

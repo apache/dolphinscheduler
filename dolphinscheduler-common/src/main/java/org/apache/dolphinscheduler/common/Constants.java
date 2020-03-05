@@ -1004,4 +1004,6 @@ public final class Constants {
      * default worker group
      */
     public static final String DEFAULT_WORKER_GROUP = "default";
+
+    public static final Integer TASK_INFO_LENGTH = 5;
 }
