@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -99,5 +100,6 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * list all resource ids
      * @return resource ids list
      */
-    List<String> listResourceIds();
+    @MapKey("id")
+    List<Map<String, Object>> listResources();
 }

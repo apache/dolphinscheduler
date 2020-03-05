@@ -548,14 +548,11 @@ public class ResourcesService extends BaseService {
         }
 
         // get all resource id of process definitions those is released
-        List<String> resourceIdsList = processDefinitionMapper.listResourceIds();
-        Set<Integer> resourceIdSet = new HashSet<>();
-        resourceIdsList.stream().map(t->t.split(",")).forEach(t-> {
-            resourceIdSet.addAll(Arrays.stream(t).map(s->Integer.parseInt(s)).collect(Collectors.toSet()));
-        });
-
+        Map<Integer, Set<Integer>> resourceProcessMap = getResourceProcessMap();
+        Set<Integer> resourceIdSet = resourceProcessMap.keySet();
         // get all children of the resource
         List<Integer> allChildren = listAllChildren(resource);
+
         if (resourceIdSet.contains(resource.getPid())) {
             logger.error("can't be deleted,because it is used of process definition");
             putMsg(result, Status.RESOURCE_IS_USED);
@@ -564,6 +561,9 @@ public class ResourcesService extends BaseService {
         resourceIdSet.retainAll(allChildren);
         if (CollectionUtils.isNotEmpty(resourceIdSet)) {
             logger.error("can't be deleted,because it is used of process definition");
+            for (Integer resId : resourceIdSet) {
+                logger.error("resource id:{} is used of process definition {}",resId,resourceProcessMap.get(resId));
+            }
             putMsg(result, Status.RESOURCE_IS_USED);
             return result;
         }
@@ -581,8 +581,6 @@ public class ResourcesService extends BaseService {
 
         return result;
     }
-
-
 
     /**
      * verify resource by name and type
@@ -1091,6 +1089,40 @@ public class ResourcesService extends BaseService {
         }
         return children;
 
+    }
+
+    /**
+     * get resource process map key is resource id,value is the set of process definition
+     * @return resource process definition map
+     */
+    private Map<Integer,Set<Integer>> getResourceProcessMap(){
+        Map<Integer, String> map = new HashMap<>();
+        Map<Integer, Set<Integer>> result = new HashMap<>();
+        List<Map<String, Object>> list = processDefinitionMapper.listResources();
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (Map<String, Object> tempMap : list) {
+
+                map.put((Integer) tempMap.get("id"), (String)tempMap.get("resource_ids"));
+            }
+        }
+
+        for (Map.Entry<Integer, String> entry : map.entrySet()) {
+            Integer mapKey = entry.getKey();
+            String[] arr = entry.getValue().split(",");
+            Set<Integer> mapValues = Arrays.stream(arr).map(Integer::parseInt).collect(Collectors.toSet());
+            for (Integer value : mapValues) {
+                if (result.containsKey(value)) {
+                    Set<Integer> set = result.get(value);
+                    set.add(mapKey);
+                    result.put(value, set);
+                } else {
+                    Set<Integer> set = new HashSet<>();
+                    set.add(mapKey);
+                    result.put(value, set);
+                }
+            }
+        }
+        return result;
     }
 
 }
