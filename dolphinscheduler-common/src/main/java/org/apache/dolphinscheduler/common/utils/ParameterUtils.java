@@ -120,12 +120,12 @@ public class ParameterUtils {
   public static String curingGlobalParams(Map<String,String> globalParamMap, List<Property> globalParamList,
                                    CommandType commandType, Date scheduleTime){
 
-    if(globalParamList == null || globalParamList.isEmpty()) {
+    if (globalParamList == null || globalParamList.isEmpty()) {
       return null;
     }
 
     Map<String, String> globalMap = new HashMap<>();
-    if(globalParamMap!= null){
+    if (globalParamMap!= null){
       globalMap.putAll(globalParamMap);
     }
     Map<String,String> allParamMap = new HashMap<>();
@@ -137,9 +137,7 @@ public class ParameterUtils {
       allParamMap.putAll(timeParams);
     }
 
-    if (globalMap != null) {
-      allParamMap.putAll(globalMap);
-    }
+    allParamMap.putAll(globalMap);
 
     Set<Map.Entry<String, String>> entries = allParamMap.entrySet();
 
@@ -151,10 +149,7 @@ public class ParameterUtils {
         resolveMap.put(entry.getKey(),str);
       }
     }
-
-    if (globalMap != null){
-      globalMap.putAll(resolveMap);
-    }
+    globalMap.putAll(resolveMap);
 
     for (Property property : globalParamList){
       String val = globalMap.get(property.getProp());
