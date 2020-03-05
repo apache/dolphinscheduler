@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-on: ["push", "pull_request"]
+on: ["pull_request"]
 env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
