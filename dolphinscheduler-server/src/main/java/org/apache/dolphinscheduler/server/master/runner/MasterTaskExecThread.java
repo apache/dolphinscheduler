@@ -182,7 +182,10 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         }
         alreadyKilled = true;
 
-        TaskExecutionContext taskExecutionContext = super.getTaskExecutionContext(taskInstance);
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(taskInstance.getId());
+        taskExecutionContext.setProcessId(taskInstance.getPid());
+
         ExecutionContext executionContext = new ExecutionContext(taskExecutionContext.toKillCommand(), ExecutorType.WORKER, taskExecutionContext.getWorkerGroup());
 
         Host host = Host.of(taskInstance.getHost());
