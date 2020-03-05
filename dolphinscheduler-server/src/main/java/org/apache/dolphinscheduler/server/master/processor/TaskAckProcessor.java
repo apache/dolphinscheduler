@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
@@ -66,12 +67,14 @@ public class TaskAckProcessor implements NettyRequestProcessor {
         logger.info("taskAckCommand : {}", taskAckCommand);
 
         taskInstanceCacheManager.cacheTaskInstance(taskAckCommand);
+
+        String workerAddress = ChannelUtils.toAddress(channel).getAddress();
         /**
          * change Task state
          */
         processService.changeTaskState(ExecutionStatus.of(taskAckCommand.getStatus()),
                 taskAckCommand.getStartTime(),
-                taskAckCommand.getHost(),
+                workerAddress,
                 taskAckCommand.getExecutePath(),
                 taskAckCommand.getLogPath(),
                 taskAckCommand.getTaskInstanceId());

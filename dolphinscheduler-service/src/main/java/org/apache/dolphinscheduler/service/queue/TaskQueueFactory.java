@@ -40,11 +40,11 @@ public class TaskQueueFactory {
    *
    * @return instance
    */
-  public static ITaskQueue getTaskQueueInstance() {
+  public static TaskUpdateQueue getTaskQueueInstance() {
     String queueImplValue = CommonUtils.getQueueImplValue();
     if (StringUtils.isNotBlank(queueImplValue)) {
         logger.info("task queue impl use zookeeper ");
-        return SpringApplicationContext.getBean(TaskQueueZkImpl.class);
+        return SpringApplicationContext.getBean(TaskUpdateQueueImpl.class);
     }else{
       logger.error("property dolphinscheduler.queue.impl can't be blank, system will exit ");
       System.exit(-1);

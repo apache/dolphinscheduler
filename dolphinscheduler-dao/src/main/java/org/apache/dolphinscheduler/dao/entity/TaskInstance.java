@@ -191,6 +191,11 @@ public class TaskInstance implements Serializable {
      */
     private int workerGroupId;
 
+    /**
+     * workerGroup
+     */
+    private String workerGroup;
+
     public ProcessInstance getProcessInstance() {
         return processInstance;
     }
@@ -460,6 +465,14 @@ public class TaskInstance implements Serializable {
         this.dependentResult = dependentResult;
     }
 
+    public String getWorkerGroup() {
+        return workerGroup;
+    }
+
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
+    }
+
     @Override
     public String toString() {
         return "TaskInstance{" +
@@ -492,6 +505,7 @@ public class TaskInstance implements Serializable {
                 ", processInstancePriority=" + processInstancePriority +
                 ", dependentResult='" + dependentResult + '\'' +
                 ", workerGroupId=" + workerGroupId +
+                ", workerGroup='" + workerGroup + '\'' +
                 '}';
     }
 }
