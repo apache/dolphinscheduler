@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
@@ -123,7 +124,7 @@ public class ShellTask extends AbstractTask {
    */
   private String buildCommand() throws Exception {
     // generate scripts
-    String fileName = String.format("%s/%s_node.sh", taskDir, taskProps.getTaskAppId());
+    String fileName = String.format("%s/%s_node.%s", taskDir, taskProps.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
     Path path = new File(fileName).toPath();
 
     if (Files.exists(path)) {
@@ -154,7 +155,11 @@ public class ShellTask extends AbstractTask {
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
     FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
 
-    Files.createFile(path, attr);
+    if (OSUtils.isWindows()) {
+      Files.createFile(path);
+    } else {
+      Files.createFile(path, attr);
+    }
 
     Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
 

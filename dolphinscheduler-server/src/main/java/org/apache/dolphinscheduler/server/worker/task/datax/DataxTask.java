@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
@@ -338,7 +339,7 @@ public class DataxTask extends AbstractTask {
     private String buildShellCommandFile(String jobConfigFilePath)
         throws Exception {
         // generate scripts
-        String fileName = String.format("%s/%s_node.sh", taskDir, taskProps.getTaskAppId());
+        String fileName = String.format("%s/%s_node.%s", taskDir, taskProps.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
         Path path = new File(fileName).toPath();
 
         if (Files.exists(path)) {
@@ -370,7 +371,13 @@ public class DataxTask extends AbstractTask {
         // create shell command file
         Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
         FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-        Files.createFile(path, attr);
+
+        if (OSUtils.isWindows()) {
+            Files.createFile(path);
+        } else {
+            Files.createFile(path, attr);
+        }
+
         Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
 
         return fileName;
