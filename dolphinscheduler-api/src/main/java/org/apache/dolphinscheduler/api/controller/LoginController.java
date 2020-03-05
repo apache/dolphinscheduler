@@ -52,13 +52,13 @@ public class LoginController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
+    private static final String COOKIE_ROOT_PATH = "/";
 
     @Autowired
     private SessionService sessionService;
 
     @Autowired
     private Authenticator authenticator;
-
 
     /**
      * login
@@ -106,6 +106,7 @@ public class LoginController extends BaseController {
             for (Map.Entry<String, String> cookieEntry : cookieMap.entrySet()) {
                 Cookie cookie = new Cookie(cookieEntry.getKey(), cookieEntry.getValue());
                 cookie.setHttpOnly(true);
+                cookie.setPath(COOKIE_ROOT_PATH);
                 response.addCookie(cookie);
             }
 
