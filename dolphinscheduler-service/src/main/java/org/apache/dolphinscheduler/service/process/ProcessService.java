@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
-import org.apache.dolphinscheduler.service.queue.ITaskQueue;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,11 +97,6 @@ public class ProcessService {
     @Autowired
     private  ProjectMapper projectMapper;
 
-    /**
-     * task queue impl
-     */
-    @Autowired
-    private ITaskQueue taskQueue;
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      * @param logger logger
@@ -960,40 +954,7 @@ public class ProcessService {
         return taskInstance;
     }
 
-    /**
-     * submit task to queue
-     * @param taskInstance taskInstance
-     * @return whether submit task to queue success
-     */
-    public Boolean submitTaskToQueue(TaskInstance taskInstance) {
 
-        try{
-            if(taskInstance.isSubProcess()){
-                return true;
-            }
-            if(taskInstance.getState().typeIsFinished()){
-                logger.info(String.format("submit to task queue, but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
-                return true;
-            }
-            // task cannot submit when running
-            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
-                logger.info(String.format("submit to task queue, but task [%s] state already be running. ", taskInstance.getName()));
-                return true;
-            }
-            if(checkTaskExistsInTaskQueue(taskInstance)){
-                logger.info(String.format("submit to task queue, but task [%s] already exists in the queue.", taskInstance.getName()));
-                return true;
-            }
-            logger.info("task ready to queue: {}" , taskInstance);
-            boolean insertQueueResult = taskQueue.add(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo(taskInstance));
-            logger.info(String.format("master insert into queue success, task : %s", taskInstance.getName()) );
-            return insertQueueResult;
-        }catch (Exception e){
-            logger.error("submit task to queue Exception: ", e);
-            logger.error("task queue error : %s", JSONUtils.toJson(taskInstance));
-            return false;
-        }
-    }
 
     /**
      * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskInstanceId}_${task executed by ip1},${ip2}...
@@ -1127,7 +1088,8 @@ public class ProcessService {
 
         String taskZkInfo = taskZkInfo(taskInstance);
 
-        return taskQueue.checkTaskExists(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo);
+//        return taskQueue.checkTaskExists(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo);
+        return false;
     }
 
     /**
