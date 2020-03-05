@@ -112,15 +112,25 @@
         where pid = #{direcotyId}
     </select>
 
-    <select id="queryResource" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+    <update id="batchUpdateResource" parameterType="java.util.List">
+        <foreach collection="resourceList" item="resource" index="index" open="" close="" separator =";">
+            update t_ds_resources
+            <set>
+                full_name=#{resource.fullName},
+                update_time=#{resource.updateTime}
+            </set>
+            <where>
+                id=#{resource.id}
+            </where>
+        </foreach>
+    </update>
+
+    <select id="listResourceByIds" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
         select *
         from t_ds_resources
-        where type = #{type}
-        <if test="fullName != null and fullName != ''">
-            and full_name = #{fullName}
-        </if>
-        <if test="pid != null and pid != 0">
-            and pid = #{pid}
-        </if>
+        where id in
+        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
     </select>
 </mapper>
