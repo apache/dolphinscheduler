@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -29,9 +28,7 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
-import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,19 +44,12 @@ import java.util.concurrent.ExecutorService;
  *  worker server
  */
 @ComponentScan("org.apache.dolphinscheduler")
-public class WorkerServer implements IStoppable {
+public class WorkerServer {
 
     /**
      * logger
      */
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
-
-    /**
-     *  zk worker client
-     */
-    @Autowired
-    private ZKWorkerClient zkWorkerClient = null;
-
 
 
     /**
@@ -130,13 +120,8 @@ public class WorkerServer implements IStoppable {
         this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort(), workerConfig.getWorkerHeartbeatInterval(), workerConfig.getWorkerGroup());
         this.workerRegistry.registry();
 
-        this.zkWorkerClient.init();
-
-
 
         this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
-
-        zkWorkerClient.setStoppable(this);
 
         /**
          * register hooks, which are called before the process exits
@@ -144,7 +129,7 @@ public class WorkerServer implements IStoppable {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                stop("shutdownHook");
+                close("shutdownHook");
             }
         }));
 
@@ -156,8 +141,7 @@ public class WorkerServer implements IStoppable {
         }
     }
 
-    @Override
-    public synchronized void stop(String cause) {
+    public void close(String cause) {
 
         try {
             //execute only once
@@ -195,11 +179,6 @@ public class WorkerServer implements IStoppable {
             }
             logger.info("worker fetch task service stopped");
 
-            try{
-                zkWorkerClient.close();
-            }catch (Exception e){
-                logger.warn("zookeeper service stopped exception:{}",e.getMessage());
-            }
             latch.countDown();
             logger.info("zookeeper service stopped");
 

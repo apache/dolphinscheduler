@@ -54,7 +54,7 @@ import java.util.concurrent.ExecutorService;
  * master server
  */
 @ComponentScan("org.apache.dolphinscheduler")
-public class MasterServer implements IStoppable {
+public class MasterServer {
 
     /**
      * logger of MasterServer
@@ -142,8 +142,6 @@ public class MasterServer implements IStoppable {
 
         masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
 
-        zkMasterClient.setStoppable(this);
-
         // master scheduler thread
         MasterSchedulerThread masterSchedulerThread = new MasterSchedulerThread(
                 zkMasterClient,
@@ -180,7 +178,7 @@ public class MasterServer implements IStoppable {
                     zkMasterClient.getAlertDao().sendServerStopedAlert(
                         1, OSUtils.getHost(), "Master-Server");
                 }
-                stop("shutdownhook");
+                close("shutdownhook");
             }
         }));
     }
@@ -190,8 +188,7 @@ public class MasterServer implements IStoppable {
      * gracefully stop
      * @param cause why stopping
      */
-    @Override
-    public synchronized void stop(String cause) {
+    public void close(String cause) {
 
         try {
             //execute only once
@@ -225,10 +222,10 @@ public class MasterServer implements IStoppable {
             try {
                 ThreadPoolExecutors.getInstance().shutdown();
             }catch (Exception e){
-                logger.warn("threadpool service stopped exception:{}",e.getMessage());
+                logger.warn("threadPool service stopped exception:{}",e.getMessage());
             }
 
-            logger.info("threadpool service stopped");
+            logger.info("threadPool service stopped");
 
             try {
                 masterSchedulerService.shutdownNow();
