@@ -245,10 +245,6 @@ public class ZKMasterClient extends AbstractZKClient {
 				logger.info("master node added : {}", path);
 				break;
 			case NODE_REMOVED:
-				String serverHost = getHostByEventDataPath(path);
-				if (checkServerSelfDead(serverHost, ZKNodeType.MASTER)) {
-					return;
-				}
 				removeZKNodePath(path, ZKNodeType.MASTER, true);
 				break;
 			default:

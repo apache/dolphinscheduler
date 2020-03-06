@@ -370,23 +370,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 	}
 
 	/**
-	 * server self dead, stop all threads
-	 * @param serverHost server host
-	 * @param zkNodeType zookeeper node type
-	 * @return true if server dead and stop all threads
-	 */
-	protected boolean checkServerSelfDead(String serverHost, ZKNodeType zkNodeType) {
-		if (serverHost.equals(OSUtils.getHost())) {
-			logger.error("{} server({}) of myself dead , stopping...",
-					zkNodeType.toString(), serverHost);
-			stoppable.stop(String.format(" %s server %s of myself dead , stopping...",
-					zkNodeType.toString(), serverHost));
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 *  get host ip, string format: masterParentPath/ip
 	 * @param path path
 	 * @return host ip, string format: masterParentPath/ip
