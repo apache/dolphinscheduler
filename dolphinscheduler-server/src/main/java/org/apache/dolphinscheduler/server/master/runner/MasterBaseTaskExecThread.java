@@ -89,7 +89,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         this.cancel = false;
         this.taskInstance = taskInstance;
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
-        this.taskUpdateQueue = new TaskUpdateQueueImpl();
+        this.taskUpdateQueue = SpringApplicationContext.getBean(TaskUpdateQueueImpl.class);
     }
 
     /**
@@ -180,8 +180,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                     processInstance.getId(),
                     taskInstance.getProcessInstancePriority().getCode(),
                     taskInstance.getId(),
-                    taskInstance.getWorkerGroup());
-
+                    org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
             taskUpdateQueue.put(taskPriorityInfo);
             logger.info(String.format("master submit success, task : %s", taskInstance.getName()) );
             return true;
