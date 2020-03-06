@@ -17,8 +17,8 @@
 package org.apache.dolphinscheduler.server.master.dispatch.context;
 
 
+import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
 /**
@@ -32,30 +32,47 @@ public class ExecutionContext {
     private Host host;
 
     /**
-     *  context
+     *  command
      */
-    private final TaskExecutionContext context;
+    private final Command command;
 
     /**
      *  executor type : worker or client
      */
     private final ExecutorType executorType;
 
-    public ExecutionContext(TaskExecutionContext context, ExecutorType executorType) {
-        this.context = context;
+    /**
+     *  worker group
+     */
+    private String workerGroup;
+
+
+    public ExecutionContext(Command command, ExecutorType executorType) {
+        this.command = command;
         this.executorType = executorType;
     }
 
-    public String getWorkerGroup(){
-        return context.getWorkerGroup();
+    public ExecutionContext(Command command, ExecutorType executorType, String workerGroup) {
+        this.command = command;
+        this.executorType = executorType;
+        this.workerGroup = workerGroup;
+    }
+
+    public Command getCommand() {
+        return command;
     }
 
     public ExecutorType getExecutorType() {
         return executorType;
     }
 
-    public TaskExecutionContext getContext() {
-        return context;
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
+    }
+
+
+    public String getWorkerGroup(){
+        return this.workerGroup;
     }
 
     public Host getHost() {
