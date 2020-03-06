@@ -51,7 +51,6 @@ public class WorkerServer {
      */
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
-
     /**
      *  worker config
      */
