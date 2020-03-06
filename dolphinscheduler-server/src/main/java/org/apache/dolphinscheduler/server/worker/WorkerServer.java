@@ -53,16 +53,6 @@ public class WorkerServer {
 
 
     /**
-     *  fetch task executor service
-     */
-    private ExecutorService fetchTaskExecutorService;
-
-    /**
-     * CountDownLatch latch
-     */
-    private CountDownLatch latch;
-
-    /**
      *  worker config
      */
     @Autowired
@@ -120,9 +110,6 @@ public class WorkerServer {
         this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort(), workerConfig.getWorkerHeartbeatInterval(), workerConfig.getWorkerGroup());
         this.workerRegistry.registry();
 
-
-        this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
-
         /**
          * register hooks, which are called before the process exits
          */
@@ -132,13 +119,6 @@ public class WorkerServer {
                 close("shutdownHook");
             }
         }));
-
-        //let the main thread await
-        latch = new CountDownLatch(1);
-        try {
-            latch.await();
-        } catch (InterruptedException ignore) {
-        }
     }
 
     public void close(String cause) {
@@ -169,19 +149,6 @@ public class WorkerServer {
             }catch (Exception e){
                 logger.warn("threadPool service stopped exception:{}",e.getMessage());
             }
-
-            logger.info("threadPool service stopped");
-
-            try {
-                fetchTaskExecutorService.shutdownNow();
-            }catch (Exception e){
-                logger.warn("worker fetch task service stopped exception:{}",e.getMessage());
-            }
-            logger.info("worker fetch task service stopped");
-
-            latch.countDown();
-            logger.info("zookeeper service stopped");
-
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);
             System.exit(-1);
