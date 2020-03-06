@@ -46,6 +46,17 @@ public class MasterConfig {
     @Value("${master.host.selector:lowerWeight}")
     private String hostSelector;
 
+    @Value("${master.listen.port:45678}")
+    private int listenPort;
+
+    public int getListenPort() {
+        return listenPort;
+    }
+
+    public void setListenPort(int listenPort) {
+        this.listenPort = listenPort;
+    }
+
     public String getHostSelector() {
         return hostSelector;
     }
