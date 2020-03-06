@@ -180,7 +180,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
                     processInstance.getId(),
                     taskInstance.getProcessInstancePriority().getCode(),
                     taskInstance.getId(),
-                    taskInstance.getWorkerGroup());
+                    org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
 
             taskUpdateQueue.put(taskPriorityInfo);
             logger.info(String.format("master submit success, task : %s", taskInstance.getName()) );
