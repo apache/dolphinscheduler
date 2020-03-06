@@ -132,7 +132,8 @@ public class TaskPriority {
      */
     public static TaskPriority of(String taskPriorityInfo){
         String[] parts = taskPriorityInfo.split(UNDERLINE);
-        if (parts.length != 4) {
+
+        if (parts.length != 5) {
             throw new IllegalArgumentException(String.format("TaskPriority : %s illegal.", taskPriorityInfo));
         }
         TaskPriority taskPriority = new TaskPriority(

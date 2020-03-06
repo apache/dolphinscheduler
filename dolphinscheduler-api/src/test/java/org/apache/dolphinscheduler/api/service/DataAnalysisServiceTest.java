@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.queue.ITaskQueue;
 import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.junit.After;
 import org.junit.Assert;
@@ -74,8 +73,7 @@ public class DataAnalysisServiceTest {
     @Mock
     TaskInstanceMapper taskInstanceMapper;
 
-    @Mock
-    ITaskQueue taskQueue;
+
 
     @Mock
     ProcessService processService;
@@ -179,30 +177,6 @@ public class DataAnalysisServiceTest {
                 DateUtils.getScheduleDate(endDate), new Integer[]{1})).thenReturn(commandCounts);
 
         result = dataAnalysisService.countCommandState(user,1,startDate,endDate);
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-
-    }
-
-    @Test
-    public void testCountQueueState(){
-
-        PowerMockito.mockStatic(TaskQueueFactory.class);
-        List<String>  taskQueueList = new ArrayList<>(1);
-        taskQueueList.add("1_0_1_1_-1");
-        List<String>  taskKillList = new ArrayList<>(1);
-        taskKillList.add("1-0");
-        PowerMockito.when(taskQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_QUEUE)).thenReturn(taskQueueList);
-        PowerMockito.when(taskQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_KILL)).thenReturn(taskKillList);
-        PowerMockito.when(TaskQueueFactory.getTaskQueueInstance()).thenReturn(taskQueue);
-        //checkProject false
-        Map<String, Object> result = dataAnalysisService.countQueueState(user,2);
-        Assert.assertTrue(result.isEmpty());
-
-        result = dataAnalysisService.countQueueState(user,1);
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-        //admin
-        user.setUserType(UserType.ADMIN_USER);
-        result = dataAnalysisService.countQueueState(user,1);
         Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
 
     }
