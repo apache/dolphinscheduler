@@ -25,7 +25,7 @@
 	</parent>
 	<artifactId>dolphinscheduler-server</artifactId>
 	<name>dolphinscheduler-server</name>
-	<url>http://maven.apache.org</url>
+
 	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
