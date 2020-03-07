@@ -1,13 +1,16 @@
-Easy Scheduler
+Dolphin Scheduler Official Website
+[dolphinscheduler.apache.org](https://dolphinscheduler.apache.org)
 ============
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![Total Lines](https://tokei.rs/b1/github/analysys/EasyScheduler?category=lines)](https://github.com/analysys/EasyScheduler)
+[![Total Lines](https://tokei.rs/b1/github/apache/Incubator-DolphinScheduler?category=lines)](https://github.com/apache/Incubator-DolphinScheduler)
+[![codecov](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/incubator-dolphinscheduler/branch/dev)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
 
-> Easy Scheduler for Big Data
+> Dolphin Scheduler for Big Data
 
 
 
-[![Stargazers over time](https://starchart.cc/analysys/EasyScheduler.svg)](https://starchart.cc/analysys/EasyScheduler)
+[![Stargazers over time](https://starchart.cc/apache/incubator-dolphinscheduler.svg)](https://starchart.cc/apache/incubator-dolphinscheduler)
 
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
@@ -30,53 +33,75 @@ Easy Scheduler
  - 支持国际化
  - 还有更多等待伙伴们探索
 
-### 与同类调度系统的对比
-
-![调度系统对比](http://geek.analysys.cn/static/upload/47/2019-03-01/9609ca82-cf8b-4d91-8dc0-0e2805194747.jpeg)
 
 ### 系统部分截图
 
-![](http://geek.analysys.cn/static/upload/221/2019-03-29/0a9dea80-fb02-4fa5-a812-633b67035ffc.jpeg)
+![home page](https://user-images.githubusercontent.com/15833811/75208819-abbad000-57b7-11ea-8d3c-67e7c270671f.jpg)
 
-![](http://geek.analysys.cn/static/upload/221/2019-04-01/83686def-a54f-4169-8cae-77b1f8300cc1.png)
+![dag](https://user-images.githubusercontent.com/15833811/75209584-93e44b80-57b9-11ea-952e-537fb24ec72d.jpg)
 
-![](http://geek.analysys.cn/static/upload/221/2019-03-29/83c937c7-1793-4d7a-aa28-b98460329fe0.jpeg)
+![log](https://user-images.githubusercontent.com/15833811/75209645-c55d1700-57b9-11ea-94d4-e3fa91ab5218.jpg)
+
+![gantt](https://user-images.githubusercontent.com/15833811/75209640-c0986300-57b9-11ea-878e-a2098533ad44.jpg)
+
+![resources](https://user-images.githubusercontent.com/15833811/75209403-11f42280-57b9-11ea-9b59-d4be77063553.jpg)
+
+![monitor](https://user-images.githubusercontent.com/15833811/75209631-b5ddce00-57b9-11ea-8d22-cdf15cf0ee25.jpg)
+
+![security](https://user-images.githubusercontent.com/15833811/75209633-baa28200-57b9-11ea-9def-94bef2e212a7.jpg)
 
 ### 文档
 
-- <a href="https://analysys.github.io/easyscheduler_docs_cn/后端部署文档.html" target="_blank">后端部署文档</a>
+- <a href="https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/backend-deployment.html" target="_blank">后端部署文档</a>
 
-- <a href="https://analysys.github.io/easyscheduler_docs_cn/前端部署文档.html" target="_blank">前端部署文档</a>
+- <a href="https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/frontend-deployment.html" target="_blank">前端部署文档</a>
 
-- [**使用手册**](https://analysys.github.io/easyscheduler_docs_cn/系统使用手册.html?_blank "系统使用手册") 
+- [**使用手册**](https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/system-manual.html?_blank "系统使用手册")
 
-- [**升级文档**](https://analysys.github.io/easyscheduler_docs_cn/升级文档.html?_blank "升级文档") 
+- [**升级文档**](https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/upgrade.html?_blank "升级文档")
 
-- <a href="http://106.75.43.194:8888" target="_blank">我要体验</a> 
+- <a href="http://106.75.43.194:8888" target="_blank">我要体验</a>
 
-更多文档请参考 <a href="https://analysys.github.io/easyscheduler_docs_cn/" target="_blank">easyscheduler中文在线文档</a>
+更多文档请参考 <a href="https://dolphinscheduler.apache.org/zh-cn/docs/1.2.0/user_doc/quick-start.html" target="_blank">DolphinScheduler中文在线文档</a>
 
 
 ### 近期研发计划
 
-EasyScheduler的工作计划：<a href="https://github.com/analysys/EasyScheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是1.1.0版本的功能，TODO卡片是待做事项(包括 feature ideas)
+DolphinScheduler的工作计划：<a href="https://github.com/apache/incubator-dolphinscheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop卡片下是正在研发的功能，TODO卡片是待做事项(包括 feature ideas)
 
-### 贡献代码
+### 参与贡献
 
-非常欢迎大家来参与贡献代码，提交代码流程请参考：
-[[How to contribute code](https://github.com/analysys/EasyScheduler/issues/310)]
+非常欢迎大家来参与贡献，贡献流程请参考：
+[[参与贡献](https://dolphinscheduler.apache.org/zh-cn/docs/development/contribute.html)]
 
+### How to Build
+
+```bash
+mvn clean install -Prelease
+```
+
+Artifact:
+
+```
+dolphinscheduler-dist/dolphinscheduler-backend/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-backend-bin.tar.gz: Binary package of DolphinScheduler-Backend
+dolphinscheduler-dist/dolphinscheduler-front/target/apache-dolphinscheduler-incubating-${latest.release.version}-dolphinscheduler-front-bin.tar.gz: Binary package of DolphinScheduler-UI
+dolphinscheduler-dist/dolphinscheduler-src/target/apache-dolphinscheduler-incubating-${latest.release.version}-src.zip: Source code package of DolphinScheduler
+```
 
 ### 感谢
 
-Easy Scheduler使用了很多优秀的开源项目，比如google的guava、guice、grpc，netty，ali的bonecp，quartz，以及apache的众多开源项目等等，
-正是由于站在这些开源项目的肩膀上，才有Easy Scheduler的诞生的可能。对此我们对使用的所有开源软件表示非常的感谢！我们也希望自己不仅是开源的受益者，也能成为开源的
-贡献者，于是我们决定把易调度贡献出来，并承诺长期维护。也希望对开源有同样热情和信念的伙伴加入进来，一起为开源献出一份力！
+Dolphin Scheduler使用了很多优秀的开源项目，比如google的guava、guice、grpc，netty，ali的bonecp，quartz，以及apache的众多开源项目等等，
+正是由于站在这些开源项目的肩膀上，才有Dolphin Scheduler的诞生的可能。对此我们对使用的所有开源软件表示非常的感谢！我们也希望自己不仅是开源的受益者，也能成为开源的贡献者,也希望对开源有同样热情和信念的伙伴加入进来，一起为开源献出一份力！
 
 
-### 帮助
-The fastest way to get response from our developers is to submit issues,   or add our wechat : 510570367
- 
+### 获得帮助
+1. 提交issue
+1. 先订阅邮件开发列表:[订阅邮件列表](https://dolphinscheduler.apache.org/zh-cn/docs/development/subscribe.html), 订阅成功后发送邮件到dev@dolphinscheduler.apache.org.
+1. 联系微信群助手(ID:dailidong66). 微信仅用于中国用户讨论.
+
+### 版权
+请参考 [LICENSE](https://github.com/apache/incubator-dolphinscheduler/blob/dev/LICENSE) 文件.
+
 
 
 

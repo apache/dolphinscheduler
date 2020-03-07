@@ -1,146 +1,92 @@
-FROM ubuntu:18.04
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
-MAINTAINER journey "825193156@qq.com"
+FROM nginx:alpine
 
-ENV LANG=C.UTF-8
+ARG VERSION
 
-ARG version
-ARG tar_version
+ENV TZ Asia/Shanghai
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND noninteractive
 
-#1,安装jdk
+#1. install dos2unix shadow bash openrc python sudo vim wget iputils net-tools ssh pip kazoo.
+#If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
+#RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
+RUN apk update && \
+    apk add dos2unix shadow bash openrc python sudo vim wget iputils net-tools openssh-server py2-pip && \
+    apk add --update procps && \
+    openrc boot && \
+    pip install kazoo
 
-RUN apt-get update \
-    && apt-get -y install openjdk-8-jdk \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+#2. install jdk
+RUN apk add openjdk8
+ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
 ENV PATH $JAVA_HOME/bin:$PATH
 
-
-#安装wget
-RUN apt-get update && \
-        apt-get -y install wget
-#2,安装ZK
-#RUN cd /opt && \
-#    wget https://archive.apache.org/dist/zookeeper/zookeeper-3.4.6/zookeeper-3.4.6.tar.gz && \
-#    tar -zxvf zookeeper-3.4.6.tar.gz && \
-#    mv zookeeper-3.4.6 zookeeper && \
-#    rm -rf ./zookeeper-*tar.gz && \
-#    mkdir -p /tmp/zookeeper && \
-#    rm -rf /opt/zookeeper/conf/zoo_sample.cfg
-
+#3. install zk
 RUN cd /opt && \
-    wget https://www-us.apache.org/dist/zookeeper/zookeeper-3.4.14/zookeeper-3.4.14.tar.gz  && \
-    tar -zxvf zookeeper-3.4.14.tar.gz  && \
-    mv zookeeper-3.4.14 zookeeper && \
-    rm -rf ./zookeeper-*tar.gz && \
+    wget https://downloads.apache.org/zookeeper/zookeeper-3.5.7/apache-zookeeper-3.5.7-bin.tar.gz && \
+    tar -zxvf apache-zookeeper-3.5.7-bin.tar.gz && \
+    mv apache-zookeeper-3.5.7-bin zookeeper && \
     mkdir -p /tmp/zookeeper && \
+    rm -rf ./zookeeper-*tar.gz && \
     rm -rf /opt/zookeeper/conf/zoo_sample.cfg
-
 ADD ./conf/zookeeper/zoo.cfg /opt/zookeeper/conf
-ENV ZK_HOME=/opt/zookeeper
-ENV PATH $PATH:$ZK_HOME/bin
+ENV ZK_HOME /opt/zookeeper
+ENV PATH $ZK_HOME/bin:$PATH
 
-#3,安装maven
-RUN cd /opt && \
-    wget http://apache-mirror.rbc.ru/pub/apache/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz && \
-    tar -zxvf apache-maven-3.3.9-bin.tar.gz && \
-    mv apache-maven-3.3.9 maven && \
-    rm -rf ./apache-maven-*tar.gz && \
-    rm -rf /opt/maven/conf/settings.xml
-ADD ./conf/maven/settings.xml /opt/maven/conf
-ENV MAVEN_HOME=/opt/maven
-ENV PATH $PATH:$MAVEN_HOME/bin
+#4. install pg
+RUN apk add postgresql postgresql-contrib
 
-#4,安装node
-RUN cd /opt && \
-    wget https://nodejs.org/download/release/v8.9.4/node-v8.9.4-linux-x64.tar.gz && \
-    tar -zxvf node-v8.9.4-linux-x64.tar.gz && \
-    mv node-v8.9.4-linux-x64 node && \
-    rm -rf ./node-v8.9.4-*tar.gz
-ENV NODE_HOME=/opt/node
-ENV PATH $PATH:$NODE_HOME/bin
+#5. add dolphinscheduler
+ADD ./apache-dolphinscheduler-incubating-${VERSION}-SNAPSHOT-dolphinscheduler-bin.tar.gz /opt/
+RUN mv /opt/apache-dolphinscheduler-incubating-${VERSION}-SNAPSHOT-dolphinscheduler-bin/ /opt/dolphinscheduler/
+ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
 
-#5,下载escheduler
-RUN cd /opt && \
-    wget https://github.com/analysys/EasyScheduler/archive/${version}.tar.gz && \
-    tar -zxvf ${version}.tar.gz && \
-    mv EasyScheduler-${version} easyscheduler_source && \
-    rm -rf ./${version}.tar.gz
+#6. modify nginx
+RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
+    rm -rf /etc/nginx/conf.d/*
+ADD ./conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
 
-#6,后端编译
-RUN cd /opt/easyscheduler_source && \
-    mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+#7. add configuration and modify permissions and set soft links
+ADD ./startup-init-conf.sh /root/startup-init-conf.sh
+ADD ./startup.sh /root/startup.sh
+ADD ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
+ADD ./conf/dolphinscheduler/env/dolphinscheduler_env /opt/dolphinscheduler/conf/env/
+RUN chmod +x /root/startup-init-conf.sh && \
+    chmod +x /root/startup.sh && \
+    chmod +x /opt/dolphinscheduler/conf/env/dolphinscheduler_env && \
+    chmod +x /opt/dolphinscheduler/script/*.sh && \
+    chmod +x /opt/dolphinscheduler/bin/*.sh && \
+    chmod +x /opt/zookeeper/bin/*.sh && \
+    dos2unix /root/startup-init-conf.sh && \
+    dos2unix /root/startup.sh && \
+    dos2unix /opt/dolphinscheduler/conf/env/dolphinscheduler_env && \
+    dos2unix /opt/dolphinscheduler/script/*.sh && \
+    dos2unix /opt/dolphinscheduler/bin/*.sh && \
+    dos2unix /opt/zookeeper/bin/*.sh && \
+    rm -rf /bin/sh && \
+    ln -s /bin/bash /bin/sh && \
+    mkdir -p /tmp/xls
 
-#7,前端编译
-RUN chmod -R 777 /opt/easyscheduler_source/escheduler-ui && \
-    cd /opt/easyscheduler_source/escheduler-ui && \
-    rm -rf /opt/easyscheduler_source/escheduler-ui/node_modules && \
-    npm install node-sass --unsafe-perm && \
-    npm install && \
-    npm run build
-#8,安装mysql
-RUN echo "deb http://cn.archive.ubuntu.com/ubuntu/ xenial main restricted universe multiverse" >> /etc/apt/sources.list
+#8. remove apk index cache
+RUN rm -rf /var/cache/apk/*
 
-RUN echo "mysql-server mysql-server/root_password password root" | debconf-set-selections
-RUN echo "mysql-server mysql-server/root_password_again password root" | debconf-set-selections
-
-RUN apt-get update && \
-        apt-get -y install mysql-server-5.7 && \
-        mkdir -p /var/lib/mysql && \
-        mkdir -p /var/run/mysqld && \
-        mkdir -p /var/log/mysql && \
-        chown -R mysql:mysql /var/lib/mysql && \
-        chown -R mysql:mysql /var/run/mysqld && \
-        chown -R mysql:mysql /var/log/mysql
-
-
-# UTF-8 and bind-address
-RUN sed -i -e "$ a [client]\n\n[mysql]\n\n[mysqld]"  /etc/mysql/my.cnf && \
-        sed -i -e "s/\(\[client\]\)/\1\ndefault-character-set = utf8/g" /etc/mysql/my.cnf && \
-        sed -i -e "s/\(\[mysql\]\)/\1\ndefault-character-set = utf8/g" /etc/mysql/my.cnf && \
-        sed -i -e "s/\(\[mysqld\]\)/\1\ninit_connect='SET NAMES utf8'\ncharacter-set-server = utf8\ncollation-server=utf8_general_ci\nbind-address = 0.0.0.0/g" /etc/mysql/my.cnf
-
-
-#9,安装nginx
-RUN apt-get update && \
-  apt-get install -y nginx && \
-  rm -rf /var/lib/apt/lists/* && \
-  echo "\ndaemon off;" >> /etc/nginx/nginx.conf && \
-  chown -R www-data:www-data /var/lib/nginx
-
-#10,修改escheduler配置文件
-#后端配置
-RUN mkdir -p /opt/escheduler && \
-    tar -zxvf /opt/easyscheduler_source/target/escheduler-${tar_version}.tar.gz -C /opt/escheduler && \
-    rm -rf /opt/escheduler/conf
-ADD ./conf/escheduler/conf /opt/escheduler/conf
-#前端nginx配置
-ADD ./conf/nginx/default.conf /etc/nginx/conf.d
-
-#11,开放端口
-EXPOSE 2181 2888 3888 3306 80 12345 8888
-
-#12,安装sudo,python,vim,ping和ssh
-RUN apt-get update && \
-  apt-get -y install sudo && \
-  apt-get -y install python && \
-  apt-get -y install vim && \
-  apt-get -y install iputils-ping && \
-  apt-get -y install net-tools && \
-  apt-get -y install openssh-server && \
-  apt-get -y install python-pip && \
-  pip install kazoo
-
-COPY ./startup.sh /root/startup.sh
-#13,修改权限和设置软连
-RUN chmod +x /root/startup.sh && \
-  chmod +x /opt/escheduler/script/create_escheduler.sh && \
-  chmod +x /opt/zookeeper/bin/zkServer.sh && \
-  chmod +x /opt/escheduler/bin/escheduler-daemon.sh && \
-  rm -rf /bin/sh && \
-  ln -s /bin/bash /bin/sh && \
-  mkdir -p /tmp/xls
-
+#9. expose port
+EXPOSE 2181 2888 3888 5432 12345 8888
 
 ENTRYPOINT ["/root/startup.sh"]
