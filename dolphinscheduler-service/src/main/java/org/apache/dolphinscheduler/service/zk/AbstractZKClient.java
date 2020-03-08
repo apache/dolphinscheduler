@@ -16,19 +16,15 @@
  */
 package org.apache.dolphinscheduler.service.zk;
 
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ResInfo;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
@@ -37,14 +33,10 @@ import static org.apache.dolphinscheduler.common.Constants.*;
 /**
  * abstract zookeeper client
  */
+@Component
 public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractZKClient.class);
-
-	/**
-	 * server stop or not
-	 */
-	protected IStoppable stoppable = null;
 
 	/**
 	 *	check dead server or not , if dead, stop self
@@ -65,8 +57,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 		if(!isExisted(zNode) || isExisted(deadServerPath)){
 			return true;
 		}
-
-
 		return false;
 	}
 
@@ -100,28 +90,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 	}
 
 	/**
-	 * register server,  if server already exists, return null.
-	 * @param zkNodeType zookeeper node type
-	 * @return register server path in zookeeper
-	 * @throws Exception errors
-	 */
-	public String registerServer(ZKNodeType zkNodeType) throws Exception {
-		String registerPath = null;
-		String host = OSUtils.getHost();
-		if(checkZKNodeExists(host, zkNodeType)){
-			logger.error("register failure , {} server already started on host : {}" ,
-					zkNodeType.toString(), host);
-			return registerPath;
-		}
-		registerPath = createZNodePath(zkNodeType, host);
-
-    // handle dead server
-		handleDeadServer(registerPath, zkNodeType, Constants.DELETE_ZK_OP);
-
-		return registerPath;
-	}
-
-	/**
 	 * opType(add): if find dead server , then add to zk deadServerPath
 	 * opType(delete): delete path from zk
 	 *
@@ -150,16 +118,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 			}
 		}
 
-	}
-
-
-
-	/**
-	 * for stop server
-	 * @param serverStoppable server stoppable interface
-	 */
-	public void setStoppable(IStoppable serverStoppable){
-		this.stoppable = serverStoppable;
 	}
 
 	/**
@@ -277,14 +235,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 
 	/**
 	 *
-	 * @return get master lock path
-	 */
-	public String getWorkerLockPath(){
-		return getZookeeperConfig().getDsRoot() + Constants.ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS;
-	}
-
-	/**
-	 *
 	 * @param zkNodeType zookeeper node type
 	 * @return get zookeeper node parent path
 	 */
@@ -339,7 +289,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 	 * release mutex
 	 * @param mutex mutex
 	 */
-	public static void releaseMutex(InterProcessMutex mutex) {
+	public void releaseMutex(InterProcessMutex mutex) {
 		if (mutex != null){
 			try {
 				mutex.release();
@@ -387,18 +337,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 		return pathArray[pathArray.length - 1];
 
 	}
-	/**
-	 * acquire zk lock
-	 * @param zkClient zk client
-	 * @param zNodeLockPath zk lock path
-	 * @return zk lock
-	 * @throws Exception errors
-	 */
-	public InterProcessMutex acquireZkLock(CuratorFramework zkClient,String zNodeLockPath)throws Exception{
-		InterProcessMutex mutex = new InterProcessMutex(zkClient, zNodeLockPath);
-		mutex.acquire();
-		return mutex;
-	}
 
 	@Override
 	public String toString() {
@@ -407,7 +345,6 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 				", deadServerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.DEAD_SERVER) + '\'' +
 				", masterZNodeParentPath='" + getZNodeParentPath(ZKNodeType.MASTER) + '\'' +
 				", workerZNodeParentPath='" + getZNodeParentPath(ZKNodeType.WORKER) + '\'' +
-				", stoppable=" + stoppable +
 				'}';
 	}
 }
