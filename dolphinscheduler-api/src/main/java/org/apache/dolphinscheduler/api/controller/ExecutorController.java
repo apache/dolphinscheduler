@@ -149,7 +149,7 @@ public class ExecutorController extends BaseController {
     ) {
         try {
             logger.info("execute command, login user: {}, project:{}, process instance id:{}, execute type:{}",
-                    loginUser.getUserName(), projectName, processInstanceId, executeType.toString());
+                    loginUser.getUserName(), projectName, processInstanceId, executeType);
             Map<String, Object> result = execService.execute(loginUser, projectName, processInstanceId, executeType);
             return returnDataList(result);
         } catch (Exception e) {
