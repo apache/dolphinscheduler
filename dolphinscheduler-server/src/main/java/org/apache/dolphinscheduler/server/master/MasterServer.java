@@ -18,9 +18,6 @@ package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
@@ -29,11 +26,8 @@ import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
-import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
@@ -44,7 +38,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.ExecutorService;
 
 /**
  * master server
@@ -56,23 +49,6 @@ public class MasterServer {
      * logger of MasterServer
      */
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
-
-    /**
-     *  zk master client
-     */
-    @Autowired
-    private ZKMasterClient zkMasterClient = null;
-
-    /**
-     *  process service
-     */
-    @Autowired
-    protected ProcessService processService;
-
-    /**
-     *  master exec thread pool
-     */
-    private ExecutorService masterSchedulerService;
 
     /**
      * master config
@@ -97,6 +73,12 @@ public class MasterServer {
      */
     @Autowired
     private MasterRegistry masterRegistry;
+
+    /**
+     * zk master client
+     */
+    @Autowired
+    private ZKMasterClient zkMasterClient;
 
     /**
      * master server startup
@@ -125,27 +107,13 @@ public class MasterServer {
         this.nettyRemotingServer.start();
 
         //
+        this.zkMasterClient.start();
         this.masterRegistry.registry();
-
-        //
-        zkMasterClient.init();
-
-        masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
-
-        // master scheduler thread
-        MasterSchedulerThread masterSchedulerThread = new MasterSchedulerThread(
-                zkMasterClient,
-                processService,
-                masterConfig.getMasterExecThreads());
-
-        // submit master scheduler thread
-        masterSchedulerService.execute(masterSchedulerThread);
 
         // start QuartzExecutors
         // what system should do if exception
         try {
             logger.info("start Quartz server...");
-            ProcessScheduleJob.init(processService);
             QuartzExecutors.getInstance().start();
         } catch (Exception e) {
             try {
@@ -162,19 +130,15 @@ public class MasterServer {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                if (zkMasterClient.getActiveMasterNum() <= 1) {
-                    zkMasterClient.getAlertDao().sendServerStopedAlert(
-                        1, OSUtils.getHost(), "Master-Server");
-                }
-                close("shutdownhook");
+                close("shutdownHook");
             }
         }));
     }
 
 
     /**
-     * gracefully stop
-     * @param cause why stopping
+     * gracefully close
+     * @param cause
      */
     public void close(String cause) {
 
@@ -197,40 +161,15 @@ public class MasterServer {
             }
             this.nettyRemotingServer.close();
             this.masterRegistry.unRegistry();
+            this.zkMasterClient.close();
 
             //close quartz
             try{
                 QuartzExecutors.getInstance().shutdown();
+                logger.info("Quartz service stopped");
             }catch (Exception e){
                 logger.warn("Quartz service stopped exception:{}",e.getMessage());
             }
-
-            logger.info("Quartz service stopped");
-
-            try {
-                ThreadPoolExecutors.getInstance().shutdown();
-            }catch (Exception e){
-                logger.warn("threadPool service stopped exception:{}",e.getMessage());
-            }
-
-            logger.info("threadPool service stopped");
-
-            try {
-                masterSchedulerService.shutdownNow();
-            }catch (Exception e){
-                logger.warn("master scheduler service stopped exception:{}",e.getMessage());
-            }
-
-            logger.info("master scheduler service stopped");
-
-            try {
-                zkMasterClient.close();
-            }catch (Exception e){
-                logger.warn("zookeeper service stopped exception:{}",e.getMessage());
-            }
-
-            logger.info("zookeeper service stopped");
-
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
             System.exit(-1);

@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
@@ -78,7 +77,6 @@ public class WorkerServer {
      * @param args arguments
      */
     public static void main(String[] args) {
-        System.setProperty("spring.profiles.active","worker");
         Thread.currentThread().setName(Constants.THREAD_NAME_WORKER_SERVER);
         new SpringApplicationBuilder(WorkerServer.class).web(WebApplicationType.NONE).run(args);
     }
@@ -136,11 +134,6 @@ public class WorkerServer {
             this.nettyRemotingServer.close();
             this.workerRegistry.unRegistry();
 
-            try {
-                ThreadPoolExecutors.getInstance().shutdown();
-            }catch (Exception e){
-                logger.warn("threadPool service stopped exception:{}",e.getMessage());
-            }
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);
             System.exit(-1);
