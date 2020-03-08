@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -26,19 +25,16 @@ import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.consumer.TaskUpdateQueueConsumer;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
-import org.apache.dolphinscheduler.service.queue.TaskUpdateQueueImpl;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,12 +81,6 @@ public class MasterServer {
     private MasterConfig masterConfig;
 
     /**
-     *  zookeeper registry center
-     */
-    @Autowired
-    private ZookeeperRegistryCenter zookeeperRegistryCenter;
-
-    /**
      *  spring application context
      *  only use it for initialization
      */
@@ -105,6 +95,7 @@ public class MasterServer {
     /**
      * master registry
      */
+    @Autowired
     private MasterRegistry masterRegistry;
 
     /**
@@ -126,7 +117,7 @@ public class MasterServer {
 
         //init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(45678);
+        serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
@@ -134,7 +125,6 @@ public class MasterServer {
         this.nettyRemotingServer.start();
 
         //
-        this.masterRegistry = new MasterRegistry(zookeeperRegistryCenter, serverConfig.getListenPort(), masterConfig.getMasterHeartbeatInterval());
         this.masterRegistry.registry();
 
         //
@@ -166,8 +156,6 @@ public class MasterServer {
             logger.error("start Quartz failed", e);
         }
 
-        TaskUpdateQueueConsumer taskUpdateQueueConsumer = SpringApplicationContext.getBean(TaskUpdateQueueConsumer.class);
-        taskUpdateQueueConsumer.start();
         /**
          *  register hooks, which are called before the process exits
          */
