@@ -123,4 +123,26 @@
             and pid = #{pid}
         </if>
     </select>
+
+    <update id="batchUpdateResource" parameterType="java.util.List">
+        <foreach collection="resourceList" item="resource" index="index" open="" close="" separator =";">
+            update t_ds_resources
+            <set>
+                full_name=#{resource.fullName},
+                update_time=#{resource.updateTime}
+            </set>
+            <where>
+                id=#{resource.id}
+            </where>
+        </foreach>
+    </update>
+
+    <select id="listResourceByIds" resultType="org.apache.dolphinscheduler.dao.entity.Resource">
+        select *
+        from t_ds_resources
+        where id in
+        <foreach collection="resIds" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+    </select>
 </mapper>

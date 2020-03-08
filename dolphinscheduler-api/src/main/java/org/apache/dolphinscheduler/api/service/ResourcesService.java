@@ -333,7 +333,11 @@ public class ResourcesService extends BaseService {
         }
 
         // updateResource data
+
+        List<Integer> integers = resourcesMapper.listChildren(resourceId);
+        String oldFullName = resource.getFullName();
         Date now = new Date();
+
         resource.setAlias(nameWithSuffix);
         resource.setFullName(fullName);
         resource.setDescription(desc);
@@ -341,6 +345,16 @@ public class ResourcesService extends BaseService {
 
         try {
             resourcesMapper.updateById(resource);
+            if (resource.isDirectory()) {
+                List<Resource> childResourceList = new ArrayList<>();
+                List<Resource> resourceList = resourcesMapper.listResourceByIds(integers.toArray(new Integer[integers.size()]));
+                childResourceList = resourceList.stream().map(t -> {
+                    t.setFullName(t.getFullName().replaceFirst(oldFullName, fullName));
+                    t.setUpdateTime(now);
+                    return t;
+                }).collect(Collectors.toList());
+                resourcesMapper.batchUpdateResource(childResourceList);
+            }
 
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
