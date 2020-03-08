@@ -53,7 +53,7 @@ public class EnterpriseWeChatUtilsTest {
             String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 
             String errmsg = JSON.parseObject(resp).getString("errmsg");
-            Assert.assertEquals(errmsg, "ok");
+            Assert.assertEquals("ok",errmsg);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -68,7 +68,7 @@ public class EnterpriseWeChatUtilsTest {
             String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 
             String errmsg = JSON.parseObject(resp).getString("errmsg");
-            Assert.assertEquals(errmsg, "ok");
+            Assert.assertEquals("ok",errmsg);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -95,7 +95,7 @@ public class EnterpriseWeChatUtilsTest {
             String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 
             String errmsg = JSON.parseObject(resp).getString("errmsg");
-            Assert.assertEquals(errmsg, "ok");
+            Assert.assertEquals("ok",errmsg);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -110,7 +110,7 @@ public class EnterpriseWeChatUtilsTest {
             String resp = EnterpriseWeChatUtils.sendEnterpriseWeChat("utf-8", msg, token);
 
             String errmsg = JSON.parseObject(resp).getString("errmsg");
-            Assert.assertEquals(errmsg, "ok");
+            Assert.assertEquals("ok",errmsg);
         } catch (IOException e) {
             e.printStackTrace();
         }
