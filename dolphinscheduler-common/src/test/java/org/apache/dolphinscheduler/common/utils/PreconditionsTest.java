@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package utils;
+package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.utils.Preconditions;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;

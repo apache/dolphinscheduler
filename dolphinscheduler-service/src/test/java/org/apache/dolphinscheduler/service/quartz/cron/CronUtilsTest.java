@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cron;
+package org.apache.dolphinscheduler.service.quartz.cron;
 
 import com.cronutils.builder.CronBuilder;
 import com.cronutils.model.Cron;
@@ -25,7 +25,6 @@ import com.cronutils.model.field.CronFieldName;
 import com.cronutils.model.field.expression.*;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
