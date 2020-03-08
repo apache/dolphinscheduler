@@ -208,10 +208,13 @@ public class FlinkParameters extends AbstractParameters {
 
   @Override
   public List<String> getResourceFilesList() {
-    if(resourceList !=null ) {
-      this.resourceList.add(mainJar);
-      return resourceList.stream()
-              .map(p -> p.getRes()).collect(Collectors.toList());
+    if(resourceList != null ) {
+      List<String> resourceFiles = resourceList.stream()
+              .map(ResourceInfo::getRes).collect(Collectors.toList());
+      if(mainJar != null) {
+        resourceFiles.add(mainJar.getRes());
+      }
+      return resourceFiles;
     }
     return Collections.emptyList();
   }
