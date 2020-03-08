@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.remote.command;
 
-import com.sun.org.apache.regexp.internal.RE;
-
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicLong;
 
