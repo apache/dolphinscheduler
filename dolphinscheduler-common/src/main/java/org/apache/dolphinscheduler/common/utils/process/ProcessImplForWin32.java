@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.utils.process;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
+import java.lang.reflect.Field;
 import sun.security.action.GetPropertyAction;
 
 import java.io.*;
@@ -33,8 +34,17 @@ import java.util.regex.Pattern;
 import static com.sun.jna.platform.win32.WinBase.STILL_ACTIVE;
 
 public class ProcessImplForWin32 extends Process {
-    private static final sun.misc.JavaIOFileDescriptorAccess fdAccess
-            = sun.misc.SharedSecrets.getJavaIOFileDescriptorAccess();
+
+    private static final Field FD_HANDLE;
+
+    static {
+        try {
+            FD_HANDLE = FileDescriptor.class.getDeclaredField("handle");
+            FD_HANDLE.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static final int PIPE_SIZE = 4096 + 24;
 
@@ -45,6 +55,22 @@ public class ProcessImplForWin32 extends Process {
     private static final int OFFSET_WRITE = 1;
 
     private static final WinNT.HANDLE JAVA_INVALID_HANDLE_VALUE = new WinNT.HANDLE(Pointer.createConstant(-1));
+
+    private static void setHandle(FileDescriptor obj, long handle) {
+        try {
+            FD_HANDLE.set(obj, handle);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static long getHandle(FileDescriptor obj) {
+        try {
+            return (Long) FD_HANDLE.get(obj);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Open a file for writing. If {@code append} is {@code true} then the file
@@ -63,7 +89,7 @@ public class ProcessImplForWin32 extends Process {
                 sm.checkWrite(path);
             long handle = openForAtomicAppend(path);
             final FileDescriptor fd = new FileDescriptor();
-            fdAccess.setHandle(fd, handle);
+            setHandle(fd, handle);
             return AccessController.doPrivileged(
                     new PrivilegedAction<FileOutputStream>() {
                         public FileOutputStream run() {
@@ -102,30 +128,30 @@ public class ProcessImplForWin32 extends Process {
                 if (redirects[0] == ProcessBuilderForWin32.Redirect.PIPE)
                     stdHandles[0] = -1L;
                 else if (redirects[0] == ProcessBuilderForWin32.Redirect.INHERIT)
-                    stdHandles[0] = fdAccess.getHandle(FileDescriptor.in);
+                    stdHandles[0] = getHandle(FileDescriptor.in);
                 else {
                     f0 = new FileInputStream(redirects[0].file());
-                    stdHandles[0] = fdAccess.getHandle(f0.getFD());
+                    stdHandles[0] = getHandle(f0.getFD());
                 }
 
                 if (redirects[1] == ProcessBuilderForWin32.Redirect.PIPE)
                     stdHandles[1] = -1L;
                 else if (redirects[1] == ProcessBuilderForWin32.Redirect.INHERIT)
-                    stdHandles[1] = fdAccess.getHandle(FileDescriptor.out);
+                    stdHandles[1] = getHandle(FileDescriptor.out);
                 else {
                     f1 = newFileOutputStream(redirects[1].file(),
                             redirects[1].append());
-                    stdHandles[1] = fdAccess.getHandle(f1.getFD());
+                    stdHandles[1] = getHandle(f1.getFD());
                 }
 
                 if (redirects[2] == ProcessBuilderForWin32.Redirect.PIPE)
                     stdHandles[2] = -1L;
                 else if (redirects[2] == ProcessBuilderForWin32.Redirect.INHERIT)
-                    stdHandles[2] = fdAccess.getHandle(FileDescriptor.err);
+                    stdHandles[2] = getHandle(FileDescriptor.err);
                 else {
                     f2 = newFileOutputStream(redirects[2].file(),
                             redirects[2].append());
-                    stdHandles[2] = fdAccess.getHandle(f2.getFD());
+                    stdHandles[2] = getHandle(f2.getFD());
                 }
             }
 
@@ -442,7 +468,7 @@ public class ProcessImplForWin32 extends Process {
                             stdin_stream = ProcessBuilderForWin32.NullOutputStream.INSTANCE;
                         else {
                             FileDescriptor stdin_fd = new FileDescriptor();
-                            fdAccess.setHandle(stdin_fd, stdHandles[0]);
+                            setHandle(stdin_fd, stdHandles[0]);
                             stdin_stream = new BufferedOutputStream(
                                     new FileOutputStream(stdin_fd));
                         }
@@ -451,7 +477,7 @@ public class ProcessImplForWin32 extends Process {
                             stdout_stream = ProcessBuilderForWin32.NullInputStream.INSTANCE;
                         else {
                             FileDescriptor stdout_fd = new FileDescriptor();
-                            fdAccess.setHandle(stdout_fd, stdHandles[1]);
+                            setHandle(stdout_fd, stdHandles[1]);
                             stdout_stream = new BufferedInputStream(
                                     new FileInputStream(stdout_fd));
                         }
@@ -460,7 +486,7 @@ public class ProcessImplForWin32 extends Process {
                             stderr_stream = ProcessBuilderForWin32.NullInputStream.INSTANCE;
                         else {
                             FileDescriptor stderr_fd = new FileDescriptor();
-                            fdAccess.setHandle(stderr_fd, stdHandles[2]);
+                            setHandle(stderr_fd, stdHandles[2]);
                             stderr_stream = new FileInputStream(stderr_fd);
                         }
 
