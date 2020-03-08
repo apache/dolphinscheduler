@@ -1086,34 +1086,12 @@ public class ProcessService {
         // or return submit success
         if( processInstanceState == ExecutionStatus.READY_PAUSE){
             state = ExecutionStatus.PAUSE;
-        }else if(processInstanceState == ExecutionStatus.READY_STOP
-                || !checkProcessStrategy(taskInstance)) {
+        }else if(processInstanceState == ExecutionStatus.READY_STOP) {
             state = ExecutionStatus.KILL;
         }else{
             state = ExecutionStatus.SUBMITTED_SUCCESS;
         }
         return state;
-    }
-
-    /**
-     *  check process instance strategy
-     * @param taskInstance taskInstance
-     * @return check strategy result
-     */
-    private boolean checkProcessStrategy(TaskInstance taskInstance){
-        ProcessInstance processInstance = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
-        FailureStrategy failureStrategy = processInstance.getFailureStrategy();
-        if(failureStrategy == FailureStrategy.CONTINUE){
-            return true;
-        }
-        List<TaskInstance> taskInstances = this.findValidTaskListByProcessId(taskInstance.getProcessInstanceId());
-
-        for(TaskInstance task : taskInstances){
-            if(task.getState() == ExecutionStatus.FAILURE){
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
