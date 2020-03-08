@@ -16,7 +16,7 @@ Official Website: https://dolphinscheduler.apache.org
 #### 你可以运行一个dolphinscheduler实例
 ```
 $ docker run -dit --name dolphinscheduler \ 
--e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test \
+-e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test -e POSTGRESQL_DATABASE=dolphinscheduler \
 -p 8888:8888 \
 dolphinscheduler all
 ```
@@ -31,7 +31,7 @@ dolphinscheduler all
 
 ```
 $ docker run -dit --name dolphinscheduler \
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" \
+-e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
 -p 8888:8888 \
 dolphinscheduler all
@@ -42,7 +42,7 @@ dolphinscheduler all
 ```
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
+-e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" -e POSTGRESQL_DATABASE="dolphinscheduler" \
 -p 8888:8888 \
 dolphinscheduler all
 ```
@@ -56,7 +56,7 @@ dolphinscheduler all
 ```
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" \
+-e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
 dolphinscheduler master-server
 ```
@@ -66,7 +66,7 @@ dolphinscheduler master-server
 ```
 $ docker run -dit --name dolphinscheduler \
 -e ZOOKEEPER_QUORUM="l92.168.x.x:2181"
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" \
+-e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
 dolphinscheduler worker-server
 ```
@@ -75,7 +75,7 @@ dolphinscheduler worker-server
 
 ```
 $ docker run -dit --name dolphinscheduler \
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" \
+-e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
 -p 12345:12345 \
 dolphinscheduler api-server
@@ -85,7 +85,7 @@ dolphinscheduler api-server
 
 ```
 $ docker run -dit --name dolphinscheduler \
--e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" \
+-e POSTGRESQL_HOST="192.168.x.x" -e POSTGRESQL_PORT="5432" -e POSTGRESQL_DATABASE="dolphinscheduler" \
 -e POSTGRESQL_USERNAME="test" -e POSTGRESQL_PASSWORD="test" \
 dolphinscheduler alert-server
 ```
@@ -99,7 +99,7 @@ $ docker run -dit --name dolphinscheduler \
 dolphinscheduler frontend
 ```
 
-**注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `POSTGRESQL_HOST` `POSTGRESQL_PORT` `ZOOKEEPER_QUORUM`。
+**注意**: 当你运行dolphinscheduler中的部分服务时，你必须指定这些环境变量 `POSTGRESQL_HOST` `POSTGRESQL_PORT` `POSTGRESQL_DATABASE` `POSTGRESQL_USERNAME` `POSTGRESQL_PASSWORD` `ZOOKEEPER_QUORUM`。
 
 ## 如何构建一个docker镜像
 
@@ -140,13 +140,35 @@ Dolphin Scheduler映像使用了几个容易遗漏的环境变量。虽然这些
 
 配置`PostgreSQL`的`USERNAME`， 默认值 `root`。
 
+**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
 **`POSTGRESQL_PASSWORD`**
 
 配置`PostgreSQL`的`PASSWORD`， 默认值 `root`。
 
+**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
+**`POSTGRESQL_DATABASE`**
+
+配置`PostgreSQL`的`DATABASE`， 默认值 `dolphinscheduler`。
+
+**注意**: 当运行`dolphinscheduler`中`master-server`、`worker-server`、`api-server`、`alert-server`这些服务时，必须指定这个环境变量，以便于你更好的搭建分布式服务。
+
 **`DOLPHINSCHEDULER_ENV_PATH`**
 
 任务执行时的环境变量配置文件， 默认值 `/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh`。
+
+**`DOLPHINSCHEDULER_DATA_BASEDIR_PATH`**
+
+用户数据目录, 用户自己配置, 请确保这个目录存在并且用户读写权限， 默认值 `/tmp/dolphinscheduler`。
+
+**`DOLPHINSCHEDULER_DATA_DOWNLOAD_BASEDIR_PATH`**
+
+用户数据下载目录, 用户自己配置, 请确保这个目录存在并且用户读写权限， 默认值 `/tmp/dolphinscheduler/download`。
+
+**`DOLPHINSCHEDULER_PROCESS_EXEC_BASEPATH`**
+
+任务执行目录, 用户自己配置, 请确保这个目录存在并且用户读写权限， 默认值 `/tmp/dolphinscheduler/exec`。
 
 **`TASK_QUEUE`**
 

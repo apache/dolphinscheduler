@@ -38,6 +38,12 @@ dolphinscheduler.env.path=${DOLPHINSCHEDULER_ENV_PATH}
 resource.view.suffixs=txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties
 # is development state? default "false"
 development.state=true
+# user data directory path, self configuration, please make sure the directory exists and have read write permissions
+data.basedir.path=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH}
+# directory path for user data download. self configuration, please make sure the directory exists and have read write permissions
+data.download.basedir.path=${DOLPHINSCHEDULER_DATA_DOWNLOAD_BASEDIR_PATH}
+# process execute directory. self configuration, please make sure the directory exists and have read write permissions
+process.exec.basepath=${DOLPHINSCHEDULER_PROCESS_EXEC_BASEPATH}
 
 # resource upload startup type : HDFS,S3,NONE
 res.upload.startup.type=NONE
@@ -49,12 +55,6 @@ res.upload.startup.type=NONE
 hdfs.root.user=hdfs
 # data base dir, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions。"/dolphinscheduler" is recommended
 data.store2hdfs.basepath=/dolphinscheduler
-# user data directory path, self configuration, please make sure the directory exists and have read write permissions
-data.basedir.path=/tmp/dolphinscheduler
-# directory path for user data download. self configuration, please make sure the directory exists and have read write permissions
-data.download.basedir.path=/tmp/dolphinscheduler/download
-# process execute directory. self configuration, please make sure the directory exists and have read write permissions
-process.exec.basepath=/tmp/dolphinscheduler/exec
 # whether kerberos starts
 hadoop.security.authentication.startup.state=false
 # java.security.krb5.conf path
