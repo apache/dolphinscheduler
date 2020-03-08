@@ -23,10 +23,14 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -37,6 +41,7 @@ import static org.apache.dolphinscheduler.remote.utils.Constants.COMMA;
 /**
  *  master registry
  */
+@Service
 public class MasterRegistry {
 
     private final Logger logger = LoggerFactory.getLogger(MasterRegistry.class);
@@ -44,38 +49,28 @@ public class MasterRegistry {
     /**
      *  zookeeper registry center
      */
-    private final ZookeeperRegistryCenter zookeeperRegistryCenter;
+    @Autowired
+    private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
     /**
-     *  port
+     * master config
      */
-    private final int port;
-
-    /**
-     * heartbeat interval
-     */
-    private final long heartBeatInterval;
+    @Autowired
+    private MasterConfig masterConfig;
 
     /**
      * heartbeat executor
      */
-    private final ScheduledExecutorService heartBeatExecutor;
+    private ScheduledExecutorService heartBeatExecutor;
 
     /**
      * worker start time
      */
-    private final String startTime;
+    private String startTime;
 
-    /**
-     * construct
-     * @param zookeeperRegistryCenter zookeeperRegistryCenter
-     * @param port port
-     * @param heartBeatInterval heartBeatInterval
-     */
-    public MasterRegistry(ZookeeperRegistryCenter zookeeperRegistryCenter, int port, long heartBeatInterval){
-        this.zookeeperRegistryCenter = zookeeperRegistryCenter;
-        this.port = port;
-        this.heartBeatInterval = heartBeatInterval;
+
+    @PostConstruct
+    public void init(){
         this.startTime = DateUtils.dateToString(new Date());
         this.heartBeatExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("HeartBeatExecutor"));
     }
@@ -100,8 +95,9 @@ public class MasterRegistry {
                 }
             }
         });
-        this.heartBeatExecutor.scheduleAtFixedRate(new HeartBeatTask(), heartBeatInterval, heartBeatInterval, TimeUnit.SECONDS);
-        logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, heartBeatInterval);
+        int masterHeartbeatInterval = masterConfig.getMasterHeartbeatInterval();
+        this.heartBeatExecutor.scheduleAtFixedRate(new HeartBeatTask(), masterHeartbeatInterval, masterHeartbeatInterval, TimeUnit.SECONDS);
+        logger.info("master node : {} registry to ZK successfully with heartBeatInterval : {}s", address, masterHeartbeatInterval);
     }
 
     /**
@@ -129,7 +125,7 @@ public class MasterRegistry {
      * @return
      */
     private String getLocalAddress(){
-        return Constants.LOCAL_ADDRESS + ":" + port;
+        return Constants.LOCAL_ADDRESS + ":" + masterConfig.getListenPort();
     }
 
     /**
