@@ -273,15 +273,15 @@ public class ProcessUtils {
    * @param appIds      app id list
    * @param logger      logger
    * @param tenantCode  tenant code
-   * @param workDir     work dir
+   * @param executePath     execute path
    * @throws IOException io exception
    */
-  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode,String workDir)
+  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode,String executePath)
           throws IOException {
     if (appIds.size() > 0) {
       String appid = appIds.get(appIds.size() - 1);
       String commandFile = String
-              .format("%s/%s.kill", workDir, appid);
+              .format("%s/%s.kill", executePath, appid);
       String cmd = "yarn application -kill " + appid;
       try {
         StringBuilder sb = new StringBuilder();
@@ -309,7 +309,7 @@ public class ProcessUtils {
 
         Runtime.getRuntime().exec(runCmd);
       } catch (Exception e) {
-        logger.error("kill application failed", e);
+        logger.error("kill application error", e);
       }
     }
   }
