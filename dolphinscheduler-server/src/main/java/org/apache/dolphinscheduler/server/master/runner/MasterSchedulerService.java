@@ -34,8 +34,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -50,11 +48,6 @@ public class MasterSchedulerService extends Thread {
     private static final Logger logger = LoggerFactory.getLogger(MasterSchedulerService.class);
 
     /**
-     * master exec service
-     */
-    private ThreadPoolExecutor masterExecService;
-
-    /**
      * dolphinscheduler database interface
      */
     @Autowired
@@ -66,28 +59,33 @@ public class MasterSchedulerService extends Thread {
     @Autowired
     private ZKMasterClient zkMasterClient;
 
-    /**
-     *  netty remoting client
-     */
-    private NettyRemotingClient nettyRemotingClient;
-
-
     @Autowired
     private MasterConfig masterConfig;
 
     /**
+     *  netty remoting client
+     */
+    private final NettyRemotingClient nettyRemotingClient;
+
+    /**
+     * master exec service
+     */
+    private final ThreadPoolExecutor masterExecService;
+
+    /**
      * constructor of MasterSchedulerThread
      */
-    @PostConstruct
-    public void init(){
+    public MasterSchedulerService(){
         this.masterExecService = (ThreadPoolExecutor)ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+    }
+
+    public void start(){
         super.setName("MasterSchedulerThread");
         super.start();
     }
 
-    @PreDestroy
     public void close(){
         nettyRemotingClient.close();
         logger.info("master schedule service stopped...");
