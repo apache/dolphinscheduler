@@ -116,12 +116,12 @@ public class ProcessService {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         //cannot construct process instance, return null;
         if(processInstance == null){
-            logger.error("scan command, command parameter is error: %s", command.toString());
+            logger.error("scan command, command parameter is error: {}", command);
             moveToErrorCommand(command, "process instance is null");
             return null;
         }
         if(!checkThreadNum(command, validThreadNum)){
-            logger.info("there is not enough thread for this command: {}",command.toString() );
+            logger.info("there is not enough thread for this command: {}", command);
             return setWaitingThreadProcess(command, processInstance);
         }
         processInstance.setCommandType(command.getCommandType());
@@ -991,7 +991,7 @@ public class ProcessService {
             return insertQueueResult;
         }catch (Exception e){
             logger.error("submit task to queue Exception: ", e);
-            logger.error("task queue error : %s", JSONUtils.toJson(taskInstance));
+            logger.error("task queue error : {}", JSONUtils.toJson(taskInstance));
             return false;
         }
     }

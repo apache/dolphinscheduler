@@ -318,6 +318,8 @@
        * Processing code highlighting
        */
       _handlerEditor () {
+        this._destroyEditor()
+
         // editor
         editor = codemirror('code-sql-mirror', {
           mode: 'sql',
@@ -332,8 +334,14 @@
           }
         }
 
+        this.changes = () => {
+          this._cacheParams()
+        }
+
         // Monitor keyboard
         editor.on('keypress', this.keypress)
+
+        editor.on('changes', this.changes)
 
         editor.setValue(this.sql)
 
@@ -351,6 +359,38 @@
           this.receivers = res.receivers && res.receivers.split(',') || []
           this.receiversCc = res.receiversCc && res.receiversCc.split(',') || []
         })
+      },
+      _cacheParams () {
+        this.$emit('on-cache-params', {
+          type: this.type,
+          datasource: this.rtDatasource,
+          sql: editor ? editor.getValue() : '',
+          udfs: this.udfs,
+          sqlType: this.sqlType,
+          title: this.title,
+          receivers: this.receivers.join(','),
+          receiversCc: this.receiversCc.join(','),
+          showType: (() => {
+
+            let showType = this.showType
+            if (showType.length === 2 && showType[0] === 'ATTACHMENT') {
+              return [showType[1], showType[0]].join(',')
+            } else {
+              return showType.join(',')
+            }
+          })(),
+          localParams: this.localParams,
+          connParams: this.connParams,
+          preStatements: this.preStatements,
+          postStatements: this.postStatements
+        });
+      },
+      _destroyEditor () {
+         if (editor) {
+          editor.toTextArea() // Uninstall
+          editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
+          editor.off($('.code-sql-mirror'), 'changes', this.changes)
+        }
       }
     },
     watch: {
@@ -373,7 +413,7 @@
       },
       //Watch the cacheParams
       cacheParams (val) {
-        this.$emit('on-cache-params', val);
+        this._cacheParams()
       }
     },
     created () {
@@ -418,6 +458,7 @@
       if (editor) {
         editor.toTextArea() // Uninstall
         editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
+        editor.off($('.code-sql-mirror'), 'changes', this.changes)
       }
     },
     computed: {
@@ -425,7 +466,6 @@
         return {
           type: this.type,
           datasource: this.rtDatasource,
-          sql: editor ? editor.getValue() : '',
           udfs: this.udfs,
           sqlType: this.sqlType,
           title: this.title,

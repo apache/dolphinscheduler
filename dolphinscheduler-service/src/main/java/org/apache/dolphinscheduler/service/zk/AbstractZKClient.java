@@ -65,14 +65,16 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 			if (splits.length != Constants.HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH){
 				return;
 			}
-			String str = splits[0] + Constants.COMMA
-					+ splits[1] + Constants.COMMA
-					+ OSUtils.cpuUsage() + Constants.COMMA
-					+ OSUtils.memoryUsage() + Constants.COMMA
-					+ OSUtils.loadAverage() + Constants.COMMA
-					+ splits[5] + Constants.COMMA
-					+ DateUtils.dateToString(new Date());
-			zkClient.setData().forPath(znode,str.getBytes());
+			StringBuilder sb = new StringBuilder();
+			sb.append(splits[0]).append(Constants.COMMA)
+					.append(splits[1]).append(Constants.COMMA)
+					.append(OSUtils.cpuUsage()).append(Constants.COMMA)
+					.append(OSUtils.memoryUsage()).append(Constants.COMMA)
+					.append(OSUtils.loadAverage()).append(Constants.COMMA)
+					.append(splits[5]).append(Constants.COMMA)
+					.append(DateUtils.dateToString(new Date()));
+
+			zkClient.setData().forPath(znode, sb.toString().getBytes());
 
 		} catch (Exception e) {
 			logger.error("heartbeat for zk failed", e);
