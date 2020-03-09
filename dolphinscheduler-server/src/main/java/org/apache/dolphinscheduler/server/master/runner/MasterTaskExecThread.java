@@ -184,6 +184,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskInstanceId(taskInstance.getId());
+        taskExecutionContext.setHost(taskInstance.getHost());
+        taskExecutionContext.setLogPath(taskInstance.getLogPath());
+        taskExecutionContext.setExecutePath(taskExecutionContext.getExecutePath());
         taskExecutionContext.setProcessId(taskInstance.getPid());
 
         ExecutionContext executionContext = new ExecutionContext(taskExecutionContext.toKillCommand(), ExecutorType.WORKER, taskExecutionContext.getWorkerGroup());
