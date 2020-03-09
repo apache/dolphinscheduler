@@ -188,6 +188,9 @@ case "$1" in
     ;;
 esac
 
+# init directories and log files
+mkdir -p ${DOLPHINSCHEDULER_LOGS} && mkdir -p /var/log/nginx/ && cat /dev/null >> ${LOGFILE}
+
 echo "tail begin"
 exec bash -c "tail -n 1 -f ${LOGFILE}"
 
