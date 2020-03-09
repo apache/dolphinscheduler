@@ -145,7 +145,7 @@ public class NettyRemotingServer {
         try {
             future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
         } catch (Exception e) {
-            logger.error("NettyRemotingServer bind fail {}, exit", e);
+            logger.error("NettyRemotingServer bind fail {}, exit",e.getMessage(), e);
             throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
         }
         if (future.isSuccess()) {

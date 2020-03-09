@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-on: ["push", "pull_request"]
+on: ["pull_request"]
 env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
@@ -30,6 +30,12 @@ jobs:
     steps:
 
       - uses: actions/checkout@v2
+      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
+      - name: checkout submodules
+        shell: bash
+        run: |
+          git submodule sync --recursive
+          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository

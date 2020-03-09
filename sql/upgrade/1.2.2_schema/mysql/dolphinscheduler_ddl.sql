@@ -36,7 +36,7 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_process_definition_A_modify_by;
 DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_modify_by;
 
--- uc_dolphin_T_t_ds_process_definition_A_modify_by
+-- uc_dolphin_T_t_ds_task_instance_A_executor_id
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_executor_id;
 delimiter d//
 CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_executor_id()

@@ -28,7 +28,7 @@ public class ZookeeperMonitorUtilsTest {
 
 
     @Test
-    public void testGetMasterLsit(){
+    public void testGetMasterList(){
 
         ZookeeperMonitor zookeeperMonitor = new ZookeeperMonitor();
 
