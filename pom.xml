@@ -59,7 +59,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <curator.version>2.12.0</curator.version>
+        <curator.version>4.3.0</curator.version>
         <spring.version>5.1.5.RELEASE</spring.version>
         <spring.boot.version>2.1.3.RELEASE</spring.boot.version>
         <java.version>1.8</java.version>
@@ -72,7 +72,7 @@
         <cron.utils.version>5.0.5</cron.utils.version>
         <fastjson.version>1.2.61</fastjson.version>
         <druid.version>1.1.14</druid.version>
-        <h2.version>1.3.163</h2.version>
+        <h2.version>1.4.200</h2.version>
         <commons.codec.version>1.6</commons.codec.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <httpclient.version>4.4.1</httpclient.version>
@@ -201,13 +201,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${h2.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-server</artifactId>
                 <version>${project.version}</version>
@@ -251,6 +244,12 @@
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-recipes</artifactId>
                 <version>${curator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.zookeeper</groupId>
+                        <artifactId>zookeeper</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
@@ -348,6 +347,11 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -680,6 +684,9 @@
                 <configuration>
                     <includes>
                         <include>**/common/utils/*.java</include>
+                        <include>**/common/utils/process/ProcessBuilderForWin32Test.java</include>
+                        <include>**/common/utils/process/ProcessEnvironmentForWin32Test.java</include>
+                        <include>**/common/utils/process/ProcessImplForWin32Test.java</include>
                         <include>**/common/log/*.java</include>
                         <include>**/common/threadutils/*.java</include>
                         <include>**/common/graph/*.java</include>
@@ -728,8 +735,10 @@
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <include>**/server/worker/task/shell/ShellTaskTest.java</include>
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
+                        <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>

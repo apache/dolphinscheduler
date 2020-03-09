@@ -28,11 +28,15 @@ export POSTGRESQL_HOST=${POSTGRESQL_HOST:-"127.0.0.1"}
 export POSTGRESQL_PORT=${POSTGRESQL_PORT:-"5432"}
 export POSTGRESQL_USERNAME=${POSTGRESQL_USERNAME:-"root"}
 export POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD:-"root"}
+export POSTGRESQL_DATABASE=${POSTGRESQL_DATABASE:-"dolphinscheduler"}
 
 #============================================================================
 # System
 #============================================================================
 export DOLPHINSCHEDULER_ENV_PATH=${DOLPHINSCHEDULER_ENV_PATH:-"/opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh"}
+export DOLPHINSCHEDULER_DATA_BASEDIR_PATH=${DOLPHINSCHEDULER_DATA_BASEDIR_PATH:-"/tmp/dolphinscheduler"}
+export DOLPHINSCHEDULER_DATA_DOWNLOAD_BASEDIR_PATH=${DOLPHINSCHEDULER_DATA_DOWNLOAD_BASEDIR_PATH:-"/tmp/dolphinscheduler/download"}
+export DOLPHINSCHEDULER_PROCESS_EXEC_BASEPATH=${DOLPHINSCHEDULER_PROCESS_EXEC_BASEPATH:-"/tmp/dolphinscheduler/exec"}
 
 #============================================================================
 # Zookeeper
