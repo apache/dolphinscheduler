@@ -194,7 +194,6 @@ public class TaskInstance implements Serializable {
     /**
      * workerGroup
      */
-    @TableField(exist = false)
     private String workerGroup;
 
     public ProcessInstance getProcessInstance() {

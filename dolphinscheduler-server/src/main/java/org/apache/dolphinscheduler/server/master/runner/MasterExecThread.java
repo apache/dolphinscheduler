@@ -486,8 +486,8 @@ public class MasterExecThread implements Runnable {
                 taskInstance.setTaskInstancePriority(taskNode.getTaskInstancePriority());
             }
 
-            String taskWorkerGroup = taskNode.getWorkerGroup();
             String processWorkerGroup = processInstance.getWorkerGroup();
+            String taskWorkerGroup = StringUtils.isBlank(taskNode.getWorkerGroup()) ? processWorkerGroup : taskNode.getWorkerGroup();
             if (!processWorkerGroup.equals(DEFAULT_WORKER_GROUP) && taskWorkerGroup.equals(DEFAULT_WORKER_GROUP)) {
                 taskInstance.setWorkerGroup(processWorkerGroup);
             }else {
