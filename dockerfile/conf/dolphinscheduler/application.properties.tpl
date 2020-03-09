@@ -19,7 +19,7 @@
 spring.datasource.type=com.alibaba.druid.pool.DruidDataSource
 # postgre
 spring.datasource.driver-class-name=org.postgresql.Driver
-spring.datasource.url=jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/dolphinscheduler?characterEncoding=utf8
+spring.datasource.url=jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}?characterEncoding=utf8
 # mysql
 #spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 #spring.datasource.url=jdbc:mysql://192.168.xx.xx:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8

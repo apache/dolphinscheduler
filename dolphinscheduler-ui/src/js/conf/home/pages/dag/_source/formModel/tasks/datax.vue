@@ -232,6 +232,8 @@
        * Processing code highlighting
        */
       _handlerEditor () {
+        this._destroyEditor()
+
         // editor
         editor = codemirror('code-sql-mirror', {
           mode: 'sql',
@@ -249,9 +251,34 @@
         // Monitor keyboard
         editor.on('keypress', this.keypress)
 
+        editor.on('changes', () => {
+          this._cacheParams()
+        })
+
         editor.setValue(this.sql)
 
         return editor
+      },
+      _cacheParams () {
+        this.$emit('on-cache-params', {
+          dsType: this.dsType,
+          dataSource: this.rtDatasource,
+          dtType: this.dtType,
+          dataTarget: this.rtDatatarget,
+          sql: editor?editor.getValue():'',
+          targetTable: this.targetTable,
+          jobSpeedByte: this.jobSpeedByte * 1024,
+          jobSpeedRecord: this.jobSpeedRecord,
+          preStatements: this.preStatements,
+          postStatements: this.postStatements
+        });
+      },
+      _destroyEditor () {
+         if (editor) {
+          editor.toTextArea() // Uninstall
+          editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
+          editor.off($('.code-sql-mirror'), 'changes', this.changes)
+        }
       }
     },
     created () {
@@ -286,7 +313,27 @@
         editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
       }
     },
-    computed: {},
+    watch: {
+      //Watch the cacheParams
+      cacheParams (val) {
+        this._cacheParams();
+      }
+    },
+    computed: {
+      cacheParams () {
+        return {
+          dsType: this.dsType,
+          dataSource: this.rtDatasource,
+          dtType: this.dtType,
+          dataTarget: this.rtDatatarget,
+          targetTable: this.targetTable,
+          jobSpeedByte: this.jobSpeedByte * 1024,
+          jobSpeedRecord: this.jobSpeedRecord,
+          preStatements: this.preStatements,
+          postStatements: this.postStatements
+        }
+      }
+    },
     components: { mListBox, mDatasource, mLocalParams, mStatementList, mSelectInput }
   }
 </script>

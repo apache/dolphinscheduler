@@ -565,7 +565,7 @@ public class MasterExecThread implements Runnable {
 
         TaskInstance taskInstance = completeTaskList.get(nodeName);
         if(taskInstance == null){
-            logger.error("task instance cannot find, please check it!", nodeName);
+            logger.error("task instance {} cannot find, please check it!", nodeName);
             return conditionTaskList;
         }
 
