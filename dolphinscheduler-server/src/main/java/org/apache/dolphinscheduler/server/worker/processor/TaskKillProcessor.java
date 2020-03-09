@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.cache.TaskExecutionContextCacheManager;
@@ -104,15 +105,24 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
 
             // find log and kill yarn job
-            killYarnJob(context.getHost(), context.getLogPath(), context.getExecutePath(), context.getTenantCode());
+            killYarnJob(Host.of(context.getHost()).getIp(),
+                    context.getLogPath(),
+                    context.getExecutePath(),
+                    context.getTenantCode());
 
             return true;
         } catch (Exception e) {
-            logger.error("kill task failed", e);
+            logger.error("kill task error", e);
             return false;
         }
     }
 
+    /**
+     * task kill process
+     *
+     * @param channel channel channel
+     * @param command command command
+     */
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_KILL_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
@@ -160,26 +170,18 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @param executePath executePath
      * @param tenantCode tenantCode
      */
-    public void killYarnJob(String host, String logPath, String executePath, String tenantCode) {
-        List<String> appIds = null;
+    private void killYarnJob(String host, String logPath, String executePath, String tenantCode) {
+        LogClientService logClient = null;
         try {
-            Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-            LogClientService logClient = null;
-            String log = null;
-            try {
-                logClient = new LogClientService();
-                logger.info("view log host : {},logPath : {}", host,logPath);
-                log = logClient.viewLog(host, Constants.RPC_PORT, logPath);
-            } finally {
-                if(logClient != null){
-                    logClient.close();
-                }
-            }
+            logClient = new LogClientService();
+            logger.info("view log host : {},logPath : {}", host,logPath);
+            String log  = logClient.viewLog(host, Constants.RPC_PORT, logPath);
+
             if (StringUtils.isNotEmpty(log)) {
-                appIds = LoggerUtils.getAppIds(log, logger);
+                List<String> appIds = LoggerUtils.getAppIds(log, logger);
                 if (StringUtils.isEmpty(executePath)) {
-                    logger.error("task instance work dir is empty");
-                    throw new RuntimeException("task instance work dir is empty");
+                    logger.error("task instance execute path is empty");
+                    throw new RuntimeException("task instance execute path is empty");
                 }
                 if (appIds.size() > 0) {
                     ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
@@ -187,7 +189,11 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             }
 
         } catch (Exception e) {
-            logger.error("kill yarn job failure",e);
+            logger.error("kill yarn job error",e);
+        } finally {
+            if(logClient != null){
+                logClient.close();
+            }
         }
     }
 
