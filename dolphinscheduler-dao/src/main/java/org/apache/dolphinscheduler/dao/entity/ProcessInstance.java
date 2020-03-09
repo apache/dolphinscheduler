@@ -189,9 +189,9 @@ public class ProcessInstance {
     private Priority processInstancePriority;
 
     /**
-     * worker group id
+     * worker group
      */
-    private int workerGroupId;
+    private String workerGroup;
 
     /**
      * process timeout for warning
@@ -527,12 +527,12 @@ public class ProcessInstance {
         this.duration = duration;
     }
 
-    public int getWorkerGroupId() {
-        return workerGroupId;
+    public String getWorkerGroup() {
+        return workerGroup;
     }
 
-    public void setWorkerGroupId(int workerGroupId) {
-        this.workerGroupId = workerGroupId;
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
     }
 
     public int getTimeout() {
@@ -610,7 +610,7 @@ public class ProcessInstance {
                 ", dependenceScheduleTimes='" + dependenceScheduleTimes + '\'' +
                 ", duration=" + duration +
                 ", processInstancePriority=" + processInstancePriority +
-                ", workerGroupId=" + workerGroupId +
+                ", workerGroup='" + workerGroup + '\'' +
                 ", timeout=" + timeout +
                 ", tenantId=" + tenantId +
                 ", workerGroupName='" + workerGroupName + '\'' +
