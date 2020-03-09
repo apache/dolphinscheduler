@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
+import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
@@ -80,6 +81,9 @@ public class MasterServer {
     @Autowired
     private ZKMasterClient zkMasterClient;
 
+    @Autowired
+    private MasterSchedulerService masterSchedulerService;
+
     /**
      * master server startup
      *
@@ -109,6 +113,8 @@ public class MasterServer {
         //
         this.zkMasterClient.start();
         this.masterRegistry.registry();
+        //
+        masterSchedulerService.start();
 
         // start QuartzExecutors
         // what system should do if exception
@@ -162,6 +168,7 @@ public class MasterServer {
             this.nettyRemotingServer.close();
             this.masterRegistry.unRegistry();
             this.zkMasterClient.close();
+            this.masterSchedulerService.close();
 
             //close quartz
             try{
