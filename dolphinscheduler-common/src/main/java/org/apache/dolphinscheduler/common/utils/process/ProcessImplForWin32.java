@@ -20,6 +20,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
 import java.lang.reflect.Field;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import sun.security.action.GetPropertyAction;
 
 import java.io.*;
@@ -32,14 +33,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.sun.jna.platform.win32.WinBase.STILL_ACTIVE;
+import static java.util.Objects.requireNonNull;
 
 public class ProcessImplForWin32 extends Process {
 
     private static final Field FD_HANDLE;
 
     static {
+        if (!OSUtils.isWindows()) {
+            throw new RuntimeException("ProcessImplForWin32 can be only initialized in " +
+                    "Windows environment, but current OS is " + OSUtils.getOSName());
+        }
+
         try {
-            FD_HANDLE = FileDescriptor.class.getDeclaredField("handle");
+            FD_HANDLE = requireNonNull(FileDescriptor.class.getDeclaredField("handle"));
             FD_HANDLE.setAccessible(true);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
