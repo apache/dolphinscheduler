@@ -452,7 +452,7 @@ export default {
       io.get(`worker-group/all-groups`, payload, res => {
         let list = res.data
         list.unshift({
-          id: -1,
+          id: 'default',
           name: 'Default'
         })
         state.workerGroupsListAll = list
