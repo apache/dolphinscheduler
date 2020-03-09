@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -59,28 +60,33 @@ public class MasterSchedulerService extends Thread {
     @Autowired
     private ZKMasterClient zkMasterClient;
 
+    /**
+     * master config
+     */
     @Autowired
     private MasterConfig masterConfig;
 
     /**
      *  netty remoting client
      */
-    private final NettyRemotingClient nettyRemotingClient;
+    private NettyRemotingClient nettyRemotingClient;
 
     /**
      * master exec service
      */
-    private final ThreadPoolExecutor masterExecService;
+    private ThreadPoolExecutor masterExecService;
 
     /**
      * constructor of MasterSchedulerThread
      */
-    public MasterSchedulerService(){
+    @PostConstruct
+    public void init(){
         this.masterExecService = (ThreadPoolExecutor)ThreadUtils.newDaemonFixedThreadExecutor("Master-Exec-Thread", masterConfig.getMasterExecThreads());
         NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
 
+    @Override
     public void start(){
         super.setName("MasterSchedulerThread");
         super.start();
