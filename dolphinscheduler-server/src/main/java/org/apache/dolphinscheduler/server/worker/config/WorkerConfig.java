@@ -40,7 +40,7 @@ public class WorkerConfig {
     @Value("${worker.group: default}")
     private String workerGroup;
 
-    @Value("${worker.listen.port: 12345}")
+    @Value("${worker.listen.port: 123456}")
     private int listenPort;
 
     public int getListenPort() {
