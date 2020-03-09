@@ -40,6 +40,17 @@ public class WorkerConfig {
     @Value("${worker.group: default}")
     private String workerGroup;
 
+    @Value("${worker.listen.port: 12345}")
+    private int listenPort;
+
+    public int getListenPort() {
+        return listenPort;
+    }
+
+    public void setListenPort(int listenPort) {
+        this.listenPort = listenPort;
+    }
+
     public String getWorkerGroup() {
         return workerGroup;
     }

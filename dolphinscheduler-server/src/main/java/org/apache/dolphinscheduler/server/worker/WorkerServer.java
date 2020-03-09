@@ -18,12 +18,9 @@ package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
@@ -37,8 +34,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 
 /**
  *  worker server
@@ -51,19 +46,6 @@ public class WorkerServer {
      */
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
-
-    /**
-     *  worker config
-     */
-    @Autowired
-    private WorkerConfig workerConfig;
-
-    /**
-     *  zookeeper registry center
-     */
-    @Autowired
-    private ZookeeperRegistryCenter zookeeperRegistryCenter;
-
     /**
      *  netty remote server
      */
@@ -72,7 +54,14 @@ public class WorkerServer {
     /**
      *  worker registry
      */
+    @Autowired
     private WorkerRegistry workerRegistry;
+
+    /**
+     *  worker config
+     */
+    @Autowired
+    private WorkerConfig workerConfig;
 
     /**
      *  spring application context
@@ -102,12 +91,13 @@ public class WorkerServer {
 
         //init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
+        serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
         this.nettyRemotingServer.start();
 
-        this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort(), workerConfig.getWorkerHeartbeatInterval(), workerConfig.getWorkerGroup());
+        //
         this.workerRegistry.registry();
 
         /**
@@ -144,11 +134,6 @@ public class WorkerServer {
             this.nettyRemotingServer.close();
             this.workerRegistry.unRegistry();
 
-            try {
-                ThreadPoolExecutors.getInstance().shutdown();
-            }catch (Exception e){
-                logger.warn("threadPool service stopped exception:{}",e.getMessage());
-            }
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);
             System.exit(-1);
