@@ -90,7 +90,7 @@
               <m-priority v-model="taskInstancePriority"></m-priority>
             </span>
             <span class="text-b">{{$t('Worker group')}}</span>
-            <m-worker-groups v-model="workerGroupId"></m-worker-groups>
+            <m-worker-groups v-model="workerGroup"></m-worker-groups>
           </div>
         </div>
 
@@ -271,7 +271,7 @@
         // Task priority
         taskInstancePriority: 'MEDIUM',
         // worker group id
-        workerGroupId: -1
+        workerGroup: 'default'
       }
     },
     /**
@@ -378,7 +378,7 @@
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId
+            workerGroup: this.workerGroup
           },
           fromThis: this
         })
@@ -433,7 +433,7 @@
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId
+            workerGroup: this.workerGroup
           },
           fromThis: this
         })
@@ -522,17 +522,17 @@
           // If the workergroup has been deleted, set the default workergroup
           var hasMatch = false;
           for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
-            var workerGroupId = this.store.state.security.workerGroupsListAll[i].id
-            if (o.workerGroupId == workerGroupId) {
+            var workerGroup = this.store.state.security.workerGroupsListAll[i].id
+            if (o.workerGroup == workerGroup) {
               hasMatch = true;
               break;
             }
           }
 
           if(!hasMatch){
-            this.workerGroupId = -1
+            this.workerGroup = 'default'
           }else{
-            this.workerGroupId = o.workerGroupId
+            this.workerGroup = o.workerGroup
           }
 
         this.params = o.params || {}
@@ -572,7 +572,7 @@
           retryInterval: this.retryInterval,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
-          workerGroupId: this.workerGroupId
+          workerGroup: this.workerGroup
         }
       }
     },
