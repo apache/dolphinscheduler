@@ -14,52 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.log;
-
+package org.apache.dolphinscheduler.server.log;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.LoggerContextVO;
+import ch.qos.logback.core.spi.FilterReply;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
-
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class SensitiveDataConverterTest {
+public class MasterLogFilterTest {
 
-    private final Logger logger = LoggerFactory.getLogger(SensitiveDataConverterTest.class);
-
-    /**
-     * password pattern
-     */
-    private final Pattern pwdPattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
-
-    private final String logMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\"," +
-            "\"database\":\"carbond\"," +
-            "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\"," +
-            "\"user\":\"view\"," +
-            "\"password\":\"view1\"}";
-
-    private final String maskLogMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\"," +
-            "\"database\":\"carbond\"," +
-            "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\"," +
-            "\"user\":\"view\"," +
-            "\"password\":\"******\"}";
     @Test
-    public void convert() {
-        SensitiveDataConverter sensitiveDataConverter = new SensitiveDataConverter();
-        String result = sensitiveDataConverter.convert(new ILoggingEvent() {
+    public void decide() {
+        MasterLogFilter masterLogFilter = new MasterLogFilter();
+
+
+        FilterReply filterReply = masterLogFilter.decide(new ILoggingEvent() {
             @Override
             public String getThreadName() {
-                return null;
+                return Constants.THREAD_NAME_MASTER_SERVER;
             }
 
             @Override
@@ -69,7 +47,8 @@ public class SensitiveDataConverterTest {
 
             @Override
             public String getMessage() {
-                return null;
+                return "master insert into queue success, task : shell2";
+//                return "consume tasks: [2_177_2_704_-1],there still have 0 tasks need to be executed";
             }
 
             @Override
@@ -79,7 +58,7 @@ public class SensitiveDataConverterTest {
 
             @Override
             public String getFormattedMessage() {
-                return logMsg;
+                return "master insert into queue success, task : shell2";
             }
 
             @Override
@@ -133,47 +112,7 @@ public class SensitiveDataConverterTest {
             }
         });
 
-        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
+        Assert.assertEquals(FilterReply.ACCEPT, filterReply);
 
     }
-
-    /**
-     * mask sensitive logMsg - sql task datasource password
-     */
-    @Test
-    public void testPwdLogMsgConverter() {
-        logger.info("parameter : {}", logMsg);
-        logger.info("parameter : {}", passwordHandler(pwdPattern, logMsg));
-
-        Assert.assertNotEquals(logMsg, passwordHandler(pwdPattern, logMsg));
-        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
-
-    }
-
-    /**
-     * password regex test
-     *
-     * @param logMsg original log
-     */
-    private static String passwordHandler(Pattern pattern, String logMsg) {
-
-        Matcher matcher = pattern.matcher(logMsg);
-
-        StringBuffer sb = new StringBuffer(logMsg.length());
-
-        while (matcher.find()) {
-
-            String password = matcher.group();
-
-            String maskPassword = SensitiveLogUtils.maskDataSourcePwd(password);
-
-            matcher.appendReplacement(sb, maskPassword);
-        }
-        matcher.appendTail(sb);
-
-        return sb.toString();
-    }
-
-
-
 }
