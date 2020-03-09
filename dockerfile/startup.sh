@@ -164,6 +164,7 @@ case "$1" in
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-worker.log
     ;;
     (api-server)
+        initZK
         initPostgreSQL
         initApiServer
         LOGFILE=${DOLPHINSCHEDULER_LOGS}/dolphinscheduler-api-server.log
@@ -187,6 +188,6 @@ case "$1" in
     ;;
 esac
 
-echo "tee begin"
-exec tee ${LOGFILE}
+echo "tail begin"
+exec bash -c "tail -n 1 -f ${LOGFILE}"
 
