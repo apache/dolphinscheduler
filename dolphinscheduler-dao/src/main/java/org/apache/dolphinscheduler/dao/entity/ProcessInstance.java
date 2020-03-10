@@ -204,12 +204,6 @@ public class ProcessInstance {
     private int tenantId;
 
     /**
-     * worker group name. for api.
-     */
-    @TableField(exist = false)
-    private String workerGroupName;
-
-    /**
      * receivers for api
      */
     @TableField(exist = false)
@@ -552,14 +546,6 @@ public class ProcessInstance {
         return this.tenantId ;
     }
 
-    public String getWorkerGroupName() {
-        return workerGroupName;
-    }
-
-    public void setWorkerGroupName(String workerGroupName) {
-        this.workerGroupName = workerGroupName;
-    }
-
     public String getReceivers() {
         return receivers;
     }
@@ -613,7 +599,6 @@ public class ProcessInstance {
                 ", workerGroup='" + workerGroup + '\'' +
                 ", timeout=" + timeout +
                 ", tenantId=" + tenantId +
-                ", workerGroupName='" + workerGroupName + '\'' +
                 ", receivers='" + receivers + '\'' +
                 ", receiversCc='" + receiversCc + '\'' +
                 '}';

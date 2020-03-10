@@ -186,10 +186,6 @@ public class TaskInstance implements Serializable {
     @TableField(exist = false)
     private String dependentResult;
 
-    /**
-     * worker group id
-     */
-    private int workerGroupId;
 
     /**
      * workerGroup
@@ -449,14 +445,6 @@ public class TaskInstance implements Serializable {
         this.processInstancePriority = processInstancePriority;
     }
 
-    public int getWorkerGroupId() {
-        return workerGroupId;
-    }
-
-    public void setWorkerGroupId(int workerGroupId) {
-        this.workerGroupId = workerGroupId;
-    }
-
     public String getDependentResult() {
         return dependentResult;
     }
@@ -504,7 +492,6 @@ public class TaskInstance implements Serializable {
                 ", taskInstancePriority=" + taskInstancePriority +
                 ", processInstancePriority=" + processInstancePriority +
                 ", dependentResult='" + dependentResult + '\'' +
-                ", workerGroupId=" + workerGroupId +
                 ", workerGroup='" + workerGroup + '\'' +
                 '}';
     }
