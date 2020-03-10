@@ -14,40 +14,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.log;
+package org.apache.dolphinscheduler.server.log;
+
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.LoggerContextVO;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.SensitiveLogUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static org.junit.Assert.*;
+public class SensitiveDataConverterTest {
 
-public class TaskLogDiscriminatorTest {
+    private final Logger logger = LoggerFactory.getLogger(SensitiveDataConverterTest.class);
 
     /**
-     * log base
+     * password pattern
      */
-    private String logBase = "logs";
+    private final Pattern pwdPattern = Pattern.compile(Constants.DATASOURCE_PASSWORD_REGEX);
 
-    TaskLogDiscriminator taskLogDiscriminator;
+    private final String logMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\"," +
+            "\"database\":\"carbond\"," +
+            "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\"," +
+            "\"user\":\"view\"," +
+            "\"password\":\"view1\"}";
 
-    @Before
-    public void before(){
-        taskLogDiscriminator = new TaskLogDiscriminator();
-        taskLogDiscriminator.setLogBase("logs");
-        taskLogDiscriminator.setKey("123");
-    }
-
+    private final String maskLogMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\"," +
+            "\"database\":\"carbond\"," +
+            "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\"," +
+            "\"user\":\"view\"," +
+            "\"password\":\"******\"}";
     @Test
-    public void getDiscriminatingValue() {
-       String result = taskLogDiscriminator.getDiscriminatingValue(new ILoggingEvent() {
+    public void convert() {
+        SensitiveDataConverter sensitiveDataConverter = new SensitiveDataConverter();
+        String result = sensitiveDataConverter.convert(new ILoggingEvent() {
             @Override
             public String getThreadName() {
                 return null;
@@ -55,7 +64,7 @@ public class TaskLogDiscriminatorTest {
 
             @Override
             public Level getLevel() {
-                return null;
+                return Level.INFO;
             }
 
             @Override
@@ -70,12 +79,12 @@ public class TaskLogDiscriminatorTest {
 
             @Override
             public String getFormattedMessage() {
-                return null;
+                return logMsg;
             }
 
             @Override
             public String getLoggerName() {
-                return "[taskAppId=TASK-1-1-1";
+                return null;
             }
 
             @Override
@@ -123,33 +132,48 @@ public class TaskLogDiscriminatorTest {
 
             }
         });
-        Assert.assertEquals("1/1/", result);
+
+        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
+
     }
 
+    /**
+     * mask sensitive logMsg - sql task datasource password
+     */
     @Test
-    public void start() {
-        taskLogDiscriminator.start();
-        Assert.assertEquals(true, taskLogDiscriminator.isStarted());
+    public void testPwdLogMsgConverter() {
+        logger.info("parameter : {}", logMsg);
+        logger.info("parameter : {}", passwordHandler(pwdPattern, logMsg));
+
+        Assert.assertNotEquals(logMsg, passwordHandler(pwdPattern, logMsg));
+        Assert.assertEquals(maskLogMsg, passwordHandler(pwdPattern, logMsg));
+
     }
 
-    @Test
-    public void getKey() {
-        Assert.assertEquals("123", taskLogDiscriminator.getKey());
+    /**
+     * password regex test
+     *
+     * @param logMsg original log
+     */
+    private static String passwordHandler(Pattern pattern, String logMsg) {
+
+        Matcher matcher = pattern.matcher(logMsg);
+
+        StringBuffer sb = new StringBuffer(logMsg.length());
+
+        while (matcher.find()) {
+
+            String password = matcher.group();
+
+            String maskPassword = SensitiveLogUtils.maskDataSourcePwd(password);
+
+            matcher.appendReplacement(sb, maskPassword);
+        }
+        matcher.appendTail(sb);
+
+        return sb.toString();
     }
 
-    @Test
-    public void setKey() {
 
-        taskLogDiscriminator.setKey("123");
-    }
 
-    @Test
-    public void getLogBase() {
-        Assert.assertEquals("logs", taskLogDiscriminator.getLogBase());
-    }
-
-    @Test
-    public void setLogBase() {
-       taskLogDiscriminator.setLogBase("logs");
-    }
 }
