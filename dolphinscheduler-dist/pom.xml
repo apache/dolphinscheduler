@@ -392,7 +392,7 @@
                                                 ${basedir}/../script
                                             </location>
                                             <includes>
-                                                <include>**/*.*</include>
+                                                <include>*.sh</include>
                                             </includes>
                                         </source>
 
