@@ -112,9 +112,9 @@ public class ProcessInstanceService extends BaseDAGService {
             return checkResult;
         }
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId);
-        String workerGroupName = "";
-        if(processInstance.getWorkerGroupId() == -1){
-            workerGroupName = DEFAULT;
+        /*String workerGroupName = "";
+        if(StringUtils.isBlank(processInstance.getWorkerGroup())){
+            workerGroupName = ;
         }else{
             WorkerGroup workerGroup = workerGroupMapper.selectById(processInstance.getWorkerGroupId());
             if(workerGroup != null){
@@ -123,7 +123,7 @@ public class ProcessInstanceService extends BaseDAGService {
                 workerGroupName = DEFAULT;
             }
         }
-        processInstance.setWorkerGroupName(workerGroupName);
+        processInstance.setWorkerGroupName(workerGroupName);*/
         ProcessDefinition processDefinition = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
         processInstance.setReceivers(processDefinition.getReceivers());
         processInstance.setReceiversCc(processDefinition.getReceiversCc());

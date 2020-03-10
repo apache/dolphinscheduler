@@ -803,7 +803,7 @@ public class ProcessDefinitionServiceTest {
         schedule.setProcessInstancePriority(Priority.MEDIUM);
         schedule.setWarningType(WarningType.NONE);
         schedule.setWarningGroupId(1);
-        schedule.setWorkerGroupId(-1);
+        schedule.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
         return schedule;
     }
 
@@ -822,7 +822,6 @@ public class ProcessDefinitionServiceTest {
         processMeta.setScheduleFailureStrategy(String.valueOf(schedule.getFailureStrategy()));
         processMeta.setScheduleReleaseState(String.valueOf(schedule.getReleaseState()));
         processMeta.setScheduleProcessInstancePriority(String.valueOf(schedule.getProcessInstancePriority()));
-        processMeta.setScheduleWorkerGroupId(schedule.getWorkerGroupId());
         processMeta.setScheduleWorkerGroupName("workgroup1");
         return processMeta;
     }
