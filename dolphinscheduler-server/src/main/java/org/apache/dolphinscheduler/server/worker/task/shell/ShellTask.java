@@ -95,7 +95,7 @@ public class ShellTask extends AbstractTask {
       setAppIds(commandExecuteResult.getAppIds());
       setProcessId(commandExecuteResult.getProcessId());
     } catch (Exception e) {
-      logger.error("shell task failure", e);
+      logger.error("shell task error", e);
       setExitStatusCode(Constants.EXIT_CODE_FAILURE);
       throw e;
     }
@@ -125,8 +125,6 @@ public class ShellTask extends AbstractTask {
     }
 
     String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
-
-
     /**
      *  combining local and global parameters
      */
