@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.EnumUtils;
@@ -151,8 +152,8 @@ public class TaskUpdateQueueConsumer extends Thread{
 
         TaskType taskType = TaskType.valueOf(taskInstance.getTaskType());
         if (taskType == TaskType.SQL){
-            String taskJson = taskInstance.getTaskJson();
-            SqlParameters sqlParameters = JSONObject.parseObject(taskJson, SqlParameters.class);
+            TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
+            SqlParameters sqlParameters = JSONObject.parseObject(taskNode.getParams(), SqlParameters.class);
             int datasourceId = sqlParameters.getDatasource();
             DataSource datasource = processService.findDataSourceById(datasourceId);
             sqlTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
@@ -216,7 +217,4 @@ public class TaskUpdateQueueConsumer extends Thread{
         }
         return false;
     }
-
-
-
 }

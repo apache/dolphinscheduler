@@ -105,8 +105,6 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getUdfs(),
                 sqlParameters.getShowType(),
                 sqlParameters.getConnParams());
-
-        Connection con = null;
         try {
             SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
             // load class
@@ -134,18 +132,13 @@ public class SqlTask extends AbstractTask {
                     logger);
 
             // execute sql task
-            con = executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+            executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+
+            setExitStatusCode(Constants.EXIT_CODE_SUCCESS);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
+            logger.error("sql task error", e);
             throw e;
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    logger.error(e.getMessage(),e);
-                }
-            }
         }
     }
 
@@ -184,11 +177,11 @@ public class SqlTask extends AbstractTask {
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
 
         // replace the ${} of the SQL statement with the Placeholder
-        String formatSql = sql.replaceAll(rgex,"?");
+        String formatSql = sql.replaceAll(rgex, "?");
         sqlBuilder.append(formatSql);
 
         // print repalce sql
-        printReplacedSql(sql,formatSql,rgex,sqlParamsMap);
+        printReplacedSql(sql, formatSql, rgex, sqlParamsMap);
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
 
@@ -205,105 +198,195 @@ public class SqlTask extends AbstractTask {
      * @param createFuncs           create functions
      * @return Connection
      */
-    public Connection executeFuncAndSql(SqlBinds mainSqlBinds,
+    public void executeFuncAndSql(SqlBinds mainSqlBinds,
                                         List<SqlBinds> preStatementsBinds,
                                         List<SqlBinds> postStatementsBinds,
                                         List<String> createFuncs){
         Connection connection = null;
+        PreparedStatement stmt = null;
+        ResultSet resultSet = null;
         try {
             // if upload resource is HDFS and kerberos startup
             CommonUtils.loadKerberosConf();
 
-            // if hive , load connection params if exists
-            if (HIVE == DbType.valueOf(sqlParameters.getType())) {
-                Properties paramProp = new Properties();
-                paramProp.setProperty(USER, baseDataSource.getUser());
-                paramProp.setProperty(PASSWORD, baseDataSource.getPassword());
-                Map<String, String> connParamMap = CollectionUtils.stringToMap(sqlParameters.getConnParams(),
-                        SEMICOLON,
-                        HIVE_CONF);
-                paramProp.putAll(connParamMap);
 
-                connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                        paramProp);
-            }else{
-                connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
-                        baseDataSource.getUser(),
-                        baseDataSource.getPassword());
-            }
+            // create connection
+            connection = createConnection();
 
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
-                try (Statement funcStmt = connection.createStatement()) {
-                    for (String createFunc : createFuncs) {
-                        logger.info("hive create function sql: {}", createFunc);
-                        funcStmt.execute(createFunc);
-                    }
-                }
+                createTempFunction(connection,createFuncs);
             }
 
-            for (SqlBinds sqlBind: preStatementsBinds) {
-                try (PreparedStatement stmt = prepareStatementAndBind(connection, sqlBind)) {
-                    int result = stmt.executeUpdate();
-                    logger.info("pre statement execute result: {}, for sql: {}",result,sqlBind.getSql());
-                }
+            // pre sql
+            preSql(connection,preStatementsBinds);
+
+
+            stmt = prepareStatementAndBind(connection, mainSqlBinds);
+            resultSet = stmt.executeQuery();
+            // decide whether to executeQuery or executeUpdate based on sqlType
+            if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
+                // query statements need to be convert to JsonArray and inserted into Alert to send
+                resultProcess(resultSet);
+
+            } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
+                // non query statement
+                stmt.executeUpdate();
             }
 
-            try (PreparedStatement  stmt = prepareStatementAndBind(connection, mainSqlBinds);
-                 ResultSet resultSet = stmt.executeQuery()) {
-                // decide whether to executeQuery or executeUpdate based on sqlType
-                if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
-                    // query statements need to be convert to JsonArray and inserted into Alert to send
-                    JSONArray resultJSONArray = new JSONArray();
-                    ResultSetMetaData md = resultSet.getMetaData();
-                    int num = md.getColumnCount();
+            postSql(connection,postStatementsBinds);
 
-                    while (resultSet.next()) {
-                        JSONObject mapOfColValues = new JSONObject(true);
-                        for (int i = 1; i <= num; i++) {
-                            mapOfColValues.put(md.getColumnName(i), resultSet.getObject(i));
-                        }
-                        resultJSONArray.add(mapOfColValues);
-                    }
-                    logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
-
-                    // if there is a result set
-                    if ( !resultJSONArray.isEmpty() ) {
-                        if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
-                            sendAttachment(sqlParameters.getTitle(),
-                                    JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
-                        }else{
-                            sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
-                                    JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
-                        }
-                    }
-
-                    exitStatusCode = 0;
-
-                } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
-                    // non query statement
-                    stmt.executeUpdate();
-                    exitStatusCode = 0;
-                }
-            }
-
-            for (SqlBinds sqlBind: postStatementsBinds) {
-                try (PreparedStatement stmt = prepareStatementAndBind(connection, sqlBind)) {
-                    int result = stmt.executeUpdate();
-                    logger.info("post statement execute result: {},for sql: {}",result,sqlBind.getSql());
-                }
-            }
         } catch (Exception e) {
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage());
+            logger.error("execute sql error",e);
+            throw new RuntimeException("execute sql error");
         } finally {
-            try { 
-                connection.close(); 
-            } catch (Exception e) { 
-                logger.error(e.getMessage(), e); 
+            close(resultSet,stmt,connection);
+        }
+    }
+
+    /**
+     * result process
+     *
+     * @param resultSet resultSet
+     * @throws Exception
+     */
+    private void resultProcess(ResultSet resultSet) throws Exception{
+        JSONArray resultJSONArray = new JSONArray();
+        ResultSetMetaData md = resultSet.getMetaData();
+        int num = md.getColumnCount();
+
+        while (resultSet.next()) {
+            JSONObject mapOfColValues = new JSONObject(true);
+            for (int i = 1; i <= num; i++) {
+                mapOfColValues.put(md.getColumnName(i), resultSet.getObject(i));
+            }
+            resultJSONArray.add(mapOfColValues);
+        }
+        logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+
+        // if there is a result set
+        if (!resultJSONArray.isEmpty() ) {
+            if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
+                sendAttachment(sqlParameters.getTitle(),
+                        JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+            }else{
+                sendAttachment(taskExecutionContext.getTaskName() + " query resultsets ",
+                        JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
             }
         }
+    }
+
+    /**
+     *  pre sql
+     *
+     * @param connection connection
+     * @param preStatementsBinds preStatementsBinds
+     */
+    private void preSql(Connection connection,
+                        List<SqlBinds> preStatementsBinds) throws Exception{
+        for (SqlBinds sqlBind: preStatementsBinds) {
+            try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)){
+                int result = pstmt.executeUpdate();
+                logger.info("pre statement execute result: {}, for sql: {}",result,sqlBind.getSql());
+
+            }
+        }
+    }
+
+    /**
+     * post psql
+     *
+     * @param connection connection
+     * @param postStatementsBinds postStatementsBinds
+     * @throws Exception
+     */
+    private void postSql(Connection connection,
+                         List<SqlBinds> postStatementsBinds) throws Exception{
+        for (SqlBinds sqlBind: postStatementsBinds) {
+            try (PreparedStatement pstmt = prepareStatementAndBind(connection, sqlBind)){
+                int result = pstmt.executeUpdate();
+                logger.info("post statement execute result: {},for sql: {}",result,sqlBind.getSql());
+            }
+        }
+    }
+    /**
+     * create temp function
+     *
+     * @param connection connection
+     * @param createFuncs createFuncs
+     * @throws Exception
+     */
+    private void createTempFunction(Connection connection,
+                                    List<String> createFuncs) throws Exception{
+        try (Statement funcStmt = connection.createStatement()) {
+            for (String createFunc : createFuncs) {
+                logger.info("hive create function sql: {}", createFunc);
+                funcStmt.execute(createFunc);
+            }
+        }
+    }
+    /**
+     * create connection
+     *
+     * @return connection
+     * @throws Exception
+     */
+    private Connection createConnection() throws Exception{
+        // if hive , load connection params if exists
+        Connection connection = null;
+        if (HIVE == DbType.valueOf(sqlParameters.getType())) {
+            Properties paramProp = new Properties();
+            paramProp.setProperty(USER, baseDataSource.getUser());
+            paramProp.setProperty(PASSWORD, baseDataSource.getPassword());
+            Map<String, String> connParamMap = CollectionUtils.stringToMap(sqlParameters.getConnParams(),
+                    SEMICOLON,
+                    HIVE_CONF);
+            paramProp.putAll(connParamMap);
+
+            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
+                    paramProp);
+        }else{
+            connection = DriverManager.getConnection(baseDataSource.getJdbcUrl(),
+                    baseDataSource.getUser(),
+                    baseDataSource.getPassword());
+
+        }
         return connection;
+    }
+
+    /**
+     *  close jdbc resource
+     *
+     * @param resultSet resultSet
+     * @param pstmt pstmt
+     * @param connection connection
+     */
+    private void close(ResultSet resultSet,
+                       PreparedStatement pstmt,
+                       Connection connection){
+        if (resultSet != null){
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+            }
+        }
+
+        if (pstmt != null){
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+            }
+        }
+
+        if (connection != null){
+            try {
+                connection.close();
+            } catch (SQLException e) {
+
+            }
+        }
     }
 
     /**
@@ -317,20 +400,19 @@ public class SqlTask extends AbstractTask {
         // is the timeout set
         boolean timeoutFlag = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED ||
                 TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
-        try (PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql())) {
-            if(timeoutFlag){
-                stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
-            }
-            Map<Integer, Property> params = sqlBinds.getParamsMap();
-            if(params != null) {
-                for (Map.Entry<Integer, Property> entry : params.entrySet()) {
-                    Property prop = entry.getValue();
-                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
-                }
-            }
-            logger.info("prepare statement replace sql : {} ", stmt);
-            return stmt;
+        PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql());
+        if(timeoutFlag){
+            stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
         }
+        Map<Integer, Property> params = sqlBinds.getParamsMap();
+        if(params != null) {
+            for (Map.Entry<Integer, Property> entry : params.entrySet()) {
+                Property prop = entry.getValue();
+                ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+            }
+        }
+        logger.info("prepare statement replace sql : {} ", stmt);
+        return stmt;
     }
 
     /**
