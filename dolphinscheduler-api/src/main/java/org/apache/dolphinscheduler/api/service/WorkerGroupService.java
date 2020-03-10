@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +50,9 @@ public class WorkerGroupService extends BaseService {
 
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    protected ZookeeperCachedOperator zookeeperCachedOperator;
 
     /**
      * create or update a worker group
@@ -181,7 +185,8 @@ public class WorkerGroupService extends BaseService {
      */
     public Map<String,Object> queryAllGroup() {
         Map<String, Object> result = new HashMap<>(5);
-        List<WorkerGroup> workerGroupList = workerGroupMapper.queryAllWorkerGroup();
+        String WORKER_PATH = zookeeperCachedOperator.getZookeeperConfig().getDsRoot()+"/nodes" +"/worker";
+        List<String> workerGroupList = zookeeperCachedOperator.getChildrenKeys(WORKER_PATH);
         result.put(Constants.DATA_LIST, workerGroupList);
         putMsg(result, Status.SUCCESS);
         return result;
