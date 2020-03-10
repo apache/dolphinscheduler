@@ -1,0 +1,10 @@
+staging:
+  profile: ~
+  whoami: dev
+  foo: trigger
+
+publish:
+  whoami: dev
+
+github:
+  description: “Dolphin Scheduler is a distributed and easy-to-extend visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.(分布式易扩展的可视化工作流任务调度)”
