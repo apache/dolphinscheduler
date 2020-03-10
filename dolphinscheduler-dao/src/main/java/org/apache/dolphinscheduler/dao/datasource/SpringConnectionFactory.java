@@ -70,7 +70,7 @@ public class SpringConnectionFactory {
      * get the data source
      * @return druid dataSource
      */
-    @Bean
+    @Bean(destroyMethod="")
     public DruidDataSource dataSource() {
 
         DruidDataSource druidDataSource = new DruidDataSource();
@@ -98,7 +98,6 @@ public class SpringConnectionFactory {
         druidDataSource.setValidationQueryTimeout(conf.getInt(Constants.SPRING_DATASOURCE_VALIDATION_QUERY_TIMEOUT));
         //auto commit
         druidDataSource.setDefaultAutoCommit(conf.getBoolean(Constants.SPRING_DATASOURCE_DEFAULT_AUTO_COMMIT));
-
         return druidDataSource;
     }
 
