@@ -63,6 +63,12 @@ public class MasterSchedulerService extends Thread {
     private MasterConfig masterConfig;
 
     /**
+     * master config
+     */
+    @Autowired
+    private MasterConfig masterConfig;
+
+    /**
      *  netty remoting client
      */
     private final NettyRemotingClient nettyRemotingClient;
@@ -81,6 +87,7 @@ public class MasterSchedulerService extends Thread {
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
 
+    @Override
     public void start(){
         super.setName("MasterSchedulerThread");
         super.start();
