@@ -400,7 +400,7 @@ public class SqlTask extends AbstractTask {
         // is the timeout set
         boolean timeoutFlag = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED ||
                 TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
-        PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql());
+        PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
         if(timeoutFlag){
             stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
         }
