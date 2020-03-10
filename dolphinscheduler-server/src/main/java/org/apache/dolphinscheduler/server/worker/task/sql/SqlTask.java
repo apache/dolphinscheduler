@@ -107,14 +107,14 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getConnParams());
 
         Connection con = null;
-        List<String> createFuncs = null;
         try {
+            SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
             // load class
             DataSourceFactory.loadClass(DbType.valueOf(sqlParameters.getType()));
 
             // get datasource
             baseDataSource = DataSourceFactory.getDatasource(DbType.valueOf(sqlParameters.getType()),
-                    sqlParameters.getConnParams());
+                    sqlTaskExecutionContext.getConnectionParams());
 
             // ready to execute SQL and parameter entity Map
             SqlBinds mainSqlBinds = getSqlAndSqlParamsMap(sqlParameters.getSql());
@@ -129,18 +129,9 @@ public class SqlTask extends AbstractTask {
                     .map(this::getSqlAndSqlParamsMap)
                     .collect(Collectors.toList());
 
-            // determine if it is UDF
-            boolean udfTypeFlag = EnumUtils.isValidEnum(UdfType.class, sqlParameters.getType())
-                    && StringUtils.isNotEmpty(sqlParameters.getUdfs());
-            if(udfTypeFlag){
-                String[] ids = sqlParameters.getUdfs().split(",");
-                int[] idsArray = new int[ids.length];
-                for(int i=0;i<ids.length;i++){
-                    idsArray[i]=Integer.parseInt(ids[i]);
-                }
-                SQLTaskExecutionContext sqlTaskExecutionContext = taskExecutionContext.getSqlTaskExecutionContext();
-                createFuncs = UDFUtils.createFuncs(sqlTaskExecutionContext.getUdfFuncList(), taskExecutionContext.getTenantCode(), logger);
-            }
+            List<String> createFuncs = UDFUtils.createFuncs(sqlTaskExecutionContext.getUdfFuncList(),
+                    taskExecutionContext.getTenantCode(),
+                    logger);
 
             // execute sql task
             con = executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);

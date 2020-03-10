@@ -1513,7 +1513,6 @@ public class ProcessService {
      * @return udf function list
      */
     public List<UdfFunc> queryUdfFunListByids(int[] ids){
-
         return udfFuncMapper.queryUdfByIdStr(ids, null);
     }
 
