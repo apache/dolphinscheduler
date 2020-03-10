@@ -32,6 +32,11 @@ public class SQLTaskExecutionContext implements Serializable {
      * warningGroupId
      */
     private int warningGroupId;
+
+    /**
+     * connectionParams
+     */
+    private String connectionParams;
     /**
      * udf function list
      */
@@ -54,10 +59,19 @@ public class SQLTaskExecutionContext implements Serializable {
         this.udfFuncList = udfFuncList;
     }
 
+    public String getConnectionParams() {
+        return connectionParams;
+    }
+
+    public void setConnectionParams(String connectionParams) {
+        this.connectionParams = connectionParams;
+    }
+
     @Override
     public String toString() {
         return "SQLTaskExecutionContext{" +
                 "warningGroupId=" + warningGroupId +
+                ", connectionParams='" + connectionParams + '\'' +
                 ", udfFuncList=" + udfFuncList +
                 '}';
     }

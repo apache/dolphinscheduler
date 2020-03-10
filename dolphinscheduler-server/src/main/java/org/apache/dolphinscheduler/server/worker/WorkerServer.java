@@ -97,7 +97,7 @@ public class WorkerServer {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
         this.nettyRemotingServer.start();
 
-        //
+        // worker registry
         this.workerRegistry.registry();
 
         /**

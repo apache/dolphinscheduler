@@ -59,7 +59,7 @@ public abstract class AbstractTask {
     /**
      *  SHELL process pid
      */
-    protected Integer processId;
+    protected int processId;
 
     /**
      * other resource manager appId , for example : YARN etc
@@ -139,11 +139,11 @@ public abstract class AbstractTask {
         this.appIds = appIds;
     }
 
-    public Integer getProcessId() {
+    public int getProcessId() {
         return processId;
     }
 
-    public void setProcessId(Integer processId) {
+    public void setProcessId(int processId) {
         this.processId = processId;
     }
 
