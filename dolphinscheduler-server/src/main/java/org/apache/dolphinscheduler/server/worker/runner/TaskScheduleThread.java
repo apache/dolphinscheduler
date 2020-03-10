@@ -296,9 +296,7 @@ public class TaskScheduleThread implements Runnable {
 
         if (baseParam != null) {
             List<String> projectResourceFiles = baseParam.getResourceFilesList();
-            if (projectResourceFiles != null) {
-                projectFiles.addAll(projectResourceFiles);
-            }
+            projectFiles.addAll(projectResourceFiles);
         }
 
         return new ArrayList<>(projectFiles);

@@ -46,7 +46,7 @@ public class FuncUtilsTest {
         logger.info(result);
 
         //Expected result string
-        assertEquals(result, "user1|user2|user3");
+        assertEquals("user1|user2|user3", result);
 
         //Null list expected return null
         result = FuncUtils.mkString(null, split);
