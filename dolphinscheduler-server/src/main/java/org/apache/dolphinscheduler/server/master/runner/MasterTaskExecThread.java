@@ -43,6 +43,11 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     private static final Logger logger = LoggerFactory.getLogger(MasterTaskExecThread.class);
 
+
+    private boolean timeoutWarningFlag = false;
+
+    private TaskTimeoutParameter taskTimeoutParameter = null;
+
     /**
      * constructor of MasterTaskExecThread
      * @param taskInstance      task instance
@@ -50,6 +55,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     public MasterTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
         super(taskInstance, processInstance);
+        taskTimeoutParameter = getTaskTimeoutParameter(this.taskInstance);
     }
 
     /**
@@ -88,6 +94,31 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         return result;
     }
 
+
+    private Boolean warningTimeout(TaskInstance taskInstance){
+        long remainTime = getRemaintime(taskTimeoutParameter.getInterval() * 60L);
+        if (remainTime < 0) {
+            logger.warn("task id: {} execution time out",taskInstance.getId());
+            // process define
+            ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
+            // send warn mail
+            alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),processDefine.getReceiversCc(),taskInstance.getId(),taskInstance.getName());
+            this.timeoutWarningFlag = false;
+        }
+        return true;
+    }
+
+    private Boolean getTimeoutWarningFlag(TaskTimeoutParameter taskTimeoutParameter ){
+        // task time out
+        if(taskTimeoutParameter.getEnable()){
+            TaskTimeoutStrategy strategy = taskTimeoutParameter.getStrategy();
+            if(strategy == TaskTimeoutStrategy.WARN || strategy == TaskTimeoutStrategy.WARNFAILED){
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * wait task quit
      * @return true if task quit success
@@ -97,16 +128,9 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         taskInstance = processService.findTaskInstanceById(taskInstance.getId());
         logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
                 this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
-        // task time out
-        Boolean checkTimeout = false;
-        TaskTimeoutParameter taskTimeoutParameter = getTaskTimeoutParameter();
-        if(taskTimeoutParameter.getEnable()){
-            TaskTimeoutStrategy strategy = taskTimeoutParameter.getStrategy();
-            if(strategy == TaskTimeoutStrategy.WARN || strategy == TaskTimeoutStrategy.WARNFAILED){
-                checkTimeout = true;
-            }
-        }
 
+
+        timeoutWarningFlag = getTimeoutWarningFlag(this.taskTimeoutParameter);
         while (Stopper.isRunning()){
             try {
                 if(this.processInstance == null){
@@ -121,16 +145,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                 if (taskInstance.getState().typeIsFinished()){
                     break;
                 }
-                if(checkTimeout){
-                    long remainTime = getRemaintime(taskTimeoutParameter.getInterval() * 60L);
-                    if (remainTime < 0) {
-                        logger.warn("task id: {} execution time out",taskInstance.getId());
-                        // process define
-                        ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
-                        // send warn mail
-                        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),processDefine.getReceiversCc(),taskInstance.getId(),taskInstance.getName());
-                        checkTimeout = false;
-                    }
+                if(this.timeoutWarningFlag){
+                    warningTimeout(taskInstance);
                 }
                 // updateProcessInstance task instance
                 taskInstance = processService.findTaskInstanceById(taskInstance.getId());
@@ -172,7 +188,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      * get task timeout parameter
      * @return TaskTimeoutParameter
      */
-    private TaskTimeoutParameter getTaskTimeoutParameter(){
+    private TaskTimeoutParameter getTaskTimeoutParameter(TaskInstance taskInstance){
         String taskJson = taskInstance.getTaskJson();
         TaskNode taskNode = JSONObject.parseObject(taskJson, TaskNode.class);
         return taskNode.getTaskTimeoutParameter();
