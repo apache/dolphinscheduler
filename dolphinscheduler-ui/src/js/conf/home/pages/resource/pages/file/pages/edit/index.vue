@@ -44,6 +44,7 @@
   </m-list-construction>
 </template>
 <script>
+  import i18n from '@/module/i18n'
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import { filtTypeArr } from '../_source/common'
@@ -78,20 +79,29 @@
     methods: {
       ...mapActions('resource', ['getViewResources', 'updateContent']),
       ok () {
-        this.spinnerLoading = true
-        this.updateContent({
-          id: this.$route.params.id,
-          content: editor.getValue()
-        }).then(res => {
-          this.$message.success(res.msg)
-          setTimeout(() => {
+        if (this._validation()) {
+            this.spinnerLoading = true
+            this.updateContent({
+            id: this.$route.params.id,
+            content: editor.getValue()
+          }).then(res => {
+            this.$message.success(res.msg)
+            setTimeout(() => {
+              this.spinnerLoading = false
+              this.close()
+            }, 800)
+          }).catch(e => {
+            this.$message.error(e.msg || '')
             this.spinnerLoading = false
-            this.close()
-          }, 800)
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-          this.spinnerLoading = false
-        })
+          })
+        }
+      },
+      _validation () {
+        if (editor.doc.size>3000) {
+          this.$message.warning(`${i18n.$t('Resource content cannot exceed 3000 lines')}`)
+          return false
+        }
+        return true
       },
       close () {
         this.$router.push({ name: 'file' })
