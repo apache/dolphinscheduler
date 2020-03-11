@@ -872,8 +872,6 @@
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-alert</module>
         <module>dolphinscheduler-dist</module>
-        <module>dolphinscheduler-remote</module>
-        <module>dolphinscheduler-service</module>
     </modules>
 
 </project>
