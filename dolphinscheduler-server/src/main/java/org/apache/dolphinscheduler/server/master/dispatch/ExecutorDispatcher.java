@@ -67,7 +67,7 @@ public class ExecutorDispatcher implements InitializingBean {
      *
      * @param context context
      * @return result
-     * @throws ExecuteException
+     * @throws ExecuteException if error throws ExecuteException
      */
     public Boolean dispatch(final ExecutionContext context) throws ExecuteException {
         /**
@@ -99,7 +99,7 @@ public class ExecutorDispatcher implements InitializingBean {
 
     /**
      * register init
-     * @throws Exception
+     * @throws Exception if error throws Exception
      */
     @Override
     public void afterPropertiesSet() throws Exception {
