@@ -262,6 +262,15 @@
 
                                         <source>
                                             <location>
+                                                ${basedir}/../dolphinscheduler-service/src/main/resources
+                                            </location>
+                                            <includes>
+                                                <include>*.*</include>
+                                            </includes>
+                                        </source>
+
+                                        <source>
+                                            <location>
                                                 ${basedir}/../script
                                             </location>
                                             <includes>
