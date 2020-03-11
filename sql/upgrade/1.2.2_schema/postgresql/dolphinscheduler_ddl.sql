@@ -58,7 +58,7 @@ BEGIN
           WHERE TABLE_NAME='t_ds_task_instance'
                             AND COLUMN_NAME ='app_link')
       THEN
-         ALTER TABLE t_ds_task_instance ALTER COLUMN app_link character varying(5999);
+         ALTER TABLE t_ds_task_instance ALTER COLUMN app_link type text;
        END IF;
 END;
 $$ LANGUAGE plpgsql;

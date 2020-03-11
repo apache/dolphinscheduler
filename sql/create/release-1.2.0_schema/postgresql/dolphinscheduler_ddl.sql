@@ -567,7 +567,7 @@ CREATE TABLE t_ds_task_instance (
   alert_flag int DEFAULT NULL ,
   retry_times int DEFAULT '0' ,
   pid int DEFAULT NULL ,
-  app_link varchar(5999) DEFAULT NULL ,
+  app_link varchar(255) DEFAULT NULL ,
   flag int DEFAULT '1' ,
   retry_interval int DEFAULT NULL ,
   max_retry_times int DEFAULT NULL ,

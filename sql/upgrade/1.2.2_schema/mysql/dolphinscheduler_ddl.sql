@@ -66,7 +66,7 @@ CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_C_app_link()
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='app_link')
    THEN
-         alter table t_ds_task_instance modify column app_link varchar(5999);
+         ALTER TABLE t_ds_task_instance CHANGE COLUMN app_link app_link text COMMENT 'yarn app id';
        END IF;
  END;
 
