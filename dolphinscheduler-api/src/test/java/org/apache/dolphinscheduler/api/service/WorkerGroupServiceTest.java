@@ -60,7 +60,6 @@ public class WorkerGroupServiceTest {
 
     private String groupName="groupName000001";
 
-
     /**
      *  create or update a worker group
      */
