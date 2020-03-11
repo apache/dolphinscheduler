@@ -363,7 +363,7 @@ CREATE TABLE `t_escheduler_task_instance` (
   `alert_flag` tinyint(4) DEFAULT NULL COMMENT 'whether alert',
   `retry_times` int(4) DEFAULT '0' COMMENT 'task retry times',
   `pid` int(4) DEFAULT NULL COMMENT 'pid of task',
-  `app_link` varchar(255) DEFAULT NULL COMMENT 'yarn app id',
+  `app_link` varchar(5999) DEFAULT NULL COMMENT 'yarn app id',
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
   `retry_interval` int(4) DEFAULT NULL COMMENT 'retry interval when task failed ',
   `max_retry_times` int(2) DEFAULT NULL COMMENT 'max retry times',
