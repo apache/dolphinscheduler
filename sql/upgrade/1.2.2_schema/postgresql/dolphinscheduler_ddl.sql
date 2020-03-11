@@ -49,3 +49,21 @@ d//
 delimiter ;
 SELECT uc_dolphin_T_t_ds_task_instance_A_executor_id();
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_A_executor_id();
+
+-- uc_dolphin_T_t_ds_task_instance_C_app_link
+delimiter d//
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_task_instance_C_app_link() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_NAME='t_ds_task_instance'
+                            AND COLUMN_NAME ='app_link')
+      THEN
+         ALTER TABLE t_ds_task_instance ALTER COLUMN app_link character varying(5999);
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+delimiter ;
+SELECT uc_dolphin_T_t_ds_task_instance_C_app_link();
+DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_C_app_link();
