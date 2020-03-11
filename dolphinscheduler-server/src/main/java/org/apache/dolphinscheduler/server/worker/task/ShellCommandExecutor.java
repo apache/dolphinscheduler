@@ -17,11 +17,12 @@
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.slf4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -34,9 +35,14 @@ import java.util.function.Consumer;
 public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
-     * sh
+     * For Unix-like, using sh
      */
     public static final String SH = "sh";
+
+    /**
+     * For Windows, using cmd.exe
+     */
+    public static final String CMD = "cmd.exe";
 
     /**
      * constructor
@@ -66,7 +72,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
     @Override
     protected String buildCommandFilePath() {
         // command file
-        return String.format("%s/%s.command", taskDir, taskAppId);
+        return String.format("%s/%s.%s", taskDir, taskAppId, OSUtils.isWindows() ? "bat" : "command");
     }
 
     /**
@@ -75,7 +81,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
      */
     @Override
     protected String commandInterpreter() {
-        return SH;
+        return OSUtils.isWindows() ? CMD : SH;
     }
 
     /**
@@ -103,21 +109,26 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             logger.info("create command file:{}", commandFile);
 
             StringBuilder sb = new StringBuilder();
-            sb.append("#!/bin/sh\n");
-            sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-            sb.append("cd $BASEDIR\n");
-
-            if (envFile != null) {
-                sb.append("source " + envFile + "\n");
+            if (OSUtils.isWindows()) {
+                sb.append("@echo off\n");
+                sb.append("cd /d %~dp0\n");
+                if (envFile != null) {
+                    sb.append("call ").append(envFile).append("\n");
+                }
+            } else {
+                sb.append("#!/bin/sh\n");
+                sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
+                sb.append("cd $BASEDIR\n");
+                if (envFile != null) {
+                    sb.append("source ").append(envFile).append("\n");
+                }
             }
 
-            sb.append("\n\n");
             sb.append(execCommand);
-            logger.info("command : {}",sb.toString());
+            logger.info("command : {}", sb.toString());
 
             // write data to file
-            FileUtils.writeStringToFile(new File(commandFile), sb.toString(),
-                    Charset.forName("UTF-8"));
+            FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
         }
     }
 

@@ -133,6 +133,8 @@ public class AlertManager {
                     continue;
                 }
                 LinkedHashMap<String, String> failedTaskMap = new LinkedHashMap();
+                failedTaskMap.put("process instance id", String.valueOf(processInstance.getId()));
+                failedTaskMap.put("process instance name", processInstance.getName());
                 failedTaskMap.put("task id", String.valueOf(task.getId()));
                 failedTaskMap.put("task name", task.getName());
                 failedTaskMap.put("task type", task.getTaskType());
@@ -193,7 +195,7 @@ public class AlertManager {
             logger.info("add alert to db , alert : {}", alert.toString());
 
         }catch (Exception e){
-            logger.error("send alert failed! " + e);
+            logger.error("send alert failed:{} ", e.getMessage());
         }
 
     }

@@ -287,6 +287,10 @@ let tasksType = {
   'SQOOP': {
     desc: 'SQOOP',
     color: '#E46F13'
+  },
+  'CONDITIONS': {
+    desc: 'CONDITIONS',
+    color: '#E46F13'
   }
 }
 
