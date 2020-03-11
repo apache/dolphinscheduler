@@ -397,22 +397,35 @@ public class SqlTask extends AbstractTask {
      * @throws Exception
      */
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) throws Exception {
-        // is the timeout set
-        boolean timeoutFlag = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED ||
-                TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
-        PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
-        if(timeoutFlag){
-            stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
-        }
+
+        PreparedStatement pstmt = connection.prepareStatement(sqlBinds.getSql());
+
+        // set timeout
+        setTimeOut(pstmt);
+
         Map<Integer, Property> params = sqlBinds.getParamsMap();
         if(params != null) {
             for (Map.Entry<Integer, Property> entry : params.entrySet()) {
                 Property prop = entry.getValue();
-                ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+                ParameterUtils.setInParameter(entry.getKey(), pstmt, prop.getType(), prop.getValue());
             }
         }
-        logger.info("prepare statement replace sql : {} ", stmt);
-        return stmt;
+        logger.info("prepare statement replace sql : {} ", pstmt);
+        return pstmt;
+    }
+
+    /**
+     * set timeout
+     * @param pstmt PreparedStatement
+     * @throws Exception
+     */
+    private void setTimeOut(PreparedStatement pstmt) throws Exception{
+        // is the timeout set
+        boolean timeoutFlag = TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.FAILED ||
+                TaskTimeoutStrategy.of(taskExecutionContext.getTaskTimeoutStrategy()) == TaskTimeoutStrategy.WARNFAILED;
+        if(timeoutFlag){
+            pstmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
+        }
     }
 
     /**
