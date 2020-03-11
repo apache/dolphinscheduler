@@ -111,7 +111,7 @@
         this.getViewResources({
           id: this.$route.params.id,
           skipLineNum: 0,
-          limit: 2000
+          limit: 3000
         }).then(res => {
           this.name = res.data.alias.split('.')[0]
           if (!res.data) {
