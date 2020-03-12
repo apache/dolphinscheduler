@@ -29,7 +29,7 @@ public interface ExecutorManager<T> {
      * before execute
      *
      * @param executeContext executeContext
-     * @throws ExecuteException
+     * @throws ExecuteException if error throws ExecuteException
      */
     void beforeExecute(ExecutionContext executeContext) throws ExecuteException;
 
@@ -37,22 +37,21 @@ public interface ExecutorManager<T> {
      * execute task
      * @param context context
      * @return T
-     * @throws ExecuteException
+     * @throws ExecuteException if error throws ExecuteException
      */
     T execute(ExecutionContext context) throws ExecuteException;
 
     /**
      * execute task directly without retry
      * @param context context
-     * @return T
-     * @throws ExecuteException
+     * @throws ExecuteException if error throws ExecuteException
      */
     void executeDirectly(ExecutionContext context) throws ExecuteException;
 
     /**
      *  after execute
      * @param context context
-     * @throws ExecuteException
+     * @throws ExecuteException if error throws ExecuteException
      */
     void afterExecute(ExecutionContext context) throws ExecuteException;
 }
