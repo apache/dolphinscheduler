@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -454,7 +454,7 @@ public class MasterExecThread implements Runnable {
             // process instance id
             taskInstance.setProcessInstanceId(processInstance.getId());
             // task instance node json
-            taskInstance.setTaskJson(JSONObject.toJSONString(taskNode));
+            taskInstance.setTaskJson(JSON.toJSONString(taskNode));
             // task instance type
             taskInstance.setTaskType(taskNode.getType());
             // task instance whether alert
