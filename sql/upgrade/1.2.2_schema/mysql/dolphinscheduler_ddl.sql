@@ -55,3 +55,23 @@ d//
 delimiter ;
 CALL uc_dolphin_T_t_ds_task_instance_A_executor_id;
 DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_executor_id;
+
+-- uc_dolphin_T_t_ds_task_instance_C_app_link
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_C_app_link;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_C_app_link()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='app_link')
+   THEN
+         ALTER TABLE t_ds_task_instance CHANGE COLUMN app_link app_link text COMMENT 'yarn app id';
+       END IF;
+ END;
+
+d//
+
+delimiter ;
+CALL uc_dolphin_T_t_ds_task_instance_C_app_link;
+DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_C_app_link;
