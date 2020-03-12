@@ -21,7 +21,12 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProcessUtilsTest {
+
     private static final Logger logger = LoggerFactory.getLogger(ProcessUtilsTest.class);
 
     @Test
@@ -30,4 +35,16 @@ public class ProcessUtilsTest {
         Assert.assertNotEquals("The child process of process 1 should not be empty", pidList, "");
         logger.info("Sub process list : {}", pidList);
     }
+
+    @Test
+    public void testBuildCommandStr() {
+        List<String> commands = new ArrayList<>();
+        commands.add("sudo");
+        try {
+            Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "sudo");
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
+    }
+
 }

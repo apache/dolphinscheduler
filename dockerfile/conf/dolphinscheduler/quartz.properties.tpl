@@ -22,7 +22,7 @@
 org.quartz.jobStore.driverDelegateClass = org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
 # postgre
 org.quartz.dataSource.myDs.driver = org.postgresql.Driver
-org.quartz.dataSource.myDs.URL = jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/dolphinscheduler?characterEncoding=utf8
+org.quartz.dataSource.myDs.URL = jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}?characterEncoding=utf8
 org.quartz.dataSource.myDs.user = ${POSTGRESQL_USERNAME}
 org.quartz.dataSource.myDs.password = ${POSTGRESQL_PASSWORD}
 org.quartz.scheduler.instanceName = DolphinScheduler
