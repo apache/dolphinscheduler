@@ -129,6 +129,8 @@
        * Processing code highlighting
        */
       _handlerEditor () {
+        this._destroyEditor()
+
         // editor
         editor = codemirror('code-python-mirror', {
           mode: 'python',
@@ -143,26 +145,45 @@
           }
         }
 
+        this.changes = () => {
+          this._cacheParams()
+        }
+
         // Monitor keyboard
         editor.on('keypress', this.keypress)
+
+        editor.on('changes', this.changes)
 
         editor.setValue(this.rawScript)
 
         return editor
+      },
+      _cacheParams () {
+        this.$emit('on-cache-params', {
+          resourceList: this.cacheResourceList,
+          localParams: this.localParams,
+          rawScript: editor ? editor.getValue() : ''
+        });
+      },
+      _destroyEditor () {
+         if (editor) {
+          editor.toTextArea() // Uninstall
+          editor.off($('.code-python-mirror'), 'keypress', this.keypress)
+          editor.off($('.code-python-mirror'), 'changes', this.changes)
+        }
       }
     },
     watch: {
       //Watch the cacheParams
       cacheParams (val) {
-        this.$emit('on-cache-params', val);
+        this._cacheParams()
       }
     },
     computed: {
       cacheParams () {
         return {
           resourceList: this.cacheResourceList,
-          localParams: this.localParams,
-          rawScript: editor ? editor.getValue() : ''
+          localParams: this.localParams
         }
       }
     },
@@ -193,8 +214,11 @@
       }, 200)
     },
     destroyed () {
-      editor.toTextArea() // Uninstall
-      editor.off($('.code-python-mirror'), 'keypress', this.keypress)
+      if (editor) {
+        editor.toTextArea() // Uninstall
+        editor.off($('.code-python-mirror'), 'keypress', this.keypress)
+        editor.off($('.code-python-mirror'), 'changes', this.changes)
+      }
     },
     components: { mLocalParams, mListBox, mResources }
   }

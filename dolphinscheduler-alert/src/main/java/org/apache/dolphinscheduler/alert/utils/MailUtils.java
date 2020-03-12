@@ -334,7 +334,7 @@ public class MailUtils {
      * @param e the exception
      */
     private static void handleException(Collection<String> receivers, Map<String, Object> retMap, Exception e) {
-        logger.error("Send email to {} failed {}", receivers, e);
+        logger.error("Send email to {} failed", receivers, e);
         retMap.put(Constants.MESSAGE, "Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 
