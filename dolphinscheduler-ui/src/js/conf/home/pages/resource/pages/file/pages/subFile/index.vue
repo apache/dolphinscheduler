@@ -137,6 +137,10 @@
           this.$message.warning(`${i18n.$t('Please enter the resource content')}`)
           return false
         }
+        if (editor.doc.size>3000) {
+          this.$message.warning(`${i18n.$t('Resource content cannot exceed 3000 lines')}`)
+          return false
+        }
 
         return true
       },
