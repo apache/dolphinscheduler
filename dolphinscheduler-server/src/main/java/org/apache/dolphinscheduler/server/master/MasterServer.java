@@ -144,7 +144,7 @@ public class MasterServer {
 
     /**
      * gracefully close
-     * @param cause
+     * @param cause close cause
      */
     public void close(String cause) {
 

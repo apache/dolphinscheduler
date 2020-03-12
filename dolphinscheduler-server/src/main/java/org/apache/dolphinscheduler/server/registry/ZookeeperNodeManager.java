@@ -82,7 +82,7 @@ public class ZookeeperNodeManager implements InitializingBean {
 
     /**
      * init listener
-     * @throws Exception
+     * @throws Exception if error throws Exception
      */
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -221,8 +221,8 @@ public class ZookeeperNodeManager implements InitializingBean {
 
     /**
      * sync worker group nodes
-     * @param workerGroup
-     * @param nodes
+     * @param workerGroup worker group
+     * @param nodes worker nodes
      */
     private void syncWorkerGroupNodes(String workerGroup, Set<String> nodes){
         workerGroupLock.lock();

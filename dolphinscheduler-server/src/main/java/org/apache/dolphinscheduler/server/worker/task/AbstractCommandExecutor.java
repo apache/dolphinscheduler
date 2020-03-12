@@ -126,7 +126,7 @@ public abstract class AbstractCommandExecutor {
      *
      * @param execCommand execCommand
      * @return CommandExecuteResult
-     * @throws Exception
+     * @throws Exception if error throws Exception
      */
     public CommandExecuteResult run(String execCommand) throws Exception{
 

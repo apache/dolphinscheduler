@@ -29,7 +29,7 @@ public abstract class AbstractExecutorManager<T> implements ExecutorManager<T>{
      * before execute , add time monitor ， timeout
      *
      * @param context context
-     * @throws ExecuteException
+     * @throws ExecuteException if error throws ExecuteException
      */
     @Override
     public void beforeExecute(ExecutionContext context) throws ExecuteException {
@@ -38,7 +38,7 @@ public abstract class AbstractExecutorManager<T> implements ExecutorManager<T>{
     /**
      * after execute , add dispatch monitor
      * @param context context
-     * @throws ExecuteException
+     * @throws ExecuteException if error throws ExecuteException
      */
     @Override
     public void afterExecute(ExecutionContext context) throws ExecuteException {

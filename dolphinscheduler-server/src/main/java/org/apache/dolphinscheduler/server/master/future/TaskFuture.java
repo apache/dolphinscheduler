@@ -70,7 +70,7 @@ public class TaskFuture {
     /**
      * wait for response
      * @return command
-     * @throws InterruptedException
+     * @throws InterruptedException if error throws InterruptedException
      */
     public Command waitResponse() throws InterruptedException {
         this.latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
