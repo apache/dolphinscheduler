@@ -235,6 +235,7 @@ export default {
   'Upload File Size': '文件大小不能超过1G',
   'Create': '创建',
   'Please enter the resource content': '请输入资源内容',
+  'Resource content cannot exceed 3000 lines': '资源内容不能超过3000行',
   'File Details': '文件详情',
   'Download Details': '下载详情',
   'Return': '返回',
