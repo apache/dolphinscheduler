@@ -32,7 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,16 +48,14 @@ public class HadoopUtils implements Closeable {
 
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtils.class);
 
-    private static String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
-    private static volatile HadoopUtils instance = new HadoopUtils();
-    private static volatile Configuration configuration;
+    private static HadoopUtils instance = new HadoopUtils();
+    private static Configuration configuration;
     private static FileSystem fs;
 
+    private String hdfsUser;
 
     private HadoopUtils(){
-        if(StringUtils.isEmpty(hdfsUser)){
-            hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
-        }
+        hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
         init();
         initHdfsPath();
     }
@@ -129,7 +129,6 @@ public class HadoopUtils implements Closeable {
 
                             if (fs == null) {
                                 if(StringUtils.isNotEmpty(hdfsUser)){
-                                    //UserGroupInformation ugi = UserGroupInformation.createProxyUser(hdfsUser,UserGroupInformation.getLoginUser());
                                     UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
                                     ugi.doAs(new PrivilegedExceptionAction<Boolean>() {
                                         @Override
@@ -196,7 +195,7 @@ public class HadoopUtils implements Closeable {
 
         if(StringUtils.isBlank(hdfsFilePath)){
             logger.error("hdfs file path:{} is blank",hdfsFilePath);
-            return null;
+            return new byte[0];
         }
 
         FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath));
@@ -218,7 +217,7 @@ public class HadoopUtils implements Closeable {
 
         if (StringUtils.isBlank(hdfsFilePath)){
             logger.error("hdfs file path:{} is blank",hdfsFilePath);
-            return null;
+            return Collections.emptyList();
         }
 
         try (FSDataInputStream in = fs.open(new Path(hdfsFilePath))){
@@ -293,7 +292,7 @@ public class HadoopUtils implements Closeable {
         if (dstPath.exists()) {
             if (dstPath.isFile()) {
                 if (overwrite) {
-                    dstPath.delete();
+                    Files.delete(dstPath.toPath());
                 }
             } else {
                 logger.error("destination file must be a file");
@@ -378,7 +377,7 @@ public class HadoopUtils implements Closeable {
 
         String responseContent = HttpUtils.get(applicationUrl);
 
-        JSONObject jsonObject = JSONObject.parseObject(responseContent);
+        JSONObject jsonObject = JSON.parseObject(responseContent);
         String result = jsonObject.getJSONObject("app").getString("finalStatus");
 
         switch (result) {
@@ -525,8 +524,6 @@ public class HadoopUtils implements Closeable {
      */
     private static final class YarnHAAdminUtils extends RMAdminCLI {
 
-        private static final Logger logger = LoggerFactory.getLogger(YarnHAAdminUtils.class);
-
         /**
          * get active resourcemanager
          *
@@ -585,8 +582,7 @@ public class HadoopUtils implements Closeable {
             JSONObject jsonObject = JSON.parseObject(retStr);
 
             //get ResourceManager state
-            String state = jsonObject.getJSONObject("clusterInfo").getString("haState");
-            return state;
+            return jsonObject.getJSONObject("clusterInfo").getString("haState");
         }
 
     }
