@@ -65,7 +65,7 @@
             <m-datasource
                     ref="refSourceDs"
                     @on-dsData="_onSourceDsData"
-                    :data="{ type:'MYSQL',datasource:srcDatasource }"
+                    :data="{ type:sourceMysqlParams.srcType,datasource:sourceMysqlParams.srcDatasource }"
                     >
             </m-datasource>
           </div>
@@ -186,8 +186,8 @@
       <div slot="content">
         <div class="from-mirror">
           <textarea
-                  id="code-sql-mirror"
-                  name="code-sql-mirror"
+                  id="code-sqoop-mirror"
+                  name="code-sqoop-mirror"
                   style="opacity: 0;">
           </textarea>
         </div>
@@ -385,7 +385,7 @@
           <m-datasource
               ref="refTargetDs"
               @on-dsData="_onTargetDsData"
-              :data="{ type:type,datasource:targetDatasource }"
+              :data="{ type:targetMysqlParams.targetType,datasource:targetMysqlParams.targetDatasource }"
               >
           </m-datasource>
         </div>
@@ -556,7 +556,8 @@
         targetType:"HDFS",
 
         sourceMysqlParams:{
-          srcDatasource:-1,
+          srcType:"MYSQL",
+          srcDatasource:"",
           srcTable:"",
           srcQueryType:"1",
           srcQuerySql:'',
@@ -588,7 +589,8 @@
         },
 
         targetMysqlParams:{
-          targetDatasource:-1,
+          targetType:"MYSQL",
+          targetDatasource:"",
           targetTable:"",
           targetColumns:"",
           fieldsTerminated:"",
@@ -680,6 +682,7 @@
        * return data source
        */
       _onSourceDsData (o) {
+        this.sourceMysqlParams.srcType = o.type
         this.sourceMysqlParams.srcDatasource = o.datasource
       },
 
@@ -687,6 +690,7 @@
        * return data source
        */
       _onTargetDsData (o) {
+        this.targetMysqlParams.targetType = o.type
         this.targetMysqlParams.targetDatasource = o.datasource
       },
 
@@ -697,7 +701,7 @@
         var params = null
         switch(this.sourceType){
           case "MYSQL":
-            this.sourceMysqlParams.srcQuerySql = editor.getValue()
+            this.sourceMysqlParams.srcQuerySql = editor ? editor.getValue() : this.sourceMysqlParams.srcQuerySql
             params = JSON.stringify(this.sourceMysqlParams)
             break;
           case "ORACLE":
@@ -879,7 +883,9 @@
        * Processing code highlighting
        */
       _handlerEditor () {
-        editor = codemirror('code-sql-mirror', {
+        this._destroyEditor()
+
+        editor = codemirror('code-sqoop-mirror', {
           mode: 'sql',
           readOnly: this.isDetails
         })
@@ -892,8 +898,14 @@
           }
         }
 
+        this.changes = () => {
+          this._cacheParams()
+        }
+
         // Monitor keyboard
         editor.on('keypress', this.keypress)
+
+        editor.on('changes', this.changes)
 
         editor.setValue(this.sourceMysqlParams.srcQuerySql)
 
@@ -905,6 +917,27 @@
        */
       _onLocalParams (a) {
         this.localParams = a
+      },
+
+      _cacheParams () {
+        this.$emit('on-cache-params', {
+          concurrency:this.concurrency,
+          modelType:this.modelType,
+          sourceType:this.sourceType,
+          targetType:this.targetType,
+          sourceParams:this._handleSourceParams(),
+          targetParams:this._handleTargetParams(),
+          localParams:this.localParams
+        });
+      },
+
+      _destroyEditor () {
+         if (editor) {
+          editor.toTextArea() // Uninstall
+          editor.off($('.code-sqoop-mirror'), 'keypress', this.keypress)
+          editor.off($('.code-sqoop-mirror'), 'changes', this.changes)
+          editor = null
+        }
       },
     },
     watch: {
@@ -927,11 +960,12 @@
       },
       //Watch the cacheParams
       cacheParams (val) {
-        this.$emit('on-cache-params', val);
+        this._cacheParams()
       }
     },
 
     created () {
+      this._destroyEditor()
       let o = this.backfillItem
 
       // Non-null objects represent backfill
@@ -963,11 +997,28 @@
        */
       if (editor) {
         editor.toTextArea() // Uninstall
-        editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
+        editor.off($('.code-sqoop-mirror'), 'keypress', this.keypress)
+        editor.off($('.code-sqoop-mirror'), 'changes', this.changes)
+        editor = null
       }
     },
 
     computed: {
+      cacheParams () {
+        return {
+          concurrency:this.concurrency,
+          modelType:this.modelType,
+          sourceType:this.sourceType,
+          targetType:this.targetType,
+          localParams:this.localParams,
+          sourceMysqlParams:this.sourceMysqlParams,
+          sourceHdfsParams:this.sourceHdfsParams,
+          sourceHiveParams:this.sourceHiveParams,
+          targetHdfsParams:this.targetHdfsParams,
+          targetMysqlParams:this.targetMysqlParams,
+          targetHiveParams:this.targetHiveParams
+        }
+      }
     },
     components: { mListBox, mDatasource, mLocalParams}
   }
