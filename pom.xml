@@ -729,6 +729,9 @@
                     </includes>
                     <!-- <skip>true</skip> -->
                     <argLine>-Xmx2048m</argLine>
+                    <threadCount>3</threadCount>
+                    <forkCount>3</forkCount>
+                    <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
 
