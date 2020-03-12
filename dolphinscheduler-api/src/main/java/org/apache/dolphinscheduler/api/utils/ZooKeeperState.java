@@ -121,7 +121,7 @@ public class ZooKeeperState {
 	private class SendThread extends Thread {
 		private String cmd;
 
-		public String ret = "";
+		private String ret = "";
 
 		public SendThread(String cmd) {
 			this.cmd = cmd;
