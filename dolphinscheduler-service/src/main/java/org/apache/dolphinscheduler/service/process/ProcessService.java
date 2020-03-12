@@ -427,8 +427,8 @@ public class ProcessService {
         processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
-        int workerGroupId = command.getWorkerGroupId() == 0 ? -1 : command.getWorkerGroupId();
-        processInstance.setWorkerGroupId(workerGroupId);
+        String workerGroup = StringUtils.isBlank(command.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : command.getWorkerGroup();
+        processInstance.setWorkerGroup(workerGroup);
         processInstance.setTimeout(processDefinition.getTimeout());
         processInstance.setTenantId(processDefinition.getTenantId());
         return processInstance;
@@ -964,7 +964,7 @@ public class ProcessService {
      */
     public String taskZkInfo(TaskInstance taskInstance) {
 
-        int taskWorkerGroupId = getTaskWorkerGroupId(taskInstance);
+        String taskWorkerGroup = getTaskWorkerGroup(taskInstance);
         ProcessInstance processInstance = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
         if(processInstance == null){
             logger.error("process instance is null. please check the task info, task id: " + taskInstance.getId());
@@ -976,9 +976,10 @@ public class ProcessService {
         sb.append(processInstance.getProcessInstancePriority().ordinal()).append(Constants.UNDERLINE)
                 .append(taskInstance.getProcessInstanceId()).append(Constants.UNDERLINE)
                 .append(taskInstance.getTaskInstancePriority().ordinal()).append(Constants.UNDERLINE)
-                .append(taskInstance.getId()).append(Constants.UNDERLINE);
+                .append(taskInstance.getId()).append(Constants.UNDERLINE)
+                .append(taskInstance.getWorkerGroup());
 
-        if(taskWorkerGroupId > 0){
+        /*if(StringUtils.isNotBlank(taskWorkerGroup)){
             //not to find data from db
             WorkerGroup workerGroup = queryWorkerGroupById(taskWorkerGroupId);
             if(workerGroup == null ){
@@ -1012,8 +1013,7 @@ public class ProcessService {
             sb.append(ipSb);
         }else{
             sb.append(Constants.DEFAULT_WORKER_ID);
-        }
-
+        }*/
 
         return  sb.toString();
     }
@@ -1513,7 +1513,6 @@ public class ProcessService {
      * @return udf function list
      */
     public List<UdfFunc> queryUdfFunListByids(int[] ids){
-
         return udfFuncMapper.queryUdfByIdStr(ids, null);
     }
 
@@ -1689,24 +1688,24 @@ public class ProcessService {
     }
 
     /**
-     * get task worker group id
+     * get task worker group
      * @param taskInstance taskInstance
      * @return workerGroupId
      */
-    public int getTaskWorkerGroupId(TaskInstance taskInstance) {
-        int taskWorkerGroupId = taskInstance.getWorkerGroupId();
+    public String getTaskWorkerGroup(TaskInstance taskInstance) {
+        String workerGroup = taskInstance.getWorkerGroup();
 
-        if(taskWorkerGroupId > 0){
-            return taskWorkerGroupId;
+        if(StringUtils.isNotBlank(workerGroup)){
+            return workerGroup;
         }
         int processInstanceId = taskInstance.getProcessInstanceId();
         ProcessInstance processInstance = findProcessInstanceById(processInstanceId);
 
         if(processInstance != null){
-            return processInstance.getWorkerGroupId();
+            return processInstance.getWorkerGroup();
         }
-        logger.info("task : {} will use default worker group id", taskInstance.getId());
-        return Constants.DEFAULT_WORKER_ID;
+        logger.info("task : {} will use default worker group", taskInstance.getId());
+        return Constants.DEFAULT_WORKER_GROUP;
     }
 
     /**
