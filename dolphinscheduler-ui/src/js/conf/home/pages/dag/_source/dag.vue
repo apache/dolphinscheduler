@@ -293,7 +293,7 @@
         let is = true
         let code = ''
 
-        if (!item.disable) {
+        if (item.disable) {
           return
         }
 
