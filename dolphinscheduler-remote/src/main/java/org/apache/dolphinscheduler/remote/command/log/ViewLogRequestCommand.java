@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *  view log request command

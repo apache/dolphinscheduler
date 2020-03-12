@@ -27,8 +27,6 @@ import org.slf4j.Marker;
 
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 public class TaskLogDiscriminatorTest {
 
     /**

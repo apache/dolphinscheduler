@@ -14,10 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package queue;
+package org.apache.dolphinscheduler.service.queue;
 
 import org.apache.dolphinscheduler.service.queue.ITaskQueue;
 import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
+import org.apache.dolphinscheduler.service.zk.ZKServer;
 import org.junit.*;
 
 /**

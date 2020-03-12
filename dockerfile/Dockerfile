@@ -23,11 +23,11 @@ ENV TZ Asia/Shanghai
 ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND noninteractive
 
-#1. install dos2unix shadow bash openrc python sudo vim wget iputils net-tools ssh pip kazoo.
+#1. install dos2unix shadow bash openrc python sudo vim wget iputils net-tools ssh pip tini kazoo.
 #If install slowly, you can replcae alpine's mirror with aliyun's mirror, Example:
 #RUN sed -i "s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g" /etc/apk/repositories
 RUN apk update && \
-    apk add dos2unix shadow bash openrc python sudo vim wget iputils net-tools openssh-server py2-pip && \
+    apk add dos2unix shadow bash openrc python sudo vim wget iputils net-tools openssh-server py2-pip tini && \
     apk add --update procps && \
     openrc boot && \
     pip install kazoo
@@ -63,19 +63,22 @@ RUN echo "daemon off;" >> /etc/nginx/nginx.conf && \
 ADD ./conf/nginx/dolphinscheduler.conf /etc/nginx/conf.d
 
 #7. add configuration and modify permissions and set soft links
+ADD ./checkpoint.sh /root/checkpoint.sh
 ADD ./startup-init-conf.sh /root/startup-init-conf.sh
 ADD ./startup.sh /root/startup.sh
 ADD ./conf/dolphinscheduler/*.tpl /opt/dolphinscheduler/conf/
-ADD ./conf/dolphinscheduler/env/dolphinscheduler_env /opt/dolphinscheduler/conf/env/
-RUN chmod +x /root/startup-init-conf.sh && \
+ADD conf/dolphinscheduler/env/dolphinscheduler_env.sh /opt/dolphinscheduler/conf/env/
+RUN chmod +x /root/checkpoint.sh && \
+    chmod +x /root/startup-init-conf.sh && \
     chmod +x /root/startup.sh && \
-    chmod +x /opt/dolphinscheduler/conf/env/dolphinscheduler_env && \
+    chmod +x /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh && \
     chmod +x /opt/dolphinscheduler/script/*.sh && \
     chmod +x /opt/dolphinscheduler/bin/*.sh && \
     chmod +x /opt/zookeeper/bin/*.sh && \
+    dos2unix /root/checkpoint.sh && \
     dos2unix /root/startup-init-conf.sh && \
     dos2unix /root/startup.sh && \
-    dos2unix /opt/dolphinscheduler/conf/env/dolphinscheduler_env && \
+    dos2unix /opt/dolphinscheduler/conf/env/dolphinscheduler_env.sh && \
     dos2unix /opt/dolphinscheduler/script/*.sh && \
     dos2unix /opt/dolphinscheduler/bin/*.sh && \
     dos2unix /opt/zookeeper/bin/*.sh && \
@@ -87,6 +90,6 @@ RUN chmod +x /root/startup-init-conf.sh && \
 RUN rm -rf /var/cache/apk/*
 
 #9. expose port
-EXPOSE 2181 2888 3888 5432 12345 8888
+EXPOSE 2181 2888 3888 5432 12345 50051 8888
 
-ENTRYPOINT ["/root/startup.sh"]
+ENTRYPOINT ["/sbin/tini", "--", "/root/startup.sh"]
