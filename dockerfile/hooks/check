@@ -17,7 +17,7 @@
 #
 echo "------ dolphinscheduler check - server - status -------"
 sleep 20
-server_num=$(docker top `docker container list | grep startup | awk '{print $1}'`| grep java | grep "dolphinscheduler" | awk -F 'classpath ' '{print $2}' | awk '{print $2}' | sort | uniq -c | wc -l)
+server_num=$(docker top `docker container list | grep '/sbin/tini' | awk '{print $1}'`| grep java | grep "dolphinscheduler" | awk -F 'classpath ' '{print $2}' | awk '{print $2}' | sort | uniq -c | wc -l)
 if [ $server_num -eq 5 ]
 then
     echo "Server all start successfully"
