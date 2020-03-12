@@ -76,7 +76,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      * execute logic
      * @param context context
      * @return result
-     * @throws ExecuteException
+     * @throws ExecuteException if error throws ExecuteException
      */
     @Override
     public Boolean execute(ExecutionContext context) throws ExecuteException {
@@ -137,7 +137,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      *  execute logic
      * @param host host
      * @param command command
-     * @throws ExecuteException
+     * @throws ExecuteException if error throws ExecuteException
      */
     private void doExecute(final Host host, final Command command) throws ExecuteException {
         /**
