@@ -125,7 +125,7 @@ public class PropertyUtils {
      * @param key property name
      * @return property value
      */
-    public static Boolean getBoolean(String key) {
+    public static boolean getBoolean(String key) {
         String value = properties.getProperty(key.trim());
         if(null != value){
             return Boolean.parseBoolean(value);
