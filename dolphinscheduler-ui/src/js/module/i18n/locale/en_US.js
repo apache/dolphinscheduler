@@ -229,6 +229,7 @@ export default {
   'File Content': 'File Content',
   'Create': 'Create',
   'Please enter the resource content': 'Please enter the resource content',
+  'Resource content cannot exceed 3000 lines': 'Resource content cannot exceed 3000 lines',
   'File Details': 'File Details',
   'Download Details': 'Download Details',
   'Return': 'Return',
