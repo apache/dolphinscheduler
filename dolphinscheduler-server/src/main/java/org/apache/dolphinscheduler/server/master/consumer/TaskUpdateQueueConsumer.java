@@ -192,9 +192,9 @@ public class TaskUpdateQueueConsumer extends Thread{
             dataxTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
             dataxTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
 
-            dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataTarget());
-            dataxTaskExecutionContext.setSourcetype(dataTarget.getType().getCode());
-            dataxTaskExecutionContext.setSourceConnectionParams(dataTarget.getConnectionParams());
+            dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
+            dataxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+            dataxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
         }
 
 
