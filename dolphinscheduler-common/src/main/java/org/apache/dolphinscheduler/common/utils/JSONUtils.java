@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
@@ -59,7 +60,7 @@ public class JSONUtils {
    */
   public static String toJson(Object object) {
     try{
-      return JSONObject.toJSONString(object,false);
+      return JSON.toJSONString(object,false);
     } catch (Exception e) {
       logger.error("object to json exception!",e);
     }
@@ -89,7 +90,7 @@ public class JSONUtils {
     }
 
     try {
-      return JSONObject.parseObject(json, clazz);
+      return JSON.parseObject(json, clazz);
     } catch (Exception e) {
       logger.error("parse object exception!",e);
     }
@@ -178,7 +179,7 @@ public class JSONUtils {
     }
 
     try {
-      return JSONObject.parseObject(json, new TypeReference<HashMap<String, String>>(){});
+      return JSON.parseObject(json, new TypeReference<HashMap<String, String>>(){});
     } catch (Exception e) {
       logger.error("json to map exception!",e);
     }
@@ -203,7 +204,7 @@ public class JSONUtils {
     }
 
     try {
-      return JSONObject.parseObject(json, new TypeReference<HashMap<K, V>>() {});
+      return JSON.parseObject(json, new TypeReference<HashMap<K, V>>() {});
     } catch (Exception e) {
       logger.error("json to map exception!",e);
     }
@@ -218,7 +219,7 @@ public class JSONUtils {
    */
   public static String toJsonString(Object object) {
     try{
-      return JSONObject.toJSONString(object,false);
+      return JSON.toJSONString(object,false);
     } catch (Exception e) {
       throw new RuntimeException("Json deserialization exception.", e);
     }
@@ -226,7 +227,7 @@ public class JSONUtils {
 
   public static JSONObject parseObject(String text) {
     try{
-      return JSONObject.parseObject(text);
+      return JSON.parseObject(text);
     } catch (Exception e) {
       throw new RuntimeException("Json deserialization exception.", e);
     }
@@ -234,7 +235,7 @@ public class JSONUtils {
 
   public static JSONArray parseArray(String text) {
     try{
-      return JSONObject.parseArray(text);
+      return JSON.parseArray(text);
     } catch (Exception e) {
       throw new RuntimeException("Json deserialization exception.", e);
     }
