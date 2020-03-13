@@ -17,16 +17,11 @@
 package org.apache.dolphinscheduler.common.utils;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
 /**
  * http utils
  */
 public class IpUtils {
 
-  private static final Logger logger = LoggerFactory.getLogger(IpUtils.class);
   public static final String DOT = ".";
 
   /**
