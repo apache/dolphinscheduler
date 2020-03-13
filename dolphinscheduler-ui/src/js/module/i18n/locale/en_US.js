@@ -567,7 +567,6 @@ export default {
   'Data Target': 'Data Target',
   'All Columns': 'All Columns',
   'Some Columns': 'Some Columns',
-  'Modify User': 'Modify User',
   'Branch flow': 'Branch flow',
   'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow'
 }
