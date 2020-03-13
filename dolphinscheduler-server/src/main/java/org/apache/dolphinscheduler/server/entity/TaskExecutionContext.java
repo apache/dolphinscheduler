@@ -178,6 +178,11 @@ public class TaskExecutionContext implements Serializable{
      */
     private DataxTaskExecutionContext dataxTaskExecutionContext;
 
+    /**
+     *  procedure TaskExecutionContext
+     */
+    private ProcedureTaskExecutionContext procedureTaskExecutionContext;
+
     public int getTaskInstanceId() {
         return taskInstanceId;
     }
@@ -402,6 +407,14 @@ public class TaskExecutionContext implements Serializable{
         this.dataxTaskExecutionContext = dataxTaskExecutionContext;
     }
 
+    public ProcedureTaskExecutionContext getProcedureTaskExecutionContext() {
+        return procedureTaskExecutionContext;
+    }
+
+    public void setProcedureTaskExecutionContext(ProcedureTaskExecutionContext procedureTaskExecutionContext) {
+        this.procedureTaskExecutionContext = procedureTaskExecutionContext;
+    }
+
     public Command toCommand(){
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
         requestCommand.setTaskExecutionContext(FastJsonSerializer.serializeToString(this));
@@ -445,6 +458,7 @@ public class TaskExecutionContext implements Serializable{
                 ", workerGroup='" + workerGroup + '\'' +
                 ", sqlTaskExecutionContext=" + sqlTaskExecutionContext +
                 ", dataxTaskExecutionContext=" + dataxTaskExecutionContext +
+                ", procedureTaskExecutionContext=" + procedureTaskExecutionContext +
                 '}';
     }
 }

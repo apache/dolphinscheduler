@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.EnumUtils;
@@ -32,10 +33,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
-import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.TaskPriority;
+import org.apache.dolphinscheduler.server.entity.*;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -149,10 +147,13 @@ public class TaskUpdateQueueConsumer extends Thread{
 
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
+        ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
 
         TaskType taskType = TaskType.valueOf(taskInstance.getTaskType());
+
+        TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
+        // SQL task
         if (taskType == TaskType.SQL){
-            TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
             SqlParameters sqlParameters = JSONObject.parseObject(taskNode.getParams(), SqlParameters.class);
             int datasourceId = sqlParameters.getDatasource();
             DataSource datasource = processService.findDataSourceById(datasourceId);
@@ -175,9 +176,20 @@ public class TaskUpdateQueueConsumer extends Thread{
 
         }
 
+        // DATAX task
         if (taskType == TaskType.DATAX){
 
         }
+
+
+        // procedure task
+        if (taskType == TaskType.PROCEDURE){
+            ProcedureParameters procedureParameters = JSONObject.parseObject(taskNode.getParams(), ProcedureParameters.class);
+            int datasourceId = procedureParameters.getDatasource();
+            DataSource datasource = processService.findDataSourceById(datasourceId);
+            procedureTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
+        }
+
 
 
         return TaskExecutionContextBuilder.get()
@@ -186,6 +198,7 @@ public class TaskUpdateQueueConsumer extends Thread{
                 .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
                 .buildSQLTaskRelatedInfo(sqlTaskExecutionContext)
                 .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
+                .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
                 .create();
     }
 
