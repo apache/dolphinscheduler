@@ -196,7 +196,6 @@ public class SqlTask extends AbstractTask {
      * @param preStatementsBinds    pre statements binds
      * @param postStatementsBinds   post statements binds
      * @param createFuncs           create functions
-     * @return Connection
      */
     public void executeFuncAndSql(SqlBinds mainSqlBinds,
                                         List<SqlBinds> preStatementsBinds,
