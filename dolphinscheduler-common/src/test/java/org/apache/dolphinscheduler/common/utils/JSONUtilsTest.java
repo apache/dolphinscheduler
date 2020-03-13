@@ -16,10 +16,10 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
-import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.junit.Assert;
@@ -53,7 +53,7 @@ public class JSONUtilsTest {
         property.setType(DataType.VARCHAR);
         property.setValue("sssssss");
         String str = "{\"direct\":\"IN\",\"prop\":\"ds\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}";
-        Property property1 = JSONObject.parseObject(str, Property.class);
+        Property property1 = JSON.parseObject(str, Property.class);
         Direct direct = property1.getDirect();
         Assert.assertEquals(direct , Direct.IN);
     }

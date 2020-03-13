@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.sql;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -92,7 +93,7 @@ public class SqlTask extends AbstractTask {
         super(taskProps, logger);
 
         logger.info("sql task params {}", taskProps.getTaskParams());
-        this.sqlParameters = JSONObject.parseObject(taskProps.getTaskParams(), SqlParameters.class);
+        this.sqlParameters = JSON.parseObject(taskProps.getTaskParams(), SqlParameters.class);
 
         if (!sqlParameters.checkParameters()) {
             throw new RuntimeException("sql task params is not valid");
@@ -308,16 +309,16 @@ public class SqlTask extends AbstractTask {
                         }
                         resultJSONArray.add(mapOfColValues);
                     }
-                    logger.debug("execute sql : {}", JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+                    logger.debug("execute sql : {}", JSON.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
 
                     // if there is a result set
                     if ( !resultJSONArray.isEmpty() ) {
                         if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
                             sendAttachment(sqlParameters.getTitle(),
-                                    JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+                                    JSON.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
                         }else{
                             sendAttachment(taskProps.getNodeName() + " query resultsets ",
-                                    JSONObject.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
+                                    JSON.toJSONString(resultJSONArray, SerializerFeature.WriteMapNullValue));
                         }
                     }
 
