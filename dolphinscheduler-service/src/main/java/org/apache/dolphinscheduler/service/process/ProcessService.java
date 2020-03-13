@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.process;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.cronutils.model.Cron;
 import org.apache.commons.lang.ArrayUtils;
@@ -207,7 +208,7 @@ public class ProcessService {
         CommandType commandType = command.getCommandType();
 
         if(cmdTypeMap.containsKey(commandType)){
-            JSONObject cmdParamObj = (JSONObject) JSONObject.parse(command.getCommandParam());
+            JSONObject cmdParamObj = (JSONObject) JSON.parse(command.getCommandParam());
             JSONObject tempObj;
             int processInstanceId = cmdParamObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING);
 
@@ -215,7 +216,7 @@ public class ProcessService {
             // for all commands
             for (Command tmpCommand:commands){
                 if(cmdTypeMap.containsKey(tmpCommand.getCommandType())){
-                    tempObj = (JSONObject) JSONObject.parse(tmpCommand.getCommandParam());
+                    tempObj = (JSONObject) JSON.parse(tmpCommand.getCommandParam());
                     if(tempObj != null && processInstanceId == tempObj.getInteger(CMDPARAM_RECOVER_PROCESS_ID_STRING)){
                         isNeedCreate = false;
                         break;
@@ -309,7 +310,7 @@ public class ProcessService {
             for (TaskNode taskNode : taskNodeList){
                 String parameter = taskNode.getParams();
                 if (parameter.contains(CMDPARAM_SUB_PROCESS_DEFINE_ID)){
-                    SubProcessParameters subProcessParam = JSONObject.parseObject(parameter, SubProcessParameters.class);
+                    SubProcessParameters subProcessParam = JSON.parseObject(parameter, SubProcessParameters.class);
                     ids.add(subProcessParam.getProcessDefinitionId());
                     recurseFindSubProcessId(subProcessParam.getProcessDefinitionId(),ids);
                 }
