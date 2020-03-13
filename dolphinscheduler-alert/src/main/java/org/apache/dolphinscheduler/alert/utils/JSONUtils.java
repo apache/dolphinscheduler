@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -54,7 +55,7 @@ public class JSONUtils {
    */
   public static <T> List<T> toList(String json, Class<T> clazz) {
     if (StringUtils.isEmpty(json)) {
-      return null;
+      return Collections.emptyList();
     }
     try {
       return JSONArray.parseArray(json, clazz);
@@ -62,7 +63,7 @@ public class JSONUtils {
       logger.error("JSONArray.parseArray exception!",e);
     }
 
-    return null;
+    return Collections.emptyList();
   }
 
 }

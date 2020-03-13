@@ -41,12 +41,6 @@ public class JSONUtils {
    */
   private static final ObjectMapper objectMapper = new ObjectMapper();
 
-  /**
-   * init
-   */
-  private static final JSONUtils instance = new JSONUtils();
-
-
   private JSONUtils() {
     //Feature that determines whether encountering of unknown properties, false means not analyzer unknown properties
     objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).setTimeZone(TimeZone.getDefault());
@@ -220,7 +214,7 @@ public class JSONUtils {
     try{
       return JSONObject.toJSONString(object,false);
     } catch (Exception e) {
-      throw new RuntimeException("Json deserialization exception.", e);
+      throw new RuntimeException("Object json deserialization exception.", e);
     }
   }
 
@@ -228,7 +222,7 @@ public class JSONUtils {
     try{
       return JSONObject.parseObject(text);
     } catch (Exception e) {
-      throw new RuntimeException("Json deserialization exception.", e);
+      throw new RuntimeException("String json deserialization exception.", e);
     }
   }
 
