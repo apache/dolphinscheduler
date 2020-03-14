@@ -98,7 +98,7 @@ public class HadoopUtils implements Closeable {
     /**
      * init hadoop configuration
      */
-    private void init() {
+    private static void init() {
         try {
             configuration = new Configuration();
 
