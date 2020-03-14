@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MysqlPerformance extends BaseDBPerformance{
 
-    private static Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
+    private static Logger logger = LoggerFactory.getLogger(MysqlPerformance.class);
 
 
     /**
