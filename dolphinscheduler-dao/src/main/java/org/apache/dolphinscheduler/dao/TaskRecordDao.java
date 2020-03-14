@@ -251,13 +251,14 @@ public class TaskRecordDao {
         List<TaskRecord> recordList = new ArrayList<>();
         Connection conn = null;
         PreparedStatement pstmt = null;
+        ResultSet rs = null;
         try {
             conn = getConn();
             if (conn == null) {
                 return recordList;
             }
             pstmt = conn.prepareStatement(selectSql);
-            ResultSet rs = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
 
             while (rs.next()) {
                 TaskRecord taskRecord = convertToTaskRecord(rs);
@@ -272,6 +273,9 @@ public class TaskRecordDao {
                 }
                 if (conn != null) {
                     conn.close();
+                }
+                if (rs != null) {
+                    rs.close();
                 }
             } catch (SQLException e) {
                 logger.error("Exception ", e);
