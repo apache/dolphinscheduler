@@ -120,12 +120,24 @@ public class ThreadUtils {
 
     /**
      * Wrapper over ScheduledThreadPoolExecutor
+     * @param threadName
      * @param corePoolSize
      * @return
      */
-    public static ScheduledExecutorService newDaemonThreadScheduledExecutor(String threadName,int corePoolSize) {
+    public static ScheduledExecutorService newDaemonThreadScheduledExecutor(String threadName, int corePoolSize) {
+        return newThreadScheduledExecutor(threadName, corePoolSize, true);
+    }
+
+    /**
+     * Wrapper over ScheduledThreadPoolExecutor
+     * @param threadName
+     * @param corePoolSize
+     * @param isDaemon
+     * @return
+     */
+    public static ScheduledExecutorService newThreadScheduledExecutor(String threadName, int corePoolSize, boolean isDaemon) {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setDaemon(true)
+                .setDaemon(isDaemon)
                 .setNameFormat(threadName)
                 .build();
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(corePoolSize, threadFactory);
@@ -134,7 +146,6 @@ public class ThreadUtils {
         executor.setRemoveOnCancelPolicy(true);
         return executor;
     }
-
 
     public static ThreadInfo getThreadInfo(Thread t) {
         long tid = t.getId();
