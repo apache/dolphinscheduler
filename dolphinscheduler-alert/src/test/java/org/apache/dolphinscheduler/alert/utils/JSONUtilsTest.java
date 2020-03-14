@@ -26,8 +26,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class JSONUtilsTest {
 
@@ -98,13 +97,15 @@ public class JSONUtilsTest {
         assertEquals("80", entity.get("no index of number"));
         assertEquals("190", entity.get("database client connections"));
 
-        //If param is null, then return null
+        //If param is null, then return empty list
         result = JSONUtils.toList(null ,LinkedHashMap.class);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
 
-        //If param is incorrect, then return null and log error message
+        //If param is incorrect, then return empty list and log error message
         result = JSONUtils.toList("}{" ,LinkedHashMap.class);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
 
     }
 

@@ -51,7 +51,7 @@ public class JSONUtils {
    * @param json the json
    * @param clazz c
    * @param <T> the generic clazz
-   * @return the result list
+   * @return the result list or empty list
    */
   public static <T> List<T> toList(String json, Class<T> clazz) {
     if (StringUtils.isEmpty(json)) {
