@@ -236,6 +236,9 @@ public class SqlTask extends AbstractTask {
             sqlParameters.setTitle(title);
         }
 
+        //new add,手动执行，手动补数，自动调度，历史重跑调度日期替换$[yyyy-MM-dd]
+        sql = ParameterUtils.replaceScheduleTime(sql, taskProps.getScheduleTime(), paramsMap);
+
         // special characters need to be escaped, ${} needs to be escaped
         String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
