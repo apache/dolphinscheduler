@@ -54,11 +54,9 @@ public class HadoopUtils implements Closeable {
 
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
-    private static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
-
     private static final LoadingCache<String, HadoopUtils> cache = CacheBuilder
             .newBuilder()
-            .expireAfterWrite(PropertyUtils.getInt(KERBEROS_EXPIRE_TIME, 7), TimeUnit.DAYS)
+            .expireAfterWrite(PropertyUtils.getInt(Constants.KERBEROS_EXPIRE_TIME, 7), TimeUnit.DAYS)
             .build(new CacheLoader<String, HadoopUtils>() {
                 @Override
                 public HadoopUtils load(String key) throws Exception {
