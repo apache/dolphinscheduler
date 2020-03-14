@@ -1062,7 +1062,7 @@ public class MasterExecThread implements Runnable {
 
             TaskInstance taskInstance = taskExecThread.getTaskInstance();
             taskInstance = processService.findTaskInstanceById(taskInstance.getId());
-            if(taskInstance.getState().typeIsFinished()){
+            if(taskInstance != null && taskInstance.getState().typeIsFinished()){
                 continue;
             }
 
