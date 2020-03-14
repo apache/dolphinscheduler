@@ -26,8 +26,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class JSONUtilsTest {
 
@@ -73,7 +72,7 @@ public class JSONUtilsTest {
         result = JSONUtils.toJsonString(null);
         logger.info(result);
 
-        assertEquals(result,"null");
+        assertEquals("null", result);
 
     }
 
@@ -86,25 +85,27 @@ public class JSONUtilsTest {
         //Invoke toList
         List<LinkedHashMap> result = JSONUtils.toList(expected ,LinkedHashMap.class);
         //Equal list size=1
-        assertEquals(result.size(),1);
+        assertEquals(1,result.size());
 
         //Transform entity to LinkedHashMap<String, Object>
         LinkedHashMap<String, Object> entity = result.get(0);
 
         //Equal expected values
-        assertEquals(entity.get("mysql service name"),"mysql200");
-        assertEquals(entity.get("mysql address"),"192.168.xx.xx");
-        assertEquals(entity.get("port"),"3306");
-        assertEquals(entity.get("no index of number"),"80");
-        assertEquals(entity.get("database client connections"),"190");
+        assertEquals("mysql200",entity.get("mysql service name"));
+        assertEquals("192.168.xx.xx", entity.get("mysql address"));
+        assertEquals("3306", entity.get("port"));
+        assertEquals("80", entity.get("no index of number"));
+        assertEquals("190", entity.get("database client connections"));
 
-        //If param is null, then return null
+        //If param is null, then return empty list
         result = JSONUtils.toList(null ,LinkedHashMap.class);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
 
-        //If param is incorrect, then return null and log error message
+        //If param is incorrect, then return empty list and log error message
         result = JSONUtils.toList("}{" ,LinkedHashMap.class);
-        assertNull(result);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
 
     }
 
