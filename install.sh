@@ -109,6 +109,7 @@ mailProtocol="SMTP"
 mailServerHost="smtp.exmail.qq.com"
 
 # mail server port
+# note: Different protocols and encryption methods correspond to different ports, when SSL/TLS is enabled, make sure the port is correct.
 mailServerPort="25"
 
 # sender
@@ -118,6 +119,7 @@ mailSender="xxxxxxxxxx"
 mailUser="xxxxxxxxxx"
 
 # sender password
+# note: The mail.passwd is email service authorization code, not the email login password.
 mailPassword="xxxxxxxxxx"
 
 # TLS mail protocol support
