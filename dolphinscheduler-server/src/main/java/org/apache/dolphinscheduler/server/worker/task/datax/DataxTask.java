@@ -216,8 +216,7 @@ public class DataxTask extends AbstractTask {
      * @return collection of datax job config JSONObject
      * @throws SQLException if error throws SQLException
      */
-    private List<JSONObject> buildDataxJobContentJson()
-        throws SQLException {
+    private List<JSONObject> buildDataxJobContentJson() throws SQLException {
         DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
 
 
