@@ -156,6 +156,7 @@ public class MasterServer implements IStoppable {
 
     @PreDestroy
     public void destroy() {
+        // master server exit alert
         if (zkMasterClient.getActiveMasterNum() <= 1) {
             zkMasterClient.getAlertDao().sendServerStopedAlert(
                     1, OSUtils.getHost(), "Master-Server");

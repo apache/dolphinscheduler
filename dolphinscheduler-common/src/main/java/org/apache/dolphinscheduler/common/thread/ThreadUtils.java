@@ -124,7 +124,7 @@ public class ThreadUtils {
      * @param corePoolSize
      * @return
      */
-    public static ScheduledExecutorService newDaemonThreadScheduledExecutor(String threadName,int corePoolSize) {
+    public static ScheduledExecutorService newDaemonThreadScheduledExecutor(String threadName, int corePoolSize) {
         return newThreadScheduledExecutor(threadName, corePoolSize, true);
     }
 
@@ -135,7 +135,7 @@ public class ThreadUtils {
      * @param isDaemon
      * @return
      */
-    public static ScheduledExecutorService newThreadScheduledExecutor(String threadName,int corePoolSize, boolean isDaemon) {
+    public static ScheduledExecutorService newThreadScheduledExecutor(String threadName, int corePoolSize, boolean isDaemon) {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setDaemon(isDaemon)
                 .setNameFormat(threadName)
