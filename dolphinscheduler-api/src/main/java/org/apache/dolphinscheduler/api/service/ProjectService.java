@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -29,8 +30,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +43,6 @@ import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
  **/
 @Service
 public class ProjectService extends BaseService{
-
-    private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -207,7 +204,7 @@ public class ProjectService extends BaseService{
 
         List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(projectId);
 
-        if(processDefinitionList.size() > 0){
+        if(CollectionUtils.isNotEmpty(processDefinitionList)){
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
             return result;
         }
@@ -296,7 +293,7 @@ public class ProjectService extends BaseService{
         List<Project> projectList = projectMapper.queryProjectExceptUserId(userId);
         List<Project> resultList = new ArrayList<>();
         Set<Project> projectSet = null;
-        if (projectList != null && projectList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(projectList)) {
             projectSet = new HashSet<>(projectList);
 
             List<Project> authedProjectList = projectMapper.queryAuthedProjectListByUserId(userId);
@@ -318,7 +315,7 @@ public class ProjectService extends BaseService{
     private List<Project> getUnauthorizedProjects(Set<Project> projectSet, List<Project> authedProjectList) {
         List<Project> resultList;
         Set<Project> authedProjectSet = null;
-        if (authedProjectList != null && authedProjectList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(authedProjectList)) {
             authedProjectSet = new HashSet<>(authedProjectList);
             projectSet.removeAll(authedProjectSet);
 
@@ -401,7 +398,7 @@ public class ProjectService extends BaseService{
             for (ProcessDefinition processDefinition : processDefinitions){
                 set.add(processDefinition.getProjectId());
             }
-            List<Project> tempDeletelist = new ArrayList<Project>();
+            List<Project> tempDeletelist = new ArrayList<>();
             for (Project project : projects) {
                 if(!set.contains(project.getId())){
                     tempDeletelist.add(project);

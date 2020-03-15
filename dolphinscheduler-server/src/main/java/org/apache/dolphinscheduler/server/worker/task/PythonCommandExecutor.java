@@ -39,7 +39,7 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
     /**
      * logger
      */
-    private static final Logger logger = LoggerFactory.getLogger(PythonCommandExecutor.class);
+    private static final Logger pythonCmdLogger = LoggerFactory.getLogger(PythonCommandExecutor.class);
 
     /**
      * python
@@ -179,14 +179,14 @@ public class PythonCommandExecutor extends AbstractCommandExecutor {
             }
 
         }catch (IOException e){
-            logger.error("read file failure",e);
+            pythonCmdLogger.error("read file failure",e);
         }finally {
             try {
                 if (br != null){
                     br.close();
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage(),e);
+                pythonCmdLogger.error(e.getMessage(),e);
             }
         }
         return null;

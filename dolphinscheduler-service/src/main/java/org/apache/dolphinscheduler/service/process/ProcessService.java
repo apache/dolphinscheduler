@@ -115,7 +115,7 @@ public class ProcessService {
     @Transactional(rollbackFor = Exception.class)
     public ProcessInstance handleCommand(Logger logger, String host, int validThreadNum, Command command) {
         ProcessInstance processInstance = constructProcessInstance(command, host);
-        //cannot construct process instance, return null;
+        //cannot construct process instance, return null
         if(processInstance == null){
             logger.error("scan command, command parameter is error: {}", command);
             moveToErrorCommand(command, "process instance is null");
@@ -201,7 +201,7 @@ public class ProcessService {
      */
     public Boolean verifyIsNeedCreateCommand(Command command){
         Boolean isNeedCreate = true;
-        Map<CommandType,Integer> cmdTypeMap = new HashMap<CommandType,Integer>();
+        Map<CommandType,Integer> cmdTypeMap = new HashMap<>();
         cmdTypeMap.put(CommandType.REPEAT_RUNNING,1);
         cmdTypeMap.put(CommandType.RECOVER_SUSPENDED_PROCESS,1);
         cmdTypeMap.put(CommandType.START_FAILURE_TASK_PROCESS,1);
@@ -305,7 +305,7 @@ public class ProcessService {
 
         List<TaskNode> taskNodeList = processData.getTasks();
 
-        if (taskNodeList != null && taskNodeList.size() > 0){
+        if (CollectionUtils.isNotEmpty(taskNodeList)){
 
             for (TaskNode taskNode : taskNodeList){
                 String parameter = taskNode.getParams();
@@ -379,10 +379,9 @@ public class ProcessService {
      */
     private Date getScheduleTime(Command command, Map<String, String> cmdParam){
         Date scheduleTime = command.getScheduleTime();
-        if(scheduleTime == null){
-            if(cmdParam != null && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)){
-                scheduleTime = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-            }
+        if(scheduleTime == null && cmdParam != null
+                && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)){
+            scheduleTime = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
         }
         return scheduleTime;
     }
@@ -473,7 +472,7 @@ public class ProcessService {
      * @param cmdParam cmdParam map
      * @return whether command param is valid
      */
-    private Boolean checkCmdParam(Command command, Map<String, String> cmdParam){
+    private boolean checkCmdParam(Command command, Map<String, String> cmdParam){
         if(command.getTaskDependType() == TaskDependType.TASK_ONLY || command.getTaskDependType()== TaskDependType.TASK_PRE){
             if(cmdParam == null
                     || !cmdParam.containsKey(Constants.CMDPARAM_START_NODE_NAMES)
@@ -902,7 +901,7 @@ public class ProcessService {
         command.setCommandType(commandType);
         command.setProcessInstancePriority(parentProcessInstance.getProcessInstancePriority());
         createCommand(command);
-        logger.info("sub process command created: {} ", command.toString());
+        logger.info("sub process command created: {} ", command);
     }
 
     /**
@@ -1008,7 +1007,7 @@ public class ProcessService {
         int taskWorkerGroupId = getTaskWorkerGroupId(taskInstance);
         ProcessInstance processInstance = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
         if(processInstance == null){
-            logger.error("process instance is null. please check the task info, task id: " + taskInstance.getId());
+            logger.error("process instance is null. please check the task info, task id: {}", taskInstance.getId());
             return "";
         }
 
@@ -1429,7 +1428,7 @@ public class ProcessService {
         if(intList == null){
             return new ArrayList<>();
         }
-        List<String> result = new ArrayList<String>(intList.size());
+        List<String> result = new ArrayList<>(intList.size());
         for(Integer intVar : intList){
             result.add(String.valueOf(intVar));
         }
@@ -1582,7 +1581,7 @@ public class ProcessService {
      */
     public CycleDependency getCycleDependency(int masterId, int processDefinitionId, Date scheduledFireTime) throws Exception {
         List<CycleDependency> list = getCycleDependencies(masterId,new int[]{processDefinitionId},scheduledFireTime);
-        return list.size()>0 ? list.get(0) : null;
+        return CollectionUtils.isNotEmpty(list) ? list.get(0) : null;
 
     }
 
@@ -1595,7 +1594,7 @@ public class ProcessService {
      * @throws Exception if error throws Exception
      */
     public List<CycleDependency> getCycleDependencies(int masterId,int[] ids,Date scheduledFireTime) throws Exception {
-        List<CycleDependency> cycleDependencyList =  new ArrayList<CycleDependency>();
+        List<CycleDependency> cycleDependencyList =  new ArrayList<>();
         if(ArrayUtils.isEmpty(ids)){
             logger.warn("ids[] is empty!is invalid!");
             return cycleDependencyList;
@@ -1623,8 +1622,6 @@ public class ProcessService {
             }
             Calendar calendar = Calendar.getInstance();
             switch (cycleEnum){
-                /*case MINUTE:
-                    calendar.add(Calendar.MINUTE,-61);*/
                 case HOUR:
                     calendar.add(Calendar.HOUR,-25);
                     break;
@@ -1638,7 +1635,7 @@ public class ProcessService {
                     calendar.add(Calendar.MONTH,-13);
                     break;
                 default:
-                    logger.warn("Dependent process definition's  cycleEnum is {},not support!!", cycleEnum.name());
+                    logger.warn("Dependent process definition's  cycleEnum is {},not support!!", cycleEnum);
                     continue;
             }
             Date start = calendar.getTime();
@@ -1648,7 +1645,7 @@ public class ProcessService {
             }else {
                 list = CronUtils.getFireDateList(start, scheduledFireTime, depCronExpression);
             }
-            if(list.size()>=1){
+            if(CollectionUtils.isNotEmpty(list)){
                 start = list.get(list.size()-1);
                 CycleDependency dependency = new CycleDependency(depSchedule.getProcessDefinitionId(),start, CronUtils.getExpirationTime(start, cycleEnum), cycleEnum);
                 cycleDependencyList.add(dependency);

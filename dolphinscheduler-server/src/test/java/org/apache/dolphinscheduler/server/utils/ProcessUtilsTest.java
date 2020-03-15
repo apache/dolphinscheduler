@@ -41,7 +41,7 @@ public class ProcessUtilsTest {
         List<String> commands = new ArrayList<>();
         commands.add("sudo");
         try {
-            Assert.assertEquals(ProcessUtils.buildCommandStr(commands), "sudo");
+            Assert.assertEquals("sudo", ProcessUtils.buildCommandStr(commands));
         } catch (IOException e) {
             Assert.fail(e.getMessage());
         }

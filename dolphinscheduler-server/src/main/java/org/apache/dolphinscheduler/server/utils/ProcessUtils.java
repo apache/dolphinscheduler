@@ -18,10 +18,7 @@ package org.apache.dolphinscheduler.server.utils;
 
 import java.nio.charset.StandardCharsets;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.service.log.LogClientService;
@@ -30,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -43,7 +41,7 @@ public class ProcessUtils {
   /**
    * logger
    */
-  private final static Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
+  private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
   /**
    * build command line characters
@@ -157,7 +155,7 @@ public class ProcessUtils {
    */
   private static class LazyPattern {
     // Escape-support version:
-    // "(\")((?:\\\\\\1|.)+?)\\1|([^\\s\"]+)";
+    // "(\")((?:\\\\\\1|.)+?)\\1|([^\\s\"]+)"
     private static final Pattern PATTERN = Pattern.compile("[^\\s\"]+|\"[^\"]*\"");
   }
 
@@ -182,11 +180,6 @@ public class ProcessUtils {
   private static final char[][] ESCAPE_VERIFICATION = {{' ', '\t', '<', '>', '&', '|', '^'},
 
           {' ', '\t', '<', '>'}, {' ', '\t'}};
-
-  /**
-   * matcher
-   */
-  private static Matcher matcher;
 
   /**
    * create command line
@@ -228,19 +221,16 @@ public class ProcessUtils {
     int lastPos = arg.length() - 1;
     if (lastPos >= 1 && arg.charAt(0) == '"' && arg.charAt(lastPos) == '"') {
       // The argument has already been quoted.
-      if (noQuotesInside) {
-        if (arg.indexOf('"', 1) != lastPos) {
-          // There is ["] inside.
-          throw new IllegalArgumentException(errorMessage);
-        }
-      }
-      return true;
-    }
-    if (noQuotesInside) {
-      if (arg.indexOf('"') >= 0) {
+      if (noQuotesInside && arg.indexOf('"', 1) != lastPos) {
         // There is ["] inside.
         throw new IllegalArgumentException(errorMessage);
       }
+      return true;
+    }
+
+    if (noQuotesInside && arg.indexOf('"') >= 0) {
+      // There is ["] inside.
+      throw new IllegalArgumentException(errorMessage);
     }
     return false;
   }
@@ -278,7 +268,7 @@ public class ProcessUtils {
    */
   public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode,String workDir)
           throws IOException {
-    if (appIds.size() > 0) {
+    if (CollectionUtils.isNotEmpty(appIds)) {
       String appid = appIds.get(appIds.size() - 1);
       String commandFile = String
               .format("%s/%s.kill", workDir, appid);
@@ -392,7 +382,7 @@ public class ProcessUtils {
           logger.error("task instance work dir is empty");
           throw new RuntimeException("task instance work dir is empty");
         }
-        if (appIds.size() > 0) {
+        if (CollectionUtils.isNotEmpty(appIds)) {
           cancelApplication(appIds, logger, taskInstance.getProcessInstance().getTenantCode(), taskInstance.getExecutePath());
         }
       }
