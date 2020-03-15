@@ -16,10 +16,19 @@
  */
 package org.apache.dolphinscheduler.dao.datasource;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * data source base class
  */
 public abstract class BaseDataSource {
+
+  private static final Logger logger = LoggerFactory.getLogger(BaseDataSource.class);
+
   /**
    * user name
    */
@@ -57,17 +66,37 @@ public abstract class BaseDataSource {
   public void setPrincipal(String principal) {
     this.principal = principal;
   }
+
   /**
-   * test whether the data source can be connected successfully
-   * @throws Exception
+   * @return driver class
    */
-  public abstract void isConnectable() throws Exception;
+  public abstract String driverClassSelector();
 
   /**
    * gets the JDBC url for the data source connection
-   * @return
    */
   public abstract String getJdbcUrl();
+
+  /**
+   * test whether the data source can be connected successfully
+   *
+   * @throws Exception if error throws Exception
+   */
+  public void isConnectable() throws Exception {
+    Connection con = null;
+    try {
+      Class.forName(driverClassSelector());
+      con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
+    } finally {
+      if (con != null) {
+        try {
+          con.close();
+        } catch (SQLException e) {
+          logger.error(e.getMessage(), e);
+        }
+      }
+    }
+  }
 
   public String getUser() {
     return user;

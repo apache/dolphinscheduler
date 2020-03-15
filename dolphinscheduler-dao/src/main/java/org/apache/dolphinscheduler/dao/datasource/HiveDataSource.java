@@ -21,10 +21,6 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
 /**
  * data source of hive
  */
@@ -34,7 +30,7 @@ public class HiveDataSource extends BaseDataSource {
 
   /**
    * gets the JDBC url for the data source connection
-   * @return
+   * @return jdbc url
    */
   @Override
   public String getJdbcUrl() {
@@ -57,23 +53,10 @@ public class HiveDataSource extends BaseDataSource {
   }
 
   /**
-   * test whether the data source can be connected successfully
-   * @throws Exception
+   * @return driver class
    */
   @Override
-  public void isConnectable() throws Exception {
-    Connection con = null;
-    try {
-      Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
-      con = DriverManager.getConnection(getJdbcUrl(), getUser(), "");
-    } finally {
-      if (con != null) {
-        try {
-          con.close();
-        } catch (SQLException e) {
-          logger.error("hive datasource try conn close conn error", e);
-        }
-      }
-    }
+  public String driverClassSelector() {
+    return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
   }
 }
