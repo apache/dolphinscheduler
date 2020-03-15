@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskRecord;
@@ -148,6 +149,7 @@ public class TaskRecordDao {
         int count = 0;
         Connection conn = null;
         PreparedStatement pstmt = null;
+        ResultSet rs = null;
         try {
             conn = getConn();
             if(conn == null){
@@ -156,7 +158,7 @@ public class TaskRecordDao {
             String sql = String.format("select count(1) as count from %s", table);
             sql += getWhereString(filterMap);
             pstmt = conn.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
             while(rs.next()){
                 count = rs.getInt("count");
                 break;
@@ -164,16 +166,7 @@ public class TaskRecordDao {
         } catch (SQLException e) {
             logger.error("Exception ", e);
         }finally {
-            try {
-                if(pstmt != null) {
-                    pstmt.close();
-                }
-                if(conn != null){
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
+            ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
         return count;
     }
@@ -239,13 +232,14 @@ public class TaskRecordDao {
         List<TaskRecord> recordList = new ArrayList<>();
         Connection conn = null;
         PreparedStatement pstmt = null;
+        ResultSet rs = null;
         try {
             conn = getConn();
             if(conn == null){
                 return recordList;
             }
             pstmt = conn.prepareStatement(selectSql);
-            ResultSet rs = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
 
             while(rs.next()){
                 TaskRecord taskRecord = convertToTaskRecord(rs);
@@ -254,16 +248,7 @@ public class TaskRecordDao {
         } catch (SQLException e) {
             logger.error("Exception ", e);
         }finally {
-            try {
-                if(pstmt != null) {
-                    pstmt.close();
-                }
-                if(conn != null){
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
+            ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
         return recordList;
     }

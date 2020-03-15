@@ -140,7 +140,7 @@ public class SqlTask extends AbstractTask {
                 dataSource.getUserId(),
                 dataSource.getConnectionParams());
 
-        Connection con = null;
+        Connection conn = null;
         List<String> createFuncs = null;
         try {
             // load class
@@ -178,18 +178,12 @@ public class SqlTask extends AbstractTask {
             }
 
             // execute sql task
-            con = executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+            conn = executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw e;
         } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    logger.error(e.getMessage(),e);
-                }
-            }
+            ConnectionUtils.releaseResource(null, null, conn);
         }
     }
 
@@ -253,7 +247,7 @@ public class SqlTask extends AbstractTask {
                                         List<SqlBinds> preStatementsBinds,
                                         List<SqlBinds> postStatementsBinds,
                                         List<String> createFuncs){
-        Connection connection = null;
+        Connection connection;
         try {
             // if upload resource is HDFS and kerberos startup
             CommonUtils.loadKerberosConf();
@@ -340,12 +334,6 @@ public class SqlTask extends AbstractTask {
         } catch (Exception e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage());
-        } finally {
-            try { 
-                connection.close(); 
-            } catch (Exception e) { 
-                logger.error(e.getMessage(), e); 
-            }
         }
         return connection;
     }
