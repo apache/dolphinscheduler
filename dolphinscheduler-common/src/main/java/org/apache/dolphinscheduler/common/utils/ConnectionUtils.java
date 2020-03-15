@@ -29,6 +29,10 @@ public class ConnectionUtils {
     throw new IllegalStateException("ConnectionUtils class");
   }
 
+  /**
+   * release resource
+   * @param resources resources
+   */
   public static void releaseResource(AutoCloseable... resources) {
 
     if (resources == null || resources.length == 0) {
