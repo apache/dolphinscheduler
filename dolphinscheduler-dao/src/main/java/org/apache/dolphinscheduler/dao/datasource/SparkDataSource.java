@@ -18,15 +18,11 @@ package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * data source of spark
  */
 public class SparkDataSource extends BaseDataSource {
-
-  private static final Logger logger = LoggerFactory.getLogger(SparkDataSource.class);
 
   /**
    * gets the JDBC url for the data source connection

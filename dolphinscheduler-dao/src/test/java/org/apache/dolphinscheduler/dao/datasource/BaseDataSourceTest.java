@@ -23,11 +23,6 @@ import org.junit.Test;
 public class BaseDataSourceTest {
 
   @Test
-  public void testIsConnectable() throws Exception {
-    //TODO
-  }
-
-  @Test
   public void testDriverClassSelector() {
     String mysqlDriverClass = new MySQLDataSource().driverClassSelector();
     Assert.assertEquals(Constants.COM_MYSQL_JDBC_DRIVER, mysqlDriverClass);

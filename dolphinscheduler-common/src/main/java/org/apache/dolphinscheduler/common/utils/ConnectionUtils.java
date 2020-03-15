@@ -25,6 +25,10 @@ public class ConnectionUtils {
 
 	public static final Logger logger = LoggerFactory.getLogger(ConnectionUtils.class);
 
+	private ConnectionUtils() {
+		throw new IllegalStateException("ConnectionUtils class");
+	}
+
 	public static void releaseResource(ResultSet rs, PreparedStatement ps, Connection conn) {
 		if (null != rs) {
 			try {

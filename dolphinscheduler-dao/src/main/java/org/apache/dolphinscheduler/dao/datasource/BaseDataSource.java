@@ -82,11 +82,13 @@ public abstract class BaseDataSource {
    *
    * @throws Exception if error throws Exception
    */
-  public void isConnectable() throws Exception {
+  public void isConnectable() {
     Connection con = null;
     try {
       Class.forName(driverClassSelector());
       con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
+    } catch (ClassNotFoundException | SQLException e) {
+      logger.error("Get connection error: {}", e.getMessage());
     } finally {
       if (con != null) {
         try {
