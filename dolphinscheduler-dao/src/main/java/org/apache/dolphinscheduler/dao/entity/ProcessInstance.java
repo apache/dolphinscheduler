@@ -506,7 +506,7 @@ public class ProcessInstance {
      * check this process is start complement data
      * @return whether complement data
      */
-    public Boolean isComplementData(){
+    public boolean isComplementData(){
         if(!StringUtils.isNotEmpty(this.historyCmd)){
             return false;
         }
