@@ -41,8 +41,6 @@ public class PropertyUtils {
 
     private static final Properties properties = new Properties();
 
-    private static final PropertyUtils propertyUtils = new PropertyUtils();
-
     private PropertyUtils(){
         init();
     }
@@ -166,7 +164,6 @@ public class PropertyUtils {
      * @return if the value not existed, return -1.0, or will return the related value
      */
     public static double getDouble(String key) {
-        String val = getString(key);
         return getDouble(key,-1.0);
     }
 
@@ -202,14 +199,14 @@ public class PropertyUtils {
     public static String[] getArray(String key, String splitStr) {
         String value = getString(key);
         if (value == null || StringUtils.isEmpty(splitStr)) {
-            return null;
+            return new String[0];
         }
         try {
             return value.split(splitStr);
         } catch (PatternSyntaxException e) {
             logger.info(e.getMessage(),e);
         }
-        return null;
+        return new String[0];
     }
 
     /**

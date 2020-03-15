@@ -36,7 +36,7 @@ public class PropertyPlaceholderHelper {
 
     private static final Log logger = LogFactory.getLog(PropertyPlaceholderHelper.class);
 
-    private static final Map<String, String> wellKnownSimplePrefixes = new HashMap<String, String>(4);
+    private static final Map<String, String> wellKnownSimplePrefixes = new HashMap<>(4);
 
     static {
         wellKnownSimplePrefixes.put("}", "{");

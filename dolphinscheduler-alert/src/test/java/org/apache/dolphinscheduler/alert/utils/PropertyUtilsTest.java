@@ -41,11 +41,11 @@ public class PropertyUtilsTest {
         //Expected "EMAIL"
         String result = PropertyUtils.getString("alert.type");
         logger.info(result);
-        assertEquals(result, "EMAIL");
+        assertEquals("EMAIL", result);
 
         //Expected "xxx.xxx.test"
         result = PropertyUtils.getString("mail.server.host");
-        assertEquals(result, "xxx.xxx.test");
+        assertEquals("xxx.xxx.test", result);
 
         //If key is undefine in alert.properties, then return null
         result = PropertyUtils.getString("abc");
@@ -88,11 +88,11 @@ public class PropertyUtilsTest {
 
         //Expected 25
         long result = PropertyUtils.getLong("mail.server.port");
-        assertSame(result, 25L);
+        assertSame(25L, result);
 
         //If key is null, then return -1
         result = PropertyUtils.getLong(null);
-        assertSame(result, -1L);
+        assertSame(-1L, result);
 
         //If key is undefine in alert.properties, then return -1
         result = PropertyUtils.getLong("abc");
@@ -100,11 +100,11 @@ public class PropertyUtilsTest {
 
         //If key is undefine in alert.properties, and there is a defaultval, then return defaultval
         result = PropertyUtils.getLong("abc", 200);
-        assertEquals(result, 200L);
+        assertEquals(200L, result);
 
         //If the value can not parse to long ,it will log the error and return -1L
         result = PropertyUtils.getLong("test.server.testnumber");
-        assertSame(result, -1L);
+        assertSame(-1L, result);
     }
 
     /**
@@ -115,7 +115,7 @@ public class PropertyUtilsTest {
 
         //Expected 3.0
         double result = PropertyUtils.getDouble("test.server.factor");
-        assertEquals(result, 3.0, 0);
+        assertEquals(3.0, result, 0);
 
         //If key is null, then return -1.0
         result = PropertyUtils.getDouble(null);
@@ -127,11 +127,11 @@ public class PropertyUtilsTest {
 
         //If key is undefine in alert.properties, and there is a defaultval, then return defaultval
         result = PropertyUtils.getDouble("abc", 5.0);
-        assertEquals(result, 5.0, 0);
+        assertEquals(5.0, result, 0);
 
         //If the value can not parse to double ,it will log the error and return -1.0
         result = PropertyUtils.getDouble("test.server.testnumber");
-        assertEquals(result, -1.0, 0);
+        assertEquals(-1.0, result, 0);
     }
 
     /**
@@ -142,12 +142,12 @@ public class PropertyUtilsTest {
 
         //Expected length 3
         String[] result = PropertyUtils.getArray("test.server.list", ",");
-        assertEquals(result.length, 3);
+        assertEquals(3, result.length);
 
         //Equal array values
-        assertEquals(result[0], "xxx.xxx.test1");
-        assertEquals(result[1], "xxx.xxx.test2");
-        assertEquals(result[2], "xxx.xxx.test3");
+        assertEquals("xxx.xxx.test1", result[0]);
+        assertEquals("xxx.xxx.test2", result[1]);
+        assertEquals("xxx.xxx.test3", result[2]);
 
         //If key is null, then return -1
         result = PropertyUtils.getArray(null, ",");
@@ -170,7 +170,7 @@ public class PropertyUtilsTest {
 
         //Expected 25
         int result = PropertyUtils.getInt("mail.server.port");
-        assertSame(result, 25);
+        assertSame(25, result);
 
         //If key is null, then return -1
         result = PropertyUtils.getInt(null);
@@ -182,7 +182,7 @@ public class PropertyUtilsTest {
 
         //If key is undefine in alert.properties, and there is a defaultval, then return defaultval
         result = PropertyUtils.getInt("abc", 300);
-        assertEquals(result, 300);
+        assertEquals(300, result);
 
         //If the value can not parse to int ,it will log the error and return -1
         result = PropertyUtils.getInt("test.server.testnumber");
@@ -197,19 +197,19 @@ public class PropertyUtilsTest {
 
         //Expected MASTER
         ZKNodeType zkNodeType = PropertyUtils.getEnum("test.server.enum1", ZKNodeType.class,ZKNodeType.WORKER);
-        assertEquals(zkNodeType, ZKNodeType.MASTER);
+        assertEquals(ZKNodeType.MASTER, zkNodeType);
 
         //Expected DEAD_SERVER
         zkNodeType = PropertyUtils.getEnum("test.server.enum2", ZKNodeType.class,ZKNodeType.WORKER);
-        assertEquals(zkNodeType, ZKNodeType.DEAD_SERVER);
+        assertEquals(ZKNodeType.DEAD_SERVER, zkNodeType);
 
         //If key is null, then return defaultval
         zkNodeType = PropertyUtils.getEnum(null, ZKNodeType.class,ZKNodeType.WORKER);
-        assertEquals(zkNodeType, ZKNodeType.WORKER);
+        assertEquals(ZKNodeType.WORKER, zkNodeType);
 
         //If the value doesn't define in enum ,it will log the error and return -1
         zkNodeType = PropertyUtils.getEnum("test.server.enum3", ZKNodeType.class,ZKNodeType.WORKER);
-        assertEquals(zkNodeType, ZKNodeType.WORKER);
+        assertEquals(ZKNodeType.WORKER, zkNodeType);
     }
 
 }

@@ -43,8 +43,6 @@ public class PropertyUtils {
 
     private static final Properties properties = new Properties();
 
-    private static final PropertyUtils propertyUtils = new PropertyUtils();
-
     private PropertyUtils(){
         init();
     }
@@ -178,8 +176,7 @@ public class PropertyUtils {
             return new String[0];
         }
         try {
-            String[] propertyArray = value.split(splitStr);
-            return propertyArray;
+            return value.split(splitStr);
         } catch (NumberFormatException e) {
             logger.info(e.getMessage(),e);
         }

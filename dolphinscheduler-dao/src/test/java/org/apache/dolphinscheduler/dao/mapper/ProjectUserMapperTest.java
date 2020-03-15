@@ -59,7 +59,7 @@ public class ProjectUserMapperTest {
         projectUser.setCreateTime(new Date());
         //update
         int update = projectUserMapper.updateById(projectUser);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         projectUserMapper.deleteById(projectUser.getId());
     }
 
@@ -70,7 +70,7 @@ public class ProjectUserMapperTest {
     public void testDelete(){
         ProjectUser projectUserMap = insertOne();
         int delete = projectUserMapper.deleteById(projectUserMap.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
@@ -94,7 +94,7 @@ public class ProjectUserMapperTest {
 
         ProjectUser projectUser = insertOne();
         int delete = projectUserMapper.deleteProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
 
     }
 

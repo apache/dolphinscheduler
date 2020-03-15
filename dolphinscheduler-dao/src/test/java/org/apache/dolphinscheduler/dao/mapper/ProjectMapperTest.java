@@ -65,7 +65,7 @@ public class ProjectMapperTest {
         project.setCreateTime(new Date());
         //update
         int update = projectMapper.updateById(project);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         projectMapper.deleteById(project.getId());
     }
 
@@ -76,7 +76,7 @@ public class ProjectMapperTest {
     public void testDelete(){
         Project projectMap = insertOne();
         int delete = projectMapper.deleteById(projectMap.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
