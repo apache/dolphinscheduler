@@ -814,6 +814,11 @@ public final class Constants {
     public static final String KERBEROS = "kerberos";
 
     /**
+     * kerberos expire time
+     */
+    public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
+
+    /**
      * java.security.krb5.conf
      */
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
