@@ -140,7 +140,6 @@ public class SqlTask extends AbstractTask {
                 dataSource.getUserId(),
                 dataSource.getConnectionParams());
 
-        Connection conn = null;
         List<String> createFuncs = null;
         try {
             // load class
@@ -332,7 +331,7 @@ public class SqlTask extends AbstractTask {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage());
         } finally {
-            ConnectionUtils.releaseResource(null, null, connection);
+            ConnectionUtils.releaseResource(connection);
         }
 
     }

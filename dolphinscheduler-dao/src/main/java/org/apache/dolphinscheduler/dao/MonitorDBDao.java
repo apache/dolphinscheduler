@@ -63,7 +63,7 @@ public class MonitorDBDao {
         }catch (Exception e) {
             logger.error("SQLException " + e);
         }finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
         }
         return monitorRecord;
     }

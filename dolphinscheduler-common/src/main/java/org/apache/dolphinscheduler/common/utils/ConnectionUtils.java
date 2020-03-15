@@ -16,42 +16,31 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import java.util.Arrays;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-
 public class ConnectionUtils {
 
-	public static final Logger logger = LoggerFactory.getLogger(ConnectionUtils.class);
+  public static final Logger logger = LoggerFactory.getLogger(ConnectionUtils.class);
 
-	private ConnectionUtils() {
-		throw new IllegalStateException("ConnectionUtils class");
-	}
+  private ConnectionUtils() {
+    throw new IllegalStateException("ConnectionUtils class");
+  }
 
-	public static void releaseResource(ResultSet rs, PreparedStatement ps, Connection conn) {
-		if (null != rs) {
-			try {
-				rs.close();
-			} catch (SQLException e) {
-				logger.error(e.getMessage(),e);
-			}
-		}
+  public static void releaseResource(AutoCloseable... resources) {
 
-		if (null != ps) {
-			try {
-				ps.close();
-			} catch (SQLException e) {
-				logger.error(e.getMessage(),e);
-			}
-		}
-
-		if (null != conn) {
-			try {
-				conn.close();
-			} catch (SQLException e) {
-				logger.error(e.getMessage(),e);
-			}
-		}
-	}
+    if (resources == null || resources.length == 0) {
+      return;
+    }
+    Arrays.stream(resources).filter(Objects::nonNull)
+        .forEach(resource -> {
+          try {
+            resource.close();
+          } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+          }
+        });
+  }
 }

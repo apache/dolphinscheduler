@@ -118,7 +118,7 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(rs, null, conn);
+            ConnectionUtils.releaseResource(rs, conn);
         }
 
     }
@@ -146,7 +146,7 @@ public class PostgresqlUpgradeDao extends UpgradeDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(rs, null, conn);
+            ConnectionUtils.releaseResource(rs, conn);
 
         }
 

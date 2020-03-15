@@ -79,7 +79,7 @@ public class MysqlUpgradeDao extends UpgradeDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(rs, null, conn);
+            ConnectionUtils.releaseResource(rs, conn);
         }
 
     }
@@ -106,7 +106,7 @@ public class MysqlUpgradeDao extends UpgradeDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
         }
 
     }
