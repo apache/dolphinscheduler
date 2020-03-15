@@ -373,7 +373,7 @@ public class TaskInstance {
     }
 
 
-    public Boolean isSubProcess(){
+    public boolean isSubProcess(){
         return TaskType.SUB_PROCESS.getDescp().equals(this.taskType);
     }
 
@@ -442,7 +442,7 @@ public class TaskInstance {
         this.executorName = executorName;
     }
 
-    public Boolean isTaskComplete() {
+    public boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
                 || this.getState().typeIsSuccess()
