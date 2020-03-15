@@ -296,27 +296,21 @@ public class TaskRecordDao {
     private static void closeResource(ResultSet rs, PreparedStatement pstmt, Connection conn) {
         if (rs != null) {
             try {
-                if (rs != null) {
-                    rs.close();
-                }
+                rs.close();
             } catch (SQLException e) {
                 logger.error("Exception ", e);
             }
         }
         if (pstmt != null) {
             try {
-                if (pstmt != null) {
-                    pstmt.close();
-                }
+                pstmt.close();
             } catch (SQLException e) {
                 logger.error("Exception ", e);
             }
         }
         if (conn != null) {
             try {
-                if (conn != null) {
-                    conn.close();
-                }
+                conn.close();
             } catch (SQLException e) {
                 logger.error("Exception ", e);
             }
