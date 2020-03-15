@@ -352,13 +352,7 @@ public class OSUtils {
 
       return sb.toString();
     } finally {
-      if (br != null) {
-        try {
-          br.close();
-        } catch (Exception e) {
-          logger.error(e.getMessage(), e);
-        }
-      }
+      IOUtils.closeQuietly(br);
     }
   }
 
@@ -408,7 +402,7 @@ public class OSUtils {
    * whether is windows
    * @return true if windows
    */
-  public static boolean isWindows() { ;
+  public static boolean isWindows() {
     return getOSName().startsWith("Windows");
   }
 
