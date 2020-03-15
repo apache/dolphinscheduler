@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.enums.DbType;
 
 /**
  * data source of mySQL
@@ -25,28 +25,19 @@ import org.apache.dolphinscheduler.common.utils.StringUtils;
 public class MySQLDataSource extends BaseDataSource {
 
   /**
-   * gets the JDBC url for the data source connection
-   * @return jdbc url
-   */
-  @Override
-  public String getJdbcUrl() {
-    String address = getAddress();
-    if (address.lastIndexOf("/") != (address.length() - 1)) {
-      address += "/";
-    }
-    String jdbcUrl = address + getDatabase();
-    if (StringUtils.isNotEmpty(getOther())) {
-      jdbcUrl += "?" + getOther();
-    }
-    return jdbcUrl;
-  }
-
-  /**
    * @return driver class
    */
   @Override
   public String driverClassSelector() {
     return Constants.COM_MYSQL_JDBC_DRIVER;
+  }
+
+  /**
+   * @return db type
+   */
+  @Override
+  public DbType dbTypeSelector() {
+    return DbType.MYSQL;
   }
 
 }

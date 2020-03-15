@@ -17,34 +17,26 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.enums.DbType;
 
 /**
  * data source of SQL Server
  */
 public class SQLServerDataSource extends BaseDataSource {
 
-    /**
-     * gets the JDBC url for the data source connection
-     * @return jdbc url
-     */
-    @Override
-    public String getJdbcUrl() {
-        String jdbcUrl = getAddress();
-        jdbcUrl += ";databaseName=" + getDatabase();
+  /**
+   * @return driver class
+   */
+  @Override
+  public String driverClassSelector() {
+    return Constants.COM_SQLSERVER_JDBC_DRIVER;
+  }
 
-        if (StringUtils.isNotEmpty(getOther())) {
-            jdbcUrl += ";" + getOther();
-        }
-
-        return jdbcUrl;
-    }
-
-    /**
-     * @return driver class
-     */
-    @Override
-    public String driverClassSelector() {
-        return Constants.COM_SQLSERVER_JDBC_DRIVER;
-    }
+  /**
+   * @return db type
+   */
+  @Override
+  public DbType dbTypeSelector() {
+    return DbType.SQLSERVER;
+  }
 }

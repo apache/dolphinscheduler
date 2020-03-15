@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.dao.datasource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,14 +75,80 @@ public abstract class BaseDataSource {
   public abstract String driverClassSelector();
 
   /**
+   * @return db type
+   */
+  public abstract DbType dbTypeSelector();
+
+  /**
    * gets the JDBC url for the data source connection
    */
-  public abstract String getJdbcUrl();
+  public String getJdbcUrl() {
+    StringBuilder jdbcUrl = new StringBuilder(getAddress());
+
+    appendDatabase(jdbcUrl);
+    appendPrincipal(jdbcUrl);
+    appendOther(jdbcUrl);
+
+    return jdbcUrl.toString();
+  }
+
+  /**
+   * append database
+   * @param jdbcUrl jdbc url
+   */
+  private void appendDatabase(StringBuilder jdbcUrl) {
+    if (dbTypeSelector() == DbType.SQLSERVER) {
+      jdbcUrl.append(";databaseName=").append(getDatabase());
+    } else {
+      if (getAddress().lastIndexOf('/') != (jdbcUrl.length() - 1)) {
+        jdbcUrl.append("/");
+      }
+      jdbcUrl.append(getDatabase());
+    }
+  }
+
+  /**
+   * append principal
+   * @param jdbcUrl jdbc url
+   */
+  private void appendPrincipal(StringBuilder jdbcUrl) {
+    boolean tag = dbTypeSelector() == DbType.HIVE || dbTypeSelector() == DbType.SPARK;
+    if (tag && StringUtils.isNotEmpty(getPrincipal())) {
+      jdbcUrl.append(";principal=").append(getPrincipal());
+    }
+  }
+
+  /**
+   * append other
+   * @param jdbcUrl jdbc url
+   */
+  private void appendOther(StringBuilder jdbcUrl) {
+    if (StringUtils.isNotEmpty(getOther())) {
+      String separator = "";
+      switch (dbTypeSelector()) {
+        case CLICKHOUSE:
+        case MYSQL:
+        case ORACLE:
+        case POSTGRESQL:
+          separator = "?";
+          break;
+        case DB2:
+          separator = ":";
+          break;
+        case HIVE:
+        case SPARK:
+        case SQLSERVER:
+          separator = ";";
+          break;
+        default:
+          logger.error("Db type mismatch!");
+      }
+      jdbcUrl.append(separator).append(getOther());
+    }
+  }
 
   /**
    * test whether the data source can be connected successfully
-   *
-   * @throws Exception if error throws Exception
    */
   public void isConnectable() {
     Connection con = null;
