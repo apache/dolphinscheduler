@@ -170,19 +170,7 @@ public class TaskRecordDao {
         } catch (SQLException e) {
             logger.error("Exception ", e);
         } finally {
-            try {
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
+            closeResource(rs, pstmt, conn);
         }
         return count;
     }
@@ -267,19 +255,7 @@ public class TaskRecordDao {
         } catch (SQLException e) {
             logger.error("Exception ", e);
         } finally {
-            try {
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-                if (rs != null) {
-                    rs.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
+            closeResource(rs, pstmt, conn);
         }
         return recordList;
     }
@@ -317,4 +293,33 @@ public class TaskRecordDao {
         }
     }
 
+    private static void closeResource(ResultSet rs, PreparedStatement pstmt, Connection conn) {
+        if (rs != null) {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                logger.error("Exception ", e);
+            }
+        }
+        if (pstmt != null) {
+            try {
+                if (pstmt != null) {
+                    pstmt.close();
+                }
+            } catch (SQLException e) {
+                logger.error("Exception ", e);
+            }
+        }
+        if (conn != null) {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                logger.error("Exception ", e);
+            }
+        }
+    }
 }
