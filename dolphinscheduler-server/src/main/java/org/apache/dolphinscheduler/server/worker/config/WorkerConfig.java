@@ -22,19 +22,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkerConfig {
 
-    @Value("${worker.exec.threads}")
+    @Value("${worker.exec.threads: 100}")
     private int workerExecThreads;
 
-    @Value("${worker.heartbeat.interval}")
+    @Value("${worker.heartbeat.interval: 10}")
     private int workerHeartbeatInterval;
 
-    @Value("${worker.fetch.task.num}")
+    @Value("${worker.fetch.task.num: 3}")
     private int workerFetchTaskNum;
 
-    @Value("${worker.max.cpuload.avg}")
+    @Value("${worker.max.cpuload.avg:100}")
     private int workerMaxCpuloadAvg;
 
-    @Value("${worker.reserved.memory}")
+    @Value("${worker.reserved.memory:0.1}")
     private double workerReservedMemory;
 
     @Value("${worker.group: default}")
