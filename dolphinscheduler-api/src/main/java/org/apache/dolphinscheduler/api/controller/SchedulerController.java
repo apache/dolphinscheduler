@@ -70,7 +70,7 @@ public class SchedulerController extends BaseController {
      * @param processInstancePriority process instance priority
      * @param receivers receivers
      * @param receiversCc receivers cc
-     * @param workerGroupId  worker group id
+     * @param workerGroup  worker group
      * @return create result code
      */
     @ApiOperation(value = "createSchedule", notes= "CREATE_SCHEDULE_NOTES")
@@ -96,15 +96,15 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
                                  @RequestParam(value = "receivers", required = false) String receivers,
                                  @RequestParam(value = "receiversCc", required = false) String receiversCc,
-                                 @RequestParam(value = "workerGroupId", required = false, defaultValue = "-1") int workerGroupId,
+                                 @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
         logger.info("login user {}, project name: {}, process name: {}, create schedule: {}, warning type: {}, warning group id: {}," +
                         "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {}, workGroupId:{}",
                 loginUser.getUserName(), projectName, processDefinitionId, schedule, warningType, warningGroupId,
-                failureStrategy, receivers, receiversCc, processInstancePriority, workerGroupId);
+                failureStrategy, receivers, receiversCc, processInstancePriority, workerGroup);
         try {
             Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectName, processDefinitionId, schedule,
-                    warningType, warningGroupId, failureStrategy, receivers, receiversCc, processInstancePriority, workerGroupId);
+                    warningType, warningGroupId, failureStrategy, receivers, receiversCc, processInstancePriority, workerGroup);
 
             return returnDataList(result);
         } catch (Exception e) {
@@ -124,7 +124,7 @@ public class SchedulerController extends BaseController {
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
      * @param receivers receivers
-     * @param workerGroupId worker group id
+     * @param workerGroup worker group
      * @param processInstancePriority process instance priority
      * @param receiversCc receivers cc
      * @return update result code
@@ -151,16 +151,16 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                  @RequestParam(value = "receivers", required = false) String receivers,
                                  @RequestParam(value = "receiversCc", required = false) String receiversCc,
-                                 @RequestParam(value = "workerGroupId", required = false, defaultValue = "-1") int workerGroupId,
+                                 @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority) {
         logger.info("login user {}, project name: {},id: {}, updateProcessInstance schedule: {}, notify type: {}, notify mails: {}, " +
                         "failure policy: {},receivers : {},receiversCc : {},processInstancePriority : {},workerGroupId:{}",
                 loginUser.getUserName(), projectName, id, schedule, warningType, warningGroupId, failureStrategy,
-                receivers, receiversCc, processInstancePriority, workerGroupId);
+                receivers, receiversCc, processInstancePriority, workerGroup);
 
         try {
             Map<String, Object> result = schedulerService.updateSchedule(loginUser, projectName, id, schedule,
-                    warningType, warningGroupId, failureStrategy, receivers, receiversCc, null, processInstancePriority, workerGroupId);
+                    warningType, warningGroupId, failureStrategy, receivers, receiversCc, null, processInstancePriority, workerGroup);
             return returnDataList(result);
 
         } catch (Exception e) {

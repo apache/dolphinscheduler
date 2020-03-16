@@ -17,28 +17,19 @@
 package org.apache.dolphinscheduler.server.master;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.consumer.TaskUpdateQueueConsumer;
 import org.apache.dolphinscheduler.server.master.processor.TaskAckProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskResponseProcessor;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistry;
-import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
+import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerService;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob;
 import org.apache.dolphinscheduler.service.quartz.QuartzExecutors;
-import org.apache.dolphinscheduler.service.queue.TaskUpdateQueueImpl;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,13 +39,12 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.ExecutorService;
 
 /**
  * master server
  */
 @ComponentScan("org.apache.dolphinscheduler")
-public class MasterServer implements IStoppable {
+public class MasterServer {
 
     /**
      * logger of MasterServer
@@ -62,33 +52,10 @@ public class MasterServer implements IStoppable {
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
     /**
-     *  zk master client
-     */
-    @Autowired
-    private ZKMasterClient zkMasterClient = null;
-
-    /**
-     *  process service
-     */
-    @Autowired
-    protected ProcessService processService;
-
-    /**
-     *  master exec thread pool
-     */
-    private ExecutorService masterSchedulerService;
-
-    /**
      * master config
      */
     @Autowired
     private MasterConfig masterConfig;
-
-    /**
-     *  zookeeper registry center
-     */
-    @Autowired
-    private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
     /**
      *  spring application context
@@ -105,7 +72,17 @@ public class MasterServer implements IStoppable {
     /**
      * master registry
      */
+    @Autowired
     private MasterRegistry masterRegistry;
+
+    /**
+     * zk master client
+     */
+    @Autowired
+    private ZKMasterClient zkMasterClient;
+
+    @Autowired
+    private MasterSchedulerService masterSchedulerService;
 
     /**
      * master server startup
@@ -126,7 +103,7 @@ public class MasterServer implements IStoppable {
 
         //init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(45678);
+        serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE, new TaskResponseProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
@@ -134,30 +111,15 @@ public class MasterServer implements IStoppable {
         this.nettyRemotingServer.start();
 
         //
-        this.masterRegistry = new MasterRegistry(zookeeperRegistryCenter, serverConfig.getListenPort(), masterConfig.getMasterHeartbeatInterval());
+        this.zkMasterClient.start();
         this.masterRegistry.registry();
-
         //
-        zkMasterClient.init();
-
-        masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
-
-        zkMasterClient.setStoppable(this);
-
-        // master scheduler thread
-        MasterSchedulerThread masterSchedulerThread = new MasterSchedulerThread(
-                zkMasterClient,
-                processService,
-                masterConfig.getMasterExecThreads());
-
-        // submit master scheduler thread
-        masterSchedulerService.execute(masterSchedulerThread);
+        masterSchedulerService.start();
 
         // start QuartzExecutors
         // what system should do if exception
         try {
             logger.info("start Quartz server...");
-            ProcessScheduleJob.init(processService);
             QuartzExecutors.getInstance().start();
         } catch (Exception e) {
             try {
@@ -168,30 +130,23 @@ public class MasterServer implements IStoppable {
             logger.error("start Quartz failed", e);
         }
 
-        TaskUpdateQueueConsumer taskUpdateQueueConsumer = SpringApplicationContext.getBean(TaskUpdateQueueConsumer.class);
-        taskUpdateQueueConsumer.start();
         /**
          *  register hooks, which are called before the process exits
          */
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                if (zkMasterClient.getActiveMasterNum() <= 1) {
-                    zkMasterClient.getAlertDao().sendServerStopedAlert(
-                        1, OSUtils.getHost(), "Master-Server");
-                }
-                stop("shutdownhook");
+                close("shutdownHook");
             }
         }));
     }
 
 
     /**
-     * gracefully stop
-     * @param cause why stopping
+     * gracefully close
+     * @param cause close cause
      */
-    @Override
-    public synchronized void stop(String cause) {
+    public void close(String cause) {
 
         try {
             //execute only once
@@ -212,40 +167,16 @@ public class MasterServer implements IStoppable {
             }
             this.nettyRemotingServer.close();
             this.masterRegistry.unRegistry();
+            this.zkMasterClient.close();
+            this.masterSchedulerService.close();
 
             //close quartz
             try{
                 QuartzExecutors.getInstance().shutdown();
+                logger.info("Quartz service stopped");
             }catch (Exception e){
                 logger.warn("Quartz service stopped exception:{}",e.getMessage());
             }
-
-            logger.info("Quartz service stopped");
-
-            try {
-                ThreadPoolExecutors.getInstance().shutdown();
-            }catch (Exception e){
-                logger.warn("threadpool service stopped exception:{}",e.getMessage());
-            }
-
-            logger.info("threadpool service stopped");
-
-            try {
-                masterSchedulerService.shutdownNow();
-            }catch (Exception e){
-                logger.warn("master scheduler service stopped exception:{}",e.getMessage());
-            }
-
-            logger.info("master scheduler service stopped");
-
-            try {
-                zkMasterClient.close();
-            }catch (Exception e){
-                logger.warn("zookeeper service stopped exception:{}",e.getMessage());
-            }
-
-            logger.info("zookeeper service stopped");
-
         } catch (Exception e) {
             logger.error("master server stop exception ", e);
             System.exit(-1);

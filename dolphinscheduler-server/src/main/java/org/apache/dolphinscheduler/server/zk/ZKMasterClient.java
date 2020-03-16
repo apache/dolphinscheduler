@@ -16,22 +16,19 @@
  */
 package org.apache.dolphinscheduler.server.zk;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.DaoFactory;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.locks.InterProcessMutex;
-import org.apache.curator.utils.ThreadUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.zk.AbstractZKClient;
 import org.slf4j.Logger;
@@ -41,7 +38,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ThreadFactory;
 
 
 /**
@@ -58,45 +54,18 @@ public class ZKMasterClient extends AbstractZKClient {
 	private static final Logger logger = LoggerFactory.getLogger(ZKMasterClient.class);
 
 	/**
-	 * thread factory
-	 */
-	private static final ThreadFactory defaultThreadFactory = ThreadUtils.newGenericThreadFactory("Master-Main-Thread");
-
-	/**
-	 *  master znode
-	 */
-	private String masterZNode = null;
-
-	/**
-	 *  alert database access
-	 */
-	private AlertDao alertDao = null;
-	/**
 	 *  process service
 	 */
 	@Autowired
 	private ProcessService processService;
 
-	/**
-	 * default constructor
-	 */
-	private ZKMasterClient(){}
-
-	/**
-	 * init
-	 */
-	public void init(){
-
-		logger.info("initialize master client...");
-
-		// init dao
-		this.initDao();
+    public void start() {
 
 		InterProcessMutex mutex = null;
 		try {
 			// create distributed lock with the root node path of the lock space as /dolphinscheduler/lock/failover/master
 			String znodeLock = getMasterStartUpLockPath();
-			mutex = new InterProcessMutex(zkClient, znodeLock);
+			mutex = new InterProcessMutex(getZkClient(), znodeLock);
 			mutex.acquire();
 
 			// init system znode
@@ -115,20 +84,9 @@ public class ZKMasterClient extends AbstractZKClient {
 		}
 	}
 
-
-	/**
-	 *  init dao
-	 */
-	public void initDao(){
-		this.alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-	}
-	/**
-	 * get alert dao
-	 *
-	 * @return AlertDao
-	 */
-	public AlertDao getAlertDao() {
-		return alertDao;
+	@Override
+	public void close(){
+		super.close();
 	}
 
 	/**
@@ -167,8 +125,6 @@ public class ZKMasterClient extends AbstractZKClient {
 			String serverHost = getHostByEventDataPath(path);
 			// handle dead server
 			handleDeadServer(path, zkNodeType, Constants.ADD_ZK_OP);
-			//alert server down.
-			alertServerDown(serverHost, zkNodeType);
 			//failover server
 			if(failover){
 				failoverServerWhenDown(serverHost, zkNodeType);
@@ -223,18 +179,6 @@ public class ZKMasterClient extends AbstractZKClient {
 	}
 
 	/**
-	 * send alert when server down
-	 *
-	 * @param serverHost	server host
-	 * @param zkNodeType	zookeeper node type
-	 */
-	private void alertServerDown(String serverHost, ZKNodeType zkNodeType) {
-
-		String serverType = zkNodeType.toString();
-		alertDao.sendServerStopedAlert(1, serverHost, serverType);
-	}
-
-	/**
 	 * monitor master
 	 * @param event event
 	 * @param path path
@@ -245,10 +189,6 @@ public class ZKMasterClient extends AbstractZKClient {
 				logger.info("master node added : {}", path);
 				break;
 			case NODE_REMOVED:
-				String serverHost = getHostByEventDataPath(path);
-				if (checkServerSelfDead(serverHost, ZKNodeType.MASTER)) {
-					return;
-				}
 				removeZKNodePath(path, ZKNodeType.MASTER, true);
 				break;
 			default:
@@ -273,16 +213,6 @@ public class ZKMasterClient extends AbstractZKClient {
 			default:
 				break;
 		}
-	}
-
-
-	/**
-	 * get master znode
-	 *
-	 * @return master zookeeper node
-	 */
-	public String getMasterZNode() {
-		return masterZNode;
 	}
 
 	/**
@@ -401,6 +331,12 @@ public class ZKMasterClient extends AbstractZKClient {
 		}
 
 		logger.info("master failover end");
+	}
+
+	public InterProcessMutex blockAcquireMutex() throws Exception {
+        InterProcessMutex mutex = new InterProcessMutex(getZkClient(), getMasterLockPath());
+        mutex.acquire();
+        return mutex;
 	}
 
 }

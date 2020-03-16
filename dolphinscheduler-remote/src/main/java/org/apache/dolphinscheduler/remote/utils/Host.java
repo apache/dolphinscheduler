@@ -80,6 +80,9 @@ public class Host implements Serializable {
      * @return host
      */
     public static Host of(String address){
+        if(address == null) {
+            throw new IllegalArgumentException("Host : address is null.");
+        }
         String[] parts = address.split(":");
         if (parts.length != 2) {
             throw new IllegalArgumentException(String.format("Host : %s illegal.", address));

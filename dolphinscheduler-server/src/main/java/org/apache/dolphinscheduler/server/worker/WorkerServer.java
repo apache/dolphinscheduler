@@ -17,21 +17,15 @@
 package org.apache.dolphinscheduler.server.worker;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.thread.ThreadPoolExecutors;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistry;
-import org.apache.dolphinscheduler.server.zk.ZKWorkerClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.queue.TaskQueueFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,49 +34,17 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 
 /**
  *  worker server
  */
 @ComponentScan("org.apache.dolphinscheduler")
-public class WorkerServer implements IStoppable {
+public class WorkerServer {
 
     /**
      * logger
      */
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
-
-    /**
-     *  zk worker client
-     */
-    @Autowired
-    private ZKWorkerClient zkWorkerClient = null;
-
-
-
-    /**
-     *  fetch task executor service
-     */
-    private ExecutorService fetchTaskExecutorService;
-
-    /**
-     * CountDownLatch latch
-     */
-    private CountDownLatch latch;
-
-    /**
-     *  worker config
-     */
-    @Autowired
-    private WorkerConfig workerConfig;
-
-    /**
-     *  zookeeper registry center
-     */
-    @Autowired
-    private ZookeeperRegistryCenter zookeeperRegistryCenter;
 
     /**
      *  netty remote server
@@ -92,7 +54,14 @@ public class WorkerServer implements IStoppable {
     /**
      *  worker registry
      */
+    @Autowired
     private WorkerRegistry workerRegistry;
+
+    /**
+     *  worker config
+     */
+    @Autowired
+    private WorkerConfig workerConfig;
 
     /**
      *  spring application context
@@ -122,21 +91,14 @@ public class WorkerServer implements IStoppable {
 
         //init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
+        serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, new TaskExecuteProcessor());
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, new TaskKillProcessor());
         this.nettyRemotingServer.start();
 
-        this.workerRegistry = new WorkerRegistry(zookeeperRegistryCenter, serverConfig.getListenPort(), workerConfig.getWorkerHeartbeatInterval(), workerConfig.getWorkerGroup());
+        // worker registry
         this.workerRegistry.registry();
-
-        this.zkWorkerClient.init();
-
-
-
-        this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
-
-        zkWorkerClient.setStoppable(this);
 
         /**
          * register hooks, which are called before the process exits
@@ -144,20 +106,12 @@ public class WorkerServer implements IStoppable {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                stop("shutdownHook");
+                close("shutdownHook");
             }
         }));
-
-        //let the main thread await
-        latch = new CountDownLatch(1);
-        try {
-            latch.await();
-        } catch (InterruptedException ignore) {
-        }
     }
 
-    @Override
-    public synchronized void stop(String cause) {
+    public void close(String cause) {
 
         try {
             //execute only once
@@ -179,29 +133,6 @@ public class WorkerServer implements IStoppable {
 
             this.nettyRemotingServer.close();
             this.workerRegistry.unRegistry();
-
-            try {
-                ThreadPoolExecutors.getInstance().shutdown();
-            }catch (Exception e){
-                logger.warn("threadPool service stopped exception:{}",e.getMessage());
-            }
-
-            logger.info("threadPool service stopped");
-
-            try {
-                fetchTaskExecutorService.shutdownNow();
-            }catch (Exception e){
-                logger.warn("worker fetch task service stopped exception:{}",e.getMessage());
-            }
-            logger.info("worker fetch task service stopped");
-
-            try{
-                zkWorkerClient.close();
-            }catch (Exception e){
-                logger.warn("zookeeper service stopped exception:{}",e.getMessage());
-            }
-            latch.countDown();
-            logger.info("zookeeper service stopped");
 
         } catch (Exception e) {
             logger.error("worker server stop exception ", e);

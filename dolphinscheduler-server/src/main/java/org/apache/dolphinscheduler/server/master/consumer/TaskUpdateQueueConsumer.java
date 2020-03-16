@@ -17,15 +17,24 @@
 
 package org.apache.dolphinscheduler.server.master.consumer;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
+import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
+import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
+import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.entity.TaskPriority;
+import org.apache.dolphinscheduler.server.entity.*;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -36,6 +45,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.util.List;
 
 /**
  * TaskUpdateQueue consumer
@@ -65,6 +77,12 @@ public class TaskUpdateQueueConsumer extends Thread{
      */
     @Autowired
     private ExecutorDispatcher dispatcher;
+
+    @PostConstruct
+    public void init(){
+        super.setName("TaskUpdateQueueConsumerThread");
+        super.start();
+    }
 
     @Override
     public void run() {
@@ -128,10 +146,72 @@ public class TaskUpdateQueueConsumer extends Thread{
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
         taskInstance.setExecutePath(getExecLocalPath(taskInstance));
 
+        SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
+        DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
+        ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
+
+        TaskType taskType = TaskType.valueOf(taskInstance.getTaskType());
+
+        TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
+        // SQL task
+        if (taskType == TaskType.SQL){
+            SqlParameters sqlParameters = JSONObject.parseObject(taskNode.getParams(), SqlParameters.class);
+            int datasourceId = sqlParameters.getDatasource();
+            DataSource datasource = processService.findDataSourceById(datasourceId);
+            sqlTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
+
+            // whether udf type
+            boolean udfTypeFlag = EnumUtils.isValidEnum(UdfType.class, sqlParameters.getType())
+                    && StringUtils.isNotEmpty(sqlParameters.getUdfs());
+
+            if (udfTypeFlag){
+                String[] udfFunIds = sqlParameters.getUdfs().split(",");
+                int[] udfFunIdsArray = new int[udfFunIds.length];
+                for(int i = 0 ; i < udfFunIds.length;i++){
+                    udfFunIdsArray[i]=Integer.parseInt(udfFunIds[i]);
+                }
+
+                List<UdfFunc> udfFuncList = processService.queryUdfFunListByids(udfFunIdsArray);
+                sqlTaskExecutionContext.setUdfFuncList(udfFuncList);
+            }
+
+        }
+
+        // DATAX task
+        if (taskType == TaskType.DATAX){
+            DataxParameters dataxParameters = JSONObject.parseObject(taskNode.getParams(), DataxParameters.class);
+
+            DataSource dataSource = processService.findDataSourceById(dataxParameters.getDataSource());
+            DataSource dataTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
+
+
+            dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
+            dataxTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
+            dataxTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+
+            dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
+            dataxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+            dataxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+        }
+
+
+        // procedure task
+        if (taskType == TaskType.PROCEDURE){
+            ProcedureParameters procedureParameters = JSONObject.parseObject(taskNode.getParams(), ProcedureParameters.class);
+            int datasourceId = procedureParameters.getDatasource();
+            DataSource datasource = processService.findDataSourceById(datasourceId);
+            procedureTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
+        }
+
+
+
         return TaskExecutionContextBuilder.get()
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildProcessInstanceRelatedInfo(taskInstance.getProcessInstance())
                 .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
+                .buildSQLTaskRelatedInfo(sqlTaskExecutionContext)
+                .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
+                .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
                 .create();
     }
 
@@ -163,7 +243,4 @@ public class TaskUpdateQueueConsumer extends Thread{
         }
         return false;
     }
-
-
-
 }

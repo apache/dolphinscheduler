@@ -139,7 +139,7 @@ public class DataxTask extends AbstractTask {
     /**
      * run DataX process
      *
-     * @throws Exception
+     * @throws Exception if error throws Exception
      */
     @Override
     public void handle() throws Exception {
@@ -168,7 +168,7 @@ public class DataxTask extends AbstractTask {
      * cancel DataX process
      *
      * @param cancelApplication cancelApplication
-     * @throws Exception
+     * @throws Exception if error throws Exception
      */
     @Override
     public void cancelApplication(boolean cancelApplication)
@@ -180,8 +180,8 @@ public class DataxTask extends AbstractTask {
     /**
      * build datax configuration file
      * 
-     * @return
-     * @throws Exception
+     * @return datax json file name
+     * @throws Exception if error throws Exception
      */
     private String buildDataxJsonFile()
         throws Exception {
@@ -213,11 +213,10 @@ public class DataxTask extends AbstractTask {
     /**
      * build datax job config
      * 
-     * @return
-     * @throws SQLException
+     * @return collection of datax job config JSONObject
+     * @throws SQLException if error throws SQLException
      */
-    private List<JSONObject> buildDataxJobContentJson()
-        throws SQLException {
+    private List<JSONObject> buildDataxJobContentJson() throws SQLException {
         DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
 
 
@@ -281,7 +280,7 @@ public class DataxTask extends AbstractTask {
     /**
      * build datax setting config
      * 
-     * @return
+     * @return datax setting config JSONObject
      */
     private JSONObject buildDataxJobSettingJson() {
         JSONObject speed = new JSONObject();
@@ -333,8 +332,8 @@ public class DataxTask extends AbstractTask {
     /**
      * create command
      * 
-     * @return
-     * @throws Exception
+     * @return shell command file name
+     * @throws Exception if error throws Exception
      */
     private String buildShellCommandFile(String jobConfigFilePath)
         throws Exception {
@@ -390,7 +389,7 @@ public class DataxTask extends AbstractTask {
      *            the database connection parameters of the data source
      * @param sql
      *            sql for data synchronization
-     * @return
+     * @return Keyword converted column names
      */
     private String[] parsingSqlColumnNames(DbType dsType, DbType dtType, BaseDataSource dataSourceCfg, String sql) {
         String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(dsType, sql);
@@ -413,7 +412,7 @@ public class DataxTask extends AbstractTask {
      * @param sql
      *            sql for data synchronization
      * @return column name array
-     * @throws RuntimeException
+     * @throws RuntimeException if error throws RuntimeException
      */
     private String[] tryGrammaticalAnalysisSqlColumnNames(DbType dbType, String sql) {
         String[] columnNames;

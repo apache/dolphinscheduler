@@ -22,6 +22,7 @@ import org.apache.curator.framework.CuratorFramework;
 
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.service.zk.AbstractListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,8 +75,14 @@ public class ZookeeperNodeManager implements InitializingBean {
     private ZookeeperRegistryCenter registryCenter;
 
     /**
+     * alert dao
+     */
+    @Autowired
+    private AlertDao alertDao;
+
+    /**
      * init listener
-     * @throws Exception
+     * @throws Exception if error throws Exception
      */
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -136,6 +143,7 @@ public class ZookeeperNodeManager implements InitializingBean {
                         Set<String> previousNodes = new HashSet<>(workerNodes);
                         Set<String> currentNodes = registryCenter.getWorkerGroupNodesDirectly(group);
                         syncWorkerGroupNodes(group, currentNodes);
+                        alertDao.sendServerStopedAlert(1, path, "WORKER");
                     }
                 } catch (IllegalArgumentException ignore) {
                     logger.warn(ignore.getMessage());
@@ -175,6 +183,7 @@ public class ZookeeperNodeManager implements InitializingBean {
                         Set<String> previousNodes = new HashSet<>(masterNodes);
                         Set<String> currentNodes = registryCenter.getMasterNodesDirectly();
                         syncMasterNodes(currentNodes);
+                        alertDao.sendServerStopedAlert(1, path, "MASTER");
                     }
                 } catch (Exception ex) {
                     logger.error("MasterNodeListener capture data change and get data failed.", ex);
@@ -212,8 +221,8 @@ public class ZookeeperNodeManager implements InitializingBean {
 
     /**
      * sync worker group nodes
-     * @param workerGroup
-     * @param nodes
+     * @param workerGroup worker group
+     * @param nodes worker nodes
      */
     private void syncWorkerGroupNodes(String workerGroup, Set<String> nodes){
         workerGroupLock.lock();

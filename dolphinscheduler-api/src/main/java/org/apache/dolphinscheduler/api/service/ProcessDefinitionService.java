@@ -561,13 +561,13 @@ public class ProcessDefinitionService extends BaseDAGService {
         List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
         if (!schedules.isEmpty()) {
             Schedule schedule = schedules.get(0);
-            WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
+            /*WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
 
             if (null == workerGroup && schedule.getWorkerGroupId() == -1) {
                 workerGroup = new WorkerGroup();
                 workerGroup.setId(-1);
                 workerGroup.setName("");
-            }
+            }*/
 
             exportProcessMeta.setScheduleWarningType(schedule.getWarningType().toString());
             exportProcessMeta.setScheduleWarningGroupId(schedule.getWarningGroupId());
@@ -577,11 +577,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             exportProcessMeta.setScheduleFailureStrategy(String.valueOf(schedule.getFailureStrategy()));
             exportProcessMeta.setScheduleReleaseState(String.valueOf(ReleaseState.OFFLINE));
             exportProcessMeta.setScheduleProcessInstancePriority(String.valueOf(schedule.getProcessInstancePriority()));
-
-            if (null != workerGroup) {
-                exportProcessMeta.setScheduleWorkerGroupId(workerGroup.getId());
-                exportProcessMeta.setScheduleWorkerGroupName(workerGroup.getName());
-            }
+            exportProcessMeta.setScheduleWorkerGroupName(schedule.getWorkerGroup());
         }
         //create workflow json file
         return JSONUtils.toJsonString(exportProcessMeta);
@@ -780,15 +776,9 @@ public class ProcessDefinitionService extends BaseDAGService {
         if (null != processMeta.getScheduleProcessInstancePriority()) {
             scheduleObj.setProcessInstancePriority(Priority.valueOf(processMeta.getScheduleProcessInstancePriority()));
         }
-        if (null != processMeta.getScheduleWorkerGroupId()) {
-            scheduleObj.setWorkerGroupId(processMeta.getScheduleWorkerGroupId());
-        } else {
-            if (null != processMeta.getScheduleWorkerGroupName()) {
-                List<WorkerGroup> workerGroups = workerGroupMapper.queryWorkerGroupByName(processMeta.getScheduleWorkerGroupName());
-                if(CollectionUtils.isNotEmpty(workerGroups)){
-                    scheduleObj.setWorkerGroupId(workerGroups.get(0).getId());
-                }
-            }
+
+        if (null != processMeta.getScheduleWorkerGroupName()) {
+            scheduleObj.setWorkerGroup(processMeta.getScheduleWorkerGroupName());
         }
 
         return scheduleMapper.insert(scheduleObj);

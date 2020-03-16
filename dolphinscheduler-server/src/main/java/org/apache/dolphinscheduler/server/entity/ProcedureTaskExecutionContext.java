@@ -14,45 +14,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+package org.apache.dolphinscheduler.server.entity;
+
+import java.io.Serializable;
 
 /**
- * UDF type
+ *  master/worker task transport
  */
-public enum UdfType {
+public class ProcedureTaskExecutionContext implements Serializable{
+
     /**
-     * 0 hive; 1 spark
+     * connectionParams
      */
-  HIVE(0, "hive"),
-  SPARK(1, "spark");
+    private String connectionParams;
 
-    UdfType(int code, String descp){
-        this.code = code;
-        this.descp = descp;
+    public String getConnectionParams() {
+        return connectionParams;
     }
 
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
+    public void setConnectionParams(String connectionParams) {
+        this.connectionParams = connectionParams;
     }
 
-    public String getDescp() {
-        return descp;
+    @Override
+    public String toString() {
+        return "ProcedureTaskExecutionContext{" +
+                "connectionParams='" + connectionParams + '\'' +
+                '}';
     }
-
-    public static UdfType of(int type){
-        for(UdfType ut : values()){
-            if(ut.getCode() == type){
-                return ut;
-            }
-        }
-        throw new IllegalArgumentException("invalid type : " + type);
-    }
-
-
 }

@@ -18,10 +18,13 @@
 package org.apache.dolphinscheduler.server.builder;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.ProcedureTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
+
+import java.util.List;
 
 /**
  *  TaskExecutionContext builder
@@ -81,6 +84,42 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setProjectId(processDefinition.getProjectId());
         return this;
     }
+
+
+    /**
+     * build SQLTask related info
+     *
+     * @param sqlTaskExecutionContext sqlTaskExecutionContext
+     * @return TaskExecutionContextBuilder
+     */
+    public TaskExecutionContextBuilder buildSQLTaskRelatedInfo(SQLTaskExecutionContext sqlTaskExecutionContext){
+        taskExecutionContext.setSqlTaskExecutionContext(sqlTaskExecutionContext);
+        return this;
+    }
+
+
+    /**
+     * build DataxTask related info
+     *
+     * @param dataxTaskExecutionContext dataxTaskExecutionContext
+     * @return TaskExecutionContextBuilder
+     */
+    public TaskExecutionContextBuilder buildDataxTaskRelatedInfo(DataxTaskExecutionContext dataxTaskExecutionContext){
+        taskExecutionContext.setDataxTaskExecutionContext(dataxTaskExecutionContext);
+        return this;
+    }
+
+    /**
+     * build procedureTask related info
+     *
+     * @param procedureTaskExecutionContext
+     * @return
+     */
+    public TaskExecutionContextBuilder buildProcedureTaskRelatedInfo(ProcedureTaskExecutionContext procedureTaskExecutionContext){
+        taskExecutionContext.setProcedureTaskExecutionContext(procedureTaskExecutionContext);
+        return this;
+    }
+
 
     /**
      * create
