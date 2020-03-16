@@ -319,7 +319,7 @@ public class ResourcesController extends BaseController{
     ){
         try{
             logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type.toString());
-            Map<String, Object> result = resourceService.queryResourceList(loginUser, type);
+            Map<String, Object> result = resourceService.queryResourceJarList(loginUser, type);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(QUERY_RESOURCES_LIST_ERROR.getMsg(),e);
