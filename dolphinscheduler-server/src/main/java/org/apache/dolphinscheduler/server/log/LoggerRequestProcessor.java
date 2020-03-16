@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.log;
 
 import io.netty.channel.Channel;
+import org.apache.dolphinscheduler.common.utils.IOUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.log.*;
@@ -116,16 +117,8 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         }catch (IOException e){
             logger.error("get file bytes error",e);
         }finally {
-            if (bos != null){
-                try {
-                    bos.close();
-                } catch (IOException ignore) {}
-            }
-            if (in != null){
-                try {
-                    in.close();
-                } catch (IOException ignore) {}
-            }
+            IOUtils.closeQuietly(bos);
+            IOUtils.closeQuietly(in);
         }
         return new byte[0];
     }
@@ -146,7 +139,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         } catch (IOException e) {
             logger.error("read file error",e);
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**
@@ -168,11 +161,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         }catch (IOException e){
             logger.error("read file error",e);
         }finally {
-            try {
-                if (br != null){
-                    br.close();
-                }
-            } catch (IOException ignore) {}
+            IOUtils.closeQuietly(br);
         }
         return "";
     }

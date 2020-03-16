@@ -29,13 +29,13 @@ public class IpUtilsTest {
         long longNumber = IpUtils.ipToLong(ip);
         long longNumber2 = IpUtils.ipToLong(ip2);
         System.out.println(longNumber);
-        Assert.assertEquals(longNumber, 3232263681L);
-        Assert.assertEquals(longNumber2, 0L);
+        Assert.assertEquals(3232263681L, longNumber);
+        Assert.assertEquals(0L, longNumber2);
 
         String ip3 = "255.255.255.255";
         long longNumber3 = IpUtils.ipToLong(ip3);
         System.out.println(longNumber3);
-        Assert.assertEquals(longNumber3, 4294967295L);
+        Assert.assertEquals(4294967295L, longNumber3);
 
     }
 
