@@ -340,12 +340,12 @@ public class ResourcesController extends BaseController{
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType ="String")
     })
-    @GetMapping(value = "/queryResourceJar")
+    @GetMapping(value = "/queryResource")
     @ResponseStatus(HttpStatus.OK)
     public Result queryResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam(value ="fullName",required = false) String fullName,
-                                @RequestParam(value ="pid",required = false) Integer pid,
-                                @RequestParam(value ="type") ResourceType type
+                                     @RequestParam(value ="fullName",required = false) String fullName,
+                                     @RequestParam(value ="pid",required = false) Integer pid,
+                                     @RequestParam(value ="type") ResourceType type
     ) {
         try {
             logger.info("login user {}, query resource by full name: {} or pid: {},resource type: {}",
