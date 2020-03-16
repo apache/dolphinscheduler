@@ -302,6 +302,32 @@ public class ResourcesController extends BaseController{
     }
 
     /**
+     * query resources jar list
+     *
+     * @param loginUser login user
+     * @param type resource type
+     * @return resource list
+     */
+    @ApiOperation(value = "queryResourceJarList", notes= "QUERY_RESOURCE_LIST_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType")
+    })
+    @GetMapping(value="/list/jar")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryResourceJarList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                    @RequestParam(value ="type") ResourceType type
+    ){
+        try{
+            logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type.toString());
+            Map<String, Object> result = resourceService.queryResourceList(loginUser, type);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(QUERY_RESOURCES_LIST_ERROR.getMsg(),e);
+            return error(Status.QUERY_RESOURCES_LIST_ERROR.getCode(), Status.QUERY_RESOURCES_LIST_ERROR.getMsg());
+        }
+    }
+
+    /**
      * query resource by full name and type
      *
      * @param loginUser login user
@@ -314,12 +340,12 @@ public class ResourcesController extends BaseController{
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
             @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType ="String")
     })
-    @GetMapping(value = "/queryResource")
+    @GetMapping(value = "/queryResourceJar")
     @ResponseStatus(HttpStatus.OK)
     public Result queryResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                     @RequestParam(value ="fullName",required = false) String fullName,
-                                     @RequestParam(value ="pid",required = false) Integer pid,
-                                     @RequestParam(value ="type") ResourceType type
+                                @RequestParam(value ="fullName",required = false) String fullName,
+                                @RequestParam(value ="pid",required = false) Integer pid,
+                                @RequestParam(value ="type") ResourceType type
     ) {
         try {
             logger.info("login user {}, query resource by full name: {} or pid: {},resource type: {}",
