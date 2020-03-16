@@ -17,7 +17,9 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import org.apache.commons.configuration.ConfigurationException;
@@ -25,12 +27,14 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 
@@ -119,12 +123,22 @@ public class SpringConnectionFactory {
     public SqlSessionFactory sqlSessionFactory() throws Exception {
         MybatisConfiguration configuration = new MybatisConfiguration();
         configuration.addMappers("org.apache.dolphinscheduler.dao.mapper");
+        configuration.setMapUnderscoreToCamelCase(true);
+        configuration.setCacheEnabled(false);
+        configuration.setCallSettersOnNulls(true);
+        configuration.setJdbcTypeForNull(JdbcType.NULL);
         configuration.addInterceptor(paginationInterceptor());
-
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
         sqlSessionFactoryBean.setConfiguration(configuration);
         sqlSessionFactoryBean.setDataSource(dataSource());
 
+        GlobalConfig.DbConfig dbConfig = new GlobalConfig.DbConfig();
+        dbConfig.setIdType(IdType.AUTO);
+        GlobalConfig globalConfig = new GlobalConfig();
+        globalConfig.setDbConfig(dbConfig);
+        sqlSessionFactoryBean.setGlobalConfig(globalConfig);
+        sqlSessionFactoryBean.setTypeAliasesPackage("rg.apache.dolphinscheduler.dao.entity");
+        sqlSessionFactoryBean.setMapperLocations(new ClassPathResource("org.apache.dolphinscheduler.dao.mapper/*.xml"));
         sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
         return sqlSessionFactoryBean.getObject();
     }
