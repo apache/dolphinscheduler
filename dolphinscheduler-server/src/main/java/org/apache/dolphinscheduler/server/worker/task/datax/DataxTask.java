@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.worker.task.datax;
 
 
 import java.io.File;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -209,7 +209,7 @@ public class DataxTask extends AbstractTask {
         logger.debug("datax job json : {}", root.toString());
 
         // create datax json file
-        FileUtils.writeStringToFile(new File(fileName), root.toString(), Charset.forName("UTF-8"));
+        FileUtils.writeStringToFile(new File(fileName), root.toString(), StandardCharsets.UTF_8);
         return fileName;
     }
 
