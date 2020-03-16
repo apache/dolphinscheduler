@@ -64,8 +64,8 @@ public class HadoopUtils implements Closeable {
                 }
             });
 
-    private static Configuration configuration;
-    private static FileSystem fs;
+    private Configuration configuration;
+    private FileSystem fs;
 
     private static String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
 
@@ -99,7 +99,7 @@ public class HadoopUtils implements Closeable {
     /**
      * init hadoop configuration
      */
-    private static void init() {
+    private void init() {
         try {
             configuration = new Configuration();
 
