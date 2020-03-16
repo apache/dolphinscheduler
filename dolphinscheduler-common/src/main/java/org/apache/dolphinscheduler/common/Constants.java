@@ -994,4 +994,11 @@ public final class Constants {
      * dataSource sensitive param
      */
     public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
+
+
+    /**
+     * new
+     * schedule time
+     */
+    public static final String PARAMETER_SHECDULE_TIME = "schedule.time";
 }
