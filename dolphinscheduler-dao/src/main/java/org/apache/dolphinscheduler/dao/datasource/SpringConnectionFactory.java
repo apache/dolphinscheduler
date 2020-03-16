@@ -34,7 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 
@@ -137,8 +138,9 @@ public class SpringConnectionFactory {
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setDbConfig(dbConfig);
         sqlSessionFactoryBean.setGlobalConfig(globalConfig);
-        sqlSessionFactoryBean.setTypeAliasesPackage("rg.apache.dolphinscheduler.dao.entity");
-        sqlSessionFactoryBean.setMapperLocations(new ClassPathResource("org.apache.dolphinscheduler.dao.mapper/*.xml"));
+        sqlSessionFactoryBean.setTypeAliasesPackage("org.apache.dolphinscheduler.dao.entity");
+        ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        sqlSessionFactoryBean.setMapperLocations(resolver.getResources("org/apache/dolphinscheduler/dao/mapper/*Mapper.xml"));
         sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
         return sqlSessionFactoryBean.getObject();
     }
