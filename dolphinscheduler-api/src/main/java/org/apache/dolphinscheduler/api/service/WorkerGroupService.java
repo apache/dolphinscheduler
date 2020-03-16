@@ -33,10 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * work group service
@@ -184,10 +181,21 @@ public class WorkerGroupService extends BaseService {
      * @return all worker group list
      */
     public Map<String,Object> queryAllGroup() {
-        Map<String, Object> result = new HashMap<>(5);
-        String WORKER_PATH = zookeeperCachedOperator.getZookeeperConfig().getDsRoot()+"/nodes" +"/worker";
-        List<String> workerGroupList = zookeeperCachedOperator.getChildrenKeys(WORKER_PATH);
-        result.put(Constants.DATA_LIST, workerGroupList);
+        Map<String, Object> result = new HashMap<>();
+        String workerPath = zookeeperCachedOperator.getZookeeperConfig().getDsRoot()+"/nodes" +"/worker";
+        List<String> workerGroupList = zookeeperCachedOperator.getChildrenKeys(workerPath);
+
+        // available workerGroup list
+        List<String> availableWorkerGroupList = new ArrayList<>();
+
+        for (String workerGroup : workerGroupList){
+            List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroup);
+            if (CollectionUtils.isNotEmpty(childrenNodes)){
+                availableWorkerGroupList.add(workerGroup);
+            }
+        }
+
+        result.put(Constants.DATA_LIST, availableWorkerGroupList);
         putMsg(result, Status.SUCCESS);
         return result;
     }

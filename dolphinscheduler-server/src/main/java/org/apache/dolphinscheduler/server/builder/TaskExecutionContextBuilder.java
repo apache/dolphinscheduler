@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.server.entity.ProcedureTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 
-import java.util.List;
-
 /**
  *  TaskExecutionContext builder
  */
