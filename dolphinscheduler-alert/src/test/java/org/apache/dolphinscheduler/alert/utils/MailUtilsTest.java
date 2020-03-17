@@ -33,7 +33,6 @@ import java.util.*;
 
 /**
  */
-@Ignore
 public class MailUtilsTest {
     private static final Logger logger = LoggerFactory.getLogger(MailUtilsTest.class);
     @Test
