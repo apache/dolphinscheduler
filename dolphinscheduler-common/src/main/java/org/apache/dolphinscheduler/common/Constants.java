@@ -119,19 +119,14 @@ public final class Constants {
     public static final String RES_UPLOAD_STARTUP_TYPE = "res.upload.startup.type";
 
     /**
-     * zookeeper quorum
-     */
-    public static final String ZOOKEEPER_QUORUM = "zookeeper.quorum";
-
-    /**
      * MasterServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/masters";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/nodes/masters";
 
     /**
      * WorkerServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "/workers";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
 
     /**
      * all servers directory registered in zookeeper
@@ -143,10 +138,6 @@ public final class Constants {
      */
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
 
-    /**
-     * WorkerServer lock directory registered in zookeeper
-     */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_WORKERS = "/lock/workers";
 
     /**
      * MasterServer failover directory registered in zookeeper
@@ -163,10 +154,6 @@ public final class Constants {
      */
     public static final String ZOOKEEPER_DOLPHINSCHEDULER_LOCK_FAILOVER_STARTUP_MASTERS = "/lock/failover/startup-masters";
 
-    /**
-     * need send warn times when master server or worker server failover
-     */
-    public static final int DOLPHINSCHEDULER_WARN_TIMES_FAILOVER = 3;
 
     /**
      * comma ,
@@ -203,37 +190,6 @@ public final class Constants {
      */
     public static final String EQUAL_SIGN = "=";
 
-    /**
-     * ZOOKEEPER_SESSION_TIMEOUT
-     */
-    public static final String ZOOKEEPER_SESSION_TIMEOUT = "zookeeper.session.timeout";
-
-    public static final String ZOOKEEPER_CONNECTION_TIMEOUT = "zookeeper.connection.timeout";
-
-    public static final String ZOOKEEPER_RETRY_SLEEP = "zookeeper.retry.sleep";
-    public static final String ZOOKEEPER_RETRY_BASE_SLEEP = "zookeeper.retry.base.sleep";
-    public static final String ZOOKEEPER_RETRY_MAX_SLEEP = "zookeeper.retry.max.sleep";
-
-    public static final String ZOOKEEPER_RETRY_MAXTIME = "zookeeper.retry.maxtime";
-
-
-    public static final String MASTER_HEARTBEAT_INTERVAL = "master.heartbeat.interval";
-
-    public static final String MASTER_EXEC_THREADS = "master.exec.threads";
-
-    public static final String MASTER_EXEC_TASK_THREADS = "master.exec.task.number";
-
-
-    public static final String MASTER_COMMIT_RETRY_TIMES = "master.task.commit.retryTimes";
-
-    public static final String MASTER_COMMIT_RETRY_INTERVAL = "master.task.commit.interval";
-
-
-    public static final String WORKER_EXEC_THREADS = "worker.exec.threads";
-
-    public static final String WORKER_HEARTBEAT_INTERVAL = "worker.heartbeat.interval";
-
-    public static final String WORKER_FETCH_TASK_NUM = "worker.fetch.task.num";
 
     public static final String WORKER_MAX_CPULOAD_AVG = "worker.max.cpuload.avg";
 
@@ -244,17 +200,6 @@ public final class Constants {
     public static final String MASTER_RESERVED_MEMORY = "master.reserved.memory";
 
 
-    /**
-     * dolphinscheduler tasks queue
-     */
-    public static final String DOLPHINSCHEDULER_TASKS_QUEUE = "tasks_queue";
-
-    /**
-     * dolphinscheduler need kill tasks queue
-     */
-    public static final String DOLPHINSCHEDULER_TASKS_KILL = "tasks_kill";
-
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_ROOT = "zookeeper.dolphinscheduler.root";
 
     public static final String SCHEDULER_QUEUE_IMPL = "dolphinscheduler.queue.impl";
 
@@ -351,26 +296,6 @@ public final class Constants {
 
 
     /**
-     * heartbeat threads number
-     */
-    public static final int DEFAUL_WORKER_HEARTBEAT_THREAD_NUM = 1;
-
-    /**
-     * heartbeat interval
-     */
-    public static final int DEFAULT_WORKER_HEARTBEAT_INTERVAL = 60;
-
-    /**
-     * worker fetch task number
-     */
-    public static final int DEFAULT_WORKER_FETCH_TASK_NUM = 1;
-
-    /**
-     * worker execute threads number
-     */
-    public static final int DEFAULT_WORKER_EXEC_THREAD_NUM = 10;
-
-    /**
      * master cpu load
      */
     public static final int DEFAULT_MASTER_CPU_LOAD = Runtime.getRuntime().availableProcessors() * 2;
@@ -391,16 +316,6 @@ public final class Constants {
     public static final double DEFAULT_WORKER_RESERVED_MEMORY = OSUtils.totalMemorySize() / 10;
 
 
-    /**
-     * master execute threads number
-     */
-    public static final int DEFAULT_MASTER_EXEC_THREAD_NUM = 100;
-
-
-    /**
-     * default master concurrent task execute num
-     */
-    public static final int DEFAULT_MASTER_TASK_EXEC_NUM = 20;
 
     /**
      * default log cache rows num,output when reach the number
@@ -408,32 +323,10 @@ public final class Constants {
     public static final int DEFAULT_LOG_ROWS_NUM = 4 * 16;
 
     /**
-     * log flush interval，output when reach the interval
+     * log flush interval?output when reach the interval
      */
     public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
 
-
-    /**
-     * default master heartbeat thread number
-     */
-    public static final int DEFAULT_MASTER_HEARTBEAT_THREAD_NUM = 1;
-
-
-    /**
-     * default master heartbeat interval
-     */
-    public static final int DEFAULT_MASTER_HEARTBEAT_INTERVAL = 60;
-
-    /**
-     * default master commit retry times
-     */
-    public static final int DEFAULT_MASTER_COMMIT_RETRY_TIMES = 5;
-
-
-    /**
-     * default master commit retry interval
-     */
-    public static final int DEFAULT_MASTER_COMMIT_RETRY_INTERVAL = 3000;
 
     /**
      * time unit secong to minutes
@@ -805,7 +698,6 @@ public final class Constants {
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
-    public static final String DEPENDENT_ALL = "ALL";
 
 
     /**
@@ -864,7 +756,7 @@ public final class Constants {
      */
     public static final String HIVE_CONF = "hiveconf:";
 
-    //flink 任务
+    //flink ??
     public static final String FLINK_YARN_CLUSTER = "yarn-cluster";
     public static final String FLINK_RUN_MODE = "-m";
     public static final String FLINK_YARN_SLOT = "-ys";
@@ -899,26 +791,20 @@ public final class Constants {
 
     /**
      * data total
-     * 数据总数
      */
     public  static final String COUNT = "count";
 
     /**
      * page size
-     * 每页数据条数
      */
     public  static final String PAGE_SIZE = "pageSize";
 
     /**
      * current page no
-     * 当前页码
      */
     public  static final String PAGE_NUMBER = "pageNo";
 
-    /**
-     * result
-     */
-    public static final String RESULT = "result";
+
 
     /**
      *

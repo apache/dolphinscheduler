@@ -39,7 +39,7 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
      */
     @Override
     protected void registerListener() {
-        treeCache = new TreeCache(zkClient, getZookeeperConfig().getDsRoot());
+        treeCache = new TreeCache(zkClient, getZookeeperConfig().getDsRoot() + "/nodes");
         logger.info("add listener to zk path: {}", getZookeeperConfig().getDsRoot());
         try {
             treeCache.start();

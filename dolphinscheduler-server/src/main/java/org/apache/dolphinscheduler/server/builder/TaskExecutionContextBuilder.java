@@ -49,6 +49,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setExecutePath(taskInstance.getExecutePath());
         taskExecutionContext.setTaskJson(taskInstance.getTaskJson());
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
+        taskExecutionContext.setHost(taskInstance.getHost());
         return this;
     }
 

@@ -38,56 +38,24 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractZKClient.class);
 
-	/**
-	 *	check dead server or not , if dead, stop self
-	 *
-	 * @param zNode   	 node path
-	 * @param serverType master or worker prefix
-	 * @return  true if not exists
-	 * @throws Exception errors
-	 */
-	protected boolean checkIsDeadServer(String zNode, String serverType) throws Exception{
-		//ip_sequenceno
-		String[] zNodesPath = zNode.split("\\/");
-		String ipSeqNo = zNodesPath[zNodesPath.length - 1];
-
-		String type = serverType.equals(MASTER_PREFIX) ? MASTER_PREFIX : WORKER_PREFIX;
-		String deadServerPath = getDeadZNodeParentPath() + SINGLE_SLASH + type + UNDERLINE + ipSeqNo;
-
-		if(!isExisted(zNode) || isExisted(deadServerPath)){
-			return true;
-		}
-		return false;
-	}
-
-
-	public void removeDeadServerByHost(String host, String serverType) throws Exception {
-        List<String> deadServers = super.getChildrenKeys(getDeadZNodeParentPath());
-        for(String serverPath : deadServers){
-            if(serverPath.startsWith(serverType+UNDERLINE+host)){
-            	String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
-              	super.remove(server);
-				logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
-            }
-        }
-	}
 
 	/**
-	 * create zookeeper path according the zk node type.
-	 * @param zkNodeType zookeeper node type
-	 * @return  register zookeeper path
+	 *  remove dead server by host
+	 * @param host host
+	 * @param serverType serverType
 	 * @throws Exception
 	 */
-	private String createZNodePath(ZKNodeType zkNodeType, String host) throws Exception {
-		// specify the format of stored data in ZK nodes
-		String heartbeatZKInfo = ResInfo.getHeartBeatInfo(new Date());
-		// create temporary sequence nodes for master znode
-		String registerPath= getZNodeParentPath(zkNodeType) + SINGLE_SLASH + host;
-
-    	super.persistEphemeral(registerPath, heartbeatZKInfo);
-		logger.info("register {} node {} success" , zkNodeType.toString(), registerPath);
-		return registerPath;
+	public void removeDeadServerByHost(String host, String serverType) throws Exception {
+		List<String> deadServers = super.getChildrenKeys(getDeadZNodeParentPath());
+		for(String serverPath : deadServers){
+			if(serverPath.startsWith(serverType+UNDERLINE+host)){
+				String server = getDeadZNodeParentPath() + SINGLE_SLASH + serverPath;
+				super.remove(server);
+				logger.info("{} server {} deleted from zk dead server path success" , serverType , host);
+			}
+		}
 	}
+
 
 	/**
 	 * opType(add): if find dead server , then add to zk deadServerPath
@@ -326,7 +294,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 	 */
 	protected String getHostByEventDataPath(String path) {
 		if(StringUtils.isEmpty(path)){
-		    logger.error("empty path!");
+			logger.error("empty path!");
 			return "";
 		}
 		String[] pathArray = path.split(SINGLE_SLASH);

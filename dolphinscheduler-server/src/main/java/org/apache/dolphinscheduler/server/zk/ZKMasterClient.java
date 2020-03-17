@@ -59,7 +59,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	@Autowired
 	private ProcessService processService;
 
-    public void start() {
+	public void start() {
 
 		InterProcessMutex mutex = null;
 		try {
@@ -71,7 +71,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			// init system znode
 			this.initSystemZNode();
 
-			// check if fault tolerance is required，failure and tolerance
+			// check if fault tolerance is required?failure and tolerance
 			if (getActiveMasterNum() == 1) {
 				failoverWorker(null, true);
 				failoverMaster(null);
@@ -146,8 +146,8 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @throws Exception	exception
 	 */
 	private void failoverServerWhenDown(String serverHost, ZKNodeType zkNodeType) throws Exception {
-	    if(StringUtils.isEmpty(serverHost)){
-	    	return ;
+		if(StringUtils.isEmpty(serverHost)){
+			return ;
 		}
 		switch (zkNodeType){
 			case MASTER:
@@ -217,7 +217,7 @@ public class ZKMasterClient extends AbstractZKClient {
 
 	/**
 	 * task needs failover if task start before worker starts
-     *
+	 *
 	 * @param taskInstance task instance
 	 * @return true if task instance need fail over
 	 */
@@ -231,10 +231,10 @@ public class ZKMasterClient extends AbstractZKClient {
 		}
 
 		// if the worker node exists in zookeeper, we must check the task starts after the worker
-	    if(checkZKNodeExists(taskInstance.getHost(), ZKNodeType.WORKER)){
-	        //if task start after worker starts, there is no need to failover the task.
-         	if(checkTaskAfterWorkerStart(taskInstance)){
-         	    taskNeedFailover = false;
+		if(checkZKNodeExists(taskInstance.getHost(), ZKNodeType.WORKER)){
+			//if task start after worker starts, there is no need to failover the task.
+			if(checkTaskAfterWorkerStart(taskInstance)){
+				taskNeedFailover = false;
 			}
 		}
 		return taskNeedFailover;
@@ -247,15 +247,15 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @return true if task instance start time after worker server start date
 	 */
 	private boolean checkTaskAfterWorkerStart(TaskInstance taskInstance) {
-	    if(StringUtils.isEmpty(taskInstance.getHost())){
-	    	return false;
+		if(StringUtils.isEmpty(taskInstance.getHost())){
+			return false;
 		}
-	    Date workerServerStartDate = null;
-	    List<Server> workerServers = getServersList(ZKNodeType.WORKER);
-	    for(Server workerServer : workerServers){
-	    	if(workerServer.getHost().equals(taskInstance.getHost())){
-	    	    workerServerStartDate = workerServer.getCreateTime();
-	    	    break;
+		Date workerServerStartDate = null;
+		List<Server> workerServers = getServersList(ZKNodeType.WORKER);
+		for(Server workerServer : workerServers){
+			if(workerServer.getHost().equals(taskInstance.getHost())){
+				workerServerStartDate = workerServer.getCreateTime();
+				break;
 			}
 		}
 
@@ -271,7 +271,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	 *
 	 * 1. kill yarn job if there are yarn jobs in tasks.
 	 * 2. change task state from running to need failover.
-     * 3. failover all tasks when workerHost is null
+	 * 3. failover all tasks when workerHost is null
 	 * @param workerHost worker host
 	 */
 
@@ -293,7 +293,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			if(needCheckWorkerAlive){
 				if(!checkTaskInstanceNeedFailover(taskInstance)){
 					continue;
-                }
+				}
 			}
 
 			ProcessInstance processInstance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());
@@ -304,7 +304,6 @@ public class ZKMasterClient extends AbstractZKClient {
 			TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
 					.buildTaskInstanceRelatedInfo(taskInstance)
 					.buildProcessInstanceRelatedInfo(processInstance)
-					.buildProcessDefinitionRelatedInfo(null)
 					.create();
 			// only kill yarn job if exists , the local thread has exited
 			ProcessUtils.killYarnJob(taskExecutionContext);
@@ -334,9 +333,9 @@ public class ZKMasterClient extends AbstractZKClient {
 	}
 
 	public InterProcessMutex blockAcquireMutex() throws Exception {
-        InterProcessMutex mutex = new InterProcessMutex(getZkClient(), getMasterLockPath());
-        mutex.acquire();
-        return mutex;
+		InterProcessMutex mutex = new InterProcessMutex(getZkClient(), getMasterLockPath());
+		mutex.acquire();
+		return mutex;
 	}
 
 }
