@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -16,25 +17,28 @@
  */
 package org.apache.dolphinscheduler.server.worker.config;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
+@PropertySource(value = "worker.properties")
 public class WorkerConfig {
 
-    @Value("${worker.exec.threads: 100}")
+    @Value("${worker.exec.threads:100}")
     private int workerExecThreads;
 
-    @Value("${worker.heartbeat.interval: 10}")
+    @Value("${worker.heartbeat.interval:10}")
     private int workerHeartbeatInterval;
 
-    @Value("${worker.fetch.task.num: 3}")
+    @Value("${worker.fetch.task.num:3}")
     private int workerFetchTaskNum;
 
-    @Value("${worker.max.cpuload.avg:100}")
+    @Value("${worker.max.cpuload.avg:-1}")
     private int workerMaxCpuloadAvg;
 
-    @Value("${worker.reserved.memory:0.1}")
+    @Value("${worker.reserved.memory:0.5}")
     private double workerReservedMemory;
 
     @Value("${worker.group: default}")
@@ -92,6 +96,9 @@ public class WorkerConfig {
     }
 
     public int getWorkerMaxCpuloadAvg() {
+        if (workerMaxCpuloadAvg == -1){
+            return Constants.DEFAULT_WORKER_CPU_LOAD;
+        }
         return workerMaxCpuloadAvg;
     }
 
