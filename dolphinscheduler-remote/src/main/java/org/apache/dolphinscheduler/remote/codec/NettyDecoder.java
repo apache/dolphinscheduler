@@ -68,13 +68,13 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
             case BODY:
                 byte[] body = new byte[commandHeader.getBodyLength()];
                 in.readBytes(body);
-                //
+                
                 Command packet = new Command();
                 packet.setType(commandType(commandHeader.getType()));
                 packet.setOpaque(commandHeader.getOpaque());
                 packet.setBody(body);
                 out.add(packet);
-                //
+
                 checkpoint(State.MAGIC);
         }
     }
