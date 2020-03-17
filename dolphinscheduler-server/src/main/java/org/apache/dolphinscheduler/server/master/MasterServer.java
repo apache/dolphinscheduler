@@ -243,7 +243,7 @@ public class MasterServer implements IStoppable {
      */
     private Runnable heartBeatThread(){
         logger.info("start master heart beat thread...");
-        Runnable heartBeatThread  = new Runnable() {
+        return new Runnable() {
             @Override
             public void run() {
                 if(Stopper.isRunning()) {
@@ -257,7 +257,6 @@ public class MasterServer implements IStoppable {
                 }
             }
         };
-        return heartBeatThread;
     }
 }
 
