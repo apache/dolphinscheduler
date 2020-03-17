@@ -136,7 +136,7 @@ public class MailUtilsTest {
      * Table
      */
     @Test
-    public void addAlertTable(){
+    public void testAddAlertTable(){
         AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
