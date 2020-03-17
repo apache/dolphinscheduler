@@ -111,7 +111,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
      * @return sqlSessionFactory
      * @throws Exception sqlSessionFactory exception
      */
-    public SqlSessionFactory getSqlSessionFactory() throws Exception {
+    private SqlSessionFactory getSqlSessionFactory() throws Exception {
         DataSource dataSource = getDataSource();
         TransactionFactory transactionFactory = new JdbcTransactionFactory();
 
