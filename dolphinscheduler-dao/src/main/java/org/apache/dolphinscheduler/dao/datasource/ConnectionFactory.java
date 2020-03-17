@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.amazonaws.services.simpleworkflow.model.Run;
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
@@ -34,29 +35,47 @@ import javax.sql.DataSource;
 
 
 /**
- *  not spring manager connection, only use for init db, and alert module for non-spring application
+ * not spring manager connection, only use for init db, and alert module for non-spring application
  * data source connection factory
  */
-public class ConnectionFactory extends SpringConnectionFactory{
+public class ConnectionFactory extends SpringConnectionFactory {
 
     private static final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
 
+    private static class ConnectionFactoryHolder {
+        public static ConnectionFactory connectionFactory = new ConnectionFactory();
+    }
+
+    public static ConnectionFactory getInstance() {
+        return ConnectionFactoryHolder.connectionFactory;
+    }
+
+    private ConnectionFactory() {
+        try {
+            sqlSessionFactory = getSqlSessionFactory();
+            sqlSessionTemplate = getSqlSessionTemplate();
+        } catch (Exception e) {
+            logger.error("Initializing ConnectionFactory error", e);
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * sql session factory
      */
-    private static SqlSessionFactory sqlSessionFactory;
+    private SqlSessionFactory sqlSessionFactory;
 
     /**
      * sql session template
      */
-    private static SqlSessionTemplate sqlSessionTemplate;
+    private SqlSessionTemplate sqlSessionTemplate;
 
     /**
      * get the data source
+     *
      * @return druid dataSource
      */
-    public static DruidDataSource getDataSource() {
+    public DruidDataSource getDataSource() {
 
         DruidDataSource druidDataSource = new DruidDataSource();
 
@@ -89,65 +108,54 @@ public class ConnectionFactory extends SpringConnectionFactory{
 
     /**
      * * get sql session factory
+     *
      * @return sqlSessionFactory
      * @throws Exception sqlSessionFactory exception
      */
-    public static SqlSessionFactory getSqlSessionFactory() throws Exception {
-        if (sqlSessionFactory == null) {
-            synchronized (ConnectionFactory.class) {
-                if (sqlSessionFactory == null) {
-                    DataSource dataSource = getDataSource();
-                    TransactionFactory transactionFactory = new JdbcTransactionFactory();
+    public SqlSessionFactory getSqlSessionFactory() throws Exception {
+        DataSource dataSource = getDataSource();
+        TransactionFactory transactionFactory = new JdbcTransactionFactory();
 
-                    Environment environment = new Environment("development", transactionFactory, dataSource);
+        Environment environment = new Environment("development", transactionFactory, dataSource);
 
-                    MybatisConfiguration configuration = new MybatisConfiguration();
-                    configuration.setEnvironment(environment);
-                    configuration.setLazyLoadingEnabled(true);
-                    configuration.addMappers("org.apache.dolphinscheduler.dao.mapper");
-                    configuration.addInterceptor(new PaginationInterceptor());
+        MybatisConfiguration configuration = new MybatisConfiguration();
+        configuration.setEnvironment(environment);
+        configuration.setLazyLoadingEnabled(true);
+        configuration.addMappers("org.apache.dolphinscheduler.dao.mapper");
+        configuration.addInterceptor(new PaginationInterceptor());
 
-                    MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
-                    sqlSessionFactoryBean.setConfiguration(configuration);
-                    sqlSessionFactoryBean.setDataSource(dataSource);
+        MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
+        sqlSessionFactoryBean.setConfiguration(configuration);
+        sqlSessionFactoryBean.setDataSource(dataSource);
 
-                    sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
-                    sqlSessionFactory = sqlSessionFactoryBean.getObject();
-                }
-            }
-        }
+        sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
+        sqlSessionFactory = sqlSessionFactoryBean.getObject();
 
         return sqlSessionFactory;
+}
+
+    private SqlSessionTemplate getSqlSessionTemplate() {
+        sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory);
+        return sqlSessionTemplate;
     }
 
     /**
      * get sql session
+     *
      * @return sqlSession
      */
-    public static SqlSession getSqlSession() {
-        if (sqlSessionTemplate == null) {
-            synchronized (ConnectionFactory.class) {
-                if (sqlSessionTemplate == null) {
-                    try {
-                        sqlSessionTemplate = new SqlSessionTemplate(getSqlSessionFactory());
-                        return sqlSessionTemplate;
-                    } catch (Exception e) {
-                        logger.error("getSqlSession error", e);
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        }
+    public SqlSession getSqlSession() {
         return sqlSessionTemplate;
     }
 
     /**
      * get mapper
+     *
      * @param type target class
-     * @param <T> generic
+     * @param <T>  generic
      * @return target object
      */
-    public static <T> T getMapper(Class<T> type) {
+    public <T> T getMapper(Class<T> type) {
         try {
             return getSqlSession().getMapper(type);
         } catch (Exception e) {
