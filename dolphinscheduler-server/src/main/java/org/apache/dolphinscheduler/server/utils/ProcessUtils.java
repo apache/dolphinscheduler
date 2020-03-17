@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public class ProcessUtils {
       allowAmbiguousCommands = true;
       String value = System.getProperty("jdk.lang.Process.allowAmbiguousCommands");
       if (value != null) {
-          allowAmbiguousCommands = !"false".equalsIgnoreCase(value);
+        allowAmbiguousCommands = !"false".equalsIgnoreCase(value);
       }
     }
     if (allowAmbiguousCommands) {
@@ -68,7 +69,7 @@ public class ProcessUtils {
       String executablePath = new File(cmd[0]).getPath();
 
       if (needsEscaping(VERIFICATION_LEGACY, executablePath)) {
-          executablePath = quoteString(executablePath);
+        executablePath = quoteString(executablePath);
       }
 
       cmdstr = createCommandLine(
@@ -81,7 +82,7 @@ public class ProcessUtils {
 
         StringBuilder join = new StringBuilder();
         for (String s : cmd) {
-            join.append(s).append(' ');
+          join.append(s).append(' ');
         }
 
         cmd = getTokensFromCommand(join.toString());
@@ -89,7 +90,7 @@ public class ProcessUtils {
 
         // Check new executable name once more
         if (security != null) {
-            security.checkExec(executablePath);
+          security.checkExec(executablePath);
         }
       }
 
@@ -147,7 +148,7 @@ public class ProcessUtils {
     ArrayList<String> matchList = new ArrayList<>(8);
     Matcher regexMatcher = LazyPattern.PATTERN.matcher(command);
     while (regexMatcher.find()) {
-        matchList.add(regexMatcher.group());
+      matchList.add(regexMatcher.group());
     }
     return matchList.toArray(new String[matchList.size()]);
   }
@@ -323,9 +324,9 @@ public class ProcessUtils {
     try {
       int processId = taskExecutionContext.getProcessId();
       if(processId == 0 ){
-          logger.error("process kill failed, process id :{}, task id:{}",
-                  processId, taskExecutionContext.getTaskInstanceId());
-          return ;
+        logger.error("process kill failed, process id :{}, task id:{}",
+                processId, taskExecutionContext.getTaskInstanceId());
+        return ;
       }
 
       String cmd = String.format("sudo kill -9 %s", getPidsStr(processId));
@@ -379,7 +380,9 @@ public class ProcessUtils {
       String log = null;
       try {
         logClient = new LogClientService();
-        log = logClient.viewLog(taskExecutionContext.getHost(), Constants.RPC_PORT, taskExecutionContext.getLogPath());
+        log = logClient.viewLog(Host.of(taskExecutionContext.getHost()).getIp(),
+                Constants.RPC_PORT,
+                taskExecutionContext.getLogPath());
       } finally {
         if(logClient != null){
           logClient.close();
