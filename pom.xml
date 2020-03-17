@@ -740,7 +740,7 @@
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
-                        <include>**/alert/MailUtilsTest.java</include>
+                        <include>**/alert/utils/MailUtilsTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
