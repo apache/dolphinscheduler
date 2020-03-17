@@ -43,13 +43,11 @@ public class PropertyUtils {
 
     private static final Properties properties = new Properties();
 
-    private static final PropertyUtils propertyUtils = new PropertyUtils();
-
-    private PropertyUtils(){
-        init();
+    private PropertyUtils() {
+        throw new IllegalStateException("PropertyUtils class");
     }
 
-    private void init(){
+    static {
         String[] propertyFiles = new String[]{COMMON_PROPERTIES_PATH};
         for (String fileName : propertyFiles) {
             InputStream fis = null;
