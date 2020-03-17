@@ -89,8 +89,8 @@ public class BaseDriver {
         chromeOptions.setPageLoadStrategy(PageLoadStrategy.NONE);
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable-dev-shm-usage");
-//        chromeOptions.addArguments("--headless");
-        chromeOptions.addArguments("Cookie:language=en-US");
+        //Browser client running requires annotation --headless
+        chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("--disable-gpu");
         chromeOptions.addArguments("--whitelisted-ips");
         chromeOptions.addArguments("--disable-infobars");
@@ -110,8 +110,6 @@ public class BaseDriver {
 
         // script timeout
         driver.manage().timeouts().setScriptTimeout(setScriptTimeout, TimeUnit.SECONDS);
-
-
 
         // window maximize
         driver.manage().window().maximize();
@@ -146,10 +144,10 @@ public class BaseDriver {
     public void closeBrowser() throws InterruptedException {
         // JS Show a pop-up box to indicate the end of the test
         Thread.sleep(TestConstant.ONE_THOUSANG);
-        ((JavascriptExecutor) driver).executeScript("alert('Test completed, browser closes after 3s')");
+//        ((JavascriptExecutor) driver).executeScript("alert('Test completed, browser closes after 3s')");
         Thread.sleep(TestConstant.THREE_THOUSANG);
         if (driver != null) {
-            driver.quit();
+//            driver.quit();
         }
     }
 }

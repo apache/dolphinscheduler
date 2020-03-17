@@ -33,6 +33,7 @@ public class UserManagePage extends PageCommon {
      * @return Whether to enter the specified page after creat tenant
      */
     public boolean createUser() throws InterruptedException {
+        System.out.println("start create user");
         Thread.sleep(TestConstant.ONE_THOUSANG);
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);

@@ -12,7 +12,8 @@ public class LoginTest {
     @Test(description = "LoginTest",priority=1)
     public void testLogin() throws InterruptedException {
         loginPage = new LoginPage(driver);
-        loginPage.jumpPage();
+//        loginPage.jumpPageEnlish();
+        loginPage.jumpPageChinese();
         loginPage.login();
     }
 }

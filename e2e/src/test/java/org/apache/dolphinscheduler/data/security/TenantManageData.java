@@ -31,7 +31,7 @@ public class TenantManageData {
     /**
      * Tenant Code
      */
-    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code2";
+    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code10";
 
     /**
      * Tenant Name
@@ -48,7 +48,7 @@ public class TenantManageData {
      */
     public static final String DESCRIPTION = "creat tenant test";
 
-    public static final String TENANAT_MANAGE = "Tenant Manage - DolphinScheduler";
+    public static final String TENANAT_MANAGE = "租户管理 - DolphinScheduler";
 
 
 

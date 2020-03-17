@@ -13,8 +13,7 @@
             <class name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"></class>
             <class name="org.apache.dolphinscheduler.testcase.security.UserManageTest"></class>
             <class name="org.apache.dolphinscheduler.testcase.project.CreateProjectTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.project.CreateWorkflowTest"></class>
-
+            <!--<class name="org.apache.dolphinscheduler.testcase.project.CreateWorkflowTest"></class>-->
         </classes>
     </test>
 

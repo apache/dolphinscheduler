@@ -31,18 +31,22 @@ public class CreateWorkflowPage extends PageCommon {
      * jump create workflow page
      */
     public boolean createWorkflow() throws InterruptedException {
+        System.out.println("Click on the project name to jump to the project homepage");
         // click project name
         clickElement(CreateWorkflowLocator.CLICK_PROJECT_NAME);
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
+        System.out.println("Click on workflow define");
         // click workflow define
         clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
+        System.out.println("Click create workflow button");
         // click create workflow button
         clickElement(CreateWorkflowLocator.CLICK_CREATE_WORKFLOW_BUTTON);
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
+        System.out.println("drag shell task");
         //drag shell_task
         dragAndDrop(CreateWorkflowLocator.MOUSE_DOWN_AT_SHELL,CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG);
 
@@ -124,7 +128,8 @@ public class CreateWorkflowPage extends PageCommon {
         //click submit button
         clickElement(CreateWorkflowLocator.CLICK_SUBMIT_BUTTON);
         Thread.sleep(TestConstant.ONE_THOUSANG);
-
+        System.out.println("Task node set up successfully");
+        System.out.println("move to Dag Element ");
         moveToDragElement(CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG,-300,-100);
 
         return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);
@@ -134,6 +139,8 @@ public class CreateWorkflowPage extends PageCommon {
      * save  workflow
      */
     public boolean saveWorkflow() throws InterruptedException {
+        System.out.println("start to save workflow ");
+
         //click save workflow button
         clickElement(CreateWorkflowLocator.CLICK_SAVE_WORKFLOW_BUTTON);
 
@@ -178,7 +185,7 @@ public class CreateWorkflowPage extends PageCommon {
 
         //click add button
         clickElement(CreateWorkflowLocator.CLICK_ADD_BUTTON);
-
+        System.out.println("submit workflow");
         return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);
     }
 }

@@ -16,9 +16,12 @@
  */
 package org.apache.dolphinscheduler.data.project;
 
-public class CreatWorkflowData {
+public class CreateWorkflowData {
+    /**
+     * create workflow data
+     */
     //input shell task name
-    public static final String SHELL_TASK_NAME = "shell task description test";
+    public static final String SHELL_TASK_NAME = "shell_task_selenium_4";
 
     //input shell task description
     public static final String SHELL_TASK_DESCRIPTION = "shell task description test";
@@ -43,4 +46,28 @@ public class CreatWorkflowData {
 
     //create workflow title
     public static final String WORKFLOW_TITLE = "创建流程定义 - DolphinScheduler";
+
+    /**
+     * save workflow data
+     */
+    //input  workflow name
+    public static final String INPUT_WORKFLOW_NAME = "selenium_shell_1";
+
+    //input  workflow description
+    public static final String INPUT_WORKFLOW_DESCRIPTION = "test selenium_shell_1 description";
+
+    //input workflow timeout
+    public static final String INPUT_WORKFLOW_TIMEOUT = "30";
+
+    //input workflow  global parameters
+    public static final String INPUT_WORKFLOW_GLOBAL_PARAMETERS = "selenium_global_parameters_1";
+
+    //input workflow  global parameters value
+    public static final String INPUT_WORKFLOW_GLOBAL_PARAMETERS_VALUES = "selenium_global_parameters_value_1";
+
+    //input to  add workflow  global parameters
+    public static final String INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS = "selenium_global_parameters_2";
+
+    //input to add workflow  global parameters value
+    public static final String INPUT_ADD_WORKFLOW_GLOBAL_PARAMETERS_VALUES = "selenium_global_parameters_value_2";
 }

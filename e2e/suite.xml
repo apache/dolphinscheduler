@@ -4,15 +4,8 @@
     <!-- create tenant -->
     <test name="create-tenant" preserve-order="true">
         <classes>
-            <class name="org.apache.dolphinscheduler.testcase.security.TenantManageTest">
-            </class>
-        </classes>
-    </test>
-    <!-- create user -->
-    <test name="create-user" preserve-order="true">
-        <classes>
-            <class name="org.apache.dolphinscheduler.testcase.security.UserManageTest">
-            </class>
+            <class name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.security.UserManageTest"></class>
         </classes>
     </test>
 </suite>

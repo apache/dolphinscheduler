@@ -40,6 +40,8 @@ public class TenantManagePage extends PageCommon {
      * @return Whether to enter the specified page after creat tenant
      */
     public boolean createTenant() throws InterruptedException {
+        System.out.println("jump to the tenant page and create the tenant");
+
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
         //create tenant
@@ -52,6 +54,17 @@ public class TenantManagePage extends PageCommon {
         sendInput(TenantManageLocator.DESCRIPTION, TenantManageData.DESCRIPTION);
 
         // click  button
+        clickButton(TenantManageLocator.SUBMIT_BUTTON);
+
+        // Whether to enter the specified page after submit
+        return ifTitleContains(TenantManageData.TENANAT_MANAGE);
+    }
+
+    public boolean deleteTenant() throws InterruptedException {
+        System.out.println("start delete tenant");
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+
+        // click delete button
         clickButton(TenantManageLocator.SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
