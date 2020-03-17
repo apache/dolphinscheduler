@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.utils;
 
+import java.nio.charset.StandardCharsets;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
