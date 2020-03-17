@@ -29,7 +29,10 @@ public class CreateProjectTest  extends BaseTest {
         // enter user manage page
         createProjectPage.jumpProjectManagePage();
         //assert user manage page
+        System.out.println("start create project");
         assert createProjectPage.createProject();
+        System.out.println("end create project");
+        System.out.println("===================================");
     }
 
 }

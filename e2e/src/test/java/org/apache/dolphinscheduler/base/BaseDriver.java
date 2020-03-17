@@ -90,7 +90,7 @@ public class BaseDriver {
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable-dev-shm-usage");
         //Browser client running requires annotation --headless
-//        chromeOptions.addArguments("--headless");
+        chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("--disable-gpu");
         chromeOptions.addArguments("--whitelisted-ips");
         chromeOptions.addArguments("--disable-infobars");
@@ -146,7 +146,7 @@ public class BaseDriver {
 //        ((JavascriptExecutor) driver).executeScript("alert('Test completed, browser closes after 3s')");
         Thread.sleep(TestConstant.THREE_THOUSANG);
         if (driver != null) {
-//            driver.quit();
+            driver.quit();
         }
     }
 }

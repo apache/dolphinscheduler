@@ -33,7 +33,6 @@ public class UserManagePage extends PageCommon {
      * @return Whether to enter the specified page after creat tenant
      */
     public boolean createUser() throws InterruptedException {
-        System.out.println("start create user");
         Thread.sleep(TestConstant.ONE_THOUSANG);
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
@@ -54,6 +53,22 @@ public class UserManagePage extends PageCommon {
 
         // click  button
         clickButton(UserManageLocator.SUBMIT);
+
+        // Whether to enter the specified page after submit
+        return ifTitleContains(UserManageData.USER_MANAGE);
+    }
+
+    public boolean deleteUser() throws InterruptedException {
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+        // click  user manage
+        clickElement(UserManageLocator.CLICK_USER_MANAGE);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+
+        // click  delete user button
+        clickButton(UserManageLocator.DELETE_USER_BUTTON );
+
+        // click confirm delete button
+        clickButton(UserManageLocator.CONFIRM_DELETE_USER_BUTTON);
 
         // Whether to enter the specified page after submit
         return ifTitleContains(UserManageData.USER_MANAGE);

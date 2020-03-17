@@ -13,10 +13,14 @@ public class LoginTest {
     @Test(description = "LoginTest", priority = 1)
     public void testLogin() throws InterruptedException {
         loginPage = new LoginPage(driver);
+        System.out.println("===================================");
         System.out.println("jump to Chinese login page");
         loginPage.jumpPageChinese();
+
         System.out.println("start login");
         assert  loginPage.login();
         System.out.println("end login");
+        System.out.println("===================================");
+
     }
 }
