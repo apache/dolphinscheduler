@@ -44,7 +44,7 @@ public class PropertyUtils {
     private static final Properties properties = new Properties();
 
     private PropertyUtils() {
-        throw new IllegalStateException("CommonUtils class");
+        throw new IllegalStateException("PropertyUtils class");
     }
 
     static {
