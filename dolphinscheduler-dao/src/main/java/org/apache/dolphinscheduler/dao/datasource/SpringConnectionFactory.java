@@ -123,7 +123,6 @@ public class SpringConnectionFactory {
     @Bean
     public SqlSessionFactory sqlSessionFactory() throws Exception {
         MybatisConfiguration configuration = new MybatisConfiguration();
-        configuration.addMappers("org.apache.dolphinscheduler.dao.mapper");
         configuration.setMapUnderscoreToCamelCase(true);
         configuration.setCacheEnabled(false);
         configuration.setCallSettersOnNulls(true);
