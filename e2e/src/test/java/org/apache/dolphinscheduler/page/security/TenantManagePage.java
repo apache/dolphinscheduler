@@ -34,15 +34,6 @@ public class TenantManagePage extends PageCommon {
         super(driver);
     }
 
-
-    /**
-     * jump page
-     */
-    public void jumpPage() {
-        System.out.println("jump tenant page");
-        super.jumpPage(TenantManageData.TENANAT_URL);
-    }
-
     /**
      * createTenant
      *
@@ -50,6 +41,7 @@ public class TenantManagePage extends PageCommon {
      */
     public boolean createTenant() throws InterruptedException {
         Thread.sleep(TestConstant.ONE_THOUSANG);
+        clickButton(TenantManageLocator.TENANT_MANAGE);
 
         //create tenant
         clickButton(TenantManageLocator.CREATE_TENANT_BUTTON);
@@ -62,6 +54,22 @@ public class TenantManagePage extends PageCommon {
 
         // click  button
         clickButton(TenantManageLocator.SUBMIT_BUTTON);
+
+        // Whether to enter the specified page after submit
+        return ifTitleContains(TenantManageData.TENANAT_MANAGE);
+    }
+
+    public boolean deleteTenant() throws InterruptedException {
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+        clickButton(TenantManageLocator.TENANT_MANAGE);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+
+        // click delete button
+        clickButton(TenantManageLocator.DELETE_TENANT_BUTTON);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+
+        //click confirm delete button
+        clickButton(TenantManageLocator.CONFIRM_DELETE_TENANT_BUTTON);
 
         // Whether to enter the specified page after submit
         return ifTitleContains(TenantManageData.TENANAT_MANAGE);
