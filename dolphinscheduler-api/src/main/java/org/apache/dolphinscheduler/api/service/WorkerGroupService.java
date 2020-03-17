@@ -189,7 +189,8 @@ public class WorkerGroupService extends BaseService {
         List<String> availableWorkerGroupList = new ArrayList<>();
 
         for (String workerGroup : workerGroupList){
-            List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroup);
+            String workerGroupPath= workerPath + "/" + workerGroup;
+            List<String> childrenNodes = zookeeperCachedOperator.getChildrenKeys(workerGroupPath);
             if (CollectionUtils.isNotEmpty(childrenNodes)){
                 availableWorkerGroupList.add(workerGroup);
             }
