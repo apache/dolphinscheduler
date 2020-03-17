@@ -302,6 +302,32 @@ public class ResourcesController extends BaseController{
     }
 
     /**
+     * query resources jar list
+     *
+     * @param loginUser login user
+     * @param type resource type
+     * @return resource list
+     */
+    @ApiOperation(value = "queryResourceJarList", notes= "QUERY_RESOURCE_LIST_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType")
+    })
+    @GetMapping(value="/list/jar")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryResourceJarList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                    @RequestParam(value ="type") ResourceType type
+    ){
+        try{
+            logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type.toString());
+            Map<String, Object> result = resourceService.queryResourceJarList(loginUser, type);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(QUERY_RESOURCES_LIST_ERROR.getMsg(),e);
+            return error(Status.QUERY_RESOURCES_LIST_ERROR.getCode(), Status.QUERY_RESOURCES_LIST_ERROR.getMsg());
+        }
+    }
+
+    /**
      * query resource by full name and type
      *
      * @param loginUser login user
