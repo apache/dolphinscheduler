@@ -64,7 +64,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * whether already Killed,default false
      */
-    private Boolean alreadyKilled = false;
+    private boolean alreadyKilled = false;
 
     /**
      * submit task instance and wait complete
@@ -98,7 +98,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
                 this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
         // task time out
-        Boolean checkTimeout = false;
+        boolean checkTimeout = false;
         TaskTimeoutParameter taskTimeoutParameter = getTaskTimeoutParameter();
         if(taskTimeoutParameter.getEnable()){
             TaskTimeoutStrategy strategy = taskTimeoutParameter.getStrategy();
@@ -189,7 +189,6 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     private long getRemaintime(long timeoutSeconds) {
         Date startTime = taskInstance.getStartTime();
         long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
-        long remainTime = timeoutSeconds - usedTime;
-        return remainTime;
+        return timeoutSeconds - usedTime;
     }
 }
