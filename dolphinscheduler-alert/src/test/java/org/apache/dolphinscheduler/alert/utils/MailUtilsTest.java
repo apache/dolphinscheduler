@@ -138,6 +138,7 @@ public class MailUtilsTest {
      */
     @Test
     public void testAddAlertTable(){
+        logger.info("testAddAlertTable");
         AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
         Assert.assertNotNull(alertDao);
         Alert alert = new Alert();
