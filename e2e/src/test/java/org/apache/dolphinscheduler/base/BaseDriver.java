@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.base;
 
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.util.PropertiesReader;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -35,7 +36,7 @@ public class BaseDriver {
     /**
      * driver
      */
-    private WebDriver driver;
+    private static WebDriver driver;
 
     /**
      * chrome driver path
@@ -88,6 +89,7 @@ public class BaseDriver {
         chromeOptions.setPageLoadStrategy(PageLoadStrategy.NONE);
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable-dev-shm-usage");
+        //Browser client running requires annotation --headless
         chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("--disable-gpu");
         chromeOptions.addArguments("--whitelisted-ips");
@@ -120,7 +122,7 @@ public class BaseDriver {
      *
      * @return driver
      */
-    public WebDriver getDriver() {
+    public static WebDriver getDriver() {
         return driver;
     }
 
@@ -141,7 +143,7 @@ public class BaseDriver {
     public void closeBrowser() throws InterruptedException {
         // JS Show a pop-up box to indicate the end of the test
         Thread.sleep(TestConstant.ONE_THOUSANG);
-        ((JavascriptExecutor) driver).executeScript("alert('Test completed, browser closes after 3s')");
+//        ((JavascriptExecutor) driver).executeScript("alert('Test completed, browser closes after 3s')");
         Thread.sleep(TestConstant.THREE_THOUSANG);
         if (driver != null) {
             driver.quit();
