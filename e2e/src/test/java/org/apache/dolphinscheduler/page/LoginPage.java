@@ -47,7 +47,6 @@ public class LoginPage extends PageCommon {
     }
 
     public void jumpPageChinese() {
-        System.out.println("jump to Chinese login page");
         super.jumpPage(LoginData.URL);
         Cookie cookie = new Cookie("language", "zh_CN", "/", null);
 
@@ -59,7 +58,6 @@ public class LoginPage extends PageCommon {
      * @return Whether to enter the specified page after searching
      */
     public boolean login() throws InterruptedException {
-        System.out.println("start login");
         // login data
         sendInput(LoginLocator.LOGIN_INPUT_USER, LoginData.USER);
         sendInput(LoginLocator.LOGIN_INPUT_PASSWORD, LoginData.PASSWORD);

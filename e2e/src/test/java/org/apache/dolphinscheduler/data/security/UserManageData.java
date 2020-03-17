@@ -16,12 +16,9 @@
  */
 package org.apache.dolphinscheduler.data.security;
 
-import org.apache.dolphinscheduler.data.LoginData;
 
 public class UserManageData  {
-    public static final String USER_URL = LoginData.URL + "/ui/#/security/users";
-
-    public static final String USERNAME = "selenium_4";
+    public static final String USERNAME = "selenium_5";
 
     public static final String PASSWORD = "123456qwe";
 

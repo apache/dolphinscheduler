@@ -26,8 +26,8 @@ public class CreateWorkflowTest  extends BaseTest {
     private CreateProjectPage createProjectPage;
 
 
-    @Test(groups={"functionTests"},description = "CreateWorkflowTest",priority=5)
-    public void CreateWorkflowTest() throws InterruptedException {
+    @Test(groups={"functionTests"},dependsOnGroups = { "login" },description = "CreateWorkflowTest",priority=5)
+    public void testCreateWorkflow() throws InterruptedException {
         createProjectPage = new CreateProjectPage(driver);
         createProjectPage.jumpProjectManagePage();
 

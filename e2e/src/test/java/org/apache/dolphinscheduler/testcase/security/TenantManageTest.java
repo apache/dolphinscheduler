@@ -24,7 +24,7 @@ import org.testng.annotations.Test;
 public class TenantManageTest extends BaseTest {
     private TenantManagePage tenantManagePage;
 
-    @Test(groups={"functionTests"},description = "TenantTest",priority=2)
+    @Test(groups={"functionTests"},dependsOnGroups = { "login" },description = "TenantManageTest",priority=2)
     public void testTenantManage() throws InterruptedException {
         tenantManagePage = new TenantManagePage(driver);
         //assert tenant manage page

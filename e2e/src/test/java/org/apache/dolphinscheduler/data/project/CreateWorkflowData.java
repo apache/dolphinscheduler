@@ -21,7 +21,7 @@ public class CreateWorkflowData {
      * create workflow data
      */
     //input shell task name
-    public static final String SHELL_TASK_NAME = "shell_task_selenium_4";
+    public static final String SHELL_TASK_NAME = "shell_task_selenium_5";
 
     //input shell task description
     public static final String SHELL_TASK_DESCRIPTION = "shell task description test";

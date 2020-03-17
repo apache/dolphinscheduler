@@ -20,18 +20,12 @@
  */
 package org.apache.dolphinscheduler.data.security;
 
-import org.apache.dolphinscheduler.data.LoginData;
 
 public class TenantManageData {
     /**
-     * Tenant URL
-     */
-    public static final String TENANAT_URL =  LoginData.URL + "/ui/#/security/tenant";
-
-    /**
      * Tenant Code
      */
-    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code10";
+    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code11";
 
     /**
      * Tenant Name

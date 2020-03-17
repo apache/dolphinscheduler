@@ -90,13 +90,12 @@ public class BaseDriver {
         chromeOptions.addArguments("--no-sandbox");
         chromeOptions.addArguments("--disable-dev-shm-usage");
         //Browser client running requires annotation --headless
-        chromeOptions.addArguments("--headless");
+//        chromeOptions.addArguments("--headless");
         chromeOptions.addArguments("--disable-gpu");
         chromeOptions.addArguments("--whitelisted-ips");
         chromeOptions.addArguments("--disable-infobars");
         chromeOptions.addArguments("--disable-browser-side-navigation");
         driver = new ChromeDriver(chromeOptions);
-
 
         /* driver setting wait time */
         // implicitly wait time
