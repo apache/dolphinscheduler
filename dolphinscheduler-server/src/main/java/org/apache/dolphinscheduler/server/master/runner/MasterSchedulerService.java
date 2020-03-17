@@ -76,6 +76,7 @@ public class MasterSchedulerService extends Thread {
      */
     private ThreadPoolExecutor masterExecService;
 
+
     /**
      * constructor of MasterSchedulerThread
      */
@@ -122,7 +123,10 @@ public class MasterSchedulerService extends Thread {
                         logger.info(String.format("find one command: id: %d, type: %s", command.getId(),command.getCommandType().toString()));
 
                         try{
-                            ProcessInstance processInstance = processService.handleCommand(logger, OSUtils.getHost(), this.masterConfig.getMasterExecThreads() - activeCount, command);
+
+                            ProcessInstance processInstance = processService.handleCommand(logger,
+                                    getLocalAddress(),
+                                    this.masterConfig.getMasterExecThreads() - activeCount, command);
                             if (processInstance != null) {
                                 logger.info("start master exec thread , split DAG ...");
                                 masterExecService.execute(new MasterExecThread(processInstance, processService, nettyRemotingClient));
@@ -137,10 +141,14 @@ public class MasterSchedulerService extends Thread {
                     }
                 }
             } catch (Exception e){
-                logger.error("master scheduler thread exception",e);
+                logger.error("master scheduler thread error",e);
             } finally{
                 zkMasterClient.releaseMutex(mutex);
             }
         }
+    }
+
+    private String getLocalAddress(){
+        return OSUtils.getHost() + ":" + masterConfig.getListenPort();
     }
 }
