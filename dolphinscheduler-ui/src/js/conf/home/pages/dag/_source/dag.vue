@@ -25,7 +25,7 @@
              :key="v"
              v-for="(item,v) in tasksTypeList"
              @mousedown="_getDagId(v)">
-          <div data-toggle="tooltip" :title="item.description">
+          <div data-toggle="tooltip" :title="item.desc">
             <div class="icos" :class="'icos-' + v" ></div>
           </div>
         </div>
@@ -293,7 +293,7 @@
         let is = true
         let code = ''
 
-        if (!item.disable) {
+        if (item.disable) {
           return
         }
 
@@ -473,7 +473,35 @@
        */
       _createNodes ({ id, type }) {
         let self = this
+        let preNode = []
+        let rearNode = []
+        let rearList = []
+        $('div[data-targetarr*="' + id + '"]').each(function(){
+          rearNode.push($(this).attr("id"))
+        })
 
+        if (rearNode.length>0) {
+          rearNode.forEach(v => {
+            let rearobj = {}
+            rearobj.value = $(`#${v}`).find('.name-p').text()
+            rearobj.label = $(`#${v}`).find('.name-p').text()
+            rearList.push(rearobj)
+          })
+        } else {
+          rearList = []
+        }
+        let targetarr = $(`#${id}`).attr('data-targetarr')
+        if (targetarr) {
+          let nodearr = targetarr.split(',')
+          nodearr.forEach(v => {
+            let nodeobj = {}
+            nodeobj.value = $(`#${v}`).find('.name-p').text()
+            nodeobj.label = $(`#${v}`).find('.name-p').text()
+            preNode.push(nodeobj)
+          })
+        } else {
+          preNode = []
+        }
         if (eventModel) {
           eventModel.remove()
         }
@@ -524,7 +552,9 @@
             props: {
               id: id,
               taskType: type,
-              self: self
+              self: self,
+              preNode: preNode,
+              rearList: rearList
             }
           })
         })

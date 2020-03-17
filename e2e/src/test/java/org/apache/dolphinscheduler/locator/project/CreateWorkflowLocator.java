@@ -20,9 +20,11 @@ package org.apache.dolphinscheduler.locator.project;
 import org.openqa.selenium.By;
 
 public class CreateWorkflowLocator {
+
     /**
      * jump workflow define page
      */
+
     // click project name
     public static final By CLICK_PROJECT_NAME = By.xpath("//span/a");
 
@@ -166,4 +168,5 @@ public class CreateWorkflowLocator {
 
     //click add button
     public static final By CLICK_ADD_BUTTON = By.xpath("//button[2]/span");
+
 }

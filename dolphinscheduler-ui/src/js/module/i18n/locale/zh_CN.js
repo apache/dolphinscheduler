@@ -228,6 +228,7 @@ export default {
   'Upload File Size': '文件大小不能超过1G',
   'Create': '创建',
   'Please enter the resource content': '请输入资源内容',
+  'Resource content cannot exceed 3000 lines': '资源内容不能超过3000行',
   'File Details': '文件详情',
   'Download Details': '下载详情',
   'Return': '返回',
@@ -565,5 +566,7 @@ export default {
   'Data Source': '数据来源',
   'Data Target': '数据目的',
   'All Columns': '全表导入',
-  'Some Columns': '选择列'
+  'Some Columns': '选择列',
+  'Branch flow': '分支流转',
+  'Cannot select the same node for successful branch flow and failed branch flow': '成功分支流转和失败分支流转不能选择同一个节点'
 }

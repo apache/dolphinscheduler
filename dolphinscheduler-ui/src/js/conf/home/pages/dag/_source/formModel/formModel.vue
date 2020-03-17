@@ -109,6 +109,43 @@
             <span>({{$t('Minute')}})</span>
           </div>
         </div>
+        <div class="clearfix list" v-if="taskType === 'CONDITIONS'">
+          <div class="text-box">
+            <span>{{$t('State')}}</span>
+          </div>
+          <div class="cont-box">
+            <span class="label-box" style="width: 193px;display: inline-block;">
+              <x-select style="width: 157px;" v-model="successNode" :disabled="true">
+              <x-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label">
+              </x-option>
+            </x-select>
+            </span>
+            <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
+            <x-select style="width: 157px;" v-model="successBranch" clearable>
+              <x-option v-for="item in rearList" :key="item.value" :value="item.value" :label="item.label">
+              </x-option>
+            </x-select>
+          </div>
+        </div>
+
+        <div class="clearfix list" v-if="taskType === 'CONDITIONS'">
+          <div class="text-box">
+            <span>{{$t('State')}}</span>
+          </div>
+          <div class="cont-box">
+            <span class="label-box" style="width: 193px;display: inline-block;">
+              <x-select style="width: 157px;" v-model="failedNode" :disabled="true">
+              <x-option v-for="item in stateList" :key="item.value" :value="item.value" :label="item.label">
+              </x-option>
+            </x-select>
+            </span>
+            <span class="text-b" style="padding-left: 38px">{{$t('Branch flow')}}</span>
+            <x-select style="width: 157px;" v-model="failedBranch" clearable>
+              <x-option v-for="item in rearList" :key="item.value" :value="item.value" :label="item.label">
+              </x-option>
+            </x-select>
+          </div>
+        </div>
 
         <!-- Task timeout alarm -->
         <m-timeout-alarm
@@ -211,6 +248,14 @@
           ref="SQOOP"
           :backfill-item="backfillItem">
         </m-sqoop>
+        <m-conditions
+          v-if="taskType === 'CONDITIONS'"
+          ref="CONDITIONS"
+          @on-dependent="_onDependent"
+          @on-cache-dependent="_onCacheDependent"
+          :backfill-item="backfillItem"
+          :pre-node="preNode">
+        </m-conditions>
       </div>
     </div>
     <div class="bottom-box">
@@ -236,6 +281,7 @@
   import mDependent from './tasks/dependent'
   import mHttp from './tasks/http'
   import mDatax from './tasks/datax'
+  import mConditions from './tasks/conditions'
   import mSqoop from './tasks/sqoop'
   import mSubProcess from './tasks/sub_process'
   import mSelectInput from './_source/selectInput'
@@ -253,13 +299,21 @@
         // loading
         spinnerLoading: false,
         // node name
-        name: ``,
+        name: '',
         // description
         description: '',
         // Node echo data
         backfillItem: {},
         // Resource(list)
         resourcesList: [],
+        successNode: 'success',
+        failedNode: 'failed',
+        successBranch: '',
+        failedBranch: '',
+        conditionResult: {
+          'successNode': [],
+          'failedNode': []
+        },
         // dependence
         dependence: {},
         // cache dependence
@@ -279,7 +333,17 @@
         // Task priority
         taskInstancePriority: 'MEDIUM',
         // worker group id
-        workerGroupId: -1
+        workerGroupId: -1,
+        stateList:[
+          {
+            value: 'success',
+            label: `${i18n.$t('success')}`
+          },
+          {
+            value: 'failed',
+            label: `${i18n.$t('failed')}`
+          }
+        ]
       }
     },
     /**
@@ -290,7 +354,9 @@
     props: {
       id: Number,
       taskType: String,
-      self: Object
+      self: Object,
+      preNode: Array,
+      rearList: Array
     },
     methods: {
       /**
@@ -373,6 +439,8 @@
       },
 
       _cacheItem () {
+        this.conditionResult.successNode[0] = this.successBranch
+        this.conditionResult.failedNode[0] = this.failedBranch
         this.$emit('cacheTaskInfo', {
           item: {
             type: this.taskType,
@@ -381,12 +449,15 @@
             params: this.params,
             description: this.description,
             runFlag: this.runFlag,
+            conditionResult: this.conditionResult,
             dependence: this.cacheDependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId
+            workerGroupId: this.workerGroupId,
+            status: this.status,
+            branch: this.branch
           },
           fromThis: this
         })
@@ -397,6 +468,10 @@
       _verifName () {
         if (!_.trim(this.name)) {
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
+          return false
+        }
+        if (this.successBranch !='' && this.successBranch == this.failedBranch) {
+          this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
         if (this.name === this.backfillItem.name) {
@@ -427,6 +502,8 @@
         }
 
         $(`#${this.id}`).find('span').text(this.name)
+        this.conditionResult.successNode[0] = this.successBranch
+        this.conditionResult.failedNode[0] = this.failedBranch
         // Store the corresponding node data structure
         this.$emit('addTaskInfo', {
           item: {
@@ -436,12 +513,15 @@
             params: this.params,
             description: this.description,
             runFlag: this.runFlag,
+            conditionResult: this.conditionResult,
             dependence: this.dependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId
+            workerGroupId: this.workerGroupId,
+            status: this.status,
+            branch: this.branch
           },
           fromThis: this
         })
@@ -526,7 +606,10 @@
         this.description = o.description
         this.maxRetryTimes = o.maxRetryTimes
         this.retryInterval = o.retryInterval
-
+        if(o.conditionResult) {
+          this.successBranch = o.conditionResult.successNode[0]
+          this.failedBranch = o.conditionResult.failedNode[0]
+        }
           // If the workergroup has been deleted, set the default workergroup
           var hasMatch = false;
           for (let i = 0; i < this.store.state.security.workerGroupsListAll.length; i++) {
@@ -580,7 +663,9 @@
           retryInterval: this.retryInterval,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
-          workerGroupId: this.workerGroupId
+          workerGroupId: this.workerGroupId,
+          successBranch: this.successBranch,
+          failedBranch: this.failedBranch
         }
       }
     },
@@ -598,6 +683,7 @@
       mHttp,
       mDatax,
       mSqoop,
+      mConditions,
       mSelectInput,
       mTimeoutAlarm,
       mPriority,

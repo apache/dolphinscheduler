@@ -32,9 +32,7 @@ public class CreateWorkflowTest  extends BaseTest {
         createProjectPage.jumpProjectManagePage();
 
         createWorkflowPage = new CreateWorkflowPage(driver);
-        //assert create workflow
-        createWorkflowPage.createWorkflow();
+        assert createWorkflowPage.createWorkflow();
         assert createWorkflowPage.saveWorkflow();
-
     }
 }

@@ -36,6 +36,7 @@ public class CreateWorkflowPage extends PageCommon {
         clickElement(CreateWorkflowLocator.CLICK_PROJECT_NAME);
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
+
         System.out.println("Click on workflow define");
         // click workflow define
         clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);

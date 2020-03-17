@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -93,7 +93,7 @@ public class TaskScheduleThread implements Runnable {
 
             logger.info("script path : {}", taskInstance.getExecutePath());
             // task node
-            TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
+            TaskNode taskNode = JSON.parseObject(taskInstance.getTaskJson(), TaskNode.class);
 
             // get resource files
             List<String> resourceFiles = createProjectResFiles(taskNode);
@@ -165,7 +165,6 @@ public class TaskScheduleThread implements Runnable {
                 new Date(),
                 taskInstance.getId());
     }
-
     /**
      * get global paras map
      * @return
@@ -177,7 +176,7 @@ public class TaskScheduleThread implements Runnable {
         String globalParamsStr = taskInstance.getProcessInstance().getGlobalParams();
 
         if (globalParamsStr != null) {
-            List<Property> globalParamsList = JSONObject.parseArray(globalParamsStr, Property.class);
+            List<Property> globalParamsList = JSON.parseArray(globalParamsStr, Property.class);
             globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
         }
         return globalParamsMap;
@@ -212,21 +211,29 @@ public class TaskScheduleThread implements Runnable {
      * @return log path
      */
     private String getTaskLogPath() {
-        String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
-                .getLogger("ROOT")
-                .getAppender("TASKLOGFILE"))
-                .getDiscriminator()).getLogBase();
-        if (baseLog.startsWith(Constants.SINGLE_SLASH)){
-            return baseLog + Constants.SINGLE_SLASH +
-                    taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
-                    taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                    taskInstance.getId() + ".log";
+        String logPath;
+        try{
+            String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+                    .getLogger("ROOT")
+                    .getAppender("TASKLOGFILE"))
+                    .getDiscriminator()).getLogBase();
+            if (baseLog.startsWith(Constants.SINGLE_SLASH)){
+                logPath =  baseLog + Constants.SINGLE_SLASH +
+                        taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
+                        taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                        taskInstance.getId() + ".log";
+            }else{
+                logPath = System.getProperty("user.dir") + Constants.SINGLE_SLASH +
+                        baseLog +  Constants.SINGLE_SLASH +
+                        taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
+                        taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
+                        taskInstance.getId() + ".log";
+            }
+        }catch (Exception e){
+            logger.error("logger" + e);
+            logPath = "";
         }
-        return System.getProperty("user.dir") + Constants.SINGLE_SLASH +
-                baseLog +  Constants.SINGLE_SLASH +
-                taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +
-                taskInstance.getProcessInstanceId() + Constants.SINGLE_SLASH  +
-                taskInstance.getId() + ".log";
+        return logPath;
     }
 
     /**
@@ -289,9 +296,7 @@ public class TaskScheduleThread implements Runnable {
 
         if (baseParam != null) {
             List<String> projectResourceFiles = baseParam.getResourceFilesList();
-            if (projectResourceFiles != null) {
-                projectFiles.addAll(projectResourceFiles);
-            }
+            projectFiles.addAll(projectResourceFiles);
         }
 
         return new ArrayList<>(projectFiles);

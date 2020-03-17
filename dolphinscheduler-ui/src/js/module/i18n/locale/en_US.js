@@ -229,6 +229,7 @@ export default {
   'File Content': 'File Content',
   'Create': 'Create',
   'Please enter the resource content': 'Please enter the resource content',
+  'Resource content cannot exceed 3000 lines': 'Resource content cannot exceed 3000 lines',
   'File Details': 'File Details',
   'Download Details': 'Download Details',
   'Return': 'Return',
@@ -520,7 +521,6 @@ export default {
   '0 means unlimited by byte': '0 means unlimited',
   '0 means unlimited by count': '0 means unlimited',
   'Modify User': 'Modify User',
-
   'Please enter Mysql Database(required)': 'Please enter Mysql Database(required)',
   'Please enter Mysql Table(required)': 'Please enter Mysql Table(required)',
   'Please enter Columns (Comma separated)': 'Please enter Columns (Comma separated)',
@@ -566,7 +566,7 @@ export default {
   'Data Source': 'Data Source',
   'Data Target': 'Data Target',
   'All Columns': 'All Columns',
-  'Some Columns': 'Some Columns'
-
-
+  'Some Columns': 'Some Columns',
+  'Branch flow': 'Branch flow',
+  'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow'
 }
