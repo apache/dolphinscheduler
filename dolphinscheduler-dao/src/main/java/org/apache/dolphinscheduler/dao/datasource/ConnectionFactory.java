@@ -42,7 +42,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionFactory.class);
 
     private static class ConnectionFactoryHolder {
-        public static ConnectionFactory connectionFactory = new ConnectionFactory();
+        private static final ConnectionFactory connectionFactory = new ConnectionFactory();
     }
 
     public static ConnectionFactory getInstance() {
