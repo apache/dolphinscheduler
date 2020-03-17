@@ -791,19 +791,16 @@ public final class Constants {
 
     /**
      * data total
-     * ????
      */
     public  static final String COUNT = "count";
 
     /**
      * page size
-     * ??????
      */
     public  static final String PAGE_SIZE = "pageSize";
 
     /**
      * current page no
-     * ????
      */
     public  static final String PAGE_NUMBER = "pageNo";
 
