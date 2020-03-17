@@ -22,7 +22,6 @@ import org.apache.curator.framework.state.ConnectionStateListener;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.remote.utils.Constants;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.registry.ZookeeperRegistryCenter;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -86,7 +85,7 @@ public class WorkerRegistry {
      *  registry
      */
     public void registry() {
-        String address = Constants.LOCAL_ADDRESS;
+        String address = OSUtils.getHost();
         String localNodePath = getWorkerPath();
         zookeeperRegistryCenter.getZookeeperCachedOperator().persistEphemeral(localNodePath, "");
         zookeeperRegistryCenter.getZookeeperCachedOperator().getZkClient().getConnectionStateListenable().addListener(new ConnectionStateListener() {
@@ -142,7 +141,7 @@ public class WorkerRegistry {
      * @return
      */
     private String getLocalAddress(){
-        return Constants.LOCAL_ADDRESS + ":" + workerConfig.getListenPort();
+        return OSUtils.getHost() + ":" + workerConfig.getListenPort();
     }
 
     /**
