@@ -39,7 +39,7 @@ public class MySQLDataSource extends BaseDataSource {
   @Override
   public String getJdbcUrl() {
     String address = getAddress();
-    if (address.lastIndexOf("/") != (address.length() - 1)) {
+    if (address.lastIndexOf('/') != (address.length() - 1)) {
       address += "/";
     }
     String jdbcUrl = address + getDatabase();

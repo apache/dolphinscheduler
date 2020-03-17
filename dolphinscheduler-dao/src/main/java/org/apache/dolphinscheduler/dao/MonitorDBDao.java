@@ -61,7 +61,7 @@ public class MonitorDBDao {
                 return new PostgrePerformance().getMonitorRecord(conn);
             }
         }catch (Exception e) {
-            logger.error("SQLException " + e);
+            logger.error("SQLException: {}", e.getMessage(), e);
         }finally {
             try {
                 if (conn != null) {
