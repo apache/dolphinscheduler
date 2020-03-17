@@ -517,6 +517,33 @@ public class ResourcesService extends BaseService {
     }
 
     /**
+     * query resource list
+     *
+     * @param loginUser login user
+     * @param type resource type
+     * @return resource list
+     */
+    public Map<String, Object> queryResourceJarList(User loginUser, ResourceType type) {
+
+        Map<String, Object> result = new HashMap<>(5);
+        List<Resource> resourceList;
+        int userId = loginUser.getId();
+        if(isAdmin(loginUser)){
+            userId = 0;
+        }
+        resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
+        List<Resource> resources = resourceList.stream().filter(t -> {
+            String alias = t.getAlias();
+            return alias.endsWith(".jar");
+        }).collect(Collectors.toList());
+        Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
+        result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
+        putMsg(result,Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
      * delete resource
      *
      * @param loginUser login user
