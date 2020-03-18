@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -31,7 +30,10 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.UdfFunc;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -1107,7 +1108,7 @@ public class ResourcesService extends BaseService {
         List<Integer> childList = new ArrayList<>();
         childList.add(resource.getId());
         if(resource.isDirectory()){
-            listAllChildren(resource.getId(),childList);
+            childList.addAll(listAllChildren(resource.getId()));
         }
         return childList;
     }
@@ -1115,18 +1116,14 @@ public class ResourcesService extends BaseService {
     /**
      * list all children id
      * @param resourceId resource id
-     * @param childIds child resource id list
      * @return all children id
      */
-    List<Integer> listAllChildren(int resourceId,List<Integer> childIds){
-
+    List<Integer> listAllChildren(int resourceId){
         List<Integer> children = resourcesMapper.listChildren(resourceId);
         for(int chlidId:children){
-            children.add(chlidId);
-            listAllChildren(chlidId,childIds);
+            listAllChildren(chlidId);
         }
         return children;
-
     }
 
     /**
