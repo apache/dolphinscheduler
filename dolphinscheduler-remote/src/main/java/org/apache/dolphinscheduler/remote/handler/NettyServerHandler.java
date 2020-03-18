@@ -158,14 +158,14 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         if (!ch.isWritable()) {
             if (logger.isWarnEnabled()) {
                 logger.warn("{} is not writable, over high water level : {}",
-                        new Object[]{ch, config.getWriteBufferHighWaterMark()});
+                        ch, config.getWriteBufferHighWaterMark());
             }
 
             config.setAutoRead(false);
         } else {
             if (logger.isWarnEnabled()) {
                 logger.warn("{} is writable, to low water : {}",
-                        new Object[]{ch, config.getWriteBufferLowWaterMark()});
+                        ch, config.getWriteBufferLowWaterMark());
             }
             config.setAutoRead(true);
         }
