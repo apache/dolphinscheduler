@@ -23,10 +23,11 @@ import org.testng.annotations.Test;
 public class CreateProjectTest  extends BaseTest {
     private CreateProjectPage createProjectPage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login" },description = "CreateProjectTest",priority=4)
+    @Test(groups={"functionTests","project"},dependsOnGroups = { "login" },description = "CreateProjectTest",priority=4)
     public void testCreateProject() throws InterruptedException {
         createProjectPage = new CreateProjectPage(driver);
         // enter user manage page
+        System.out.println("jump to the projectManage page");
         createProjectPage.jumpProjectManagePage();
         //assert user manage page
         System.out.println("start create project");

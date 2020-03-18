@@ -30,18 +30,21 @@ public class CreateWorkflowPage extends PageCommon {
     /**
      * jump create workflow page
      */
-    public boolean createWorkflow() throws InterruptedException {
-        System.out.println("Click on the project name to jump to the project homepage");
+
+    public boolean jumpWorkflowPage() throws InterruptedException {
         // click project name
         clickElement(CreateWorkflowLocator.CLICK_PROJECT_NAME);
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
-
-        System.out.println("Click on workflow define");
+        System.out.println("Click on workflow define to jump to workflow define page");
         // click workflow define
         clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
+        return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);
+    }
+
+    public boolean createWorkflow() throws InterruptedException {
         System.out.println("Click create workflow button");
         // click create workflow button
         clickElement(CreateWorkflowLocator.CLICK_CREATE_WORKFLOW_BUTTON);
@@ -98,7 +101,7 @@ public class CreateWorkflowPage extends PageCommon {
 
         //click codeMirror and input script
         inputCodeMirror(CreateWorkflowLocator.CLICK_CODE_MIRROR, CreateWorkflowLocator.INPUT_SCRIPT, CreateWorkflowData.SHELL_SCRIPT);
-        scrollToElementBottom();
+        scrollToElementBottom(CreateWorkflowLocator.SCROLL_BOTTOM);
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
         //click custom parameters
@@ -113,7 +116,7 @@ public class CreateWorkflowPage extends PageCommon {
         //click add custom parameters
         clickElement(CreateWorkflowLocator.CLICK_ADD_CUSTOM_PARAMETERS);
 
-        scrollToElementBottom();
+        scrollToElementBottom(CreateWorkflowLocator.SCROLL_BOTTOM);
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
         //input add custom parameters
@@ -133,7 +136,7 @@ public class CreateWorkflowPage extends PageCommon {
         System.out.println("move to Dag Element ");
         moveToDragElement(CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG,-300,-100);
 
-        return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);
+        return ifTitleContains(CreateWorkflowData.CREATE_WORKFLOW_TITLE);
     }
 
     /**
@@ -187,6 +190,17 @@ public class CreateWorkflowPage extends PageCommon {
         //click add button
         clickElement(CreateWorkflowLocator.CLICK_ADD_BUTTON);
         System.out.println("submit workflow");
+        return ifTitleContains(CreateWorkflowData.CREATE_WORKFLOW_TITLE);
+    }
+
+    public boolean deleteWorkflow() throws InterruptedException {
+        //click  delete project
+        clickElement(CreateWorkflowLocator.DELETE_WORKFLOW_BOTTOM);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+        //click confirm delete project
+        clickElement(CreateWorkflowLocator.CONFIRM_DELETE_WORKFLOW_BOTTOM);
+
+        // Whether to enter the specified page after submit
         return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);
     }
 }

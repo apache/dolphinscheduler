@@ -82,6 +82,7 @@ public class BaseDriver {
      * start chrome browser
      */
     public void startBrowser() throws Exception {
+        System.out.println("===================test start===================");
         // set chrome driver
         System.setProperty("webdriver.chrome.driver", chromeDriverPath);
         ChromeOptions chromeOptions = new ChromeOptions();
@@ -140,12 +141,10 @@ public class BaseDriver {
      * close browser
      */
     public void closeBrowser() throws InterruptedException {
-        // JS Show a pop-up box to indicate the end of the test
-        Thread.sleep(TestConstant.ONE_THOUSANG);
-//        ((JavascriptExecutor) driver).executeScript("alert('Test completed, browser closes after 3s')");
         Thread.sleep(TestConstant.THREE_THOUSANG);
         if (driver != null) {
             driver.quit();
+            System.out.println("===================test end===================");
         }
     }
 }

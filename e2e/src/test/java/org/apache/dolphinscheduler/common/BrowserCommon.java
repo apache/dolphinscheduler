@@ -314,9 +314,8 @@ public class BrowserCommon {
         executeScript("window.scrollTo(0, document.body.scrollHeight)");
     }
 
-    public void scrollToElementBottom() {
-
-        WebElement webElement = driver.findElement(By.xpath("/html/body/div[4]/div/div[2]/div/div[2]/div/div[7]/div[3]"));
+    public void scrollToElementBottom(By locator) {
+        WebElement webElement = locateElement(locator);
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", webElement);
     }
 

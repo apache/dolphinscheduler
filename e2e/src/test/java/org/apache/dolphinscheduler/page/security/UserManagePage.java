@@ -63,7 +63,6 @@ public class UserManagePage extends PageCommon {
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
         Thread.sleep(TestConstant.ONE_THOUSANG);
-
         // click  delete user button
         clickButton(UserManageLocator.DELETE_USER_BUTTON );
 

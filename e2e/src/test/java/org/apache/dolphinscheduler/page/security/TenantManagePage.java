@@ -32,12 +32,23 @@ public class TenantManagePage extends PageCommon {
     }
 
     /**
+     * jump security page
+     *
+     * @return Whether to enter the specified page after create tenant
+     */
+    public boolean jumpSecurity() throws InterruptedException {
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+        clickButton(TenantManageLocator.SECURITY_CENTER);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+        return ifTitleContains(TenantManageData.TENANAT_MANAGE);
+    }
+
+    /**
      * createTenant
      *
-     * @return Whether to enter the specified page after creat tenant
+     * @return Whether to enter the specified page after create tenant
      */
     public boolean createTenant() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
         clickButton(TenantManageLocator.TENANT_MANAGE);
 
         //create tenant
@@ -57,10 +68,8 @@ public class TenantManagePage extends PageCommon {
     }
 
     public boolean deleteTenant() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
         clickButton(TenantManageLocator.TENANT_MANAGE);
         Thread.sleep(TestConstant.ONE_THOUSANG);
-
         // click delete button
         clickButton(TenantManageLocator.DELETE_TENANT_BUTTON);
         Thread.sleep(TestConstant.ONE_THOUSANG);

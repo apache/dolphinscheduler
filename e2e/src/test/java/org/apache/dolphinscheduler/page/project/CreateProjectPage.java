@@ -28,7 +28,7 @@ public class CreateProjectPage extends PageCommon {
     }
 
     /**
-     * jump page
+     * jump to ProjectManagePage
      */
     public void jumpProjectManagePage() throws InterruptedException {
         Thread.sleep(TestConstant.ONE_THOUSANG);
@@ -37,9 +37,9 @@ public class CreateProjectPage extends PageCommon {
     }
 
     /**
-     * createTenant
+     * create project
      *
-     * @return Whether to enter the specified page after creat tenant
+     * @return Whether to enter the specified page after create project
      */
     public boolean createProject() throws InterruptedException {
         //click  create project
@@ -52,6 +52,22 @@ public class CreateProjectPage extends PageCommon {
 
         // click submit  button
         clickButton(CreateProjectLocator.SUBMIT_BUTTON);
+
+        // Whether to enter the specified page after submit
+        return ifTitleContains(CreateProjectData.PROJECT_TITLE);
+    }
+
+    /**
+     * delete project
+     *
+     * @return Whether to enter the specified page after delete project
+     */
+    public boolean deleteProject() throws InterruptedException {
+        //click  delete project
+        clickElement(CreateProjectLocator.DELETE_PROJECT_BUTTON);
+        Thread.sleep(TestConstant.ONE_THOUSANG);
+        //click confirm delete project
+        clickElement(CreateProjectLocator.CONFIRM_DELETE_PROJECT_BUTTON);
 
         // Whether to enter the specified page after submit
         return ifTitleContains(CreateProjectData.PROJECT_TITLE);

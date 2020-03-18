@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="dolphinscheduler_e2e" parallel="true">
-    <test name="dolphinscheduler_test" preserve-order="true">
+    <test name="dolphinscheduler_test_create_userInfo" preserve-order="true" enabled="true">
         <groups>
             <run>
-                <include name="functionTests" />
+                <include name="functionTests"/>
             </run>
         </groups>
 
@@ -12,10 +12,12 @@
             <class name="org.apache.dolphinscheduler.testcase.LoginTest"></class>
             <class name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"></class>
             <class name="org.apache.dolphinscheduler.testcase.security.UserManageTest"></class>
-            <!--<class name="org.apache.dolphinscheduler.testcase.project.CreateProjectTest"></class>-->
-            <!--&lt;!&ndash;<class name="org.apache.dolphinscheduler.testcase.project.CreateWorkflowTest"></class>&ndash;&gt;-->
-            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteTenantTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.project.CreateProjectTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.project.CreateWorkflowTest"></class>
             <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteUserTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteTenantTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteWorkflowTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteProjectTest"></class>
         </classes>
     </test>
 
