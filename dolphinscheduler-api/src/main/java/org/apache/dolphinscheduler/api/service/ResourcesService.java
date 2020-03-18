@@ -1113,7 +1113,7 @@ public class ResourcesService extends BaseService {
     }
 
     /**
-     *
+     * /**
      * list all children id
      * @param resourceId resource id
      * @param childIds child resource id list

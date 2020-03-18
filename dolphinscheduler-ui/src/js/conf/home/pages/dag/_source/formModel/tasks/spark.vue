@@ -63,19 +63,9 @@
     <m-list-box>
       <div slot="text">{{$t('Main jar package')}}</div>
       <div slot="content">
-        <x-select
-                style="width: 100%;"
-                :placeholder="$t('Please enter main jar package')"
-                v-model="mainJar"
-                filterable
-                :disabled="isDetails">
-          <x-option
-                  v-for="city in mainJarList"
-                  :key="city.code"
-                  :value="city.code"
-                  :label="city.code">
-          </x-option>
-        </x-select>
+        <treeselect v-model="mainJar" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :placeholder="$t('Please enter main jar package')">
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+        </treeselect>
       </div>
     </m-list-box>
     <m-list-box>
@@ -215,6 +205,7 @@
   import mListBox from './_source/listBox'
   import mResources from './_source/resources'
   import Treeselect from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
 
   export default {
@@ -226,6 +217,7 @@
         // Master jar package
         mainJar: null,
         // Master jar package(List)
+        mainJarLists: [],
         mainJarList: [],
         // Deployment method
         deployMode: 'cluster',
@@ -415,8 +407,11 @@
     },
     created () {
         let item = this.store.state.dag.resourcesListS
+        let items = this.store.state.dag.resourcesListJar
         this.diGuiTree(item)
+        this.diGuiTree(items)
         this.mainJarList = item
+        this.mainJarLists = items
         let o = this.backfillItem
 
         // Non-null objects represent backfill
