@@ -38,7 +38,7 @@ public class HttpUtilsTest {
 		String result = HttpUtils.get("https://github.com/manifest.json");
 		Assert.assertNotNull(result);
 		JSONObject jsonObject = JSON.parseObject(result);
-		Assert.assertEquals(jsonObject.getString("name"), "GitHub");
+		Assert.assertEquals("GitHub", jsonObject.getString("name"));
 
 		result = HttpUtils.get("https://123.333.111.33/ccc");
 		Assert.assertNull(result);

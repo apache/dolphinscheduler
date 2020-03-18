@@ -122,22 +122,19 @@ public class MapReduceTask extends AbstractYarnTask {
         }
 
         // main class
-        if(mapreduceParameters.getProgramType() !=null ){
-            if(mapreduceParameters.getProgramType()!= ProgramType.PYTHON){
-                if(StringUtils.isNotEmpty(mapreduceParameters.getMainClass())){
-                    result.add(mapreduceParameters.getMainClass());
-                }
-            }
+        if(!ProgramType.PYTHON.equals(mapreduceParameters.getProgramType())
+                && StringUtils.isNotEmpty(mapreduceParameters.getMainClass())){
+            result.add(mapreduceParameters.getMainClass());
         }
 
         // others
         if (StringUtils.isNotEmpty(mapreduceParameters.getOthers())) {
             String others = mapreduceParameters.getOthers();
-            if(!others.contains(Constants.MR_QUEUE)){
-                if (StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
-                    result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));
-                }
+            if (!others.contains(Constants.MR_QUEUE)
+                    && StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
+                result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));
             }
+
             result.add(mapreduceParameters.getOthers());
         }else if (StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
             result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));

@@ -81,17 +81,15 @@ public class HttpUtils {
 				logger.error(e.getMessage(),e);
 			}
 
-			if (httpget != null && !httpget.isAborted()) {
+			if (!httpget.isAborted()) {
 				httpget.releaseConnection();
 				httpget.abort();
 			}
 
-			if (httpclient != null) {
-				try {
-					httpclient.close();
-				} catch (IOException e) {
-					logger.error(e.getMessage(),e);
-				}
+			try {
+				httpclient.close();
+			} catch (IOException e) {
+				logger.error(e.getMessage(),e);
 			}
 		}
 		return responseContent;

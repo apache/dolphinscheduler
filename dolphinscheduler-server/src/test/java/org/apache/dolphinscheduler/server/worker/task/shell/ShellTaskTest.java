@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -172,7 +173,7 @@ public class ShellTaskTest {
     @Test
     public void testHandleForWindows() throws Exception {
         try {
-            PowerMockito.when(OSUtils.isWindows()).thenReturn(true);
+            Assume.assumeTrue(OSUtils.isWindows());
             shellTask.handle();
             Assert.assertTrue(true);
         } catch (Error | Exception e) {
