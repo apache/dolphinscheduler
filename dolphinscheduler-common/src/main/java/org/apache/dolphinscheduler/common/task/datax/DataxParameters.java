@@ -204,8 +204,8 @@ public class DataxParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "DataxParameters{" +
-                "customConfig=" + customConfig + '\'' +
-                ", json=" + json + '\'' +
+                "customConfig=" + customConfig  +
+                ", json='" + json + '\'' +
                 ", dsType='" + dsType + '\'' +
                 ", dataSource=" + dataSource +
                 ", dtType='" + dtType + '\'' +
