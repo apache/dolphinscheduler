@@ -52,8 +52,8 @@ public class NamedThreadFactory implements ThreadFactory {
      */
     @Override
     public Thread newThread(Runnable r) {
-        final String threadName = count > 0 ? String.format(name + "_%d_%d", count, increment.getAndIncrement())
-                : String.format(name + "_%d", increment.getAndIncrement());
+        final String threadName = count > 0 ? String.format("%s_%d_%d", name, count, increment.getAndIncrement())
+                : String.format("%s_%d", name, increment.getAndIncrement());
         Thread t = new Thread(r, threadName);
         t.setDaemon(true);
         return t;
