@@ -61,7 +61,7 @@ public class TaskRecordDao {
      * @return whether startup taskrecord
      */
     public static boolean getTaskRecordFlag(){
-       return conf.getBoolean(Constants.TASK_RECORD_FLAG);
+       return conf.getBoolean(Constants.TASK_RECORD_FLAG,false);
     }
     /**
      * create connection
