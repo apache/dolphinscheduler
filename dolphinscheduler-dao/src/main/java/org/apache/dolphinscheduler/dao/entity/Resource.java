@@ -104,6 +104,14 @@ public class Resource {
     this.updateTime = updateTime;
   }
 
+  public Resource(int id, int pid, String alias, String fullName, boolean isDirectory) {
+    this.id = id;
+    this.pid = pid;
+    this.alias = alias;
+    this.fullName = fullName;
+    this.isDirectory = isDirectory;
+  }
+
   /*public Resource(String alias, String fileName, String description, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
     this.alias = alias;
     this.fileName = fileName;
