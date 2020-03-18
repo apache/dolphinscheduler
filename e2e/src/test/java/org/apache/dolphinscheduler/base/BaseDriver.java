@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.base;
 
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.util.PropertiesReader;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import org.openqa.selenium.PageLoadStrategy;
 
 
 /**

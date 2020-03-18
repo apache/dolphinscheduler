@@ -18,11 +18,8 @@ package org.apache.dolphinscheduler.page.security;
 
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
-import org.apache.dolphinscheduler.data.LoginData;
 import org.apache.dolphinscheduler.data.security.TenantManageData;
-import org.apache.dolphinscheduler.locator.LoginLocator;
 import org.apache.dolphinscheduler.locator.security.TenantManageLocator;
-import org.apache.dolphinscheduler.util.RedisUtil;
 import org.openqa.selenium.WebDriver;
 
 public class TenantManagePage extends PageCommon {
