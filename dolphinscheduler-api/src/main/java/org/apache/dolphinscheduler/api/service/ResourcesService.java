@@ -22,6 +22,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.BeanMap;
+import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -532,10 +533,7 @@ public class ResourcesService extends BaseService {
             userId = 0;
         }
         resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        List<Resource> resources = resourceList.stream().filter(t -> {
-            String alias = t.getAlias();
-            return alias.endsWith(".jar");
-        }).collect(Collectors.toList());
+        List<Resource> resources = new ResourceFilter(".jar",resourceList).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
@@ -1115,7 +1113,7 @@ public class ResourcesService extends BaseService {
     }
 
     /**
-     * /**
+     *
      * list all children id
      * @param resourceId resource id
      * @param childIds child resource id list
