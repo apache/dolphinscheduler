@@ -741,6 +741,7 @@
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/alert/utils/MailUtilsTest.java</include>
+                        <include>**/alert/AlertDaoTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
