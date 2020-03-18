@@ -28,6 +28,16 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 public class DataxParameters extends AbstractParameters {
 
     /**
+     * if custom json config，eg  0, 1
+     */
+    private Integer customConfig;
+
+    /**
+     * if customConfig eq 1 ,then json is usable
+     */
+    private String json;
+
+    /**
      * data source type，eg  MYSQL, POSTGRES ...
      */
     private String dsType;
@@ -157,16 +167,32 @@ public class DataxParameters extends AbstractParameters {
         this.jobSpeedRecord = jobSpeedRecord;
     }
 
+    public Integer getCustomConfig() {
+        return customConfig;
+    }
+
+    public void setCustomConfig(Integer customConfig) {
+        this.customConfig = customConfig;
+    }
+
+    public String getJson() {
+        return json;
+    }
+
+    public void setJson(String json) {
+        this.json = json;
+    }
+
     @Override
     public boolean checkParameters() {
-        if (!(dataSource != 0
-                && dataTarget != 0
-                && StringUtils.isNotEmpty(sql)
-                && StringUtils.isNotEmpty(targetTable))) {
-            return false;
+        if (customConfig == 0) {
+            return dataSource != 0
+                    && dataTarget != 0
+                    && StringUtils.isNotEmpty(sql)
+                    && StringUtils.isNotEmpty(targetTable);
+        } else {
+            return StringUtils.isNotEmpty(json);
         }
-
-        return true;
     }
 
     @Override
