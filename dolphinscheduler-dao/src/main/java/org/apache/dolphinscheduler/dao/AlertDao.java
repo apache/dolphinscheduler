@@ -50,10 +50,8 @@ public class AlertDao extends AbstractBaseDao {
 
     @Override
     protected void init() {
-        logger.info("AlertDao start");
         alertMapper = ConnectionFactory.getInstance().getMapper(AlertMapper.class);
         userAlertGroupMapper = ConnectionFactory.getInstance().getMapper(UserAlertGroupMapper.class);
-        logger.info("AlertDao end");
     }
 
     /**
