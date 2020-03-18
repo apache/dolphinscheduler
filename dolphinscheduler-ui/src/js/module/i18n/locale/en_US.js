@@ -568,5 +568,6 @@ export default {
   'All Columns': 'All Columns',
   'Some Columns': 'Some Columns',
   'Branch flow': 'Branch flow',
-  'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow'
+  'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow',
+  'Successful branch flow and failed branch flow are required': 'Successful branch flow and failed branch flow are required'
 }
