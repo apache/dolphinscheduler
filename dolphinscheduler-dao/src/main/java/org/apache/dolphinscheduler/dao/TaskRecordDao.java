@@ -293,28 +293,4 @@ public class TaskRecordDao {
 
         }
     }
-
-    private static void closeResource(ResultSet rs, PreparedStatement pstmt, Connection conn) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
-        }
-        if (pstmt != null) {
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
-        }
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
-        }
-    }
 }
