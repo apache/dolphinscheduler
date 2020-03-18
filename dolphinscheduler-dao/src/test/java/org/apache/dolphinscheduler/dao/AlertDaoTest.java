@@ -14,24 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.mapper;
+package org.apache.dolphinscheduler.dao;
 
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
+public class AlertDaoTest {
+    private static final Logger logger = LoggerFactory.getLogger(AlertDaoTest.class);
 
-
-public class ConnectionFactoryTest {
-
-    /**
-     * test connection
-     * @throws Exception if error throws Exception
-     */
     @Test
-    public void testConnection()throws Exception{
-        Connection connection = ConnectionFactory.getInstance().getDataSource().getPooledConnection().getConnection();
-        Assert.assertTrue(connection != null);
+    public void testGetAlertDao() {
+        logger.info("testGetAlertDao start");
+        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        Assert.assertNotNull(alertDao);
+        logger.info("testGetAlertDao end");
     }
 }
