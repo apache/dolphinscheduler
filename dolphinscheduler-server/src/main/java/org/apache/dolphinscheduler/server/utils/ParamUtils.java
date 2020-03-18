@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.utils;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 
 import java.util.Date;
@@ -70,17 +71,16 @@ public class ParamUtils {
             Map.Entry<String, Property> en = iter.next();
             Property property = en.getValue();
 
-            if (property.getValue() != null && property.getValue().length() > 0){
-                if (property.getValue().startsWith("$")){
-                    /**
-                     *  local parameter refers to global parameter with the same name
-                     *  note: the global parameters of the process instance here are solidified parameters,
-                     *  and there are no variables in them.
-                     */
-                    String val = property.getValue();
-                    val  = ParameterUtils.convertParameterPlaceholders(val, timeParams);
-                    property.setValue(val);
-                }
+            if (StringUtils.isNotEmpty(property.getValue())
+                    && property.getValue().startsWith("$")){
+                /**
+                 *  local parameter refers to global parameter with the same name
+                 *  note: the global parameters of the process instance here are solidified parameters,
+                 *  and there are no variables in them.
+                 */
+                String val = property.getValue();
+                val  = ParameterUtils.convertParameterPlaceholders(val, timeParams);
+                property.setValue(val);
             }
         }
 

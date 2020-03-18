@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
-<suite name="dolphinscheduler_e2e" parallel="false">
-    <test name="dolphinscheduler_test">
-        <!--<packages>-->
-            <!--&lt;!&ndash;<package name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"/>&ndash;&gt;-->
-            <!--<package name="org.apache.dolphinscheduler.testcase.security.*"/>-->
-        <!--</packages>-->
-        <classes>
-        <class name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"></class>
-        </classes>
-        </test>
+<suite name="dolphinscheduler_e2e" parallel="true">
+    <test name="dolphinscheduler_test" preserve-order="true">
+        <groups>
+            <run>
+                <include name="functionTests" />
+            </run>
+        </groups>
 
-        <!--<suite-files>-->
-            <!--<suite-file path="suite.xml"/>-->
-        <!--</suite-files>-->
+        <classes>
+            <class name="org.apache.dolphinscheduler.testcase.LoginTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.security.TenantManageTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.security.UserManageTest"></class>
+            <!--<class name="org.apache.dolphinscheduler.testcase.project.CreateProjectTest"></class>-->
+            <!--&lt;!&ndash;<class name="org.apache.dolphinscheduler.testcase.project.CreateWorkflowTest"></class>&ndash;&gt;-->
+            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteTenantTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteUserTest"></class>
+        </classes>
+    </test>
 
     <listeners>
         <listener class-name="org.uncommons.reportng.HTMLReporter" />

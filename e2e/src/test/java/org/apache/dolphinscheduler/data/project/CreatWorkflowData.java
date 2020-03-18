@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.data.project;
 
 public class CreatWorkflowData {
     //input shell task name
-    public static final String SHELL_TASK_NAME = "shell task description test";
+    public static final String SHELL_TASK_NAME = "shell task description test1";
 
     //input shell task description
     public static final String SHELL_TASK_DESCRIPTION = "shell task description test";

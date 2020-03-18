@@ -144,9 +144,11 @@ public class AlertDao extends AbstractBaseDao {
      * @param taskId taskId
      * @param taskName taskName
      */
-    public void sendTaskTimeoutAlert(int alertgroupId,String receivers,String receiversCc,int taskId,String taskName){
+    public void sendTaskTimeoutAlert(int alertgroupId,String receivers,String receiversCc, int processInstanceId,
+                                     String processInstanceName, int taskId,String taskName){
         Alert alert = new Alert();
-        String content = String.format("[{'id':'%d','name':'%s','event':'timeout','warnLevel':'middle'}]",taskId,taskName);
+        String content = String.format("[{'process instance id':'%d','task name':'%s','task id':'%d','task name':'%s'," +
+                        "'event':'timeout','warnLevel':'middle'}]", processInstanceId, processInstanceName, taskId, taskName);
         alert.setTitle("Task Timeout Warn");
         alert.setShowType(ShowType.TABLE);
         alert.setContent(content);

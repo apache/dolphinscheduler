@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DataType;
@@ -23,7 +24,6 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.PlaceholderUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.TimePlaceholderUtils;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.slf4j.Logger;
@@ -119,10 +119,15 @@ public class ParameterUtils {
    */
   public static String curingGlobalParams(Map<String,String> globalParamMap, List<Property> globalParamList,
                                    CommandType commandType, Date scheduleTime){
-      Map<String, String> globalMap = new HashMap<>();
-      if(globalParamMap!= null){
-        globalMap.putAll(globalParamMap);
-      }
+
+    if (globalParamList == null || globalParamList.isEmpty()) {
+      return null;
+    }
+
+    Map<String, String> globalMap = new HashMap<>();
+    if (globalParamMap!= null){
+      globalMap.putAll(globalParamMap);
+    }
     Map<String,String> allParamMap = new HashMap<>();
     //If it is a complement, a complement time needs to be passed in, according to the task type
     Map<String,String> timeParams = BusinessTimeUtils
@@ -132,9 +137,7 @@ public class ParameterUtils {
       allParamMap.putAll(timeParams);
     }
 
-    if (globalMap != null) {
-      allParamMap.putAll(globalMap);
-    }
+    allParamMap.putAll(globalMap);
 
     Set<Map.Entry<String, String>> entries = allParamMap.entrySet();
 
@@ -146,22 +149,15 @@ public class ParameterUtils {
         resolveMap.put(entry.getKey(),str);
       }
     }
+    globalMap.putAll(resolveMap);
 
-    if (globalMap != null){
-      globalMap.putAll(resolveMap);
-    }
-
-    if (globalParamList != null && globalParamList.size() > 0){
-
-      for (Property property : globalParamList){
-        String val = globalMap.get(property.getProp());
-        if (val != null){
-          property.setValue(val);
-        }
+    for (Property property : globalParamList){
+      String val = globalMap.get(property.getProp());
+      if (val != null){
+        property.setValue(val);
       }
-      return JSONObject.toJSONString(globalParamList);
     }
-    return null;
+    return JSON.toJSONString(globalParamList);
   }
 
 

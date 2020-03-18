@@ -27,7 +27,6 @@ import java.util.Date;
 
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MysqlPerformance extends BaseDBPerformance{
 
-    private static Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
+    private static Logger logger = LoggerFactory.getLogger(MysqlPerformance.class);
 
 
     /**
