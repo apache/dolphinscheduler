@@ -252,6 +252,7 @@
           v-if="taskType === 'CONDITIONS'"
           ref="CONDITIONS"
           @on-dependent="_onDependent"
+          @on-cache-dependent="_onCacheDependent"
           :backfill-item="backfillItem"
           :pre-node="preNode">
         </m-conditions>
@@ -438,6 +439,8 @@
       },
 
       _cacheItem () {
+        this.conditionResult.successNode[0] = this.successBranch
+        this.conditionResult.failedNode[0] = this.failedBranch
         this.$emit('cacheTaskInfo', {
           item: {
             type: this.taskType,
@@ -446,12 +449,15 @@
             params: this.params,
             description: this.description,
             runFlag: this.runFlag,
+            conditionResult: this.conditionResult,
             dependence: this.cacheDependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId
+            workerGroupId: this.workerGroupId,
+            status: this.status,
+            branch: this.branch
           },
           fromThis: this
         })
@@ -657,7 +663,9 @@
           retryInterval: this.retryInterval,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
-          workerGroupId: this.workerGroupId
+          workerGroupId: this.workerGroupId,
+          successBranch: this.successBranch,
+          failedBranch: this.failedBranch
         }
       }
     },

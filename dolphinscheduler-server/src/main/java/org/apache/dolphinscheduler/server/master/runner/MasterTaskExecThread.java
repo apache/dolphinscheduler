@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -25,7 +26,6 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * whether already Killed,default false
      */
-    private Boolean alreadyKilled = false;
+    private boolean alreadyKilled = false;
 
     /**
      * submit task instance and wait complete
@@ -98,7 +98,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
                 this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
         // task time out
-        Boolean checkTimeout = false;
+        boolean checkTimeout = false;
         TaskTimeoutParameter taskTimeoutParameter = getTaskTimeoutParameter();
         if(taskTimeoutParameter.getEnable()){
             TaskTimeoutStrategy strategy = taskTimeoutParameter.getStrategy();
@@ -176,7 +176,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     private TaskTimeoutParameter getTaskTimeoutParameter(){
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONObject.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
         return taskNode.getTaskTimeoutParameter();
     }
 
@@ -189,7 +189,6 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     private long getRemaintime(long timeoutSeconds) {
         Date startTime = taskInstance.getStartTime();
         long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
-        long remainTime = timeoutSeconds - usedTime;
-        return remainTime;
+        return timeoutSeconds - usedTime;
     }
 }

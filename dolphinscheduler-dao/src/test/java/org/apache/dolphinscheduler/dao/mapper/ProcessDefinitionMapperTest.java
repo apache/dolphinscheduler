@@ -77,7 +77,7 @@ public class ProcessDefinitionMapperTest {
         //update
         processDefinition.setUpdateTime(new Date());
         int update = processDefinitionMapper.updateById(processDefinition);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
@@ -88,7 +88,7 @@ public class ProcessDefinitionMapperTest {
     public void testDelete(){
         ProcessDefinition processDefinition = insertOne();
         int delete = processDefinitionMapper.deleteById(processDefinition.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
@@ -189,7 +189,7 @@ public class ProcessDefinitionMapperTest {
         List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryDefinitionListByIdList(array);
         processDefinitionMapper.deleteById(processDefinition.getId());
         processDefinitionMapper.deleteById(processDefinition1.getId());
-        Assert.assertEquals(processDefinitions.size(), 2);
+        Assert.assertEquals(2, processDefinitions.size());
 
     }
 

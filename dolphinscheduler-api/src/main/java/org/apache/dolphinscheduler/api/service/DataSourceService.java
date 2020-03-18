@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -303,7 +304,7 @@ public class DataSourceService extends BaseService{
         for (DataSource dataSource : dataSourceList) {
 
             String connectionParams  = dataSource.getConnectionParams();
-            JSONObject  object = JSONObject.parseObject(connectionParams);
+            JSONObject  object = JSON.parseObject(connectionParams);
             object.put(Constants.PASSWORD, Constants.XXXXXX);
             dataSource.setConnectionParams(JSONUtils.toJson(object));
 
@@ -367,11 +368,11 @@ public class DataSourceService extends BaseService{
         try {
             switch (dbType) {
                 case POSTGRESQL:
-                    datasource = JSONObject.parseObject(parameter, PostgreDataSource.class);
+                    datasource = JSON.parseObject(parameter, PostgreDataSource.class);
                     Class.forName(Constants.ORG_POSTGRESQL_DRIVER);
                     break;
                 case MYSQL:
-                    datasource = JSONObject.parseObject(parameter, MySQLDataSource.class);
+                    datasource = JSON.parseObject(parameter, MySQLDataSource.class);
                     Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
                     break;
                 case HIVE:
@@ -386,26 +387,26 @@ public class DataSourceService extends BaseService{
                                     getString(org.apache.dolphinscheduler.common.Constants.LOGIN_USER_KEY_TAB_PATH));
                     }
                     if (dbType == DbType.HIVE){
-                        datasource = JSONObject.parseObject(parameter, HiveDataSource.class);
+                        datasource = JSON.parseObject(parameter, HiveDataSource.class);
                     }else if (dbType == DbType.SPARK){
-                        datasource = JSONObject.parseObject(parameter, SparkDataSource.class);
+                        datasource = JSON.parseObject(parameter, SparkDataSource.class);
                     }
                     Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
                     break;
                 case CLICKHOUSE:
-                    datasource = JSONObject.parseObject(parameter, ClickHouseDataSource.class);
+                    datasource = JSON.parseObject(parameter, ClickHouseDataSource.class);
                     Class.forName(Constants.COM_CLICKHOUSE_JDBC_DRIVER);
                     break;
                 case ORACLE:
-                    datasource = JSONObject.parseObject(parameter, OracleDataSource.class);
+                    datasource = JSON.parseObject(parameter, OracleDataSource.class);
                     Class.forName(Constants.COM_ORACLE_JDBC_DRIVER);
                     break;
                 case SQLSERVER:
-                    datasource = JSONObject.parseObject(parameter, SQLServerDataSource.class);
+                    datasource = JSON.parseObject(parameter, SQLServerDataSource.class);
                     Class.forName(Constants.COM_SQLSERVER_JDBC_DRIVER);
                     break;
                 case DB2:
-                    datasource = JSONObject.parseObject(parameter, DB2ServerDataSource.class);
+                    datasource = JSON.parseObject(parameter, DB2ServerDataSource.class);
                     Class.forName(Constants.COM_DB2_JDBC_DRIVER);
                     break;
                 default:
@@ -507,7 +508,7 @@ public class DataSourceService extends BaseService{
             parameterMap.put(Constants.PRINCIPAL,principal);
         }
         if (other != null && !"".equals(other)) {
-            LinkedHashMap<String, String> map = JSONObject.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
+            LinkedHashMap<String, String> map = JSON.parseObject(other, new TypeReference<LinkedHashMap<String, String>>() {
             });
             if (map.size() > 0) {
                 StringBuilder otherSb = new StringBuilder();
@@ -523,9 +524,9 @@ public class DataSourceService extends BaseService{
         }
 
         if(logger.isDebugEnabled()){
-            logger.info("parameters map-----" + JSONObject.toJSONString(parameterMap));
+            logger.info("parameters map-----" + JSON.toJSONString(parameterMap));
         }
-        return JSONObject.toJSONString(parameterMap);
+        return JSON.toJSONString(parameterMap);
 
 
     }

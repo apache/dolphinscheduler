@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.locator.security;
 import org.openqa.selenium.By;
 
 public class TenantManageLocator{
-    public static final By CREATE_TENANT_BUTTON = By.xpath("//button[@class='ans-btn ans-btn-ghost ans-btn-small']");
+    public static final By TENANT_MANAGE = By.xpath("//div[2]/div/a/div/a/span");
+
+    public static final By CREATE_TENANT_BUTTON = By.xpath("//button/span");
 
     public static final By TENANT_INPUT_CODE = By.xpath("//div[2]/div/div/div[2]/div/input");
 
@@ -30,4 +32,8 @@ public class TenantManageLocator{
     public static final By DESCRIPTION = By.xpath("//textarea");
 
     public static final By SUBMIT_BUTTON = By.xpath("//div[3]/button[2]/span");
+
+    public static final By DELETE_TENANT_BUTTON = By.xpath("//div[3]/div[1]/div/table/tr[2]/td[8]/span/button");
+
+    public static final By CONFIRM_DELETE_TENANT_BUTTON = By.xpath("//div[2]/div/button[2]/span");
 }

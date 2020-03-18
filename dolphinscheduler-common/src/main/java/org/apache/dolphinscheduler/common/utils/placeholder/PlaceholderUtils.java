@@ -31,12 +31,12 @@ public class PlaceholderUtils {
     /**
      * Prefix of the position to be replaced
      */
-    public static final String placeholderPrefix = "${";
+    public static final String PLACEHOLDER_PREFIX = "${";
 
     /**
      * The suffix of the position to be replaced
      */
-    public static final String placeholderSuffix = "}";
+    public static final String PLACEHOLDER_SUFFIX = "}";
 
 
     /**
@@ -68,7 +68,7 @@ public class PlaceholderUtils {
      */
     public static PropertyPlaceholderHelper getPropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {
 
-        return new PropertyPlaceholderHelper(placeholderPrefix, placeholderSuffix, null, ignoreUnresolvablePlaceholders);
+        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null, ignoreUnresolvablePlaceholders);
     }
 
     /**
