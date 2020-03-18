@@ -28,14 +28,29 @@ import java.util.stream.Collectors;
  * resource filter
  */
 public class ResourceFilter implements IFilter {
+    /**
+     * resource suffix
+     */
     private String suffix;
+    /**
+     * resource list
+     */
     private List<Resource> resourceList;
 
+    /**
+     * constructor
+     * @param suffix        resource suffix
+     * @param resourceList  resource list
+     */
     public ResourceFilter(String suffix, List<Resource> resourceList) {
         this.suffix = suffix;
         this.resourceList = resourceList;
     }
 
+    /**
+     * file filter
+     * @return file filtered by suffix
+     */
     public Set<Resource> fileFilter(){
         Set<Resource> resources = resourceList.stream().filter(t -> {
             String alias = t.getAlias();
@@ -44,7 +59,10 @@ public class ResourceFilter implements IFilter {
         return resources;
     }
 
-
+    /**
+     * list all parent dir
+     * @return parent resource dir set
+     */
     Set<Resource> listAllParent(){
         Set<Resource> parentList =  new HashSet<>();
         Set<Resource> filterFileList = fileFilter();
@@ -57,6 +75,11 @@ public class ResourceFilter implements IFilter {
 
     }
 
+    /**
+     * list all parent dir
+     * @param resource  resource
+     * @return parent resource dir set
+     */
     Set<Resource> listAllParent(Resource resource){
         Set<Resource> parentList =  new HashSet<>();
         for (Resource resourceTemp : resourceList) {

@@ -118,7 +118,7 @@ public class ResourceTreeVisitor implements Visitor{
             tempResourceComponent = new FileLeaf();
         }
         tempResourceComponent.setName(resource.getAlias());
-        tempResourceComponent.setFullName(resource.getFullName());
+        tempResourceComponent.setFullName(resource.getFullName().replaceFirst("/",""));
         tempResourceComponent.setId(resource.getId());
         tempResourceComponent.setPid(resource.getPid());
         tempResourceComponent.setIdValue(resource.getId(),resource.isDirectory());
