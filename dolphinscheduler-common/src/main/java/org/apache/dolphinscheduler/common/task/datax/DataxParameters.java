@@ -87,6 +87,22 @@ public class DataxParameters extends AbstractParameters {
      */
     private int jobSpeedRecord;
 
+    public Integer getCustomConfig() {
+        return customConfig;
+    }
+
+    public void setCustomConfig(Integer customConfig) {
+        this.customConfig = customConfig;
+    }
+
+    public String getJson() {
+        return json;
+    }
+
+    public void setJson(String json) {
+        this.json = json;
+    }
+
     public String getDsType() {
         return dsType;
     }
@@ -167,21 +183,6 @@ public class DataxParameters extends AbstractParameters {
         this.jobSpeedRecord = jobSpeedRecord;
     }
 
-    public Integer getCustomConfig() {
-        return customConfig;
-    }
-
-    public void setCustomConfig(Integer customConfig) {
-        this.customConfig = customConfig;
-    }
-
-    public String getJson() {
-        return json;
-    }
-
-    public void setJson(String json) {
-        this.json = json;
-    }
 
     @Override
     public boolean checkParameters() {
@@ -203,7 +204,9 @@ public class DataxParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "DataxParameters{" +
-                "dsType='" + dsType + '\'' +
+                "customConfig=" + customConfig + '\'' +
+                ", json=" + json + '\'' +
+                ", dsType='" + dsType + '\'' +
                 ", dataSource=" + dataSource +
                 ", dtType='" + dtType + '\'' +
                 ", dataTarget=" + dataTarget +
