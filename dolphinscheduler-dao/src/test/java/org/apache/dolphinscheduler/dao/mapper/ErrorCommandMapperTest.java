@@ -67,7 +67,7 @@ public class ErrorCommandMapperTest {
         //update
         errorCommand.setUpdateTime(new Date());
         int update = errorCommandMapper.updateById(errorCommand);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1,update);
         errorCommandMapper.deleteById(errorCommand.getId());
     }
 
@@ -79,7 +79,7 @@ public class ErrorCommandMapperTest {
 
         ErrorCommand errorCommand = insertOne();
         int delete = errorCommandMapper.deleteById(errorCommand.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1,delete);
     }
 
     /**

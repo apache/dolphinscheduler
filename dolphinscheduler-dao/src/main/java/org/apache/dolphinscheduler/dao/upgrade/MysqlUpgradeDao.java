@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,15 +29,7 @@ import java.sql.SQLException;
  */
 public class MysqlUpgradeDao extends UpgradeDao {
 
-    public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
-
-    /**
-     * init
-     */
-    @Override
-    protected void init() {
-
-    }
+    public static final Logger logger = LoggerFactory.getLogger(MysqlUpgradeDao.class);
 
     /**
      * mysql upgrade dao holder
@@ -70,12 +61,7 @@ public class MysqlUpgradeDao extends UpgradeDao {
         try {
             conn = dataSource.getConnection();
             rs = conn.getMetaData().getTables(null, null, tableName, null);
-            if (rs.next()) {
-                return true;
-            } else {
-                return false;
-            }
-
+            return rs.next();
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
@@ -97,11 +83,7 @@ public class MysqlUpgradeDao extends UpgradeDao {
         try {
             conn = dataSource.getConnection();
             ResultSet rs = conn.getMetaData().getColumns(null,null,tableName,columnName);
-            if (rs.next()) {
-                return true;
-            } else {
-                return false;
-            }
+            return rs.next();
 
         } catch (SQLException e) {
             logger.error(e.getMessage(),e);

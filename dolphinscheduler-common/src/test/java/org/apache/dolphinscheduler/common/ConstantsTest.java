@@ -14,13 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.data.project;
+package org.apache.dolphinscheduler.common;
 
-public class CreatProjectData {
-    // create project name
-    public static final String PROJECT_NAME = "selenium_project";
-    // create project description
-    public static final String DESCRIPTION = "test create project description";
-    // project page title
-    public static final String PROJECT_TITLE = "项目 - DolphinScheduler";
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.junit.Assert;
+import org.junit.Test;
+
+/**
+ * Constants Test
+ */
+public class ConstantsTest {
+
+    /**
+     * Test PID via env
+     */
+    @Test
+    public void testPID() {
+        if (OSUtils.isWindows()) {
+            Assert.assertEquals(Constants.PID, "handle");
+        } else {
+            Assert.assertEquals(Constants.PID, "pid");
+        }
+    }
+
 }

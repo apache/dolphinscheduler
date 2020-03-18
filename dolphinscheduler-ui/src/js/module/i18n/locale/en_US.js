@@ -229,6 +229,7 @@ export default {
   'File Content': 'File Content',
   'Create': 'Create',
   'Please enter the resource content': 'Please enter the resource content',
+  'Resource content cannot exceed 3000 lines': 'Resource content cannot exceed 3000 lines',
   'File Details': 'File Details',
   'Download Details': 'Download Details',
   'Return': 'Return',
@@ -566,7 +567,6 @@ export default {
   'Data Target': 'Data Target',
   'All Columns': 'All Columns',
   'Some Columns': 'Some Columns',
-  'Modify User': 'Modify User',
   'Branch flow': 'Branch flow',
   'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow'
 }

@@ -21,7 +21,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *  ping machine
@@ -31,12 +30,12 @@ public class Ping implements Serializable {
     /**
      *  ping body
      */
-    protected static ByteBuf EMPTY_BODY = Unpooled.EMPTY_BUFFER;
+    protected static final ByteBuf EMPTY_BODY = Unpooled.EMPTY_BUFFER;
 
     /**
      *  request command body
      */
-    private static byte[] EMPTY_BODY_ARRAY = new byte[0];
+    private static final byte[] EMPTY_BODY_ARRAY = new byte[0];
 
     private static final ByteBuf PING_BUF;
 
