@@ -400,8 +400,7 @@ public class OSUtils {
    * @return true if mac
    */
   public static boolean isMacOS() {
-    String os = System.getProperty("os.name");
-    return os.startsWith("Mac");
+    return getOSName().startsWith("Mac");
   }
 
 
@@ -409,9 +408,16 @@ public class OSUtils {
    * whether is windows
    * @return true if windows
    */
-  public static boolean isWindows() {
-    String os = System.getProperty("os.name");
-    return os.startsWith("Windows");
+  public static boolean isWindows() { ;
+    return getOSName().startsWith("Windows");
+  }
+
+  /**
+   * get current OS name
+   * @return current OS name
+   */
+  public static String getOSName() {
+    return System.getProperty("os.name");
   }
 
   /**

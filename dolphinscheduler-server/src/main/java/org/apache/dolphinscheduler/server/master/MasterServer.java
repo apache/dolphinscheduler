@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerThread;
+import org.apache.dolphinscheduler.server.worker.WorkerServer;
 import org.apache.dolphinscheduler.server.zk.ZKMasterClient;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -37,8 +38,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,7 +49,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * master server
  */
-@ComponentScan("org.apache.dolphinscheduler")
+@ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WorkerServer.class})
+})
 public class MasterServer implements IStoppable {
 
     /**
@@ -112,7 +117,7 @@ public class MasterServer implements IStoppable {
 
         masterSchedulerService = ThreadUtils.newDaemonSingleThreadExecutor("Master-Scheduler-Thread");
 
-        heartbeatMasterService = ThreadUtils.newDaemonThreadScheduledExecutor("Master-Main-Thread",Constants.DEFAULT_MASTER_HEARTBEAT_THREAD_NUM);
+        heartbeatMasterService = ThreadUtils.newThreadScheduledExecutor("Master-Main-Thread",Constants.DEFAULT_MASTER_HEARTBEAT_THREAD_NUM, false);
 
         // heartbeat thread implement
         Runnable heartBeatThread = heartBeatThread();
@@ -147,23 +152,17 @@ public class MasterServer implements IStoppable {
             }
             logger.error("start Quartz failed", e);
         }
-
-
-        /**
-         *  register hooks, which are called before the process exits
-         */
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (zkMasterClient.getActiveMasterNum() <= 1) {
-                    zkMasterClient.getAlertDao().sendServerStopedAlert(
-                        1, OSUtils.getHost(), "Master-Server");
-                }
-                stop("shutdownhook");
-            }
-        }));
     }
 
+    @PreDestroy
+    public void destroy() {
+        // master server exit alert
+        if (zkMasterClient.getActiveMasterNum() <= 1) {
+            zkMasterClient.getAlertDao().sendServerStopedAlert(
+                    1, OSUtils.getHost(), "Master-Server");
+        }
+        stop("shutdownhook");
+    }
 
     /**
      * gracefully stop
@@ -244,7 +243,7 @@ public class MasterServer implements IStoppable {
      */
     private Runnable heartBeatThread(){
         logger.info("start master heart beat thread...");
-        Runnable heartBeatThread  = new Runnable() {
+        return new Runnable() {
             @Override
             public void run() {
                 if(Stopper.isRunning()) {
@@ -258,7 +257,6 @@ public class MasterServer implements IStoppable {
                 }
             }
         };
-        return heartBeatThread;
     }
 }
 
