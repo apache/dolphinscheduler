@@ -175,6 +175,14 @@ public class TenantServiceTest {
         logger.info(result.toString());
         List<Tenant> tenantList = (List<Tenant>) result.get(Constants.DATA_LIST);
         Assert.assertTrue(CollectionUtils.isNotEmpty(tenantList));
+
+        Mockito.when( tenantMapper.queryByTenantCode("1")).thenReturn(getList());
+        Map<String, Object> successRes = tenantService.queryTenantList("1");
+        Assert.assertEquals(Status.SUCCESS,successRes.get(Constants.STATUS));
+
+        Mockito.when( tenantMapper.queryByTenantCode("1")).thenReturn(null);
+        Map<String, Object> tenantNotExistRes = tenantService.queryTenantList("1");
+        Assert.assertEquals(Status.TENANT_NOT_EXIST,tenantNotExistRes.get(Constants.STATUS));
     }
 
     @Test

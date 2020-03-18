@@ -122,8 +122,11 @@
     },
     // Watch the cacheParams
     watch: {
-      cacheParams (val) {
-        this.$emit('on-dsData', val);
+      datasource (val) {
+        this.$emit('on-dsData', {
+          type: this.type,
+          datasource: val
+        });
       }
     },
     created () {
@@ -150,7 +153,8 @@
           })
         }
         this.$emit('on-dsData', {
-          type: this.type
+          type: this.type,
+          datasource: this.datasource
         })
       })
     },

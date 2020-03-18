@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.page.project;
 
 import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
-import org.apache.dolphinscheduler.data.project.CreatProjectData;
+import org.apache.dolphinscheduler.data.project.CreateProjectData;
 import org.apache.dolphinscheduler.locator.project.CreateProjectLocator;
 import org.openqa.selenium.WebDriver;
 
@@ -26,6 +26,7 @@ public class CreateProjectPage extends PageCommon {
     public CreateProjectPage(WebDriver driver) {
         super(driver);
     }
+
     /**
      * jump page
      */
@@ -36,7 +37,7 @@ public class CreateProjectPage extends PageCommon {
     }
 
     /**
-     * creatTenant
+     * createTenant
      *
      * @return Whether to enter the specified page after creat tenant
      */
@@ -46,13 +47,13 @@ public class CreateProjectPage extends PageCommon {
         Thread.sleep(TestConstant.ONE_THOUSANG);
 
         // input create project data
-        sendInput(CreateProjectLocator.PROJECT_NAME, CreatProjectData.PROJECT_NAME);
-        sendInput(CreateProjectLocator.PROJECT_DESCRIPTION, CreatProjectData.DESCRIPTION);
+        sendInput(CreateProjectLocator.PROJECT_NAME, CreateProjectData.PROJECT_NAME);
+        sendInput(CreateProjectLocator.PROJECT_DESCRIPTION, CreateProjectData.DESCRIPTION);
 
         // click submit  button
         clickButton(CreateProjectLocator.SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(CreatProjectData.PROJECT_TITLE);
+        return ifTitleContains(CreateProjectData.PROJECT_TITLE);
     }
 }

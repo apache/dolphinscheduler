@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.LoginData;
 import org.apache.dolphinscheduler.locator.LoginLocator;
 import org.apache.dolphinscheduler.util.RedisUtil;
+import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
 
@@ -38,18 +39,25 @@ public class LoginPage extends PageCommon {
     /**
      * jump page
      */
-    public void jumpPage() {
-        System.out.println("jump login page");
+    public void jumpPageEnlish() {
+        System.out.println("jump to English login page");
         super.jumpPage(LoginData.URL);
+        Cookie cookie = new Cookie("language", "en_US", "/", null);
+        driver.manage().addCookie(cookie);
     }
 
+    public void jumpPageChinese() {
+        super.jumpPage(LoginData.URL);
+        Cookie cookie = new Cookie("language", "zh_CN", "/", null);
+
+        driver.manage().addCookie(cookie);
+    }
     /**
      * login
      *
      * @return Whether to enter the specified page after searching
      */
     public boolean login() throws InterruptedException {
-        System.out.println("LoginPage");
         // login data
         sendInput(LoginLocator.LOGIN_INPUT_USER, LoginData.USER);
         sendInput(LoginLocator.LOGIN_INPUT_PASSWORD, LoginData.PASSWORD);

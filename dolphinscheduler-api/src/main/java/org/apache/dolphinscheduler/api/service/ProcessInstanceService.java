@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import java.nio.charset.StandardCharsets;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -49,7 +50,6 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -273,7 +273,8 @@ public class ProcessInstanceService extends BaseDAGService {
             return resultMap;
         }
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(log.getBytes(Charset.forName("utf8"))), Charset.forName("utf8")));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(log.getBytes(
+            StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
         String line;
         while ((line = br.readLine()) != null) {
             if(line.contains(DEPENDENT_SPLIT)){

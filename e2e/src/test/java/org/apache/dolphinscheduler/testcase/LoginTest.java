@@ -16,22 +16,27 @@
  */
 package org.apache.dolphinscheduler.testcase;
 
-import org.apache.dolphinscheduler.base.BaseTest;
 import org.apache.dolphinscheduler.page.LoginPage;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static org.apache.dolphinscheduler.base.BaseTest.driver;
 
-public class LoginTest extends BaseTest {
+@Test(groups={"functionTests","login"})
+public class LoginTest {
     private LoginPage loginPage;
+
     @Test(description = "LoginTest", priority = 1)
     public void testLogin() throws InterruptedException {
-        // init login page
         loginPage = new LoginPage(driver);
+        System.out.println("===================================");
+        System.out.println("jump to Chinese login page");
+        loginPage.jumpPageChinese();
 
-        // enter login page
-        loginPage.jumpPage();
+        System.out.println("start login");
+        assert  loginPage.login();
+        System.out.println("end login");
+        System.out.println("===================================");
 
-        //assert login page
-        assert loginPage.login();
     }
 }

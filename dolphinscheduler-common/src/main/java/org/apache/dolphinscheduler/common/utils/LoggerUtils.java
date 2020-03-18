@@ -79,7 +79,7 @@ public class LoggerUtils {
      */
     public static List<String> getAppIds(String log, Logger logger) {
 
-        List<String> appIds = new ArrayList<String>();
+        List<String> appIds = new ArrayList<>();
 
         Matcher matcher = APPLICATION_REGEX.matcher(log);
 
