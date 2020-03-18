@@ -186,6 +186,7 @@ public class DataxParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
+        if (customConfig == null) return false;
         if (customConfig == 0) {
             return dataSource != 0
                     && dataTarget != 0
@@ -204,7 +205,7 @@ public class DataxParameters extends AbstractParameters {
     @Override
     public String toString() {
         return "DataxParameters{" +
-                "customConfig=" + customConfig  +
+                "customConfig=" + customConfig +
                 ", json='" + json + '\'' +
                 ", dsType='" + dsType + '\'' +
                 ", dataSource=" + dataSource +
