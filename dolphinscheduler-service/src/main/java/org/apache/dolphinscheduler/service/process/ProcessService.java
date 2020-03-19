@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.subprocess.SubProcessParameters;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
 import org.apache.dolphinscheduler.service.queue.ITaskQueue;
@@ -95,6 +96,9 @@ public class ProcessService {
 
     @Autowired
     private TenantMapper tenantMapper;
+
+    @Autowired
+    private QueueMapper queueMapper;
 
     @Autowired
     private  ProjectMapper projectMapper;
@@ -1695,21 +1699,24 @@ public class ProcessService {
                 stateArray);
     }
 
+
     /**
-     * query user queue by process instance id
-     * @param processInstanceId processInstanceId
-     * @return queue
+     * query user queue by executor id
+     * @param executorId executor id
+     * @return queue value
      */
-    public String queryUserQueueByProcessInstanceId(int processInstanceId){
+    public String queryUserQueueByExecutorId(int executorId){
 
         String queue = "";
-        ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
-        if(processInstance == null){
-            return queue;
-        }
-        User executor = userMapper.selectById(processInstance.getExecutorId());
+        User executor = userMapper.selectById(executorId);
         if(executor != null){
-            queue = executor.getQueue();
+            String queueName = executor.getQueue();
+            if (StringUtils.isNotEmpty(queueName)) {
+                Queue executorQueue = queueMapper.selectByQueueName(queueName);
+                if (executorQueue != null) {
+                    queue = executorQueue.getQueue();
+                }
+            }
         }
         return queue;
     }

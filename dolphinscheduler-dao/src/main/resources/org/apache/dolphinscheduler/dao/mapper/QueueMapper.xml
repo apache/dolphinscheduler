@@ -39,4 +39,10 @@
         </if>
     </select>
 
+    <select id="selectByQueueName" resultType="org.apache.dolphinscheduler.dao.entity.Queue">
+        select *
+        from t_ds_queue
+        where queue_name =#{queueName}
+    </select>
+
 </mapper>

@@ -46,4 +46,10 @@ public interface QueueMapper extends BaseMapper<Queue> {
     List<Queue> queryAllQueueList(@Param("queue") String queue,
                              @Param("queueName") String queueName);
 
+    /**
+     * query queue by queue name
+     * @param queueName queue name
+     * @return queue
+     */
+    Queue selectByQueueName(@Param("queueName") String queueName);
 }
