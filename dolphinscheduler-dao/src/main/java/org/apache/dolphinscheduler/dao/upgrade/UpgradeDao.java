@@ -54,8 +54,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * @return DruidDataSource
      */
     public static DataSource getDataSource(){
-        DataSource dataSource = ConnectionFactory.getInstance().getDataSource();
-        return dataSource;
+        return ConnectionFactory.getInstance().getDataSource();
     }
 
     /**

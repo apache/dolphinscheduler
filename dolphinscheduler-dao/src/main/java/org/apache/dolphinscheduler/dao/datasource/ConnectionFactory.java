@@ -119,10 +119,9 @@ public class ConnectionFactory extends SpringConnectionFactory {
      * @throws Exception sqlSessionFactory exception
      */
     private SqlSessionFactory getSqlSessionFactory() throws Exception {
-        DataSource dataSource = getDataSource();
         TransactionFactory transactionFactory = new JdbcTransactionFactory();
 
-        Environment environment = new Environment("development", transactionFactory, dataSource);
+        Environment environment = new Environment("development", transactionFactory, getDataSource());
 
         MybatisConfiguration configuration = new MybatisConfiguration();
         configuration.setEnvironment(environment);
@@ -132,7 +131,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
 
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
         sqlSessionFactoryBean.setConfiguration(configuration);
-        sqlSessionFactoryBean.setDataSource(dataSource);
+        sqlSessionFactoryBean.setDataSource(getDataSource());
 
         sqlSessionFactoryBean.setTypeEnumsPackage("org.apache.dolphinscheduler.*.enums");
         sqlSessionFactory = sqlSessionFactoryBean.getObject();
