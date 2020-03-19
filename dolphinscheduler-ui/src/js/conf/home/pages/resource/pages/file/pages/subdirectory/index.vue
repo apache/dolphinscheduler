@@ -152,11 +152,15 @@
         this.breadList = dir
         this.getResourceId({
           type: 'FILE',
-          pid: a.params.id
+          id: a.params.id
         }).then(res => {
-          dir = res.fullName.split('/')
-          dir.shift()
-          this.breadList = dir
+          if(res==null) {
+            this.breadList = dir
+          } else {
+            dir = res.fullName.split('/')
+            dir.shift()
+            this.breadList = dir
+          }
         }).catch(e => {
           this.$message.error(e.msg || '')
         })
