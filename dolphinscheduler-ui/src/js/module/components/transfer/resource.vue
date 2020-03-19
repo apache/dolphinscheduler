@@ -20,8 +20,8 @@
       <div class="clearfix transfer-model" style="width: 660px">
         <div>
             <x-button-group v-model="checkedValue" size="small">
-                <x-button type="ghost" value="fileResource" @click="_ckFile">{{$t('File resources')}}</x-button>
-                <x-button type="ghost" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</x-button>
+              <x-button type="ghost" value="fileResource" @click="_ckFile">{{$t('File resources')}}</x-button>
+              <x-button type="ghost" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</x-button>
             </x-button-group>
         </div>
         <div class="select-list-box">

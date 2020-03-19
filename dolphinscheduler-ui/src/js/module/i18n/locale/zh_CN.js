@@ -90,6 +90,7 @@ export default {
   'Please enter other parameters': '请输入其他参数',
   'Resources': '资源',
   'Custom Parameters': '自定义参数',
+  'Custom template': '自定义模版',
   'Please enter main class': '请填写主函数的class',
   'Datasource': '数据源',
   'methods': '方法',
