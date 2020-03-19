@@ -378,8 +378,8 @@ public class ResourcesService extends BaseService {
 
         // get file hdfs path
         // delete hdfs file by type
-        String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originResourceName);
-        String destHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,name);
+        String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originFullName);
+        String destHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,fullName);
 
         try {
             if (HadoopUtils.getInstance().exists(originHdfsFileName)) {
