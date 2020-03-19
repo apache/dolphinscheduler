@@ -180,10 +180,6 @@
           return false
         }
 
-        if (!this.$refs.refResources._verifResources()) {
-          return false
-        }
-
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false

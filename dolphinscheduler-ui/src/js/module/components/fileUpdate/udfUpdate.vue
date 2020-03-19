@@ -105,6 +105,7 @@
         let formData = new FormData()
         formData.append('file', this.file)
         formData.append('type', 'UDF')
+        formData.append('pid', 155)
         formData.append('name', this.udfName)
         formData.append('description', this.udfDesc)
         this.spinnerLoading = true
