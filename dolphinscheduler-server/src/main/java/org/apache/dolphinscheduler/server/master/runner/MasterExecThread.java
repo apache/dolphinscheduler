@@ -674,6 +674,9 @@ public class MasterExecThread implements Runnable {
         TaskNode taskNode = dag.getNode(taskName);
         List<String> depNameList = taskNode.getDepList();
         for(String depsNode : depNameList ){
+            if(!dag.containsNode(depsNode)) {
+                continue;
+            }
 
             if(forbiddenTaskList.containsKey(depsNode) ||
                     skipTaskNodeList.containsKey(depsNode)){
