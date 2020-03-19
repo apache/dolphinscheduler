@@ -676,7 +676,7 @@ public class ResourcesService extends BaseService {
             return result;
         }
         if (StringUtils.isNotBlank(fullName)) {
-            List<Resource> resourceList = resourcesMapper.queryResource(fullName,id,type.ordinal());
+            List<Resource> resourceList = resourcesMapper.queryResource(fullName,type.ordinal());
             if (CollectionUtils.isEmpty(resourceList)) {
                 logger.error("resource file not exist,  resource full name {} ", fullName);
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
