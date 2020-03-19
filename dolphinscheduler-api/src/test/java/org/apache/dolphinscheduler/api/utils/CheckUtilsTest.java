@@ -211,6 +211,7 @@ public class CheckUtilsTest {
         // DataxParameters
         DataxParameters dataxParameters = new DataxParameters();
         assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(dataxParameters), TaskType.DATAX.toString()));
+        dataxParameters.setCustomConfig(0);
         dataxParameters.setDataSource(111);
         dataxParameters.setDataTarget(333);
         dataxParameters.setSql("sql");
