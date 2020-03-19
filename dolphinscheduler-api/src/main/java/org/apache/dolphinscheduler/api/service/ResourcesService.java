@@ -336,7 +336,7 @@ public class ResourcesService extends BaseService {
 
         // updateResource data
 
-        List<Integer> integers = resourcesMapper.listChildren(resourceId);
+        List<Integer> childrenResource = resourcesMapper.listChildren(resourceId);
         String oldFullName = resource.getFullName();
         Date now = new Date();
 
@@ -347,9 +347,9 @@ public class ResourcesService extends BaseService {
 
         try {
             resourcesMapper.updateById(resource);
-            if (resource.isDirectory()) {
+            if (resource.isDirectory() && CollectionUtils.isNotEmpty(childrenResource)) {
                 List<Resource> childResourceList = new ArrayList<>();
-                List<Resource> resourceList = resourcesMapper.listResourceByIds(integers.toArray(new Integer[integers.size()]));
+                List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
                 childResourceList = resourceList.stream().map(t -> {
                     t.setFullName(t.getFullName().replaceFirst(oldFullName, fullName));
                     t.setUpdateTime(now);
@@ -881,7 +881,7 @@ public class ResourcesService extends BaseService {
         resourcesMapper.updateById(resource);
 
 
-        result = uploadContentToHdfs(resource.getAlias(), tenantCode, content);
+        result = uploadContentToHdfs(resource.getFullName(), tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new RuntimeException(result.getMsg());
         }
@@ -1122,24 +1122,28 @@ public class ResourcesService extends BaseService {
      */
     List<Integer> listAllChildren(Resource resource){
         List<Integer> childList = new ArrayList<>();
-        childList.add(resource.getId());
+        if (resource.getId() != -1) {
+            childList.add(resource.getId());
+        }
+
         if(resource.isDirectory()){
-            childList.addAll(listAllChildren(resource.getId()));
+            listAllChildren(resource.getId(),childList);
         }
         return childList;
     }
 
     /**
      * list all children id
-     * @param resourceId resource id
-     * @return all children id
+     * @param resourceId    resource id
+     * @param childList     child list
      */
-    List<Integer> listAllChildren(int resourceId){
+    void listAllChildren(int resourceId,List<Integer> childList){
+
         List<Integer> children = resourcesMapper.listChildren(resourceId);
         for(int chlidId:children){
-            listAllChildren(chlidId);
+            childList.add(chlidId);
+            listAllChildren(chlidId,childList);
         }
-        return children;
     }
 
     /**
