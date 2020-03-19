@@ -301,7 +301,7 @@ public class NettyRemotingClient {
                 return channel;
             }
         } catch (Exception ex) {
-            logger.info("connect to {} error  {}", address, ex);
+            logger.info("connect to {} error", address, ex);
         }
         return null;
     }
