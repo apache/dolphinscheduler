@@ -235,7 +235,7 @@ public class AlertGroupService extends BaseService{
             alertGroups.add(userAlertGroup);
         }
 
-        if(CollectionUtils.isNotEmpty(alertGroups)){
+        if (CollectionUtils.isNotEmpty(alertGroups)) {
             userAlertGroupService.saveBatch(alertGroups);
         }
 

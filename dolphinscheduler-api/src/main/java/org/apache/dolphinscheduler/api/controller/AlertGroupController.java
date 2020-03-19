@@ -93,11 +93,11 @@ public class AlertGroupController extends  BaseController{
     public Result list(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login  user {}, query all alertGroup",
                 loginUser.getUserName());
-        try{
+        try {
             HashMap<String, Object> result = alertGroupService.queryAlertgroup();
             return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_ALL_ALERTGROUP_ERROR.getMsg(),e);
+        } catch (Exception e) {
+            logger.error(Status.QUERY_ALL_ALERTGROUP_ERROR.getMsg(), e);
             return error(Status.QUERY_ALL_ALERTGROUP_ERROR.getCode(), Status.QUERY_ALL_ALERTGROUP_ERROR.getMsg());
         }
     }

@@ -160,34 +160,35 @@ public class AlertGroupServiceTest {
 
 
     }
-    @Test
-    public  void testGrantUser(){
 
-        Integer groupId=1;
+    @Test
+    public void testGrantUser() {
+
+        Integer groupId = 1;
 
         ArgumentCaptor<Integer> groupArgument = ArgumentCaptor.forClass(Integer.class);
 
         Mockito.when(userAlertGroupService.deleteByAlertGroupId(anyInt())).thenReturn(true);
 
-		Map<String, Object> result = alertGroupService.grantUser(getLoginUser(), groupId, "123,321");
+        Map<String, Object> result = alertGroupService.grantUser(getLoginUser(), groupId, "123,321");
         Mockito.verify(userAlertGroupService).deleteByAlertGroupId(groupArgument.capture());
 
-		logger.info(result.toString());
+        logger.info(result.toString());
         assertEquals(groupArgument.getValue(), groupId);
-		assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-	}
+        assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+    }
 
-	@Test
-	public void testVerifyGroupName() {
-		//group name not exist
-		boolean result = alertGroupService.existGroupName(groupName);
-		Assert.assertFalse(result);
-		Mockito.when(alertGroupMapper.queryByGroupName(groupName)).thenReturn(getList());
+    @Test
+    public void testVerifyGroupName() {
+        //group name not exist
+        boolean result = alertGroupService.existGroupName(groupName);
+        Assert.assertFalse(result);
+        Mockito.when(alertGroupMapper.queryByGroupName(groupName)).thenReturn(getList());
 
-		//group name exist
-		result = alertGroupService.existGroupName(groupName);
-		Assert.assertTrue(result);
-	}
+        //group name exist
+        result = alertGroupService.existGroupName(groupName);
+        Assert.assertTrue(result);
+    }
 
 
     /**
