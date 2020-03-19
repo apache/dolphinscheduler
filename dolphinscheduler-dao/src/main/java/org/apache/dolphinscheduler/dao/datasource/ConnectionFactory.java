@@ -51,9 +51,9 @@ public class ConnectionFactory extends SpringConnectionFactory {
 
     private ConnectionFactory() {
         try {
+            dataSource = buildDataSource();
             sqlSessionFactory = getSqlSessionFactory();
             sqlSessionTemplate = getSqlSessionTemplate();
-            dataSource = buildDataSource();
         } catch (Exception e) {
             logger.error("Initializing ConnectionFactory error", e);
             throw new RuntimeException(e);
