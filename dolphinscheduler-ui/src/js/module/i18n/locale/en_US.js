@@ -90,6 +90,7 @@ export default {
   'Please enter other parameters': 'Please enter other parameters',
   'Resources': 'Resources',
   'Custom Parameters': 'Custom Parameters',
+  'Custom template': 'Custom template',
   'Datasource': 'Datasource',
   'methods': 'methods',
   'Please enter method(optional)': 'Please enter method(optional)',
