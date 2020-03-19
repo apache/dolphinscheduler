@@ -664,23 +664,41 @@ public class ResourcesService extends BaseService {
     /**
      * verify resource by full name or pid and type
      * @param fullName  resource full name
-     * @param pid       parent id
+     * @param id        resource id
      * @param type      resource type
      * @return true if the resource full name or pid not exists, otherwise return false
      */
-    public Result queryResource(String fullName,Integer pid,ResourceType type) {
+    public Result queryResource(String fullName,Integer id,ResourceType type) {
         Result result = new Result();
-        if (StringUtils.isBlank(fullName) && pid == null) {
+        if (StringUtils.isBlank(fullName) && id == null) {
             logger.error("You must input one of fullName and pid");
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             return result;
         }
-        List<Resource> resourceList = resourcesMapper.queryResource(fullName,pid,type.ordinal());
-        putMsg(result, Status.SUCCESS);
-        if (CollectionUtils.isEmpty(resourceList)) {
-            result.setData(null);
-        }else{
+        if (StringUtils.isNotBlank(fullName)) {
+            List<Resource> resourceList = resourcesMapper.queryResource(fullName,id,type.ordinal());
+            if (CollectionUtils.isEmpty(resourceList)) {
+                logger.error("resource file not exist,  resource full name {} ", fullName);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+            putMsg(result, Status.SUCCESS);
             result.setData(resourceList.get(0));
+        } else {
+            Resource resource = resourcesMapper.selectById(id);
+            if (resource == null) {
+                logger.error("resource file not exist,  resource id {}", id);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+            Resource parentResource = resourcesMapper.selectById(resource.getPid());
+            if (parentResource == null) {
+                logger.error("parent resource file not exist,  resource id {}", id);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+            putMsg(result, Status.SUCCESS);
+            result.setData(parentResource);
         }
         return result;
     }
