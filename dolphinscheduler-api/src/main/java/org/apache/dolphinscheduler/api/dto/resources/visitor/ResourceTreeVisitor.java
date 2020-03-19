@@ -1,14 +1,3 @@
-package org.apache.dolphinscheduler.api.dto.resources.visitor;
-
-
-import org.apache.dolphinscheduler.api.dto.resources.Directory;
-import org.apache.dolphinscheduler.api.dto.resources.FileLeaf;
-import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -24,6 +13,20 @@ import java.util.List;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+package org.apache.dolphinscheduler.api.dto.resources.visitor;
+
+
+import org.apache.dolphinscheduler.api.dto.resources.Directory;
+import org.apache.dolphinscheduler.api.dto.resources.FileLeaf;
+import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
+import org.apache.dolphinscheduler.dao.entity.Resource;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * resource tree visitor
  */
 public class ResourceTreeVisitor implements Visitor{
 
@@ -115,7 +118,7 @@ public class ResourceTreeVisitor implements Visitor{
             tempResourceComponent = new FileLeaf();
         }
         tempResourceComponent.setName(resource.getAlias());
-        tempResourceComponent.setFullName(resource.getFullName());
+        tempResourceComponent.setFullName(resource.getFullName().replaceFirst("/",""));
         tempResourceComponent.setId(resource.getId());
         tempResourceComponent.setPid(resource.getPid());
         tempResourceComponent.setIdValue(resource.getId(),resource.isDirectory());
