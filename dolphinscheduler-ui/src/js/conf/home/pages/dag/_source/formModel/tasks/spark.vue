@@ -333,11 +333,6 @@
           this.$message.warning(`${i18n.$t('Core number should be positive integer')}`)
           return false
         }
-
-        if (!this.$refs.refResources._verifResources()) {
-          return false
-        }
-
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
