@@ -430,7 +430,8 @@
        * return params
        */
       _onParams (o) {
-        this.params = Object.assign(this.params, {}, o)
+        console.log(o)
+        this.params = Object.assign({}, o)
       },
 
       _onCacheParams (o) {
