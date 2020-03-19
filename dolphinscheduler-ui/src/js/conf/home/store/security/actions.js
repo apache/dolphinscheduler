@@ -461,7 +461,7 @@ export default {
         } else {
           list.unshift({
             id: 'default',
-            name: 'Default'
+            name: 'default'
           })
         }
         state.workerGroupsListAll = list
