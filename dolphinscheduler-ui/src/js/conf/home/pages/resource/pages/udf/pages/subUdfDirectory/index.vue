@@ -149,20 +149,6 @@
         let dir = localStore.getItem('currentDir').split('/')
         dir.shift()
         this.breadList = dir
-        this.getResourceId({
-          type: 'UDF',
-          id: a.params.id
-        }).then(res => {
-          if(res==null) {
-            this.breadList = dir
-          } else {
-            dir = res.fullName.split('/')
-            dir.shift()
-            this.breadList = dir
-          }
-        }).catch(e => {
-          this.$message.error(e.msg || '')
-        })
       }
     },
     created () {
