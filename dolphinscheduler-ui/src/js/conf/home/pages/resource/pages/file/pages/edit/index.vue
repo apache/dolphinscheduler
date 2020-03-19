@@ -104,7 +104,7 @@
         return true
       },
       close () {
-        this.$router.push({ name: 'file' })
+        this.$router.go(-1)
       },
       _getViewResources () {
         this.isLoading = true
