@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.DataSource;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,7 +41,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     private static final String T_VERSION_NAME = "t_escheduler_version";
     private static final String T_NEW_VERSION_NAME = "t_ds_version";
     private static final String rootDir = System.getProperty("user.dir");
-    protected static final DruidDataSource dataSource = getDataSource();
+    protected static final DataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
 
     @Override
@@ -52,12 +53,8 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * get datasource
      * @return DruidDataSource
      */
-    public static DruidDataSource getDataSource(){
-        DruidDataSource dataSource = ConnectionFactory.getInstance().getDataSource();
-        dataSource.setInitialSize(2);
-        dataSource.setMinIdle(2);
-        dataSource.setMaxActive(2);
-
+    public static DataSource getDataSource(){
+        DataSource dataSource = ConnectionFactory.getInstance().getDataSource();
         return dataSource;
     }
 

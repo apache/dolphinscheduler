@@ -53,6 +53,7 @@ public class ConnectionFactory extends SpringConnectionFactory {
         try {
             sqlSessionFactory = getSqlSessionFactory();
             sqlSessionTemplate = getSqlSessionTemplate();
+            dataSource = buildDataSource();
         } catch (Exception e) {
             logger.error("Initializing ConnectionFactory error", e);
             throw new RuntimeException(e);
@@ -69,12 +70,18 @@ public class ConnectionFactory extends SpringConnectionFactory {
      */
     private SqlSessionTemplate sqlSessionTemplate;
 
+    private DataSource dataSource;
+
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
     /**
      * get the data source
      *
      * @return druid dataSource
      */
-    public DruidDataSource getDataSource() {
+    private DataSource buildDataSource() {
 
         DruidDataSource druidDataSource = new DruidDataSource();
 
