@@ -31,6 +31,7 @@
         <m-resources
                 ref="refResources"
                 @on-resourcesData="_onResourcesData"
+                @on-cache-resourcesData="_onCacheResourcesData"
                 :resource-list="resourceList">
         </m-resources>
       </div>
@@ -69,7 +70,9 @@
         // Custom parameter
         localParams: [],
         // resource(list)
-        resourceList: []
+        resourceList: [],
+        // Cache ResourceList
+        cacheResourceList: []
       }
     },
     mixins: [disabledState],
@@ -88,6 +91,12 @@
        */
       _onResourcesData (a) {
         this.resourceList = a
+      },
+      /**
+       * cache resourceList
+       */
+      _onCacheResourcesData (a) {
+        this.cacheResourceList = a
       },
       /**
        * verification
@@ -120,6 +129,8 @@
        * Processing code highlighting
        */
       _handlerEditor () {
+        this._destroyEditor()
+
         // editor
         editor = codemirror('code-python-mirror', {
           mode: 'python',
@@ -134,26 +145,60 @@
           }
         }
 
+        this.changes = () => {
+          this._cacheParams()
+        }
+
         // Monitor keyboard
         editor.on('keypress', this.keypress)
+
+        editor.on('changes', this.changes)
 
         editor.setValue(this.rawScript)
 
         return editor
+      },
+      _cacheParams () {
+        this.$emit('on-cache-params', {
+          resourceList: this.cacheResourceList,
+          localParams: this.localParams,
+          rawScript: editor ? editor.getValue() : ''
+        });
+      },
+      _destroyEditor () {
+         if (editor) {
+          editor.toTextArea() // Uninstall
+          editor.off($('.code-python-mirror'), 'keypress', this.keypress)
+          editor.off($('.code-python-mirror'), 'changes', this.changes)
+        }
       }
     },
-    watch: {},
+    watch: {
+      //Watch the cacheParams
+      cacheParams (val) {
+        this._cacheParams()
+      }
+    },
+    computed: {
+      cacheParams () {
+        return {
+          resourceList: this.cacheResourceList,
+          localParams: this.localParams
+        }
+      }
+    },
     created () {
       let o = this.backfillItem
 
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
-        this.rawScript = o.params.rawScript
+        this.rawScript = o.params.rawScript || ''
 
         // backfill resourceList
         let resourceList = o.params.resourceList || []
         if (resourceList.length) {
           this.resourceList = resourceList
+          this.cacheResourceList = resourceList
         }
 
         // backfill localParams
@@ -169,8 +214,11 @@
       }, 200)
     },
     destroyed () {
-      editor.toTextArea() // Uninstall
-      editor.off($('.code-python-mirror'), 'keypress', this.keypress)
+      if (editor) {
+        editor.toTextArea() // Uninstall
+        editor.off($('.code-python-mirror'), 'keypress', this.keypress)
+        editor.off($('.code-python-mirror'), 'changes', this.changes)
+      }
     },
     components: { mLocalParams, mListBox, mResources }
   }

@@ -16,9 +16,9 @@
  */
 package org.apache.dolphinscheduler.api.interceptor;
 
+import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.commons.httpclient.HttpStatus;
@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,6 +42,9 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
 
   @Autowired
   private UserMapper userMapper;
+
+  @Autowired
+  private Authenticator authenticator;
 
   /**
    * Intercept the execution of a handler. Called after HandlerMapping determined
@@ -68,17 +70,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     String token = request.getHeader("token");
     User user = null;
     if (StringUtils.isEmpty(token)){
-      Session session = sessionService.getSession(request);
-
-      if (session == null) {
-        response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-        logger.info("session info is null ");
-        return false;
-      }
-
-      //get user object from session
-      user = userMapper.selectById(session.getUserId());
-
+      user = authenticator.getAuthUser(request);
       // if user is null
       if (user == null) {
         response.setStatus(HttpStatus.SC_UNAUTHORIZED);
@@ -95,16 +87,6 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     }
     request.setAttribute(Constants.SESSION_USER, user);
     return true;
-  }
-
-  @Override
-  public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-
-  }
-
-  @Override
-  public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-
   }
 
 }

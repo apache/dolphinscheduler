@@ -23,10 +23,10 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
@@ -122,22 +122,19 @@ public class MapReduceTask extends AbstractYarnTask {
         }
 
         // main class
-        if(mapreduceParameters.getProgramType() !=null ){
-            if(mapreduceParameters.getProgramType()!= ProgramType.PYTHON){
-                if(StringUtils.isNotEmpty(mapreduceParameters.getMainClass())){
-                    result.add(mapreduceParameters.getMainClass());
-                }
-            }
+        if(!ProgramType.PYTHON.equals(mapreduceParameters.getProgramType())
+                && StringUtils.isNotEmpty(mapreduceParameters.getMainClass())){
+            result.add(mapreduceParameters.getMainClass());
         }
 
         // others
         if (StringUtils.isNotEmpty(mapreduceParameters.getOthers())) {
             String others = mapreduceParameters.getOthers();
-            if(!others.contains(Constants.MR_QUEUE)){
-                if (StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
-                    result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));
-                }
+            if (!others.contains(Constants.MR_QUEUE)
+                    && StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
+                result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));
             }
+
             result.add(mapreduceParameters.getOthers());
         }else if (StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
             result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));

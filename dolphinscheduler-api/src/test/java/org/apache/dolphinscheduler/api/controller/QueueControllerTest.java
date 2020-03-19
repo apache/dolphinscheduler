@@ -41,7 +41,7 @@ public class QueueControllerTest extends AbstractControllerTest{
     private static Logger logger = LoggerFactory.getLogger(QueueControllerTest.class);
 
     @Test
-    public void queryList() throws Exception {
+    public void testQueryList() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(get("/queue/list")
                 .header(SESSION_ID, sessionId))
@@ -55,7 +55,7 @@ public class QueueControllerTest extends AbstractControllerTest{
     }
 
     @Test
-    public void queryPagingList() throws Exception {
+    public void testQueryQueueListPaging() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         //paramsMap.add("processInstanceId","1380");
@@ -74,8 +74,11 @@ public class QueueControllerTest extends AbstractControllerTest{
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
+
+
+
     @Test
-    public void createQueue() throws Exception {
+    public void testCreateQueue() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("queue","ait");
@@ -90,12 +93,10 @@ public class QueueControllerTest extends AbstractControllerTest{
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 //        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
-
-
     }
 
     @Test
-    public void updateQueue() throws Exception {
+    public void testUpdateQueue() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","2");
@@ -114,7 +115,7 @@ public class QueueControllerTest extends AbstractControllerTest{
     }
 
     @Test
-    public void verifyQueue() throws Exception {
+    public void testVerifyQueue() throws Exception {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("queue","ait123");

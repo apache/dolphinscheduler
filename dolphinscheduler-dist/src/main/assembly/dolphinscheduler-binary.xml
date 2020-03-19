@@ -94,26 +94,12 @@
 				<include>**/*.properties</include>
 				<include>**/*.xml</include>
 				<include>**/*.json</include>
+				<include>config/*.*</include>
 			</includes>
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
-		<fileSet>
-			<directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
-			<includes>
-				<include>**/*.properties</include>
-				<include>**/*.xml</include>
-				<include>**/*.json</include>
-			</includes>
-			<outputDirectory>conf</outputDirectory>
-		</fileSet>
-		<fileSet>
-			<directory>${basedir}/../dolphinscheduler-common/src/main/resources/bin</directory>
-			<includes>
-				<include>*.*</include>
-			</includes>
-			<directoryMode>755</directoryMode>
-			<outputDirectory>bin</outputDirectory>
-		</fileSet>
+
+
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
 			<includes>
@@ -125,6 +111,21 @@
 			<outputDirectory>conf</outputDirectory>
 		</fileSet>
 		<!--server end-->
+
+
+		<!--service end-->
+		<fileSet>
+			<directory>${basedir}/../dolphinscheduler-service/src/main/resources</directory>
+			<includes>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.json</include>
+				<include>**/*.yml</include>
+			</includes>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+		<!--service end-->
+
 
 		<fileSet>
 			<directory>${basedir}/../dolphinscheduler-server/target/dolphinscheduler-server-${project.version}</directory>
@@ -177,7 +178,6 @@
 		<fileSet>
 			<directory>${basedir}/../script</directory>
 			<includes>
-				<include>config/*.*</include>
 				<include>env/*.*</include>
 			</includes>
 			<outputDirectory>./conf</outputDirectory>

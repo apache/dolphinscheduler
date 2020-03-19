@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
-import static org.apache.dolphinscheduler.common.Constants.HADOOP_PROPERTIES_PATH;
 
 /**
  * property utils
@@ -44,14 +43,12 @@ public class PropertyUtils {
 
     private static final Properties properties = new Properties();
 
-    private static final PropertyUtils propertyUtils = new PropertyUtils();
-
-    private PropertyUtils(){
-        init();
+    private PropertyUtils() {
+        throw new IllegalStateException("PropertyUtils class");
     }
 
-    private void init(){
-        String[] propertyFiles = new String[]{HADOOP_PROPERTIES_PATH,COMMON_PROPERTIES_PATH};
+    static {
+        String[] propertyFiles = new String[]{COMMON_PROPERTIES_PATH};
         for (String fileName : propertyFiles) {
             InputStream fis = null;
             try {
@@ -126,7 +123,7 @@ public class PropertyUtils {
      * @param key property name
      * @return property value
      */
-    public static Boolean getBoolean(String key) {
+    public static boolean getBoolean(String key) {
         String value = properties.getProperty(key.trim());
         if(null != value){
             return Boolean.parseBoolean(value);

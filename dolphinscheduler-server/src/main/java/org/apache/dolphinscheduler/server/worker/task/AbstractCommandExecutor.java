@@ -16,19 +16,24 @@
  */
 package org.apache.dolphinscheduler.server.worker.task;
 
+import com.sun.jna.platform.win32.Kernel32;
+import com.sun.jna.platform.win32.WinNT;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.process.ProcessBuilderForWin32;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.utils.LoggerUtils;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -124,10 +129,10 @@ public abstract class AbstractCommandExecutor {
      * task specific execution logic
      *
      * @param execCommand   exec command
-     * @param processDao    process dao
+     * @param processService    process dao
      * @return exit status code
      */
-    public int run(String execCommand, ProcessDao processDao) {
+    public int run(String execCommand, ProcessService processService) {
         int exitStatusCode;
 
         try {
@@ -150,10 +155,7 @@ public abstract class AbstractCommandExecutor {
             // get process id
             int pid = getProcessId(process);
 
-            // task instance id
-            int taskInstId = Integer.parseInt(taskAppId.split("_")[2]);
-
-            processDao.updatePidByTaskInstId(taskInstId, pid, "");
+            processService.updatePidByTaskInstId(taskInstId, pid, "");
 
             logger.info("process start, process id is: {}", pid);
 
@@ -167,10 +169,10 @@ public abstract class AbstractCommandExecutor {
                 exitStatusCode = process.exitValue();
                 logger.info("process has exited, work dir:{}, pid:{} ,exitStatusCode:{}", taskDir, pid,exitStatusCode);
                 //update process state to db
-                exitStatusCode = updateState(processDao, exitStatusCode, pid, taskInstId);
+                exitStatusCode = updateState(processService, exitStatusCode, pid, taskInstId);
 
             } else {
-                TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+                TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
                 if (taskInstance == null) {
                     logger.error("task instance id:{} not exist", taskInstId);
                 } else {
@@ -182,7 +184,7 @@ public abstract class AbstractCommandExecutor {
 
         } catch (InterruptedException e) {
             exitStatusCode = -1;
-            logger.error(String.format("interrupt exception: {}, task may be cancelled or killed",e.getMessage()), e);
+            logger.error("interrupt exception: {}, task may be cancelled or killed", e.getMessage(), e);
             throw new RuntimeException("interrupt exception. exitCode is :  " + exitStatusCode);
         } catch (Exception e) {
             exitStatusCode = -1;
@@ -200,41 +202,71 @@ public abstract class AbstractCommandExecutor {
      * @throws IOException IO Exception
      */
     private void buildProcess(String commandFile) throws IOException {
-        //init process builder
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        // setting up a working directory
-        processBuilder.directory(new File(taskDir));
-        // merge error information to standard output stream
-        processBuilder.redirectErrorStream(true);
-        // setting up user to run commands
-        processBuilder.command("sudo", "-u", tenantCode, commandType(), commandFile);
+        // command list
+        List<String> command = new ArrayList<>();
 
-        process = processBuilder.start();
+        //init process builder
+        if (OSUtils.isWindows()) {
+            ProcessBuilderForWin32 processBuilder = new ProcessBuilderForWin32();
+            // setting up a working directory
+            processBuilder.directory(new File(taskDir));
+            processBuilder.user(tenantCode, StringUtils.EMPTY);
+            // merge error information to standard output stream
+            processBuilder.redirectErrorStream(true);
+
+            // setting up user to run commands
+            command.add(commandInterpreter());
+            command.add("/c");
+            command.addAll(commandOptions());
+            command.add(commandFile);
+
+            // setting commands
+            processBuilder.command(command);
+            process = processBuilder.start();
+        } else {
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            // setting up a working directory
+            processBuilder.directory(new File(taskDir));
+            // merge error information to standard output stream
+            processBuilder.redirectErrorStream(true);
+
+            // setting up user to run commands
+            command.add("sudo");
+            command.add("-u");
+            command.add(tenantCode);
+            command.add(commandInterpreter());
+            command.addAll(commandOptions());
+            command.add(commandFile);
+
+            // setting commands
+            processBuilder.command(command);
+            process = processBuilder.start();
+        }
 
         // print command
-        printCommand(processBuilder);
+        printCommand(command);
     }
 
     /**
      * update process state to db
      *
-     * @param processDao        process dao
+     * @param processService        process dao
      * @param exitStatusCode    exit status code
      * @param pid               process id
      * @param taskInstId        task instance id
      * @return exit status code
      */
-    private int updateState(ProcessDao processDao, int exitStatusCode, int pid, int taskInstId) {
+    private int updateState(ProcessService processService, int exitStatusCode, int pid, int taskInstId) {
         //get yarn state by log
         if (exitStatusCode == 0) {
-            TaskInstance taskInstance = processDao.findTaskInstanceById(taskInstId);
+            TaskInstance taskInstance = processService.findTaskInstanceById(taskInstId);
             logger.info("process id is {}", pid);
 
             List<String> appIds = getAppLinks(taskInstance.getLogPath());
             if (appIds.size() > 0) {
                 String appUrl = String.join(Constants.COMMA, appIds);
                 logger.info("yarn log url:{}",appUrl);
-                processDao.updatePidByTaskInstId(taskInstId, pid, appUrl);
+                processService.updatePidByTaskInstId(taskInstId, pid, appUrl);
             }
 
             // check if all operations are completed
@@ -292,7 +324,7 @@ public abstract class AbstractCommandExecutor {
 
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
-                logger.info("kill attempt failed." + e.getMessage(), e);
+                logger.info("kill attempt failed", e);
             }
         }
 
@@ -312,20 +344,20 @@ public abstract class AbstractCommandExecutor {
 
                 Runtime.getRuntime().exec(cmd);
             } catch (IOException e) {
-                logger.error("kill attempt failed." + e.getMessage(), e);
+                logger.error("kill attempt failed ", e);
             }
         }
     }
 
     /**
      * print command
-     * @param processBuilder process builder
+     * @param command command
      */
-    private void printCommand(ProcessBuilder processBuilder) {
+    private void printCommand(List<String> command) {
         String cmdStr;
 
         try {
-            cmdStr = ProcessUtils.buildCommandStr(processBuilder.command());
+            cmdStr = ProcessUtils.buildCommandStr(command);
             logger.info("task run command:\n{}", cmdStr);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -357,7 +389,11 @@ public abstract class AbstractCommandExecutor {
                 BufferedReader inReader = null;
 
                 try {
-                    inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    if (OSUtils.isWindows()) {
+                        inReader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.forName("GBK")));
+                    } else {
+                        inReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    }
                     String line;
 
                     long lastFlushTime = System.currentTimeMillis();
@@ -405,9 +441,9 @@ public abstract class AbstractCommandExecutor {
                     }
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
-           }
+            }
         } catch (Exception e) {
-            logger.error(String.format("yarn applications: %s  status failed : " + e.getMessage(), appIds.toString()),e);
+            logger.error("yarn applications: {}  status failed ", appIds,e);
             result = false;
         }
         return result;
@@ -457,7 +493,7 @@ public abstract class AbstractCommandExecutor {
                 lineList.add(line);
             }
         } catch (Exception e) {
-            logger.error(String.format("read file: %s failed : ",filename),e);
+            logger.error("read file: {} failed",filename,e);
         } finally {
             if(br != null){
                 try {
@@ -509,12 +545,15 @@ public abstract class AbstractCommandExecutor {
      */
     private int getProcessId(Process process) {
         int processId = 0;
-
         try {
             Field f = process.getClass().getDeclaredField(Constants.PID);
             f.setAccessible(true);
-
-            processId = f.getInt(process);
+            if (OSUtils.isWindows()) {
+                WinNT.HANDLE handle = (WinNT.HANDLE) f.get(process);
+                processId = Kernel32.INSTANCE.GetProcessId(handle);
+            } else {
+                processId = f.getInt(process);
+            }
         } catch (Throwable e) {
             logger.error(e.getMessage(), e);
         }
@@ -534,7 +573,7 @@ public abstract class AbstractCommandExecutor {
         /**
          * when log buffer siz or flush time reach condition , then flush
          */
-        if (logBuffer.size() >= Constants.defaultLogRowsNum  || now - lastFlushTime > Constants.defaultLogFlushInterval) {
+        if (logBuffer.size() >= Constants.DEFAULT_LOG_ROWS_NUM || now - lastFlushTime > Constants.DEFAULT_LOG_FLUSH_INTERVAL) {
             lastFlushTime = now;
             /** log handle */
             logHandler.accept(logBuffer);
@@ -559,9 +598,11 @@ public abstract class AbstractCommandExecutor {
         }
     }
 
-
+    protected List<String> commandOptions() {
+        return Collections.emptyList();
+    }
     protected abstract String buildCommandFilePath();
-    protected abstract String commandType();
+    protected abstract String commandInterpreter();
     protected abstract boolean checkFindApp(String line);
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
 }

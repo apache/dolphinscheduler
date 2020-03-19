@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -25,7 +26,6 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     /**
      * whether already Killed,default false
      */
-    private Boolean alreadyKilled = false;
+    private boolean alreadyKilled = false;
 
     /**
      * submit task instance and wait complete
@@ -74,11 +74,15 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     public Boolean submitWaitComplete() {
         Boolean result = false;
         this.taskInstance = submit();
+        if(this.taskInstance == null){
+            logger.error("submit task instance to mysql and queue failed , please check and fix it");
+            return result;
+        }
         if(!this.taskInstance.getState().typeIsFinished()) {
             result = waitTaskQuit();
         }
         taskInstance.setEndTime(new Date());
-        processDao.updateTaskInstance(taskInstance);
+        processService.updateTaskInstance(taskInstance);
         logger.info("task :{} id:{}, process id:{}, exec thread completed ",
                 this.taskInstance.getName(),taskInstance.getId(), processInstance.getId() );
         return result;
@@ -90,11 +94,11 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     public Boolean waitTaskQuit(){
         // query new state
-        taskInstance = processDao.findTaskInstanceById(taskInstance.getId());
+        taskInstance = processService.findTaskInstanceById(taskInstance.getId());
         logger.info("wait task: process id: {}, task id:{}, task name:{} complete",
                 this.taskInstance.getProcessInstanceId(), this.taskInstance.getId(), this.taskInstance.getName());
         // task time out
-        Boolean checkTimeout = false;
+        boolean checkTimeout = false;
         TaskTimeoutParameter taskTimeoutParameter = getTaskTimeoutParameter();
         if(taskTimeoutParameter.getEnable()){
             TaskTimeoutStrategy strategy = taskTimeoutParameter.getStrategy();
@@ -118,22 +122,24 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                     break;
                 }
                 if(checkTimeout){
-                    long remainTime = getRemaintime(taskTimeoutParameter.getInterval()*60);
+                    long remainTime = getRemaintime(taskTimeoutParameter.getInterval() * 60L);
                     if (remainTime < 0) {
                         logger.warn("task id: {} execution time out",taskInstance.getId());
                         // process define
-                        ProcessDefinition processDefine = processDao.findProcessDefineById(processInstance.getProcessDefinitionId());
+                        ProcessDefinition processDefine = processService.findProcessDefineById(processInstance.getProcessDefinitionId());
                         // send warn mail
-                        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),processDefine.getReceiversCc(),taskInstance.getId(),taskInstance.getName());
+                        alertDao.sendTaskTimeoutAlert(processInstance.getWarningGroupId(),processDefine.getReceivers(),
+                                processDefine.getReceiversCc(), processInstance.getId(), processInstance.getName(),
+                                taskInstance.getId(),taskInstance.getName());
                         checkTimeout = false;
                     }
                 }
                 // updateProcessInstance task instance
-                taskInstance = processDao.findTaskInstanceById(taskInstance.getId());
-                processInstance = processDao.findProcessInstanceById(processInstance.getId());
+                taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+                processInstance = processService.findProcessInstanceById(processInstance.getId());
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
-                logger.error("exception: "+ e.getMessage(),e);
+                logger.error("exception",e);
                 if (processInstance != null) {
                     logger.error("wait task quit failed, instance id:{}, task id:{}",
                             processInstance.getId(), taskInstance.getId());
@@ -170,7 +176,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     private TaskTimeoutParameter getTaskTimeoutParameter(){
         String taskJson = taskInstance.getTaskJson();
-        TaskNode taskNode = JSONObject.parseObject(taskJson, TaskNode.class);
+        TaskNode taskNode = JSON.parseObject(taskJson, TaskNode.class);
         return taskNode.getTaskTimeoutParameter();
     }
 
@@ -183,7 +189,6 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     private long getRemaintime(long timeoutSeconds) {
         Date startTime = taskInstance.getStartTime();
         long usedTime = (System.currentTimeMillis() - startTime.getTime()) / 1000;
-        long remainTime = timeoutSeconds - usedTime;
-        return remainTime;
+        return timeoutSeconds - usedTime;
     }
 }

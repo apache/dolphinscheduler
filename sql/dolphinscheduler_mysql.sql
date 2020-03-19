@@ -366,6 +366,7 @@ CREATE TABLE `t_ds_process_definition` (
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  `modify_by` varchar(36) DEFAULT '' COMMENT 'modify user',
   PRIMARY KEY (`id`),
   KEY `process_definition_index` (`project_id`,`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -615,6 +616,7 @@ CREATE TABLE `t_ds_task_instance` (
   `max_retry_times` int(2) DEFAULT NULL COMMENT 'max retry times',
   `task_instance_priority` int(11) DEFAULT NULL COMMENT 'task instance priority:0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group_id` int(11) DEFAULT '-1' COMMENT 'worker group id',
+  `executor_id` int(11) DEFAULT NULL COMMENT 'executor id',
   PRIMARY KEY (`id`),
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
   KEY `task_instance_index` (`process_definition_id`,`process_instance_id`) USING BTREE,

@@ -25,8 +25,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @ServletComponentScan
-@ComponentScan("org.apache.dolphinscheduler")
-@EnableSwagger2
+@ComponentScan({"org.apache.dolphinscheduler.api",
+        "org.apache.dolphinscheduler.dao",
+        "org.apache.dolphinscheduler.service"})
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
   public static void main(String[] args) {

@@ -154,6 +154,7 @@
         <m-resources
                 ref="refResources"
                 @on-resourcesData="_onResourcesData"
+                @on-cache-resourcesData="_onCacheResourcesData"
                 :resource-list="resourceList">
         </m-resources>
       </div>
@@ -193,6 +194,8 @@
         deployMode: 'cluster',
         // Resource(list)
         resourceList: [],
+        // Cache ResourceList
+        cacheResourceList: [],
         // Custom function
         localParams: [],
         // Driver Number of cores
@@ -231,6 +234,12 @@
        */
       _onResourcesData (a) {
         this.resourceList = a
+      },
+      /**
+       * cache resourceList
+       */
+      _onCacheResourcesData (a) {
+        this.cacheResourceList = a
       },
       /**
        * verification
@@ -336,6 +345,31 @@
         if (type === 'PYTHON') {
           this.mainClass = ''
         }
+      },
+      //Watch the cacheParams
+      cacheParams (val) {
+        this.$emit('on-cache-params', val);
+      }
+    },
+    computed: {
+      cacheParams () {
+        return {
+          mainClass: this.mainClass,
+          mainJar: {
+            res: this.mainJar
+          },
+          deployMode: this.deployMode,
+          resourceList: this.cacheResourceList,
+          localParams: this.localParams,
+          slot: this.slot,
+          taskManager: this.taskManager,
+          jobManagerMemory: this.jobManagerMemory,
+          taskManagerMemory: this.taskManagerMemory,
+          executorCores: this.executorCores,
+          mainArgs: this.mainArgs,
+          others: this.others,
+          programType: this.programType
+        }
       }
     },
     created () {
@@ -345,7 +379,7 @@
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.mainClass = o.params.mainClass || ''
-          this.mainJar = o.params.mainJar.res || ''
+          this.mainJar = o.params.mainJar && o.params.mainJar.res ? o.params.mainJar.res : ''
           this.deployMode = o.params.deployMode || ''
           this.slot = o.params.slot || 1
           this.taskManager = o.params.taskManager || '2'
@@ -360,6 +394,7 @@
           let resourceList = o.params.resourceList || []
           if (resourceList.length) {
             this.resourceList = resourceList
+            this.cacheResourceList = resourceList
           }
 
           // backfill localParams

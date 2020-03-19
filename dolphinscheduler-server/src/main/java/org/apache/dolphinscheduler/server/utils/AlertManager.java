@@ -90,15 +90,15 @@ public class AlertManager {
      * process instance format
      */
     private static final String PROCESS_INSTANCE_FORMAT =
-            "\"Id:%d\"," +
-            "\"Name:%s\"," +
-            "\"Job type: %s\"," +
-            "\"State: %s\"," +
-            "\"Recovery:%s\"," +
-            "\"Run time: %d\"," +
-            "\"Start time: %s\"," +
-            "\"End time: %s\"," +
-            "\"Host: %s\"" ;
+            "\"id:%d\"," +
+            "\"name:%s\"," +
+            "\"job type: %s\"," +
+            "\"state: %s\"," +
+            "\"recovery:%s\"," +
+            "\"run time: %d\"," +
+            "\"start time: %s\"," +
+            "\"end time: %s\"," +
+            "\"host: %s\"" ;
 
     /**
      * get process instance content
@@ -133,6 +133,8 @@ public class AlertManager {
                     continue;
                 }
                 LinkedHashMap<String, String> failedTaskMap = new LinkedHashMap();
+                failedTaskMap.put("process instance id", String.valueOf(processInstance.getId()));
+                failedTaskMap.put("process instance name", processInstance.getName());
                 failedTaskMap.put("task id", String.valueOf(task.getId()));
                 failedTaskMap.put("task name", task.getName());
                 failedTaskMap.put("task type", task.getTaskType());
@@ -193,7 +195,7 @@ public class AlertManager {
             logger.info("add alert to db , alert : {}", alert.toString());
 
         }catch (Exception e){
-            logger.error("send alert failed! " + e);
+            logger.error("send alert failed:{} ", e.getMessage());
         }
 
     }
@@ -234,7 +236,7 @@ public class AlertManager {
 
         String cmdName = getCommandCnName(processInstance.getCommandType());
         String success = processInstance.getState().typeIsSuccess() ? "success" :"failed";
-        alert.setTitle(cmdName + success);
+        alert.setTitle(cmdName + " " + success);
         ShowType showType = processInstance.getState().typeIsSuccess() ? ShowType.TEXT : ShowType.TABLE;
         alert.setShowType(showType);
         String content = getContentProcessInstance(processInstance, taskInstances);

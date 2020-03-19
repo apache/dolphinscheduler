@@ -16,25 +16,25 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.processdure;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.cronutils.utils.StringUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.common.job.db.BaseDataSource;
-import org.apache.dolphinscheduler.common.job.db.DataSourceFactory;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
+import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
+import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.sql.*;
@@ -56,14 +56,9 @@ public class ProcedureTask extends AbstractTask {
     private ProcedureParameters procedureParameters;
 
     /**
-     *  process database access
+     *  process service
      */
-    private ProcessDao processDao;
-
-    /**
-     * base datasource
-     */
-    private BaseDataSource baseDataSource;
+    private ProcessService processService;
 
     /**
      * constructor
@@ -75,14 +70,14 @@ public class ProcedureTask extends AbstractTask {
 
         logger.info("procedure task params {}", taskProps.getTaskParams());
 
-        this.procedureParameters = JSONObject.parseObject(taskProps.getTaskParams(), ProcedureParameters.class);
+        this.procedureParameters = JSON.parseObject(taskProps.getTaskParams(), ProcedureParameters.class);
 
         // check parameters
         if (!procedureParameters.checkParameters()) {
             throw new RuntimeException("procedure task params is not valid");
         }
 
-        this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
+        this.processService = SpringApplicationContext.getBean(ProcessService.class);
     }
 
     @Override
@@ -97,7 +92,7 @@ public class ProcedureTask extends AbstractTask {
                 procedureParameters.getMethod(),
                 procedureParameters.getLocalParams());
 
-        DataSource dataSource = processDao.findDataSourceById(procedureParameters.getDatasource());
+        DataSource dataSource = processService.findDataSourceById(procedureParameters.getDatasource());
         if (dataSource == null){
             logger.error("datasource not exists");
             exitStatusCode = -1;
@@ -117,7 +112,7 @@ public class ProcedureTask extends AbstractTask {
             // load class
             DataSourceFactory.loadClass(dataSource.getType());
             // get datasource
-            baseDataSource = DataSourceFactory.getDatasource(dataSource.getType(),
+            BaseDataSource baseDataSource = DataSourceFactory.getDatasource(dataSource.getType(),
                     dataSource.getConnectionParams());
 
             // get jdbc connection
@@ -163,7 +158,7 @@ public class ProcedureTask extends AbstractTask {
                 stmt.setQueryTimeout(taskProps.getTaskTimeout());
             }
             Map<Integer,Property> outParameterMap = new HashMap<>();
-            if (userDefParamsList != null && userDefParamsList.size() > 0){
+            if (CollectionUtils.isNotEmpty(userDefParamsList)){
                 int index = 1;
                 for (Property property : userDefParamsList){
                     logger.info("localParams : prop : {} , dirct : {} , type : {} , value : {}"
@@ -237,31 +232,31 @@ public class ProcedureTask extends AbstractTask {
     private void getOutputParameter(CallableStatement stmt, int index, String prop, DataType dataType) throws SQLException {
         switch (dataType){
             case VARCHAR:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getString(index));
+                logger.info("out prameter varchar key : {} , value : {}",prop,stmt.getString(index));
                 break;
             case INTEGER:
-                logger.info("out prameter key : {} , value : {}", prop, stmt.getInt(index));
+                logger.info("out prameter integer key : {} , value : {}", prop, stmt.getInt(index));
                 break;
             case LONG:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getLong(index));
+                logger.info("out prameter long key : {} , value : {}",prop,stmt.getLong(index));
                 break;
             case FLOAT:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getFloat(index));
+                logger.info("out prameter float key : {} , value : {}",prop,stmt.getFloat(index));
                 break;
             case DOUBLE:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getDouble(index));
+                logger.info("out prameter double key : {} , value : {}",prop,stmt.getDouble(index));
                 break;
             case DATE:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getDate(index));
+                logger.info("out prameter date key : {} , value : {}",prop,stmt.getDate(index));
                 break;
             case TIME:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getTime(index));
+                logger.info("out prameter time key : {} , value : {}",prop,stmt.getTime(index));
                 break;
             case TIMESTAMP:
-                logger.info("out prameter key : {} , value : {}",prop,stmt.getTimestamp(index));
+                logger.info("out prameter timestamp key : {} , value : {}",prop,stmt.getTimestamp(index));
                 break;
             case BOOLEAN:
-                logger.info("out prameter key : {} , value : {}",prop, stmt.getBoolean(index));
+                logger.info("out prameter boolean key : {} , value : {}",prop, stmt.getBoolean(index));
                 break;
             default:
                 break;

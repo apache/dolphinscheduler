@@ -21,14 +21,16 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.shell.ShellParameters;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.ProcessDao;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
-import org.apache.dolphinscheduler.server.utils.SpringApplicationContext;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -64,7 +66,7 @@ public class ShellTask extends AbstractTask {
   /**
    * process database access
    */
-  private ProcessDao processDao;
+  private ProcessService processService;
 
   /**
    * constructor
@@ -84,7 +86,7 @@ public class ShellTask extends AbstractTask {
             taskProps.getTaskStartTime(),
             taskProps.getTaskTimeout(),
             logger);
-    this.processDao = SpringApplicationContext.getBean(ProcessDao.class);
+    this.processService = SpringApplicationContext.getBean(ProcessService.class);
   }
 
   @Override
@@ -102,7 +104,7 @@ public class ShellTask extends AbstractTask {
   public void handle() throws Exception {
     try {
       // construct process
-      exitStatusCode = shellCommandExecutor.run(buildCommand(), processDao);
+      exitStatusCode = shellCommandExecutor.run(buildCommand(), processService);
     } catch (Exception e) {
       logger.error("shell task failure", e);
       exitStatusCode = -1;
@@ -123,7 +125,7 @@ public class ShellTask extends AbstractTask {
    */
   private String buildCommand() throws Exception {
     // generate scripts
-    String fileName = String.format("%s/%s_node.sh", taskDir, taskProps.getTaskAppId());
+    String fileName = String.format("%s/%s_node.%s", taskDir, taskProps.getTaskAppId(), OSUtils.isWindows() ? "bat" : "sh");
     Path path = new File(fileName).toPath();
 
     if (Files.exists(path)) {
@@ -141,10 +143,20 @@ public class ShellTask extends AbstractTask {
             shellParameters.getLocalParametersMap(),
             taskProps.getCmdTypeIfComplement(),
             taskProps.getScheduleTime());
-    if (paramsMap != null){
-      script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-    }
+//    if (paramsMap != null){
+//      script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+//    }
 
+    //new
+//    replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
+    if (paramsMap != null) {
+      String dateTime = DateUtils.format(taskProps.getScheduleTime(), Constants.PARAMETER_FORMAT_TIME);
+      Property p = new Property();
+      p.setValue(dateTime);
+      p.setProp(Constants.PARAMETER_SHECDULE_TIME);
+      paramsMap.put(Constants.PARAMETER_SHECDULE_TIME, p);
+      script = ParameterUtils.convertParameterPlaceholders2(script, ParamUtils.convert(paramsMap));
+    }
 
     shellParameters.setRawScript(script);
 
@@ -154,7 +166,11 @@ public class ShellTask extends AbstractTask {
     Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
     FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
 
-    Files.createFile(path, attr);
+    if (OSUtils.isWindows()) {
+      Files.createFile(path);
+    } else {
+      Files.createFile(path, attr);
+    }
 
     Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
 

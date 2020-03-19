@@ -17,14 +17,13 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.SchemaUtils;
 import org.apache.dolphinscheduler.common.utils.ScriptRunner;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.AbstractBaseDao;
 import org.apache.dolphinscheduler.dao.datasource.ConnectionFactory;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +53,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * @return DruidDataSource
      */
     public static DruidDataSource getDataSource(){
-        DruidDataSource dataSource = ConnectionFactory.getDataSource();
+        DruidDataSource dataSource = ConnectionFactory.getInstance().getDataSource();
         dataSource.setInitialSize(2);
         dataSource.setMinIdle(2);
         dataSource.setMaxActive(2);
@@ -156,7 +155,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
@@ -313,7 +314,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (SQLException e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
@@ -321,7 +324,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
             try {
-                conn.rollback();
+                if (null != conn) {
+                    conn.rollback();
+                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }

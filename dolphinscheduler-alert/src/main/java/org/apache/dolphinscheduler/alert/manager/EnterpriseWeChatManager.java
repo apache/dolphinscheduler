@@ -32,7 +32,7 @@ import java.util.Map;
  * Enterprise WeChat Manager
  */
 public class EnterpriseWeChatManager {
-    private static final Logger logger = LoggerFactory.getLogger(MsgManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(EnterpriseWeChatManager.class);
     /**
      * Enterprise We Chat send
      * @param alert the alert
@@ -42,8 +42,8 @@ public class EnterpriseWeChatManager {
     public Map<String,Object> send(Alert alert, String token){
         Map<String,Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
-        String agentId = EnterpriseWeChatUtils.enterpriseWeChatAgentId;
-        String users = EnterpriseWeChatUtils.enterpriseWeChatUsers;
+        String agentId = EnterpriseWeChatUtils.ENTERPRISE_WE_CHAT_AGENT_ID;
+        String users = EnterpriseWeChatUtils.ENTERPRISE_WE_CHAT_USERS;
         List<String> userList = Arrays.asList(users.split(","));
         logger.info("send message {}",alert);
         String msg = EnterpriseWeChatUtils.makeUserSendMsg(userList, agentId,EnterpriseWeChatUtils.markdownByAlert(alert));

@@ -16,12 +16,12 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.*;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public class ProcessDefinitionController extends BaseController{
 
     /**
      * create process definition
-     * 
+     *
      * @param loginUser login user
      * @param projectName project name
      * @param name process definition name
@@ -96,7 +96,7 @@ public class ProcessDefinitionController extends BaseController{
 
     /**
      * verify process definition name unique
-     * 
+     *
      * @param loginUser login user
      * @param projectName project name
      * @param name name
@@ -328,9 +328,9 @@ public class ProcessDefinitionController extends BaseController{
 
 
     /**
-     * 
+     *
      * get tasks list by process definition id
-     *  
+     *
      *
      * @param loginUser login user
      * @param projectName project name
@@ -442,7 +442,7 @@ public class ProcessDefinitionController extends BaseController{
                     loginUser.getUserName(), projectName, processDefinitionIds);
 
             Map<String, Object> result = new HashMap<>(5);
-            List<Integer> deleteFailedIdList = new ArrayList<Integer>();
+            List<String> deleteFailedIdList = new ArrayList<>();
             if(StringUtils.isNotEmpty(processDefinitionIds)){
                 String[] processDefinitionIdArray = processDefinitionIds.split(",");
 
@@ -451,17 +451,17 @@ public class ProcessDefinitionController extends BaseController{
                     try {
                         Map<String, Object> deleteResult = processDefinitionService.deleteProcessDefinitionById(loginUser, projectName, processDefinitionId);
                         if(!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))){
-                            deleteFailedIdList.add(processDefinitionId);
+                            deleteFailedIdList.add(strProcessDefinitionId);
                             logger.error((String)deleteResult.get(Constants.MSG));
                         }
                     } catch (Exception e) {
-                        deleteFailedIdList.add(processDefinitionId);
+                        deleteFailedIdList.add(strProcessDefinitionId);
                     }
                 }
             }
 
-            if(deleteFailedIdList.size() > 0){
-                putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR,StringUtils.join(deleteFailedIdList.toArray(),","));
+            if(!deleteFailedIdList.isEmpty()){
+                putMsg(result, Status.BATCH_DELETE_PROCESS_DEFINE_BY_IDS_ERROR, String.join(",", deleteFailedIdList));
             }else{
                 putMsg(result, Status.SUCCESS);
             }

@@ -16,26 +16,20 @@
  */
 package org.apache.dolphinscheduler.alert.utils;
 
+import org.apache.dolphinscheduler.alert.template.AlertTemplate;
+import org.apache.dolphinscheduler.alert.template.AlertTemplateFactory;
 import org.apache.dolphinscheduler.common.enums.ShowType;
-import freemarker.cache.StringTemplateLoader;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.HtmlEmail;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ResourceUtils;
 
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.*;
 import java.util.*;
-
-import static org.apache.dolphinscheduler.alert.utils.PropertyUtils.getInt;
 
 
 /**
@@ -45,49 +39,31 @@ public class MailUtils {
 
     public static final Logger logger = LoggerFactory.getLogger(MailUtils.class);
 
-    public static final String mailProtocol = PropertyUtils.getString(Constants.MAIL_PROTOCOL);
+    public static final String MAIL_PROTOCOL = PropertyUtils.getString(Constants.MAIL_PROTOCOL);
 
-    public static final String mailServerHost = PropertyUtils.getString(Constants.MAIL_SERVER_HOST);
+    public static final String MAIL_SERVER_HOST = PropertyUtils.getString(Constants.MAIL_SERVER_HOST);
 
-    public static final Integer mailServerPort = PropertyUtils.getInt(Constants.MAIL_SERVER_PORT);
+    public static final Integer MAIL_SERVER_PORT = PropertyUtils.getInt(Constants.MAIL_SERVER_PORT);
 
-    public static final String mailSender = PropertyUtils.getString(Constants.MAIL_SENDER);
+    public static final String MAIL_SENDER = PropertyUtils.getString(Constants.MAIL_SENDER);
 
-    public static final String mailUser = PropertyUtils.getString(Constants.MAIL_USER);
+    public static final String MAIL_USER = PropertyUtils.getString(Constants.MAIL_USER);
 
-    public static final String mailPasswd = PropertyUtils.getString(Constants.MAIL_PASSWD);
+    public static final String MAIL_PASSWD = PropertyUtils.getString(Constants.MAIL_PASSWD);
 
-    public static final Boolean mailUseStartTLS = PropertyUtils.getBoolean(Constants.MAIL_SMTP_STARTTLS_ENABLE);
+    public static final Boolean MAIL_USE_START_TLS = PropertyUtils.getBoolean(Constants.MAIL_SMTP_STARTTLS_ENABLE);
 
-    public static final Boolean mailUseSSL = PropertyUtils.getBoolean(Constants.MAIL_SMTP_SSL_ENABLE);
+    public static final Boolean MAIL_USE_SSL = PropertyUtils.getBoolean(Constants.MAIL_SMTP_SSL_ENABLE);
 
-    public static final String xlsFilePath = PropertyUtils.getString(Constants.XLS_FILE_PATH);
+    public static final String XLS_FILE_PATH = PropertyUtils.getString(Constants.XLS_FILE_PATH);
 
-    public static final String starttlsEnable = PropertyUtils.getString(Constants.MAIL_SMTP_STARTTLS_ENABLE);
+    public static final String STARTTLS_ENABLE = PropertyUtils.getString(Constants.MAIL_SMTP_STARTTLS_ENABLE);
 
-    public static final String sslEnable = PropertyUtils.getString(Constants.MAIL_SMTP_SSL_ENABLE);
+    public static final String SSL_ENABLE = PropertyUtils.getString(Constants.MAIL_SMTP_SSL_ENABLE);
 
-    public static final String sslTrust = PropertyUtils.getString(Constants.MAIL_SMTP_SSL_TRUST);
+    public static final String SSL_TRUST = PropertyUtils.getString(Constants.MAIL_SMTP_SSL_TRUST);
 
-    private static Template MAIL_TEMPLATE;
-
-    static {
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_21);
-        cfg.setDefaultEncoding(Constants.UTF_8);
-        StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
-        cfg.setTemplateLoader(stringTemplateLoader);
-        InputStreamReader isr = null;
-        try {
-            isr = new InputStreamReader(new FileInputStream(ResourceUtils.getFile(Constants.CLASSPATH_MAIL_TEMPLATES_ALERT_MAIL_TEMPLATE_FTL)),
-                    Constants.UTF_8);
-
-            MAIL_TEMPLATE = new Template("alert_mail_template", isr, cfg);
-        } catch (Exception e) {
-            MAIL_TEMPLATE = null;
-        } finally {
-            IOUtils.closeQuietly(isr);
-        }
-    }
+    public static final AlertTemplate alertTemplate = AlertTemplateFactory.getMessageTemplate();
 
 
     /**
@@ -114,14 +90,14 @@ public class MailUtils {
     public static Map<String,Object> sendMails(Collection<String> receivers, Collection<String> receiversCc, String title, String content, ShowType showType) {
         Map<String,Object> retMap = new HashMap<>();
         retMap.put(Constants.STATUS, false);
-        
+
         // if there is no receivers && no receiversCc, no need to process
         if (CollectionUtils.isEmpty(receivers) && CollectionUtils.isEmpty(receiversCc)) {
             return retMap;
         }
 
-        receivers.removeIf((from) -> (StringUtils.isEmpty(from)));
-        
+        receivers.removeIf(StringUtils::isEmpty);
+
         if (showType == ShowType.TABLE || showType == ShowType.TEXT){
             // send email
             HtmlEmail email = new HtmlEmail();
@@ -129,7 +105,7 @@ public class MailUtils {
             try {
                 Session session = getSession();
                 email.setMailSession(session);
-                email.setFrom(mailSender);
+                email.setFrom(MAIL_SENDER);
                 email.setCharset(Constants.UTF_8);
                 if (CollectionUtils.isNotEmpty(receivers)){
                     // receivers mail
@@ -174,46 +150,7 @@ public class MailUtils {
      * @return the html table form
      */
     private static String htmlTable(String content, boolean showAll){
-        if (StringUtils.isNotEmpty(content)){
-            List<LinkedHashMap> mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);
-
-            if(!showAll && mapItemsList.size() > Constants.NUMBER_1000){
-                mapItemsList = mapItemsList.subList(0,Constants.NUMBER_1000);
-            }
-
-            StringBuilder contents = new StringBuilder(200);
-
-            boolean flag = true;
-
-            String title = "";
-            for (LinkedHashMap mapItems : mapItemsList){
-
-                Set<Map.Entry<String, Object>> entries = mapItems.entrySet();
-
-                Iterator<Map.Entry<String, Object>> iterator = entries.iterator();
-
-                StringBuilder t = new StringBuilder(Constants.TR);
-                StringBuilder cs = new StringBuilder(Constants.TR);
-                while (iterator.hasNext()){
-
-                    Map.Entry<String, Object> entry = iterator.next();
-                    t.append(Constants.TH).append(entry.getKey()).append(Constants.TH_END);
-                    cs.append(Constants.TD).append(String.valueOf(entry.getValue())).append(Constants.TD_END);
-
-                }
-                t.append(Constants.TR_END);
-                cs.append(Constants.TR_END);
-                if (flag){
-                    title = t.toString();
-                }
-                flag = false;
-                contents.append(cs);
-            }
-
-            return getTemplateContent(title,contents.toString());
-        }
-
-        return null;
+        return alertTemplate.getMessageFromTemplate(content,ShowType.TABLE,showAll);
     }
 
     /**
@@ -231,32 +168,8 @@ public class MailUtils {
      * @return text in html form
      */
     private static String htmlText(String content){
-
-        if (StringUtils.isNotEmpty(content)){
-            List<String> list;
-            try {
-                list = JSONUtils.toList(content,String.class);
-            }catch (Exception e){
-                logger.error("json format exception",e);
-                return null;
-            }
-
-            StringBuilder contents = new StringBuilder(100);
-            for (String str : list){
-                contents.append(Constants.TR);
-                contents.append(Constants.TD).append(str).append(Constants.TD_END);
-                contents.append(Constants.TR_END);
-            }
-
-            return getTemplateContent(null,contents.toString());
-
-        }
-
-        return null;
+        return alertTemplate.getMessageFromTemplate(content,ShowType.TEXT);
     }
-
-
-
 
     /**
      * send mail as Excel attachment
@@ -272,7 +185,7 @@ public class MailUtils {
 
     /**
      * get MimeMessage
-     * @param receivers
+     * @param receivers receivers
      * @return the MimeMessage
      * @throws MessagingException
      */
@@ -286,10 +199,10 @@ public class MailUtils {
         // 2. creating mail: Creating a MimeMessage
         MimeMessage msg = new MimeMessage(session);
         // 3. set sender
-        msg.setFrom(new InternetAddress(mailSender));
+        msg.setFrom(new InternetAddress(MAIL_SENDER));
         // 4. set receivers
         for (String receiver : receivers) {
-            msg.addRecipients(MimeMessage.RecipientType.TO, InternetAddress.parse(receiver));
+            msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
         }
         return msg;
     }
@@ -300,24 +213,23 @@ public class MailUtils {
      */
     private static Session getSession() {
         Properties props = new Properties();
-        props.setProperty(Constants.MAIL_HOST, mailServerHost);
-        props.setProperty(Constants.MAIL_PORT, String.valueOf(mailServerPort));
+        props.setProperty(Constants.MAIL_HOST, MAIL_SERVER_HOST);
+        props.setProperty(Constants.MAIL_PORT, String.valueOf(MAIL_SERVER_PORT));
         props.setProperty(Constants.MAIL_SMTP_AUTH, Constants.STRING_TRUE);
-        props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, mailProtocol);
-        props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, starttlsEnable);
-        props.setProperty(Constants.MAIL_SMTP_SSL_ENABLE, sslEnable);
-        props.setProperty(Constants.MAIL_SMTP_SSL_TRUST, sslTrust);
+        props.setProperty(Constants.MAIL_TRANSPORT_PROTOCOL, MAIL_PROTOCOL);
+        props.setProperty(Constants.MAIL_SMTP_STARTTLS_ENABLE, STARTTLS_ENABLE);
+        props.setProperty(Constants.MAIL_SMTP_SSL_ENABLE, SSL_ENABLE);
+        props.setProperty(Constants.MAIL_SMTP_SSL_TRUST, SSL_TRUST);
 
         Authenticator auth = new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 // mail username and password
-                return new PasswordAuthentication(mailUser, mailPasswd);
+                return new PasswordAuthentication(MAIL_USER, MAIL_PASSWD);
             }
         };
 
-        Session session = Session.getInstance(props, auth);
-        return session;
+        return Session.getInstance(props, auth);
     }
 
     /**
@@ -336,12 +248,10 @@ public class MailUtils {
          */
         if(CollectionUtils.isNotEmpty(receiversCc)){
             for (String receiverCc : receiversCc){
-                msg.addRecipients(MimeMessage.RecipientType.CC, InternetAddress.parse(receiverCc));
+                msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(receiverCc));
             }
         }
 
-        // set receivers type to cc
-        // msg.addRecipients(MimeMessage.RecipientType.CC, InternetAddress.parse(propMap.get("${CC}")));
         // set subject
         msg.setSubject(title);
         MimeMultipart partList = new MimeMultipart();
@@ -351,8 +261,8 @@ public class MailUtils {
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
         // make excel file
-        ExcelUtils.genExcelFile(content,title,xlsFilePath);
-        File file = new File(xlsFilePath + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
+        ExcelUtils.genExcelFile(content,title, XLS_FILE_PATH);
+        File file = new File(XLS_FILE_PATH + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
         part2.attachFile(file);
         part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS,Constants.UTF_8,"B"));
         // add components to collection
@@ -405,12 +315,12 @@ public class MailUtils {
     public static void deleteFile(File file){
         if(file.exists()){
             if(file.delete()){
-                logger.info("delete success:"+file.getAbsolutePath()+file.getName());
+                logger.info("delete success: {}",file.getAbsolutePath() + file.getName());
             }else{
-                logger.info("delete fail"+file.getAbsolutePath()+file.getName());
+                logger.info("delete fail: {}", file.getAbsolutePath() + file.getName());
             }
         }else{
-            logger.info("file not exists:"+file.getAbsolutePath()+file.getName());
+            logger.info("file not exists: {}", file.getAbsolutePath() + file.getName());
         }
     }
 
@@ -422,32 +332,8 @@ public class MailUtils {
      * @param e the exception
      */
     private static void handleException(Collection<String> receivers, Map<String, Object> retMap, Exception e) {
-        logger.error("Send email to {} failed", StringUtils.join(",", receivers), e);
-        retMap.put(Constants.MESSAGE, "Send email to {" + StringUtils.join(",", receivers) + "} failed，" + e.toString());
+        logger.error("Send email to {} failed", receivers, e);
+        retMap.put(Constants.MESSAGE, "Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 
-    /**
-     * get the content of the template
-     * @param title the title
-     * @param content the content to retrieve
-     * @return the content in the template or null if exception occurs
-     */
-    private static String getTemplateContent(String title,String content){
-        StringWriter out = new StringWriter();
-        Map<String,String> map = new HashMap<>();
-        if(null != title){
-            map.put(Constants.TITLE,title);
-        }
-        map.put(Constants.CONTENT,content);
-        try {
-            MAIL_TEMPLATE.process(map, out);
-            return out.toString();
-        } catch (TemplateException e) {
-            logger.error(e.getMessage(),e);
-        } catch (IOException e) {
-            logger.error(e.getMessage(),e);
-        }
-
-        return null;
-    }
 }

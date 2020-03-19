@@ -17,9 +17,9 @@
 package org.apache.dolphinscheduler.dao;
 
 
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
@@ -50,8 +50,8 @@ public class AlertDao extends AbstractBaseDao {
 
     @Override
     protected void init() {
-        alertMapper = ConnectionFactory.getMapper(AlertMapper.class);
-        userAlertGroupMapper = ConnectionFactory.getMapper(UserAlertGroupMapper.class);
+        alertMapper = ConnectionFactory.getInstance().getMapper(AlertMapper.class);
+        userAlertGroupMapper = ConnectionFactory.getInstance().getMapper(UserAlertGroupMapper.class);
     }
 
     /**
@@ -144,9 +144,11 @@ public class AlertDao extends AbstractBaseDao {
      * @param taskId taskId
      * @param taskName taskName
      */
-    public void sendTaskTimeoutAlert(int alertgroupId,String receivers,String receiversCc,int taskId,String taskName){
+    public void sendTaskTimeoutAlert(int alertgroupId,String receivers,String receiversCc, int processInstanceId,
+                                     String processInstanceName, int taskId,String taskName){
         Alert alert = new Alert();
-        String content = String.format("[{'id':'%d','name':'%s','event':'timeout','warnLevel':'middle'}]",taskId,taskName);
+        String content = String.format("[{'process instance id':'%d','task name':'%s','task id':'%d','task name':'%s'," +
+                        "'event':'timeout','warnLevel':'middle'}]", processInstanceId, processInstanceName, taskId, taskName);
         alert.setTitle("Task Timeout Warn");
         alert.setShowType(ShowType.TABLE);
         alert.setContent(content);

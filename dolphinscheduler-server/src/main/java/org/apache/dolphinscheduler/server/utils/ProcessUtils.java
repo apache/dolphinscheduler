@@ -16,19 +16,20 @@
  */
 package org.apache.dolphinscheduler.server.utils;
 
+import java.nio.charset.StandardCharsets;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.rpc.LogClient;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -296,7 +297,7 @@ public class ProcessUtils {
         File f = new File(commandFile);
 
         if (!f.exists()) {
-          FileUtils.writeStringToFile(new File(commandFile), sb.toString(), Charset.forName("UTF-8"));
+          FileUtils.writeStringToFile(new File(commandFile), sb.toString(), StandardCharsets.UTF_8);
         }
 
         String runCmd = "sh " + commandFile;
@@ -308,7 +309,7 @@ public class ProcessUtils {
 
         Runtime.getRuntime().exec(runCmd);
       } catch (Exception e) {
-        logger.error("kill application failed : " + e.getMessage(), e);
+        logger.error("kill application failed", e);
       }
     }
   }
@@ -337,7 +338,7 @@ public class ProcessUtils {
       killYarnJob(taskInstance);
 
     } catch (Exception e) {
-      logger.error("kill failed : " + e.getMessage(), e);
+      logger.error("kill task failed", e);
     }
   }
 
@@ -374,9 +375,16 @@ public class ProcessUtils {
   public static void killYarnJob(TaskInstance taskInstance) {
     try {
       Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-      LogClient logClient = new LogClient(taskInstance.getHost(), Constants.RPC_PORT);
-
-      String log = logClient.viewLog(taskInstance.getLogPath());
+      LogClientService logClient = null;
+      String log = null;
+      try {
+        logClient = new LogClientService();
+        log = logClient.viewLog(taskInstance.getHost(), Constants.RPC_PORT, taskInstance.getLogPath());
+      } finally {
+        if(logClient != null){
+          logClient.close();
+        }
+      }
       if (StringUtils.isNotEmpty(log)) {
         List<String> appIds = LoggerUtils.getAppIds(log, logger);
         String workerDir = taskInstance.getExecutePath();

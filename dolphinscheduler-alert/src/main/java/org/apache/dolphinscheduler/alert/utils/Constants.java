@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.alert.utils;
  * constants
  */
 public class Constants {
-
+    private Constants() {
+        throw new IllegalStateException("Constants class");
+    }
     /**
      * alert properties path
      */
@@ -75,6 +77,8 @@ public class Constants {
 
     public static final int NUMBER_1000 = 1000;
 
+    public static final String ALERT_TEMPLATE = "alert.template";
+
     public static final String SPRING_DATASOURCE_DRIVER_CLASS_NAME = "spring.datasource.driver-class-name";
 
     public static final String SPRING_DATASOURCE_URL = "spring.datasource.url";
@@ -115,8 +119,6 @@ public class Constants {
 
     public static final String DEVELOPMENT = "development";
 
-    public static final String CLASSPATH_MAIL_TEMPLATES_ALERT_MAIL_TEMPLATE_FTL = "classpath:mail_templates/alert_mail_template.ftl";
-
     public static final String TR = "<tr>";
 
     public static final String TD = "<td>";
@@ -133,7 +135,7 @@ public class Constants {
 
     public static final String TH_END = "</th>";
 
-    public static final int ALERT_SCAN_INTERVEL = 5000;
+    public static final int ALERT_SCAN_INTERVAL = 5000;
 
     public static final String MARKDOWN_QUOTE = ">";
 
