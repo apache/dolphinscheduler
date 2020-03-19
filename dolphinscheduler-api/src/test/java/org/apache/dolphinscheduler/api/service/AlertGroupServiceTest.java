@@ -18,9 +18,12 @@ package org.apache.dolphinscheduler.api.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -31,23 +34,18 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
 import org.junit.After;
 import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import static org.mockito.ArgumentMatchers.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AlertGroupServiceTest {
@@ -60,6 +58,8 @@ public class AlertGroupServiceTest {
     private AlertGroupMapper alertGroupMapper;
     @Mock
     private UserAlertGroupMapper userAlertGroupMapper;
+    @Mock
+    UserAlertGroupService userAlertGroupService;
 
     private String groupName = "AlertGroupServiceTest";
 
@@ -163,23 +163,31 @@ public class AlertGroupServiceTest {
     @Test
     public  void testGrantUser(){
 
-        Map<String, Object>  result = alertGroupService.grantUser(getLoginUser(),1,"123,321");
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-    }
-    @Test
-    public  void testVerifyGroupName(){
-        //group name not exist
-        Result result = alertGroupService.verifyGroupName(getLoginUser(), groupName);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS.getMsg(),result.getMsg());
-        Mockito.when(alertGroupMapper.queryByGroupName(groupName)).thenReturn(getList());
+        Integer groupId=1;
 
-        //group name exist
-        result = alertGroupService.verifyGroupName(getLoginUser(), groupName);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.ALERT_GROUP_EXIST.getMsg(),result.getMsg());
-    }
+        ArgumentCaptor<Integer> groupArgument = ArgumentCaptor.forClass(Integer.class);
+
+        Mockito.when(userAlertGroupService.deleteByAlertGroupId(anyInt())).thenReturn(true);
+
+		Map<String, Object> result = alertGroupService.grantUser(getLoginUser(), groupId, "123,321");
+        Mockito.verify(userAlertGroupService).deleteByAlertGroupId(groupArgument.capture());
+
+		logger.info(result.toString());
+        assertEquals(groupArgument.getValue(), groupId);
+		assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+	}
+
+	@Test
+	public void testVerifyGroupName() {
+		//group name not exist
+		boolean result = alertGroupService.existGroupName(groupName);
+		Assert.assertFalse(result);
+		Mockito.when(alertGroupMapper.queryByGroupName(groupName)).thenReturn(getList());
+
+		//group name exist
+		result = alertGroupService.existGroupName(groupName);
+		Assert.assertTrue(result);
+	}
 
 
     /**
