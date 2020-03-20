@@ -49,28 +49,28 @@ public class FlinkParameters extends AbstractParameters {
   private String mainArgs;
 
   /**
-   * slot个数
+   * slot count
    */
   private int slot;
 
   /**
-   *Yarn application的名字
+   *Yarn application name
    */
 
   private String appName;
 
   /**
-   * taskManager 数量
+   * taskManager count
    */
   private int  taskManager;
 
   /**
-   * jobManagerMemory 内存大小
+   * job manager memory
    */
   private String  jobManagerMemory ;
 
   /**
-   * taskManagerMemory内存大小
+   * task manager memory
    */
   private String  taskManagerMemory;
 
@@ -207,6 +207,9 @@ public class FlinkParameters extends AbstractParameters {
 
   @Override
   public List<ResourceInfo> getResourceFilesList() {
+    if (mainJar != null) {
+      resourceList.add(mainJar);
+    }
     return resourceList;
   }
 

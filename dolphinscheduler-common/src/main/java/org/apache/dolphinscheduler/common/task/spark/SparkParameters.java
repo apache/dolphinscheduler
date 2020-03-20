@@ -220,6 +220,9 @@ public class SparkParameters extends AbstractParameters {
 
   @Override
   public List<ResourceInfo> getResourceFilesList() {
+    if (mainJar != null) {
+      resourceList.add(mainJar);
+    }
     return resourceList;
   }
 
