@@ -414,7 +414,7 @@
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.mainClass = o.params.mainClass || ''
-          this.mainJar = o.params.mainJar && o.params.mainJar.res ? o.params.mainJar.res : ''
+          this.mainJar = o.params.mainJar && o.params.mainJar.id ? o.params.mainJar.id : ''
           this.deployMode = o.params.deployMode || ''
           this.driverCores = o.params.driverCores || 1
           this.driverMemory = o.params.driverMemory || '512M'
