@@ -115,7 +115,7 @@ public class RedisUtil {
         try {
             System.out.println("redis init");
             if (redisPwd.isEmpty())
-                jedisPool = new JedisPool(jedisPoolConfig, redisIp, redisPort, TestConstant.THREE_THOUSANG);
+                jedisPool = new JedisPool(jedisPoolConfig, redisIp, redisPort, TestConstant.THREE_THOUSAND);
             else {
                 jedisPool = new JedisPool(jedisPoolConfig, redisIp, redisPort, TestConstant.TEN_THOUSANG, redisPwd);
             }
