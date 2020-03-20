@@ -144,7 +144,7 @@ public class ResourcesController extends BaseController{
                                      @RequestParam(value ="type") ResourceType type
     ){
         try{
-            logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type.toString());
+            logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type);
             Map<String, Object> result = resourceService.queryResourceList(loginUser, type);
             return returnDataList(result);
         }catch (Exception e){
@@ -180,7 +180,7 @@ public class ResourcesController extends BaseController{
     ){
         try{
             logger.info("query resource list, login user:{}, resource type:{}, search value:{}",
-                    loginUser.getUserName(), type.toString(), searchVal);
+                    loginUser.getUserName(), type, searchVal);
             Map<String, Object> result = checkPageParams(pageNo, pageSize);
             if(result.get(Constants.STATUS) != Status.SUCCESS){
                 return returnDataListPaging(result);
@@ -426,8 +426,6 @@ public class ResourcesController extends BaseController{
                                 @RequestParam(value = "resourceId") int resourceId) {
         logger.info("login user {}, create udf function, type: {},  funcName: {},argTypes: {} ,database: {},desc: {},resourceId: {}",
                 loginUser.getUserName(),type, funcName, argTypes,database,description, resourceId);
-        Result result = new Result();
-
         try {
             return udfFuncService.createUdfFunction(loginUser,funcName,className,argTypes,database,description,type,resourceId);
         } catch (Exception e) {
@@ -563,7 +561,7 @@ public class ResourcesController extends BaseController{
     public Result queryResourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("type") UdfType type){
         try{
-            logger.info("query datasource list, user:{}, type:{}", loginUser.getUserName(), type.toString());
+            logger.info("query datasource list, user:{}, type:{}", loginUser.getUserName(), type);
             Map<String, Object> result = udfFuncService.queryResourceList(loginUser,type.ordinal());
             return returnDataList(result);
         }catch (Exception e){
