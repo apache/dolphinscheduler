@@ -30,6 +30,6 @@ public class TestConstant {
     /**
      * 10000
      */
-    public static final int TEN_THOUSANG = 10000;
+    public static final int TEN_THOUSAND = 10000;
 
 }
