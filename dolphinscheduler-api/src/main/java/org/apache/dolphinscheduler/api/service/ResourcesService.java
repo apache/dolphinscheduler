@@ -21,6 +21,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.collections.BeanMap;
+import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
@@ -970,6 +971,33 @@ public class ResourcesService extends BaseService {
         return file;
     }
 
+
+    /**
+     * list all file
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @return unauthorized result code
+     */
+    public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
+
+        Map<String, Object> result = new HashMap<>();
+        if (checkAdmin(loginUser, result)) {
+            return result;
+        }
+        List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
+        List<ResourceComponent> list ;
+        if (CollectionUtils.isNotEmpty(resourceList)) {
+            Visitor visitor = new ResourceTreeVisitor(resourceList);
+            list = visitor.visit().getChildren();
+        }else {
+            list = new ArrayList<>(0);
+        }
+
+        result.put(Constants.DATA_LIST, list);
+        putMsg(result,Status.SUCCESS);
+        return result;
+    }
 
     /**
      * unauthorized file

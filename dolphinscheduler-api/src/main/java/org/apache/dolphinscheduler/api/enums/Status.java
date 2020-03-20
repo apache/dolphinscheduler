@@ -93,7 +93,7 @@ public enum Status {
     VERIFY_UDF_FUNCTION_NAME_ERROR( 10070,"verify udf function name error"),
     DELETE_UDF_FUNCTION_ERROR( 10071,"delete udf function error"),
     AUTHORIZED_FILE_RESOURCE_ERROR( 10072,"authorized file resource error"),
-    UNAUTHORIZED_FILE_RESOURCE_ERROR( 10073,"unauthorized file resource error"),
+    AUTHORIZE_RESOURCE_TREE( 10073,"authorize resource tree display error"),
     UNAUTHORIZED_UDF_FUNCTION_ERROR( 10074,"unauthorized udf function error"),
     AUTHORIZED_UDF_FUNCTION_ERROR(10075,"authorized udf function error"),
     CREATE_SCHEDULE_ERROR(10076,"create schedule error"),
