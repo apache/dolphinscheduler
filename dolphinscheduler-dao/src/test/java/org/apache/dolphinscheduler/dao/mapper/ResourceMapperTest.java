@@ -138,7 +138,7 @@ public class ResourceMapperTest {
         resource.setCreateTime(new Date());
         //update
         int update = resourceMapper.updateById(resource);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         resourceMapper.deleteById(resource.getId());
     }
 
@@ -149,7 +149,7 @@ public class ResourceMapperTest {
     public void testDelete(){
         Resource resourceMap = insertOne();
         int delete = resourceMapper.deleteById(resourceMap.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
@@ -236,8 +236,8 @@ public class ResourceMapperTest {
 
         resourceUserMapper.deleteById(resourcesUser.getId());
         resourceMapper.deleteById(resource.getId());
-        Assert.assertEquals(resources.size(), 0);
-        Assert.assertNotEquals(resources1.size(), 0);
+        Assert.assertEquals(0, resources.size());
+        Assert.assertNotEquals(0, resources1.size());
 
     }
 
@@ -251,7 +251,7 @@ public class ResourceMapperTest {
         List<Resource> resources = resourceMapper.queryAuthorizedResourceList(resource.getUserId());
 
         resourceMapper.deleteById(resource.getId());
-        Assert.assertEquals(resources.size(), 0);
+        Assert.assertEquals(0, resources.size());
     }
 
     /**
@@ -293,7 +293,7 @@ public class ResourceMapperTest {
         );
 
 
-        Assert.assertEquals(resource1, "ut tenant code for resource");
+        Assert.assertEquals("ut tenant code for resource", resource1);
         resourceMapper.deleteById(resource.getId());
 
     }
