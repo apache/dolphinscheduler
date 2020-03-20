@@ -707,6 +707,7 @@
                         <include>**/api/service/TenantServiceTest.java</include>
                         <include>**/api/service/WorkerGroupServiceTest.java</include>
                         <include>**/api/service/AlertGroupServiceTest.java</include>
+                        <include>**/api/service/UserAlertGroupServiceTest.java</include>
                         <include>**/api/service/ProjectServiceTest.java</include>
                         <include>**/api/service/ProcessDefinitionServiceTest.java</include>
                         <include>**/api/service/UdfFuncServiceTest.java</include>
