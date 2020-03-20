@@ -166,7 +166,7 @@
           id: item.id
         }).then(res => {
           this.$refs[`poptip-${i}`][0].doClose()
-          this.$emit('on-update')
+          this.$router.push({ path: `/resource/udf/subUdfDirectory/${item.id}` })
           this.$message.success(res.msg)
         }).catch(e => {
           this.$refs[`poptip-${i}`][0].doClose()
