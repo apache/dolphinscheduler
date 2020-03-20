@@ -386,7 +386,7 @@
             res: this.mainJar
           },
           deployMode: this.deployMode,
-          resourceList: this.cacheResourceList,
+          resourceList: this.resourceList,
           localParams: this.localParams,
           driverCores: this.driverCores,
           driverMemory: this.driverMemory,

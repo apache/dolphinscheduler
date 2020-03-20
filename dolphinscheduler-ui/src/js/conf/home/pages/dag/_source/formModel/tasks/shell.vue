@@ -218,7 +218,7 @@
     computed: {
       cacheParams () {
         return {
-          // resourceList: this.cacheResourceList,
+          resourceList: this.resourceList,
           localParams: this.localParams,
           rawScript: editor ? editor.getValue() : ''
         }
