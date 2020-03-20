@@ -93,11 +93,11 @@ public class AlertGroupController extends  BaseController{
     public Result list(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login  user {}, query all alertGroup",
                 loginUser.getUserName());
-        try{
+        try {
             HashMap<String, Object> result = alertGroupService.queryAlertgroup();
             return returnDataList(result);
-        }catch (Exception e){
-            logger.error(Status.QUERY_ALL_ALERTGROUP_ERROR.getMsg(),e);
+        } catch (Exception e) {
+            logger.error(Status.QUERY_ALL_ALERTGROUP_ERROR.getMsg(), e);
             return error(Status.QUERY_ALL_ALERTGROUP_ERROR.getCode(), Status.QUERY_ALL_ALERTGROUP_ERROR.getMsg());
         }
     }
@@ -214,12 +214,20 @@ public class AlertGroupController extends  BaseController{
     @GetMapping(value = "/verify-group-name")
     @ResponseStatus(HttpStatus.OK)
     public Result verifyGroupName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                 @RequestParam(value ="groupName") String groupName
-    ) {
-        logger.info("login user {}, verfiy group name: {}",
-                loginUser.getUserName(),groupName);
+                                 @RequestParam(value ="groupName") String groupName) {
+        logger.info("login user {}, verify group name: {}", loginUser.getUserName(), groupName);
 
-        return alertGroupService.verifyGroupName(loginUser, groupName);
+        boolean exist= alertGroupService.existGroupName(groupName);
+        Result result = new Result();
+        if (exist) {
+            logger.error("group {} has exist, can't create again.", groupName);
+            result.setCode(Status.ALERT_GROUP_EXIST.getCode());
+            result.setMsg(Status.ALERT_GROUP_EXIST.getMsg());
+        } else {
+            result.setCode(Status.SUCCESS.getCode());
+            result.setMsg(Status.SUCCESS.getMsg());
+        }
+        return result;
     }
 
     /**
