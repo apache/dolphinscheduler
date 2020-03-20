@@ -338,7 +338,7 @@
             res: this.mainJar
           },
           deployMode: this.deployMode,
-          resourceList: this.cacheResourceList,
+          resourceList: this.resourceList,
           localParams: this.localParams,
           slot: this.slot,
           taskManager: this.taskManager,

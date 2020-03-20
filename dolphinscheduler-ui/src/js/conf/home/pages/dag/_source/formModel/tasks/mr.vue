@@ -184,7 +184,6 @@
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
         }
-
         // storage
         this.$emit('on-params', {
           mainClass: this.mainClass,
@@ -222,7 +221,7 @@
           mainJar: {
             res: this.mainJar
           },
-          resourceList: this.cacheResourceList,
+          resourceList: this.resourceList,
           localParams: this.localParams,
           mainArgs: this.mainArgs,
           others: this.others,
