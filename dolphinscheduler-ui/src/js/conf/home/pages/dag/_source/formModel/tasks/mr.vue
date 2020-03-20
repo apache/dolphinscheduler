@@ -188,9 +188,11 @@
         this.$emit('on-params', {
           mainClass: this.mainClass,
           mainJar: {
-            res: this.mainJar
+            id: this.mainJar
           },
-          resourceList: this.resourceList,
+          resourceList: _.map(this.resourceList, v => {
+            return {id: v}
+          }),
           localParams: this.localParams,
           mainArgs: this.mainArgs,
           others: this.others,
@@ -219,9 +221,11 @@
         return {
           mainClass: this.mainClass,
           mainJar: {
-            res: this.mainJar
+            id: this.mainJar
           },
-          resourceList: this.resourceList,
+          resourceList: _.map(this.resourceList, v => {
+            return {id: v}
+          }),
           localParams: this.localParams,
           mainArgs: this.mainArgs,
           others: this.others,
@@ -249,7 +253,9 @@
           // backfill resourceList
           let resourceList = o.params.resourceList || []
           if (resourceList.length) {
-            this.resourceList = resourceList
+            this.resourceList = _.map(resourceList, v => {
+              return v.id
+            })
             this.cacheResourceList = resourceList
           }
 
