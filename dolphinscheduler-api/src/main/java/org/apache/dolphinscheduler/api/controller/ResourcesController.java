@@ -344,14 +344,14 @@ public class ResourcesController extends BaseController{
     @ResponseStatus(HttpStatus.OK)
     public Result queryResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value ="fullName",required = false) String fullName,
-                                     @RequestParam(value ="pid",required = false) Integer pid,
+                                     @RequestParam(value ="id",required = false) Integer id,
                                      @RequestParam(value ="type") ResourceType type
     ) {
         try {
-            logger.info("login user {}, query resource by full name: {} or pid: {},resource type: {}",
-                    loginUser.getUserName(), fullName,pid,type);
+            logger.info("login user {}, query resource by full name: {} or id: {},resource type: {}",
+                    loginUser.getUserName(), fullName,id,type);
 
-            return resourceService.queryResource(fullName,pid,type);
+            return resourceService.queryResource(fullName,id,type);
         } catch (Exception e) {
             logger.error(RESOURCE_NOT_EXIST.getMsg(), e);
             return error(Status.RESOURCE_NOT_EXIST.getCode(), Status.RESOURCE_NOT_EXIST.getMsg());

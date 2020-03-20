@@ -336,7 +336,7 @@ public class ResourcesService extends BaseService {
 
         // updateResource data
 
-        List<Integer> integers = resourcesMapper.listChildren(resourceId);
+        List<Integer> childrenResource = resourcesMapper.listChildren(resourceId);
         String oldFullName = resource.getFullName();
         Date now = new Date();
 
@@ -347,9 +347,9 @@ public class ResourcesService extends BaseService {
 
         try {
             resourcesMapper.updateById(resource);
-            if (resource.isDirectory()) {
+            if (resource.isDirectory() && CollectionUtils.isNotEmpty(childrenResource)) {
                 List<Resource> childResourceList = new ArrayList<>();
-                List<Resource> resourceList = resourcesMapper.listResourceByIds(integers.toArray(new Integer[integers.size()]));
+                List<Resource> resourceList = resourcesMapper.listResourceByIds(childrenResource.toArray(new Integer[childrenResource.size()]));
                 childResourceList = resourceList.stream().map(t -> {
                     t.setFullName(t.getFullName().replaceFirst(oldFullName, fullName));
                     t.setUpdateTime(now);
@@ -378,8 +378,8 @@ public class ResourcesService extends BaseService {
 
         // get file hdfs path
         // delete hdfs file by type
-        String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originResourceName);
-        String destHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,name);
+        String originHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,originFullName);
+        String destHdfsFileName = HadoopUtils.getHdfsFileName(resource.getType(),tenantCode,fullName);
 
         try {
             if (HadoopUtils.getInstance().exists(originHdfsFileName)) {
@@ -664,26 +664,42 @@ public class ResourcesService extends BaseService {
     /**
      * verify resource by full name or pid and type
      * @param fullName  resource full name
-     * @param pid       parent id
+     * @param id        resource id
      * @param type      resource type
      * @return true if the resource full name or pid not exists, otherwise return false
      */
-    public Result queryResource(String fullName,Integer pid,ResourceType type) {
+    public Result queryResource(String fullName,Integer id,ResourceType type) {
         Result result = new Result();
-        if (StringUtils.isBlank(fullName) && pid == null) {
+        if (StringUtils.isBlank(fullName) && id == null) {
             logger.error("You must input one of fullName and pid");
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
             return result;
         }
-        List<Resource> resourceList = resourcesMapper.queryResource(fullName,pid,type.ordinal());
-        if (CollectionUtils.isEmpty(resourceList)) {
-            logger.error("resource file not exist,  resource full name {}", fullName);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
-            return result;
+        if (StringUtils.isNotBlank(fullName)) {
+            List<Resource> resourceList = resourcesMapper.queryResource(fullName,type.ordinal());
+            if (CollectionUtils.isEmpty(resourceList)) {
+                logger.error("resource file not exist,  resource full name {} ", fullName);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+            putMsg(result, Status.SUCCESS);
+            result.setData(resourceList.get(0));
+        } else {
+            Resource resource = resourcesMapper.selectById(id);
+            if (resource == null) {
+                logger.error("resource file not exist,  resource id {}", id);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+            Resource parentResource = resourcesMapper.selectById(resource.getPid());
+            if (parentResource == null) {
+                logger.error("parent resource file not exist,  resource id {}", id);
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+            putMsg(result, Status.SUCCESS);
+            result.setData(parentResource);
         }
-        putMsg(result, Status.SUCCESS);
-        result.setData(resourceList.get(0));
-
         return result;
     }
 
@@ -865,7 +881,7 @@ public class ResourcesService extends BaseService {
         resourcesMapper.updateById(resource);
 
 
-        result = uploadContentToHdfs(resource.getAlias(), tenantCode, content);
+        result = uploadContentToHdfs(resource.getFullName(), tenantCode, content);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             throw new RuntimeException(result.getMsg());
         }
@@ -1106,24 +1122,28 @@ public class ResourcesService extends BaseService {
      */
     List<Integer> listAllChildren(Resource resource){
         List<Integer> childList = new ArrayList<>();
-        childList.add(resource.getId());
+        if (resource.getId() != -1) {
+            childList.add(resource.getId());
+        }
+
         if(resource.isDirectory()){
-            childList.addAll(listAllChildren(resource.getId()));
+            listAllChildren(resource.getId(),childList);
         }
         return childList;
     }
 
     /**
      * list all children id
-     * @param resourceId resource id
-     * @return all children id
+     * @param resourceId    resource id
+     * @param childList     child list
      */
-    List<Integer> listAllChildren(int resourceId){
+    void listAllChildren(int resourceId,List<Integer> childList){
+
         List<Integer> children = resourcesMapper.listChildren(resourceId);
         for(int chlidId:children){
-            listAllChildren(chlidId);
+            childList.add(chlidId);
+            listAllChildren(chlidId,childList);
         }
-        return children;
     }
 
     /**
