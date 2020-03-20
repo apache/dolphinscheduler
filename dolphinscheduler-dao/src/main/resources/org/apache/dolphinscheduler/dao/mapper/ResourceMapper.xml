@@ -116,12 +116,7 @@
         select *
         from t_ds_resources
         where type = #{type}
-        <if test="fullName != null and fullName != ''">
-            and full_name = #{fullName}
-        </if>
-        <if test="pid != null and pid != 0">
-            and pid = #{pid}
-        </if>
+        and full_name = #{fullName}
     </select>
 
     <update id="batchUpdateResource" parameterType="java.util.List">

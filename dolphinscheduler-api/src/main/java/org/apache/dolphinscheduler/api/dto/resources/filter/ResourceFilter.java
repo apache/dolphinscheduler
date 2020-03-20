@@ -38,6 +38,11 @@ public class ResourceFilter implements IFilter {
     private List<Resource> resourceList;
 
     /**
+     * parent list
+     */
+    //Set<Resource> parentList =  new HashSet<>();
+
+    /**
      * constructor
      * @param suffix        resource suffix
      * @param resourceList  resource list
@@ -68,8 +73,7 @@ public class ResourceFilter implements IFilter {
         Set<Resource> filterFileList = fileFilter();
         for(Resource file:filterFileList){
             parentList.add(file);
-            parentList.addAll(listAllParent(file));
-            //listAllParent(file);
+            setAllParent(file,parentList);
         }
         return parentList;
 
@@ -80,16 +84,13 @@ public class ResourceFilter implements IFilter {
      * @param resource  resource
      * @return parent resource dir set
      */
-    Set<Resource> listAllParent(Resource resource){
-        Set<Resource> parentList =  new HashSet<>();
+    private void setAllParent(Resource resource,Set<Resource> parentList){
         for (Resource resourceTemp : resourceList) {
             if (resourceTemp.getId() == resource.getPid()) {
                 parentList.add(resourceTemp);
-                listAllParent(resourceTemp);
+                setAllParent(resourceTemp,parentList);
             }
         }
-        return parentList;
-
     }
 
     @Override

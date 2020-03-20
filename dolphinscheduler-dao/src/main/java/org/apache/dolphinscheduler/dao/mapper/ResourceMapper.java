@@ -118,11 +118,10 @@ public interface ResourceMapper extends BaseMapper<Resource> {
     /**
      * query resource by full name or pid
      * @param fullName  full name
-     * @param pid       parent id
      * @param type      resource type
      * @return resource
      */
-    List<Resource> queryResource(@Param("fullName") String fullName,@Param("pid") Integer pid,@Param("type") int type);
+    List<Resource> queryResource(@Param("fullName") String fullName,@Param("type") int type);
 
     /**
      * list resource by id array
