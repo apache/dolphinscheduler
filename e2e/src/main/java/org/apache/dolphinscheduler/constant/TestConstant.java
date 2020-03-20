@@ -20,14 +20,12 @@ public class TestConstant {
     /**
      * 1000
      */
-    public static final int ONE_THOUSANG = 1000;
-
-
+    public static final int ONE_THOUSAND = 1000;
 
     /**
      * 3000
      */
-    public static final int THREE_THOUSANG = 3000;
+    public static final int THREE_THOUSAND = 3000;
 
     /**
      * 10000
