@@ -144,7 +144,7 @@
       pageSize: Number
     },
     methods: {
-      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization']),
+      ...mapActions('security', ['deleteUser', 'getAuthList', 'grantAuthorization','getResourceList']),
       _closeDelete (i) {
         this.$refs[`poptip-delete-${i}`][0].doClose()
       },
@@ -215,9 +215,9 @@
           })
         })
       },
-      _authFile (item, i) {
+      _authFile (item, i) { 
         this.$refs[`poptip-auth-${i}`][0].doClose()
-        this.getAuthList({
+        this.getResourceList({
           id: item.id,
           type: 'file',
           category: 'resources'
@@ -247,8 +247,6 @@
               udfTargetList.push(value)
             }
           })
-          fileSourceList = fileTargetList.concat(fileSourceList)
-          udfSourceList  = udfTargetList.concat(udfSourceList)
           fileTargetList = _.map(fileTargetList, v => {
             return v.id
           })
