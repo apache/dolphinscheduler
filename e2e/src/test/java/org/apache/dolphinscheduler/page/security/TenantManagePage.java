@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.page.security;
 
 import org.apache.dolphinscheduler.common.PageCommon;
-import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.security.TenantManageData;
 import org.apache.dolphinscheduler.locator.security.TenantManageLocator;
 import org.openqa.selenium.WebDriver;
@@ -37,9 +36,7 @@ public class TenantManagePage extends PageCommon {
      * @return Whether to enter the specified page after create tenant
      */
     public boolean jumpSecurity() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
         clickButton(TenantManageLocator.SECURITY_CENTER);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
         return ifTitleContains(TenantManageData.TENANAT_MANAGE);
     }
 
@@ -69,10 +66,9 @@ public class TenantManagePage extends PageCommon {
 
     public boolean deleteTenant() throws InterruptedException {
         clickButton(TenantManageLocator.TENANT_MANAGE);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+
         // click delete button
         clickButton(TenantManageLocator.DELETE_TENANT_BUTTON);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         //click confirm delete button
         clickButton(TenantManageLocator.CONFIRM_DELETE_TENANT_BUTTON);

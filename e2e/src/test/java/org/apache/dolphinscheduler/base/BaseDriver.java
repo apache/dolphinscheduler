@@ -23,6 +23,7 @@ import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -104,9 +105,6 @@ public class BaseDriver {
         // page load timeout
         driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
 
-        // page load timeout
-        driver.manage().timeouts().pageLoadTimeout(pageLoadTimeout, TimeUnit.SECONDS);
-
         // script timeout
         driver.manage().timeouts().setScriptTimeout(setScriptTimeout, TimeUnit.SECONDS);
 
@@ -141,7 +139,7 @@ public class BaseDriver {
      * close browser
      */
     public void closeBrowser() throws InterruptedException {
-        Thread.sleep(TestConstant.THREE_THOUSANG);
+        Thread.sleep(TestConstant.THREE_THOUSAND);
         if (driver != null) {
             driver.quit();
             System.out.println("===================test end===================");

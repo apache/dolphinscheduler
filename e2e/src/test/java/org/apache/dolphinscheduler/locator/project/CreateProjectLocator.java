@@ -20,10 +20,10 @@ import org.openqa.selenium.By;
 
 public class CreateProjectLocator {
     //click project manage
-    public static final By PROJECT_MANAGE = By.xpath("//div[2]/div/a/span");
+    public static final By PROJECT_MANAGE = By.xpath("//div[1]/div/div[2]/div[2]/div/a/span");
 
     //click create project button
-    public static final By CREATE_PROJECT_BUTTON = By.xpath("//button/span");
+    public static final By CREATE_PROJECT_BUTTON = By.xpath("//div[2]/div/div[1]/button/span");
 
     //input project name
     public static final By PROJECT_NAME = By.xpath("//div[2]/div/div/div[2]/div/input");

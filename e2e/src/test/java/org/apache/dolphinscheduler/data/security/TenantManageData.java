@@ -25,7 +25,7 @@ public class TenantManageData {
     /**
      * Tenant Code
      */
-    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code15";
+    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code_1";
 
     /**
      * Tenant Name

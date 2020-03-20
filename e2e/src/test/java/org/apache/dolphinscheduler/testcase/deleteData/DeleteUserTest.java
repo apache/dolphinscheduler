@@ -28,7 +28,7 @@ public class DeleteUserTest extends BaseTest {
     @Test(groups={"functionTests"},dependsOnGroups = { "login","user" },description = "DeleteUserTest",priority=8)
     public void testDeleteUser() throws InterruptedException {
         tenantManagePage = new TenantManagePage(driver);
-        System.out.println("jump to security");
+        System.out.println("jump to security to delete user");
         tenantManagePage.jumpSecurity();
 
         userManagePage = new UserManagePage(driver);

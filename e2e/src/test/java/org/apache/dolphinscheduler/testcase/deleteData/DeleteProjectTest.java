@@ -23,11 +23,11 @@ import org.testng.annotations.Test;
 public class DeleteProjectTest extends BaseTest {
     private CreateProjectPage createProjectPage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login"},description = "DeleteProjectTest",priority=7)
+    @Test(groups={"functionTests"},dependsOnGroups = { "login","project"},description = "DeleteProjectTest",priority=7)
     public void testDeleteProject() throws InterruptedException {
         createProjectPage = new CreateProjectPage(driver);
         //jump to project manage page
-        System.out.println("jump to project manage page");
+        System.out.println("jump to the project manage page to delete project");
         createProjectPage.jumpProjectManagePage();
 
         //assert tenant manage page

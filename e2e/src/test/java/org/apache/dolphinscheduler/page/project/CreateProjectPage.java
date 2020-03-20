@@ -20,7 +20,9 @@ import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.project.CreateProjectData;
 import org.apache.dolphinscheduler.locator.project.CreateProjectLocator;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 public class CreateProjectPage extends PageCommon {
     public CreateProjectPage(WebDriver driver) {
@@ -31,9 +33,11 @@ public class CreateProjectPage extends PageCommon {
      * jump to ProjectManagePage
      */
     public void jumpProjectManagePage() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+        System.out.println("111111111");
+        Thread.sleep(100000);
         clickElement(CreateProjectLocator.PROJECT_MANAGE);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+        Thread.sleep(TestConstant.ONE_THOUSAND);
+        System.out.println("2222222222222");
     }
 
     /**
@@ -44,7 +48,6 @@ public class CreateProjectPage extends PageCommon {
     public boolean createProject() throws InterruptedException {
         //click  create project
         clickElement(CreateProjectLocator.CREATE_PROJECT_BUTTON);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         // input create project data
         sendInput(CreateProjectLocator.PROJECT_NAME, CreateProjectData.PROJECT_NAME);
@@ -65,7 +68,7 @@ public class CreateProjectPage extends PageCommon {
     public boolean deleteProject() throws InterruptedException {
         //click  delete project
         clickElement(CreateProjectLocator.DELETE_PROJECT_BUTTON);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+
         //click confirm delete project
         clickElement(CreateProjectLocator.CONFIRM_DELETE_PROJECT_BUTTON);
 

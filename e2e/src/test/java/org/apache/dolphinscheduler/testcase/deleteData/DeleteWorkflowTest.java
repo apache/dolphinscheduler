@@ -25,11 +25,11 @@ public class DeleteWorkflowTest extends BaseTest {
     private CreateWorkflowPage createWorkflowPage;
     private CreateProjectPage createProjectPage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login"},description = "DeleteWorkflowTest",priority=6)
+    @Test(groups={"functionTests"},dependsOnGroups = { "login","workflow"},description = "DeleteWorkflowTest",priority=6)
     public void testDeleteWorkflow() throws InterruptedException {
         createProjectPage = new CreateProjectPage(driver);
         //jump to project manage page
-        System.out.println("jump to project manage page");
+        System.out.println("jump to the project manage page to delete workflow");
         createProjectPage.jumpProjectManagePage();
 
         createWorkflowPage = new CreateWorkflowPage(driver);

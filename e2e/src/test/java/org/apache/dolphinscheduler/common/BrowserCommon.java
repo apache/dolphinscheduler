@@ -222,26 +222,38 @@ public class BrowserCommon {
      *
      * @return driver
      */
-    public WebDriver switchNextHandle() {
+    public WebDriver switchNextHandle(String windowTitle) {
         // Current window handle
         String currentHandle = driver.getWindowHandle();
         // All window handle
         Set<String> allHandles = driver.getWindowHandles();
         // Finding the next handle
         for (String handle : allHandles) {
-            if (!handle.equals(currentHandle)) {
-                return driver.switchTo().window(handle);
+            if (handle.equals(currentHandle))
+                continue;
+            else {
+                driver.switchTo().window(handle);
+                if (driver.getTitle().contains(windowTitle)) {
+                    System.out.println("Switch to window: "
+                            + windowTitle + " successfully!");
+                    break;
+                } else
+                    continue;
             }
         }
         return driver;
     }
 
-    /**
-     * Multi-window switch handle, according to the handle number passed in
-     *
-     * @param num Number starts from 1
-     * @return driver
-     */
+
+
+
+
+        /**
+         * Multi-window switch handle, according to the handle number passed in
+         *
+         * @param num Number starts from 1
+         * @return driver
+         */
     public WebDriver switchHandle(int num) {
         // current handle
         String currentHandle = driver.getWindowHandle();

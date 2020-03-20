@@ -27,7 +27,7 @@ public class CreateProjectTest  extends BaseTest {
     public void testCreateProject() throws InterruptedException {
         createProjectPage = new CreateProjectPage(driver);
         // enter user manage page
-        System.out.println("jump to the projectManage page");
+        System.out.println("jump to the projectManage page to create project ");
         createProjectPage.jumpProjectManagePage();
         //assert user manage page
         System.out.println("start create project");
