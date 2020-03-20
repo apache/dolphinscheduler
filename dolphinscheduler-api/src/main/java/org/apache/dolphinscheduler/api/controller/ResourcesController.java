@@ -770,21 +770,21 @@ public class ResourcesController extends BaseController{
      * @param userId user id
      * @return unauthorized result code
      */
-    @ApiOperation(value = "unauthorizedFile", notes= "UNAUTHORIZED_FILE_NOTES")
+    @ApiOperation(value = "authorizeResourceTree", notes= "AUTHORIZE_RESOURCE_TREE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType ="Int", example = "100")
     })
-    @GetMapping(value = "/unauth-file")
+    @GetMapping(value = "/authorize-resource-tree")
     @ResponseStatus(HttpStatus.CREATED)
-    public Result unauthorizedFile(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result authorizeResourceTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
         try{
-            logger.info("resource unauthorized file, user:{}, unauthorized user id:{}", loginUser.getUserName(), userId);
-            Map<String, Object> result =  resourceService.unauthorizedFile(loginUser, userId);
+            logger.info("all resource file, user:{}, user id:{}", loginUser.getUserName(), userId);
+            Map<String, Object> result =  resourceService.authorizeResourceTree(loginUser, userId);
             return returnDataList(result);
         }catch (Exception e){
-            logger.error(UNAUTHORIZED_FILE_RESOURCE_ERROR.getMsg(),e);
-            return error(Status.UNAUTHORIZED_FILE_RESOURCE_ERROR.getCode(), Status.UNAUTHORIZED_FILE_RESOURCE_ERROR.getMsg());
+            logger.error(AUTHORIZE_RESOURCE_TREE.getMsg(),e);
+            return error(Status.AUTHORIZE_RESOURCE_TREE.getCode(), Status.AUTHORIZE_RESOURCE_TREE.getMsg());
         }
     }
 

@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MapreduceParameters extends AbstractParameters {
 
@@ -125,6 +124,9 @@ public class MapreduceParameters extends AbstractParameters {
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
+        if (mainJar != null) {
+            resourceList.add(mainJar);
+        }
         return resourceList;
     }
 

@@ -18,11 +18,13 @@ package org.apache.dolphinscheduler.server.worker.task.spark;
 
 import org.apache.dolphinscheduler.common.enums.SparkVersion;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.utils.SparkArgsUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
@@ -67,8 +69,8 @@ public class SparkTask extends AbstractYarnTask {
     if (!sparkParameters.checkParameters()) {
       throw new RuntimeException("spark task params is not valid");
     }
+    setMainJarName();
     sparkParameters.setQueue(taskProps.getQueue());
-
     if (StringUtils.isNotEmpty(sparkParameters.getMainArgs())) {
       String args = sparkParameters.getMainArgs();
 
@@ -113,6 +115,28 @@ public class SparkTask extends AbstractYarnTask {
     logger.info("spark task command : {}", command);
 
     return command;
+  }
+
+  @Override
+  protected void setMainJarName() {
+    // main jar
+    ResourceInfo mainJar = sparkParameters.getMainJar();
+    if (mainJar != null) {
+      int resourceId = mainJar.getId();
+      String resourceName;
+      if (resourceId == 0) {
+        resourceName = mainJar.getRes();
+      } else {
+        Resource resource = processDao.getResourceById(sparkParameters.getMainJar().getId());
+        if (resource == null) {
+          logger.error("resource id: {} not exist", resourceId);
+          throw new RuntimeException(String.format("resource id: %d not exist", resourceId));
+        }
+        resourceName = resource.getFullName().replaceFirst("/", "");
+      }
+      mainJar.setRes(resourceName);
+      sparkParameters.setMainJar(mainJar);
+    }
   }
 
   @Override
