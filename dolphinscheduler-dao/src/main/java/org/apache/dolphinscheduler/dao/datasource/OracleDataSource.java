@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,18 @@ import java.sql.SQLException;
  * data source of Oracle
  */
 public class OracleDataSource extends BaseDataSource {
+
     private static final Logger logger = LoggerFactory.getLogger(OracleDataSource.class);
+
+    private DbConnectType type;
+
+    public DbConnectType getType() {
+        return type;
+    }
+
+    public void setType(DbConnectType type) {
+        this.type = type;
+    }
 
     /**
      * gets the JDBC url for the data source connection
