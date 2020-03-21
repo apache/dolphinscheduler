@@ -430,7 +430,6 @@
        * return params
        */
       _onParams (o) {
-        console.log(o)
         this.params = Object.assign({}, o)
       },
 
