@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.configuration;
 import com.google.common.collect.Multimap;
 import io.swagger.models.*;
 import io.swagger.models.parameters.Parameter;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -152,9 +153,9 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
         operation.setSchemes(stringSetToSchemeList(from.getProtocol()));
         Set<String> tagsSet = new HashSet<>(1);
 
-        if(from.getTags() != null && from.getTags().size() > 0){
+        if(CollectionUtils.isNotEmpty(from.getTags())){
 
-            List<String> list = new ArrayList<String>(tagsSet.size());
+            List<String> list = new ArrayList<>(tagsSet.size());
 
             Iterator<String> it = from.getTags().iterator();
             while(it.hasNext()){
@@ -230,10 +231,10 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
     protected List<Tag> tagSetToTagList(Set<springfox.documentation.service.Tag> set) {
 
         if (set == null) {
-            return null;
+            return Collections.emptyList();
         }
 
-        List<Tag> list = new ArrayList<Tag>(set.size());
+        List<Tag> list = new ArrayList<>(set.size());
         for (springfox.documentation.service.Tag tag : set) {
             list.add(mapTag(tag));
         }
@@ -243,10 +244,10 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
 
     protected List<Scheme> stringSetToSchemeList(Set<String> set) {
         if (set == null) {
-            return null;
+            return Collections.emptyList();
         }
 
-        List<Scheme> list = new ArrayList<Scheme>(set.size());
+        List<Scheme> list = new ArrayList<>(set.size());
         for (String string : set) {
             list.add(Enum.valueOf(Scheme.class, string));
         }
@@ -256,10 +257,10 @@ public class ServiceModelToSwagger2MapperImpl extends ServiceModelToSwagger2Mapp
 
     protected List<Parameter> parameterListToParameterList(List<springfox.documentation.service.Parameter> list) {
         if (list == null) {
-            return null;
+            return Collections.emptyList();
         }
 
-        List<Parameter> list1 = new ArrayList<Parameter>(list.size());
+        List<Parameter> list1 = new ArrayList<>(list.size());
 
         Locale locale = LocaleContextHolder.getLocale();
 

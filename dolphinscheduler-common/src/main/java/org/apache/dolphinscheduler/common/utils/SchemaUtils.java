@@ -48,7 +48,7 @@ public class SchemaUtils {
 		List<String> schemaDirList = new ArrayList<>();
 		File[] schemaDirArr = FileUtils.getAllDir("sql/upgrade");
 		if(schemaDirArr == null || schemaDirArr.length == 0) {
-			return null;
+			return Collections.emptyList();
 		}
 
 		for(File file : schemaDirArr) {
@@ -114,10 +114,10 @@ public class SchemaUtils {
 	 * @return current software version
 	 */
 	public static String getSoftVersion() {
-		String soft_version;
+		String softVersion;
 		try {
-			soft_version = FileUtils.readFile2Str(new FileInputStream(new File("sql/soft_version")));
-			soft_version = replaceBlank(soft_version);
+			softVersion = FileUtils.readFile2Str(new FileInputStream(new File("sql/soft_version")));
+			softVersion = replaceBlank(softVersion);
 		} catch (FileNotFoundException e) {
 			logger.error(e.getMessage(),e);
 			throw new RuntimeException("Failed to get the product version description file. The file could not be found", e);
@@ -125,7 +125,7 @@ public class SchemaUtils {
 			logger.error(e.getMessage(),e);
 			throw new RuntimeException("Failed to get product version number description file, failed to read the file", e);
 		}
-		return soft_version;
+		return softVersion;
 	}
 
 	/**

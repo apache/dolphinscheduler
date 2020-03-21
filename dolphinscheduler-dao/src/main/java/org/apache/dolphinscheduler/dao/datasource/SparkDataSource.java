@@ -39,7 +39,7 @@ public class SparkDataSource extends BaseDataSource {
   @Override
   public String getJdbcUrl() {
     String jdbcUrl = getAddress();
-    if (jdbcUrl.lastIndexOf("/") != (jdbcUrl.length() - 1)) {
+    if (jdbcUrl.lastIndexOf('/') != (jdbcUrl.length() - 1)) {
       jdbcUrl += "/";
     }
 

@@ -54,12 +54,10 @@ public class SecurityConfig {
     public Authenticator authenticator() {
         setAuthenticationType(type);
         Authenticator authenticator;
-        switch (authenticationType) {
-            case PASSWORD:
-                authenticator = new PasswordAuthenticator();
-                break;
-            default:
-                throw new IllegalStateException("Unexpected value: " + authenticationType);
+        if (AuthenticationType.PASSWORD == authenticationType) {
+            authenticator = new PasswordAuthenticator();
+        } else {
+            throw new IllegalStateException("Unexpected value: " + authenticationType);
         }
         beanFactory.autowireBean(authenticator);
         return authenticator;

@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 /*
  *  Copyright 2004 Clinton Begin
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  Licensed under the Apache License, Version 2.0 (the "License")
  *  you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
  *
@@ -137,13 +137,13 @@ public class ScriptRunner {
 	 *             if there is an error reading from the Reader
 	 */
 	private void runScript(Connection conn, Reader reader) throws IOException, SQLException {
-		StringBuffer command = null;
+		StringBuilder command = null;
 		try {
 			LineNumberReader lineReader = new LineNumberReader(reader);
 			String line = null;
 			while ((line = lineReader.readLine()) != null) {
 				if (command == null) {
-					command = new StringBuffer();
+					command = new StringBuilder();
 				}
 				String trimmedLine = line.trim();
 				if (trimmedLine.startsWith("--")) {
@@ -197,25 +197,25 @@ public class ScriptRunner {
 			}
 
 		} catch (SQLException e) {
-			logger.error("Error executing: {}", command);
+			logger.error("SQL Error executing: {}", command);
 			throw e;
 		} catch (IOException e) {
 			e.fillInStackTrace();
-			logger.error("Error executing: {}", command);
+			logger.error("IO Error executing: {}", command);
 			throw e;
 		}
 	}
 
 	private void runScript(Connection conn, Reader reader , String dbName) throws IOException, SQLException {
-		StringBuffer command = null;
+		StringBuilder command = null;
 		String sql = "";
-		String appKey = dbName.substring(dbName.lastIndexOf("_")+1, dbName.length());
+		// String appKey = dbName.substring(dbName.lastIndexOf('_')+1, dbName.length())
 		try {
 			LineNumberReader lineReader = new LineNumberReader(reader);
 			String line = null;
 			while ((line = lineReader.readLine()) != null) {
 				if (command == null) {
-					command = new StringBuffer();
+					command = new StringBuilder();
 				}
 				String trimmedLine = line.trim();
 				if (trimmedLine.startsWith("--")) {

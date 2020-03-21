@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -108,7 +109,7 @@ public class SchedulerService extends BaseService {
                                               Priority processInstancePriority,
                                               int workerGroupId) throws IOException {
 
-        Map<String, Object> result = new HashMap<String, Object>(5);
+        Map<String, Object> result = new HashMap<>(5);
 
         Project project = projectMapper.queryByName(projectName);
 
@@ -141,7 +142,7 @@ public class SchedulerService extends BaseService {
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
         if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
-            logger.error(scheduleParam.getCrontab() + " verify failure");
+            logger.error("{} verify failure", scheduleParam.getCrontab());
 
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
             return result;
@@ -203,7 +204,7 @@ public class SchedulerService extends BaseService {
                                               ReleaseState scheduleStatus,
                                               Priority processInstancePriority,
                                               int workerGroupId) throws IOException {
-        Map<String, Object> result = new HashMap<String, Object>(5);
+        Map<String, Object> result = new HashMap<>(5);
 
         Project project = projectMapper.queryByName(projectName);
 
@@ -298,7 +299,7 @@ public class SchedulerService extends BaseService {
                                                 Integer id,
                                                 ReleaseState scheduleStatus) {
 
-        Map<String, Object> result = new HashMap<String, Object>(5);
+        Map<String, Object> result = new HashMap<>(5);
 
         Project project = projectMapper.queryByName(projectName);
         // check project auth
@@ -340,10 +341,10 @@ public class SchedulerService extends BaseService {
             List<Integer> subProcessDefineIds = new ArrayList<>();
             processService.recurseFindSubProcessId(scheduleObj.getProcessDefinitionId(), subProcessDefineIds);
             Integer[] idArray = subProcessDefineIds.toArray(new Integer[subProcessDefineIds.size()]);
-            if (subProcessDefineIds.size() > 0){
+            if (!subProcessDefineIds.isEmpty()){
                 List<ProcessDefinition> subProcessDefinitionList =
                         processDefinitionMapper.queryDefinitionListByIdList(idArray);
-                if (subProcessDefinitionList != null && subProcessDefinitionList.size() > 0){
+                if (CollectionUtils.isNotEmpty(subProcessDefinitionList)){
                     for (ProcessDefinition subProcessDefinition : subProcessDefinitionList){
                         /**
                          * if there is no online process, exit directly
@@ -363,7 +364,7 @@ public class SchedulerService extends BaseService {
         List<Server> masterServers = monitorService.getServerListFromZK(true);
 
 
-        if (masterServers.size() == 0) {
+        if (CollectionUtils.isEmpty(masterServers)) {
             putMsg(result, Status.MASTER_NOT_EXISTS);
         }
 
@@ -374,20 +375,17 @@ public class SchedulerService extends BaseService {
 
         try {
             switch (scheduleStatus) {
-                case ONLINE: {
+                case ONLINE:
                     logger.info("Call master client set schedule online, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
                     setSchedule(project.getId(), id);
                     break;
-                }
-                case OFFLINE: {
+                case OFFLINE:
                     logger.info("Call master client set schedule offline, project id: {}, flow id: {},host: {}", project.getId(), processDefinition.getId(), masterServers);
                     deleteSchedule(project.getId(), id);
                     break;
-                }
-                default: {
+                default:
                     putMsg(result, Status.SCHEDULE_STATUS_UNKNOWN, scheduleStatus.toString());
                     return result;
-                }
             }
         } catch (Exception e) {
             result.put(Constants.MSG, scheduleStatus == ReleaseState.ONLINE ? "set online failure" : "set offline failure");
@@ -506,7 +504,7 @@ public class SchedulerService extends BaseService {
 
         if(!QuartzExecutors.getInstance().deleteJob(jobName, jobGroupName)){
             logger.warn("set offline failure:projectId:{},scheduleId:{}",projectId,scheduleId);
-            throw new RuntimeException(String.format("set offline failure"));
+            throw new RuntimeException("set offline failure");
         }
 
     }
@@ -602,7 +600,7 @@ public class SchedulerService extends BaseService {
             return result;
         }
         List<Date> selfFireDateList = CronUtils.getSelfFireDateList(startTime, endTime,cronExpression,Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT);
-        result.put(Constants.DATA_LIST, selfFireDateList.stream().map(t -> DateUtils.dateToString(t)));
+        result.put(Constants.DATA_LIST, selfFireDateList.stream().map(DateUtils::dateToString));
         putMsg(result, Status.SUCCESS);
         return result;
     }

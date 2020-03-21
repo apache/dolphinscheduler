@@ -134,11 +134,6 @@ public class Schedule {
     this.warningGroupId = warningGroupId;
   }
 
-
-
-  public Schedule() {
-  }
-
   public String getProjectName() {
     return projectName;
   }

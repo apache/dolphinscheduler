@@ -111,6 +111,7 @@ public class SchemaUtilsTest {
         files = new File[0];
         PowerMockito.when(FileUtils.getAllDir("sql/upgrade")).thenReturn(files);
         real = SchemaUtils.getAllSchemaList();
-        Assert.assertNull(real);
+        Assert.assertNotNull(real);
+        Assert.assertTrue(real.isEmpty());
     }
 }

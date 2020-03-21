@@ -91,7 +91,7 @@ public class SessionServiceTest {
         session = sessionService.getSession(mockHttpServletRequest);
         Assert.assertNotNull(session);
         logger.info("session ip {}",session.getIp());
-        Assert.assertEquals(session.getIp(),"127.0.0.1");
+        Assert.assertEquals("127.0.0.1", session.getIp());
 
 
     }

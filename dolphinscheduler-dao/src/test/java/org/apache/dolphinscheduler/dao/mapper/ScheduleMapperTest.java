@@ -82,7 +82,7 @@ public class ScheduleMapperTest {
         schedule.setCreateTime(new Date());
         //update
         int update = scheduleMapper.updateById(schedule);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         scheduleMapper.deleteById(schedule.getId());
     }
 
@@ -93,7 +93,7 @@ public class ScheduleMapperTest {
     public void testDelete(){
         Schedule schedule = insertOne();
         int delete = scheduleMapper.deleteById(schedule.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**

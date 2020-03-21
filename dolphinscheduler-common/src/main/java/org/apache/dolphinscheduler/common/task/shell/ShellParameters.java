@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.common.task.shell;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,9 +63,9 @@ public class ShellParameters extends AbstractParameters {
   public List<String> getResourceFilesList() {
     if (resourceList != null) {
       return resourceList.stream()
-              .map(p -> p.getRes()).collect(Collectors.toList());
+              .map(ResourceInfo::getRes).collect(Collectors.toList());
     }
 
-    return null;
+    return Collections.emptyList();
   }
 }

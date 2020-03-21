@@ -58,7 +58,7 @@ public class SessionMapperTest {
         session.setLastLoginTime(new Date());
         //update
         int update = sessionMapper.updateById(session);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         sessionMapper.deleteById(session.getId());
     }
 
@@ -69,7 +69,7 @@ public class SessionMapperTest {
     public void testDelete(){
         Session session = insertOne();
         int delete = sessionMapper.deleteById(session.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
