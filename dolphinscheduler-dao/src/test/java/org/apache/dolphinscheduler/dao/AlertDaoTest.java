@@ -14,10 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/**
- * project external config
- */
-export default {
-  // task record switch
-  recordSwitch:false
+package org.apache.dolphinscheduler.dao;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class AlertDaoTest {
+    private static final Logger logger = LoggerFactory.getLogger(AlertDaoTest.class);
+
+    @Test
+    public void testGetAlertDao() {
+        logger.info("testGetAlertDao start");
+        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        Assert.assertNotNull(alertDao);
+        logger.info("testGetAlertDao end");
+    }
 }

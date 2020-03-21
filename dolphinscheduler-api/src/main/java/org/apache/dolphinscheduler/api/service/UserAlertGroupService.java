@@ -14,10 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.api.service;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
+import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 /**
- * project external config
+ *
  */
-export default {
-  // task record switch
-  recordSwitch:false
+@Service
+public class UserAlertGroupService extends ServiceImpl<UserAlertGroupMapper, UserAlertGroup> {
+
+    @Autowired
+    private UserAlertGroupMapper userAlertGroupMapper;
+
+    boolean deleteByAlertGroupId(Integer groupId) {
+        return userAlertGroupMapper.deleteByAlertgroupId(groupId) >= 1;
+    }
+
 }
