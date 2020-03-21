@@ -131,7 +131,7 @@
         <m-list-box-f v-if="showConnectType">
           <template slot="name"><strong>*</strong>{{$t('Oracle Connect Type')}}</template>
           <template slot="content">
-            <x-radio-group v-model="connectType" size="small" default="ORACLE_SERVICE_NAME">
+            <x-radio-group v-model="connectType" size="small">
               <x-radio :label="'ORACLE_SERVICE_NAME'">{{$t('Oracle Service Name')}}</x-radio>
               <x-radio :label="'ORACLE_SID'">{{$t('Oracle SID')}}</x-radio>
             </x-radio-group>
