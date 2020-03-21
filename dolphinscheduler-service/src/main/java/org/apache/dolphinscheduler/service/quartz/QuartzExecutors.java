@@ -70,9 +70,10 @@ public class QuartzExecutors {
       synchronized (QuartzExecutors.class) {
         // when more than two threads run into the first null check same time, to avoid instanced more than one time, it needs to be checked again.
         if (INSTANCE == null) {
-          INSTANCE = new QuartzExecutors();
+          QuartzExecutors quartzExecutors = new QuartzExecutors();
           //finish QuartzExecutors init
-          INSTANCE.init();
+          quartzExecutors.init();
+          INSTANCE = quartzExecutors;
         }
       }
     }
