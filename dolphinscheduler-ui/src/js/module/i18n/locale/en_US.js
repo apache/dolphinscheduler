@@ -120,6 +120,7 @@ export default {
   'SQL Statement': 'SQL Statement',
   'UDF Function': 'UDF Function',
   'Please enter a SQL Statement(required)': 'Please enter a SQL Statement(required)',
+  'Please enter a JSON Statement(required)': 'Please enter a JSON Statement(required)',
   'One form or attachment must be selected': 'One form or attachment must be selected',
   'Recipient required': 'Recipient required',
   'Mail subject required': 'Mail subject required',
