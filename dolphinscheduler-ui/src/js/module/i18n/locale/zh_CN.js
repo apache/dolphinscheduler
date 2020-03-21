@@ -121,6 +121,7 @@ export default {
   'SQL Statement': 'sql语句',
   'UDF Function': 'UDF函数',
   'Please enter a SQL Statement(required)': '请输入sql语句(必填)',
+  'Please enter a JSON Statement(required)': '请输入json语句(必填)',
   'One form or attachment must be selected': '表格、附件必须勾选一个',
   'Recipient required': '收件人邮箱必填',
   'Mail subject required': '邮件主题必填',

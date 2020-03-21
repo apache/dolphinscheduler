@@ -161,7 +161,6 @@
       return {
         // Data Custom template
         enable: false,
-        enables: false,
         // Data source type
         dsType: '',
         // data source
@@ -199,12 +198,17 @@
     },
     methods: {
       _onSwitch (is) {
-        console.log(is)
-        this.enables = true
-        this.customConfig = 1
-        setTimeout(() => {
-        this._handlerJsonEditor()
-      }, 200)
+        if(is) {
+          this.customConfig = 1
+          setTimeout(() => {
+            this._handlerJsonEditor()
+          }, 200)
+        } else {
+          this.customConfig = 0
+          setTimeout(() => {
+            this._handlerEditor()
+          }, 200)
+        }
       },
       /**
        * return data source
@@ -237,6 +241,11 @@
        */
       _verification () {
         if(this.customConfig) {
+          if (!jsonEditor.getValue()) {
+            this.$message.warning(`${i18n.$t('Please enter a JSON Statement(required)')}`)
+            return false
+          }
+
           // storage
           this.$emit('on-params', {
             customConfig: this.customConfig,
@@ -245,7 +254,6 @@
           })
           return true
         } else {
-          console.log(123)
           if (!editor.getValue()) {
             this.$message.warning(`${i18n.$t('Please enter a SQL Statement(required)')}`)
             return false
@@ -387,27 +395,37 @@
       // Non-null objects represent backfill
       if (!_.isEmpty(o)) {
         // backfill
-        this.dsType = o.params.dsType || ''
-        this.datasource = o.params.dataSource || ''
-        this.dtType = o.params.dtType || ''
-        this.datatarget = o.params.dataTarget || ''
-        this.sql = o.params.sql || ''
-        this.targetTable = o.params.targetTable || ''
-        this.jobSpeedByte = o.params.jobSpeedByte / 1024 || 0
-        this.jobSpeedRecord = o.params.jobSpeedRecord || 0
-        this.preStatements = o.params.preStatements || []
-        this.postStatements = o.params.postStatements || []
+        if(o.params.customConfig == 0) {
+          this.customConfig = 0
+          this.enable = false
+          this.dsType = o.params.dsType || ''
+          this.datasource = o.params.dataSource || ''
+          this.dtType = o.params.dtType || ''
+          this.datatarget = o.params.dataTarget || ''
+          this.sql = o.params.sql || ''
+          this.targetTable = o.params.targetTable || ''
+          this.jobSpeedByte = o.params.jobSpeedByte / 1024 || 0
+          this.jobSpeedRecord = o.params.jobSpeedRecord || 0
+          this.preStatements = o.params.preStatements || []
+          this.postStatements = o.params.postStatements || []
+        } else {
+          this.customConfig = 1
+          this.enable = true
+          this.json = o.params.json || []
+          this.localParams = o.params.localParams || ''
+        }
       }
     },
     mounted () {
-      setTimeout(() => {
-        this._handlerEditor()
-      }, 200)
-      // this._handlerJsonEditor()
-      // setTimeout(() => {
-      //   this._handlerJsonEditor()
-      // }, 200)
-      
+      if(this.customConfig) {
+        setTimeout(() => {
+          this._handlerJsonEditor()
+        }, 200)
+      } else {
+        setTimeout(() => {
+          this._handlerEditor()
+        }, 200)
+      }
     },
     destroyed () {
       /**
