@@ -14,36 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.data.project;
 
-/**
- * Tenant page object: data
- */
-package org.apache.dolphinscheduler.data.security;
-
-
-public class TenantManageData {
-    /**
-     * Tenant Code
-     */
-    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code15";
-
-    /**
-     * Tenant Name
-     */
-    public static final String TENANAT_NAME = "dolphinscheduler_tenant_Name";
-
-    /**
-     * Queue
-     */
-    public static final String QUEUE = "default";
-
-    /**
-     * Description
-     */
-    public static final String DESCRIPTION = "creat tenant test";
-
-    public static final String TENANAT_MANAGE = "租户管理 - DolphinScheduler";
-
-
-
+public class CreateProjectData {
+    // create project name
+    public static final String PROJECT_NAME = "selenium_project_3";
+    // create project description
+    public static final String DESCRIPTION = "test create project description";
+    // project page title
+    public static final String PROJECT_TITLE = "项目 - DolphinScheduler";
 }

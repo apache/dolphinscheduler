@@ -14,36 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.dao;
 
-/**
- * Tenant page object: data
- */
-package org.apache.dolphinscheduler.data.security;
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class AlertDaoTest {
+    private static final Logger logger = LoggerFactory.getLogger(AlertDaoTest.class);
 
-public class TenantManageData {
-    /**
-     * Tenant Code
-     */
-    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code15";
-
-    /**
-     * Tenant Name
-     */
-    public static final String TENANAT_NAME = "dolphinscheduler_tenant_Name";
-
-    /**
-     * Queue
-     */
-    public static final String QUEUE = "default";
-
-    /**
-     * Description
-     */
-    public static final String DESCRIPTION = "creat tenant test";
-
-    public static final String TENANAT_MANAGE = "租户管理 - DolphinScheduler";
-
-
-
+    @Test
+    public void testGetAlertDao() {
+        logger.info("testGetAlertDao start");
+        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        Assert.assertNotNull(alertDao);
+        logger.info("testGetAlertDao end");
+    }
 }
