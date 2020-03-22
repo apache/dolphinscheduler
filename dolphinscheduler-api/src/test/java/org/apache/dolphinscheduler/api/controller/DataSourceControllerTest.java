@@ -96,6 +96,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
 
 
 
+    @Ignore
     @Test
     public void testQueryDataSource() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
