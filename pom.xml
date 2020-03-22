@@ -778,25 +778,23 @@
                 <artifactId>apache-rat-plugin</artifactId>
                 <version>${apache.rat.version}</version>
                 <configuration>
-                    <includes>
-                        <include>**/*.java</include>
-                        <include>**/dolphinscheduler-ui/src/**/*.scss</include>
-                        <include>**/dolphinscheduler-ui/src/**/*.css</include>
-                        <include>**/dolphinscheduler-ui/src/**/*.vue</include>
-                        <include>**/dolphinscheduler-ui/src/**/*.js</include>
-                        <include>**/dolphinscheduler-ui/src/**/*.html</include>
-                    </includes>
                     <excludes>
-                        <exclude>**/dolphinscheduler-ui/src/lib/**</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/js/module/util/cookie.js</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/font/awesome/font-awesome.css</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/sass/common/_animation.scss</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/sass/common/_normalize.scss</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/combo/1.0.0/es5.js</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/combo/1.0.0/base.css</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
+                        <exclude>**/node_modules/**</exclude>
+                        <exclude>**/node/**</exclude>
+                        <exclude>**/dist/**</exclude>
+                        <exclude>**/licenses/**</exclude>
+                        <exclude>**/src/sass/common/_animation.scss</exclude>
+                        <exclude>**/src/sass/common/_normalize.scss</exclude>
+                        <exclude>.github/**</exclude>
+                        <exclude>sql/soft_version</exclude>
+                        <exclude>**/*.json</exclude>
+                        <!-- document files -->
+                        <exclude>**/*.md</exclude>
+                        <excldue>**/*.MD</excldue>
+                        <exclude>**/*.txt</exclude>
+                        <exclude>**/docs/**</exclude>
+                        <exclude>**/*.babelrc</exclude>
+                        <exclude>**/*.eslintrc</exclude>
                     </excludes>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
