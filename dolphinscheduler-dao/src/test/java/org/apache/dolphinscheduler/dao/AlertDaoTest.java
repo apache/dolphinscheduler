@@ -16,10 +16,14 @@
  */
 package org.apache.dolphinscheduler.dao;
 
+import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class AlertDaoTest {
     private static final Logger logger = LoggerFactory.getLogger(AlertDaoTest.class);
@@ -30,5 +34,13 @@ public class AlertDaoTest {
         AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
         Assert.assertNotNull(alertDao);
         logger.info("testGetAlertDao end");
+    }
+
+    @Test
+    public void testQuery(){
+        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        List<Alert> alerts = alertDao.listWaitExecutionAlert();
+        Assert.assertNotNull(alerts);
+        Assert.assertNotEquals(0, alerts.size());
     }
 }
