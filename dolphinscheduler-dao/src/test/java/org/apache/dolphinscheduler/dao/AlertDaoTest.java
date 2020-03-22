@@ -53,7 +53,7 @@ public class AlertDaoTest {
         alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, "", id);
 
         alerts = alertDao.listWaitExecutionAlert();
-        Assert.assertNotEquals(alertStatus, alerts.get(0).getAlertStatus());
+        Assert.assertEquals(0, alerts.size());
         alertDao.getAlertMapper().deleteById(id);
     }
 }
