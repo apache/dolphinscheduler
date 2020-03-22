@@ -40,6 +40,7 @@ public class AlertDaoTest {
                 "\"get the alarm exception.！，interface error，exception information：timed out\", \"request address：http://blog.csdn.net/dreamInTheWorld/article/details/78539286\"]");
         alert.setAlertType(AlertType.EMAIL);
         alert.setAlertGroupId(1);
+        alertDao.addAlert(alert);
         List<Alert> alerts = alertDao.listWaitExecutionAlert();
         Assert.assertNotNull(alerts);
         Assert.assertNotEquals(0, alerts.size());
