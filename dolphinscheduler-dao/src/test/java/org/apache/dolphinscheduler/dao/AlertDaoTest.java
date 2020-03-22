@@ -29,8 +29,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class AlertDaoTest {
-    private static final Logger logger = LoggerFactory.getLogger(AlertDaoTest.class);
-
     @Test
     public void testAlertDao(){
         AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
