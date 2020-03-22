@@ -42,10 +42,10 @@ public class PropertyUtils {
     private static final Properties properties = new Properties();
 
     private PropertyUtils(){
-        init();
+        throw new IllegalStateException("PropertyUtils class");
     }
 
-    private void init(){
+    static {
         String[] propertyFiles = new String[]{ALERT_PROPERTIES_PATH};
         for (String fileName : propertyFiles) {
             InputStream fis = null;

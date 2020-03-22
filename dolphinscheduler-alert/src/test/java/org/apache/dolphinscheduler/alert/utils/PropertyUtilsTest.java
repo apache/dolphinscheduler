@@ -151,15 +151,18 @@ public class PropertyUtilsTest {
 
         //If key is null, then return -1
         result = PropertyUtils.getArray(null, ",");
-        assertNull(result);
+        assertNotNull(result);
+        assertEquals(0, result.length);
 
         //If key is undefine in alert.properties, then return null
         result = PropertyUtils.getArray("abc", ",");
-        assertNull(result);
+        assertNotNull(result);
+        assertEquals(0, result.length);
 
         //If splitStr is null, then return null
         result = PropertyUtils.getArray("test.server.list", null);
-        assertNull(result);
+        assertNotNull(result);
+        assertEquals(0, result.length);
     }
 
     /**
