@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.dao;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
+import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,18 +31,19 @@ public class AlertDaoTest {
     private static final Logger logger = LoggerFactory.getLogger(AlertDaoTest.class);
 
     @Test
-    public void testGetAlertDao() {
-        logger.info("testGetAlertDao start");
+    public void testAlertDao(){
         AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
-        Assert.assertNotNull(alertDao);
-        logger.info("testGetAlertDao end");
-    }
-
-    @Test
-    public void testQuery(){
-        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        Alert alert = new Alert();
+        alert.setTitle("Mysql Exception");
+        alert.setShowType(ShowType.TEXT);
+        alert.setContent("[\"alarm time：2018-02-05\", \"service name：MYSQL_ALTER\", \"alarm name：MYSQL_ALTER_DUMP\", " +
+                "\"get the alarm exception.！，interface error，exception information：timed out\", \"request address：http://blog.csdn.net/dreamInTheWorld/article/details/78539286\"]");
+        alert.setAlertType(AlertType.EMAIL);
+        alert.setAlertGroupId(1);
         List<Alert> alerts = alertDao.listWaitExecutionAlert();
         Assert.assertNotNull(alerts);
         Assert.assertNotEquals(0, alerts.size());
+        int id = alerts.get(0).getId();
+        alertDao.getAlertMapper().deleteById(id);
     }
 }
