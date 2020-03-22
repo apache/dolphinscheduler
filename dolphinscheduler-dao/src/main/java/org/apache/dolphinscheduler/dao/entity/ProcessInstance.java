@@ -487,7 +487,7 @@ public class ProcessInstance {
      * @return whether complement data
      */
     public Boolean isComplementData(){
-        if(!StringUtils.isNotEmpty(this.historyCmd)){
+        if(StringUtils.isEmpty(this.historyCmd)){
             return false;
         }
         return historyCmd.startsWith(CommandType.COMPLEMENT_DATA.toString());

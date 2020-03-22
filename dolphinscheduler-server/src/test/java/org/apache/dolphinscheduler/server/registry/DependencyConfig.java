@@ -18,14 +18,16 @@
 package org.apache.dolphinscheduler.server.registry;
 
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
+import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
+import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * dependency config for ZookeeperNodeManager
+ * dependency config
  */
 @Configuration
 public class DependencyConfig {
@@ -45,4 +47,88 @@ public class DependencyConfig {
         return Mockito.mock(UserAlertGroupMapper.class);
     }
 
+    @Bean
+    public TaskInstanceCacheManagerImpl taskInstanceCacheManagerImpl(){
+        return Mockito.mock(TaskInstanceCacheManagerImpl.class);
+    }
+
+    @Bean
+    public ProcessService processService(){
+        return Mockito.mock(ProcessService.class);
+    }
+
+    @Bean
+    public UserMapper userMapper(){
+        return Mockito.mock(UserMapper.class);
+    }
+
+    @Bean
+    public ProcessDefinitionMapper processDefineMapper(){
+        return Mockito.mock(ProcessDefinitionMapper.class);
+    }
+
+    @Bean
+    public ProcessInstanceMapper processInstanceMapper(){
+        return Mockito.mock(ProcessInstanceMapper.class);
+    }
+
+    @Bean
+    public DataSourceMapper dataSourceMapper(){
+        return Mockito.mock(DataSourceMapper.class);
+    }
+
+    @Bean
+    public ProcessInstanceMapMapper processInstanceMapMapper(){
+        return Mockito.mock(ProcessInstanceMapMapper.class);
+    }
+
+    @Bean
+    public TaskInstanceMapper taskInstanceMapper(){
+        return Mockito.mock(TaskInstanceMapper.class);
+    }
+
+    @Bean
+    public CommandMapper commandMapper(){
+        return Mockito.mock(CommandMapper.class);
+    }
+
+    @Bean
+    public ScheduleMapper scheduleMapper(){
+        return Mockito.mock(ScheduleMapper.class);
+    }
+
+    @Bean
+    public UdfFuncMapper udfFuncMapper(){
+        return Mockito.mock(UdfFuncMapper.class);
+    }
+
+    @Bean
+    public ResourceMapper resourceMapper(){
+        return Mockito.mock(ResourceMapper.class);
+    }
+
+    @Bean
+    public WorkerGroupMapper workerGroupMapper(){
+        return Mockito.mock(WorkerGroupMapper.class);
+    }
+
+    @Bean
+    public ErrorCommandMapper errorCommandMapper(){
+        return Mockito.mock(ErrorCommandMapper.class);
+    }
+
+    @Bean
+    public TenantMapper tenantMapper(){
+        return Mockito.mock(TenantMapper.class);
+    }
+
+    @Bean
+    public ProjectMapper projectMapper(){
+        return Mockito.mock(ProjectMapper.class);
+    }
+
+    @Bean
+    public TaskCallbackService taskCallbackService(){
+        return Mockito.mock(TaskCallbackService.class);
+    }
 }

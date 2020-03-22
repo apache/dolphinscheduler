@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
+import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+
 /**
  *  execution context
  */
@@ -48,8 +50,7 @@ public class ExecutionContext {
 
 
     public ExecutionContext(Command command, ExecutorType executorType) {
-        this.command = command;
-        this.executorType = executorType;
+        this(command, executorType, DEFAULT_WORKER_GROUP);
     }
 
     public ExecutionContext(Command command, ExecutorType executorType, String workerGroup) {
