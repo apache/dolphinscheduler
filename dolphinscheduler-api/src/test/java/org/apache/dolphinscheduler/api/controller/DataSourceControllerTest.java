@@ -39,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * data source controller test
  */
 public class DataSourceControllerTest extends AbstractControllerTest{
+
     private static Logger logger = LoggerFactory.getLogger(DataSourceControllerTest.class);
 
     @Ignore
@@ -169,6 +170,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
     }
 
 
+    @Ignore
     @Test
     public void testConnectionTest() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -248,6 +250,7 @@ public class DataSourceControllerTest extends AbstractControllerTest{
 
 
 
+    @Ignore
     @Test
     public void testDelete() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
