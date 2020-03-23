@@ -184,6 +184,8 @@ export default {
   'Authorize': '授权',
   'File resources': '文件资源',
   'UDF resources': 'UDF资源',
+  'UDF resources directory': 'UDF资源目录',
+  'Please select UDF resources directory': '请选择UDF资源目录',
   'Edit alarm group': '编辑告警组',
   'Create alarm group': '创建告警组',
   'Group Name': '组名称',
