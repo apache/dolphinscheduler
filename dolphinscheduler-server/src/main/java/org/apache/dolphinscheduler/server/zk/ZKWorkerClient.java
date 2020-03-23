@@ -99,9 +99,7 @@ public class ZKWorkerClient extends AbstractZKClient {
 			case NODE_REMOVED:
 				//find myself dead
 				String serverHost = getHostByEventDataPath(path);
-				if(checkServerSelfDead(serverHost, ZKNodeType.WORKER)){
-					return;
-				}
+				checkServerSelfDead(serverHost, ZKNodeType.WORKER);
 				break;
 			default:
 				break;

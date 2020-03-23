@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ZKServer {
     private static final Logger logger = LoggerFactory.getLogger(ZKServer.class);
 
-    private static volatile PublicZooKeeperServerMain zkServer = null;
+    private static PublicZooKeeperServerMain publicZKServer = null;
 
     public static final int DEFAULT_ZK_TEST_PORT = 2181;
 
@@ -67,7 +67,7 @@ public class ZKServer {
         try {
             startLocalZkServer(DEFAULT_ZK_TEST_PORT);
         } catch (Exception e) {
-            logger.error("Failed to start ZK: " + e);
+            logger.error("Failed to start ZK: {}", e.getMessage(), e);
         }
     }
 
@@ -108,10 +108,10 @@ public class ZKServer {
      * @param maxClientCnxns    zk max client connections
      */
     private static synchronized void startLocalZkServer(final int port, final String dataDirPath,final int tickTime,String maxClientCnxns) {
-        if (zkServer != null) {
+        if (publicZKServer != null) {
             throw new RuntimeException("Zookeeper server is already started!");
         }
-        zkServer = new PublicZooKeeperServerMain();
+        publicZKServer = new PublicZooKeeperServerMain();
         logger.info("Zookeeper data path : {} ", dataDirPath);
         dataDir = dataDirPath;
         final String[] args = new String[]{Integer.toString(port), dataDirPath, Integer.toString(tickTime), maxClientCnxns};
@@ -120,9 +120,9 @@ public class ZKServer {
             logger.info("Zookeeper server started ");
             isStarted.compareAndSet(false, true);
 
-            zkServer.initializeAndRun(args);
+            publicZKServer.initializeAndRun(args);
         } catch (QuorumPeerConfig.ConfigException e) {
-            logger.warn("Caught exception while starting ZK", e);
+            logger.warn("Caught config exception while starting ZK", e);
         } catch (IOException e) {
             logger.warn("Caught exception while starting ZK", e);
         }
@@ -147,10 +147,10 @@ public class ZKServer {
      * @param deleteDataDir Whether or not to delete the data directory
      */
     private static synchronized void stopLocalZkServer(final boolean deleteDataDir) {
-        if (zkServer != null) {
+        if (publicZKServer != null) {
             try {
-                zkServer.shutdown();
-                zkServer = null;
+                publicZKServer.shutdown();
+                publicZKServer = null;
                 if (deleteDataDir) {
                     org.apache.commons.io.FileUtils.deleteDirectory(new File(dataDir));
                 }

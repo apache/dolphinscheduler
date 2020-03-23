@@ -176,7 +176,7 @@ public class ZKMasterClient extends AbstractZKClient {
 	 * @param failover		is failover
 	 */
 	private void removeZKNodePath(String path, ZKNodeType zkNodeType, boolean failover) {
-		logger.info("{} node deleted : {}", zkNodeType.toString(), path);
+		logger.info("{} node deleted : {}", zkNodeType, path);
 		InterProcessMutex mutex = null;
 		try {
 			String failoverPath = getFailoverLockPath(zkNodeType);
@@ -194,7 +194,7 @@ public class ZKMasterClient extends AbstractZKClient {
 				failoverServerWhenDown(serverHost, zkNodeType);
 			}
 		}catch (Exception e){
-			logger.error("{} server failover failed.", zkNodeType.toString());
+			logger.error("{} server failover failed.", zkNodeType);
 			logger.error("failover exception ",e);
 		}
 		finally {
@@ -219,6 +219,7 @@ public class ZKMasterClient extends AbstractZKClient {
 				break;
 			case WORKER:
 				failoverWorker(serverHost, true);
+				break;
 			default:
 				break;
 		}
@@ -376,10 +377,8 @@ public class ZKMasterClient extends AbstractZKClient {
 
 		List<TaskInstance> needFailoverTaskInstanceList = processService.queryNeedFailoverTaskInstances(workerHost);
 		for(TaskInstance taskInstance : needFailoverTaskInstanceList){
-			if(needCheckWorkerAlive){
-				if(!checkTaskInstanceNeedFailover(taskInstance)){
-					continue;
-                }
+			if(needCheckWorkerAlive && !checkTaskInstanceNeedFailover(taskInstance)){
+				continue;
 			}
 
 			ProcessInstance instance = processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId());

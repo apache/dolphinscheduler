@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public class ZookeeperMonitor extends AbstractZKClient {
 		}catch(Exception e){
 			LOG.error(e.getMessage(),e);
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	/**

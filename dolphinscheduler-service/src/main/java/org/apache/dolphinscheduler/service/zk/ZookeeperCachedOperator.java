@@ -58,7 +58,9 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
     }
 
     //for sub class
-    protected void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path){}
+    protected void dataChanged(final CuratorFramework client, final TreeCacheEvent event, final String path){
+        // nothing to do
+    }
 
     public String getFromCache(final String cachePath, final String key) {
         ChildData resultInCache = treeCache.getCurrentData(key);
@@ -78,6 +80,7 @@ public class ZookeeperCachedOperator extends ZookeeperOperator {
         try {
             Thread.sleep(500);
         } catch (InterruptedException ignore) {
+            // nothing to do
         }
         super.close();
     }

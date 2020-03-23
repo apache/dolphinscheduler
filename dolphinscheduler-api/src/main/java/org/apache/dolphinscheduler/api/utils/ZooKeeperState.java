@@ -33,7 +33,9 @@ public class ZooKeeperState {
 	private final String host;
 	private final int port;
 
-	private int minLatency = -1, avgLatency = -1, maxLatency = -1;
+	private int minLatency = -1;
+	private int avgLatency = -1;
+	private int maxLatency = -1;
 	private long received = -1;
 	private long sent = -1;
 	private int outStanding = -1;
@@ -44,12 +46,12 @@ public class ZooKeeperState {
 	private int connections = -1;
 
 	public ZooKeeperState(String connectionString) {
-		String host = connectionString.substring(0,
+		String connectHost = connectionString.substring(0,
 				connectionString.indexOf(':'));
-		int port = Integer.parseInt(connectionString.substring(connectionString
+		int connectPort = Integer.parseInt(connectionString.substring(connectionString
 				.indexOf(':') + 1));
-		this.host = host;
-		this.port = port;
+		this.host = connectHost;
+		this.port = connectPort;
 	}
 
 	public void getZookeeperInfo() {
@@ -99,8 +101,7 @@ public class ZooKeeperState {
 				connections = 0;
 			}
 			while (scannerForCons.hasNext()) {
-				@SuppressWarnings("unused")
-				String line = scannerForCons.nextLine();
+				scannerForCons.nextLine();
 				++connections;
 			}
 			scannerForCons.close();
@@ -114,8 +115,7 @@ public class ZooKeeperState {
 
 
 	private String getStringValueFromLine(String line) {
-		return line.substring(line.indexOf(":") + 1, line.length()).replaceAll(
-				" ", "").trim();
+		return line.substring(line.indexOf(':') + 1, line.length()).replace(" ", "").trim();
 	}
 
 	private class SendThread extends Thread {
@@ -133,7 +133,6 @@ public class ZooKeeperState {
 				ret = FourLetterWordMain.send4LetterWord(host, port, cmd);
 			} catch (Exception e) {
 				logger.error(e.getMessage(),e);
-				return;
 			}
 		}
 
@@ -148,7 +147,7 @@ public class ZooKeeperState {
 			sendThread.join(waitTimeout * 1000L);
 			return sendThread.ret;
 		} catch (InterruptedException e) {
-			logger.error("send " + cmd + " to server " + host + ":" + port + " failed!", e);
+			logger.error("send {} to server {}:{} failed!", cmd, host, port, e);
 		}
 		return "";
 	}

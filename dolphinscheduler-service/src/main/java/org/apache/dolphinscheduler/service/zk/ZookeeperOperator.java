@@ -62,7 +62,9 @@ public class ZookeeperOperator implements InitializingBean {
     /**
      * this method is for sub class,
      */
-    protected void registerListener(){}
+    protected void registerListener(){
+        // noghint to do
+    }
 
     public void initStateLister() {
         checkNotNull(zkClient);
