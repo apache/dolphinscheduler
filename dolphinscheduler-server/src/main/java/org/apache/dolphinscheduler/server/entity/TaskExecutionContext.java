@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.entity;
 
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRequestCommand;
-import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 
 import java.io.Serializable;
@@ -417,12 +416,6 @@ public class TaskExecutionContext implements Serializable{
 
     public Command toCommand(){
         TaskExecuteRequestCommand requestCommand = new TaskExecuteRequestCommand();
-        requestCommand.setTaskExecutionContext(FastJsonSerializer.serializeToString(this));
-        return requestCommand.convert2Command();
-    }
-
-    public Command toKillCommand(){
-        TaskKillRequestCommand requestCommand = new TaskKillRequestCommand();
         requestCommand.setTaskExecutionContext(FastJsonSerializer.serializeToString(this));
         return requestCommand.convert2Command();
     }
