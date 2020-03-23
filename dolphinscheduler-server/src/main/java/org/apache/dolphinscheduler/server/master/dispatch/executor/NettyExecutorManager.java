@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -59,9 +60,16 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
      */
     private final NettyRemotingClient nettyRemotingClient;
 
+    /**
+     * constructor
+     */
     public NettyExecutorManager(){
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
+    }
+
+    @PostConstruct
+    public void init(){
         /**
          * register EXECUTE_TASK_RESPONSE command type TaskResponseProcessor
          * register EXECUTE_TASK_ACK command type TaskAckProcessor
@@ -70,7 +78,6 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean>{
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_ACK, new TaskAckProcessor());
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, new TaskKillResponseProcessor());
     }
-
 
     /**
      * execute logic
