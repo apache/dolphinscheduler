@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UdfType;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -136,10 +137,7 @@ public class UdfFuncService extends BaseService{
      */
     private boolean checkUdfFuncNameExists(String name){
         List<UdfFunc> resource = udfFuncMapper.queryUdfByIdStr(null, name);
-        if(resource != null && resource.size() > 0){
-            return true;
-        }
-        return false;
+        return CollectionUtils.isNotEmpty(resource);
     }
 
 
@@ -201,13 +199,12 @@ public class UdfFuncService extends BaseService{
         }
 
         // verify udfFuncName is exist
-        if (!funcName.equals(udf.getFuncName())) {
-            if (checkUdfFuncNameExists(funcName)) {
-                logger.error("UdfFunc {} has exist, can't create again.", funcName);
-                result.put(Constants.STATUS, Status.UDF_FUNCTION_EXISTS);
-                result.put(Constants.MSG, Status.UDF_FUNCTION_EXISTS.getMsg());
-                return result;
-            }
+        if (!funcName.equals(udf.getFuncName())
+                && checkUdfFuncNameExists(funcName)) {
+            logger.error("UdfFunc {} has exist, can't create again.", funcName);
+            result.put(Constants.STATUS, Status.UDF_FUNCTION_EXISTS);
+            result.put(Constants.MSG, Status.UDF_FUNCTION_EXISTS.getMsg());
+            return result;
         }
 
         Resource resource = resourceMapper.selectById(resourceId);

@@ -39,10 +39,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
     public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
     private static final String T_VERSION_NAME = "t_escheduler_version";
     private static final String T_NEW_VERSION_NAME = "t_ds_version";
-    private static final String rootDir = System.getProperty("user.dir");
+    private static final String ROOT_DIR = System.getProperty("user.dir");
     protected static final DruidDataSource dataSource = getDataSource();
     private static final DbType dbType = getCurrentDbType();
-
+    private static final String UPDATE_VERSION_SQL = "update %s set version = ?";
     @Override
     protected void init() {
 
@@ -91,10 +91,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * init schema
      */
     public void initSchema(){
-        DbType dbType = getDbType();
+        DbType initDbType = getDbType();
         String initSqlPath = "";
-        if (dbType != null) {
-            switch (dbType) {
+        if (initDbType != null) {
+            switch (initDbType) {
                 case MYSQL:
                     initSqlPath = "/sql/create/release-1.0.0_schema/mysql/";
                     initSchema(initSqlPath);
@@ -104,7 +104,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
                     initSchema(initSqlPath);
                     break;
                 default:
-                    logger.error("not support sql type: {},can't upgrade", dbType);
+                    logger.error("not support sql type: {},can't upgrade", initDbType);
                     throw new IllegalArgumentException("not support sql type,can't upgrade");
             }
         }
@@ -131,10 +131,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      */
     private void runInitDML(String initSqlPath) {
         Connection conn = null;
-        if (StringUtils.isEmpty(rootDir)) {
+        if (StringUtils.isEmpty(ROOT_DIR)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_dml.sql";
+        String mysqlSQLFilePath = ROOT_DIR + initSqlPath + "dolphinscheduler_dml.sql";
         try {
             conn = dataSource.getConnection();
             conn.setAutoCommit(false);
@@ -176,11 +176,11 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      */
     private void runInitDDL(String initSqlPath) {
         Connection conn = null;
-        if (StringUtils.isEmpty(rootDir)) {
+        if (StringUtils.isEmpty(ROOT_DIR)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        //String mysqlSQLFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/dolphinscheduler_ddl.sql";
-        String mysqlSQLFilePath = rootDir + initSqlPath + "dolphinscheduler_ddl.sql";
+        //String mysqlSQLFilePath = rootDir + "/sql/create/release-1.0.0_schema/mysql/dolphinscheduler_ddl.sql"
+        String mysqlSQLFilePath = ROOT_DIR + initSqlPath + "dolphinscheduler_ddl.sql";
         try {
             conn = dataSource.getConnection();
             // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
@@ -188,12 +188,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             Reader initSqlReader = new FileReader(new File(mysqlSQLFilePath));
             initScriptRunner.runScript(initSqlReader);
 
-        } catch (IOException e) {
-
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
-
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
@@ -268,11 +263,11 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      */
     private void upgradeDolphinSchedulerDML(String schemaDir) {
         String schemaVersion = schemaDir.split("_")[0];
-        if (StringUtils.isEmpty(rootDir)) {
+        if (StringUtils.isEmpty(ROOT_DIR)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql",rootDir,schemaDir,getDbType().name().toLowerCase());
-        logger.info("sqlSQLFilePath"+sqlFilePath);
+        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_dml.sql", ROOT_DIR,schemaDir,getDbType().name().toLowerCase());
+        logger.info("sqlSQLFilePath {}", sqlFilePath);
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -284,13 +279,13 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             scriptRunner.runScript(sqlReader);
             if (isExistsTable(T_VERSION_NAME)) {
                 // Change version in the version table to the new version
-                String upgradeSQL = String.format("update %s set version = ?",T_VERSION_NAME);
+                String upgradeSQL = String.format(UPDATE_VERSION_SQL,T_VERSION_NAME);
                 pstmt = conn.prepareStatement(upgradeSQL);
                 pstmt.setString(1, schemaVersion);
                 pstmt.executeUpdate();
             }else if (isExistsTable(T_NEW_VERSION_NAME)) {
                 // Change version in the version table to the new version
-                String upgradeSQL = String.format("update %s set version = ?",T_NEW_VERSION_NAME);
+                String upgradeSQL = String.format(UPDATE_VERSION_SQL,T_NEW_VERSION_NAME);
                 pstmt = conn.prepareStatement(upgradeSQL);
                 pstmt.setString(1, schemaVersion);
                 pstmt.executeUpdate();
@@ -307,16 +302,6 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         } catch (IOException e) {
             try {
                 conn.rollback();
-            } catch (SQLException e1) {
-                logger.error(e1.getMessage(),e1);
-            }
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage(),e);
-        } catch (SQLException e) {
-            try {
-                if (null != conn) {
-                    conn.rollback();
-                }
             } catch (SQLException e1) {
                 logger.error(e1.getMessage(),e1);
             }
@@ -343,10 +328,10 @@ public abstract class UpgradeDao extends AbstractBaseDao {
      * @param schemaDir schemaDir
      */
     private void upgradeDolphinSchedulerDDL(String schemaDir) {
-        if (StringUtils.isEmpty(rootDir)) {
+        if (StringUtils.isEmpty(ROOT_DIR)) {
             throw new RuntimeException("Environment variable user.dir not found");
         }
-        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_ddl.sql",rootDir,schemaDir,getDbType().name().toLowerCase());
+        String sqlFilePath = MessageFormat.format("{0}/sql/upgrade/{1}/{2}/dolphinscheduler_ddl.sql", ROOT_DIR,schemaDir,getDbType().name().toLowerCase());
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -363,14 +348,6 @@ public abstract class UpgradeDao extends AbstractBaseDao {
 
             logger.error(e.getMessage(),e);
             throw new RuntimeException("sql file not found ", e);
-        } catch (IOException e) {
-
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage(),e);
-        } catch (SQLException e) {
-
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage(),e);
         } catch (Exception e) {
 
             logger.error(e.getMessage(),e);
@@ -390,9 +367,9 @@ public abstract class UpgradeDao extends AbstractBaseDao {
         // Change version in the version table to the new version
         String versionName = T_VERSION_NAME;
         if(!SchemaUtils.isAGreatVersion("1.2.0" , version)){
-            versionName = "t_ds_version";
+            versionName = T_NEW_VERSION_NAME;
         }
-        String upgradeSQL = String.format("update %s set version = ?",versionName);
+        String upgradeSQL = String.format(UPDATE_VERSION_SQL,versionName);
         PreparedStatement pstmt = null;
         Connection conn = null;
         try {

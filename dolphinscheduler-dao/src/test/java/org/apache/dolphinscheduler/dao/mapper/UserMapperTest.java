@@ -201,7 +201,7 @@ public class UserMapperTest {
         user.setUserName("user1_update");
         user.setUserType(UserType.ADMIN_USER);
         int update = userMapper.updateById(user);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         userMapper.deleteById(user.getId());
     }
 
@@ -214,7 +214,7 @@ public class UserMapperTest {
         User user = insertOne();
         //delete
         int delete = userMapper.deleteById(user.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
         userMapper.deleteById(user.getId());
     }
 

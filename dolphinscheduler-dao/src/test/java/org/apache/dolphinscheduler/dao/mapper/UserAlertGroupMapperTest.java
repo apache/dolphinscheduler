@@ -130,7 +130,7 @@ public class UserAlertGroupMapperTest {
         userAlertGroup.setUpdateTime(new Date());
 
         int update = userAlertGroupMapper.updateById(userAlertGroup);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         userAlertGroupMapper.deleteById(userAlertGroup.getId());
         userMapper.deleteById(user.getId());
         alertGroupMapper.deleteById(alertGroup.getId());
@@ -145,7 +145,7 @@ public class UserAlertGroupMapperTest {
         UserAlertGroup userAlertGroup = insertOne();
         //delete
         int delete = userAlertGroupMapper.deleteById(userAlertGroup.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
@@ -174,7 +174,7 @@ public class UserAlertGroupMapperTest {
         //insertOne
         UserAlertGroup userAlertGroup = insertOne(user,alertGroup);
         int delete = userAlertGroupMapper.deleteByAlertgroupId(alertGroup.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
         userMapper.deleteById(user.getId());
         alertGroupMapper.deleteById(alertGroup.getId());
     }

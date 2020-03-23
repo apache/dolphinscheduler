@@ -171,7 +171,7 @@ public class UdfFuncMapperTest {
         //update
         int update = udfFuncMapper.updateById(udfFunc);
         udfFuncMapper.deleteById(udfFunc.getId());
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
 
     }
 
@@ -184,7 +184,7 @@ public class UdfFuncMapperTest {
         UdfFunc udfFunc = insertOne();
         //delete
         int delete = udfFuncMapper.deleteById(udfFunc.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**

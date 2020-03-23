@@ -317,55 +317,55 @@ public class UsersService extends BaseService {
             Tenant oldTenant = tenantMapper.queryById(user.getTenantId());
             //query tenant
             Tenant newTenant = tenantMapper.queryById(tenantId);
-            if (newTenant != null) {
-                // if hdfs startup
-                if (PropertyUtils.getResUploadStartupState() && oldTenant != null){
-                    String newTenantCode = newTenant.getTenantCode();
-                    String oldResourcePath = HadoopUtils.getHdfsResDir(oldTenant.getTenantCode());
-                    String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
+            // if hdfs startup
+            if (newTenant != null
+                    && PropertyUtils.getResUploadStartupState() && oldTenant != null){
+                String newTenantCode = newTenant.getTenantCode();
+                String oldResourcePath = HadoopUtils.getHdfsResDir(oldTenant.getTenantCode());
+                String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
 
-                    // if old tenant dir exists
-                    if (HadoopUtils.getInstance().exists(oldResourcePath)){
-                        String newResourcePath = HadoopUtils.getHdfsResDir(newTenantCode);
-                        String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
+                // if old tenant dir exists
+                if (HadoopUtils.getInstance().exists(oldResourcePath)){
+                    String newResourcePath = HadoopUtils.getHdfsResDir(newTenantCode);
+                    String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
 
-                        //file resources list
-                        List<Resource> fileResourcesList = resourceMapper.queryResourceList(
-                                null, userId, ResourceType.FILE.ordinal());
-                        if (CollectionUtils.isNotEmpty(fileResourcesList)) {
-                            for (Resource resource : fileResourcesList) {
-                                HadoopUtils.getInstance().copy(oldResourcePath + "/" + resource.getAlias(), newResourcePath, false, true);
-                            }
+                    //file resources list
+                    List<Resource> fileResourcesList = resourceMapper.queryResourceList(
+                            null, userId, ResourceType.FILE.ordinal());
+                    if (CollectionUtils.isNotEmpty(fileResourcesList)) {
+                        for (Resource resource : fileResourcesList) {
+                            HadoopUtils.getInstance().copy(oldResourcePath + "/" + resource.getAlias(), newResourcePath, false, true);
                         }
-
-                        //udf resources
-                        List<Resource> udfResourceList = resourceMapper.queryResourceList(
-                                null, userId, ResourceType.UDF.ordinal());
-                        if (CollectionUtils.isNotEmpty(udfResourceList)) {
-                            for (Resource resource : udfResourceList) {
-                                HadoopUtils.getInstance().copy(oldUdfsPath + "/" + resource.getAlias(), newUdfsPath, false, true);
-                            }
-                        }
-
-                        //Delete the user from the old tenant directory
-                        String oldUserPath = HadoopUtils.getHdfsUserDir(oldTenant.getTenantCode(),userId);
-                        HadoopUtils.getInstance().delete(oldUserPath, true);
-                    }else {
-                        // if old tenant dir not exists , create
-                        createTenantDirIfNotExists(oldTenant.getTenantCode());
                     }
 
-                    if (HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(newTenant.getTenantCode()))){
-                        //create user in the new tenant directory
-                        String newUserPath = HadoopUtils.getHdfsUserDir(newTenant.getTenantCode(),user.getId());
-                        HadoopUtils.getInstance().mkdir(newUserPath);
-                    }else {
-                        // if new tenant dir not exists , create
-                        createTenantDirIfNotExists(newTenant.getTenantCode());
+                    //udf resources
+                    List<Resource> udfResourceList = resourceMapper.queryResourceList(
+                            null, userId, ResourceType.UDF.ordinal());
+                    if (CollectionUtils.isNotEmpty(udfResourceList)) {
+                        for (Resource resource : udfResourceList) {
+                            HadoopUtils.getInstance().copy(oldUdfsPath + "/" + resource.getAlias(), newUdfsPath, false, true);
+                        }
                     }
 
+                    //Delete the user from the old tenant directory
+                    String oldUserPath = HadoopUtils.getHdfsUserDir(oldTenant.getTenantCode(),userId);
+                    HadoopUtils.getInstance().delete(oldUserPath, true);
+                }else {
+                    // if old tenant dir not exists , create
+                    createTenantDirIfNotExists(oldTenant.getTenantCode());
                 }
+
+                if (HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(newTenant.getTenantCode()))){
+                    //create user in the new tenant directory
+                    String newUserPath = HadoopUtils.getHdfsUserDir(newTenant.getTenantCode(),user.getId());
+                    HadoopUtils.getInstance().mkdir(newUserPath);
+                }else {
+                    // if new tenant dir not exists , create
+                    createTenantDirIfNotExists(newTenant.getTenantCode());
+                }
+
             }
+
             user.setTenantId(tenantId);
         }
 
@@ -398,13 +398,11 @@ public class UsersService extends BaseService {
         }
         // delete user
         User user = userMapper.queryTenantCodeByUserId(id);
-
-        if (user != null) {
-            if (PropertyUtils.getResUploadStartupState()) {
-                String userPath = HadoopUtils.getHdfsUserDir(user.getTenantCode(),id);
-                if (HadoopUtils.getInstance().exists(userPath)) {
-                    HadoopUtils.getInstance().delete(userPath, true);
-                }
+        if (user != null
+                && PropertyUtils.getResUploadStartupState()) {
+            String userPath = HadoopUtils.getHdfsUserDir(user.getTenantCode(),id);
+            if (HadoopUtils.getInstance().exists(userPath)) {
+                HadoopUtils.getInstance().delete(userPath, true);
             }
         }
 
@@ -621,7 +619,7 @@ public class UsersService extends BaseService {
 
             StringBuilder sb = new StringBuilder();
 
-            if (alertGroups != null && alertGroups.size() > 0) {
+            if (CollectionUtils.isNotEmpty(alertGroups)) {
                 for (int i = 0; i < alertGroups.size() - 1; i++) {
                     sb.append(alertGroups.get(i).getGroupName() + ",");
                 }
@@ -717,13 +715,13 @@ public class UsersService extends BaseService {
         List<User> userList = userMapper.selectList(null );
         List<User> resultUsers = new ArrayList<>();
         Set<User> userSet = null;
-        if (userList != null && userList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(userList)) {
             userSet = new HashSet<>(userList);
 
             List<User> authedUserList = userMapper.queryUserListByAlertGroupId(alertgroupId);
 
             Set<User> authedUserSet = null;
-            if (authedUserList != null && authedUserList.size() > 0) {
+            if (CollectionUtils.isNotEmpty(authedUserList)) {
                 authedUserSet = new HashSet<>(authedUserList);
                 userSet.removeAll(authedUserSet);
             }
@@ -779,7 +777,7 @@ public class UsersService extends BaseService {
      * @return true if tenant exists, otherwise return false
      */
     private boolean checkTenantExists(int tenantId) {
-        return tenantMapper.queryById(tenantId) != null ? true : false;
+        return tenantMapper.queryById(tenantId) != null;
     }
 
     /**
