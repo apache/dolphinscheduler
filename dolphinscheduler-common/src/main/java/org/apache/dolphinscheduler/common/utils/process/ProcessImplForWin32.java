@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.sun.jna.platform.win32.WinBase.INVALID_HANDLE_VALUE;
 import static com.sun.jna.platform.win32.WinBase.STILL_ACTIVE;
 import static java.util.Objects.requireNonNull;
 
@@ -742,7 +743,9 @@ public class ProcessImplForWin32 extends Process {
     }
 
     private static void closeHandle(WinNT.HANDLE handle) {
-        Kernel32Util.closeHandle(handle);
+        if (!handle.equals(INVALID_HANDLE_VALUE)) {
+            Kernel32Util.closeHandle(handle);
+        }
     }
 
     /**
