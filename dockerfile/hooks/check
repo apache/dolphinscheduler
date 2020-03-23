@@ -16,8 +16,8 @@
 # limitations under the License.
 #
 echo "------ dolphinscheduler check - server - status -------"
-sleep 5
-for i in `seq 20`
+sleep 60
+for i in `seq 30`
 do
     server_num=`cat /tmp/logs/dolphinscheduler-worker.log /tmp/logs/dolphinscheduler-master.log /tmp/logs/dolphinscheduler-api-server.log /tmp/logs/dolphinscheduler-alert.log | grep -E "worker start fetch tasks|Started MasterServer in|Started ApiApplicationServer in|alert server ready start" | wc -l`
     if [ $server_num -eq 4 ]
