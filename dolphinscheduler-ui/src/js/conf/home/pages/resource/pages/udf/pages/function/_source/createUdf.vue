@@ -201,7 +201,7 @@
       },
       // selTree
       selTree(node) {
-        this.$refs.assignment.receivedValue(node.pid,node.name)
+        this.$refs.assignment.receivedValue(node.id,node.fullName)
       },
       /**
        * get udf resources
@@ -225,8 +225,8 @@
       // filterEmptyDirectory
       filterEmptyDirectory(array) {
         for (const item of array) {
-          if (item.children.length>0) {
-            this.filterJarFile(item.children)
+          if (item.children) {
+            this.filterEmptyDirectory(item.children)
           }
         }
         return array.filter(n => ((/\.jar$/.test(n.name) && n.children.length==0) || (!/\.jar$/.test(n.name) && n.children.length>0)))
