@@ -49,6 +49,7 @@ jobs:
       - name: Docker Run
         run: |
           VERSION=`cat $(pwd)/pom.xml| grep "SNAPSHOT</version>" | awk -F "-SNAPSHOT" '{print $1}' | awk -F ">" '{print $2}'`
+          mkdir -p /tmp/logs
           docker run -dit -e POSTGRESQL_USERNAME=test -e POSTGRESQL_PASSWORD=test -v /tmp/logs:/opt/dolphinscheduler/logs -p 8888:8888 dolphinscheduler:$VERSION all
       - name: Check Server Status
         run: sh ./dockerfile/hooks/check
