@@ -17,7 +17,7 @@
 #
 echo "------ dolphinscheduler check - server - status -------"
 sleep 5
-for((i=1;i<=20;i++));
+for i in `seq 20`
 do
     server_num=`cat /tmp/logs/dolphinscheduler-worker.log /tmp/logs/dolphinscheduler-master.log /tmp/logs/dolphinscheduler-api-server.log /tmp/logs/dolphinscheduler-alert.log | grep -E "worker start fetch tasks|Started MasterServer in|Started ApiApplicationServer in|alert server ready start" | wc -l`
     if [ $server_num -eq 4 ]
