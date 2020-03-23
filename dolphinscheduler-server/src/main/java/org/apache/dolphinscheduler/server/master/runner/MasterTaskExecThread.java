@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -25,9 +26,8 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import com.alibaba.fastjson.JSONObject;
+import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -172,8 +172,6 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
 
     /**
-     *  TODO Kill TASK
-     *
      *  task instance add queue , waiting worker to kill
      */
     private void cancelTaskInstance() throws Exception{
@@ -182,14 +180,10 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
         }
         alreadyKilled = true;
 
-        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        taskExecutionContext.setTaskInstanceId(taskInstance.getId());
-        taskExecutionContext.setHost(taskInstance.getHost());
-        taskExecutionContext.setLogPath(taskInstance.getLogPath());
-        taskExecutionContext.setExecutePath(taskInstance.getExecutePath());
-        taskExecutionContext.setProcessId(taskInstance.getPid());
+        TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
+        killCommand.setTaskInstanceId(taskInstance.getId());
 
-        ExecutionContext executionContext = new ExecutionContext(taskExecutionContext.toKillCommand(), ExecutorType.WORKER, taskExecutionContext.getWorkerGroup());
+        ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER);
 
         Host host = Host.of(taskInstance.getHost());
         executionContext.setHost(host);
