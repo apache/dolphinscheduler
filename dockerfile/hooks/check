@@ -27,6 +27,6 @@ do
         sleep 3
     fi
 done
-echo "Server start failed "$server_num"
+echo "Server start failed $server_num"
 cat /tmp/logs/dolphinscheduler-worker.log /tmp/logs/dolphinscheduler-master.log /tmp/logs/dolphinscheduler-api-server.log /tmp/logs/dolphinscheduler-alert.log | grep -E "worker start fetch tasks|Started MasterServer in|Started ApiApplicationServer in|alert server ready start"
-
+exit 255
