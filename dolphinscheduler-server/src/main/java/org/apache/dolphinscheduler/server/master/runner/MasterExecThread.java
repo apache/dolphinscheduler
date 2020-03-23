@@ -725,7 +725,7 @@ public class MasterExecThread implements Runnable {
         ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
         ExecutionStatus state = instance.getState();
 
-        if(activeTaskNode.size() > 0){
+        if(activeTaskNode.size() > 0 || haveRetryTaskStandBy()){
             return runningState(state);
         }
         // process failure
@@ -766,6 +766,24 @@ public class MasterExecThread implements Runnable {
         }
 
         return state;
+    }
+
+    /**
+     * whether standby task list have retry tasks
+     * @return
+     */
+    private boolean haveRetryTaskStandBy() {
+
+        boolean result = false;
+
+        for(String taskName : readyToSubmitTaskList.keySet()){
+            TaskInstance task = readyToSubmitTaskList.get(taskName);
+            if(task.getState().typeIsFailure()){
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
     /**
@@ -856,7 +874,11 @@ public class MasterExecThread implements Runnable {
         // submit start node
         submitPostNode(null);
         boolean sendTimeWarning = false;
-        while(!processInstance.IsProcessInstanceStop()){
+        while(Stopper.isRunning()){
+
+            if(processInstance.IsProcessInstanceStop()){
+                break;
+            }
 
             // send warning email if process time out.
             if( !sendTimeWarning && checkProcessTimeOut(processInstance) ){
@@ -871,12 +893,21 @@ public class MasterExecThread implements Runnable {
                 if(!future.isDone()){
                     continue;
                 }
+
                 // node monitor thread complete
-                activeTaskNode.remove(entry.getKey());
+                task = this.processService.findTaskInstanceById(task.getId());
+
                 if(task == null){
                     this.taskFailedSubmit = true;
+                    activeTaskNode.remove(entry.getKey());
                     continue;
                 }
+
+                // node monitor thread complete
+                if(task.getState().typeIsFinished()){
+                    activeTaskNode.remove(entry.getKey());
+                }
+
                 logger.info("task :{}, id:{} complete, state is {} ",
                         task.getName(), task.getId(), task.getState().toString());
                 //TODO  node success , post node submit
