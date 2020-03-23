@@ -336,8 +336,7 @@ public class ResourcesService extends BaseService {
         }
 
         // updateResource data
-
-        List<Integer> childrenResource = resourcesMapper.listChildren(resourceId);
+        List<Integer> childrenResource = listAllChildren(resource);
         String oldFullName = resource.getFullName();
         Date now = new Date();
 
@@ -505,18 +504,42 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type) {
 
         Map<String, Object> result = new HashMap<>(5);
-        List<Resource> resourceList;
-        int userId = loginUser.getId();
-        if(isAdmin(loginUser)){
-            userId = 0;
-        }
-        resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        Visitor resourceTreeVisitor = new ResourceTreeVisitor(resourceList);
+
+        Set<Resource> allResourceList = getAllResources(loginUser, type);
+        Visitor resourceTreeVisitor = new ResourceTreeVisitor(new ArrayList<>(allResourceList));
         //JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(resourceTreeVisitor.visit().getChildren(), SerializerFeature.SortField));
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
 
         return result;
+    }
+
+    /**
+     * get all resources
+     * @param loginUser     login user
+     * @return all resource set
+     */
+    private Set<Resource> getAllResources(User loginUser, ResourceType type) {
+        int userId = loginUser.getId();
+        boolean listChildren = true;
+        if(isAdmin(loginUser)){
+            userId = 0;
+            listChildren = false;
+        }
+        List<Resource> resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
+        Set<Resource> allResourceList = new HashSet<>(resourceList);
+        if (listChildren) {
+            Set<Integer> authorizedIds = new HashSet<>();
+            List<Resource> authorizedDirecoty = resourceList.stream().filter(t->t.getUserId() != loginUser.getId() && t.isDirectory()).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(authorizedDirecoty)) {
+                for(Resource resource : authorizedDirecoty){
+                    authorizedIds.addAll(listAllChildren(resource));
+                }
+                List<Resource> childrenResources = resourcesMapper.listResourceByIds(authorizedIds.toArray(new Integer[authorizedIds.size()]));
+                allResourceList.addAll(childrenResources);
+            }
+        }
+        return allResourceList;
     }
 
     /**
@@ -529,13 +552,9 @@ public class ResourcesService extends BaseService {
     public Map<String, Object> queryResourceJarList(User loginUser, ResourceType type) {
 
         Map<String, Object> result = new HashMap<>(5);
-        List<Resource> resourceList;
-        int userId = loginUser.getId();
-        if(isAdmin(loginUser)){
-            userId = 0;
-        }
-        resourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal());
-        List<Resource> resources = new ResourceFilter(".jar",resourceList).filter();
+
+        Set<Resource> allResourceList = getAllResources(loginUser, type);
+        List<Resource> resources = new ResourceFilter(".jar",new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
