@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-popup :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit UDF Function') : $t('Create UDF Function')" @ok="_ok" ref="popup">
+  <m-popup style="width:800px" :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit UDF Function') : $t('Create UDF Function')" @ok="_ok" ref="popup">
     <template slot="content">
       <div class="udf-create-model">
         <m-list-box-f>
@@ -72,16 +72,25 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('UDF Resources')}}</template>
           <template slot="content">
-            <treeselect style="width:260px;float:left;" v-model="resourceId" :disable-branch-nodes="true" :options="udfResourceList" :disabled="isUpdate" :normalizer="normalizer" :placeholder="$t('Please select resources')">
+            <treeselect style="width:535px;float:left;" v-model="resourceId" :disable-branch-nodes="true" :options="udfResourceList" :disabled="isUpdate" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
               <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
             </treeselect>
             <x-button type="primary" @click="_toggleUpdate" :disabled="upDisabled">{{$t('Upload Resources')}}</x-button>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isUpdate">
+          <template slot="name"><strong>*</strong>{{$t('UDF resources directory')}}</template>
+          <template slot="content">
+            <treeselect style="width:535px;float:left;" v-model="pid" @select="selTree" :options="udfResourceDirList" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
+              <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+            </treeselect>
+          </template>
+        </m-list-box-f>
+        <m-list-box-f v-if="isUpdate">
           <template slot="name">&nbsp;</template>
           <template slot="content">
             <m-udf-update
+                    ref="assignment"
                     @on-update-present="_onUpdatePresent"
                     @on-update="_onUpdate">
             </m-udf-update>
@@ -123,6 +132,7 @@
         database: '',
         description: '',
         resourceId: null,
+        pid: null,
         udfResourceList: [],
         isUpdate: false,
         upDisabled: false,
@@ -189,6 +199,10 @@
         // disabled update
         this.upDisabled = true
       },
+      // selTree
+      selTree(node) {
+        this.$refs.assignment.receivedValue(node.pid,node.name)
+      },
       /**
        * get udf resources
        */
@@ -196,12 +210,37 @@
         return new Promise((resolve, reject) => {
           this.store.dispatch('resource/getResourcesList', { type: 'UDF' }).then(res => {
             let item = res.data
+            this.filterEmptyDirectory(item)
+            item = this.filterEmptyDirectory(item)
+            let item1 = _.cloneDeep(res.data)
             this.diGuiTree(item)
+            
+            this.diGuiTree(this.filterJarFile(item1))
             this.udfResourceList = item
+            this.udfResourceDirList = item1
             resolve()
           })
         })
       },
+      // filterEmptyDirectory
+      filterEmptyDirectory(array) {
+        for (const item of array) {
+          if (item.children.length>0) {
+            this.filterJarFile(item.children)
+          }
+        }
+        return array.filter(n => ((/\.jar$/.test(n.name) && n.children.length==0) || (!/\.jar$/.test(n.name) && n.children.length>0)))
+      },
+      // filterJarFile
+      filterJarFile (array) {
+        for (const item of array) {
+          if (item.children) {
+            item.children = this.filterJarFile(item.children)
+          }
+        }
+        return array.filter(n => !/\.jar$/.test(n.name))
+      },
+      // diGuiTree
       diGuiTree(item) {  // Recursive convenience tree structure
         item.forEach(item => {
           item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
