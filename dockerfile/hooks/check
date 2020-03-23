@@ -16,12 +16,17 @@
 # limitations under the License.
 #
 echo "------ dolphinscheduler check - server - status -------"
-sleep 20
-server_num=$(docker top `docker container list | grep '/sbin/tini' | awk '{print $1}'`| grep java | grep "dolphinscheduler" | awk -F 'classpath ' '{print $2}' | awk '{print $2}' | sort | uniq -c | wc -l)
-if [ $server_num -eq 5 ]
-then
-    echo "Server all start successfully"
-else
-    echo "Server start failed "$server_num
-    exit 1
-fi
+for i in {1..10}
+do
+    server_num=`cat /tmp/logs/dolphinscheduler-worker.log /tmp/logs/dolphinscheduler-master.log /tmp/logs/dolphinscheduler-api-server.log /tmp/logs/dolphinscheduler-alert.log | grep -E "worker start fetch tasks|Started MasterServer in|Started ApiApplicationServer in|alert server ready start" | wc -l`
+    if [ $server_num -eq 4 ]
+    then
+        echo "Server all start successfully"
+        exit 0
+    else
+        sleep 3
+    fi
+done
+echo "Server start failed "$server_num"
+cat /tmp/logs/dolphinscheduler-worker.log /tmp/logs/dolphinscheduler-master.log /tmp/logs/dolphinscheduler-api-server.log /tmp/logs/dolphinscheduler-alert.log | grep -E "worker start fetch tasks|Started MasterServer in|Started ApiApplicationServer in|alert server ready start"
+
