@@ -128,10 +128,6 @@
             this.store.dispatch('dag/getProcessTasksList', { processDefinitionId: ids }).then(res => {
               resolve(['ALL'].concat(_.map(res, v => v.name)))
             })
-          } else {
-            this.store.dispatch('dag/getTaskListDefIdAll', { processDefinitionIdList: ids }).then(res => {
-              resolve(res)
-            })
           }
         })
       },
