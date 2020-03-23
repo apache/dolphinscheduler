@@ -427,6 +427,7 @@ public class OSUtils {
   public static Boolean checkResource(double systemCpuLoad, double systemReservedMemory){
     // system load average
     double loadAverage = OSUtils.loadAverage();
+
     // system available physical memory
     double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
 
