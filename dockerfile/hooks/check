@@ -25,8 +25,8 @@ else
     echo "Server start failed "$server_num
     exit 1
 fi
-ok=`curl http://127.0.0.1:8888/dolphinscheduler/login -d 'userName=admin&userPassword=dolphinscheduler123' -v | grep "login success" | wc -l`
-if [ $server_num -eq 1 ]
+ready=`curl http://127.0.0.1:8888/dolphinscheduler/login -d 'userName=admin&userPassword=dolphinscheduler123' -v | grep "login success" | wc -l`
+if [ $ready -eq 1 ]
 then
     echo "Servers is ready"
 else
