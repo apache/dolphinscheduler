@@ -78,8 +78,7 @@ public class TaskAckProcessor implements NettyRequestProcessor {
                 workerAddress,
                 taskAckCommand.getExecutePath(),
                 taskAckCommand.getLogPath(),
-                taskAckCommand.getTaskInstanceId(),
-                TaskEvent.ACK);
+                taskAckCommand.getTaskInstanceId());
 
         taskManager.putTask(taskEvent);
 
