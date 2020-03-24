@@ -73,14 +73,12 @@ public class TaskAckProcessor implements NettyRequestProcessor {
         String workerAddress = ChannelUtils.toAddress(channel).getAddress();
 
         // TaskEvent
-        TaskEvent taskEvent = new TaskEvent();
-        taskEvent.receiveAck(ExecutionStatus.of(taskAckCommand.getStatus()),
+        TaskEvent taskEvent = new TaskEvent(ExecutionStatus.of(taskAckCommand.getStatus()),
                 taskAckCommand.getStartTime(),
                 workerAddress,
                 taskAckCommand.getExecutePath(),
                 taskAckCommand.getLogPath(),
-                taskAckCommand.getTaskInstanceId(),
-                TaskEvent.ACK);
+                taskAckCommand.getTaskInstanceId());
 
         taskManager.putTask(taskEvent);
 
