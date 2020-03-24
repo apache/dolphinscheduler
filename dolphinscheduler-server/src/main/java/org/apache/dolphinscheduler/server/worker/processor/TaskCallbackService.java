@@ -79,8 +79,11 @@ public class TaskCallbackService {
      * @param taskInstanceId taskInstanceId
      * @return callback channel
      */
-    public NettyRemoteChannel getRemoteChannel(int taskInstanceId){
+    private NettyRemoteChannel getRemoteChannel(int taskInstanceId){
         NettyRemoteChannel nettyRemoteChannel = REMOTE_CHANNELS.get(taskInstanceId);
+        if(nettyRemoteChannel == null){
+            throw new IllegalArgumentException("nettyRemoteChannel is empty, should call addRemoteChannel first");
+        }
         if(nettyRemoteChannel.isActive()){
             return nettyRemoteChannel;
         }
