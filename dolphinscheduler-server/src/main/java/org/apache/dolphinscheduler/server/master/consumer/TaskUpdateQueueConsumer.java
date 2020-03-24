@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import com.alibaba.fastjson.JSONObject;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
@@ -89,12 +88,11 @@ public class TaskUpdateQueueConsumer extends Thread{
     public void run() {
         while (Stopper.isRunning()){
             try {
-                if (taskUpdateQueue.size() == 0){
-                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                    continue;
-                }
+                // if not task , blocking here
                 String taskPriorityInfo = taskUpdateQueue.take();
+
                 TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
+
                 dispatch(taskPriority.getTaskId());
             }catch (Exception e){
                 logger.error("dispatcher task error",e);

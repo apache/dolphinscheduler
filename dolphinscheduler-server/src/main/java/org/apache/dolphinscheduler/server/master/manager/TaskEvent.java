@@ -26,9 +26,6 @@ import java.util.Date;
  */
 public class TaskEvent {
 
-    public static final String ACK = "ack";
-    public static final String RESPONSE = "response";
-
     /**
      * taskInstanceId
      */
@@ -77,7 +74,7 @@ public class TaskEvent {
     /**
      * ack / response
      */
-    private String type;
+    private TaskEventEnum type;
 
 
     /**
@@ -88,22 +85,21 @@ public class TaskEvent {
      * @param executePath executePath
      * @param logPath logPath
      * @param taskInstanceId taskInstanceId
-     * @param type type
      */
-    public void receiveAck(ExecutionStatus state,
-                           Date startTime,
-                           String workerAddress,
-                           String executePath,
-                           String logPath,
-                           int taskInstanceId,
-                           String type){
+    public TaskEvent(ExecutionStatus state,
+                     Date startTime,
+                     String workerAddress,
+                     String executePath,
+                     String logPath,
+                     int taskInstanceId){
         this.state = state;
         this.startTime = startTime;
         this.workerAddress = workerAddress;
         this.executePath = executePath;
         this.logPath = logPath;
         this.taskInstanceId = taskInstanceId;
-        this.type = type;
+        this.type = TaskEventEnum.ACK;
+
     }
 
     /**
@@ -113,20 +109,18 @@ public class TaskEvent {
      * @param processId processId
      * @param appIds appIds
      * @param taskInstanceId taskInstanceId
-     * @param type type
      */
-    public void receiveResponse(ExecutionStatus state,
+    public TaskEvent(ExecutionStatus state,
                                 Date endTime,
                                 int processId,
                                 String appIds,
-                                int taskInstanceId,
-                                String type){
+                                int taskInstanceId){
         this.state = state;
         this.endTime = endTime;
         this.processId = processId;
         this.appIds = appIds;
         this.taskInstanceId = taskInstanceId;
-        this.type = type;
+        this.type = TaskEventEnum.RESPONSE;
     }
 
     public int getTaskInstanceId() {
@@ -201,11 +195,11 @@ public class TaskEvent {
         this.appIds = appIds;
     }
 
-    public String getType() {
+    public TaskEventEnum getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(TaskEventEnum type) {
         this.type = type;
     }
 
@@ -221,7 +215,7 @@ public class TaskEvent {
                 ", logPath='" + logPath + '\'' +
                 ", processId=" + processId +
                 ", appIds='" + appIds + '\'' +
-                ", type='" + type + '\'' +
+                ", type=" + type +
                 '}';
     }
 }
