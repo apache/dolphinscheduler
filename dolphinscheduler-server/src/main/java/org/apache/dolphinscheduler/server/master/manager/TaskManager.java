@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.manager;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
@@ -28,6 +27,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import static org.apache.dolphinscheduler.server.master.manager.TaskEventEnum.*;
 
 /**
  * task manager
@@ -56,6 +56,7 @@ public class TaskManager {
     @PostConstruct
     public void init(){
         TaskWorker taskWorker = new TaskWorker();
+        taskWorker.setName("TaskWorkerThread");
         taskWorker.start();
     }
 
@@ -83,12 +84,8 @@ public class TaskManager {
 
             while (Stopper.isRunning()){
                 try {
-                    if (attemptQueue.size() == 0){
-                        Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                        continue;
-                    }
+                    // if not task , blocking here
                     TaskEvent taskEvent = attemptQueue.take();
-
                     persist(taskEvent);
 
                 }catch (Exception e){
@@ -102,19 +99,28 @@ public class TaskManager {
          * @param taskEvent taskEvent
          */
         private void persist(TaskEvent taskEvent){
-            if (TaskEvent.ACK.equals(taskEvent.getType())){
-                processService.changeTaskState(taskEvent.getState(),
-                        taskEvent.getStartTime(),
-                        taskEvent.getWorkerAddress(),
-                        taskEvent.getExecutePath(),
-                        taskEvent.getLogPath(),
-                        taskEvent.getTaskInstanceId());
-            }else if (TaskEvent.RESPONSE.equals(taskEvent.getType())){
-                processService.changeTaskState(taskEvent.getState(),
-                        taskEvent.getEndTime(),
-                        taskEvent.getProcessId(),
-                        taskEvent.getAppIds(),
-                        taskEvent.getTaskInstanceId());
+            // task event type
+            TaskEventEnum type = taskEvent.getType();
+
+            switch (type){
+                case ACK:
+                    processService.changeTaskState(taskEvent.getState(),
+                            taskEvent.getStartTime(),
+                            taskEvent.getWorkerAddress(),
+                            taskEvent.getExecutePath(),
+                            taskEvent.getLogPath(),
+                            taskEvent.getTaskInstanceId());
+                    break;
+                case RESPONSE:
+                    processService.changeTaskState(taskEvent.getState(),
+                            taskEvent.getEndTime(),
+                            taskEvent.getProcessId(),
+                            taskEvent.getAppIds(),
+                            taskEvent.getTaskInstanceId());
+                    break;
+                default:
+                    throw new IllegalArgumentException("invalid task event type : " + type);
+
             }
         }
     }
