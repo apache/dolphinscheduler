@@ -16,12 +16,20 @@
 # limitations under the License.
 #
 echo "------ dolphinscheduler check - server - status -------"
-sleep 20
+sleep 60
 server_num=$(docker top `docker container list | grep '/sbin/tini' | awk '{print $1}'`| grep java | grep "dolphinscheduler" | awk -F 'classpath ' '{print $2}' | awk '{print $2}' | sort | uniq -c | wc -l)
 if [ $server_num -eq 5 ]
 then
     echo "Server all start successfully"
 else
     echo "Server start failed "$server_num
+    exit 1
+fi
+ready=`curl http://127.0.0.1:8888/dolphinscheduler/login -d 'userName=admin&userPassword=dolphinscheduler123' -v | grep "login success" | wc -l`
+if [ $ready -eq 1 ]
+then
+    echo "Servers is ready"
+else
+    echo "Servers is not ready"
     exit 1
 fi
