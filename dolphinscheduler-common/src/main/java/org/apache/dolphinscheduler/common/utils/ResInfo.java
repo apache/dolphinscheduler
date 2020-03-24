@@ -143,13 +143,11 @@ public class ResInfo {
 
         }
         Server masterServer = new Server();
-        masterServer.setHost(masterArray[0]);
-        masterServer.setPort(Integer.parseInt(masterArray[1]));
-        masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[2]),
-                Double.parseDouble(masterArray[3]),
-                Double.parseDouble(masterArray[4])));
-        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[5]));
-        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[6]));
+        masterServer.setResInfo(getResInfoJson(Double.parseDouble(masterArray[0]),
+                Double.parseDouble(masterArray[1]),
+                Double.parseDouble(masterArray[2])));
+        masterServer.setCreateTime(DateUtils.stringToDate(masterArray[3]));
+        masterServer.setLastHeartbeatTime(DateUtils.stringToDate(masterArray[4]));
         return masterServer;
     }
 
