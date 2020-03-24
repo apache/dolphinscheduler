@@ -116,8 +116,8 @@
         this.searchParams.searchVal = ''
         this._debounceGET()
       },
-       _onUpdate (data) {
-        this.searchParams.id = data
+       _onUpdate () {
+        this.searchParams.id = this.$route.params.id
         this._debounceGET()
       },
       _ckOperation(index) {
