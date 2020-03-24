@@ -96,6 +96,7 @@
         this.searchParams.pageSize = val
       },
       _onUpdate () {
+        this.searchParams.id = this.$route.params.id
         this._debounceGET()
       },
       _updateList (data) {
