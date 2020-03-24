@@ -732,6 +732,8 @@
                         <include>**/server/log/WorkerLogFilterTest.java</include>
                         <include>**/server/master/executor/NettyExecutorManagerTest.java</include>
                         <include>**/server/master/host/LowerWeightRoundRobinTest.java</include>
+                        <include>**/server/master/host/RandomSelectorTest.java</include>
+                        <include>**/server/master/host/RoundRobinSelectorTest.java</include>
                         <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
@@ -743,6 +745,7 @@
                         <include>**/server/utils/ParamUtilsTest.java</include>
                         <include>**/server/utils/ProcessUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
+                        <include>**/server/worker/processor/TaskCallbackServiceTest.java</include>
                         <include>**/server/worker/register/WorkerRegistryTest.java</include>
                         <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
@@ -750,6 +753,7 @@
                         <include>**/server/worker/task/dependent/DependentTaskTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
+
                     </includes>
                     <!-- <skip>true</skip> -->
                     <argLine>-Xmx2048m</argLine>
