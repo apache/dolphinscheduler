@@ -25,9 +25,43 @@ import java.util.regex.Pattern;
  * Constants
  */
 public final class Constants {
+
     private Constants() {
         throw new IllegalStateException("Constants class");
     }
+
+    /**
+     * quartz config
+     */
+    public static final String ORG_QUARTZ_JOBSTORE_DRIVERDELEGATECLASS = "org.quartz.jobStore.driverDelegateClass";
+    public static final String ORG_QUARTZ_SCHEDULER_INSTANCENAME = "org.quartz.scheduler.instanceName";
+    public static final String ORG_QUARTZ_SCHEDULER_INSTANCEID = "org.quartz.scheduler.instanceId";
+    public static final String ORG_QUARTZ_SCHEDULER_MAKESCHEDULERTHREADDAEMON = "org.quartz.scheduler.makeSchedulerThreadDaemon";
+    public static final String ORG_QUARTZ_JOBSTORE_USEPROPERTIES = "org.quartz.jobStore.useProperties";
+    public static final String ORG_QUARTZ_THREADPOOL_CLASS = "org.quartz.threadPool.class";
+    public static final String ORG_QUARTZ_THREADPOOL_THREADCOUNT = "org.quartz.threadPool.threadCount";
+    public static final String ORG_QUARTZ_THREADPOOL_MAKETHREADSDAEMONS = "org.quartz.threadPool.makeThreadsDaemons";
+    public static final String ORG_QUARTZ_THREADPOOL_THREADPRIORITY = "org.quartz.threadPool.threadPriority";
+    public static final String ORG_QUARTZ_JOBSTORE_CLASS = "org.quartz.jobStore.class";
+    public static final String ORG_QUARTZ_JOBSTORE_TABLEPREFIX = "org.quartz.jobStore.tablePrefix";
+    public static final String ORG_QUARTZ_JOBSTORE_ISCLUSTERED = "org.quartz.jobStore.isClustered";
+    public static final String ORG_QUARTZ_JOBSTORE_MISFIRETHRESHOLD = "org.quartz.jobStore.misfireThreshold";
+    public static final String ORG_QUARTZ_JOBSTORE_CLUSTERCHECKININTERVAL = "org.quartz.jobStore.clusterCheckinInterval";
+    public static final String ORG_QUARTZ_JOBSTORE_DATASOURCE = "org.quartz.jobStore.dataSource";
+    public static final String ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS = "org.quartz.dataSource.myDs.connectionProvider.class";
+
+    /**
+     * quartz config default value
+     */
+    public static final String QUARTZ_TABLE_PREFIX = "QRTZ_";
+    public static final String QUARTZ_MISFIRETHRESHOLD = "60000";
+    public static final String QUARTZ_CLUSTERCHECKININTERVAL = "5000";
+    public static final String QUARTZ_DATASOURCE = "myDs";
+    public static final String QUARTZ_THREADCOUNT = "25";
+    public static final String QUARTZ_THREADPRIORITY = "5";
+    public static final String QUARTZ_INSTANCENAME = "DolphinScheduler";
+    public static final String QUARTZ_INSTANCEID = "AUTO";
+
     /**
      * common properties path
      */
@@ -56,9 +90,11 @@ public final class Constants {
 
 
     /**
-     * yarn.resourcemanager.ha.rm.idsfs.defaultFS
+     * yarn.resourcemanager.ha.rm.ids
      */
     public static final String YARN_RESOURCEMANAGER_HA_RM_IDS = "yarn.resourcemanager.ha.rm.ids";
+    public static final String YARN_RESOURCEMANAGER_HA_XX = "xx";
+
 
     /**
      * yarn.application.status.address
@@ -72,31 +108,25 @@ public final class Constants {
     public static final String HDFS_ROOT_USER = "hdfs.root.user";
 
     /**
-     * hdfs configuration
-     * data.store2hdfs.basepath
+     * hdfs/s3 configuration
+     * resource.upload.path
      */
-    public static final String DATA_STORE_2_HDFS_BASEPATH = "data.store2hdfs.basepath";
+    public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
 
     /**
-     * data.basedir.path
+     * resource basedir path
      */
-    public static final String DATA_BASEDIR_PATH = "data.basedir.path";
-
-    /**
-     * data.download.basedir.path
-     */
-    public static final String DATA_DOWNLOAD_BASEDIR_PATH = "data.download.basedir.path";
-
-    /**
-     * process.exec.basepath
-     */
-    public static final String PROCESS_EXEC_BASEPATH = "process.exec.basepath";
+    public static final String RESOURCE_BASEDIR_PATH = "resource.basedir.path";
 
     /**
      * dolphinscheduler.env.path
      */
     public static final String DOLPHINSCHEDULER_ENV_PATH = "dolphinscheduler.env.path";
 
+    /**
+     * environment properties default path
+     */
+    public static final String ENV_PATH = "env/dolphinscheduler_env.sh";
 
     /**
      * python home
@@ -108,15 +138,23 @@ public final class Constants {
      */
     public static final String RESOURCE_VIEW_SUFFIXS = "resource.view.suffixs";
 
+    public static final String RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE = "txt,log,sh,conf,cfg,py,java,sql,hql,xml,properties";
+
     /**
      * development.state
      */
     public static final String DEVELOPMENT_STATE = "development.state";
+    public static final String DEVELOPMENT_STATE_DEFAULT_VALUE = "true";
 
     /**
-     * res.upload.startup.type
+     * string true
      */
-    public static final String RES_UPLOAD_STARTUP_TYPE = "res.upload.startup.type";
+    public static final String STRING_TRUE = "true";
+
+    /**
+     * resource storage type
+     */
+    public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
     /**
      * MasterServer directory registered in zookeeper
@@ -346,9 +384,9 @@ public final class Constants {
     public static final String FLOWNODE_RUN_FLAG_FORBIDDEN = "FORBIDDEN";
 
     /**
-     * task record configuration path
+     * datasource configuration path
      */
-    public static final String APPLICATION_PROPERTIES = "application.properties";
+    public static final String DATASOURCE_PROPERTIES = "/datasource.properties";
 
     public static final String TASK_RECORD_URL = "task.record.datasource.url";
 

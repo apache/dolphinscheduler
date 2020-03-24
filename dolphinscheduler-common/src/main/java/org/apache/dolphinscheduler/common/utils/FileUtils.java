@@ -34,6 +34,8 @@ import static org.apache.dolphinscheduler.common.Constants.*;
 public class FileUtils {
     public static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
+    public static final String RESOURCE_BASEDIR = PropertyUtils.getString(RESOURCE_BASEDIR_PATH,"/tmp/dolphinscheduler");
+
     /**
      * get file suffix
      *
@@ -59,7 +61,14 @@ public class FileUtils {
      * @return download file name
      */
     public static String getDownloadFilename(String filename) {
-        return String.format("%s/%s/%s", PropertyUtils.getString(DATA_DOWNLOAD_BASEDIR_PATH), DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+        String fileName = String.format("%s/download/%s/%s", RESOURCE_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
@@ -70,7 +79,13 @@ public class FileUtils {
      * @return local file path
      */
     public static String getUploadFilename(String tenantCode, String filename) {
-        return String.format("%s/%s/resources/%s", PropertyUtils.getString(DATA_BASEDIR_PATH), tenantCode, filename);
+        String fileName = String.format("%s/%s/resources/%s", RESOURCE_BASEDIR, tenantCode, filename);
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
@@ -82,9 +97,14 @@ public class FileUtils {
      * @return directory of process execution
      */
     public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId, int taskInstanceId) {
-
-        return String.format("%s/process/%s/%s/%s/%s", PropertyUtils.getString(PROCESS_EXEC_BASEPATH), Integer.toString(projectId),
+        String fileName = String.format("%s/exec/process/%s/%s/%s/%s", RESOURCE_BASEDIR, Integer.toString(projectId),
                 Integer.toString(processDefineId), Integer.toString(processInstanceId),Integer.toString(taskInstanceId));
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
@@ -95,15 +115,21 @@ public class FileUtils {
      * @return directory of process instances
      */
     public static String getProcessExecDir(int projectId, int processDefineId, int processInstanceId) {
-        return String.format("%s/process/%s/%s/%s", PropertyUtils.getString(PROCESS_EXEC_BASEPATH), Integer.toString(projectId),
+        String fileName = String.format("%s/exec/process/%s/%s/%s", RESOURCE_BASEDIR, Integer.toString(projectId),
                 Integer.toString(processDefineId), Integer.toString(processInstanceId));
+        File file = new File(fileName);
+        if (!file.getParentFile().exists()){
+            file.getParentFile().mkdirs();
+        }
+
+        return fileName;
     }
 
     /**
      * @return get suffixes for resource files that support online viewing
      */
     public static String getResourceViewSuffixs() {
-        return PropertyUtils.getString(RESOURCE_VIEW_SUFFIXS);
+        return PropertyUtils.getString(RESOURCE_VIEW_SUFFIXS, RESOURCE_VIEW_SUFFIXS_DEFAULT_VALUE);
     }
 
     /**
