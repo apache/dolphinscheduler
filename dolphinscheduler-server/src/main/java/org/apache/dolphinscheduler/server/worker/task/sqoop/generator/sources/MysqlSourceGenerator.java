@@ -69,17 +69,16 @@ public class MysqlSourceGenerator implements ISourceGenerator {
                             result.append(" --columns ").append(sourceMysqlParameter.getSrcColumns());
                         }
 
-                    }else if(sourceMysqlParameter.getSrcQueryType() == QueryType.SQL.ordinal()){
-                        if(StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())){
-
-                            String srcQuery = sourceMysqlParameter.getSrcQuerySql();
-                            if(srcQuery.toLowerCase().contains("where")){
-                                srcQuery += " AND "+"$CONDITIONS";
-                            }else{
-                                srcQuery += " WHERE $CONDITIONS";
-                            }
-                            result.append(" --query \'"+srcQuery+"\'");
+                    }else if(sourceMysqlParameter.getSrcQueryType() == QueryType.SQL.ordinal()
+                            && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())){
+                        String srcQuery = sourceMysqlParameter.getSrcQuerySql();
+                        if(srcQuery.toLowerCase().contains("where")){
+                            srcQuery += " AND "+"$CONDITIONS";
+                        }else{
+                            srcQuery += " WHERE $CONDITIONS";
                         }
+                        result.append(" --query \'"+srcQuery+"\'");
+
                     }
 
                     List<Property>  mapColumnHive = sourceMysqlParameter.getMapColumnHive();
