@@ -814,6 +814,11 @@ public final class Constants {
     public static final String KERBEROS = "kerberos";
 
     /**
+     * kerberos expire time
+     */
+    public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
+
+    /**
      * java.security.krb5.conf
      */
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
@@ -994,4 +999,11 @@ public final class Constants {
      * dataSource sensitive param
      */
     public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
+
+
+    /**
+     * new
+     * schedule time
+     */
+    public static final String PARAMETER_SHECDULE_TIME = "schedule.time";
 }

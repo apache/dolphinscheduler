@@ -75,12 +75,11 @@ public class MysqlTargetGenerator implements ITargetGenerator {
                         result.append(" --lines-terminated-by '").append(targetMysqlParameter.getLinesTerminated()).append("'");
                     }
 
-                    if(targetMysqlParameter.isUpdate()){
-                        if(StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())&&
-                                StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())){
-                            result.append(" --update-key ").append(targetMysqlParameter.getTargetUpdateKey())
-                                  .append(" --update-mode ").append(targetMysqlParameter.getTargetUpdateMode());
-                        }
+                    if(targetMysqlParameter.isUpdate()
+                            && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())
+                            && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())){
+                        result.append(" --update-key ").append(targetMysqlParameter.getTargetUpdateKey())
+                              .append(" --update-mode ").append(targetMysqlParameter.getTargetUpdateMode());
                     }
                 }
             }

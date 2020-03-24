@@ -43,13 +43,11 @@ public class PropertyUtils {
 
     private static final Properties properties = new Properties();
 
-    private static final PropertyUtils propertyUtils = new PropertyUtils();
-
-    private PropertyUtils(){
-        init();
+    private PropertyUtils() {
+        throw new IllegalStateException("PropertyUtils class");
     }
 
-    private void init(){
+    static {
         String[] propertyFiles = new String[]{COMMON_PROPERTIES_PATH};
         for (String fileName : propertyFiles) {
             InputStream fis = null;
@@ -73,7 +71,7 @@ public class PropertyUtils {
      *
      * @return  judge whether resource upload startup
      */
-    public static Boolean getResUploadStartupState(){
+    public static boolean getResUploadStartupState(){
         String resUploadStartupType = PropertyUtils.getString(Constants.RES_UPLOAD_STARTUP_TYPE);
         ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
         return resUploadType == ResUploadType.HDFS || resUploadType == ResUploadType.S3;
