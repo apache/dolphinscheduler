@@ -57,6 +57,7 @@ pid=$DOLPHINSCHEDULER_LOG_DIR/dolphinscheduler-$command.pid
 cd $DOLPHINSCHEDULER_HOME
 
 if [ "$command" = "api-server" ]; then
+  DOLPHINSCHEDULER_LIB_JARS=`ls $DOLPHINSCHEDULER_LIB_JARS | grep -v dolphinscheduler-server`
   LOG_FILE="-Dlogging.config=classpath:logback-api.xml -Dspring.profiles.active=api"
   CLASS=org.apache.dolphinscheduler.api.ApiApplicationServer
 elif [ "$command" = "master-server" ]; then

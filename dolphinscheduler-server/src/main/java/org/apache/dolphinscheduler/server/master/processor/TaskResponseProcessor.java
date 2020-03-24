@@ -73,8 +73,7 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
         taskInstanceCacheManager.cacheTaskInstance(responseCommand);
 
         // TaskEvent
-        TaskEvent taskEvent = new TaskEvent();
-        taskEvent.receiveResponse(ExecutionStatus.of(responseCommand.getStatus()),
+        TaskEvent taskEvent = new TaskEvent(ExecutionStatus.of(responseCommand.getStatus()),
                 responseCommand.getEndTime(),
                 responseCommand.getProcessId(),
                 responseCommand.getAppIds(),
