@@ -127,6 +127,18 @@ public class BrowserCommon {
     }
 
     /**
+     * Click Navigation Bar element
+     * @param locator By
+     * @return clickButton
+     */
+    public void clickTopElement(By locator) {
+        WebElement element = driver.findElement(locator);
+        JavascriptExecutor executor = (JavascriptExecutor)driver;
+        executor.executeScript("arguments[0].click();", element);
+    }
+
+
+    /**
      * Click element
      *
      * @param locator By
@@ -137,6 +149,7 @@ public class BrowserCommon {
         clickElement.click();
         return clickElement;
     }
+
 
     /**
      * input element
@@ -236,12 +249,16 @@ public class BrowserCommon {
         return driver;
     }
 
-    /**
-     * Multi-window switch handle, according to the handle number passed in
-     *
-     * @param num Number starts from 1
-     * @return driver
-     */
+
+
+
+
+        /**
+         * Multi-window switch handle, according to the handle number passed in
+         *
+         * @param num Number starts from 1
+         * @return driver
+         */
     public WebDriver switchHandle(int num) {
         // current handle
         String currentHandle = driver.getWindowHandle();
@@ -314,9 +331,8 @@ public class BrowserCommon {
         executeScript("window.scrollTo(0, document.body.scrollHeight)");
     }
 
-    public void scrollToElementBottom() {
-
-        WebElement webElement = driver.findElement(By.xpath("/html/body/div[4]/div/div[2]/div/div[2]/div/div[7]/div[3]"));
+    public void scrollToElementBottom(By locator) {
+        WebElement webElement = locateElement(locator);
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", webElement);
     }
 

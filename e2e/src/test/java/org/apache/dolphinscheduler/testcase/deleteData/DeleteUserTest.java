@@ -17,14 +17,20 @@
 package org.apache.dolphinscheduler.testcase.deleteData;
 
 import org.apache.dolphinscheduler.base.BaseTest;
+import org.apache.dolphinscheduler.page.security.TenantManagePage;
 import org.apache.dolphinscheduler.page.security.UserManagePage;
 import org.testng.annotations.Test;
 
 public class DeleteUserTest extends BaseTest {
     private UserManagePage userManagePage;
+    private TenantManagePage tenantManagePage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login","user" },description = "DeleteUserTest")
+    @Test(groups={"functionTests"},dependsOnGroups = { "login","user" },description = "DeleteUserTest",priority=8)
     public void testDeleteUser() throws InterruptedException {
+        tenantManagePage = new TenantManagePage(driver);
+        System.out.println("jump to security to delete user");
+        tenantManagePage.jumpSecurity();
+
         userManagePage = new UserManagePage(driver);
         //assert user manage page
         System.out.println("start delete user");

@@ -17,22 +17,23 @@
 package org.apache.dolphinscheduler.testcase.deleteData;
 
 import org.apache.dolphinscheduler.base.BaseTest;
-import org.apache.dolphinscheduler.page.security.TenantManagePage;
+import org.apache.dolphinscheduler.page.project.CreateProjectPage;
 import org.testng.annotations.Test;
 
-public class DeleteTenantTest extends BaseTest {
-    private TenantManagePage tenantManagePage;
+public class DeleteProjectTest extends BaseTest {
+    private CreateProjectPage createProjectPage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login","createTenant"},description = "DeleteTenantTest",priority=9)
-    public void testDeleteTenant() throws InterruptedException {
-        tenantManagePage = new TenantManagePage(driver);
+    @Test(groups={"functionTests"},dependsOnGroups = { "login","project"},description = "DeleteProjectTest",priority=7)
+    public void testDeleteProject() throws InterruptedException {
+        createProjectPage = new CreateProjectPage(driver);
+        //jump to project manage page
+        System.out.println("jump to the project manage page to delete project");
+        createProjectPage.jumpProjectManagePage();
+
         //assert tenant manage page
-        System.out.println("jump to security to delete tenant");
-        tenantManagePage.jumpSecurity();
-
-        System.out.println("start delete tenant");
-        assert tenantManagePage.deleteTenant();
-        System.out.println("end delete tenant");
+        System.out.println("start delete project");
+        assert createProjectPage.deleteProject();
+        System.out.println("end delete project");
         System.out.println("===================================");
     }
 }
