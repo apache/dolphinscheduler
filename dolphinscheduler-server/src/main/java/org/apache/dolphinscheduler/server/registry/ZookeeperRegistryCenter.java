@@ -41,29 +41,31 @@ public class ZookeeperRegistryCenter implements InitializingBean {
     protected ZookeeperCachedOperator zookeeperCachedOperator;
 
     @Autowired
-    private static ZookeeperConfig zookeeperConfig;
+    private  ZookeeperConfig zookeeperConfig;
 
     /**
      * nodes namespace
      */
-    public static final String NODES = zookeeperConfig.getDsRoot() + "/nodes";
+    public String NODES;
 
     /**
      * master path
      */
-    public static final String MASTER_PATH = NODES + "/master";
+    public String MASTER_PATH;
 
     /**
      * worker path
      */
-    public static final String WORKER_PATH = NODES + "/worker";
+    public String WORKER_PATH;
 
-    public static final String EMPTY = "";
-
-
+    public final String EMPTY = "";
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        NODES = zookeeperConfig.getDsRoot() + "/nodes";
+        MASTER_PATH = NODES + "/master";
+        WORKER_PATH = NODES + "/worker";
+
         init();
     }
 
