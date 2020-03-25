@@ -21,7 +21,7 @@ public class CreateWorkflowData {
      * create workflow data
      */
     //input shell task name
-    public static final String SHELL_TASK_NAME = "shell_task_selenium_5";
+    public static final String SHELL_TASK_NAME = "shell_task_selenium_1";
 
     //input shell task description
     public static final String SHELL_TASK_DESCRIPTION = "shell task description test";
@@ -44,8 +44,12 @@ public class CreateWorkflowData {
     //input add custom parameters value
     public static final String INPUT_ADD_CUSTOM_PARAMETERS_VALUE = "selenium_parameter_delete_456";
 
+    //workflow define title
+    public static final String WORKFLOW_TITLE = "工作流定义 - DolphinScheduler";
+
     //create workflow title
-    public static final String WORKFLOW_TITLE = "创建流程定义 - DolphinScheduler";
+    public static final String CREATE_WORKFLOW_TITLE = "创建流程定义 - DolphinScheduler";
+
 
     /**
      * save workflow data

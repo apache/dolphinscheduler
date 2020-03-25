@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
 public class UserManageTest extends BaseTest {
     private UserManagePage userManagePage;
 
-    @Test(groups={"functionTests","user"},dependsOnGroups = { "login" },description = "UserManageTest")
+    @Test(groups={"functionTests","user"},dependsOnGroups = { "login" },description = "UserManageTest",priority=3)
     public void testUserManage() throws InterruptedException {
         userManagePage = new UserManagePage(driver);
         //assert user manage page

@@ -17,12 +17,8 @@
 package org.apache.dolphinscheduler.page.security;
 
 import org.apache.dolphinscheduler.common.PageCommon;
-import org.apache.dolphinscheduler.constant.TestConstant;
-import org.apache.dolphinscheduler.data.LoginData;
 import org.apache.dolphinscheduler.data.security.TenantManageData;
-import org.apache.dolphinscheduler.locator.LoginLocator;
 import org.apache.dolphinscheduler.locator.security.TenantManageLocator;
-import org.apache.dolphinscheduler.util.RedisUtil;
 import org.openqa.selenium.WebDriver;
 
 public class TenantManagePage extends PageCommon {
@@ -35,20 +31,29 @@ public class TenantManagePage extends PageCommon {
     }
 
     /**
+     * jump security page
+     *
+     * @return Whether to enter the specified page after create tenant
+     */
+    public boolean jumpSecurity() throws InterruptedException {
+        clickTopElement(TenantManageLocator.SECURITY_CENTER);
+        return ifTitleContains(TenantManageData.TENANT_MANAGE);
+    }
+
+    /**
      * createTenant
      *
-     * @return Whether to enter the specified page after creat tenant
+     * @return Whether to enter the specified page after create tenant
      */
     public boolean createTenant() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
         clickButton(TenantManageLocator.TENANT_MANAGE);
 
         //create tenant
         clickButton(TenantManageLocator.CREATE_TENANT_BUTTON);
 
         // tenant data
-        sendInput(TenantManageLocator.TENANT_INPUT_CODE, TenantManageData.TENANAT_CODE);
-        sendInput(TenantManageLocator.TENANT_INPUT_NAME, TenantManageData.TENANAT_NAME);
+        sendInput(TenantManageLocator.TENANT_INPUT_CODE, TenantManageData.TENANT_CODE);
+        sendInput(TenantManageLocator.TENANT_INPUT_NAME, TenantManageData.TENANT_NAME);
         sendInput(TenantManageLocator.QUEUE, TenantManageData.QUEUE);
         sendInput(TenantManageLocator.DESCRIPTION, TenantManageData.DESCRIPTION);
 
@@ -56,22 +61,19 @@ public class TenantManagePage extends PageCommon {
         clickButton(TenantManageLocator.SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(TenantManageData.TENANAT_MANAGE);
+        return ifTitleContains(TenantManageData.TENANT_MANAGE);
     }
 
     public boolean deleteTenant() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
         clickButton(TenantManageLocator.TENANT_MANAGE);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         // click delete button
         clickButton(TenantManageLocator.DELETE_TENANT_BUTTON);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         //click confirm delete button
         clickButton(TenantManageLocator.CONFIRM_DELETE_TENANT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(TenantManageData.TENANAT_MANAGE);
+        return ifTitleContains(TenantManageData.TENANT_MANAGE);
     }
 }

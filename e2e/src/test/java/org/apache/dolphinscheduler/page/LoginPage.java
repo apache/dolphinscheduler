@@ -17,10 +17,8 @@
 package org.apache.dolphinscheduler.page;
 
 import org.apache.dolphinscheduler.common.PageCommon;
-import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.LoginData;
 import org.apache.dolphinscheduler.locator.LoginLocator;
-import org.apache.dolphinscheduler.util.RedisUtil;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.WebDriver;
 
@@ -49,7 +47,6 @@ public class LoginPage extends PageCommon {
     public void jumpPageChinese() {
         super.jumpPage(LoginData.URL);
         Cookie cookie = new Cookie("language", "zh_CN", "/", null);
-
         driver.manage().addCookie(cookie);
     }
     /**
