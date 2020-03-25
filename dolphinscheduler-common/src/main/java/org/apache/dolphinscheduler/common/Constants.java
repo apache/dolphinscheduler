@@ -114,7 +114,7 @@ public final class Constants {
     public static final String RESOURCE_UPLOAD_PATH = "resource.upload.path";
 
     /**
-     * resource basedir path
+     * data basedir path
      */
     public static final String DATA_BASEDIR_PATH = "data.basedir.path";
 
