@@ -89,12 +89,11 @@ public class TaskUpdateQueueConsumer extends Thread{
     public void run() {
         while (Stopper.isRunning()){
             try {
-                if (taskUpdateQueue.size() == 0){
-                    Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-                    continue;
-                }
+                // if not task , blocking here
                 String taskPriorityInfo = taskUpdateQueue.take();
+
                 TaskPriority taskPriority = TaskPriority.of(taskPriorityInfo);
+
                 dispatch(taskPriority.getTaskId());
             }catch (Exception e){
                 logger.error("dispatcher task error",e);

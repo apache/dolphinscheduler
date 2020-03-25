@@ -159,7 +159,7 @@ public final class Constants {
     /**
      * MasterServer directory registered in zookeeper
      */
-    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/nodes/masters";
+    public static final String ZOOKEEPER_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
 
     /**
      * WorkerServer directory registered in zookeeper
@@ -504,7 +504,7 @@ public final class Constants {
     /**
      * heartbeat for zk info length
      */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 7;
+    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 5;
 
 
     /**

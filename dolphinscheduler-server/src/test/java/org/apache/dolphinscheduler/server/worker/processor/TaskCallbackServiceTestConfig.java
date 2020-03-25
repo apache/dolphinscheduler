@@ -15,12 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.registry;
+package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
-import org.apache.dolphinscheduler.server.worker.processor.TaskCallbackService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +29,8 @@ import org.springframework.context.annotation.Configuration;
  * dependency config
  */
 @Configuration
-public class DependencyConfig {
+public class TaskCallbackServiceTestConfig {
+
 
     @Bean
     public AlertDao alertDao() {
@@ -127,8 +127,4 @@ public class DependencyConfig {
         return Mockito.mock(ProjectMapper.class);
     }
 
-    @Bean
-    public TaskCallbackService taskCallbackService(){
-        return Mockito.mock(TaskCallbackService.class);
-    }
 }
