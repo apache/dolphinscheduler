@@ -74,7 +74,7 @@ public class PropertyUtils {
      * @return  judge whether resource upload startup
      */
     public static Boolean getResUploadStartupState(){
-        String resUploadStartupType = PropertyUtils.getString(Constants.RES_UPLOAD_STARTUP_TYPE);
+        String resUploadStartupType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
         ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
         return resUploadType == ResUploadType.HDFS || resUploadType == ResUploadType.S3;
     }
@@ -87,6 +87,18 @@ public class PropertyUtils {
      */
     public static String getString(String key) {
         return properties.getProperty(key.trim());
+    }
+
+    /**
+     * get property value
+     *
+     * @param key property name
+     * @param defaultVal default value
+     * @return property value
+     */
+    public static String getString(String key, String defaultVal) {
+        String val = properties.getProperty(key.trim());
+        return val == null ? defaultVal : val;
     }
 
     /**
@@ -132,6 +144,22 @@ public class PropertyUtils {
         }
 
         return false;
+    }
+
+    /**
+     * get property value
+     *
+     * @param key property name
+     * @param defaultValue default value
+     * @return property value
+     */
+    public static Boolean getBoolean(String key, boolean defaultValue) {
+        String value = properties.getProperty(key.trim());
+        if(null != value){
+            return Boolean.parseBoolean(value);
+        }
+
+        return defaultValue;
     }
 
     /**

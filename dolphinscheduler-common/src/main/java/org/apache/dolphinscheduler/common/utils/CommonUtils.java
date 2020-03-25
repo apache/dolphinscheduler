@@ -20,13 +20,18 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URL;
 
 /**
  * common utils
  */
 public class CommonUtils {
+  private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
+
   private CommonUtils() {
     throw new IllegalStateException("CommonUtils class");
   }
@@ -37,7 +42,14 @@ public class CommonUtils {
   public static String getSystemEnvPath() {
     String envPath = PropertyUtils.getString(Constants.DOLPHINSCHEDULER_ENV_PATH);
     if (StringUtils.isEmpty(envPath)) {
-      envPath = System.getProperty("user.home") + File.separator + ".bash_profile";
+      URL envDefaultPath = CommonUtils.class.getClassLoader().getResource(Constants.ENV_PATH);
+
+      if (envDefaultPath != null){
+        envPath = envDefaultPath.getPath();
+        logger.debug("env path :{}", envPath);
+      }else{
+        envPath = System.getProperty("user.home") + File.separator + ".bash_profile";
+      }
     }
 
     return envPath;
@@ -55,7 +67,7 @@ public class CommonUtils {
    * @return is develop mode
    */
   public static boolean isDevelopMode() {
-    return PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE);
+    return PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE, true);
   }
 
 
@@ -65,9 +77,9 @@ public class CommonUtils {
    * @return true if upload resource is HDFS and kerberos startup
    */
   public static boolean getKerberosStartupState(){
-    String resUploadStartupType = PropertyUtils.getString(Constants.RES_UPLOAD_STARTUP_TYPE);
+    String resUploadStartupType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
     ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
-    Boolean kerberosStartupState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE);
+    Boolean kerberosStartupState = PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false);
     return resUploadType == ResUploadType.HDFS && kerberosStartupState;
   }
 
