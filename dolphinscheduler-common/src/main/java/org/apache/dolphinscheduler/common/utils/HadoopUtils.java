@@ -49,7 +49,7 @@ public class HadoopUtils implements Closeable {
     private static final Logger logger = LoggerFactory.getLogger(HadoopUtils.class);
 
     private static String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
-    public static final String resourceUploadPath = PropertyUtils.getString(RESOURCE_UPLOAD_PATH,"/dolphinscheduler");
+    public static final String resourceUploadPath = PropertyUtils.getString(RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
 
     private static volatile HadoopUtils instance = new HadoopUtils();
     private static volatile Configuration configuration;
@@ -380,11 +380,8 @@ public class HadoopUtils implements Closeable {
     }
 
     /**
-     *
-     * haddop resourcemanager enabled or not
-     *
-     * @return  true if haddop resourcemanager enabled
-     * @throws IOException errors
+     * hadoop resourcemanager enabled or not
+     * @return result
      */
     public boolean isYarnEnabled()  {
         return yarnEnabled;
@@ -429,7 +426,7 @@ public class HadoopUtils implements Closeable {
     }
 
     /**
-     *
+     * get data hdfs path
      * @return data hdfs path
      */
     public static String getHdfsDataBasePath() {

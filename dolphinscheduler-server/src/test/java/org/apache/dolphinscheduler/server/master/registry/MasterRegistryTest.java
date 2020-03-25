@@ -54,7 +54,6 @@ public class MasterRegistryTest {
     public void testRegistry() throws InterruptedException {
         masterRegistry.registry();
         String masterPath = zookeeperRegistryCenter.getMasterPath();
-        Assert.assertEquals(ZookeeperRegistryCenter.MASTER_PATH, masterPath);
         TimeUnit.SECONDS.sleep(masterConfig.getMasterHeartbeatInterval() + 2); //wait heartbeat info write into zk node
         String masterNodePath = masterPath + "/" + (Constants.LOCAL_ADDRESS + ":" + masterConfig.getListenPort());
         String heartbeat = zookeeperRegistryCenter.getZookeeperCachedOperator().get(masterNodePath);

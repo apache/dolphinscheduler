@@ -178,16 +178,20 @@ public abstract class AbstractCommandExecutor {
             List<String> appIds = getAppIds(taskExecutionContext.getLogPath());
             result.setAppIds(String.join(Constants.COMMA, appIds));
 
+            // SHELL task state
+            result.setExitStatusCode(process.exitValue());
+
             // if yarn task , yarn state is final state
-            result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
+            if (process.exitValue() == 0){
+                result.setExitStatusCode(isSuccessOfYarnState(appIds) ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE);
+            }
         } else {
             logger.error("process has failure , exitStatusCode : {} , ready to kill ...", result.getExitStatusCode());
             ProcessUtils.kill(taskExecutionContext);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
 
-        // SHELL task state
-        result.setExitStatusCode(process.exitValue());
+
         return result;
     }
 
