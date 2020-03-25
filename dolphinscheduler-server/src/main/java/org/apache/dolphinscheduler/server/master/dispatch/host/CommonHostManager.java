@@ -76,7 +76,7 @@ public abstract class CommonHostManager implements HostManager {
         return select(candidateHosts);
     }
 
-    public abstract Host select(Collection<Host> nodes);
+    protected abstract Host select(Collection<Host> nodes);
 
     public void setZookeeperNodeManager(ZookeeperNodeManager zookeeperNodeManager) {
         this.zookeeperNodeManager = zookeeperNodeManager;
