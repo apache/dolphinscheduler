@@ -20,9 +20,7 @@ import org.apache.dolphinscheduler.common.PageCommon;
 import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.project.CreateProjectData;
 import org.apache.dolphinscheduler.locator.project.CreateProjectLocator;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
 public class CreateProjectPage extends PageCommon {
     public CreateProjectPage(WebDriver driver) {
@@ -32,12 +30,11 @@ public class CreateProjectPage extends PageCommon {
     /**
      * jump to ProjectManagePage
      */
-    public void jumpProjectManagePage() throws InterruptedException {
-        System.out.println("111111111");
-        Thread.sleep(100000);
-        clickElement(CreateProjectLocator.PROJECT_MANAGE);
+    public boolean jumpProjectManagePage() throws InterruptedException {
+        Thread.sleep(TestConstant.THREE_THOUSAND);
+        clickTopElement(CreateProjectLocator.PROJECT_MANAGE);
         Thread.sleep(TestConstant.ONE_THOUSAND);
-        System.out.println("2222222222222");
+        return ifTitleContains(CreateProjectData.PROJECT_TITLE);
     }
 
     /**
@@ -46,7 +43,6 @@ public class CreateProjectPage extends PageCommon {
      * @return Whether to enter the specified page after create project
      */
     public boolean createProject() throws InterruptedException {
-        //click  create project
         clickElement(CreateProjectLocator.CREATE_PROJECT_BUTTON);
 
         // input create project data

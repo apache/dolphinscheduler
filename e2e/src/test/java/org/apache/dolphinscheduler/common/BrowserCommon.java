@@ -127,6 +127,18 @@ public class BrowserCommon {
     }
 
     /**
+     * Click Navigation Bar element
+     * @param locator By
+     * @return clickButton
+     */
+    public void clickTopElement(By locator) {
+        WebElement element = driver.findElement(locator);
+        JavascriptExecutor executor = (JavascriptExecutor)driver;
+        executor.executeScript("arguments[0].click();", element);
+    }
+
+
+    /**
      * Click element
      *
      * @param locator By
@@ -135,6 +147,32 @@ public class BrowserCommon {
     public WebElement clickElement(By locator) {
         WebElement clickElement = locateElement(locator);
         clickElement.click();
+        return clickElement;
+    }
+
+    /**
+     * JS Click top element
+     *
+     * @param locator By
+     * @return inputElement
+     */
+    public WebElement clickJSTopElement(By locator) {
+        WebElement clickElement = locateElement(locator);
+        JavascriptExecutor jse = (JavascriptExecutor)driver;
+        jse.executeScript("scroll(250, 0)", clickElement); // if the element is on top.
+        return clickElement;
+    }
+
+    /**
+     * JS Click bottom element
+     *
+     * @param locator By
+     * @return inputElement
+     */
+    public WebElement clickJSBottomElement(By locator) {
+        WebElement clickElement = locateElement(locator);
+        JavascriptExecutor jse = (JavascriptExecutor)driver;
+        jse.executeScript("scroll(0, 250)", clickElement); // if the element is on bottom.
         return clickElement;
     }
 
@@ -222,23 +260,15 @@ public class BrowserCommon {
      *
      * @return driver
      */
-    public WebDriver switchNextHandle(String windowTitle) {
+    public WebDriver switchNextHandle() {
         // Current window handle
         String currentHandle = driver.getWindowHandle();
         // All window handle
         Set<String> allHandles = driver.getWindowHandles();
         // Finding the next handle
         for (String handle : allHandles) {
-            if (handle.equals(currentHandle))
-                continue;
-            else {
-                driver.switchTo().window(handle);
-                if (driver.getTitle().contains(windowTitle)) {
-                    System.out.println("Switch to window: "
-                            + windowTitle + " successfully!");
-                    break;
-                } else
-                    continue;
+            if (!handle.equals(currentHandle)) {
+                return driver.switchTo().window(handle);
             }
         }
         return driver;

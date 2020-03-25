@@ -14,10 +14,10 @@
             <class name="org.apache.dolphinscheduler.testcase.security.UserManageTest"></class>
             <class name="org.apache.dolphinscheduler.testcase.project.CreateProjectTest"></class>
             <class name="org.apache.dolphinscheduler.testcase.project.CreateWorkflowTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteUserTest"></class>
-            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteTenantTest"></class>
             <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteWorkflowTest"></class>
             <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteProjectTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteUserTest"></class>
+            <class name="org.apache.dolphinscheduler.testcase.deleteData.DeleteTenantTest"></class>
         </classes>
     </test>
 

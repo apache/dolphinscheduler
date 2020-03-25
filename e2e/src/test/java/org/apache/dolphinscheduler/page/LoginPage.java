@@ -47,7 +47,6 @@ public class LoginPage extends PageCommon {
     public void jumpPageChinese() {
         super.jumpPage(LoginData.URL);
         Cookie cookie = new Cookie("language", "zh_CN", "/", null);
-
         driver.manage().addCookie(cookie);
     }
     /**

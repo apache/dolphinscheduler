@@ -36,7 +36,7 @@ public class TenantManagePage extends PageCommon {
      * @return Whether to enter the specified page after create tenant
      */
     public boolean jumpSecurity() throws InterruptedException {
-        clickButton(TenantManageLocator.SECURITY_CENTER);
+        clickTopElement(TenantManageLocator.SECURITY_CENTER);
         return ifTitleContains(TenantManageData.TENANAT_MANAGE);
     }
 
