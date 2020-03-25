@@ -27,7 +27,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @SpringBootApplication
 @ServletComponentScan
 @ComponentScan(basePackages = {"org.apache.dolphinscheduler"},
-        excludeFilters = @ComponentScan.Filter(type = FilterType.ASPECTJ, pattern = "org.apache.dolphinscheduler.server.*"))
+        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
+                pattern = "org.apache.dolphinscheduler.server.*"))
 public class ApiApplicationServer extends SpringBootServletInitializer {
 
   public static void main(String[] args) {
