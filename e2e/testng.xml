@@ -17,7 +17,7 @@
   -->
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="dolphinscheduler_e2e" parallel="true">
-    <test name="dolphinscheduler_test_create_userInfo" preserve-order="true" enabled="true">
+    <test name="dolphinscheduler_test" preserve-order="true">
         <groups>
             <run>
                 <include name="functionTests"/>
