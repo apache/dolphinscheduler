@@ -56,7 +56,6 @@ public class WorkerRegistryTest {
     public void testRegistry() throws InterruptedException {
         workerRegistry.registry();
         String workerPath = zookeeperRegistryCenter.getWorkerPath();
-        Assert.assertEquals(ZookeeperRegistryCenter.WORKER_PATH, workerPath);
         Assert.assertEquals(DEFAULT_WORKER_GROUP, workerConfig.getWorkerGroup().trim());
         String instancePath = workerPath + "/" + workerConfig.getWorkerGroup().trim() + "/" + (Constants.LOCAL_ADDRESS + ":" + workerConfig.getListenPort());
         TimeUnit.SECONDS.sleep(workerConfig.getWorkerHeartbeatInterval() + 2); //wait heartbeat info write into zk node

@@ -32,13 +32,10 @@ import static org.apache.dolphinscheduler.common.Constants.*;
  */
 @Service
 public class TaskUpdateQueueImpl implements TaskUpdateQueue {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskUpdateQueueImpl.class);
-
     /**
      * queue size
      */
-    private static final Integer QUEUE_MAX_SIZE = 100;
+    private static final Integer QUEUE_MAX_SIZE = 3000;
 
     /**
      * queue
@@ -53,12 +50,6 @@ public class TaskUpdateQueueImpl implements TaskUpdateQueue {
      */
     @Override
     public void put(String taskPriorityInfo) throws Exception {
-
-        if (QUEUE_MAX_SIZE.equals(queue.size())){
-            //TODO need persist db , then load from db to queue when queue size is zero
-            logger.error("queue is full...");
-            return;
-        }
         queue.put(taskPriorityInfo);
     }
 

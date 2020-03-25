@@ -37,17 +37,20 @@ public class PlaceholderUtils {
      * The suffix of the position to be replaced
      */
     public static final String placeholderSuffix = "}";
-
+    
 
     /**
      * Replaces all placeholders of format {@code ${name}} with the value returned
      * from the supplied {@link PropertyPlaceholderHelper.PlaceholderResolver}.
      *
-     * @param value                 the value containing the placeholders to be replaced
-     * @param paramsMap             placeholder data dictionary
+     * @param value the value containing the placeholders to be replaced
+     * @param paramsMap placeholder data dictionary
+     * @param ignoreUnresolvablePlaceholders ignoreUnresolvablePlaceholders
      * @return the supplied value with placeholders replaced inline
      */
-    public static String replacePlaceholders(String value, Map<String, String> paramsMap, boolean ignoreUnresolvablePlaceholders) {
+    public static String replacePlaceholders(String value,
+                                             Map<String, String> paramsMap,
+                                             boolean ignoreUnresolvablePlaceholders) {
         //replacement tool， parameter key will be replaced by value,if can't match , will throw an exception
         PropertyPlaceholderHelper strictHelper = getPropertyPlaceholderHelper(false);
 
