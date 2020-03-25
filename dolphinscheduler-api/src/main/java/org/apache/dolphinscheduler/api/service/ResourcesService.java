@@ -629,7 +629,7 @@ public class ResourcesService extends BaseService {
         }
 
         // get hdfs file by type
-        String hdfsFilename = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getAlias());
+        String hdfsFilename = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getFullName());
 
         //delete data in database
         resourcesMapper.deleteIds(allChildren.toArray(new Integer[allChildren.size()]));
@@ -824,15 +824,15 @@ public class ResourcesService extends BaseService {
         }
 
         String name = fileName.trim() + "." + nameSuffix;
+        String fullName = currentDirectory.equals("/") ? String.format("%s%s",currentDirectory,name):String.format("%s/%s",currentDirectory,name);
 
-        result = verifyResourceName(name,type,loginUser);
+        result = verifyResourceName(fullName,type,loginUser);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
 
         // save data
         Date now = new Date();
-        String fullName = currentDirectory.equals("/") ? String.format("%s%s",currentDirectory,name):String.format("%s/%s",currentDirectory,name);
         Resource resource = new Resource(pid,name,fullName,false,desc,name,loginUser.getId(),type,content.getBytes().length,now,now);
 
         resourcesMapper.insert(resource);
