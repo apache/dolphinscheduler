@@ -37,7 +37,7 @@ public class TenantManagePage extends PageCommon {
      */
     public boolean jumpSecurity() throws InterruptedException {
         clickTopElement(TenantManageLocator.SECURITY_CENTER);
-        return ifTitleContains(TenantManageData.TENANAT_MANAGE);
+        return ifTitleContains(TenantManageData.TENANT_MANAGE);
     }
 
     /**
@@ -52,8 +52,8 @@ public class TenantManagePage extends PageCommon {
         clickButton(TenantManageLocator.CREATE_TENANT_BUTTON);
 
         // tenant data
-        sendInput(TenantManageLocator.TENANT_INPUT_CODE, TenantManageData.TENANAT_CODE);
-        sendInput(TenantManageLocator.TENANT_INPUT_NAME, TenantManageData.TENANAT_NAME);
+        sendInput(TenantManageLocator.TENANT_INPUT_CODE, TenantManageData.TENANT_CODE);
+        sendInput(TenantManageLocator.TENANT_INPUT_NAME, TenantManageData.TENANT_NAME);
         sendInput(TenantManageLocator.QUEUE, TenantManageData.QUEUE);
         sendInput(TenantManageLocator.DESCRIPTION, TenantManageData.DESCRIPTION);
 
@@ -61,7 +61,7 @@ public class TenantManagePage extends PageCommon {
         clickButton(TenantManageLocator.SUBMIT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(TenantManageData.TENANAT_MANAGE);
+        return ifTitleContains(TenantManageData.TENANT_MANAGE);
     }
 
     public boolean deleteTenant() throws InterruptedException {
@@ -74,6 +74,6 @@ public class TenantManagePage extends PageCommon {
         clickButton(TenantManageLocator.CONFIRM_DELETE_TENANT_BUTTON);
 
         // Whether to enter the specified page after submit
-        return ifTitleContains(TenantManageData.TENANAT_MANAGE);
+        return ifTitleContains(TenantManageData.TENANT_MANAGE);
     }
 }
