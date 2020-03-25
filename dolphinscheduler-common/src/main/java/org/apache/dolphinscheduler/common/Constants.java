@@ -116,7 +116,7 @@ public final class Constants {
     /**
      * resource basedir path
      */
-    public static final String RESOURCE_BASEDIR_PATH = "resource.basedir.path";
+    public static final String DATA_BASEDIR_PATH = "data.basedir.path";
 
     /**
      * dolphinscheduler.env.path
