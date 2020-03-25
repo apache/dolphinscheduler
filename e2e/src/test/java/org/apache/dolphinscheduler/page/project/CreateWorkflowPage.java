@@ -183,17 +183,17 @@ public class CreateWorkflowPage extends PageCommon {
         Thread.sleep(TestConstant.ONE_THOUSAND);
 
         //click add button
-        clickElement(CreateWorkflowLocator.CLICK_ADD_BUTTON);
+        clickButton(CreateWorkflowLocator.CLICK_ADD_BUTTON);
         System.out.println("submit workflow");
         return ifTitleContains(CreateWorkflowData.CREATE_WORKFLOW_TITLE);
     }
 
     public boolean deleteWorkflow() throws InterruptedException {
         //click  delete project
-        clickElement(CreateWorkflowLocator.DELETE_WORKFLOW_BOTTOM);
+        clickButton(CreateWorkflowLocator.DELETE_WORKFLOW_BOTTOM);
 
         //click confirm delete project
-        clickElement(CreateWorkflowLocator.CONFIRM_DELETE_WORKFLOW_BOTTOM);
+        clickButton(CreateWorkflowLocator.CONFIRM_DELETE_WORKFLOW_BOTTOM);
 
         // Whether to enter the specified page after submit
         return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);

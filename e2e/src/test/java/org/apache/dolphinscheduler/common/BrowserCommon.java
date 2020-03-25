@@ -150,31 +150,6 @@ public class BrowserCommon {
         return clickElement;
     }
 
-    /**
-     * JS Click top element
-     *
-     * @param locator By
-     * @return inputElement
-     */
-    public WebElement clickJSTopElement(By locator) {
-        WebElement clickElement = locateElement(locator);
-        JavascriptExecutor jse = (JavascriptExecutor)driver;
-        jse.executeScript("scroll(250, 0)", clickElement); // if the element is on top.
-        return clickElement;
-    }
-
-    /**
-     * JS Click bottom element
-     *
-     * @param locator By
-     * @return inputElement
-     */
-    public WebElement clickJSBottomElement(By locator) {
-        WebElement clickElement = locateElement(locator);
-        JavascriptExecutor jse = (JavascriptExecutor)driver;
-        jse.executeScript("scroll(0, 250)", clickElement); // if the element is on bottom.
-        return clickElement;
-    }
 
     /**
      * input element
