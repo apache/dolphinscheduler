@@ -281,7 +281,7 @@ public class TaskNode {
 
   /**
    * get task time out parameter
-   * @return
+   * @return task time out parameter
    */
   public TaskTimeoutParameter getTaskTimeoutParameter() {
     if(StringUtils.isNotEmpty(this.getTimeout())){

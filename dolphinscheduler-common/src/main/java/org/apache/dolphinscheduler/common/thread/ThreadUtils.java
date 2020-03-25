@@ -33,10 +33,11 @@ public class ThreadUtils {
     private static final int STACK_DEPTH = 20;
 
     /**
-       Wrapper over newCachedThreadPool. Thread names are formatted as prefix-ID, where ID is a
+     * Wrapper over newCachedThreadPool. Thread names are formatted as prefix-ID, where ID is a
      * unique, sequentially assigned integer.
-     * @param prefix
-     * @return
+     *
+     * @param prefix prefix
+     * @return ThreadPoolExecutor
      */
     public static ThreadPoolExecutor newDaemonCachedThreadPool(String prefix){
         ThreadFactory threadFactory = namedThreadFactory(prefix);
@@ -45,8 +46,8 @@ public class ThreadUtils {
 
     /**
      * Create a thread factory that names threads with a prefix and also sets the threads to daemon.
-     * @param prefix
-     * @return
+     * @param prefix prefix
+     * @return ThreadFactory
      */
     private static ThreadFactory namedThreadFactory(String prefix) {
         return new ThreadFactoryBuilder().setDaemon(true).setNameFormat(prefix + "-%d").build();
@@ -56,10 +57,10 @@ public class ThreadUtils {
     /**
      * Create a cached thread pool whose max number of threads is `maxThreadNumber`. Thread names
      * are formatted as prefix-ID, where ID is a unique, sequentially assigned integer.
-     * @param prefix
-     * @param maxThreadNumber
-     * @param keepAliveSeconds
-     * @return
+     * @param prefix prefix
+     * @param maxThreadNumber maxThreadNumber
+     * @param keepAliveSeconds keepAliveSeconds
+     * @return ThreadPoolExecutor
      */
     public static ThreadPoolExecutor newDaemonCachedThreadPool(String prefix ,
                                                                int maxThreadNumber,
@@ -82,9 +83,9 @@ public class ThreadUtils {
     /**
      * Wrapper over newFixedThreadPool. Thread names are formatted as prefix-ID, where ID is a
      * unique, sequentially assigned integer.
-     * @param nThreads
-     * @param prefix
-     * @return
+     * @param nThreads nThreads
+     * @param prefix prefix
+     * @return ThreadPoolExecutor
      */
     public static ThreadPoolExecutor newDaemonFixedThreadPool(int nThreads , String prefix){
         ThreadFactory threadFactory = namedThreadFactory(prefix);
@@ -93,8 +94,8 @@ public class ThreadUtils {
 
     /**
      * Wrapper over newSingleThreadExecutor.
-     * @param threadName
-     * @return
+     * @param threadName threadName
+     * @return ExecutorService
      */
     public static ExecutorService newDaemonSingleThreadExecutor(String threadName){
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
@@ -106,22 +107,23 @@ public class ThreadUtils {
 
     /**
      * Wrapper over newDaemonFixedThreadExecutor.
-     * @param threadName
-     * @param threadsNum
-     * @return
+     * @param threadName threadName
+     * @param threadsNum threadsNum
+     * @return ExecutorService
      */
     public static ExecutorService newDaemonFixedThreadExecutor(String threadName,int threadsNum){
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setDaemon(true)
                 .setNameFormat(threadName)
                 .build();
-        return Executors.newFixedThreadPool(threadsNum,threadFactory);
+        return Executors.newFixedThreadPool(threadsNum, threadFactory);
     }
 
     /**
      * Wrapper over ScheduledThreadPoolExecutor
-     * @param corePoolSize
-     * @return
+     * @param threadName threadName
+     * @param corePoolSize corePoolSize
+     * @return ScheduledExecutorService
      */
     public static ScheduledExecutorService newDaemonThreadScheduledExecutor(String threadName,int corePoolSize) {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()
@@ -136,6 +138,11 @@ public class ThreadUtils {
     }
 
 
+    /**
+     * get thread info
+     * @param t t
+     * @return ThreadInfo
+     */
     public static ThreadInfo getThreadInfo(Thread t) {
         long tid = t.getId();
         return threadBean.getThreadInfo(tid, STACK_DEPTH);
@@ -144,7 +151,9 @@ public class ThreadUtils {
 
     /**
      * Format the given ThreadInfo object as a String.
-     * @param indent a prefix for each line, used for nested indentation
+     * @param threadInfo threadInfo
+     * @param indent indent
+     * @return threadInfo
      */
     public static String formatThreadInfo(ThreadInfo threadInfo, String indent) {
         StringBuilder sb = new StringBuilder();
@@ -156,9 +165,9 @@ public class ThreadUtils {
     /**
      * Print all of the thread's information and stack traces.
      *
-     * @param sb
-     * @param info
-     * @param indent
+     * @param sb StringBuilder
+     * @param info ThreadInfo
+     * @param indent indent
      */
     public static void appendThreadInfo(StringBuilder sb,
                                         ThreadInfo info,
@@ -193,6 +202,12 @@ public class ThreadUtils {
         }
     }
 
+    /**
+     *  getTaskName
+     * @param id id
+     * @param name name
+     * @return task name
+     */
     private static String getTaskName(long id, String name) {
         if (name == null) {
             return Long.toString(id);
