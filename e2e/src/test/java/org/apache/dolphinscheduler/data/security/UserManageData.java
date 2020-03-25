@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.data.security;
 
 
 public class UserManageData  {
-    public static final String USERNAME = "selenium_1";
+    public static final String USERNAME = "selenium_user_1";
 
     public static final String PASSWORD = "123456qwe";
 

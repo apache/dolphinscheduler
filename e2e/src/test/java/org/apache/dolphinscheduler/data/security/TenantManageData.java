@@ -25,12 +25,12 @@ public class TenantManageData {
     /**
      * Tenant Code
      */
-    public static final String TENANAT_CODE = "dolphinscheduler_tenant_code_1";
+    public static final String TENANAT_CODE = "selenium_tenant_code_1";
 
     /**
      * Tenant Name
      */
-    public static final String TENANAT_NAME = "dolphinscheduler_tenant_Name";
+    public static final String TENANAT_NAME = "selenium_tenant_Name";
 
     /**
      * Queue
@@ -40,7 +40,7 @@ public class TenantManageData {
     /**
      * Description
      */
-    public static final String DESCRIPTION = "creat tenant test";
+    public static final String DESCRIPTION = "create tenant test";
 
     public static final String TENANAT_MANAGE = "租户管理 - DolphinScheduler";
 
