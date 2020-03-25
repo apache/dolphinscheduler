@@ -32,9 +32,9 @@ import java.util.concurrent.*;
  */
 public class ResponseFuture {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(ResponseFuture.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseFuture.class);
 
-    private final static ConcurrentHashMap<Long,ResponseFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
+    private static final ConcurrentHashMap<Long,ResponseFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
 
     /**
      *  request unique identification
@@ -63,11 +63,11 @@ public class ResponseFuture {
     /**
      *  response command
      */
-    private volatile Command responseCommand;
+    private Command responseCommand;
 
     private volatile boolean sendOk = true;
 
-    private volatile Throwable cause;
+    private Throwable cause;
 
     public ResponseFuture(long opaque, long timeoutMillis, InvokeCallback invokeCallback, ReleaseSemaphore releaseSemaphore) {
         this.opaque = opaque;

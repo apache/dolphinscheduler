@@ -50,8 +50,8 @@ public class AlertDao extends AbstractBaseDao {
 
     @Override
     protected void init() {
-        alertMapper = ConnectionFactory.getMapper(AlertMapper.class);
-        userAlertGroupMapper = ConnectionFactory.getMapper(UserAlertGroupMapper.class);
+        alertMapper = ConnectionFactory.getInstance().getMapper(AlertMapper.class);
+        userAlertGroupMapper = ConnectionFactory.getInstance().getMapper(UserAlertGroupMapper.class);
     }
 
     /**
@@ -99,13 +99,7 @@ public class AlertDao extends AbstractBaseDao {
         String content = String.format("[{'type':'%s','host':'%s','event':'server down','warning level':'serious'}]",
                 serverType, host);
         alert.setTitle("Fault tolerance warning");
-        alert.setShowType(ShowType.TABLE);
-        alert.setContent(content);
-        alert.setAlertType(AlertType.EMAIL);
-        alert.setAlertGroupId(alertgroupId);
-        alert.setCreateTime(new Date());
-        alert.setUpdateTime(new Date());
-        alertMapper.insert(alert);
+        saveTaskTimeoutAlert(alert, content, alertgroupId, null, null);
     }
 
     /**
@@ -121,6 +115,11 @@ public class AlertDao extends AbstractBaseDao {
         String content = String.format("[{'id':'%d','name':'%s','event':'timeout','warnLevel':'middle'}]",
                 processInstance.getId(), processInstance.getName());
         alert.setTitle("Process Timeout Warn");
+        saveTaskTimeoutAlert(alert, content, alertgroupId, receivers, receiversCc);
+    }
+
+    private void  saveTaskTimeoutAlert(Alert alert, String content, int alertgroupId,
+                                    String receivers,  String receiversCc){
         alert.setShowType(ShowType.TABLE);
         alert.setContent(content);
         alert.setAlertType(AlertType.EMAIL);
@@ -150,19 +149,7 @@ public class AlertDao extends AbstractBaseDao {
         String content = String.format("[{'process instance id':'%d','task name':'%s','task id':'%d','task name':'%s'," +
                         "'event':'timeout','warnLevel':'middle'}]", processInstanceId, processInstanceName, taskId, taskName);
         alert.setTitle("Task Timeout Warn");
-        alert.setShowType(ShowType.TABLE);
-        alert.setContent(content);
-        alert.setAlertType(AlertType.EMAIL);
-        alert.setAlertGroupId(alertgroupId);
-        if (StringUtils.isNotEmpty(receivers)) {
-            alert.setReceivers(receivers);
-        }
-        if (StringUtils.isNotEmpty(receiversCc)) {
-            alert.setReceiversCc(receiversCc);
-        }
-        alert.setCreateTime(new Date());
-        alert.setUpdateTime(new Date());
-        alertMapper.insert(alert);
+        saveTaskTimeoutAlert(alert, content, alertgroupId, receivers, receiversCc);
     }
 
     /**
