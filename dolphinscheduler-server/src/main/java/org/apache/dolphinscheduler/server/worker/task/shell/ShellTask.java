@@ -134,7 +134,6 @@ public class ShellTask extends AbstractTask {
 
     String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
 
-
     /**
      *  combining local and global parameters
      */
@@ -180,7 +179,5 @@ public class ShellTask extends AbstractTask {
   public AbstractParameters getParameters() {
     return shellParameters;
   }
-
-
 
 }

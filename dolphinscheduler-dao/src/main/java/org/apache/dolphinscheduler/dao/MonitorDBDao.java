@@ -18,10 +18,10 @@ package org.apache.dolphinscheduler.dao;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.utils.MysqlPerformance;
 import org.apache.dolphinscheduler.dao.utils.PostgrePerformance;
@@ -63,13 +63,7 @@ public class MonitorDBDao {
         }catch (Exception e) {
             logger.error("SQLException: {}", e.getMessage(), e);
         }finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                logger.error("SQLException ", e);
-            }
+            ConnectionUtils.releaseResource(conn);
         }
         return monitorRecord;
     }
