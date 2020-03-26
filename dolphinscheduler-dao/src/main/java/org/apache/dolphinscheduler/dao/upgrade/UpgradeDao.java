@@ -79,7 +79,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             return null;
         }finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
         }
     }
 
@@ -160,7 +160,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
 
         }
 
@@ -193,7 +193,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, null, conn);
+            ConnectionUtils.releaseResource(conn);
 
         }
 
@@ -329,7 +329,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, pstmt, conn);
+            ConnectionUtils.releaseResource(pstmt, conn);
         }
 
     }
@@ -372,7 +372,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage(),e);
         } finally {
-            ConnectionUtils.releaseResource(null, pstmt, conn);
+            ConnectionUtils.releaseResource(pstmt, conn);
         }
 
     }
@@ -401,7 +401,7 @@ public abstract class UpgradeDao extends AbstractBaseDao {
             logger.error(e.getMessage(),e);
             throw new RuntimeException("sql: " + upgradeSQL, e);
         } finally {
-            ConnectionUtils.releaseResource(null, pstmt, conn);
+            ConnectionUtils.releaseResource(pstmt, conn);
         }
 
     }
