@@ -84,9 +84,9 @@ public class TaskRecordDao {
             Class.forName(driver);
             conn = DriverManager.getConnection(url, username, password);
         } catch (ClassNotFoundException e) {
-            logger.error("Exception ", e);
+            logger.error("Class not found Exception ", e);
         } catch (SQLException e) {
-            logger.error("Exception ", e);
+            logger.error("SQL Exception ", e);
         }
         return conn;
     }
