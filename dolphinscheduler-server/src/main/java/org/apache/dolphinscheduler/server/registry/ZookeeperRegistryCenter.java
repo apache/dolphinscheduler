@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.registry;
 
 import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,33 +36,36 @@ public class ZookeeperRegistryCenter implements InitializingBean {
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    /**
-     * namespace
-     */
-    public static final String NAMESPACE = "/dolphinscheduler";
-
-    /**
-     * nodes namespace
-     */
-    public static final String NODES = NAMESPACE + "/nodes";
-
-    /**
-     * master path
-     */
-    public static final String MASTER_PATH = NODES + "/master";
-
-    /**
-     * worker path
-     */
-    public static final String WORKER_PATH = NODES + "/worker";
-
-    public static final String EMPTY = "";
 
     @Autowired
     protected ZookeeperCachedOperator zookeeperCachedOperator;
 
+    @Autowired
+    private  ZookeeperConfig zookeeperConfig;
+
+    /**
+     * nodes namespace
+     */
+    public String NODES;
+
+    /**
+     * master path
+     */
+    public String MASTER_PATH;
+
+    /**
+     * worker path
+     */
+    public String WORKER_PATH;
+
+    public final String EMPTY = "";
+
     @Override
     public void afterPropertiesSet() throws Exception {
+        NODES = zookeeperConfig.getDsRoot() + "/nodes";
+        MASTER_PATH = NODES + "/master";
+        WORKER_PATH = NODES + "/worker";
+
         init();
     }
 

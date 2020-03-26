@@ -85,7 +85,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     private Boolean alreadyKilled = false;
 
     /**
-     * TODO submit task instance and wait complete
+     * submit task instance and wait complete
      *
      * @return true is task quit is true
      */
@@ -108,7 +108,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
-     * TODO polling db
+     * polling db
      *
      * wait task quit
      * @return true if task quit success
