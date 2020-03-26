@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * users controller test
  */
 public class UsersControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(QueueControllerTest.class);
+    private static Logger logger = LoggerFactory.getLogger(UsersControllerTest.class);
 
     @Test
     public void testCreateUser() throws Exception {
