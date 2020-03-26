@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.manager;
+package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -27,23 +27,22 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import static org.apache.dolphinscheduler.server.master.manager.TaskEventEnum.*;
 
 /**
  * task manager
  */
 @Component
-public class TaskManager {
+public class TaskResponseService {
 
     /**
      * logger
      */
-    private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskResponseService.class);
 
     /**
      * attemptQueue
      */
-    private final BlockingQueue<TaskEvent> attemptQueue = new LinkedBlockingQueue<>(5000);
+    private final BlockingQueue<TaskResponseEvent> attemptQueue = new LinkedBlockingQueue<>(5000);
 
 
     /**
@@ -63,13 +62,13 @@ public class TaskManager {
     /**
      * put task to attemptQueue
      *
-     * @param taskEvent taskEvent
+     * @param taskResponseEvent taskResponseEvent
      */
-    public void putTask(TaskEvent taskEvent){
+    public void addResponse(TaskResponseEvent taskResponseEvent){
         try {
-            attemptQueue.put(taskEvent);
+            attemptQueue.put(taskResponseEvent);
         } catch (InterruptedException e) {
-            logger.error("put task : {} error :{}",taskEvent,e);
+            logger.error("put task : {} error :{}", taskResponseEvent,e);
         }
     }
 
@@ -85,8 +84,8 @@ public class TaskManager {
             while (Stopper.isRunning()){
                 try {
                     // if not task , blocking here
-                    TaskEvent taskEvent = attemptQueue.take();
-                    persist(taskEvent);
+                    TaskResponseEvent taskResponseEvent = attemptQueue.take();
+                    persist(taskResponseEvent);
 
                 }catch (Exception e){
                     logger.error("persist task error",e);
@@ -95,32 +94,30 @@ public class TaskManager {
         }
 
         /**
-         * persist  taskEvent
-         * @param taskEvent taskEvent
+         * persist  taskResponseEvent
+         * @param taskResponseEvent taskResponseEvent
          */
-        private void persist(TaskEvent taskEvent){
-            // task event type
-            TaskEventEnum type = taskEvent.getType();
+        private void persist(TaskResponseEvent taskResponseEvent){
+            TaskResponseEvent.Event event = taskResponseEvent.getEvent();
 
-            switch (type){
+            switch (event){
                 case ACK:
-                    processService.changeTaskState(taskEvent.getState(),
-                            taskEvent.getStartTime(),
-                            taskEvent.getWorkerAddress(),
-                            taskEvent.getExecutePath(),
-                            taskEvent.getLogPath(),
-                            taskEvent.getTaskInstanceId());
+                    processService.changeTaskState(taskResponseEvent.getState(),
+                            taskResponseEvent.getStartTime(),
+                            taskResponseEvent.getWorkerAddress(),
+                            taskResponseEvent.getExecutePath(),
+                            taskResponseEvent.getLogPath(),
+                            taskResponseEvent.getTaskInstanceId());
                     break;
-                case RESPONSE:
-                    processService.changeTaskState(taskEvent.getState(),
-                            taskEvent.getEndTime(),
-                            taskEvent.getProcessId(),
-                            taskEvent.getAppIds(),
-                            taskEvent.getTaskInstanceId());
+                case RESULT:
+                    processService.changeTaskState(taskResponseEvent.getState(),
+                            taskResponseEvent.getEndTime(),
+                            taskResponseEvent.getProcessId(),
+                            taskResponseEvent.getAppIds(),
+                            taskResponseEvent.getTaskInstanceId());
                     break;
                 default:
-                    throw new IllegalArgumentException("invalid task event type : " + type);
-
+                    throw new IllegalArgumentException("invalid event type : " + event);
             }
         }
     }

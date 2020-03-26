@@ -27,10 +27,9 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
-import org.apache.dolphinscheduler.server.master.manager.TaskEvent;
-import org.apache.dolphinscheduler.server.master.manager.TaskManager;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +43,7 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
     /**
      * process service
      */
-    private final TaskManager taskManager;
+    private final TaskResponseService taskResponseService;
 
     /**
      * taskInstance cache manager
@@ -52,7 +51,7 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
     private final TaskInstanceCacheManager taskInstanceCacheManager;
 
     public TaskResponseProcessor(){
-        this.taskManager = SpringApplicationContext.getBean(TaskManager.class);
+        this.taskResponseService = SpringApplicationContext.getBean(TaskResponseService.class);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
     }
 
@@ -72,14 +71,14 @@ public class TaskResponseProcessor implements NettyRequestProcessor {
 
         taskInstanceCacheManager.cacheTaskInstance(responseCommand);
 
-        // TaskEvent
-        TaskEvent taskEvent = new TaskEvent(ExecutionStatus.of(responseCommand.getStatus()),
+        // TaskResponseEvent
+        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newResult(ExecutionStatus.of(responseCommand.getStatus()),
                 responseCommand.getEndTime(),
                 responseCommand.getProcessId(),
                 responseCommand.getAppIds(),
                 responseCommand.getTaskInstanceId());
 
-        taskManager.putTask(taskEvent);
+        taskResponseService.addResponse(taskResponseEvent);
     }
 
 
