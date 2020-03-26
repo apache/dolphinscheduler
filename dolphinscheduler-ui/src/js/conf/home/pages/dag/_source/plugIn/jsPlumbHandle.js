@@ -293,6 +293,7 @@ JSP.prototype.tasksContextmenu = function (event) {
     if (isOne) {
       // start run
       $('#startRunning').on('click', () => {
+        let name = store.state.dag.name
         let id = router.history.current.params.id
         store.dispatch('dag/getStartCheck', { processDefinitionId: id }).then(res => {
           let modal = Vue.$modal.dialog({
@@ -313,7 +314,8 @@ JSP.prototype.tasksContextmenu = function (event) {
                 },
                 props: {
                   item: {
-                    id: id
+                    id: id,
+                    name: name
                   },
                   startNodeList: $name,
                   sourceType: 'contextmenu'
