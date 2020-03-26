@@ -58,11 +58,11 @@ public class TaskQueueZKImplTest extends BaseTaskQueueTest  {
         init();
         // get all
         List<String> allTasks = tasksQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
-        assertEquals(allTasks.size(),2);
+        assertEquals(2, allTasks.size());
         //delete all
         tasksQueue.delete();
         allTasks = tasksQueue.getAllTasks(Constants.DOLPHINSCHEDULER_TASKS_QUEUE);
-        assertEquals(allTasks.size(),0);
+        assertEquals(0, allTasks.size());
     }
     @Test
     public void hasTask(){
@@ -126,10 +126,10 @@ public class TaskQueueZKImplTest extends BaseTaskQueueTest  {
         //add
         init();
         List<String> taskList = tasksQueue.poll(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, 2);
-        assertEquals(taskList.size(),2);
+        assertEquals(2, taskList.size());
 
-        assertEquals(taskList.get(0),"0_1_1_1_-1");
-        assertEquals(taskList.get(1),"1_0_1_1_-1");
+        assertEquals("0_1_1_1_-1", taskList.get(0));
+        assertEquals("1_0_1_1_-1", taskList.get(1));
     }
 
     /**
@@ -153,7 +153,7 @@ public class TaskQueueZKImplTest extends BaseTaskQueueTest  {
         String task = "1_0_1_1_-1";
         tasksQueue.sadd(Constants.DOLPHINSCHEDULER_TASKS_QUEUE,task);
         //check size
-        assertEquals(tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size(),1);
+        assertEquals(1, tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size());
     }
 
 
@@ -166,10 +166,10 @@ public class TaskQueueZKImplTest extends BaseTaskQueueTest  {
         String task = "1_0_1_1_-1";
         tasksQueue.sadd(Constants.DOLPHINSCHEDULER_TASKS_QUEUE,task);
         //check size
-        assertEquals(tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size(),1);
+        assertEquals(1, tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size());
         //remove and get size
         tasksQueue.srem(Constants.DOLPHINSCHEDULER_TASKS_QUEUE,task);
-        assertEquals(tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size(),0);
+        assertEquals(0, tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size());
     }
 
     /**
@@ -179,17 +179,17 @@ public class TaskQueueZKImplTest extends BaseTaskQueueTest  {
     public void smembers(){
 
         //first init
-        assertEquals(tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size(),0);
+        assertEquals(0, tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size());
         //add
         String task = "1_0_1_1_-1";
         tasksQueue.sadd(Constants.DOLPHINSCHEDULER_TASKS_QUEUE,task);
         //check size
-        assertEquals(tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size(),1);
+        assertEquals(1, tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size());
         //add
         task = "0_1_1_1_";
         tasksQueue.sadd(Constants.DOLPHINSCHEDULER_TASKS_QUEUE,task);
         //check size
-        assertEquals(tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size(),2);
+        assertEquals(2, tasksQueue.smembers(Constants.DOLPHINSCHEDULER_TASKS_QUEUE).size());
     }
 
 
@@ -222,7 +222,7 @@ public class TaskQueueZKImplTest extends BaseTaskQueueTest  {
         }
 
         String node1 = tasksQueue.poll(Constants.DOLPHINSCHEDULER_TASKS_QUEUE, 1).get(0);
-        assertEquals(node1,"0");
+        assertEquals("0", node1);
 
     }
 
