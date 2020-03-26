@@ -17,7 +17,7 @@
 <template>
   <div class="home-main list-construction-model">
     <div class="content-title">
-      <a class="bread" style="padding-left: 15px;" @click="() => $router.push({path: `/resource/udf`})">{{$t('Resource manage')}}</a>
+      <a class="bread" style="padding-left: 15px;" @click="() => $router.push({path: `/resource/udf`})">{{$t('UDF Resources')}}</a>
       <a class="bread" v-for="(item,$index) in breadList" :key="$index" @click="_ckOperation($index)">{{'>'+item}}</a>
     </div>
     <div class="conditions-box">
