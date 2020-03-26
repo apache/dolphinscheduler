@@ -293,14 +293,14 @@ public class TaskNode {
   public TaskTimeoutParameter getTaskTimeoutParameter() {
     if(StringUtils.isNotEmpty(this.getTimeout())){
       String formatStr = String.format("%s,%s", TaskTimeoutStrategy.WARN.name(), TaskTimeoutStrategy.FAILED.name());
-      String timeout = this.getTimeout().replace(formatStr,TaskTimeoutStrategy.WARNFAILED.name());
-      return JSON.parseObject(timeout,TaskTimeoutParameter.class);
+      String taskTimeout = this.getTimeout().replace(formatStr,TaskTimeoutStrategy.WARNFAILED.name());
+      return JSON.parseObject(taskTimeout,TaskTimeoutParameter.class);
     }
     return new TaskTimeoutParameter(false);
   }
 
   public boolean isConditionsTask(){
-    return this.getType().toUpperCase().equals(TaskType.CONDITIONS.toString());
+    return TaskType.CONDITIONS.toString().equalsIgnoreCase(this.getType());
   }
 
   @Override
