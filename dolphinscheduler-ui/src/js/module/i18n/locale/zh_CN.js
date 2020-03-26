@@ -90,6 +90,7 @@ export default {
   'Please enter other parameters': '请输入其他参数',
   'Resources': '资源',
   'Custom Parameters': '自定义参数',
+  'Custom template': '自定义模版',
   'Please enter main class': '请填写主函数的class',
   'Datasource': '数据源',
   'methods': '方法',
@@ -120,6 +121,7 @@ export default {
   'SQL Statement': 'sql语句',
   'UDF Function': 'UDF函数',
   'Please enter a SQL Statement(required)': '请输入sql语句(必填)',
+  'Please enter a JSON Statement(required)': '请输入json语句(必填)',
   'One form or attachment must be selected': '表格、附件必须勾选一个',
   'Recipient required': '收件人邮箱必填',
   'Mail subject required': '邮件主题必填',
@@ -571,5 +573,6 @@ export default {
   'All Columns': '全表导入',
   'Some Columns': '选择列',
   'Branch flow': '分支流转',
-  'Cannot select the same node for successful branch flow and failed branch flow': '成功分支流转和失败分支流转不能选择同一个节点'
+  'Cannot select the same node for successful branch flow and failed branch flow': '成功分支流转和失败分支流转不能选择同一个节点',
+  'Successful branch flow and failed branch flow are required': '成功分支流转和失败分支流转必填',
 }
