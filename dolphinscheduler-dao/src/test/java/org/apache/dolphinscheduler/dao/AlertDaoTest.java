@@ -14,18 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.data.security;
+package org.apache.dolphinscheduler.dao;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class UserManageData  {
-    public static final String USERNAME = "selenium_user_1";
+public class AlertDaoTest {
+    private static final Logger logger = LoggerFactory.getLogger(AlertDaoTest.class);
 
-    public static final String PASSWORD = "123456qwe";
-
-    public static final String EMAIL = "123456789@qq.com";
-
-    public static final String PHONE = "15811112222";
-
-    public static final String USER_MANAGE = "用户管理 - DolphinScheduler";
-
+    @Test
+    public void testGetAlertDao() {
+        logger.info("testGetAlertDao start");
+        AlertDao alertDao = DaoFactory.getDaoInstance(AlertDao.class);
+        Assert.assertNotNull(alertDao);
+        logger.info("testGetAlertDao end");
+    }
 }

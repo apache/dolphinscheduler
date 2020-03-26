@@ -14,18 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.data.security;
+package org.apache.dolphinscheduler.api.service;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
+import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public class UserManageData  {
-    public static final String USERNAME = "selenium_user_1";
+/**
+ *
+ */
+@Service
+public class UserAlertGroupService extends ServiceImpl<UserAlertGroupMapper, UserAlertGroup> {
 
-    public static final String PASSWORD = "123456qwe";
+    @Autowired
+    private UserAlertGroupMapper userAlertGroupMapper;
 
-    public static final String EMAIL = "123456789@qq.com";
-
-    public static final String PHONE = "15811112222";
-
-    public static final String USER_MANAGE = "用户管理 - DolphinScheduler";
+    boolean deleteByAlertGroupId(Integer groupId) {
+        return userAlertGroupMapper.deleteByAlertgroupId(groupId) >= 1;
+    }
 
 }

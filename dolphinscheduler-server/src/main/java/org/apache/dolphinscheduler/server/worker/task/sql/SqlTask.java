@@ -222,7 +222,9 @@ public class SqlTask extends AbstractTask {
             logger.info("SQL title : {}",title);
             sqlParameters.setTitle(title);
         }
-
+        //new
+        //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
+        sql = ParameterUtils.replaceScheduleTime(sql, taskProps.getScheduleTime(), paramsMap);
         // special characters need to be escaped, ${} needs to be escaped
         String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap);
@@ -341,10 +343,10 @@ public class SqlTask extends AbstractTask {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage());
         } finally {
-            try { 
-                connection.close(); 
-            } catch (Exception e) { 
-                logger.error(e.getMessage(), e); 
+            try {
+                connection.close();
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         }
         return connection;
@@ -361,20 +363,20 @@ public class SqlTask extends AbstractTask {
         // is the timeout set
         boolean timeoutFlag = taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED ||
                 taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
-        try (PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql())) {
-            if(timeoutFlag){
-                stmt.setQueryTimeout(taskProps.getTaskTimeout());
-            }
-            Map<Integer, Property> params = sqlBinds.getParamsMap();
-            if(params != null) {
-                for (Map.Entry<Integer, Property> entry : params.entrySet()) {
-                    Property prop = entry.getValue();
-                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
-                }
-            }
-            logger.info("prepare statement replace sql : {} ", stmt);
-            return stmt;
+        // prepare statement
+        PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
+        if(timeoutFlag){
+            stmt.setQueryTimeout(taskProps.getTaskTimeout());
         }
+        Map<Integer, Property> params = sqlBinds.getParamsMap();
+        if(params != null) {
+            for (Map.Entry<Integer, Property> entry : params.entrySet()) {
+                Property prop = entry.getValue();
+                ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+            }
+        }
+        logger.info("prepare statement replace sql : {} ", stmt);
+        return stmt;
     }
 
     /**
