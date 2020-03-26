@@ -35,12 +35,12 @@ public class TimePlaceholderUtils {
     /**
      * Prefix of the position to be replaced
      */
-    public static final String placeholderPrefix = "$[";
+    public static final String PLACEHOLDER_PREFIX = "$[";
 
     /**
      * The suffix of the position to be replaced
      */
-    public static final String placeholderSuffix = "]";
+    public static final String PLACEHOLDER_SUFFIX = "]";
 
     /**
      * Replaces all placeholders of format {@code ${name}} with the value returned
@@ -66,7 +66,7 @@ public class TimePlaceholderUtils {
      * be ignored ({@code true}) or cause an exception ({@code false})
      */
     private static PropertyPlaceholderHelper getPropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {
-        return new PropertyPlaceholderHelper(placeholderPrefix, placeholderSuffix, null, ignoreUnresolvablePlaceholders);
+        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null, ignoreUnresolvablePlaceholders);
     }
 
     /**
@@ -503,7 +503,7 @@ public class TimePlaceholderUtils {
      * @return calculate need minutes
      */
     public static Integer calcMinutes(String minuteExpression) {
-        int index = minuteExpression.indexOf("/");
+        int index = minuteExpression.indexOf('/');
 
         String calcExpression;
 

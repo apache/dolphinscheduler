@@ -78,7 +78,7 @@ public class TaskInstanceMapperTest {
         TaskInstance taskInstance = insertOne();
         //update
         int update = taskInstanceMapper.updateById(taskInstance);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         taskInstanceMapper.deleteById(taskInstance.getId());
     }
 
@@ -89,7 +89,7 @@ public class TaskInstanceMapperTest {
     public void testDelete(){
         TaskInstance taskInstance = insertOne();
         int delete = taskInstanceMapper.deleteById(taskInstance.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**

@@ -310,7 +310,7 @@ public class TenantService extends BaseService{
     Map<String, Object> result = new HashMap<>(5);
 
     List<Tenant> resourceList = tenantMapper.queryByTenantCode(tenantCode);
-    if (resourceList != null && resourceList.size() > 0) {
+    if (CollectionUtils.isNotEmpty(resourceList)) {
       result.put(Constants.DATA_LIST, resourceList);
       putMsg(result, Status.SUCCESS);
     } else {
@@ -346,6 +346,6 @@ public class TenantService extends BaseService{
    */
   private boolean checkTenantExists(String tenantCode) {
       List<Tenant> tenants = tenantMapper.queryByTenantCode(tenantCode);
-      return (tenants != null && tenants.size() > 0);
+      return CollectionUtils.isNotEmpty(tenants);
   }
 }
