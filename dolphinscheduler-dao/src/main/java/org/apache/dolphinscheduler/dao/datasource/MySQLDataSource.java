@@ -17,57 +17,27 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import org.apache.dolphinscheduler.common.enums.DbType;
 
 /**
  * data source of mySQL
  */
 public class MySQLDataSource extends BaseDataSource {
 
-  private static final Logger logger = LoggerFactory.getLogger(MySQLDataSource.class);
-
   /**
-   * gets the JDBC url for the data source connection
-   * @return
+   * @return driver class
    */
   @Override
-  public String getJdbcUrl() {
-    String address = getAddress();
-    if (address.lastIndexOf('/') != (address.length() - 1)) {
-      address += "/";
-    }
-    String jdbcUrl = address + getDatabase();
-    if (StringUtils.isNotEmpty(getOther())) {
-      jdbcUrl += "?" + getOther();
-    }
-    return jdbcUrl;
+  public String driverClassSelector() {
+    return Constants.COM_MYSQL_JDBC_DRIVER;
   }
 
   /**
-   * test whether the data source can be connected successfully
-   * @throws Exception
+   * @return db type
    */
   @Override
-  public void isConnectable() throws Exception {
-    Connection con = null;
-    try {
-      Class.forName(Constants.COM_MYSQL_JDBC_DRIVER);
-      con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
-    } finally {
-      if (con != null) {
-        try {
-          con.close();
-        } catch (SQLException e) {
-          logger.error("Mysql datasource try conn close conn error", e);
-        }
-      }
-    }
+  public DbType dbTypeSelector() {
+    return DbType.MYSQL;
   }
 
 }
