@@ -60,7 +60,7 @@ public class ProcessInstanceMapMapperTest {
         //update
         processInstanceMap.setParentProcessInstanceId(1);
         int update = processInstanceMapMapper.updateById(processInstanceMap);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         processInstanceMapMapper.deleteById(processInstanceMap.getId());
     }
 
@@ -71,7 +71,7 @@ public class ProcessInstanceMapMapperTest {
     public void testDelete(){
         ProcessInstanceMap processInstanceMap = insertOne();
         int delete = processInstanceMapMapper.deleteById(processInstanceMap.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
@@ -132,7 +132,7 @@ public class ProcessInstanceMapMapperTest {
         int delete = processInstanceMapMapper.deleteByParentProcessId(
                 processInstanceMap.getParentProcessInstanceId()
         );
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**

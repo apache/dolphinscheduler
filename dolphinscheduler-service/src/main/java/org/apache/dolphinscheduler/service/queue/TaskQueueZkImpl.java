@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.service.queue;
 
 
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.IpUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.service.zk.ZookeeperOperator;
@@ -67,8 +68,7 @@ public class TaskQueueZkImpl implements ITaskQueue {
     @Override
     public List<String> getAllTasks(String key) {
         try {
-            List<String> list = zookeeperOperator.getChildrenKeys(getTasksPath(key));
-            return list;
+            return zookeeperOperator.getChildrenKeys(getTasksPath(key));
         } catch (Exception e) {
             logger.error("get all tasks from tasks queue exception",e);
         }
@@ -141,7 +141,7 @@ public class TaskQueueZkImpl implements ITaskQueue {
         try{
             List<String> list = zookeeperOperator.getChildrenKeys(getTasksPath(key));
 
-            if(list != null && list.size() > 0){
+            if(CollectionUtils.isNotEmpty(list)){
 
                 String workerIp = OSUtils.getHost();
                 String workerIpLongStr = String.valueOf(IpUtils.ipToLong(workerIp));
