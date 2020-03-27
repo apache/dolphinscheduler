@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.manager;
+package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 
@@ -24,7 +24,7 @@ import java.util.Date;
 /**
  * task event
  */
-public class TaskEvent {
+public class TaskResponseEvent {
 
     /**
      * taskInstanceId
@@ -74,53 +74,29 @@ public class TaskEvent {
     /**
      * ack / response
      */
-    private TaskEventEnum type;
+    private Event event;
 
-
-    /**
-     * receive ack info
-     * @param state state
-     * @param startTime startTime
-     * @param workerAddress workerAddress
-     * @param executePath executePath
-     * @param logPath logPath
-     * @param taskInstanceId taskInstanceId
-     */
-    public TaskEvent(ExecutionStatus state,
-                     Date startTime,
-                     String workerAddress,
-                     String executePath,
-                     String logPath,
-                     int taskInstanceId){
-        this.state = state;
-        this.startTime = startTime;
-        this.workerAddress = workerAddress;
-        this.executePath = executePath;
-        this.logPath = logPath;
-        this.taskInstanceId = taskInstanceId;
-        this.type = TaskEventEnum.ACK;
-
+    public static TaskResponseEvent newAck(ExecutionStatus state, Date startTime, String workerAddress, String executePath, String logPath, int taskInstanceId){
+        TaskResponseEvent event = new TaskResponseEvent();
+        event.setState(state);
+        event.setStartTime(startTime);
+        event.setWorkerAddress(workerAddress);
+        event.setExecutePath(executePath);
+        event.setLogPath(logPath);
+        event.setTaskInstanceId(taskInstanceId);
+        event.setEvent(Event.ACK);
+        return event;
     }
 
-    /**
-     * receive response info
-     * @param state state
-     * @param endTime endTime
-     * @param processId processId
-     * @param appIds appIds
-     * @param taskInstanceId taskInstanceId
-     */
-    public TaskEvent(ExecutionStatus state,
-                                Date endTime,
-                                int processId,
-                                String appIds,
-                                int taskInstanceId){
-        this.state = state;
-        this.endTime = endTime;
-        this.processId = processId;
-        this.appIds = appIds;
-        this.taskInstanceId = taskInstanceId;
-        this.type = TaskEventEnum.RESPONSE;
+    public static TaskResponseEvent newResult(ExecutionStatus state, Date endTime, int processId, String appIds, int taskInstanceId){
+        TaskResponseEvent event = new TaskResponseEvent();
+        event.setState(state);
+        event.setEndTime(endTime);
+        event.setProcessId(processId);
+        event.setAppIds(appIds);
+        event.setTaskInstanceId(taskInstanceId);
+        event.setEvent(Event.RESULT);
+        return event;
     }
 
     public int getTaskInstanceId() {
@@ -195,27 +171,16 @@ public class TaskEvent {
         this.appIds = appIds;
     }
 
-    public TaskEventEnum getType() {
-        return type;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setType(TaskEventEnum type) {
-        this.type = type;
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
-    @Override
-    public String toString() {
-        return "TaskEvent{" +
-                "taskInstanceId=" + taskInstanceId +
-                ", workerAddress='" + workerAddress + '\'' +
-                ", state=" + state +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", executePath='" + executePath + '\'' +
-                ", logPath='" + logPath + '\'' +
-                ", processId=" + processId +
-                ", appIds='" + appIds + '\'' +
-                ", type=" + type +
-                '}';
+    public enum Event{
+        ACK,
+        RESULT;
     }
 }

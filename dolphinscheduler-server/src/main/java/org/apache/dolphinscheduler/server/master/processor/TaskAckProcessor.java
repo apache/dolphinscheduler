@@ -28,10 +28,9 @@ import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.FastJsonSerializer;
 import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
-import org.apache.dolphinscheduler.server.master.manager.TaskEvent;
-import org.apache.dolphinscheduler.server.master.manager.TaskManager;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseEvent;
+import org.apache.dolphinscheduler.server.master.processor.queue.TaskResponseService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +44,7 @@ public class TaskAckProcessor implements NettyRequestProcessor {
     /**
      * process service
      */
-    private final TaskManager taskManager;
+    private final TaskResponseService taskResponseService;
 
     /**
      * taskInstance cache manager
@@ -53,7 +52,7 @@ public class TaskAckProcessor implements NettyRequestProcessor {
     private final TaskInstanceCacheManager taskInstanceCacheManager;
 
     public TaskAckProcessor(){
-        this.taskManager = SpringApplicationContext.getBean(TaskManager.class);
+        this.taskResponseService = SpringApplicationContext.getBean(TaskResponseService.class);
         this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
     }
 
@@ -72,15 +71,15 @@ public class TaskAckProcessor implements NettyRequestProcessor {
 
         String workerAddress = ChannelUtils.toAddress(channel).getAddress();
 
-        // TaskEvent
-        TaskEvent taskEvent = new TaskEvent(ExecutionStatus.of(taskAckCommand.getStatus()),
+        // TaskResponseEvent
+        TaskResponseEvent taskResponseEvent = TaskResponseEvent.newAck(ExecutionStatus.of(taskAckCommand.getStatus()),
                 taskAckCommand.getStartTime(),
                 workerAddress,
                 taskAckCommand.getExecutePath(),
                 taskAckCommand.getLogPath(),
                 taskAckCommand.getTaskInstanceId());
 
-        taskManager.putTask(taskEvent);
+        taskResponseService.addResponse(taskResponseEvent);
 
     }
 
