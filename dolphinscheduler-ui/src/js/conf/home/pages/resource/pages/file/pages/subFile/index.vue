@@ -84,6 +84,7 @@
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mSpin from '@/module/components/spin/spin'
   import mConditions from '@/module/components/conditions/conditions'
+  import localStore from '@/module/util/localStorage'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   let editor
@@ -109,8 +110,8 @@
           this.spinnerLoading = true
           this.createResourceFile({
             type: 'FILE',
-            pid: this.pid,
-            currentDir: this.currentDir,
+            pid: this.$route.params.id,
+            currentDir: localStore.getItem('currentDir'),
             fileName: this.fileName,
             suffix: this.suffix,
             description: this.description,
@@ -119,7 +120,7 @@
             this.$message.success(res.msg)
             setTimeout(() => {
               this.spinnerLoading = false
-              this.$router.push({ name: 'file' })
+              this.$router.push({ path: `/resource/file/subdirectory/${this.$route.params.id}`})
             }, 800)
           }).catch(e => {
             this.$message.error(e.msg || '')
