@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.page.security;
 
 import org.apache.dolphinscheduler.common.PageCommon;
-import org.apache.dolphinscheduler.constant.TestConstant;
 import org.apache.dolphinscheduler.data.security.UserManageData;
 import org.apache.dolphinscheduler.locator.security.UserManageLocator;
 import org.openqa.selenium.WebDriver;
@@ -33,10 +32,8 @@ public class UserManagePage extends PageCommon {
      * @return Whether to enter the specified page after creat tenant
      */
     public boolean createUser() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         // click  create user button
         clickButton(UserManageLocator.CLICK_CREATE_USER_BUTTON);
@@ -59,10 +56,9 @@ public class UserManagePage extends PageCommon {
     }
 
     public boolean deleteUser() throws InterruptedException {
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+
         // click  user manage
         clickElement(UserManageLocator.CLICK_USER_MANAGE);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         // click  delete user button
         clickButton(UserManageLocator.DELETE_USER_BUTTON );

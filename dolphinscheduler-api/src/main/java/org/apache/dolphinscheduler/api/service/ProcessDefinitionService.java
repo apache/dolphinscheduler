@@ -148,7 +148,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
-        if (globalParamsList != null && globalParamsList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(globalParamsList)) {
             Set<Property> globalParamsSet = new HashSet<>(globalParamsList);
             globalParamsList = new ArrayList<>(globalParamsSet);
             processDefine.setGlobalParamList(globalParamsList);
@@ -314,7 +314,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();
-        if (processData.getGlobalParams() != null && processData.getGlobalParams().size() > 0) {
+        if (CollectionUtils.isNotEmpty(processData.getGlobalParams())) {
             Set<Property> userDefParamsSet = new HashSet<>(processData.getGlobalParams());
             globalParamsList = new ArrayList<>(userDefParamsSet);
         }
@@ -453,12 +453,11 @@ public class ProcessDefinitionService extends BaseDAGService {
         ProcessDefinition processDefinition = processDefineMapper.selectById(id);
 
         switch (state) {
-            case ONLINE: {
+            case ONLINE:
                 processDefinition.setReleaseState(state);
                 processDefineMapper.updateById(processDefinition);
                 break;
-            }
-            case OFFLINE: {
+            case OFFLINE:
                 processDefinition.setReleaseState(state);
                 processDefineMapper.updateById(processDefinition);
                 List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(
@@ -473,11 +472,9 @@ public class ProcessDefinitionService extends BaseDAGService {
                     SchedulerService.deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
-            }
-            default: {
+            default:
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "releaseState");
                 return result;
-            }
         }
 
         putMsg(result, Status.SUCCESS);
