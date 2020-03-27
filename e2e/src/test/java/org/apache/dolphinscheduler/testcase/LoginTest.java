@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.testcase;
 
 import org.apache.dolphinscheduler.page.LoginPage;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import static org.apache.dolphinscheduler.base.BaseTest.driver;

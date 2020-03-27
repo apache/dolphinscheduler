@@ -44,6 +44,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
+import static org.apache.dolphinscheduler.common.enums.CommandType.START_PROCESS;
+
 /**
  * DataxTask Tester.
  */
@@ -59,6 +61,8 @@ public class DataxTaskTest {
 
     private ApplicationContext applicationContext;
 
+    private TaskProps props = new TaskProps();
+
     @Before
     public void before()
         throws Exception {
@@ -70,7 +74,6 @@ public class DataxTaskTest {
         springApplicationContext.setApplicationContext(applicationContext);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
-        TaskProps props = new TaskProps();
         props.setTaskDir("/tmp");
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
         props.setTaskInstId(1);
@@ -78,10 +81,8 @@ public class DataxTaskTest {
         props.setEnvFile(".dolphinscheduler_env.sh");
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
-        props.setTaskParams(
-            "{\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedByte\":1024,\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"datasource\":1,\"dsType\":\"MYSQL\",\"datatarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test from dual\",\"preStatements\":[\"delete from test\"],\"postStatements\":[\"delete from test\"]}");
-        dataxTask = PowerMockito.spy(new DataxTask(props, logger));
-        dataxTask.init();
+        props.setCmdTypeIfComplement(START_PROCESS);
+        setTaskParems(0);
 
         Mockito.when(processService.findDataSourceById(1)).thenReturn(getDataSource());
         Mockito.when(processService.findDataSourceById(2)).thenReturn(getDataSource());
@@ -89,6 +90,22 @@ public class DataxTaskTest {
 
         String fileName = String.format("%s/%s_node.sh", props.getTaskDir(), props.getTaskAppId());
         Mockito.when(shellCommandExecutor.run(fileName, processService)).thenReturn(0);
+    }
+
+    private void setTaskParems(Integer customConfig) {
+        if (customConfig == 1) {
+            props.setTaskParams(
+                    "{\"customConfig\":1, \"localParams\":[{\"prop\":\"test\",\"value\":\"38294729\"}],\"json\":\"{\\\"job\\\":{\\\"setting\\\":{\\\"speed\\\":{\\\"byte\\\":1048576},\\\"errorLimit\\\":{\\\"record\\\":0,\\\"percentage\\\":0.02}},\\\"content\\\":[{\\\"reader\\\":{\\\"name\\\":\\\"rdbmsreader\\\",\\\"parameter\\\":{\\\"username\\\":\\\"xxx\\\",\\\"password\\\":\\\"${test}\\\",\\\"column\\\":[\\\"id\\\",\\\"name\\\"],\\\"splitPk\\\":\\\"pk\\\",\\\"connection\\\":[{\\\"querySql\\\":[\\\"SELECT * from dual\\\"],\\\"jdbcUrl\\\":[\\\"jdbc:dm://ip:port/database\\\"]}],\\\"fetchSize\\\":1024,\\\"where\\\":\\\"1 = 1\\\"}},\\\"writer\\\":{\\\"name\\\":\\\"streamwriter\\\",\\\"parameter\\\":{\\\"print\\\":true}}}]}}\"}");
+
+//                    "{\"customConfig\":1,\"json\":\"{\\\"job\\\":{\\\"setting\\\":{\\\"speed\\\":{\\\"byte\\\":1048576},\\\"errorLimit\\\":{\\\"record\\\":0,\\\"percentage\\\":0.02}},\\\"content\\\":[{\\\"reader\\\":{\\\"name\\\":\\\"rdbmsreader\\\",\\\"parameter\\\":{\\\"username\\\":\\\"xxx\\\",\\\"password\\\":\\\"xxx\\\",\\\"column\\\":[\\\"id\\\",\\\"name\\\"],\\\"splitPk\\\":\\\"pk\\\",\\\"connection\\\":[{\\\"querySql\\\":[\\\"SELECT * from dual\\\"],\\\"jdbcUrl\\\":[\\\"jdbc:dm://ip:port/database\\\"]}],\\\"fetchSize\\\":1024,\\\"where\\\":\\\"1 = 1\\\"}},\\\"writer\\\":{\\\"name\\\":\\\"streamwriter\\\",\\\"parameter\\\":{\\\"print\\\":true}}}]}}\"}");
+        } else {
+            props.setTaskParams(
+                    "{\"customConfig\":0,\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedByte\":1024,\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"datasource\":1,\"dsType\":\"MYSQL\",\"datatarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test from dual\",\"preStatements\":[\"delete from test\"],\"postStatements\":[\"delete from test\"]}");
+
+        }
+
+        dataxTask = PowerMockito.spy(new DataxTask(props, logger));
+        dataxTask.init();
     }
 
     private DataSource getDataSource() {
@@ -102,7 +119,7 @@ public class DataxTaskTest {
 
     private ProcessInstance getProcessInstance() {
         ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setCommandType(CommandType.START_PROCESS);
+        processInstance.setCommandType(START_PROCESS);
         processInstance.setScheduleTime(new Date());
         return processInstance;
     }
@@ -229,16 +246,22 @@ public class DataxTaskTest {
      */
     @Test
     public void testBuildDataxJsonFile()
-        throws Exception {
+            throws Exception {
         try {
-            Method method = DataxTask.class.getDeclaredMethod("buildDataxJsonFile");
-            method.setAccessible(true);
-            String filePath = (String) method.invoke(dataxTask, null);
-            Assert.assertNotNull(filePath);
-        }
-        catch (Exception e) {
+            setTaskParems(1);
+            buildDataJson();
+            setTaskParems(0);
+            buildDataJson();
+        } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
+    }
+
+    public void buildDataJson() throws Exception {
+        Method method = DataxTask.class.getDeclaredMethod("buildDataxJsonFile");
+        method.setAccessible(true);
+        String filePath = (String) method.invoke(dataxTask, null);
+        Assert.assertNotNull(filePath);
     }
 
     /**

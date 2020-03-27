@@ -90,6 +90,7 @@ export default {
   'Please enter other parameters': 'Please enter other parameters',
   'Resources': 'Resources',
   'Custom Parameters': 'Custom Parameters',
+  'Custom template': 'Custom template',
   'Datasource': 'Datasource',
   'methods': 'methods',
   'Please enter method(optional)': 'Please enter method(optional)',
@@ -119,6 +120,7 @@ export default {
   'SQL Statement': 'SQL Statement',
   'UDF Function': 'UDF Function',
   'Please enter a SQL Statement(required)': 'Please enter a SQL Statement(required)',
+  'Please enter a JSON Statement(required)': 'Please enter a JSON Statement(required)',
   'One form or attachment must be selected': 'One form or attachment must be selected',
   'Recipient required': 'Recipient required',
   'Mail subject required': 'Mail subject required',
@@ -568,5 +570,6 @@ export default {
   'All Columns': 'All Columns',
   'Some Columns': 'Some Columns',
   'Branch flow': 'Branch flow',
-  'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow'
+  'Cannot select the same node for successful branch flow and failed branch flow': 'Cannot select the same node for successful branch flow and failed branch flow',
+  'Successful branch flow and failed branch flow are required': 'Successful branch flow and failed branch flow are required'
 }
