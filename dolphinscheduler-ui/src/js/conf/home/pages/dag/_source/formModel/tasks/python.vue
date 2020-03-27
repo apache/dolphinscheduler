@@ -108,10 +108,6 @@
           return false
         }
 
-        if (!this.$refs.refResources._verifResources()) {
-          return false
-        }
-
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
@@ -119,7 +115,9 @@
 
         // storage
         this.$emit('on-params', {
-          resourceList: this.resourceList,
+          resourceList: _.map(this.resourceList, v => {
+            return {id: v}
+          }),
           localParams: this.localParams,
           rawScript: editor.getValue()
         })
@@ -129,8 +127,6 @@
        * Processing code highlighting
        */
       _handlerEditor () {
-        this._destroyEditor()
-
         // editor
         editor = codemirror('code-python-mirror', {
           mode: 'python',
@@ -145,45 +141,28 @@
           }
         }
 
-        this.changes = () => {
-          this._cacheParams()
-        }
-
         // Monitor keyboard
         editor.on('keypress', this.keypress)
-
-        editor.on('changes', this.changes)
 
         editor.setValue(this.rawScript)
 
         return editor
-      },
-      _cacheParams () {
-        this.$emit('on-cache-params', {
-          resourceList: this.cacheResourceList,
-          localParams: this.localParams,
-          rawScript: editor ? editor.getValue() : ''
-        });
-      },
-      _destroyEditor () {
-         if (editor) {
-          editor.toTextArea() // Uninstall
-          editor.off($('.code-python-mirror'), 'keypress', this.keypress)
-          editor.off($('.code-python-mirror'), 'changes', this.changes)
-        }
       }
     },
     watch: {
       //Watch the cacheParams
       cacheParams (val) {
-        this._cacheParams()
+        this.$emit('on-cache-params', val);
       }
     },
     computed: {
       cacheParams () {
         return {
-          resourceList: this.cacheResourceList,
-          localParams: this.localParams
+          resourceList: _.map(this.resourceList, v => {
+            return {id: v}
+          }),
+          localParams: this.localParams,
+          rawScript: editor ? editor.getValue() : ''
         }
       }
     },
@@ -197,7 +176,9 @@
         // backfill resourceList
         let resourceList = o.params.resourceList || []
         if (resourceList.length) {
-          this.resourceList = resourceList
+          this.resourceList = _.map(resourceList, v => {
+            return v.id
+          })
           this.cacheResourceList = resourceList
         }
 
@@ -214,11 +195,8 @@
       }, 200)
     },
     destroyed () {
-      if (editor) {
-        editor.toTextArea() // Uninstall
-        editor.off($('.code-python-mirror'), 'keypress', this.keypress)
-        editor.off($('.code-python-mirror'), 'changes', this.changes)
-      }
+      editor.toTextArea() // Uninstall
+      editor.off($('.code-python-mirror'), 'keypress', this.keypress)
     },
     components: { mLocalParams, mListBox, mResources }
   }
