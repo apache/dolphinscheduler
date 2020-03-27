@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskRecordStatus;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
+import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskRecord;
@@ -84,9 +85,9 @@ public class TaskRecordDao {
             Class.forName(driver);
             conn = DriverManager.getConnection(url, username, password);
         } catch (ClassNotFoundException e) {
-            logger.error("Exception ", e);
+            logger.error("Class not found Exception ", e);
         } catch (SQLException e) {
-            logger.error("Exception ", e);
+            logger.error("SQL Exception ", e);
         }
         return conn;
     }
@@ -163,14 +164,14 @@ public class TaskRecordDao {
             sql += getWhereString(filterMap);
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
-            while (rs.next()) {
+            while (rs.next()){
                 count = rs.getInt("count");
                 break;
             }
         } catch (SQLException e) {
             logger.error("Exception ", e);
-        } finally {
-            closeResource(rs, pstmt, conn);
+        }finally {
+            ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
         return count;
     }
@@ -254,8 +255,8 @@ public class TaskRecordDao {
             }
         } catch (SQLException e) {
             logger.error("Exception ", e);
-        } finally {
-            closeResource(rs, pstmt, conn);
+        }finally {
+            ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
         return recordList;
     }
@@ -290,30 +291,6 @@ public class TaskRecordDao {
                 return TaskRecordStatus.SUCCESS;
             }
 
-        }
-    }
-
-    private static void closeResource(ResultSet rs, PreparedStatement pstmt, Connection conn) {
-        if (rs != null) {
-            try {
-                rs.close();
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
-        }
-        if (pstmt != null) {
-            try {
-                pstmt.close();
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
-        }
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                logger.error("Exception ", e);
-            }
         }
     }
 }

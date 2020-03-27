@@ -28,7 +28,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("org.apache.dolphinscheduler")
 public class RemoveZKNode implements CommandLineRunner {
 
-    private static Integer ARGS_LENGTH = 1;
+    private static final Integer ARGS_LENGTH = 1;
 
     private static final Logger logger = LoggerFactory.getLogger(RemoveZKNode.class);
 

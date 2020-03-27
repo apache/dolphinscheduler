@@ -117,7 +117,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                     try {
                         pair.getLeft().process(channel, msg);
                     } catch (Throwable ex) {
-                        logger.error("process msg {} error : {}", msg, ex);
+                        logger.error("process msg {} error", msg, ex);
                     }
                 }
             };
