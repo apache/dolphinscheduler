@@ -28,8 +28,7 @@ public class FlinkParametersTest {
     @Test
     public void getResourceFilesList() {
         FlinkParameters flinkParameters = new FlinkParameters();
-        Assert.assertNotNull(flinkParameters.getResourceFilesList());
-        Assert.assertTrue(flinkParameters.getResourceFilesList().isEmpty());
+        Assert.assertNull(flinkParameters.getResourceFilesList());
 
         ResourceInfo mainResource = new ResourceInfo();
         mainResource.setRes("testFlinkMain-1.0.0-SNAPSHOT.jar");
@@ -41,15 +40,17 @@ public class FlinkParametersTest {
         resourceInfos.add(resourceInfo1);
 
         flinkParameters.setResourceList(resourceInfos);
-        Assert.assertNotNull(flinkParameters.getResourceFilesList());
-        Assert.assertEquals(2, flinkParameters.getResourceFilesList().size());
+        List<ResourceInfo> resourceFilesList = flinkParameters.getResourceFilesList();
+        Assert.assertNotNull(resourceFilesList);
+        Assert.assertEquals(2, resourceFilesList.size());
 
         ResourceInfo resourceInfo2 = new ResourceInfo();
         resourceInfo2.setRes("testFlinkParameters2.jar");
         resourceInfos.add(resourceInfo2);
 
         flinkParameters.setResourceList(resourceInfos);
-        Assert.assertNotNull(flinkParameters.getResourceFilesList());
-        Assert.assertEquals(3, flinkParameters.getResourceFilesList().size());
+        resourceFilesList = flinkParameters.getResourceFilesList();
+        Assert.assertNotNull(resourceFilesList);
+        Assert.assertEquals(4, resourceFilesList.size());
     }
 }
