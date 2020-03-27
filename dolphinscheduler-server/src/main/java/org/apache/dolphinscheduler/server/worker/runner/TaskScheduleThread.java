@@ -230,7 +230,7 @@ public class TaskScheduleThread implements Runnable {
                         taskInstance.getId() + ".log";
             }
         }catch (Exception e){
-            logger.error("logger" + e);
+            logger.error("logger {}", e.getMessage(), e);
             logPath = "";
         }
         return logPath;

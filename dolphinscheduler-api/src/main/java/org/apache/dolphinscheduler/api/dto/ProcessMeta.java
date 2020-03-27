@@ -106,9 +106,6 @@ public class ProcessMeta {
      */
     private String scheduleWorkerGroupName;
 
-    public ProcessMeta() {
-    }
-
     public String getProjectName() {
         return projectName;
     }
