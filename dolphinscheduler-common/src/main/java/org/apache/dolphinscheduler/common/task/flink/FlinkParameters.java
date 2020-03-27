@@ -20,7 +20,6 @@ import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,28 +49,28 @@ public class FlinkParameters extends AbstractParameters {
   private String mainArgs;
 
   /**
-   * slot个数
+   * slot count
    */
   private int slot;
 
   /**
-   *Yarn application的名字
+   *Yarn application name
    */
 
   private String appName;
 
   /**
-   * taskManager 数量
+   * taskManager count
    */
   private int  taskManager;
 
   /**
-   * jobManagerMemory 内存大小
+   * job manager memory
    */
   private String  jobManagerMemory ;
 
   /**
-   * taskManagerMemory内存大小
+   * task manager memory
    */
   private String  taskManagerMemory;
 
@@ -207,16 +206,11 @@ public class FlinkParameters extends AbstractParameters {
 
 
   @Override
-  public List<String> getResourceFilesList() {
-    if(resourceList != null ) {
-      List<String> resourceFiles = resourceList.stream()
-              .map(ResourceInfo::getRes).collect(Collectors.toList());
-      if(mainJar != null) {
-        resourceFiles.add(mainJar.getRes());
-      }
-      return resourceFiles;
+  public List<ResourceInfo> getResourceFilesList() {
+    if (mainJar != null) {
+      resourceList.add(mainJar);
     }
-    return Collections.emptyList();
+    return null;
   }
 
 

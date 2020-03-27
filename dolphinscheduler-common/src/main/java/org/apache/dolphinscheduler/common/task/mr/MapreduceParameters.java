@@ -20,9 +20,7 @@ import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MapreduceParameters extends AbstractParameters {
 
@@ -125,16 +123,11 @@ public class MapreduceParameters extends AbstractParameters {
     }
 
     @Override
-    public List<String> getResourceFilesList() {
-        if(resourceList != null ) {
-            List<String> resourceFiles = resourceList.stream()
-                    .map(ResourceInfo::getRes).collect(Collectors.toList());
-            if(mainJar != null) {
-                resourceFiles.add(mainJar.getRes());
-            }
-            return resourceFiles;
+    public List<ResourceInfo> getResourceFilesList() {
+        if (mainJar != null) {
+            resourceList.add(mainJar);
         }
-        return Collections.emptyList();
+        return resourceList;
     }
 
     @Override

@@ -119,7 +119,9 @@
 
         // storage
         this.$emit('on-params', {
-          resourceList: this.resourceList,
+          resourceList: _.map(this.resourceList, v => {
+            return {id: v}
+          }),
           localParams: this.localParams,
           rawScript: editor.getValue()
         })
@@ -182,8 +184,11 @@
     computed: {
       cacheParams () {
         return {
-          resourceList: this.cacheResourceList,
-          localParams: this.localParams
+          resourceList: _.map(this.resourceList, v => {
+            return {id: v}
+          }),
+          localParams: this.localParams,
+          rawScript: editor ? editor.getValue() : ''
         }
       }
     },
@@ -197,7 +202,9 @@
         // backfill resourceList
         let resourceList = o.params.resourceList || []
         if (resourceList.length) {
-          this.resourceList = resourceList
+          this.resourceList = _.map(resourceList, v => {
+            return v.id
+          })
           this.cacheResourceList = resourceList
         }
 

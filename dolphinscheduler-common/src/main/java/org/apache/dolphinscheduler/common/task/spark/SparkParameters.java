@@ -218,15 +218,12 @@ public class SparkParameters extends AbstractParameters {
     return mainJar != null && programType != null && sparkVersion != null;
   }
 
-
   @Override
-  public List<String> getResourceFilesList() {
-    if(resourceList !=null ) {
-      this.resourceList.add(mainJar);
-      return resourceList.stream()
-              .map(ResourceInfo::getRes).collect(Collectors.toList());
+  public List<ResourceInfo> getResourceFilesList() {
+    if (mainJar != null) {
+      resourceList.add(mainJar);
     }
-    return null;
+    return resourceList;
   }
 
 
