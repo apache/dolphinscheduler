@@ -90,6 +90,7 @@
   import io from '@/module/io'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
+  import localStore from '@/module/util/localStorage'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mProgressBar from '@/module/components/progressBar/progressBar'
@@ -107,8 +108,8 @@
         progress: 0,
         // file
         file: '',
-        currentDir: '/',
-        pid: -1,
+        currentDir: localStore.getItem('currentDir'),
+        pid: this.id,
         // Whether to drag upload
         dragOver: false
       }
@@ -116,7 +117,8 @@
     watch: {
     },
     props: {
-      type: String
+      type: String,
+      id: Number
     },
     methods: {
       /**
@@ -126,7 +128,7 @@
         this.$refs['popup'].spinnerLoading = true
         if (this._validation()) {
           this.store.dispatch('resource/resourceVerifyName', {
-            fullName: '/'+this.name,
+            fullName: this.currentDir+'/'+this.name,
             type: this.type
           }).then(res => {
             const isLt1024M = this.file.size / 1024 / 1024 < 1024
