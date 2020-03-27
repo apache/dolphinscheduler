@@ -100,7 +100,7 @@ const setSvgColor = (e, color) => {
   // Traverse clear all colors
   $('.jtk-connector').each((i, o) => {
     _.map($(o)[0].childNodes, v => {
-      $(v).attr('fill', '#555').attr('stroke', '#555').attr('stroke-width', 2)
+      $(v).attr('fill', '#2d8cf0').attr('stroke', '#2d8cf0').attr('stroke-width', 2)
     })
   })
 

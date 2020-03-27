@@ -274,6 +274,7 @@
     },
     created () {
       this.warningType = this.warningTypeList[0].id
+      this.workflowName = this.item.name
 
       this._getReceiver()
     },
