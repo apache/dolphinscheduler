@@ -19,7 +19,9 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button type="ghost" @click="_create"  size="small" >{{$t('Create UDF Function')}}</x-button>
+          <x-button-group size="small">
+            <x-button type="ghost" @click="_create">{{$t('Create UDF Function')}}</x-button>
+          </x-button-group>
         </template>
       </m-conditions>
     </template>
@@ -58,6 +60,7 @@
         isLoading: false,
         udfFuncList: [],
         searchParams: {
+          id: -1,
           pageSize: 10,
           pageNo: 1,
           searchVal: ''

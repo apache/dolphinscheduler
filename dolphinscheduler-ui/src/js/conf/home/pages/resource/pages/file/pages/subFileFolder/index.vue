@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('Create File')">
+  <m-list-construction :title="$t('Create folder')">
     <template slot="content">
       <div class="resource-create-model">
         <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('File Name')}}</template>
+          <template slot="name"><strong>*</strong>{{$t('Folder Name')}}</template>
           <template slot="content">
             <x-input
                     type="input"
-                    v-model="fileName"
+                    v-model="name"
                     maxlength="60"
                     style="width: 300px;"
                     :placeholder="$t('Please enter name')"
@@ -31,19 +31,19 @@
             </x-input>
           </template>
         </m-list-box-f>
-        <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('File Format')}}</template>
+        <!-- <m-list-box-f>
+          <template slot="name"><strong>*</strong>{{$t('Folder Format')}}</template>
           <template slot="content">
-            <x-select v-model="suffix" style="width: 100px;" @on-change="_onChange">
+            <x-select v-model="type" style="width: 100px;">
               <x-option
-                      v-for="city in fileTypeList"
-                      :key="city"
-                      :value="city"
-                      :label="city">
+                      v-for="item in folderList"
+                      :key="item.value"
+                      :value="item.value"
+                      :label="item.label">
               </x-option>
             </x-select>
           </template>
-        </m-list-box-f>
+        </m-list-box-f> -->
         <m-list-box-f>
           <template slot="name">{{$t('Description')}}</template>
           <template slot="content">
@@ -54,12 +54,6 @@
                     :placeholder="$t('Please enter description')"
                     autocomplete="off">
             </x-input>
-          </template>
-        </m-list-box-f>
-        <m-list-box-f>
-          <template slot="name"><strong>*</strong>{{$t('File Content')}}</template>
-          <template slot="content">
-            <textarea id="code-create-mirror" name="code-create-mirror"></textarea>
           </template>
         </m-list-box-f>
         <m-list-box-f>
@@ -78,48 +72,42 @@
 <script>
   import i18n from '@/module/i18n'
   import { mapActions } from 'vuex'
-  import { filtTypeArr } from '../_source/common'
+  import { folderList } from '../_source/common'
   import { handlerSuffix } from '../details/_source/utils'
-  import codemirror from '../_source/codemirror'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mSpin from '@/module/components/spin/spin'
   import mConditions from '@/module/components/conditions/conditions'
+  import localStore from '@/module/util/localStorage'
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
-  let editor
   export default {
     name: 'resource-list-create-FILE',
     data () {
       return {
-        suffix: 'sh',
-        fileName: '',
+        type: '',
+        name: '',
         description: '',
-        fileTypeList: filtTypeArr,
-        content: '',
-        pid: -1,
-        currentDir: '/',
+        folderList: folderList,
         spinnerLoading: false
       }
     },
     props: {},
     methods: {
-      ...mapActions('resource', ['createResourceFile']),
+      ...mapActions('resource', ['createResourceFolder']),
       ok () {
         if (this._validation()) {
           this.spinnerLoading = true
-          this.createResourceFile({
+          this.createResourceFolder({
             type: 'FILE',
-            pid: this.pid,
-            currentDir: this.currentDir,
-            fileName: this.fileName,
-            suffix: this.suffix,
-            description: this.description,
-            content: editor.getValue()
+            name: this.name,
+            currentDir: localStore.getItem('currentDir'),
+            pid: this.$route.params.id,
+            description: this.description
           }).then(res => {
             this.$message.success(res.msg)
             setTimeout(() => {
               this.spinnerLoading = false
-              this.$router.push({ name: 'file' })
+              this.$router.push({ path: `/resource/file/subdirectory/${this.$route.params.id}`})
             }, 800)
           }).catch(e => {
             this.$message.error(e.msg || '')
@@ -128,56 +116,21 @@
         }
       },
       _validation () {
-        if (!this.fileName) {
-          this.$message.warning(`${i18n.$t('Please enter resource name')}`)
-          return false
-        }
-        if (!editor.getValue()) {
-          this.$message.warning(`${i18n.$t('Please enter the resource content')}`)
-          return false
-        }
-        if (editor.doc.size>3000) {
-          this.$message.warning(`${i18n.$t('Resource content cannot exceed 3000 lines')}`)
+        if (!this.name) {
+          this.$message.warning(`${i18n.$t('Please enter resource folder name')}`)
           return false
         }
 
         return true
       },
-      /**
-       * Processing code highlighting
-       */
-      _handlerEditor () {
-        // editor
-        editor = codemirror('code-create-mirror', {
-          mode: 'shell',
-          readOnly: false
-        })
-
-        this.keypress = () => {
-          if (!editor.getOption('readOnly')) {
-            editor.showHint({
-              completeSingle: false
-            })
-          }
-        }
-
-        // Monitor keyboard
-        editor.on('keypress', this.keypress)
-      },
-      _onChange (val) {
-        editor.setOption('mode', handlerSuffix['.' + val.label])
-      }
     },
     watch: {},
     created () {
     },
     mounted () {
       this.$modal.destroy()
-      this._handlerEditor()
     },
     destroyed () {
-      editor.toTextArea() // uninstall
-      editor.off($('.code-create-mirror'), 'keypress', this.keypress)
     },
     computed: {},
     components: { mListConstruction, mConditions, mSpin, mListBoxF }
@@ -187,9 +140,5 @@
 <style lang="scss" rel="stylesheet/scss">
   .resource-create-model {
     padding: 30px;
-  }
-  .CodeMirror {
-    border:1px solid #DDDEDD;
-    border-radius: 3px;
   }
 </style>

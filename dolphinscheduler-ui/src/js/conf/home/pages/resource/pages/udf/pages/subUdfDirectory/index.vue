@@ -15,38 +15,42 @@
  * limitations under the License.
  */
 <template>
-  <m-list-construction :title="$t('File Manage')">
-    <template slot="conditions">
+  <div class="home-main list-construction-model">
+    <div class="content-title">
+      <a class="bread" style="padding-left: 15px;" @click="() => $router.push({path: `/resource/udf`})">{{$t('UDF Resources')}}</a>
+      <a class="bread" v-for="(item,$index) in breadList" :key="$index" @click="_ckOperation($index)">{{'>'+item}}</a>
+    </div>
+    <div class="conditions-box">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
           <x-button-group size="small" >
-            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-createFolder'})">{{$t('Create folder')}}</x-button>
-            <x-button type="ghost" @click="() => $router.push({name: 'resource-file-create'})">{{$t('Create File')}}</x-button>
-            <x-button type="ghost" @click="_uploading">{{$t('Upload Files')}}</x-button>
+            <x-button type="ghost" @click="() => $router.push({name: 'resource-udf-subCreateUdfFolder'})">{{$t('Create folder')}}</x-button>
+            <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
           </x-button-group>
         </template>
       </m-conditions>
-    </template>
-    <template slot="content">
-      <template v-if="fileResourcesList.length || total>0">
-        <m-list @on-update="_onUpdate" :file-resources-list="fileResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
+      </div>
+      <div class="list-box">
+      <template v-if="udfResourcesList.length || total>0">
+        <m-list @on-update="_onUpdate" :udf-resources-list="udfResourcesList" :page-no="searchParams.pageNo" :page-size="searchParams.pageSize">
         </m-list>
         <div class="page-box">
           <x-page :current="parseInt(searchParams.pageNo)" :total="total" :page-size="searchParams.pageSize" show-elevator @on-change="_page" show-sizer :page-size-options="[10,30,50]" @on-size-change="_pageSize"></x-page>
         </div>
       </template>
-      <template v-if="!fileResourcesList.length && total<=0">
+      <template v-if="!udfResourcesList.length && total<=0">
         <m-no-data></m-no-data>
       </template>
       <m-spin :is-spin="isLoading">
       </m-spin>
-    </template>
-  </m-list-construction>
+    </div>
+  </div>
 </template>
 <script>
   import _ from 'lodash'
   import { mapActions } from 'vuex'
   import mList from './_source/list'
+  import localStore from '@/module/util/localStorage'
   import mSpin from '@/module/components/spin/spin'
   import { findComponentDownward } from '@/module/util/'
   import mNoData from '@/module/components/noData/noData'
@@ -55,30 +59,31 @@
   import mListConstruction from '@/module/components/listConstruction/listConstruction'
 
   export default {
-    name: 'resource-list-index-FILE',
+    name: 'resource-list-index-UDF',
     data () {
       return {
         total: null,
         isLoading: false,
-        fileResourcesList: [],
+        udfResourcesList: [],
         searchParams: {
-          id: -1,
+          id: this.$route.params.id,
           pageSize: 10,
           pageNo: 1,
           searchVal: '',
-          type: 'FILE'
-        }
+          type: 'UDF'
+        },
+        breadList: []
       }
     },
     mixins: [listUrlParamHandle],
     props: {},
     methods: {
-      ...mapActions('resource', ['getResourcesListP']),
+      ...mapActions('resource', ['getResourcesListP','getResourceId']),
       /**
        * File Upload
        */
       _uploading () {
-        findComponentDownward(this.$root, 'roof-nav')._fileUpdate('FILE')
+        findComponentDownward(this.$root, 'roof-nav')._resourceChildUpdate('UDF',this.searchParams.id)
       },
       _onConditions (o) {
         this.searchParams = _.assign(this.searchParams, o)
@@ -90,13 +95,24 @@
       _pageSize (val) {
         this.searchParams.pageSize = val
       },
+      _onUpdate () {
+        this.searchParams.id = this.$route.params.id
+        this._debounceGET()
+      },
+      _updateList (data) {
+        this.searchParams.id = data
+        this.searchParams.pageNo = 1
+        this.searchParams.searchVal = ''
+        this._debounceGET()
+      },
       _getList (flag) {
         this.isLoading = !flag
         this.getResourcesListP(this.searchParams).then(res => {
           if(this.searchParams.pageNo>1 && res.totalList.length == 0) {
             this.searchParams.pageNo = this.searchParams.pageNo -1
           } else {
-            this.fileResourcesList = res.totalList
+            this.udfResourcesList = []
+            this.udfResourcesList = res.totalList
             this.total = res.total
             this.isLoading = false
           }
@@ -104,13 +120,25 @@
           this.isLoading = false
         })
       },
-      _updateList () {
-        this.searchParams.pageNo = 1
-        this.searchParams.searchVal = ''
-        this._debounceGET()
+       _ckOperation(index) {
+        let breadName =''
+        this.breadList.forEach((item, i) => {
+          if(i<=index) {
+            breadName = breadName+'/'+item
+          }
+        })
+        this.transferApi(breadName)
       },
-       _onUpdate () {
-        this._debounceGET()
+      transferApi(api) {
+        this.getResourceId({
+          type: 'UDF',
+          fullName: api
+        }).then(res => {
+          localStore.setItem('currentDir', `${res.fullName}`)
+          this.$router.push({ path: `/resource/udf/subUdfDirectory/${res.id}` })
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
       }
     },
     watch: {
@@ -118,13 +146,29 @@
       '$route' (a) {
         // url no params get instance list
         this.searchParams.pageNo = _.isEmpty(a.query) ? 1 : a.query.pageNo
+        this.searchParams.id = a.params.id
+        let dir = localStore.getItem('currentDir').split('/')
+        dir.shift()
+        this.breadList = dir
       }
     },
     created () {
     },
     mounted () {
+      let dir = localStore.getItem('currentDir').split('/')
+      dir.shift()
+      this.breadList = dir
       this.$modal.destroy()
     },
     components: { mListConstruction, mConditions, mList, mSpin, mNoData }
   }
 </script>
+<style lang="scss" rel="stylesheet/scss">
+  .bread {
+    font-size: 22px;
+    padding-top: 10px;
+    color: #2a455b;
+    display: inline-block;
+    cursor: pointer;
+  }
+</style>
