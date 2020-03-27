@@ -68,7 +68,7 @@ JSP.prototype.init = function ({ dag, instance, options }) {
   // Register jsplumb connection type and configuration
   this.JspInstance.registerConnectionType('basic', {
     anchor: 'Continuous',
-    connector: 'Straight' // Line type
+    connector: 'Bezier' // Line type
   })
 
   // Initial configuration
@@ -236,7 +236,7 @@ JSP.prototype.initNode = function (el) {
     filter: '.ep',
     anchor: 'Continuous',
     connectorStyle: {
-      stroke: '#555',
+      stroke: '#2d8cf0',
       strokeWidth: 2,
       outlineStroke: 'transparent',
       outlineWidth: 4
@@ -297,6 +297,7 @@ JSP.prototype.tasksContextmenu = function (event) {
     if (isOne) {
       // start run
       $('#startRunning').on('click', () => {
+        let name = store.state.dag.name
         let id = router.history.current.params.id
         store.dispatch('dag/getStartCheck', { processDefinitionId: id }).then(res => {
           let modal = Vue.$modal.dialog({
@@ -317,7 +318,8 @@ JSP.prototype.tasksContextmenu = function (event) {
                 },
                 props: {
                   item: {
-                    id: id
+                    id: id,
+                    name: name
                   },
                   startNodeList: $name,
                   sourceType: 'contextmenu'
@@ -378,7 +380,7 @@ JSP.prototype.tasksClick = function (e) {
     $('.w').removeClass('jtk-tasks-active')
     $(e.currentTarget).addClass('jtk-tasks-active')
     if ($connect) {
-      setSvgColor($connect, '#555')
+      setSvgColor($connect, '#2d8cf0')
       this.selectedElement.connect = null
     }
     this.selectedElement.id = $(e.currentTarget).attr('id')
@@ -437,19 +439,19 @@ JSP.prototype.handleEventPointer = function (is) {
     isClick: is,
     isAttachment: false
   })
-  wDom.removeClass('jtk-ep')
-  if (!is) {
-    wDom.removeClass('jtk-tasks-active')
-    this.selectedElement = {}
-    _.map($('#canvas svg'), v => {
-      if ($(v).attr('class')) {
-        _.map($(v).find('path'), v1 => {
-          $(v1).attr('fill', '#555')
-          $(v1).attr('stroke', '#555')
-        })
-      }
-    })
-  }
+  // wDom.removeClass('jtk-ep')
+  // if (!is) {
+  //   wDom.removeClass('jtk-tasks-active')
+  //   this.selectedElement = {}
+  //   _.map($('#canvas svg'), v => {
+  //     if ($(v).attr('class')) {
+  //       _.map($(v).find('path'), v1 => {
+  //         $(v1).attr('fill', '#555')
+  //         $(v1).attr('stroke', '#555')
+  //       })
+  //     }
+  //   })
+  // }
 }
 
 /**
@@ -764,7 +766,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
         source: sourceId,
         target: targetId,
         type: 'basic',
-        paintStyle: { strokeWidth: 2, stroke: '#555' }
+        paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' }
       })
     })
   })
