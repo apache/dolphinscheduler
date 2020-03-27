@@ -65,7 +65,7 @@ public class WorkerGroupMapperTest {
         workerGroup.setName("workerGroup11");
         int update = workerGroupMapper.updateById(workerGroup);
         workerGroupMapper.deleteById(workerGroup.getId());
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
     }
 
     /**
@@ -77,7 +77,7 @@ public class WorkerGroupMapperTest {
         WorkerGroup workerGroup = insertOne();
         //delete
         int delete = workerGroupMapper.deleteById(workerGroup.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
