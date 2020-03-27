@@ -51,6 +51,6 @@ public class FlinkParametersTest {
         flinkParameters.setResourceList(resourceInfos);
         resourceFilesList = flinkParameters.getResourceFilesList();
         Assert.assertNotNull(resourceFilesList);
-        Assert.assertEquals(4, resourceFilesList.size());
+        Assert.assertEquals(3, resourceFilesList.size());
     }
 }

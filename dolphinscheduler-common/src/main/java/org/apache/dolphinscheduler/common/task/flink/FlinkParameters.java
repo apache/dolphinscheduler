@@ -207,10 +207,10 @@ public class FlinkParameters extends AbstractParameters {
 
   @Override
   public List<ResourceInfo> getResourceFilesList() {
-    if (mainJar != null) {
+    if (mainJar != null && !resourceList.contains(mainJar)) {
       resourceList.add(mainJar);
     }
-    return null;
+    return resourceList;
   }
 
 
