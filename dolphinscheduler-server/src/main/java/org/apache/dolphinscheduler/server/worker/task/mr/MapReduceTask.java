@@ -111,7 +111,7 @@ public class MapReduceTask extends AbstractYarnTask {
             if (resourceId == 0) {
                 resourceName = mainJar.getRes();
             } else {
-                Resource resource = processDao.getResourceById(mapreduceParameters.getMainJar().getId());
+                Resource resource = processService.getResourceById(mapreduceParameters.getMainJar().getId());
                 if (resource == null) {
                     logger.error("resource id: {} not exist", resourceId);
                     throw new RuntimeException(String.format("resource id: %d not exist", resourceId));

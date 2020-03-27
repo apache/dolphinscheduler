@@ -97,7 +97,7 @@ public enum Status {
     VERIFY_UDF_FUNCTION_NAME_ERROR( 10070,"verify udf function name error", "UDF函数名称验证错误"),
     DELETE_UDF_FUNCTION_ERROR( 10071,"delete udf function error", "删除UDF函数错误"),
     AUTHORIZED_FILE_RESOURCE_ERROR( 10072,"authorized file resource error", "授权资源文件错误"),
-    UNAUTHORIZED_FILE_RESOURCE_ERROR( 10073,"unauthorized file resource error", "查询未授权资源错误"),
+    AUTHORIZE_RESOURCE_TREE( 10073,"authorize resource tree display error","授权资源目录树错误"),
     UNAUTHORIZED_UDF_FUNCTION_ERROR( 10074,"unauthorized udf function error", "查询未授权UDF函数错误"),
     AUTHORIZED_UDF_FUNCTION_ERROR(10075,"authorized udf function error", "授权UDF函数错误"),
     CREATE_SCHEDULE_ERROR(10076,"create schedule error", "创建调度配置错误"),

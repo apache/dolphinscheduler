@@ -100,13 +100,13 @@ public class PermissionCheck<T> {
      * permission check
      * @param logger
      * @param authorizationType
-     * @param processDao
+     * @param processService
      * @param resourceList
      * @param userId
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessDao processDao, List<ResourceInfo> resourceList, int userId,Logger logger) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, List<ResourceInfo> resourceList, int userId,Logger logger) {
         this.authorizationType = authorizationType;
-        this.processDao = processDao;
+        this.processService = processService;
         this.resourceList = resourceList;
         this.userId = userId;
         this.logger = logger;

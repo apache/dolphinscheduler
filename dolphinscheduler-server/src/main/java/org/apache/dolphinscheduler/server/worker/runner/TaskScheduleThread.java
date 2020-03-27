@@ -320,7 +320,7 @@ public class TaskScheduleThread implements Runnable {
         String resourceName;
         for (ResourceInfo res : projectRes) {
             if (res.getId() != 0) {
-                Resource resource = processDao.getResourceById(res.getId());
+                Resource resource = processService.getResourceById(res.getId());
                 resourceName = resource.getFullName();
             }else{
                 resourceName = res.getRes();
@@ -329,10 +329,8 @@ public class TaskScheduleThread implements Runnable {
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String tentnCode = processDao.queryTenantCodeByResName(resourceName, ResourceType.FILE);
+                    String tentnCode = processService.queryTenantCodeByResName(resourceName, ResourceType.FILE);
                     String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tentnCode, resourceName);
-                    String tentnCode = processService.queryTenantCodeByResName(res);
-                    String resHdfsPath = HadoopUtils.getHdfsFilename(tentnCode, res);
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
                     HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + resourceName, false, true);
@@ -356,11 +354,11 @@ public class TaskScheduleThread implements Runnable {
         int userId = taskInstance.getProcessInstance().getExecutorId();
         if (projectRes.stream().allMatch(t->t.getId() == 0)) {
             String[] resNames = projectRes.stream().map(t -> t.getRes()).collect(Collectors.toList()).toArray(new String[projectRes.size()]);
-            PermissionCheck<String> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_NAME,processDao,resNames,userId,logger);
+            PermissionCheck<String> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_NAME,processService,resNames,userId,logger);
             permissionCheck.checkPermission();
         }else{
             Integer[] resIds = projectRes.stream().map(t -> t.getId()).collect(Collectors.toList()).toArray(new Integer[projectRes.size()]);
-            PermissionCheck<Integer> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_ID,processDao,resIds,userId,logger);
+            PermissionCheck<Integer> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_ID,processService,resIds,userId,logger);
             permissionCheck.checkPermission();
         }
     }
