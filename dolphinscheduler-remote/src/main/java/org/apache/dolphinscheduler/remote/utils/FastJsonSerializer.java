@@ -54,7 +54,7 @@ public class FastJsonSerializer {
 	 * @return deserialize type
 	 */
 	public static <T> T deserialize(byte[] src, Class<T> clazz) {
-		return JSON.parseObject(new String(src, Constants.UTF8), clazz);
+		return JSON.parseObject(src, clazz);
 	}
 
 }
