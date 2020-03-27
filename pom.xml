@@ -717,23 +717,37 @@
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/AlertMapperTest.java</include>
-                        <include>**/dao/mapper/CommandMapperTest.java</include>
-                        <include>**/dao/cron/CronUtilsTest.java</include>
-                        <include>**/dao/utils/DagHelperTest.java</include>
-                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
-                        <include>**/server/utils/DataxUtilsTest.java</include>
-                        <include>**/server/utils/SparkArgsUtilsTest.java</include>
-                        <include>**/server/utils/FlinkArgsUtilsTest.java</include>
-                        <include>**/server/utils/ParamUtilsTest.java</include>
+                        <include>**/dao/mapper/DataSourceMapperTest.java</include>
+                        <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
+                        <include>**/dao/mapper/ErrorCommandMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessDefinitionMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessInstanceMapMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessInstanceMapperTest.java</include>
+                        <include>**/dao/mapper/ProjectMapperTest.java</include>
+                        <include>**/dao/mapper/ProjectUserMapperTest.java</include>
+                        <include>**/dao/mapper/QueueMapperTest.java</include>
+                        <include>**/dao/mapper/ResourceMapperTest.java</include>
+                        <include>**/dao/mapper/ResourceUserMapperTest.java</include>
+                        <include>**/dao/mapper/ScheduleMapperTest.java</include>
+                        <include>**/dao/mapper/SessionMapperTest.java</include>
+                        <include>**/dao/mapper/TaskInstanceMapperTest.java</include>
+                        <include>**/dao/mapper/TenantMapperTest.java</include>
+                        <include>**/dao/mapper/UdfFuncMapperTest.java</include>
+                        <include>**/dao/mapper/UDFUserMapperTest.java</include>
+                        <include>**/dao/mapper/UserAlertGroupMapperTest.java</include>
+                        <include>**/dao/mapper/UserMapperTest.java</include>
+                        <include>**/dao/mapper/WorkerGroupMapperTest.java</include>
                         <include>**/server/log/MasterLogFilterTest.java</include>
                         <include>**/server/log/SensitiveDataConverterTest.java</include>
                         <include>**/server/log/TaskLogDiscriminatorTest.java</include>
                         <include>**/server/log/TaskLogFilterTest.java</include>
                         <include>**/server/log/WorkerLogFilterTest.java</include>
-                        <include>**/server/master/executor/NettyExecutorManagerTest.java</include>
-                        <include>**/server/master/host/LowerWeightRoundRobinTest.java</include>
-                        <include>**/server/master/host/RandomSelectorTest.java</include>
-                        <include>**/server/master/host/RoundRobinSelectorTest.java</include>
+                        <include>**/server/master/dispatch/executor/NettyExecutorManagerTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/LowerWeightRoundRobinTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
+                        <include>**/server/master/dispatch/host/RoundRobinHostManagerTest.java</include>
+                        <include>**/server/master/dispatch/ExecutorDispatcherTest.java</include>
                         <include>**/server/master/register/MasterRegistryTest.java</include>
                         <include>**/server/master/AlertManagerTest.java</include>
                         <include>**/server/master/MasterCommandTest.java</include>
@@ -741,19 +755,19 @@
                         <include>**/server/master/ParamsTest.java</include>
                         <include>**/server/register/ZookeeperNodeManagerTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
+                        <include>**/server/utils/ExecutionContextTestUtils.java</include>
                         <include>**/server/utils/FlinkArgsUtilsTest.java</include>
                         <include>**/server/utils/ParamUtilsTest.java</include>
                         <include>**/server/utils/ProcessUtilsTest.java</include>
                         <include>**/server/utils/SparkArgsUtilsTest.java</include>
                         <include>**/server/worker/processor/TaskCallbackServiceTest.java</include>
-                        <include>**/server/worker/register/WorkerRegistryTest.java</include>
+                        <include>**/server/worker/registry/WorkerRegistryTest.java</include>
                         <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
                         <include>**/server/worker/sql/SqlExecutorTest.java</include>
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
                         <include>**/server/worker/task/dependent/DependentTaskTest.java</include>
                         <include>**/server/worker/task/spark/SparkTaskTest.java</include>
                         <include>**/server/worker/task/EnvFileTest.java</include>
-
                     </includes>
                     <!-- <skip>true</skip> -->
                     <argLine>-Xmx2048m</argLine>
