@@ -26,9 +26,6 @@
             <span>{{$t('Name')}}</span>
           </th>
           <th scope="col">
-            <span>{{$t('Whether directory')}}</span>
-          </th>
-          <th scope="col">
             <span>{{$t('File Name')}}</span>
           </th>
           <th scope="col">
@@ -52,9 +49,6 @@
             <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.alias, maxWidth: '500px'}">
               <a href="javascript:" class="links" @click="_go(item)">{{item.alias}}</a>
             </span>
-          </td>
-          <td>
-            <span>{{item.directory? $t('Yes') : $t('No')}}</span>
           </td>
           <td><span class="ellipsis" v-tooltip.large.top.start.light="{text: item.fileName, maxWidth: '500px'}">{{item.fileName}}</span></td>
           <td>
@@ -95,7 +89,6 @@
                     size="xsmall"
                     data-toggle="tooltip"
                     :title="$t('Download')"
-                    :disabled="item.directory? true: false"
                     @click="_downloadFile(item)"
                     icon="ans-icon-download">
             </x-button>
@@ -155,12 +148,7 @@
       },
       _go (item) {
         localStore.setItem('file', `${item.alias}|${item.size}`)
-        if(item.directory) {
-          localStore.setItem('currentDir', `${item.fullName}`)
-          this.$router.push({ path: `/resource/file/subdirectory/${item.id}` })
-        } else {
-          this.$router.push({ path: `/resource/file/list/${item.id}` })
-        }
+        this.$router.push({ path: `/resource/file/list/${item.id}` })
       },
       _downloadFile (item) {
         downloadFile('/dolphinscheduler/resources/download', {

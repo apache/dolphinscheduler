@@ -19,10 +19,7 @@
     <template slot="conditions">
       <m-conditions @on-conditions="_onConditions">
         <template slot="button-group">
-          <x-button-group size="small">
-            <x-button type="ghost"  @click="() => this.$router.push({name: 'resource-udf-createUdfFolder'})">{{$t('Create folder')}}</x-button>
-            <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
-          </x-button-group>
+          <x-button type="ghost" size="small"  @click="_uploading">{{$t('Upload UDF Resources')}}</x-button>
         </template>
       </m-conditions>
     </template>
@@ -61,7 +58,6 @@
         isLoading: false,
         udfResourcesList: [],
         searchParams: {
-          id: -1,
           pageSize: 10,
           pageNo: 1,
           searchVal: '',

@@ -48,9 +48,19 @@
     <m-list-box>
       <div slot="text">{{$t('Main jar package')}}</div>
       <div slot="content">
-        <treeselect v-model="mainJar" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :placeholder="$t('Please enter main jar package')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
-        </treeselect>
+        <x-select
+                style="width: 100%;"
+                :placeholder="$t('Please enter main jar package')"
+                v-model="mainJar"
+                filterable
+                :disabled="isDetails">
+          <x-option
+                  v-for="city in mainJarList"
+                  :key="city.code"
+                  :value="city.code"
+                  :label="city.code">
+          </x-option>
+        </x-select>
       </div>
     </m-list-box>
     <m-list-box>
@@ -141,9 +151,12 @@
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
-        <treeselect v-model="resourceList" :multiple="true" :options="mainJarList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
-        </treeselect>
+        <m-resources
+                ref="refResources"
+                @on-resourcesData="_onResourcesData"
+                @on-cache-resourcesData="_onCacheResourcesData"
+                :resource-list="resourceList">
+        </m-resources>
       </div>
     </m-list-box>
     <m-list-box>
@@ -165,8 +178,6 @@
   import mLocalParams from './_source/localParams'
   import mListBox from './_source/listBox'
   import mResources from './_source/resources'
-  import Treeselect from '@riophae/vue-treeselect'
-  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
 
   export default {
@@ -178,7 +189,6 @@
         // Master jar package
         mainJar: null,
         // Master jar package(List)
-        mainJarLists: [],
         mainJarList: [],
         // Deployment method
         deployMode: 'cluster',
@@ -205,12 +215,7 @@
         // Program type
         programType: 'SCALA',
         // Program type(List)
-        programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }],
-        normalizer(node) {
-          return {
-            label: node.name
-          }
-        }
+        programTypeList: [{ code: 'JAVA' }, { code: 'SCALA' }, { code: 'PYTHON' }]
       }
     },
     props: {
@@ -286,6 +291,10 @@
           return false
         }
 
+        if (!this.$refs.refResources._verifResources()) {
+          return false
+        }
+
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
@@ -295,12 +304,10 @@
         this.$emit('on-params', {
           mainClass: this.mainClass,
           mainJar: {
-            id: this.mainJar
+            res: this.mainJar
           },
           deployMode: this.deployMode,
-          resourceList: _.map(this.resourceList, v => {
-            return {id: v}
-          }),
+          resourceList: this.resourceList,
           localParams: this.localParams,
           slot: this.slot,
           taskManager: this.taskManager,
@@ -313,12 +320,24 @@
         })
         return true
       },
-      diGuiTree(item) {  // Recursive convenience tree structure
-        item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
-            delete item.children : this.diGuiTree(item.children);
+      /**
+       * get resources list
+       */
+      _getResourcesList () {
+        return new Promise((resolve, reject) => {
+          let isJar = (alias) => {
+            return alias.substring(alias.lastIndexOf('.') + 1, alias.length) !== 'jar'
+          }
+          this.mainJarList = _.map(_.cloneDeep(this.store.state.dag.resourcesListS), v => {
+            return {
+              id: v.id,
+              code: v.alias,
+              disabled: isJar(v.alias)
+            }
+          })
+          resolve()
         })
-      },
+      }
     },
     watch: {
       // Listening type
@@ -337,12 +356,10 @@
         return {
           mainClass: this.mainClass,
           mainJar: {
-            id: this.mainJar
+            res: this.mainJar
           },
           deployMode: this.deployMode,
-          resourceList: _.map(this.resourceList, v => {
-            return {id: v}
-          }),
+          resourceList: this.cacheResourceList,
           localParams: this.localParams,
           slot: this.slot,
           taskManager: this.taskManager,
@@ -356,17 +373,13 @@
       }
     },
     created () {
-        let item = this.store.state.dag.resourcesListS
-        let items = this.store.state.dag.resourcesListJar
-        this.diGuiTree(item)
-        this.diGuiTree(items)
-        this.mainJarList = item
-        this.mainJarLists = items
+      this._getResourcesList().then(() => {
         let o = this.backfillItem
+
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.mainClass = o.params.mainClass || ''
-          this.mainJar = o.params.mainJar && o.params.mainJar.id ? o.params.mainJar.id : ''
+          this.mainJar = o.params.mainJar && o.params.mainJar.res ? o.params.mainJar.res : ''
           this.deployMode = o.params.deployMode || ''
           this.slot = o.params.slot || 1
           this.taskManager = o.params.taskManager || '2'
@@ -380,9 +393,7 @@
           // backfill resourceList
           let resourceList = o.params.resourceList || []
           if (resourceList.length) {
-            this.resourceList = _.map(resourceList, v => {
-              return v.id
-            })
+            this.resourceList = resourceList
             this.cacheResourceList = resourceList
           }
 
@@ -392,11 +403,12 @@
             this.localParams = localParams
           }
         }
+      })
     },
     mounted () {
 
     },
-    components: { mLocalParams, mListBox, mResources, Treeselect }
+    components: { mLocalParams, mListBox, mResources }
   }
 </script>
 

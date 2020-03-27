@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 <template>
-  <m-popup style="width:800px" :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit UDF Function') : $t('Create UDF Function')" @ok="_ok" ref="popup">
+  <m-popup :ok-text="item ? $t('Edit') : $t('Submit')" :nameText="item ? $t('Edit UDF Function') : $t('Create UDF Function')" @ok="_ok" ref="popup">
     <template slot="content">
       <div class="udf-create-model">
         <m-list-box-f>
@@ -72,25 +72,26 @@
         <m-list-box-f>
           <template slot="name"><strong>*</strong>{{$t('UDF Resources')}}</template>
           <template slot="content">
-            <treeselect style="width:535px;float:left;" v-model="resourceId" :disable-branch-nodes="true" :options="udfResourceList" :disabled="isUpdate" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
-              <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
-            </treeselect>
+            <x-select
+                    filterable
+                    v-model="resourceId"
+                    :disabled="isUpdate"
+                    :add-title="true"
+                    style="width: 261px">
+              <x-option
+                      v-for="city in udfResourceList"
+                      :key="city.id"
+                      :value="city.id"
+                      :label="city.alias">
+              </x-option>
+            </x-select>
             <x-button type="primary" @click="_toggleUpdate" :disabled="upDisabled">{{$t('Upload Resources')}}</x-button>
-          </template>
-        </m-list-box-f>
-        <m-list-box-f v-if="isUpdate">
-          <template slot="name"><strong>*</strong>{{$t('UDF resources directory')}}</template>
-          <template slot="content">
-            <treeselect style="width:535px;float:left;" v-model="pid" @select="selTree" :options="udfResourceDirList" :normalizer="normalizer" :placeholder="$t('Please select UDF resources directory')">
-              <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
-            </treeselect>
           </template>
         </m-list-box-f>
         <m-list-box-f v-if="isUpdate">
           <template slot="name">&nbsp;</template>
           <template slot="content">
             <m-udf-update
-                    ref="assignment"
                     @on-update-present="_onUpdatePresent"
                     @on-update="_onUpdate">
             </m-udf-update>
@@ -114,8 +115,6 @@
   import _ from 'lodash'
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import Treeselect from '@riophae/vue-treeselect'
-  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
   import mUdfUpdate from '@/module/components/fileUpdate/udfUpdate'
@@ -131,16 +130,10 @@
         argTypes: '',
         database: '',
         description: '',
-        resourceId: null,
-        pid: null,
+        resourceId: '',
         udfResourceList: [],
         isUpdate: false,
-        upDisabled: false,
-        normalizer(node) {
-          return {
-            label: node.name
-          }
-        },
+        upDisabled: false
       }
     },
     props: {
@@ -199,52 +192,15 @@
         // disabled update
         this.upDisabled = true
       },
-      // selTree
-      selTree(node) {
-        this.$refs.assignment.receivedValue(node.id,node.fullName)
-      },
       /**
        * get udf resources
        */
       _getUdfList () {
         return new Promise((resolve, reject) => {
           this.store.dispatch('resource/getResourcesList', { type: 'UDF' }).then(res => {
-            let item = res.data
-            this.filterEmptyDirectory(item)
-            item = this.filterEmptyDirectory(item)
-            let item1 = _.cloneDeep(res.data)
-            this.diGuiTree(item)
-            
-            this.diGuiTree(this.filterJarFile(item1))
-            this.udfResourceList = item
-            this.udfResourceDirList = item1
+            this.udfResourceList = res.data
             resolve()
           })
-        })
-      },
-      // filterEmptyDirectory
-      filterEmptyDirectory(array) {
-        for (const item of array) {
-          if (item.children) {
-            this.filterEmptyDirectory(item.children)
-          }
-        }
-        return array.filter(n => ((/\.jar$/.test(n.name) && n.children.length==0) || (!/\.jar$/.test(n.name) && n.children.length>0)))
-      },
-      // filterJarFile
-      filterJarFile (array) {
-        for (const item of array) {
-          if (item.children) {
-            item.children = this.filterJarFile(item.children)
-          }
-        }
-        return array.filter(n => !/\.jar$/.test(n.name))
-      },
-      // diGuiTree
-      diGuiTree(item) {  // Recursive convenience tree structure
-        item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
-            delete item.children : this.diGuiTree(item.children);
         })
       },
       /**
@@ -301,7 +257,8 @@
         })
       }
     },
-    watch: {},
+    watch: {
+    },
     created () {
       this._getUdfList().then(res => {
         // edit
@@ -314,18 +271,13 @@
           this.description = this.item.description || ''
           this.resourceId = this.item.resourceId
         } else {
-          this.resourceId = null
+          this.resourceId = this.udfResourceList.length && this.udfResourceList[0].id || ''
         }
       })
     },
     mounted () {
 
     },
-    components: { mPopup, mListBoxF, mUdfUpdate, Treeselect }
+    components: { mPopup, mListBoxF, mUdfUpdate }
   }
 </script>
-<style lang="scss" rel="stylesheet/scss">
-  .vue-treeselect__control {
-    height: 32px;
-  }
-</style>

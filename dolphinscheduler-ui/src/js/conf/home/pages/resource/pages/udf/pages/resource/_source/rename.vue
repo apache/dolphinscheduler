@@ -48,7 +48,6 @@
 <script>
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import localStore from '@/module/util/localStorage'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
@@ -73,7 +72,7 @@
             })
           }else{
             return this.store.dispatch('resource/resourceVerifyName', {
-              fullName: localStore.getItem('currentDir')+'/'+this.name,
+              name: this.name,
               type: 'UDF'
             })
           }

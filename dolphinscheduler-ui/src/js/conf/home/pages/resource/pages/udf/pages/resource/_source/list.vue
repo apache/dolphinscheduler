@@ -26,9 +26,6 @@
             <span>{{$t('UDF Resource Name')}}</span>
           </th>
           <th scope="col">
-            <span>{{$t('Whether directory')}}</span>
-          </th>
-          <th scope="col">
             <span>{{$t('File Name')}}</span>
           </th>
           <th scope="col" width="80">
@@ -53,11 +50,8 @@
           </td>
           <td>
             <span class="ellipsis" v-tooltip.large.top.start.light="{text: item.alias, maxWidth: '500px'}">
-              <a href="javascript:" class="links" @click="_go(item)">{{item.alias}}</a>
+              <a href="javascript:" class="links" >{{item.alias}}</a>
             </span>
-          </td>
-          <td>
-            <span>{{item.directory? $t('Yes') : $t('No')}}</span>
           </td>
           <td><span class="ellipsis" v-tooltip.large.top.start.light="{text: item.fileName, maxWidth: '500px'}">{{item.fileName}}</span></td>
           <td>
@@ -91,7 +85,6 @@
                     size="xsmall"
                     data-toggle="tooltip"
                     :title="$t('Download')"
-                    :disabled="item.directory? true: false"
                     icon="ans-icon-download"
                     @click="_downloadFile(item)">
             </x-button>
@@ -127,7 +120,6 @@
   import mRename from './rename'
   import { downloadFile } from '@/module/download'
   import { bytesToSize } from '@/module/util/util'
-  import localStore from '@/module/util/localStorage'
 
   export default {
     name: 'udf-manage-list',
@@ -147,13 +139,6 @@
         downloadFile('/dolphinscheduler/resources/download', {
           id: item.id
         })
-      },
-      _go (item) {
-        localStore.setItem('file', `${item.alias}|${item.size}`)
-        if(item.directory) {
-          localStore.setItem('currentDir', `${item.fullName}`)
-          this.$router.push({ path: `/resource/udf/subUdfDirectory/${item.id}` })
-        }
       },
       _rtSize (val) {
         return bytesToSize(parseInt(val))

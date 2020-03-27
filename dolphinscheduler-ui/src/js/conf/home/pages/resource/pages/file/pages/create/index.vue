@@ -96,8 +96,6 @@
         description: '',
         fileTypeList: filtTypeArr,
         content: '',
-        pid: -1,
-        currentDir: '/',
         spinnerLoading: false
       }
     },
@@ -109,8 +107,6 @@
           this.spinnerLoading = true
           this.createResourceFile({
             type: 'FILE',
-            pid: this.pid,
-            currentDir: this.currentDir,
             fileName: this.fileName,
             suffix: this.suffix,
             description: this.description,
@@ -140,7 +136,6 @@
           this.$message.warning(`${i18n.$t('Resource content cannot exceed 3000 lines')}`)
           return false
         }
-
         return true
       },
       /**

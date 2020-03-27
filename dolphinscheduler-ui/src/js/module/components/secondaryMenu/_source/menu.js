@@ -148,13 +148,13 @@ let menu = {
       children: [
         {
           name: `${i18n.$t('Resource manage')}`,
-          path: 'resource-udf',
+          path: 'resource-udf-resource',
           id: 0,
           disabled: true
         },
         {
           name: `${i18n.$t('Function manage')}`,
-          path: 'resource-func',
+          path: 'resource-udf-function',
           id: 1,
           disabled: true
         }

@@ -43,7 +43,7 @@ v-ps<template>
           <!-- <th scope="col">
             <span>{{$t('Library Name')}}</span>
           </th> -->
-          <th scope="col" width="150">
+          <th scope="col" width="140">
             <span>{{$t('Update Time')}}</span>
           </th>
           <th scope="col" width="80">
@@ -71,8 +71,7 @@ v-ps<template>
             <span v-else>-</span>
           </td>
           <td>
-            <span v-if="item.resourceName" class="ellipsis" v-tooltip.large.top.start.light="{text: item.resourceName, maxWidth: '500px'}">{{item.resourceName}}</span>
-            <span v-else>-</span>
+            <span>{{item.resourceName}}</span>
           </td>
           <!-- <td>
             <span>{{item.database || '-'}}</span>

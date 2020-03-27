@@ -34,14 +34,6 @@
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
-        <treeselect v-model="resourceList" :multiple="true" :options="options" :normalizer="normalizer" :placeholder="$t('Please select resources')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
-        </treeselect>
-      </div>
-    </m-list-box>
-    <!-- <m-list-box>
-      <div slot="text">{{$t('Resources')}}</div>
-      <div slot="content">
         <m-resources
                 ref="refResources"
                 @on-resourcesData="_onResourcesData"
@@ -49,7 +41,7 @@
                 :resource-list="resourceList">
         </m-resources>
       </div>
-    </m-list-box> -->
+    </m-list-box>
     <m-list-box>
       <div slot="text">{{$t('Custom Parameters')}}</div>
       <div slot="content">
@@ -71,8 +63,6 @@
   import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
   import disabledState from '@/module/mixin/disabledState'
-  import Treeselect from '@riophae/vue-treeselect'
-  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import codemirror from '@/conf/home/pages/resource/pages/file/pages/_source/codemirror'
 
   let editor
@@ -88,14 +78,7 @@
         // resource(list)
         resourceList: [],
         // Cache ResourceList
-        cacheResourceList: [],
-        // define options
-        options: [],
-        normalizer(node) {
-          return {
-            label: node.name
-          }
-        },
+        cacheResourceList: []
       }
     },
     mixins: [disabledState],
@@ -160,19 +143,17 @@
           return false
         }
 
+        if (!this.$refs.refResources._verifResources()) {
+          return false
+        }
+
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
         }
-        // Process resourcelist
-        let dataProcessing= _.map(this.resourceList, v => {
-          return {
-            id: v
-          }
-        })
         // storage
         this.$emit('on-params', {
-          resourceList: dataProcessing,
+          resourceList: this.resourceList,
           localParams: this.localParams,
           rawScript: editor.getValue()
         })
@@ -224,12 +205,6 @@
           editor.off($('.code-sql-mirror'), 'keypress', this.keypress)
           editor.off($('.code-sql-mirror'), 'changes', this.changes)
         }
-      },
-      diGuiTree(item) {  // Recursive convenience tree structure
-        item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
-            delete item.children : this.diGuiTree(item.children);
-        })
       }
     },
     watch: {
@@ -241,18 +216,12 @@
     computed: {
       cacheParams () {
         return {
-          resourceList: _.map(this.resourceList, v => {
-            return {id: v}
-          }),
-          localParams: this.localParams,
-          rawScript: editor ? editor.getValue() : ''
+          resourceList: this.cacheResourceList,
+          localParams: this.localParams
         }
       }
     },
     created () {
-      let item = this.store.state.dag.resourcesListS
-      this.diGuiTree(item)
-      this.options = item
       let o = this.backfillItem
 
       // Non-null objects represent backfill
@@ -262,9 +231,7 @@
         // backfill resourceList
         let resourceList = o.params.resourceList || []
         if (resourceList.length) {
-          this.resourceList = _.map(resourceList, v => {
-            return v.id
-          })
+          this.resourceList = resourceList
           this.cacheResourceList = resourceList
         }
 
@@ -287,7 +254,7 @@
         editor.off($('.code-shell-mirror'), 'changes', this.changes)
       }
     },
-    components: { mLocalParams, mListBox, mResources, mScriptBox, Treeselect }
+    components: { mLocalParams, mListBox, mResources, mScriptBox }
   }
 </script>
 <style lang="scss" rel="stylesheet/scss" scope>

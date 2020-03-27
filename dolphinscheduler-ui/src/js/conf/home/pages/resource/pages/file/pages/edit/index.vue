@@ -80,8 +80,8 @@
       ...mapActions('resource', ['getViewResources', 'updateContent']),
       ok () {
         if (this._validation()) {
-            this.spinnerLoading = true
-            this.updateContent({
+          this.spinnerLoading = true
+          this.updateContent({
             id: this.$route.params.id,
             content: editor.getValue()
           }).then(res => {
@@ -104,7 +104,7 @@
         return true
       },
       close () {
-        this.$router.go(-1)
+        this.$router.push({ name: 'file' })
       },
       _getViewResources () {
         this.isLoading = true

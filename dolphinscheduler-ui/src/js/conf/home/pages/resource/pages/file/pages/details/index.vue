@@ -21,7 +21,7 @@
         <h2>
           <span>{{name}}</span>
           <div class="down">
-            <em class="ans-icon-download" style="font-size:20px" data-container="body" data-toggle="tooltip" :title="$t('Download Details')" @click="_downloadFile"></em>
+            <em class="ans-icon-download" data-container="body" data-toggle="tooltip" :title="$t('Download Details')" @click="_downloadFile"></em>
             <em>{{size}}</em>
           </div>
         </h2>

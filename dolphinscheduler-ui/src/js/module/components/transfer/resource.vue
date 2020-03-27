@@ -24,17 +24,22 @@
               <x-button type="ghost" value="udfResource" @click="_ckUDf">{{$t('UDF resources')}}</x-button>
             </x-button-group>
         </div>
-        <treeselect v-show="checkedValue=='fileResource'" v-model="selectFileSource" :multiple="true" :options="fileList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
-        </treeselect>
-        <treeselect v-show="checkedValue=='udfResource'" v-model="selectUdfSource" :multiple="true" :options="udfList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
-          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
-        </treeselect>
-        <!-- <div class="select-list-box">
+        <div class="select-list-box">
           <div class="tf-header">
             <div class="title">{{type.name}}{{$t('List')}}</div>
             <div class="count">（{{cacheSourceList.length}}）</div>
           </div>
+          <!--<div class="tf-search">
+            <x-input v-model="searchSourceVal"
+                     @on-enterkey="_sourceQuery"
+                     @on-click-icon="_sourceQuery"
+                     size="small"
+                     placeholder="Please enter keyword"
+                     type="text"
+                     style="width:202px;">
+              <em slot="suffix" class="ans-icon-search"></em>
+            </x-input>
+          </div>-->
           <div class="scrollbar tf-content">
             <ul>
               <li v-for="(item,$index) in sourceList" :key="$index" @click="_ckSource(item)">
@@ -50,12 +55,23 @@
             <div class="title">{{$t('Selected')}}{{type.name}}</div>
             <div class="count">（{{cacheTargetList.length}}）</div>
           </div>
+          <!--<div class="tf-search">
+            <x-input v-model="searchTargetVal"
+                     @on-enterkey="_targetQuery"
+                     @on-click-icon="_targetQuery"
+                     size="small"
+                     placeholder="Please enter keyword"
+                     type="text"
+                     style="width:202px;">
+              <em slot="suffix" class="ans-icon-search"></em>
+            </x-input>
+          </div>-->
           <div class="scrollbar tf-content">
             <ul>
               <li v-for="(item,$index) in targetList" :key="$index" @click="_ckTarget(item)"><span :title="item.name">{{item.name}}</span></li>
             </ul>
           </div>
-        </div> -->
+        </div>
       </div>
     </template>
   </m-popup>
@@ -64,9 +80,6 @@
   import _ from 'lodash'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
-  import Treeselect from '@riophae/vue-treeselect'
-  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
-
 
   export default {
     name: 'transfer',
@@ -79,22 +92,11 @@
         cacheTargetList: this.fileTargetList,
 
         fileSource: this.fileSourceList,
-        fileList: [],
-        udfList: [],
-        selectFileSource: [],
-        selectUdfSource: [],
         fileTarget: this.fileTargetList,
         udfSource: this.udfSourceList,
         udfTarget: this.udfTargetList,
         searchSourceVal: '',
-        searchTargetVal: '',
-        // define default value
-        value: null,
-        normalizer(node) {
-          return {
-            label: node.name
-          }
-        },
+        searchTargetVal: ''
       }
     },
     props: {
@@ -104,22 +106,12 @@
       fileTargetList: Array,
       udfTargetList: Array,
     },
-    created() {
-      let file = this.fileSourceList
-      let udf = this.udfSourceList
-      this.diGuiTree(file)
-      this.diGuiTree(udf)
-      this.fileList = file
-      this.udfList = udf
-      this.selectFileSource = this.fileTargetList
-      this.selectUdfSource = this.udfTargetList
-    },
     methods: {
       _ok () {
         this.$refs['popup'].spinnerLoading = true
         setTimeout(() => {
           this.$refs['popup'].spinnerLoading = false
-          this.$emit('onUpdate', _.map(this.selectFileSource.concat(this.selectUdfSource), v => v).join(','))
+          this.$emit('onUpdate', _.map(this.fileTarget.concat(this.udfTarget), v => v.id).join(','))
         }, 800)
       },
       _ckFile() {
@@ -177,12 +169,6 @@
             this.udfSource = this.sourceList
             this.udfTarget = this.targetList
         }
-      },
-      diGuiTree(item) {  // Recursive convenience tree structure
-        item.forEach(item => {
-          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
-            delete item.children : this.diGuiTree(item.children);
-        })
       }
     },
     watch: {
@@ -201,7 +187,7 @@
         this._targetQuery()
       }
     },
-    components: { mPopup, mListBoxF, Treeselect }
+    components: { mPopup, mListBoxF }
   }
 </script>
 

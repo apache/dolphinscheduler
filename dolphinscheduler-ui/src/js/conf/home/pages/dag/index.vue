@@ -40,7 +40,7 @@
     props: {},
     methods: {
       ...mapMutations('dag', ['resetParams']),
-      ...mapActions('dag', ['getProcessList','getProjectList', 'getResourcesList','getResourcesListJar']),
+      ...mapActions('dag', ['getProcessList','getProjectList', 'getResourcesList']),
       ...mapActions('security', ['getTenantList','getWorkerGroupsAll']),
       /**
        * init
@@ -57,8 +57,6 @@
           this.getProjectList(),
           // get resource
           this.getResourcesList(),
-          // get jar
-          this.getResourcesListJar(),
           // get worker group list
           this.getWorkerGroupsAll(),
           this.getTenantList()

@@ -18,19 +18,6 @@
 /**
  * Create file type
  */
-import i18n from '@/module/i18n'
-
 let filtTypeArr = ['txt', 'log', 'sh', 'conf', 'cfg', 'py', 'java', 'sql', 'xml', 'hql', 'properties']
 
-const folderList = [
-    {
-      value: 'FILE',
-      label: `${i18n.$t('FILE')}`
-    },
-    {
-      value: 'UDF',
-      label: `${i18n.$t('UDF')}`
-    }
-  ]
-
-export { filtTypeArr, folderList }
+export { filtTypeArr }
