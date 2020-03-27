@@ -140,7 +140,6 @@ public class SqlTask extends AbstractTask {
                 dataSource.getUserId(),
                 dataSource.getConnectionParams());
 
-        Connection con = null;
         List<String> createFuncs = null;
         try {
             // load class
@@ -178,18 +177,10 @@ public class SqlTask extends AbstractTask {
             }
 
             // execute sql task
-            con = executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+            executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw e;
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    logger.error(e.getMessage(),e);
-                }
-            }
         }
     }
 
@@ -249,9 +240,8 @@ public class SqlTask extends AbstractTask {
      * @param preStatementsBinds    pre statements binds
      * @param postStatementsBinds   post statements binds
      * @param createFuncs           create functions
-     * @return Connection
      */
-    public Connection executeFuncAndSql(SqlBinds mainSqlBinds,
+    public void executeFuncAndSql(SqlBinds mainSqlBinds,
                                         List<SqlBinds> preStatementsBinds,
                                         List<SqlBinds> postStatementsBinds,
                                         List<String> createFuncs){
@@ -343,13 +333,9 @@ public class SqlTask extends AbstractTask {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage());
         } finally {
-            try {
-                connection.close();
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
+            ConnectionUtils.releaseResource(connection);
         }
-        return connection;
+
     }
 
     /**
@@ -363,20 +349,20 @@ public class SqlTask extends AbstractTask {
         // is the timeout set
         boolean timeoutFlag = taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED ||
                 taskProps.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
-        try (PreparedStatement  stmt = connection.prepareStatement(sqlBinds.getSql())) {
-            if(timeoutFlag){
-                stmt.setQueryTimeout(taskProps.getTaskTimeout());
-            }
-            Map<Integer, Property> params = sqlBinds.getParamsMap();
-            if(params != null) {
-                for (Map.Entry<Integer, Property> entry : params.entrySet()) {
-                    Property prop = entry.getValue();
-                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
-                }
-            }
-            logger.info("prepare statement replace sql : {} ", stmt);
-            return stmt;
+        // prepare statement
+        PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
+        if(timeoutFlag){
+            stmt.setQueryTimeout(taskProps.getTaskTimeout());
         }
+        Map<Integer, Property> params = sqlBinds.getParamsMap();
+        if(params != null) {
+            for (Map.Entry<Integer, Property> entry : params.entrySet()) {
+                Property prop = entry.getValue();
+                ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+            }
+        }
+        logger.info("prepare statement replace sql : {} ", stmt);
+        return stmt;
     }
 
     /**

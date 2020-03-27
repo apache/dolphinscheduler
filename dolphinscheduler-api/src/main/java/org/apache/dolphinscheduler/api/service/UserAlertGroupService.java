@@ -14,13 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.data.project;
+package org.apache.dolphinscheduler.api.service;
 
-public class CreateProjectData {
-    // create project name
-    public static final String PROJECT_NAME = "selenium_project_1";
-    // create project description
-    public static final String DESCRIPTION = "test create project description";
-    // project page title
-    public static final String PROJECT_TITLE = "项目 - DolphinScheduler";
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.apache.dolphinscheduler.dao.entity.UserAlertGroup;
+import org.apache.dolphinscheduler.dao.mapper.UserAlertGroupMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ *
+ */
+@Service
+public class UserAlertGroupService extends ServiceImpl<UserAlertGroupMapper, UserAlertGroup> {
+
+    @Autowired
+    private UserAlertGroupMapper userAlertGroupMapper;
+
+    boolean deleteByAlertGroupId(Integer groupId) {
+        return userAlertGroupMapper.deleteByAlertgroupId(groupId) >= 1;
+    }
+
 }
