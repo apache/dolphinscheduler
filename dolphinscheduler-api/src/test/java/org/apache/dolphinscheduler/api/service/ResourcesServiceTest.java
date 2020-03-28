@@ -140,7 +140,7 @@ public class ResourcesServiceTest {
         Mockito.when(resourcesMapper.selectById(Mockito.anyInt())).thenReturn(null);
         result = resourcesService.createDirectory(user,"directoryTest","directory test",ResourceType.FILE,1,"/");
         logger.info(result.toString());
-        Assert.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(),result.getMsg());
+        Assert.assertEquals(Status.PARENT_RESOURCE_NOT_EXIST.getMsg(),result.getMsg());
         //RESOURCE_EXIST
         PowerMockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
         Mockito.when(resourcesMapper.queryResourceList("/directoryTest", 0, 0)).thenReturn(getResourceList());
