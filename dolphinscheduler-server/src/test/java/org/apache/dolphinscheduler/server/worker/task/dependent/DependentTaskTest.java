@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.utils.dependent.DependentDateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -52,7 +53,7 @@ public class DependentTaskTest {
     public void before() throws Exception{
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(processService
-                .findLastRunningProcess(4,new DateInterval(new Date(1585324800000L),new Date(1585411199999L))))
+                .findLastRunningProcess(4,DependentDateUtils.getTodayInterval(new Date()).get(0)))
                 .thenReturn(findLastProcessInterval());
         Mockito.when(processService
                 .getTaskNodeListByDefinitionId(4))
@@ -71,7 +72,7 @@ public class DependentTaskTest {
     }
 
     @Test
-    public void testDependInit() throws Exception{
+    public void test() throws Exception{
 
         TaskProps taskProps = new TaskProps();
         String dependString = "{\"dependTaskList\":[{\"dependItemList\":[{\"dateValue\":\"today\",\"depTasks\":\"ALL\",\"projectId\":1,\"definitionList\":[{\"label\":\"C\",\"value\":4},{\"label\":\"B\",\"value\":3},{\"label\":\"A\",\"value\":2}],\"cycle\":\"day\",\"definitionId\":4}],\"relation\":\"AND\"}],\"relation\":\"AND\"}";
