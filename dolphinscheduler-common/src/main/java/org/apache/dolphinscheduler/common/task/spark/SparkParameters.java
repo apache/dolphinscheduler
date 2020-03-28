@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.common.task.spark;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * spark parameters
@@ -78,7 +78,7 @@ public class SparkParameters extends AbstractParameters {
   /**
    * resource list
    */
-  private List<ResourceInfo> resourceList;
+  private List<ResourceInfo> resourceList = new ArrayList<>();
 
   /**
    * The YARN queue to submit to
@@ -219,18 +219,12 @@ public class SparkParameters extends AbstractParameters {
     return mainJar != null && programType != null && sparkVersion != null;
   }
 
-
   @Override
-  public List<String> getResourceFilesList() {
-    if(resourceList !=null ) {
-      List<String> resourceFilesList = resourceList.stream()
-              .map(ResourceInfo::getRes).collect(Collectors.toList());
-      if(mainJar != null){
-          resourceFilesList.add(mainJar.getRes());
-      }
-      return resourceFilesList;
+  public List<ResourceInfo> getResourceFilesList() {
+    if (mainJar != null && !resourceList.contains(mainJar)) {
+      resourceList.add(mainJar);
     }
-    return Collections.emptyList();
+    return resourceList;
   }
 
 

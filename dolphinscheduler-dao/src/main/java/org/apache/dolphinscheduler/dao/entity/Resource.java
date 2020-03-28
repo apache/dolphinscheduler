@@ -33,9 +33,24 @@ public class Resource {
   private int id;
 
   /**
+   * parent id
+   */
+  private int pid;
+
+  /**
    * resource alias
    */
   private String alias;
+
+  /**
+   * full name
+   */
+  private String fullName;
+
+  /**
+   * is directory
+   */
+  private boolean isDirectory=false;
 
   /**
    * description
@@ -89,10 +104,32 @@ public class Resource {
     this.updateTime = updateTime;
   }
 
-  public Resource(String alias, String fileName, String description, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
+  public Resource(int id, int pid, String alias, String fullName, boolean isDirectory) {
+    this.id = id;
+    this.pid = pid;
+    this.alias = alias;
+    this.fullName = fullName;
+    this.isDirectory = isDirectory;
+  }
+
+  /*public Resource(String alias, String fileName, String description, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
     this.alias = alias;
     this.fileName = fileName;
     this.description = description;
+    this.userId = userId;
+    this.type = type;
+    this.size = size;
+    this.createTime = createTime;
+    this.updateTime = updateTime;
+  }*/
+
+  public Resource(int pid, String alias, String fullName, boolean isDirectory, String description, String fileName, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
+    this.pid = pid;
+    this.alias = alias;
+    this.fullName = fullName;
+    this.isDirectory = isDirectory;
+    this.description = description;
+    this.fileName = fileName;
     this.userId = userId;
     this.type = type;
     this.size = size;
@@ -114,6 +151,30 @@ public class Resource {
 
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  public int getPid() {
+    return pid;
+  }
+
+  public void setPid(int pid) {
+    this.pid = pid;
+  }
+
+  public String getFullName() {
+    return fullName;
+  }
+
+  public void setFullName(String fullName) {
+    this.fullName = fullName;
+  }
+
+  public boolean isDirectory() {
+    return isDirectory;
+  }
+
+  public void setDirectory(boolean directory) {
+    isDirectory = directory;
   }
 
   public String getFileName() {
@@ -177,9 +238,12 @@ public class Resource {
   public String toString() {
     return "Resource{" +
             "id=" + id +
+            ", pid=" + pid +
             ", alias='" + alias + '\'' +
-            ", fileName='" + fileName + '\'' +
+            ", fullName='" + fullName + '\'' +
+            ", isDirectory=" + isDirectory +
             ", description='" + description + '\'' +
+            ", fileName='" + fileName + '\'' +
             ", userId=" + userId +
             ", type=" + type +
             ", size=" + size +
