@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.common.task;
 
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.flink.FlinkParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,7 +29,7 @@ public class FlinkParametersTest {
     @Test
     public void getResourceFilesList() {
         FlinkParameters flinkParameters = new FlinkParameters();
-        Assert.assertNull(flinkParameters.getResourceFilesList());
+        Assert.assertTrue(CollectionUtils.isEmpty(flinkParameters.getResourceFilesList()));
 
         ResourceInfo mainResource = new ResourceInfo();
         mainResource.setRes("testFlinkMain-1.0.0-SNAPSHOT.jar");
