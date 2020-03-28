@@ -25,6 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -37,12 +40,12 @@ public class TaskResponseService {
     /**
      * logger
      */
-    private static final Logger logger = LoggerFactory.getLogger(TaskResponseService.class);
+    private final Logger logger = LoggerFactory.getLogger(TaskResponseService.class);
 
     /**
      * attemptQueue
      */
-    private final BlockingQueue<TaskResponseEvent> attemptQueue = new LinkedBlockingQueue<>(5000);
+    private final BlockingQueue<TaskResponseEvent> eventQueue = new LinkedBlockingQueue<>(5000);
 
 
     /**
@@ -51,12 +54,29 @@ public class TaskResponseService {
     @Autowired
     private ProcessService processService;
 
+    /**
+     * task response worker
+     */
+    private Thread taskResponseWorker;
+
 
     @PostConstruct
-    public void init(){
-        TaskWorker taskWorker = new TaskWorker();
-        taskWorker.setName("TaskWorkerThread");
-        taskWorker.start();
+    public void start(){
+        this.taskResponseWorker = new TaskResponseWorker();
+        this.taskResponseWorker.setName("TaskResponseWorker");
+        this.taskResponseWorker.start();
+    }
+
+    @PreDestroy
+    public void stop(){
+        this.taskResponseWorker.interrupt();
+        if(!eventQueue.isEmpty()){
+            List<TaskResponseEvent> remainEvents = new ArrayList<>(eventQueue.size());
+            eventQueue.drainTo(remainEvents);
+            for(TaskResponseEvent event : remainEvents){
+                this.persist(event);
+            }
+        }
     }
 
     /**
@@ -66,7 +86,7 @@ public class TaskResponseService {
      */
     public void addResponse(TaskResponseEvent taskResponseEvent){
         try {
-            attemptQueue.put(taskResponseEvent);
+            eventQueue.put(taskResponseEvent);
         } catch (InterruptedException e) {
             logger.error("put task : {} error :{}", taskResponseEvent,e);
         }
@@ -76,7 +96,7 @@ public class TaskResponseService {
     /**
      * task worker thread
      */
-    class TaskWorker extends Thread {
+    class TaskResponseWorker extends Thread {
 
         @Override
         public void run() {
@@ -84,41 +104,47 @@ public class TaskResponseService {
             while (Stopper.isRunning()){
                 try {
                     // if not task , blocking here
-                    TaskResponseEvent taskResponseEvent = attemptQueue.take();
+                    TaskResponseEvent taskResponseEvent = eventQueue.take();
                     persist(taskResponseEvent);
-
-                }catch (Exception e){
+                } catch (InterruptedException e){
+                    break;
+                } catch (Exception e){
                     logger.error("persist task error",e);
                 }
             }
+            logger.info("TaskResponseWorker stopped");
         }
+    }
 
-        /**
-         * persist  taskResponseEvent
-         * @param taskResponseEvent taskResponseEvent
-         */
-        private void persist(TaskResponseEvent taskResponseEvent){
-            TaskResponseEvent.Event event = taskResponseEvent.getEvent();
+    /**
+     * persist  taskResponseEvent
+     * @param taskResponseEvent taskResponseEvent
+     */
+    private void persist(TaskResponseEvent taskResponseEvent){
+        TaskResponseEvent.Event event = taskResponseEvent.getEvent();
 
-            switch (event){
-                case ACK:
-                    processService.changeTaskState(taskResponseEvent.getState(),
-                            taskResponseEvent.getStartTime(),
-                            taskResponseEvent.getWorkerAddress(),
-                            taskResponseEvent.getExecutePath(),
-                            taskResponseEvent.getLogPath(),
-                            taskResponseEvent.getTaskInstanceId());
-                    break;
-                case RESULT:
-                    processService.changeTaskState(taskResponseEvent.getState(),
-                            taskResponseEvent.getEndTime(),
-                            taskResponseEvent.getProcessId(),
-                            taskResponseEvent.getAppIds(),
-                            taskResponseEvent.getTaskInstanceId());
-                    break;
-                default:
-                    throw new IllegalArgumentException("invalid event type : " + event);
-            }
+        switch (event){
+            case ACK:
+                processService.changeTaskState(taskResponseEvent.getState(),
+                        taskResponseEvent.getStartTime(),
+                        taskResponseEvent.getWorkerAddress(),
+                        taskResponseEvent.getExecutePath(),
+                        taskResponseEvent.getLogPath(),
+                        taskResponseEvent.getTaskInstanceId());
+                break;
+            case RESULT:
+                processService.changeTaskState(taskResponseEvent.getState(),
+                        taskResponseEvent.getEndTime(),
+                        taskResponseEvent.getProcessId(),
+                        taskResponseEvent.getAppIds(),
+                        taskResponseEvent.getTaskInstanceId());
+                break;
+            default:
+                throw new IllegalArgumentException("invalid event type : " + event);
         }
+    }
+
+    public BlockingQueue<TaskResponseEvent> getEventQueue() {
+        return eventQueue;
     }
 }
