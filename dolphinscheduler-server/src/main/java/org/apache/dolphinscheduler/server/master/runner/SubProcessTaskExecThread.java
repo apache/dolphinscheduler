@@ -95,7 +95,7 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
      *  set task instance state
      * @return
      */
-    private Boolean setTaskInstanceState(){
+    private boolean setTaskInstanceState(){
         subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
         if(subProcessInstance == null || taskInstance.getState().typeIsFinished()){
             return false;
@@ -131,8 +131,8 @@ public class SubProcessTaskExecThread extends MasterBaseTaskExecThread {
         if (taskInstance.getState().typeIsFinished()) {
             logger.info("sub work flow task {} already complete. task state:{}, parent work flow instance state:{}",
                     this.taskInstance.getName(),
-                    this.taskInstance.getState().toString(),
-                    this.processInstance.getState().toString());
+                    this.taskInstance.getState(),
+                    this.processInstance.getState());
             return;
         }
         while (Stopper.isRunning()) {
