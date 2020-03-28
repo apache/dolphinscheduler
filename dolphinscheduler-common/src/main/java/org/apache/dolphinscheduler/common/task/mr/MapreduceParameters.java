@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.common.task.mr;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapreduceParameters extends AbstractParameters {
@@ -52,7 +54,7 @@ public class MapreduceParameters extends AbstractParameters {
     /**
      * resource list
      */
-    private List<ResourceInfo> resourceList;
+    private List<ResourceInfo> resourceList = new ArrayList<>();
 
     /**
      * program type
@@ -124,9 +126,10 @@ public class MapreduceParameters extends AbstractParameters {
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
-        if (mainJar != null) {
+        if (mainJar != null && !resourceList.contains(mainJar)) {
             resourceList.add(mainJar);
         }
+
         return resourceList;
     }
 
