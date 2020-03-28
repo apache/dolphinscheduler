@@ -204,14 +204,8 @@ public class ProcessInstanceService extends BaseDAGService {
             }
         }
 
-        Set<String> exclusionSet = new HashSet<>();
-        exclusionSet.add(Constants.CLASS);
-        exclusionSet.add("locations");
-        exclusionSet.add("connects");
-        exclusionSet.add("processInstanceJson");
-
         pageInfo.setTotalCount((int) processInstanceList.getTotal());
-        pageInfo.setLists(CollectionUtils.getListByExclusion(processInstances, exclusionSet));
+        pageInfo.setLists(processInstances);
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
