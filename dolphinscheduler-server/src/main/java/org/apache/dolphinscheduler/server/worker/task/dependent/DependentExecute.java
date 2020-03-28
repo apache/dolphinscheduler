@@ -105,7 +105,7 @@ public class DependentExecute {
                        dependentItem.getDefinitionId(), dateInterval.getStartTime(), dateInterval.getEndTime() );
                 return DependResult.FAILED;
             }
-
+            // need to check workflow for updates, so get all task and check the task state
             if(dependentItem.getDepTasks().equals(Constants.DEPENDENT_ALL)){
                 List<TaskNode> taskNodes =
                         processService.getTaskNodeListByDefinitionId(dependentItem.getDefinitionId());
