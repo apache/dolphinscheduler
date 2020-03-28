@@ -114,17 +114,24 @@ public class DependentExecute {
                     result = DependResult.FAILED;
                 }else{
                     List<DependResult> results = new ArrayList<>();
+                    DependResult tmpResult =  DependResult.FAILED;
                     for(TaskNode taskNode:taskNodes){
-                        results.add(getDependTaskResult(taskNode.getName(),processInstance));
+                        tmpResult = getDependTaskResult(taskNode.getName(),processInstance);
+                        if(DependResult.FAILED == tmpResult){
+                            break;
+                        }else{
+                            results.add(getDependTaskResult(taskNode.getName(),processInstance));
+                        }
                     }
 
-                    if(results.contains(DependResult.FAILED)){
+                    if(DependResult.FAILED == tmpResult){
                         result = DependResult.FAILED;
                     }else if(results.contains(DependResult.WAITING)){
                         result = DependResult.WAITING;
                     }else{
                         result =  DependResult.SUCCESS;
                     }
+
                 }
             }else{
                 result = getDependTaskResult(dependentItem.getDepTasks(),processInstance);
@@ -143,7 +150,8 @@ public class DependentExecute {
      * @return
      */
     private DependResult getDependTaskResult(String taskName,ProcessInstance processInstance) {
-        DependResult result;TaskInstance taskInstance = null;
+        DependResult result = DependResult.FAILED;
+        TaskInstance taskInstance = null;
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
 
         for(TaskInstance task : taskInstanceList){
@@ -160,6 +168,7 @@ public class DependentExecute {
         }else{
             result = getDependResultByState(taskInstance.getState());
         }
+
         return result;
     }
 
