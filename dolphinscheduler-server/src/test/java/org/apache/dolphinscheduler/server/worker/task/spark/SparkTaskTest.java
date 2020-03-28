@@ -135,7 +135,7 @@ public class SparkTaskTest {
 
         logger.info("spark task command : {}", sparkArgs);
 
-        Assert.assertEquals(sparkArgs.split(" ")[0], SPARK2_COMMAND );
+        Assert.assertEquals(SPARK2_COMMAND, sparkArgs.split(" ")[0]);
 
     }
 }
