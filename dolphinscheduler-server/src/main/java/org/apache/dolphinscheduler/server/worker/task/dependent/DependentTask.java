@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.dependent;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
@@ -86,6 +87,7 @@ public class DependentTask extends AbstractTask {
         for(DependentTaskModel taskModel : dependentParameters.getDependTaskList()){
             this.dependentTaskList.add(new DependentExecute(
                             taskModel.getDependItemList(), taskModel.getRelation()));
+            logger.info(JSON.toJSONString(taskModel));
         }
 
         this.processService = SpringApplicationContext.getBean(ProcessService.class);

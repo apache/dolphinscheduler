@@ -318,7 +318,7 @@ public class SqlTask extends AbstractTask {
 
                 } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {
                     // non query statement
-                    stmt.executeUpdate();
+                    stmt.execute();
                     exitStatusCode = 0;
                 }
             }

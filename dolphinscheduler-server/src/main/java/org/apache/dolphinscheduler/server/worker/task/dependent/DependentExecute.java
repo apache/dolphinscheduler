@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.DateInterval;
 import org.apache.dolphinscheduler.common.model.DependentItem;
+import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.DependentUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -104,29 +105,60 @@ public class DependentExecute {
                        dependentItem.getDefinitionId(), dateInterval.getStartTime(), dateInterval.getEndTime() );
                 return DependResult.FAILED;
             }
-            if(dependentItem.getDepTasks().equals(Constants.DEPENDENT_ALL)){
-                result = getDependResultByState(processInstance.getState());
-            }else{
-                TaskInstance taskInstance = null;
-                List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
 
-                for(TaskInstance task : taskInstanceList){
-                    if(task.getName().equals(dependentItem.getDepTasks())){
-                        taskInstance = task;
-                        break;
+            if(dependentItem.getDepTasks().equals(Constants.DEPENDENT_ALL)){
+                List<TaskNode> taskNodes =
+                        processService.getTaskNodeListByDefinitionId(dependentItem.getDefinitionId());
+
+                if(taskNodes.size() == 0){
+                    result = DependResult.FAILED;
+                }else{
+                    List<DependResult> results = new ArrayList<>();
+                    for(TaskNode taskNode:taskNodes){
+                        results.add(getDependTaskResult(taskNode.getName(),processInstance));
+                    }
+
+                    if(results.contains(DependResult.FAILED)){
+                        result = DependResult.FAILED;
+                    }else if(results.contains(DependResult.WAITING)){
+                        result = DependResult.WAITING;
+                    }else{
+                        result =  DependResult.SUCCESS;
                     }
                 }
-                if(taskInstance == null){
-                    // cannot find task in the process instance
-                    // maybe because process instance is running or failed.
-                     result = getDependResultByState(processInstance.getState());
-                }else{
-                    result = getDependResultByState(taskInstance.getState());
-                }
+            }else{
+                result = getDependTaskResult(dependentItem.getDepTasks(),processInstance);
             }
             if(result != DependResult.SUCCESS){
                 break;
             }
+        }
+        return result;
+    }
+
+    /**
+     * get depend task result
+     * @param taskName
+     * @param processInstance
+     * @return
+     */
+    private DependResult getDependTaskResult(String taskName,ProcessInstance processInstance) {
+        DependResult result;TaskInstance taskInstance = null;
+        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
+
+        for(TaskInstance task : taskInstanceList){
+            if(task.getName().equals(taskName)){
+                taskInstance = task;
+                break;
+            }
+        }
+
+        if(taskInstance == null){
+            // cannot find task in the process instance
+            // maybe because process instance is running or failed.
+            result = getDependResultByProcessStateWhenTaskNull(processInstance.getState());
+        }else{
+            result = getDependResultByState(taskInstance.getState());
         }
         return result;
     }
@@ -172,10 +204,28 @@ public class DependentExecute {
      */
     private DependResult getDependResultByState(ExecutionStatus state) {
 
-        if(state.typeIsRunning() || state == ExecutionStatus.SUBMITTED_SUCCESS || state == ExecutionStatus.WAITTING_THREAD){
+        if(state.typeIsRunning()
+                || state == ExecutionStatus.SUBMITTED_SUCCESS
+                || state == ExecutionStatus.WAITTING_THREAD){
             return DependResult.WAITING;
         }else if(state.typeIsSuccess()){
             return DependResult.SUCCESS;
+        }else{
+            return DependResult.FAILED;
+        }
+    }
+
+    /**
+     * get dependent result by task instance state when task instance is null
+     * @param state state
+     * @return DependResult
+     */
+    private DependResult getDependResultByProcessStateWhenTaskNull(ExecutionStatus state) {
+
+        if(state.typeIsRunning()
+                || state == ExecutionStatus.SUBMITTED_SUCCESS
+                || state == ExecutionStatus.WAITTING_THREAD){
+            return DependResult.WAITING;
         }else{
             return DependResult.FAILED;
         }
