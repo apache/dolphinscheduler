@@ -84,10 +84,12 @@ public class DependentTask extends AbstractTask {
         this.dependentParameters = JSONUtils.parseObject(this.taskProps.getDependence(),
                 DependentParameters.class);
 
-        for(DependentTaskModel taskModel : dependentParameters.getDependTaskList()){
-            this.dependentTaskList.add(new DependentExecute(
-                            taskModel.getDependItemList(), taskModel.getRelation()));
-            logger.info(JSON.toJSONString(taskModel));
+        if(dependentParameters!=null
+                && dependentParameters.getDependTaskList() != null){
+            for(DependentTaskModel taskModel : dependentParameters.getDependTaskList()){
+                this.dependentTaskList.add(new DependentExecute(
+                        taskModel.getDependItemList(), taskModel.getRelation()));
+            }
         }
 
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
