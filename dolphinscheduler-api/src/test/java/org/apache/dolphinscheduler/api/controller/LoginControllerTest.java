@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * login controller test
  */
 public class LoginControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
+    private static Logger logger = LoggerFactory.getLogger(LoginControllerTest.class);
 
 
     @Test

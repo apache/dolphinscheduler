@@ -239,7 +239,7 @@ public class ProcessInstanceService extends BaseDAGService {
         }
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processId);
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processId);
-        AddDependResultForTaskList(taskInstanceList);
+        addDependResultForTaskList(taskInstanceList);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
         resultMap.put(TASK_LIST, taskInstanceList);
@@ -253,9 +253,9 @@ public class ProcessInstanceService extends BaseDAGService {
      * add dependent result for dependent task
      * @param taskInstanceList
      */
-    private void AddDependResultForTaskList(List<TaskInstance> taskInstanceList) throws IOException {
+    private void addDependResultForTaskList(List<TaskInstance> taskInstanceList) throws IOException {
         for(TaskInstance taskInstance: taskInstanceList){
-            if(taskInstance.getTaskType().toUpperCase().equals(TaskType.DEPENDENT.toString())){
+            if(taskInstance.getTaskType().equalsIgnoreCase(TaskType.DEPENDENT.toString())){
                 Result logResult = loggerService.queryLog(
                         taskInstance.getId(), 0, 4098);
                 if(logResult.getCode() == Status.SUCCESS.ordinal()){
@@ -414,11 +414,10 @@ public class ProcessInstanceService extends BaseDAGService {
             processInstance.setProcessInstanceJson(processInstanceJson);
             processInstance.setGlobalParams(globalParams);
         }
-//        int update = processDao.updateProcessInstance(processInstanceId, processInstanceJson,
-//                globalParams, schedule, flag, locations, connects);
+
         int update = processService.updateProcessInstance(processInstance);
         int updateDefine = 1;
-        if (syncDefine && StringUtils.isNotEmpty(processInstanceJson)) {
+        if (Boolean.TRUE.equals(syncDefine) && StringUtils.isNotEmpty(processInstanceJson)) {
             processDefinition.setProcessDefinitionJson(processInstanceJson);
             processDefinition.setGlobalParams(originDefParams);
             processDefinition.setLocations(locations);
@@ -544,7 +543,7 @@ public class ProcessInstanceService extends BaseDAGService {
                     nodeValueSb.append(ipSb);
                 }
 
-                logger.info("delete task queue node : {}",nodeValueSb.toString());
+                logger.info("delete task queue node : {}",nodeValueSb);
                 tasksQueue.removeNode(org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_QUEUE, nodeValueSb.toString());
 
             }
@@ -621,7 +620,7 @@ public class ProcessInstanceService extends BaseDAGService {
                 Map<String,Object> localParamsMap = new HashMap<>();
                 localParamsMap.put("taskType",taskNode.getType());
                 localParamsMap.put("localParamsList",localParamsList);
-                if (localParamsList.size() > 0) {
+                if (CollectionUtils.isNotEmpty(localParamsList)) {
                     localUserDefParams.put(taskNode.getName(), localParamsMap);
                 }
             }
