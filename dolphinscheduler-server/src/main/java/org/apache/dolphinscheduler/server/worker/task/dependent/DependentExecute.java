@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.dependent;
 
-import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.DependentRelation;

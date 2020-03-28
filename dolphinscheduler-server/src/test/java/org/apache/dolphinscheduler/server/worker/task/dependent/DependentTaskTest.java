@@ -74,9 +74,7 @@ public class DependentTaskTest {
     public void testDependInit() throws Exception{
 
         TaskProps taskProps = new TaskProps();
-
         String dependString = "{\"dependTaskList\":[{\"dependItemList\":[{\"dateValue\":\"today\",\"depTasks\":\"ALL\",\"projectId\":1,\"definitionList\":[{\"label\":\"C\",\"value\":4},{\"label\":\"B\",\"value\":3},{\"label\":\"A\",\"value\":2}],\"cycle\":\"day\",\"definitionId\":4}],\"relation\":\"AND\"}],\"relation\":\"AND\"}";
-
         taskProps.setTaskInstId(252612);
         taskProps.setDependence(dependString);
         taskProps.setTaskStartTime(new Date());
