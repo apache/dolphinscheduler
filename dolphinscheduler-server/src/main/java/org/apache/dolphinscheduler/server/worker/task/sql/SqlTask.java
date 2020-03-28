@@ -378,7 +378,7 @@ public class SqlTask extends AbstractTask {
         List<User> users = alertDao.queryUserByAlertGroupId(instance.getWarningGroupId());
 
         // receiving group list
-        List<String> receviersList = new ArrayList<String>();
+        List<String> receviersList = new ArrayList<>();
         for(User user:users){
             receviersList.add(user.getEmail().trim());
         }
@@ -392,7 +392,7 @@ public class SqlTask extends AbstractTask {
         }
 
         // copy list
-        List<String> receviersCcList = new ArrayList<String>();
+        List<String> receviersCcList = new ArrayList<>();
         // Custom Copier
         String receiversCc = sqlParameters.getReceiversCc();
         if (StringUtils.isNotEmpty(receiversCc)){
@@ -406,7 +406,7 @@ public class SqlTask extends AbstractTask {
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
             Map<String, Object> mailResult = MailUtils.sendMails(receviersList,
                     receviersCcList, title, content, ShowType.valueOf(showTypeName));
-            if(!(Boolean) mailResult.get(STATUS)){
+            if(!(boolean) mailResult.get(STATUS)){
                 throw new RuntimeException("send mail failed!");
             }
         }else{
@@ -463,22 +463,7 @@ public class SqlTask extends AbstractTask {
         ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
         int userId = processInstance.getExecutorId();
 
-        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF, processService,udfFunIds,userId,logger);
+        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<>(AuthorizationType.UDF, processService,udfFunIds,userId,logger);
         permissionCheckUdf.checkPermission();
     }
-
-    /**
-     * check data source permission
-     * @param dataSourceId    data source id
-     * @return if has download permission return true else false
-     */
-    private void checkDataSourcePermission(int dataSourceId) throws Exception{
-        //  process instance
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
-        int userId = processInstance.getExecutorId();
-
-        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE, processService,new Integer[]{dataSourceId},userId,logger);
-        permissionCheckDataSource.checkPermission();
-    }
-
 }

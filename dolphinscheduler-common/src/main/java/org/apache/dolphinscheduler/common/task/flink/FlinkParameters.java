@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.common.task.flink;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * spark parameters
@@ -50,35 +50,35 @@ public class FlinkParameters extends AbstractParameters {
   private String mainArgs;
 
   /**
-   * slot个数
+   * slot count
    */
   private int slot;
 
   /**
-   *Yarn application的名字
+   *Yarn application name
    */
 
   private String appName;
 
   /**
-   * taskManager 数量
+   * taskManager count
    */
   private int  taskManager;
 
   /**
-   * jobManagerMemory 内存大小
+   * job manager memory
    */
   private String  jobManagerMemory ;
 
   /**
-   * taskManagerMemory内存大小
+   * task manager memory
    */
   private String  taskManagerMemory;
 
   /**
    * resource list
    */
-  private List<ResourceInfo> resourceList;
+  private List<ResourceInfo> resourceList = new ArrayList<>();
 
   /**
    * The YARN queue to submit to
@@ -207,16 +207,11 @@ public class FlinkParameters extends AbstractParameters {
 
 
   @Override
-  public List<String> getResourceFilesList() {
-    if(resourceList != null ) {
-      List<String> resourceFiles = resourceList.stream()
-              .map(ResourceInfo::getRes).collect(Collectors.toList());
-      if(mainJar != null) {
-        resourceFiles.add(mainJar.getRes());
-      }
-      return resourceFiles;
+  public List<ResourceInfo> getResourceFilesList() {
+    if (mainJar != null && !resourceList.contains(mainJar)) {
+      resourceList.add(mainJar);
     }
-    return Collections.emptyList();
+    return resourceList;
   }
 
 
