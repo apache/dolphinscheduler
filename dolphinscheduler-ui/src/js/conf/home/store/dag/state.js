@@ -53,6 +53,8 @@ export default {
   projectListS: [],
   // tasks resourcesList
   resourcesListS: [],
+  // tasks resourcesListJar
+  resourcesListJar: [],
   // tasks datasource Type
   dsTypeListS: [
     {

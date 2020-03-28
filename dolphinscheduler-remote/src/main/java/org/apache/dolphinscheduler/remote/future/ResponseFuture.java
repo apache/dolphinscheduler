@@ -18,7 +18,13 @@
 package org.apache.dolphinscheduler.remote.future;
 
 import org.apache.dolphinscheduler.remote.command.Command;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -26,7 +32,9 @@ import java.util.concurrent.*;
  */
 public class ResponseFuture {
 
-    private final static ConcurrentHashMap<Long,ResponseFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseFuture.class);
+
+    private static final ConcurrentHashMap<Long,ResponseFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
 
     /**
      *  request unique identification
@@ -55,11 +63,11 @@ public class ResponseFuture {
     /**
      *  response command
      */
-    private volatile Command responseCommand;
+    private Command responseCommand;
 
     private volatile boolean sendOk = true;
 
-    private volatile Throwable cause;
+    private Throwable cause;
 
     public ResponseFuture(long opaque, long timeoutMillis, InvokeCallback invokeCallback, ReleaseSemaphore releaseSemaphore) {
         this.opaque = opaque;
@@ -159,6 +167,46 @@ public class ResponseFuture {
     public void release() {
         if(this.releaseSemaphore != null){
             this.releaseSemaphore.release();
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseFuture{" +
+                "opaque=" + opaque +
+                ", timeoutMillis=" + timeoutMillis +
+                ", invokeCallback=" + invokeCallback +
+                ", releaseSemaphore=" + releaseSemaphore +
+                ", latch=" + latch +
+                ", beginTimestamp=" + beginTimestamp +
+                ", responseCommand=" + responseCommand +
+                ", sendOk=" + sendOk +
+                ", cause=" + cause +
+                '}';
+    }
+
+    /**
+     * scan future table
+     */
+    public static void scanFutureTable(){
+        final List<ResponseFuture> futureList = new LinkedList<>();
+        Iterator<Map.Entry<Long, ResponseFuture>> it = FUTURE_TABLE.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Long, ResponseFuture> next = it.next();
+            ResponseFuture future = next.getValue();
+            if ((future.getBeginTimestamp() + future.getTimeoutMillis() + 1000) <= System.currentTimeMillis()) {
+                futureList.add(future);
+                it.remove();
+                LOGGER.warn("remove timeout request : {}", future);
+            }
+        }
+        for (ResponseFuture future : futureList) {
+            try {
+                future.release();
+                future.executeInvokeCallback();
+            } catch (Throwable ex) {
+                LOGGER.warn("scanFutureTable, execute callback error", ex);
+            }
         }
     }
 }

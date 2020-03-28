@@ -148,6 +148,28 @@ public class UsersServiceTest {
         Assert.assertTrue(queryUser!=null);
     }
 
+    @Test
+    public void testGetUserIdByName() {
+        User user = new User();
+        user.setId(1);
+        user.setUserType(UserType.ADMIN_USER);
+        user.setUserName("test_user");
+
+        //user name null
+        int userId = usersService.getUserIdByName("");
+        Assert.assertEquals(0, userId);
+
+        //user not exist
+        when(usersService.queryUser(user.getUserName())).thenReturn(null);
+        int userNotExistId = usersService.getUserIdByName(user.getUserName());
+        Assert.assertEquals(-1, userNotExistId);
+
+        //user exist
+        when(usersService.queryUser(user.getUserName())).thenReturn(user);
+        int userExistId = usersService.getUserIdByName(user.getUserName());
+        Assert.assertEquals(user.getId(), userExistId);
+    }
+
 
 
     @Test

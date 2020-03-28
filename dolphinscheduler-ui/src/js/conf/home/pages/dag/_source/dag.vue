@@ -25,7 +25,7 @@
              :key="v"
              v-for="(item,v) in tasksTypeList"
              @mousedown="_getDagId(v)">
-          <div data-toggle="tooltip" :title="item.description">
+          <div data-toggle="tooltip" :title="item.desc">
             <div class="icos" :class="'icos-' + v" ></div>
           </div>
         </div>
@@ -61,7 +61,7 @@
           <span v-if="name"  class="copy-name" @click="_copyName" :data-clipboard-text="name"><em class="ans-icon-copy" data-container="body"  data-toggle="tooltip" :title="$t('Copy name')" ></em></span>
         </div>
         <div class="save-btn">
-          <div class="operation" style="vertical-align: middle;"> 
+          <div class="operation" style="vertical-align: middle;">
             <a href="javascript:"
                v-for="(item,$index) in toolOperList"
                :class="_operationClass(item)"
@@ -71,14 +71,14 @@
               <x-button type="text" data-container="body" :icon="item.icon" v-tooltip.light="item.desc"></x-button>
             </a>
           </div>
-          <x-button 
-                  type="primary" 
+          <x-button
+                  type="primary"
                   v-tooltip.light="$t('Format DAG')"
-                  icon="ans-icon-triangle-solid-right" 
-                  size="xsmall" 
+                  icon="ans-icon-triangle-solid-right"
+                  size="xsmall"
                   data-container="body"
                   v-if="type === 'instance'"
-                  style="vertical-align: middle;" 
+                  style="vertical-align: middle;"
                   @click="dagAutomaticLayout">
           </x-button>
           <x-button
@@ -169,7 +169,7 @@
       // DAG automatic layout
       dagAutomaticLayout() {
         $('#canvas').html('')
-        
+
       // Destroy round robin
         Dag.init({
         dag: this,
@@ -293,7 +293,7 @@
         let is = true
         let code = ''
 
-        if (!item.disable) {
+        if (item.disable) {
           return
         }
 
@@ -326,45 +326,62 @@
        * Storage interface
        */
       _save (sourceType) {
-        return new Promise((resolve, reject) => {
-          this.spinnerLoading = true
-          // Storage store
-          Dag.saveStore().then(res => {
-            if (this.urlParam.id) {
-              /**
-               * Edit
-               * @param saveInstanceEditDAGChart => Process instance editing
-               * @param saveEditDAGChart => Process definition editing
-               */
-              this[this.type === 'instance' ? 'updateInstance' : 'updateDefinition'](this.urlParam.id).then(res => {
-                this.$message.success(res.msg)
-                this.spinnerLoading = false
-                resolve()
-              }).catch(e => {
-                this.$message.error(e.msg || '')
-                this.spinnerLoading = false
-                reject(e)
-              })
-            } else {
-              // New
-              this.saveDAGchart().then(res => {
-                this.$message.success(res.msg)
-                this.spinnerLoading = false
-                // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
-                if (sourceType !== 'affirm') {
-                  // Jump process definition
-                  this.$router.push({ name: 'projects-definition-list' })
-                }
-                resolve()
-              }).catch(e => {
-                this.$message.error(e.msg || '')
-                this.setName('')
-                this.spinnerLoading = false
-                reject(e)
-              })
-            }
+        if(this._verifConditions()) {
+          return new Promise((resolve, reject) => {
+            this.spinnerLoading = true
+            // Storage store
+            Dag.saveStore().then(res => {
+              if (this.urlParam.id) {
+                /**
+                 * Edit
+                 * @param saveInstanceEditDAGChart => Process instance editing
+                 * @param saveEditDAGChart => Process definition editing
+                 */
+                this[this.type === 'instance' ? 'updateInstance' : 'updateDefinition'](this.urlParam.id).then(res => {
+                  this.$message.success(res.msg)
+                  this.spinnerLoading = false
+                  resolve()
+                }).catch(e => {
+                  this.$message.error(e.msg || '')
+                  this.spinnerLoading = false
+                  reject(e)
+                })
+              } else {
+                // New
+                this.saveDAGchart().then(res => {
+                  this.$message.success(res.msg)
+                  this.spinnerLoading = false
+                  // source @/conf/home/pages/dag/_source/editAffirmModel/index.js
+                  if (sourceType !== 'affirm') {
+                    // Jump process definition
+                    this.$router.push({ name: 'projects-definition-list' })
+                  }
+                  resolve()
+                }).catch(e => {
+                  this.$message.error(e.msg || '')
+                  this.setName('')
+                  this.spinnerLoading = false
+                  reject(e)
+                })
+              }
+            })
           })
+        }
+      },
+      _verifConditions () {
+        let tasks = this.$store.state.dag.tasks
+        let bool = true
+        tasks.map(v=>{
+          if(v.type == 'CONDITIONS' && (v.conditionResult.successNode[0] =='' || v.conditionResult.successNode[0] == null || v.conditionResult.failedNode[0] =='' || v.conditionResult.failedNode[0] == null)) {
+            bool = false
+            return false
+          }
         })
+        if(!bool) {
+          this.$message.warning(`${i18n.$t('Successful branch flow and failed branch flow are required')}`)
+          return false
+        }
+        return true
       },
       /**
        * Global parameter
@@ -473,7 +490,35 @@
        */
       _createNodes ({ id, type }) {
         let self = this
+        let preNode = []
+        let rearNode = []
+        let rearList = []
+        $('div[data-targetarr*="' + id + '"]').each(function(){
+          rearNode.push($(this).attr("id"))
+        })
 
+        if (rearNode.length>0) {
+          rearNode.forEach(v => {
+            let rearobj = {}
+            rearobj.value = $(`#${v}`).find('.name-p').text()
+            rearobj.label = $(`#${v}`).find('.name-p').text()
+            rearList.push(rearobj)
+          })
+        } else {
+          rearList = []
+        }
+        let targetarr = $(`#${id}`).attr('data-targetarr')
+        if (targetarr) {
+          let nodearr = targetarr.split(',')
+          nodearr.forEach(v => {
+            let nodeobj = {}
+            nodeobj.value = $(`#${v}`).find('.name-p').text()
+            nodeobj.label = $(`#${v}`).find('.name-p').text()
+            preNode.push(nodeobj)
+          })
+        } else {
+          preNode = []
+        }
         if (eventModel) {
           eventModel.remove()
         }
@@ -486,6 +531,7 @@
         }
 
         this.taskId = id
+        type = type || self.dagBarId
 
         eventModel = this.$drawer({
           closable: false,
@@ -522,11 +568,18 @@
             },
             props: {
               id: id,
-              taskType: type || self.dagBarId,
-              self: self
+              taskType: type,
+              self: self,
+              preNode: preNode,
+              rearList: rearList
             }
           })
         })
+      },
+      removeEventModelById ($id) {
+        if(eventModel && this.taskId == $id){
+          eventModel.remove()
+        }
       }
     },
     watch: {
@@ -580,6 +633,9 @@
       clearInterval(this.setIntervalP)
     },
     destroyed () {
+      if (eventModel) {
+        eventModel.remove()
+      }
     },
     computed: {
       ...mapState('dag', ['tasks', 'locations', 'connects', 'isEditDag', 'name'])

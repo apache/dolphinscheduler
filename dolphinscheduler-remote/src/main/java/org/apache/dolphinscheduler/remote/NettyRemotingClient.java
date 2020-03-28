@@ -97,6 +97,11 @@ public class NettyRemotingClient {
     private final NettyClientHandler clientHandler;
 
     /**
+     *  response future executor
+     */
+    private final ScheduledExecutorService responseFutureExecutor;
+
+    /**
      *  client init
      * @param clientConfig client config
      */
@@ -114,6 +119,8 @@ public class NettyRemotingClient {
                 new LinkedBlockingQueue<>(1000), new NamedThreadFactory("CallbackExecutor", 10),
                 new CallerThreadExecutePolicy());
         this.clientHandler = new NettyClientHandler(this, callbackExecutor);
+
+        this.responseFutureExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ResponseFutureExecutor"));
 
         this.start();
     }
@@ -139,6 +146,12 @@ public class NettyRemotingClient {
                                 encoder);
                     }
                 });
+        this.responseFutureExecutor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                ResponseFuture.scanFutureTable();
+            }
+        }, 5000, 1000, TimeUnit.MILLISECONDS);
         //
         isStarted.compareAndSet(false, true);
     }
@@ -288,7 +301,7 @@ public class NettyRemotingClient {
                 return channel;
             }
         } catch (Exception ex) {
-            logger.info("connect to {} error  {}", address, ex);
+            logger.error("connect to {} error", address, ex);
         }
         return null;
     }
@@ -305,6 +318,9 @@ public class NettyRemotingClient {
                 }
                 if(callbackExecutor != null){
                     this.callbackExecutor.shutdownNow();
+                }
+                if(this.responseFutureExecutor != null){
+                    this.responseFutureExecutor.shutdownNow();
                 }
             } catch (Exception ex) {
                 logger.error("netty client close exception", ex);

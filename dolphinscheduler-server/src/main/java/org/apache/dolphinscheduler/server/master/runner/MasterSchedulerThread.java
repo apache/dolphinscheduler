@@ -117,7 +117,7 @@ public class MasterSchedulerThread implements Runnable {
                     // make sure to scan and delete command  table in one transaction
                     Command command = processService.findOneCommand();
                     if (command != null) {
-                        logger.info(String.format("find one command: id: %d, type: %s", command.getId(),command.getCommandType().toString()));
+                        logger.info("find one command: id: {}, type: {}", command.getId(),command.getCommandType());
 
                         try{
                             processInstance = processService.handleCommand(logger, OSUtils.getHost(), this.masterExecThreadNum - activeCount, command);

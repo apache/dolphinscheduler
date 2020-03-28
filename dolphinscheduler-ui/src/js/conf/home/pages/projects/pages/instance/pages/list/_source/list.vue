@@ -29,6 +29,9 @@
             <span>{{$t('Process Name')}}</span>
           </th>
           <th scope="col" width="70">
+            <span>{{$t('Executor')}}</span>
+          </th>
+          <th scope="col" width="70">
             <span>{{$t('Run Type')}}</span>
           </th>
           <th scope="col" width="130">
@@ -66,6 +69,10 @@
           </td>
           <td>
             <span class="ellipsis" style="padding-left: 4px;"><router-link :to="{ path: '/projects/instance/list/' + item.id}" tag="a" class="links" :title="item.name">{{item.name}}</router-link></span>
+          </td>
+          <td>
+            <span v-if="item.executorName">{{item.executorName}}</span>
+            <span v-else>-</span>
           </td>
           <td><span>{{_rtRunningType(item.commandType)}}</span></td>
           <td>

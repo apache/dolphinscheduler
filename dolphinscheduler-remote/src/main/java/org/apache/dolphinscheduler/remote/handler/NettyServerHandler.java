@@ -117,7 +117,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                     try {
                         pair.getLeft().process(channel, msg);
                     } catch (Throwable ex) {
-                        logger.error("process msg {} error : {}", msg, ex);
+                        logger.error("process msg {} error", msg, ex);
                     }
                 }
             };
@@ -140,7 +140,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("exceptionCaught : {}", cause);
+        logger.error("exceptionCaught : {}",cause.getMessage(), cause);
         ctx.channel().close();
     }
 
@@ -158,14 +158,14 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         if (!ch.isWritable()) {
             if (logger.isWarnEnabled()) {
                 logger.warn("{} is not writable, over high water level : {}",
-                        new Object[]{ch, config.getWriteBufferHighWaterMark()});
+                        ch, config.getWriteBufferHighWaterMark());
             }
 
             config.setAutoRead(false);
         } else {
             if (logger.isWarnEnabled()) {
                 logger.warn("{} is writable, to low water : {}",
-                        new Object[]{ch, config.getWriteBufferLowWaterMark()});
+                        ch, config.getWriteBufferLowWaterMark());
             }
             config.setAutoRead(true);
         }

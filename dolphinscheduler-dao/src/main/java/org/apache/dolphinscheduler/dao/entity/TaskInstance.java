@@ -196,6 +196,17 @@ public class TaskInstance {
      */
     private int workerGroupId;
 
+    /**
+     * executor id
+     */
+    private int executorId;
+
+    /**
+     * executor name
+     */
+    @TableField(exist = false)
+    private String executorName;
+
 
 
     public void  init(String host,Date startTime,String executePath){
@@ -362,8 +373,8 @@ public class TaskInstance {
     }
 
 
-    public Boolean isSubProcess(){
-        return TaskType.SUB_PROCESS.toString().equals(this.taskType.toUpperCase());
+    public boolean isSubProcess(){
+        return TaskType.SUB_PROCESS.getDescp().equals(this.taskType);
     }
 
     public String getDependency(){
@@ -415,7 +426,23 @@ public class TaskInstance {
         this.retryInterval = retryInterval;
     }
 
-    public Boolean isTaskComplete() {
+    public int getExecutorId() {
+        return executorId;
+    }
+
+    public void setExecutorId(int executorId) {
+        this.executorId = executorId;
+    }
+
+    public String getExecutorName() {
+        return executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this.executorName = executorName;
+    }
+
+    public boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
                 || this.getState().typeIsSuccess()
@@ -466,6 +493,14 @@ public class TaskInstance {
         this.workerGroupId = workerGroupId;
     }
 
+    public String getDependentResult() {
+        return dependentResult;
+    }
+
+    public void setDependentResult(String dependentResult) {
+        this.dependentResult = dependentResult;
+    }
+
     @Override
     public String toString() {
         return "TaskInstance{" +
@@ -485,27 +520,21 @@ public class TaskInstance {
                 ", logPath='" + logPath + '\'' +
                 ", retryTimes=" + retryTimes +
                 ", alertFlag=" + alertFlag +
-                ", flag=" + flag +
                 ", processInstance=" + processInstance +
                 ", processDefine=" + processDefine +
                 ", pid=" + pid +
                 ", appLink='" + appLink + '\'' +
                 ", flag=" + flag +
-                ", dependency=" + dependency +
+                ", dependency='" + dependency + '\'' +
                 ", duration=" + duration +
                 ", maxRetryTimes=" + maxRetryTimes +
                 ", retryInterval=" + retryInterval +
                 ", taskInstancePriority=" + taskInstancePriority +
                 ", processInstancePriority=" + processInstancePriority +
-                ", workGroupId=" + workerGroupId +
+                ", dependentResult='" + dependentResult + '\'' +
+                ", workerGroupId=" + workerGroupId +
+                ", executorId=" + executorId +
+                ", executorName='" + executorName + '\'' +
                 '}';
-    }
-
-    public String getDependentResult() {
-        return dependentResult;
-    }
-
-    public void setDependentResult(String dependentResult) {
-        this.dependentResult = dependentResult;
     }
 }
