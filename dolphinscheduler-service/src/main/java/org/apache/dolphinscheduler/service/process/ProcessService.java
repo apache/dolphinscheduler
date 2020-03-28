@@ -242,11 +242,10 @@ public class ProcessService {
      * @return
      */
     public  List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId){
-        List<TaskNode> result = new ArrayList<>();
         ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
         if (processDefinition == null) {
             logger.info("process define not exists");
-            return result;
+            return null;
         }
 
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
@@ -255,10 +254,10 @@ public class ProcessService {
         //process data check
         if (null == processData) {
             logger.error("process data is null");
-            return result;
+            return null;
         }
 
-        return (processData.getTasks() == null) ? result : processData.getTasks();
+        return processData.getTasks();
     }
 
     /**

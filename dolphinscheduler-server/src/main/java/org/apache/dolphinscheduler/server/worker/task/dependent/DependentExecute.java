@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.worker.task.dependent;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
@@ -30,7 +31,6 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.*;
 
 /**
@@ -83,7 +83,7 @@ public class DependentExecute {
      * @param currentTime   current time
      * @return DependResult
      */
-    public DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime){
+    private DependResult getDependentResultForItem(DependentItem dependentItem, Date currentTime){
         List<DateInterval> dateIntervals = DependentUtils.getDateIntervalList(currentTime, dependentItem.getDateValue());
         return calculateResultForTasks(dependentItem, dateIntervals );
     }
@@ -96,6 +96,7 @@ public class DependentExecute {
      */
     private DependResult calculateResultForTasks(DependentItem dependentItem,
                                                         List<DateInterval> dateIntervals) {
+
         DependResult result = DependResult.FAILED;
         for(DateInterval dateInterval : dateIntervals){
             ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionId(),
@@ -110,9 +111,7 @@ public class DependentExecute {
                 List<TaskNode> taskNodes =
                         processService.getTaskNodeListByDefinitionId(dependentItem.getDefinitionId());
 
-                if(taskNodes.size() == 0){
-                    result = DependResult.FAILED;
-                }else{
+                if(taskNodes != null && taskNodes.size() > 0){
                     List<DependResult> results = new ArrayList<>();
                     DependResult tmpResult =  DependResult.FAILED;
                     for(TaskNode taskNode:taskNodes){
@@ -131,7 +130,8 @@ public class DependentExecute {
                     }else{
                         result =  DependResult.SUCCESS;
                     }
-
+                }else{
+                    result = DependResult.FAILED;
                 }
             }else{
                 result = getDependTaskResult(dependentItem.getDepTasks(),processInstance);
@@ -281,7 +281,7 @@ public class DependentExecute {
      * @param currentTime   current time
      * @return DependResult
      */
-    public DependResult getDependResultForItem(DependentItem item, Date currentTime){
+    private DependResult getDependResultForItem(DependentItem item, Date currentTime){
         String key = item.getKey();
         if(dependResultMap.containsKey(key)){
             return dependResultMap.get(key);

@@ -739,6 +739,7 @@
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
                         <include>**/server/worker/task/shell/ShellTaskTest.java</include>
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
+                        <include>**/server/worker/task/dependent/DependentTaskTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/dao/datasource/BaseDataSourceTest.java</include>
