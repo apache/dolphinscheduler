@@ -143,13 +143,16 @@ public class ShellTask extends AbstractTask {
             taskProps.getCmdTypeIfComplement(),
             taskProps.getScheduleTime());
 
-//    replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
-    if(paramsMap != null && taskProps.getScheduleTime()!=null) {
-      String dateTime = DateUtils.format(taskProps.getScheduleTime(), Constants.PARAMETER_FORMAT_TIME);
-      Property p = new Property();
-      p.setValue(dateTime);
-      p.setProp(Constants.PARAMETER_SHECDULE_TIME);
-      paramsMap.put(Constants.PARAMETER_SHECDULE_TIME, p);
+    // new
+    // replace variable TIME with $[YYYYmmddd...] in shell file when history run job and batch complement job
+    if (paramsMap != null) {
+      if (taskProps.getScheduleTime() != null) {
+        String dateTime = DateUtils.format(taskProps.getScheduleTime(), Constants.PARAMETER_FORMAT_TIME);
+        Property p = new Property();
+        p.setValue(dateTime);
+        p.setProp(Constants.PARAMETER_SHECDULE_TIME);
+        paramsMap.put(Constants.PARAMETER_SHECDULE_TIME, p);
+      }
       script = ParameterUtils.convertParameterPlaceholders2(script, ParamUtils.convert(paramsMap));
     }
 
