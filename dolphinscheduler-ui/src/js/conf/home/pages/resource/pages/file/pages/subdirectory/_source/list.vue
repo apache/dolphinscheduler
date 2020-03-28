@@ -229,7 +229,17 @@
         setTimeout(() => {
           this.list = a
         })
-      }
+      },
+      // Listening for routing changes
+      // '$route': {
+      //   deep: false,
+      //   handler () {
+      //     this.$emit('on-update',this.$route.params.id)
+      //   }
+      // }
+    },
+    beforeRouteUpdate (to, from, next) {
+      next() // 一定要有next
     },
     created () {
     },
