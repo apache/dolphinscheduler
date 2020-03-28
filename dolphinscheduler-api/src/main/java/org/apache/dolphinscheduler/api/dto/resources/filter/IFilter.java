@@ -14,31 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.api.enums;
+package org.apache.dolphinscheduler.api.dto.resources.filter;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 
-import java.util.Locale;
+import java.util.List;
 
-import static org.junit.Assert.*;
-
-public class StatusTest {
-
-    @Test
-    public void testGetCode() {
-        assertEquals(0, Status.SUCCESS.getCode());
-        assertNotEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 0);
-    }
-
-    @Test
-    public void testGetMsg() {
-        LocaleContextHolder.setLocale(Locale.US);
-        Assert.assertEquals("success", Status.SUCCESS.getMsg());
-
-        LocaleContextHolder.setLocale(Locale.SIMPLIFIED_CHINESE);
-        Assert.assertEquals("成功", Status.SUCCESS.getMsg());
-    }
-
+/**
+ * interface filter
+ */
+public interface IFilter {
+    List<Resource> filter();
 }
