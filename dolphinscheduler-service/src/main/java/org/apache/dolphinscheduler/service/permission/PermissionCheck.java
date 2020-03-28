@@ -147,7 +147,7 @@ public class PermissionCheck<T> {
                 List<T> unauthorizedList = processService.listUnauthorized(userId,needChecks,authorizationType);
                 // if exist unauthorized resource
                 if(CollectionUtils.isNotEmpty(unauthorizedList)){
-                    logger.error("user {} didn't has permission of {}: {}", user.getUserName(), authorizationType.getDescp(),unauthorizedList.toString());
+                    logger.error("user {} didn't has permission of {}: {}", user.getUserName(), authorizationType.getDescp(),unauthorizedList);
                     throw new RuntimeException(String.format("user %s didn't has permission of %s %s", user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
                 }
             }

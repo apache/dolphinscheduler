@@ -87,35 +87,35 @@ public class FlinkArgsUtilsTest {
         }
 
         //Expected values and order
-        assertEquals(result.size(),20);
+        assertEquals(20, result.size());
 
-        assertEquals(result.get(0),"-m");
-        assertEquals(result.get(1),"yarn-cluster");
+        assertEquals("-m", result.get(0));
+        assertEquals("yarn-cluster", result.get(1));
 
-        assertEquals(result.get(2),"-ys");
+        assertEquals("-ys", result.get(2));
         assertSame(Integer.valueOf(result.get(3)),slot);
 
-        assertEquals(result.get(4),"-ynm");
+        assertEquals("-ynm",result.get(4));
         assertEquals(result.get(5),appName);
 
-        assertEquals(result.get(6),"-yn");
+        assertEquals("-yn", result.get(6));
         assertSame(Integer.valueOf(result.get(7)),taskManager);
 
-        assertEquals(result.get(8),"-yjm");
+        assertEquals("-yjm", result.get(8));
         assertEquals(result.get(9),jobManagerMemory);
 
-        assertEquals(result.get(10),"-ytm");
+        assertEquals("-ytm", result.get(10));
         assertEquals(result.get(11),taskManagerMemory);
 
-        assertEquals(result.get(12),"-d");
+        assertEquals("-d", result.get(12));
 
-        assertEquals(result.get(13),"-c");
+        assertEquals("-c", result.get(13));
         assertEquals(result.get(14),mainClass);
 
         assertEquals(result.get(15),mainJar.getRes());
         assertEquals(result.get(16),mainArgs);
 
-        assertEquals(result.get(17),"--qu");
+        assertEquals("--qu", result.get(17));
         assertEquals(result.get(18),queue);
 
         assertEquals(result.get(19),others);
@@ -125,7 +125,7 @@ public class FlinkArgsUtilsTest {
         param1.setQueue(queue);
         param1.setDeployMode(mode);
         result = FlinkArgsUtils.buildArgs(param1);
-        assertEquals(result.size(),5);
+        assertEquals(5, result.size());
 
     }
 }

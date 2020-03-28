@@ -41,7 +41,6 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-api</artifactId>
         </dependency>
-
     </dependencies>
 
     <profiles>
@@ -97,7 +96,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
                 </plugins>
             </build>
         </profile>
@@ -222,10 +220,7 @@
                                                 ${basedir}/../dolphinscheduler-alert/src/main/resources
                                             </location>
                                             <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
-                                                <include>**/*.ftl</include>
+                                                <include>**/*.*</include>
                                             </includes>
                                         </source>
 
@@ -234,9 +229,7 @@
                                                 ${basedir}/../dolphinscheduler-common/src/main/resources
                                             </location>
                                             <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
+                                                <include>**/*.*</include>
                                             </includes>
                                         </source>
 
@@ -245,10 +238,7 @@
                                                 ${basedir}/../dolphinscheduler-dao/src/main/resources
                                             </location>
                                             <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
-                                                <include>**/*.yml</include>
+                                                <include>**/*.*</include>
                                             </includes>
                                         </source>
 
@@ -257,9 +247,7 @@
                                                 ${basedir}/../dolphinscheduler-api/src/main/resources
                                             </location>
                                             <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
+                                                <include>**/*.*</include>
                                             </includes>
                                         </source>
 
@@ -268,10 +256,16 @@
                                                 ${basedir}/../dolphinscheduler-server/src/main/resources
                                             </location>
                                             <includes>
-                                                <include>**/*.properties</include>
-                                                <include>**/*.xml</include>
-                                                <include>**/*.json</include>
                                                 <include>config/*.*</include>
+                                            </includes>
+                                        </source>
+
+                                        <source>
+                                            <location>
+                                                ${basedir}/../dolphinscheduler-service/src/main/resources
+                                            </location>
+                                            <includes>
+                                                <include>*.*</include>
                                             </includes>
                                         </source>
 
@@ -346,14 +340,6 @@
 
                                         <source>
                                             <location>
-                                                ${basedir}/../dolphinscheduler-ui
-                                            </location>
-                                            <includes>
-                                                <include>install-dolphinscheduler-ui.sh</include>
-                                            </includes>
-                                        </source>
-                                        <source>
-                                            <location>
                                                 ${basedir}/release-docs
                                             </location>
                                             <includes>
@@ -364,7 +350,7 @@
                                     </sources>
                                 </mapping>
                                 <mapping>
-                                    <directory>/opt/soft/${project.build.finalName}/dist</directory>
+                                    <directory>/opt/soft/${project.build.finalName}/ui</directory>
                                     <filemode>755</filemode>
                                     <username>root</username>
                                     <groupname>root</groupname>
@@ -393,6 +379,14 @@
                                                 <include>**/*.*</include>
                                             </includes>
                                         </source>
+                                        <source>
+                                            <location>
+                                                ${basedir}/../sql
+                                            </location>
+                                            <includes>
+                                                <include>soft_version</include>
+                                            </includes>
+                                        </source>
                                     </sources>
                                 </mapping>
 
@@ -407,7 +401,7 @@
                                                 ${basedir}/../script
                                             </location>
                                             <includes>
-                                                <include>**/*.*</include>
+                                                <include>*.sh</include>
                                             </includes>
                                         </source>
 
@@ -418,6 +412,9 @@
                             <preinstallScriptlet>
                                 <script>mkdir -p /opt/soft</script>
                             </preinstallScriptlet>
+                            <postinstallScriptlet>
+                                <script>rm -rf /opt/soft/dolphinscheduler ; ln -s /opt/soft/apache-dolphinscheduler-incubating-${project.version} /opt/soft/dolphinscheduler</script>
+                            </postinstallScriptlet>
                             <postremoveScriptlet>
                                 <script>rm -rf /opt/soft/apache-dolphinscheduler-incubating-${project.version}</script>
                             </postremoveScriptlet>
