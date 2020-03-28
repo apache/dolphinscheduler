@@ -17,10 +17,15 @@
 package org.apache.dolphinscheduler.api.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbConnectType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -30,10 +35,6 @@ import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
@@ -473,12 +474,19 @@ public class DataSourceService extends BaseService{
      * @return datasource parameter
      */
     public String buildParameter(String name, String desc, DbType type, String host,
-                                 String port, String database,String principal,String userName,
-                                 String password, String other) {
+                                 String port, String database, String principal, String userName,
+                                 String password, DbConnectType connectType, String other) {
 
-        String address = buildAddress(type, host, port);
+        String address = buildAddress(type, host, port, connectType);
 
-        String jdbcUrl = address + "/" + database;
+        String jdbcUrl;
+        if (Constants.ORACLE.equals(type.name())
+                && connectType == DbConnectType.ORACLE_SID) {
+            jdbcUrl = address + ":" + database;
+        } else {
+            jdbcUrl = address + "/" + database;
+        }
+
         if (CommonUtils.getKerberosStartupState() &&
                 (type == DbType.HIVE || type == DbType.SPARK)){
             jdbcUrl += ";principal=" + principal;
@@ -531,7 +539,7 @@ public class DataSourceService extends BaseService{
 
     }
 
-    private String buildAddress(DbType type, String host, String port) {
+    private String buildAddress(DbType type, String host, String port, DbConnectType connectType) {
         StringBuilder sb = new StringBuilder();
         if (Constants.MYSQL.equals(type.name())) {
             sb.append(Constants.JDBC_MYSQL);
@@ -552,7 +560,11 @@ public class DataSourceService extends BaseService{
             sb.append(Constants.JDBC_CLICKHOUSE);
             sb.append(host).append(":").append(port);
         } else if (Constants.ORACLE.equals(type.name())) {
-            sb.append(Constants.JDBC_ORACLE);
+            if (connectType == DbConnectType.ORACLE_SID) {
+                sb.append(Constants.JDBC_ORACLE_SID);
+            } else {
+                sb.append(Constants.JDBC_ORACLE_SERVICE_NAME);
+            }
             sb.append(host).append(":").append(port);
         } else if (Constants.SQLSERVER.equals(type.name())) {
             sb.append(Constants.JDBC_SQLSERVER);
