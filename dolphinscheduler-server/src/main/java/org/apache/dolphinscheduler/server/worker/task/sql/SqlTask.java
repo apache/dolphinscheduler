@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.UdfType;
@@ -247,11 +248,12 @@ public class SqlTask extends AbstractTask {
                                         List<String> createFuncs){
         Connection connection = null;
         try {
-            // if upload resource is HDFS and kerberos startup
-            CommonUtils.loadKerberosConf();
 
             // if hive , load connection params if exists
-            if (HIVE == dataSource.getType()) {
+            if (DbType.HIVE == dataSource.getType() || DbType.SPARK == dataSource.getType()) {
+                // if upload resource is HDFS and kerberos startup
+                CommonUtils.loadKerberosConf();
+
                 Properties paramProp = new Properties();
                 paramProp.setProperty(USER, baseDataSource.getUser());
                 paramProp.setProperty(PASSWORD, baseDataSource.getPassword());
