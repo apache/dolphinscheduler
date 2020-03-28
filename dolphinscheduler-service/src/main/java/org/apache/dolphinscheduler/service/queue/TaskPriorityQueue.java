@@ -17,7 +17,7 @@
 package org.apache.dolphinscheduler.service.queue;
 
 
-public interface TaskUpdateQueue {
+public interface TaskPriorityQueue {
 
     /**
      * put task info

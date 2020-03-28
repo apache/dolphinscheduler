@@ -17,8 +17,8 @@
 
 package queue;
 
-import org.apache.dolphinscheduler.service.queue.TaskUpdateQueue;
-import org.apache.dolphinscheduler.service.queue.TaskUpdateQueueImpl;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -45,7 +45,7 @@ public class TaskUpdateQueueTest {
         String taskInfo3 = "1_1_0_3_default";
         String taskInfo4 = "1_1_0_4_default";
 
-        TaskUpdateQueue queue = new TaskUpdateQueueImpl();
+        TaskPriorityQueue queue = new TaskPriorityQueueImpl();
         queue.put(taskInfo1);
         queue.put(taskInfo2);
         queue.put(taskInfo3);

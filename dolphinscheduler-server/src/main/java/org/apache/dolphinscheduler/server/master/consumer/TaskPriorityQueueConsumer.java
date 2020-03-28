@@ -40,7 +40,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionConte
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.queue.TaskUpdateQueue;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,18 +53,18 @@ import java.util.List;
  * TaskUpdateQueue consumer
  */
 @Component
-public class TaskUpdateQueueConsumer extends Thread{
+public class TaskPriorityQueueConsumer extends Thread{
 
     /**
      * logger of TaskUpdateQueueConsumer
      */
-    private static final Logger logger = LoggerFactory.getLogger(TaskUpdateQueueConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskPriorityQueueConsumer.class);
 
     /**
      * taskUpdateQueue
      */
     @Autowired
-    private TaskUpdateQueue taskUpdateQueue;
+    private TaskPriorityQueue taskUpdateQueue;
 
     /**
      * processService
@@ -155,52 +155,19 @@ public class TaskUpdateQueueConsumer extends Thread{
         TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
         // SQL task
         if (taskType == TaskType.SQL){
-            SqlParameters sqlParameters = JSONObject.parseObject(taskNode.getParams(), SqlParameters.class);
-            int datasourceId = sqlParameters.getDatasource();
-            DataSource datasource = processService.findDataSourceById(datasourceId);
-            sqlTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
-
-            // whether udf type
-            boolean udfTypeFlag = EnumUtils.isValidEnum(UdfType.class, sqlParameters.getType())
-                    && StringUtils.isNotEmpty(sqlParameters.getUdfs());
-
-            if (udfTypeFlag){
-                String[] udfFunIds = sqlParameters.getUdfs().split(",");
-                int[] udfFunIdsArray = new int[udfFunIds.length];
-                for(int i = 0 ; i < udfFunIds.length;i++){
-                    udfFunIdsArray[i]=Integer.parseInt(udfFunIds[i]);
-                }
-
-                List<UdfFunc> udfFuncList = processService.queryUdfFunListByids(udfFunIdsArray);
-                sqlTaskExecutionContext.setUdfFuncList(udfFuncList);
-            }
+            setSQLTaskRelation(sqlTaskExecutionContext, taskNode);
 
         }
 
         // DATAX task
         if (taskType == TaskType.DATAX){
-            DataxParameters dataxParameters = JSONObject.parseObject(taskNode.getParams(), DataxParameters.class);
-
-            DataSource dataSource = processService.findDataSourceById(dataxParameters.getDataSource());
-            DataSource dataTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
-
-
-            dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
-            dataxTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
-            dataxTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
-
-            dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
-            dataxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
-            dataxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+            setDataxTaskRelation(dataxTaskExecutionContext, taskNode);
         }
 
 
         // procedure task
         if (taskType == TaskType.PROCEDURE){
-            ProcedureParameters procedureParameters = JSONObject.parseObject(taskNode.getParams(), ProcedureParameters.class);
-            int datasourceId = procedureParameters.getDatasource();
-            DataSource datasource = processService.findDataSourceById(datasourceId);
-            procedureTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
+            setProcedureTaskRelation(procedureTaskExecutionContext, taskNode);
         }
 
 
@@ -213,6 +180,66 @@ public class TaskUpdateQueueConsumer extends Thread{
                 .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
                 .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
                 .create();
+    }
+
+    /**
+     * set procedure task relation
+     * @param procedureTaskExecutionContext procedureTaskExecutionContext
+     * @param taskNode taskNode
+     */
+    private void setProcedureTaskRelation(ProcedureTaskExecutionContext procedureTaskExecutionContext, TaskNode taskNode) {
+        ProcedureParameters procedureParameters = JSONObject.parseObject(taskNode.getParams(), ProcedureParameters.class);
+        int datasourceId = procedureParameters.getDatasource();
+        DataSource datasource = processService.findDataSourceById(datasourceId);
+        procedureTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
+    }
+
+    /**
+     * set datax task relation
+     * @param dataxTaskExecutionContext dataxTaskExecutionContext
+     * @param taskNode taskNode
+     */
+    private void setDataxTaskRelation(DataxTaskExecutionContext dataxTaskExecutionContext, TaskNode taskNode) {
+        DataxParameters dataxParameters = JSONObject.parseObject(taskNode.getParams(), DataxParameters.class);
+
+        DataSource dataSource = processService.findDataSourceById(dataxParameters.getDataSource());
+        DataSource dataTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
+
+
+        dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
+        dataxTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
+        dataxTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+
+        dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
+        dataxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+        dataxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+    }
+
+    /**
+     * set SQL task relation
+     * @param sqlTaskExecutionContext sqlTaskExecutionContext
+     * @param taskNode taskNode
+     */
+    private void setSQLTaskRelation(SQLTaskExecutionContext sqlTaskExecutionContext, TaskNode taskNode) {
+        SqlParameters sqlParameters = JSONObject.parseObject(taskNode.getParams(), SqlParameters.class);
+        int datasourceId = sqlParameters.getDatasource();
+        DataSource datasource = processService.findDataSourceById(datasourceId);
+        sqlTaskExecutionContext.setConnectionParams(datasource.getConnectionParams());
+
+        // whether udf type
+        boolean udfTypeFlag = EnumUtils.isValidEnum(UdfType.class, sqlParameters.getType())
+                && StringUtils.isNotEmpty(sqlParameters.getUdfs());
+
+        if (udfTypeFlag){
+            String[] udfFunIds = sqlParameters.getUdfs().split(",");
+            int[] udfFunIdsArray = new int[udfFunIds.length];
+            for(int i = 0 ; i < udfFunIds.length;i++){
+                udfFunIdsArray[i]=Integer.parseInt(udfFunIds[i]);
+            }
+
+            List<UdfFunc> udfFuncList = processService.queryUdfFunListByids(udfFunIdsArray);
+            sqlTaskExecutionContext.setUdfFuncList(udfFuncList);
+        }
     }
 
     /**
