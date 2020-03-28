@@ -23,6 +23,16 @@ public class ResourceInfo {
   /**
    * res the name of the resource that was uploaded
    */
+  private int id;
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+  }
+
   private String res;
 
   public String getRes() {

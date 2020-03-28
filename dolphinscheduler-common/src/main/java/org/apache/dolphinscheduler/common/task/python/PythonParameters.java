@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class PythonParameters extends AbstractParameters {
   /**
@@ -56,12 +55,7 @@ public class PythonParameters extends AbstractParameters {
   }
 
   @Override
-  public List<String> getResourceFilesList() {
-    if (resourceList != null) {
-      return resourceList.stream()
-              .map(p -> p.getRes()).collect(Collectors.toList());
-    }
-
-    return null;
+  public List<ResourceInfo> getResourceFilesList() {
+    return this.resourceList;
   }
 }
