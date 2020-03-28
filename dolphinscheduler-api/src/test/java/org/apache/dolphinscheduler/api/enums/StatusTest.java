@@ -28,7 +28,7 @@ public class StatusTest {
 
     @Test
     public void testGetCode() {
-        assertEquals(Status.SUCCESS.getCode(), 0);
+        assertEquals(0, Status.SUCCESS.getCode());
         assertNotEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 0);
     }
 
