@@ -71,7 +71,9 @@
           // Start Time
           startDate: '',
           // End Time
-          endDate: ''
+          endDate: '',
+          // Exectuor Name
+          executorName: ''
         }
       }
     },

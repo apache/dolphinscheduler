@@ -34,7 +34,7 @@ public class WorkerConfig {
     @Value("${worker.max.cpuload.avg}")
     private int workerMaxCpuloadAvg;
 
-    @Value("${master.reserved.memory}")
+    @Value("${worker.reserved.memory}")
     private double workerReservedMemory;
 
     public int getWorkerExecThreads() {

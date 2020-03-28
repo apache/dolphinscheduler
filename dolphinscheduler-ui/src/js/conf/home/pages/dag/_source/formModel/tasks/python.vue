@@ -108,10 +108,6 @@
           return false
         }
 
-        if (!this.$refs.refResources._verifResources()) {
-          return false
-        }
-
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
@@ -119,7 +115,9 @@
 
         // storage
         this.$emit('on-params', {
-          resourceList: this.resourceList,
+          resourceList: _.map(this.resourceList, v => {
+            return {id: v}
+          }),
           localParams: this.localParams,
           rawScript: editor.getValue()
         })
@@ -160,7 +158,9 @@
     computed: {
       cacheParams () {
         return {
-          resourceList: this.cacheResourceList,
+          resourceList: _.map(this.resourceList, v => {
+            return {id: v}
+          }),
           localParams: this.localParams,
           rawScript: editor ? editor.getValue() : ''
         }
@@ -176,7 +176,9 @@
         // backfill resourceList
         let resourceList = o.params.resourceList || []
         if (resourceList.length) {
-          this.resourceList = resourceList
+          this.resourceList = _.map(resourceList, v => {
+            return v.id
+          })
           this.cacheResourceList = resourceList
         }
 

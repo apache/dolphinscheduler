@@ -74,7 +74,7 @@ public class ProcessInstanceMapperTest {
         ProcessInstance processInstanceMap = insertOne();
         //update
         int update = processInstanceMapper.updateById(processInstanceMap);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         processInstanceMapper.deleteById(processInstanceMap.getId());
     }
 
@@ -85,7 +85,7 @@ public class ProcessInstanceMapperTest {
     public void testDelete(){
         ProcessInstance processInstanceMap = insertOne();
         int delete = processInstanceMapper.deleteById(processInstanceMap.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**
@@ -165,6 +165,7 @@ public class ProcessInstanceMapperTest {
                 processDefinition.getProjectId(),
                 processInstance.getProcessDefinitionId(),
                 processInstance.getName(),
+                0,
                 stateArray,
                 processInstance.getHost(),
                 null,
@@ -196,7 +197,7 @@ public class ProcessInstanceMapperTest {
         Assert.assertNotEquals(update, 0);
 
         processInstance = processInstanceMapper.selectById(processInstance.getId());
-        Assert.assertEquals(processInstance.getHost(), null);
+        Assert.assertNull(processInstance.getHost());
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
@@ -216,7 +217,7 @@ public class ProcessInstanceMapperTest {
         ProcessInstance processInstance1 = processInstanceMapper.selectById(processInstance.getId());
 
         processInstanceMapper.deleteById(processInstance.getId());
-        Assert.assertEquals(processInstance1.getState(), ExecutionStatus.SUCCESS);
+        Assert.assertEquals(ExecutionStatus.SUCCESS, processInstance1.getState());
 
     }
 
@@ -260,10 +261,10 @@ public class ProcessInstanceMapperTest {
 
 
         List<ProcessInstance> processInstances = processInstanceMapper.queryByProcessDefineId(processInstance.getProcessDefinitionId(), 1);
-        Assert.assertEquals(processInstances.size(), 1);
+        Assert.assertEquals(1, processInstances.size());
 
         processInstances = processInstanceMapper.queryByProcessDefineId(processInstance.getProcessDefinitionId(), 2);
-        Assert.assertEquals(processInstances.size(), 2);
+        Assert.assertEquals(2, processInstances.size());
 
         processInstanceMapper.deleteById(processInstance.getId());
         processInstanceMapper.deleteById(processInstance1.getId());
@@ -319,7 +320,7 @@ public class ProcessInstanceMapperTest {
         start = new Date(2019-1900, 1-1, 01, 1, 0, 0);
         processInstance1 = processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionId(),start, end
                 );
-        Assert.assertEquals(processInstance1, null);
+        Assert.assertNull(processInstance1);
 
         processInstanceMapper.deleteById(processInstance.getId());
 

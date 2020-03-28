@@ -59,7 +59,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <curator.version>2.12.0</curator.version>
+        <curator.version>4.3.0</curator.version>
         <spring.version>5.1.5.RELEASE</spring.version>
         <spring.boot.version>2.1.3.RELEASE</spring.boot.version>
         <java.version>1.8</java.version>
@@ -72,7 +72,7 @@
         <cron.utils.version>5.0.5</cron.utils.version>
         <fastjson.version>1.2.61</fastjson.version>
         <druid.version>1.1.14</druid.version>
-        <h2.version>1.3.163</h2.version>
+        <h2.version>1.4.200</h2.version>
         <commons.codec.version>1.6</commons.codec.version>
         <commons.logging.version>1.1.1</commons.logging.version>
         <httpclient.version>4.4.1</httpclient.version>
@@ -201,13 +201,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-                <version>${h2.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-server</artifactId>
                 <version>${project.version}</version>
@@ -242,7 +235,6 @@
                 <artifactId>dolphinscheduler-alert</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-framework</artifactId>
@@ -252,6 +244,12 @@
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-recipes</artifactId>
                 <version>${curator.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.zookeeper</groupId>
+                        <artifactId>zookeeper</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.zookeeper</groupId>
@@ -349,6 +347,11 @@
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.connector.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>${h2.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -681,10 +684,15 @@
                 <configuration>
                     <includes>
                         <include>**/common/utils/*.java</include>
+                        <include>**/common/utils/process/ProcessBuilderForWin32Test.java</include>
+                        <include>**/common/utils/process/ProcessEnvironmentForWin32Test.java</include>
+                        <include>**/common/utils/process/ProcessImplForWin32Test.java</include>
                         <include>**/common/log/*.java</include>
                         <include>**/common/threadutils/*.java</include>
                         <include>**/common/graph/*.java</include>
                         <include>**/common/queue/*.java</include>
+                        <include>**/common/task/FlinkParametersTest.java</include>
+                        <include>**/common/task/SqoopParameterEntityTest.java</include>
                         <include>**/api/utils/CheckUtilsTest.java</include>
                         <include>**/api/utils/FileUtilsTest.java</include>
                         <include>**/api/utils/FourLetterWordTest.java</include>
@@ -699,6 +707,7 @@
                         <include>**/api/service/TenantServiceTest.java</include>
                         <include>**/api/service/WorkerGroupServiceTest.java</include>
                         <include>**/api/service/AlertGroupServiceTest.java</include>
+                        <include>**/api/service/UserAlertGroupServiceTest.java</include>
                         <include>**/api/service/ProjectServiceTest.java</include>
                         <include>**/api/service/ProcessDefinitionServiceTest.java</include>
                         <include>**/api/service/UdfFuncServiceTest.java</include>
@@ -708,6 +717,8 @@
                         <include>**/api/service/BaseDAGServiceTest.java</include>
                         <include>**/api/service/LoggerServiceTest.java</include>
                         <include>**/api/service/DataAnalysisServiceTest.java</include>
+                        <include>**/api/service/ProcessInstanceServiceTest.java</include>
+                        <include>**/api/service/TaskInstanceServiceTest.java</include>
                         <include>**/alert/utils/ExcelUtilsTest.java</include>
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
@@ -720,12 +731,19 @@
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/AlertMapperTest.java</include>
                         <include>**/dao/mapper/CommandMapperTest.java</include>
+                        <include>**/dao/entity/TaskInstanceTest.java</include>
                         <include>**/dao/cron/CronUtilsTest.java</include>
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/alert/template/AlertTemplateFactoryTest.java</include>
                         <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <include>**/server/worker/task/shell/ShellTaskTest.java</include>
+                        <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
+                        <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
+                        <include>**/dao/datasource/BaseDataSourceTest.java</include>
+                        <include>**/alert/utils/MailUtilsTest.java</include>
+                        <include>**/dao/AlertDaoTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
@@ -761,25 +779,23 @@
                 <artifactId>apache-rat-plugin</artifactId>
                 <version>${apache.rat.version}</version>
                 <configuration>
-                    <includes>
-                        <include>**/*.java</include>
-                        <include>**/dolphinscheduler-ui/src/**/*.scss</include>
-                        <include>**/dolphinscheduler-ui/src/**/*.css</include>
-                        <include>**/dolphinscheduler-ui/src/**/*.vue</include>
-                        <include>**/dolphinscheduler-ui/src/**/*.js</include>
-                        <include>**/dolphinscheduler-ui/src/**/*.html</include>
-                    </includes>
                     <excludes>
-                        <exclude>**/dolphinscheduler-ui/src/lib/**</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/js/module/util/cookie.js</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/font/awesome/font-awesome.css</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/sass/common/_animation.scss</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/sass/common/_normalize.scss</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/combo/1.0.0/es5.js</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/combo/1.0.0/base.css</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/view/common/outro.inc</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/view/common/meta.inc</exclude>
-                        <exclude>**/dolphinscheduler-ui/src/combo/1.0.0/3rd.css</exclude>
+                        <exclude>**/node_modules/**</exclude>
+                        <exclude>**/node/**</exclude>
+                        <exclude>**/dist/**</exclude>
+                        <exclude>**/licenses/**</exclude>
+                        <exclude>**/src/sass/common/_animation.scss</exclude>
+                        <exclude>**/src/sass/common/_normalize.scss</exclude>
+                        <exclude>.github/**</exclude>
+                        <exclude>sql/soft_version</exclude>
+                        <exclude>**/*.json</exclude>
+                        <!-- document files -->
+                        <exclude>**/*.md</exclude>
+                        <excldue>**/*.MD</excldue>
+                        <exclude>**/*.txt</exclude>
+                        <exclude>**/docs/**</exclude>
+                        <exclude>**/*.babelrc</exclude>
+                        <exclude>**/*.eslintrc</exclude>
                     </excludes>
                     <consoleOutput>true</consoleOutput>
                 </configuration>

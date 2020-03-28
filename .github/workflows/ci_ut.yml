@@ -15,12 +15,16 @@
 # limitations under the License.
 #
 
-on: ["push", "pull_request"]
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
 env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler
 
-name: Test Coveralls Parallel
+name: Unit Test
 
 jobs:
 
@@ -29,9 +33,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: actions/checkout@v1
-        with:
-          submodules: true
+      - uses: actions/checkout@v2
+      # In the checkout@v2, it doesn't support git submodule. Execute the commands manually.
+      - name: checkout submodules
+        shell: bash
+        run: |
+          git submodule sync --recursive
+          git -c protocol.version=2 submodule update --init --force --recursive --depth=1
       - uses: actions/cache@v1
         with:
           path: ~/.m2/repository
@@ -44,10 +52,17 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
+      - name: Git fetch unshallow
+        run: |
+          git fetch --unshallow
+          git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+          git fetch origin
       - name: Compile
         run: |
           export MAVEN_OPTS='-Dmaven.repo.local=.m2/repository -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:-UseGCOverheadLimit -Xmx3g'
           mvn test -B -Dmaven.test.skip=false
+      - name: Upload coverage report to codecov
+        run: |
           CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
       - name: Run SonarCloud Analysis
         run: >

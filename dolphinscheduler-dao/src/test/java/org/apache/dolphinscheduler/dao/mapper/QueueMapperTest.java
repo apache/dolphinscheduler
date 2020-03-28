@@ -18,7 +18,6 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 
 import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.entity.Queue;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.Assert;
@@ -65,7 +64,7 @@ public class QueueMapperTest {
         queue.setCreateTime(new Date());
         //update
         int update = queueMapper.updateById(queue);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         queueMapper.deleteById(queue.getId());
     }
 
@@ -76,7 +75,7 @@ public class QueueMapperTest {
     public void testDelete(){
         Queue queue = insertOne();
         int delete = queueMapper.deleteById(queue.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**

@@ -24,10 +24,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -141,7 +138,7 @@ public class ResourcesService extends BaseService {
 
             putMsg(result, Status.SUCCESS);
             Map<Object, Object> dataMap = new BeanMap(resource);
-            Map<String, Object> resultMap = new HashMap<String, Object>();
+            Map<String, Object> resultMap = new HashMap<>();
             for (Map.Entry<Object, Object> entry: dataMap.entrySet()) {
                 if (!"class".equalsIgnoreCase(entry.getKey().toString())) {
                     resultMap.put(entry.getKey().toString(), entry.getValue());
@@ -171,12 +168,8 @@ public class ResourcesService extends BaseService {
      * @return true if resource exists
      */
     private boolean checkResourceExists(String alias, int userId, int type ){
-
         List<Resource> resources = resourcesMapper.queryResourceList(alias, userId, type);
-        if (resources != null && resources.size() > 0) {
-            return true;
-        }
-        return false;
+        return CollectionUtils.isNotEmpty(resources);
     }
 
 
@@ -237,7 +230,7 @@ public class ResourcesService extends BaseService {
 
         //get the file suffix
         String originResourceName = resource.getAlias();
-        String suffix = originResourceName.substring(originResourceName.lastIndexOf("."));
+        String suffix = originResourceName.substring(originResourceName.lastIndexOf('.'));
 
         //if the name without suffix then add it ,else use the origin name
         String nameWithSuffix = name;
@@ -547,7 +540,7 @@ public class ResourcesService extends BaseService {
             }
 
         } catch (Exception e) {
-            logger.error(String.format("Resource %s read failed", hdfsFileName), e);
+            logger.error("Resource {} read failed", hdfsFileName, e);
             putMsg(result, Status.HDFS_OPERATION_ERROR);
         }
 
@@ -746,8 +739,7 @@ public class ResourcesService extends BaseService {
         logger.info("resource hdfs path is {} ", hdfsFileName);
 
         HadoopUtils.getInstance().copyHdfsToLocal(hdfsFileName, localFileName, false, true);
-        org.springframework.core.io.Resource file = org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
-        return file;
+        return org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
     }
 
 
@@ -766,7 +758,7 @@ public class ResourcesService extends BaseService {
         }
         List<Resource> resourceList = resourcesMapper.queryResourceExceptUserId(userId);
         List<Object> list ;
-        if (resourceList != null && resourceList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(resourceList)) {
             Set<Resource> resourceSet = new HashSet<>(resourceList);
             List<Resource> authedResourceList = resourcesMapper.queryAuthorizedResourceList(userId);
 
@@ -801,7 +793,7 @@ public class ResourcesService extends BaseService {
         List<UdfFunc> udfFuncList = udfFunctionMapper.queryUdfFuncExceptUserId(userId);
         List<UdfFunc> resultList = new ArrayList<>();
         Set<UdfFunc> udfFuncSet = null;
-        if (udfFuncList != null && udfFuncList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(udfFuncList)) {
             udfFuncSet = new HashSet<>(udfFuncList);
 
             List<UdfFunc> authedUDFFuncList = udfFunctionMapper.queryAuthedUdfFunc(userId);
@@ -897,10 +889,9 @@ public class ResourcesService extends BaseService {
      */
     private void getAuthorizedResourceList(Set<?> resourceSet, List<?> authedResourceList) {
         Set<?> authedResourceSet = null;
-        if (authedResourceList != null && authedResourceList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(authedResourceList)) {
             authedResourceSet = new HashSet<>(authedResourceList);
             resourceSet.removeAll(authedResourceSet);
-
         }
     }
 

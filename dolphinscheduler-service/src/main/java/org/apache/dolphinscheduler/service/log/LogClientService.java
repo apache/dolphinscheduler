@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.service.log;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.*;
@@ -41,7 +40,7 @@ public class LogClientService {
     /**
      *  request time out
      */
-    private final long logRequestTimeout = 10 * 1000;
+    private static final long LOG_REQUEST_TIMEOUT = 10 * 1000L;
 
     /**
      * construct client
@@ -76,7 +75,7 @@ public class LogClientService {
         final Address address = new Address(host, port);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if(response != null){
                 RollViewLogResponseCommand rollReviewLog = FastJsonSerializer.deserialize(
                         response.getBody(), RollViewLogResponseCommand.class);
@@ -104,7 +103,7 @@ public class LogClientService {
         final Address address = new Address(host, port);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if(response != null){
                 ViewLogResponseCommand viewLog = FastJsonSerializer.deserialize(
                         response.getBody(), ViewLogResponseCommand.class);
@@ -132,7 +131,7 @@ public class LogClientService {
         final Address address = new Address(host, port);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, logRequestTimeout);
+            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
             if(response != null){
                 GetLogBytesResponseCommand getLog = FastJsonSerializer.deserialize(
                         response.getBody(), GetLogBytesResponseCommand.class);

@@ -140,6 +140,12 @@ public class ProcessInstance {
     private int executorId;
 
     /**
+     * executor name
+     */
+    @TableField(exist = false)
+    private String executorName;
+
+    /**
      * tenant code
      */
     @TableField(exist = false)
@@ -360,7 +366,7 @@ public class ProcessInstance {
     }
 
 
-    public boolean IsProcessInstanceStop(){
+    public boolean isProcessInstanceStop(){
         return this.state.typeIsFinished();
     }
 
@@ -472,6 +478,14 @@ public class ProcessInstance {
         return historyCmd;
     }
 
+    public String getExecutorName() {
+        return executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this.executorName = executorName;
+    }
+
     public void setHistoryCmd(String historyCmd) {
         this.historyCmd = historyCmd;
     }
@@ -492,7 +506,7 @@ public class ProcessInstance {
      * check this process is start complement data
      * @return whether complement data
      */
-    public Boolean isComplementData(){
+    public boolean isComplementData(){
         if(!StringUtils.isNotEmpty(this.historyCmd)){
             return false;
         }
