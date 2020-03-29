@@ -65,7 +65,7 @@ jobs:
         run: |
           CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
       - name: Run SonarCloud Analysis
-        # just test
+        # just test again
         run: >
           mvn verify --batch-mode
           org.sonarsource.scanner.maven:sonar-maven-plugin:3.6.1.1688:sonar
