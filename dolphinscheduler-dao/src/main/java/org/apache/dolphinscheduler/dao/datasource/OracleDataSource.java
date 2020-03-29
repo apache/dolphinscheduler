@@ -17,59 +17,41 @@
 package org.apache.dolphinscheduler.dao.datasource;
 
 import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.enums.DbConnectType;
+import org.apache.dolphinscheduler.common.enums.DbType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 /**
  * data source of Oracle
  */
 public class OracleDataSource extends BaseDataSource {
+
     private static final Logger logger = LoggerFactory.getLogger(OracleDataSource.class);
 
-    /**
-     * gets the JDBC url for the data source connection
-     * @return
-     */
-    @Override
-    public String getJdbcUrl() {
-        String jdbcUrl = getAddress();
-        if (jdbcUrl.lastIndexOf('/') != (jdbcUrl.length() - 1)) {
-            jdbcUrl += "/";
-        }
+    private DbConnectType type;
 
-        jdbcUrl += getDatabase();
+    public DbConnectType getType() {
+        return type;
+    }
 
-        if (StringUtils.isNotEmpty(getOther())) {
-            jdbcUrl += "?" + getOther();
-        }
-
-        return jdbcUrl;
+    public void setType(DbConnectType type) {
+        this.type = type;
     }
 
     /**
-     * test whether the data source can be connected successfully
-     * @throws Exception
+     * @return driver class
      */
     @Override
-    public void isConnectable() throws Exception {
-        Connection con = null;
-        try {
-            Class.forName(Constants.COM_ORACLE_JDBC_DRIVER);
-            con = DriverManager.getConnection(getJdbcUrl(), getUser(), getPassword());
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    logger.error("Oracle datasource try conn close conn error", e);
-                }
-            }
-        }
+    public String driverClassSelector() {
+        return Constants.COM_ORACLE_JDBC_DRIVER;
+    }
 
+    /**
+     * @return db type
+     */
+    @Override
+    public DbType dbTypeSelector() {
+        return DbType.ORACLE;
     }
 }
