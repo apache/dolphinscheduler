@@ -59,12 +59,7 @@ public class ShellParameters extends AbstractParameters {
   }
 
   @Override
-  public List<String> getResourceFilesList() {
-    if (resourceList != null) {
-      return resourceList.stream()
-              .map(p -> p.getRes()).collect(Collectors.toList());
-    }
-
-    return null;
+  public List<ResourceInfo> getResourceFilesList() {
+    return resourceList;
   }
 }

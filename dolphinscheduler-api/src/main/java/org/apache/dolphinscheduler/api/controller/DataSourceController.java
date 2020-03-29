@@ -16,18 +16,19 @@
  */
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.DataSourceService;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.DbType;
-import org.apache.dolphinscheduler.common.utils.CommonUtils;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.DataSourceService;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.DbConnectType;
+import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +77,7 @@ public class DataSourceController extends BaseController {
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME",required = true, dataType ="String"),
             @ApiImplicitParam(name = "userName", value = "USER_NAME",required = true, dataType ="String"),
             @ApiImplicitParam(name = "password", value = "PASSWORD", dataType ="String"),
+            @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
             @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType ="String")
     })
     @PostMapping(value = "/create")
@@ -90,11 +92,12 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "principal") String principal,
                                    @RequestParam(value = "userName") String userName,
                                    @RequestParam(value = "password") String password,
+                                   @RequestParam(value = "connectType") DbConnectType connectType,
                                    @RequestParam(value = "other") String other) {
-        logger.info("login user {} create datasource name: {}, note: {}, type: {}, host: {},port: {},database : {},principal: {},userName : {} other: {}",
-                loginUser.getUserName(), name, note, type, host,port,database,principal,userName,other);
+        logger.info("login user {} create datasource name: {}, note: {}, type: {}, host: {}, port: {}, database : {}, principal: {}, userName : {}, connectType: {}, other: {}",
+                loginUser.getUserName(), name, note, type, host, port, database, principal, userName, connectType, other);
         try {
-            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database,principal,userName, password, other);
+            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
             Map<String, Object> result = dataSourceService.createDataSource(loginUser, name, note, type, parameter);
             return returnDataList(result);
 
@@ -133,6 +136,7 @@ public class DataSourceController extends BaseController {
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME",required = true, dataType ="String"),
             @ApiImplicitParam(name = "userName", value = "USER_NAME",required = true, dataType ="String"),
             @ApiImplicitParam(name = "password", value = "PASSWORD", dataType ="String"),
+            @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
             @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType ="String")
     })
     @PostMapping(value = "/update")
@@ -148,11 +152,12 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "principal") String principal,
                                    @RequestParam(value = "userName") String userName,
                                    @RequestParam(value = "password") String password,
+                                   @RequestParam(value = "connectType") DbConnectType connectType,
                                    @RequestParam(value = "other") String other) {
-        logger.info("login user {} updateProcessInstance datasource name: {}, note: {}, type: {}, other: {}",
-                loginUser.getUserName(), name, note, type, other);
+        logger.info("login user {} updateProcessInstance datasource name: {}, note: {}, type: {}, connectType: {}, other: {}",
+                loginUser.getUserName(), name, note, type, connectType, other);
         try {
-            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database,principal, userName, password, other);
+            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database,principal, userName, password, connectType, other);
             Map<String, Object> dataSource = dataSourceService.updateDataSource(id, loginUser, name, note, type, parameter);
             return returnDataList(dataSource);
         } catch (Exception e) {
@@ -277,6 +282,7 @@ public class DataSourceController extends BaseController {
             @ApiImplicitParam(name = "database", value = "DATABASE_NAME",required = true, dataType ="String"),
             @ApiImplicitParam(name = "userName", value = "USER_NAME",required = true, dataType ="String"),
             @ApiImplicitParam(name = "password", value = "PASSWORD", dataType ="String"),
+            @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
             @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType ="String")
     })
     @PostMapping(value = "/connect")
@@ -291,11 +297,12 @@ public class DataSourceController extends BaseController {
                                     @RequestParam(value = "principal") String principal,
                                     @RequestParam(value = "userName") String userName,
                                     @RequestParam(value = "password") String password,
+                                    @RequestParam(value = "connectType") DbConnectType connectType,
                                     @RequestParam(value = "other") String other) {
-        logger.info("login user {}, connect datasource: {} failure, note: {}, type: {}, other: {}",
-                loginUser.getUserName(), name, note, type, other);
+        logger.info("login user {}, connect datasource: {} failure, note: {}, type: {}, connectType: {}, other: {}",
+                loginUser.getUserName(), name, note, type, connectType, other);
         try {
-            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database,principal,userName, password, other);
+            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
             Boolean isConnection = dataSourceService.checkConnection(type, parameter);
             Result result = new Result();
 
