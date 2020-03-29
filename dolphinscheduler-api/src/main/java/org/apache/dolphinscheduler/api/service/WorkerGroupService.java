@@ -111,7 +111,7 @@ public class WorkerGroupService extends BaseService {
 
         List<WorkerGroup> workerGroupList = workerGroupMapper.queryWorkerGroupByName(workerGroup.getName());
 
-        if(workerGroupList.size() > 0 ){
+        if(CollectionUtils.isNotEmpty(workerGroupList)){
             // new group has same name..
             if(workerGroup.getId() == 0){
                 return true;

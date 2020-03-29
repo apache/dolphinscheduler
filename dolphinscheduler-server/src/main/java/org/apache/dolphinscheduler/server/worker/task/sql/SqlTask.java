@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.alert.utils.MailUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.enums.ShowType;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.common.enums.UdfType;
@@ -140,7 +141,6 @@ public class SqlTask extends AbstractTask {
                 dataSource.getUserId(),
                 dataSource.getConnectionParams());
 
-        Connection con = null;
         List<String> createFuncs = null;
         try {
             // load class
@@ -178,18 +178,10 @@ public class SqlTask extends AbstractTask {
             }
 
             // execute sql task
-            con = executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
+            executeFuncAndSql(mainSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw e;
-        } finally {
-            if (con != null) {
-                try {
-                    con.close();
-                } catch (SQLException e) {
-                    logger.error(e.getMessage(),e);
-                }
-            }
         }
     }
 
@@ -249,19 +241,19 @@ public class SqlTask extends AbstractTask {
      * @param preStatementsBinds    pre statements binds
      * @param postStatementsBinds   post statements binds
      * @param createFuncs           create functions
-     * @return Connection
      */
-    public Connection executeFuncAndSql(SqlBinds mainSqlBinds,
+    public void executeFuncAndSql(SqlBinds mainSqlBinds,
                                         List<SqlBinds> preStatementsBinds,
                                         List<SqlBinds> postStatementsBinds,
                                         List<String> createFuncs){
         Connection connection = null;
         try {
-            // if upload resource is HDFS and kerberos startup
-            CommonUtils.loadKerberosConf();
 
             // if hive , load connection params if exists
-            if (HIVE == dataSource.getType()) {
+            if (DbType.HIVE == dataSource.getType() || DbType.SPARK == dataSource.getType()) {
+                // if upload resource is HDFS and kerberos startup
+                CommonUtils.loadKerberosConf();
+
                 Properties paramProp = new Properties();
                 paramProp.setProperty(USER, baseDataSource.getUser());
                 paramProp.setProperty(PASSWORD, baseDataSource.getPassword());
@@ -343,13 +335,9 @@ public class SqlTask extends AbstractTask {
             logger.error(e.getMessage(),e);
             throw new RuntimeException(e.getMessage());
         } finally {
-            try {
-                connection.close();
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
+            ConnectionUtils.releaseResource(connection);
         }
-        return connection;
+
     }
 
     /**
@@ -392,7 +380,7 @@ public class SqlTask extends AbstractTask {
         List<User> users = alertDao.queryUserByAlertGroupId(instance.getWarningGroupId());
 
         // receiving group list
-        List<String> receviersList = new ArrayList<String>();
+        List<String> receviersList = new ArrayList<>();
         for(User user:users){
             receviersList.add(user.getEmail().trim());
         }
@@ -406,7 +394,7 @@ public class SqlTask extends AbstractTask {
         }
 
         // copy list
-        List<String> receviersCcList = new ArrayList<String>();
+        List<String> receviersCcList = new ArrayList<>();
         // Custom Copier
         String receiversCc = sqlParameters.getReceiversCc();
         if (StringUtils.isNotEmpty(receiversCc)){
@@ -420,7 +408,7 @@ public class SqlTask extends AbstractTask {
         if(EnumUtils.isValidEnum(ShowType.class,showTypeName)){
             Map<String, Object> mailResult = MailUtils.sendMails(receviersList,
                     receviersCcList, title, content, ShowType.valueOf(showTypeName));
-            if(!(Boolean) mailResult.get(STATUS)){
+            if(!(boolean) mailResult.get(STATUS)){
                 throw new RuntimeException("send mail failed!");
             }
         }else{
@@ -477,22 +465,7 @@ public class SqlTask extends AbstractTask {
         ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
         int userId = processInstance.getExecutorId();
 
-        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<Integer>(AuthorizationType.UDF, processService,udfFunIds,userId,logger);
+        PermissionCheck<Integer> permissionCheckUdf = new PermissionCheck<>(AuthorizationType.UDF, processService,udfFunIds,userId,logger);
         permissionCheckUdf.checkPermission();
     }
-
-    /**
-     * check data source permission
-     * @param dataSourceId    data source id
-     * @return if has download permission return true else false
-     */
-    private void checkDataSourcePermission(int dataSourceId) throws Exception{
-        //  process instance
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
-        int userId = processInstance.getExecutorId();
-
-        PermissionCheck<Integer> permissionCheckDataSource = new PermissionCheck<Integer>(AuthorizationType.DATASOURCE, processService,new Integer[]{dataSourceId},userId,logger);
-        permissionCheckDataSource.checkPermission();
-    }
-
 }

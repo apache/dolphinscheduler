@@ -107,6 +107,8 @@
         progress: 0,
         // file
         file: '',
+        currentDir: '/',
+        pid: -1,
         // Whether to drag upload
         dragOver: false
       }
@@ -124,7 +126,7 @@
         this.$refs['popup'].spinnerLoading = true
         if (this._validation()) {
           this.store.dispatch('resource/resourceVerifyName', {
-            name: this.name,
+            fullName: '/'+this.name,
             type: this.type
           }).then(res => {
             const isLt1024M = this.file.size / 1024 / 1024 < 1024
@@ -172,6 +174,8 @@
           formData.append('file', this.file)
           formData.append('type', this.type)
           formData.append('name', this.name)
+          formData.append('pid', this.pid)
+          formData.append('currentDir', this.currentDir)
           formData.append('description', this.description)
           io.post(`resources/create`, res => {
             this.$message.success(res.msg)
