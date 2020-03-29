@@ -17,8 +17,6 @@
 package org.apache.dolphinscheduler.service.queue;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -31,7 +29,7 @@ import static org.apache.dolphinscheduler.common.Constants.*;
  * tasks queue implementation
  */
 @Service
-public class TaskUpdateQueueImpl implements TaskUpdateQueue {
+public class TaskPriorityQueueImpl implements TaskPriorityQueue {
     /**
      * queue size
      */
