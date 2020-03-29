@@ -699,6 +699,7 @@
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/enums/*.java</include>
+                        <include>**/api/controller/DataSourceControllerTest.java</include>
                         <include>**/api/service/AccessTokenServiceTest.java</include>
                         <include>**/api/service/QueueServiceTest.java</include>
                         <include>**/api/service/MonitorServiceTest.java</include>
