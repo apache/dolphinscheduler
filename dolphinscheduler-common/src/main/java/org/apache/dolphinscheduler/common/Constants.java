@@ -238,10 +238,6 @@ public final class Constants {
     public static final String MASTER_RESERVED_MEMORY = "master.reserved.memory";
 
 
-
-    public static final String SCHEDULER_QUEUE_IMPL = "dolphinscheduler.queue.impl";
-
-
     /**
      * date format of yyyy-MM-dd HH:mm:ss
      */
