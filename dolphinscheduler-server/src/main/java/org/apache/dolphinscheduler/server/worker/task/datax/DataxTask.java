@@ -38,6 +38,8 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.DataType;
 import org.apache.dolphinscheduler.common.enums.DbType;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
@@ -49,11 +51,13 @@ import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractTask;
+import org.apache.dolphinscheduler.server.worker.task.CommandExecuteResult;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
-import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
@@ -96,39 +100,27 @@ public class DataxTask extends AbstractTask {
     private DataxParameters dataXParameters;
 
     /**
-     * task dir
-     */
-    private String taskDir;
-
-    /**
      * shell command executor
      */
     private ShellCommandExecutor shellCommandExecutor;
 
     /**
-     * process dao
+     * taskExecutionContext
      */
-    private ProcessService processService;
+    private TaskExecutionContext taskExecutionContext;
 
     /**
      * constructor
-     * 
-     * @param props
-     *            props
-     * @param logger
-     *            logger
+     * @param taskExecutionContext taskExecutionContext
+     * @param logger logger
      */
-    public DataxTask(TaskProps props, Logger logger) {
-        super(props, logger);
+    public DataxTask(TaskExecutionContext taskExecutionContext, Logger logger) {
+        super(taskExecutionContext, logger);
+        this.taskExecutionContext = taskExecutionContext;
 
-        this.taskDir = props.getTaskDir();
-        logger.info("task dir : {}", taskDir);
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, props.getTaskDir(), props.getTaskAppId(),
-            props.getTaskInstId(), props.getTenantCode(), props.getEnvFile(), props.getTaskStartTime(),
-            props.getTaskTimeout(), logger);
-
-        this.processService = SpringApplicationContext.getBean(ProcessService.class);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
+                taskExecutionContext,logger);
     }
 
     /**
@@ -136,8 +128,8 @@ public class DataxTask extends AbstractTask {
      */
     @Override
     public void init() {
-        logger.info("datax task params {}", taskProps.getTaskParams());
-        dataXParameters = JSONUtils.parseObject(taskProps.getTaskParams(), DataxParameters.class);
+        logger.info("datax task params {}", taskExecutionContext.getTaskParams());
+        dataXParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DataxParameters.class);
 
         if (!dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
@@ -146,33 +138,37 @@ public class DataxTask extends AbstractTask {
 
     /**
      * run DataX process
-     * 
-     * @throws Exception
+     *
+     * @throws Exception if error throws Exception
      */
     @Override
-    public void handle()
-        throws Exception {
+    public void handle() throws Exception {
         try {
             // set the name of the current thread
-            String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskProps.getTaskAppId());
+            String threadLoggerInfoName = String.format("TaskLogInfo-%s", taskExecutionContext.getTaskAppId());
             Thread.currentThread().setName(threadLoggerInfoName);
 
             // run datax process
             String jsonFilePath = buildDataxJsonFile();
             String shellCommandFilePath = buildShellCommandFile(jsonFilePath);
-            exitStatusCode = shellCommandExecutor.run(shellCommandFilePath, processService);
+            CommandExecuteResult commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
+
+            setExitStatusCode(commandExecuteResult.getExitStatusCode());
+            setAppIds(commandExecuteResult.getAppIds());
+            setProcessId(commandExecuteResult.getProcessId());
         }
         catch (Exception e) {
-            exitStatusCode = -1;
+            logger.error("datax task failure", e);
+            setExitStatusCode(Constants.EXIT_CODE_FAILURE);
             throw e;
         }
     }
 
     /**
      * cancel DataX process
-     * 
-     * @param cancelApplication
-     * @throws Exception
+     *
+     * @param cancelApplication cancelApplication
+     * @throws Exception if error throws Exception
      */
     @Override
     public void cancelApplication(boolean cancelApplication)
@@ -184,13 +180,15 @@ public class DataxTask extends AbstractTask {
     /**
      * build datax configuration file
      * 
-     * @return
-     * @throws Exception
+     * @return datax json file name
+     * @throws Exception if error throws Exception
      */
     private String buildDataxJsonFile()
         throws Exception {
         // generate json
-        String fileName = String.format("%s/%s_job.json", taskDir, taskProps.getTaskAppId());
+        String fileName = String.format("%s/%s_job.json",
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
 
         Path path = new File(fileName).toPath();
         if (Files.exists(path)) {
@@ -215,18 +213,18 @@ public class DataxTask extends AbstractTask {
     /**
      * build datax job config
      * 
-     * @return
-     * @throws SQLException
+     * @return collection of datax job config JSONObject
+     * @throws SQLException if error throws SQLException
      */
-    private List<JSONObject> buildDataxJobContentJson()
-        throws SQLException {
-        DataSource dataSource = processService.findDataSourceById(dataXParameters.getDataSource());
-        BaseDataSource dataSourceCfg = DataSourceFactory.getDatasource(dataSource.getType(),
-            dataSource.getConnectionParams());
+    private List<JSONObject> buildDataxJobContentJson() throws SQLException {
+        DataxTaskExecutionContext dataxTaskExecutionContext = taskExecutionContext.getDataxTaskExecutionContext();
 
-        DataSource dataTarget = processService.findDataSourceById(dataXParameters.getDataTarget());
-        BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(dataTarget.getType(),
-            dataTarget.getConnectionParams());
+
+        BaseDataSource dataSourceCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+                dataxTaskExecutionContext.getSourceConnectionParams());
+
+        BaseDataSource dataTargetCfg = DataSourceFactory.getDatasource(DbType.of(dataxTaskExecutionContext.getTargetType()),
+                dataxTaskExecutionContext.getTargetConnectionParams());
 
         List<JSONObject> readerConnArr = new ArrayList<>();
         JSONObject readerConn = new JSONObject();
@@ -240,7 +238,7 @@ public class DataxTask extends AbstractTask {
         readerParam.put("connection", readerConnArr);
 
         JSONObject reader = new JSONObject();
-        reader.put("name", DataxUtils.getReaderPluginName(dataSource.getType()));
+        reader.put("name", DataxUtils.getReaderPluginName(DbType.of(dataxTaskExecutionContext.getSourcetype())));
         reader.put("parameter", readerParam);
 
         List<JSONObject> writerConnArr = new ArrayList<>();
@@ -253,7 +251,9 @@ public class DataxTask extends AbstractTask {
         writerParam.put("username", dataTargetCfg.getUser());
         writerParam.put("password", dataTargetCfg.getPassword());
         writerParam.put("column",
-            parsingSqlColumnNames(dataSource.getType(), dataTarget.getType(), dataSourceCfg, dataXParameters.getSql()));
+            parsingSqlColumnNames(DbType.of(dataxTaskExecutionContext.getSourcetype()),
+                    DbType.of(dataxTaskExecutionContext.getTargetType()),
+                    dataSourceCfg, dataXParameters.getSql()));
         writerParam.put("connection", writerConnArr);
 
         if (CollectionUtils.isNotEmpty(dataXParameters.getPreStatements())) {
@@ -265,7 +265,7 @@ public class DataxTask extends AbstractTask {
         }
 
         JSONObject writer = new JSONObject();
-        writer.put("name", DataxUtils.getWriterPluginName(dataTarget.getType()));
+        writer.put("name", DataxUtils.getWriterPluginName(DbType.of(dataxTaskExecutionContext.getTargetType())));
         writer.put("parameter", writerParam);
 
         List<JSONObject> contentList = new ArrayList<>();
@@ -280,7 +280,7 @@ public class DataxTask extends AbstractTask {
     /**
      * build datax setting config
      * 
-     * @return
+     * @return datax setting config JSONObject
      */
     private JSONObject buildDataxJobSettingJson() {
         JSONObject speed = new JSONObject();
@@ -332,13 +332,15 @@ public class DataxTask extends AbstractTask {
     /**
      * create command
      * 
-     * @return
-     * @throws Exception
+     * @return shell command file name
+     * @throws Exception if error throws Exception
      */
     private String buildShellCommandFile(String jobConfigFilePath)
         throws Exception {
         // generate scripts
-        String fileName = String.format("%s/%s_node.sh", taskDir, taskProps.getTaskAppId());
+        String fileName = String.format("%s/%s_node.sh",
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
         Path path = new File(fileName).toPath();
 
         if (Files.exists(path)) {
@@ -354,13 +356,13 @@ public class DataxTask extends AbstractTask {
         sbr.append(jobConfigFilePath);
         String dataxCommand = sbr.toString();
 
-        // find process instance by task id
-        ProcessInstance processInstance = processService.findProcessInstanceByTaskId(taskProps.getTaskInstId());
-
         // combining local and global parameters
-        Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
-            taskProps.getDefinedParams(), dataXParameters.getLocalParametersMap(),
-            processInstance.getCmdTypeIfComplement(), processInstance.getScheduleTime());
+        // replace placeholder
+        Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                taskExecutionContext.getDefinedParams(),
+                dataXParameters.getLocalParametersMap(),
+                CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                taskExecutionContext.getScheduleTime());
         if (paramsMap != null) {
             dataxCommand = ParameterUtils.convertParameterPlaceholders(dataxCommand, ParamUtils.convert(paramsMap));
         }
@@ -387,7 +389,7 @@ public class DataxTask extends AbstractTask {
      *            the database connection parameters of the data source
      * @param sql
      *            sql for data synchronization
-     * @return
+     * @return Keyword converted column names
      */
     private String[] parsingSqlColumnNames(DbType dsType, DbType dtType, BaseDataSource dataSourceCfg, String sql) {
         String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(dsType, sql);
@@ -410,7 +412,7 @@ public class DataxTask extends AbstractTask {
      * @param sql
      *            sql for data synchronization
      * @return column name array
-     * @throws RuntimeException
+     * @throws RuntimeException if error throws RuntimeException
      */
     private String[] tryGrammaticalAnalysisSqlColumnNames(DbType dbType, String sql) {
         String[] columnNames;

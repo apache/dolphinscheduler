@@ -27,13 +27,14 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * task instance
  */
 @TableName("t_ds_task_instance")
-public class TaskInstance {
+public class TaskInstance implements Serializable {
 
     /**
      * id
@@ -154,20 +155,17 @@ public class TaskInstance {
 
     /**
      * duration
-     * @return
      */
     @TableField(exist = false)
     private Long duration;
 
     /**
      * max retry times
-     * @return
      */
     private int maxRetryTimes;
 
     /**
      * task retry interval, unit: minute
-     * @return
      */
     private int retryInterval;
 
@@ -184,26 +182,15 @@ public class TaskInstance {
 
     /**
      * dependent state
-     * @return
      */
     @TableField(exist = false)
     private String dependentResult;
 
 
     /**
-     * worker group id
-     * @return
+     * workerGroup
      */
-    private int workerGroupId;
-
-
-
-    public void  init(String host,Date startTime,String executePath){
-        this.host = host;
-        this.startTime = startTime;
-        this.executePath = executePath;
-    }
-
+    private String workerGroup;
 
     public ProcessInstance getProcessInstance() {
         return processInstance;
@@ -458,12 +445,20 @@ public class TaskInstance {
         this.processInstancePriority = processInstancePriority;
     }
 
-    public int getWorkerGroupId() {
-        return workerGroupId;
+    public String getDependentResult() {
+        return dependentResult;
     }
 
-    public void setWorkerGroupId(int workerGroupId) {
-        this.workerGroupId = workerGroupId;
+    public void setDependentResult(String dependentResult) {
+        this.dependentResult = dependentResult;
+    }
+
+    public String getWorkerGroup() {
+        return workerGroup;
+    }
+
+    public void setWorkerGroup(String workerGroup) {
+        this.workerGroup = workerGroup;
     }
 
     @Override
@@ -485,27 +480,19 @@ public class TaskInstance {
                 ", logPath='" + logPath + '\'' +
                 ", retryTimes=" + retryTimes +
                 ", alertFlag=" + alertFlag +
-                ", flag=" + flag +
                 ", processInstance=" + processInstance +
                 ", processDefine=" + processDefine +
                 ", pid=" + pid +
                 ", appLink='" + appLink + '\'' +
                 ", flag=" + flag +
-                ", dependency=" + dependency +
+                ", dependency='" + dependency + '\'' +
                 ", duration=" + duration +
                 ", maxRetryTimes=" + maxRetryTimes +
                 ", retryInterval=" + retryInterval +
                 ", taskInstancePriority=" + taskInstancePriority +
                 ", processInstancePriority=" + processInstancePriority +
-                ", workGroupId=" + workerGroupId +
+                ", dependentResult='" + dependentResult + '\'' +
+                ", workerGroup='" + workerGroup + '\'' +
                 '}';
-    }
-
-    public String getDependentResult() {
-        return dependentResult;
-    }
-
-    public void setDependentResult(String dependentResult) {
-        this.dependentResult = dependentResult;
     }
 }

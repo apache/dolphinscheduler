@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.service.quartz.cron.CronUtils;
-import org.apache.dolphinscheduler.service.queue.ITaskQueue;
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,11 +97,6 @@ public class ProcessService {
     @Autowired
     private  ProjectMapper projectMapper;
 
-    /**
-     * task queue impl
-     */
-    @Autowired
-    private ITaskQueue taskQueue;
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      * @param logger logger
@@ -433,8 +427,8 @@ public class ProcessService {
         processInstance.setProcessInstanceJson(processDefinition.getProcessDefinitionJson());
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
-        int workerGroupId = command.getWorkerGroupId() == 0 ? -1 : command.getWorkerGroupId();
-        processInstance.setWorkerGroupId(workerGroupId);
+        String workerGroup = StringUtils.isBlank(command.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP : command.getWorkerGroup();
+        processInstance.setWorkerGroup(workerGroup);
         processInstance.setTimeout(processDefinition.getTimeout());
         processInstance.setTenantId(processDefinition.getTenantId());
         return processInstance;
@@ -960,40 +954,7 @@ public class ProcessService {
         return taskInstance;
     }
 
-    /**
-     * submit task to queue
-     * @param taskInstance taskInstance
-     * @return whether submit task to queue success
-     */
-    public Boolean submitTaskToQueue(TaskInstance taskInstance) {
 
-        try{
-            if(taskInstance.isSubProcess()){
-                return true;
-            }
-            if(taskInstance.getState().typeIsFinished()){
-                logger.info(String.format("submit to task queue, but task [%s] state [%s] is already  finished. ", taskInstance.getName(), taskInstance.getState().toString()));
-                return true;
-            }
-            // task cannot submit when running
-            if(taskInstance.getState() == ExecutionStatus.RUNNING_EXEUTION){
-                logger.info(String.format("submit to task queue, but task [%s] state already be running. ", taskInstance.getName()));
-                return true;
-            }
-            if(checkTaskExistsInTaskQueue(taskInstance)){
-                logger.info(String.format("submit to task queue, but task [%s] already exists in the queue.", taskInstance.getName()));
-                return true;
-            }
-            logger.info("task ready to queue: {}" , taskInstance);
-            boolean insertQueueResult = taskQueue.add(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo(taskInstance));
-            logger.info(String.format("master insert into queue success, task : %s", taskInstance.getName()) );
-            return insertQueueResult;
-        }catch (Exception e){
-            logger.error("submit task to queue Exception: ", e);
-            logger.error("task queue error : %s", JSONUtils.toJson(taskInstance));
-            return false;
-        }
-    }
 
     /**
      * ${processInstancePriority}_${processInstanceId}_${taskInstancePriority}_${taskInstanceId}_${task executed by ip1},${ip2}...
@@ -1003,7 +964,7 @@ public class ProcessService {
      */
     public String taskZkInfo(TaskInstance taskInstance) {
 
-        int taskWorkerGroupId = getTaskWorkerGroupId(taskInstance);
+        String taskWorkerGroup = getTaskWorkerGroup(taskInstance);
         ProcessInstance processInstance = this.findProcessInstanceById(taskInstance.getProcessInstanceId());
         if(processInstance == null){
             logger.error("process instance is null. please check the task info, task id: " + taskInstance.getId());
@@ -1015,9 +976,10 @@ public class ProcessService {
         sb.append(processInstance.getProcessInstancePriority().ordinal()).append(Constants.UNDERLINE)
                 .append(taskInstance.getProcessInstanceId()).append(Constants.UNDERLINE)
                 .append(taskInstance.getTaskInstancePriority().ordinal()).append(Constants.UNDERLINE)
-                .append(taskInstance.getId()).append(Constants.UNDERLINE);
+                .append(taskInstance.getId()).append(Constants.UNDERLINE)
+                .append(taskInstance.getWorkerGroup());
 
-        if(taskWorkerGroupId > 0){
+        /*if(StringUtils.isNotBlank(taskWorkerGroup)){
             //not to find data from db
             WorkerGroup workerGroup = queryWorkerGroupById(taskWorkerGroupId);
             if(workerGroup == null ){
@@ -1051,8 +1013,7 @@ public class ProcessService {
             sb.append(ipSb);
         }else{
             sb.append(Constants.DEFAULT_WORKER_ID);
-        }
-
+        }*/
 
         return  sb.toString();
     }
@@ -1127,7 +1088,8 @@ public class ProcessService {
 
         String taskZkInfo = taskZkInfo(taskInstance);
 
-        return taskQueue.checkTaskExists(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo);
+//        return taskQueue.checkTaskExists(DOLPHINSCHEDULER_TASKS_QUEUE, taskZkInfo);
+        return false;
     }
 
     /**
@@ -1411,8 +1373,12 @@ public class ProcessService {
      */
     public void changeTaskState(ExecutionStatus state,
                                 Date endTime,
+                                int processId,
+                                String appIds,
                                 int taskInstId) {
         TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstId);
+        taskInstance.setPid(processId);
+        taskInstance.setAppLink(appIds);
         taskInstance.setState(state);
         taskInstance.setEndTime(endTime);
         saveTaskInstance(taskInstance);
@@ -1547,7 +1513,6 @@ public class ProcessService {
      * @return udf function list
      */
     public List<UdfFunc> queryUdfFunListByids(int[] ids){
-
         return udfFuncMapper.queryUdfByIdStr(ids, null);
     }
 
@@ -1723,24 +1688,24 @@ public class ProcessService {
     }
 
     /**
-     * get task worker group id
+     * get task worker group
      * @param taskInstance taskInstance
      * @return workerGroupId
      */
-    public int getTaskWorkerGroupId(TaskInstance taskInstance) {
-        int taskWorkerGroupId = taskInstance.getWorkerGroupId();
+    public String getTaskWorkerGroup(TaskInstance taskInstance) {
+        String workerGroup = taskInstance.getWorkerGroup();
 
-        if(taskWorkerGroupId > 0){
-            return taskWorkerGroupId;
+        if(StringUtils.isNotBlank(workerGroup)){
+            return workerGroup;
         }
         int processInstanceId = taskInstance.getProcessInstanceId();
         ProcessInstance processInstance = findProcessInstanceById(processInstanceId);
 
         if(processInstance != null){
-            return processInstance.getWorkerGroupId();
+            return processInstance.getWorkerGroup();
         }
-        logger.info("task : {} will use default worker group id", taskInstance.getId());
-        return Constants.DEFAULT_WORKER_ID;
+        logger.info("task : {} will use default worker group", taskInstance.getId());
+        return Constants.DEFAULT_WORKER_GROUP;
     }
 
     /**

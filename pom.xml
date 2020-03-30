@@ -107,7 +107,7 @@
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
-        <maven-surefire-plugin.version>2.18.1</maven-surefire-plugin.version>
+        <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
         <jacoco.version>0.8.4</jacoco.version>
@@ -712,22 +712,49 @@
                         <include>**/alert/utils/FuncUtilsTest.java</include>
                         <include>**/alert/utils/JSONUtilsTest.java</include>
                         <include>**/alert/utils/PropertyUtilsTest.java</include>
-                        <include>**/server/utils/SparkArgsUtilsTest.java</include>
-                        <include>**/server/utils/FlinkArgsUtilsTest.java</include>
-                        <include>**/server/utils/ParamUtilsTest.java</include>
-                        <include>**/server/master/MasterExecThreadTest.java</include>
+                        <include>**/alert/template/AlertTemplateFactoryTest.java</include>
+                        <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/AlertMapperTest.java</include>
-                        <include>**/dao/mapper/CommandMapperTest.java</include>
-                        <include>**/dao/cron/CronUtilsTest.java</include>
-                        <include>**/dao/utils/DagHelperTest.java</include>
-                        <include>**/alert/template/AlertTemplateFactoryTest.java</include>
-                        <include>**/alert/template/impl/DefaultHTMLTemplateTest.java</include>
-                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <include>**/dao/mapper/DataSourceMapperTest.java</include>
+                        <include>**/server/log/MasterLogFilterTest.java</include>
+                        <include>**/server/log/SensitiveDataConverterTest.java</include>
+                        <include>**/server/log/TaskLogDiscriminatorTest.java</include>
+                        <include>**/server/log/TaskLogFilterTest.java</include>
+                        <include>**/server/log/WorkerLogFilterTest.java</include>
+                        <include>**/server/master/dispatch/executor/NettyExecutorManagerTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/LowerWeightRoundRobinTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/RandomSelectorTest.java</include>
+                        <include>**/server/master/dispatch/host/assign/RoundRobinSelectorTest.java</include>
+                        <include>**/server/master/dispatch/host/RoundRobinHostManagerTest.java</include>
+                        <include>**/server/master/dispatch/ExecutorDispatcherTest.java</include>
+                        <include>**/server/master/register/MasterRegistryTest.java</include>
+                        <include>**/server/master/AlertManagerTest.java</include>
+                        <include>**/server/master/MasterCommandTest.java</include>
+                        <include>**/server/master/MasterExecThreadTest.java</include>
+                        <include>**/server/master/ParamsTest.java</include>
+                        <include>**/server/register/ZookeeperNodeManagerTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
+                        <include>**/server/utils/ExecutionContextTestUtils.java</include>
+                        <include>**/server/utils/FlinkArgsUtilsTest.java</include>
+                        <include>**/server/utils/ParamUtilsTest.java</include>
+                        <include>**/server/utils/ProcessUtilsTest.java</include>
+                        <include>**/server/utils/SparkArgsUtilsTest.java</include>
+                        <include>**/server/worker/processor/TaskCallbackServiceTest.java</include>
+                        <include>**/server/worker/registry/WorkerRegistryTest.java</include>
+                        <include>**/server/worker/shell/ShellCommandExecutorTest.java</include>
+                        <include>**/server/worker/sql/SqlExecutorTest.java</include>
+                        <include>**/server/worker/task/datax/DataxTaskTest.java</include>
+                        <include>**/server/worker/task/dependent/DependentTaskTest.java</include>
+                        <include>**/server/worker/task/spark/SparkTaskTest.java</include>
+                        <include>**/server/worker/task/EnvFileTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
+                    <argLine>-Xmx2048m</argLine>
+                    <threadCount>3</threadCount>
+                    <forkCount>3</forkCount>
+                    <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
 
