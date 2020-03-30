@@ -98,7 +98,7 @@ public class ExecutorService extends BaseService{
                                                    String receivers, String receiversCc, RunMode runMode,
                                                    Priority processInstancePriority, int workerGroupId, Integer timeout) throws ParseException {
         Map<String, Object> result = new HashMap<>(5);
-        // timeout is valid
+        // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             putMsg(result,Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
