@@ -21,8 +21,9 @@ import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.commons.io.FileUtils;
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,7 @@ public class ProcessUtils {
       allowAmbiguousCommands = true;
       String value = System.getProperty("jdk.lang.Process.allowAmbiguousCommands");
       if (value != null) {
-          allowAmbiguousCommands = !"false".equalsIgnoreCase(value);
+        allowAmbiguousCommands = !"false".equalsIgnoreCase(value);
       }
     }
     if (allowAmbiguousCommands) {
@@ -68,7 +69,7 @@ public class ProcessUtils {
       String executablePath = new File(cmd[0]).getPath();
 
       if (needsEscaping(VERIFICATION_LEGACY, executablePath)) {
-          executablePath = quoteString(executablePath);
+        executablePath = quoteString(executablePath);
       }
 
       cmdstr = createCommandLine(
@@ -81,7 +82,7 @@ public class ProcessUtils {
 
         StringBuilder join = new StringBuilder();
         for (String s : cmd) {
-            join.append(s).append(' ');
+          join.append(s).append(' ');
         }
 
         cmd = getTokensFromCommand(join.toString());
@@ -89,7 +90,7 @@ public class ProcessUtils {
 
         // Check new executable name once more
         if (security != null) {
-            security.checkExec(executablePath);
+          security.checkExec(executablePath);
         }
       }
 
@@ -147,7 +148,7 @@ public class ProcessUtils {
     ArrayList<String> matchList = new ArrayList<>(8);
     Matcher regexMatcher = LazyPattern.PATTERN.matcher(command);
     while (regexMatcher.find()) {
-        matchList.add(regexMatcher.group());
+      matchList.add(regexMatcher.group());
     }
     return matchList.toArray(new String[matchList.size()]);
   }
@@ -273,15 +274,15 @@ public class ProcessUtils {
    * @param appIds      app id list
    * @param logger      logger
    * @param tenantCode  tenant code
-   * @param workDir     work dir
+   * @param executePath     execute path
    * @throws IOException io exception
    */
-  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode,String workDir)
+  public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode,String executePath)
           throws IOException {
     if (appIds.size() > 0) {
       String appid = appIds.get(appIds.size() - 1);
       String commandFile = String
-              .format("%s/%s.kill", workDir, appid);
+              .format("%s/%s.kill", executePath, appid);
       String cmd = "yarn application -kill " + appid;
       try {
         StringBuilder sb = new StringBuilder();
@@ -309,7 +310,7 @@ public class ProcessUtils {
 
         Runtime.getRuntime().exec(runCmd);
       } catch (Exception e) {
-        logger.error("kill application failed", e);
+        logger.error("kill application error", e);
       }
     }
   }
@@ -317,15 +318,15 @@ public class ProcessUtils {
   /**
    * kill tasks according to different task types
    *
-   * @param taskInstance  task instance
+   * @param taskExecutionContext  taskExecutionContext
    */
-  public static void kill(TaskInstance taskInstance) {
+  public static void kill(TaskExecutionContext taskExecutionContext) {
     try {
-      int processId = taskInstance.getPid();
+      int processId = taskExecutionContext.getProcessId();
       if(processId == 0 ){
-          logger.error("process kill failed, process id :{}, task id:{}",
-                  processId, taskInstance.getId());
-          return ;
+        logger.error("process kill failed, process id :{}, task id:{}",
+                processId, taskExecutionContext.getTaskInstanceId());
+        return ;
       }
 
       String cmd = String.format("sudo kill -9 %s", getPidsStr(processId));
@@ -335,7 +336,7 @@ public class ProcessUtils {
       OSUtils.exeCmd(cmd);
 
       // find log and kill yarn job
-      killYarnJob(taskInstance);
+      killYarnJob(taskExecutionContext);
 
     } catch (Exception e) {
       logger.error("kill task failed", e);
@@ -370,16 +371,18 @@ public class ProcessUtils {
   /**
    * find logs and kill yarn tasks
    *
-   * @param taskInstance  task instance
+   * @param taskExecutionContext  taskExecutionContext
    */
-  public static void killYarnJob(TaskInstance taskInstance) {
+  public static void killYarnJob(TaskExecutionContext taskExecutionContext) {
     try {
       Thread.sleep(Constants.SLEEP_TIME_MILLIS);
       LogClientService logClient = null;
       String log = null;
       try {
         logClient = new LogClientService();
-        log = logClient.viewLog(taskInstance.getHost(), Constants.RPC_PORT, taskInstance.getLogPath());
+        log = logClient.viewLog(Host.of(taskExecutionContext.getHost()).getIp(),
+                Constants.RPC_PORT,
+                taskExecutionContext.getLogPath());
       } finally {
         if(logClient != null){
           logClient.close();
@@ -387,13 +390,13 @@ public class ProcessUtils {
       }
       if (StringUtils.isNotEmpty(log)) {
         List<String> appIds = LoggerUtils.getAppIds(log, logger);
-        String workerDir = taskInstance.getExecutePath();
+        String workerDir = taskExecutionContext.getExecutePath();
         if (StringUtils.isEmpty(workerDir)) {
           logger.error("task instance work dir is empty");
           throw new RuntimeException("task instance work dir is empty");
         }
         if (appIds.size() > 0) {
-          cancelApplication(appIds, logger, taskInstance.getProcessInstance().getTenantCode(), taskInstance.getExecutePath());
+          cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
         }
       }
 

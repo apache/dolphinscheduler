@@ -148,3 +148,4 @@ dolphinscheduler-ui/dist/lib/external/
 dolphinscheduler-ui/src/js/conf/home/pages/projects/pages/taskInstance/index.vue
 /dolphinscheduler-dao/src/main/resources/dao/data_source.properties
 
+!/zookeeper_data/

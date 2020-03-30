@@ -114,9 +114,9 @@ public class TaskNode {
   private Priority taskInstancePriority;
 
   /**
-   * worker group id
+   * worker group
    */
-  private int workerGroupId;
+  private String workerGroup;
 
 
   /**
@@ -230,7 +230,7 @@ public class TaskNode {
             Objects.equals(extras, taskNode.extras) &&
             Objects.equals(runFlag, taskNode.runFlag) &&
             Objects.equals(dependence, taskNode.dependence) &&
-            Objects.equals(workerGroupId, taskNode.workerGroupId) &&
+            Objects.equals(workerGroup, taskNode.workerGroup) &&
             CollectionUtils.equalLists(depList, taskNode.depList);
   }
 
@@ -281,7 +281,7 @@ public class TaskNode {
 
   /**
    * get task time out parameter
-   * @return
+   * @return task time out parameter
    */
   public TaskTimeoutParameter getTaskTimeoutParameter() {
     if(StringUtils.isNotEmpty(this.getTimeout())){
@@ -310,15 +310,15 @@ public class TaskNode {
             ", dependence='" + dependence + '\'' +
             ", taskInstancePriority=" + taskInstancePriority +
             ", timeout='" + timeout + '\'' +
-            ", workerGroupId='" + workerGroupId + '\'' +
+            ", workerGroup='" + workerGroup + '\'' +
             '}';
   }
 
-  public int getWorkerGroupId() {
-    return workerGroupId;
+  public String getWorkerGroup() {
+    return workerGroup;
   }
 
-  public void setWorkerGroupId(int workerGroupId) {
-    this.workerGroupId = workerGroupId;
+  public void setWorkerGroup(String workerGroup) {
+    this.workerGroup = workerGroup;
   }
 }

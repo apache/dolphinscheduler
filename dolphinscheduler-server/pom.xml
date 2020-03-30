@@ -37,10 +37,6 @@
 			<artifactId>dolphinscheduler-common</artifactId>
 			<exclusions>
 				<exclusion>
-					<artifactId>protobuf-java</artifactId>
-					<groupId>com.google.protobuf</groupId>
-				</exclusion>
-				<exclusion>
 					<groupId>io.netty</groupId>
 					<artifactId>netty</artifactId>
 				</exclusion>
@@ -132,7 +128,11 @@
 			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
-    </dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+	</dependencies>
 
 
 	<build>

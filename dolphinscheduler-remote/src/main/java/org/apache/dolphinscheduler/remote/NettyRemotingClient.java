@@ -25,6 +25,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
 import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingTimeoutException;
@@ -33,7 +34,8 @@ import org.apache.dolphinscheduler.remote.future.InvokeCallback;
 import org.apache.dolphinscheduler.remote.future.ReleaseSemaphore;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.handler.NettyClientHandler;
-import org.apache.dolphinscheduler.remote.utils.Address;
+import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.CallerThreadExecutePolicy;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.slf4j.Logger;
@@ -64,7 +66,7 @@ public class NettyRemotingClient {
     /**
      * channels
      */
-    private final ConcurrentHashMap<Address, Channel> channels = new ConcurrentHashMap(128);
+    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap(128);
 
     /**
      *  started flag
@@ -97,6 +99,11 @@ public class NettyRemotingClient {
     private final NettyClientHandler clientHandler;
 
     /**
+     *  response future executor
+     */
+    private final ScheduledExecutorService responseFutureExecutor;
+
+    /**
      *  client init
      * @param clientConfig client config
      */
@@ -114,6 +121,8 @@ public class NettyRemotingClient {
                 new LinkedBlockingQueue<>(1000), new NamedThreadFactory("CallbackExecutor", 10),
                 new CallerThreadExecutePolicy());
         this.clientHandler = new NettyClientHandler(this, callbackExecutor);
+
+        this.responseFutureExecutor = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ResponseFutureExecutor"));
 
         this.start();
     }
@@ -139,23 +148,29 @@ public class NettyRemotingClient {
                                 encoder);
                     }
                 });
+        this.responseFutureExecutor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                ResponseFuture.scanFutureTable();
+            }
+        }, 5000, 1000, TimeUnit.MILLISECONDS);
         //
         isStarted.compareAndSet(false, true);
     }
 
     /**
      *  async send
-     * @param address address
+     * @param host host
      * @param command command
      * @param timeoutMillis timeoutMillis
      * @param invokeCallback callback function
      * @throws InterruptedException
      * @throws RemotingException
      */
-    public void sendAsync(final Address address, final Command command,
+    public void sendAsync(final Host host, final Command command,
                           final long timeoutMillis,
                           final InvokeCallback invokeCallback) throws InterruptedException, RemotingException {
-        final Channel channel = getChannel(address);
+        final Channel channel = getChannel(host);
         if (channel == null) {
             throw new RemotingException("network error");
         }
@@ -201,7 +216,7 @@ public class NettyRemotingClient {
                 });
             } catch (Throwable ex){
                 responseFuture.release();
-                throw new RemotingException(String.format("send command to address: %s failed", address), ex);
+                throw new RemotingException(String.format("send command to host: %s failed", host), ex);
             }
         } else{
             String message = String.format("try to acquire async semaphore timeout: %d, waiting thread num: %d, total permits: %d",
@@ -212,17 +227,17 @@ public class NettyRemotingClient {
 
     /**
      * sync send
-     * @param address address
+     * @param host host
      * @param command command
      * @param timeoutMillis timeoutMillis
      * @return command
      * @throws InterruptedException
      * @throws RemotingException
      */
-    public Command sendSync(final Address address, final Command command, final long timeoutMillis) throws InterruptedException, RemotingException {
-        final Channel channel = getChannel(address);
+    public Command sendSync(final Host host, final Command command, final long timeoutMillis) throws InterruptedException, RemotingException {
+        final Channel channel = getChannel(host);
         if (channel == null) {
-            throw new RemotingException(String.format("connect to : %s fail", address));
+            throw new RemotingException(String.format("connect to : %s fail", host));
         }
         final long opaque = command.getOpaque();
         final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null, null);
@@ -237,7 +252,7 @@ public class NettyRemotingClient {
                 }
                 responseFuture.setCause(future.cause());
                 responseFuture.putResponse(null);
-                logger.error("send command {} to address {} failed", command, address);
+                logger.error("send command {} to host {} failed", command, host);
             }
         });
         /**
@@ -246,49 +261,95 @@ public class NettyRemotingClient {
         Command result = responseFuture.waitResponse();
         if(result == null){
             if(responseFuture.isSendOK()){
-                throw new RemotingTimeoutException(address.toString(), timeoutMillis, responseFuture.getCause());
+                throw new RemotingTimeoutException(host.toString(), timeoutMillis, responseFuture.getCause());
             } else{
-                throw new RemotingException(address.toString(), responseFuture.getCause());
+                throw new RemotingException(host.toString(), responseFuture.getCause());
             }
         }
         return result;
     }
 
     /**
+     *  send task
+     * @param host host
+     * @param command command
+     * @throws RemotingException
+     */
+    public void send(final Host host, final Command command) throws RemotingException {
+        Channel channel = getChannel(host);
+        if (channel == null) {
+            throw new RemotingException(String.format("connect to : %s fail", host));
+        }
+        try {
+            ChannelFuture future = channel.writeAndFlush(command).await();
+            if (future.isSuccess()) {
+                logger.debug("send command : {} , to : {} successfully.", command, host.getAddress());
+            } else {
+                String msg = String.format("send command : %s , to :%s failed", command, host.getAddress());
+                logger.error(msg, future.cause());
+                throw new RemotingException(msg);
+            }
+        } catch (Exception e) {
+            logger.error("Send command {} to address {} encounter error.", command, host.getAddress());
+            throw new RemotingException(String.format("Send command : %s , to :%s encounter error", command, host.getAddress()), e);
+        }
+    }
+
+    /**
+     *  register processor
+     * @param commandType command type
+     * @param processor processor
+     */
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
+        this.registerProcessor(commandType, processor, null);
+    }
+
+    /**
+     *  register processor
+     *
+     * @param commandType command type
+     * @param processor processor
+     * @param executor thread executor
+     */
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
+        this.clientHandler.registerProcessor(commandType, processor, executor);
+    }
+
+    /**
      *  get channel
-     * @param address
+     * @param host
      * @return
      */
-    public Channel getChannel(Address address) {
-        Channel channel = channels.get(address);
+    public Channel getChannel(Host host) {
+        Channel channel = channels.get(host);
         if(channel != null && channel.isActive()){
             return channel;
         }
-        return createChannel(address, true);
+        return createChannel(host, true);
     }
 
     /**
      * create channel
-     * @param address address
+     * @param host host
      * @param isSync sync flag
      * @return channel
      */
-    public Channel createChannel(Address address, boolean isSync) {
+    public Channel createChannel(Host host, boolean isSync) {
         ChannelFuture future;
         try {
             synchronized (bootstrap){
-                future = bootstrap.connect(new InetSocketAddress(address.getHost(), address.getPort()));
+                future = bootstrap.connect(new InetSocketAddress(host.getIp(), host.getPort()));
             }
             if(isSync){
                 future.sync();
             }
             if (future.isSuccess()) {
                 Channel channel = future.channel();
-                channels.put(address, channel);
+                channels.put(host, channel);
                 return channel;
             }
         } catch (Exception ex) {
-            logger.info("connect to {} error  {}", address, ex);
+            logger.info("connect to {} error  {}", host, ex);
         }
         return null;
     }
@@ -305,6 +366,9 @@ public class NettyRemotingClient {
                 }
                 if(callbackExecutor != null){
                     this.callbackExecutor.shutdownNow();
+                }
+                if(this.responseFutureExecutor != null){
+                    this.responseFutureExecutor.shutdownNow();
                 }
             } catch (Exception ex) {
                 logger.error("netty client close exception", ex);
@@ -325,10 +389,10 @@ public class NettyRemotingClient {
 
     /**
      * close channel
-     * @param address address
+     * @param host host
      */
-    public void closeChannel(Address address){
-        Channel channel = this.channels.remove(address);
+    public void closeChannel(Host host){
+        Channel channel = this.channels.remove(host);
         if(channel != null){
             channel.close();
         }

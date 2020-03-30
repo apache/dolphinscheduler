@@ -64,7 +64,7 @@ public class ExecutorController extends BaseController {
      * @param receiversCc receivers cc
      * @param runMode run mode
      * @param processInstancePriority process instance priority
-     * @param workerGroupId worker group id
+     * @param workerGroup worker group
      * @param timeout timeout
      * @return start process result code
      */
@@ -82,7 +82,7 @@ public class ExecutorController extends BaseController {
             @ApiImplicitParam(name = "receiversCc", value = "RECEIVERS_CC",dataType ="String" ),
             @ApiImplicitParam(name = "runMode", value = "RUN_MODE",dataType ="RunMode" ),
             @ApiImplicitParam(name = "processInstancePriority", value = "PROCESS_INSTANCE_PRIORITY", required = true, dataType = "Priority" ),
-            @ApiImplicitParam(name = "workerGroupId", value = "WORKER_GROUP_ID", dataType = "Int",example = "100"),
+            @ApiImplicitParam(name = "workerGroup", value = "WORKER_GROUP", dataType = "String",example = "default"),
             @ApiImplicitParam(name = "timeout", value = "TIMEOUT", dataType = "Int",example = "100"),
     })
     @PostMapping(value = "start-process-instance")
@@ -101,15 +101,15 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "receiversCc", required = false) String receiversCc,
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
-                                       @RequestParam(value = "workerGroupId", required = false, defaultValue = "-1") int workerGroupId,
+                                       @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                        @RequestParam(value = "timeout", required = false) Integer timeout) {
         try {
             logger.info("login user {}, start process instance, project name: {}, process definition id: {}, schedule time: {}, "
                             + "failure policy: {}, node name: {}, node dep: {}, notify type: {}, "
-                            + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroupId: {}, timeout: {}",
+                            + "notify group id: {},receivers:{},receiversCc:{}, run mode: {},process instance priority:{}, workerGroup: {}, timeout: {}",
                     loginUser.getUserName(), projectName, processDefinitionId, scheduleTime,
-                    failureStrategy, startNodeList, taskDependType, warningType, warningGroupId,receivers,receiversCc,runMode,processInstancePriority,
-                    workerGroupId, timeout);
+                    failureStrategy, startNodeList, taskDependType, warningType, workerGroup,receivers,receiversCc,runMode,processInstancePriority,
+                    workerGroup, timeout);
 
             if (timeout == null) {
                 timeout = Constants.MAX_TASK_TIMEOUT;
@@ -117,7 +117,7 @@ public class ExecutorController extends BaseController {
 
             Map<String, Object> result = execService.execProcessInstance(loginUser, projectName, processDefinitionId, scheduleTime, execType, failureStrategy,
                             startNodeList, taskDependType, warningType,
-                    warningGroupId,receivers,receiversCc, runMode,processInstancePriority, workerGroupId, timeout);
+                    warningGroupId,receivers,receiversCc, runMode,processInstancePriority, workerGroup, timeout);
             return returnDataList(result);
         } catch (Exception e) {
             logger.error(Status.START_PROCESS_INSTANCE_ERROR.getMsg(),e);

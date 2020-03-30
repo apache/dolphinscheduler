@@ -55,7 +55,7 @@ public class MailUtils {
 
     public static final Boolean mailUseSSL = PropertyUtils.getBoolean(Constants.MAIL_SMTP_SSL_ENABLE);
 
-    public static final String xlsFilePath = PropertyUtils.getString(Constants.XLS_FILE_PATH);
+    public static final String xlsFilePath = PropertyUtils.getString(Constants.XLS_FILE_PATH,"/tmp/xls");
 
     public static final String starttlsEnable = PropertyUtils.getString(Constants.MAIL_SMTP_STARTTLS_ENABLE);
 
