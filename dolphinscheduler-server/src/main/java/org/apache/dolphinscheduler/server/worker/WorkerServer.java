@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.master.MasterServer;
 import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.FetchTaskThread;
@@ -43,12 +44,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +59,10 @@ import java.util.concurrent.TimeUnit;
 /**
  *  worker server
  */
-@ComponentScan("org.apache.dolphinscheduler")
+@SpringBootApplication
+@ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {MasterServer.class})
+})
 public class WorkerServer implements IStoppable {
 
     /**
@@ -104,11 +110,6 @@ public class WorkerServer implements IStoppable {
      */
     private ExecutorService fetchTaskExecutorService;
 
-    /**
-     * CountDownLatch latch
-     */
-    private CountDownLatch latch;
-
     @Value("${server.is-combined-server:false}")
     private Boolean isCombinedServer;
 
@@ -149,7 +150,7 @@ public class WorkerServer implements IStoppable {
 
         this.fetchTaskExecutorService = ThreadUtils.newDaemonSingleThreadExecutor("Worker-Fetch-Thread-Executor");
 
-        heartbeatWorkerService = ThreadUtils.newDaemonThreadScheduledExecutor("Worker-Heartbeat-Thread-Executor", Constants.DEFAUL_WORKER_HEARTBEAT_THREAD_NUM);
+        heartbeatWorkerService = ThreadUtils.newThreadScheduledExecutor("Worker-Heartbeat-Thread-Executor", Constants.DEFAUL_WORKER_HEARTBEAT_THREAD_NUM, false);
 
         // heartbeat thread implement
         Runnable heartBeatThread = heartBeatThread();
@@ -171,29 +172,15 @@ public class WorkerServer implements IStoppable {
 
         // submit fetch task thread
         fetchTaskExecutorService.execute(fetchTaskThread);
+    }
 
-        /**
-         * register hooks, which are called before the process exits
-         */
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // worker server exit alert
-                if (zkWorkerClient.getActiveMasterNum() <= 1) {
-                    alertDao.sendServerStopedAlert(1, OSUtils.getHost(), "Worker-Server");
-                }
-                stop("shutdownhook");
-            }
-        }));
-
-        //let the main thread await
-        latch = new CountDownLatch(1);
-        if (!isCombinedServer) {
-            try {
-                latch.await();
-            } catch (InterruptedException ignore) {
-            }
+    @PreDestroy
+    public void destroy() {
+        // worker server exit alert
+        if (zkWorkerClient.getActiveMasterNum() <= 1) {
+            alertDao.sendServerStopedAlert(1, OSUtils.getHost(), "Worker-Server");
         }
+        stop("shutdownhook");
     }
 
     @Override
@@ -251,7 +238,6 @@ public class WorkerServer implements IStoppable {
             }catch (Exception e){
                 logger.warn("zookeeper service stopped exception:{}",e.getMessage());
             }
-            latch.countDown();
             logger.info("zookeeper service stopped");
 
         } catch (Exception e) {
@@ -268,7 +254,7 @@ public class WorkerServer implements IStoppable {
      */
     private Runnable heartBeatThread(){
         logger.info("start worker heart beat thread...");
-        Runnable heartBeatThread  = new Runnable() {
+        return new Runnable() {
             @Override
             public void run() {
                 // send heartbeat to zk
@@ -279,7 +265,6 @@ public class WorkerServer implements IStoppable {
                 zkWorkerClient.heartBeatForZk(zkWorkerClient.getWorkerZNode() , Constants.WORKER_PREFIX);
             }
         };
-        return heartBeatThread;
     }
 
 
@@ -289,7 +274,7 @@ public class WorkerServer implements IStoppable {
      * @return kill process thread
      */
     private Runnable getKillProcessThread(){
-        Runnable killProcessThread  = new Runnable() {
+        return new Runnable() {
             @Override
             public void run() {
                 logger.info("start listening kill process thread...");
@@ -310,7 +295,6 @@ public class WorkerServer implements IStoppable {
                 }
             }
         };
-        return killProcessThread;
     }
 
     /**
@@ -320,17 +304,17 @@ public class WorkerServer implements IStoppable {
      * @param pd        process dao
      */
     private void killTask(String taskInfo, ProcessService pd) {
-        logger.info("get one kill command from tasks kill queue: " + taskInfo);
+        logger.info("get one kill command from tasks kill queue: {}" , taskInfo);
         String[] taskInfoArray = taskInfo.split("-");
         if(taskInfoArray.length != 2){
-            logger.error("error format kill info: " + taskInfo);
+            logger.error("error format kill info: {}", taskInfo);
             return ;
         }
         String host = taskInfoArray[0];
         int taskInstanceId = Integer.parseInt(taskInfoArray[1]);
         TaskInstance taskInstance = pd.getTaskInstanceDetailByTaskId(taskInstanceId);
         if(taskInstance == null){
-            logger.error("cannot find the kill task :" + taskInfo);
+            logger.error("cannot find the kill task : {}", taskInfo);
             return;
         }
 
@@ -345,8 +329,7 @@ public class WorkerServer implements IStoppable {
             }else if(!taskInstance.getState().typeIsFinished()){
                 ProcessUtils.kill(taskInstance);
             }else{
-                logger.info("the task aleady finish: task id: " + taskInstance.getId()
-                        + " state: " + taskInstance.getState().toString());
+                logger.info("the task aleady finish: task id: {} state: {}", taskInstance.getId(), taskInstance.getState());
             }
         }
     }
@@ -360,7 +343,7 @@ public class WorkerServer implements IStoppable {
     private void deleteTaskFromQueue(TaskInstance taskInstance, ProcessService pd){
         // creating distributed locks, lock path /dolphinscheduler/lock/worker
         InterProcessMutex mutex = null;
-        logger.info("delete task from tasks queue: " + taskInstance.getId());
+        logger.info("delete task from tasks queue: {}", taskInstance.getId());
 
         try {
             mutex = zkWorkerClient.acquireZkLock(zkWorkerClient.getZkClient(),

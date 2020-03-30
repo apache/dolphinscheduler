@@ -19,19 +19,22 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.sift.SiftingAppender;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.CommonUtils;
 import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.log.TaskLogDiscriminator;
@@ -93,10 +96,10 @@ public class TaskScheduleThread implements Runnable {
 
             logger.info("script path : {}", taskInstance.getExecutePath());
             // task node
-            TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
+            TaskNode taskNode = JSON.parseObject(taskInstance.getTaskJson(), TaskNode.class);
 
             // get resource files
-            List<String> resourceFiles = createProjectResFiles(taskNode);
+            List<ResourceInfo> resourceFiles = createProjectResFiles(taskNode);
             // copy hdfs/minio file to local
             downloadResource(
                     taskInstance.getExecutePath(),
@@ -165,6 +168,7 @@ public class TaskScheduleThread implements Runnable {
                 new Date(),
                 taskInstance.getId());
     }
+
     /**
      * get global paras map
      * @return
@@ -176,7 +180,7 @@ public class TaskScheduleThread implements Runnable {
         String globalParamsStr = taskInstance.getProcessInstance().getGlobalParams();
 
         if (globalParamsStr != null) {
-            List<Property> globalParamsList = JSONObject.parseArray(globalParamsStr, Property.class);
+            List<Property> globalParamsList = JSON.parseArray(globalParamsStr, Property.class);
             globalParamsMap.putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
         }
         return globalParamsMap;
@@ -230,7 +234,7 @@ public class TaskScheduleThread implements Runnable {
                         taskInstance.getId() + ".log";
             }
         }catch (Exception e){
-            logger.error("logger" + e);
+            logger.error("logger {}", e.getMessage(), e);
             logPath = "";
         }
         return logPath;
@@ -289,13 +293,13 @@ public class TaskScheduleThread implements Runnable {
     /**
      *  create project resource files
      */
-    private List<String> createProjectResFiles(TaskNode taskNode) throws Exception{
+    private List<ResourceInfo> createProjectResFiles(TaskNode taskNode) throws Exception{
 
-        Set<String> projectFiles = new HashSet<>();
+        Set<ResourceInfo> projectFiles = new HashSet<>();
         AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
 
         if (baseParam != null) {
-            List<String> projectResourceFiles = baseParam.getResourceFilesList();
+            List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
             if (projectResourceFiles != null) {
                 projectFiles.addAll(projectResourceFiles);
             }
@@ -311,18 +315,25 @@ public class TaskScheduleThread implements Runnable {
      * @param projectRes
      * @param logger
      */
-    private void downloadResource(String execLocalPath, List<String> projectRes, Logger logger) throws Exception {
+    private void downloadResource(String execLocalPath, List<ResourceInfo> projectRes, Logger logger) throws Exception {
         checkDownloadPermission(projectRes);
-        for (String res : projectRes) {
-            File resFile = new File(execLocalPath, res);
+        String resourceName;
+        for (ResourceInfo res : projectRes) {
+            if (res.getId() != 0) {
+                Resource resource = processService.getResourceById(res.getId());
+                resourceName = resource.getFullName();
+            }else{
+                resourceName = res.getRes();
+            }
+            File resFile = new File(execLocalPath, resourceName);
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String tentnCode = processService.queryTenantCodeByResName(res);
-                    String resHdfsPath = HadoopUtils.getHdfsFilename(tentnCode, res);
+                    String tentnCode = processService.queryTenantCodeByResName(resourceName, ResourceType.FILE);
+                    String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tentnCode, resourceName);
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
-                    HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + res, false, true);
+                    HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + resourceName, false, true);
                 }catch (Exception e){
                     logger.error(e.getMessage(),e);
                     throw new RuntimeException(e.getMessage());
@@ -338,10 +349,17 @@ public class TaskScheduleThread implements Runnable {
      * @param projectRes resource name list
      * @throws Exception exception
      */
-    private void checkDownloadPermission(List<String> projectRes) throws Exception {
+    private void checkDownloadPermission(List<ResourceInfo> projectRes) throws Exception {
+
         int userId = taskInstance.getProcessInstance().getExecutorId();
-        String[] resNames = projectRes.toArray(new String[projectRes.size()]);
-        PermissionCheck<String> permissionCheck = new PermissionCheck<>(AuthorizationType.RESOURCE_FILE, processService,resNames,userId,logger);
-        permissionCheck.checkPermission();
+        if (projectRes.stream().allMatch(t->t.getId() == 0)) {
+            String[] resNames = projectRes.stream().map(t -> t.getRes()).collect(Collectors.toList()).toArray(new String[projectRes.size()]);
+            PermissionCheck<String> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_NAME,processService,resNames,userId,logger);
+            permissionCheck.checkPermission();
+        }else{
+            Integer[] resIds = projectRes.stream().map(t -> t.getId()).collect(Collectors.toList()).toArray(new Integer[projectRes.size()]);
+            PermissionCheck<Integer> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_ID,processService,resIds,userId,logger);
+            permissionCheck.checkPermission();
+        }
     }
 }

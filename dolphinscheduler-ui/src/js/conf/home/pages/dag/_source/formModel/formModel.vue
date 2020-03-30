@@ -252,6 +252,7 @@
           v-if="taskType === 'CONDITIONS'"
           ref="CONDITIONS"
           @on-dependent="_onDependent"
+          @on-cache-dependent="_onCacheDependent"
           :backfill-item="backfillItem"
           :pre-node="preNode">
         </m-conditions>
@@ -429,7 +430,7 @@
        * return params
        */
       _onParams (o) {
-        this.params = Object.assign(this.params, {}, o)
+        this.params = Object.assign({}, o)
       },
 
       _onCacheParams (o) {
@@ -438,6 +439,8 @@
       },
 
       _cacheItem () {
+        this.conditionResult.successNode[0] = this.successBranch
+        this.conditionResult.failedNode[0] = this.failedBranch
         this.$emit('cacheTaskInfo', {
           item: {
             type: this.taskType,
@@ -446,12 +449,15 @@
             params: this.params,
             description: this.description,
             runFlag: this.runFlag,
+            conditionResult: this.conditionResult,
             dependence: this.cacheDependence,
             maxRetryTimes: this.maxRetryTimes,
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-            workerGroupId: this.workerGroupId
+            workerGroupId: this.workerGroupId,
+            status: this.status,
+            branch: this.branch
           },
           fromThis: this
         })
@@ -464,7 +470,7 @@
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
-        if (this.successBranch !='' && this.successBranch == this.failedBranch) {
+        if (this.successBranch !='' && this.successBranch !=null && this.successBranch == this.failedBranch) {
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
@@ -657,7 +663,9 @@
           retryInterval: this.retryInterval,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
-          workerGroupId: this.workerGroupId
+          workerGroupId: this.workerGroupId,
+          successBranch: this.successBranch,
+          failedBranch: this.failedBranch
         }
       }
     },

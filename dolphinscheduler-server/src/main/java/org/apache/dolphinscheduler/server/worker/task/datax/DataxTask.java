@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.worker.task.datax;
 
 
 import java.io.File;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -192,24 +192,47 @@ public class DataxTask extends AbstractTask {
         throws Exception {
         // generate json
         String fileName = String.format("%s/%s_job.json", taskDir, taskProps.getTaskAppId());
+        String json;
 
         Path path = new File(fileName).toPath();
         if (Files.exists(path)) {
             return fileName;
         }
 
-        JSONObject job = new JSONObject();
-        job.put("content", buildDataxJobContentJson());
-        job.put("setting", buildDataxJobSettingJson());
 
-        JSONObject root = new JSONObject();
-        root.put("job", job);
-        root.put("core", buildDataxCoreJson());
 
-        logger.debug("datax job json : {}", root.toString());
+        if (dataXParameters.getCustomConfig() == 1){
+
+            json = dataXParameters.getJson().replaceAll("\\r\\n", "\n");
+
+            /**
+             *  combining local and global parameters
+             */
+            Map<String, Property> paramsMap = ParamUtils.convert(taskProps.getUserDefParamsMap(),
+                    taskProps.getDefinedParams(),
+                    dataXParameters.getLocalParametersMap(),
+                    taskProps.getCmdTypeIfComplement(),
+                    taskProps.getScheduleTime());
+            if (paramsMap != null){
+                json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
+            }
+
+        }else {
+
+            JSONObject job = new JSONObject();
+            job.put("content", buildDataxJobContentJson());
+            job.put("setting", buildDataxJobSettingJson());
+
+            JSONObject root = new JSONObject();
+            root.put("job", job);
+            root.put("core", buildDataxCoreJson());
+            json = root.toString();
+        }
+
+        logger.debug("datax job json : {}", json);
 
         // create datax json file
-        FileUtils.writeStringToFile(new File(fileName), root.toString(), Charset.forName("UTF-8"));
+        FileUtils.writeStringToFile(new File(fileName), json, StandardCharsets.UTF_8);
         return fileName;
     }
 

@@ -25,12 +25,10 @@ import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
@@ -44,6 +42,7 @@ import java.util.Date;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(OSUtils.class)
+@PowerMockIgnore({"javax.management.*"})
 public class ShellTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ShellTaskTest.class);
@@ -135,6 +134,28 @@ public class ShellTaskTest {
         }
     }
 
+    @Test
+    public void testInitException() {
+        TaskProps props = new TaskProps();
+        props.setTaskDir("/tmp");
+        props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
+        props.setTaskInstId(1);
+        props.setTenantCode("1");
+        props.setEnvFile(".dolphinscheduler_env.sh");
+        props.setTaskStartTime(new Date());
+        props.setTaskTimeout(0);
+        props.setTaskParams("{\"rawScript\": \"\"}");
+        ShellTask shellTask = new ShellTask(props, logger);
+        try {
+            shellTask.init();
+        } catch (Exception e) {
+            logger.info(e.getMessage(), e);
+            if (e.getMessage().contains("shell task params is not valid")) {
+                Assert.assertTrue(true);
+            }
+        }
+    }
+
     /**
      * Method: init for Windows
      */
@@ -156,7 +177,20 @@ public class ShellTaskTest {
     public void testHandleForUnix() throws Exception {
         try {
             PowerMockito.when(OSUtils.isWindows()).thenReturn(false);
-            shellTask.handle();
+            TaskProps props = new TaskProps();
+            props.setTaskDir("/tmp");
+            props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
+            props.setTaskInstId(1);
+            props.setTenantCode("1");
+            props.setEnvFile(".dolphinscheduler_env.sh");
+            props.setTaskStartTime(new Date());
+            props.setTaskTimeout(0);
+            props.setScheduleTime(new Date());
+            props.setCmdTypeIfComplement(CommandType.START_PROCESS);
+            props.setTaskParams("{\"rawScript\": \" echo ${test}\", \"localParams\": [{\"prop\":\"test\", \"direct\":\"IN\", \"type\":\"VARCHAR\", \"value\":\"123\"}]}");
+            ShellTask shellTask1 = new ShellTask(props, logger);
+            shellTask1.init();
+            shellTask1.handle();
             Assert.assertTrue(true);
         } catch (Error | Exception e) {
             if (!e.getMessage().contains("process error . exitCode is :  -1")
@@ -172,8 +206,21 @@ public class ShellTaskTest {
     @Test
     public void testHandleForWindows() throws Exception {
         try {
-            PowerMockito.when(OSUtils.isWindows()).thenReturn(true);
-            shellTask.handle();
+            Assume.assumeTrue(OSUtils.isWindows());
+            TaskProps props = new TaskProps();
+            props.setTaskDir("/tmp");
+            props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
+            props.setTaskInstId(1);
+            props.setTenantCode("1");
+            props.setEnvFile(".dolphinscheduler_env.sh");
+            props.setTaskStartTime(new Date());
+            props.setTaskTimeout(0);
+            props.setScheduleTime(new Date());
+            props.setCmdTypeIfComplement(CommandType.START_PROCESS);
+            props.setTaskParams("{\"rawScript\": \" echo ${test}\", \"localParams\": [{\"prop\":\"test\", \"direct\":\"IN\", \"type\":\"VARCHAR\", \"value\":\"123\"}]}");
+            ShellTask shellTask1 = new ShellTask(props, logger);
+            shellTask1.init();
+            shellTask1.handle();
             Assert.assertTrue(true);
         } catch (Error | Exception e) {
             if (!e.getMessage().contains("process error . exitCode is :  -1")) {

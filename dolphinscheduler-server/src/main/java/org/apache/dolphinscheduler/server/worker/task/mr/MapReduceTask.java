@@ -19,11 +19,13 @@ package org.apache.dolphinscheduler.server.worker.task.mr;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.mr.MapreduceParameters;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.server.utils.ParamUtils;
 import org.apache.dolphinscheduler.server.worker.task.AbstractYarnTask;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -64,7 +66,7 @@ public class MapReduceTask extends AbstractYarnTask {
         if (!mapreduceParameters.checkParameters()) {
             throw new RuntimeException("mapreduce task params is not valid");
         }
-
+        setMainJarName();
         mapreduceParameters.setQueue(taskProps.getQueue());
 
         // replace placeholder
@@ -100,6 +102,28 @@ public class MapReduceTask extends AbstractYarnTask {
     }
 
     @Override
+    protected void setMainJarName() {
+        // main jar
+        ResourceInfo mainJar = mapreduceParameters.getMainJar();
+        if (mainJar != null) {
+            int resourceId = mainJar.getId();
+            String resourceName;
+            if (resourceId == 0) {
+                resourceName = mainJar.getRes();
+            } else {
+                Resource resource = processService.getResourceById(mapreduceParameters.getMainJar().getId());
+                if (resource == null) {
+                    logger.error("resource id: {} not exist", resourceId);
+                    throw new RuntimeException(String.format("resource id: %d not exist", resourceId));
+                }
+                resourceName = resource.getFullName().replaceFirst("/", "");
+            }
+            mainJar.setRes(resourceName);
+            mapreduceParameters.setMainJar(mainJar);
+        }
+    }
+
+    @Override
     public AbstractParameters getParameters() {
         return mapreduceParameters;
     }
@@ -122,22 +146,19 @@ public class MapReduceTask extends AbstractYarnTask {
         }
 
         // main class
-        if(mapreduceParameters.getProgramType() !=null ){
-            if(mapreduceParameters.getProgramType()!= ProgramType.PYTHON){
-                if(StringUtils.isNotEmpty(mapreduceParameters.getMainClass())){
-                    result.add(mapreduceParameters.getMainClass());
-                }
-            }
+        if(!ProgramType.PYTHON.equals(mapreduceParameters.getProgramType())
+                && StringUtils.isNotEmpty(mapreduceParameters.getMainClass())){
+            result.add(mapreduceParameters.getMainClass());
         }
 
         // others
         if (StringUtils.isNotEmpty(mapreduceParameters.getOthers())) {
             String others = mapreduceParameters.getOthers();
-            if(!others.contains(Constants.MR_QUEUE)){
-                if (StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
-                    result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));
-                }
+            if (!others.contains(Constants.MR_QUEUE)
+                    && StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
+                result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));
             }
+
             result.add(mapreduceParameters.getOthers());
         }else if (StringUtils.isNotEmpty(mapreduceParameters.getQueue())) {
             result.add(String.format("%s %s=%s", Constants.D, Constants.MR_QUEUE, mapreduceParameters.getQueue()));

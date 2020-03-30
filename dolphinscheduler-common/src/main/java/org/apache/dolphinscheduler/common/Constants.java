@@ -814,6 +814,11 @@ public final class Constants {
     public static final String KERBEROS = "kerberos";
 
     /**
+     * kerberos expire time
+     */
+    public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
+
+    /**
      * java.security.krb5.conf
      */
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
@@ -967,7 +972,8 @@ public final class Constants {
     public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
     public static final String JDBC_HIVE_2 = "jdbc:hive2://";
     public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
-    public static final String JDBC_ORACLE = "jdbc:oracle:thin:@//";
+    public static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
+    public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
     public static final String JDBC_DB2 = "jdbc:db2://";
 
@@ -994,4 +1000,11 @@ public final class Constants {
      * dataSource sensitive param
      */
     public static final String DATASOURCE_PASSWORD_REGEX = "(?<=(\"password\":\")).*?(?=(\"))";
+
+
+    /**
+     * new
+     * schedule time
+     */
+    public static final String PARAMETER_SHECDULE_TIME = "schedule.time";
 }
