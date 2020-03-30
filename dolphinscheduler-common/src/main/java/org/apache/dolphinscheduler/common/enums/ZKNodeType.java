@@ -22,10 +22,10 @@ package org.apache.dolphinscheduler.common.enums;
 public enum ZKNodeType {
 
     /**
-     * 0 do not send warning;
-     * 1 send if process success;
-     * 2 send if process failed;
-     * 3 send if process ending;
+     * 0 master node;
+     * 1 worker node;
+     * 2 dead_server node;
+     * 3 task_queue node;
      */
     MASTER, WORKER, DEAD_SERVER, TASK_QUEUE;
 }
