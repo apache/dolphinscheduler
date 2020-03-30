@@ -56,13 +56,6 @@ public class CommonUtils {
   }
 
   /**
-   * @return get queue implementation name
-   */
-  public static String getQueueImplValue(){
-    return PropertyUtils.getString(Constants.SCHEDULER_QUEUE_IMPL);
-  }
-
-  /**
    * 
    * @return is develop mode
    */
