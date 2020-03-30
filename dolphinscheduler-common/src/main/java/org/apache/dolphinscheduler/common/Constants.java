@@ -47,6 +47,7 @@ public final class Constants {
     public static final String ORG_QUARTZ_JOBSTORE_ISCLUSTERED = "org.quartz.jobStore.isClustered";
     public static final String ORG_QUARTZ_JOBSTORE_MISFIRETHRESHOLD = "org.quartz.jobStore.misfireThreshold";
     public static final String ORG_QUARTZ_JOBSTORE_CLUSTERCHECKININTERVAL = "org.quartz.jobStore.clusterCheckinInterval";
+    public static final String ORG_QUARTZ_JOBSTORE_ACQUIRETRIGGERSWITHINLOCK = "org.quartz.jobStore.acquireTriggersWithinLock";
     public static final String ORG_QUARTZ_JOBSTORE_DATASOURCE = "org.quartz.jobStore.dataSource";
     public static final String ORG_QUARTZ_DATASOURCE_MYDS_CONNECTIONPROVIDER_CLASS = "org.quartz.dataSource.myDs.connectionProvider.class";
 
@@ -61,6 +62,7 @@ public final class Constants {
     public static final String QUARTZ_THREADPRIORITY = "5";
     public static final String QUARTZ_INSTANCENAME = "DolphinScheduler";
     public static final String QUARTZ_INSTANCEID = "AUTO";
+    public static final String QUARTZ_ACQUIRETRIGGERSWITHINLOCK = "true";
 
     /**
      * common properties path
