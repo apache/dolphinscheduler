@@ -23,15 +23,16 @@ import org.testng.annotations.Test;
 public class DeleteTenantTest extends BaseTest {
     private TenantManagePage tenantManagePage;
 
-    @Test(groups={"functionTests"},dependsOnGroups = { "login","createTenant"},description = "DeleteTenantTest")
+    @Test(groups={"functionTests"},dependsOnGroups = { "login","createTenant"},description = "DeleteTenantTest",priority=9)
     public void testDeleteTenant() throws InterruptedException {
         tenantManagePage = new TenantManagePage(driver);
         //assert tenant manage page
+        System.out.println("jump to security to delete tenant");
+        tenantManagePage.jumpSecurity();
+
         System.out.println("start delete tenant");
         assert tenantManagePage.deleteTenant();
         System.out.println("end delete tenant");
         System.out.println("===================================");
     }
-
-
 }

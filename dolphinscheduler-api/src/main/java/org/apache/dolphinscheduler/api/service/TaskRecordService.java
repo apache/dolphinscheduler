@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.TaskRecordDao;
 import org.apache.dolphinscheduler.dao.entity.TaskRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -36,8 +34,6 @@ import static org.apache.dolphinscheduler.common.Constants.*;
  */
 @Service
 public class TaskRecordService extends BaseService{
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskRecordService.class);
 
     /**
      * query task record list paging
