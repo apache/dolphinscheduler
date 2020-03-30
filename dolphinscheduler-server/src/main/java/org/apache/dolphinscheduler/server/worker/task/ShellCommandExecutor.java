@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.slf4j.Logger;
 
 import java.io.File;
@@ -24,7 +25,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -40,33 +40,21 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     /**
      * constructor
-     * @param logHandler    log handler
-     * @param taskDir       task dir
-     * @param taskAppId     task app id
-     * @param taskInstId    task instance id
-     * @param tenantCode    tenant code
-     * @param envFile       env file
-     * @param startTime     start time
-     * @param timeout       timeout
-     * @param logger        logger
+     * @param logHandler logHandler
+     * @param taskExecutionContext taskExecutionContext
+     * @param logger logger
      */
     public ShellCommandExecutor(Consumer<List<String>> logHandler,
-                                String taskDir,
-                                String taskAppId,
-                                int taskInstId,
-                                String tenantCode,
-                                String envFile,
-                                Date startTime,
-                                int timeout,
+                                TaskExecutionContext taskExecutionContext,
                                 Logger logger) {
-        super(logHandler,taskDir,taskAppId,taskInstId,tenantCode, envFile, startTime, timeout, logger);
+        super(logHandler,taskExecutionContext,logger);
     }
 
 
     @Override
     protected String buildCommandFilePath() {
         // command file
-        return String.format("%s/%s.command", taskDir, taskAppId);
+        return String.format("%s/%s.command", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
     }
 
     /**
@@ -78,15 +66,6 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
         return SH;
     }
 
-    /**
-     * check find yarn application id
-     * @param line line
-     * @return true if line contains task app id
-     */
-    @Override
-    protected boolean checkFindApp(String line) {
-        return line.contains(taskAppId);
-    }
 
     /**
      * create command file if not exists
@@ -96,7 +75,7 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
      */
     @Override
     protected void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException {
-        logger.info("tenantCode user:{}, task dir:{}", tenantCode, taskAppId);
+        logger.info("tenantCode user:{}, task dir:{}", taskExecutionContext.getTenantCode(), taskExecutionContext.getTaskAppId());
 
         // create if non existence
         if (!Files.exists(Paths.get(commandFile))) {
@@ -107,8 +86,8 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
             sb.append("cd $BASEDIR\n");
 
-            if (envFile != null) {
-                sb.append("source " + envFile + "\n");
+            if (taskExecutionContext.getEnvFile() != null) {
+                sb.append("source " + taskExecutionContext.getEnvFile() + "\n");
             }
 
             sb.append("\n\n");

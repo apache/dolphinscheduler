@@ -1,4 +1,4 @@
-package org.apache.dolphinscheduler.remote;/*
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -15,9 +15,9 @@ package org.apache.dolphinscheduler.remote;/*
  * limitations under the License.
  */
 
+package org.apache.dolphinscheduler.remote;
+
 import io.netty.channel.Channel;
-import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.Ping;
@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.future.InvokeCallback;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.Address;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -62,11 +62,13 @@ public class NettyRemotingClientTest {
         NettyRemotingClient client = new NettyRemotingClient(clientConfig);
         Command commandPing = Ping.create();
         try {
-            Command response = client.sendSync(new Address("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000);
+            Command response = client.sendSync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000);
             Assert.assertEquals(commandPing.getOpaque(), response.getOpaque());
         } catch (Exception e) {
             e.printStackTrace();
         }
+        server.close();
+        client.close();
     }
 
     /**
@@ -91,7 +93,7 @@ public class NettyRemotingClientTest {
         Command commandPing = Ping.create();
         try {
             final AtomicLong opaque = new AtomicLong(0);
-            client.sendAsync(new Address("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000, new InvokeCallback() {
+            client.sendAsync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000, new InvokeCallback() {
                 @Override
                 public void operationComplete(ResponseFuture responseFuture) {
                     opaque.set(responseFuture.getOpaque());
@@ -103,5 +105,7 @@ public class NettyRemotingClientTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        server.close();
+        client.close();
     }
 }

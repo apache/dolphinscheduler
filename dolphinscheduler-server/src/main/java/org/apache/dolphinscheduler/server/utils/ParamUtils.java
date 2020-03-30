@@ -17,6 +17,8 @@
 package org.apache.dolphinscheduler.server.utils;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.DataType;
+import org.apache.dolphinscheduler.common.enums.Direct;
 import org.apache.dolphinscheduler.common.process.Property;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
@@ -104,5 +106,25 @@ public class ParamUtils {
             map.put(en.getKey(),en.getValue().getValue());
         }
         return map;
+    }
+
+
+    /**
+     * get parameters map
+     * @param definedParams definedParams
+     * @return parameters map
+     */
+    public static Map<String,Property> getUserDefParamsMap(Map<String,String> definedParams) {
+        if (definedParams != null) {
+            Map<String,Property> userDefParamsMaps = new HashMap<>();
+            Iterator<Map.Entry<String, String>> iter = definedParams.entrySet().iterator();
+            while (iter.hasNext()){
+                Map.Entry<String, String> en = iter.next();
+                Property property = new Property(en.getKey(), Direct.IN, DataType.VARCHAR , en.getValue());
+                userDefParamsMaps.put(property.getProp(),property);
+            }
+            return userDefParamsMaps;
+        }
+        return null;
     }
 }
