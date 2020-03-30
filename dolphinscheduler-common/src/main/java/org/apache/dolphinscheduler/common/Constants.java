@@ -154,6 +154,11 @@ public final class Constants {
     public static final String STRING_TRUE = "true";
 
     /**
+     * string true
+     */
+    public static final String STRING_FALSE = "false";
+
+    /**
      * resource storage type
      */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
