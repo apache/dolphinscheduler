@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  *  master scheduler thread
@@ -93,7 +94,15 @@ public class MasterSchedulerService extends Thread {
         super.start();
     }
 
-    public void close(){
+    public void close() {
+        masterExecService.shutdown();
+        boolean terminated = false;
+        try {
+            terminated = masterExecService.awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException ignore) {}
+        if(!terminated){
+            logger.warn("masterExecService shutdown without terminated, increase await time");
+        }
         nettyRemotingClient.close();
         logger.info("master schedule service stopped...");
     }

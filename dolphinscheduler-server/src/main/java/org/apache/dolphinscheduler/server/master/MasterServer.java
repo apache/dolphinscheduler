@@ -81,6 +81,9 @@ public class MasterServer {
     @Autowired
     private ZKMasterClient zkMasterClient;
 
+    /**
+     * scheduler service
+     */
     @Autowired
     private MasterSchedulerService masterSchedulerService;
 
@@ -160,16 +163,16 @@ public class MasterServer {
             Stopper.stop();
 
             try {
-                //thread sleep 3 seconds for thread quitely stop
+                //thread sleep 3 seconds for thread quietly stop
                 Thread.sleep(3000L);
             }catch (Exception e){
                 logger.warn("thread sleep exception ", e);
             }
+            //
+            this.masterSchedulerService.close();
             this.nettyRemotingServer.close();
             this.masterRegistry.unRegistry();
             this.zkMasterClient.close();
-            this.masterSchedulerService.close();
-
             //close quartz
             try{
                 QuartzExecutors.getInstance().shutdown();
