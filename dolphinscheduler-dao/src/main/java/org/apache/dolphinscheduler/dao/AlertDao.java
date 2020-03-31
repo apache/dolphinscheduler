@@ -169,5 +169,11 @@ public class AlertDao extends AbstractBaseDao {
         return userAlertGroupMapper.listUserByAlertgroupId(alertgroupId);
     }
 
-
+    /**
+     * for test
+     * @return
+     */
+    public AlertMapper getAlertMapper() {
+        return alertMapper;
+    }
 }
