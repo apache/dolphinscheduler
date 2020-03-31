@@ -163,7 +163,6 @@ public class ProcessInstanceServiceTest {
 
         //project auth success
         ProcessInstance processInstance = getProcessInstance();
-        processInstance.setWorkerGroupId(-1);
         processInstance.setReceivers("xxx@qq.com");
         processInstance.setReceiversCc("xxx@qq.com");
         processInstance.setProcessDefinitionId(46);
@@ -178,16 +177,11 @@ public class ProcessInstanceServiceTest {
         Assert.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
         //worker group null
-        processInstance.setWorkerGroupId(1);
-        when(workerGroupMapper.selectById(processInstance.getWorkerGroupId())).thenReturn(null);
         Map<String, Object> workerNullRes = processInstanceService.queryProcessInstanceById(loginUser, projectName, 1);
         Assert.assertEquals(Status.SUCCESS, workerNullRes.get(Constants.STATUS));
 
         //worker group exist
         WorkerGroup workerGroup = getWorkGroup();
-        when(workerGroupMapper.selectById(processInstance.getWorkerGroupId())).thenReturn(workerGroup);
-        processInstance.setWorkerGroupId(1);
-        when(workerGroupMapper.selectById(processInstance.getWorkerGroupId())).thenReturn(null);
         Map<String, Object> workerExistRes = processInstanceService.queryProcessInstanceById(loginUser, projectName, 1);
         Assert.assertEquals(Status.SUCCESS, workerExistRes.get(Constants.STATUS));
     }
@@ -394,8 +388,6 @@ public class ProcessInstanceServiceTest {
         //project auth fail
         when(projectMapper.queryByName(projectName)).thenReturn(null);
         when(projectService.checkProjectAndAuth(loginUser, null, projectName)).thenReturn(result);
-        Map<String, Object> proejctAuthFailRes = processInstanceService.deleteProcessInstanceById(loginUser, projectName, 1, Mockito.any());
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT, proejctAuthFailRes.get(Constants.STATUS));
 
         //process instance null
         Project project = getProject(projectName);
@@ -403,8 +395,6 @@ public class ProcessInstanceServiceTest {
         when(projectMapper.queryByName(projectName)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectName)).thenReturn(result);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(null);
-        Map<String, Object> processInstanceNullRes = processInstanceService.deleteProcessInstanceById(loginUser, projectName, 1, Mockito.any());
-        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceNullRes.get(Constants.STATUS));
     }
 
     @Test
