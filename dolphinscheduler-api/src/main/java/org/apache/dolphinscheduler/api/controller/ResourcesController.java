@@ -154,8 +154,7 @@ public class ResourcesController extends BaseController{
             @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType ="Int", example = "100"),
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
             @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType ="String"),
-            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC",  dataType ="String"),
-            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true,dataType = "MultipartFile")
+            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC",  dataType ="String")
     })
     @PostMapping(value = "/update")
     public Result updateResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
