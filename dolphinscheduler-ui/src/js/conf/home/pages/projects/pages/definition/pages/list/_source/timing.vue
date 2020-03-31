@@ -413,4 +413,11 @@
       padding: 0;
     }
   }
+  .x-date-packer-panel .x-date-packer-day .lattice label.bg-hover {
+    background: #00BFFF!important; 
+    margin-top: -4px;
+  }
+  .x-date-packer-panel .x-date-packer-day .lattice em:hover {
+    background: #0098e1!important; 
+  }
 </style>
