@@ -129,7 +129,7 @@ public class MasterSchedulerService extends Thread {
                     // make sure to scan and delete command  table in one transaction
                     Command command = processService.findOneCommand();
                     if (command != null) {
-                        logger.info(String.format("find one command: id: %d, type: %s", command.getId(),command.getCommandType().toString()));
+                        logger.info("find one command: id: {}, type: {}", command.getId(),command.getCommandType());
 
                         try{
 

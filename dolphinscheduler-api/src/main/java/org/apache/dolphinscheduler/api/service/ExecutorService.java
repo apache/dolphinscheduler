@@ -242,7 +242,7 @@ public class ExecutorService extends BaseService{
                 }
                 break;
             default:
-                logger.error(String.format("unknown execute type : %s", executeType.toString()));
+                logger.error("unknown execute type : {}", executeType);
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "unknown execute type");
 
                 break;
@@ -259,10 +259,7 @@ public class ExecutorService extends BaseService{
         // checkTenantExists();
         Tenant tenant = processService.getTenantForProcess(processDefinition.getTenantId(),
                 processDefinition.getUserId());
-        if(tenant == null){
-            return false;
-        }
-        return true;
+        return tenant != null;
     }
 
     /**
@@ -298,6 +295,7 @@ public class ExecutorService extends BaseService{
                 if (executionStatus.typeIsPause()|| executionStatus.typeIsCancel()) {
                     checkResult = true;
                 }
+                break;
             default:
                 break;
         }
@@ -369,7 +367,7 @@ public class ExecutorService extends BaseService{
      * @return check result code
      */
     public Map<String, Object> startCheckByProcessDefinedId(int processDefineId) {
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<>();
 
         if (processDefineId == 0){
             logger.error("process definition id is null");
@@ -378,10 +376,9 @@ public class ExecutorService extends BaseService{
         List<Integer> ids = new ArrayList<>();
         processService.recurseFindSubProcessId(processDefineId, ids);
         Integer[] idArray = ids.toArray(new Integer[ids.size()]);
-        if (ids.size() > 0){
-            List<ProcessDefinition> processDefinitionList;
-            processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(idArray);
-            if (processDefinitionList != null && processDefinitionList.size() > 0){
+        if (!ids.isEmpty()){
+            List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryDefinitionListByIdList(idArray);
+            if (processDefinitionList != null){
                 for (ProcessDefinition processDefinition : processDefinitionList){
                     /**
                      * if there is no online process, exit directly

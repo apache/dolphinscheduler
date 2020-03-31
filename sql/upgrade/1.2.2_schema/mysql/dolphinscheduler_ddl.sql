@@ -36,6 +36,7 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_process_definition_A_modify_by;
 DROP PROCEDURE uc_dolphin_T_t_ds_process_definition_A_modify_by;
 
+<<<<<<< HEAD
 -- ac_dolphin_T_t_ds_process_instance_A_worker_group
 drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_process_instance_A_worker_group;
 delimiter d//
@@ -47,12 +48,26 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_process_instance_A_worker_group()
            AND COLUMN_NAME ='worker_group')
    THEN
          ALTER TABLE t_ds_process_instance ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+=======
+-- uc_dolphin_T_t_ds_task_instance_A_executor_id
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_A_executor_id;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_A_executor_id()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='executor_id')
+   THEN
+         ALTER TABLE t_ds_task_instance ADD `executor_id` int(11) DEFAULT NULL COMMENT 'executor id';
+>>>>>>> remotes/upstream/dev
        END IF;
  END;
 
 d//
 
 delimiter ;
+<<<<<<< HEAD
 CALL ac_dolphin_T_t_ds_process_instance_A_worker_group;
 DROP PROCEDURE ac_dolphin_T_t_ds_process_instance_A_worker_group;
 
@@ -67,12 +82,29 @@ CREATE PROCEDURE dc_dolphin_T_t_ds_process_instance_D_worker_group_id()
            AND COLUMN_NAME ='worker_group_id')
    THEN
          ALTER TABLE t_ds_process_instance DROP COLUMN worker_group_id;
+=======
+CALL uc_dolphin_T_t_ds_task_instance_A_executor_id;
+DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_A_executor_id;
+
+-- uc_dolphin_T_t_ds_task_instance_C_app_link
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_instance_C_app_link;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_task_instance_C_app_link()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='app_link')
+   THEN
+         ALTER TABLE t_ds_task_instance CHANGE COLUMN app_link app_link text COMMENT 'yarn app id';
+>>>>>>> remotes/upstream/dev
        END IF;
  END;
 
 d//
 
 delimiter ;
+<<<<<<< HEAD
 CALL dc_dolphin_T_t_ds_process_instance_D_worker_group_id;
 DROP PROCEDURE dc_dolphin_T_t_ds_process_instance_D_worker_group_id;
 
@@ -87,12 +119,29 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_task_instance_A_worker_group()
            AND COLUMN_NAME ='worker_group')
    THEN
          ALTER TABLE t_ds_task_instance ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+=======
+CALL uc_dolphin_T_t_ds_task_instance_C_app_link;
+DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_C_app_link;
+
+-- ac_dolphin_T_t_ds_resources_A_pid
+drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_resources_A_pid;
+delimiter d//
+CREATE PROCEDURE ac_dolphin_T_t_ds_resources_A_pid()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_resources'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='pid')
+   THEN
+         ALTER TABLE t_ds_resources ADD `pid` int(11) DEFAULT -1 COMMENT 'parent id';
+>>>>>>> remotes/upstream/dev
        END IF;
  END;
 
 d//
 
 delimiter ;
+<<<<<<< HEAD
 CALL ac_dolphin_T_t_ds_task_instance_A_worker_group;
 DROP PROCEDURE ac_dolphin_T_t_ds_task_instance_A_worker_group;
 
@@ -107,12 +156,29 @@ CREATE PROCEDURE dc_dolphin_T_t_ds_task_instance_D_worker_group_id()
            AND COLUMN_NAME ='worker_group_id')
    THEN
          ALTER TABLE t_ds_task_instance DROP COLUMN worker_group_id;
+=======
+CALL ac_dolphin_T_t_ds_resources_A_pid;
+DROP PROCEDURE ac_dolphin_T_t_ds_resources_A_pid;
+
+-- ac_dolphin_T_t_ds_resources_A_full_name
+drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_resources_A_full_name;
+delimiter d//
+CREATE PROCEDURE ac_dolphin_T_t_ds_resources_A_full_name()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_resources'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='full_name')
+   THEN
+         ALTER TABLE t_ds_resources ADD `full_name` varchar(255) DEFAULT NULL COMMENT 'full name';
+>>>>>>> remotes/upstream/dev
        END IF;
  END;
 
 d//
 
 delimiter ;
+<<<<<<< HEAD
 CALL dc_dolphin_T_t_ds_task_instance_D_worker_group_id;
 DROP PROCEDURE dc_dolphin_T_t_ds_task_instance_D_worker_group_id;
 
@@ -127,12 +193,29 @@ CREATE PROCEDURE ac_dolphin_T_t_ds_schedules_A_worker_group()
            AND COLUMN_NAME ='worker_group')
    THEN
          ALTER TABLE t_ds_schedules ADD `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group';
+=======
+CALL ac_dolphin_T_t_ds_resources_A_full_name;
+DROP PROCEDURE ac_dolphin_T_t_ds_resources_A_full_name;
+
+-- ac_dolphin_T_t_ds_resources_A_pid
+drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_resources_is_directory;
+delimiter d//
+CREATE PROCEDURE ac_dolphin_T_t_ds_resources_is_directory()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_resources'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='is_directory')
+   THEN
+         ALTER TABLE t_ds_resources ADD `is_directory` tinyint(1) DEFAULT 0 COMMENT 'is directory';
+>>>>>>> remotes/upstream/dev
        END IF;
  END;
 
 d//
 
 delimiter ;
+<<<<<<< HEAD
 CALL ac_dolphin_T_t_ds_schedules_A_worker_group;
 DROP PROCEDURE ac_dolphin_T_t_ds_schedules_A_worker_group;
 
@@ -147,11 +230,32 @@ CREATE PROCEDURE dc_dolphin_T_t_ds_schedules_D_worker_group_id()
            AND COLUMN_NAME ='worker_group_id')
    THEN
          ALTER TABLE t_ds_schedules DROP COLUMN worker_group_id;
+=======
+CALL ac_dolphin_T_t_ds_resources_is_directory;
+DROP PROCEDURE ac_dolphin_T_t_ds_resources_is_directory;
+
+-- ac_dolphin_T_t_ds_process_definition_A_resource_ids
+drop PROCEDURE if EXISTS ac_dolphin_T_t_ds_process_definition_A_resource_ids;
+delimiter d//
+CREATE PROCEDURE ac_dolphin_T_t_ds_process_definition_A_resource_ids()
+   BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='resource_ids')
+   THEN
+         ALTER TABLE t_ds_process_definition ADD `resource_ids` varchar(255) DEFAULT NULL COMMENT 'resource ids';
+>>>>>>> remotes/upstream/dev
        END IF;
  END;
 
 d//
 
 delimiter ;
+<<<<<<< HEAD
 CALL dc_dolphin_T_t_ds_schedules_D_worker_group_id;
 DROP PROCEDURE dc_dolphin_T_t_ds_schedules_D_worker_group_id;
+=======
+CALL ac_dolphin_T_t_ds_process_definition_A_resource_ids;
+DROP PROCEDURE ac_dolphin_T_t_ds_process_definition_A_resource_ids;
+>>>>>>> remotes/upstream/dev

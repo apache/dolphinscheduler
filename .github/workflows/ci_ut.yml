@@ -20,7 +20,6 @@ on:
   push:
     branches:
       - dev
-      - refactor-worker
 env:
   DOCKER_DIR: ./docker
   LOG_DIR: /tmp/dolphinscheduler

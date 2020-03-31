@@ -30,12 +30,12 @@ public class Pong implements Serializable {
     /**
      *  pong body
      */
-    protected static ByteBuf EMPTY_BODY = Unpooled.EMPTY_BUFFER;
+    protected static final ByteBuf EMPTY_BODY = Unpooled.EMPTY_BUFFER;
 
     /**
      *  pong command body
      */
-    private static byte[] EMPTY_BODY_ARRAY = new byte[0];
+    private static final byte[] EMPTY_BODY_ARRAY = new byte[0];
 
     /**
      *  ping byte buffer

@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.dolphinscheduler.common.Constants;
@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
+import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.*;
@@ -68,7 +69,7 @@ public class MasterExecThread implements Runnable {
     /**
      *  runing TaskNode
      */
-    private final Map<MasterBaseTaskExecThread,Future<Boolean>> activeTaskNode = new ConcurrentHashMap<MasterBaseTaskExecThread,Future<Boolean>>();
+    private final Map<MasterBaseTaskExecThread,Future<Boolean>> activeTaskNode = new ConcurrentHashMap<>();
 
     /**
      * task exec service
@@ -78,7 +79,7 @@ public class MasterExecThread implements Runnable {
     /**
      * submit failure nodes
      */
-    private Boolean taskFailedSubmit = false;
+    private boolean taskFailedSubmit = false;
 
     /**
      * recover node id list
@@ -109,6 +110,11 @@ public class MasterExecThread implements Runnable {
      * forbidden task map
      */
     private Map<String, TaskNode> forbiddenTaskList = new ConcurrentHashMap<>();
+
+    /**
+     * skip task map
+     */
+    private Map<String, TaskNode> skipTaskNodeList = new ConcurrentHashMap<>();
 
     /**
      * recover tolerance fault task list
@@ -444,7 +450,7 @@ public class MasterExecThread implements Runnable {
      * @return TaskInstance
      */
     private TaskInstance createTaskInstance(ProcessInstance processInstance, String nodeName,
-                                            TaskNode taskNode, String parentNodeName) {
+                                            TaskNode taskNode) {
 
         TaskInstance taskInstance = findTaskIfExists(nodeName);
         if(taskInstance == null){
@@ -458,7 +464,7 @@ public class MasterExecThread implements Runnable {
             // process instance id
             taskInstance.setProcessInstanceId(processInstance.getId());
             // task instance node json
-            taskInstance.setTaskJson(JSONObject.toJSONString(taskNode));
+            taskInstance.setTaskJson(JSON.toJSONString(taskNode));
             // task instance type
             taskInstance.setTaskType(taskNode.getType());
             // task instance whether alert
@@ -499,58 +505,140 @@ public class MasterExecThread implements Runnable {
     }
 
     /**
-     * get post task instance by node
-     * @param dag               dag
-     * @param parentNodeName    parent node name
-     * @return task instance list
+     * is there have conditions after the parent node
+     * @param parentNodeName
+     * @return
      */
-    private List<TaskInstance> getPostTaskInstanceByNode(DAG<String, TaskNode, TaskNodeRelation> dag, String parentNodeName){
+    private boolean haveConditionsAfterNode(String parentNodeName){
 
-        List<TaskInstance> postTaskList = new ArrayList<>();
+        boolean result = false;
         Collection<String> startVertex = DagHelper.getStartVertex(parentNodeName, dag, completeTaskList);
         if(startVertex == null){
-            return postTaskList;
+            return result;
         }
-
-        for (String nodeName : startVertex){
-            // encapsulation task instance
-            TaskInstance taskInstance = createTaskInstance(processInstance, nodeName ,
-                    dag.getNode(nodeName),parentNodeName);
-            postTaskList.add(taskInstance);
+        for(String nodeName : startVertex){
+            TaskNode taskNode = dag.getNode(nodeName);
+            if(taskNode.getType().equals(TaskType.CONDITIONS.toString())){
+                result = true;
+                break;
+            }
         }
-        return postTaskList;
+        return result;
     }
 
     /**
-     * return start task node list
-     * @return task instance list
+     * if all of the task dependence are skip, skip it too.
+     * @param taskNode
+     * @return
      */
-    private List<TaskInstance> getStartSubmitTaskList(){
+    private boolean isTaskNodeNeedSkip(TaskNode taskNode){
+        if(CollectionUtils.isEmpty(taskNode.getDepList())){
+            return false;
+        }
+        for(String depNode : taskNode.getDepList()){
+            if(!skipTaskNodeList.containsKey(depNode)){
+                return false;
+            }
+        }
+        return true;
+    }
 
-        List<TaskInstance> startTaskList = getPostTaskInstanceByNode(dag, null);
-
-        HashMap<String, TaskInstance> successTaskMaps = new HashMap<>();
-        List<TaskInstance> resultList = new ArrayList<>();
-        while(Stopper.isRunning()){
-            for(TaskInstance task : startTaskList){
-                if(task.getState().typeIsSuccess()){
-                    successTaskMaps.put(task.getName(), task);
-                }else if(!completeTaskList.containsKey(task.getName()) && !errorTaskList.containsKey(task.getName())){
-                    resultList.add(task);
+    /**
+     * set task node skip if dependence all skip
+     * @param taskNodesSkipList
+     */
+    private void setTaskNodeSkip(List<String> taskNodesSkipList){
+        for(String skipNode : taskNodesSkipList){
+            skipTaskNodeList.putIfAbsent(skipNode, dag.getNode(skipNode));
+            Collection<String> postNodeList = DagHelper.getStartVertex(skipNode, dag, completeTaskList);
+            List<String> postSkipList = new ArrayList<>();
+            for(String post : postNodeList){
+                TaskNode postNode = dag.getNode(post);
+                if(isTaskNodeNeedSkip(postNode)){
+                    postSkipList.add(post);
                 }
             }
-            startTaskList.clear();
-            if(successTaskMaps.size() == 0){
-                break;
-            }
-
-            Set<String> taskNameKeys = successTaskMaps.keySet();
-            for(String taskName : taskNameKeys){
-                startTaskList.addAll(getPostTaskInstanceByNode(dag, taskName));
-            }
-            successTaskMaps.clear();
+            setTaskNodeSkip(postSkipList);
         }
-        return resultList;
+    }
+
+
+    /**
+     *  parse condition task find the branch process
+     *  set skip flag for another one.
+     * @param nodeName
+     * @return
+     */
+    private List<String> parseConditionTask(String nodeName){
+        List<String> conditionTaskList = new ArrayList<>();
+        TaskNode taskNode = dag.getNode(nodeName);
+        if(!taskNode.isConditionsTask()){
+            return conditionTaskList;
+        }
+        ConditionsParameters conditionsParameters =
+                JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
+
+        TaskInstance taskInstance = completeTaskList.get(nodeName);
+        if(taskInstance == null){
+            logger.error("task instance {} cannot find, please check it!", nodeName);
+            return conditionTaskList;
+        }
+
+        if(taskInstance.getState().typeIsSuccess()){
+            conditionTaskList = conditionsParameters.getSuccessNode();
+            setTaskNodeSkip(conditionsParameters.getFailedNode());
+        }else if(taskInstance.getState().typeIsFailure()){
+            conditionTaskList = conditionsParameters.getFailedNode();
+            setTaskNodeSkip(conditionsParameters.getSuccessNode());
+        }else{
+            conditionTaskList.add(nodeName);
+        }
+        return conditionTaskList;
+    }
+
+    /**
+     * parse post node list of previous node
+     * if condition node: return process according to the settings
+     * if post node completed, return post nodes of the completed node
+     * @param previousNodeName
+     * @return
+     */
+    private List<String> parsePostNodeList(String previousNodeName){
+        List<String> postNodeList = new ArrayList<>();
+
+        TaskNode taskNode = dag.getNode(previousNodeName);
+        if(taskNode != null  && taskNode.isConditionsTask()){
+            return parseConditionTask(previousNodeName);
+        }
+        Collection<String> postNodeCollection = DagHelper.getStartVertex(previousNodeName, dag, completeTaskList);
+        List<String> postSkipList = new ArrayList<>();
+        // delete success node, parse the past nodes
+        // if conditions node,
+        //  1. parse the branch process according the conditions setting
+        //  2. set skip flag on anther branch process
+        for(String postNode : postNodeCollection){
+            if(completeTaskList.containsKey(postNode)){
+                TaskInstance postTaskInstance = completeTaskList.get(postNode);
+                if(dag.getNode(postNode).isConditionsTask()){
+                    List<String> conditionTaskNodeList = parseConditionTask(postNode);
+                    for(String conditions : conditionTaskNodeList){
+                        postNodeList.addAll(parsePostNodeList(conditions));
+                    }
+                }else if(postTaskInstance.getState().typeIsSuccess()){
+                    postNodeList.addAll(parsePostNodeList(postNode));
+                }else{
+                    postNodeList.add(postNode);
+                }
+
+            }else if(isTaskNodeNeedSkip(dag.getNode(postNode))){
+                postSkipList.add(postNode);
+                setTaskNodeSkip(postSkipList);
+                postSkipList.clear();
+            }else{
+                postNodeList.add(postNode);
+            }
+        }
+        return postNodeList;
     }
 
     /**
@@ -559,14 +647,17 @@ public class MasterExecThread implements Runnable {
      */
     private void submitPostNode(String parentNodeName){
 
-        List<TaskInstance> submitTaskList = null;
-        if(parentNodeName == null){
-            submitTaskList = getStartSubmitTaskList();
-        }else{
-            submitTaskList = getPostTaskInstanceByNode(dag, parentNodeName);
+        List<String> submitTaskNodeList = parsePostNodeList(parentNodeName);
+
+        List<TaskInstance> taskInstances = new ArrayList<>();
+        for(String taskNode : submitTaskNodeList){
+            taskInstances.add(createTaskInstance(processInstance, taskNode,
+                    dag.getNode(taskNode)));
         }
+
         // if previous node success , post node submit
-        for(TaskInstance task : submitTaskList){
+        for(TaskInstance task : taskInstances){
+
             if(readyToSubmitTaskList.containsKey(task.getName())){
                 continue;
             }
@@ -576,7 +667,7 @@ public class MasterExecThread implements Runnable {
                 continue;
             }
             if(task.getState().typeIsPause() || task.getState().typeIsCancel()){
-                logger.info("task {} stopped, the state is {}", task.getName(), task.getState().toString());
+                logger.info("task {} stopped, the state is {}", task.getName(), task.getState());
             }else{
                 addTaskToStandByList(task);
             }
@@ -590,27 +681,32 @@ public class MasterExecThread implements Runnable {
     private DependResult isTaskDepsComplete(String taskName) {
 
         Collection<String> startNodes = dag.getBeginNode();
-        // if the vertex returns true directly
+        // if vertex,returns true directly
         if(startNodes.contains(taskName)){
             return DependResult.SUCCESS;
         }
 
         TaskNode taskNode = dag.getNode(taskName);
-        List<String> depsNameList = taskNode.getDepList();
-        for(String depsNode : depsNameList ){
-
-            if(forbiddenTaskList.containsKey(depsNode)){
+        List<String> depNameList = taskNode.getDepList();
+        for(String depsNode : depNameList ){
+            if(!dag.containsNode(depsNode)
+                    || forbiddenTaskList.containsKey(depsNode)
+                    || skipTaskNodeList.containsKey(depsNode)){
                 continue;
             }
             // dependencies must be fully completed
             if(!completeTaskList.containsKey(depsNode)){
                 return DependResult.WAITING;
             }
-            ExecutionStatus taskState = completeTaskList.get(depsNode).getState();
-            if(taskState.typeIsFailure()){
+            ExecutionStatus depTaskState = completeTaskList.get(depsNode).getState();
+            // conditions task would not return failed.
+            if(depTaskState.typeIsFailure()
+                    && !haveConditionsAfterNode(depsNode)
+                    && !dag.getNode(depsNode).isConditionsTask()){
                 return DependResult.FAILED;
             }
-            if(taskState.typeIsPause() || taskState.typeIsCancel()){
+
+            if(depTaskState.typeIsPause() || depTaskState.typeIsCancel()){
                 return DependResult.WAITING;
             }
         }
@@ -657,7 +753,7 @@ public class MasterExecThread implements Runnable {
      *
      * @return Boolean whether has failed task
      */
-    private Boolean hasFailedTask(){
+    private boolean hasFailedTask(){
 
         if(this.taskFailedSubmit){
             return true;
@@ -673,7 +769,7 @@ public class MasterExecThread implements Runnable {
      *
      * @return Boolean whether process instance failed
      */
-    private Boolean processFailed(){
+    private boolean processFailed(){
         if(hasFailedTask()) {
             if(processInstance.getFailureStrategy() == FailureStrategy.END){
                 return true;
@@ -689,9 +785,9 @@ public class MasterExecThread implements Runnable {
      * whether task for waiting thread
      * @return Boolean whether has waiting thread task
      */
-    private Boolean hasWaitingThreadTask(){
+    private boolean hasWaitingThreadTask(){
         List<TaskInstance> waitingList = getCompleteTaskByState(ExecutionStatus.WAITTING_THREAD);
-        return waitingList.size() > 0;
+        return CollectionUtils.isNotEmpty(waitingList);
     }
 
     /**
@@ -707,7 +803,7 @@ public class MasterExecThread implements Runnable {
         }
 
         List<TaskInstance> pauseList = getCompleteTaskByState(ExecutionStatus.PAUSE);
-        if(pauseList.size() > 0
+        if(CollectionUtils.isNotEmpty(pauseList)
                 || !isComplementEnd()
                 || readyToSubmitTaskList.size() > 0){
             return ExecutionStatus.PAUSE;
@@ -747,7 +843,8 @@ public class MasterExecThread implements Runnable {
         if(state == ExecutionStatus.READY_STOP){
             List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
             List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
-            if(stopList.size() > 0 || killList.size() > 0 || !isComplementEnd()){
+            if(CollectionUtils.isNotEmpty(stopList)
+                    || CollectionUtils.isNotEmpty(killList) || !isComplementEnd()){
                 return ExecutionStatus.STOP;
             }else{
                 return ExecutionStatus.SUCCESS;
@@ -790,7 +887,7 @@ public class MasterExecThread implements Runnable {
      * whether complement end
      * @return Boolean whether is complement end
      */
-    private Boolean isComplementEnd() {
+    private boolean isComplementEnd() {
         if(!processInstance.isComplementData()){
             return true;
         }
@@ -815,8 +912,8 @@ public class MasterExecThread implements Runnable {
             logger.info(
                     "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
                     processInstance.getId(), processInstance.getName(),
-                    processInstance.getState().toString(), state.toString(),
-                    processInstance.getCommandType().toString());
+                    processInstance.getState(), state,
+                    processInstance.getCommandType());
             processInstance.setState(state);
             ProcessInstance instance = processService.findProcessInstanceById(processInstance.getId());
             instance.setState(state);
@@ -832,8 +929,7 @@ public class MasterExecThread implements Runnable {
      * @return DependResult
      */
     private DependResult getDependResultForTask(TaskInstance taskInstance){
-        DependResult inner = isTaskDepsComplete(taskInstance.getName());
-        return inner;
+        return isTaskDepsComplete(taskInstance.getName());
     }
 
     /**
@@ -858,7 +954,7 @@ public class MasterExecThread implements Runnable {
      * has retry task in standby
      * @return Boolean whether has retry task in standby
      */
-    private Boolean hasRetryTaskInStandBy(){
+    private boolean hasRetryTaskInStandBy(){
         for (Map.Entry<String, TaskInstance> entry: readyToSubmitTaskList.entrySet()) {
             if(entry.getValue().getState().typeIsFailure()){
                 return true;
@@ -874,14 +970,10 @@ public class MasterExecThread implements Runnable {
         // submit start node
         submitPostNode(null);
         boolean sendTimeWarning = false;
-        while(Stopper.isRunning()){
-
-            if(processInstance.IsProcessInstanceStop()){
-                break;
-            }
+        while(!processInstance.isProcessInstanceStop()){
 
             // send warning email if process time out.
-            if( !sendTimeWarning && checkProcessTimeOut(processInstance) ){
+            if(!sendTimeWarning && checkProcessTimeOut(processInstance) ){
                 alertManager.sendProcessTimeoutAlert(processInstance,
                         processService.findProcessDefineById(processInstance.getProcessDefinitionId()));
                 sendTimeWarning = true;
@@ -909,7 +1001,7 @@ public class MasterExecThread implements Runnable {
                 }
 
                 logger.info("task :{}, id:{} complete, state is {} ",
-                        task.getName(), task.getId(), task.getState().toString());
+                        task.getName(), task.getId(), task.getState());
                 // node success , post node submit
                 if(task.getState() == ExecutionStatus.SUCCESS){
                     completeTaskList.put(task.getName(), task);
@@ -924,11 +1016,15 @@ public class MasterExecThread implements Runnable {
                     if(task.taskCanRetry()){
                         addTaskToStandByList(task);
                     }else{
-                        // node failure, based on failure strategy
-                        errorTaskList.put(task.getName(), task);
                         completeTaskList.put(task.getName(), task);
-                        if(processInstance.getFailureStrategy() == FailureStrategy.END){
-                            killTheOtherTasks();
+                        if( task.getTaskType().equals(TaskType.CONDITIONS.toString()) ||
+                                haveConditionsAfterNode(task.getName())) {
+                            submitPostNode(task.getName());
+                        }else{
+                            errorTaskList.put(task.getName(), task);
+                            if(processInstance.getFailureStrategy() == FailureStrategy.END){
+                                killTheOtherTasks();
+                            }
                         }
                     }
                     continue;
@@ -937,7 +1033,7 @@ public class MasterExecThread implements Runnable {
                 completeTaskList.put(task.getName(), task);
             }
             // send alert
-            if(this.recoverToleranceFaultTaskList.size() > 0){
+            if(CollectionUtils.isNotEmpty(this.recoverToleranceFaultTaskList)){
                 alertManager.sendAlertWorkerToleranceFault(processInstance, recoverToleranceFaultTaskList);
                 this.recoverToleranceFaultTaskList.clear();
             }
@@ -981,10 +1077,7 @@ public class MasterExecThread implements Runnable {
         Date now = new Date();
         long runningTime =  DateUtils.diffMin(now, processInstance.getStartTime());
 
-        if(runningTime > processInstance.getTimeout()){
-            return true;
-        }
-        return false;
+        return runningTime > processInstance.getTimeout();
     }
 
     /**
@@ -1009,7 +1102,7 @@ public class MasterExecThread implements Runnable {
 
             TaskInstance taskInstance = taskExecThread.getTaskInstance();
             taskInstance = processService.findTaskInstanceById(taskInstance.getId());
-            if(taskInstance.getState().typeIsFinished()){
+            if(taskInstance != null && taskInstance.getState().typeIsFinished()){
                 continue;
             }
 
@@ -1028,22 +1121,19 @@ public class MasterExecThread implements Runnable {
      * @param taskInstance task instance
      * @return Boolean
      */
-    private Boolean retryTaskIntervalOverTime(TaskInstance taskInstance){
+    private boolean retryTaskIntervalOverTime(TaskInstance taskInstance){
         if(taskInstance.getState() != ExecutionStatus.FAILURE){
-            return Boolean.TRUE;
+            return true;
         }
         if(taskInstance.getId() == 0 ||
                 taskInstance.getMaxRetryTimes() ==0 ||
                 taskInstance.getRetryInterval() == 0 ){
-            return Boolean.TRUE;
+            return true;
         }
         Date now = new Date();
         long failedTimeInterval = DateUtils.differSec(now, taskInstance.getEndTime());
         // task retry does not over time, return false
-        if(taskInstance.getRetryInterval() * SEC_2_MINUTES_TIME_UNIT >= failedTimeInterval){
-            return Boolean.FALSE;
-        }
-        return Boolean.TRUE;
+        return taskInstance.getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
 
     /**
@@ -1136,7 +1226,7 @@ public class MasterExecThread implements Runnable {
      */
     private List<String> getRecoveryNodeNameList(){
         List<String> recoveryNodeNameList = new ArrayList<>();
-        if(recoverNodeIdList.size() > 0) {
+        if(CollectionUtils.isNotEmpty(recoverNodeIdList)) {
             for (TaskInstance task : recoverNodeIdList) {
                 recoveryNodeNameList.add(task.getName());
             }

@@ -170,9 +170,38 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("exceptionCaught : {}", cause);
+        logger.error("exceptionCaught : {}",cause.getMessage(), cause);
         nettyRemotingClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
         ctx.channel().close();
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     *  channel write changed
+     *
+     * @param ctx channel handler context
+     * @throws Exception
+     */
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        Channel ch = ctx.channel();
+        ChannelConfig config = ch.config();
+
+        if (!ch.isWritable()) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("{} is not writable, over high water level : {}",
+                        ch, config.getWriteBufferHighWaterMark());
+            }
+
+            config.setAutoRead(false);
+        } else {
+            if (logger.isWarnEnabled()) {
+                logger.warn("{} is writable, to low water : {}",
+                        ch, config.getWriteBufferLowWaterMark());
+            }
+            config.setAutoRead(true);
+        }
+    }
+>>>>>>> remotes/upstream/dev
 }

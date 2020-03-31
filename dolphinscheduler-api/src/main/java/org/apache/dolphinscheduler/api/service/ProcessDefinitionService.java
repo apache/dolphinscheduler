@@ -38,11 +38,9 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
@@ -148,7 +146,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
-        if (globalParamsList != null && globalParamsList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(globalParamsList)) {
             Set<Property> globalParamsSet = new HashSet<>(globalParamsList);
             globalParamsList = new ArrayList<>(globalParamsSet);
             processDefine.setGlobalParamList(globalParamsList);
@@ -160,6 +158,31 @@ public class ProcessDefinitionService extends BaseDAGService {
         putMsg(result, Status.SUCCESS);
         result.put("processDefinitionId",processDefine.getId());
         return result;
+    }
+
+    /**
+     * get resource ids
+     * @param processData process data
+     * @return resource ids
+     */
+    private String getResourceIds(ProcessData processData) {
+        List<TaskNode> tasks = processData.getTasks();
+        Set<Integer> resourceIds = new HashSet<>();
+        for(TaskNode taskNode : tasks){
+            String taskParameter = taskNode.getParams();
+            AbstractParameters params = TaskParametersUtils.getParameters(taskNode.getType(),taskParameter);
+            Set<Integer> tempSet = params.getResourceFilesList().stream().map(t->t.getId()).collect(Collectors.toSet());
+            resourceIds.addAll(tempSet);
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(int i : resourceIds) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            sb.append(i);
+        }
+        return sb.toString();
     }
 
 
@@ -314,7 +337,7 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();
-        if (processData.getGlobalParams() != null && processData.getGlobalParams().size() > 0) {
+        if (CollectionUtils.isNotEmpty(processData.getGlobalParams())) {
             Set<Property> userDefParamsSet = new HashSet<>(processData.getGlobalParams());
             globalParamsList = new ArrayList<>(userDefParamsSet);
         }
@@ -453,12 +476,11 @@ public class ProcessDefinitionService extends BaseDAGService {
         ProcessDefinition processDefinition = processDefineMapper.selectById(id);
 
         switch (state) {
-            case ONLINE: {
+            case ONLINE:
                 processDefinition.setReleaseState(state);
                 processDefineMapper.updateById(processDefinition);
                 break;
-            }
-            case OFFLINE: {
+            case OFFLINE:
                 processDefinition.setReleaseState(state);
                 processDefineMapper.updateById(processDefinition);
                 List<Schedule> scheduleList = scheduleMapper.selectAllByProcessDefineArray(
@@ -473,11 +495,9 @@ public class ProcessDefinitionService extends BaseDAGService {
                     SchedulerService.deleteSchedule(project.getId(), schedule.getId());
                 }
                 break;
-            }
-            default: {
+            default:
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "releaseState");
                 return result;
-            }
         }
 
         putMsg(result, Status.SUCCESS);
@@ -939,7 +959,9 @@ public class ProcessDefinitionService extends BaseDAGService {
             return result;
         }
 
+
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
+
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
         //process data check
@@ -1156,6 +1178,7 @@ public class ProcessDefinitionService extends BaseDAGService {
     private DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) throws Exception {
 
         String processDefinitionJson = processDefinition.getProcessDefinitionJson();
+
         ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
 
         //check process data
