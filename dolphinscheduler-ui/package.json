@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@riophae/vue-treeselect": "^0.4.0",
-    "ans-ui": "1.1.7",
+    "ans-ui": "1.1.9",
     "axios": "^0.16.2",
     "bootstrap": "3.3.7",
     "canvg": "1.5.1",
