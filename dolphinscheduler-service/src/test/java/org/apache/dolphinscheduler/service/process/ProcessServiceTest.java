@@ -53,5 +53,8 @@ public class ProcessServiceTest {
 
         taskInstance.setState(ExecutionStatus.FAILURE);
         Assert.assertEquals(ExecutionStatus.SUBMITTED_SUCCESS, processService.getSubmitTaskState(taskInstance, ExecutionStatus.RUNNING_EXEUTION));
+
+        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        Assert.assertEquals(ExecutionStatus.FAILURE, processService.getSubmitTaskState(taskInstance, ExecutionStatus.FAILURE));
     }
 }
