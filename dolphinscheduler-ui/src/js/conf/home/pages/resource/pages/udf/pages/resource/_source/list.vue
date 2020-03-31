@@ -128,7 +128,6 @@
   import { downloadFile } from '@/module/download'
   import { bytesToSize } from '@/module/util/util'
   import localStore from '@/module/util/localStorage'
-
   export default {
     name: 'udf-manage-list',
     data () {
