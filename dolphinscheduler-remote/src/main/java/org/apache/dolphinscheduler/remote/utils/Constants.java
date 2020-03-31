@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.remote.utils;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -31,7 +32,7 @@ public class Constants {
     /**
      *  charset
      */
-    public static final Charset UTF8 = Charset.forName("UTF-8");
+    public static final Charset UTF8 = StandardCharsets.UTF_8;
 
     /**
      *  cpus

@@ -28,7 +28,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * login controller test
  */
 public class LoginControllerTest extends AbstractControllerTest{
-    private static Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
+    private static Logger logger = LoggerFactory.getLogger(LoginControllerTest.class);
 
 
     @Test

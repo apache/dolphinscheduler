@@ -178,6 +178,11 @@ public class TaskExecutionContext implements Serializable{
     private DataxTaskExecutionContext dataxTaskExecutionContext;
 
     /**
+     * dependence TaskExecutionContext
+     */
+    private DependenceTaskExecutionContext dependenceTaskExecutionContext;
+
+    /**
      *  procedure TaskExecutionContext
      */
     private ProcedureTaskExecutionContext procedureTaskExecutionContext;
@@ -420,6 +425,14 @@ public class TaskExecutionContext implements Serializable{
         return requestCommand.convert2Command();
     }
 
+    public DependenceTaskExecutionContext getDependenceTaskExecutionContext() {
+        return dependenceTaskExecutionContext;
+    }
+
+    public void setDependenceTaskExecutionContext(DependenceTaskExecutionContext dependenceTaskExecutionContext) {
+        this.dependenceTaskExecutionContext = dependenceTaskExecutionContext;
+    }
+
     @Override
     public String toString() {
         return "TaskExecutionContext{" +
@@ -451,6 +464,7 @@ public class TaskExecutionContext implements Serializable{
                 ", workerGroup='" + workerGroup + '\'' +
                 ", sqlTaskExecutionContext=" + sqlTaskExecutionContext +
                 ", dataxTaskExecutionContext=" + dataxTaskExecutionContext +
+                ", dependenceTaskExecutionContext=" + dependenceTaskExecutionContext +
                 ", procedureTaskExecutionContext=" + procedureTaskExecutionContext +
                 '}';
     }

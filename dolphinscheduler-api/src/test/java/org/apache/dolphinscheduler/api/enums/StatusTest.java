@@ -16,19 +16,29 @@
  */
 package org.apache.dolphinscheduler.api.enums;
 
+import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.context.i18n.LocaleContextHolder;
+
+import java.util.Locale;
+
 import static org.junit.Assert.*;
 
 public class StatusTest {
 
     @Test
     public void testGetCode() {
-        assertEquals(Status.SUCCESS.getCode(), 0);
+        assertEquals(0, Status.SUCCESS.getCode());
         assertNotEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 0);
     }
 
     @Test
     public void testGetMsg() {
-        assertEquals("success", Status.SUCCESS.getMsg());
+        LocaleContextHolder.setLocale(Locale.US);
+        Assert.assertEquals("success", Status.SUCCESS.getMsg());
+
+        LocaleContextHolder.setLocale(Locale.SIMPLIFIED_CHINESE);
+        Assert.assertEquals("成功", Status.SUCCESS.getMsg());
     }
+
 }

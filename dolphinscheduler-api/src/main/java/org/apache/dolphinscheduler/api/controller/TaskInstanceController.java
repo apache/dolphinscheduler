@@ -69,6 +69,7 @@ public class TaskInstanceController extends BaseController{
             @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID",required = false, dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type ="String"),
             @ApiImplicitParam(name = "taskName", value = "TASK_NAME", type ="String"),
+            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type ="String"),
             @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type ="ExecutionStatus"),
             @ApiImplicitParam(name = "host", value = "HOST", type ="String"),
             @ApiImplicitParam(name = "startDate", value = "START_DATE", type ="String"),
@@ -83,6 +84,7 @@ public class TaskInstanceController extends BaseController{
                                       @RequestParam(value = "processInstanceId", required = false, defaultValue = "0") Integer processInstanceId,
                                       @RequestParam(value = "searchVal", required = false) String searchVal,
                                       @RequestParam(value = "taskName", required = false) String taskName,
+                                      @RequestParam(value = "executorName", required = false) String executorName,
                                       @RequestParam(value = "stateType", required = false) ExecutionStatus stateType,
                                       @RequestParam(value = "host", required = false) String host,
                                       @RequestParam(value = "startDate", required = false) String startTime,
@@ -91,11 +93,11 @@ public class TaskInstanceController extends BaseController{
                                       @RequestParam("pageSize") Integer pageSize){
 
         try{
-            logger.info("query task instance list, project name:{},process instance:{}, search value:{},task name:{}, state type:{}, host:{}, start:{}, end:{}",
-                    projectName, processInstanceId, searchVal, taskName, stateType, host, startTime, endTime);
+            logger.info("query task instance list, project name:{},process instance:{}, search value:{},task name:{}, executor name: {},state type:{}, host:{}, start:{}, end:{}",
+                    projectName, processInstanceId, searchVal, taskName, executorName, stateType, host, startTime, endTime);
             searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = taskInstanceService.queryTaskListPaging(
-                    loginUser, projectName, processInstanceId, taskName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
+                    loginUser, projectName, processInstanceId, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){
             logger.error(Status.QUERY_TASK_LIST_PAGING_ERROR.getMsg(),e);

@@ -26,7 +26,7 @@ import Permissions from '@/module/permissions'
  * @desc tooltip
  */
 const toolOper = (dagThis) => {
-  let disabled =!dagThis.$store.state.dag.isDetails// Permissions.getAuth() === false ? false : !dagThis.$store.state.dag.isDetails
+  let disabled =!!dagThis.$store.state.dag.isDetails// Permissions.getAuth() === false ? false : !dagThis.$store.state.dag.isDetails
   return [
     {
       code: 'pointer',
@@ -49,13 +49,13 @@ const toolOper = (dagThis) => {
     {
       code: 'download',
       icon: 'ans-icon-download',
-      disable: !!dagThis.type,
+      disable: !dagThis.type,
       desc: `${i18n.$t('Download')}`
     },
     {
       code: 'screen',
       icon: 'ans-icon-max',
-      disable: disabled,
+      disable: false,
       desc: `${i18n.$t('Full Screen')}`
     }
   ]
@@ -283,6 +283,14 @@ let tasksType = {
   'DATAX': {
     desc: 'DataX',
     color: '#1fc747'
+  },
+  'SQOOP': {
+    desc: 'SQOOP',
+    color: '#E46F13'
+  },
+  'CONDITIONS': {
+    desc: 'CONDITIONS',
+    color: '#E46F13'
   }
 }
 
