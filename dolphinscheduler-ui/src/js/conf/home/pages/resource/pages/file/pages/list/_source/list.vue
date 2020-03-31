@@ -134,7 +134,6 @@
   import { bytesToSize } from '@/module/util/util'
   import { downloadFile } from '@/module/download'
   import localStore from '@/module/util/localStorage'
-
   export default {
     name: 'file-manage-list',
     data () {
