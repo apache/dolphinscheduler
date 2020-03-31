@@ -154,7 +154,7 @@ public final class Constants {
     public static final String STRING_TRUE = "true";
 
     /**
-     * string true
+     * string false
      */
     public static final String STRING_FALSE = "false";
 
