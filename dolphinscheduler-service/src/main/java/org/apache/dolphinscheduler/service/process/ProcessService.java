@@ -1087,7 +1087,8 @@ public class ProcessService {
         // or return submit success
         if( processInstanceState == ExecutionStatus.READY_PAUSE){
             state = ExecutionStatus.PAUSE;
-        }else if(processInstanceState == ExecutionStatus.READY_STOP) {
+        }else if(processInstanceState == ExecutionStatus.READY_STOP
+                || processInstanceState == ExecutionStatus.FAILURE) {
             state = ExecutionStatus.KILL;
         }else{
             state = ExecutionStatus.SUBMITTED_SUCCESS;
