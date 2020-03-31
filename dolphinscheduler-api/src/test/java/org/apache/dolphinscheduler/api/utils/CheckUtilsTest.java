@@ -43,6 +43,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -173,7 +174,11 @@ public class CheckUtilsTest {
         // MapreduceParameters
         MapreduceParameters mapreduceParameters = new MapreduceParameters();
         assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(mapreduceParameters), TaskType.MR.toString()));
-        mapreduceParameters.setMainJar(new ResourceInfo());
+
+        ResourceInfo resourceInfoMapreduce = new ResourceInfo();
+        resourceInfoMapreduce.setId(1);
+        resourceInfoMapreduce.setRes("");
+        mapreduceParameters.setMainJar(resourceInfoMapreduce);
         mapreduceParameters.setProgramType(ProgramType.JAVA);
         assertTrue(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(mapreduceParameters), TaskType.MR.toString()));
 
@@ -211,6 +216,7 @@ public class CheckUtilsTest {
         // DataxParameters
         DataxParameters dataxParameters = new DataxParameters();
         assertFalse(CheckUtils.checkTaskNodeParameters(JSONUtils.toJsonString(dataxParameters), TaskType.DATAX.toString()));
+        dataxParameters.setCustomConfig(0);
         dataxParameters.setDataSource(111);
         dataxParameters.setDataTarget(333);
         dataxParameters.setSql("sql");

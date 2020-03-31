@@ -574,6 +574,7 @@ CREATE TABLE t_ds_task_instance (
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
   worker_group_id int DEFAULT '-1' ,
+  executor_id int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 

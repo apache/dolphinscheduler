@@ -68,7 +68,7 @@ JSP.prototype.init = function ({ dag, instance, options }) {
   // Register jsplumb connection type and configuration
   this.JspInstance.registerConnectionType('basic', {
     anchor: 'Continuous',
-    connector: 'Straight' // Line type
+    connector: 'Bezier' // Line type
   })
 
   // Initial configuration
@@ -135,15 +135,6 @@ JSP.prototype.draggable = function () {
       helper: 'clone',
       containment: $('.dag-model'),
       stop: function (e, ui) {
-        self.tasksEvent(selfId)
-
-        // Dom structure is not generated without pop-up form form
-        if ($(`#${selfId}`).html()) {
-          // dag event
-          findComponentDownward(self.dag.$root, 'dag-chart')._createNodes({
-            id: selfId
-          })
-        }
       },
       drag: function () {
         $('body').find('.tooltip.fade.top.in').remove()
@@ -178,6 +169,16 @@ JSP.prototype.draggable = function () {
           self.initNode(thisDom[thisDom.length - 1])
         })
         selfId = id
+
+        self.tasksEvent(selfId)
+
+        // Dom structure is not generated without pop-up form form
+        if ($(`#${selfId}`).html()) {
+          // dag event
+          findComponentDownward(self.dag.$root, 'dag-chart')._createNodes({
+            id: selfId
+          })
+        }
       }
     })
   }
@@ -197,7 +198,8 @@ JSP.prototype.jsonHandle = function ({ largeJson, locations }) {
       targetarr: locations[v.id]['targetarr'],
       isAttachment: this.config.isAttachment,
       taskType: v.type,
-      runFlag: v.runFlag
+      runFlag: v.runFlag,
+      nodenumber: locations[v.id]['nodenumber'],
     }))
 
     // contextmenu event
@@ -234,7 +236,7 @@ JSP.prototype.initNode = function (el) {
     filter: '.ep',
     anchor: 'Continuous',
     connectorStyle: {
-      stroke: '#555',
+      stroke: '#2d8cf0',
       strokeWidth: 2,
       outlineStroke: 'transparent',
       outlineWidth: 4
@@ -295,6 +297,7 @@ JSP.prototype.tasksContextmenu = function (event) {
     if (isOne) {
       // start run
       $('#startRunning').on('click', () => {
+        let name = store.state.dag.name
         let id = router.history.current.params.id
         store.dispatch('dag/getStartCheck', { processDefinitionId: id }).then(res => {
           let modal = Vue.$modal.dialog({
@@ -315,7 +318,8 @@ JSP.prototype.tasksContextmenu = function (event) {
                 },
                 props: {
                   item: {
-                    id: id
+                    id: id,
+                    name: name
                   },
                   startNodeList: $name,
                   sourceType: 'contextmenu'
@@ -376,7 +380,7 @@ JSP.prototype.tasksClick = function (e) {
     $('.w').removeClass('jtk-tasks-active')
     $(e.currentTarget).addClass('jtk-tasks-active')
     if ($connect) {
-      setSvgColor($connect, '#555')
+      setSvgColor($connect, '#2d8cf0')
       this.selectedElement.connect = null
     }
     this.selectedElement.id = $(e.currentTarget).attr('id')
@@ -435,19 +439,19 @@ JSP.prototype.handleEventPointer = function (is) {
     isClick: is,
     isAttachment: false
   })
-  wDom.removeClass('jtk-ep')
-  if (!is) {
-    wDom.removeClass('jtk-tasks-active')
-    this.selectedElement = {}
-    _.map($('#canvas svg'), v => {
-      if ($(v).attr('class')) {
-        _.map($(v).find('path'), v1 => {
-          $(v1).attr('fill', '#555')
-          $(v1).attr('stroke', '#555')
-        })
-      }
-    })
-  }
+  // wDom.removeClass('jtk-ep')
+  // if (!is) {
+  //   wDom.removeClass('jtk-tasks-active')
+  //   this.selectedElement = {}
+  //   _.map($('#canvas svg'), v => {
+  //     if ($(v).attr('class')) {
+  //       _.map($(v).find('path'), v1 => {
+  //         $(v1).attr('fill', '#555')
+  //         $(v1).attr('stroke', '#555')
+  //       })
+  //     }
+  //   })
+  // }
 }
 
 /**
@@ -516,6 +520,9 @@ JSP.prototype.removeConnect = function ($connect) {
     targetarr = _.filter(targetarr, v => v !== sourceId)
     $(`#${targetId}`).attr('data-targetarr', targetarr.toString())
   }
+  if ($(`#${sourceId}`).attr('data-tasks-type')=='CONDITIONS') {
+    $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))-1)
+  }
   this.JspInstance.deleteConnection($connect)
 
   this.selectedElement = {}
@@ -571,6 +578,7 @@ JSP.prototype.copyNodes = function ($id) {
     [newId]: {
       name: newName,
       targetarr: '',
+      nodenumber: 0,
       x: newX,
       y: newY
     }
@@ -657,6 +665,7 @@ JSP.prototype.saveStore = function () {
       locations[v.id] = {
         name: v.name,
         targetarr: v.targetarr,
+        nodenumber: v.nodenumber,
         x: v.x,
         y: v.y
       }
@@ -710,6 +719,12 @@ JSP.prototype.handleEvent = function () {
       return false
     }
 
+    if ($(`#${sourceId}`).attr('data-tasks-type')=='CONDITIONS' && $(`#${sourceId}`).attr('data-nodenumber')==2) {
+      return false
+    } else {
+      $(`#${sourceId}`).attr('data-nodenumber',Number($(`#${sourceId}`).attr('data-nodenumber'))+1)
+    }
+
     // Storage node dependency information
     saveTargetarr(sourceId, targetId)
 
@@ -751,7 +766,7 @@ JSP.prototype.jspBackfill = function ({ connects, locations, largeJson }) {
         source: sourceId,
         target: targetId,
         type: 'basic',
-        paintStyle: { strokeWidth: 2, stroke: '#555' }
+        paintStyle: { strokeWidth: 2, stroke: '#2d8cf0' }
       })
     })
   })

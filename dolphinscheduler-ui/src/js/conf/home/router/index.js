@@ -211,11 +211,43 @@ const router = new Router({
           }
         },
         {
+          path: '/resource/file/createFolder',
+          name: 'resource-file-createFolder',
+          component: resolve => require(['../pages/resource/pages/file/pages/createFolder/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Create Resource')}`
+          }
+        },
+        {
+          path: '/resource/file/subFileFolder/:id',
+          name: 'resource-file-subFileFolder',
+          component: resolve => require(['../pages/resource/pages/file/pages/subFileFolder/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Create Resource')}`
+          }
+        },
+        {
+          path: '/resource/file/subFile/:id',
+          name: 'resource-file-subFile',
+          component: resolve => require(['../pages/resource/pages/file/pages/subFile/index'], resolve),
+          meta: {
+            title: `${i18n.$t('Create Resource')}`
+          }
+        },
+        {
           path: '/resource/file/list/:id',
           name: 'resource-file-details',
           component: resolve => require(['../pages/resource/pages/file/pages/details/index'], resolve),
           meta: {
             title: `${i18n.$t('File Details')}`
+          }
+        },
+        {
+          path: '/resource/file/subdirectory/:id',
+          name: 'resource-file-subdirectory',
+          component: resolve => require(['../pages/resource/pages/file/pages/subdirectory/index'], resolve),
+          meta: {
+            title: `${i18n.$t('File Manage')}`
           }
         },
         {
@@ -235,16 +267,40 @@ const router = new Router({
           },
           children: [
             {
-              path: '/resource/udf/resource',
-              name: 'resource-udf-resource',
+              path: '/resource/udf',
+              name: 'resource-udf',
               component: resolve => require(['../pages/resource/pages/udf/pages/resource/index'], resolve),
               meta: {
                 title: `${i18n.$t('UDF Resources')}`
               }
             },
             {
-              path: '/resource/udf/function',
-              name: 'resource-udf-function',
+              path: '/resource/udf/subUdfDirectory/:id',
+              name: 'resource-udf-subUdfDirectory',
+              component: resolve => require(['../pages/resource/pages/udf/pages/subUdfDirectory/index'], resolve),
+              meta: {
+                title: `${i18n.$t('UDF Resources')}`
+              }
+            },
+            {
+              path: '/resource/udf/createUdfFolder',
+              name: 'resource-udf-createUdfFolder',
+              component: resolve => require(['../pages/resource/pages/udf/pages/createUdfFolder/index'], resolve),
+              meta: {
+                title: `${i18n.$t('Create Resource')}`
+              }
+            },
+            {
+              path: '/resource/udf/subCreateUdfFolder/:id',
+              name: 'resource-udf-subCreateUdfFolder',
+              component: resolve => require(['../pages/resource/pages/udf/pages/subUdfFolder/index'], resolve),
+              meta: {
+                title: `${i18n.$t('Create Resource')}`
+              }
+            },
+            {
+              path: '/resource/func',
+              name: 'resource-func',
               component: resolve => require(['../pages/resource/pages/udf/pages/function/index'], resolve),
               meta: {
                 title: `${i18n.$t('UDF Function')}`

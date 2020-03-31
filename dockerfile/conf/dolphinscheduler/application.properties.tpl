@@ -1,0 +1,115 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# base spring data source configuration
+spring.datasource.type=com.alibaba.druid.pool.DruidDataSource
+# postgre
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.datasource.url=jdbc:postgresql://${POSTGRESQL_HOST}:${POSTGRESQL_PORT}/${POSTGRESQL_DATABASE}?characterEncoding=utf8
+# mysql
+#spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+#spring.datasource.url=jdbc:mysql://192.168.xx.xx:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
+spring.datasource.username=${POSTGRESQL_USERNAME}
+spring.datasource.password=${POSTGRESQL_PASSWORD}
+# connection configuration
+spring.datasource.initialSize=5
+# min connection number
+spring.datasource.minIdle=5
+# max connection number
+spring.datasource.maxActive=50
+# max wait time for get a connection in milliseconds. if configuring maxWait, fair locks are enabled by default and concurrency efficiency decreases.
+# If necessary, unfair locks can be used by configuring the useUnfairLock attribute to true.
+spring.datasource.maxWait=60000
+# milliseconds for check to close free connections
+spring.datasource.timeBetweenEvictionRunsMillis=60000
+# the Destroy thread detects the connection interval and closes the physical connection in milliseconds if the connection idle time is greater than or equal to minEvictableIdleTimeMillis.
+spring.datasource.timeBetweenConnectErrorMillis=60000
+# the longest time a connection remains idle without being evicted, in milliseconds
+spring.datasource.minEvictableIdleTimeMillis=300000
+#the SQL used to check whether the connection is valid requires a query statement. If validation Query is null, testOnBorrow, testOnReturn, and testWhileIdle will not work.
+spring.datasource.validationQuery=SELECT 1
+#check whether the connection is valid for timeout, in seconds
+spring.datasource.validationQueryTimeout=3
+# when applying for a connection, if it is detected that the connection is idle longer than time Between Eviction Runs Millis,
+# validation Query is performed to check whether the connection is valid
+spring.datasource.testWhileIdle=true
+#execute validation to check if the connection is valid when applying for a connection
+spring.datasource.testOnBorrow=true
+#execute validation to check if the connection is valid when the connection is returned
+spring.datasource.testOnReturn=false
+spring.datasource.defaultAutoCommit=true
+spring.datasource.keepAlive=true
+# open PSCache, specify count PSCache for every connection
+spring.datasource.poolPreparedStatements=true
+spring.datasource.maxPoolPreparedStatementPerConnectionSize=20
+spring.datasource.spring.datasource.filters=stat,wall,log4j
+spring.datasource.connectionProperties=druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+
+#mybatis
+mybatis-plus.mapper-locations=classpath*:/org.apache.dolphinscheduler.dao.mapper/*.xml
+mybatis-plus.typeEnumsPackage=org.apache.dolphinscheduler.*.enums
+#Entity scan, where multiple packages are separated by a comma or semicolon
+mybatis-plus.typeAliasesPackage=org.apache.dolphinscheduler.dao.entity
+#Primary key type AUTO:" database ID AUTO ", INPUT:" user INPUT ID", ID_WORKER:" global unique ID (numeric type unique ID)", UUID:" global unique ID UUID";
+mybatis-plus.global-config.db-config.id-type=AUTO
+#Field policy IGNORED:" ignore judgment ",NOT_NULL:" not NULL judgment "),NOT_EMPTY:" not NULL judgment"
+mybatis-plus.global-config.db-config.field-strategy=NOT_NULL
+#The hump underline is converted
+mybatis-plus.global-config.db-config.column-underline=true
+mybatis-plus.global-config.db-config.logic-delete-value=-1
+mybatis-plus.global-config.db-config.logic-not-delete-value=0
+mybatis-plus.global-config.db-config.banner=false
+#The original configuration
+mybatis-plus.configuration.map-underscore-to-camel-case=true
+mybatis-plus.configuration.cache-enabled=false
+mybatis-plus.configuration.call-setters-on-nulls=true
+mybatis-plus.configuration.jdbc-type-for-null=null
+
+# master settings
+# master execute thread num
+master.exec.threads=${MASTER_EXEC_THREADS}
+# master execute task number in parallel
+master.exec.task.num=${MASTER_EXEC_TASK_NUM}
+# master heartbeat interval
+master.heartbeat.interval=${MASTER_HEARTBEAT_INTERVAL}
+# master commit task retry times
+master.task.commit.retryTimes=${MASTER_TASK_COMMIT_RETRYTIMES}
+# master commit task interval
+master.task.commit.interval=${MASTER_TASK_COMMIT_INTERVAL}
+# only less than cpu avg load, master server can work. default value : the number of cpu cores * 2
+master.max.cpuload.avg=${MASTER_MAX_CPULOAD_AVG}
+# only larger than reserved memory, master server can work. default value : physical memory * 1/10, unit is G.
+master.reserved.memory=${MASTER_RESERVED_MEMORY}
+
+# worker settings
+# worker execute thread num
+worker.exec.threads=${WORKER_EXEC_THREADS}
+# worker heartbeat interval
+worker.heartbeat.interval=${WORKER_HEARTBEAT_INTERVAL}
+# submit the number of tasks at a time
+worker.fetch.task.num=${WORKER_FETCH_TASK_NUM}
+# only less than cpu avg load, worker server can work. default value : the number of cpu cores * 2
+worker.max.cpuload.avg=${WORKER_MAX_CPULOAD_AVG}
+# only larger than reserved memory, worker server can work. default value : physical memory * 1/6, unit is G.
+worker.reserved.memory=${WORKER_RESERVED_MEMORY}
+
+# data quality analysis is not currently in use. please ignore the following configuration
+# task record
+task.record.flag=false
+task.record.datasource.url=jdbc:mysql://192.168.xx.xx:3306/etl?characterEncoding=UTF-8
+task.record.datasource.username=xx
+task.record.datasource.password=xx

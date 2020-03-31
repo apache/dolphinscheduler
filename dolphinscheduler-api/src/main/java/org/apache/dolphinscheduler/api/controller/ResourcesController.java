@@ -67,6 +67,50 @@ public class ResourcesController extends BaseController{
      * @param alias alias
      * @param description description
      * @param type type
+     * @return create result code
+     */
+
+    /**
+     *
+     * @param loginUser     login user
+     * @param type          type
+     * @param alias         alias
+     * @param description   description
+     * @param pid           parent id
+     * @param currentDir    current directory
+     * @return
+     */
+    @ApiOperation(value = "createDirctory", notes= "CREATE_RESOURCE_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
+            @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType ="String"),
+            @ApiImplicitParam(name = "description", value = "RESOURCE_DESC",  dataType ="String"),
+            @ApiImplicitParam(name = "file", value = "RESOURCE_FILE", required = true, dataType = "MultipartFile")
+    })
+    @PostMapping(value = "/directory/create")
+    public Result createDirectory(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                 @RequestParam(value = "type") ResourceType type,
+                                 @RequestParam(value ="name") String alias,
+                                 @RequestParam(value = "description", required = false) String description,
+                                 @RequestParam(value ="pid") int pid,
+                                 @RequestParam(value ="currentDir") String currentDir) {
+        try {
+            logger.info("login user {}, create resource, type: {}, resource alias: {}, desc: {}, file: {},{}",
+                    loginUser.getUserName(),type, alias, description,pid,currentDir);
+            return resourceService.createDirectory(loginUser,alias, description,type ,pid,currentDir);
+        } catch (Exception e) {
+            logger.error(CREATE_RESOURCE_ERROR.getMsg(),e);
+            return error(CREATE_RESOURCE_ERROR.getCode(), CREATE_RESOURCE_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * create resource
+     *
+     * @param loginUser login user
+     * @param alias alias
+     * @param description description
+     * @param type type
      * @param file file
      * @return create result code
      */
@@ -80,13 +124,15 @@ public class ResourcesController extends BaseController{
     @PostMapping(value = "/create")
     public Result createResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "type") ResourceType type,
-                                 @RequestParam(value ="name")String alias,
+                                 @RequestParam(value ="name") String alias,
                                  @RequestParam(value = "description", required = false) String description,
-                                 @RequestParam("file") MultipartFile file) {
+                                 @RequestParam("file") MultipartFile file,
+                                 @RequestParam(value ="pid") int pid,
+                                 @RequestParam(value ="currentDir") String currentDir) {
         try {
             logger.info("login user {}, create resource, type: {}, resource alias: {}, desc: {}, file: {},{}",
                     loginUser.getUserName(),type, alias, description, file.getName(), file.getOriginalFilename());
-            return resourceService.createResource(loginUser,alias, description,type ,file);
+            return resourceService.createResource(loginUser,alias, description,type ,file,pid,currentDir);
         } catch (Exception e) {
             logger.error(CREATE_RESOURCE_ERROR.getMsg(),e);
             return error(CREATE_RESOURCE_ERROR.getCode(), CREATE_RESOURCE_ERROR.getMsg());
@@ -120,7 +166,7 @@ public class ResourcesController extends BaseController{
         try {
             logger.info("login user {}, update resource, type: {}, resource alias: {}, desc: {}",
                     loginUser.getUserName(),type, alias, description);
-            return resourceService.updateResource(loginUser,resourceId,alias, description,type);
+            return resourceService.updateResource(loginUser,resourceId,alias,description,type);
         } catch (Exception e) {
             logger.error(UPDATE_RESOURCE_ERROR.getMsg(),e);
             return error(Status.UPDATE_RESOURCE_ERROR.getCode(), Status.UPDATE_RESOURCE_ERROR.getMsg());
@@ -144,7 +190,7 @@ public class ResourcesController extends BaseController{
                                      @RequestParam(value ="type") ResourceType type
     ){
         try{
-            logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type.toString());
+            logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type);
             Map<String, Object> result = resourceService.queryResourceList(loginUser, type);
             return returnDataList(result);
         }catch (Exception e){
@@ -166,6 +212,7 @@ public class ResourcesController extends BaseController{
     @ApiOperation(value = "queryResourceListPaging", notes= "QUERY_RESOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
+            @ApiImplicitParam(name = "id", value = "RESOURCE_ID", required = true, dataType ="int"),
             @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType ="String"),
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
             @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType ="Int",example = "20")
@@ -174,20 +221,21 @@ public class ResourcesController extends BaseController{
     @ResponseStatus(HttpStatus.OK)
     public Result queryResourceListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value ="type") ResourceType type,
+                                     @RequestParam(value ="id") int id,
                                      @RequestParam("pageNo") Integer pageNo,
                                      @RequestParam(value = "searchVal", required = false) String searchVal,
                                      @RequestParam("pageSize") Integer pageSize
     ){
         try{
             logger.info("query resource list, login user:{}, resource type:{}, search value:{}",
-                    loginUser.getUserName(), type.toString(), searchVal);
+                    loginUser.getUserName(), type, searchVal);
             Map<String, Object> result = checkPageParams(pageNo, pageSize);
             if(result.get(Constants.STATUS) != Status.SUCCESS){
                 return returnDataListPaging(result);
             }
 
             searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = resourceService.queryResourceListPaging(loginUser,type,searchVal,pageNo, pageSize);
+            result = resourceService.queryResourceListPaging(loginUser,id,type,searchVal,pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){
             logger.error(QUERY_RESOURCES_LIST_PAGING.getMsg(),e);
@@ -227,29 +275,86 @@ public class ResourcesController extends BaseController{
      * verify resource by alias and type
      *
      * @param loginUser login user
-     * @param alias resource name
-     * @param type resource type
+     * @param fullName  resource full name
+     * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
     @ApiOperation(value = "verifyResourceName", notes= "VERIFY_RESOURCE_NAME_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
-            @ApiImplicitParam(name = "name", value = "RESOURCE_NAME", required = true, dataType ="String")
+            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType ="String")
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     public Result verifyResourceName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                     @RequestParam(value ="name") String alias,
+                                     @RequestParam(value ="fullName") String fullName,
                                      @RequestParam(value ="type") ResourceType type
     ) {
         try {
             logger.info("login user {}, verfiy resource alias: {},resource type: {}",
-                    loginUser.getUserName(), alias,type);
+                    loginUser.getUserName(), fullName,type);
 
-            return resourceService.verifyResourceName(alias,type,loginUser);
+            return resourceService.verifyResourceName(fullName,type,loginUser);
         } catch (Exception e) {
             logger.error(VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg(), e);
             return error(Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getCode(), Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * query resources jar list
+     *
+     * @param loginUser login user
+     * @param type resource type
+     * @return resource list
+     */
+    @ApiOperation(value = "queryResourceJarList", notes= "QUERY_RESOURCE_LIST_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType")
+    })
+    @GetMapping(value="/list/jar")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryResourceJarList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                    @RequestParam(value ="type") ResourceType type
+    ){
+        try{
+            logger.info("query resource list, login user:{}, resource type:{}", loginUser.getUserName(), type.toString());
+            Map<String, Object> result = resourceService.queryResourceJarList(loginUser, type);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(QUERY_RESOURCES_LIST_ERROR.getMsg(),e);
+            return error(Status.QUERY_RESOURCES_LIST_ERROR.getCode(), Status.QUERY_RESOURCES_LIST_ERROR.getMsg());
+        }
+    }
+
+    /**
+     * query resource by full name and type
+     *
+     * @param loginUser login user
+     * @param fullName  resource full name
+     * @param type      resource type
+     * @return true if the resource name not exists, otherwise return false
+     */
+    @ApiOperation(value = "queryResource", notes= "QUERY_BY_RESOURCE_NAME")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "type", value = "RESOURCE_TYPE", required = true, dataType ="ResourceType"),
+            @ApiImplicitParam(name = "fullName", value = "RESOURCE_FULL_NAME", required = true, dataType ="String")
+    })
+    @GetMapping(value = "/queryResource")
+    @ResponseStatus(HttpStatus.OK)
+    public Result queryResource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                     @RequestParam(value ="fullName",required = false) String fullName,
+                                     @RequestParam(value ="id",required = false) Integer id,
+                                     @RequestParam(value ="type") ResourceType type
+    ) {
+        try {
+            logger.info("login user {}, query resource by full name: {} or id: {},resource type: {}",
+                    loginUser.getUserName(), fullName,id,type);
+
+            return resourceService.queryResource(fullName,id,type);
+        } catch (Exception e) {
+            logger.error(RESOURCE_NOT_EXIST.getMsg(), e);
+            return error(Status.RESOURCE_NOT_EXIST.getCode(), Status.RESOURCE_NOT_EXIST.getMsg());
         }
     }
 
@@ -310,16 +415,18 @@ public class ResourcesController extends BaseController{
                                        @RequestParam(value ="fileName")String fileName,
                                        @RequestParam(value ="suffix")String fileSuffix,
                                        @RequestParam(value = "description", required = false) String description,
-                                       @RequestParam(value = "content") String content
+                                       @RequestParam(value = "content") String content,
+                                       @RequestParam(value ="pid") int pid,
+                                       @RequestParam(value ="currentDir") String currentDir
     ) {
         try{
             logger.info("login user {}, online create resource! fileName : {}, type : {}, suffix : {},desc : {},content : {}",
-                    loginUser.getUserName(),fileName,type,fileSuffix,description,content);
+                    loginUser.getUserName(),fileName,type,fileSuffix,description,content,pid,currentDir);
             if(StringUtils.isEmpty(content)){
                 logger.error("resource file contents are not allowed to be empty");
                 return error(Status.RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
             }
-            return resourceService.onlineCreateResource(loginUser,type,fileName,fileSuffix,description,content);
+            return resourceService.onlineCreateResource(loginUser,type,fileName,fileSuffix,description,content,pid,currentDir);
         }catch (Exception e){
             logger.error(CREATE_RESOURCE_FILE_ON_LINE_ERROR.getMsg(),e);
             return error(Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR.getCode(), Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR.getMsg());
@@ -384,6 +491,9 @@ public class ResourcesController extends BaseController{
                     .ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
                     .body(file);
+        }catch (RuntimeException e){
+            logger.error(e.getMessage(),e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }catch (Exception e){
             logger.error(DOWNLOAD_RESOURCE_FILE_ERROR.getMsg(),e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Status.DOWNLOAD_RESOURCE_FILE_ERROR.getMsg());
@@ -426,8 +536,6 @@ public class ResourcesController extends BaseController{
                                 @RequestParam(value = "resourceId") int resourceId) {
         logger.info("login user {}, create udf function, type: {},  funcName: {},argTypes: {} ,database: {},desc: {},resourceId: {}",
                 loginUser.getUserName(),type, funcName, argTypes,database,description, resourceId);
-        Result result = new Result();
-
         try {
             return udfFuncService.createUdfFunction(loginUser,funcName,className,argTypes,database,description,type,resourceId);
         } catch (Exception e) {
@@ -563,7 +671,7 @@ public class ResourcesController extends BaseController{
     public Result queryResourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("type") UdfType type){
         try{
-            logger.info("query datasource list, user:{}, type:{}", loginUser.getUserName(), type.toString());
+            logger.info("query datasource list, user:{}, type:{}", loginUser.getUserName(), type);
             Map<String, Object> result = udfFuncService.queryResourceList(loginUser,type.ordinal());
             return returnDataList(result);
         }catch (Exception e){
@@ -660,21 +768,21 @@ public class ResourcesController extends BaseController{
      * @param userId user id
      * @return unauthorized result code
      */
-    @ApiOperation(value = "unauthorizedFile", notes= "UNAUTHORIZED_FILE_NOTES")
+    @ApiOperation(value = "authorizeResourceTree", notes= "AUTHORIZE_RESOURCE_TREE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType ="Int", example = "100")
     })
-    @GetMapping(value = "/unauth-file")
+    @GetMapping(value = "/authorize-resource-tree")
     @ResponseStatus(HttpStatus.CREATED)
-    public Result unauthorizedFile(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result authorizeResourceTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
         try{
-            logger.info("resource unauthorized file, user:{}, unauthorized user id:{}", loginUser.getUserName(), userId);
-            Map<String, Object> result =  resourceService.unauthorizedFile(loginUser, userId);
+            logger.info("all resource file, user:{}, user id:{}", loginUser.getUserName(), userId);
+            Map<String, Object> result =  resourceService.authorizeResourceTree(loginUser, userId);
             return returnDataList(result);
         }catch (Exception e){
-            logger.error(UNAUTHORIZED_FILE_RESOURCE_ERROR.getMsg(),e);
-            return error(Status.UNAUTHORIZED_FILE_RESOURCE_ERROR.getCode(), Status.UNAUTHORIZED_FILE_RESOURCE_ERROR.getMsg());
+            logger.error(AUTHORIZE_RESOURCE_TREE.getMsg(),e);
+            return error(Status.AUTHORIZE_RESOURCE_TREE.getCode(), Status.AUTHORIZE_RESOURCE_TREE.getMsg());
         }
     }
 

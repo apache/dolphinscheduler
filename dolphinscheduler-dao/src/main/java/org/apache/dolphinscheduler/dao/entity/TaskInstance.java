@@ -192,6 +192,27 @@ public class TaskInstance implements Serializable {
      */
     private String workerGroup;
 
+
+    /**
+     * executor id
+     */
+    private int executorId;
+
+    /**
+     * executor name
+     */
+    @TableField(exist = false)
+    private String executorName;
+
+
+
+    public void  init(String host,Date startTime,String executePath){
+        this.host = host;
+        this.startTime = startTime;
+        this.executePath = executePath;
+    }
+
+
     public ProcessInstance getProcessInstance() {
         return processInstance;
     }
@@ -349,8 +370,8 @@ public class TaskInstance implements Serializable {
     }
 
 
-    public Boolean isSubProcess(){
-        return TaskType.SUB_PROCESS.toString().equals(this.taskType.toUpperCase());
+    public boolean isSubProcess(){
+        return TaskType.SUB_PROCESS.getDescp().equals(this.taskType);
     }
 
     public String getDependency(){
@@ -402,7 +423,23 @@ public class TaskInstance implements Serializable {
         this.retryInterval = retryInterval;
     }
 
-    public Boolean isTaskComplete() {
+    public int getExecutorId() {
+        return executorId;
+    }
+
+    public void setExecutorId(int executorId) {
+        this.executorId = executorId;
+    }
+
+    public String getExecutorName() {
+        return executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this.executorName = executorName;
+    }
+
+    public boolean isTaskComplete() {
 
         return this.getState().typeIsPause()
                 || this.getState().typeIsSuccess()
@@ -445,20 +482,20 @@ public class TaskInstance implements Serializable {
         this.processInstancePriority = processInstancePriority;
     }
 
-    public String getDependentResult() {
-        return dependentResult;
-    }
-
-    public void setDependentResult(String dependentResult) {
-        this.dependentResult = dependentResult;
-    }
-
     public String getWorkerGroup() {
         return workerGroup;
     }
 
     public void setWorkerGroup(String workerGroup) {
         this.workerGroup = workerGroup;
+    }
+
+    public String getDependentResult() {
+        return dependentResult;
+    }
+
+    public void setDependentResult(String dependentResult) {
+        this.dependentResult = dependentResult;
     }
 
     @Override
@@ -493,6 +530,8 @@ public class TaskInstance implements Serializable {
                 ", processInstancePriority=" + processInstancePriority +
                 ", dependentResult='" + dependentResult + '\'' +
                 ", workerGroup='" + workerGroup + '\'' +
+                ", executorId=" + executorId +
+                ", executorName='" + executorName + '\'' +
                 '}';
     }
 }

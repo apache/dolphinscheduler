@@ -62,7 +62,7 @@ public class ResourceUserMapperTest {
         queue.setCreateTime(new Date());
         //update
         int update = resourceUserMapper.updateById(queue);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         resourceUserMapper.deleteById(queue.getId());
     }
 
@@ -73,7 +73,7 @@ public class ResourceUserMapperTest {
     public void testDelete(){
         ResourcesUser queue = insertOne();
         int delete = resourceUserMapper.deleteById(queue.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**

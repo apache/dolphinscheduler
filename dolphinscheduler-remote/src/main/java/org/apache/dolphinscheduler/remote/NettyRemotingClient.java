@@ -349,7 +349,11 @@ public class NettyRemotingClient {
                 return channel;
             }
         } catch (Exception ex) {
+<<<<<<< HEAD
             logger.info("connect to {} error  {}", host, ex);
+=======
+            logger.error("connect to {} error", address, ex);
+>>>>>>> remotes/upstream/dev
         }
         return null;
     }

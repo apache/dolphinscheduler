@@ -400,8 +400,7 @@ public class OSUtils {
    * @return true if mac
    */
   public static boolean isMacOS() {
-    String os = System.getProperty("os.name");
-    return os.startsWith("Mac");
+    return getOSName().startsWith("Mac");
   }
 
 
@@ -409,9 +408,16 @@ public class OSUtils {
    * whether is windows
    * @return true if windows
    */
-  public static boolean isWindows() {
-    String os = System.getProperty("os.name");
-    return os.startsWith("Windows");
+  public static boolean isWindows() { ;
+    return getOSName().startsWith("Windows");
+  }
+
+  /**
+   * get current OS name
+   * @return current OS name
+   */
+  public static String getOSName() {
+    return System.getProperty("os.name");
   }
 
   /**
@@ -421,13 +427,13 @@ public class OSUtils {
    * @return check memory and cpu usage
    */
   public static Boolean checkResource(double systemCpuLoad, double systemReservedMemory){
-    // judging usage
+    // system load average
     double loadAverage = OSUtils.loadAverage();
-    //
+    // system available physical memory
     double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
 
     if(loadAverage > systemCpuLoad || availablePhysicalMemorySize < systemReservedMemory){
-      logger.warn("load or availablePhysicalMemorySize(G) is too high, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize , loadAverage);
+      logger.warn("load is too high or availablePhysicalMemorySize(G) is too low, it's availablePhysicalMemorySize(G):{},loadAvg:{}", availablePhysicalMemorySize , loadAverage);
       return false;
     }else{
       return true;

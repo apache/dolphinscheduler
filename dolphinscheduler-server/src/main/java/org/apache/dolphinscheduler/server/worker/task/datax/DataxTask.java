@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.server.worker.task.datax;
 
 
 import java.io.File;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
 import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
@@ -189,24 +190,47 @@ public class DataxTask extends AbstractTask {
         String fileName = String.format("%s/%s_job.json",
                 taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTaskAppId());
+        String json;
 
         Path path = new File(fileName).toPath();
         if (Files.exists(path)) {
             return fileName;
         }
 
-        JSONObject job = new JSONObject();
-        job.put("content", buildDataxJobContentJson());
-        job.put("setting", buildDataxJobSettingJson());
 
-        JSONObject root = new JSONObject();
-        root.put("job", job);
-        root.put("core", buildDataxCoreJson());
 
-        logger.debug("datax job json : {}", root.toString());
+        if (dataXParameters.getCustomConfig() == 1){
+
+            json = dataXParameters.getJson().replaceAll("\\r\\n", "\n");
+
+            /**
+             *  combining local and global parameters
+             */
+            Map<String, Property> paramsMap = ParamUtils.convert(ParamUtils.getUserDefParamsMap(taskExecutionContext.getDefinedParams()),
+                    taskExecutionContext.getDefinedParams(),
+                    dataXParameters.getLocalParametersMap(),
+                    CommandType.of(taskExecutionContext.getCmdTypeIfComplement()),
+                    taskExecutionContext.getScheduleTime());
+            if (paramsMap != null){
+                json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
+            }
+
+        }else {
+
+            JSONObject job = new JSONObject();
+            job.put("content", buildDataxJobContentJson());
+            job.put("setting", buildDataxJobSettingJson());
+
+            JSONObject root = new JSONObject();
+            root.put("job", job);
+            root.put("core", buildDataxCoreJson());
+            json = root.toString();
+        }
+
+        logger.debug("datax job json : {}", json);
 
         // create datax json file
-        FileUtils.writeStringToFile(new File(fileName), root.toString(), Charset.forName("UTF-8"));
+        FileUtils.writeStringToFile(new File(fileName), json, StandardCharsets.UTF_8);
         return fileName;
     }
 
@@ -341,6 +365,7 @@ public class DataxTask extends AbstractTask {
         String fileName = String.format("%s/%s_node.sh",
                 taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTaskAppId());
+
         Path path = new File(fileName).toPath();
 
         if (Files.exists(path)) {
@@ -372,7 +397,13 @@ public class DataxTask extends AbstractTask {
         // create shell command file
         Set<PosixFilePermission> perms = PosixFilePermissions.fromString(Constants.RWXR_XR_X);
         FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-        Files.createFile(path, attr);
+
+        if (OSUtils.isWindows()) {
+            Files.createFile(path);
+        } else {
+            Files.createFile(path, attr);
+        }
+
         Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
 
         return fileName;

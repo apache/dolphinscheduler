@@ -109,6 +109,7 @@ mailProtocol="SMTP"
 mailServerHost="smtp.exmail.qq.com"
 
 # mail server port
+# note: Different protocols and encryption methods correspond to different ports, when SSL/TLS is enabled, make sure the port is correct.
 mailServerPort="25"
 
 # sender
@@ -118,6 +119,7 @@ mailSender="xxxxxxxxxx"
 mailUser="xxxxxxxxxx"
 
 # sender password
+# note: The mail.passwd is email service authorization code, not the email login password.
 mailPassword="xxxxxxxxxx"
 
 # TLS mail protocol support
@@ -422,17 +424,8 @@ fi
 done
 
 
-# 3,stop server
-echo "3,stop server"
-sh ${workDir}/script/stop-all.sh
-
-# 4,delete zk node
-echo "4,delete zk node"
-
-sh ${workDir}/script/remove-zk-node.sh $zkRoot
-
-# 5,scp resources
-echo "5,scp resources"
+# 3,scp resources
+echo "3,scp resources"
 sh ${workDir}/script/scp-hosts.sh
 if [ $? -eq 0 ]
 then
@@ -441,6 +434,18 @@ else
 	echo 'scp copy failed to exit'
 	exit -1
 fi
+
+
+# 4,stop server
+echo "4,stop server"
+sh ${workDir}/script/stop-all.sh
+
+
+# 5,delete zk node
+echo "5,delete zk node"
+
+sh ${workDir}/script/remove-zk-node.sh $zkRoot
+
 
 # 6,startup
 echo "6,startup"
