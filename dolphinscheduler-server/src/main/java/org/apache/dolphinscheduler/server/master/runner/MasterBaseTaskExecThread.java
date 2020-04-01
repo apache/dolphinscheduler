@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.queue.TaskUpdateQueue;
-import org.apache.dolphinscheduler.service.queue.TaskUpdateQueueImpl;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
+import org.apache.dolphinscheduler.service.queue.TaskPriorityQueueImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.apache.dolphinscheduler.common.Constants.*;
@@ -76,7 +76,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
     /**
      * taskUpdateQueue
      */
-    private TaskUpdateQueue taskUpdateQueue;
+    private TaskPriorityQueue taskUpdateQueue;
     /**
      * constructor of MasterBaseTaskExecThread
      * @param taskInstance      task instance
@@ -89,7 +89,7 @@ public class MasterBaseTaskExecThread implements Callable<Boolean> {
         this.cancel = false;
         this.taskInstance = taskInstance;
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
-        this.taskUpdateQueue = SpringApplicationContext.getBean(TaskUpdateQueueImpl.class);
+        this.taskUpdateQueue = SpringApplicationContext.getBean(TaskPriorityQueueImpl.class);
     }
 
     /**
