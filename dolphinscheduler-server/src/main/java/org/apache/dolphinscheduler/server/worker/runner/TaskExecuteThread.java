@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.*;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -211,9 +213,11 @@ public class TaskExecuteThread implements Runnable {
         AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
 
         if (baseParam != null) {
-            List<String> projectResourceFiles = baseParam.getResourceFilesList();
+            List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
             if (projectResourceFiles != null) {
-                projectFiles.addAll(projectResourceFiles);
+                Stream<String> resourceInfotream = projectResourceFiles.stream().map(resourceInfo -> resourceInfo.getRes());
+                projectFiles.addAll(resourceInfotream.collect(Collectors.toList()));
+
             }
         }
 
@@ -236,7 +240,7 @@ public class TaskExecuteThread implements Runnable {
             if (!resFile.exists()) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
-                    String resHdfsPath = HadoopUtils.getHdfsFilename(tenantCode, resource);
+                    String resHdfsPath = HadoopUtils.getHdfsResourceFileName(tenantCode, resource);
 
                     logger.info("get resource file from hdfs :{}", resHdfsPath);
                     HadoopUtils.getInstance().copyHdfsToLocal(resHdfsPath, execLocalPath + File.separator + resource, false, true);

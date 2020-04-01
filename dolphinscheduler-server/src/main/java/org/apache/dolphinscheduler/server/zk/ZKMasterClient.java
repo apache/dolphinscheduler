@@ -78,7 +78,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			}
 
 		}catch (Exception e){
-			logger.error("master start up  exception",e);
+			logger.error("master start up exception",e);
 		}finally {
 			releaseMutex(mutex);
 		}
@@ -97,13 +97,13 @@ public class ZKMasterClient extends AbstractZKClient {
 	 */
 	@Override
 	protected void dataChanged(CuratorFramework client, TreeCacheEvent event, String path) {
-		if(path.startsWith(getZNodeParentPath(ZKNodeType.MASTER)+Constants.SINGLE_SLASH)){  //monitor master
+		//monitor master
+		if(path.startsWith(getZNodeParentPath(ZKNodeType.MASTER)+Constants.SINGLE_SLASH)){
 			handleMasterEvent(event,path);
-
-		}else if(path.startsWith(getZNodeParentPath(ZKNodeType.WORKER)+Constants.SINGLE_SLASH)){  //monitor worker
+		}else if(path.startsWith(getZNodeParentPath(ZKNodeType.WORKER)+Constants.SINGLE_SLASH)){
+			//monitor worker
 			handleWorkerEvent(event,path);
 		}
-		//other path event, ignore
 	}
 
 	/**
