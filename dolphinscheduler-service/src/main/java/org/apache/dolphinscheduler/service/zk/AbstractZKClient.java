@@ -126,7 +126,7 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 		int i = 0;
 		for (Map.Entry<String, String> entry : masterMap.entrySet()) {
 			Server masterServer = ResInfo.parseHeartbeatForZKInfo(entry.getValue());
-			masterServer.setZkDirectory( parentPath + "/"+ entry.getKey());
+			masterServer.setZkDirectory(parentPath + "/"+ entry.getKey());
 			masterServer.setId(i);
 			i ++;
 			masterServers.add(masterServer);
