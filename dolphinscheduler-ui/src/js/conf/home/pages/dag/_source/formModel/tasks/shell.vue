@@ -95,8 +95,7 @@
           return {
             label: node.name
           }
-        },
-        id: null
+        }
       }
     },
     mixins: [disabledState],
