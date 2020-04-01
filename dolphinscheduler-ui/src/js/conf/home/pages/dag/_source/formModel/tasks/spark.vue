@@ -262,6 +262,19 @@
     mixins: [disabledState],
     methods: {
       /**
+       * getResourceId
+       */
+      marjarId(name) {
+        this.store.dispatch('dag/getResourceId',{
+          type: 'FILE',
+          fullName: '/'+name
+        }).then(res => {
+          this.mainJar = res.id
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
+      /**
        * return localParams
        */
       _onLocalParams (a) {
@@ -414,7 +427,13 @@
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.mainClass = o.params.mainClass || ''
-          this.mainJar = o.params.mainJar && o.params.mainJar.id ? o.params.mainJar.id : ''
+          if(o.params.mainJar.res) {
+            this.marjarId(o.params.mainJar.res)
+          } else if(o.params.mainJar.res=='') {
+            this.mainJar = ''
+          } else {
+            this.mainJar = o.params.mainJar.id || ''
+          }
           this.deployMode = o.params.deployMode || ''
           this.driverCores = o.params.driverCores || 1
           this.driverMemory = o.params.driverMemory || '512M'
@@ -429,9 +448,20 @@
           // backfill resourceList
           let resourceList = o.params.resourceList || []
           if (resourceList.length) {
-            this.resourceList = _.map(resourceList, v => {
-            return v.id
-          })
+            _.map(resourceList, v => {
+              if(v.res) {
+                this.store.dispatch('dag/getResourceId',{
+                  type: 'FILE',
+                  fullName: '/'+v.res
+                }).then(res => {
+                  this.resourceList.push(res.id)
+                }).catch(e => {
+                  this.$message.error(e.msg || '')
+                })
+              } else {
+                this.resourceList.push(v.id)
+              }
+            })
             this.cacheResourceList = resourceList
           }
 

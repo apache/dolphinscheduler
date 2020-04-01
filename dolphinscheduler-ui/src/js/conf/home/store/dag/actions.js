@@ -715,5 +715,14 @@ export default {
         reject(e)
       })
     })
-  }
+  },
+  getResourceId ({ state }, payload) {
+    return new Promise((resolve, reject) => {
+      io.get(`resources/queryResource`, payload, res => {
+        resolve(res.data)
+      }).catch(e => {
+        reject(e)
+      })
+    })
+  },
 }
