@@ -22,7 +22,7 @@
           <th scope="col" width="50">
             <x-checkbox @on-change="_topCheckBoxClick" v-model="checkAll"></x-checkbox>
           </th>
-          <th scope="col">
+          <th scope="col" width="30">
             <span>{{$t('#')}}</span>
           </th>
           <th scope="col" width="70">
