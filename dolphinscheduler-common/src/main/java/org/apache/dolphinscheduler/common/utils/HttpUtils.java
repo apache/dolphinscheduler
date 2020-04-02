@@ -21,6 +21,8 @@ import org.apache.http.HttpEntity;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
@@ -95,4 +97,44 @@ public class HttpUtils {
 		return responseContent;
 	}
 
+	/**
+	 * send http request
+	 * @param url  url
+	 * @param json data with json format
+	 * @return
+	 */
+	public static String put(String url, String json) {
+		// create HttpClient
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		CloseableHttpResponse response = null;
+		String responseContent = null;
+
+		try {
+			// create http post request
+			HttpPut httpPut = new HttpPut(url);
+			httpPut.setHeader("Content-Type", "application/json;charset=UTF-8");
+
+			StringEntity se = new StringEntity(json);
+			se.setContentType("text/json");
+
+			httpPut.setEntity(se);
+
+			// execute
+			response = httpclient.execute(httpPut);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+		} finally {
+			try {
+				responseContent = EntityUtils.toString(response.getEntity(), "UTF-8");
+				if (response != null) {
+					response.close();
+				}
+				httpclient.close();
+			} catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
+			}
+		}
+
+		return responseContent;
+	}
 }

@@ -1,19 +1,19 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Licensed to the Apache Software Foundation (ASF) under one or more
+* contributor license agreements.  See the NOTICE file distributed with
+* this work for additional information regarding copyright ownership.
+* The ASF licenses this file to You under the Apache License, Version 2.0
+* (the "License"); you may not use this file except in compliance with
+* the License.  You may obtain a copy of the License at
+*
+*    http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 <template>
   <div class="list-model">
     <div class="table-box">
@@ -66,7 +66,8 @@
           <td>
             <span class="ellipsis" :title="item.name">{{item.name}}</span>
           </td>
-          <td><a href="javascript:" class="links" @click="_go(item)"><span class="ellipsis">{{item.processInstanceName}}</span></a></td>
+          <td><a href="javascript:" class="links" @click="_go(item)"><span
+            class="ellipsis">{{item.processInstanceName}}</span></a></td>
           <td>
             <span v-if="item.executorName">{{item.executorName}}</span>
             <span v-else>-</span>
@@ -90,13 +91,26 @@
           <td><span>{{item.retryTimes}}</span></td>
           <td>
             <x-button
-                    type="info"
-                    shape="circle"
-                    size="xsmall"
-                    data-toggle="tooltip"
-                    :title="$t('View log')"
-                    icon="ans-icon-log"
-                    @click="_refreshLog(item)">
+              type="info"
+              shape="circle"
+              size="xsmall"
+              data-toggle="tooltip"
+              :title="$t('View log')"
+              icon="ans-icon-log"
+              @click="_refreshLog(item)">
+            </x-button>
+          </td>
+          <td>
+            <x-button
+              v-show="item.taskType==='SPARK'"
+              :disabled="item.state !== 'RUNNING_EXEUTION'"
+              type="error"
+              shape="circle"
+              size="xsmall"
+              data-toggle="tooltip"
+              :title="$t('Stop')"
+              icon="ans-icon-stop"
+              @click="_stopTask(item)">
             </x-button>
           </td>
         </tr>
@@ -107,15 +121,40 @@
 <script>
   import Permissions from '@/module/permissions'
   import mLog from '@/conf/home/pages/dag/_source/formModel/log'
-  import { tasksState } from '@/conf/home/pages/dag/_source/config'
+  import {tasksState} from '@/conf/home/pages/dag/_source/config'
+  import io from '@/module/io'
+  import localStore from '@/module/util/localStorage'
+
+  // Get the name of the item currently clicked
+  let projectName = localStore.getItem('projectName')
 
   export default {
     name: 'list',
-    data () {
+    data() {
       return {
         list: [],
         isAuth: Permissions.getAuth(),
-        backfillItem: {}
+        backfillItem: {},
+        searchParams: {
+          // page size
+          pageSize: 10,
+          // page index
+          pageNo: 1,
+          // Query name
+          searchVal: '',
+          // Process instance id
+          processInstanceId: '',
+          // host
+          host: '',
+          // state
+          stateType: '',
+          // start date
+          startDate: '',
+          // end date
+          endDate: '',
+          // Exectuor Name
+          executorName: ''
+        }
       }
     },
     props: {
@@ -124,11 +163,37 @@
       pageSize: Number
     },
     methods: {
-      _rtState (code) {
+      _rtState(code) {
         let o = tasksState[code]
         return `<em class="${o.icoUnicode} ${o.isSpin ? 'as as-spin' : ''}" style="color:${o.color}" data-toggle="tooltip" data-container="body" title="${o.desc}"></em>`
       },
-      _refreshLog (item) {
+      _stopTask(item) {
+        let prom = new Promise((resolve, reject) => {
+          io.post(`projects/${projectName}/task-instance/kill`, {
+            host: item.host,
+            taskInstanceId: item.id
+          }, res => {
+            resolve(res)
+          }).catch(e => {
+            reject(e)
+          })
+        })
+        prom.then(() => {
+          console.log("killed task， will update task list")
+          new Promise((resolve, reject) => {
+            io.get(`projects/${projectName}/task-instance/list-paging`, this.searchParams, res => {
+              resolve(res.data)
+            }).catch(e => {
+              reject(e)
+            })
+          }).then(res => {
+            this.taskInstanceList = res.totalList
+          }, err => {
+            console.log("get task list failed " + err)
+          })
+        })
+      },
+      _refreshLog(item) {
         let self = this
         let instance = this.$modal.dialog({
           closable: false,
@@ -136,12 +201,12 @@
           escClose: true,
           className: 'v-modal-custom',
           transitionName: 'opacityp',
-          render (h) {
+          render(h) {
             return h(mLog, {
               on: {
-                ok () {
+                ok() {
                 },
-                close () {
+                close() {
                   instance.remove()
                 }
               },
@@ -154,23 +219,23 @@
           }
         })
       },
-      _go (item) {
-        this.$router.push({ path: `/projects/instance/list/${item.processInstanceId}` })
+      _go(item) {
+        this.$router.push({path: `/projects/instance/list/${item.processInstanceId}`})
       },
     },
     watch: {
-      taskInstanceList (a) {
+      taskInstanceList(a) {
         this.list = []
         setTimeout(() => {
           this.list = a
         })
       }
     },
-    created () {
+    created() {
     },
-    mounted () {
+    mounted() {
       this.list = this.taskInstanceList
     },
-    components: { }
+    components: {}
   }
 </script>

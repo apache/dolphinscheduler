@@ -226,6 +226,7 @@ public enum Status {
     TENANT_NOT_SUITABLE(50027,"there is not any tenant suitable, please choose a tenant available.", "没有合适的租户，请选择可用的租户"),
     EXPORT_PROCESS_DEFINE_BY_ID_ERROR(50028,"export process definition by id error", "导出工作流定义错误"),
     IMPORT_PROCESS_DEFINE_ERROR(50029,"import process definition error", "导入工作流定义错误"),
+    TASK_KILL_ERROR(50030, "task kill error", "任务停止错误"),
 
     HDFS_NOT_STARTUP(60001,"hdfs not startup", "hdfs未启用"),
 

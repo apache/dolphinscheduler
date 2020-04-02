@@ -159,17 +159,25 @@ public class HadoopUtils implements Closeable {
                 fs = FileSystem.get(configuration);
             }
 
-
-            String rmHaIds = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
-            String appAddress = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
-            if (!StringUtils.isEmpty(rmHaIds)) {
-                appAddress = getAppAddress(appAddress, rmHaIds);
-                logger.info("appAddress : {}", appAddress);
-            }
+            String appAddress = getYarnAppAddress();
             configuration.set(Constants.YARN_APPLICATION_STATUS_ADDRESS, appAddress);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * get yarn app url
+     * @return yarn app url
+     */
+    public static String getYarnAppAddress() {
+        String rmHaIds = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
+        String appAddress = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
+        if (!StringUtils.isEmpty(rmHaIds)) {
+            appAddress = HadoopUtils.getAppAddress(appAddress, rmHaIds);
+            logger.info("appAddress : {}", appAddress);
+        }
+        return appAddress;
     }
 
     /**

@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.server.utils.ProcessUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -136,6 +138,38 @@ public class TaskInstanceService extends BaseService {
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);
 
+        return result;
+    }
+
+    /**
+     * kill a task instance by its id
+     * @param taskInstanceId task instace id
+     * @return status of process result
+     */
+    public Map<String, Object> killTask(Integer taskInstanceId) {
+        Map<String, Object> result = new HashMap<>(5);
+        TaskInstance taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstanceId);
+        if (taskInstance == null) {
+            result.put(Constants.STATUS, Status.TASK_INSTANCE_NOT_FOUND);
+            return result;
+        }
+
+        if (!taskInstance.getTaskType().toLowerCase().equals(TaskType.SPARK.getDescp())) {
+            result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+            result.put(Constants.MSG, "not support kill the task type " + taskInstance.getTaskType());
+            return result;
+        }
+
+        try {
+            ProcessUtils.killSparkTask(taskInstance);
+        } catch (Exception e) {
+            result.put(Constants.STATUS, Status.TASK_KILL_ERROR);
+            result.put(Constants.MSG, "kill spark task failed");
+            return result;
+        }
+
+        result.put(Constants.STATUS, Status.SUCCESS);
+        result.put(Constants.MSG, "kill task success");
         return result;
     }
 }
