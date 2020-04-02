@@ -237,6 +237,30 @@ public class ProcessService {
     }
 
     /**
+     * get task node list by definitionId
+     * @param defineId
+     * @return
+     */
+    public  List<TaskNode> getTaskNodeListByDefinitionId(Integer defineId){
+        ProcessDefinition processDefinition = processDefineMapper.selectById(defineId);
+        if (processDefinition == null) {
+            logger.info("process define not exists");
+            return null;
+        }
+
+        String processDefinitionJson = processDefinition.getProcessDefinitionJson();
+        ProcessData processData = JSONUtils.parseObject(processDefinitionJson, ProcessData.class);
+
+        //process data check
+        if (null == processData) {
+            logger.error("process data is null");
+            return null;
+        }
+
+        return processData.getTasks();
+    }
+
+    /**
      * find process instance by id
      * @param processId processId
      * @return process instance
