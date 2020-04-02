@@ -162,6 +162,7 @@
             return {id: v}
           }),
           localParams: this.localParams,
+          rawScript: editor ? editor.getValue() : ''
         }
       }
     },
