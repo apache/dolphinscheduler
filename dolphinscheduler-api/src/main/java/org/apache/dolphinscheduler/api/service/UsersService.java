@@ -492,14 +492,24 @@ public class UsersService extends BaseService {
         String[] resourcesIdArr = resourceIds.split(",");
 
         for (String resourceId : resourcesIdArr) {
-            Date now = new Date();
-            ResourcesUser resourcesUser = new ResourcesUser();
-            resourcesUser.setUserId(userId);
-            resourcesUser.setResourcesId(Integer.parseInt(resourceId));
-            resourcesUser.setPerm(7);
-            resourcesUser.setCreateTime(now);
-            resourcesUser.setUpdateTime(now);
-            resourcesUserMapper.insert(resourcesUser);
+            String[] allResources = resourceId.split("-");
+            for (String resId:allResources) {
+                Resource resource = resourceMapper.selectById(resId);
+                if (resource == null) {
+                    putMsg(result, Status.RESOURCE_NOT_EXIST);
+                    return result;
+                }
+
+                Date now = new Date();
+                ResourcesUser resourcesUser = new ResourcesUser();
+                resourcesUser.setUserId(userId);
+                resourcesUser.setResourcesId(Integer.parseInt(resourceId));
+                resourcesUser.setPerm(7);
+                resourcesUser.setCreateTime(now);
+                resourcesUser.setUpdateTime(now);
+                resourcesUserMapper.insert(resourcesUser);
+            }
+
         }
 
         putMsg(result, Status.SUCCESS);
