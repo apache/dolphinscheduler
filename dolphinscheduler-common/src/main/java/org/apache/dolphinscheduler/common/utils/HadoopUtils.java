@@ -26,6 +26,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.io.IOUtils;
+import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.fs.FileSystem;
@@ -421,6 +422,22 @@ public class HadoopUtils implements Closeable {
      * @param tenantCode tenant code
      * @return hdfs resource dir
      */
+    public static String getHdfsDir(ResourceType resourceType,String tenantCode) {
+        String hdfsDir = "";
+        if (resourceType.equals(ResourceType.FILE)) {
+            hdfsDir = getHdfsResDir(tenantCode);
+        } else if (resourceType.equals(ResourceType.UDF)) {
+            hdfsDir = getHdfsUdfDir(tenantCode);
+        }
+        return hdfsDir;
+    }
+
+    /**
+     * hdfs resource dir
+     *
+     * @param tenantCode tenant code
+     * @return hdfs resource dir
+     */
     public static String getHdfsResDir(String tenantCode) {
         return String.format("%s/resources", getHdfsTenantDir(tenantCode));
     }
@@ -450,22 +467,42 @@ public class HadoopUtils implements Closeable {
      * get absolute path and name for file on hdfs
      *
      * @param tenantCode tenant code
-     * @param filename   file name
+     * @param fileName   file name
      * @return get absolute path and name for file on hdfs
      */
-    public static String getHdfsFilename(String tenantCode, String filename) {
-        return String.format("%s/%s", getHdfsResDir(tenantCode), filename);
+
+    /**
+     * get hdfs file name
+     *
+     * @param resourceType  resource type
+     * @param tenantCode    tenant code
+     * @param fileName      file name
+     * @return hdfs file name
+     */
+    public static String getHdfsFileName(ResourceType resourceType, String tenantCode, String fileName) {
+        return String.format("%s/%s", getHdfsDir(resourceType,tenantCode), fileName);
+    }
+
+    /**
+     * get absolute path and name for resource file on hdfs
+     *
+     * @param tenantCode tenant code
+     * @param fileName   file name
+     * @return get absolute path and name for file on hdfs
+     */
+    public static String getHdfsResourceFileName(String tenantCode, String fileName) {
+        return String.format("%s/%s", getHdfsResDir(tenantCode), fileName);
     }
 
     /**
      * get absolute path and name for udf file on hdfs
      *
      * @param tenantCode tenant code
-     * @param filename   file name
+     * @param fileName   file name
      * @return get absolute path and name for udf file on hdfs
      */
-    public static String getHdfsUdfFilename(String tenantCode, String filename) {
-        return String.format("%s/%s", getHdfsUdfDir(tenantCode), filename);
+    public static String getHdfsUdfFileName(String tenantCode, String fileName) {
+        return String.format("%s/%s", getHdfsUdfDir(tenantCode), fileName);
     }
 
     /**

@@ -18,6 +18,7 @@ package org.apache.dolphinscheduler.service.permission;
 
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -44,6 +45,11 @@ public class PermissionCheck<T> {
      * need check array
      */
     private T[] needChecks;
+
+    /**
+     * resoruce info
+     */
+    private List<ResourceInfo> resourceList;
 
     /**
      * user id
@@ -90,6 +96,22 @@ public class PermissionCheck<T> {
         this.logger = logger;
     }
 
+    /**
+     * permission check
+     * @param logger
+     * @param authorizationType
+     * @param processService
+     * @param resourceList
+     * @param userId
+     */
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, List<ResourceInfo> resourceList, int userId,Logger logger) {
+        this.authorizationType = authorizationType;
+        this.processService = processService;
+        this.resourceList = resourceList;
+        this.userId = userId;
+        this.logger = logger;
+    }
+
     public AuthorizationType getAuthorizationType() {
         return authorizationType;
     }
@@ -122,6 +144,14 @@ public class PermissionCheck<T> {
         this.userId = userId;
     }
 
+    public List<ResourceInfo> getResourceList() {
+        return resourceList;
+    }
+
+    public void setResourceList(List<ResourceInfo> resourceList) {
+        this.resourceList = resourceList;
+    }
+
     /**
      * has permission
      * @return true if has permission
@@ -141,6 +171,7 @@ public class PermissionCheck<T> {
      */
     public void checkPermission() throws Exception{
         if(this.needChecks.length > 0){
+
             // get user type in order to judge whether the user is admin
             User user = processService.getUserById(userId);
             if (user.getUserType() != UserType.ADMIN_USER){
