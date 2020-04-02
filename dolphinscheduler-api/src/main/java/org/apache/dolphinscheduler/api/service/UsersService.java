@@ -494,7 +494,7 @@ public class UsersService extends BaseService {
         for (String resourceId : resourcesIdArr) {
             String[] allResources = resourceId.split("-");
             for (String resId:allResources) {
-                Resource resource = resourceMapper.selectById(resId);
+                Resource resource = resourceMapper.selectById(Integer.parseInt(resId));
                 if (resource == null) {
                     putMsg(result, Status.RESOURCE_NOT_EXIST);
                     return result;
