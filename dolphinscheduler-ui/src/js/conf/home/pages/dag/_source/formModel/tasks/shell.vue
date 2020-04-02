@@ -95,7 +95,7 @@
           return {
             label: node.name
           }
-        },
+        }
       }
     },
     mixins: [disabledState],
@@ -238,12 +238,22 @@
         // backfill resourceList
         let resourceList = o.params.resourceList || []
         if (resourceList.length) {
-          this.resourceList = _.map(resourceList, v => {
-            return v.id
+           _.map(resourceList, v => {
+            if(v.res) {
+              this.store.dispatch('dag/getResourceId',{
+                type: 'FILE',
+                fullName: '/'+v.res
+              }).then(res => {
+                this.resourceList.push(res.id)
+              }).catch(e => {
+                this.$message.error(e.msg || '')
+              })
+            } else {
+              this.resourceList.push(v.id)
+            }
           })
           this.cacheResourceList = resourceList
         }
-
         // backfill localParams
         let localParams = o.params.localParams || []
         if (localParams.length) {
