@@ -161,8 +161,7 @@
           resourceList: _.map(this.resourceList, v => {
             return {id: v}
           }),
-          localParams: this.localParams,
-          rawScript: editor ? editor.getValue() : ''
+          localParams: this.localParams
         }
       }
     },
