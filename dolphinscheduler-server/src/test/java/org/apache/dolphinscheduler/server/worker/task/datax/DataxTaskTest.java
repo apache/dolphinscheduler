@@ -65,11 +65,8 @@ public class DataxTaskTest {
 
     private ApplicationContext applicationContext;
 
-<<<<<<< HEAD
     private TaskExecutionContext taskExecutionContext;
-=======
     private TaskProps props = new TaskProps();
->>>>>>> remotes/upstream/dev
 
     @Before
     public void before()
@@ -82,19 +79,14 @@ public class DataxTaskTest {
         springApplicationContext.setApplicationContext(applicationContext);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
-<<<<<<< HEAD
         TaskProps props = new TaskProps();
         props.setExecutePath("/tmp");
-=======
-        props.setTaskDir("/tmp");
->>>>>>> remotes/upstream/dev
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
         props.setTaskInstanceId(1);
         props.setTenantCode("1");
         props.setEnvFile(".dolphinscheduler_env.sh");
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
-<<<<<<< HEAD
         props.setTaskParams(
             "{\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedByte\":1024,\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"datasource\":1,\"dsType\":\"MYSQL\",\"datatarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test from dual\",\"preStatements\":[\"delete from test\"],\"postStatements\":[\"delete from test\"]}");
 
@@ -117,10 +109,8 @@ public class DataxTaskTest {
 
         dataxTask = PowerMockito.spy(new DataxTask(taskExecutionContext, logger));
         dataxTask.init();
-=======
         props.setCmdTypeIfComplement(START_PROCESS);
         setTaskParems(0);
->>>>>>> remotes/upstream/dev
 
         Mockito.when(processService.findDataSourceById(1)).thenReturn(getDataSource());
         Mockito.when(processService.findDataSourceById(2)).thenReturn(getDataSource());
@@ -142,7 +132,7 @@ public class DataxTaskTest {
 
         }
 
-        dataxTask = PowerMockito.spy(new DataxTask(props, logger));
+        dataxTask = PowerMockito.spy(new DataxTask(taskExecutionContext, logger));
         dataxTask.init();
     }
 
