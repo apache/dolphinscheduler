@@ -50,7 +50,8 @@ public class HadoopUtils implements Closeable {
 
     private static String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
     public static final String resourceUploadPath = PropertyUtils.getString(RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
-
+    public static final String rmHaIds = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
+    public static final String appAddress = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
     private static volatile HadoopUtils instance = new HadoopUtils();
     private static volatile Configuration configuration;
     private static volatile boolean yarnEnabled = false;
@@ -58,9 +59,6 @@ public class HadoopUtils implements Closeable {
 
 
     private HadoopUtils(){
-        if(StringUtils.isEmpty(hdfsUser)){
-            hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
-        }
         init();
         initHdfsPath();
     }
@@ -99,14 +97,15 @@ public class HadoopUtils implements Closeable {
                     try {
                         configuration = new Configuration();
 
-                        String resUploadStartupType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
-                        ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
+                        String resourceStorageType = PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE);
+                        ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType);
 
                         if (resUploadType == ResUploadType.HDFS){
                             if (PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE,false)){
                                 System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF,
                                         PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH));
                                 configuration.set(Constants.HADOOP_SECURITY_AUTHENTICATION,"kerberos");
+                                hdfsUser = "";
                                 UserGroupInformation.setConfiguration(configuration);
                                 UserGroupInformation.loginUserFromKeytab(PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
                                         PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH));
@@ -155,27 +154,6 @@ public class HadoopUtils implements Closeable {
                             fs = FileSystem.get(configuration);
                         }
 
-                        /**
-                         * if rmHaIds includes xx, it signs not use resourcemanager
-                         * otherwise:
-                         *  if rmHaIds is empty, single resourcemanager enabled
-                         *  if rmHaIds not empty: resourcemanager HA enabled
-                         */
-                        String rmHaIds = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
-                        String appAddress = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
-                        //not use resourcemanager
-                        if (rmHaIds.contains(Constants.YARN_RESOURCEMANAGER_HA_XX)){
-                            yarnEnabled = false;
-                        } else if (!StringUtils.isEmpty(rmHaIds)) {
-                            //resourcemanager HA enabled
-                            appAddress = getAppAddress(appAddress, rmHaIds);
-                            yarnEnabled = true;
-                            logger.info("appAddress : {}", appAddress);
-                        } else {
-                            //single resourcemanager enabled
-                            yarnEnabled = true;
-                        }
-                        configuration.set(Constants.YARN_APPLICATION_STATUS_ADDRESS, appAddress);
 
                     } catch (Exception e) {
                         logger.error(e.getMessage(), e);
@@ -200,7 +178,29 @@ public class HadoopUtils implements Closeable {
      * @return url of application
      */
     public String getApplicationUrl(String applicationId) {
-        return String.format(configuration.get(Constants.YARN_APPLICATION_STATUS_ADDRESS), applicationId);
+        /**
+         * if rmHaIds contains xx, it signs not use resourcemanager
+         * otherwise:
+         *  if rmHaIds is empty, single resourcemanager enabled
+         *  if rmHaIds not empty: resourcemanager HA enabled
+         */
+        String appUrl = "";
+        //not use resourcemanager
+        if (rmHaIds.contains(Constants.YARN_RESOURCEMANAGER_HA_XX)){
+
+            yarnEnabled = false;
+            logger.warn("should not step here");
+        } else if (!StringUtils.isEmpty(rmHaIds)) {
+            //resourcemanager HA enabled
+            appUrl = getAppAddress(appAddress, rmHaIds);
+            yarnEnabled = true;
+            logger.info("application url : {}", appUrl);
+        } else {
+            //single resourcemanager enabled
+            yarnEnabled = true;
+        }
+
+        return String.format(appUrl, applicationId);
     }
 
     /**
