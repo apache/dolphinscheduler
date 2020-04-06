@@ -54,7 +54,6 @@ sed -i ${txt} "s#hadoop.security.authentication.startup.state.*#hadoop.security.
 sed -i ${txt} "s#java.security.krb5.conf.path.*#java.security.krb5.conf.path=${krb5ConfPath}#g" conf/common.properties
 sed -i ${txt} "s#login.user.keytab.username.*#login.user.keytab.username=${keytabUserName}#g" conf/common.properties
 sed -i ${txt} "s#login.user.keytab.path.*#login.user.keytab.path=${keytabPath}#g" conf/common.properties
-
 sed -i ${txt} "s#zookeeper.quorum.*#zookeeper.quorum=${zkQuorum}#g" conf/common.properties
 
 sed -i ${txt} "s#server.port.*#server.port=${apiServerPort}#g" conf/application-api.properties
@@ -68,18 +67,6 @@ sed -i ${txt} "s#mail.passwd.*#mail.passwd=${mailPassword}#g" conf/alert.propert
 sed -i ${txt} "s#mail.smtp.starttls.enable.*#mail.smtp.starttls.enable=${starttlsEnable}#g" conf/alert.properties
 sed -i ${txt} "s#mail.smtp.ssl.trust.*#mail.smtp.ssl.trust=${sslTrust}#g" conf/alert.properties
 sed -i ${txt} "s#mail.smtp.ssl.enable.*#mail.smtp.ssl.enable=${sslEnable}#g" conf/alert.properties
-
-sed -i ${txt} "s#installPath.*#installPath=${installPath}#g" conf/config/install_config.conf
-sed -i ${txt} "s#deployUser.*#deployUser=${deployUser}#g" conf/config/install_config.conf
-sed -i ${txt} "s#ips.*#ips=${ips}#g" conf/config/install_config.conf
-sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/install_config.conf
-
-
-sed -i ${txt} "s#masters.*#masters=${masters}#g" conf/config/install_config.conf
-sed -i ${txt} "s#workers.*#workers=${workers}#g" conf/config/install_config.conf
-sed -i ${txt} "s#alertServer.*#alertServer=${alertServer}#g" conf/config/install_config.conf
-sed -i ${txt} "s#apiServers.*#apiServers=${apiServers}#g" conf/config/install_config.conf
-sed -i ${txt} "s#sshPort.*#sshPort=${sshPort}#g" conf/config/install_config.conf
 
 
 # 2.create directory
