@@ -453,7 +453,7 @@ public class ExecutorService extends BaseService{
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
                               int excutorId, int warningGroupId,
-                              RunMode runMode,Priority processInstancePriority, int workerGroupId) throws ParseException {
+                              RunMode runMode,Priority processInstancePriority, int workerGroupId){
 
         /**
          * instantiate command schedule instance
@@ -496,6 +496,7 @@ public class ExecutorService extends BaseService{
             }
         }
 
+        // determine whether to complement
         if(commandType == CommandType.COMPLEMENT_DATA){
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
             if(null != start && null != end && start.before(end)){
