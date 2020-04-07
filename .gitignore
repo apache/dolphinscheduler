@@ -145,7 +145,6 @@ dolphinscheduler-ui/dist/js/home/index.78a5d12.js.map
 dolphinscheduler-ui/dist/js/login/index.291b8e3.js
 dolphinscheduler-ui/dist/js/login/index.291b8e3.js.map
 dolphinscheduler-ui/dist/lib/external/
-dolphinscheduler-ui/src/js/conf/home/pages/projects/pages/taskInstance/index.vue
 /dolphinscheduler-dao/src/main/resources/dao/data_source.properties
 
 !/zookeeper_data/
