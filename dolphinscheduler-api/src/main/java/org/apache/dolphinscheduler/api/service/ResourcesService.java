@@ -176,6 +176,21 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
+
+        if (pid != -1) {
+            Resource parentResource = resourcesMapper.selectById(pid);
+
+            if (parentResource == null) {
+                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
+                return result;
+            }
+
+            if (!hasPerm(loginUser, parentResource.getUserId())) {
+                putMsg(result, Status.USER_NO_OPERATION_PERM);
+                return result;
+            }
+        }
+
         // file is empty
         if (file.isEmpty()) {
             logger.error("file is empty: {}", file.getOriginalFilename());
@@ -416,6 +431,14 @@ public class ResourcesService extends BaseService {
         if (isAdmin(loginUser)) {
             userId= 0;
         }
+        if (direcotryId != -1) {
+            Resource directory = resourcesMapper.selectById(direcotryId);
+            if (directory == null) {
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
+            }
+        }
+
         IPage<Resource> resourceIPage = resourcesMapper.queryResourcePaging(page,
                 userId,direcotryId, type.ordinal(), searchVal);
         PageInfo pageInfo = new PageInfo<Resource>(pageNo, pageSize);
@@ -505,8 +528,12 @@ public class ResourcesService extends BaseService {
 
         Map<String, Object> result = new HashMap<>(5);
 
-        Set<Resource> allResourceList = getAllResources(loginUser, type);
-        Visitor resourceTreeVisitor = new ResourceTreeVisitor(new ArrayList<>(allResourceList));
+        int userId = loginUser.getId();
+        if(isAdmin(loginUser)){
+            userId = 0;
+        }
+        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(userId, type.ordinal(),0);
+        Visitor resourceTreeVisitor = new ResourceTreeVisitor(allResourceList);
         //JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(resourceTreeVisitor.visit().getChildren(), SerializerFeature.SortField));
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());
         putMsg(result,Status.SUCCESS);
@@ -519,7 +546,7 @@ public class ResourcesService extends BaseService {
      * @param loginUser     login user
      * @return all resource set
      */
-    private Set<Resource> getAllResources(User loginUser, ResourceType type) {
+    /*private Set<Resource> getAllResources(User loginUser, ResourceType type) {
         int userId = loginUser.getId();
         boolean listChildren = true;
         if(isAdmin(loginUser)){
@@ -540,7 +567,7 @@ public class ResourcesService extends BaseService {
             }
         }
         return allResourceList;
-    }
+    }*/
 
     /**
      * query resource list
@@ -553,7 +580,7 @@ public class ResourcesService extends BaseService {
 
         Map<String, Object> result = new HashMap<>(5);
 
-        Set<Resource> allResourceList = getAllResources(loginUser, type);
+        List<Resource> allResourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), type.ordinal(),0);
         List<Resource> resources = new ResourceFilter(".jar",new ArrayList<>(allResourceList)).filter();
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resources);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit().getChildren());

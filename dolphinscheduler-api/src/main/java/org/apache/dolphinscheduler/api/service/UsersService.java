@@ -489,25 +489,37 @@ public class UsersService extends BaseService {
             return result;
         }
 
-        String[] resourcesIdArr = resourceIds.split(",");
+        String[] resourceFullIdArr = resourceIds.split(",");
+        Set<Integer> needAuthorizeResIds = new HashSet();
+        for (String resourceFullId : resourceFullIdArr) {
+            String[] resourceIdArr = resourceFullId.split("-");
+            for (int i=0;i<=resourceIdArr.length-1;i++) {
 
-        for (String resourceId : resourcesIdArr) {
-            String[] allResources = resourceId.split("-");
-            for (String resId:allResources) {
-                Resource resource = resourceMapper.selectById(Integer.parseInt(resId));
-                if (resource == null) {
-                    putMsg(result, Status.RESOURCE_NOT_EXIST);
-                    return result;
+                int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
+                if (!needAuthorizeResIds.contains(resourceIdValue)) {
+                    Resource resource = resourceMapper.selectById(Integer.parseInt(resourceIdArr[i]));
+                    if (resource == null) {
+                        putMsg(result, Status.RESOURCE_NOT_EXIST);
+                        return result;
+                    }
+
+                    Date now = new Date();
+                    ResourcesUser resourcesUser = new ResourcesUser();
+                    resourcesUser.setUserId(userId);
+                    resourcesUser.setResourcesId(resourceIdValue);
+                    if (i == resourceIdArr.length-1) {
+                        resourcesUser.setPerm(7);
+                    }else{
+                        resourcesUser.setPerm(4);
+                    }
+
+                    resourcesUser.setCreateTime(now);
+                    resourcesUser.setUpdateTime(now);
+                    resourcesUserMapper.insert(resourcesUser);
+                    needAuthorizeResIds.add(resourceIdValue);
                 }
 
-                Date now = new Date();
-                ResourcesUser resourcesUser = new ResourcesUser();
-                resourcesUser.setUserId(userId);
-                resourcesUser.setResourcesId(Integer.parseInt(resourceId));
-                resourcesUser.setPerm(7);
-                resourcesUser.setCreateTime(now);
-                resourcesUser.setUpdateTime(now);
-                resourcesUserMapper.insert(resourcesUser);
+
             }
 
         }
