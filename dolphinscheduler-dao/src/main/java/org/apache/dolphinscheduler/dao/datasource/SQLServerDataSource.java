@@ -51,7 +51,6 @@ public class SQLServerDataSource extends BaseDataSource {
 
     /**
      * test whether the data source can be connected successfully
-     * @throws Exception
      */
     @Override
     public void isConnectable() {
