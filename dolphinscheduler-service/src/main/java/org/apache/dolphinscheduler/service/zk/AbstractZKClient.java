@@ -145,8 +145,18 @@ public abstract class AbstractZKClient extends ZookeeperCachedOperator {
 		try {
 			String path =  getZNodeParentPath(zkNodeType);
 			List<String> serverList  = super.getChildrenKeys(path);
+			if(zkNodeType == ZKNodeType.WORKER){
+			    List<String> workerList = new ArrayList<>();
+			    for(String group : serverList){
+			    	List<String> groupServers = super.getChildrenKeys(path + Constants.SLASH + group);
+			    	for(String groupServer : groupServers){
+			    		workerList.add(group + Constants.SLASH + groupServer);
+					}
+				}
+				serverList = workerList;
+			}
 			for(String server : serverList){
-				masterMap.putIfAbsent(server, super.get(path + "/" + server));
+				masterMap.putIfAbsent(server, super.get(path + Constants.SLASH + server));
 			}
 		} catch (Exception e) {
 			logger.error("get server list failed", e);
