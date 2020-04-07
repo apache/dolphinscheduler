@@ -130,10 +130,10 @@ public class ThreadUtils {
 
     /**
      * Wrapper over ScheduledThreadPoolExecutor
-     * @param threadName
-     * @param corePoolSize
-     * @param isDaemon
-     * @return
+     * @param threadName threadName
+     * @param corePoolSize corePoolSize
+     * @param isDaemon isDaemon
+     * @return ScheduledThreadPoolExecutor
      */
     public static ScheduledExecutorService newThreadScheduledExecutor(String threadName, int corePoolSize, boolean isDaemon) {
         ThreadFactory threadFactory = new ThreadFactoryBuilder()

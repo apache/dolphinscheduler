@@ -425,10 +425,7 @@ public class HadoopUtils implements Closeable {
     }
 
     /**
-<<<<<<< HEAD
      * get data hdfs path
-=======
->>>>>>> remotes/upstream/dev
      * @return data hdfs path
      */
     public static String getHdfsDataBasePath() {
