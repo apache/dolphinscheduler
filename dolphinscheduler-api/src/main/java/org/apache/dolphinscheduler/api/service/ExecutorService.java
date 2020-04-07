@@ -447,12 +447,13 @@ public class ExecutorService extends BaseService{
      * @param warningGroupId
      * @param runMode
      * @return
+     * @throws ParseException
      */
     private int createCommand(CommandType commandType, int processDefineId,
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
                               int excutorId, int warningGroupId,
-                              RunMode runMode,Priority processInstancePriority, int workerGroupId){
+                              RunMode runMode,Priority processInstancePriority, int workerGroupId) throws ParseException {
 
         /**
          * instantiate command schedule instance
@@ -495,7 +496,6 @@ public class ExecutorService extends BaseService{
             }
         }
 
-        // determine whether to complement
         if(commandType == CommandType.COMPLEMENT_DATA){
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
             if(null != start && null != end && start.before(end)){
@@ -539,9 +539,12 @@ public class ExecutorService extends BaseService{
                 logger.error("there is not valid schedule date for the process definition: id:{},date:{}",
                         processDefineId, schedule);
             }
+        }else{
+
+            return processService.createCommand(command);
         }
 
-        return processService.createCommand(command);
+        return 0;
     }
 
     /**
