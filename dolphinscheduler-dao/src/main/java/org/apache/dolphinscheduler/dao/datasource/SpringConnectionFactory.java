@@ -134,7 +134,8 @@ public class SpringConnectionFactory {
 
     /**
      * get sql session
-     * @return sqlSession
+     * @return SqlSession
+     * @throws Exception
      */
     @Bean
     public SqlSession sqlSession() throws Exception{
