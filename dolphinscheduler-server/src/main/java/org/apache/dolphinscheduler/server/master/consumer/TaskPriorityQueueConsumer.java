@@ -27,6 +27,9 @@ import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
+import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceMysqlParameter;
+import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
@@ -44,7 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -219,13 +221,17 @@ public class TaskPriorityQueueConsumer extends Thread{
         DataSource dataTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
 
 
-        dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
-        dataxTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
-        dataxTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+        if (dataSource != null){
+            dataxTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
+            dataxTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
+            dataxTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+        }
 
-        dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
-        dataxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
-        dataxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+        if (dataTarget != null){
+            dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
+            dataxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+            dataxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+        }
     }
 
 
@@ -235,19 +241,25 @@ public class TaskPriorityQueueConsumer extends Thread{
      * @param taskNode taskNode
      */
     private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskNode taskNode) {
-        DataxParameters dataxParameters = JSONObject.parseObject(taskNode.getParams(), DataxParameters.class);
+        SqoopParameters sqoopParameters = JSONObject.parseObject(taskNode.getParams(), SqoopParameters.class);
 
-        DataSource dataSource = processService.findDataSourceById(dataxParameters.getDataSource());
-        DataSource dataTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
+        SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
+        TargetMysqlParameter targetMysqlParameter = JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
 
+        DataSource dataSource = processService.findDataSourceById(sourceMysqlParameter.getSrcDatasource());
+        DataSource dataTarget = processService.findDataSourceById(targetMysqlParameter.getTargetDatasource());
 
-        sqoopTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
-        sqoopTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
-        sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+        if (dataSource != null){
+            sqoopTaskExecutionContext.setDataSourceId(dataSource.getId());
+            sqoopTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
+            sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+        }
 
-        sqoopTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
-        sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
-        sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+        if (dataTarget != null){
+            sqoopTaskExecutionContext.setDataTargetId(dataTarget.getId());
+            sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+            sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+        }
     }
 
     /**
