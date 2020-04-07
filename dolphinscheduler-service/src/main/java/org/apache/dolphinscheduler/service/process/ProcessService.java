@@ -1487,7 +1487,7 @@ public class ProcessService {
      * @return tenant code
      */
     public String queryTenantCodeByResName(String resName,ResourceType resourceType){
-        return resourceMapper.queryTenantCodeByResourceName(resName,resourceType.ordinal());
+        return resourceMapper.queryTenantCodeByResourceName(resName, resourceType.ordinal());
     }
 
     /**
@@ -1763,6 +1763,16 @@ public class ProcessService {
      */
     public Resource getResourceById(int resoruceId){
         return resourceMapper.selectById(resoruceId);
+    }
+
+
+    /**
+     * list resources by ids
+     * @param resIds resIds
+     * @return resource list
+     */
+    public List<Resource> listResourceByIds(Integer[] resIds){
+        return resourceMapper.listResourceByIds(resIds);
     }
 
 

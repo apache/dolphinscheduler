@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
@@ -29,10 +31,8 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.EnumUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
+import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.*;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
@@ -47,7 +47,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * TaskUpdateQueue consumer
@@ -127,6 +132,12 @@ public class TaskPriorityQueueConsumer extends Thread{
     protected TaskExecutionContext getTaskExecutionContext(int taskInstanceId){
         TaskInstance taskInstance = processService.getTaskInstanceDetailByTaskId(taskInstanceId);
 
+        // task type
+        TaskType taskType = TaskType.valueOf(taskInstance.getTaskType());
+
+        // task node
+        TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
+
         Integer userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
         Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
 
@@ -145,14 +156,14 @@ public class TaskPriorityQueueConsumer extends Thread{
         taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
         taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
         taskInstance.setExecutePath(getExecLocalPath(taskInstance));
+        taskInstance.setResources(getResourceFullNames(taskNode));
+
 
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
         ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
 
-        TaskType taskType = TaskType.valueOf(taskInstance.getTaskType());
 
-        TaskNode taskNode = JSONObject.parseObject(taskInstance.getTaskJson(), TaskNode.class);
         // SQL task
         if (taskType == TaskType.SQL){
             setSQLTaskRelation(sqlTaskExecutionContext, taskNode);
@@ -169,7 +180,6 @@ public class TaskPriorityQueueConsumer extends Thread{
         if (taskType == TaskType.PROCEDURE){
             setProcedureTaskRelation(procedureTaskExecutionContext, taskNode);
         }
-
 
 
         return TaskExecutionContextBuilder.get()
@@ -269,5 +279,34 @@ public class TaskPriorityQueueConsumer extends Thread{
             return true;
         }
         return false;
+    }
+
+
+    /**
+     *  create project resource files
+     */
+    private List<String> getResourceFullNames(TaskNode taskNode){
+
+        Set<Integer> resourceIdsSet = new HashSet<>();
+        AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
+
+        if (baseParam != null) {
+            List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
+            if (projectResourceFiles != null) {
+                Stream<Integer> resourceInfotream = projectResourceFiles.stream().map(resourceInfo -> resourceInfo.getId());
+                resourceIdsSet.addAll(resourceInfotream.collect(Collectors.toSet()));
+
+            }
+        }
+
+        Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
+
+        List<Resource> resources = processService.listResourceByIds(resourceIds);
+
+        List<String> resourceFullNames = resources.stream()
+                .map(resourceInfo -> resourceInfo.getFullName())
+                .collect(Collectors.toList());
+
+        return resourceFullNames;
     }
 }
