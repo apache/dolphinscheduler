@@ -739,6 +739,7 @@ public final class Constants {
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
+    public static final String DEPENDENT_ALL = "ALL";
 
 
     /**
