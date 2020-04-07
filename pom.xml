@@ -691,25 +691,25 @@
                         <include>**/alert/utils/JSONUtilsTest.java</include>
                         <include>**/alert/utils/MailUtilsTest.java</include>
                         <include>**/alert/utils/PropertyUtilsTest.java</include>
-                        <include>**/api/controller/AccessTokenControllerTest.java</include>
-                        <include>**/api/controller/AlertGroupControllerTest.java</include>
-                        <include>**/api/controller/DataAnalysisControllerTest.java</include>
-                        <include>**/api/controller/DataSourceControllerTest.java</include>
-                        <include>**/api/controller/ExecutorControllerTest.java</include>
-                        <include>**/api/controller/LoggerControllerTest.java</include>
-                        <include>**/api/controller/LoginControllerTest.java</include>
-                        <include>**/api/controller/MonitorControllerTest.java</include>
-                        <include>**/api/controller/ProcessDefinitionControllerTest.java</include>
-                        <include>**/api/controller/ProcessInstanceControllerTest.java</include>
-                        <include>**/api/controller/ProjectControllerTest.java</include>
-                        <include>**/api/controller/QueueControllerTest.java</include>
-                        <include>**/api/controller/ResourcesControllerTest.java</include>
-                        <include>**/api/controller/SchedulerControllerTest.java</include>
-                        <include>**/api/controller/TaskInstanceControllerTest.java</include>
-                        <include>**/api/controller/TaskRecordControllerTest.java</include>
-                        <include>**/api/controller/TenantControllerTest.java</include>
-                        <include>**/api/controller/UsersControllerTest.java</include>
-                        <include>**/api/controller/WorkerGroupControllerTest.java</include>
+                        <!--<include>**/api/controller/AccessTokenControllerTest.java</include>-->
+                        <!--<include>**/api/controller/AlertGroupControllerTest.java</include>-->
+                        <!--<include>**/api/controller/DataAnalysisControllerTest.java</include>-->
+                        <!--<include>**/api/controller/DataSourceControllerTest.java</include>-->
+                        <!--<include>**/api/controller/ExecutorControllerTest.java</include>-->
+                        <!--<include>**/api/controller/LoggerControllerTest.java</include>-->
+                        <!--<include>**/api/controller/LoginControllerTest.java</include>-->
+                        <!--<include>**/api/controller/MonitorControllerTest.java</include>-->
+                        <!--<include>**/api/controller/ProcessDefinitionControllerTest.java</include>-->
+                        <!--<include>**/api/controller/ProcessInstanceControllerTest.java</include>-->
+                        <!--<include>**/api/controller/ProjectControllerTest.java</include>-->
+                        <!--<include>**/api/controller/QueueControllerTest.java</include>-->
+                        <!--<include>**/api/controller/ResourcesControllerTest.java</include>-->
+                        <!--<include>**/api/controller/SchedulerControllerTest.java</include>-->
+                        <!--<include>**/api/controller/TaskInstanceControllerTest.java</include>-->
+                        <!--<include>**/api/controller/TaskRecordControllerTest.java</include>-->
+                        <!--<include>**/api/controller/TenantControllerTest.java</include>-->
+                        <!--<include>**/api/controller/UsersControllerTest.java</include>-->
+                        <!--<include>**/api/controller/WorkerGroupControllerTest.java</include>-->
                         <include>**/api/dto/resources/filter/ResourceFilterTest.java</include>
                         <include>**/api/dto/resources/visitor/ResourceTreeVisitorTest.java</include>
                         <include>**/api/enums/testGetEnum.java</include>
@@ -783,11 +783,6 @@
                         <include>**/common/utils/StringUtilsTest.java</include>
                         <include>**/common/utils/TaskParametersUtilsTest.java</include>
                         <include>**/common/ConstantsTest.java</include>
-
-
-
-
-
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
                         <include>**/dao/mapper/AlertMapperTest.java</include>

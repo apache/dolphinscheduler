@@ -91,8 +91,7 @@ public class HadoopUtils implements Closeable {
      */
 
     private void initHdfsPath() {
-        String hdfsPath = PropertyUtils.getString(resourceUploadPath);
-        Path path = new Path(hdfsPath);
+        Path path = new Path(resourceUploadPath);
 
         try {
             if (!fs.exists(path)) {
