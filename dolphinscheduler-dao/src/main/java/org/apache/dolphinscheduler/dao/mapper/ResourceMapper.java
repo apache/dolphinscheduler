@@ -49,13 +49,15 @@ public interface ResourceMapper extends BaseMapper<Resource> {
                                      @Param("userId") int userId,
                                      @Param("type") int type);
 
+
     /**
      * resource page
      * @param page page
-     * @param userId query all if 0, then query the authed resources
+     * @param userId userId
+     * @param id id
      * @param type type
      * @param searchVal searchVal
-     * @return resource list
+     * @return resource page
      */
     IPage<Resource> queryResourcePaging(IPage<Resource> page,
                                         @Param("userId") int userId,
@@ -94,10 +96,13 @@ public interface ResourceMapper extends BaseMapper<Resource> {
      */
     <T> List<Resource> listAuthorizedResource(@Param("userId") int userId,@Param("resNames")T[] resNames);
 
+
+
     /**
      * list authorized resource
      * @param userId userId
-     * @param resIds resource ids
+     * @param resIds resIds
+     * @param <T> T
      * @return resource list
      */
     <T> List<Resource> listAuthorizedResourceById(@Param("userId") int userId,@Param("resIds")T[] resIds);
