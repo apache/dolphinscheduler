@@ -21,8 +21,6 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.process.ResourceInfo;
-import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.dolphinscheduler.common.task.TaskTimeoutParameter;
 import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
@@ -36,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /**
@@ -213,6 +210,10 @@ public class TaskExecuteThread implements Runnable {
                                   List<String> projectRes,
                                   String tenantCode,
                                   Logger logger) throws Exception {
+        if (CollectionUtils.isEmpty(projectRes)){
+            return;
+        }
+
         for (String resource : projectRes) {
             File resFile = new File(execLocalPath, resource);
             if (!resFile.exists()) {
