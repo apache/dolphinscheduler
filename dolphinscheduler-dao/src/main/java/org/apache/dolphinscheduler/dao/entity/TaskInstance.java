@@ -29,6 +29,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * task instance
@@ -46,6 +47,8 @@ public class TaskInstance implements Serializable {
      * task name
      */
     private String name;
+
+
 
     /**
      * task type
@@ -205,8 +208,12 @@ public class TaskInstance implements Serializable {
     private String executorName;
 
 
+    @TableField(exist = false)
+    private List<String> resources;
 
-    public void  init(String host,Date startTime,String executePath){
+
+
+    public void init(String host,Date startTime,String executePath){
         this.host = host;
         this.startTime = startTime;
         this.executePath = executePath;
@@ -446,6 +453,15 @@ public class TaskInstance implements Serializable {
                 || this.getState().typeIsCancel()
                 || (this.getState().typeIsFailure() && !taskCanRetry());
     }
+
+    public List<String> getResources() {
+        return resources;
+    }
+
+    public void setResources(List<String> resources) {
+        this.resources = resources;
+    }
+
     /**
      * determine if you can try again
      * @return can try result

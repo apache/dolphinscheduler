@@ -50,6 +50,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setTaskJson(taskInstance.getTaskJson());
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
         taskExecutionContext.setHost(taskInstance.getHost());
+        taskExecutionContext.setResources(taskInstance.getResources());
         return this;
     }
 

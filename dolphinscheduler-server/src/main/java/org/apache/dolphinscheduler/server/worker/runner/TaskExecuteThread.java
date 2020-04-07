@@ -83,11 +83,9 @@ public class TaskExecuteThread implements Runnable {
             // task node
             TaskNode taskNode = JSONObject.parseObject(taskExecutionContext.getTaskJson(), TaskNode.class);
 
-            // get resource files
-            List<String> resourceFiles = createProjectResFiles(taskNode);
             // copy hdfs/minio file to local
             downloadResource(taskExecutionContext.getExecutePath(),
-                    resourceFiles,
+                    taskExecutionContext.getResources(),
                     taskExecutionContext.getTenantCode(),
                     logger);
 
