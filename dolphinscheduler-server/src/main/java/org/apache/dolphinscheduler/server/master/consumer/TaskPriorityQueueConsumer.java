@@ -159,6 +159,7 @@ public class TaskPriorityQueueConsumer extends Thread{
         SQLTaskExecutionContext sqlTaskExecutionContext = new SQLTaskExecutionContext();
         DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
         ProcedureTaskExecutionContext procedureTaskExecutionContext = new ProcedureTaskExecutionContext();
+        SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();
 
 
         // SQL task
@@ -176,6 +177,10 @@ public class TaskPriorityQueueConsumer extends Thread{
         // procedure task
         if (taskType == TaskType.PROCEDURE){
             setProcedureTaskRelation(procedureTaskExecutionContext, taskNode);
+        }
+
+        if (taskType == TaskType.SQOOP){
+            setSqoopTaskRelation(sqoopTaskExecutionContext,taskNode);
         }
 
 
@@ -220,6 +225,28 @@ public class TaskPriorityQueueConsumer extends Thread{
         dataxTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
         dataxTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
         dataxTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
+    }
+
+
+    /**
+     * set datax task relation
+     * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
+     * @param taskNode taskNode
+     */
+    private void setSqoopTaskRelation(SqoopTaskExecutionContext sqoopTaskExecutionContext, TaskNode taskNode) {
+        DataxParameters dataxParameters = JSONObject.parseObject(taskNode.getParams(), DataxParameters.class);
+
+        DataSource dataSource = processService.findDataSourceById(dataxParameters.getDataSource());
+        DataSource dataTarget = processService.findDataSourceById(dataxParameters.getDataTarget());
+
+
+        sqoopTaskExecutionContext.setDataSourceId(dataxParameters.getDataSource());
+        sqoopTaskExecutionContext.setSourcetype(dataSource.getType().getCode());
+        sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());
+
+        sqoopTaskExecutionContext.setDataTargetId(dataxParameters.getDataTarget());
+        sqoopTaskExecutionContext.setTargetType(dataTarget.getType().getCode());
+        sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());
     }
 
     /**
