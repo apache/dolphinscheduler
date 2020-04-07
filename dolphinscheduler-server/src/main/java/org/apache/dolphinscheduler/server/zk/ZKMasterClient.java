@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.ZKNodeType;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
@@ -72,7 +73,7 @@ public class ZKMasterClient extends AbstractZKClient {
 			this.initSystemZNode();
 
 			// check if fault tolerance is required?failure and tolerance
-			if (getActiveMasterNum() == 1) {
+			if (getActiveMasterNum() == 1 && checkZKNodeExists(OSUtils.getHost(), ZKNodeType.MASTER)) {
 				failoverWorker(null, true);
 				failoverMaster(null);
 			}
