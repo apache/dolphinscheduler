@@ -191,6 +191,7 @@ public class TaskPriorityQueueConsumer extends Thread{
                 .buildSQLTaskRelatedInfo(sqlTaskExecutionContext)
                 .buildDataxTaskRelatedInfo(dataxTaskExecutionContext)
                 .buildProcedureTaskRelatedInfo(procedureTaskExecutionContext)
+                .buildSqoopTaskRelatedInfo(sqoopTaskExecutionContext)
                 .create();
     }
 
