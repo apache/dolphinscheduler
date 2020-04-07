@@ -203,26 +203,6 @@ public class TaskExecuteThread implements Runnable {
 
 
     /**
-     *  create project resource files
-     */
-    private List<String> createProjectResFiles(TaskNode taskNode) throws Exception{
-
-        Set<String> projectFiles = new HashSet<>();
-        AbstractParameters baseParam = TaskParametersUtils.getParameters(taskNode.getType(), taskNode.getParams());
-
-        if (baseParam != null) {
-            List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
-            if (projectResourceFiles != null) {
-                Stream<String> resourceInfotream = projectResourceFiles.stream().map(resourceInfo -> resourceInfo.getRes());
-                projectFiles.addAll(resourceInfotream.collect(Collectors.toList()));
-
-            }
-        }
-
-        return new ArrayList<>(projectFiles);
-    }
-
-    /**
      * download resource file
      *
      * @param execLocalPath

@@ -378,7 +378,7 @@ public class TaskInstance implements Serializable {
 
 
     public boolean isSubProcess(){
-        return TaskType.SUB_PROCESS.getDescp().equals(this.taskType);
+        return TaskType.SUB_PROCESS.equals(TaskType.valueOf(this.taskType));
     }
 
     public String getDependency(){
