@@ -28,10 +28,7 @@ import org.apache.dolphinscheduler.common.task.datax.DataxParameters;
 import org.apache.dolphinscheduler.common.task.procedure.ProcedureParameters;
 import org.apache.dolphinscheduler.common.task.sql.SqlParameters;
 import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.EnumUtils;
-import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
-import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.server.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.entity.*;
@@ -297,6 +294,10 @@ public class TaskPriorityQueueConsumer extends Thread{
                 resourceIdsSet.addAll(resourceInfotream.collect(Collectors.toSet()));
 
             }
+        }
+
+        if (CollectionUtils.isEmpty(resourceIdsSet)){
+            return null;
         }
 
         Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
