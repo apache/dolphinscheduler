@@ -188,6 +188,11 @@ public class TaskExecutionContext implements Serializable{
     private DependenceTaskExecutionContext dependenceTaskExecutionContext;
 
     /**
+     * sqoop TaskExecutionContext
+     */
+    private SqoopTaskExecutionContext sqoopTaskExecutionContext;
+
+    /**
      *  procedure TaskExecutionContext
      */
     private ProcedureTaskExecutionContext procedureTaskExecutionContext;
@@ -446,6 +451,14 @@ public class TaskExecutionContext implements Serializable{
         this.resources = resources;
     }
 
+    public SqoopTaskExecutionContext getSqoopTaskExecutionContext() {
+        return sqoopTaskExecutionContext;
+    }
+
+    public void setSqoopTaskExecutionContext(SqoopTaskExecutionContext sqoopTaskExecutionContext) {
+        this.sqoopTaskExecutionContext = sqoopTaskExecutionContext;
+    }
+
     @Override
     public String toString() {
         return "TaskExecutionContext{" +
@@ -479,6 +492,7 @@ public class TaskExecutionContext implements Serializable{
                 ", sqlTaskExecutionContext=" + sqlTaskExecutionContext +
                 ", dataxTaskExecutionContext=" + dataxTaskExecutionContext +
                 ", dependenceTaskExecutionContext=" + dependenceTaskExecutionContext +
+                ", sqoopTaskExecutionContext=" + sqoopTaskExecutionContext +
                 ", procedureTaskExecutionContext=" + procedureTaskExecutionContext +
                 '}';
     }
