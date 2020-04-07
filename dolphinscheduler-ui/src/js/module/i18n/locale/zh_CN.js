@@ -115,7 +115,7 @@ export default {
   'SQL Type': 'sql类型',
   'Title': '主题',
   'Please enter the title of email': '请输入邮件主题',
-  'Table': '表格',
+  'Table': '表名',
   'Attachment': '附件',
   'SQL Parameter': 'sql参数',
   'SQL Statement': 'sql语句',
