@@ -435,18 +435,19 @@ public class ExecutorService extends BaseService{
 
     /**
      * create command
-     *
-     * @param commandType
-     * @param processDefineId
-     * @param nodeDep
-     * @param failureStrategy
-     * @param startNodeList
-     * @param schedule
-     * @param warningType
-     * @param excutorId
-     * @param warningGroupId
-     * @param runMode
-     * @return
+     * @param commandType commandType
+     * @param processDefineId processDefineId
+     * @param nodeDep nodeDep
+     * @param failureStrategy failureStrategy
+     * @param startNodeList startNodeList
+     * @param schedule schedule
+     * @param warningType warningType
+     * @param executorId executorId
+     * @param warningGroupId warningGroupId
+     * @param runMode runMode
+     * @param processInstancePriority processInstancePriority
+     * @param workerGroup workerGroup
+     * @return command id
      * @throws ParseException
      */
     private int createCommand(CommandType commandType, int processDefineId,
