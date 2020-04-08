@@ -80,7 +80,7 @@ Welcome to participate in contributing, please refer to the process of submittin
 ### How to Build
 
 ```bash
-mvn clean install -Prelease
+./mvnw clean install -Prelease
 ```
 
 Artifact:
