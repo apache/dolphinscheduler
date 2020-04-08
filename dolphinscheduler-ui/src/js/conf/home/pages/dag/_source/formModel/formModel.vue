@@ -333,10 +333,7 @@
         // Task priority
         taskInstancePriority: 'MEDIUM',
         // worker group id
-<<<<<<< HEAD
-        workerGroup: 'default'
-=======
-        workerGroupId: -1,
+        workerGroup: 'default',
         stateList:[
           {
             value: 'success',
@@ -347,7 +344,6 @@
             label: `${i18n.$t('failed')}`
           }
         ]
->>>>>>> remotes/upstream/dev
       }
     },
     /**
@@ -459,13 +455,9 @@
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-<<<<<<< HEAD
-            workerGroup: this.workerGroup
-=======
-            workerGroupId: this.workerGroupId,
+            workerGroup: this.workerGroup,
             status: this.status,
             branch: this.branch
->>>>>>> remotes/upstream/dev
           },
           fromThis: this
         })
@@ -527,13 +519,9 @@
             retryInterval: this.retryInterval,
             timeout: this.timeout,
             taskInstancePriority: this.taskInstancePriority,
-<<<<<<< HEAD
-            workerGroup: this.workerGroup
-=======
-            workerGroupId: this.workerGroupId,
+            workerGroup: this.workerGroup,
             status: this.status,
             branch: this.branch
->>>>>>> remotes/upstream/dev
           },
           fromThis: this
         })
@@ -675,13 +663,9 @@
           retryInterval: this.retryInterval,
           timeout: this.timeout,
           taskInstancePriority: this.taskInstancePriority,
-<<<<<<< HEAD
-          workerGroup: this.workerGroup
-=======
-          workerGroupId: this.workerGroupId,
+          workerGroup: this.workerGroup,
           successBranch: this.successBranch,
           failedBranch: this.failedBranch
->>>>>>> remotes/upstream/dev
         }
       }
     },
