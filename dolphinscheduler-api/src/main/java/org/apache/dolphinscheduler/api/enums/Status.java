@@ -250,6 +250,16 @@ public enum Status {
     QUEUE_COUNT_ERROR(90001,"queue count error", "查询队列数据错误"),
 
     KERBEROS_STARTUP_STATE(100001,"get kerberos startup state error", "获取kerberos启动状态错误"),
+
+
+    //----------  Create by ZhangLong :   2020年04月08日15:59:14     ------------------
+    CALENDAR_NAME_EXIST(60100, "calendar name already exists", "日历名称已存在"),
+    CALENDAR_NOT_EXIST(60101, "calendar {0} not exists", "日历[{0}]不存在"),
+
+
+
+    //----------- Create by ZhangLong :   2020年04月08日15:59:14    -----------------
+
     ;
 
     private final int code;
