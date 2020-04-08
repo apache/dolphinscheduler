@@ -76,7 +76,7 @@ public class SchedulerController extends BaseController {
     @ApiOperation(value = "createSchedule", notes= "CREATE_SCHEDULE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "String", example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"),
             @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type ="WarningType"),
             @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type ="FailureStrategy"),
@@ -132,7 +132,7 @@ public class SchedulerController extends BaseController {
     @ApiOperation(value = "updateSchedule", notes= "UPDATE_SCHEDULE_NOTES")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", value = "SCHEDULE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "schedule", value = "SCHEDULE", dataType = "String", example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}"),
             @ApiImplicitParam(name = "warningType", value = "WARNING_TYPE", type ="WarningType"),
             @ApiImplicitParam(name = "warningGroupId", value = "WARNING_GROUP_ID", dataType = "Int", example = "100"),
             @ApiImplicitParam(name = "failureStrategy", value = "FAILURE_STRATEGY", type ="FailureStrategy"),
