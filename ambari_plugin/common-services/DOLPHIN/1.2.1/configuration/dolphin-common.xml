@@ -187,7 +187,7 @@
     </property>
     <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://mycluster:8020</value>
+        <value>hdfs://127.0.0.1:8020</value>
         <description>
             HA or single namenode,
             If namenode ha needs to copy core-site.xml and hdfs-site.xml to the conf directory，

@@ -52,7 +52,7 @@ res.upload.startup.type=NONE
 # HDFS
 #============================================================================
 # Users who have permission to create directories under the HDFS root path
-hdfs.root.user=hdfs
+hdfs.root.user=sysadmin
 # data base dir, resource file will store to this hadoop hdfs path, self configuration, please make sure the directory exists on hdfs and have read write permissions。"/dolphinscheduler" is recommended
 data.store2hdfs.basepath=/dolphinscheduler
 # whether kerberos starts
@@ -69,7 +69,7 @@ login.user.keytab.path=/opt/hdfs.headless.keytab
 #============================================================================
 # ha or single namenode,If namenode ha needs to copy core-site.xml and hdfs-site.xml
 # to the conf directory，support s3，for example : s3a://dolphinscheduler
-fs.defaultFS=hdfs://mycluster:8020
+fs.defaultFS=hdfs://127.0.0.1:8020
 # s3 need，s3 endpoint
 fs.s3a.endpoint=http://192.168.199.91:9010
 # s3 need，s3 access key

@@ -217,10 +217,12 @@ public class TaskScheduleThread implements Runnable {
     private String getTaskLogPath() {
         String logPath;
         try{
-            String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
-                    .getLogger("ROOT")
-                    .getAppender("TASKLOGFILE"))
-                    .getDiscriminator()).getLogBase();
+//            String baseLog = ((TaskLogDiscriminator) ((SiftingAppender) ((LoggerContext) LoggerFactory.getILoggerFactory())
+//                    .getLogger("ROOT")
+//                    .getAppender("TASKLOGFILE"))
+//                    .getDiscriminator()).getLogBase();
+
+            String baseLog = "logs";
             if (baseLog.startsWith(Constants.SINGLE_SLASH)){
                 logPath =  baseLog + Constants.SINGLE_SLASH +
                         taskInstance.getProcessDefinitionId() + Constants.SINGLE_SLASH  +

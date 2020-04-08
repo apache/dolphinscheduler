@@ -274,6 +274,9 @@ public class ProcessDefinitionService extends BaseDAGService {
             result.put(Constants.DATA_LIST, processDefinition);
             putMsg(result, Status.SUCCESS);
         }
+
+        System.out.println("out data  :" + processDefinition.getProcessDefinitionJson());
+
         return result;
     }
 

@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,4 +41,11 @@ public class SecurityConfigTest {
         Authenticator authenticator = securityConfig.authenticator();
         Assert.assertNotNull(authenticator);
     }
+
+    @Test
+    public void testMD5() {
+        String pwd  =  EncryptionUtils.getMd5("hdfs");
+        System.out.println(pwd);
+    }
+
 }

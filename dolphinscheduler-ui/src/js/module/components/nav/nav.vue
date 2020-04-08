@@ -402,7 +402,7 @@
         width: 180px;
         height: 46px;
         display: block;
-        background: url("./logo.svg") no-repeat;
+        background: url("./logo.png") no-repeat;
       }
     }
     .nav-box {
