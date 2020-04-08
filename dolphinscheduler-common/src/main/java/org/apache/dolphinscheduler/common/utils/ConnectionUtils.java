@@ -16,86 +16,35 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import java.util.Arrays;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-
 public class ConnectionUtils {
 
-	public static final Logger logger = LoggerFactory.getLogger(ConnectionUtils.class);
+  public static final Logger logger = LoggerFactory.getLogger(ConnectionUtils.class);
 
-	private static ConnectionUtils instance;
+  private ConnectionUtils() {
+    throw new IllegalStateException("ConnectionUtils class");
+  }
 
-	ConnectionUtils() {
-	}
+  /**
+   * release resource
+   * @param resources resources
+   */
+  public static void releaseResource(AutoCloseable... resources) {
 
-	public static ConnectionUtils getInstance() {
-		if (null == instance) {
-			syncInit();
-		}
-		return instance;
-	}
-
-	private static synchronized void syncInit() {
-		if (instance == null) {
-			instance = new ConnectionUtils();
-		}
-	}
-
-	public void release(ResultSet rs, Statement stmt, Connection conn) {
-		try {
-			if (rs != null) {
-				rs.close();
-				rs = null;
-			}
-		} catch (SQLException e) {
-			logger.error(e.getMessage(),e);
-		} finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-					stmt = null;
-				}
-			} catch (SQLException e) {
-				logger.error(e.getMessage(),e);
-			} finally {
-				try {
-					if (conn != null) {
-						conn.close();
-						conn = null;
-					}
-				} catch (SQLException e) {
-					logger.error(e.getMessage(),e);
-				}
-			}
-		}
-	}
-
-	public static void releaseResource(ResultSet rs, PreparedStatement ps, Connection conn) {
-		ConnectionUtils.getInstance().release(rs,ps,conn);
-		if (null != rs) {
-			try {
-				rs.close();
-			} catch (SQLException e) {
-				logger.error(e.getMessage(),e);
-			}
-		}
-
-		if (null != ps) {
-			try {
-				ps.close();
-			} catch (SQLException e) {
-				logger.error(e.getMessage(),e);
-			}
-		}
-
-		if (null != conn) {
-			try {
-				conn.close();
-			} catch (SQLException e) {
-				logger.error(e.getMessage(),e);
-			}
-		}
-	}
+    if (resources == null || resources.length == 0) {
+      return;
+    }
+    Arrays.stream(resources).filter(Objects::nonNull)
+        .forEach(resource -> {
+          try {
+            resource.close();
+          } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+          }
+        });
+  }
 }

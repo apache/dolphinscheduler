@@ -30,22 +30,23 @@ public class CreateWorkflowPage extends PageCommon {
     /**
      * jump create workflow page
      */
-    public boolean createWorkflow() throws InterruptedException {
-        System.out.println("Click on the project name to jump to the project homepage");
+
+    public boolean jumpWorkflowPage() throws InterruptedException {
         // click project name
         clickElement(CreateWorkflowLocator.CLICK_PROJECT_NAME);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+        Thread.sleep(TestConstant.ONE_THOUSAND);
 
-
-        System.out.println("Click on workflow define");
+        System.out.println("Click on workflow define to jump to workflow define page");
         // click workflow define
         clickElement(CreateWorkflowLocator.CLICK_WORKFLOW_DEFINE);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
+        return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);
+    }
+
+    public boolean createWorkflow() throws InterruptedException {
         System.out.println("Click create workflow button");
         // click create workflow button
         clickElement(CreateWorkflowLocator.CLICK_CREATE_WORKFLOW_BUTTON);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         System.out.println("drag shell task");
         //drag shell_task
@@ -98,8 +99,7 @@ public class CreateWorkflowPage extends PageCommon {
 
         //click codeMirror and input script
         inputCodeMirror(CreateWorkflowLocator.CLICK_CODE_MIRROR, CreateWorkflowLocator.INPUT_SCRIPT, CreateWorkflowData.SHELL_SCRIPT);
-        scrollToElementBottom();
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+        scrollToElementBottom(CreateWorkflowLocator.SCROLL_BOTTOM);
 
         //click custom parameters
         clickElement(CreateWorkflowLocator.CLICK_CUSTOM_PARAMETERS);
@@ -113,8 +113,7 @@ public class CreateWorkflowPage extends PageCommon {
         //click add custom parameters
         clickElement(CreateWorkflowLocator.CLICK_ADD_CUSTOM_PARAMETERS);
 
-        scrollToElementBottom();
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+        scrollToElementBottom(CreateWorkflowLocator.SCROLL_BOTTOM);
 
         //input add custom parameters
         sendInput(CreateWorkflowLocator.INPUT_ADD_CUSTOM_PARAMETERS, CreateWorkflowData.INPUT_ADD_CUSTOM_PARAMETERS);
@@ -124,16 +123,15 @@ public class CreateWorkflowPage extends PageCommon {
 
         //click delete custom parameters
         clickElement(CreateWorkflowLocator.CLICK_DELETE_CUSTOM_PARAMETERS);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
 
         //click submit button
         clickElement(CreateWorkflowLocator.CLICK_SUBMIT_BUTTON);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+        Thread.sleep(TestConstant.ONE_THOUSAND);
         System.out.println("Task node set up successfully");
         System.out.println("move to Dag Element ");
         moveToDragElement(CreateWorkflowLocator.MOUSE_MOVE_SHELL_AT_DAG,-300,-100);
 
-        return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);
+        return ifTitleContains(CreateWorkflowData.CREATE_WORKFLOW_TITLE);
     }
 
     /**
@@ -182,11 +180,22 @@ public class CreateWorkflowPage extends PageCommon {
 
         //delete workflow  global parameters value
         clickElement(CreateWorkflowLocator.CLICK_DELETE_WORKFLOW_GLOBAL_PARAMETERS);
-        Thread.sleep(TestConstant.ONE_THOUSANG);
+        Thread.sleep(TestConstant.ONE_THOUSAND);
 
         //click add button
-        clickElement(CreateWorkflowLocator.CLICK_ADD_BUTTON);
+        clickButton(CreateWorkflowLocator.CLICK_ADD_BUTTON);
         System.out.println("submit workflow");
+        return ifTitleContains(CreateWorkflowData.CREATE_WORKFLOW_TITLE);
+    }
+
+    public boolean deleteWorkflow() throws InterruptedException {
+        //click  delete project
+        clickButton(CreateWorkflowLocator.DELETE_WORKFLOW_BOTTOM);
+
+        //click confirm delete project
+        clickButton(CreateWorkflowLocator.CONFIRM_DELETE_WORKFLOW_BOTTOM);
+
+        // Whether to enter the specified page after submit
         return ifTitleContains(CreateWorkflowData.WORKFLOW_TITLE);
     }
 }

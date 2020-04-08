@@ -430,7 +430,7 @@
        * return params
        */
       _onParams (o) {
-        this.params = Object.assign(this.params, {}, o)
+        this.params = Object.assign({}, o)
       },
 
       _onCacheParams (o) {
@@ -470,7 +470,7 @@
           this.$message.warning(`${i18n.$t('Please enter name (required)')}`)
           return false
         }
-        if (this.successBranch !='' && this.successBranch == this.failedBranch) {
+        if (this.successBranch !='' && this.successBranch !=null && this.successBranch == this.failedBranch) {
           this.$message.warning(`${i18n.$t('Cannot select the same node for successful branch flow and failed branch flow')}`)
           return false
         }
