@@ -138,6 +138,7 @@ public class ResourceMapperTest {
         resourcesUser.setUpdateTime(new Date());
         resourcesUser.setUserId(user.getId());
         resourcesUser.setResourcesId(resource.getId());
+        resourcesUser.setPerm(7);
         resourceUserMapper.insert(resourcesUser);
         return resourcesUser;
     }
@@ -359,5 +360,21 @@ public class ResourceMapperTest {
         resourceList.add(resource1.getId());
         int result = resourceMapper.deleteIds(resourceList.toArray(new Integer[resourceList.size()]));
         Assert.assertEquals(result,2);
+    }
+
+    @Test
+    public void queryResourceListAuthored(){
+        // create a general user
+        User generalUser1 = createGeneralUser("user1");
+        User generalUser2 = createGeneralUser("user2");
+        // create resource
+        Resource resource = createResource(generalUser1);
+        createResourcesUser(resource, generalUser2);
+
+        List<Resource> resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal(), 0);
+        Assert.assertNotNull(resourceList);
+
+        resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal(), 4);
+        Assert.assertFalse(resourceList.contains(resource));
     }
 }

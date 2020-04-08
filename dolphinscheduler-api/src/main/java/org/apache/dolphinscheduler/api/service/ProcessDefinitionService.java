@@ -143,6 +143,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setTimeout(processData.getTimeout());
         processDefine.setTenantId(processData.getTenantId());
         processDefine.setModifyBy(loginUser.getUserName());
+        processDefine.setResourceIds(getResourceIds(processData));
 
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
@@ -333,6 +334,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setTimeout(processData.getTimeout());
         processDefine.setTenantId(processData.getTenantId());
         processDefine.setModifyBy(loginUser.getUserName());
+        processDefine.setResourceIds(getResourceIds(processData));
 
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();

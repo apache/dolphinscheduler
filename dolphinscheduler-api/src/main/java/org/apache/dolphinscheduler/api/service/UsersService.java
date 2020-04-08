@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * user service
@@ -71,6 +73,9 @@ public class UsersService extends BaseService {
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
 
 
     /**
@@ -483,44 +488,69 @@ public class UsersService extends BaseService {
             return result;
         }
 
+        String[] resourceFullIdArr = resourceIds.split(",");
+        // need authorize resource id set
+        Set<Integer> needAuthorizeResIds = new HashSet();
+        for (String resourceFullId : resourceFullIdArr) {
+            String[] resourceIdArr = resourceFullId.split("-");
+            for (int i=0;i<=resourceIdArr.length-1;i++) {
+                int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
+                needAuthorizeResIds.add(resourceIdValue);
+            }
+        }
+
+        //get the authorized resource id list by user id
+        List<Resource> oldAuthorizedRes = resourceMapper.queryAuthorizedResourceList(userId);
+        //if resource type is UDF,need check whether it is bound by UDF functon
+        Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(t -> t.getId()).collect(Collectors.toSet());
+
+        //get the unauthorized resource id list
+        oldAuthorizedResIds.removeAll(needAuthorizeResIds);
+
+        if (CollectionUtils.isNotEmpty(oldAuthorizedResIds)) {
+
+            // get all resource id of process definitions those is released
+            Map<Integer, Set<Integer>> resourceProcessMap = getResourceProcessMap();
+            Set<Integer> resourceIdSet = resourceProcessMap.keySet();
+
+            resourceIdSet.retainAll(oldAuthorizedResIds);
+            if (CollectionUtils.isNotEmpty(resourceIdSet)) {
+                logger.error("can't be deleted,because it is used of process definition");
+                for (Integer resId : resourceIdSet) {
+                    logger.error("resource id:{} is used of process definition {}",resId,resourceProcessMap.get(resId));
+                }
+                putMsg(result, Status.RESOURCE_IS_USED);
+                return result;
+            }
+
+        }
+
         resourcesUserMapper.deleteResourceUser(userId, 0);
 
         if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
             return result;
         }
 
-        String[] resourceFullIdArr = resourceIds.split(",");
-        Set<Integer> needAuthorizeResIds = new HashSet();
-        for (String resourceFullId : resourceFullIdArr) {
-            String[] resourceIdArr = resourceFullId.split("-");
-            for (int i=0;i<=resourceIdArr.length-1;i++) {
-
-                int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
-                if (!needAuthorizeResIds.contains(resourceIdValue)) {
-                    Resource resource = resourceMapper.selectById(Integer.parseInt(resourceIdArr[i]));
-                    if (resource == null) {
-                        putMsg(result, Status.RESOURCE_NOT_EXIST);
-                        return result;
-                    }
-
-                    Date now = new Date();
-                    ResourcesUser resourcesUser = new ResourcesUser();
-                    resourcesUser.setUserId(userId);
-                    resourcesUser.setResourcesId(resourceIdValue);
-                    if (i == resourceIdArr.length-1) {
-                        resourcesUser.setPerm(7);
-                    }else{
-                        resourcesUser.setPerm(4);
-                    }
-
-                    resourcesUser.setCreateTime(now);
-                    resourcesUser.setUpdateTime(now);
-                    resourcesUserMapper.insert(resourcesUser);
-                    needAuthorizeResIds.add(resourceIdValue);
-                }
-
-
+        for (int resourceIdValue : needAuthorizeResIds) {
+            Resource resource = resourceMapper.selectById(resourceIdValue);
+            if (resource == null) {
+                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                return result;
             }
+
+            Date now = new Date();
+            ResourcesUser resourcesUser = new ResourcesUser();
+            resourcesUser.setUserId(userId);
+            resourcesUser.setResourcesId(resourceIdValue);
+            if (resource.isDirectory()) {
+                resourcesUser.setPerm(Constants.AUTHORIZE_READABLE_PERM);
+            }else{
+                resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+            }
+
+            resourcesUser.setCreateTime(now);
+            resourcesUser.setUpdateTime(now);
+            resourcesUserMapper.insert(resourcesUser);
 
         }
 
@@ -830,5 +860,39 @@ public class UsersService extends BaseService {
         }
 
         return msg;
+    }
+
+    /**
+     * get resource process map key is resource id,value is the set of process definition
+     * @return resource process definition map
+     */
+    private Map<Integer,Set<Integer>> getResourceProcessMap(){
+        Map<Integer, String> map = new HashMap<>();
+        Map<Integer, Set<Integer>> result = new HashMap<>();
+        List<Map<String, Object>> list = processDefinitionMapper.listResources();
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (Map<String, Object> tempMap : list) {
+
+                map.put((Integer) tempMap.get("id"), (String)tempMap.get("resource_ids"));
+            }
+        }
+
+        for (Map.Entry<Integer, String> entry : map.entrySet()) {
+            Integer mapKey = entry.getKey();
+            String[] arr = entry.getValue().split(",");
+            Set<Integer> mapValues = Arrays.stream(arr).map(Integer::parseInt).collect(Collectors.toSet());
+            for (Integer value : mapValues) {
+                if (result.containsKey(value)) {
+                    Set<Integer> set = result.get(value);
+                    set.add(mapKey);
+                    result.put(value, set);
+                } else {
+                    Set<Integer> set = new HashSet<>();
+                    set.add(mapKey);
+                    result.put(value, set);
+                }
+            }
+        }
+        return result;
     }
 }
