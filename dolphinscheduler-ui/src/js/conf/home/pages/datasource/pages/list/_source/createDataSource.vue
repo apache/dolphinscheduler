@@ -128,6 +128,15 @@
             </x-input>
           </template>
         </m-list-box-f>
+        <m-list-box-f v-if="showConnectType">
+          <template slot="name"><strong>*</strong>{{$t('Oracle Connect Type')}}</template>
+          <template slot="content">
+            <x-radio-group v-model="connectType" size="small">
+              <x-radio :label="'ORACLE_SERVICE_NAME'">{{$t('Oracle Service Name')}}</x-radio>
+              <x-radio :label="'ORACLE_SID'">{{$t('Oracle SID')}}</x-radio>
+            </x-radio-group>
+          </template>
+        </m-list-box-f>
         <m-list-box-f>
           <template slot="name">{{$t('jdbc connect parameters')}}</template>
           <template slot="content">
@@ -152,7 +161,7 @@
 <script>
   import i18n from '@/module/i18n'
   import store from '@/conf/home/store'
-  import { isJson } from '@/module/util/util'
+  import {isJson} from '@/module/util/util'
   import mPopup from '@/module/components/popup/popup'
   import mListBoxF from '@/module/components/listBoxF/listBoxF'
 
@@ -181,12 +190,15 @@
         userName: '',
         // Database password
         password: '',
+        // Database connect type
+        connectType: '',
         // Jdbc connection parameter
         other: '',
         // btn test loading
         testLoading: false,
         showPrincipal: true,
         showdDatabase: false,
+        showConnectType: false,
         isShowPrincipal:true,
         prePortMapper:{}
       }
@@ -229,6 +241,7 @@
           principal: this.principal,
           userName: this.userName,
           password: this.password,
+          connectType: this.connectType,
           other: this.other
         }
       },
@@ -339,6 +352,7 @@
           this.database = res.database
           this.userName = res.userName
           this.password = res.password
+          this.connectType = res.connectType
           this.other = JSON.stringify(res.other) === '{}' ? '' : JSON.stringify(res.other)
         }).catch(e => {
           this.$message.error(e.msg || '')
@@ -413,6 +427,14 @@
           this.showdDatabase = true;
         } else {
           this.showdDatabase = false;
+        }
+
+        if (value== 'ORACLE') {
+          this.showConnectType = true;
+          this.connectType = 'ORACLE_SERVICE_NAME'
+        } else {
+          this.showConnectType = false;
+          this.connectType = ''
         }
 
         //Set default port for each type datasource

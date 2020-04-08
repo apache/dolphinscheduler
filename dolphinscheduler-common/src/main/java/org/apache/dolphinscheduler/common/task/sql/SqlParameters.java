@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.task.sql;
 
+import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 import org.apache.commons.lang.StringUtils;
 
@@ -189,7 +190,7 @@ public class SqlParameters extends AbstractParameters {
     }
 
     @Override
-    public List<String> getResourceFilesList() {
+    public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
     }
 

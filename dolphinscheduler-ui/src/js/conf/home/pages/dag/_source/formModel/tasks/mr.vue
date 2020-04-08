@@ -44,19 +44,9 @@
     <m-list-box>
       <div slot="text">{{$t('Main jar package')}}</div>
       <div slot="content">
-        <x-select
-                style="width: 100%;"
-                :placeholder="$t('Please enter main jar package')"
-                v-model="mainJar"
-                filterable
-                :disabled="isDetails">
-          <x-option
-                  v-for="city in mainJarList"
-                  :key="city.code"
-                  :value="city.code"
-                  :label="city.code">
-          </x-option>
-        </x-select>
+        <treeselect v-model="mainJar" :options="mainJarLists" :disable-branch-nodes="true" :normalizer="normalizer" :placeholder="$t('Please enter main jar package')">
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+        </treeselect>
       </div>
     </m-list-box>
     <m-list-box>
@@ -88,12 +78,9 @@
     <m-list-box>
       <div slot="text">{{$t('Resources')}}</div>
       <div slot="content">
-        <m-resources
-                ref="refResources"
-                @on-resourcesData="_onResourcesData"
-                @on-cache-resourcesData="_onCacheResourcesData"
-                :resource-list="resourceList">
-        </m-resources>
+        <treeselect v-model="resourceList" :multiple="true" :options="mainJarList" :normalizer="normalizer" :placeholder="$t('Please select resources')">
+          <div slot="value-label" slot-scope="{ node }">{{ node.raw.fullName }}</div>
+        </treeselect>
       </div>
     </m-list-box>
     <m-list-box>
@@ -115,6 +102,8 @@
   import mListBox from './_source/listBox'
   import mResources from './_source/resources'
   import mLocalParams from './_source/localParams'
+  import Treeselect from '@riophae/vue-treeselect'
+  import '@riophae/vue-treeselect/dist/vue-treeselect.css'
   import disabledState from '@/module/mixin/disabledState'
   export default {
     name: 'mr',
@@ -125,6 +114,7 @@
         // Master jar package
         mainJar: null,
         // Main jar package (List)
+        mainJarLists: [],
         mainJarList: [],
         // Resource(list)
         resourceList: [],
@@ -139,7 +129,12 @@
         // Program type
         programType: 'JAVA',
         // Program type(List)
-        programTypeList: [{ code: 'JAVA' }, { code: 'PYTHON' }]
+        programTypeList: [{ code: 'JAVA' }, { code: 'PYTHON' }],
+        normalizer(node) {
+          return {
+            label: node.name
+          }
+        }
       }
     },
     props: {
@@ -147,6 +142,19 @@
     },
     mixins: [disabledState],
     methods: {
+      /**
+       * getResourceId
+       */
+      marjarId(name) {
+        this.store.dispatch('dag/getResourceId',{
+          type: 'FILE',
+          fullName: '/'+name
+        }).then(res => {
+          this.mainJar = res.id
+        }).catch(e => {
+          this.$message.error(e.msg || '')
+        })
+      },
       /**
        * return localParams
        */
@@ -165,6 +173,12 @@
       _onCacheResourcesData (a) {
         this.cacheResourceList = a
       },
+      diGuiTree(item) {  // Recursive convenience tree structure
+        item.forEach(item => {
+          item.children === '' || item.children === undefined || item.children === null || item.children.length === 0?　　　　　　　　
+            delete item.children : this.diGuiTree(item.children);
+        })
+      },
       /**
        * verification
        */
@@ -179,22 +193,19 @@
           return false
         }
 
-        if (!this.$refs.refResources._verifResources()) {
-          return false
-        }
-
         // localParams Subcomponent verification
         if (!this.$refs.refLocalParams._verifProp()) {
           return false
         }
-
         // storage
         this.$emit('on-params', {
           mainClass: this.mainClass,
           mainJar: {
-            res: this.mainJar
+            id: this.mainJar
           },
-          resourceList: this.resourceList,
+          resourceList: _.map(this.resourceList, v => {
+            return {id: v}
+          }),
           localParams: this.localParams,
           mainArgs: this.mainArgs,
           others: this.others,
@@ -202,24 +213,7 @@
         })
         return true
       },
-      /**
-       * Get resource data
-       */
-      _getResourcesList () {
-        return new Promise((resolve, reject) => {
-          let isJar = (alias) => {
-            return alias.substring(alias.lastIndexOf('.') + 1, alias.length) !== 'jar'
-          }
-          this.mainJarList = _.map(_.cloneDeep(this.store.state.dag.resourcesListS), v => {
-            return {
-              id: v.id,
-              code: v.alias,
-              disabled: isJar(v.alias)
-            }
-          })
-          resolve()
-        })
-      }
+    
     },
     watch: {
       /**
@@ -240,9 +234,11 @@
         return {
           mainClass: this.mainClass,
           mainJar: {
-            res: this.mainJar
+            id: this.mainJar
           },
-          resourceList: this.cacheResourceList,
+          resourceList: _.map(this.resourceList, v => {
+            return {id: v}
+          }),
           localParams: this.localParams,
           mainArgs: this.mainArgs,
           others: this.others,
@@ -251,13 +247,24 @@
       }
     },
     created () {
-      this._getResourcesList().then(() => {
+        let item = this.store.state.dag.resourcesListS
+        let items = this.store.state.dag.resourcesListJar
+        this.diGuiTree(item)
+        this.diGuiTree(items)
+        this.mainJarList = item
+        this.mainJarLists = items
         let o = this.backfillItem
 
         // Non-null objects represent backfill
         if (!_.isEmpty(o)) {
           this.mainClass = o.params.mainClass || ''
-          this.mainJar = o.params.mainJar.res || ''
+          if(o.params.mainJar.res) {
+            this.marjarId(o.params.mainJar.res)
+          } else if(o.params.mainJar.res=='') {
+            this.mainJar = ''
+          } else {
+            this.mainJar = o.params.mainJar.id || ''
+          }
           this.mainArgs = o.params.mainArgs || ''
           this.others = o.params.others
           this.programType = o.params.programType || 'JAVA'
@@ -265,7 +272,20 @@
           // backfill resourceList
           let resourceList = o.params.resourceList || []
           if (resourceList.length) {
-            this.resourceList = resourceList
+            _.map(resourceList, v => {
+              if(v.res) {
+                this.store.dispatch('dag/getResourceId',{
+                  type: 'FILE',
+                  fullName: '/'+v.res
+                }).then(res => {
+                  this.resourceList.push(res.id)
+                }).catch(e => {
+                  this.$message.error(e.msg || '')
+                })
+              } else {
+                this.resourceList.push(v.id)
+              }
+            })
             this.cacheResourceList = resourceList
           }
 
@@ -275,12 +295,11 @@
             this.localParams = localParams
           }
         }
-      })
     },
     mounted () {
 
     },
-    components: { mLocalParams, mListBox, mResources }
+    components: { mLocalParams, mListBox, mResources, Treeselect }
   }
 </script>
 

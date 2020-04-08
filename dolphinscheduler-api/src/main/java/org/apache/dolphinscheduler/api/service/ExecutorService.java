@@ -98,7 +98,7 @@ public class ExecutorService extends BaseService{
                                                    String receivers, String receiversCc, RunMode runMode,
                                                    Priority processInstancePriority, int workerGroupId, Integer timeout) throws ParseException {
         Map<String, Object> result = new HashMap<>(5);
-        // timeout is valid
+        // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             putMsg(result,Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
@@ -453,7 +453,7 @@ public class ExecutorService extends BaseService{
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
                               int excutorId, int warningGroupId,
-                              RunMode runMode,Priority processInstancePriority, int workerGroupId) throws ParseException {
+                              RunMode runMode,Priority processInstancePriority, int workerGroupId){
 
         /**
          * instantiate command schedule instance
@@ -496,6 +496,7 @@ public class ExecutorService extends BaseService{
             }
         }
 
+        // determine whether to complement
         if(commandType == CommandType.COMPLEMENT_DATA){
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
             if(null != start && null != end && start.before(end)){
@@ -540,7 +541,7 @@ public class ExecutorService extends BaseService{
                         processDefineId, schedule);
             }
         }else{
-            command.setCommandParam(JSONUtils.toJson(cmdParam));
+
             return processService.createCommand(command);
         }
 

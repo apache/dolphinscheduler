@@ -163,6 +163,11 @@ public class ProcessDefinition {
      */
     private String modifyBy;
 
+    /**
+     * resource ids
+     */
+    private String resourceIds;
+
 
     public String getName() {
         return name;
@@ -334,6 +339,14 @@ public class ProcessDefinition {
         this.scheduleReleaseState = scheduleReleaseState;
     }
 
+    public String getResourceIds() {
+        return resourceIds;
+    }
+
+    public void setResourceIds(String resourceIds) {
+        this.resourceIds = resourceIds;
+    }
+
     public int getTimeout() {
         return timeout;
     }
@@ -393,6 +406,8 @@ public class ProcessDefinition {
                 ", timeout=" + timeout +
                 ", tenantId=" + tenantId +
                 ", modifyBy='" + modifyBy + '\'' +
+                ", resourceIds='" + resourceIds + '\'' +
                 '}';
     }
+
 }

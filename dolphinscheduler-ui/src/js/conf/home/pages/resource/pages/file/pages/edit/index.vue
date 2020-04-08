@@ -44,8 +44,8 @@
   </m-list-construction>
 </template>
 <script>
-  import _ from 'lodash'
   import i18n from '@/module/i18n'
+  import _ from 'lodash'
   import { mapActions } from 'vuex'
   import { filtTypeArr } from '../_source/common'
   import mNoType from '../details/_source/noType'
@@ -80,8 +80,8 @@
       ...mapActions('resource', ['getViewResources', 'updateContent']),
       ok () {
         if (this._validation()) {
-          this.spinnerLoading = true
-          this.updateContent({
+            this.spinnerLoading = true
+            this.updateContent({
             id: this.$route.params.id,
             content: editor.getValue()
           }).then(res => {
@@ -104,7 +104,7 @@
         return true
       },
       close () {
-        this.$router.push({ name: 'file' })
+        this.$router.go(-1)
       },
       _getViewResources () {
         this.isLoading = true
