@@ -449,24 +449,6 @@ public class ExecutorService extends BaseService{
      * @return
      * @throws ParseException
      */
-
-    /**
-     * create commonad
-     * @param commandType       command type
-     * @param processDefineId   process define id
-     * @param nodeDep           node dependency
-     * @param failureStrategy   failure strategy
-     * @param startNodeList     start node list
-     * @param schedule          schedule
-     * @param warningType       warning type
-     * @param executorId        executor id
-     * @param warningGroupId    warning group id
-     * @param runMode           run mode
-     * @param processInstancePriority   process instance priority
-     * @param workerGroup     worker group
-     * @return create command result
-     * @throws ParseException parse exception
-     */
     private int createCommand(CommandType commandType, int processDefineId,
                               TaskDependType nodeDep, FailureStrategy failureStrategy,
                               String startNodeList, String schedule, WarningType warningType,
@@ -514,6 +496,7 @@ public class ExecutorService extends BaseService{
             }
         }
 
+        // determine whether to complement
         if(commandType == CommandType.COMPLEMENT_DATA){
             runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
             if(null != start && null != end && start.before(end)){
