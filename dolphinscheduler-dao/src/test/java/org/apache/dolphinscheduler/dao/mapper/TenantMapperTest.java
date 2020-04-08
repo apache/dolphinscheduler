@@ -64,7 +64,7 @@ public class TenantMapperTest {
         tenant.setUpdateTime(new Date());
         //update
         int update = tenantMapper.updateById(tenant);
-        Assert.assertEquals(update, 1);
+        Assert.assertEquals(1, update);
         tenantMapper.deleteById(tenant.getId());
     }
 
@@ -75,7 +75,7 @@ public class TenantMapperTest {
     public void testDelete(){
         Tenant tenant = insertOne();
         int delete = tenantMapper.deleteById(tenant.getId());
-        Assert.assertEquals(delete, 1);
+        Assert.assertEquals(1, delete);
     }
 
     /**

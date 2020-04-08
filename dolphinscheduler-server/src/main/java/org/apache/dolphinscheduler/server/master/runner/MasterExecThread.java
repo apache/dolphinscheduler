@@ -674,9 +674,9 @@ public class MasterExecThread implements Runnable {
         TaskNode taskNode = dag.getNode(taskName);
         List<String> depNameList = taskNode.getDepList();
         for(String depsNode : depNameList ){
-
-            if(forbiddenTaskList.containsKey(depsNode) ||
-                    skipTaskNodeList.containsKey(depsNode)){
+            if(!dag.containsNode(depsNode)
+                    || forbiddenTaskList.containsKey(depsNode)
+                    || skipTaskNodeList.containsKey(depsNode)){
                 continue;
             }
             // dependencies must be fully completed
@@ -937,7 +937,7 @@ public class MasterExecThread implements Runnable {
         // submit start node
         submitPostNode(null);
         boolean sendTimeWarning = false;
-        while(!processInstance.IsProcessInstanceStop()){
+        while(!processInstance.isProcessInstanceStop()){
 
             // send warning email if process time out.
             if( !sendTimeWarning && checkProcessTimeOut(processInstance) ){
