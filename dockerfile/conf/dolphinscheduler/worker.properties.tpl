@@ -15,31 +15,23 @@
 # limitations under the License.
 #
 
-# server port
-server.port=12345
+# worker execute thread num
+worker.exec.threads=${WORKER_EXEC_THREADS}
 
-# session config
-server.servlet.session.timeout=7200
+# worker heartbeat interval
+worker.heartbeat.interval=${WORKER_HEARTBEAT_INTERVAL}
 
-# servlet config
-server.servlet.context-path=/dolphinscheduler/
+# submit the number of tasks at a time
+worker.fetch.task.num=${WORKER_FETCH_TASK_NUM}
 
-# file size limit for upload
-spring.servlet.multipart.max-file-size=1024MB
-spring.servlet.multipart.max-request-size=1024MB
+# only less than cpu avg load, worker server can work. default value : the number of cpu cores * 2
+worker.max.cpuload.avg=${WORKER_MAX_CPULOAD_AVG}
 
-# post content
-server.jetty.max-http-post-size=5000000
+# only larger than reserved memory, worker server can work. default value : physical memory * 1/6, unit is G.
+worker.reserved.memory=${WORKER_RESERVED_MEMORY}
 
-# i18n
-spring.messages.encoding=UTF-8
+# worker listener port
+#worker.listen.port=${WORKER_LISTEN_PORT}
 
-#i18n classpath folder , file prefix messages， if have many files, use "," seperator
-spring.messages.basename=i18n/messages
-
-# Authentication types (supported types: PASSWORD)
-security.authentication.type=PASSWORD
-
-
-
-
+# default worker group
+#worker.group=${WORKER_GROUP}
