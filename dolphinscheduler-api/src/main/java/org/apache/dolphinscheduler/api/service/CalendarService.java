@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -34,6 +35,9 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.dolphinscheduler.dao.entity.Calendar;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CalendarMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
@@ -103,7 +107,7 @@ public class CalendarService extends BaseService{
     calendar.setName(name);
     calendar.setStartTime(calendarParam.getStartTime());
     calendar.setEndTime(calendarParam.getEndTime());
-    calendar.setFlag(Flag.NO);
+    calendar.setReleaseState(ReleaseState.OFFLINE);
 
     calendar.setUserId(loginUser.getId());
     calendar.setDescription(desc);
@@ -204,7 +208,7 @@ public class CalendarService extends BaseService{
       calendar.setEndTime(calendarParam.getEndTime());
     }
 
-    calendar.setFlag(Flag.NO);
+    calendar.setReleaseState(ReleaseState.OFFLINE);
 
     calendar.setUserId(loginUser.getId());
     calendar.setDescription(desc);
@@ -320,13 +324,50 @@ public class CalendarService extends BaseService{
       return CollectionUtils.isNotEmpty(Calendars);
   }
 
+  /**
+   * release process definition: online / offline
+   *
+   * @param loginUser login user
+   * @param id process definition id
+   * @param releaseState release state
+   * @return release result code
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public Map<String, Object> releaseCalendar(User loginUser,  int id, int releaseState) {
+    HashMap<String, Object> result = new HashMap<>();
+
+    ReleaseState state = ReleaseState.getEnum(releaseState);
+
+    // check state
+    if (null == state) {
+      putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "releaseState");
+      return result;
+    }
+
+    Calendar calendar = calendarMapper.selectById(id);
+    switch (state) {
+      case ONLINE:
+        calendar.setReleaseState(state);
+        calendarMapper.updateById(calendar);
+        break;
+      case OFFLINE:
+        calendar.setReleaseState(state);
+        calendarMapper.updateById(calendar);
+        break;
+      default:
+        putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "releaseState");
+        return result;
+    }
+
+    putMsg(result, Status.SUCCESS);
+    return result;
+  }
 
   private void doDetailsInfo(Calendar calendar, CalendarParam calendarParam) {
 
 
 
   }
-
 
 
 

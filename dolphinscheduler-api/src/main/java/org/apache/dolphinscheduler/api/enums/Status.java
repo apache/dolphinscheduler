@@ -253,15 +253,16 @@ public enum Status {
 
 
     //----------  Create by ZhangLong :   2020年04月08日15:59:14     ------------------
-    CALENDAR_NAME_EXIST(60100, "calendar name already exists", "日历名称已存在"),
-    CALENDAR_NOT_EXIST(60101, "calendar {0} not exists", "日历[{0}]不存在"),
-    CREATE_CALENDAR_ERROR(60102, "create calendar error", "创建日历异常"),
-    QUERY_CALENDAR_LIST_PAGING_ERROR(60103,"query calendar  list paging error", "获取日历列表异常."),
-    QUERY_CALENDAR_LIST_ERROR(60104,"query calendar list error", "查询队列列表错误"),
+    CALENDAR_NAME_EXIST(60100, "calendar name already exists", "调度日历名称已存在"),
+    CALENDAR_NOT_EXIST(60101, "calendar {0} not exists", "调度日历[{0}]不存在"),
+    CREATE_CALENDAR_ERROR(60102, "create calendar error", "创建调度日历异常"),
+    QUERY_CALENDAR_LIST_PAGING_ERROR(60103,"query calendar  list paging error", "获取调度日历列表异常."),
+    QUERY_CALENDAR_LIST_ERROR(60104,"query calendar list error", "查询调度日历列表错误"),
 
-    UPDATE_CALENDAR_ERROR(60105,"update calendar  error", "更新日历错误"),
-    DELETE_CALENDAR_BY_ID_ERROR(60106,"delete calendar  error", "删除日历错误"),
-    VERIFY_CALENDAR_NAME_ERROR(60107,"verify calendar name error", "验证日历名称错误"),
+    UPDATE_CALENDAR_ERROR(60105,"update calendar  error", "更新调度日历错误"),
+    DELETE_CALENDAR_BY_ID_ERROR(60106,"delete calendar  error", "删除调度日历错误"),
+    VERIFY_CALENDAR_NAME_ERROR(60107,"verify calendar name error", "验证调度日历名称错误"),
+    RELEASE_CALENDAR_ERROR(60108,"release calendar error", "上线调度日历错误"),
 
     //----------- Create by ZhangLong :   2020年04月08日15:59:14    -----------------
 

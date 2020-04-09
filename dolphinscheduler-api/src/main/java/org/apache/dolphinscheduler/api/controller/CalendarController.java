@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +43,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 
@@ -236,5 +238,34 @@ public class CalendarController extends BaseController{
         }
     }
 
+
+    /**
+     * release calendar
+     *
+     * @param loginUser login user
+     * @param id calendar id
+     * @param releaseState release state
+     * @return release result code
+     */
+    @ApiOperation(value = "releaseCalendar", notes= "RELEASE_CALENDAR_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", value = "ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "releaseState", value = "CALENDAR_CONNECTS", required = true, dataType = "Int", example = "100"),
+    })
+    @PostMapping(value = "/release")
+    @ResponseStatus(HttpStatus.OK)
+    public Result releaseCalendar(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+            @RequestParam(value = "id", required = true) int id,
+            @RequestParam(value = "releaseState", required = true) int releaseState) {
+
+        try {
+
+            Map<String, Object> result = calendarService.releaseCalendar(loginUser, id, releaseState);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(Status.RELEASE_CALENDAR_ERROR.getMsg(),e);
+            return error(Status.RELEASE_CALENDAR_ERROR.getCode(), Status.RELEASE_CALENDAR_ERROR.getMsg());
+        }
+    }
 
 }
