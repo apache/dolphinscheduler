@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.dolphinscheduler.api.dto.CalendarParam;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -28,6 +29,8 @@ import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
 import org.apache.dolphinscheduler.dao.entity.Calendar;
@@ -62,8 +65,7 @@ public class CalendarService extends BaseService{
    *
    * @param loginUser
    * @param name
-   * @param startTime
-   * @param endTime
+   * @param calendarInfo
    * @param desc
    * @return
    * @throws Exception
@@ -71,13 +73,24 @@ public class CalendarService extends BaseService{
   @Transactional(rollbackFor = Exception.class)
   public Map<String,Object> createCalendar(User loginUser,
                          String name,
-                         Date startTime,
-                         Date endTime,
-                         String extTime,
+                         String calendarInfo,
                          String desc) throws Exception {
 
     Map<String, Object> result = new HashMap<>(5);
     result.put(Constants.STATUS, false);
+
+
+
+
+    CalendarParam calendarParam = JSONUtils.parseObject(calendarInfo, CalendarParam.class);
+
+
+    if (DateUtils.differSec(calendarParam.getStartTime(),calendarParam.getEndTime()) == 0) {
+      logger.warn("The start time must not be the same as the end");
+      putMsg(result,Status.SCHEDULE_START_TIME_END_TIME_SAME);
+      return result;
+    }
+
 
     if (checkCalendarExists(name)){
       putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, name);
@@ -88,8 +101,8 @@ public class CalendarService extends BaseService{
     Date now = new Date();
 
     calendar.setName(name);
-    calendar.setStartTime(startTime);
-    calendar.setEndTime(endTime);
+    calendar.setStartTime(calendarParam.getStartTime());
+    calendar.setEndTime(calendarParam.getEndTime());
     calendar.setFlag(Flag.NO);
 
     calendar.setUserId(loginUser.getId());
@@ -102,7 +115,7 @@ public class CalendarService extends BaseService{
 
 
     // todo deal detail info
-
+   doDetailsInfo(calendar,calendarParam);
 
     putMsg(result, Status.SUCCESS);
 
@@ -144,9 +157,6 @@ public class CalendarService extends BaseService{
    * @param loginUser
    * @param id
    * @param name
-   * @param startTime
-   * @param endTime
-   * @param extTime
    * @param desc
    * @return
    * @throws Exception
@@ -154,13 +164,22 @@ public class CalendarService extends BaseService{
   public Map<String, Object>  updateCalendar(User loginUser,
           int id,
           String name,
-          Date startTime,
-          Date endTime,
-          String extTime,
+          String calendarInfo,
           String desc) throws Exception {
 
     Map<String, Object> result = new HashMap<>(5);
     result.put(Constants.STATUS, false);
+
+    CalendarParam calendarParam = JSONUtils.parseObject(calendarInfo, CalendarParam.class);
+
+
+    if (DateUtils.differSec(calendarParam.getStartTime(),calendarParam.getEndTime()) == 0) {
+      logger.warn("The start time must not be the same as the end");
+      putMsg(result,Status.SCHEDULE_START_TIME_END_TIME_SAME);
+      return result;
+    }
+
+
 
     Calendar calendar = calendarMapper.selectById(id);
 
@@ -177,12 +196,12 @@ public class CalendarService extends BaseService{
       calendar.setName(name);
     }
 
-    if (null != startTime ){
-      calendar.setStartTime(startTime);
+    if (null != calendarParam.getStartTime() ){
+      calendar.setStartTime(calendarParam.getStartTime());
     }
 
-    if (null != endTime ){
-      calendar.setEndTime(endTime);
+    if (null != calendarParam.getEndTime() ){
+      calendar.setEndTime(calendarParam.getEndTime());
     }
 
     calendar.setFlag(Flag.NO);
@@ -194,6 +213,11 @@ public class CalendarService extends BaseService{
 
 
     calendarMapper.updateById(calendar);
+
+
+    doDetailsInfo(calendar,calendarParam);
+
+
 
     result.put(Constants.STATUS, Status.SUCCESS);
     result.put(Constants.MSG, Status.SUCCESS.getMsg());
@@ -295,4 +319,15 @@ public class CalendarService extends BaseService{
       List<Calendar> Calendars = calendarMapper.queryByCalendarName(name);
       return CollectionUtils.isNotEmpty(Calendars);
   }
+
+
+  private void doDetailsInfo(Calendar calendar, CalendarParam calendarParam) {
+
+
+
+  }
+
+
+
+
 }
