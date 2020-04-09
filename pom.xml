@@ -699,6 +699,7 @@
                         <include>**/api/utils/exportprocess/DataSourceParamTest.java</include>
                         <include>**/api/utils/exportprocess/DependentParamTest.java</include>
                         <include>**/api/enums/*.java</include>
+                        <include>**/api/controller/DataSourceControllerTest.java</include>
                         <include>**/api/service/AccessTokenServiceTest.java</include>
                         <include>**/api/service/QueueServiceTest.java</include>
                         <include>**/api/service/MonitorServiceTest.java</include>
@@ -739,6 +740,7 @@
                         <include>**/server/worker/task/datax/DataxTaskTest.java</include>
                         <include>**/server/worker/task/shell/ShellTaskTest.java</include>
                         <include>**/server/worker/task/sqoop/SqoopTaskTest.java</include>
+                        <include>**/server/worker/task/dependent/DependentTaskTest.java</include>
                         <include>**/server/utils/DataxUtilsTest.java</include>
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/dao/datasource/BaseDataSourceTest.java</include>
@@ -796,6 +798,8 @@
                         <exclude>**/docs/**</exclude>
                         <exclude>**/*.babelrc</exclude>
                         <exclude>**/*.eslintrc</exclude>
+                        <exclude>**/.mvn/jvm.config</exclude>
+                        <exclude>**/.mvn/wrapper/maven-wrapper.properties</exclude>
                     </excludes>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
