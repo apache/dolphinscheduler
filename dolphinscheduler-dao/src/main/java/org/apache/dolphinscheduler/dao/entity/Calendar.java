@@ -17,17 +17,15 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
-import java.util.Objects;
 
-import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 /**
- * tenant
+ * calendar
  */
 @TableName("t_yss_calendar")
 public class Calendar {
@@ -39,7 +37,7 @@ public class Calendar {
     private int id;
 
     /**
-     * tenant name
+     * calendar name
      */
     private String name;
 
@@ -56,7 +54,7 @@ public class Calendar {
     /**
      * process is valid: yes/no
      */
-    private Flag flag;
+    private ReleaseState releaseState;
 
     /**
      * description
@@ -110,12 +108,12 @@ public class Calendar {
         this.endTime = endTime;
     }
 
-    public Flag getFlag() {
-        return flag;
+    public ReleaseState getReleaseState() {
+        return releaseState;
     }
 
-    public void setFlag(Flag flag) {
-        this.flag = flag;
+    public void setReleaseState(ReleaseState flag) {
+        this.releaseState = releaseState;
     }
 
     public String getDescription() {
