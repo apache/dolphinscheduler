@@ -46,12 +46,5 @@ public class AlertDaoTest {
         List<Alert> alerts = alertDao.listWaitExecutionAlert();
         Assert.assertNotNull(alerts);
         Assert.assertNotEquals(0, alerts.size());
-        int id = alerts.get(0).getId();
-        AlertStatus alertStatus = alerts.get(0).getAlertStatus();
-        alertDao.updateAlert(AlertStatus.EXECUTION_SUCCESS, "", id);
-
-        alerts = alertDao.listWaitExecutionAlert();
-        Assert.assertEquals(0, alerts.size());
-        alertDao.getAlertMapper().deleteById(id);
     }
 }
