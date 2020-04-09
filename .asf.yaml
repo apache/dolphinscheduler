@@ -1,3 +1,21 @@
 github:
   description: "Dolphin Scheduler is a distributed and easy-to-extend visual workflow scheduling platform, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.(分布式易扩展的可视化工作流任务调度)"
+  labels:
+    - workflow-engine
+    - workflow
+    - workflow-scheduling-system
+    - etl-dependency
+    - workflow-platform
+    - distributed-schedule-system
+    - schedule
+    - cronjob-schedule
+    - job-schedule
+    - task-schedule
+    - workflow-schedule
+    - azkaban
+    - oozie
+    - airflow
+    - task-scheduler
+    - job-scheduler
+    - data processing
   homepage: https://dolphinscheduler.apache.org
