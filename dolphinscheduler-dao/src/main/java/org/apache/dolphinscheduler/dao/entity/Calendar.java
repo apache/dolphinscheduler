@@ -52,7 +52,8 @@ public class Calendar {
     private Date endTime;
 
     /**
-     * process is valid: yes/no
+     * 0 offline
+     * 1 on line
      */
     private ReleaseState releaseState;
 
