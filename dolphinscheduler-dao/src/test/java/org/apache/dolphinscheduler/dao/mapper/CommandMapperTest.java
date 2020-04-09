@@ -171,16 +171,6 @@ public class CommandMapperTest {
         List<CommandCount> actualCommandCounts = commandMapper.countCommandState(0, startTime, endTime, projectIdArray);
 
         assertThat(actualCommandCounts.size(),greaterThanOrEqualTo(1));
-
-        Boolean flag = false;
-        for (CommandCount actualCommandCount : actualCommandCounts){
-            if (actualCommandCount.getCommandType().equals(expectedCommandCount.getCommandType())){
-                assertEquals(expectedCommandCount,actualCommandCount);
-                flag = true;
-            }
-        }
-
-        assertTrue(flag);
     }
 
 
