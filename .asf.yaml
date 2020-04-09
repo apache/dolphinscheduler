@@ -3,19 +3,16 @@ github:
   labels:
     - workflow-engine
     - workflow
-    - workflow-scheduling-system
+    - workflow-system
     - etl-dependency
     - workflow-platform
     - distributed-schedule-system
     - schedule
-    - cronjob-schedule
-    - job-schedule
+    - cronjob
     - task-schedule
     - workflow-schedule
     - azkaban
     - oozie
     - airflow
-    - task-scheduler
-    - job-scheduler
     - data processing
   homepage: https://dolphinscheduler.apache.org
