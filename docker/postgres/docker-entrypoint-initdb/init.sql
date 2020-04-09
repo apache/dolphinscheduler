@@ -191,7 +191,7 @@ CREATE TABLE t_ds_alert (
   content text ,
   alert_type int DEFAULT NULL ,
   alert_status int DEFAULT '0' ,
-  log text ,
+  ·log· text ,
   alertgroup_id int DEFAULT NULL ,
   receivers text ,
   receivers_cc text ,
@@ -497,10 +497,10 @@ CREATE TABLE t_ds_resources (
   update_time timestamp DEFAULT NULL ,
   pid int,
   full_name varchar(64),
-  is_directory int
+  is_directory int,
   PRIMARY KEY (id)
 ) ;
-;
+
 
 --
 -- Table structure for table t_ds_schedules
@@ -685,9 +685,6 @@ ALTER TABLE t_ds_command ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_command_id_se
 DROP SEQUENCE IF EXISTS t_ds_datasource_id_sequence;
 CREATE SEQUENCE  t_ds_datasource_id_sequence;
 ALTER TABLE t_ds_datasource ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_datasource_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_master_server_id_sequence;
-CREATE SEQUENCE  t_ds_master_server_id_sequence;
-ALTER TABLE t_ds_master_server ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_master_server_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_process_definition_id_sequence;
 CREATE SEQUENCE  t_ds_process_definition_id_sequence;
 ALTER TABLE t_ds_process_definition ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_process_definition_id_sequence');
