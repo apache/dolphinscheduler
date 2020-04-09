@@ -37,8 +37,7 @@ fi
 sed -i ${txt} "s#spring.datasource.driver-class-name.*#spring.datasource.driver-class-name=${datasourceDriverClassname}#g" conf/datasource.properties
 sed -i ${txt} "s#spring.datasource.url.*#spring.datasource.url=jdbc:${dbtype}://${dbhost}/dolphinscheduler?characterEncoding=UTF-8#g" conf/datasource.properties
 sed -i ${txt} "s#spring.datasource.username.*#spring.datasource.username=${username}#g" conf/datasource.properties
-sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${passowrd}#g" conf/datasource.properties
-
+sed -i ${txt} "s#spring.datasource.password.*#spring.datasource.password=${password}#g" conf/datasource.properties
 
 sed -i ${txt} "s#fs.defaultFS.*#fs.defaultFS=${defaultFS}#g" conf/common.properties
 sed -i ${txt} "s#fs.s3a.endpoint.*#fs.s3a.endpoint=${s3Endpoint}#g" conf/common.properties
@@ -46,7 +45,6 @@ sed -i ${txt} "s#fs.s3a.access.key.*#fs.s3a.access.key=${s3AccessKey}#g" conf/co
 sed -i ${txt} "s#fs.s3a.secret.key.*#fs.s3a.secret.key=${s3SecretKey}#g" conf/common.properties
 sed -i ${txt} "s#yarn.resourcemanager.ha.rm.ids.*#yarn.resourcemanager.ha.rm.ids=${yarnHaIps}#g" conf/common.properties
 sed -i ${txt} "s#yarn.application.status.address.*#yarn.application.status.address=http://${singleYarnIp}:8088/ws/v1/cluster/apps/%s#g" conf/common.properties
-
 sed -i ${txt} "s#hdfs.root.user.*#hdfs.root.user=${hdfsRootUser}#g" conf/common.properties
 sed -i ${txt} "s#resource.upload.path.*#resource.upload.path=${resourceUploadPath}#g" conf/common.properties
 sed -i ${txt} "s#resource.storage.type.*#resource.storage.type=${resourceStorageType}#g" conf/common.properties
@@ -67,7 +65,6 @@ sed -i ${txt} "s#mail.passwd.*#mail.passwd=${mailPassword}#g" conf/alert.propert
 sed -i ${txt} "s#mail.smtp.starttls.enable.*#mail.smtp.starttls.enable=${starttlsEnable}#g" conf/alert.properties
 sed -i ${txt} "s#mail.smtp.ssl.trust.*#mail.smtp.ssl.trust=${sslTrust}#g" conf/alert.properties
 sed -i ${txt} "s#mail.smtp.ssl.enable.*#mail.smtp.ssl.enable=${sslEnable}#g" conf/alert.properties
-
 
 # 2.create directory
 echo "2.create directory"

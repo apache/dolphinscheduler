@@ -35,6 +35,8 @@ BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
 DOLPHINSCHEDULER_HOME=$BIN_DIR/..
 
+source /etc/profile
+
 export JAVA_HOME=$JAVA_HOME
 #export JAVA_HOME=/opt/soft/jdk
 export HOSTNAME=`hostname`
@@ -90,8 +92,8 @@ case $startStop in
 
     exec_command="$LOG_FILE $DOLPHINSCHEDULER_OPTS -classpath $DOLPHINSCHEDULER_CONF_DIR:$DOLPHINSCHEDULER_LIB_JARS $CLASS"
 
-    echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 > /dev/null &"
-    nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 > /dev/null &
+    echo "nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &"
+    nohup $JAVA_HOME/bin/java $exec_command > $log 2>&1 &
     echo $! > $pid
     ;;
 
