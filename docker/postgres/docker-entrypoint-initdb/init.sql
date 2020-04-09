@@ -283,18 +283,6 @@ CREATE TABLE t_ds_error_command (
 -- Table structure for table t_ds_master_server
 --
 
-DROP TABLE IF EXISTS t_ds_master_server;
-CREATE TABLE t_ds_master_server (
-  id int NOT NULL  ,
-  host varchar(45) DEFAULT NULL ,
-  port int DEFAULT NULL ,
-  zk_directory varchar(64) DEFAULT NULL ,
-  res_info varchar(256) DEFAULT NULL ,
-  create_time timestamp DEFAULT NULL ,
-  last_heartbeat_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
-) ;
-
 --
 -- Table structure for table t_ds_process_definition
 --
@@ -319,6 +307,8 @@ CREATE TABLE t_ds_process_definition (
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   update_time timestamp DEFAULT NULL ,
+  modify_by varchar(36) DEFAULT '' ,
+  resource_ids varchar(64)
   PRIMARY KEY (id)
 ) ;
 
@@ -359,7 +349,7 @@ CREATE TABLE t_ds_process_instance (
   history_cmd text ,
   dependence_schedule_times text ,
   process_instance_priority int DEFAULT NULL ,
-  worker_group_id int DEFAULT '-1' ,
+  worker_group varchar(64) ,
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
   PRIMARY KEY (id)
@@ -505,6 +495,9 @@ CREATE TABLE t_ds_resources (
   size bigint DEFAULT NULL ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
+  pid int,
+  full_name varchar(64),
+  is_directory int
   PRIMARY KEY (id)
 ) ;
 ;
@@ -526,7 +519,7 @@ CREATE TABLE t_ds_schedules (
   warning_type int NOT NULL ,
   warning_group_id int DEFAULT NULL ,
   process_instance_priority int DEFAULT NULL ,
-  worker_group_id int DEFAULT '-1' ,
+  worker_group varchar(64),
   create_time timestamp NOT NULL ,
   update_time timestamp NOT NULL ,
   PRIMARY KEY (id)
@@ -572,7 +565,8 @@ CREATE TABLE t_ds_task_instance (
   retry_interval int DEFAULT NULL ,
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
-  worker_group_id int DEFAULT '-1' ,
+   worker_group varchar(64),
+  executor_id int DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
