@@ -162,18 +162,6 @@ This environment variable sets the runtime environment for task. The default val
 
 User data directory path, self configuration, please make sure the directory exists and have read write permissions. The default value is `/tmp/dolphinscheduler`
 
-**`DOLPHINSCHEDULER_DATA_DOWNLOAD_BASEDIR_PATH`**
-
-Directory path for user data download. self configuration, please make sure the directory exists and have read write permissions. The default value is `/tmp/dolphinscheduler/download`
-
-**`DOLPHINSCHEDULER_PROCESS_EXEC_BASEPATH`**
-
-Process execute directory. self configuration, please make sure the directory exists and have read write permissions. The default value is `/tmp/dolphinscheduler/exec`
-
-**`TASK_QUEUE`**
-
-This environment variable sets the task queue for `master-server` and `worker-serverr`. The default value is `zookeeper`.
-
 **`ZOOKEEPER_QUORUM`**
 
 This environment variable sets zookeeper quorum for `master-server` and `worker-serverr`. The default value is `127.0.0.1:2181`.
@@ -208,6 +196,10 @@ This environment variable sets max cpu load avg for `master-server`. The default
 
 This environment variable sets reserved memory for `master-server`. The default value is `0.1`.
 
+**`MASTER_LISTEN_PORT`**
+
+This environment variable sets port for `master-server`. The default value is `5678`.
+
 **`WORKER_EXEC_THREADS`**
 
 This environment variable sets exec thread num for `worker-server`. The default value is `100`.
@@ -227,6 +219,14 @@ This environment variable sets max cpu load avg for `worker-server`. The default
 **`WORKER_RESERVED_MEMORY`**
 
 This environment variable sets reserved memory for `worker-server`. The default value is `0.1`.
+
+**`WORKER_LISTEN_PORT`**
+
+This environment variable sets port for `worker-server`. The default value is `1234`.
+
+**`WORKER_GROUP`**
+
+This environment variable sets group for `worker-server`. The default value is `default`.
 
 **`XLS_FILE_PATH`**
 
