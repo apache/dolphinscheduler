@@ -308,7 +308,7 @@ CREATE TABLE t_ds_process_definition (
   tenant_id int NOT NULL DEFAULT '-1' ,
   update_time timestamp DEFAULT NULL ,
   modify_by varchar(36) DEFAULT '' ,
-  resource_ids varchar(64)
+  resource_ids varchar(64),
   PRIMARY KEY (id)
 ) ;
 
