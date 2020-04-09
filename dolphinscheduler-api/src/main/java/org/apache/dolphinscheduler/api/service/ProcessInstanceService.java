@@ -150,6 +150,7 @@ public class ProcessInstanceService extends BaseDAGService {
      * @param host host
      * @param startDate start time
      * @param endDate end time
+     * @param executorName executor name
      * @return process instance list
      */
     public Map<String, Object> queryProcessInstanceList(User loginUser, String projectName, Integer processDefineId,

@@ -75,7 +75,7 @@ public class DependentParam implements ProcessAddTaskParam, InitializingBean {
     /**
      * import process add dependent param
      * @param taskNode task node json object
-     * @return
+     * @return return json obj
      */
     @Override
     public JSONObject addImportSpecialParam(JSONObject taskNode) {

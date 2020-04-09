@@ -471,6 +471,7 @@ public class DataSourceService extends BaseService{
      * @param password password
      * @param other other parameters
      * @param principal principal
+     * @param connectType connect type
      * @return datasource parameter
      */
     public String buildParameter(String name, String desc, DbType type, String host,

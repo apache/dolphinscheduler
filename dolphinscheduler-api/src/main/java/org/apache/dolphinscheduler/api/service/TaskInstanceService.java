@@ -71,6 +71,7 @@ public class TaskInstanceService extends BaseService {
      * @param processInstanceId process instance id
      * @param searchVal search value
      * @param taskName task name
+     * @param executorName excutor name
      * @param stateType state type
      * @param host host
      * @param startDate start time

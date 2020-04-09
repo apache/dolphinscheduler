@@ -402,6 +402,7 @@ public class ResourcesService extends BaseService {
      * query resources list paging
      *
      * @param loginUser login user
+     * @param direcotryId direcotry id
      * @param type resource type
      * @param searchVal search value
      * @param pageNo page number
@@ -798,7 +799,9 @@ public class ResourcesService extends BaseService {
      * @param fileName file name
      * @param fileSuffix file suffix
      * @param desc description
+     * @param pid pid
      * @param content content
+     * @param currentDirectory current directory
      * @return create result code
      */
     @Transactional(rollbackFor = Exception.class)
