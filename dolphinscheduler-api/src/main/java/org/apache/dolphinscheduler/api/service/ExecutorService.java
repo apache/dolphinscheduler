@@ -96,7 +96,7 @@ public class ExecutorService extends BaseService{
                                                    FailureStrategy failureStrategy, String startNodeList,
                                                    TaskDependType taskDependType, WarningType warningType, int warningGroupId,
                                                    String receivers, String receiversCc, RunMode runMode,
-                                                   Priority processInstancePriority, int workerGroupId, Integer timeout) throws ParseException {
+                                                   Priority processInstancePriority, int workerGroupId, Integer timeout) {
         Map<String, Object> result = new HashMap<>(5);
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {

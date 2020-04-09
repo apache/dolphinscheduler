@@ -16,6 +16,10 @@
  */
 package org.apache.dolphinscheduler.api.utils;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+
+import java.text.MessageFormat;
+
 /**
  * result
  *
@@ -37,11 +41,41 @@ public class Result<T> {
      */
     private T data;
 
-    public Result(){}
+    public Result() {
+    }
 
-    public Result(Integer code , String msg){
+    public Result(Integer code, String msg) {
         this.code = code;
         this.msg = msg;
+    }
+
+    private Result(T data) {
+        this.data = data;
+    }
+
+    private Result(Status status) {
+        if (status != null) {
+            this.code = status.getCode();
+            this.msg = status.getMsg();
+        }
+    }
+
+    /**
+     * Call this function if there is success
+     */
+    public static <T> Result<T> success(T data) {
+        return new Result<T>(data);
+    }
+
+    /**
+     * Call this function if there is any error
+     */
+    public static Result error(Status status) {
+        return new Result(status);
+    }
+
+    public static Result errorWithArgs(Status status, Object... args) {
+        return new Result(status.getCode(), MessageFormat.format(status.getMsg(), args));
     }
 
     public Integer getCode() {

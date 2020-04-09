@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ControllerException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -39,6 +40,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import java.util.Map;
 
 import static org.apache.dolphinscheduler.api.enums.Status.*;
+
 /**
  * data source controller
  */
@@ -54,34 +56,36 @@ public class DataSourceController extends BaseController {
 
     /**
      * create data source
+     *
      * @param loginUser login user
-     * @param name data source name
-     * @param note  data source description
-     * @param type data source type
-     * @param host host
-     * @param port port
-     * @param database data base
+     * @param name      data source name
+     * @param note      data source description
+     * @param type      data source type
+     * @param host      host
+     * @param port      port
+     * @param database  data base
      * @param principal principal
-     * @param userName user name
-     * @param password password
-     * @param other other arguments
+     * @param userName  user name
+     * @param password  password
+     * @param other     other arguments
      * @return create result code
      */
-    @ApiOperation(value = "createDataSource", notes= "CREATE_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "createDataSource", notes = "CREATE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType ="String"),
+            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "note", value = "DATA_SOURCE_NOTE", dataType = "String"),
-            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true,dataType ="DbType"),
-            @ApiImplicitParam(name = "host", value = "DATA_SOURCE_HOST",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "port", value = "DATA_SOURCE_PORT",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "database", value = "DATABASE_NAME",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "userName", value = "USER_NAME",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "password", value = "PASSWORD", dataType ="String"),
+            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType"),
+            @ApiImplicitParam(name = "host", value = "DATA_SOURCE_HOST", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "port", value = "DATA_SOURCE_PORT", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "database", value = "DATABASE_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "password", value = "PASSWORD", dataType = "String"),
             @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
-            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType ="String")
+            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String")
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
+    @ControllerException(CREATE_DATASOURCE_ERROR)
     public Result createDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("name") String name,
                                    @RequestParam(value = "note", required = false) String note,
@@ -96,15 +100,10 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "other") String other) {
         logger.info("login user {} create datasource name: {}, note: {}, type: {}, host: {}, port: {}, database : {}, principal: {}, userName : {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, host, port, database, principal, userName, connectType, other);
-        try {
-            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
-            Map<String, Object> result = dataSourceService.createDataSource(loginUser, name, note, type, parameter);
-            return returnDataList(result);
 
-        } catch (Exception e) {
-            logger.error(CREATE_DATASOURCE_ERROR.getMsg(),e);
-            return error(Status.CREATE_DATASOURCE_ERROR.getCode(), Status.CREATE_DATASOURCE_ERROR.getMsg());
-        }
+        String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
+        Map<String, Object> result = dataSourceService.createDataSource(loginUser, name, note, type, parameter);
+        return returnDataList(result);
     }
 
 
@@ -112,35 +111,36 @@ public class DataSourceController extends BaseController {
      * updateProcessInstance data source
      *
      * @param loginUser login user
-     * @param name data source name
-     * @param note description
-     * @param type data source type
-     * @param other other arguments
-     * @param id data source di
-     * @param host host
-     * @param port port
-     * @param database database
+     * @param name      data source name
+     * @param note      description
+     * @param type      data source type
+     * @param other     other arguments
+     * @param id        data source di
+     * @param host      host
+     * @param port      port
+     * @param database  database
      * @param principal principal
-     * @param userName user name
-     * @param password password
+     * @param userName  user name
+     * @param password  password
      * @return update result code
      */
-    @ApiOperation(value = "updateDataSource", notes= "UPDATE_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "updateDataSource", notes = "UPDATE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType ="Int", example = "100"),
-            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType ="String"),
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100"),
+            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "note", value = "DATA_SOURCE_NOTE", dataType = "String"),
-            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true,dataType ="DbType"),
-            @ApiImplicitParam(name = "host", value = "DATA_SOURCE_HOST",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "port", value = "DATA_SOURCE_PORT",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "database", value = "DATABASE_NAME",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "userName", value = "USER_NAME",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "password", value = "PASSWORD", dataType ="String"),
+            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType"),
+            @ApiImplicitParam(name = "host", value = "DATA_SOURCE_HOST", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "port", value = "DATA_SOURCE_PORT", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "database", value = "DATABASE_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "password", value = "PASSWORD", dataType = "String"),
             @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
-            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType ="String")
+            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String")
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
+    @ControllerException(UPDATE_DATASOURCE_ERROR)
     public Result updateDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("id") int id,
                                    @RequestParam("name") String name,
@@ -156,69 +156,54 @@ public class DataSourceController extends BaseController {
                                    @RequestParam(value = "other") String other) {
         logger.info("login user {} updateProcessInstance datasource name: {}, note: {}, type: {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, connectType, other);
-        try {
-            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database,principal, userName, password, connectType, other);
-            Map<String, Object> dataSource = dataSourceService.updateDataSource(id, loginUser, name, note, type, parameter);
-            return returnDataList(dataSource);
-        } catch (Exception e) {
-            logger.error(UPDATE_DATASOURCE_ERROR.getMsg(),e);
-            return error(UPDATE_DATASOURCE_ERROR.getCode(), UPDATE_DATASOURCE_ERROR.getMsg());
-        }
 
-
+        String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
+        Map<String, Object> dataSource = dataSourceService.updateDataSource(id, loginUser, name, note, type, parameter);
+        return returnDataList(dataSource);
     }
 
     /**
      * query data source detail
      *
      * @param loginUser login user
-     * @param id datasource id
+     * @param id        datasource id
      * @return data source detail
      */
-    @ApiOperation(value = "queryDataSource", notes= "QUERY_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "queryDataSource", notes = "QUERY_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType ="Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
 
     })
     @PostMapping(value = "/update-ui")
     @ResponseStatus(HttpStatus.OK)
+    @ControllerException(QUERY_DATASOURCE_ERROR)
     public Result queryDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("id") int id) {
         logger.info("login user {}, query datasource: {}",
                 loginUser.getUserName(), id);
-        try {
-            Map<String, Object> result  = dataSourceService.queryDataSource(id);
-            return returnDataList(result);
-        } catch (Exception e) {
-            logger.error(QUERY_DATASOURCE_ERROR.getMsg(),e);
-            return error(Status.QUERY_DATASOURCE_ERROR.getCode(), Status.QUERY_DATASOURCE_ERROR.getMsg());
-        }
 
-
+        Map<String, Object> result = dataSourceService.queryDataSource(id);
+        return returnDataList(result);
     }
 
     /**
      * query datasouce by type
      *
      * @param loginUser login user
-     * @param type data source type
+     * @param type      data source type
      * @return data source list page
      */
-    @ApiOperation(value = "queryDataSourceList", notes= "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
+    @ApiOperation(value = "queryDataSourceList", notes = "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true,dataType ="DbType")
+            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType")
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
+    @ControllerException(QUERY_DATASOURCE_ERROR)
     public Result queryDataSourceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam("type") DbType type) {
-        try {
-            Map<String, Object> result = dataSourceService.queryDataSourceList(loginUser, type.ordinal());
-            return returnDataList(result);
-        } catch (Exception e) {
-            logger.error(QUERY_DATASOURCE_ERROR.getMsg(),e);
-            return error(Status.QUERY_DATASOURCE_ERROR.getCode(), Status.QUERY_DATASOURCE_ERROR.getMsg());
-        }
+        Map<String, Object> result = dataSourceService.queryDataSourceList(loginUser, type.ordinal());
+        return returnDataList(result);
     }
 
     /**
@@ -226,67 +211,64 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return data source list page
      */
-    @ApiOperation(value = "queryDataSourceListPaging", notes= "QUERY_DATA_SOURCE_LIST_PAGING_NOTES")
+    @ApiOperation(value = "queryDataSourceListPaging", notes = "QUERY_DATA_SOURCE_LIST_PAGING_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType ="String"),
+            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
             @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType ="Int",example = "20")
+            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
+    @ControllerException(QUERY_DATASOURCE_ERROR)
     public Result queryDataSourceListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "searchVal", required = false) String searchVal,
                                             @RequestParam("pageNo") Integer pageNo,
                                             @RequestParam("pageSize") Integer pageSize) {
-        try {
-            Map<String, Object> result = checkPageParams(pageNo, pageSize);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return returnDataListPaging(result);
-            }
-            searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
+        Map<String, Object> result = checkPageParams(pageNo, pageSize);
+        if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataListPaging(result);
-        } catch (Exception e) {
-            logger.error(QUERY_DATASOURCE_ERROR.getMsg(),e);
-            return error(QUERY_DATASOURCE_ERROR.getCode(), QUERY_DATASOURCE_ERROR.getMsg());
         }
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        result = dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
+        return returnDataListPaging(result);
     }
 
     /**
      * connect datasource
      *
      * @param loginUser login user
-     * @param name data source name
-     * @param note data soruce description
-     * @param type data source type
-     * @param other other parameters
-     * @param host host
-     * @param port port
-     * @param database data base
+     * @param name      data source name
+     * @param note      data soruce description
+     * @param type      data source type
+     * @param other     other parameters
+     * @param host      host
+     * @param port      port
+     * @param database  data base
      * @param principal principal
-     * @param userName user name
-     * @param password password
+     * @param userName  user name
+     * @param password  password
      * @return connect result code
      */
-    @ApiOperation(value = "connectDataSource", notes= "CONNECT_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "connectDataSource", notes = "CONNECT_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType ="String"),
+            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType = "String"),
             @ApiImplicitParam(name = "note", value = "DATA_SOURCE_NOTE", dataType = "String"),
-            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true,dataType ="DbType"),
-            @ApiImplicitParam(name = "host", value = "DATA_SOURCE_HOST",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "port", value = "DATA_SOURCE_PORT",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "database", value = "DATABASE_NAME",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "userName", value = "USER_NAME",required = true, dataType ="String"),
-            @ApiImplicitParam(name = "password", value = "PASSWORD", dataType ="String"),
+            @ApiImplicitParam(name = "type", value = "DB_TYPE", required = true, dataType = "DbType"),
+            @ApiImplicitParam(name = "host", value = "DATA_SOURCE_HOST", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "port", value = "DATA_SOURCE_PORT", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "database", value = "DATABASE_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "userName", value = "USER_NAME", required = true, dataType = "String"),
+            @ApiImplicitParam(name = "password", value = "PASSWORD", dataType = "String"),
             @ApiImplicitParam(name = "connectType", value = "CONNECT_TYPE", dataType = "DbConnectType"),
-            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType ="String")
+            @ApiImplicitParam(name = "other", value = "DATA_SOURCE_OTHER", dataType = "String")
     })
     @PostMapping(value = "/connect")
     @ResponseStatus(HttpStatus.OK)
+    @ControllerException(CONNECT_DATASOURCE_FAILURE)
     public Result connectDataSource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("name") String name,
                                     @RequestParam(value = "note", required = false) String note,
@@ -301,134 +283,112 @@ public class DataSourceController extends BaseController {
                                     @RequestParam(value = "other") String other) {
         logger.info("login user {}, connect datasource: {} failure, note: {}, type: {}, connectType: {}, other: {}",
                 loginUser.getUserName(), name, note, type, connectType, other);
-        try {
-            String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
-            Boolean isConnection = dataSourceService.checkConnection(type, parameter);
-            Result result = new Result();
 
-            if (isConnection) {
-                putMsg(result, SUCCESS);
-            } else {
-                putMsg(result, CONNECT_DATASOURCE_FAILURE);
-            }
-            return result;
-        } catch (Exception e) {
-            logger.error(CONNECT_DATASOURCE_FAILURE.getMsg(),e);
-            return error(CONNECT_DATASOURCE_FAILURE.getCode(), CONNECT_DATASOURCE_FAILURE.getMsg());
+        String parameter = dataSourceService.buildParameter(name, note, type, host, port, database, principal, userName, password, connectType, other);
+        Boolean isConnection = dataSourceService.checkConnection(type, parameter);
+        Result result = new Result();
+
+        if (isConnection) {
+            putMsg(result, SUCCESS);
+        } else {
+            putMsg(result, CONNECT_DATASOURCE_FAILURE);
         }
+        return result;
     }
 
     /**
      * connection test
      *
      * @param loginUser login user
-     * @param id  data source id
+     * @param id        data source id
      * @return connect result code
      */
-    @ApiOperation(value = "connectionTest", notes= "CONNECT_DATA_SOURCE_TEST_NOTES")
+    @ApiOperation(value = "connectionTest", notes = "CONNECT_DATA_SOURCE_TEST_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType ="Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/connect-by-id")
     @ResponseStatus(HttpStatus.OK)
+    @ControllerException(CONNECTION_TEST_FAILURE)
     public Result connectionTest(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam("id") int id) {
         logger.info("connection test, login user:{}, id:{}", loginUser.getUserName(), id);
 
-        try {
-            Boolean isConnection = dataSourceService.connectionTest(loginUser, id);
-            Result result = new Result();
+        Boolean isConnection = dataSourceService.connectionTest(loginUser, id);
+        Result result = new Result();
 
-            if (isConnection) {
-                putMsg(result, SUCCESS);
-            } else {
-                putMsg(result, CONNECTION_TEST_FAILURE);
-            }
-            return result;
-        } catch (Exception e) {
-            logger.error(CONNECTION_TEST_FAILURE.getMsg(),e);
-            return error(CONNECTION_TEST_FAILURE.getCode(), CONNECTION_TEST_FAILURE.getMsg());
+        if (isConnection) {
+            putMsg(result, SUCCESS);
+        } else {
+            putMsg(result, CONNECTION_TEST_FAILURE);
         }
-
+        return result;
     }
 
     /**
      * delete datasource by id
      *
      * @param loginUser login user
-     * @param id datasource id
+     * @param id        datasource id
      * @return delete result
      */
-    @ApiOperation(value = "delete", notes= "DELETE_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "delete", notes = "DELETE_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType ="Int", example = "100")
+            @ApiImplicitParam(name = "id", value = "DATA_SOURCE_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
+    @ControllerException(DELETE_DATA_SOURCE_FAILURE)
     public Result delete(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                          @RequestParam("id") int id) {
-        try {
-            logger.info("delete datasource,login user:{}, id:{}", loginUser.getUserName(), id);
-            return dataSourceService.delete(loginUser, id);
-        } catch (Exception e) {
-            logger.error(DELETE_DATA_SOURCE_FAILURE.getMsg(),e);
-            return error(DELETE_DATA_SOURCE_FAILURE.getCode(), DELETE_DATA_SOURCE_FAILURE.getMsg());
-        }
+        logger.info("delete datasource,login user:{}, id:{}", loginUser.getUserName(), id);
+        return dataSourceService.delete(loginUser, id);
     }
 
     /**
      * verify datasource name
      *
      * @param loginUser login user
-     * @param name data source name
+     * @param name      data source name
      * @return true if data source name not exists.otherwise return false
      */
-    @ApiOperation(value = "verifyDataSourceName", notes= "VERIFY_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "verifyDataSourceName", notes = "VERIFY_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType ="String")
+            @ApiImplicitParam(name = "name", value = "DATA_SOURCE_NAME", required = true, dataType = "String")
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
+    @ControllerException(VERIFY_DATASOURCE_NAME_FAILURE)
     public Result verifyDataSourceName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "name") String name
     ) {
         logger.info("login user {}, verfiy datasource name: {}",
                 loginUser.getUserName(), name);
 
-        try {
-            return dataSourceService.verifyDataSourceName(loginUser, name);
-        } catch (Exception e) {
-            logger.error(VERIFY_DATASOURCE_NAME_FAILURE.getMsg(), e);
-            return error(VERIFY_DATASOURCE_NAME_FAILURE.getCode(), VERIFY_DATASOURCE_NAME_FAILURE.getMsg());
-        }
+        return dataSourceService.verifyDataSourceName(loginUser, name);
     }
-
 
 
     /**
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthed data source result code
      */
-    @ApiOperation(value = "unauthDatasource", notes= "UNAUTHORIZED_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "unauthDatasource", notes = "UNAUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType ="Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/unauth-datasource")
     @ResponseStatus(HttpStatus.OK)
+    @ControllerException(UNAUTHORIZED_DATASOURCE)
     public Result unauthDatasource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
-        try {
-            logger.info("unauthorized datasource, login user:{}, unauthorized userId:{}",
-                    loginUser.getUserName(), userId);
-            Map<String, Object> result = dataSourceService.unauthDatasource(loginUser, userId);
-            return returnDataList(result);
-        } catch (Exception e) {
-            logger.error(UNAUTHORIZED_DATASOURCE.getMsg(),e);
-            return error(UNAUTHORIZED_DATASOURCE.getCode(), UNAUTHORIZED_DATASOURCE.getMsg());
-        }
+        logger.info("unauthorized datasource, login user:{}, unauthorized userId:{}",
+                loginUser.getUserName(), userId);
+        Map<String, Object> result = dataSourceService.unauthDatasource(loginUser, userId);
+        return returnDataList(result);
     }
 
 
@@ -436,26 +396,22 @@ public class DataSourceController extends BaseController {
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
-    @ApiOperation(value = "authedDatasource", notes= "AUTHORIZED_DATA_SOURCE_NOTES")
+    @ApiOperation(value = "authedDatasource", notes = "AUTHORIZED_DATA_SOURCE_NOTES")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType ="Int", example = "100")
+            @ApiImplicitParam(name = "userId", value = "USER_ID", required = true, dataType = "Int", example = "100")
     })
     @GetMapping(value = "/authed-datasource")
     @ResponseStatus(HttpStatus.OK)
+    @ControllerException(AUTHORIZED_DATA_SOURCE)
     public Result authedDatasource(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam("userId") Integer userId) {
-        try {
-            logger.info("authorized data source, login user:{}, authorized useId:{}",
-                    loginUser.getUserName(), userId);
-            Map<String, Object> result = dataSourceService.authedDatasource(loginUser, userId);
-            return returnDataList(result);
-        } catch (Exception e) {
-            logger.error(AUTHORIZED_DATA_SOURCE.getMsg(),e);
-            return error(AUTHORIZED_DATA_SOURCE.getCode(), AUTHORIZED_DATA_SOURCE.getMsg());
-        }
+        logger.info("authorized data source, login user:{}, authorized useId:{}",
+                loginUser.getUserName(), userId);
+        Map<String, Object> result = dataSourceService.authedDatasource(loginUser, userId);
+        return returnDataList(result);
     }
 
     /**
@@ -464,17 +420,13 @@ public class DataSourceController extends BaseController {
      * @param loginUser login user
      * @return user info data
      */
-    @ApiOperation(value = "getKerberosStartupState", notes= "GET_USER_INFO_NOTES")
-    @GetMapping(value="/kerberos-startup-state")
+    @ApiOperation(value = "getKerberosStartupState", notes = "GET_USER_INFO_NOTES")
+    @GetMapping(value = "/kerberos-startup-state")
     @ResponseStatus(HttpStatus.OK)
-    public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
+    @ControllerException(KERBEROS_STARTUP_STATE)
+    public Result getKerberosStartupState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         logger.info("login user {}", loginUser.getUserName());
-        try{
-            // if upload resource is HDFS and kerberos startup is true , else false
-            return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
-        }catch (Exception e){
-            logger.error(KERBEROS_STARTUP_STATE.getMsg(),e);
-            return error(Status.KERBEROS_STARTUP_STATE.getCode(), Status.KERBEROS_STARTUP_STATE.getMsg());
-        }
+        // if upload resource is HDFS and kerberos startup is true , else false
+        return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
     }
 }
