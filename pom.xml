@@ -726,7 +726,7 @@
                         <include>**/server/master/MasterExecThreadTest.java</include>
                         <include>**/dao/mapper/AccessTokenMapperTest.java</include>
                         <include>**/dao/mapper/AlertGroupMapperTest.java</include>
-                        <include>**/dao/mapper/AlertMapperTest.java</include>
+                        <!--<include>**/dao/mapper/AlertMapperTest.java</include>-->
                         <include>**/dao/mapper/CommandMapperTest.java</include>
                         <include>**/dao/entity/TaskInstanceTest.java</include>
                         <include>**/dao/cron/CronUtilsTest.java</include>
