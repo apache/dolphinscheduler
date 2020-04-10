@@ -262,9 +262,13 @@ public class MailUtils {
         part1.setContent(partContent, Constants.TEXT_HTML_CHARSET_UTF_8);
         // set attach file
         MimeBodyPart part2 = new MimeBodyPart();
+        File file = new File(xlsFilePath + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
         // make excel file
         ExcelUtils.genExcelFile(content,title,xlsFilePath);
-        File file = new File(xlsFilePath + Constants.SINGLE_SLASH +  title + Constants.EXCEL_SUFFIX_XLS);
+
         part2.attachFile(file);
         part2.setFileName(MimeUtility.encodeText(title + Constants.EXCEL_SUFFIX_XLS,Constants.UTF_8,"B"));
         // add components to collection
