@@ -93,8 +93,8 @@ public class TaskInstanceController extends BaseController{
                                       @RequestParam("pageSize") Integer pageSize){
 
         try{
-            logger.info("query task instance list, project name:{},process instance:{}, search value:{},task name:{}, executor name: {},state type:{}, host:{}, start:{}, end:{}",
-                    projectName, processInstanceId, searchVal, taskName, executorName, stateType, host, startTime, endTime);
+            logger.info("login user {}, query task instance list, project name:{},process instance:{}, search value:{},task name:{}, executor name: {},state type:{}, host:{}, start:{}, end:{}",
+                    loginUser, projectName, processInstanceId, searchVal, taskName, executorName, stateType, host, startTime, endTime);
             searchVal = ParameterUtils.handleEscapes(searchVal);
             Map<String, Object> result = taskInstanceService.queryTaskListPaging(
                     loginUser, projectName, processInstanceId, taskName, executorName, startTime, endTime, searchVal, stateType, host, pageNo, pageSize);
