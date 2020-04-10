@@ -82,7 +82,6 @@ public class ProcessDefinitionMapperTest {
         processDefinition.setUpdateTime(new Date());
         int update = processDefinitionMapper.updateById(processDefinition);
         Assert.assertEquals(1, update);
-        processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
     /**
@@ -104,7 +103,6 @@ public class ProcessDefinitionMapperTest {
         //query
         List<ProcessDefinition> dataSources = processDefinitionMapper.selectList(null);
         Assert.assertNotEquals(dataSources.size(), 0);
-        processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
     /**
@@ -147,11 +145,6 @@ public class ProcessDefinitionMapperTest {
 
         ProcessDefinition processDefinition1 = processDefinitionMapper.queryByDefineName(project.getId(), "def 1");
         Assert.assertNotEquals(processDefinition1, null);
-        processDefinitionMapper.deleteById(processDefinition.getId());
-        queueMapper.deleteById(queue.getId());
-        projectMapper.deleteById(project.getId());
-        tenantMapper.deleteById(tenant.getId());
-        userMapper.deleteById(user.getId());
     }
 
     /**
@@ -163,7 +156,6 @@ public class ProcessDefinitionMapperTest {
         Page<ProcessDefinition> page = new Page(1,3);
         IPage<ProcessDefinition> processDefinitionIPage =  processDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010,true);
         Assert.assertNotEquals(processDefinitionIPage.getTotal(), 0);
-        processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
     /**
@@ -174,7 +166,6 @@ public class ProcessDefinitionMapperTest {
         ProcessDefinition processDefinition = insertOne();
         List<ProcessDefinition> processDefinitionIPage =  processDefinitionMapper.queryAllDefinitionList(1010);
         Assert.assertNotEquals(processDefinitionIPage.size(), 0);
-        processDefinitionMapper.deleteById(processDefinition.getId());
     }
 
     /**
@@ -191,8 +182,6 @@ public class ProcessDefinitionMapperTest {
         array[1] = processDefinition1.getId();
 
         List<ProcessDefinition> processDefinitions = processDefinitionMapper.queryDefinitionListByIdList(array);
-        processDefinitionMapper.deleteById(processDefinition.getId());
-        processDefinitionMapper.deleteById(processDefinition1.getId());
         Assert.assertEquals(2, processDefinitions.size());
 
     }
@@ -224,7 +213,6 @@ public class ProcessDefinitionMapperTest {
                 projectIds,
                 user.getUserType() == UserType.ADMIN_USER
         );
-        processDefinitionMapper.deleteById(processDefinition.getId());
         Assert.assertNotEquals(processDefinitions.size(), 0);
     }
 }

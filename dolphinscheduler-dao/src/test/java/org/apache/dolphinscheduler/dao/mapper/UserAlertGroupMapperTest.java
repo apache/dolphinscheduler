@@ -135,9 +135,6 @@ public class UserAlertGroupMapperTest {
 
         int update = userAlertGroupMapper.updateById(userAlertGroup);
         Assert.assertEquals(update, 1);
-        userAlertGroupMapper.deleteById(userAlertGroup.getId());
-        userMapper.deleteById(user.getId());
-        alertGroupMapper.deleteById(alertGroup.getId());
     }
 
     /**
@@ -162,7 +159,6 @@ public class UserAlertGroupMapperTest {
         //query
         List<UserAlertGroup> userAlertGroupList = userAlertGroupMapper.selectList(null);
         Assert.assertNotEquals(userAlertGroupList.size(), 0);
-        userAlertGroupMapper.deleteById(userAlertGroup.getId());
     }
 
     /**
@@ -179,8 +175,6 @@ public class UserAlertGroupMapperTest {
         UserAlertGroup userAlertGroup = insertOne(user,alertGroup);
         int delete = userAlertGroupMapper.deleteByAlertgroupId(alertGroup.getId());
         Assert.assertEquals(delete, 1);
-        userMapper.deleteById(user.getId());
-        alertGroupMapper.deleteById(alertGroup.getId());
     }
 
     /**
@@ -198,8 +192,5 @@ public class UserAlertGroupMapperTest {
         List<User> userList = userAlertGroupMapper.listUserByAlertgroupId(alertGroup.getId());
         Assert.assertNotEquals(userList.size(), 0);
 
-        userAlertGroupMapper.deleteByAlertgroupId(alertGroup.getId());
-        userMapper.deleteById(user.getId());
-        alertGroupMapper.deleteById(alertGroup.getId());
     }
 }

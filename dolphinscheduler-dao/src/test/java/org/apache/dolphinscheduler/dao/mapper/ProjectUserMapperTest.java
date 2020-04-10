@@ -64,7 +64,6 @@ public class ProjectUserMapperTest {
         //update
         int update = projectUserMapper.updateById(projectUser);
         Assert.assertEquals(update, 1);
-        projectUserMapper.deleteById(projectUser.getId());
     }
 
     /**
@@ -86,7 +85,6 @@ public class ProjectUserMapperTest {
         //query
         List<ProjectUser> projectUsers = projectUserMapper.selectList(null);
         Assert.assertNotEquals(projectUsers.size(), 0);
-        projectUserMapper.deleteById(projectUser.getId());
     }
 
     /**
@@ -111,6 +109,5 @@ public class ProjectUserMapperTest {
         ProjectUser projectUser1 = projectUserMapper.queryProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
         Assert.assertNotEquals(projectUser1, null);
 
-        projectUserMapper.deleteById(projectUser.getId());
     }
 }

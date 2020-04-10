@@ -70,7 +70,6 @@ public class ProjectMapperTest {
         //update
         int update = projectMapper.updateById(project);
         Assert.assertEquals(update, 1);
-        projectMapper.deleteById(project.getId());
     }
 
     /**
@@ -92,7 +91,6 @@ public class ProjectMapperTest {
         //query
         List<Project> projects = projectMapper.selectList(null);
         Assert.assertNotEquals(projects.size(), 0);
-        projectMapper.deleteById(project.getId());
     }
 
     /**
@@ -110,8 +108,6 @@ public class ProjectMapperTest {
         projectMapper.updateById(project);
         Project project1 = projectMapper.queryDetailById(project.getId());
 
-        userMapper.deleteById(user.getId());
-        projectMapper.deleteById(project.getId());
         Assert.assertNotEquals(project1, null);
         Assert.assertEquals(project1.getUserName(), user.getUserName());
     }
@@ -130,8 +126,6 @@ public class ProjectMapperTest {
         projectMapper.updateById(project);
         Project project1 = projectMapper.queryByName(project.getName());
 
-        userMapper.deleteById(user.getId());
-        projectMapper.deleteById(project.getId());
         Assert.assertNotEquals(project1, null);
         Assert.assertEquals(project1.getUserName(), user.getUserName());
     }
@@ -161,9 +155,6 @@ public class ProjectMapperTest {
                 project.getUserId(),
                 project.getName()
         );
-        projectMapper.deleteById(project.getId());
-        projectMapper.deleteById(project1.getId());
-        userMapper.deleteById(user.getId());
         Assert.assertNotEquals(projectIPage.getTotal(), 0);
         Assert.assertNotEquals(projectIPage1.getTotal(), 0);
     }
@@ -177,7 +168,6 @@ public class ProjectMapperTest {
 
         List<Project> projects = projectMapper.queryProjectCreatedByUser(project.getUserId());
 
-        projectMapper.deleteById(project.getId());
         Assert.assertNotEquals(projects.size(), 0);
 
     }
@@ -191,7 +181,6 @@ public class ProjectMapperTest {
 
         List<Project> projects = projectMapper.queryProjectCreatedByUser(project.getUserId());
 
-        projectMapper.deleteById(project.getId());
         Assert.assertNotEquals(projects.size(), 0);
     }
 
@@ -206,7 +195,6 @@ public class ProjectMapperTest {
                 100000
         );
 
-        projectMapper.deleteById(project.getId());
         Assert.assertNotEquals(projects.size(), 0);
     }
 }

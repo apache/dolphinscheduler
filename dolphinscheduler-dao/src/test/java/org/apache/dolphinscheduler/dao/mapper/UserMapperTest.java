@@ -206,7 +206,6 @@ public class UserMapperTest {
         user.setUserType(UserType.ADMIN_USER);
         int update = userMapper.updateById(user);
         Assert.assertEquals(update, 1);
-        userMapper.deleteById(user.getId());
     }
 
     /**
@@ -219,7 +218,6 @@ public class UserMapperTest {
         //delete
         int delete = userMapper.deleteById(user.getId());
         Assert.assertEquals(delete, 1);
-        userMapper.deleteById(user.getId());
     }
 
     /**
@@ -232,7 +230,6 @@ public class UserMapperTest {
         //query
         List<User> userList = userMapper.selectList(null);
         Assert.assertNotEquals(userList.size(), 0);
-        userMapper.deleteById(user.getId());
     }
 
     /**
@@ -245,7 +242,6 @@ public class UserMapperTest {
         //queryAllGeneralUser
         List<User> userList = userMapper.queryAllGeneralUser();
         Assert.assertNotEquals(userList.size(), 0);
-        userMapper.deleteById(user.getId());
     }
 
     /**
@@ -258,7 +254,6 @@ public class UserMapperTest {
         //queryByUserNameAccurately
         User queryUser = userMapper.queryByUserNameAccurately(user.getUserName());
         Assert.assertEquals(queryUser.getUserName(), user.getUserName());
-        userMapper.deleteById(user.getId());
     }
 
     /**
@@ -272,7 +267,6 @@ public class UserMapperTest {
         User queryUser = userMapper.queryUserByNamePassword(user.getUserName(),user.getUserPassword());
         Assert.assertEquals(queryUser.getUserName(),user.getUserName());
         Assert.assertEquals(queryUser.getUserPassword(),user.getUserPassword());
-        userMapper.deleteById(user.getId());
     }
 
     /**
@@ -290,9 +284,6 @@ public class UserMapperTest {
         Page<User> page = new Page(1,3);
         IPage<User> userIPage = userMapper.queryUserPaging(page, user.getUserName());
         Assert.assertNotEquals(userIPage.getTotal(), 0);
-        queueMapper.deleteById(queue.getId());
-        tenantMapper.deleteById(tenant.getId());
-        userMapper.deleteById(user.getId());
     }
 
     /**
@@ -305,7 +296,6 @@ public class UserMapperTest {
         //queryDetailsById
         User queryUser = userMapper.queryDetailsById(user.getId());
         Assert.assertEquals(queryUser,user);
-        userMapper.deleteById(user.getId());
     }
 
     /**
@@ -322,9 +312,6 @@ public class UserMapperTest {
         //queryUserListByAlertGroupId
         List<User> userList = userMapper.queryUserListByAlertGroupId(userAlertGroup.getAlertgroupId());
         Assert.assertNotEquals(userList.size(), 0);
-        userMapper.deleteById(user.getId());
-        alertGroupMapper.deleteById(alertGroup.getId());
-        userAlertGroupMapper.deleteById(userAlertGroup.getAlertgroupId());
 
     }
 
@@ -340,8 +327,6 @@ public class UserMapperTest {
         //queryTenantCodeByUserId
         User queryUser = userMapper.queryTenantCodeByUserId(user.getId());
         Assert.assertEquals(queryUser,user);
-        userMapper.deleteById(user.getId());
-        tenantMapper.deleteById(tenant.getId());
     }
 
     /**
@@ -356,8 +341,6 @@ public class UserMapperTest {
         //queryUserByToken
         User userToken = userMapper.queryUserByToken(accessToken.getToken());
         Assert.assertEquals(userToken,user);
-        userMapper.deleteById(user.getId());
-        accessTokenMapper.deleteById(accessToken.getId());
 
     }
 }

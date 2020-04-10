@@ -72,7 +72,6 @@ public class ErrorCommandMapperTest {
         errorCommand.setUpdateTime(new Date());
         int update = errorCommandMapper.updateById(errorCommand);
         Assert.assertEquals(1,update);
-        errorCommandMapper.deleteById(errorCommand.getId());
     }
 
     /**
@@ -107,8 +106,8 @@ public class ErrorCommandMapperTest {
 
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(
                 null,
-                 null,
-                          new Integer[0]
+                null,
+                new Integer[0]
         );
 
         Integer[] projectIdArray = new Integer[2];
@@ -120,8 +119,6 @@ public class ErrorCommandMapperTest {
                 projectIdArray
         );
 
-        errorCommandMapper.deleteById(errorCommand.getId());
-        processDefinitionMapper.deleteById(processDefinition.getId());
         Assert.assertNotEquals(commandCounts.size(), 0);
         Assert.assertNotEquals(commandCounts2.size(), 0);
     }

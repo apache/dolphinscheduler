@@ -800,6 +800,27 @@
                         <include>**/service/zk/DefaultEnsembleProviderTest.java</include>
                         <include>**/service/zk/ZKServerTest.java</include>
                         <include>**/service/queue/TaskUpdateQueueTest.java</include>
+
+                        <include>**/dao/mapper/DataSourceUserMapperTest.java</include>
+                        <include>**/dao/mapper/ErrorCommandMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessDefinitionMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessInstanceMapMapperTest.java</include>
+                        <include>**/dao/mapper/ProcessInstanceMapperTest.java</include>
+                        <include>**/dao/mapper/ProjectMapperTest.java</include>
+                        <include>**/dao/mapper/ProjectUserMapperTest.java</include>
+                        <include>**/dao/mapper/QueueMapperTest.java</include>
+                        <include>**/dao/mapper/ResourceMapperTest.java</include>
+                        <include>**/dao/mapper/ResourceUserMapperTest.java</include>
+                        <include>**/dao/mapper/ScheduleMapperTest.java</include>
+                        <include>**/dao/mapper/SessionMapperTest.java</include>
+                        <include>**/dao/mapper/TaskInstanceMapperTest.java</include>
+                        <include>**/dao/mapper/TenantMapperTest.java</include>
+                        <include>**/dao/mapper/UdfFuncMapperTest.java</include>
+                        <include>**/dao/mapper/UDFUserMapperTest.java</include>
+                        <include>**/dao/mapper/UserAlertGroupMapperTest.java</include>
+                        <include>**/dao/mapper/UserMapperTest.java</include>
+                        <include>**/dao/utils/DagHelperTest.java</include>
+                        <include>**/dao/AlertDaoTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
