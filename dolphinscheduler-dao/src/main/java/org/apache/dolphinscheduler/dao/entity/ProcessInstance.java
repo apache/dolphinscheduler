@@ -366,7 +366,7 @@ public class ProcessInstance {
     }
 
 
-    public boolean IsProcessInstanceStop(){
+    public boolean isProcessInstanceStop(){
         return this.state.typeIsFinished();
     }
 
