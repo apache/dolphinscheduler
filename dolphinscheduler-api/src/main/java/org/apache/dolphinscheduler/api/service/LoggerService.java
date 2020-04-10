@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClientService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ public class LoggerService {
       return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(), Status.TASK_INSTANCE_NOT_FOUND.getMsg());
     }
 
-    String host = taskInstance.getHost();
+    String host = Host.of(taskInstance.getHost()).getIp();
     if(StringUtils.isEmpty(host)){
       return new Result(Status.TASK_INSTANCE_NOT_FOUND.getCode(), Status.TASK_INSTANCE_NOT_FOUND.getMsg());
     }
@@ -94,7 +95,7 @@ public class LoggerService {
     if (taskInstance == null){
       throw new RuntimeException("task instance is null");
     }
-    String host = taskInstance.getHost();
+    String host = Host.of(taskInstance.getHost()).getIp();
     return logClient.getLogBytes(host, Constants.RPC_PORT, taskInstance.getLogPath());
   }
 }

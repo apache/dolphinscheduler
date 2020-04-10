@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.sources.SourceHdfsParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ISourceGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class HdfsSourceGenerator implements ISourceGenerator {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public String generate(SqoopParameters sqoopParameters) {
+    public String generate(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext) {
         StringBuilder result = new StringBuilder();
         try{
             SourceHdfsParameter sourceHdfsParameter
