@@ -65,4 +65,13 @@ public enum CommandType {
     public String getDescp() {
         return descp;
     }
+
+    public static CommandType of(Integer status){
+        for(CommandType cmdType : values()){
+            if(cmdType.getCode() == status){
+                return cmdType;
+            }
+        }
+        throw new IllegalArgumentException("invalid status : " + status);
+    }
 }

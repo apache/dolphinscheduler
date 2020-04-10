@@ -81,6 +81,7 @@ public abstract class BaseDataSource {
 
   /**
    * gets the JDBC url for the data source connection
+   * @return getJdbcUrl
    */
   public String getJdbcUrl() {
     StringBuilder jdbcUrl = new StringBuilder(getAddress());
