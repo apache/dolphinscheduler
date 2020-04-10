@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.utils.dependent.DependentDateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -76,10 +77,9 @@ public class DependentTaskTest {
 
         TaskProps taskProps = new TaskProps();
         String dependString = "{\"dependTaskList\":[{\"dependItemList\":[{\"dateValue\":\"today\",\"depTasks\":\"ALL\",\"projectId\":1,\"definitionList\":[{\"label\":\"C\",\"value\":4},{\"label\":\"B\",\"value\":3},{\"label\":\"A\",\"value\":2}],\"cycle\":\"day\",\"definitionId\":4}],\"relation\":\"AND\"}],\"relation\":\"AND\"}";
-        taskProps.setTaskInstId(252612);
         taskProps.setDependence(dependString);
         taskProps.setTaskStartTime(new Date());
-        DependentTask dependentTask = new DependentTask(taskProps, logger);
+        DependentTask dependentTask = new DependentTask(new TaskExecutionContext(), logger);
         dependentTask.init();
         dependentTask.handle();
         Assert.assertEquals(dependentTask.getExitStatusCode(), Constants.EXIT_CODE_SUCCESS );

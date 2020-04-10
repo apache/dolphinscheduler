@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.server.worker.task.sqoop.generator;
 
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.HdfsSourceGenerator;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.HiveSourceGenerator;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.sources.MysqlSourceGenerator;
@@ -60,15 +61,15 @@ public class SqoopJobGenerator {
      * @param sqoopParameters
      * @return
      */
-    public String generateSqoopJob(SqoopParameters sqoopParameters){
+    public String generateSqoopJob(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext){
         createSqoopJobGenerator(sqoopParameters.getSourceType(),sqoopParameters.getTargetType());
         if(sourceGenerator == null || targetGenerator == null){
             return null;
         }
 
         return commonGenerator.generate(sqoopParameters)
-                + sourceGenerator.generate(sqoopParameters)
-                + targetGenerator.generate(sqoopParameters);
+                + sourceGenerator.generate(sqoopParameters,taskExecutionContext)
+                + targetGenerator.generate(sqoopParameters,taskExecutionContext);
     }
 
     /**
