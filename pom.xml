@@ -822,9 +822,6 @@
                         <include>**/dao/mapper/UserMapperTest.java</include>
                         <include>**/dao/utils/DagHelperTest.java</include>
                         <include>**/dao/AlertDaoTest.java</include>
-
-                        <include>**/server/master/dispatch/host/RoundRobinHostManagerTest.java</include>
-                        <include>**/server/master/dispatch/ExecutorDispatcherTest.java</include>
                     </includes>
                     <!-- <skip>true</skip> -->
                 </configuration>
