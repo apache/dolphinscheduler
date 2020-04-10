@@ -307,7 +307,7 @@ public class ExecutorService extends BaseService{
      * @param processInstance process instance
      * @param commandType command type
      * @param executionStatus execute status
-     * @return
+     * @return update result
      */
     private Map<String, Object> updateProcessInstancePrepare(ProcessInstance processInstance, CommandType commandType, ExecutionStatus executionStatus) {
         Map<String, Object> result = new HashMap<>(5);
