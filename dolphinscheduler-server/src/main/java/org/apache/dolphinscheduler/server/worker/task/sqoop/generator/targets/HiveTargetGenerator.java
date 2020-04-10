@@ -20,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.common.task.sqoop.SqoopParameters;
 import org.apache.dolphinscheduler.common.task.sqoop.targets.TargetHiveParameter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.task.sqoop.generator.ITargetGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class HiveTargetGenerator implements ITargetGenerator {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
-    public String generate(SqoopParameters sqoopParameters) {
+    public String generate(SqoopParameters sqoopParameters,TaskExecutionContext taskExecutionContext) {
 
         StringBuilder result = new StringBuilder();
 
