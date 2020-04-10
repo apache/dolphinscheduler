@@ -17,11 +17,10 @@
 package org.apache.dolphinscheduler.api.controller;
 
 
-import java.util.Date;
 import java.util.Map;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.CalendarService;
+import org.apache.dolphinscheduler.api.service.SchedulerCalendarService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.utils.ParameterUtils;
@@ -31,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +41,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 
@@ -53,20 +50,20 @@ import springfox.documentation.annotations.ApiIgnore;
 @Api(tags = "CALENDAR_TAG", position = 1)
 @RestController
 @RequestMapping("/calendar")
-public class CalendarController extends BaseController{
+public class SchedulerCalendarController extends BaseController{
 
-    private static final Logger logger = LoggerFactory.getLogger(CalendarController.class);
+    private static final Logger logger = LoggerFactory.getLogger(SchedulerCalendarController.class);
 
 
     @Autowired
-    private CalendarService calendarService;
+    private SchedulerCalendarService schedulerCalendarService;
 
     @ApiOperation(value = "createCalendar", notes= "CREATE_CALENDAR_NOTES")
     @ApiImplicitParams({
 
             @ApiImplicitParam(name = "name", value = "CALENDAR_NAME", required = true, dataType ="String"),
             @ApiImplicitParam(name = "calendarInfo", value = "CALENDARINFO", required = true, dataType ="String",example =
-                    "{'startTime' : '2019-06-10 00:00:00','endTime' : '2019-06-13 00:00:00','extDate' : ['20190102','20190103','20190103']}"),
+                    "{'startTime' : '2019-06-10 00:00:00','endTime' : '2019-06-13 00:00:00','extTime' : ['20190102','20190103','20190103']}"),
             @ApiImplicitParam(name = "description", value = "CALENDAR_DESC", dataType ="String")
 
     })
@@ -78,7 +75,7 @@ public class CalendarController extends BaseController{
                                                        @RequestParam(value = "description",required = false) String desc) {
         try {
 
-            Map<String, Object> result = calendarService.createCalendar(loginUser,name,calendarInfo,desc);
+            Map<String, Object> result = schedulerCalendarService.createCalendar(loginUser,name,calendarInfo,desc);
             return returnDataList(result);
 
         }catch (Exception e){
@@ -117,7 +114,7 @@ public class CalendarController extends BaseController{
                 return returnDataListPaging(result);
             }
             searchVal = ParameterUtils.handleEscapes(searchVal);
-            result = calendarService.queryCalendarList(loginUser, searchVal, pageNo, pageSize);
+            result = schedulerCalendarService.queryCalendarList(loginUser, searchVal, pageNo, pageSize);
             return returnDataListPaging(result);
         }catch (Exception e){
             logger.error(Status.QUERY_CALENDAR_LIST_PAGING_ERROR.getMsg(),e);
@@ -138,7 +135,7 @@ public class CalendarController extends BaseController{
     public Result queryCalendarlist(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser){
         logger.info("login user {}, query calendar list", loginUser.getUserName());
         try{
-            Map<String, Object> result = calendarService.queryCalendarList(loginUser);
+            Map<String, Object> result = schedulerCalendarService.queryCalendarList(loginUser);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.QUERY_CALENDAR_LIST_ERROR.getMsg(),e);
@@ -163,7 +160,7 @@ public class CalendarController extends BaseController{
             @ApiImplicitParam(name = "ID", value = "CALENDAR_ID", required = true, dataType ="Int", example = "100"),
             @ApiImplicitParam(name = "name", value = "CALENDAR_NAME", required = true, dataType ="String"),
             @ApiImplicitParam(name = "calendarInfo", value = "CALENDARINFO", required = true, dataType ="String",example =
-                    "{'startTime' : '2019-06-10 00:00:00','endTime' : '2019-06-13 00:00:00','extDate' : ['20190102','20190103','20190103']}"),
+                    "{'startTime' : '2019-06-10 00:00:00','endTime' : '2019-06-13 00:00:00','extTime' : ['20190102','20190103','20190103']}"),
             @ApiImplicitParam(name = "description", value = "CALENDAR_DESC", dataType ="String")
 
     })
@@ -176,7 +173,7 @@ public class CalendarController extends BaseController{
                                                        @RequestParam(value = "description",required = false) String description) {
 
         try {
-            Map<String, Object> result = calendarService.updateCalendar(loginUser,id,name, calendarInfo, description);
+            Map<String, Object> result = schedulerCalendarService.updateCalendar(loginUser,id,name, calendarInfo, description);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.UPDATE_CALENDAR_ERROR.getMsg(),e);
@@ -202,7 +199,7 @@ public class CalendarController extends BaseController{
                                    @RequestParam(value = "id") int id) {
         logger.info("login user {}, delete calendar, calendarId: {},", loginUser.getUserName(), id);
         try {
-            Map<String, Object> result = calendarService.deleteCalendarById(loginUser,id);
+            Map<String, Object> result = schedulerCalendarService.deleteCalendarById(loginUser,id);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.DELETE_CALENDAR_BY_ID_ERROR.getMsg(),e);
@@ -231,7 +228,7 @@ public class CalendarController extends BaseController{
         try{
             logger.info("login user {}, verfiy calendar code: {}",
                     loginUser.getUserName(),calendarCode);
-            return calendarService.verifyCalendarName(calendarCode);
+            return schedulerCalendarService.verifyCalendarName(calendarCode);
         }catch (Exception e){
             logger.error(Status.VERIFY_CALENDAR_NAME_ERROR.getMsg(),e);
             return error(Status.VERIFY_CALENDAR_NAME_ERROR.getCode(), Status.VERIFY_CALENDAR_NAME_ERROR.getMsg());
@@ -260,7 +257,7 @@ public class CalendarController extends BaseController{
 
         try {
 
-            Map<String, Object> result = calendarService.releaseCalendar(loginUser, id, releaseState);
+            Map<String, Object> result = schedulerCalendarService.releaseCalendar(loginUser, id, releaseState);
             return returnDataList(result);
         }catch (Exception e){
             logger.error(Status.RELEASE_CALENDAR_ERROR.getMsg(),e);

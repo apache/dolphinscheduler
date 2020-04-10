@@ -16,10 +16,13 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.dolphinscheduler.api.dto.CalendarParam;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -34,12 +37,11 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.StringUtils;
 
-import org.apache.dolphinscheduler.dao.entity.Calendar;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.SchedulerCalendar;
+import org.apache.dolphinscheduler.dao.entity.SchedulerCalendarDetails;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.CalendarMapper;
+import org.apache.dolphinscheduler.dao.mapper.SchedulerCalendarDetailsMapper;
+import org.apache.dolphinscheduler.dao.mapper.SchedulerCalendarMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,16 +52,20 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import  com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
 /**
  * Calendar service
  */
 @Service
-public class CalendarService extends BaseService{
+@SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
+public class SchedulerCalendarService extends BaseService{
 
-  private static final Logger logger = LoggerFactory.getLogger(CalendarService.class);
+  private static final Logger logger = LoggerFactory.getLogger(SchedulerCalendarService.class);
 
   @Autowired
-  private CalendarMapper calendarMapper;
+  private SchedulerCalendarMapper schedulerCalendarMapper;
+  @Autowired
+  private SchedulerCalendarDetailsMapper schedulerCalendarDetailsMapper;
 
   @Autowired
   private UserMapper userMapper;
@@ -78,7 +84,7 @@ public class CalendarService extends BaseService{
   public Map<String,Object> createCalendar(User loginUser,
                          String name,
                          String calendarInfo,
-                         String desc) throws Exception {
+                         String desc)  {
 
     Map<String, Object> result = new HashMap<>(5);
     result.put(Constants.STATUS, false);
@@ -101,7 +107,7 @@ public class CalendarService extends BaseService{
       return result;
     }
 
-    Calendar calendar = new Calendar();
+    SchedulerCalendar calendar = new SchedulerCalendar();
     Date now = new Date();
 
     calendar.setName(name);
@@ -115,13 +121,19 @@ public class CalendarService extends BaseService{
     calendar.setUpdateTime(now);
 
     // save
-    calendarMapper.insert(calendar);
+    schedulerCalendarMapper.insert(calendar);
 
 
     // todo deal detail info
-   doDetailsInfo(calendar,calendarParam);
+   boolean detailStatus = doDetailsInfo(calendar,calendarParam);
 
-    putMsg(result, Status.SUCCESS);
+   if( detailStatus ){
+     putMsg(result, Status.SUCCESS);
+     result.put(Constants.MSG, Status.SUCCESS.getMsg());
+   }else{
+     putMsg(result, Status.UPDATE_CALENDAR_DETAILS_ERROR);
+     result.put(Constants.MSG, Status.UPDATE_CALENDAR_DETAILS_ERROR.getMsg());
+   }
 
     return result;
 }
@@ -144,9 +156,9 @@ public class CalendarService extends BaseService{
       return result;
     }
 
-    Page<Calendar> page = new Page(pageNo, pageSize);
-    IPage<Calendar> calendarIPage = calendarMapper.queryCalendarPaging(page, searchVal);
-    PageInfo<Calendar> pageInfo = new PageInfo<>(pageNo, pageSize);
+    Page<SchedulerCalendar> page = new Page(pageNo, pageSize);
+    IPage<SchedulerCalendar> calendarIPage = schedulerCalendarMapper.queryCalendarPaging(page, searchVal);
+    PageInfo<SchedulerCalendar> pageInfo = new PageInfo<>(pageNo, pageSize);
     pageInfo.setTotalCount((int)calendarIPage.getTotal());
     pageInfo.setLists(calendarIPage.getRecords());
     result.put(Constants.DATA_LIST, pageInfo);
@@ -169,7 +181,7 @@ public class CalendarService extends BaseService{
           int id,
           String name,
           String calendarInfo,
-          String desc) throws Exception {
+          String desc)  {
 
     Map<String, Object> result = new HashMap<>(5);
     result.put(Constants.STATUS, false);
@@ -185,14 +197,14 @@ public class CalendarService extends BaseService{
 
 
 
-    Calendar calendar = calendarMapper.selectById(id);
+    SchedulerCalendar calendar = schedulerCalendarMapper.selectById(id);
 
     if (calendar == null){
       putMsg(result, Status.CALENDAR_NOT_EXIST);
       return result;
     }
 
-    // update Calendar Instance
+    // update SchedulerCalendar Instance
 
     Date now = new Date();
 
@@ -216,24 +228,29 @@ public class CalendarService extends BaseService{
     calendar.setUpdateTime(now);
 
 
-    calendarMapper.updateById(calendar);
+    schedulerCalendarMapper.updateById(calendar);
 
 
-    doDetailsInfo(calendar,calendarParam);
+    // todo deal detail info
+    boolean detailStatus = doDetailsInfo(calendar,calendarParam);
 
+    if( detailStatus ){
+      putMsg(result, Status.SUCCESS);
+      result.put(Constants.MSG, Status.SUCCESS.getMsg());
+    }else{
+      putMsg(result, Status.UPDATE_CALENDAR_DETAILS_ERROR);
+      result.put(Constants.MSG, Status.UPDATE_CALENDAR_DETAILS_ERROR.getMsg());
+    }
 
-
-    result.put(Constants.STATUS, Status.SUCCESS);
-    result.put(Constants.MSG, Status.SUCCESS.getMsg());
     return result;
 
   }
 
   /**
-   * delete Calendar
+   * delete SchedulerCalendar
    *
    * @param loginUser login user
-   * @param id Calendar id
+   * @param id SchedulerCalendar id
    * @return delete result code
    * @throws Exception exception
    */
@@ -242,7 +259,7 @@ public class CalendarService extends BaseService{
     Map<String, Object> result = new HashMap<>(5);
 
 
-    Calendar calendar = calendarMapper.selectById(id);
+    SchedulerCalendar calendar = schedulerCalendarMapper.selectById(id);
     if (calendar == null){
       putMsg(result, Status.CALENDAR_NOT_EXIST);
       return result;
@@ -252,7 +269,7 @@ public class CalendarService extends BaseService{
 
 
 
-    calendarMapper.deleteById(id);
+    schedulerCalendarMapper.deleteById(id);
 
     putMsg(result, Status.SUCCESS);
     return result;
@@ -260,16 +277,16 @@ public class CalendarService extends BaseService{
 
 
   /**
-   * query Calendar list
+   * query SchedulerCalendar list
    *
    * @param loginUser login user
-   * @return Calendar list
+   * @return SchedulerCalendar list
    */
-  public Map<String, Object> queryCalendarList(User loginUser) {
+  public Map<String, Object> querySchedulerCalendarList(User loginUser) {
 
     Map<String, Object> result = new HashMap<>(5);
 
-    List<Calendar> resourceList = calendarMapper.selectList(null);
+    List<SchedulerCalendar> resourceList = schedulerCalendarMapper.selectList(null);
     result.put(Constants.DATA_LIST, resourceList);
     putMsg(result, Status.SUCCESS);
     
@@ -277,14 +294,14 @@ public class CalendarService extends BaseService{
   }
 
   /**
-   * query Calendar list via Calendar name
-   * @param name
-   * @return Calendar list
+   *
+   * @param loginUser
+   * @return
    */
-  public Map<String, Object> queryCalendarList(String name) {
+  public Map<String, Object> queryCalendarList(User loginUser) {
     Map<String, Object> result = new HashMap<>(5);
 
-    List<Calendar> resourceList = calendarMapper.queryByCalendarName(name);
+    List<SchedulerCalendar> resourceList = schedulerCalendarMapper.queryByCalendarName(null);
     if (CollectionUtils.isNotEmpty(resourceList)) {
       result.put(Constants.DATA_LIST, resourceList);
       putMsg(result, Status.SUCCESS);
@@ -296,15 +313,15 @@ public class CalendarService extends BaseService{
   }
 
   /**
-   * verify Calendar name
+   * verify SchedulerCalendar name
    *
-   * @param CalendarCode Calendar name
-   * @return true if Calendar name can user, otherwise return false
+   * @param    name
+   * @return true if SchedulerCalendar name can user, otherwise return false
    */
-  public Result verifyCalendarName(String CalendarCode) {
+  public Result verifyCalendarName(String name) {
     Result result=new Result();
-    if (checkCalendarExists(CalendarCode)) {
-      logger.error("Calendar {} has exist, can't create again.", CalendarCode);
+    if (checkCalendarExists(name)) {
+      logger.error("Calendar {} has exist, can't create again.", name);
       putMsg(result, Status.CALENDAR_NAME_EXIST);
     }else{
       putMsg(result, Status.SUCCESS);
@@ -314,13 +331,13 @@ public class CalendarService extends BaseService{
 
 
   /**
-   * check Calendar exists
+   * check SchedulerCalendar exists
    *
    * @param   name
-   * @return ture if the Calendar name exists, otherwise return false
+   * @return ture if the SchedulerCalendar name exists, otherwise return false
    */
   private boolean checkCalendarExists(String name) {
-      List<Calendar> Calendars = calendarMapper.queryByCalendarName(name);
+      List<SchedulerCalendar> Calendars = schedulerCalendarMapper.queryByCalendarName(name);
       return CollectionUtils.isNotEmpty(Calendars);
   }
 
@@ -344,15 +361,15 @@ public class CalendarService extends BaseService{
       return result;
     }
 
-    Calendar calendar = calendarMapper.selectById(id);
+    SchedulerCalendar calendar = schedulerCalendarMapper.selectById(id);
     switch (state) {
       case ONLINE:
         calendar.setReleaseState(state);
-        calendarMapper.updateById(calendar);
+        schedulerCalendarMapper.updateById(calendar);
         break;
       case OFFLINE:
         calendar.setReleaseState(state);
-        calendarMapper.updateById(calendar);
+        schedulerCalendarMapper.updateById(calendar);
         break;
       default:
         putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "releaseState");
@@ -363,12 +380,104 @@ public class CalendarService extends BaseService{
     return result;
   }
 
-  private void doDetailsInfo(Calendar calendar, CalendarParam calendarParam) {
+  private boolean doDetailsInfo(SchedulerCalendar calendar, CalendarParam calendarParam) {
+
+    boolean result = false;
+
+    //验证calendarParam中的数据是否有效
+    if(null != calendarParam
+            && null != calendarParam.getStartTime()
+            && null != calendarParam.getEndTime()){
+    }
 
 
+    Map<Date,Object> extDateMap = new HashMap<>();
+
+
+
+//    // key = id, value - websites
+//    Map<Integer, String> result1 = list.stream().collect(
+//            Collectors.toMap(Hosting::getId, Hosting::getName));
+//    calendarParam.getExtTime();
+//
+
+    //清理掉之前遗留的记录
+    schedulerCalendarDetailsMapper.clearByCalendarId(calendar.getId());
+
+    //获取重新添加记录
+    List<Integer> days  =  getDays(calendarParam.getStartTime(),calendarParam.getEndTime());
+
+    //更新记录
+    if(null != days && days.size()>0){
+
+      SchedulerCalendarDetails schedulerCalendarDetails = null ;
+      for (Integer day : days){
+
+        schedulerCalendarDetails = new SchedulerCalendarDetails();
+        schedulerCalendarDetails.setCalendarId(calendar.getId());
+        schedulerCalendarDetails.setCreateTime(calendar.getUpdateTime());
+        schedulerCalendarDetails.setUpdateTime(calendar.getUpdateTime());
+        schedulerCalendarDetails.setUserId(calendar.getUserId());
+        schedulerCalendarDetails.setStamp(day);
+
+        schedulerCalendarDetails.setFlag(Flag.YES);
+
+        schedulerCalendarDetailsMapper.insert(schedulerCalendarDetails);
+        schedulerCalendarDetails = null ;
+      }
+    }
+
+
+    return  result;
 
   }
 
+
+  /**
+   * 这个方法待优化
+   * 获取两个日期之间的所有日期
+   *
+   * @param startTime
+   *            开始日期
+   * @param endTime
+   *            结束日期
+   * @return
+   */
+  public static List<Integer> getDays(Date startTime, Date endTime) {
+
+    // 返回的日期集合
+    List<Integer> days = new ArrayList<Integer>();
+
+    try {
+
+      Calendar tempStart = Calendar.getInstance();
+      tempStart.setTime(startTime);
+      tempStart.set(Calendar.HOUR_OF_DAY, 0);
+      tempStart.set(Calendar.MINUTE, 0);
+      tempStart.set(Calendar.SECOND, 0);
+      tempStart.set(Calendar.MILLISECOND, 0);
+
+      Calendar tempEnd = Calendar.getInstance();
+      tempEnd.setTime(endTime);
+      tempEnd.set(Calendar.HOUR_OF_DAY, 0);
+      tempEnd.set(Calendar.MINUTE, 0);
+      tempEnd.set(Calendar.SECOND, 0);
+      tempEnd.set(Calendar.MILLISECOND, 0);
+
+      // 日期加1(包含结束)
+      tempEnd.add(Calendar.DATE, +1);
+      while (tempStart.before(tempEnd)) {
+        String dateTime =  DateUtils.format(tempStart.getTime(),"yyyyMMdd");
+        days.add(Integer.valueOf(dateTime) );
+        tempStart.add(Calendar.DAY_OF_YEAR, 1);
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return days;
+  }
 
 
 }

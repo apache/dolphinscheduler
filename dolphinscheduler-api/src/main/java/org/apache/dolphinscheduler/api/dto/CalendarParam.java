@@ -19,18 +19,21 @@ package org.apache.dolphinscheduler.api.dto;
 import java.util.Date;
 import java.util.List;
 
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
+
 /**
  * schedule parameters
  */
+@SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
 public class CalendarParam {
   private Date startTime;
   private Date endTime;
-  private List<Date> extTime;
+  private List<Integer> extTime;
 
   public CalendarParam() {
   }
 
-  public CalendarParam(Date startTime, Date endTime, List<Date> extTime) {
+  public CalendarParam(Date startTime, Date endTime, List<Integer> extTime) {
     this.startTime = startTime;
     this.endTime = endTime;
     this.extTime = extTime;
@@ -52,11 +55,11 @@ public class CalendarParam {
     this.endTime = endTime;
   }
 
-  public List<Date> getExtTime() {
+  public List<Integer> getExtTime() {
     return extTime;
   }
 
-  public void setExtTime(List<Date> extTime) {
+  public void setExtTime(List<Integer> extTime) {
     this.extTime = extTime;
   }
 

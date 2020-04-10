@@ -18,17 +18,19 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.Flag;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
 
 /**
- * calendar
+ * tenant
  */
-@TableName("t_yss_calendar")
-public class Calendar {
+@TableName("t_yss_calendar_details")
+@SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
+public class SchedulerCalendarDetails {
 
     /**
      * id
@@ -37,31 +39,25 @@ public class Calendar {
     private int id;
 
     /**
-     * calendar name
+     * tenant calendarId
      */
-    private String name;
+    private int calendarId;
 
     /**
-     * schedule start time
+     *
      */
-    private Date startTime;
+    private int stamp;
+
 
     /**
-     * schedule end time
+     * process is valid: yes/no
      */
-    private Date endTime;
-
-    /**
-     * 0 offline
-     * 1 on line
-     */
-    private ReleaseState releaseState;
+    private Flag flag;
 
     /**
      * description
      */
     private String description;
-
 
     /**
      * process user id
@@ -77,6 +73,7 @@ public class Calendar {
      */
     private Date updateTime;
 
+
     public int getId() {
         return id;
     }
@@ -85,36 +82,28 @@ public class Calendar {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public int getCalendarId() {
+        return calendarId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCalendarId(int calendarId) {
+        this.calendarId = calendarId;
     }
 
-    public Date getStartTime() {
-        return startTime;
+    public int getStamp() {
+        return stamp;
     }
 
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
+    public void setStamp(int stamp) {
+        this.stamp = stamp;
     }
 
-    public Date getEndTime() {
-        return endTime;
+    public Flag getFlag() {
+        return flag;
     }
 
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public ReleaseState getReleaseState() {
-        return releaseState;
-    }
-
-    public void setReleaseState(ReleaseState flag) {
-        this.releaseState = releaseState;
+    public void setFlag(Flag flag) {
+        this.flag = flag;
     }
 
     public String getDescription() {

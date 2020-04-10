@@ -263,6 +263,7 @@ public enum Status {
     DELETE_CALENDAR_BY_ID_ERROR(60106,"delete calendar  error", "删除调度日历错误"),
     VERIFY_CALENDAR_NAME_ERROR(60107,"verify calendar name error", "验证调度日历名称错误"),
     RELEASE_CALENDAR_ERROR(60108,"release calendar error", "上线调度日历错误"),
+    UPDATE_CALENDAR_DETAILS_ERROR(60109,"update calendar deatils error", "更新调度日历详情错误"),
 
     //----------- Create by ZhangLong :   2020年04月08日15:59:14    -----------------
 

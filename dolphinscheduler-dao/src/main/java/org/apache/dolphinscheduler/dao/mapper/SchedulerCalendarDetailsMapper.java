@@ -16,34 +16,45 @@
  */
 package org.apache.dolphinscheduler.dao.mapper;
 
+import java.util.Date;
 import java.util.List;
 
-import org.apache.dolphinscheduler.dao.entity.Calendar;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.SchedulerCalendarDetails;
 import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
 
 /**
- * Calendar mapper interface
+ * Calendar Detail mapper interface
  */
-public interface CalendarMapper extends BaseMapper<Calendar> {
+@SourceCodeConstraint.AddedBy(SourceCodeConstraint.Author.ZHANGLONG)
+public interface SchedulerCalendarDetailsMapper extends BaseMapper<SchedulerCalendarDetails> {
+
 
     /**
-     * tenant page
-     * @param page page
-     * @param searchVal searchVal
-     * @return tenant IPage
-     */
-    IPage<Calendar> queryCalendarPaging(IPage<Calendar> page,
-            @Param("searchVal") String searchVal);
-    /**
-     * query Calendar by name
-     * @param  name
+     * query Calendar Detail by id
+     * @param  calendarId
      * @return Calendar list
      */
-    List<Calendar> queryByCalendarName(@Param("name") String name);
+    List<SchedulerCalendarDetails> queryByCalendarId(@Param("calendarId") String calendarId);
+
+
+
+    /**
+     * clear Calendar Detail by id
+     * @param  calendarId
+     * @return Calendar list
+     */
+   int clearByCalendarId(@Param("calendarId") int calendarId);
+
+
+    /**
+     * query Calendar Detail by stamp
+     * @param  stamp
+     * @return Calendar list
+     */
+    List<SchedulerCalendarDetails> queryByCalendarStamp(@Param("stamp") Date stamp);
 
 
 

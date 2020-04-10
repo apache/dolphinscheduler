@@ -19,24 +19,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.SchedulerCalendarMapper">
 
-    <select id="queryCalendarPaging" resultType="org.apache.dolphinscheduler.dao.entity.SchedulerCalendar">
-        SELECT t.*
-        FROM t_ds_calendar t
-        WHERE 1=1
-        <if test="searchVal != null and searchVal != ''">
-            and  t.name like concat('%', #{searchVal}, '%')
-        </if>
-        order by  t.update_time desc
-    </select>
-
-
-    <select id="queryByCalendarName" resultType="org.apache.dolphinscheduler.dao.entity.SchedulerCalendar">
+    <select id="queryByCalendarId" resultType="org.apache.dolphinscheduler.dao.entity.SchedulerCalendarDetails">
         select *
         from t_ds_calendar
-        where name = #{name}
+        where calendar_id = #{calendarId}
+    </select>
+
+    <select id="queryByCalendarStamp" resultType="org.apache.dolphinscheduler.dao.entity.SchedulerCalendarDetails">
+        select *
+        from t_ds_calendar
+        where stamp = #{stamp}
     </select>
 
 
-
+    <select id="clearByCalendarId" resultType="org.apache.dolphinscheduler.dao.entity.SchedulerCalendarDetails">
+        delete from t_ds_calendar
+        where calendar_id = #{calendarId}
+    </select>
 
 </mapper>
