@@ -92,7 +92,7 @@ public class SchedulerService extends BaseService {
      * @param processInstancePriority process instance priority
      * @param receivers receivers
      * @param receiversCc receivers cc
-     * @param workerGroupId worker group id
+     * @param workerGroup worker group
      * @return create result code
      * @throws IOException ioexception
      */
@@ -106,7 +106,7 @@ public class SchedulerService extends BaseService {
                                               String receivers,
                                               String receiversCc,
                                               Priority processInstancePriority,
-                                              int workerGroupId) throws IOException {
+                                              String workerGroup) throws IOException {
 
         Map<String, Object> result = new HashMap<String, Object>(5);
 
@@ -156,7 +156,7 @@ public class SchedulerService extends BaseService {
         scheduleObj.setUserName(loginUser.getUserName());
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
         scheduleObj.setProcessInstancePriority(processInstancePriority);
-        scheduleObj.setWorkerGroupId(workerGroupId);
+        scheduleObj.setWorkerGroup(workerGroup);
         scheduleMapper.insert(scheduleObj);
 
         /**
@@ -182,7 +182,7 @@ public class SchedulerService extends BaseService {
      * @param warningType warning type
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
-     * @param workerGroupId worker group id
+     * @param workerGroup worker group
      * @param processInstancePriority process instance priority
      * @param receiversCc receiver cc
      * @param receivers receivers
@@ -202,7 +202,7 @@ public class SchedulerService extends BaseService {
                                               String receiversCc,
                                               ReleaseState scheduleStatus,
                                               Priority processInstancePriority,
-                                              int workerGroupId) throws IOException {
+                                              String workerGroup) throws IOException {
         Map<String, Object> result = new HashMap<String, Object>(5);
 
         Project project = projectMapper.queryByName(projectName);
@@ -266,7 +266,7 @@ public class SchedulerService extends BaseService {
         if (scheduleStatus != null) {
             schedule.setReleaseState(scheduleStatus);
         }
-        schedule.setWorkerGroupId(workerGroupId);
+        schedule.setWorkerGroup(workerGroup);
         schedule.setUpdateTime(now);
         schedule.setProcessInstancePriority(processInstancePriority);
         scheduleMapper.updateById(schedule);

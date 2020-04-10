@@ -28,13 +28,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class ProcessInstanceMapperTest {
 
 
@@ -314,12 +318,12 @@ public class ProcessInstanceMapperTest {
         Date start = new Date(2019-1900, 1-1, 01, 0, 0, 0);
         Date end = new Date(2019-1900, 1-1, 01, 5, 0, 0);
         ProcessInstance processInstance1 = processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionId(),start, end
-                );
+        );
         Assert.assertEquals(processInstance1.getId(), processInstance.getId());
 
         start = new Date(2019-1900, 1-1, 01, 1, 0, 0);
         processInstance1 = processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionId(),start, end
-                );
+        );
         Assert.assertNull(processInstance1);
 
         processInstanceMapper.deleteById(processInstance.getId());
