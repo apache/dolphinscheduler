@@ -147,3 +147,4 @@ dolphinscheduler-ui/dist/js/login/index.291b8e3.js.map
 dolphinscheduler-ui/dist/lib/external/
 /dolphinscheduler-dao/src/main/resources/dao/data_source.properties
 
+!/zookeeper_data/

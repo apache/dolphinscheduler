@@ -159,7 +159,6 @@ public class ResourceMapperTest {
         //update
         int update = resourceMapper.updateById(resource);
         Assert.assertEquals(1, update);
-        resourceMapper.deleteById(resource.getId());
     }
 
     /**
@@ -181,7 +180,6 @@ public class ResourceMapperTest {
         //query
         List<Resource> resources = resourceMapper.selectList(null);
         Assert.assertNotEquals(resources.size(), 0);
-        resourceMapper.deleteById(resource.getId());
     }
 
     /**
@@ -196,13 +194,12 @@ public class ResourceMapperTest {
         int userId = resource.getUserId();
         int type = resource.getType().ordinal();
         List<Resource> resources = resourceMapper.queryResourceList(
-                    alias,
-                    userId,
-                    type
+                alias,
+                userId,
+                type
         );
 
         Assert.assertNotEquals(resources.size(), 0);
-        resourceMapper.deleteById(resource.getId());
     }
 
     /**
@@ -232,8 +229,6 @@ public class ResourceMapperTest {
                 resource.getType().ordinal(),
                 ""
         );
-        resourceMapper.deleteById(resource.getId());
-        resourceUserMapper.deleteById(resourcesUser.getId());
         Assert.assertNotEquals(resourceIPage.getTotal(), 0);
         Assert.assertNotEquals(resourceIPage1.getTotal(), 0);
 
@@ -256,8 +251,6 @@ public class ResourceMapperTest {
 
         List<Resource> resources1 = resourceMapper.queryAuthorizedResourceList(1110);
 
-        resourceUserMapper.deleteById(resourcesUser.getId());
-        resourceMapper.deleteById(resource.getId());
         Assert.assertEquals(0, resources.size());
         Assert.assertNotEquals(0, resources1.size());
 
@@ -286,7 +279,6 @@ public class ResourceMapperTest {
                 11111
         );
         Assert.assertNotEquals(resources.size(), 0);
-        resourceMapper.deleteById(resource.getId());
     }
 
     /**
@@ -316,7 +308,6 @@ public class ResourceMapperTest {
 
 
         Assert.assertEquals("ut tenant code for resource", resource1);
-        resourceMapper.deleteById(resource.getId());
 
     }
 
