@@ -446,8 +446,11 @@ public class SchedulerCalendarService extends BaseService{
 
       //insert details
       if(null != days && days.size()>0){
+
         SchedulerCalendarDetails schedulerCalendarDetails = null ;
         for (Integer day : days){
+
+
 
           schedulerCalendarDetails = new SchedulerCalendarDetails();
           schedulerCalendarDetails.setCalendarId(calendar.getId());
@@ -456,7 +459,11 @@ public class SchedulerCalendarService extends BaseService{
           schedulerCalendarDetails.setUserId(calendar.getUserId());
           schedulerCalendarDetails.setStamp(day);
 
-          schedulerCalendarDetails.setFlag(Flag.YES);
+          if(extDateMap.containsKey(day)){
+            schedulerCalendarDetails.setFlag(Flag.NO);
+          }else{
+            schedulerCalendarDetails.setFlag(Flag.YES);
+          }
 
           schedulerCalendarDetailsMapper.insert(schedulerCalendarDetails);
           schedulerCalendarDetails = null ;
