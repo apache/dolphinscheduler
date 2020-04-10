@@ -30,6 +30,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.junit.Assert.*;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
@@ -96,7 +101,7 @@ public class ProjectUserMapperTest {
 
         ProjectUser projectUser = insertOne();
         int delete = projectUserMapper.deleteProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
-        Assert.assertEquals(delete, 1);
+        assertThat(delete,greaterThanOrEqualTo(1));
 
     }
 

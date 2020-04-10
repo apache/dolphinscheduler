@@ -809,7 +809,7 @@
                         <include>**/dao/mapper/ProjectMapperTest.java</include>
                         <include>**/dao/mapper/ProjectUserMapperTest.java</include>
                         <include>**/dao/mapper/QueueMapperTest.java</include>
-                        <include>**/dao/mapper/ResourceMapperTest.java</include>
+                        <!--<include>**/dao/mapper/ResourceMapperTest.java</include>-->
                         <include>**/dao/mapper/ResourceUserMapperTest.java</include>
                         <include>**/dao/mapper/ScheduleMapperTest.java</include>
                         <include>**/dao/mapper/SessionMapperTest.java</include>
