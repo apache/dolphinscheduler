@@ -24,16 +24,18 @@ hostsArr=(${ips//,/ })
 for host in ${hostsArr[@]}
 do
 
-    if ! ssh -p $sshPort $host test -e $installPath; then
-      ssh -p $sshPort $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
-    fi
+  if ! ssh -p $sshPort $host test -e $installPath; then
+    ssh -p $sshPort $host "sudo mkdir -p $installPath; sudo chown -R $deployUser:$deployUser $installPath"
+  fi
 
+  echo "scp dirs to $host/$installPath starting"
 	ssh -p $sshPort $host  "cd $installPath/; rm -rf bin/ conf/ lib/ script/ sql/ ui/"
-	scp -P $sshPort -r $workDir/../bin  $host:$installPath
-	scp -P $sshPort -r $workDir/../conf  $host:$installPath
-	scp -P $sshPort -r $workDir/../lib   $host:$installPath
-	scp -P $sshPort -r $workDir/../script  $host:$installPath
-	scp -P $sshPort -r $workDir/../sql  $host:$installPath
-	scp -P $sshPort -r $workDir/../ui  $host:$installPath
-	scp -P $sshPort  $workDir/../install.sh  $host:$installPath
+
+  for dsDir in bin conf lib script sql ui install.sh
+  do
+    echo "start to scp $dsDir to $host/$installPath"
+    scp -P $sshPort -r $workDir/../$dsDir  $host:$installPath
+  done
+
+  echo "scp dirs to $host/$installPath complete"
 done
