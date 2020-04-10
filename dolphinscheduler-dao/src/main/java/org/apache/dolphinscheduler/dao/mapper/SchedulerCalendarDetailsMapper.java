@@ -37,7 +37,7 @@ public interface SchedulerCalendarDetailsMapper extends BaseMapper<SchedulerCale
      * @param  calendarId
      * @return Calendar list
      */
-    List<SchedulerCalendarDetails> queryByCalendarId(@Param("calendarId") String calendarId);
+    List<SchedulerCalendarDetails> queryByCalendarId(@Param("calendarId") int calendarId);
 
 
 

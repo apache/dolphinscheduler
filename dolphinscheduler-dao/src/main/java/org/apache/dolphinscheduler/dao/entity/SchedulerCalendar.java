@@ -17,10 +17,12 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yss.henghe.platform.tools.constraint.SourceCodeConstraint;
@@ -78,6 +80,11 @@ public class SchedulerCalendar {
      * update time
      */
     private Date updateTime;
+
+    @TableField(exist=false)
+    List<SchedulerCalendarDetails> detailsList ;
+
+
 
     public int getId() {
         return id;
@@ -149,5 +156,13 @@ public class SchedulerCalendar {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public List<SchedulerCalendarDetails> getDetailsList() {
+        return detailsList;
+    }
+
+    public void setDetailsList(List<SchedulerCalendarDetails> detailsList) {
+        this.detailsList = detailsList;
     }
 }

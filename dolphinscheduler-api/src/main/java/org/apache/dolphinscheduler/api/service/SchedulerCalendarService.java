@@ -120,14 +120,16 @@ public class SchedulerCalendarService extends BaseService{
     calendar.setCreateTime(now);
     calendar.setUpdateTime(now);
 
-    // save
-    schedulerCalendarMapper.insert(calendar);
 
 
-    // todo deal detail info
+
    boolean detailStatus = doDetailsInfo(calendar,calendarParam);
 
    if( detailStatus ){
+
+     // save
+     schedulerCalendarMapper.insert(calendar);
+
      putMsg(result, Status.SUCCESS);
      result.put(Constants.MSG, Status.SUCCESS.getMsg());
    }else{
@@ -204,37 +206,38 @@ public class SchedulerCalendarService extends BaseService{
       return result;
     }
 
-    // update SchedulerCalendar Instance
-
-    Date now = new Date();
-
-    if (StringUtils.isNotEmpty(name)){
-      calendar.setName(name);
-    }
-
-    if (null != calendarParam.getStartTime() ){
-      calendar.setStartTime(calendarParam.getStartTime());
-    }
-
-    if (null != calendarParam.getEndTime() ){
-      calendar.setEndTime(calendarParam.getEndTime());
-    }
-
-    calendar.setReleaseState(ReleaseState.OFFLINE);
-
-    calendar.setUserId(loginUser.getId());
-    calendar.setDescription(desc);
-
-    calendar.setUpdateTime(now);
-
-
-    schedulerCalendarMapper.updateById(calendar);
 
 
     // todo deal detail info
     boolean detailStatus = doDetailsInfo(calendar,calendarParam);
 
     if( detailStatus ){
+
+      // update SchedulerCalendar Instance
+      Date now = new Date();
+
+      if (StringUtils.isNotEmpty(name)){
+        calendar.setName(name);
+      }
+
+      if (null != calendarParam.getStartTime() ){
+        calendar.setStartTime(calendarParam.getStartTime());
+      }
+
+      if (null != calendarParam.getEndTime() ){
+        calendar.setEndTime(calendarParam.getEndTime());
+      }
+
+      calendar.setReleaseState(ReleaseState.OFFLINE);
+
+      calendar.setUserId(loginUser.getId());
+      calendar.setDescription(desc);
+
+      calendar.setUpdateTime(now);
+
+      schedulerCalendarMapper.updateById(calendar);
+
+
       putMsg(result, Status.SUCCESS);
       result.put(Constants.MSG, Status.SUCCESS.getMsg());
     }else{
@@ -265,15 +268,44 @@ public class SchedulerCalendarService extends BaseService{
       return result;
     }
 
-    //todo 这里需要处理任务&实例的依赖关系
-
-
 
     schedulerCalendarMapper.deleteById(id);
+    schedulerCalendarDetailsMapper.clearByCalendarId(id);
+    //todo 这里需要处理任务&实例的依赖关系
+
 
     putMsg(result, Status.SUCCESS);
     return result;
   }
+
+
+  /**
+   * select SchedulerCalendar
+   *
+   * @param loginUser login user
+   * @param id SchedulerCalendar id
+   * @return delete result code
+   * @throws Exception exception
+   */
+  @Transactional(rollbackFor = Exception.class)
+  public Map<String, Object> selectById(User loginUser, int id) throws Exception {
+    Map<String, Object> result = new HashMap<>(5);
+
+
+    SchedulerCalendar calendar = schedulerCalendarMapper.selectById(id);
+
+    if (calendar == null){
+      putMsg(result, Status.CALENDAR_NOT_EXIST);
+      return result;
+    }
+
+    List<SchedulerCalendarDetails> detailsList =  schedulerCalendarDetailsMapper.queryByCalendarId(id);
+    calendar.setDetailsList(detailsList);
+
+    putMsg(result, Status.SUCCESS);
+    return result;
+  }
+
 
 
   /**
@@ -378,55 +410,61 @@ public class SchedulerCalendarService extends BaseService{
 
     putMsg(result, Status.SUCCESS);
     return result;
+
   }
 
+  /**
+   * deal details info
+   * @param calendar
+   * @param calendarParam
+   * @return
+   */
   private boolean doDetailsInfo(SchedulerCalendar calendar, CalendarParam calendarParam) {
 
     boolean result = false;
 
-    //验证calendarParam中的数据是否有效
+    //validate calendarParam
     if(null != calendarParam
             && null != calendarParam.getStartTime()
             && null != calendarParam.getEndTime()){
-    }
 
+      Map<Integer,Object> extDateMap = new HashMap<>();
 
-    Map<Date,Object> extDateMap = new HashMap<>();
+      List<Integer> extList = calendarParam.getExtTime();
 
-
-
-//    // key = id, value - websites
-//    Map<Integer, String> result1 = list.stream().collect(
-//            Collectors.toMap(Hosting::getId, Hosting::getName));
-//    calendarParam.getExtTime();
-//
-
-    //清理掉之前遗留的记录
-    schedulerCalendarDetailsMapper.clearByCalendarId(calendar.getId());
-
-    //获取重新添加记录
-    List<Integer> days  =  getDays(calendarParam.getStartTime(),calendarParam.getEndTime());
-
-    //更新记录
-    if(null != days && days.size()>0){
-
-      SchedulerCalendarDetails schedulerCalendarDetails = null ;
-      for (Integer day : days){
-
-        schedulerCalendarDetails = new SchedulerCalendarDetails();
-        schedulerCalendarDetails.setCalendarId(calendar.getId());
-        schedulerCalendarDetails.setCreateTime(calendar.getUpdateTime());
-        schedulerCalendarDetails.setUpdateTime(calendar.getUpdateTime());
-        schedulerCalendarDetails.setUserId(calendar.getUserId());
-        schedulerCalendarDetails.setStamp(day);
-
-        schedulerCalendarDetails.setFlag(Flag.YES);
-
-        schedulerCalendarDetailsMapper.insert(schedulerCalendarDetails);
-        schedulerCalendarDetails = null ;
+      if(null != extList && extList.size()>0){
+        for (Integer key : extList){
+          extDateMap.put(key,null);
+        }
       }
-    }
 
+      //clear old data
+      schedulerCalendarDetailsMapper.clearByCalendarId(calendar.getId());
+
+      //Gets the list<Integer>  days from the start date to the end date
+      List<Integer> days  =  getDays(calendarParam.getStartTime(),calendarParam.getEndTime());
+
+      //insert details
+      if(null != days && days.size()>0){
+        SchedulerCalendarDetails schedulerCalendarDetails = null ;
+        for (Integer day : days){
+
+          schedulerCalendarDetails = new SchedulerCalendarDetails();
+          schedulerCalendarDetails.setCalendarId(calendar.getId());
+          schedulerCalendarDetails.setCreateTime(calendar.getUpdateTime());
+          schedulerCalendarDetails.setUpdateTime(calendar.getUpdateTime());
+          schedulerCalendarDetails.setUserId(calendar.getUserId());
+          schedulerCalendarDetails.setStamp(day);
+
+          schedulerCalendarDetails.setFlag(Flag.YES);
+
+          schedulerCalendarDetailsMapper.insert(schedulerCalendarDetails);
+          schedulerCalendarDetails = null ;
+        }
+      }
+
+      result = true;
+    }
 
     return  result;
 

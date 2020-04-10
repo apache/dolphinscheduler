@@ -182,6 +182,35 @@ public class SchedulerCalendarController extends BaseController{
     }
 
     /**
+     * select calendar by id
+     *
+     * @param loginUser login user
+     * @param id calendar id
+     * @return delete result code
+     */
+    @ApiOperation(value = "selectCalendarById", notes= "GET_CALENDAR_NOTES")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "ID", value = "CALENDAR_ID", required = true, dataType ="Int", example = "100")
+
+    })
+    @PostMapping(value = "/selectCalendarById")
+    @ResponseStatus(HttpStatus.OK)
+    public Result selectCalendarById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+            @RequestParam(value = "id") int id) {
+        logger.info("login user {}, delete calendar, calendarId: {},", loginUser.getUserName(), id);
+        try {
+            Map<String, Object> result = schedulerCalendarService.selectById(loginUser,id);
+            return returnDataList(result);
+        }catch (Exception e){
+            logger.error(Status.DELETE_CALENDAR_BY_ID_ERROR.getMsg(),e);
+            return error(Status.DELETE_CALENDAR_BY_ID_ERROR.getCode(), Status.DELETE_CALENDAR_BY_ID_ERROR.getMsg());
+        }
+    }
+
+
+
+
+    /**
      * delete calendar by id
      *
      * @param loginUser login user
@@ -196,7 +225,7 @@ public class SchedulerCalendarController extends BaseController{
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     public Result deleteCalendarById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "id") int id) {
+            @RequestParam(value = "id") int id) {
         logger.info("login user {}, delete calendar, calendarId: {},", loginUser.getUserName(), id);
         try {
             Map<String, Object> result = schedulerCalendarService.deleteCalendarById(loginUser,id);
