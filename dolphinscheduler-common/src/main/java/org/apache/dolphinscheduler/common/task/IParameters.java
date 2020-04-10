@@ -27,7 +27,7 @@ public interface IParameters {
     /**
      * check parameters is valid
      *
-     * @return
+     * @return result
      */
     boolean checkParameters();
 
