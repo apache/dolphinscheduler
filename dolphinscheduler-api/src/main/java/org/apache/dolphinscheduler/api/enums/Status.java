@@ -16,8 +16,10 @@
  */
 package org.apache.dolphinscheduler.api.enums;
 
+import org.apache.hadoop.fs.Stat;
 import org.springframework.context.i18n.LocaleContextHolder;
 
+import java.text.MessageFormat;
 import java.util.Locale;
 
 /**
@@ -26,6 +28,8 @@ import java.util.Locale;
 public enum Status {
 
     SUCCESS(0, "success", "成功"),
+
+    INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
 
     REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
     TASK_TIMEOUT_PARAMS_ERROR(10002, "task timeout parameter is not valid", "任务超时参数无效"),
