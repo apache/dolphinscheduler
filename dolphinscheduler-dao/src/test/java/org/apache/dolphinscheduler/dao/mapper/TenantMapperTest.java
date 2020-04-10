@@ -69,7 +69,6 @@ public class TenantMapperTest {
         //update
         int update = tenantMapper.updateById(tenant);
         Assert.assertEquals(1, update);
-        tenantMapper.deleteById(tenant.getId());
     }
 
     /**
@@ -91,7 +90,6 @@ public class TenantMapperTest {
         //query
         List<Tenant> tenants = tenantMapper.selectList(null);
         Assert.assertNotEquals(tenants.size(), 0);
-        tenantMapper.deleteById(tenant.getId());
     }
 
     /**
@@ -112,7 +110,6 @@ public class TenantMapperTest {
 
         Tenant tenant1 = tenantMapper.queryById(tenant.getId());
 
-        tenantMapper.deleteById(tenant.getId());
         Assert.assertNotEquals(tenant1, null);
     }
 
@@ -125,7 +122,6 @@ public class TenantMapperTest {
         Tenant tenant = insertOne();
         tenant.setTenantCode("ut code");
         tenantMapper.updateById(tenant);
-        tenantMapper.deleteById(tenant.getId());
     }
 
     /**
@@ -148,8 +144,6 @@ public class TenantMapperTest {
 
         IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, tenant.getTenantName());
 
-        queueMapper.deleteById(queue.getId());
-        tenantMapper.deleteById(tenant.getId());
         Assert.assertNotEquals(tenantIPage.getTotal(), 0);
     }
 }

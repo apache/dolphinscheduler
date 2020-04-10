@@ -67,7 +67,6 @@ public class ResourceUserMapperTest {
         //update
         int update = resourceUserMapper.updateById(queue);
         Assert.assertEquals(1, update);
-        resourceUserMapper.deleteById(queue.getId());
     }
 
     /**
@@ -89,7 +88,6 @@ public class ResourceUserMapperTest {
         //query
         List<ResourcesUser> queues = resourceUserMapper.selectList(null);
         Assert.assertNotEquals(queues.size(), 0);
-        resourceUserMapper.deleteById(queue.getId());
     }
 
     /**
