@@ -259,7 +259,7 @@ public class ProcessInstanceServiceTest {
 
         //task not sub process
         TaskInstance taskInstance = getTaskInstance();
-        taskInstance.setTaskType(TaskType.HTTP.getDescp());
+        taskInstance.setTaskType(TaskType.HTTP.toString());
         taskInstance.setProcessInstanceId(1);
         when(processService.findTaskInstanceById(1)).thenReturn(taskInstance);
         Map<String, Object> notSubprocessRes = processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectName, 1);
@@ -267,7 +267,7 @@ public class ProcessInstanceServiceTest {
 
         //sub process not exist
         TaskInstance subTask = getTaskInstance();
-        subTask.setTaskType(TaskType.SUB_PROCESS.getDescp());
+        subTask.setTaskType(TaskType.SUB_PROCESS.toString());
         subTask.setProcessInstanceId(1);
         when(processService.findTaskInstanceById(subTask.getId())).thenReturn(subTask);
         when(processService.findSubProcessInstance(subTask.getProcessInstanceId(), subTask.getId())).thenReturn(null);
