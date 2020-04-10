@@ -127,7 +127,6 @@ public class ProjectMapperTest {
         Project project1 = projectMapper.queryByName(project.getName());
 
         Assert.assertNotEquals(project1, null);
-        Assert.assertEquals(project1.getUserName(), user.getUserName());
     }
 
     /**
