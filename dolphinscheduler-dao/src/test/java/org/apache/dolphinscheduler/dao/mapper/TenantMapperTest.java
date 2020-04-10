@@ -26,13 +26,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class TenantMapperTest {
 
     @Autowired
@@ -65,7 +69,6 @@ public class TenantMapperTest {
         //update
         int update = tenantMapper.updateById(tenant);
         Assert.assertEquals(1, update);
-        tenantMapper.deleteById(tenant.getId());
     }
 
     /**
@@ -87,7 +90,6 @@ public class TenantMapperTest {
         //query
         List<Tenant> tenants = tenantMapper.selectList(null);
         Assert.assertNotEquals(tenants.size(), 0);
-        tenantMapper.deleteById(tenant.getId());
     }
 
     /**
@@ -108,7 +110,6 @@ public class TenantMapperTest {
 
         Tenant tenant1 = tenantMapper.queryById(tenant.getId());
 
-        tenantMapper.deleteById(tenant.getId());
         Assert.assertNotEquals(tenant1, null);
     }
 
@@ -121,7 +122,6 @@ public class TenantMapperTest {
         Tenant tenant = insertOne();
         tenant.setTenantCode("ut code");
         tenantMapper.updateById(tenant);
-        tenantMapper.deleteById(tenant.getId());
     }
 
     /**
@@ -144,8 +144,6 @@ public class TenantMapperTest {
 
         IPage<Tenant> tenantIPage = tenantMapper.queryTenantPaging(page, tenant.getTenantName());
 
-        queueMapper.deleteById(queue.getId());
-        tenantMapper.deleteById(tenant.getId());
         Assert.assertNotEquals(tenantIPage.getTotal(), 0);
     }
 }

@@ -98,7 +98,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         if(executorRef == null){
             executorRef = nettyRemotingServer.getDefaultExecutor();
         }
-        this.processors.putIfAbsent(commandType, new Pair<NettyRequestProcessor, ExecutorService>(processor, executorRef));
+        this.processors.putIfAbsent(commandType, new Pair<>(processor, executorRef));
     }
 
     /**
