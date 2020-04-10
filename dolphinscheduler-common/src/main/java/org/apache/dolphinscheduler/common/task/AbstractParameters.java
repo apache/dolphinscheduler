@@ -41,7 +41,7 @@ public abstract class AbstractParameters implements IParameters {
 
   /**
    * get local parameters list
-   * @return
+   * @return Property list
    */
   public List<Property> getLocalParams() {
     return localParams;
@@ -53,7 +53,7 @@ public abstract class AbstractParameters implements IParameters {
 
   /**
    * get local parameters map
-   * @return
+   * @return parameters map
    */
   public Map<String,Property> getLocalParametersMap() {
       if (localParams != null) {

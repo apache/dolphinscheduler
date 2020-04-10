@@ -135,11 +135,14 @@ public class AlertDao extends AbstractBaseDao {
         alertMapper.insert(alert);
     }
 
+
     /**
      * task timeout warn
      * @param alertgroupId alertgroupId
      * @param receivers receivers
      * @param receiversCc receiversCc
+     * @param processInstanceId processInstanceId
+     * @param processInstanceName processInstanceName
      * @param taskId taskId
      * @param taskName taskName
      */
@@ -171,7 +174,7 @@ public class AlertDao extends AbstractBaseDao {
 
     /**
      * for test
-     * @return
+     * @return AlertMapper
      */
     public AlertMapper getAlertMapper() {
         return alertMapper;

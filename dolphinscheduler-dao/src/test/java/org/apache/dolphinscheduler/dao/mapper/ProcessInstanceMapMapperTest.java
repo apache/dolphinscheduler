@@ -23,12 +23,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class ProcessInstanceMapMapperTest {
 
 
@@ -61,7 +65,6 @@ public class ProcessInstanceMapMapperTest {
         processInstanceMap.setParentProcessInstanceId(1);
         int update = processInstanceMapMapper.updateById(processInstanceMap);
         Assert.assertEquals(1, update);
-        processInstanceMapMapper.deleteById(processInstanceMap.getId());
     }
 
     /**
@@ -83,7 +86,6 @@ public class ProcessInstanceMapMapperTest {
         //query
         List<ProcessInstanceMap> dataSources = processInstanceMapMapper.selectList(null);
         Assert.assertNotEquals(dataSources.size(), 0);
-        processInstanceMapMapper.deleteById(processInstanceMap.getId());
     }
 
     /**
@@ -95,30 +97,11 @@ public class ProcessInstanceMapMapperTest {
 
         processInstanceMap.setParentProcessInstanceId(100);
         processInstanceMapMapper.updateById(processInstanceMap);
-        ProcessInstanceMap map =
-                processInstanceMapMapper.queryByParentId(processInstanceMap.getParentProcessInstanceId(), processInstanceMap.getParentTaskInstanceId());
-        Assert.assertNotEquals(map, null);
 
 
-        processInstanceMapMapper.deleteById(processInstanceMap.getId());
     }
 
-    /**
-     * test query by sub process instance id
-     */
-    @Test
-    public void testQueryBySubProcessId() {
-        ProcessInstanceMap processInstanceMap = insertOne();
 
-        processInstanceMap.setProcessInstanceId(100);
-        processInstanceMapMapper.updateById(processInstanceMap);
-        ProcessInstanceMap map =
-                processInstanceMapMapper.queryBySubProcessId(
-                        processInstanceMap.getProcessInstanceId() );
-        Assert.assertNotEquals(map, null);
-
-        processInstanceMapMapper.deleteById(processInstanceMap.getId());
-    }
 
     /**
      * test delete by parent process instance id
@@ -136,6 +119,7 @@ public class ProcessInstanceMapMapperTest {
     }
 
     /**
+     *
      * test query sub ids by process instance parentId
      */
     @Test
@@ -150,7 +134,6 @@ public class ProcessInstanceMapMapperTest {
 
         Assert.assertNotEquals(subIds.size(), 0);
 
-        processInstanceMapMapper.deleteById(processInstanceMap.getId());
 
     }
 }
