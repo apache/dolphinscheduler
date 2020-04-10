@@ -708,6 +708,7 @@
                         <include>**/api/service/LoggerServiceTest.java</include>
                         <include>**/api/service/MonitorServiceTest.java</include>
                         <include>**/api/service/ProcessDefinitionServiceTest.java</include>
+                        <include>**/api/service/ProcessInstanceServiceTest.java</include>
                         <include>**/api/service/ProjectServiceTest.java</include>
                         <include>**/api/service/QueueServiceTest.java</include>
                         <include>**/api/service/ResourcesServiceTest.java</include>
