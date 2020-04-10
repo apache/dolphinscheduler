@@ -67,7 +67,6 @@ public class DataSourceUserMapperTest {
         dataSourceUser.setUpdateTime(new Date());
         int update = dataSourceUserMapper.updateById(dataSourceUser);
         Assert.assertEquals(update, 1);
-        dataSourceUserMapper.deleteById(dataSourceUser.getId());
     }
 
     /**
@@ -90,7 +89,6 @@ public class DataSourceUserMapperTest {
         //query
         List<DatasourceUser> dataSources = dataSourceUserMapper.selectList(null);
         Assert.assertNotEquals(dataSources.size(), 0);
-        dataSourceUserMapper.deleteById(dataSourceUser.getId());
     }
 
     /**
