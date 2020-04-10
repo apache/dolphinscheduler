@@ -798,6 +798,8 @@
                         <exclude>**/docs/**</exclude>
                         <exclude>**/*.babelrc</exclude>
                         <exclude>**/*.eslintrc</exclude>
+                        <exclude>**/.mvn/jvm.config</exclude>
+                        <exclude>**/.mvn/wrapper/maven-wrapper.properties</exclude>
                     </excludes>
                     <consoleOutput>true</consoleOutput>
                 </configuration>
