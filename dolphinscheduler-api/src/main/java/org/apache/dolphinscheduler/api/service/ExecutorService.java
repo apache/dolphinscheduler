@@ -225,20 +225,14 @@ public class ExecutorService extends BaseService{
                 if (processInstance.getState() == ExecutionStatus.READY_STOP) {
                     putMsg(result, Status.PROCESS_INSTANCE_ALREADY_CHANGED, processInstance.getName(), processInstance.getState());
                 } else {
-                    processInstance.setCommandType(CommandType.STOP);
-                    processInstance.addHistoryCmd(CommandType.STOP);
-                    processService.updateProcessInstance(processInstance);
-                    result = updateProcessInstanceState(processInstanceId, ExecutionStatus.READY_STOP);
+                    result = updateProcessInstancePrepare(processInstance, CommandType.STOP, ExecutionStatus.READY_STOP);
                 }
                 break;
             case PAUSE:
                 if (processInstance.getState() == ExecutionStatus.READY_PAUSE) {
                     putMsg(result, Status.PROCESS_INSTANCE_ALREADY_CHANGED, processInstance.getName(), processInstance.getState());
                 } else {
-                    processInstance.setCommandType(CommandType.PAUSE);
-                    processInstance.addHistoryCmd(CommandType.PAUSE);
-                    processService.updateProcessInstance(processInstance);
-                    result = updateProcessInstanceState(processInstanceId, ExecutionStatus.READY_PAUSE);
+                    result = updateProcessInstancePrepare(processInstance, CommandType.PAUSE, ExecutionStatus.READY_PAUSE);
                 }
                 break;
             default:
@@ -308,16 +302,22 @@ public class ExecutorService extends BaseService{
     }
 
     /**
-     * update process instance state
+     *  prepare to update process instance command type and status
      *
-     * @param processInstanceId process instance id
+     * @param processInstance process instance
+     * @param commandType command type
      * @param executionStatus execute status
-     * @return update result
+     * @return
      */
-    private Map<String, Object> updateProcessInstanceState(Integer processInstanceId, ExecutionStatus executionStatus) {
+    private Map<String, Object> updateProcessInstancePrepare(ProcessInstance processInstance, CommandType commandType, ExecutionStatus executionStatus) {
         Map<String, Object> result = new HashMap<>(5);
 
-        int update = processService.updateProcessInstanceState(processInstanceId, executionStatus);
+        processInstance.setCommandType(commandType);
+        processInstance.addHistoryCmd(commandType);
+        processInstance.setState(executionStatus);
+        int update = processService.updateProcessInstance(processInstance);
+
+        // determine whether the process is normal
         if (update > 0) {
             putMsg(result, Status.SUCCESS);
         } else {
