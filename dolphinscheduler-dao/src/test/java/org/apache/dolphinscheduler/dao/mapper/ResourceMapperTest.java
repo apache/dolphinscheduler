@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -248,6 +249,7 @@ public class ResourceMapperTest {
 
         resourcesUser.setResourcesId(resource.getId());
         resourcesUser.setUserId(1110);
+        resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
         resourceUserMapper.insert(resourcesUser);
 
         List<Resource> resources1 = resourceMapper.queryAuthorizedResourceList(1110);
