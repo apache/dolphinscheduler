@@ -501,6 +501,9 @@ public class HadoopUtils implements Closeable {
      * @return hdfs file name
      */
     public static String getHdfsFileName(ResourceType resourceType, String tenantCode, String fileName) {
+        if (fileName.startsWith("/")) {
+            fileName = fileName.replaceFirst("/","");
+        }
         return String.format("%s/%s", getHdfsDir(resourceType,tenantCode), fileName);
     }
 
@@ -512,6 +515,9 @@ public class HadoopUtils implements Closeable {
      * @return get absolute path and name for file on hdfs
      */
     public static String getHdfsResourceFileName(String tenantCode, String fileName) {
+        if (fileName.startsWith("/")) {
+            fileName = fileName.replaceFirst("/","");
+        }
         return String.format("%s/%s", getHdfsResDir(tenantCode), fileName);
     }
 
@@ -523,6 +529,9 @@ public class HadoopUtils implements Closeable {
      * @return get absolute path and name for udf file on hdfs
      */
     public static String getHdfsUdfFileName(String tenantCode, String fileName) {
+        if (fileName.startsWith("/")) {
+            fileName = fileName.replaceFirst("/","");
+        }
         return String.format("%s/%s", getHdfsUdfDir(tenantCode), fileName);
     }
 

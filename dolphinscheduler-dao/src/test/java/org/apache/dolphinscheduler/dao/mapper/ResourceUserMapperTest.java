@@ -102,4 +102,18 @@ public class ResourceUserMapperTest {
                 queue.getResourcesId());
         Assert.assertNotEquals(delete, 0);
     }
+
+    /**
+     * test delete
+     */
+    @Test
+    public void testDeleteResourceUserArray() {
+
+        ResourcesUser resourcesUser = insertOne();
+        Integer[] resourceIdArray = new Integer[]{resourcesUser.getResourcesId()};
+        int delete = resourceUserMapper.deleteResourceUserArray(
+                resourcesUser.getUserId(),
+                resourceIdArray);
+        Assert.assertNotEquals(delete, 0);
+    }
 }

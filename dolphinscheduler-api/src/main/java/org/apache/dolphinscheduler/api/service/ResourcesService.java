@@ -619,15 +619,6 @@ public class ResourcesService extends BaseService {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        //if resource type is UDF,need check whether it is bound by UDF functon
-        if (resource.getType() == (ResourceType.UDF)) {
-            List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(new int[]{resourceId});
-            if (CollectionUtils.isNotEmpty(udfFuncs)) {
-                logger.error("can't be deleted,because it is bound by UDF functions:{}",udfFuncs.toString());
-                putMsg(result,Status.UDF_RESOURCE_IS_BOUND,udfFuncs.get(0).getFuncName());
-                return result;
-            }
-        }
 
         String tenantCode = getTenantCode(resource.getUserId(),result);
         if (StringUtils.isEmpty(tenantCode)){
@@ -639,6 +630,17 @@ public class ResourcesService extends BaseService {
         Set<Integer> resourceIdSet = resourceProcessMap.keySet();
         // get all children of the resource
         List<Integer> allChildren = listAllChildren(resource);
+        Integer[] needDeleteResourceIdArray = allChildren.toArray(new Integer[allChildren.size()]);
+
+        //if resource type is UDF,need check whether it is bound by UDF functon
+        if (resource.getType() == (ResourceType.UDF)) {
+            List<UdfFunc> udfFuncs = udfFunctionMapper.listUdfByResourceId(needDeleteResourceIdArray);
+            if (CollectionUtils.isNotEmpty(udfFuncs)) {
+                logger.error("can't be deleted,because it is bound by UDF functions:{}",udfFuncs.toString());
+                putMsg(result,Status.UDF_RESOURCE_IS_BOUND,udfFuncs.get(0).getFuncName());
+                return result;
+            }
+        }
 
         if (resourceIdSet.contains(resource.getPid())) {
             logger.error("can't be deleted,because it is used of process definition");
@@ -659,8 +661,8 @@ public class ResourcesService extends BaseService {
         String hdfsFilename = HadoopUtils.getHdfsFileName(resource.getType(), tenantCode, resource.getFullName());
 
         //delete data in database
-        resourcesMapper.deleteIds(allChildren.toArray(new Integer[allChildren.size()]));
-        resourceUserMapper.deleteResourceUser(0, resourceId);
+        resourcesMapper.deleteIds(needDeleteResourceIdArray);
+        resourceUserMapper.deleteResourceUserArray(0, needDeleteResourceIdArray);
 
         //delete file on hdfs
         HadoopUtils.getInstance().delete(hdfsFilename, true);

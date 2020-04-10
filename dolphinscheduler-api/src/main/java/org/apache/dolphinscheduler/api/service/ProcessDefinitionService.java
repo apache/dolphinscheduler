@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -478,6 +479,20 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         switch (state) {
             case ONLINE:
+                // To check resources whether they are already cancel authorized or deleted
+                String resourceIds = processDefinition.getResourceIds();
+                if (StringUtils.isNotBlank(resourceIds)) {
+                    Integer[] resourceIdArray = Arrays.stream(resourceIds.split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+                    PermissionCheck<Integer> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_ID,processService,resourceIdArray,loginUser.getId(),logger);
+                    try {
+                        permissionCheck.checkPermission();
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(),e);
+                        putMsg(result, Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION, "releaseState");
+                        return result;
+                    }
+                }
+
                 processDefinition.setReleaseState(state);
                 processDefineMapper.updateById(processDefinition);
                 break;
