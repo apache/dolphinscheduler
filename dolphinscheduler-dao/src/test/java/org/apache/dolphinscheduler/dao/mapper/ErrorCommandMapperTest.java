@@ -61,29 +61,9 @@ public class ErrorCommandMapperTest {
         return errorCommand;
     }
 
-    /**
-     * test update
-     */
-    @Test
-    public void testUpdate(){
-        //insertOne
-        ErrorCommand errorCommand = insertOne();
-        //update
-        errorCommand.setUpdateTime(new Date());
-        int update = errorCommandMapper.updateById(errorCommand);
-        Assert.assertEquals(1,update);
-    }
 
-    /**
-     * test delete
-     */
-    @Test
-    public void testDelete(){
 
-        ErrorCommand errorCommand = insertOne();
-        int delete = errorCommandMapper.deleteById(errorCommand.getId());
-        Assert.assertEquals(1,delete);
-    }
+
 
     /**
      * test query
