@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.service.permission.PermissionCheck;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,6 +144,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setTimeout(processData.getTimeout());
         processDefine.setTenantId(processData.getTenantId());
         processDefine.setModifyBy(loginUser.getUserName());
+        processDefine.setResourceIds(getResourceIds(processData));
 
         //custom global params
         List<Property> globalParamsList = processData.getGlobalParams();
@@ -336,6 +338,7 @@ public class ProcessDefinitionService extends BaseDAGService {
         processDefine.setTimeout(processData.getTimeout());
         processDefine.setTenantId(processData.getTenantId());
         processDefine.setModifyBy(loginUser.getUserName());
+        processDefine.setResourceIds(getResourceIds(processData));
 
         //custom global params
         List<Property> globalParamsList = new ArrayList<>();
@@ -479,6 +482,20 @@ public class ProcessDefinitionService extends BaseDAGService {
 
         switch (state) {
             case ONLINE:
+                // To check resources whether they are already cancel authorized or deleted
+                String resourceIds = processDefinition.getResourceIds();
+                if (StringUtils.isNotBlank(resourceIds)) {
+                    Integer[] resourceIdArray = Arrays.stream(resourceIds.split(",")).map(Integer::parseInt).toArray(Integer[]::new);
+                    PermissionCheck<Integer> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_ID,processService,resourceIdArray,loginUser.getId(),logger);
+                    try {
+                        permissionCheck.checkPermission();
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(),e);
+                        putMsg(result, Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION, "releaseState");
+                        return result;
+                    }
+                }
+
                 processDefinition.setReleaseState(state);
                 processDefineMapper.updateById(processDefinition);
                 break;
@@ -583,13 +600,13 @@ public class ProcessDefinitionService extends BaseDAGService {
         List<Schedule> schedules = scheduleMapper.queryByProcessDefinitionId(processDefinitionId);
         if (!schedules.isEmpty()) {
             Schedule schedule = schedules.get(0);
-            WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
+            /*WorkerGroup workerGroup = workerGroupMapper.selectById(schedule.getWorkerGroupId());
 
             if (null == workerGroup && schedule.getWorkerGroupId() == -1) {
                 workerGroup = new WorkerGroup();
                 workerGroup.setId(-1);
                 workerGroup.setName("");
-            }
+            }*/
 
             exportProcessMeta.setScheduleWarningType(schedule.getWarningType().toString());
             exportProcessMeta.setScheduleWarningGroupId(schedule.getWarningGroupId());
@@ -599,11 +616,7 @@ public class ProcessDefinitionService extends BaseDAGService {
             exportProcessMeta.setScheduleFailureStrategy(String.valueOf(schedule.getFailureStrategy()));
             exportProcessMeta.setScheduleReleaseState(String.valueOf(ReleaseState.OFFLINE));
             exportProcessMeta.setScheduleProcessInstancePriority(String.valueOf(schedule.getProcessInstancePriority()));
-
-            if (null != workerGroup) {
-                exportProcessMeta.setScheduleWorkerGroupId(workerGroup.getId());
-                exportProcessMeta.setScheduleWorkerGroupName(workerGroup.getName());
-            }
+            exportProcessMeta.setScheduleWorkerGroupName(schedule.getWorkerGroup());
         }
         //create workflow json file
         return JSONUtils.toJsonString(exportProcessMeta);
@@ -802,15 +815,9 @@ public class ProcessDefinitionService extends BaseDAGService {
         if (null != processMeta.getScheduleProcessInstancePriority()) {
             scheduleObj.setProcessInstancePriority(Priority.valueOf(processMeta.getScheduleProcessInstancePriority()));
         }
-        if (null != processMeta.getScheduleWorkerGroupId()) {
-            scheduleObj.setWorkerGroupId(processMeta.getScheduleWorkerGroupId());
-        } else {
-            if (null != processMeta.getScheduleWorkerGroupName()) {
-                List<WorkerGroup> workerGroups = workerGroupMapper.queryWorkerGroupByName(processMeta.getScheduleWorkerGroupName());
-                if(CollectionUtils.isNotEmpty(workerGroups)){
-                    scheduleObj.setWorkerGroupId(workerGroups.get(0).getId());
-                }
-            }
+
+        if (null != processMeta.getScheduleWorkerGroupName()) {
+            scheduleObj.setWorkerGroup(processMeta.getScheduleWorkerGroupName());
         }
 
         return scheduleMapper.insert(scheduleObj);

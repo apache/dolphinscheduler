@@ -60,14 +60,14 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
          */
         final CommandType commandType = command.getType();
         switch (commandType){
-            case GET_LOG_BYTES_REQUEST:
-                GetLogBytesRequestCommand getLogRequest = FastJsonSerializer.deserialize(
-                        command.getBody(), GetLogBytesRequestCommand.class);
-                byte[] bytes = getFileContentBytes(getLogRequest.getPath());
-                GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
-                channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
-                break;
-            case VIEW_WHOLE_LOG_REQUEST:
+                case GET_LOG_BYTES_REQUEST:
+                    GetLogBytesRequestCommand getLogRequest = FastJsonSerializer.deserialize(
+                            command.getBody(), GetLogBytesRequestCommand.class);
+                    byte[] bytes = getFileContentBytes(getLogRequest.getPath());
+                    GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
+                    channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
+                    break;
+                case VIEW_WHOLE_LOG_REQUEST:
                 ViewLogRequestCommand viewLogRequest = FastJsonSerializer.deserialize(
                         command.getBody(), ViewLogRequestCommand.class);
                 String msg = readWholeFileContent(viewLogRequest.getPath());
