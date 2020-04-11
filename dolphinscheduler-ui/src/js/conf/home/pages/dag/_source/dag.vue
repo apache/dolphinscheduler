@@ -177,7 +177,7 @@
           Endpoint: [
             'Dot', { radius: 1, cssClass: 'dot-style' }
           ],
-          Connector: 'Straight',
+          Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
           ConnectionOverlays: [
             [
@@ -606,7 +606,7 @@
           Endpoint: [
             'Dot', { radius: 1, cssClass: 'dot-style' }
           ],
-          Connector: 'Straight',
+          Connector: 'Bezier',
           PaintStyle: { lineWidth: 2, stroke: '#456' }, // Connection style
           ConnectionOverlays: [
             [

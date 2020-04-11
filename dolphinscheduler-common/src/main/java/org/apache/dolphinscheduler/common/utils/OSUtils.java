@@ -416,6 +416,8 @@ public class OSUtils {
 
   /**
    * check memory and cpu usage
+   * @param systemCpuLoad systemCpuLoad
+   * @param systemReservedMemory systemReservedMemory
    * @return check memory and cpu usage
    */
   public static Boolean checkResource(double systemCpuLoad, double systemReservedMemory){

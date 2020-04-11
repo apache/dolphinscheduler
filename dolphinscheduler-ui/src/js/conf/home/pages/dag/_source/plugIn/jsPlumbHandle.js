@@ -332,7 +332,7 @@ JSP.prototype.tasksContextmenu = function (event) {
         })
       })
     }
-    if (!isTwo) {
+    if (!isTwo) { 
       // edit node
       $(`#editNodes`).click(ev => {
         findComponentDownward(this.dag.$root, 'dag-chart')._createNodes({

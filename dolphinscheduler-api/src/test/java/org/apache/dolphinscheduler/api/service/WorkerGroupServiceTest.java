@@ -27,12 +27,15 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.service.zk.ZookeeperCachedOperator;
+import org.apache.dolphinscheduler.service.zk.ZookeeperConfig;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.matchers.Any;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +55,10 @@ public class WorkerGroupServiceTest {
     private WorkerGroupMapper workerGroupMapper;
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
-
+    @Mock
+    private ZookeeperCachedOperator zookeeperCachedOperator;
 
     private String groupName="groupName000001";
-
 
     /**
      *  create or update a worker group
@@ -129,8 +132,14 @@ public class WorkerGroupServiceTest {
     }
 
     @Test
-    public void testQueryAllGroup(){
-        Mockito.when(workerGroupMapper.queryAllWorkerGroup()).thenReturn(getList());
+    public void testQueryAllGroup() throws Exception {
+        ZookeeperConfig zookeeperConfig = new ZookeeperConfig();
+        zookeeperConfig.setDsRoot("/ds");
+        Mockito.when(zookeeperCachedOperator.getZookeeperConfig()).thenReturn(zookeeperConfig);
+        List<String> workerGroupStrList = new ArrayList<>();
+        workerGroupStrList.add("workerGroup1");
+        Mockito.when(zookeeperCachedOperator.getChildrenKeys(Mockito.anyString())).thenReturn(workerGroupStrList);
+
         Map<String, Object> result = workerGroupService.queryAllGroup();
         logger.info(result.toString());
         Assert.assertEquals(Status.SUCCESS.getMsg(),(String)result.get(Constants.MSG));

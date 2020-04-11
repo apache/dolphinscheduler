@@ -16,7 +16,11 @@
  */
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.slf4j.Logger;
+
+
 import com.alibaba.fastjson.JSON;
+
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskTimeoutStrategy;
@@ -26,12 +30,18 @@ import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.slf4j.Logger;
+import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.cache.TaskInstanceCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.impl.TaskInstanceCacheManagerImpl;
+import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
+import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-import static org.apache.dolphinscheduler.common.Constants.DOLPHINSCHEDULER_TASKS_KILL;
 
 /**
  * master task exec thread
@@ -43,6 +53,15 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     private static final Logger logger = LoggerFactory.getLogger(MasterTaskExecThread.class);
 
+
+    /**
+     * taskInstance state manager
+     */
+    private TaskInstanceCacheManager taskInstanceCacheManager;
+
+
+    private NettyExecutorManager nettyExecutorManager;
+
     /**
      * constructor of MasterTaskExecThread
      * @param taskInstance      task instance
@@ -50,6 +69,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
      */
     public MasterTaskExecThread(TaskInstance taskInstance, ProcessInstance processInstance){
         super(taskInstance, processInstance);
+        this.taskInstanceCacheManager = SpringApplicationContext.getBean(TaskInstanceCacheManagerImpl.class);
+        this.nettyExecutorManager = SpringApplicationContext.getBean(NettyExecutorManager.class);
     }
 
     /**
@@ -68,6 +89,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
     /**
      * submit task instance and wait complete
+     *
      * @return true is task quit is true
      */
     @Override
@@ -89,6 +111,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     }
 
     /**
+     * polling db
+     *
      * wait task quit
      * @return true if task quit success
      */
@@ -119,6 +143,8 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
                 }
                 // task instance finished
                 if (taskInstance.getState().typeIsFinished()){
+                    // if task is final result , then remove taskInstance from cache
+                    taskInstanceCacheManager.removeByTaskInstanceId(taskInstance.getId());
                     break;
                 }
                 if(checkTimeout){
@@ -153,18 +179,21 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
     /**
      *  task instance add queue , waiting worker to kill
      */
-    private void cancelTaskInstance(){
+    private void cancelTaskInstance() throws Exception{
         if(alreadyKilled){
             return ;
         }
         alreadyKilled = true;
-        String host = taskInstance.getHost();
-        if(host == null){
-            host = Constants.NULL;
-        }
-        String queueValue = String.format("%s-%d",
-                host, taskInstance.getId());
-        taskQueue.sadd(DOLPHINSCHEDULER_TASKS_KILL, queueValue);
+
+        TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
+        killCommand.setTaskInstanceId(taskInstance.getId());
+
+        ExecutionContext executionContext = new ExecutionContext(killCommand.convert2Command(), ExecutorType.WORKER);
+
+        Host host = Host.of(taskInstance.getHost());
+        executionContext.setHost(host);
+
+        nettyExecutorManager.executeDirectly(executionContext);
 
         logger.info("master add kill task :{} id:{} to kill queue",
                 taskInstance.getName(), taskInstance.getId() );
@@ -182,7 +211,7 @@ public class MasterTaskExecThread extends MasterBaseTaskExecThread {
 
 
     /**
-     * get remain time（s）
+     * get remain time?s?
      *
      * @return remain time
      */

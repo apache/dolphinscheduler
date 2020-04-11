@@ -25,7 +25,8 @@ import org.apache.dolphinscheduler.common.enums.DbType;
 public class SparkDataSource extends BaseDataSource {
 
   /**
-   * @return driver class
+   * gets the JDBC url for the data source connection
+   * @return jdbc url
    */
   @Override
   public String driverClassSelector() {

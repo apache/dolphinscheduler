@@ -17,19 +17,24 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
+@Rollback(true)
 public class ResourceUserMapperTest {
 
 
@@ -43,13 +48,14 @@ public class ResourceUserMapperTest {
      */
     private ResourcesUser insertOne(){
         //insertOne
-        ResourcesUser queue = new ResourcesUser();
-        queue.setCreateTime(new Date());
-        queue.setUpdateTime(new Date());
-        queue.setUserId(11111);
-        queue.setResourcesId(1110);
-        resourceUserMapper.insert(queue);
-        return queue;
+        ResourcesUser resourcesUser = new ResourcesUser();
+        resourcesUser.setCreateTime(new Date());
+        resourcesUser.setUpdateTime(new Date());
+        resourcesUser.setUserId(11111);
+        resourcesUser.setResourcesId(1110);
+        resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+        resourceUserMapper.insert(resourcesUser);
+        return resourcesUser;
     }
 
     /**
@@ -63,7 +69,6 @@ public class ResourceUserMapperTest {
         //update
         int update = resourceUserMapper.updateById(queue);
         Assert.assertEquals(1, update);
-        resourceUserMapper.deleteById(queue.getId());
     }
 
     /**
@@ -85,7 +90,6 @@ public class ResourceUserMapperTest {
         //query
         List<ResourcesUser> queues = resourceUserMapper.selectList(null);
         Assert.assertNotEquals(queues.size(), 0);
-        resourceUserMapper.deleteById(queue.getId());
     }
 
     /**
@@ -98,6 +102,20 @@ public class ResourceUserMapperTest {
         int delete = resourceUserMapper.deleteResourceUser(
                 queue.getUserId(),
                 queue.getResourcesId());
+        Assert.assertNotEquals(delete, 0);
+    }
+
+    /**
+     * test delete
+     */
+    @Test
+    public void testDeleteResourceUserArray() {
+
+        ResourcesUser resourcesUser = insertOne();
+        Integer[] resourceIdArray = new Integer[]{resourcesUser.getResourcesId()};
+        int delete = resourceUserMapper.deleteResourceUserArray(
+                resourcesUser.getUserId(),
+                resourceIdArray);
         Assert.assertNotEquals(delete, 0);
     }
 }

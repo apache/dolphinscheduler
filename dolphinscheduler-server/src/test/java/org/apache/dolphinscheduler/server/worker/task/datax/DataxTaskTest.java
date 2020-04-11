@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.dao.datasource.BaseDataSource;
 import org.apache.dolphinscheduler.dao.datasource.DataSourceFactory;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.server.entity.DataxTaskExecutionContext;
+import org.apache.dolphinscheduler.server.entity.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.utils.DataxUtils;
 import org.apache.dolphinscheduler.server.worker.task.ShellCommandExecutor;
 import org.apache.dolphinscheduler.server.worker.task.TaskProps;
@@ -53,6 +55,8 @@ public class DataxTaskTest {
 
     private static final Logger logger = LoggerFactory.getLogger(DataxTaskTest.class);
 
+    private static final String CONNECTION_PARAMS = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://127.0.0.1:3306\",\"database\":\"test\",\"jdbcUrl\":\"jdbc:mysql://127.0.0.1:3306/test\"}";
+
     private DataxTask dataxTask;
 
     private ProcessService processService;
@@ -61,6 +65,7 @@ public class DataxTaskTest {
 
     private ApplicationContext applicationContext;
 
+    private TaskExecutionContext taskExecutionContext;
     private TaskProps props = new TaskProps();
 
     @Before
@@ -74,13 +79,36 @@ public class DataxTaskTest {
         springApplicationContext.setApplicationContext(applicationContext);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
 
-        props.setTaskDir("/tmp");
+        TaskProps props = new TaskProps();
+        props.setExecutePath("/tmp");
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
-        props.setTaskInstId(1);
+        props.setTaskInstanceId(1);
         props.setTenantCode("1");
         props.setEnvFile(".dolphinscheduler_env.sh");
         props.setTaskStartTime(new Date());
         props.setTaskTimeout(0);
+        props.setTaskParams(
+            "{\"targetTable\":\"test\",\"postStatements\":[],\"jobSpeedByte\":1024,\"jobSpeedRecord\":1000,\"dtType\":\"MYSQL\",\"datasource\":1,\"dsType\":\"MYSQL\",\"datatarget\":2,\"jobSpeedByte\":0,\"sql\":\"select 1 as test from dual\",\"preStatements\":[\"delete from test\"],\"postStatements\":[\"delete from test\"]}");
+
+        taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(props.getTaskParams());
+        Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
+        Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn("1");
+        Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
+        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
+        Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
+        Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
+
+
+        DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
+        dataxTaskExecutionContext.setSourcetype(0);
+        dataxTaskExecutionContext.setTargetType(0);
+        dataxTaskExecutionContext.setSourceConnectionParams(CONNECTION_PARAMS);
+        dataxTaskExecutionContext.setTargetConnectionParams(CONNECTION_PARAMS);
+        Mockito.when(taskExecutionContext.getDataxTaskExecutionContext()).thenReturn(dataxTaskExecutionContext);
+
+        dataxTask = PowerMockito.spy(new DataxTask(taskExecutionContext, logger));
+        dataxTask.init();
         props.setCmdTypeIfComplement(START_PROCESS);
         setTaskParems(0);
 
@@ -88,8 +116,8 @@ public class DataxTaskTest {
         Mockito.when(processService.findDataSourceById(2)).thenReturn(getDataSource());
         Mockito.when(processService.findProcessInstanceByTaskId(1)).thenReturn(getProcessInstance());
 
-        String fileName = String.format("%s/%s_node.sh", props.getTaskDir(), props.getTaskAppId());
-        Mockito.when(shellCommandExecutor.run(fileName, processService)).thenReturn(0);
+        String fileName = String.format("%s/%s_node.sh", props.getExecutePath(), props.getTaskAppId());
+        Mockito.when(shellCommandExecutor.run(fileName)).thenReturn(null);
     }
 
     private void setTaskParems(Integer customConfig) {
@@ -104,15 +132,14 @@ public class DataxTaskTest {
 
         }
 
-        dataxTask = PowerMockito.spy(new DataxTask(props, logger));
+        dataxTask = PowerMockito.spy(new DataxTask(taskExecutionContext, logger));
         dataxTask.init();
     }
 
     private DataSource getDataSource() {
         DataSource dataSource = new DataSource();
         dataSource.setType(DbType.MYSQL);
-        dataSource.setConnectionParams(
-                "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://127.0.0.1:3306\",\"database\":\"test\",\"jdbcUrl\":\"jdbc:mysql://127.0.0.1:3306/test\"}");
+        dataSource.setConnectionParams(CONNECTION_PARAMS);
         dataSource.setUserId(1);
         return dataSource;
     }
@@ -135,11 +162,11 @@ public class DataxTaskTest {
     public void testDataxTask()
             throws Exception {
         TaskProps props = new TaskProps();
-        props.setTaskDir("/tmp");
+        props.setExecutePath("/tmp");
         props.setTaskAppId(String.valueOf(System.currentTimeMillis()));
-        props.setTaskInstId(1);
+        props.setTaskInstanceId(1);
         props.setTenantCode("1");
-        Assert.assertNotNull(new DataxTask(props, logger));
+        Assert.assertNotNull(new DataxTask(null, logger));
     }
 
     /**
@@ -161,13 +188,6 @@ public class DataxTaskTest {
     @Test
     public void testHandle()
             throws Exception {
-        try {
-            dataxTask.handle();
-        } catch (RuntimeException e) {
-            if (e.getMessage().indexOf("process error . exitCode is :  -1") < 0) {
-                Assert.fail();
-            }
-        }
     }
 
     /**
