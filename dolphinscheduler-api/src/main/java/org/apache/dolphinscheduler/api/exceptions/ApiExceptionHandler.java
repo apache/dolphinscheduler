@@ -37,7 +37,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Result exceptionHandler(Exception e, HandlerMethod hm) {
         logger.error(e.getMessage(), e);
-        ControllerException ce = hm.getMethodAnnotation(ControllerException.class);
+        ApiException ce = hm.getMethodAnnotation(ApiException.class);
         if (ce == null) {
             return Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, e.getMessage());
         }

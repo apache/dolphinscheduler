@@ -36,7 +36,7 @@ public class ApiExceptionHandlerTest {
         AccessTokenController controller = new AccessTokenController();
         Method method = controller.getClass().getMethod("createToken", User.class, int.class, String.class, String.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
-        Result result = handler.exceptionHandler(new ApiServerException("test exception"), hm);
+        Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
         Assert.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(),result.getCode().intValue());
     }
 }

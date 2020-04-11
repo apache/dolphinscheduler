@@ -17,7 +17,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiServerException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -85,7 +84,7 @@ public class AccessTokenService extends BaseService {
         Map<String, Object> result = new HashMap<>(5);
 
         if (userId <= 0) {
-            throw new ApiServerException("User id should not less than or equals to 0.");
+            throw new IllegalArgumentException("User id should not less than or equals to 0.");
         }
         AccessToken accessToken = new AccessToken();
         accessToken.setUserId(userId);

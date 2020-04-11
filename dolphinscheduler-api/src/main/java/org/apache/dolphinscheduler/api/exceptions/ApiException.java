@@ -16,15 +16,19 @@
  */
 package org.apache.dolphinscheduler.api.exceptions;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 /**
- * ApiException
+ * controller exception annotation
  */
-public class ApiServerException extends RuntimeException {
-
-    private static final long serialVersionUID = 1L;
-
-    public ApiServerException(String message) {
-        super(message);
-    }
-
+@Retention(RUNTIME)
+@Target(METHOD)
+public @interface ApiException {
+    Status value();
 }

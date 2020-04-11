@@ -18,7 +18,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ControllerException;
+import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
@@ -66,7 +66,7 @@ public class AccessTokenController extends BaseController {
     @ApiIgnore
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
-    @ControllerException(CREATE_ACCESS_TOKEN_ERROR)
+    @ApiException(CREATE_ACCESS_TOKEN_ERROR)
     public Result createToken(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "userId") int userId,
                               @RequestParam(value = "expireTime") String expireTime,
@@ -89,7 +89,7 @@ public class AccessTokenController extends BaseController {
     @ApiIgnore
     @PostMapping(value = "/generate")
     @ResponseStatus(HttpStatus.CREATED)
-    @ControllerException(GENERATE_TOKEN_ERROR)
+    @ApiException(GENERATE_TOKEN_ERROR)
     public Result generateToken(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam(value = "userId") int userId,
                                 @RequestParam(value = "expireTime") String expireTime) {
@@ -115,7 +115,7 @@ public class AccessTokenController extends BaseController {
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
-    @ControllerException(QUERY_ACCESSTOKEN_LIST_PAGING_ERROR)
+    @ApiException(QUERY_ACCESSTOKEN_LIST_PAGING_ERROR)
     public Result queryAccessTokenList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam(value = "searchVal", required = false) String searchVal,
@@ -142,7 +142,7 @@ public class AccessTokenController extends BaseController {
     @ApiIgnore
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
-    @ControllerException(DELETE_ACCESS_TOKEN_ERROR)
+    @ApiException(DELETE_ACCESS_TOKEN_ERROR)
     public Result delAccessTokenById(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value = "id") int id) {
         logger.info("login user {}, delete access token, id: {},", loginUser.getUserName(), id);
@@ -164,7 +164,7 @@ public class AccessTokenController extends BaseController {
     @ApiIgnore
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
-    @ControllerException(UPDATE_ACCESS_TOKEN_ERROR)
+    @ApiException(UPDATE_ACCESS_TOKEN_ERROR)
     public Result updateToken(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "id") int id,
                               @RequestParam(value = "userId") int userId,
