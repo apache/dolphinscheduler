@@ -128,4 +128,13 @@ public enum ExecutionStatus {
     public String getDescp() {
         return descp;
     }
+
+    public static ExecutionStatus of(int status){
+        for(ExecutionStatus es : values()){
+            if(es.getCode() == status){
+                return es;
+            }
+        }
+        throw new IllegalArgumentException("invalid status : " + status);
+    }
 }
