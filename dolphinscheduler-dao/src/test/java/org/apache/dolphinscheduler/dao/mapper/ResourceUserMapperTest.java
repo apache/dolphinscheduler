@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,13 +48,14 @@ public class ResourceUserMapperTest {
      */
     private ResourcesUser insertOne(){
         //insertOne
-        ResourcesUser queue = new ResourcesUser();
-        queue.setCreateTime(new Date());
-        queue.setUpdateTime(new Date());
-        queue.setUserId(11111);
-        queue.setResourcesId(1110);
-        resourceUserMapper.insert(queue);
-        return queue;
+        ResourcesUser resourcesUser = new ResourcesUser();
+        resourcesUser.setCreateTime(new Date());
+        resourcesUser.setUpdateTime(new Date());
+        resourcesUser.setUserId(11111);
+        resourcesUser.setResourcesId(1110);
+        resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+        resourceUserMapper.insert(resourcesUser);
+        return resourcesUser;
     }
 
     /**

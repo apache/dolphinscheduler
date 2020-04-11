@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -626,7 +627,8 @@ public class ResourcesService extends BaseService {
         }
 
         // get all resource id of process definitions those is released
-        Map<Integer, Set<Integer>> resourceProcessMap = getResourceProcessMap();
+        List<Map<String, Object>> list = processDefinitionMapper.listResources();
+        Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
         Set<Integer> resourceIdSet = resourceProcessMap.keySet();
         // get all children of the resource
         List<Integer> allChildren = listAllChildren(resource);
@@ -1218,40 +1220,6 @@ public class ResourcesService extends BaseService {
             childList.add(chlidId);
             listAllChildren(chlidId,childList);
         }
-    }
-
-    /**
-     * get resource process map key is resource id,value is the set of process definition
-     * @return resource process definition map
-     */
-    private Map<Integer,Set<Integer>> getResourceProcessMap(){
-        Map<Integer, String> map = new HashMap<>();
-        Map<Integer, Set<Integer>> result = new HashMap<>();
-        List<Map<String, Object>> list = processDefinitionMapper.listResources();
-        if (CollectionUtils.isNotEmpty(list)) {
-            for (Map<String, Object> tempMap : list) {
-
-                map.put((Integer) tempMap.get("id"), (String)tempMap.get("resource_ids"));
-            }
-        }
-
-        for (Map.Entry<Integer, String> entry : map.entrySet()) {
-            Integer mapKey = entry.getKey();
-            String[] arr = entry.getValue().split(",");
-            Set<Integer> mapValues = Arrays.stream(arr).map(Integer::parseInt).collect(Collectors.toSet());
-            for (Integer value : mapValues) {
-                if (result.containsKey(value)) {
-                    Set<Integer> set = result.get(value);
-                    set.add(mapKey);
-                    result.put(value, set);
-                } else {
-                    Set<Integer> set = new HashSet<>();
-                    set.add(mapKey);
-                    result.put(value, set);
-                }
-            }
-        }
-        return result;
     }
 
 }

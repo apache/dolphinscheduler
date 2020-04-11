@@ -16,7 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.commons.lang.ArrayUtils;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -24,15 +25,10 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.ResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.*;
 import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -510,7 +506,8 @@ public class UsersService extends BaseService {
         if (CollectionUtils.isNotEmpty(oldAuthorizedResIds)) {
 
             // get all resource id of process definitions those is released
-            Map<Integer, Set<Integer>> resourceProcessMap = getResourceProcessMap();
+            List<Map<String, Object>> list = processDefinitionMapper.listResources();
+            Map<Integer, Set<Integer>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
             Set<Integer> resourceIdSet = resourceProcessMap.keySet();
 
             resourceIdSet.retainAll(oldAuthorizedResIds);
@@ -860,39 +857,5 @@ public class UsersService extends BaseService {
         }
 
         return msg;
-    }
-
-    /**
-     * get resource process map key is resource id,value is the set of process definition
-     * @return resource process definition map
-     */
-    private Map<Integer,Set<Integer>> getResourceProcessMap(){
-        Map<Integer, String> map = new HashMap<>();
-        Map<Integer, Set<Integer>> result = new HashMap<>();
-        List<Map<String, Object>> list = processDefinitionMapper.listResources();
-        if (CollectionUtils.isNotEmpty(list)) {
-            for (Map<String, Object> tempMap : list) {
-
-                map.put((Integer) tempMap.get("id"), (String)tempMap.get("resource_ids"));
-            }
-        }
-
-        for (Map.Entry<Integer, String> entry : map.entrySet()) {
-            Integer mapKey = entry.getKey();
-            String[] arr = entry.getValue().split(",");
-            Set<Integer> mapValues = Arrays.stream(arr).map(Integer::parseInt).collect(Collectors.toSet());
-            for (Integer value : mapValues) {
-                if (result.containsKey(value)) {
-                    Set<Integer> set = result.get(value);
-                    set.add(mapKey);
-                    result.put(value, set);
-                } else {
-                    Set<Integer> set = new HashSet<>();
-                    set.add(mapKey);
-                    result.put(value, set);
-                }
-            }
-        }
-        return result;
     }
 }
