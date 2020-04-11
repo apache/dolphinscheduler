@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -214,5 +216,14 @@ public class ProcessDefinitionMapperTest {
                 user.getUserType() == UserType.ADMIN_USER
         );
         Assert.assertNotEquals(processDefinitions.size(), 0);
+    }
+
+    @Test
+    public void listResourcesTest(){
+        ProcessDefinition processDefinition = insertOne();
+        processDefinition.setResourceIds("3,5");
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
+        List<Map<String, Object>> maps = processDefinitionMapper.listResources();
+        Assert.assertNotNull(maps);
     }
 }
