@@ -356,7 +356,7 @@ public class ResourceMapperTest {
     }
 
     @Test
-    public void queryResourceListAuthored(){
+    public void queryResourceListAuthoredTest(){
         // create a general user
         User generalUser1 = createGeneralUser("user1");
         User generalUser2 = createGeneralUser("user2");
@@ -369,5 +369,19 @@ public class ResourceMapperTest {
 
         resourceList = resourceMapper.queryResourceListAuthored(generalUser2.getId(), ResourceType.FILE.ordinal(), 4);
         Assert.assertFalse(resourceList.contains(resource));
+    }
+
+    @Test
+    public void batchUpdateResourceTest(){
+        // create a general user
+        User generalUser1 = createGeneralUser("user1");
+        // create resource
+        Resource resource = createResource(generalUser1);
+        resource.setFullName(String.format("%s-update",resource.getFullName()));
+        resource.setUpdateTime(new Date());
+        List<Resource> resourceList = new ArrayList<>();
+        resourceList.add(resource);
+        int result = resourceMapper.batchUpdateResource(resourceList);
+        Assert.assertTrue(result>0);
     }
 }
